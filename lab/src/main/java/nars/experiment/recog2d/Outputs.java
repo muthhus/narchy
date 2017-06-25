@@ -157,7 +157,7 @@ public class Outputs {
 
                 Truth t =
                         //cc.belief(now, dur);
-                        cc.goal(now, now, dur, nar);
+                        cc.goals().truth(now, now, dur, nar);
 
                 float f, c;
                 if (t == null) {

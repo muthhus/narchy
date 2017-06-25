@@ -70,7 +70,7 @@ public final class DynTruth implements Truthed {
     @Override
     @Nullable
     public PreciseTruth truth() {
-        return conf <= 0 ? null : new PreciseTruth(freq, conf);
+        return conf==conf && conf <= 0 ? null : new PreciseTruth(freq, conf);
     }
 
 

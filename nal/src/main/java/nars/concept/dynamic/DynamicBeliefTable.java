@@ -54,7 +54,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         long start = Long.MAX_VALUE;
         long end = Long.MIN_VALUE;
         @Nullable FasterList<Task> ee = yy.e;
-        if (ee == null)
+        if (ee == null || ee.isEmpty())
             return null;
 
         for (int i = 0, e1Size = ee.size(); i < e1Size; i++) {
@@ -70,8 +70,6 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public Truth truth(long when, long now, int dur, NAR nar) {
-        if (isEmpty())
-            return null;
         DynTruth d = truth(when, now, null, false, nar);
         return Truth.maxConf(d != null ? d.truth() : null, super.truth(when, now, dur, nar) /* includes only non-dynamic beliefs */);
     }
@@ -86,8 +84,13 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Nullable
     DynTruth truth(long when, long now, Compound template, boolean evidence, NAR nar) {
-        if (template == null)
+
+        if (template == null) {
+            //HACK
+            if (isEmpty())
+                return null;
             template = iterator().next().term(); //HACK
+        }
 
         return model.eval(template, beliefOrGoal, when, now, evidence, nar); //newDyn(evidence);
     }

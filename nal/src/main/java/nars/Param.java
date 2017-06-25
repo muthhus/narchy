@@ -84,7 +84,7 @@ public abstract class Param  {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 12;
+    public static final int STAMP_CAPACITY = 8;
 
     public final static int UnificationStackMax = 64;
     public static final int UnificationConstraintsMax = 6;

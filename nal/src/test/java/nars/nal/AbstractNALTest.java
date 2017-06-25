@@ -70,7 +70,7 @@ public abstract class AbstractNALTest {
 
         l.add(supply("Default[NAL<=" + level + ']', () -> {
                     NAR n = new NARBuilder().get();
-                    n.termVolumeMax.setValue(32);
+                    n.termVolumeMax.setValue(36);
                     n.nal(level);
                     if (level >= 7) {
                         new STMTemporalLinkage(n, 1, false);

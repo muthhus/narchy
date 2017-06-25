@@ -1,8 +1,10 @@
 package nars.table;
 
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import jcog.Util;
+import jcog.pri.Pri;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
 import jcog.util.Top2;
@@ -14,6 +16,7 @@ import nars.attention.Activate;
 import nars.concept.TaskConcept;
 import nars.task.Revision;
 import nars.task.SignalTask;
+import nars.task.Tasked;
 import nars.task.TruthPolation;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -33,7 +36,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     static final int sampleRadius = 8;
 
 
-    public static class TaskRegion implements HyperRegion {
+    public static class TaskRegion implements HyperRegion, Tasked {
 
         public final long start;
         long end; //allow end to stretch for ongoing tasks
@@ -143,6 +146,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         public boolean isDeleted() {
             return task != null && task.isDeleted();
         }
+
+        @Override
+        public final @Nullable Task task() {
+            return task;
+        }
     }
 
     final Space<TaskRegion> tree;
@@ -219,14 +227,19 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public Truth truth(long when, long now, int dur, EternalTable eternal) {
 
-        updateSignalTasks(now);
-
-        List<TaskRegion> tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).list();
         @Nullable Task e = eternal != null ? eternal.strongest() : null;
-        if (!tt.isEmpty())
-            return TruthPolation.truth(e, when, dur, Iterables.transform(tt, t -> t.task));
-        else
-            return e != null ? e.truth() : null;
+
+        if (!tree.isEmpty()) {
+            updateSignalTasks(now);
+
+            List<TaskRegion> tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).list();
+            if (!tt.isEmpty())
+                return TruthPolation.truth(e, when, dur, tt);
+
+        }
+
+        return e != null ? e.truth() : null;
+
     }
 
     @Override
@@ -296,17 +309,17 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
 
 
+        } else if (t!=found) {
+            //MERGE
+            float before = found.priElseZero();
+            float after = found.priAdd(activation);
+            activation -= (after - before);
         } else {
-            if (t != found) {
-                float overflow = found.priAddOverflow(activation);
-                activation -= overflow;
-            }
+            return; //t==found
         }
 
-        if (activation > 0)
+        if (activation >= Pri.EPSILON)
             TaskTable.activate(t, activation, n);
-
-
     }
 
     private void add(@NotNull Task t) {
@@ -561,10 +574,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     @Override
     public Iterator<Task> taskIterator() {
-        //return id.keySet().iterator();
-
-        //TODO tree.stream().iterator()
-        throw new UnsupportedOperationException("TODO");
+        return Iterators.transform(tree.iterator(), x -> x.task);
     }
 
     @Override

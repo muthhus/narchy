@@ -842,7 +842,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                     default:
                         throw new UnsupportedOperationException();
                 }
-                return table.truth(when, when, dur(), this);
+                return table.truth(when, time(), dur(), this);
             }
         }
         return null;

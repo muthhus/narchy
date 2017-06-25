@@ -419,6 +419,10 @@ public interface Stamp {
         return (length > 1 && e[length -1] == Long.MAX_VALUE);
     }
 
+    static long[] uncyclic(@NotNull long[] assumedCyclic) {
+
+        return ArrayUtils.remove(assumedCyclic, assumedCyclic.length-1);
+    }
     static long[] cyclic(@NotNull long[] x) {
         int l = x.length;
 

@@ -61,7 +61,6 @@ public interface Concept extends Termed {
      */
     void setMeta(@NotNull Map newMeta);
 
-
     /**
      * follows Map.compute() semantics
      */
@@ -79,12 +78,6 @@ public interface Concept extends Termed {
         } else {
             return (C) meta.compute(key, value);
         }
-    }
-
-
-
-    default String termString() {
-        return term().toString();
     }
 
     /**
@@ -121,7 +114,10 @@ public interface Concept extends Termed {
     default Map metaOrCreate() {
         Map<Object, Object> m = meta();
         if (m == null) {
-            setMeta(m = new UnifiedMap(1));
+            setMeta(
+                m = new UnifiedMap(1)
+                //TODO try FlatMap3
+            );
             //new WeakIdentityHashMap();
             //new SoftValueHashMap(1));
         }
@@ -176,18 +172,6 @@ public interface Concept extends Termed {
 
     default boolean isDeleted() {
         return state() == ConceptState.Deleted;
-    }
-
-    /** use NAR.beliefTruth(Term|String, when) */
-    @Deprecated
-    default Truth belief(long when, long now, int dur, NAR nar) {
-        return beliefs().truth(when, now, dur, nar);
-    }
-
-    /** use NAR.goalTruth(Term|String, when) */
-    @Deprecated
-    default Truth goal(long when, long now, int dur, NAR nar) {
-        return goals().truth(when, now, dur, nar);
     }
 
     @Nullable

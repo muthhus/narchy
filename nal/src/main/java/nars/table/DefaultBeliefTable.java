@@ -12,18 +12,21 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
+import static nars.time.Tense.ETERNAL;
+
 
 /**
  * Stores beliefs ranked in a sorted ArrayList, with strongest beliefs at lowest indexes (first iterated)
  */
-public class DefaultBeliefTable extends EternalTable implements BeliefTable {
+public class DefaultBeliefTable implements BeliefTable {
 
-//    @Nullable   public EternalTable eternal = this;
+    @Nullable public final EternalTable eternal;
 
     @NotNull public final TemporalBeliefTable temporal;
 
     public DefaultBeliefTable(TemporalBeliefTable t) {
-        super(0);
+        super();
+        eternal = new EternalTable(0);
         temporal = t;
     }
 
@@ -33,22 +36,18 @@ public class DefaultBeliefTable extends EternalTable implements BeliefTable {
      */
     @Override
     public Truth truth(long when, long now, int dur, NAR nar) {
-
-        Truth tt = temporal().truth(when, now, dur, this);
-
-        return (tt != null) ? tt : super.truth();
-
+        return temporal().truth(when, now, dur, eternal);
     }
 
     @Override
     public boolean removeTask(Task x) {
-        return (x.isEternal()) ? super.removeTask(x) : temporal().removeTask(x);
+        return (x.isEternal()) ? eternal.removeTask(x) : temporal().removeTask(x);
     }
 
     @Override
     public void clear() {
         temporal().clear();
-        super.clear();
+        eternal.clear();
     }
 
     @NotNull
@@ -56,7 +55,7 @@ public class DefaultBeliefTable extends EternalTable implements BeliefTable {
     @Deprecated
     public final Iterator<Task> iterator() {
         return Iterators.concat(
-                super.iterator(),
+                eternal.iterator(),
                 temporal().taskIterator()
         );
     }
@@ -68,7 +67,7 @@ public class DefaultBeliefTable extends EternalTable implements BeliefTable {
 
     @Override
     public final void forEachTask(Consumer<? super Task> action) {
-        super.forEachTask(action);
+        eternal.forEachTask(action);
         temporal().forEachTask(action);
     }
 
@@ -76,36 +75,31 @@ public class DefaultBeliefTable extends EternalTable implements BeliefTable {
     public float priSum() {
         final float[] total = {0};
         Consumer<Task> totaler = t -> total[0] += t.priSafe(0);
-        super.forEachTask(totaler);
+        eternal.forEachTask(totaler);
         temporal().forEachTask(totaler);
         return total[0];
     }
 
     @Override
     public int size() {
-        return size /* eternal */ + temporal().size();
+        return eternal.size() /* eternal */ + temporal().size();
     }
 
     @Override
     @Deprecated
     public int capacity() {
         //throw new UnsupportedOperationException("doesnt make sense to call this");
-        return capacity /* eternal */ + temporal().capacity();
+        return eternal.capacity() /* eternal */ + temporal().capacity();
     }
 
     @Override
     public final void setCapacity(int eternals, int temporals) {
         temporal.setCapacity(temporals);
-        super.setCapacity(eternals);
-    }
-
-    @Override
-    public void setCapacity(int c) {
-        throw new RuntimeException("only super.setCapacity should be called by this instance");
+        eternal.setCapacity(eternals);
     }
 
     public EternalTable eternal() {
-        return this;
+        return eternal;
     }
 
     public TemporalBeliefTable temporal() {
@@ -118,10 +112,10 @@ public class DefaultBeliefTable extends EternalTable implements BeliefTable {
     @Override
     public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
 
-        final Task ete = super.strongest();
-//        if (ete != null && when == ETERNAL) {
-//            return ete;
-//        }
+        final Task ete = eternal.strongest();
+        if (ete != null && when == ETERNAL) {
+            return ete;
+        }
 
         Task tmp = temporal().match(when, now, dur, against, nar);
 
@@ -146,7 +140,7 @@ public class DefaultBeliefTable extends EternalTable implements BeliefTable {
     public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (input.isEternal()) {
 
-            super.add(input, concept, nar);
+            eternal.add(input, concept, nar);
 
         } else {
 

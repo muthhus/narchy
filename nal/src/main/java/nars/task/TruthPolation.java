@@ -40,7 +40,6 @@ public enum TruthPolation {
         //return evi * 1f/( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
 
 
-
         //return evi / (1f + dt / dur ); //first order decay
         //return evi / (1f + (dt*dt) / (dur*dur) ); //2nd order decay
 
@@ -102,7 +101,7 @@ public enum TruthPolation {
      * uses "waldorf method" to calculate a running variance
      * additionally, the variance is weighted by the contributor's confidences
      */
-    public static class TruthPolationWithVariance implements Consumer<Task> {
+    public static class TruthPolationWithVariance implements Consumer<Tasked> {
         float eviSum = 0, wFreqSum = 0;
         float meanSum = 0.5f, deltaSum = 0;
         int count = 0;
@@ -116,8 +115,9 @@ public enum TruthPolation {
         }
 
         @Override
-        public void accept(Task t) {
-             float tw = t.evi(when, dur);
+        public void accept(Tasked tt) {
+            Task t = tt.task();
+            float tw = t.evi(when, dur);
 
             if (tw > 0) {
                 eviSum += tw;
@@ -154,9 +154,9 @@ public enum TruthPolation {
     }
 
     @Nullable
-    public static PreciseTruth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<Task> tasks) {
+    public static PreciseTruth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<? extends Tasked> tasks) {
 
-        assert(dur>0);
+        assert (dur > 0);
 
         TruthPolationWithVariance t =
                 //new TruthPolationBasic(when, dur);

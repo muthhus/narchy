@@ -3,9 +3,11 @@ package nars.derive.meta;
 import nars.Op;
 import nars.control.premise.Derivation;
 import nars.term.Compound;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;
 
@@ -102,10 +104,16 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 throw new Op.InvalidPunctuationException(punct);
         }
 
+        @Nullable long[] ev = single ? m.evidenceSingle() : m.evidenceDouble();
+        if (punct==GOAL && m.taskPunct!=GOAL && Stamp.isCyclic(ev)) {
+            //when deriving a goal from a belief, reset any cyclic stamp state
+            ev = Stamp.uncyclic(ev);
+        }
+
         m.truth(
             t,
             punct,
-            single ? m.evidenceSingle() : m.evidenceDouble()
+            ev
         );
         return true;
     }

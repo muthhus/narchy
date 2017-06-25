@@ -6,6 +6,8 @@ import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
 
+import static jcog.Util.clamp;
+
 /**
  * Created by me on 5/11/16.
  */
@@ -24,8 +26,8 @@ public final class DefaultConceptState extends ConceptState {
     /** minimum of 3 beliefs per belief table. for eternal, this allows revision between two goals to produce a third  */
     public DefaultConceptState(String id, int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
         this(   id,
-                new MutableInteger(Math.max(3, beliefsCapTotal / 4)), //belief ete ~1/4
-                new MutableInteger(Math.max(3, goalsCapTotal   / 4)),   //goal ete  ~1/4
+                new MutableInteger(clamp(beliefsCapTotal/4, 2, 6)), //belief ete ~1/4
+                new MutableInteger(clamp(beliefsCapTotal/4, 2, 6)),   //goal ete  ~1/4
                 new MutableInteger(Math.max(3, beliefsCapTotal * 3 / 4)), //belief temp ~3/4
                 new MutableInteger(Math.max(3, goalsCapTotal   * 3 / 4)), //goal temp  ~3/4
                 new MutableInteger(questionsMax),

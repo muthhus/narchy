@@ -45,8 +45,6 @@ public interface Node<L, V> extends Nodelike<L> {
      */
     boolean isLeaf();
 
-
-
     default FasterList<V> childMinList(FloatFunction<V> rank, int limit) {
         return new FasterList(stream().sorted(new FloatFunctionComparator(rank)).limit(limit).toArray());
     }

@@ -22,7 +22,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 900;
+    final int cycles = 1500;
 
     public NAL8Test(Supplier<NAR> b) { super(b); }
 
@@ -1279,9 +1279,10 @@ public class NAL8Test extends AbstractNALTest {
 
     @Test public void conjDecoposeGoalAfterNegNeg() {
         test()
+                .log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
-                .inputAt(13, "(--,(b))! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.48f, 13) //since b is not desired now, it should reverse predict the goal of (a)
+                .inputAt(6, "(--,(b))! :|:")
+                .mustDesire(cycles, "(a)", 1f, 0.48f, 6) //since b is not desired now, it should reverse predict the goal of (a)
                 .mustNotOutput(cycles, "(a)", GOAL, new long[] { ETERNAL } );
     }
 

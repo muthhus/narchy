@@ -20,9 +20,14 @@ package jcog.tree.rtree;
  * #L%
  */
 
+
+import jcog.list.FasterList;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -169,5 +174,35 @@ public interface Space<T> extends Nodelike<T> {
     void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile);
 
     HyperRegion bounds(T task);
+
+    default Iterator<T> iterator() {
+        int s = size();
+        if (s ==0)
+            return Collections.emptyIterator();
+
+        //HACK
+        List<T> snapshot = new FasterList(s);
+        forEach(snapshot::add);
+        return snapshot.iterator();
+
+//        return new Iterator<T>() {
+//            List<Node> stack = new FasterList();
+//            {
+//                stack.add(root());
+//            }
+//            Iterator<>
+//
+//            @Override
+//            public boolean hasNext() {
+//
+//                return false;
+//            }
+//
+//            @Override
+//            public T next() {
+//                return null;
+//            }
+//        };
+    }
 
 }
