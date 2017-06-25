@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 import static com.google.common.collect.Iterators.singletonIterator;
 import static nars.Op.NEG;

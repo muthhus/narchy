@@ -1,7 +1,6 @@
 package nars.derive.meta;
 
 import nars.$;
-import nars.IO;
 import nars.Op;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;

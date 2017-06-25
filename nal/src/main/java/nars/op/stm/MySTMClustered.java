@@ -11,7 +11,6 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.index.term.TermIndex;
 import nars.task.GeneratedTask;
-import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Stamp;

@@ -16,7 +16,6 @@ import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.control.ConceptFire;
-import nars.table.EternalTable;
 import nars.task.GeneratedTask;
 import nars.task.ITask;
 import nars.term.Compound;
@@ -36,7 +35,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
-import static jcog.Texts.n4;
 import static nars.$.*;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;

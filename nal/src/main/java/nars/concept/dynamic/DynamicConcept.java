@@ -1,16 +1,10 @@
 package nars.concept.dynamic;
 
-import jcog.bag.Bag;
 import nars.NAR;
 import nars.concept.TaskConcept;
-import nars.conceptualize.ConceptBuilder;
 import nars.table.BeliefTable;
-import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Supplier;
 
 
 public class DynamicConcept extends TaskConcept {

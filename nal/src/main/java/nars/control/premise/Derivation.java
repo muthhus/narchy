@@ -7,7 +7,6 @@ import nars.Task;
 import nars.control.Premise;
 import nars.derive.meta.BoolPred;
 import nars.index.term.TermContext;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

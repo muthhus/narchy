@@ -10,8 +10,6 @@ import nars.Task;
 import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
-
 
 /**
  * Short-term Memory Belief Event Induction.

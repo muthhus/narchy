@@ -1,19 +1,12 @@
 package nars.util.exe;
 
-import com.google.common.base.Joiner;
 import jcog.math.MultiStatistics;
 import jcog.meter.event.PeriodMeter;
 import jcog.pri.mix.control.CLink;
 import nars.NAR;
-import nars.control.SynchTaskExecutor;
 import nars.task.ITask;
-import org.eclipse.collections.api.tuple.primitive.DoubleObjectPair;
-import org.eclipse.collections.impl.collector.Collectors2;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 /**

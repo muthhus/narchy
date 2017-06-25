@@ -28,7 +28,7 @@ import static nars.Op.BELIEF;
 
 public class NARBuilder {
 
-    private @NotNull Supplier<TermIndex> concepts = () -> new NARBuilder.BasicTermIndex(1024 );
+    private @NotNull Supplier<TermIndex> concepts = () -> new NARBuilder.BasicTermIndex(16 * 1024 );
 
     private @NotNull Time time = new CycleTime();
 

@@ -1,7 +1,6 @@
 package nars.conceptualize;
 
 import nars.NAR;
-import nars.concept.TaskConcept;
 import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.RTreeBeliefTable;

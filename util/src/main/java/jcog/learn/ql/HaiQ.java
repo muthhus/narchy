@@ -81,10 +81,10 @@ abstract public class HaiQ implements Agent {
         rng = new XorShift128PlusRandom();
         decideState =
                 //DecideEpsilonGreedy.ArgMax;
-                new DecideSoftmax(0.01f, rng);
+                new DecideSoftmax(0.5f, rng);
         decideAction =
                 //new DecideEpsilonGreedy(0.05f, rng);
-                new DecideSoftmax(0.1f, rng);
+                new DecideSoftmax(0.5f, rng);
     }
 
     int learn(int state, float reward) {

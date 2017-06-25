@@ -3,7 +3,6 @@ package nars.concept;
 import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Param;
-import nars.Task;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 

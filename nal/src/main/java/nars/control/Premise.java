@@ -182,17 +182,17 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
     protected static long whenMatch(Task task, long now, NAR nar) {
         if (task.isEternal()) {
             return ETERNAL;
-        } else if (task.isInput()) {
+        } else //if (task.isInput()) {
             return task.nearestStartOrEnd(now);
-        } else {
-            if (task.isBelief()) {
-                return now +
-                        nar.dur() *
-                            nar.random().nextInt(2*Param.PREDICTION_HORIZON)-Param.PREDICTION_HORIZON; //predictive belief
-            } else {
-                return Math.max(now, task.start()); //the corresponding belief for a goal or question task
-            }
-        }
+//        } else {
+//            if (task.isBelief()) {
+//                return now +
+//                        nar.dur() *
+//                            nar.random().nextInt(2*Param.PREDICTION_HORIZON)-Param.PREDICTION_HORIZON; //predictive belief
+//            } else {
+//                return Math.max(now, task.start()); //the corresponding belief for a goal or question task
+//            }
+//        }
 
         //now;
         //now + dur;

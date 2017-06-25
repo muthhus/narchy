@@ -30,7 +30,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int sampleRadius = 16;
+    static final int sampleRadius = 8;
 
 
     public static class TaskRegion implements HyperRegion {

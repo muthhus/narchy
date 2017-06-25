@@ -3,7 +3,6 @@ package nars.task;
 import com.google.common.collect.Lists;
 import nars.Task;
 import nars.truth.PreciseTruth;
-import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

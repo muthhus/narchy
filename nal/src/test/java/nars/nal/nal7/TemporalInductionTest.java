@@ -2,7 +2,6 @@ package nars.nal.nal7;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.nar.NARBuilder;
 import nars.nar.Terminal;

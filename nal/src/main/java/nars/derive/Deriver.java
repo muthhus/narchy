@@ -2,13 +2,10 @@ package nars.derive;
 
 import nars.control.premise.Derivation;
 import nars.derive.rule.PremiseRuleSet;
-import nars.task.DerivedTask;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
