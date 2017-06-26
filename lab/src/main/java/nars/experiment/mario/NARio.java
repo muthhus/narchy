@@ -13,7 +13,10 @@ import nars.video.PixelBag;
 
 import javax.swing.*;
 
+import java.io.FileNotFoundException;
+
 import static nars.$.$;
+import static nars.gui.graph.run.SimpleConceptGraph1.csvPriority;
 
 public class NARio extends NAgentX {
 
@@ -53,6 +56,11 @@ public class NARio extends NAgentX {
         PixelBag cc = PixelBag.of(() -> mario.image, 32, 24);
         cc.setClarity(0.5f, 0.9f);
 
+//        try {
+//            csvPriority(nar, "/tmp/x.csv");
+//        } catch (FileNotFoundException e) {
+//            e.printStackTrace();
+//        }
 
         onFrame((z)->{
         //nar.onCycle(() -> {

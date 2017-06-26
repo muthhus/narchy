@@ -159,12 +159,16 @@ public class Premise extends Pri {
                 or
                         (taskPri, beliefPriority);
 
+        //priMult(parentTaskPri);
+
         Derivation d = derivation.get();
 
         d.restartA(nar);
         d.restartB(task);
-        d.restartC(this, belief, beliefTerm,
-                Util.lerp(parentTaskPri, Param.UnificationTTLMin, Param.UnificationTTLMax));
+        d.restartC(this, belief, beliefTerm, parentTaskPri,
+                //Util.lerp(parentTaskPri, Param.UnificationTTLMin, Param.UnificationTTLMax)
+                Param.UnificationTTLMax
+        );
 
         DefaultDeriver.the.test(d);
 

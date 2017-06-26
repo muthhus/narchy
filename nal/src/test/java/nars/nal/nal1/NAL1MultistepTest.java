@@ -27,15 +27,16 @@ public class NAL1MultistepTest extends AbstractNALTest {
 
 
     @Test public void multistep2() {
-        new DeductiveChainTest(test(), 2, 500, inh);
+        new DeductiveChainTest(test(), 2, 1000, inh);
     }
 
     @Test
     public void multistep3() {
-        new DeductiveChainTest(test(), 3, 1000, inh);
+        new DeductiveChainTest(test(), 3, 2000, inh);
     }
 
     @Test public void multistep4() {
+
         new DeductiveChainTest(test(), 4, 3500, inh);
     }
 

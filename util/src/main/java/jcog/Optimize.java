@@ -3,6 +3,7 @@ package jcog;
 import com.google.common.base.Joiner;
 import com.google.common.primitives.Doubles;
 import jcog.list.FasterList;
+import jcog.meter.event.CSVOutput;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
@@ -37,6 +39,7 @@ public class Optimize<X> {
     public final List<Tweak<X>> tweaks = new ArrayList();
     private final boolean trace = true;
     private final static Logger logger = LoggerFactory.getLogger(Optimize.class);
+    private CSVOutput csv;
 
     public Optimize(Supplier<X> subject) {
         this.subject = subject;
@@ -141,7 +144,8 @@ public class Optimize<X> {
 
 
             if (trace)
-                System.out.println(Joiner.on(",").join(Doubles.asList(point)) + ",\t" + score);
+                csv.out(ArrayUtils.add(point, (double)score));
+                //System.out.println(Joiner.on(",").join(Doubles.asList(point)) + ",\t" + score);
 
             experiments.add(pair((double) score, point));
             onExperiment(point, score);
@@ -207,11 +211,7 @@ public class Optimize<X> {
 
     private void startExperiments() {
         if (trace) {
-            //CSV header
-            System.out.print(
-                    Joiner.on(',').join(tweaks.stream().map(t -> t.id).iterator())
-            );
-            System.out.println(",score");
+            csv = new CSVOutput(System.out, Stream.concat(tweaks.stream().map(t -> t.id), Stream.of("score")).toArray(String[]::new));
         }
     }
 

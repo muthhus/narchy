@@ -27,9 +27,9 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises
      */
-    private static final int samplesMax = 8;
-    private static final float priMinAbsolute = Pri.EPSILON * 16;
-    private static final float momentum = 0.5f;
+    private static final int samplesMax = 6;
+    private static final float priMinAbsolute = Pri.EPSILON * 8;
+    private static final float momentum = 0.75f;
 
     static final ThreadLocal<Map<DerivedTask, DerivedTask>> buffers =
             ThreadLocal.withInitial(LinkedHashMap::new);
@@ -76,6 +76,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         int premises = 0;
         int derivations = 0;
         float cost = 0;
+        int samplesMax = Math.min(this.samplesMax, terml.size() * taskl.size());
 
         Map<DerivedTask, DerivedTask> results = buffers.get();
         Consumer<DerivedTask> resultMerger = (nt) -> results.merge(nt, nt, (tt, pt) -> {
@@ -124,11 +125,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             premises++;
 
             float thisPri = priElseZero();
-            float pBefore = thisPri / samplesMax * (1f - momentum);
+            float pLimitFactor = thisPri / samplesMax * (1f - momentum);
+            p.setPri(pLimitFactor);
 
-            priSub(pBefore); //pay up-front
+            priSub(p.priElseZero()); //pay up-front
 
-            p.setPri(pBefore);
             p.run(nar);
 
 //            float pAfter = p.priElseZero();

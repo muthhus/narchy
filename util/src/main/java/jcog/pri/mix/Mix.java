@@ -27,9 +27,9 @@ public abstract class Mix<X extends Priority, Y extends Priority> implements PSi
     public final Map<Object, PSink<X,Y>> streams = new ConcurrentHashMap();
     final List<PSink> streamList = new CopyOnWriteArrayList<>();
 
-    public TelemetryRing data;
-    float[] now; //temporary buffer for storing current statistics before appending to history
-    int historySize = 4;
+//    public TelemetryRing data;
+//    float[] now; //temporary buffer for storing current statistics before appending to history
+//    int historySize = 4;
 
 
         //TODO use a WeakValue map?
@@ -45,7 +45,7 @@ public abstract class Mix<X extends Priority, Y extends Priority> implements PSi
         return streams.computeIfAbsent(streamID, xx -> {
             //nullify the history, need to create a new one for the new stream
             //TODO allow empty channel slots in the history buffer for stream alloc/dealloc
-            data = null;
+            //data = null;
             PSink<X,Y> s = new PSink(xx, this, each);
             streamList.add(s);
             this.streamID = streamList.toArray(this.streamID);

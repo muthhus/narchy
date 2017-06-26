@@ -237,8 +237,8 @@ public class Activate extends UnaryTask<Task> {
 
             } else {
                 @Nullable Concept targetConcept =
-                        depth <2 ? nar.conceptualize(target) /* only conceptualize first layer */ : nar.concept(target);
-                        //nar.conceptualize(target);
+                        //depth <2 ? nar.conceptualize(target) /* only conceptualize first layer */ : nar.concept(target);
+                        nar.conceptualize(target);
 
                 if (targetConcept != null)
                     target = targetConcept;

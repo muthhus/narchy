@@ -109,6 +109,7 @@ public class Derivation extends Unify implements TermContext {
     private final substituteIfUnifiesAny _substituteIfUnifiesAny;
     private final substituteIfUnifiesDep _substituteIfUnifiesDep;
     private int serial;
+    public float parentPri;
 
 
     /** if using this, must set: nar, index, random, DerivationBudgeting */
@@ -177,7 +178,7 @@ public class Derivation extends Unify implements TermContext {
 
 
     /** termlink scope */
-    @NotNull public Derivation restartC(@NotNull Premise p, Task belief, Term beliefTerm, int ttl) {
+    @NotNull public Derivation restartC(@NotNull Premise p, Task belief, Term beliefTerm, float parentTaskPri, int ttl) {
 
         assert(ttl >= 0);
 
@@ -243,6 +244,7 @@ public class Derivation extends Unify implements TermContext {
             premiseEvidence = (premiseEvidence + beliefTruth.evi());
         this.premiseEvi = premiseEvidence;
 
+        this.parentPri = parentTaskPri;
 
 
         //remove common variable entries because they will just consume memory if retained as empty

@@ -1,5 +1,7 @@
 package nars.table;
 
+import jcog.Util;
+import jcog.pri.Pri;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activate;
@@ -26,7 +28,8 @@ public interface TaskTable  {
 
 
     static void activate(@NotNull Task t, float activation, @NotNull NAR n) {
-        n.eventTaskProcess.emit(/*post*/t);
+        if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))
+            n.eventTaskProcess.emit(/*post*/t); //suppress emitting re-activations
         n.input(new Activate(t, activation));
     }
 

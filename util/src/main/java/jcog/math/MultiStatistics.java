@@ -1,7 +1,6 @@
 package jcog.math;
 
 import com.google.common.base.Joiner;
-import com.google.common.math.PairedStats;
 import com.google.common.math.PairedStatsAccumulator;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -24,23 +23,18 @@ public class MultiStatistics<X> implements Consumer<X> {
     public static class BooleanClassifierWithStatistics<X> extends RecycledSummaryStatistics implements Consumer<X> /* implements AbstractClassifier */ {
         public final Predicate<X> filter;
         public final String id;
-        @Nullable public final HashBag<X> uniques;
 
         public BooleanClassifierWithStatistics(String id, Predicate<X> filter) {
-            this(id, filter, new HashBag());
-        }
-        public BooleanClassifierWithStatistics(String id, Predicate<X> filter, @Nullable HashBag<X> uniques) {
             super();
             this.id = id;
             this.filter = filter;
-            this.uniques = uniques;
         }
 
         @Override
         public String toString() {
             long N = getN();
             return id + ": " +
-                    (N > 0 ? (N +":" + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum() + ":" + uniques)
+                    (N > 0 ? (N +":" + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum() + ":" + super.toString())
                         :
                         "none")
                     ;
@@ -55,8 +49,6 @@ public class MultiStatistics<X> implements Consumer<X> {
         void accept(X parameter, float v) {
             if (filter.test(parameter)) {
                 accept(v);
-                if (uniques!=null)
-                    uniques.add(parameter);
             }
         }
     }
@@ -68,7 +60,7 @@ public class MultiStatistics<X> implements Consumer<X> {
         this.cond = new FasterList();
 
         /** wildcard catch-all; by default will not collect all the unique values but other added conditions will */
-        cond.add( new BooleanClassifierWithStatistics<X>("*", x -> true, null) );
+        cond.add( new BooleanClassifierWithStatistics<X>("*", x -> true) );
     }
 
 

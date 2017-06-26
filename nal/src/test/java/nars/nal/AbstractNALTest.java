@@ -3,9 +3,11 @@ package nars.nal;
 import nars.$;
 import nars.NAR;
 import nars.Param;
+import nars.control.SynchTaskExecutor;
 import nars.nar.NARBuilder;
 import nars.op.stm.STMTemporalLinkage;
 import nars.test.TestNAR;
+import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
@@ -69,11 +71,11 @@ public abstract class AbstractNALTest {
 
 
         l.add(supply("Default[NAL<=" + level + ']', () -> {
-                    NAR n = new NARBuilder().get();
+                    NAR n = new NARBuilder().exe(new TaskExecutor(512, 0.25f)).get();
                     n.termVolumeMax.setValue(32);
                     n.nal(level);
-                    n.DEFAULT_QUEST_PRIORITY = 0.5f;
-                    n.DEFAULT_QUESTION_PRIORITY = 0.5f;
+//                    n.DEFAULT_QUEST_PRIORITY = 0.5f;
+//                    n.DEFAULT_QUESTION_PRIORITY = 0.5f;
                     if (level >= 7) {
                         new STMTemporalLinkage(n, 1, false);
                     }

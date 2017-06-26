@@ -1,6 +1,8 @@
 package nars.gui.graph.run;
 
 import jcog.bag.util.Bagregate;
+import jcog.math.MultiStatistics;
+import jcog.meter.event.CSVOutput;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
@@ -11,12 +13,15 @@ import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
 import nars.nar.NARBuilder;
 import nars.task.ITask;
+import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -51,12 +56,17 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         }
     }
 
-    public static void main(String[] args) throws Narsese.NarseseException {
+    public static void main(String[] args) throws Narsese.NarseseException, FileNotFoundException {
 
         Param.DEBUG = false;
 
+
         NAR n = new NARBuilder().get();
-        float fps = 25f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        float fps = 1f;
+
+        csvPriority(n, "/tmp/x.csv");
 
 //        Default n = O.of(new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
 //                new CycleTime(), new BufferedSynchronousExecutor(64, 0.5f)).the(Default.class);
@@ -181,7 +191,8 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         //n.onCycle(nn->{System.out.println(nn.time() + "\n" + n.exe.stats() + "\n\n");});
 
-        n.startFPS(fps).join();
+        //n.startFPS(fps).join();
+        n.run(100);
 
 
 
@@ -207,6 +218,33 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //
 
 
+    }
+
+    public static void csvPriority(NAR n, String path) throws FileNotFoundException {
+
+        CSVOutput csv = new CSVOutput(new File(path), "time", "ALL_sumPri", "All_meanPri", "NAL_sumPri", "NAL_meanPri", "ConceptFire_sumPri", "ConceptFire_meanPri");
+
+        MultiStatistics<ITask> exeTasks = new MultiStatistics<ITask>()
+                .classify("NALTask", x -> x instanceof NALTask)
+                .classify("ConceptFire", x -> x instanceof ConceptFire)
+                ;
+        n.onCycle((nn)->{
+            n.exe.forEach(exeTasks::accept);
+            csv.out(
+                    nn.time(),
+
+                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(0)).getSum(),
+                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(0)).getMean(),
+
+                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(1)).getSum(),
+                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(1)).getMean(),
+
+                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(2)).getSum(),
+                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(2)).getMean()
+
+            );
+            exeTasks.clear();
+        });
     }
 
 }

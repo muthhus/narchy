@@ -54,7 +54,7 @@ public class TaskExecutor extends Executioner {
     /**
      * active tasks
      */
-    public final PriorityHijackBag<ITask, CLink<ITask>> active = new PriorityHijackBag<>(4) {
+    public final PriorityHijackBag<ITask, CLink<ITask>> active = new PriorityHijackBag<>(3) {
         @Override
         protected final Consumer<CLink<ITask>> forget(float rate) {
             return null; //manages its own forgets
@@ -108,7 +108,7 @@ public class TaskExecutor extends Executioner {
         super();
         active.setCapacity(capacity);
 
-        int overCapacity = capacity * 8;
+        int overCapacity = capacity * 1;
         overflow = new DisruptorBlockingQueue(overCapacity);
     }
 
