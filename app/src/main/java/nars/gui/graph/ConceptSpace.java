@@ -92,8 +92,10 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 
 
     protected void update() {
-        for (int i = 0, activeSize = active.size(); i < activeSize; i++)
-            active.get(i).commit(vis, this);
+        for (int i = 0, activeSize = active.size(); i < activeSize; i++) {
+            ConceptWidget a = active.get(i);
+            if (a!=null) a.commit(vis, this);
+        }
     }
 
 

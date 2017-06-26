@@ -92,7 +92,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
             } else {
                 //nearest endpoint of the interval
-                assert(dur>0);
+                assert (dur > 0);
                 long dist = a != z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a - when);
                 if (dist > 0) {
                     //cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
@@ -393,23 +393,53 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         return answer;
     }
 
+
+    /** to the interval [x,y] */
+    default long nearestStartOrEnd(long x, long y) {
+        long a = this.start();
+        if (a == ETERNAL)
+            return ETERNAL;
+        long b = this.end();
+        if (x == y) {
+            return nearestStartOrEnd(a, b, x);
+        } else {
+            if (a == b) {
+                return nearestStartOrEnd(x, y, a);
+            } else {
+                //HACK there is probably a better way
+                long u = nearestStartOrEnd(a, b, x);
+                long v = nearestStartOrEnd(a, b, y);
+                if (Math.min(Math.abs(u-a),Math.abs(u-b)) <
+                    Math.min(Math.abs(v-a),Math.abs(v-b))) {
+                    return u;
+                } else {
+                    return v;
+                }
+            }
+        }
+    }
+
     default long nearestStartOrEnd(long when) {
         long s = start();
         if (s == ETERNAL)
             return ETERNAL;
-        long e = end();
-        if (e == s)
-            return s; //point
-
-        if (when >= s && when <= e) {
-            return when; //internal
-        } else if (Math.abs(when - s) <= Math.abs(when - e)) {
-            return s; //closer or beyond the start
-        } else {
-            return e; //closer or beyond the end
-        }
+        return nearestStartOrEnd(s, end(), when);
     }
 
+    static long nearestStartOrEnd(long s, long e, long when) {
+        assert (s != ETERNAL);
+
+        if (e == s) {
+            return s; //point
+        } else if (when >= s && when <= e) {
+            return when; //internal
+        } else if (Math.abs(when - s) <= Math.abs(when - e)) {
+            return s; //at or beyond the start
+        } else {
+            return e; //at or beyond the end
+        }
+
+    }
 
 
 //    @NotNull
@@ -644,6 +674,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     default Truth truth(long when, int dur, float minConf) {
         float cw = evi(when, dur);
         if (cw == cw && cw > 0) {
+
 
             float conf = w2c(cw);
             if (conf > minConf) {
@@ -1036,24 +1067,29 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     }
 
-    /** amount of time this spans for */
+    /**
+     * amount of time this spans for
+     */
     default long dtRange() {
         long s = start();
-        return s!=ETERNAL ? end() - s : 0;
+        return s != ETERNAL ? end() - s : 0;
     }
 
     default boolean isFutureOf(long when) {
         long x = nearestStartOrEnd(when);
         return x == ETERNAL || x > when;
     }
+
     default boolean isPastOf(long when) {
         long x = nearestStartOrEnd(when);
         return x == ETERNAL || x < when;
     }
+
     default boolean isPresentOf(long when) {
         long x = nearestStartOrEnd(when);
         return x == ETERNAL || x == when;
     }
+
     default boolean isPresentOf(long when, int dur) {
         long x = nearestStartOrEnd(when);
         return x == ETERNAL || Math.abs(x - when) <= dur;

@@ -51,8 +51,10 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
 
     public final MixChannel[] mix;
     public final FloatParam priMin = new FloatParam(Pri.EPSILON, 0f, 1f);
-    public final FloatParam gainMin = new FloatParam(0.5f, 0f, 0f);
-    public final FloatParam gainMax = new FloatParam(2f, 0f, 16f);
+
+    float dynamicRange = 8f;
+    public final FloatParam gainMin = new FloatParam(1/dynamicRange, 0f, 0f);
+    public final FloatParam gainMax = new FloatParam(dynamicRange, 0f, 16f);
 
     /** the tests to apply to input (doesnt include aux's which will already have applied their id)  */
     public  final AbstractClassifier<X>[] tests;
@@ -65,7 +67,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
 
         public final AtomicSummaryStatistics input = new AtomicSummaryStatistics();
         public final AtomicSummaryStatistics active = new AtomicSummaryStatistics();
-        private String id;
+        public String id;
 
         public MixChannel(String id) {
             this.id = id;

@@ -42,12 +42,12 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", () -> fz.image, 20, 12)
+        senseCamera("fz", () -> fz.image, 28, 16)
                 .resolution(0.2f);
 
 
         actionBipolar($.inh(Atomic.the("fwd"), id), (f) -> {
-            fz.vehicleMetrics[0][6] += (f*f*f) * 1f;
+            fz.vehicleMetrics[0][6] += (f*f) * 1f;
             return f;
         }).resolution.setValue(0.1f);
         actionBipolar($.inh(Atomic.the("rot"), id), (r) -> {
@@ -203,7 +203,7 @@ public class FZero extends NAgentX {
 
         double distance = fz.vehicleMetrics[0][1];
         double deltaDistance;
-        deltaDistance = (distance - lastDistance) / 10f;
+        deltaDistance = (distance - lastDistance) / 15f;
         if (deltaDistance > 1f) deltaDistance = 1f;
         if (deltaDistance < -1f) deltaDistance = -1f;
 

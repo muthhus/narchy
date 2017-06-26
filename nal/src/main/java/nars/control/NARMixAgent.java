@@ -25,7 +25,7 @@ import static nars.$.p;
  */
 public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent {
 
-    float speed = 0.1f;
+    float speed = 0.5f;
 
     public final FloatParam reward = new FloatParam(0, -1f, 1f);
     private final float[] outs;

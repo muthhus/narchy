@@ -1,6 +1,7 @@
 package nars.nar;
 
 
+import com.google.common.util.concurrent.MoreExecutors;
 import jcog.AffinityExecutor;
 import jcog.Loop;
 import jcog.Util;
@@ -144,8 +145,11 @@ public class NARS extends NAR {
         );
 
         r.setAgent(
-            new NARMixAgent<>(new NARBuilder().index(
-                    new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
+            new NARMixAgent<>(new NARBuilder()
+                .index(
+                    //new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
+                        new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
+
             ).get(), r, this )
             //new HaiQMixAgent(),
             //new MultiHaiQMixAgent(),

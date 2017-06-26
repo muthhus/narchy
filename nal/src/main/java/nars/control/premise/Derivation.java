@@ -183,20 +183,11 @@ public class Derivation extends Unify implements TermContext {
 
         revert(0);
 
-        //remove common variable entries because they will just consume memory if retained as empty
-        xy.map.entrySet().removeIf(e -> {
-            if (e.getKey() instanceof CommonVariable)
-                return true;
-            else
-                return false;
-        });
 
         this.concTruth = null;
         this.concPunc = 0;
         this.concEvidence = null;
 
-        forEachMatch = null;
-        termutes.clear(); //assert(termutes.isEmpty()); //should already have been cleared:
 
         evidenceDouble = evidenceSingle = null;
         temporal = cyclic = overlap = false;
@@ -206,8 +197,9 @@ public class Derivation extends Unify implements TermContext {
         this.premise = p;
 
         this.belief = belief;
-        this.beliefTerm = beliefTerm;
+
         assert(beliefTerm.op()!=NEG): beliefTerm + " is negated";
+        this.beliefTerm = beliefTerm;
 
 
         if (belief == null) {
@@ -222,20 +214,9 @@ public class Derivation extends Unify implements TermContext {
             if ((tstart != ETERNAL)) {
                 long bstart = belief.start();
                 if (bstart != ETERNAL) {
-                    long tend = task.end();
-                    long bend = belief.end();
-                    long btime;
-                    if (tstart <= bstart) btime = tstart;
-                    else if (tend >= bend) btime = tend;
-                    else {
-                      //if ((bend >= tend) && (bstart <= tstart))
-                          btime = belief.mid();
-                      //else if (Math.abs(bend - tstart))
-                        //TODO
-                    }
-                    if (!belief.contains(btime)) {
-                        beliefTruth = belief.truth(btime, dur, confMin); //project belief truth to task's time
-                    }
+
+                    long beliefTruthTime = belief.nearestStartOrEnd(tstart, task.end());
+                    beliefTruth = belief.truth(beliefTruthTime, dur, 0 /* confMin */); //project belief truth to task's time
                 }
             }
             this.beliefTruth = beliefTruth;
@@ -249,8 +230,6 @@ public class Derivation extends Unify implements TermContext {
                 overlap |= Stamp.overlapping(task, belief);
         }
 
-
-
         this.termSub1Struct = beliefTerm.structure();
 
         Op bOp = beliefTerm.op();
@@ -263,6 +242,15 @@ public class Derivation extends Unify implements TermContext {
         if (beliefTruth!=null)
             premiseEvidence = (premiseEvidence + beliefTruth.evi());
         this.premiseEvi = premiseEvidence;
+
+
+
+        //remove common variable entries because they will just consume memory if retained as empty
+        xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);
+
+        termutes.clear();
+
+        forEachMatch = null;
 
         return this;
     }

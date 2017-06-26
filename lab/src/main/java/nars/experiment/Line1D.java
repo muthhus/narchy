@@ -35,7 +35,7 @@ public class Line1D {
     static class Line1DExperiment implements FloatFunction<NAR> {
         float tHz = 0.001f; //in time units
         float yResolution = 0.01f; //in 0..1.0
-        float periods = 64;
+        float periods = 32;
 
         final int runtime = Math.round(periods /tHz);
 
@@ -57,7 +57,10 @@ public class Line1D {
             a.happy.resolution.setValue(0.02f);
             a.out.resolution.setValue(yResolution);
             a.in.resolution.setValue(yResolution);
-            a.curiosity.setValue((2/yResolution)*tHz);
+            a.curiosity.setValue(
+                    0.1f
+                    //(2/yResolution)*tHz);
+            );
 
             //            a.in.beliefs().capacity(0, 100, a.nar);
             //            a.out.beliefs().capacity(0, 100, a.nar);
@@ -104,7 +107,7 @@ public class Line1D {
             Object d = DefaultDeriver.the;
 
             int maxIterations = 1024;
-            int repeats = 1;
+            int repeats = 2;
 
             Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
 
@@ -112,33 +115,38 @@ public class Line1D {
                 n.random().setSeed(System.nanoTime());
 
                 n.time.dur(1);
-
-                n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-                n.DEFAULT_GOAL_PRIORITY = 0.5f;
-                n.DEFAULT_QUESTION_PRIORITY = 0.5f;
-                n.DEFAULT_QUEST_PRIORITY = 0.5f;
+                n.termVolumeMax.set(32);
 
                 return n;
-            }).tweak("beliefConf", 0.1f, 0.9f, 0.1f, (y, x) -> {
+            })/*.tweak("beliefConf", 0.1f, 0.9f, 0.1f, (y, x) -> {
                 x.beliefConfidence(y);
-            }).tweak("goalConf", 0.1f, 0.9f, 0.1f, (y, x) -> {
+            })*/.tweak("goalConf", 0.1f, 0.9f, 0.1f, (y, x) -> {
                 x.goalConfidence(y);
-            }).tweak("termVolMax", 10, 16, 1, (y, x) -> {
+            }).tweak("belfPri", 0.1f, 1.0f, 0.1f, (y, x) -> {
+                x.DEFAULT_BELIEF_PRIORITY = (y);
+            }).tweak("goalPri", 0.1f, 1.0f, 0.1f, (y, x) -> {
+                x.DEFAULT_GOAL_PRIORITY = (y);
+            }).tweak("questionPri", 0.1f, 1.0f, 0.1f, (y, x) -> {
+                x.DEFAULT_QUESTION_PRIORITY = (y);
+                x.DEFAULT_QUEST_PRIORITY = (y);
+            })
+
+                    /*.tweak("termVolMax", 10, 25, 1, (y, x) -> {
                 x.termVolumeMax.setValue(y);
 //            }).tweak("exeRate", 0.1f, 0.9f, 0.1f, (y, x) -> {
 //                ((TaskExecutor) x.exe).exePerCycleMax.setValue(y);
-            })/*.tweak("activation", 0.1f, 1f, 0.1f, (y, x) -> {
+            })*//*.tweak("activation", 0.1f, 1f, 0.1f, (y, x) -> {
                 x.in.streams.values().forEach(s -> s.setValue(y));
             })*//*.tweak("stmSize", 1, 2, 1, (y, x) -> {
                 ((Default) x).stmLinkage.capacity.setValue(y);
-            })*/.tweak("confMin", 0.01f, 0.9f, 0.1f, (y, x) -> {
+            })*//*.tweak("confMin", 0.05f, 0.5f, 0.01f, (y, x) -> {
                 x.confMin.setValue(y);
-            }).tweak("truthResolution", 0, 0.05f, 0.01f, (y, x) -> {
+            })*//*.tweak("truthResolution", 0.01f, 0.04f, 0.01f, (y, x) -> {
                 x.truthResolution.setValue(y);
-            });
+            })*/
+            ;
 
-
-            Optimize.Result r = o.run(maxIterations, repeats, new Line1DExperiment());
+            Optimize.Result r = o.run(64, maxIterations, repeats, new Line1DExperiment());
 
             r.print();
 
