@@ -1,9 +1,8 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.math.FloatNormalized;
-import jcog.math.FloatPolarNormalized;
-import jcog.math.FloatSupplier;
 import jcog.pri.Priority;
 import jcog.pri.mix.control.MixAgent;
 import jcog.pri.mix.control.MixContRL;
@@ -14,21 +13,26 @@ import nars.NAR;
 import nars.NAgent;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 
+import java.util.Arrays;
+
 import static nars.$.p;
 
-/** embeds an RL controller NAR "homonculus", ideally single-thread
- *  meta-controller of an NAgent
-        tunes runtime parameters in response to feedback signals
-        can be instantiated in a NAR 'around' any agent
- * */
+/**
+ * embeds an RL controller NAR "homonculus", ideally single-thread
+ * meta-controller of an NAgent
+ * tunes runtime parameters in response to feedback signals
+ * can be instantiated in a NAR 'around' any agent
+ */
 public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent {
+
+    float speed = 0.1f;
 
     public final FloatParam reward = new FloatParam(0, -1f, 1f);
     private final float[] outs;
     private final FloatArrayList ins = new FloatArrayList();
     private final NAR controlled;
 
-    private int cyclesPerFrame = 16;
+    private final int cyclesPerFrame = 16;
 
 //    public NARMixAgent(NAR controller, NAR controlled) {
 //        this(controller, ()->controlled.emotion.happy());
@@ -37,15 +41,18 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
     @Override
     public void act(Tensor in, float score, ArrayTensor out) {
 
-        if (in.volume()!=ins.size()) {
+        if (in.volume() != ins.size()) {
             throw new RuntimeException();
         }
 
         in.forEach(ins::set);
 
-        nar.time.dur(cyclesPerFrame);
-        nar.run(cyclesPerFrame);
+        nar.time.dur(1);
+
+        for (int i = 0; i < cyclesPerFrame; i++)
+            nar.exe.cycle(nar);
         next();
+        nar.time.cycle();
 
         for (int i = 0, outsLength = outs.length; i < outsLength; i++) {
             out.set(outs[i], i);
@@ -53,10 +60,11 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
     }
 
     public NARMixAgent(NAR controller, MixContRL<X> mix, NAR controlled) {
-        super("meta", controller);
+        super("", controller);
 
-        controller.truthResolution.setValue(0.1f);
-        controller.termVolumeMax.setValue(16);
+        controller.truthResolution.setValue(0.05f);
+        controller.termVolumeMax.setValue(24);
+        controller.DEFAULT_QUEST_PRIORITY = controller.DEFAULT_QUESTION_PRIORITY = 0.25f;
 
         this.controlled = controlled;
 //        senseNumber(p("happy"),
@@ -66,23 +74,25 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
         senseNumber(p("busyVol"),
                 new FloatNormalized(controlled.emotion.busyVol::getSum));
 
-
         //controller.log();
 
         int iv = mix.agentIn.volume();
         for (int s = 0; s < iv; s++) {
             ins.add(0);
             int ss = s;
-            senseNumber($.p("t" + s), ()->ins.get(ss));
+            senseNumber($.p("I", Integer.toString(ss)), () -> ins.get(ss));
         }
 
         int d = mix.dim;
         outs = new float[d];
+        Arrays.fill(outs, 0.5f);
         for (int a = 0; a < d; a++) {
             int aa = a;
-            actionUnipolar($.p(mix.mix[a].toString()), (v) -> {
-                if (v == v)
-                    outs[aa] = v;
+            actionBipolar($.p("O", mix.mix[a].id), (v) -> {
+                if (v == v) {
+                    //outs[aa] = v;
+                    outs[aa] = Util.unitize(outs[aa] + v * speed);
+                }
                 return v;
             });
         }
@@ -109,7 +119,6 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
 //                 Math.max(1,dur *0.5f) /* 0 might cause problems with temporal truthpolation, examine */,
 //                dur * 2f /* multiple of the originl duration of the input NAR */);
     }
-
 
 
     @Override

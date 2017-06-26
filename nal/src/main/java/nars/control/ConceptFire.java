@@ -27,14 +27,14 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises
      */
-    private static final int samplesMax = 16;
+    private static final int samplesMax = 8;
     private static final float priMinAbsolute = Pri.EPSILON * 16;
     private static final float momentum = 0.5f;
 
     static final ThreadLocal<Map<DerivedTask, DerivedTask>> buffers =
             ThreadLocal.withInitial(LinkedHashMap::new);
 
-    static final int TASKLINKS_SAMPLED = 4;
+    static final int TASKLINKS_SAMPLED = 8;
     static final int TERMLINKS_SAMPLED = 8;
 
     public ConceptFire(Concept c, float pri) {

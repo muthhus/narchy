@@ -20,6 +20,7 @@ import nars.attention.Activate;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
 import nars.control.NARMixAgent;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -143,7 +144,9 @@ public class NARS extends NAR {
         );
 
         r.setAgent(
-            new NARMixAgent<>(new NARBuilder().get(), r, this )
+            new NARMixAgent<>(new NARBuilder().index(
+                    new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
+            ).get(), r, this )
             //new HaiQMixAgent(),
             //new MultiHaiQMixAgent(),
         );
