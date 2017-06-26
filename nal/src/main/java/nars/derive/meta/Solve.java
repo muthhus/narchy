@@ -105,10 +105,10 @@ abstract public class Solve extends AbstractPred<Derivation> {
         }
 
         @Nullable long[] ev = single ? m.evidenceSingle() : m.evidenceDouble();
-        if (punct==GOAL && m.taskPunct!=GOAL && Stamp.isCyclic(ev)) {
-            //when deriving a goal from a belief, reset any cyclic stamp state
-            ev = Stamp.uncyclic(ev);
-        }
+//        if (punct==GOAL && m.taskPunct!=GOAL && Stamp.isCyclic(ev)) {
+//            //when deriving a goal from a belief, reset any cyclic stamp state
+//            ev = Stamp.uncyclic(ev);
+//        }
 
         m.truth(
             t,

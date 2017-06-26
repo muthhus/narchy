@@ -265,7 +265,12 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
         synchronized (items) {
             assert(max > 0);
             int s = size();
-            PriReference<X>[] ll = items.list;
+
+            Object[] oo = items.list;
+            if (oo.length == 0)
+                return this;
+
+            PriReference<X>[] ll = (PriReference<X>[]) oo;
             if (s == 1) {
                 //get the only
                 kontinue.test(ll[0]);

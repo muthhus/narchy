@@ -21,6 +21,12 @@ public class ArrayTensor implements
     private final int[] shape;
     private final int[] stride;
 
+    public ArrayTensor(float... oneD) {
+        this.shape = new int[] { oneD.length };
+        this.stride = ArrayUtils.EMPTY_INT_ARRAY;
+        this.data = oneD;
+    }
+
     public ArrayTensor(int... shape) {
         int size = shape[0];
         if (shape.length > 1) {

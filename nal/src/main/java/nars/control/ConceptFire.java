@@ -8,6 +8,7 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.Term;
@@ -26,11 +27,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises
      */
-    private static final int sampleLimit = 12;
-    private static final float priMinAbsolute = Pri.EPSILON * 128;
+    private static final int samplesMax = 16;
+    private static final float priMinAbsolute = Pri.EPSILON * 16;
     private static final float momentum = 0.5f;
 
-    static final ThreadLocal<Map<ITask, ITask>> buffers =
+    static final ThreadLocal<Map<DerivedTask, DerivedTask>> buffers =
             ThreadLocal.withInitial(LinkedHashMap::new);
 
     static final int TASKLINKS_SAMPLED = 4;
@@ -43,8 +44,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     @Override
     public ITask[] run(NAR nar) {
-        float pri = this.pri;
-        if (pri != pri || pri < priMinAbsolute)
+        float priBefore = this.pri;
+        if (priBefore != priBefore || priBefore < priMinAbsolute)
             return null;
 
         final float minPri = priMinAbsolute;
@@ -63,6 +64,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
         tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) return null;
+
         List<PriReference<Term>> terml = $.newArrayList();
         termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
         if (terml.isEmpty()) return null;
@@ -70,70 +72,95 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         @Nullable PriReference<Task> tasklink = null;
         @Nullable PriReference<Term> termlink = null;
 
-        int ttl = sampleLimit;
+        int samples = 0;
+        int premises = 0;
+        int derivations = 0;
+        float cost = 0;
 
-        Map<ITask, ITask> results = buffers.get();
-        try {
+        Map<DerivedTask, DerivedTask> results = buffers.get();
+        Consumer<DerivedTask> resultMerger = (nt) -> results.merge(nt, nt, (tt, pt) -> {
+            if (pt == null) {
+                priSub(nt.priElseZero());
+                return nt;
+            } else {
+                float ptBefore = pt.priElseZero();
+                pt.merge(nt);
+                float ptAfter = pt.priElseZero();
+                priSub(ptAfter - ptBefore);
+                return pt;
+            }
+        });
 
-            Random rng = nar.random();
-            while (ttl-- > 0 && pri >= minPri) {
-                tasklink = taskl.get(
-                        Util.selectRoulette(taskl.size(), (i) -> taskl.get(i).priElseZero(), rng)
-                );
-                termlink = terml.get(
-                        Util.selectRoulette(terml.size(), (i) -> terml.get(i).priElseZero(), rng)
-                );
 
-                //            if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-                //                tasklink = tasklinks.sample();
-                //                if (tasklink == null)
-                //                    break;
-                //
-                //                taskLinkPri = clamp(tasklinks.normalizeMinMax(tasklink.priElseZero()), taskMargin, 1f-taskMargin);
-                //            }
-                //
-                //
-                //            if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-                //                termlink = termlinks.sample();
-                //                if (termlink == null)
-                //                    break;
-                //                termLinkPri = clamp(termlinks.normalizeMinMax(termlink.priElseZero()), termMargin, 1f-termMargin);
-                //            }
+        Random rng = nar.random();
+        while (++samples < samplesMax && priElseZero() >= minPri) {
+            tasklink = taskl.get(
+                    Util.selectRoulette(taskl.size(), (i) -> taskl.get(i).priElseZero(), rng)
+            );
+            termlink = terml.get(
+                    Util.selectRoulette(terml.size(), (i) -> terml.get(i).priElseZero(), rng)
+            );
+
+            //            if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
+            //                tasklink = tasklinks.sample();
+            //                if (tasklink == null)
+            //                    break;
+            //
+            //                taskLinkPri = clamp(tasklinks.normalizeMinMax(tasklink.priElseZero()), taskMargin, 1f-taskMargin);
+            //            }
+            //
+            //
+            //            if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
+            //                termlink = termlinks.sample();
+            //                if (termlink == null)
+            //                    break;
+            //                termLinkPri = clamp(termlinks.normalizeMinMax(termlink.priElseZero()), termMargin, 1f-termMargin);
+            //            }
 
 //                if (termlink.get().op() == NEG)
 //                    throw new RuntimeException("NEG termlink: " + termlink);
 
-                Premise p = new Premise(tasklink, termlink, results);
-                float thisPri = priElseZero();
-                float pBefore = thisPri / sampleLimit * (1f - momentum);
-                p.pri(pBefore);
-                p.run(nar);
-                float pAfter = p.priElseZero();
-                float cost = pBefore - pAfter;
-                if (cost >= Pri.EPSILON)
-                    priSub(cost);
+            Premise p = new Premise(tasklink, termlink, resultMerger);
+            premises++;
 
-                //                if (result!=null) {
-                //                    for (ITask x : result) {
-                //                        results.merge(x, x, (pv, nv) -> {
-                //                           pv.merge(nv);
-                //                           return pv;
-                //                        });
-                //                    }
-                //                    float cost = thisPri - p.priElseZero();
-                //                    priSub(cost);
-                //                }
-            }
+            float thisPri = priElseZero();
+            float pBefore = thisPri / samplesMax * (1f - momentum);
 
+            priSub(pBefore); //pay up-front
 
-            int size = results.size();
-            if (size > 0)
-                return results.values().toArray(new ITask[size]);
-            else
-                return null;
-        } finally {
-            results.clear();
+            p.setPri(pBefore);
+            p.run(nar);
+
+//            float pAfter = p.priElseZero();
+//            float ba = pBefore - pAfter;
+//            if (ba >= Pri.EPSILON)
+//                priSub(ba);
+
+            //                if (result!=null) {
+            //                    for (ITask x : result) {
+            //                        results.merge(x, x, (pv, nv) -> {
+            //                           pv.merge(nv);
+            //                           return pv;
+            //                        });
+            //                    }
+            //                    float cost = thisPri - p.priElseZero();
+            //                    priSub(cost);
+            //                }
         }
+
+        derivations = results.size();
+
+        //float priAfter = priElseZero();
+        //cost = priBefore - priAfter;
+        //System.out.println(this + " " + samples + "," + premises + "," + derivations + "," + cost);
+
+        if (derivations > 0) {
+            ITask[] a = results.values().toArray(new ITask[derivations]);
+            results.clear();
+            return a;
+        } else
+            return null;
+
 
 //        int num = premises.size();
 //        if (num > 0) {

@@ -21,6 +21,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -48,13 +49,13 @@ import static jcog.Util.sqr;
  */
 public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLink<X>> {
 
-    private final MixChannel[] mix;
+    public final MixChannel[] mix;
     public final FloatParam priMin = new FloatParam(Pri.EPSILON, 0f, 1f);
     public final FloatParam gainMin = new FloatParam(0.5f, 0f, 0f);
     public final FloatParam gainMax = new FloatParam(2f, 0f, 16f);
 
-    /** the active tests to apply to input (doesnt include aux's which will already have applied their id)  */
-    private final AbstractClassifier<X>[] tests;
+    /** the tests to apply to input (doesnt include aux's which will already have applied their id)  */
+    public  final AbstractClassifier<X>[] tests;
     private final ObjectIntPair<EnumClassifier<X>>[] dynTests;
 
     /** should probably be calibrated in relation to the executioner's processing rate */
@@ -80,7 +81,8 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
 
 
 
-    public final MixAgent agent;
+    @Nullable
+    public MixAgent agent = null;
 
 
     public final FloatSupplier score;
@@ -253,14 +255,20 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
     @Override
     public boolean next() {
 
+        @Nullable MixAgent agent = this.agent;
+
         //HACK
-        if (mixControl == null || score == null || agentIn == null) return true;
+        if (agent == null || mixControl == null || score == null || agentIn == null) return true;
 
         agent.act(agentIn, this.lastScore = score.asFloat(), mixControl);
 
         updateTraffic();
 
         return true;
+    }
+
+    public void setAgent(MixAgent agent) {
+        this.agent = agent;
     }
 
     private void updateTraffic() {

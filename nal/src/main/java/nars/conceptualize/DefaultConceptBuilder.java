@@ -2,6 +2,7 @@ package nars.conceptualize;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
+import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.$;
@@ -17,9 +18,7 @@ import nars.concept.dynamic.DynamicConcept;
 import nars.concept.dynamic.DynamicTruthModel;
 import nars.conceptualize.state.ConceptState;
 import nars.conceptualize.state.DefaultConceptState;
-import nars.table.BeliefTable;
-import nars.table.DefaultBeliefTable;
-import nars.table.RTreeBeliefTable;
+import nars.table.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -49,8 +48,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
         this(
-                new DefaultConceptState("sleep", 32, 32, 5, 32, 24),
-                new DefaultConceptState("awake", 32, 32, 5, 32, 24)
+                new DefaultConceptState("sleep", 32, 32, 5, 16, 12),
+                new DefaultConceptState("awake", 32, 32, 5, 16, 12)
         );
     }
 
@@ -71,11 +70,19 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
-        Map sharedMap = newBagMap(v);
-        @NotNull Bag<Term, PriReference<Term>> termbag =
-                new CurveBag<>(0, DEFAULT_BLEND, sharedMap);
-        @NotNull Bag<Task, PriReference<Task>> taskbag =
-                new CurveBag<>(0, DEFAULT_BLEND, sharedMap);
+        if (v < 10) {
+            Map sharedMap = newBagMap(v);
+            @NotNull Bag<Term, PriReference<Term>> termbag =
+                    new CurveBag<>(0, DEFAULT_BLEND, sharedMap);
+            @NotNull Bag<Task, PriReference<Task>> taskbag =
+                    new CurveBag<>(0, DEFAULT_BLEND, sharedMap);
+            return new Bag[]{termbag, taskbag};
+        } else {
+            return new Bag[]{
+                new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, 2),
+                new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, 2)
+            };
+        }
 
 
 //        public <X> Bag<X, PriReference<X>> newBag(@NotNull Map m, PriMerge blend) {
@@ -92,7 +99,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 //            return f.apply(termlink, tasklink);
 //        }
 
-        return new Bag[]{termbag, taskbag};
     }
 
     @Nullable
@@ -254,11 +260,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         if (dmt != null) {
 
             BeliefTable beliefs = dmt != null ?
-                    new DynamicBeliefTable(t, newTemporalBeliefTable(), dmt, true) :
+                    new DynamicBeliefTable(t, newTemporalBeliefTable(t), dmt, true) :
                     newBeliefTable(t, true);
 
             BeliefTable goals = dmt != null ?
-                    new DynamicBeliefTable(t, newTemporalBeliefTable(), dmt, true) :
+                    new DynamicBeliefTable(t, newTemporalBeliefTable(t), dmt, true) :
                     newBeliefTable(t, false);
 
             return new DynamicConcept(t, beliefs, goals, nar);
@@ -272,13 +278,17 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         //TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
         //return new HijackTemporalBeliefTable(tCap);
         //return new RTreeBeliefTable(tCap);
-        DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable());
+        DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable(c));
         return b;
     }
 
     @Override
-    public RTreeBeliefTable newTemporalBeliefTable() {
-        return new RTreeBeliefTable();
+    public TemporalBeliefTable newTemporalBeliefTable(Compound c) {
+        if (c.complexity() < 8) {
+            return new RTreeBeliefTable();
+        } else {
+            return new HijackTemporalBeliefTable();
+        }
     }
 
 

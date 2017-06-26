@@ -26,9 +26,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     long now;
 
-    public HijackTemporalBeliefTable(int initialCapacity) {
+    public HijackTemporalBeliefTable() {
         super(4 /* reprobes */);
-        setCapacity(initialCapacity);
     }
 
     @Override

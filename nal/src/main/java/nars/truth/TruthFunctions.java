@@ -477,6 +477,10 @@ public final class TruthFunctions  {
     private static float c2w(float c, float horizon) {
         if (c!=c || (c > MAX_CONF) || (c < 0))
             throw new InvalidParameterException();
+        return c2wSafe(c, horizon);
+    }
+
+    public static float c2wSafe(float c, float horizon) {
         return horizon * c / (1f - c);
     }
 

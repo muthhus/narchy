@@ -10,10 +10,8 @@ import nars.term.Compound;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -32,13 +30,13 @@ public class GoalActionConcept extends ActionConcept {
     @NotNull
     private MotorFunction motor;
 
-    public GoalActionConcept(@NotNull Compound term, @NotNull NAct act, @NotNull MotorFunction motor) {
-        this(term, act.nar(), act.curiosity(), motor);
+    public GoalActionConcept(@NotNull Compound c, @NotNull NAct act, @NotNull MotorFunction motor) {
+        this(c, act.nar(), act.curiosity(), motor);
     }
 
-    public GoalActionConcept(@NotNull Compound term, @NotNull NAR n, FloatParam curiosity, @NotNull MotorFunction motor) {
-        super(term,
-                new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable()),
+    public GoalActionConcept(@NotNull Compound c, @NotNull NAR n, FloatParam curiosity, @NotNull MotorFunction motor) {
+        super(c,
+                new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable(c)),
                 null,
                 n);
 

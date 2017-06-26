@@ -491,9 +491,11 @@ abstract public class NAgent implements NSense, NAct {
         return runCycles(nar.dur(), totalCycles);
     }
 
+    /** for synchronous control */
     protected void next() {
+        next(0);
+    }
 
-}
     /**
      * synchronous execution
      */
@@ -503,14 +505,7 @@ abstract public class NAgent implements NSense, NAct {
 
         @NotNull On active = nar.onCycle((n) -> {
             if (enabled.get()) {
-                long lastNow = this.now;
-                long now = nar.time();
-                if (now - lastNow >= cyclesPerFrame) {
-                    this.now = now;
-                    //only execute at most one agent frame per duration
-                    senseAndMotor();
-                    predict();
-                }
+                next(cyclesPerFrame);
             }
         });
 
@@ -519,6 +514,19 @@ abstract public class NAgent implements NSense, NAct {
         active.off();
 
         return this;
+    }
+
+
+
+    public void next(int minCyclesPerFrame) {
+        long lastNow = this.now;
+        long now = nar.time();
+        if (lastNow == ETERNAL || now - lastNow >= minCyclesPerFrame) {
+            this.now = now;
+            //only execute at most one agent frame per duration
+            senseAndMotor();
+            predict();
+        }
     }
 
     public NARLoop startRT(float fps) {

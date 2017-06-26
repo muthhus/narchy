@@ -60,7 +60,7 @@ public enum TruthPolation {
      * uses "waldorf method" to calculate a running variance
      * additionally, the variance is weighted by the contributor's confidences
      */
-    public static class TruthPolationBasic implements Consumer<Task> {
+    public static class TruthPolationBasic implements Consumer<Tasked> {
         float eviSum = 0, wFreqSum = 0;
         final long when;
         final int dur;
@@ -71,12 +71,13 @@ public enum TruthPolation {
         }
 
         @Override
-        public void accept(Task t) {
-            float tw = t.evi(when, dur);
+        public void accept(Tasked t) {
+            Task task = t.task();
+            float tw = task.evi(when, dur);
             if (tw > 0) {
                 eviSum += tw;
 
-                float f = t.freq();
+                float f = task.freq();
                 wFreqSum += tw * f;
             }
 
@@ -158,9 +159,9 @@ public enum TruthPolation {
 
         assert (dur > 0);
 
-        TruthPolationWithVariance t =
-                //new TruthPolationBasic(when, dur);
-                new TruthPolationWithVariance(when, dur);
+        TruthPolationBasic t =
+                new TruthPolationBasic(when, dur);
+                //new TruthPolationWithVariance(when, dur);
 
         // Contribution of each task's truth
         // use forEach instance of the iterator(), since HijackBag forEach should be cheaper

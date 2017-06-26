@@ -33,11 +33,11 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
 
-    public SensorConcept(@NotNull Compound term, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
-        super(term, new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable()),
+    public SensorConcept(@NotNull Compound c, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
+        super(c, new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable(c)),
                 null, n);
 
-        this.sensor = new ScalarSignal(n, term, this, truth, resolution) {
+        this.sensor = new ScalarSignal(n, c, this, truth, resolution) {
 
             @Override
             public Task set(@NotNull Compound term, @Nullable Truthed nextTruth, LongSupplier nextStamp, NAR nar) {

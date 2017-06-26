@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.truth.TruthFunctions.c2w;
+import static nars.truth.TruthFunctions.c2wSafe;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -21,11 +22,17 @@ public class PreciseTruth implements Truth {
 
     public PreciseTruth(float freq, float x, boolean xIsConfOrEvidence) {
         assert ((freq == freq) && (freq >= 0) && (freq <= 1)):
-                freq + " isinvalid freq value";
+                "invalid freq";
         this.f = freq;
-        float e = xIsConfOrEvidence ? c2w(x) : x;
-        assert ((e == e) && (e > 0)):
-                e + " is invalid evidence value";
+        assert ((x == x) && (x > 0)):
+                "invalid evidence/conf";
+        float e;
+        if (xIsConfOrEvidence) {
+            assert(x <= TruthFunctions.MAX_CONF);
+            e = c2wSafe(x, Param.HORIZON);
+        } else {
+            e = x;
+        }
         this.e = e;
     }
 
@@ -36,7 +43,7 @@ public class PreciseTruth implements Truth {
 
     @Override
     public boolean equals(@Nullable Object that) {
-        return that!=null &&equals( (Truth)that, Param.TRUTH_EPSILON );
+        return this == that ||  (that!=null && equals( (Truth)that, Param.TRUTH_EPSILON ));
         //throw new UnsupportedOperationException();
     }
 

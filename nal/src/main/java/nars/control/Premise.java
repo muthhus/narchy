@@ -17,7 +17,6 @@ import nars.concept.TaskConcept;
 import nars.control.premise.Derivation;
 import nars.derive.DefaultDeriver;
 import nars.table.BeliefTable;
-import nars.task.BinaryTask;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.term.Compound;
@@ -27,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
@@ -42,16 +42,21 @@ import static nars.time.Tense.ETERNAL;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> {
+public class Premise extends Pri {
+
+    final PriReference<Task> taskLink;
+    final PriReference<Term> termLink;
 
     static final ThreadLocal<Derivation> derivation =
             ThreadLocal.withInitial(Derivation::new);
 
-    transient private final Map<ITask, ITask> buffer;
+    transient private final Consumer<DerivedTask> target;
 
-    public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Map<ITask,ITask> buffer) {
-        super(tasklink, termlink, 0 /* priority assigned after construction */);
-        this.buffer = buffer;
+    public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> target) {
+        super(0);
+        this.taskLink = tasklink;
+        this.termLink = termlink;
+        this.target = target;
     }
 
     /**
@@ -67,20 +72,19 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
      * patham9 especially try to understand the "temporal temporal" case
      * patham9 its using the result of higher confidence
      */
-    @Override
-    public ITask[] run(NAR nar) {
+    public void run(NAR nar) {
 
-        PriReference<Task> taskLink = getOne();
+        PriReference<Task> taskLink = this.taskLink;
         Task task = taskLink.get();
         float taskPri = task.pri();
         if (taskPri != taskPri)
-            return ITask.DeleteMe; //task deleted so completely erase this premise
+            return; //task deleted so completely erase this premise
 
         float premisePri = priElseZero();
         if (premisePri < Pri.EPSILON * 128) //multiplier to compensate for the fact that each derived task will use only a fraction of this
-            return ITask.DeleteMe;
+            return;
 
-        Term beliefTerm = getTwo().get();
+        Term beliefTerm = termLink.get();
         Task belief = null;
 
         if (beliefTerm instanceof Compound) {
@@ -121,7 +125,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
                     if (match!=null)
                         tryAnswer(reUnified, taskLink, match, nar);
                 } else {
-                    long when = whenMatch(task, now, nar);
+                    long when = whenMatch(task, now);
                     match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar);
                 }
 
@@ -164,7 +168,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
 
         DefaultDeriver.the.test(d);
 
-        return null;
+
 //        ITask[] r = d.flush(parentTaskPri);
 ////
 //        return r;
@@ -173,7 +177,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
     /**
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
-    protected static long whenMatch(Task task, long now, NAR nar) {
+    protected static long whenMatch(Task task, long now) {
         if (task.isEternal()) {
             return ETERNAL;
         } else //if (task.isInput()) {
@@ -285,19 +289,7 @@ public class Premise extends BinaryTask<PriReference<Task>, PriReference<Term>> 
     }
 
     public boolean accept(DerivedTask nt) {
-        buffer.compute(nt, (tt, pt) -> {
-            if (pt == null) {
-                priSub(nt.priElseZero());
-                return nt;
-            } else {
-                float ptBefore = pt.priElseZero();
-                pt.merge(nt);
-                float ptAfter = pt.priElseZero();
-                float cost = ptAfter - ptBefore;
-                priSub(cost);
-                return pt;
-            }
-        });
+        target.accept(nt);
         return (priElseZero() > Pri.EPSILON);
     }
 }

@@ -12,6 +12,17 @@ public interface Tensor extends Supplier<float[]> {
 
     float get(int linearCell);
 
+    int index(int... cell);
+
+    default void set(float newValue, int linearCell) {
+        throw new UnsupportedOperationException("read-only");
+    }
+
+    default void set(float newValue, int... cell) {
+        set(newValue, index(cell));
+    }
+
+
     float[] snapshot();
 
     //void copyTo(float[] target, int targetOffset, int... subset);
@@ -39,6 +50,7 @@ public interface Tensor extends Supplier<float[]> {
      * receives the pair: linearIndex,value (in increasing order)
      */
     default void forEach(IntFloatProcedure sequential) {
+        get();
         forEach(sequential, 0, volume());
     }
 
@@ -75,7 +87,7 @@ public interface Tensor extends Supplier<float[]> {
 
     default void writeTo(FloatFloatToFloatFunction perElement, float[] target, int offset) {
         forEach((i, v) -> {
-            target[i + offset] = perElement.apply(target[i+offset], v);
+            target[i + offset] = perElement.apply(target[i + offset], v);
         });
     }
 
@@ -89,6 +101,40 @@ public interface Tensor extends Supplier<float[]> {
 
     default Tensor scale(float v) {
         return apply((x) -> x * v);
+    }
+
+    default float max() {
+        final float[] max = {Float.MIN_VALUE};
+        forEach((i, v) -> {
+            if (max[0] < v)
+                max[0] = v;
+        });
+        return max[0];
+    }
+
+    default float min() {
+        final float[] min = {Float.MAX_VALUE};
+        forEach((i, v) -> {
+            if (min[0] > v)
+                min[0] = v;
+        });
+        return min[0];
+    }
+
+    default float sum() {
+        final float[] sum = {0};
+        forEach((i,x) -> {
+            sum[0] += x;
+        });
+        return sum[0];
+    }
+
+    default void add(Tensor pc) {
+        int v = pc.volume();
+        assert(v == volume());
+        for (int i = 0; i < v; i++) {
+            this.set( get(i) + pc.get(i), i );
+        }
     }
 
 

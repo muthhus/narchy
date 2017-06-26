@@ -1,5 +1,6 @@
 package nars.nar;
 
+
 import jcog.AffinityExecutor;
 import jcog.Loop;
 import jcog.Util;
@@ -18,6 +19,7 @@ import nars.Task;
 import nars.attention.Activate;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
+import nars.control.NARMixAgent;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -76,9 +78,7 @@ public class NARS extends NAR {
     @Override
     protected PSinks newInputMixer() {
         MixContRL<ITask> r = new MixContRL<>(40f,
-
-                new HaiQMixAgent(),
-                //new MultiHaiQMixAgent(),
+                null,
 
                 FloatAveraged.averaged(emotion.happy.sumIntegrator()::sumThenClear, 1),
 
@@ -142,6 +142,11 @@ public class NARS extends NAR {
 //                    (x) -> x.stamp().length > 2),
         );
 
+        r.setAgent(
+            new NARMixAgent<>(new NARBuilder().get(), r, this )
+            //new HaiQMixAgent(),
+            //new MultiHaiQMixAgent(),
+        );
 
         return r;
     }

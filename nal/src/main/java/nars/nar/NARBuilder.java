@@ -32,7 +32,7 @@ public class NARBuilder {
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 0.1f);
+    private Supplier<Executioner> exe = () -> new TaskExecutor(256, 0.25f);
 
     private Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 
@@ -49,8 +49,8 @@ public class NARBuilder {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.9f);
-        n.goalConfidence(0.9f);
+        n.beliefConfidence(0.95f);
+        n.goalConfidence(0.25f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 1;

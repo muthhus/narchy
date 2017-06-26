@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -86,11 +87,13 @@ public class Optimize<X> {
 
     /*@NotNull*/
     public Result run(int maxIterations, @NotNull FloatFunction<X> eval) {
-        return run(maxIterations, 1, eval);
+        return run(
+                (int)(16 * Math.round(Util.sqr(tweaks.size()))) /* estimate */,
+                maxIterations, 1, eval);
     }
 
     /*@NotNull*/
-    public Result run(int maxIterations, int repeats, @NotNull FloatFunction<X> eval) {
+    public Result run(int populationSize, int maxIterations, int repeats, @NotNull FloatFunction<X> eval) {
 
         int i = 0;
         int n = tweaks.size();
@@ -119,6 +122,7 @@ public class Optimize<X> {
 
 
 
+
         ObjectiveFunction func = new ObjectiveFunction(point -> {
 
 
@@ -135,7 +139,7 @@ public class Optimize<X> {
                 score = Float.NEGATIVE_INFINITY;
             }
 
-            //System.out.println(Arrays.toString(point) + " = " + loss);
+
             if (trace)
                 System.out.println(Joiner.on(",").join(Doubles.asList(point)) + ",\t" + score);
 
@@ -163,7 +167,7 @@ public class Optimize<X> {
 
 
         CMAESOptimizer optim = new CMAESOptimizer(maxIterations, Double.NEGATIVE_INFINITY, true, 0,
-                0, new MersenneTwister(3), true, null);
+                1, new MersenneTwister(3), false, null);
 
         startExperiments();
 
@@ -174,7 +178,8 @@ public class Optimize<X> {
                 new SimpleBounds(min, max),
                 new InitialGuess(mid),
                 new CMAESOptimizer.Sigma(MathArrays.scale(1f, inc)),
-                new CMAESOptimizer.PopulationSize((int)(16 * Math.round(Util.sqr(tweaks.size()))) /* estimate */));
+                new CMAESOptimizer.PopulationSize(populationSize)
+            );
 
             return new Result(experiments, r);
 
@@ -201,7 +206,13 @@ public class Optimize<X> {
     }
 
     private void startExperiments() {
-        System.out.println(Joiner.on(",").join(tweaks) + ",score");
+        if (trace) {
+            //CSV header
+            System.out.print(
+                    Joiner.on(',').join(tweaks.stream().map(t -> t.id).iterator())
+            );
+            System.out.println(",score");
+        }
     }
 
     protected void onExperiment(double[] point, double score) {
