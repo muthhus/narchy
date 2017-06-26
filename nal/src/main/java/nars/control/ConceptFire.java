@@ -34,8 +34,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     static final ThreadLocal<Map<DerivedTask, DerivedTask>> buffers =
             ThreadLocal.withInitial(LinkedHashMap::new);
 
-    static final int TASKLINKS_SAMPLED = 8;
-    static final int TERMLINKS_SAMPLED = 8;
+    static final int TASKLINKS_SAMPLED = samplesMax;
+    static final int TERMLINKS_SAMPLED = samplesMax;
 
     public ConceptFire(Concept c, float pri) {
         super(c, pri);

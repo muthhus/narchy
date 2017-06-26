@@ -1419,13 +1419,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         level = newLevel;
     }
 
-    public final void setState(@NotNull Concept c, @NotNull ConceptState p) {
-
-        if (c.state(p) != p) {
-            terms.onStateChanged(c);
-        }
-
-    }
 
     public final long time() {
         return time.time();

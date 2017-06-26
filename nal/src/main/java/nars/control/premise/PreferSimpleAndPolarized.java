@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * prioritizes derivations exhibiting polarization (confident and discerning)
@@ -18,9 +19,8 @@ import static nars.Op.GOAL;
  */
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
-    /** range for adjusting polarization (1f has no effect) */
-    final float minPolarizationFactor = 0.75f;
-    final float maxPolarizationFactor = 1f;
+    /** value between 0 and 1.0, range for adjusting polarization (1f has no effect) */
+    final float minPolarizationFactor = 0.5f;
 
 //    /** preference for polarity (includes conf) */
 //    public final FloatParam polarity = new FloatParam(0.5f, 0f, 1f);
@@ -72,7 +72,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
         float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm);
         if (truth != null) { //belief and goal:
             p *= simplicityFactor;
-            float freqFactor = Util.lerp(polarization(truth.freq()), minPolarizationFactor, maxPolarizationFactor);
+            float freqFactor = Util.lerp(polarization(truth.freq()), minPolarizationFactor, 1);
             p *= freqFactor;
             float confFactor = evidencePreservationRelative(truth, d);
             p *= confFactor;
@@ -149,8 +149,8 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
     }
 
     protected float evidencePreservationRelative(@NotNull Truth truth, @NotNull Derivation d) {
-        float concEvi = truth.evi();
-        float premiseEvi = d.premiseEvi;
+        float concEvi = truth.conf();
+        float premiseEvi = d.premiseEvi > 0 ? w2c(d.premiseEvi) : 0;
         float evidenceShrink = (premiseEvi - concEvi) / ((premiseEvi + concEvi) / 2f);
         return 1f / (1f + Math.max(0, evidenceShrink));
     }

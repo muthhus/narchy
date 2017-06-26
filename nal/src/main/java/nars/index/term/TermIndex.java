@@ -437,28 +437,28 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     }
 
 
-    /**
-     * implementations can override this to update the index when a concept's state changes, ex: to re-evaluate it's features
-     */
-    public void onStateChanged(Concept c) {
-        /* nothing */
-    }
-
     @NotNull
     public Term atemporalize(@NotNull Term t) {
         return t instanceof Compound ? atemporalize((Compound) t) : t;
     }
 
 
-    protected void onRemove(Termed value) {
+    protected final void onRemove(Termed value) {
         if (value instanceof Concept) {
             if (value instanceof PermanentConcept) {
                 //refuse deletion
                 set(value);
             } else {
-                ((Concept) value).delete(nar);
+
+                Concept c = (Concept) value;
+                onBeforeRemove(c);
+                c.delete(nar);
             }
         }
+    }
+
+    protected void onBeforeRemove(Concept c) {
+
     }
 
     public Compound retemporalize(@NotNull Compound x) {

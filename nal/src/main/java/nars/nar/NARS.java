@@ -5,45 +5,35 @@ import com.google.common.util.concurrent.MoreExecutors;
 import jcog.AffinityExecutor;
 import jcog.Loop;
 import jcog.Util;
-import jcog.bag.impl.hijack.HijackMemoize;
+import jcog.bag.Bag;
 import jcog.math.FloatAveraged;
+import jcog.pri.PriReference;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
 import jcog.pri.mix.control.CLink;
-import jcog.pri.mix.control.HaiQMixAgent;
 import jcog.pri.mix.control.MixContRL;
-import jcog.util.Memoize;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Task;
 import nars.attention.Activate;
+import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
 import nars.control.NARMixAgent;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.task.NALTask;
-import nars.term.Termed;
+import nars.term.Term;
 import nars.time.Time;
-import nars.truth.Truth;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.api.tuple.primitive.ByteLongPair;
-import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
-import org.eclipse.collections.impl.tuple.Tuples;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -51,7 +41,6 @@ import java.util.function.Consumer;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 import static nars.Op.*;
-import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * recursive cluster of NAR's
@@ -72,7 +61,44 @@ public class NARS extends NAR {
     private List<Loop> loops;
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(new CaffeineIndex(new DefaultConceptBuilder(), 96 * 1024, -1, e), e, time,
+        super(new CaffeineIndex(new DefaultConceptBuilder(), 64 * 1024,  e) {
+
+//                  @Override
+//                  protected void onBeforeRemove(Concept c) {
+//
+//                      //victimize neighbors
+//                      PriReference<Term> mostComplex = c.termlinks().maxBy((x -> x.get().volume()));
+//                      if (mostComplex!=null) shrink(mostComplex.get());
+//
+//                      PriReference<Task> mostComplexTa = c.tasklinks().maxBy((x -> x.get().volume()));
+//                      if (mostComplexTa!=null) shrink(mostComplexTa.get());
+//
+//                  }
+//
+//                  private void shrink(Term term) {
+//                      Concept n = nar.concept(term);
+//                      if (n != null) {
+//                          shrink(n);
+//                      }
+//                  }
+//
+//                  private void shrink(Task task) {
+//                      Concept n = task.concept(nar);
+//                      if (n != null) {
+//                          shrink(n);
+//                      }
+//                  }
+//
+//                  private void shrink(Concept n) {
+//                      int ntl = n.termlinks().capacity();
+//                      if (ntl > 0) {
+//                          n.termlinks().setCapacity(ntl - 1);
+//                      }
+//                  }
+//
+//
+
+              }, e, time,
                 //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
                 rng);
     }
@@ -93,7 +119,7 @@ public class NARS extends NAR {
 
                     if (x instanceof Task) {
                         //NAL
-                        switch (((Task)x).punc()) {
+                        switch (((Task) x).punc()) {
                             case BELIEF:
                                 return 0;
                             case GOAL:
@@ -127,7 +153,7 @@ public class NARS extends NAR {
                     if (t instanceof NALTask) {
                         long now = time();
                         long h = ((NALTask) t).nearestStartOrEnd(now);
-                        if (Math.abs(h - now) <= dur() ) {
+                        if (Math.abs(h - now) <= dur()) {
                             return 0; //present
                         } else if (h > now) {
                             return 1; //future
@@ -145,14 +171,14 @@ public class NARS extends NAR {
         );
 
         r.setAgent(
-            new NARMixAgent<>(new NARBuilder()
-                .index(
-                    //new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
-                        new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
+                new NARMixAgent<>(new NARBuilder()
+                        .index(
+                                //new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
+                                new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
 
-            ).get(), r, this )
-            //new HaiQMixAgent(),
-            //new MultiHaiQMixAgent(),
+                        ).get(), r, this)
+                //new HaiQMixAgent(),
+                //new MultiHaiQMixAgent(),
         );
 
         return r;
@@ -167,7 +193,7 @@ public class NARS extends NAR {
 
     @Override
     public void input(@NotNull CLink<ITask> partiallyClassified) {
-        ((MixContRL)in).test(partiallyClassified);
+        ((MixContRL) in).test(partiallyClassified);
         super.input(partiallyClassified);
     }
 
@@ -220,7 +246,7 @@ public class NARS extends NAR {
 
         public CLink<ITask> apply(CLink<ITask> x) {
             if (!x.isDeleted())
-                x.priMult( ((MixContRL)(((NARS)nar).in)).gain(x) );
+                x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
             return x;
         }
 
@@ -236,7 +262,6 @@ public class NARS extends NAR {
         public void cycle(@NotNull NAR nar) {
 
 
-
 //            int waitCycles = 0;
 //            while (!passive.isQuiescent()) {
 //                Util.pauseNext(waitCycles++);
@@ -245,7 +270,7 @@ public class NARS extends NAR {
             if (!busy.compareAndSet(false, true))
                 return; //already in the cycle
 
-            ((NARS)nar).nextCycle();
+            ((NARS) nar).nextCycle();
             try {
 
                 if (lastCycle != null) {
@@ -259,7 +284,7 @@ public class NARS extends NAR {
                     lastCycle.reinitialize();
                     passive.execute(lastCycle);
 
-                    ((NARS)nar).nextCycle();
+                    ((NARS) nar).nextCycle();
 
                 } else {
                     lastCycle = passive.submit(this);
@@ -335,14 +360,14 @@ public class NARS extends NAR {
 
         @Override
         protected void actuallyRun(CLink<ITask> x) {
-            ((RootExecutioner)exe).apply(x); //apply gain before running, because it may be an ephemeral task this would be the only point to affect it and its children
+            ((RootExecutioner) exe).apply(x); //apply gain before running, because it may be an ephemeral task this would be the only point to affect it and its children
 
             super.actuallyRun(x);
         }
 
         @Override
         protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
-            if (next!=null)
+            if (next != null)
                 NARS.this.input(next); //through post mix
         }
 
@@ -363,7 +388,6 @@ public class NARS extends NAR {
             return l;
         }
     }
-
 
 
     public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {

@@ -20,8 +20,10 @@ public final class DefaultConceptState extends ConceptState {
     public final MutableInteger questionsMax;
     @NotNull
     public final MutableInteger termLinksCapacityMax, termLinksCapacityMin, taskLinksCapacityMax, taskLinksCapacityMin;
-    public final MutableInteger beliefsMaxTemp;
-    public final MutableInteger goalsMaxTemp;
+    public final int beliefsMaxTemp;
+    public final int beliefsMinTemp;
+    public final int goalsMaxTemp;
+    public final int goalsMinTemp;
 
     /** minimum of 3 beliefs per belief table. for eternal, this allows revision between two goals to produce a third  */
     public DefaultConceptState(String id, int beliefsCapTotal, int goalsCapTotal, int questionsMax, int termlinksCapacity, int taskLinksCapacity) {
@@ -41,30 +43,33 @@ public final class DefaultConceptState extends ConceptState {
                         MutableInteger questionsMax, @NotNull MutableInteger termlinksCapacity, @NotNull MutableInteger taskLinksCapacity) {
         super("___" + id);
         this.beliefsMaxEte = beliefsMaxEte;
-        this.beliefsMaxTemp = beliefsMaxTemp;
+        this.beliefsMaxTemp = beliefsMaxTemp.intValue();
+        this.beliefsMinTemp = beliefsMaxTemp.intValue()/8;
         this.goalsMaxEte = goalsMaxEte;
-        this.goalsMaxTemp = goalsMaxTemp;
+        this.goalsMaxTemp = goalsMaxTemp.intValue();
+        this.goalsMinTemp = goalsMaxTemp.intValue()/8;
         this.questionsMax = questionsMax;
-        this.termLinksCapacityMin = new MutableInteger(Math.max(1,termlinksCapacity.intValue()/2));
+
+        this.termLinksCapacityMin = new MutableInteger(Math.max(1,termlinksCapacity.intValue()/4));
         this.termLinksCapacityMax = termlinksCapacity;
-        this.taskLinksCapacityMin = new MutableInteger(Math.max(1,taskLinksCapacity.intValue()/2));
+        this.taskLinksCapacityMin = new MutableInteger(Math.max(1,taskLinksCapacity.intValue()/4));
         this.taskLinksCapacityMax = taskLinksCapacity;
     }
 
 
     @Override
     public int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
-        int max;
+        int max, min;
         if (beliefOrGoal) {
-            max = eternalOrTemporal ? beliefsMaxEte.intValue() : beliefsMaxTemp.intValue();
+            max = eternalOrTemporal ? beliefsMaxEte.intValue() : beliefsMaxTemp;
+            min = eternalOrTemporal ? beliefsMaxEte.intValue() : beliefsMinTemp;
         } else {
-            max = eternalOrTemporal ? goalsMaxEte.intValue() : goalsMaxTemp.intValue();
+            max = eternalOrTemporal ? goalsMaxEte.intValue() : goalsMaxTemp;
+            min = eternalOrTemporal ? goalsMaxEte.intValue() : goalsMinTemp;
         }
-        return tasks(compoundConcept, beliefComplexityCapacity, max);
-    }
 
-    static int tasks(CompoundConcept compoundConcept, float complexityCost, int b) {
-        return (int) Math.ceil(b * Math.min(1f, (1f / (compoundConcept.volume()/complexityCost))));
+        return Util.lerp(Util.unitize((-1 + compoundConcept.complexity())/32f), max, min);
+        //return (int) Math.ceil(max * Math.min(1f, (1f / (compoundConcept.volume()/ beliefComplexityCapacity))));
     }
 
     @Override
@@ -79,12 +84,13 @@ public final class DefaultConceptState extends ConceptState {
     }
 
     public static int lerp(@NotNull Concept c, @NotNull MutableInteger _min, @NotNull MutableInteger _max) {
+
         int min = _min.intValue();
         int max = _max.intValue();
 
         float v = c.complexity();
-        float complexityFactor = v / 12; //(nar.compoundVolumeMax.intValue()/2f); //HEURISTIC
-        complexityFactor = Math.min(complexityFactor, 1f); //clip at +1
+        float complexityFactor = ((v-1) / 32); //(nar.compoundVolumeMax.intValue()/2f); //HEURISTIC
+        complexityFactor = Util.sqr(Util.unitize(complexityFactor)); //clip at +1
 
         return Util.lerp(complexityFactor, max, min); //at least enough for its templates
     }

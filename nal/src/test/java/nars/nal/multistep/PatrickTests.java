@@ -115,10 +115,13 @@ public class PatrickTests extends AbstractNALTest {
 
 
         TestNAR tt = test();
-        tt.nar.time.dur(25);
+        tt.nar.time.dur(5);
         tt.nar.termVolumeMax.setValue(32);
 
-        //tt.log();
+        tt.nar.onCycle(()->{
+            System.err.println(tt.nar.time());
+        });
+        tt.log();
         tt.input(
                 "made_of(toothbrush,plastic).",
                 "( ( made_of($1, plastic) &&+0 lighter(I, $1) ) ==>+10 <$1 --> [heated]>).",

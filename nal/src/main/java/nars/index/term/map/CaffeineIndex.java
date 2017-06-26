@@ -3,6 +3,7 @@ package nars.index.term.map;
 import com.github.benmanes.caffeine.cache.*;
 import nars.NAR;
 import nars.Param;
+import nars.concept.PermanentConcept;
 import nars.concept.WiredConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.term.Term;
@@ -51,10 +52,10 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
 
     final static Weigher<? super Term, ? super Termed> w = (k,v) -> {
-        if (v instanceof WiredConcept) return 0;
+        if (v instanceof PermanentConcept) return 0;
         int vol = v.volume();
         //return vol;
-        return vol*vol;
+        return vol;
     };
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
@@ -72,7 +73,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         Caffeine<Term, Termed> builder = Caffeine.newBuilder().removalListener(this);
         if (capacity > 0) {
             //builder.maximumSize(capacity);
-            builder.maximumWeight(capacity * 100);
+            builder.maximumWeight(capacity*10);
             builder.weigher(w);
         } else
             builder.softValues();
@@ -80,11 +81,12 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         if (Param.DEBUG)
             builder.recordStats();
 
-        Caffeine<Object, Object> subTermsBuilder = subCapacity > 0 ? Caffeine.newBuilder() : null;
 
         if (exe!=null) {
             builder.executor(exe);
         }
+
+        Caffeine<Object, Object> subTermsBuilder = subCapacity > 0 ? Caffeine.newBuilder() : null;
 
         if (subCapacity > 0) {
             subTermsBuilder.executor(exe);
@@ -121,7 +123,6 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     @NotNull
     @Override
     public final TermContainer intern(@NotNull Term[] a) {
-
 
         TermContainer v = super.intern(a);
 
@@ -225,7 +226,8 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     /** this will be called from within a worker task */
     @Override public final void onRemoval(Term key, Termed value, @NotNull RemovalCause cause) {
 
-        onRemove(value);
+        if (value!=null)
+            onRemove(value);
     }
 
 

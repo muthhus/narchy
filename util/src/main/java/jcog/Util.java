@@ -850,6 +850,7 @@ public enum Util {
     public static float sigmoid(float v) {
         return (float) (1 / (1 + Math.exp(-v)));
     }
+
     public static double sigmoid(double v) {
         return (1 / (1 + Math.exp(-v)));
     }
@@ -1295,6 +1296,7 @@ public enum Util {
     public static int selectRoulette(float[] x, Random rng) {
         return selectRoulette(x.length, (n) -> x[n], rng);
     }
+
     /**
      * https://en.wikipedia.org/wiki/Fitness_proportionate_selection
      * Returns the selected index based on the weights(probabilities)
@@ -1382,7 +1384,9 @@ public enum Util {
     }
 
 
-    /** semi-busy wait loop */
+    /**
+     * semi-busy wait loop
+     */
     public static void stall(int delayMS) {
         stall(System.currentTimeMillis(), delayMS);
     }
@@ -1616,21 +1620,20 @@ public enum Util {
 
     public final static ObjectMapper msgPackMapper =
             new ObjectMapper(new MessagePackFactory())
-                    .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
-            ;
+                    .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
     public final static ObjectMapper jsonMapper =
             new ObjectMapper()
                     .enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES)
-            .enable(SerializationFeature.WRAP_EXCEPTIONS)
-            .enable(SerializationFeature.WRITE_NULL_MAP_VALUES)
-            .enable(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS)
-            .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
-            .enable(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)
-            .enable(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS)
-            .enable(MapperFeature.AUTO_DETECT_FIELDS)
-            .enable(MapperFeature.AUTO_DETECT_GETTERS)
-            .enable(MapperFeature.AUTO_DETECT_IS_GETTERS)
-            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                    .enable(SerializationFeature.WRAP_EXCEPTIONS)
+                    .enable(SerializationFeature.WRITE_NULL_MAP_VALUES)
+                    .enable(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS)
+                    .enable(SerializationFeature.WRITE_ENUMS_USING_TO_STRING)
+                    .enable(SerializationFeature.FLUSH_AFTER_WRITE_VALUE)
+                    .enable(MapperFeature.CAN_OVERRIDE_ACCESS_MODIFIERS)
+                    .enable(MapperFeature.AUTO_DETECT_FIELDS)
+                    .enable(MapperFeature.AUTO_DETECT_GETTERS)
+                    .enable(MapperFeature.AUTO_DETECT_IS_GETTERS)
+                    .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
             //.disable(SerializationFeature.FAIL_ON_SELF_REFERENCES)
             ;
 
@@ -1698,6 +1701,7 @@ public enum Util {
     public static float[] doubleToFloatArray(double[] a) {
         return doubleToFloatArray(a, 0, a.length);
     }
+
     public static float[] doubleToFloatArray(double[] a, int from, int to, DoubleToFloatFunction df) {
         float[] result = new float[to - from];
         for (int j = 0, i = from; i < to; i++, j++) {
@@ -1723,17 +1727,29 @@ public enum Util {
     }
 
     public static void mul(float scale, float[] ff) {
-        for (int i = 0; i< ff.length; i++)
+        for (int i = 0; i < ff.length; i++)
             ff[i] *= scale;
     }
 
     public static <X> X[] map(int from, int to, IntFunction<X> build, IntFunction<X[]> arrayizer) {
-        assert(to > from);
-        X[] x = arrayizer.apply(to-from);
+        assert (to > from);
+        X[] x = arrayizer.apply(to - from);
         for (int i = from, j = 0; i < to; ) {
             x[j++] = build.apply(i++);
         }
         return x;
     }
 
+    /** returns amount of memory used as a value between 0 and 100% (1.0) */
+    public static float memoryUsed() {
+        Runtime runtime = Runtime.getRuntime();
+        long total = runtime.totalMemory(); // current heap allocated to the VM process
+        long free = runtime.freeMemory(); // out of the current heap, how much is free
+        long max = runtime.maxMemory(); // Max heap VM can use e.g. Xmx setting
+        long usedMemory = total - free; // how much of the current heap the VM is using
+        long availableMemory = max - usedMemory; // available memory i.e. Maximum heap size minus the current amount used
+        float ratio = 1f - ((float) availableMemory) / max;
+        //logger.warn("max={}k, used={}k {}%, free={}k", max/1024, total/1024, Texts.n2(100f * ratio), free/1024);
+        return ratio;
+    }
 }

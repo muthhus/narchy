@@ -34,7 +34,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Activate extends UnaryTask<Task> {
 
-    static final float activationThreshold = Pri.EPSILON * 128;
+
 
 
     /**
@@ -47,23 +47,39 @@ public class Activate extends UnaryTask<Task> {
     @Override
     public ITask[] run(@NotNull NAR nar) {
 
-        Task t = get();
 
         float p = priElseZero();
-        if (p < activationThreshold) {
-            return DeleteMe;
+
+        ITask[] activations = null;
+        if (p >= Pri.EPSILON) {
+
+            Task t = get();
+            Concept origin = t.concept(nar);
+            if (origin != null /*&& !origin.isDeleted()*/) {
+                TaskActivation a = new TaskActivation(nar, t, (TaskConcept) origin, p, levels(t.term()));
+                float remain = a.linkOverflow.floatValue();
+                float remaining = priSub(p - remain);
+
+                if (remaining >= Pri.EPSILON * get().complexity()) {
+                    a.activate.addToValue(origin, remaining); //transfer back to concept fire
+                }
+
+                //if (!a.activations.isEmpty()) //HACK
+                activations = a.activations();
+
+            }
+
         }
 
-        Concept origin = t.concept(nar);
-        if (origin != null /*&& !origin.isDeleted()*/) {
-            TaskActivation a = new TaskActivation(nar, t, (TaskConcept) origin, p, levels(t.term()));
-            float remain = a.linkOverflow.floatValue();
-            priSub(p - remain);
+//        float memUsed = Util.memoryUsed();
+//        if (memUsed > 0.75f) {
+//            System.err.println(memUsed + "  memory used!");
+//        }
 
-            return a.activations != null ? a.activations.array() : null;
-        } else {
-            return DeleteMe;
-        }
+        delete();
+
+        return activations;
+
     }
 
     public static int levels(@NotNull Compound host) {
@@ -151,7 +167,7 @@ public class Activate extends UnaryTask<Task> {
          */
         private static final float TERMLINK_BALANCE = 0.5f;
 
-        final transient private ObjectFloatHashMap<Termed> spread;
+        final transient public ObjectFloatHashMap<Termed> activate;
         final transient private NAR nar;
         transient private FasterList<ITask> activations;
 
@@ -165,26 +181,26 @@ public class Activate extends UnaryTask<Task> {
             this.momentum = nar.momentum.floatValue();
             this.dur = nar.dur();
 
-            ITask[] a = null;
-
-
-            int ss = 0;
-
             /* HEURISTIC estimate */
-            spread = (origin.volume() > 16 ? activationsLarge : activationsSmall).get();
-            spread.clear();
+            activate = (origin.volume() > 16 ? activationsLarge : activationsSmall).get();
+            activate.clear();
             linkOverflow.setValue(0);
 
             link(origin, p, 0);
             nar.emotion.stress(linkOverflow);
 
-            ss = spread.size();
+        }
+
+        public ITask[] activations() {
+            int ss;
+            ITask[] a;
+            ss = activate.size();
             if (ss > 0) {
                 this.activations = new FasterList<>(0, a = new ITask[ss]);
-                this.spread.forEachKeyValue(this);
+                this.activate.forEachKeyValue(this);
+                return activations.array();
             }
-
-
+            return null;
         }
 
         @Override
@@ -220,7 +236,10 @@ public class Activate extends UnaryTask<Task> {
             if ((target instanceof Variable)) {
 
             } else {
-                @Nullable Concept targetConcept = nar.conceptualize(target);
+                @Nullable Concept targetConcept =
+                        depth <2 ? nar.conceptualize(target) /* only conceptualize first layer */ : nar.concept(target);
+                        //nar.conceptualize(target);
+
                 if (targetConcept != null)
                     target = targetConcept;
             }
@@ -254,7 +273,7 @@ public class Activate extends UnaryTask<Task> {
             //assert (target.op() != NEG); //should have been un-negated already
 
             if (parentActivation > 0)
-                spread.addToValue(target, parentActivation);
+                activate.addToValue(target, parentActivation);
         }
 
         protected float activateAtom(AtomConcept atom, float scale) {
