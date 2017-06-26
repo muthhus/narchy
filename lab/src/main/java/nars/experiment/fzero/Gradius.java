@@ -26,26 +26,28 @@ public class Gradius extends NAgentX {
 
         this.g = new Gradius4K();
 
-        //Scale camScale = new Scale(() -> g.image, 64, 64);
-        PixelBag cc = PixelBag.of(() -> g.image, 48, 48);
-        cc.setClarity(0.5f, 0.9f);
+        g.updateMS = 100;
+        Scale cc = new Scale(() -> g.image, 96, 96);
+        //PixelBag cc = PixelBag.of(camScale, 64, 64);
+        //cc.setClarity(0.5f, 0.9f);
 
 
-        //TODO fix the panning/zooming
-        onFrame((z) -> {
+//        //TODO fix the panning/zooming
+//        onFrame((z) -> {
+//
+//            float x = (g.player[Gradius4K.OBJ_X] - g.cameraX) / g.getWidth();
+//            float y = (g.player[OBJ_Y]) / g.getHeight();
+//
+//            cc.setXRelative(x + 0.5f);
+//            cc.setYRelative(y + 0.5f);
+//            cc.setZoom(0.5f);
+//
+//            //cc.setXRelative( mario.)
+//        });
 
-            float x = (g.player[Gradius4K.OBJ_X] - g.cameraX) / g.getWidth();
-            float y = (g.player[OBJ_Y]) / g.getHeight();
-
-            cc.setXRelative(x/2f);
-            cc.setYRelative(y/2f);
-            cc.setZoom(0.8f);
-
-            //cc.setXRelative( mario.)
-        });
-
-        CameraSensor<PixelBag> camScale = senseCamera("(G,cam)" /*"(nario,local)"*/, cc);
-        camScale.resolution(0.1f);
+        //CameraSensor<PixelBag> camScale = senseCamera("(G,cam)" /*"(nario,local)"*/, cc);
+        //camScale.resolution(0.1f);
+        senseCamera("(G)", cc);
 
 
 //        Scale camScaleLow = new Scale(() -> g.image, 16, 16);

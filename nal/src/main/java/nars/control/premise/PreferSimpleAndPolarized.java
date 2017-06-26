@@ -67,7 +67,9 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
     @Override
     public float budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end) {
 
-        float p = d.premise.pri();
+        float p =
+            d.parentPri;
+            //d.premise.pri();
 
         float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm);
         if (truth != null) { //belief and goal:
