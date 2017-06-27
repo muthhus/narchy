@@ -3,15 +3,13 @@ package nars.util.exe;
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;
-import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.HijackBag;
+import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
-import jcog.pri.PriReference;
 import jcog.pri.mix.control.CLink;
-import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -20,10 +18,7 @@ import nars.task.NALTask;
 import nars.truth.Truthed;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -49,7 +44,7 @@ public class TaskExecutor extends Executioner {
 //     */
 //    protected final FasterList<ITask> toRemove = new FasterList();
 
-//    /**
+    //    /**
 //     * amount of priority to subtract from each processed task (re-calculated each cycle according to bag pressure)
 //     */
 //    protected float forgetEachPri;
@@ -59,14 +54,20 @@ public class TaskExecutor extends Executioner {
      * active tasks
      */
     public final Bag<ITask, CLink<ITask>> active =
-            new ArrayBag<>(PriMerge.plus, new ConcurrentHashMap<>()) {
+//            new ArrayBag<>(PriMerge.plus, new ConcurrentHashMap<>()) {
 
 
-                //new PriorityHijackBag<>(3) {
-//        @Override
-//        protected final Consumer<CLink<ITask>> forget(float rate) {
-//            return null;
-//        }
+            new PriorityHijackBag<>(3) {
+                @Override
+                protected final Consumer<CLink<ITask>> forget(float rate) {
+                    return null;
+                }
+
+                @Override
+                public HijackBag commit(Consumer c) {
+                    return this; //do nothing
+                }
+
 
                 @Override
                 public CLink<ITask> put(@NotNull CLink<ITask> x) {
@@ -91,11 +92,6 @@ public class TaskExecutor extends Executioner {
                     }
                 }
 
-                @NotNull
-                @Override
-                public Bag<ITask, CLink<ITask>> commit(@Nullable Consumer<CLink<ITask>> update) {
-                    return this;
-                }
 
                 @NotNull
                 @Override
@@ -173,6 +169,9 @@ public class TaskExecutor extends Executioner {
             return;
 
         try {
+
+            active.commit(null);
+
             int ps = active.size();
             if (ps == 0)
                 return;
@@ -223,6 +222,7 @@ public class TaskExecutor extends Executioner {
     protected void actuallyRun(CLink<ITask> x) {
         ITask[] next;
         try {
+            if (x == null) return; //HACK
 
             if (x.isDeleted()) {
                 active.remove(x.ref);
@@ -232,17 +232,19 @@ public class TaskExecutor extends Executioner {
 
         } catch (Throwable e) {
             NAR.logger.error("{} {}", x, (Param.DEBUG) ? e : e.getMessage());
-            x.delete(); active.remove(x.ref);
+            x.delete();
+            active.remove(x.ref);
             return;
         }
 
         if (next == ITask.DeleteMe) {
-            x.delete(); active.remove(x.ref);
+            x.delete();
+            active.remove(x.ref);
         } else if (next == ITask.Disappear) {
             active.remove(x.ref); //immediately but dont affect its budget
-        } else  {
+        } else {
             float g = masterGain.floatValue();
-            if (g!=1)
+            if (g != 1)
                 x.priMult(g);
         }
 
@@ -250,7 +252,7 @@ public class TaskExecutor extends Executioner {
     }
 
     protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
-        if (next!=null)
+        if (next != null)
             nar.input(next);
     }
 
@@ -261,7 +263,8 @@ public class TaskExecutor extends Executioner {
             actuallyRun(input); //commands executed immediately
             return true;
         } else {
-            return active.put(input) != null;
+            active.putAsync(input);
+            return true;//!= null;
         }
     }
 
@@ -271,26 +274,26 @@ public class TaskExecutor extends Executioner {
         RecycledSummaryStatistics pri = new RecycledSummaryStatistics();
 
         ObjectFloatHashMap<Class<? extends ITask>> typeToPri = new ObjectFloatHashMap();
-                //.value("pri", x -> x.priElseZero());
+        //.value("pri", x -> x.priElseZero());
 
 
         MultiStatistics<NALTask> beliefs = new MultiStatistics<NALTask>()
-                .value( "pri", Task::pri)
-                .value( "freq", Truthed::freq)
-                .value( "conf", Truthed::conf);
+                .value("pri", Task::pri)
+                .value("freq", Truthed::freq)
+                .value("conf", Truthed::conf);
 
         active.forEachKey(x -> {
             float p = x.pri();
-            if (p!=p)
+            if (p != p)
                 return;
             typeToPri.addToValue(x.getClass(), p);
-            if (x.punc()==BELIEF) {
-                beliefs.accept((NALTask)x);
+            if (x.punc() == BELIEF) {
+                beliefs.accept((NALTask) x);
             }
             pri.accept(p);
         });
 
-                //.classify("type", x -> x.getClass().toString()
+        //.classify("type", x -> x.getClass().toString()
 
         return Joiner.on("\n").join(typeToPri, beliefs, pri);
     }

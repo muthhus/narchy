@@ -121,7 +121,7 @@ public class Builtin {
          */
         nar.on(Functor.f1((Atom) $.the("dropAnyConj"), (Term t) -> {
             if (t.op() != CONJ)
-                return t;
+                return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
             Compound c = compoundOrNull(t);  //for use in deriver, fail if any variable parameters
 

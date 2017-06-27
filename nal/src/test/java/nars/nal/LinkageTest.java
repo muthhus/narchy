@@ -124,7 +124,9 @@ public class LinkageTest extends AbstractNALTest {
         System.out.println("========================");
         p1.print();
         System.out.println("------------------------");
-        nar.concept(premise2).print();
+        Concept c2 = nar.concept(premise2);
+        assertNotNull(c2);
+        c2.print();
         System.out.println("========================");
 
         boolean passed = linksIndirectly(nar, premise2, p1);

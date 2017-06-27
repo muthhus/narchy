@@ -27,7 +27,10 @@ public class Gradius extends NAgentX {
         this.g = new Gradius4K();
 
         g.updateMS = 100;
-        Scale cc = new Scale(() -> g.image, 96, 96);
+
+        //Scale cc = new Scale(() -> g.image, 96, 96);
+        //senseCamera("(G)", cc);
+
         //PixelBag cc = PixelBag.of(camScale, 64, 64);
         //cc.setClarity(0.5f, 0.9f);
 
@@ -47,19 +50,20 @@ public class Gradius extends NAgentX {
 
         //CameraSensor<PixelBag> camScale = senseCamera("(G,cam)" /*"(nario,local)"*/, cc);
         //camScale.resolution(0.1f);
-        senseCamera("(G)", cc);
 
 
-//        Scale camScaleLow = new Scale(() -> g.image, 16, 16);
-//        for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[]{
-//                R,
-//                BufferedImageBitmap2D.ColorMode.B,
-//                BufferedImageBitmap2D.ColorMode.G
-//        }) {
-//            senseCamera("Gc" + cm.name(), /*"(G,c" + cm.name() + ")"*/
-//                    (cm == R ? camScale : camScaleLow).filter(cm)
-//            ).resolution(0.1f);
-//        }
+
+        Scale camScaleLow = new Scale(() -> g.image, 24, 24);
+        for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[]{
+                R,
+                BufferedImageBitmap2D.ColorMode.B,
+                BufferedImageBitmap2D.ColorMode.G
+        }) {
+            senseCamera("Gc" + cm.name(), /*"(G,c" + cm.name() + ")"*/
+                    //(cm == R ? camScale : camScaleLow).filter(cm)
+                    camScaleLow.filter(cm)
+            ).resolution(0.1f);
+        }
 
         actionToggle($.inh(Atomic.the("fire"), id),
                 (b) -> g.keys[Gradius4K.VK_SHOOT] = b);

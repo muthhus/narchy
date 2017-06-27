@@ -65,7 +65,7 @@ public class NARBuilder {
         Inperience inp = new Inperience(n, 0.01f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(512, 0.1f);
+            n.addNAR(1024, 0.25f);
         }
 
 //        n.onTask(t -> {

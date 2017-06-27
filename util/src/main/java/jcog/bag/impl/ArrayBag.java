@@ -5,7 +5,6 @@ import jcog.bag.Bag;
 import jcog.data.sorted.SortedArray;
 import jcog.list.FasterList;
 import jcog.pri.Pri;
-import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
@@ -691,7 +690,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                     swap(c, i, left);
                 }
 
-                PriReference temp = (PriReference) c[i];
+                Prioritized temp = (Prioritized) c[i];
                 float tempV = pCmp(temp);
 
                 while (true) {

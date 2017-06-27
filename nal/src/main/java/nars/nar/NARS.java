@@ -11,6 +11,7 @@ import jcog.pri.PriReference;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
 import jcog.pri.mix.control.CLink;
+import jcog.pri.mix.control.HaiQMixAgent;
 import jcog.pri.mix.control.MixContRL;
 import nars.$;
 import nars.NAR;
@@ -61,7 +62,7 @@ public class NARS extends NAR {
     private List<Loop> loops;
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(new CaffeineIndex(new DefaultConceptBuilder(), 64 * 1024,  e) {
+        super(new CaffeineIndex(new DefaultConceptBuilder(), -1,  e) {
 
 //                  @Override
 //                  protected void onBeforeRemove(Concept c) {
@@ -105,7 +106,7 @@ public class NARS extends NAR {
 
     @Override
     protected PSinks newInputMixer() {
-        MixContRL<ITask> r = new MixContRL<>(40f,
+        MixContRL<ITask> r = new MixContRL<>(20f,
                 null,
 
                 FloatAveraged.averaged(emotion.happy.sumIntegrator()::sumThenClear, 1),
@@ -177,8 +178,10 @@ public class NARS extends NAR {
                                 new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
 
                         ).get(), r, this)
-                //new HaiQMixAgent(),
-                //new MultiHaiQMixAgent(),
+
+                //new HaiQMixAgent()
+
+                //new MultiHaiQMixAgent()
         );
 
         return r;
@@ -245,7 +248,7 @@ public class NARS extends NAR {
 
 
         public CLink<ITask> apply(CLink<ITask> x) {
-            if (!x.isDeleted())
+            if (x!=null && !x.isDeleted())
                 x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
             return x;
         }

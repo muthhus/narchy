@@ -102,17 +102,11 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        NARS n = NARBuilder.newMultiThreadNAR(4, clock);
+        NARS n = NARBuilder.newMultiThreadNAR(2, clock);
 
         NAgent a = init.apply(n);
         //a.trace = true;
 
-
-        NARLoop narLoop = a.startRT(fps, endTime);
-        n.onCycle(nn -> {
-            float lag = narLoop.lagSumThenClear() + a.running().lagSumThenClear();
-            n.emotion.happy(-lag);
-        });
 
         chart(a);
         chart(n, a);
@@ -126,7 +120,6 @@ abstract public class NAgentX extends NAgent {
                 col(
                         row(
                                 new Plot2D(HISTORY, Plot2D.Line)
-                                        .add("lag", () -> narLoop.lag())
                                         .on(a::onFrame),
                                 new Plot2D(HISTORY, Plot2D.Line)
                                         .add("happy", () -> m.lastScore)
@@ -168,6 +161,11 @@ abstract public class NAgentX extends NAgent {
                 )
         ), 800, 800);
 
+        NARLoop narLoop = a.startRT(fps, endTime);
+        n.onCycle(nn -> {
+            float lag = narLoop.lagSumThenClear() + a.running().lagSumThenClear();
+            n.emotion.happy(-lag);
+        });
         return n;
     }
 

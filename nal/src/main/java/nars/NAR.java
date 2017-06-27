@@ -1392,8 +1392,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         if ((existing != null) && (existing != c))
             throw new RuntimeException("concept already indexed for term: " + c.term());
 
-        terms.set(c);
         c.state(terms.conceptBuilder().awake());
+        terms.set(c);
 
         return c;
     }

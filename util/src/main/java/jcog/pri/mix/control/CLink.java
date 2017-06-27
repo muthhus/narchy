@@ -18,6 +18,11 @@ public class CLink<X extends Priority> extends RoaringBitmap implements Priority
     }
 
     @Override
+    public String toString() {
+        return ref.toString() + super.toString();
+    }
+
+    @Override
     public int hashCode() {
         return ref.hashCode();
     }

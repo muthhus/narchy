@@ -80,7 +80,7 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
         for (int s = 0; s < iv; s++) {
             ins.add(0);
             int ss = s;
-            senseNumber($.p("I", Integer.toString(ss)), () -> ins.get(ss));
+            senseNumber($.inh($.p( Integer.toString(ss) ), $.the("I") ), () -> ins.get(ss));
         }
 
         int d = mix.dim;
@@ -88,7 +88,7 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
         Arrays.fill(outs, 0.5f);
         for (int a = 0; a < d; a++) {
             int aa = a;
-            actionBipolar($.p("O", mix.mix[a].id), (v) -> {
+            actionBipolar($.inh( $.p(mix.mix[a].id), $.the("O")), (v) -> {
                 if (v == v) {
                     //outs[aa] = v;
                     outs[aa] = Util.unitize(outs[aa] + v * speed);
