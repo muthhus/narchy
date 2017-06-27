@@ -2,6 +2,7 @@ package jcog.bag;
 
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.CurveBag;
+import jcog.bag.impl.PriArrayBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
 import jcog.pri.PLink;
@@ -32,7 +33,7 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalArray() {
-        testBasicInsertionRemoval(new ArrayBag<>(1, plus, new HashMap<>(1)));
+        testBasicInsertionRemoval(new PriArrayBag<>(1, plus, new HashMap<>(1)));
     }
 
     @Test
@@ -66,7 +67,7 @@ public class BagTest {
 
     @Test
     public void testBudgetMerge() {
-        ArrayBag<String> a = new ArrayBag<String>(4, plus, new HashMap<>(4));
+        PriArrayBag<String> a = new PriArrayBag<String>(4, plus, new HashMap<>(4));
         assertEquals(0, a.size());
 
         a.put(new PLink("x", 0.1f));
@@ -84,7 +85,7 @@ public class BagTest {
 
     @Test
     public void testSort() {
-        ArrayBag<String> a = new ArrayBag(4, plus, new HashMap<>(4));
+        PriArrayBag a = new PriArrayBag(4, plus, new HashMap<>(4));
 
         a.put(new PLink("x",0.1f));
         a.put(new PLink("y",0.2f));
@@ -117,7 +118,7 @@ public class BagTest {
 
     @Test
     public void testCapacity() {
-        ArrayBag<String> a = new ArrayBag(2, plus, new HashMap<>(2));
+        PriArrayBag a = new PriArrayBag(2, plus, new HashMap<>(2));
 
         a.put(new PLink("x", 0.1f));
         a.put(new PLink("y", 0.2f));
@@ -136,7 +137,7 @@ public class BagTest {
 
     @Test
     public void testRemoveByKey() {
-        testRemoveByKey(new ArrayBag(2, plus, new HashMap<>(2)));
+        testRemoveByKey(new PriArrayBag(2, plus, new HashMap<>(2)));
     }
 
     public static void testRemoveByKey(Bag<String,PriReference<String>> a) {

@@ -29,11 +29,11 @@ import java.util.function.Predicate;
  * A bag implemented as a combination of a Map and a SortedArrayList
  * TODO extract a version of this which will work for any Prioritized, not only BLink
  */
-public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements Bag<X, PriReference<X>> {
+abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable<X, Y> implements Bag<X, Y> {
 
     public final PriMerge mergeFunction;
 
-    final QueueLock<PriReference<X>> toPut = new QueueLock<>((p)->this.put(p, null));
+    final QueueLock<Y> toPut = new QueueLock<>((p) -> this.put(p, null));
 
     /**
      * inbound pressure sum since last commit
@@ -44,23 +44,29 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
     private final AtomicBoolean unsorted = new AtomicBoolean(false);
 
-    public ArrayBag(PriMerge mergeFunction, @NotNull Map<X, PriReference<X>> map) {
+    public ArrayBag(PriMerge mergeFunction, @NotNull Map<X, Y> map) {
         this(0, mergeFunction, map);
     }
 
     static final class SortedPLinks extends SortedArray {
         @Override
         protected Object[] newArray(int oldSize) {
-            return new PriReference[grow(oldSize)];
+            return new Object[oldSize == 0 ? 4 : oldSize * 2];
         }
     }
 
-    public ArrayBag(@Deprecated int cap, PriMerge mergeFunction, @NotNull Map<X, PriReference<X>> map) {
+    public ArrayBag(@Deprecated int cap, PriMerge mergeFunction, @NotNull Map<X, Y> map) {
         super(new SortedPLinks(), map);
 
         this.mergeFunction = mergeFunction;
         this.capacity = cap;
     }
+
+    @Override
+    public final float floatValueOf(Prioritized x) {
+        return -pCmp(x);
+    }
+
 
     /**
      * returns whether the capacity has changed
@@ -70,8 +76,8 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
         if (newCapacity != this.capacity) {
             this.capacity = newCapacity;
             //synchronized (items) {
-                if (this.size() > newCapacity)
-                    commit(null, true);
+            if (this.size() > newCapacity)
+                commit(null, true);
             //}
             //return true;
         }
@@ -86,7 +92,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
     @NotNull
     @Override
-    public Iterator<PriReference<X>> iterator() {
+    public Iterator<Y> iterator() {
         ensureSorted();
         return super.iterator();
     }
@@ -95,54 +101,51 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
      * returns true unless failed to add during 'add' operation or becomes empty
      */
     @Override
-    protected boolean updateItems(@Nullable PriReference<X> toAdd) {
+    protected boolean updateItems(@Nullable Y toAdd) {
 
         int c = capacity();
-        List<PriReference> pendingRemoval = null;
+        List<Y> pendingRemoval = null;
         boolean result;
-        {
-            int additional = (toAdd != null) ? 1 : 0;
+        int additional = (toAdd != null) ? 1 : 0;
 
-            int s = size();
+        int s = size();
 
-            int nextSize = s + additional;
+        int nextSize = s + additional;
 
-            int needsRemoved = nextSize - c;
-            if (needsRemoved > 0) {
+        int needsRemoved = nextSize - c;
+        if (needsRemoved > 0) {
 
+            synchronized (items) {
+                pendingRemoval = new FasterList(needsRemoved);
+                clean(toAdd, s, nextSize - c, pendingRemoval);
+            }
+
+
+            pendingRemoval.forEach(this::onRemoved); //execute outside of synchronization
+
+
+        }
+
+
+        if (toAdd != null) {
+            int ss = size();
+            if (ss < c) {
                 synchronized (items) {
-                    pendingRemoval = new FasterList(needsRemoved);
-                    clean(toAdd, s, nextSize - c, pendingRemoval);
+                    items.add(toAdd, this);
                 }
-
-
-                pendingRemoval.forEach(this::onRemoved); //execute outside of synchronization
-
-
-            }
-
-
-            if (toAdd != null) {
-                int ss = size();
-                if (ss < c) {
-                    synchronized (items) {
-                        items.add(toAdd, this);
-                    }
-                    result = true;
-                } else {
-                    //throw new RuntimeException("list became full during insert");
-                    result = false;
-                }
+                result = true;
             } else {
-                result = size() > 0;
+                //throw new RuntimeException("list became full during insert");
+                result = false;
             }
-
+        } else {
+            result = size() > 0;
         }
 
         return result;
     }
 
-    private void clean(@Nullable PriReference<X> toAdd, int s, int minRemoved, List<PriReference> trash) {
+    private void clean(@Nullable Y toAdd, int s, int minRemoved, List<Y> trash) {
 
         if (cleanDeletedEntries()) {
             //first step: remove any nulls and deleted values
@@ -151,10 +154,10 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
         //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
         int s1 = s;
-        SortedArray<PriReference<X>> items1 = this.items;
+        SortedArray<Y> items1 = this.items;
         final int c = capacity;
         while (s1 > 0 && ((s1 - c) + (toAdd != null ? 1 : 0)) > 0) {
-            PriReference<X> w1 = items1.remove(s1 - 1);
+            Y w1 = items1.remove(s1 - 1);
             if (w1 != null) //skip over nulls
                 trash.add(w1);
             s1--;
@@ -162,7 +165,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
         int trashed = trash.size();
         for (int i = 0; i < trashed; i++) {
-            PriReference w = trash.get(i);
+            Y w = trash.get(i);
             map.remove(key(w));
         }
     }
@@ -175,11 +178,6 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
         return true;
     }
 
-
-    @Override
-    public final float floatValueOf(PriReference x) {
-        return -pCmp(x);
-    }
 
     //    @Override
 //    public final int compare(@Nullable BLink o1, @Nullable BLink o2) {
@@ -194,21 +192,29 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 //    }
 
 
+    static boolean cmpGT(@Nullable Object o1, @Nullable Object o2) {
+        return cmpGT((Prioritized)o1, (Prioritized)o2);
+    }
+
+    static boolean cmpGT(@Nullable Object o1, @Nullable float o2) {
+        return cmpGT((Prioritized)o1, o2);
+    }
+
     /**
      * true iff o1 > o2
      */
-    static boolean cmpGT(@Nullable PriReference o1, @Nullable PriReference o2) {
+    static boolean cmpGT(@Nullable Prioritized o1, @Nullable Prioritized o2) {
         return cmpGT(o1, pCmp(o2));
     }
 
-    static boolean cmpGT(@Nullable PriReference o1, float o2) {
+    static boolean cmpGT(@Nullable Prioritized o1, float o2) {
         return (pCmp(o1) < o2);
     }
 
     /**
      * true iff o1 > o2
      */
-    static boolean cmpGT(float o1, @Nullable PriReference o2) {
+    static boolean cmpGT(float o1, @Nullable Prioritized o2) {
         return (o1 < pCmp(o2));
     }
 
@@ -216,11 +222,11 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
     /**
      * true iff o1 < o2
      */
-    static boolean cmpLT(@Nullable PriReference o1, @Nullable PriReference o2) {
+    static boolean cmpLT(@Nullable Prioritized o1, @Nullable Prioritized o2) {
         return cmpLT(o1, pCmp(o2));
     }
 
-    static boolean cmpLT(@Nullable PriReference o1, float o2) {
+    static boolean cmpLT(@Nullable Prioritized o1, float o2) {
         return (pCmp(o1) > o2);
     }
 
@@ -238,11 +244,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
     }
 
 
-    @Override
-    @NotNull
-    public final X key(@NotNull PriReference<X> l) {
-        return l.get();
-    }
+
 
 
     /**
@@ -250,42 +252,45 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
      */
     @NotNull
     @Override
-    public Bag<X, PriReference<X>> sample(@NotNull Bag.BagCursor<? super PriReference<X>> each, boolean pop) {
+    public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each, boolean pop) {
         sample(each, 0, pop);
         return this;
     }
 
     @Override
-    public Bag<X, PriReference<X>> sample(int max, Consumer<? super PriReference<X>> each) {
-        return sample(max, ((x) -> { each.accept(x); return true;  }));
+    public Bag<X, Y> sample(int max, Consumer<? super Y> each) {
+        return sample(max, ((x) -> {
+            each.accept(x);
+            return true;
+        }));
     }
 
     @Override
-    public Bag<X, PriReference<X>> sample(int max, Predicate<? super PriReference<X>> kontinue) {
+    public Bag<X, Y> sample(int max, Predicate<? super Y> kontinue) {
         synchronized (items) {
-            assert(max > 0);
+            assert (max > 0);
             int s = size();
 
             Object[] oo = items.list;
             if (oo.length == 0)
                 return this;
 
-            PriReference<X>[] ll = (PriReference<X>[]) oo;
+            Object[] ll = oo;
             if (s == 1) {
                 //get the only
-                kontinue.test(ll[0]);
+                kontinue.test((Y)ll[0]);
             } else if (s == max) {
                 //get all
                 for (int i = 0; i < s; i++) {
-                    if (!kontinue.test(ll[i]))
+                    if (!kontinue.test((Y)ll[i]))
                         break;
                 }
             } else if (s > 1) {
                 //get some: choose random starting index, get the next consecutive values
                 max = Math.min(s, max);
                 for (int i = ThreadLocalRandom.current().nextInt(s), m = 0; m < max; m++) {
-                    PriReference<X> lll = ll[i++];
-                    if (lll!=null)
+                    Y lll = (Y) ll[i++];
+                    if (lll != null)
                         if (!kontinue.test(lll))
                             break;
                     if (i == s) i = 0; //modulo
@@ -299,7 +304,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
      * @param each
      * @param startingIndex if negative, a random starting location is used
      */
-    protected void sample(@NotNull Bag.@NotNull BagCursor<? super PriReference<X>> each, int startingIndex, boolean pop) {
+    protected void sample(@NotNull Bag.@NotNull BagCursor<? super Y> each, int startingIndex, boolean pop) {
         int i = startingIndex;
         if (i < 0) {
             int s = size();
@@ -313,7 +318,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
         int s;
         while (!next.stop && (0 < (s = size()))) {
             if (i >= s) i = 0;
-            PriReference<X> x = get(i++);
+            Y x = get(i++);
 
             if (x != null/*.remove*/) {
                 if (pop) {
@@ -335,26 +340,28 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
     }
 
     @Override
-    public final void putAsync(@NotNull PriReference<X> b) {
+    public final void putAsync(@NotNull Y b) {
         toPut.accept(b);
     }
 
     @Override
-    public final PriReference<X> put(@NotNull PriReference<X> b, @Nullable MutableFloat overflow) {
+    public final Y put(@NotNull Y b, @Nullable MutableFloat overflow) {
 
-        float[] incoming = { b.priSafe(0) };
+        float[] incoming = { priSafeOrZero(b) };
 
         final boolean[] isNew = {false};
 
         X key = key(b);
-        PriReference<X> v = map.compute(key, (kk, existing) -> {
-            PriReference<X> res;
+        Y v = map.compute(key, (kk, existing) -> {
+            Y res;
 
             if (existing != null) {
                 //MERGE
                 res = existing;
-                float oo = existing!=b ? mergeFunction.merge(existing, b) : incoming[0] /* all of it if identical */;
-                if (oo > 0) {
+                float oo = existing != b ? mergeFunction.merge(
+                        (Priority) /* HACK */ existing, b)
+                        : incoming[0] /* all of it if identical */;
+                if (oo > Pri.EPSILON) {
                     incoming[0] -= oo; //release any unabsorbed pressure
                     if (overflow != null) overflow.add(oo);
                 }
@@ -399,29 +406,30 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
     @Nullable
     @Override
-    protected PriReference<X> addItem(@NotNull PriReference<X> i) {
+    protected Y addItem(@NotNull Y i) {
         throw new UnsupportedOperationException();
     }
 
 
     @Override
     @Deprecated
-    public Bag<X, PriReference<X>> commit() {
+    public Bag<X, Y> commit() {
         double p = this.pressure.getAndSet(0);
         if (p > Pri.EPSILON) {
-            return commit(PriForget.forget(size(), capacity(), (float) p, mass, PriForget.DEFAULT_TEMP, Priority.EPSILON, PriForget::new));
+            return commit(PriForget.forget(size(), capacity(),
+                    (float) p, mass, PriForget.DEFAULT_TEMP, Priority.EPSILON, PriForget::new));
         }
         return this;
     }
 
     @Override
     @NotNull
-    public final ArrayBag<X> commit(Consumer<PriReference<X>> update) {
+    public Bag<X, Y> commit(Consumer<Y> update) {
         commit(update, false);
         return this;
     }
 
-    private void commit(@Nullable Consumer<PriReference<X>> update, boolean checkCapacity) {
+    private void commit(@Nullable Consumer<Y> update, boolean checkCapacity) {
 
         if (update != null || checkCapacity)
             update(update, checkCapacity);
@@ -431,7 +439,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
         //synchronized (items) {
         int iii = size();
         for (int i = 0; i < iii; i++) {
-            PriReference x = get(i);
+            Y x = get(i);
             if (x != null)
                 mass += x.priSafe(0);
         }
@@ -446,7 +454,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
      * applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted
      */
     @NotNull
-    protected ArrayBag<X> update(@Nullable Consumer<PriReference<X>> each, boolean checkCapacity) {
+    protected ArrayBag<X, Y> update(@Nullable Consumer<Y> each, boolean checkCapacity) {
         boolean needsSort = false;
 
         synchronized (items) {
@@ -483,7 +491,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
                 Object[] a = items.list;
                 if (a.length > 1) { //test again
                     int[] stack = new int[sortSize(s) /* estimate */];
-                    qsort(stack, (PriReference[]) a, 0 /*dirtyStart - 1*/, (s - 1));
+                    qsort(stack, a, 0 /*dirtyStart - 1*/, (s - 1));
                 }
             }
         }
@@ -506,17 +514,17 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
     /**
      * returns whether the items list was detected to be sorted
      */
-    private boolean updateBudget(@NotNull Consumer<PriReference<X>> each) {
+    private boolean updateBudget(@NotNull Consumer<Y> each) {
 //        int dirtyStart = -1;
         boolean sorted = true;
 
 
         int s = size();
-        PriReference[] l = items.array();
+        Object[] l = items.array();
         //@NotNull PLink<V> beneath = l[i]; //compares with self below to avoid a null check in subsequent iterations
         float pBelow = -2;
         for (int i = s - 1; i >= 0; ) {
-            PriReference b = l[i];
+            Y b = (Y) l[i];
 
             float p = (b != null) ? b.priSafe(-2) : -2; //sort nulls to the end of the end
 
@@ -537,8 +545,8 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
     }
 
 
-    public @Nullable PriReference<X> remove(boolean topOrBottom) {
-        @Nullable PriReference<X> x = topOrBottom ? top() : bottom();
+    public @Nullable Y remove(boolean topOrBottom) {
+        @Nullable Y x = topOrBottom ? top() : bottom();
         if (x != null) {
             remove(key(x));
             return x;
@@ -546,15 +554,15 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
         return null;
     }
 
-    private int removeDeleted(@NotNull List<PriReference> trash, int minRemoved) {
+    private int removeDeleted(@NotNull List<Y> trash, int minRemoved) {
 
-        SortedArray<PriReference<X>> items = this.items;
+        SortedArray items = this.items;
         final Object[] l = items.array();
         int removedFromMap = 0;
 
         //iterate in reverse since null entries should be more likely to gather at the end
         for (int s = size() - 1; removedFromMap < minRemoved && s >= 0; s--) {
-            PriReference x = (PriReference) l[s];
+            Y x = (Y) l[s];
             if (x == null || (x.isDeleted() && trash.add(x))) {
                 items.removeFast(s);
                 removedFromMap++;
@@ -569,7 +577,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
         synchronized (items) {
             //map is possibly shared with another bag. only remove the items from it which are present in items
             items.forEach(x -> {
-                map.remove(x.get());
+                map.remove(key(x));
                 onRemoved(x);
             });
             items.clear();
@@ -590,20 +598,20 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
 
     @Override
-    public float pri(@NotNull PriReference<X> key) {
+    public float pri(@NotNull Y key) {
         return key.pri();
         //throw new UnsupportedOperationException("TODO currently this bag works with PLink.pri() directly");
     }
 
     @Override
-    public void forEach(int max, @NotNull Consumer<? super PriReference<X>> action) {
+    public void forEach(int max, @NotNull Consumer<? super Y> action) {
         ensureSorted();
 
         Object[] x = items.array();
         if (x.length > 0) {
-            for (PriReference a : ((PriReference[]) x)) {
+            for (Object a : (x)) {
                 if (a != null) {
-                    PriReference<X> b = a;
+                    Y b = (Y) a;
                     float p = b.pri();
                     if (p == p) {
                         action.accept(b);
@@ -619,11 +627,11 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
     @Override
     public void forEachKey(@NotNull Consumer<? super X> each) {
-        forEach(x -> each.accept(x.get()));
+        forEach(x -> each.accept(key(x)));
     }
 
     @Override
-    public void forEach(Consumer<? super PriReference<X>> action) {
+    public void forEach(Consumer<? super Y> action) {
 
         forEach(Integer.MAX_VALUE, action);
     }
@@ -642,7 +650,7 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
      * http://kosbie.net/cmu/summer-08/15-100/handouts/IterativeQuickSort.java
      */
 
-    public static void qsort(int[] stack, PriReference[] c, int left, int right) {
+    public static void qsort(int[] stack, Object[] c, int left, int right) {
         int stack_pointer = -1;
         int cLenMin1 = c.length - 1;
         while (true) {
@@ -650,10 +658,10 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
             if (right - left <= 7) {
                 //bubble sort on a region of right less than 8?
                 for (j = left + 1; j <= right; j++) {
-                    PriReference swap = c[j];
+                    Prioritized swap = (Prioritized) c[j];
                     i = j - 1;
                     float swapV = pCmp(swap);
-                    while (i >= left && cmpGT(c[i], swapV)) {
+                    while (i >= left && cmpGT((Prioritized)c[i], swapV)) {
                         swap(c, i + 1, i);
                         i--;
                     }
@@ -666,7 +674,6 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
                     break;
                 }
             } else {
-                PriReference swap;
 
                 int median = (left + right) / 2;
                 i = left + 1;
@@ -684,11 +691,11 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
                     swap(c, i, left);
                 }
 
-                PriReference temp = c[i];
+                PriReference temp = (PriReference) c[i];
                 float tempV = pCmp(temp);
 
                 while (true) {
-                    while (i < cLenMin1 && cmpLT(c[++i], tempV)) ;
+                    while (i < cLenMin1 && cmpLT((Prioritized)c[++i], tempV)) ;
                     while (cmpGT(c[--j], tempV)) ;
                     if (j < i) {
                         break;
@@ -716,8 +723,8 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
         }
     }
 
-    public static void swap(PriReference[] c, int x, int y) {
-        PriReference swap = c[y];
+    public static void swap(Object[] c, int x, int y) {
+        Object swap = c[y];
         c[y] = c[x];
         c[x] = swap;
     }
@@ -771,10 +778,10 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
 
     @Override
     public float priMax() {
-        PriReference x;
+        Y y;
         ensureSorted();
-        x = items.first();
-        return x != null ? x.priSafe(0) : 0f;
+        y = items.first();
+        return y != null ? y.priSafe(0) : 0f;
     }
 
     @Override
@@ -787,9 +794,9 @@ public class ArrayBag<X> extends SortedListTable<X, PriReference<X>> implements 
      * doesnt ensure sorting to avoid synchronization
      */
     float priMinFast(float ifDeleted) {
-        PriReference x;
-        x = items.last();
-        return x != null ? x.priSafe(ifDeleted) : ifDeleted;
+        Y y;
+        y = items.last();
+        return y != null ? y.priSafe(ifDeleted) : ifDeleted;
     }
 
 

@@ -51,11 +51,12 @@ public class SortedArray<E> implements Iterable<E> {
 
     public static final int binarySearchThreshold = 8;
 
-    public E[] list = (E[]) zeroList;
+    public Object[] list = zeroList;
 
     protected int size;
 
-    public E[] array() {
+    /** direct array access; use with caution ;) */
+    public Object[] array() {
         return list;
     }
 
@@ -68,7 +69,7 @@ public class SortedArray<E> implements Iterable<E> {
 
         int totalOffset = this.size - index - 1;
         if (totalOffset >= 0) {
-            E[] list = this.list;
+            E[] list = (E[]) this.list;
             E previous = list[index];
             if (totalOffset > 0) {
                 System.arraycopy(list, index + 1, list, index, totalOffset);
@@ -82,7 +83,7 @@ public class SortedArray<E> implements Iterable<E> {
     public void removeFast(int index) {
         int totalOffset = this.size - index - 1;
         if (totalOffset >= 0) {
-            E[] list = this.list;
+            E[] list = (E[]) this.list;
             if (totalOffset > 0) {
                 System.arraycopy(list, index + 1, list, index, totalOffset);
             }
@@ -104,7 +105,7 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     public void clear() {
-        this.list = (E[]) zeroList;
+        this.list = zeroList;
         this.size = 0;
 
     }
@@ -149,9 +150,9 @@ public class SortedArray<E> implements Iterable<E> {
 
     @Override
     public void forEach(Consumer<? super E> action) {
-        for (E x : list) {
+        for (Object x : list) {
             if (x != null) {
-                action.accept(x);
+                action.accept((E)x);
             } else {
                 break; //first null element at the end of the array indicates the end
             }
@@ -176,7 +177,7 @@ public class SortedArray<E> implements Iterable<E> {
         float elementRank = cmp.floatValueOf(element);
         final int index = this.findInsertionIndex(elementRank, 0, s - 1, new int[1], cmp);
 
-        final E last = list[s - 1];
+        final E last = (E) list[s - 1];
         if (index == s || Util.fastCompare(cmp.floatValueOf(last), elementRank) < 0) {
             addInternal(element);
         } else {
@@ -188,11 +189,11 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     public void addLinear(E element, int s, FloatFunction<E> cmp) {
-        E[] l = this.list;
+        Object[] l = this.list;
         if (s > 0 && l.length > 0) {
             float elementRank = cmp.floatValueOf(element);
             for (int i = 0; i < s; i++) {
-                final E current = l[i];
+                final E current = (E) l[i];
                 if (0 <= Util.fastCompare(cmp.floatValueOf(current), elementRank)) {
                     addInternal(i, element);
                     return;
@@ -209,9 +210,9 @@ public class SortedArray<E> implements Iterable<E> {
 
     public void addInternal(E e) {
         int s = this.size;
-        E[] l = this.list;
+        Object[] l = this.list;
         if (l.length == s) {
-            E[] newList = newArray(Math.max(l.length, s));
+            Object[] newList = newArray(Math.max(l.length, s));
             System.arraycopy(l, 0, newList, 0, s);
             this.list = l = newList;
         }
@@ -232,7 +233,7 @@ public class SortedArray<E> implements Iterable<E> {
 
     private void addAtIndex(int index, E element) {
         int oldSize = this.size++;
-        E[] list = this.list;
+        E[] list = (E[]) this.list;
         if (list.length == oldSize) {
             E[] newItems = newArray(oldSize); //new Object[this.sizePlusFiftyPercent(oldSize)];
             if (index > 0) {
@@ -259,7 +260,7 @@ public class SortedArray<E> implements Iterable<E> {
 
     public E removeLast() {
         //if (size > 0)
-        return this.list[--size];
+        return (E) this.list[--size];
         //else
         //return null;
     }
@@ -507,7 +508,7 @@ public class SortedArray<E> implements Iterable<E> {
             final int[] rightBorder = {0};
             final int left = this.findInsertionIndex(cmp.floatValueOf(element), 0, size, rightBorder, cmp);
 
-            E[] l = this.list;
+            E[] l = (E[]) this.list;
             for (int index = left; index < rightBorder[0]; index++) {
                 if (element.equals(l[index])) {
                     return index;// element is found
@@ -522,7 +523,7 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     private final int indexOfInternal(E e) {
-        E[] l = this.list;
+        Object[] l = this.list;
         int s = this.size;
         for (int i = 0; i < s; i++) {
             if (e.equals(l[i]))
@@ -606,9 +607,9 @@ public class SortedArray<E> implements Iterable<E> {
 
         final int midle = left + (right - left) / 2;
 
-        E[] list = this.list;
+        Object[] list = this.list;
 
-        final E midleE = list[midle];
+        final E midleE = (E) list[midle];
 
 
         final int comparedValue = Util.fastCompare(cmp.floatValueOf(midleE), elementRank);
@@ -616,7 +617,7 @@ public class SortedArray<E> implements Iterable<E> {
             // find the first element
             int index = midle;
             for (; index >= 0; ) {
-                final E e = list[index];
+                final E e = (E) list[index];
                 if (0 != Util.fastCompare(cmp.floatValueOf(e), elementRank)) {
                     break;
                 }
@@ -643,9 +644,9 @@ public class SortedArray<E> implements Iterable<E> {
                                final int left, final int right, FloatFunction<E> cmp) {
 
 
-        E[] l = this.list;
+        Object[] l = this.list;
         for (int index = left; index < right; ) {
-            if (0 <= Util.fastCompare(cmp.floatValueOf(l[index]), elementRank)) {
+            if (0 <= Util.fastCompare(cmp.floatValueOf((E) l[index]), elementRank)) {
                 return index;
             }
             index++;
@@ -686,7 +687,7 @@ public class SortedArray<E> implements Iterable<E> {
      */
     @Nullable
     public final E first() {
-        return this.isEmpty() ? null : list[0];
+        return this.isEmpty() ? null : (E) list[0];
     }
 
     /**
@@ -696,8 +697,8 @@ public class SortedArray<E> implements Iterable<E> {
     public final E last() {
         int size = this.size;
         if (size == 0) return null;
-        E[] ll = list;
-        return ll[Math.min(ll.length - 1, size - 1)];
+        Object[] ll = list;
+        return (E) ll[Math.min(ll.length - 1, size - 1)];
     }
 
 //	@Override

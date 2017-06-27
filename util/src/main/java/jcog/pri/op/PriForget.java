@@ -11,7 +11,7 @@ import java.util.function.Consumer;
  * decreases priority at a specified rate which is diminished in proportion to a budget's quality
  * so that high quality results in slower priority loss
  */
-public class PriForget<X extends Priority> implements Consumer<X> {
+public class PriForget<P extends Priority> implements Consumer<P> {
 
     public static final float DEFAULT_TEMP = 0.5f;
     public final float avgToBeRemoved;
@@ -34,7 +34,7 @@ public class PriForget<X extends Priority> implements Consumer<X> {
      * @return the update function to apply to a bag
      */
     @Nullable
-    public static <X> Consumer<X> forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer<X>> f) {
+    public static Consumer forget(int s, int c, float p, float m, float temperature, float priEpsilon, FloatToObjectFunction<Consumer> f) {
 
         if ((s > 0) && (p > 0)) {
 
@@ -51,7 +51,7 @@ public class PriForget<X extends Priority> implements Consumer<X> {
     }
 
     @Override
-    public void accept(@NotNull X b) {
+    public void accept(@NotNull Priority b) {
         b.priSub(avgToBeRemoved);
 
 //        b.priSub(avgToBeRemoved

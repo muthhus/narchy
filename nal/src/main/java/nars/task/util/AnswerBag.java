@@ -1,6 +1,7 @@
 package nars.task.util;
 
 import jcog.bag.impl.ArrayBag;
+import jcog.bag.impl.PriArrayBag;
 import jcog.map.SynchronizedHashMap;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
@@ -10,7 +11,7 @@ import nars.Task;
 import nars.op.Command;
 import org.jetbrains.annotations.NotNull;
 
-public final class AnswerBag extends ArrayBag<Task> {
+public final class AnswerBag extends PriArrayBag<Task> {
 
     private final NAR nar;
     private final Task question;

@@ -2,13 +2,16 @@ package nars.util.exe;
 
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import com.google.common.base.Joiner;
+import jcog.bag.Bag;
+import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.HijackBag;
-import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
+import jcog.pri.PriReference;
 import jcog.pri.mix.control.CLink;
+import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -20,6 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -54,54 +58,53 @@ public class TaskExecutor extends Executioner {
     /**
      * active tasks
      */
-    public final PriorityHijackBag<ITask, CLink<ITask>> active = new PriorityHijackBag<>(3) {
-        @Override
-        protected final Consumer<CLink<ITask>> forget(float rate) {
-            return null; //manages its own forgets
-            //return new PForget(rate);
-        }
+    public final Bag<ITask, CLink<ITask>> active =
+            new ArrayBag<>(PriMerge.plus, new ConcurrentHashMap<>()) {
 
-        @Override
-        public CLink<ITask> put(@NotNull CLink<ITask> x) {
-            CLink<ITask> y = super.put(x);
-            if (y == null) {
-                overflow.offer(x);
-            }
-            return y;
-        }
 
-        @Override
-        public void onRemoved(@NotNull CLink<ITask> value) {
-            if (value.priElseZero() >= Pri.EPSILON) {
-                if (overflow.remainingCapacity() < 1) {
-                    overflow.poll(); //forget
+                //new PriorityHijackBag<>(3) {
+//        @Override
+//        protected final Consumer<CLink<ITask>> forget(float rate) {
+//            return null;
+//        }
+
+                @Override
+                public CLink<ITask> put(@NotNull CLink<ITask> x) {
+                    CLink<ITask> y = super.put(x);
+                    if (y == null) {
+                        overflow.offer(x);
+                    }
+                    return y;
                 }
-                overflow.offer(value); //save
-            } else {
-                CLink<ITask> x = overflow.poll();
-                if (x!=null && x.priElseZero() >= Pri.EPSILON)
-                    put(x); //restore
-            }
-        }
 
-        @NotNull
-        @Override
-        public HijackBag<ITask, CLink<ITask>> commit(@Nullable Consumer<CLink<ITask>> update) {
-            return this;
-        }
+                @Override
+                public void onRemoved(@NotNull CLink<ITask> value) {
+                    if (value.priElseZero() >= Pri.EPSILON) {
+                        if (overflow.remainingCapacity() < 1) {
+                            overflow.poll(); //forget
+                        }
+                        overflow.offer(value); //save
+                    } else {
+                        CLink<ITask> x = overflow.poll();
+                        if (x != null && x.priElseZero() >= Pri.EPSILON)
+                            put(x); //restore
+                    }
+                }
 
-        @NotNull
-        @Override
-        public final ITask key(CLink<ITask> value) {
-            return value.ref;
-        }
+                @NotNull
+                @Override
+                public Bag<ITask, CLink<ITask>> commit(@Nullable Consumer<CLink<ITask>> update) {
+                    return this;
+                }
 
-        @NotNull
-        @Override
-        public Iterator<CLink<ITask>> iterator() {
-            return super.iterator();
-        }
-    };
+                @NotNull
+                @Override
+                public final ITask key(CLink<ITask> value) {
+                    return value.ref;
+                }
+
+
+            };
 
 
     public TaskExecutor(int capacity) {

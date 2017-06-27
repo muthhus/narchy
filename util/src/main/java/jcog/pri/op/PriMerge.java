@@ -37,7 +37,7 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
         return existing;
     }
 
-    static void max(Priority existing, Priority incoming) {
+    static void max(Priority existing, Prioritized incoming) {
         float p = incoming.priSafe(0);
         if (p > 0)
             existing.priMax(p);

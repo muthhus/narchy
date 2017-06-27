@@ -3,6 +3,7 @@ package nars;
 import jcog.Texts;
 import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import jcog.pri.Priority;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
@@ -380,7 +381,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         if (isInput()) {
             TaskConcept concept = concept(nar);
             if (concept != null) {
-                ArrayBag<Task> answers = concept.computeIfAbsent(Op.QUESTION, () ->
+                ArrayBag<Task, PriReference<Task>> answers = concept.computeIfAbsent(Op.QUESTION, () ->
                         new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
                 answers.commit();
 

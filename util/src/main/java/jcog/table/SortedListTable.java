@@ -15,16 +15,16 @@ import java.util.function.Consumer;
 /**
  * Created by me on 1/15/16.
  */
-abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implements SortedTable<V,L>, FloatFunction<L> {
+abstract public class SortedListTable<X, Y> extends ArrayListTable<X, Y> implements SortedTable<X, Y>, FloatFunction<Y> {
 
     /**
      * array of lists of items, for items on different level
      */
     //protected final SortedList_1x4<L> items;
-    protected final @NotNull SortedArray<L> items;
+    protected final @NotNull SortedArray<Y> items;
 
 
-    public SortedListTable(SortedArray<L> items, @NotNull Map<V, L> map) {
+    public SortedListTable(SortedArray<Y> items, @NotNull Map<X, Y> map) {
         super(map);
         //this.items = new SortedList_1x4<>(items, this, searchType, false);
         this.items = items;
@@ -38,13 +38,13 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
     @NotNull
     @Override
-    public Iterator<L> iterator() {
+    public Iterator<Y> iterator() {
         return items.iterator();
     }
 
     @Override
-    public final L get(int i) {
-        return items.array()[i];
+    public final Y get(int i) {
+        return (Y) items.array()[i];
     }
 
     @Override
@@ -53,12 +53,12 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     }
 
     @Override
-    protected final boolean listRemove(L removed) {
+    protected final boolean listRemove(Y removed) {
         return items.remove(removed, this);
     }
 
     @Override
-    protected final void listAdd(L i) {
+    protected final void listAdd(Y i) {
         items.add(i, this);
     }
 
@@ -69,12 +69,12 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
 
     @Override @Nullable
-    public final L top() {
+    public final Y top() {
         return (size()==0) ? null : get(0);
     }
 
     @Override @Nullable
-    public final L bottom() {
+    public final Y bottom() {
         int s = size();
         return s == 0 ? null : get(s - 1);
     }
@@ -83,14 +83,14 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
     /** gets the key associated with a value */
     @Nullable @Override
-    abstract public V key(@NotNull L l);
+    abstract public X key(@NotNull Y l);
 
 
 
 
     @Nullable
     @Override
-    @Deprecated protected L addItem(@NotNull L i) {
+    @Deprecated protected Y addItem(@NotNull Y i) {
         int cap = capacity();
         if (cap < 1) {
             return i; //bounce
@@ -98,10 +98,10 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
 
         int size = size();
 
-        L displaced = null;
+        Y displaced = null;
 
         if (size == cap) {
-            L last = items.last();
+            Y last = items.last();
             if (Float.compare(floatValueOf(last), floatValueOf(i)) < 0) {
                 //insufficient rank, bounce
                 return i;
@@ -116,9 +116,9 @@ abstract public class SortedListTable<V, L> extends ArrayListTable<V,L> implemen
     }
 
     @NotNull
-    @Deprecated public List<L> listCopy() {
-        List<L> l = new ArrayList(size());
-        forEach((Consumer<L>) l::add);
+    @Deprecated public List<Y> listCopy() {
+        List<Y> l = new ArrayList(size());
+        forEach((Consumer<Y>) l::add);
         return l;
     }
 

@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import static jcog.bag.Bag.BagCursorAction.Next;
 
@@ -25,6 +27,8 @@ import static jcog.bag.Bag.BagCursorAction.Next;
  * K=key, V = item/value of type Item
  */
 public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
+
+
 
     enum BagCursorAction {
         Next(/*false, */false),
@@ -165,6 +169,9 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         });
     }
 
+    default Stream<V> stream() {
+        return StreamSupport.stream(()->this.spliterator(), 0, false);
+    }
 
     default Bag<K, V> sample(int max, Consumer<? super V> each) {
         return sampleOrPop(false, max, each);

@@ -12,11 +12,10 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * ArrayBag with a randomized sampling range
  */
-public class CurveBag<X> extends ArrayBag<X> {
+public class CurveBag<X> extends PriArrayBag<X> {
 
     public CurveBag(int initialCapacity, @NotNull PriMerge mergeFunction, @NotNull Map<X, PriReference<X>> map) {
-        super(mergeFunction, map);
-        setCapacity(initialCapacity);
+        super(initialCapacity, mergeFunction, map);
     }
 
 

@@ -1,6 +1,7 @@
 package nars.bag.leak;
 
 import jcog.bag.impl.ArrayBag;
+import jcog.bag.impl.PriArrayBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
@@ -17,7 +18,7 @@ import java.util.function.Consumer;
 abstract public class LeakOut extends TaskLeak<Task,PriReference<Task>> {
 
     public LeakOut(NAR nar, int capacity, float rate) {
-        super(new ArrayBag<>(capacity, PriMerge.max, new ConcurrentHashMap<>()), rate, nar);
+        super(new PriArrayBag<>(capacity, PriMerge.max, new ConcurrentHashMap<>()), rate, nar);
     }
 
     @Override protected float onOut(@NotNull PriReference<Task> t) {
