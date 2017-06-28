@@ -11,6 +11,7 @@ import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.SoftReference;
 import java.lang.ref.WeakReference;
 import java.util.Random;
 import java.util.function.Consumer;
@@ -26,7 +27,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
     private final Random rng = new XorShift128PlusRandom();
 
-    public static class HalfWeakPair<K,V> extends WeakReference/*SoftReference*/<V> implements Priority {
+    public static class HalfWeakPair<K,V> extends /*WeakReference*/SoftReference<V> implements Priority {
         public final K key;
         private final int hash;
         private float pri;
@@ -143,13 +144,15 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         super.setCapacity(i);
 
         float boost = i > 0 ?
-                (float) (1f / Math.sqrt(capacity())) : 0;
+                0.02f
+                //(float) (1f / Math.sqrt(capacity()))
+                : 0;
 
         //note: cut should probably be some factor less than 1/reprobes
         // for example, 1/(N*reprobes)
         // to ammortize additional attempts where the cut was not necessary
         //TODO make this a momentum parameter
-        float cut = boost;///(1.5f*reprobes);
+        float cut = boost/(reprobes-1);
 
         assert(cut > Pri.EPSILON);
 

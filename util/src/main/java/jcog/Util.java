@@ -1294,14 +1294,14 @@ public enum Util {
     }
 
     public static int selectRoulette(float[] x, Random rng) {
-        return selectRoulette(x.length, (n) -> x[n], rng);
+        return decideRoulette(x.length, (n) -> x[n], rng);
     }
 
     /**
      * https://en.wikipedia.org/wiki/Fitness_proportionate_selection
      * Returns the selected index based on the weights(probabilities)
      */
-    public static int selectRoulette(int count, IntToFloatFunction weight, Random rng) {
+    public static int decideRoulette(int count, IntToFloatFunction weight, Random rng) {
         // calculate the total weight
         float weight_sum = 0;
         for (int i = 0; i < count; i++) {

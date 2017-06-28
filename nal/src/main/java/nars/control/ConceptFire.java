@@ -27,15 +27,15 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises
      */
-    private static final int samplesMax = 8;
+    private static final int samplesMax = 4;
     private static final float priMinAbsolute = Pri.EPSILON * 16;
-    private static final float momentum = 0.5f;
+    private static final float momentum = 0.75f;
 
     static final ThreadLocal<Map<DerivedTask, DerivedTask>> buffers =
             ThreadLocal.withInitial(LinkedHashMap::new);
 
-    static final int TASKLINKS_SAMPLED = samplesMax/2;
-    static final int TERMLINKS_SAMPLED = samplesMax;
+    static final int TASKLINKS_SAMPLED = samplesMax*2;
+    static final int TERMLINKS_SAMPLED = samplesMax*2;
 
     public ConceptFire(Concept c, float pri) {
         super(c, pri);
@@ -113,10 +113,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         Random rng = nar.random();
         while (++samples < samplesMax && priElseZero() >= minPri) {
             tasklink = taskl.get(
-                    Util.selectRoulette(taskl.size(), (i) -> taskl.get(i).priElseZero(), rng)
+                    Util.decideRoulette(taskl.size(), (i) -> taskl.get(i).priElseZero(), rng)
             );
             termlink = terml.get(
-                    Util.selectRoulette(terml.size(), (i) -> terml.get(i).priElseZero(), rng)
+                    Util.decideRoulette(terml.size(), (i) -> terml.get(i).priElseZero(), rng)
             );
 
             //            if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority

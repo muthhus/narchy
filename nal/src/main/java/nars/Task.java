@@ -9,10 +9,7 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
 import nars.op.Command;
-import nars.task.DerivedTask;
-import nars.task.ITask;
-import nars.task.NALTask;
-import nars.task.Tasked;
+import nars.task.*;
 import nars.task.util.AnswerBag;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
@@ -96,7 +93,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                 assert (dur > 0);
                 long dist = a != z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a - when);
                 if (dist > 0) {
-                    //cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
+                    cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
                     cw = 0; //immediate cut-off
                 }
 

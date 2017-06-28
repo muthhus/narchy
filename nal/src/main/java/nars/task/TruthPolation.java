@@ -1,11 +1,16 @@
 package nars.task;
 
 import com.google.common.collect.Lists;
+import jcog.Util;
+import jcog.decide.DecideSoftmax;
 import nars.Task;
 import nars.truth.PreciseTruth;
+import nars.truth.Truth;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 import static nars.truth.TruthFunctions.w2c;
@@ -96,6 +101,101 @@ public enum TruthPolation {
         }
     }
 
+    public static class TruthPolationGreedy implements Consumer<Tasked> {
+
+        final long when;
+        final int dur;
+        Truth best = null;
+
+        public TruthPolationGreedy(long when, int dur) {
+            this.when = when;
+            this.dur = dur;
+        }
+
+        @Override
+        public void accept(Tasked t) {
+            Task task = t.task();
+            Truth tt = task.truth(when,dur);
+            if (best==null || best.conf() < tt.conf())
+                best = tt;
+        }
+
+
+        public PreciseTruth truth() {
+            if (best == null)
+                return null;
+
+            return new PreciseTruth(best.freq(), best.conf());
+        }
+    }
+
+    public static class TruthPolationSoftMax implements Consumer<Tasked> {
+
+        final long when;
+        final int dur;
+        final FloatArrayList freq = new FloatArrayList();
+        final FloatArrayList conf = new FloatArrayList();
+
+        public TruthPolationSoftMax(long when, int dur) {
+            this.when = when;
+            this.dur = dur;
+        }
+
+        @Override
+        public void accept(Tasked t) {
+            Task task = t.task();
+            conf.add(task.conf(when, dur));
+            freq.add(task.freq());
+        }
+
+
+        public PreciseTruth truth() {
+            if (!conf.isEmpty()) {
+                int which = new DecideSoftmax(0f, ThreadLocalRandom.current()).decide(conf.toArray(), -1);
+                float f = freq.get(which);
+                float c = conf.get(which);
+                return new PreciseTruth(f, c);
+
+            } else {
+                return null;
+            }
+
+        }
+    }
+    public static class TruthPolationRoulette implements Consumer<Tasked> {
+
+        final long when;
+        final int dur;
+        final FloatArrayList freq = new FloatArrayList();
+        final FloatArrayList evi = new FloatArrayList();
+
+        public TruthPolationRoulette(long when, int dur) {
+            this.when = when;
+            this.dur = dur;
+        }
+
+        @Override
+        public void accept(Tasked t) {
+            Task task = t.task();
+            evi.add(task.evi(when, dur));
+            freq.add(task.freq());
+        }
+
+
+        public PreciseTruth truth() {
+            if (!evi.isEmpty()) {
+                int which = Util.decideRoulette(freq.size(), evi::get, ThreadLocalRandom.current());
+                float f = freq.get(which);
+                float e = evi.get(which);
+                return new PreciseTruth(f, e, false);
+
+            } else {
+                return null;
+            }
+
+        }
+    }
+
     /**
      * computes truth at a given time from iterative task samples
      * includes variance calculation for reduction of evidence in proportion to confusion/conflict
@@ -161,6 +261,8 @@ public enum TruthPolation {
 
         TruthPolationBasic t =
                 new TruthPolationBasic(when, dur);
+                //new TruthPolationGreedy(when, dur);
+                //new TruthPolationRoulette(when, dur);
                 //new TruthPolationWithVariance(when, dur);
 
         // Contribution of each task's truth
