@@ -241,7 +241,7 @@ abstract public class NAgent implements NSense, NAct {
             );
 
             //contribution of this agent to the NAR's global happiness measurement
-            nar.emotion.happy(Util.sigmoid(reward));
+            //nar.emotion.happy(Util.sigmoid(reward));
             nar.emotion.happy(dexterity()/nar.confDefault(GOAL));
 
 //              float dxm = c2w(dexterity());
@@ -593,10 +593,14 @@ abstract public class NAgent implements NSense, NAct {
         int dur = nar.dur();
         long now = nar.time();
         for (int i = 0; i < n; i++) {
-            actions.get(i).goals().forEach(x -> {
-                //System.out.println(x.proof());
-                m[0] += x.conf(now, dur);
-            });
+            Truth g = nar.goalTruth(actions.get(i), now);
+            float c;
+            if (g!=null) {
+                c = g.conf();
+            } else {
+                c = 0;
+            }
+            m[0] += c;
         }
         float dex = (m[0] / n);
         return dex;
