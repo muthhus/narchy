@@ -630,6 +630,9 @@ public class TestNAR {
             //return this;
 
 
+            System.out.println(nar.emotion.summary());
+
+
             //assertTrue("No cycles elapsed", tester.nar.memory().time/*SinceLastCycle*/() > 0);
 
             long time = time();

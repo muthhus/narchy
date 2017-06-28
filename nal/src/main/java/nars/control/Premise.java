@@ -30,6 +30,7 @@ import java.util.function.Consumer;
 
 import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
+import static nars.util.UtilityFunctions.aveAri;
 
 /**
  * NOTE: this currently isnt input to the NAR like ITask's are even though it inherits
@@ -74,15 +75,14 @@ public class Premise extends Pri {
      */
     public void run(NAR nar) {
 
+        nar.emotion.count("Premise_run");
+
         PriReference<Task> taskLink = this.taskLink;
         Task task = taskLink.get();
         float taskPri = task.pri();
         if (taskPri != taskPri)
             return; //task deleted so completely erase this premise
 
-        float premisePri = priElseZero();
-        if (premisePri < Pri.EPSILON * 128) //multiplier to compensate for the fact that each derived task will use only a fraction of this
-            return;
 
         Term beliefTerm = termLink.get();
         Task belief = null;
@@ -155,8 +155,8 @@ public class Premise extends Pri {
 
         float parentTaskPri = beliefPriority != beliefPriority ? taskPri :
                 //Math.max
-                //aveAri
-                or
+                aveAri
+                //or
                         (taskPri, beliefPriority);
 
         //priMult(parentTaskPri);

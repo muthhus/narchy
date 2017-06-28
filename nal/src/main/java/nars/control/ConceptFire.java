@@ -28,13 +28,13 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
      * rate at which ConceptFire forms premises
      */
     private static final int samplesMax = 8;
-    private static final float priMinAbsolute = Pri.EPSILON * 2;
+    private static final float priMinAbsolute = Pri.EPSILON * 16;
     private static final float momentum = 0.5f;
 
     static final ThreadLocal<Map<DerivedTask, DerivedTask>> buffers =
             ThreadLocal.withInitial(LinkedHashMap::new);
 
-    static final int TASKLINKS_SAMPLED = samplesMax;
+    static final int TASKLINKS_SAMPLED = samplesMax/2;
     static final int TERMLINKS_SAMPLED = samplesMax;
 
     public ConceptFire(Concept c, float pri) {
@@ -44,30 +44,43 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     @Override
     public ITask[] run(NAR nar) {
+
+        nar.emotion.count("ConceptFire_run_attempt");
+
         float priBefore = this.pri;
-        if (priBefore != priBefore || priBefore < priMinAbsolute)
+        if (priBefore != priBefore || priBefore < priMinAbsolute) {
+            nar.emotion.count("ConceptFire_run_but_deleted");
             return null;
+        }
+
 
         final float minPri = priMinAbsolute;
 
         final Concept c = id;
 
         final Bag<Task, PriReference<Task>> tasklinks = c.tasklinks().commit();//.normalize(0.1f);
-        if (tasklinks.isEmpty())
+        if (tasklinks.isEmpty()) {
+            nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
             return null;
+        }
+        List<PriReference<Task>> taskl = $.newArrayList();
+        tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
+        if (taskl.isEmpty()) {
+            nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
+            return null;
+        }
 
         final Bag<Term, PriReference<Term>> termlinks = c.termlinks().commit();//.normalize(0.1f);
-        nar.terms.commit(c); //index cache update
-
-
-        List<PriReference<Task>> taskl = $.newArrayList();
-
-        tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
-        if (taskl.isEmpty()) return null;
-
         List<PriReference<Term>> terml = $.newArrayList();
         termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
-        if (terml.isEmpty()) return null;
+        if (terml.isEmpty()) {
+            nar.emotion.count("ConceptFire_run_but_zero_termlinks_selected");
+            return null;
+        }
+
+        nar.emotion.count("ConceptFire_run");
+
+        nar.terms.commit(c); //index cache update
 
         @Nullable PriReference<Task> tasklink = null;
         @Nullable PriReference<Term> termlink = null;
@@ -76,22 +89,26 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         int premises = 0;
         int derivations = 0;
         float cost = 0;
-        int samplesMax = Math.min(this.samplesMax, terml.size() * taskl.size());
+        int samplesMax =
+                this.samplesMax;
+                //Math.min(this.samplesMax, terml.size() * taskl.size());
 
         Map<DerivedTask, DerivedTask> results = buffers.get();
         Consumer<DerivedTask> resultMerger = (nt) -> results.merge(nt, nt, (tt, pt) -> {
             if (pt == null) {
-                priSub(nt.priElseZero());
+                //priSub(nt.priElseZero());
                 return nt;
             } else {
-                float ptBefore = pt.priElseZero();
+                //float ptBefore = pt.priElseZero();
                 pt.merge(nt);
-                float ptAfter = pt.priElseZero();
-                priSub(ptAfter - ptBefore);
+                //float ptAfter = pt.priElseZero();
+                //priSub(ptAfter - ptBefore);
                 return pt;
             }
         });
 
+
+        float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
 
         Random rng = nar.random();
         while (++samples < samplesMax && priElseZero() >= minPri) {
@@ -124,13 +141,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             Premise p = new Premise(tasklink, termlink, resultMerger);
             premises++;
 
-            float thisPri = priElseZero();
-            float pLimitFactor = thisPri / samplesMax * (1f - momentum);
-            p.setPri(pLimitFactor);
+            priSub(pLimitFactor); //pay up-front
 
-            priSub(p.priElseZero()); //pay up-front
+            p.run(nar); //inline
 
-            p.run(nar);
 
 //            float pAfter = p.priElseZero();
 //            float ba = pBefore - pAfter;

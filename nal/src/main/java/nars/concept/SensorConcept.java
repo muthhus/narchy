@@ -3,6 +3,7 @@ package nars.concept;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
+import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -173,4 +174,11 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
 
+    public float freq() {
+        SignalTask t = sensor.current;
+        if (t !=null)
+            return t.freq();
+        else
+            return Float.NaN;
+    }
 }

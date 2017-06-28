@@ -34,7 +34,7 @@ public class Line1D {
 
     static class Line1DExperiment implements FloatFunction<NAR> {
         float tHz = 0.001f; //in time units
-        float yResolution = 0.01f; //in 0..1.0
+        float yResolution = 0.02f; //in 0..1.0
         float periods = 32;
 
         final int runtime = Math.round(periods /tHz);
@@ -180,10 +180,13 @@ public class Line1D {
 //
                 NAR n = new NARBuilder().get();
 
-                n.time.dur(4);
+                n.time.dur(2);
                 n.termVolumeMax.set(28);
+                n.beliefConfidence(0.9f);
                 n.goalConfidence(0.5f);
-                n.beliefConfidence(0.5f);
+                n.onCycle((nn)->{
+                    System.out.println(nn.emotion.summary());
+                });
 
                 new Line1DExperiment() {
                     @Override
@@ -206,7 +209,7 @@ public class Line1D {
                                                     new Vis.EmotionPlot(history, a),
                                                     new ReflectionSurface<>(a),
                                                     Vis.beliefCharts(history,
-                                                            Lists.newArrayList(a.in, a.out)
+                                                            Lists.newArrayList(a.sensors.get(0).freq(), a.out)
                                                             , a.nar)
                                             )
                                     )

@@ -69,7 +69,7 @@ public class bAblTests extends AbstractNALTest {
                 .input("pick(john,football). :|:") ////John picked up the football.
                 .input("inside(bob,kitchen). :|:") ////Bob went to the kitchen.
                 .inputAt(150, "$0.9 inside(football,?where)?") ////Where is the football?
-                .mustOutput(0, 5000,
+                .mustOutput(0, 2000,
                         "inside(football,playground)", BELIEF,
                         1f, 1f, 0.5f, 0.99f, 0); ////A: playground
 

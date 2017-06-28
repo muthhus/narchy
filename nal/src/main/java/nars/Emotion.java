@@ -7,6 +7,9 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static jcog.Texts.n4;
 
@@ -45,6 +48,8 @@ public final class Emotion implements Serializable {
     @NotNull
     public final BufferedFloatGuage errrVol;
 
+
+    final Map<String,AtomicInteger> counts = new ConcurrentHashMap<>();
 
     //private transient final Logger logger;
 
@@ -94,6 +99,11 @@ public final class Emotion implements Serializable {
         errrVol.clear();
 
         confident.clear();
+
+    }
+
+    public void clearCounts() {
+        counts.values().forEach(x -> x.set(0));
     }
 
     /** percentage of business which was not frustration, by aggregate volume */
@@ -213,8 +223,8 @@ public final class Emotion implements Serializable {
     public String summary() {
         //long now = nar.time();
 
-        return new StringBuilder()
-                .append(" hapy=").append(n4(happy() ))
+        StringBuilder sb = new StringBuilder()
+                .append(" hapy=").append(n4(happy()))
                 .append(" busy=").append(n4(busyVol.getSum()))
                 .append(" lern=").append(n4(learningVol()))
                 .append(" errr=").append(n4(erring()))
@@ -222,7 +232,12 @@ public final class Emotion implements Serializable {
                 //.append(" cpu=").append(resourceMeter.CYCLE_CPU_TIME)
                 //.append(" mem=").append(resourceMeter.CYCLE_RAM_USED)
                 //.append(" alrt=").append(n4(alert.getSum()))
-        .toString();
+                ;
+
+        counts.forEach((k,v) -> {
+            sb.append(' ').append(k).append('=').append(v.get());
+        });
+        return sb.toString();
 
 
 //                 + "rwrd=[" +
@@ -235,6 +250,16 @@ public final class Emotion implements Serializable {
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());
 
+    }
+
+    public void count(String id) {
+        AtomicInteger c = counts.get(id);
+        if (c == null) {
+            c = new AtomicInteger(1);
+            counts.put(id, c);
+        } else {
+            c.incrementAndGet();
+        }
     }
 
 

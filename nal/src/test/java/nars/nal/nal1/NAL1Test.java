@@ -68,7 +68,7 @@ public class NAL1Test extends AbstractNALTest {
     @Test
     public void deduction()  {
 
-        test().log().
+        test().
                 believe("<bird --> animal>")
                 /*.en("bird is a type of animal.")
                 .es("bird es un tipo de animal.")
@@ -173,7 +173,6 @@ public class NAL1Test extends AbstractNALTest {
 //
 //       TestNAR t = test();
 //       t.nar.nal(8); //necessary why
-//       t.log()
 //            .believe("(bird --> swimmer)")
 //            .believe("--(rock <-> swimmer)")
 //            .mustBelieve(CYCLES, "<bird --> rock>", 0, 0.81f)

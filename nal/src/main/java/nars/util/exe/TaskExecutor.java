@@ -16,8 +16,10 @@ import nars.Task;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.truth.Truthed;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -64,10 +66,30 @@ public class TaskExecutor extends Executioner {
                 }
 
                 @Override
+                public Bag<ITask, CLink<ITask>> commit() {
+                    return this; //do nothing
+                }
+
+                @Override
                 public HijackBag commit(Consumer c) {
                     return this; //do nothing
                 }
 
+                @Override
+                protected CLink<ITask> merge(@NotNull CLink<ITask> existing, @NotNull CLink<ITask> incoming, @Nullable MutableFloat overflowing) {
+                    float before = existing.priElseZero();
+                    float inc = incoming.priSafe(0);
+                    float next = existing.priMax(inc);
+                    float overflow = inc - (next - before);
+                    if (overflow > 0) {
+                        pressurize(-overflow);
+                        if (overflowing!=null) overflowing.add(overflow);
+                    }
+                    return existing; //the original instance
+
+
+                    //return super.merge(existing, incoming, overflowing);
+                }
 
                 @Override
                 public CLink<ITask> put(@NotNull CLink<ITask> x) {
@@ -101,6 +123,7 @@ public class TaskExecutor extends Executioner {
 
 
             };
+    private float forgetEachPri;
 
 
     public TaskExecutor(int capacity) {
@@ -108,7 +131,7 @@ public class TaskExecutor extends Executioner {
         active.setCapacity(capacity);
 
         int overCapacity = capacity * 1;
-        overflow = new DisruptorBlockingQueue(overCapacity);
+        overflow = new DisruptorBlockingQueue(overCapacity*2);
     }
 
     public TaskExecutor(int capacity, float executedPerCycle) {
@@ -164,13 +187,14 @@ public class TaskExecutor extends Executioner {
     }
 
 
+
     protected void flush() {
         if (!busy.compareAndSet(false, true))
             return;
 
         try {
 
-            active.commit(null);
+            //active.commit(null);
 
             int ps = active.size();
             if (ps == 0)
@@ -185,13 +209,13 @@ public class TaskExecutor extends Executioner {
                 toExe = active.capacity();
 
 
-//            toExe = Math.min(ps, toExe);
+            toExe = Math.min(ps, toExe);
 
-//            float eFrac = ((float) toExe) / ps;
-//            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * active.depressurize(eFrac) / toExe;
-//            this.forgetEachPri =
-//                    pAvg > Pri.EPSILON ? pAvg : 0;
-//                    //0;
+            float eFrac = ((float) toExe) / active.capacity();
+            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag)active).depressurize(eFrac) * (eFrac);
+            this.forgetEachPri =
+                    pAvg > Pri.EPSILON * 8 ? pAvg : 0;
+                    //0;
 
             active.sample(toExe, this::actuallyRun);
 
@@ -246,6 +270,9 @@ public class TaskExecutor extends Executioner {
             float g = masterGain.floatValue();
             if (g != 1)
                 x.priMult(g);
+            if (forgetEachPri > 0) {
+                x.priSub(forgetEachPri);
+            }
         }
 
         actuallyFeedback(x, next);

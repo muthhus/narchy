@@ -414,8 +414,8 @@ public class Activate extends UnaryTask<Task> {
                 throw new RuntimeException("should not create NEG termlinks");
 
             recipient.termlinks()
-                    //.put(new PLink<>(target, pri), linkOverflow);
-                    .putAsync(new PLink(target, pri));
+                    .put(new PLink<>(target, pri), linkOverflow);
+                    //.putAsync(new PLink(target, pri));
         }
 
     }

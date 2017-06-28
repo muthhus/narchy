@@ -595,10 +595,10 @@ abstract public class NAgent implements NSense, NAct {
         for (int i = 0; i < n; i++) {
             actions.get(i).goals().forEach(x -> {
                 //System.out.println(x.proof());
-                m[0] += x.evi(now, dur);
+                m[0] += x.conf(now, dur);
             });
         }
-        float dex = w2c(m[0] / n);
+        float dex = (m[0] / n);
         return dex;
     }
 

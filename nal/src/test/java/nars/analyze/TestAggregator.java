@@ -1,8 +1,11 @@
 package nars.analyze;
 
+import com.google.common.base.Joiner;
+import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.nar.NARBuilder;
+import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
@@ -27,7 +30,7 @@ public class TestAggregator extends RunListener {
 
     @Override
     public void testRunStarted(Description description) throws Exception {
-        testName = "nartest" + System.currentTimeMillis();
+        testName = "nartest" + description.getTestClass() + "_" + System.currentTimeMillis();
     }
 
     @Override
@@ -59,19 +62,16 @@ public class TestAggregator extends RunListener {
     @NotNull
     public String getDescriptionTerm(@NotNull Description d) {
         String[] meth = d.getMethodName().split("[\\[\\]]");
-        String m = String.join(",", meth);
+        String m = Joiner.on("\",\"").join(meth);
 
-        return '{' + d.getTestClass().getSimpleName() /*.replace(".",",")*/
-                + ',' + m + '}';
+        return "{\"" +d.getTestClass().getSimpleName() /*.replace(".",",")*/
+                + "\",\"" + m + "\"}";
     }
 
     protected void describe(@NotNull Description d, boolean success) throws Narsese.NarseseException {
-
-
-        String si = '<' + getDescriptionTerm(d) + " --> [" +
-                (success ? "ok" : "fail") + "]>.";
-
-        nar.input(si);
+        Compound x = $.negIf($.func("ok", getDescriptionTerm(d)), success);
+        System.out.println(x);
+        nar.believe(x);
     }
 
     @Override
@@ -116,22 +116,22 @@ public class TestAggregator extends RunListener {
         NAR da = new NARBuilder().get();
         //da.memory.realTime();
         NAR nar = da;
+        nar.log();
 
         //nar.input("<?x --> [fail]>?");
         //nar.input("<?x --> [ok]>?");
-        nar.input("<ok <-> fail>. %0%");
-        nar.input("<<#x --> [fail]> =/> fix(#x)>.");
+        nar.input("<(--,ok($x)) ==> fix($x)>.");
 
 
 //        nar.input("<{nal1,nal2,nal3,nal4} --> nal>.");
 //        nar.input("<nars --> [nal]>.");
 
-        new Thread( () -> {
+        //new Thread( () -> {
             new TestAggregator(nar, "nars.nal.nal1.NAL1Test");
-        }).start();
-        new Thread( () -> {
+        //}).start();
+        //new Thread( () -> {
             new TestAggregator(nar, "nars.nal.nal2.NAL2Test");
-        }).start();
+        //}).start();
 
 //        new NARStream(nar).forEachFrame(() -> {
 //            //System.out.println(new MemoryBudget(nar));
