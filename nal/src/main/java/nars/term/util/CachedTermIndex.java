@@ -28,7 +28,7 @@ public class CachedTermIndex extends StaticTermIndex {
                 return _terms.the(C.op(), C.dt(), C.subterms());
             } catch (InvalidTermException e) {
                 if (Param.DEBUG_EXTRA)
-                    logger.error("{}", e);
+                    logger.error("Term Build: {}, {}", C, e);
                 return Null;
             } catch (Throwable t) {
                 logger.error("{}", t);

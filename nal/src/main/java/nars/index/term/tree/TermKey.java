@@ -25,7 +25,7 @@ import static nars.IO.writeEvidence;
  */
 public class TermKey extends HashCachedDynByteSeq {
 
-    private final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(Lz4Compressor::new);
+    public final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(Lz4Compressor::new);
     //final static Lz4Decompressor decompressor = new Lz4Decompressor();
 
     private final static float minCompressionRatio = 0.9f;
@@ -102,10 +102,10 @@ public class TermKey extends HashCachedDynByteSeq {
         if (to < MIN_COMPRESSION_INPUT) {
             return false;
         }
+        byte[] uncompressed = this.bytes;
 
         int uncLength = to - from;
 
-        byte[] uncompressed = this.bytes;
         byte[] compressed = new byte[from + Lz4RawCompressor.maxCompressedLength(uncLength)];
 
         int compressedLength = compressor.get()

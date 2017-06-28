@@ -180,10 +180,16 @@ public enum Op {
             new UnnormalizedVariable(Op.VAR_DEP, "_") {
 
                 final int RANK = Term.opX(VAR_PATTERN, 20 /* different from normalized variables with a subOp of 0 */);
-                @Override public int opX() { return RANK; }
+
+                @Override
+                public int opX() {
+                    return RANK;
+                }
             };
 
-    /** absolutely invalid */
+    /**
+     * absolutely invalid
+     */
     public static final AtomicSingleton Null = new AtomicSingleton("Null");
 
     /**
@@ -210,7 +216,6 @@ public enum Op {
 
     public static final Term[] TrueArray = {True};
     public static final Term[] FalseArray = {False};
-
 
 
     /**
@@ -353,6 +358,27 @@ public enum Op {
                     }
                 }
             }
+        }
+        return null;
+    }
+
+    @Nullable
+    public static Pair<Atomic, TermContainer> functor(Op cOp, @NotNull Term[] subs, TermContext index) {
+        if (cOp == INH) {
+            Term s0 = subs[0];
+            if (s0.op() == PROD) {
+                Term s1 = subs[1];
+                if (s1.op() == ATOM) {
+                    Atomic ff = (Atomic) index.getIfPresentElse(s1);
+
+                    return Tuples.pair(
+                            ff,
+                            ((Compound) s0).subterms()
+                    );
+
+                }
+            }
+
         }
         return null;
     }

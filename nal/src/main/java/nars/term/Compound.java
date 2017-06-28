@@ -181,7 +181,6 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-
     @NotNull
     @Override
     default public Term unneg() { //probably rarely called; UnitCompound1 should be used for NEG's
@@ -236,9 +235,6 @@ public interface Compound extends Term, IPair, TermContainer {
         //subterms().forEach(s -> s.recurseTerms(v));
         subterms().recurseTerms(v);
     }
-
-
-
 
 
     @Override
@@ -347,7 +343,6 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-
     /**
      * unification matching entry point (default implementation)
      *
@@ -408,7 +403,7 @@ public interface Compound extends Term, IPair, TermContainer {
     static boolean matchTemporalDT(int a, int b, int dur) {
         if (a == XTERNAL || b == XTERNAL) return true;
         if (a == DTERNAL || b == DTERNAL) return true;
-        return Math.abs(a-b) <= dur;
+        return Math.abs(a - b) <= dur;
     }
 
     @Override
@@ -852,7 +847,8 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @Override default Term eval(TermContext index) {
+    @Override
+    default Term eval(TermContext index) {
 
         //the presence of these bits means that somewhere in the subterms is a functor to eval
         if (!isDynamic()) //!hasAll(Op.EvalBits))
@@ -874,32 +870,41 @@ public interface Compound extends Term, IPair, TermContainer {
 
         TermContainer tt = subterms();
 
+        Term[] evalSubs = null;
         //any contained evaluables
         if (tt.hasAll(OpBits)) {
             int s = tt.size();
-            Term[] evalSubs = new Term[s];
+            evalSubs = new Term[s];
             boolean modified = false;
             for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
                 Term x = tt.sub(i);
+                if (x == Null)
+                    return Null;
                 Term y = x.eval(index);
                 if (y == null) {
                     y = x;
-                } else if (x != y) {
-
-                    if (!y.equals(x)) {
-                        //the result comparing with the x
-                        modified = true;
-                    }
+                } else if (y == Null) {
+                    return Null;
+                } else if (x!=y) {
+                    //the result comparing with the x
+                    modified = true;
                 }
 
                 evalSubs[i] = y;
             }
 
             if (modified) {
-                return
-                    index.the(op(), dt(), evalSubs)
-                    //$.terms.the(op(), dt(), evalSubs) //evaluate in static context to absolutely avoid memoization?
-                        .eval(index);
+                @Nullable Term t;
+
+                t = index.the(op(), dt(), evalSubs);
+                if (t!=this)
+                    return t.eval(index);
+                //else {
+                //    continue;
+                //}
+
+                //$.terms.the(op(), dt(), evalSubs) //evaluate in static context to absolutely avoid memoization?
+                //.eval(index);
             }
         }
 
@@ -907,11 +912,13 @@ public interface Compound extends Term, IPair, TermContainer {
         //check if this is a funct
         if (op() == INH) {
             //recursively compute contained subterm functors
-            org.eclipse.collections.api.tuple.Pair<Atomic, TermContainer> f = Op.functor(this, index);
+            org.eclipse.collections.api.tuple.Pair<Atomic, TermContainer> f =
+                    (evalSubs != null) ? (f = Op.functor(op(), evalSubs, index)) : Op.functor(this, index);
+
             if (f != null && f.getOne() instanceof Functor) {
                 TermContainer args = f.getTwo();
 
-                Term dy = ((Functor)f.getOne()).apply(args);
+                Term dy = ((Functor) f.getOne()).apply(args);
                 if (dy == null || dy == this) {
                     return this; //functor returning null return value means keep the original input term
                 } else {

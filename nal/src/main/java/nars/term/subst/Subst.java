@@ -12,6 +12,7 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.Null;
 import static nars.index.term.TermIndex.disallowTrueOrFalse;
 
 
@@ -114,6 +115,9 @@ public interface Subst  {
 
 
         }
+
+        if (cop.statement && next.size()!=2) //QUICK valid statement test
+            return null;
 
         return index.the(next);
     }

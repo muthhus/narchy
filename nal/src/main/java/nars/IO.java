@@ -243,8 +243,8 @@ public class IO {
 
     public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
 
-        if (isAbsolute(term))
-            throw new InvalidTermException("absolute leak", $.p(term));
+//        if (isAbsolute(term))
+//            throw new IOException("absolute leak");
 
         if (term instanceof SerialCompound) {
             //it's already serialized in a SerialCompound

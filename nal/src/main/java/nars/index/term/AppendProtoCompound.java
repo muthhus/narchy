@@ -1,5 +1,8 @@
 package nars.index.term;
 
+import io.airlift.compress.snappy.SnappyCodec;
+import io.airlift.compress.snappy.SnappyCompressor;
+import io.airlift.compress.snappy.SnappyRawCompressor;
 import jcog.byt.DynByteSeq;
 import nars.IO;
 import nars.Op;
@@ -147,8 +150,8 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
 
     private void appendKey(@NotNull Term x) {
         try {
-            IO.writeTerm(this, x);
             writeByte(0); //separator
+            IO.writeTerm(this, x);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
