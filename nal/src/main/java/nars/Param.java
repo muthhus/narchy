@@ -20,7 +20,7 @@ public abstract class Param  {
     /** belief projection lookahead time in premise formation, in multiples of duration */
     public static final int PREDICTION_HORIZON = 4;
 
-    public static final boolean ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS = true;
+    public static final boolean ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS = false;
 
     /**
      * use this for advanced error checking, at the expense of lower performance.

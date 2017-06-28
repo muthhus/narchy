@@ -70,7 +70,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
-        if (v < 10) {
+        if (v < 16) {
             Map sharedMap = newBagMap(v);
             @NotNull Bag<Term, PriReference<Term>> termbag =
                     new CurveBag<>(0, DEFAULT_BLEND, sharedMap);
@@ -79,8 +79,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return new Bag[]{termbag, taskbag};
         } else {
             return new Bag[]{
-                new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, 2),
-                new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, 2)
+                new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, 4),
+                new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, 4)
             };
         }
 
