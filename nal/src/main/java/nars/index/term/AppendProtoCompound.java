@@ -58,8 +58,7 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
             this.subs = new Term[initial_capacity];
         this.op = op;
         this.dt = dt;
-        writeByte(op.ordinal());
-        writeInt(dt);
+
     }
 
     @Override
@@ -101,6 +100,11 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
      * hashes and prepares for use in hashmap
      */
     public AppendProtoCompound commit() {
+        writeByte(op.ordinal());
+        writeInt(dt);
+        for (Term x : subs)
+            appendKey(x);
+
         compact();
         this.hash = hash(0, len);
         return this;
@@ -145,7 +149,6 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
 
     protected void _add(@NotNull Term x) {
         subs[size++] = x;
-        appendKey(x);
     }
 
     private void appendKey(@NotNull Term x) {

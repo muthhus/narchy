@@ -7,6 +7,7 @@ import nars.Task;
 import nars.control.Premise;
 import nars.derive.meta.BoolPred;
 import nars.index.term.TermContext;
+import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -282,9 +283,9 @@ public class Derivation extends Unify implements TermContext {
     @Override public final boolean onMatch() {
         try {
             forEachMatch.test(this);
-        } catch (InvalidTermException t) {
-            if (Param.DEBUG) {
-                logger.error("{}", t.getMessage());
+        } catch (InvalidTermException | InvalidTaskException t) {
+            if (Param.DEBUG_EXTRA) {
+                logger.error("Derivation onMatch {}", t.getMessage());
             }
         }
         //return  (--matchesRemain > 0) && ;

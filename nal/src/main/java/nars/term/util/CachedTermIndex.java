@@ -37,7 +37,7 @@ public class CachedTermIndex extends StaticTermIndex {
         };
 
     public static final Memoize<ProtoCompound, Term> terms =
-            new HijackMemoize<>( 384 * 1024, 5, buildTerm);
+            new HijackMemoize<>( 384 * 1024, 3, buildTerm);
             //CaffeineMemoize.build(buildTerm);
 
 
