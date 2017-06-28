@@ -57,7 +57,7 @@ public class GoalActionConcept extends ActionConcept {
         int dur = nar.dur();
         long now = nar.time();
 
-        Truth goal = this.goals().truth(now, now, dur, nar);
+        Truth goal = this.goals().truth(now, nar);
 
         //float curiPeriod = 2; //TODO vary this
         float cur = curiosity.floatValue();
@@ -93,7 +93,7 @@ public class GoalActionConcept extends ActionConcept {
         }
 
 
-        Truth belief = this.beliefs().truth(now, now, dur, nar);
+        Truth belief = this.beliefs().truth(now, nar);
 
 //        //HACK try to improve this
 //        //if (goal == null) goal = belief; //use belief state, if exists (latch)

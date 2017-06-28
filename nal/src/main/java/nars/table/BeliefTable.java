@@ -58,7 +58,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long when, long now, int dur, Task question, Compound template, boolean noOverlap, NAR nar) {
+        public Task match(long when, Task question, Compound template, boolean noOverlap, NAR nar) {
             return null;
         }
 
@@ -106,7 +106,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Truth truth(long when, long now, int dur, NAR nar) {
+        public Truth truth(long when, NAR nar) {
             return null;
         }
 
@@ -147,7 +147,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      */
     @Nullable void add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
 
-    Task match(long when, long now, int dur, Task question, @Nullable Compound template, boolean noOverlap, NAR nar);
+    Task match(long when, Task question, @Nullable Compound template, boolean noOverlap, NAR nar);
 
 
     default void print(@NotNull PrintStream out) {
@@ -175,7 +175,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      * estimates the current truth value from the top task, projected to the specified 'when' time;
      * returns null if no evidence is available
      */
-    Truth truth(long when, long now, int dur, NAR nar);
+    Truth truth(long when, NAR nar);
 
 
     //    default float expectation(long when, int dur) {
@@ -203,7 +203,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, TaskConcept beliefConcept, NAR nar) {
 
 
-        Task answer = match(when, now, dur, question, question.term(), false, nar);
+        Task answer = match(when, question, question.term(), false, nar);
         if (answer == null || answer.isDeleted())
             return null;
 

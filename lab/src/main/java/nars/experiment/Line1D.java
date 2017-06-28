@@ -35,7 +35,7 @@ public class Line1D {
     static class Line1DExperiment implements FloatFunction<NAR> {
         float tHz = 0.001f; //in time units
         float yResolution = 0.02f; //in 0..1.0
-        float periods = 32;
+        float periods = 132;
 
         final int runtime = Math.round(periods /tHz);
 
@@ -180,10 +180,10 @@ public class Line1D {
 //
                 NAR n = new NARBuilder().get();
 
-                n.time.dur(2);
+                n.time.dur(5);
                 n.termVolumeMax.set(28);
                 n.beliefConfidence(0.9f);
-                n.goalConfidence(0.5f);
+                n.goalConfidence(0.75f);
                 n.onCycle((nn)->{
                     System.out.println(nn.emotion.summary());
                 });

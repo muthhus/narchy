@@ -2,10 +2,10 @@ package nars.control;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
 import nars.task.DerivedTask;
@@ -22,79 +22,32 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
 
-public class ConceptFire extends UnaryTask<Concept> implements Termed {
+public class ConceptFire extends UnaryTask<Concept> implements Termed, Consumer<DerivedTask> {
 
     /**
-     * rate at which ConceptFire forms premises
+     * rate at which ConceptFire forms premises and derives
      */
-    private static final int samplesMax = 4;
-    private static final float priMinAbsolute = Pri.EPSILON * 16;
-    private static final float momentum = 0.75f;
+    private static final int maxSamples = 3;
+
+    static final int TASKLINKS_SAMPLED = maxSamples * 2;
+    static final int TERMLINKS_SAMPLED = maxSamples * 3;
+
+    //private static final float priMinAbsolute = Pri.EPSILON * 1;
+    //private static final float momentum = 0.75f;
 
     static final ThreadLocal<Map<DerivedTask, DerivedTask>> buffers =
             ThreadLocal.withInitial(LinkedHashMap::new);
 
-    static final int TASKLINKS_SAMPLED = samplesMax*2;
-    static final int TERMLINKS_SAMPLED = samplesMax*2;
+
+    transient private Map<DerivedTask, DerivedTask> results;
 
     public ConceptFire(Concept c, float pri) {
         super(c, pri);
     }
 
-
     @Override
-    public ITask[] run(NAR nar) {
-
-        nar.emotion.count("ConceptFire_run_attempt");
-
-        float priBefore = this.pri;
-        if (priBefore != priBefore || priBefore < priMinAbsolute) {
-            nar.emotion.count("ConceptFire_run_but_deleted");
-            return null;
-        }
-
-
-        final float minPri = priMinAbsolute;
-
-        final Concept c = id;
-
-        final Bag<Task, PriReference<Task>> tasklinks = c.tasklinks().commit();//.normalize(0.1f);
-        if (tasklinks.isEmpty()) {
-            nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
-            return null;
-        }
-        List<PriReference<Task>> taskl = $.newArrayList();
-        tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
-        if (taskl.isEmpty()) {
-            nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
-            return null;
-        }
-
-        final Bag<Term, PriReference<Term>> termlinks = c.termlinks().commit();//.normalize(0.1f);
-        List<PriReference<Term>> terml = $.newArrayList();
-        termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
-        if (terml.isEmpty()) {
-            nar.emotion.count("ConceptFire_run_but_zero_termlinks_selected");
-            return null;
-        }
-
-        nar.emotion.count("ConceptFire_run");
-
-        nar.terms.commit(c); //index cache update
-
-        @Nullable PriReference<Task> tasklink = null;
-        @Nullable PriReference<Term> termlink = null;
-
-        int samples = 0;
-        int premises = 0;
-        int derivations = 0;
-        float cost = 0;
-        int samplesMax =
-                this.samplesMax;
-                //Math.min(this.samplesMax, terml.size() * taskl.size());
-
-        Map<DerivedTask, DerivedTask> results = buffers.get();
-        Consumer<DerivedTask> resultMerger = (nt) -> results.merge(nt, nt, (tt, pt) -> {
+    public void accept(DerivedTask nt) {
+        results.merge(nt, nt, (tt, pt) -> {
             if (pt == null) {
                 //priSub(nt.priElseZero());
                 return nt;
@@ -106,61 +59,97 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 return pt;
             }
         });
+    }
 
+    @Override
+    public ITask[] run(NAR nar) {
 
-        float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
+        //nar.emotion.count("ConceptFire_run_attempt");
+
+//        float priBefore = this.pri;
+//        if (priBefore != priBefore) {
+//            nar.emotion.count("ConceptFire_run_but_deleted");
+//            return null;
+//        }
+//        if (priBefore < priMinAbsolute) {
+//            nar.emotion.count("ConceptFire_run_but_depleted");
+//            return null;
+//        }
+//
+//
+//        final float minPri = priMinAbsolute;
+
+        final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks().commit();//.normalize(0.1f);
+        if (tasklinks.isEmpty()) {
+            //nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
+            return null;
+        }
+        List<PriReference<Task>> taskl = $.newArrayList();
+        tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
+        if (taskl.isEmpty()) {
+            //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
+            return null;
+        }
+
+        final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
+        List<PriReference<Term>> terml = $.newArrayList();
+        termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
+        if (terml.isEmpty()) {
+            //nar.emotion.count("ConceptFire_run_but_zero_termlinks_selected");
+            return null;
+        }
+
+        //nar.emotion.count("ConceptFire_run");
+
+        nar.terms.commit(id); //index cache update
+
+        @Nullable PriReference<Task> tasklink = null;
+        @Nullable PriReference<Term> termlink = null;
+
+        //int samples = 0;
+        int premises = 0;
+        int derivations = 0;
+        float cost = 0;
+                //Math.min(this.samplesMax, terml.size() * taskl.size());
+
+        results = buffers.get();
+
+        //float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
+
+        int ttlPerPremise = Param.UnificationTTLMax;
+        int maxTTL = maxSamples * ttlPerPremise;
+        int ttl = maxTTL;
+
+        int termlSize = terml.size();
+        float[] termlinkPri = new float[termlSize];
+        for (int i = 0; i < termlSize; i++)
+            termlinkPri[i] = terml.get(i).priElseZero();
+        int tasklSize = taskl.size();
+        float[] tasklinkPri = new float[tasklSize];
+        for (int i = 0; i < tasklSize; i++)
+            tasklinkPri[i] = taskl.get(i).priElseZero();
 
         Random rng = nar.random();
-        while (++samples < samplesMax && priElseZero() >= minPri) {
-            tasklink = taskl.get(
-                    Util.decideRoulette(taskl.size(), (i) -> taskl.get(i).priElseZero(), rng)
-            );
-            termlink = terml.get(
-                    Util.decideRoulette(terml.size(), (i) -> terml.get(i).priElseZero(), rng)
-            );
+        while (ttl > 0 /*samples++ < samplesMax*/) {
 
-            //            if (tasklink == null || (rng.nextFloat() > taskLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-            //                tasklink = tasklinks.sample();
-            //                if (tasklink == null)
-            //                    break;
-            //
-            //                taskLinkPri = clamp(tasklinks.normalizeMinMax(tasklink.priElseZero()), taskMargin, 1f-taskMargin);
-            //            }
-            //
-            //
-            //            if (termlink == null || (rng.nextFloat() > termLinkPri)) { //sample a new link inversely probabalistically in proportion to priority
-            //                termlink = termlinks.sample();
-            //                if (termlink == null)
-            //                    break;
-            //                termLinkPri = clamp(termlinks.normalizeMinMax(termlink.priElseZero()), termMargin, 1f-termMargin);
-            //            }
+            int tasklSelected = Util.decideRoulette(tasklSize, (i) -> tasklinkPri[i], rng);
+            tasklink = taskl.get( tasklSelected );
 
-//                if (termlink.get().op() == NEG)
-//                    throw new RuntimeException("NEG termlink: " + termlink);
+            int termlSelected = Util.decideRoulette(termlSize, (i) -> termlinkPri[i], rng);
+            termlink = terml.get( termlSelected );
 
-            Premise p = new Premise(tasklink, termlink, resultMerger);
+            Premise p = new Premise(tasklink, termlink, this);
             premises++;
 
-            priSub(pLimitFactor); //pay up-front
 
-            p.run(nar); //inline
+            int ttlUsed = p.run(nar, ttlPerPremise); //inline
+//            if (ttlUsed <= 0) {
+//                //failure penalty
+//                tasklinkPri[tasklSelected] *= 0.9f;
+//                termlinkPri[termlSelected] *= 0.9f;
+//            }
+            ttl -= Math.max(ttlUsed, ttlPerPremise/2);
 
-
-//            float pAfter = p.priElseZero();
-//            float ba = pBefore - pAfter;
-//            if (ba >= Pri.EPSILON)
-//                priSub(ba);
-
-            //                if (result!=null) {
-            //                    for (ITask x : result) {
-            //                        results.merge(x, x, (pv, nv) -> {
-            //                           pv.merge(nv);
-            //                           return pv;
-            //                        });
-            //                    }
-            //                    float cost = thisPri - p.priElseZero();
-            //                    priSub(cost);
-            //                }
         }
 
         derivations = results.size();

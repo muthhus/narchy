@@ -217,7 +217,7 @@ public class RevisionTest {
                 "(a). %0.1;0.5%"
                 );
         n.run(1);
-        Task t = n.concept("(a)").beliefs().match(ETERNAL, ETERNAL, 0, null, null, true, null);
+        Task t = n.concept("(a)").beliefs().match(ETERNAL, null, null, true, null);
         assertEquals(0.37f, t.freq(), 0.02f);
         assertEquals(0.75f, t.conf(), 0.02f);
     }
@@ -226,7 +226,7 @@ public class RevisionTest {
         NAR n = newNAR(3)
             .input("(x ==> y). %1.0;0.9%",
                    "(x ==> y). %0.0;0.9%" ).run(1);
-        Task t = n.concept("(x ==> y)").beliefs().match(ETERNAL, ETERNAL, 0, null, null, true, null);
+        Task t = n.concept("(x ==> y)").beliefs().match(ETERNAL, null, null, true, null);
         assertEquals(0.5f, t.freq(), 0.01f);
         assertEquals(0.947f, t.conf(), 0.01f);
     }
@@ -254,7 +254,7 @@ public class RevisionTest {
 
         Bag<Task,?> tasklinks = b.concept().tasklinks();
 
-        assertEquals(0.5f, b.beliefs().match(ETERNAL, ETERNAL, 0, null, null, true, null).truth().conf(), 0.01f);
+        assertEquals(0.5f, b.beliefs().match(ETERNAL, null, null, true, null).truth().conf(), 0.01f);
 
         printTaskLinks(b);        System.out.println("--------");
 
@@ -280,7 +280,7 @@ public class RevisionTest {
 
         //assertEquals(linksBeforeRevisionLink, tasklinks.priSum(), 0.01f);
 
-        assertEquals(0.71f, b.beliefs().match(ETERNAL, ETERNAL, 0, null, null, true, null).truth().conf(), 0.06f); //the revised task on top
+        assertEquals(0.71f, b.beliefs().match(ETERNAL, null, null, true, null).truth().conf(), 0.06f); //the revised task on top
 
         b.print();
 

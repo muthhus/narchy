@@ -25,7 +25,7 @@ public class NAL5Test extends AbstractNALTest {
         return AbstractNALTest.nars(5);
     }
 
-    final int cycles = 550;
+    final int cycles = 1550;
 
     @Test
     public void revision() {
@@ -376,8 +376,8 @@ public class NAL5Test extends AbstractNALTest {
     public void conditional_abduction_viaMultiConditionalSyllogism() {
         //((&&,M,A_1..n) ==> C), ((&&,A_1..n) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
         TestNAR tester = test();
-        tester.believe("(<robin --> [flying]> ==> bird:robin)"); //.en("If robin can fly then robin is a bird.");
-        tester.believe("((&&,swimmer:robin,<robin --> [flying]>) ==> bird:robin)"); //.en("If robin both swims and flys then robin is a bird.");
+        tester.believe("([flying]:robin ==> bird:robin)"); //.en("If robin can fly then robin is a bird.");
+        tester.believe("((swimmer:robin && [flying]:robin) ==> bird:robin)"); //.en("If robin both swims and flys then robin is a bird.");
         tester.mustBelieve(cycles * 4, "swimmer:robin", 1.00f, 0.45f /*0.4f*/); //.en("I guess robin swims.");
 
     }

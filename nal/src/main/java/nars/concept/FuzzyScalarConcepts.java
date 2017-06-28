@@ -190,7 +190,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
                         return "?";
                     else {
                         long when = nar.time();
-                        return s.term() + " " + s.beliefs().truth(when, when, nar.dur(), nar);
+                        return s.term() + " " + s.beliefs().truth(when, nar);
                     }
                 }
         ));

@@ -50,17 +50,17 @@ public class NARBuilder {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.95f);
-        n.goalConfidence(0.25f);
+        n.goalConfidence(0.75f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 1;
         n.DEFAULT_GOAL_PRIORITY = 1;
         n.DEFAULT_QUESTION_PRIORITY = 1;
         n.DEFAULT_QUEST_PRIORITY = 1;
-        n.termVolumeMax.setValue(36);
+        n.termVolumeMax.setValue(48);
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, false);
-        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 4, false, 16f);
+        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 3, false, 16f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 4);
 

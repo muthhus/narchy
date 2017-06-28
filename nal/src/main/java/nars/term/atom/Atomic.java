@@ -44,7 +44,7 @@ public interface Atomic extends Term {
             //try to parse int
             int i = Texts.i(id, MIN_VALUE);
             if (i != MIN_VALUE)
-                return AtomInt.the(i); //parsed as integer, so
+                return IntAtom.the(i); //parsed as integer, so
         }
 
         if ($.isQuoteNecessary(id))

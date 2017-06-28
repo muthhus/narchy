@@ -87,7 +87,6 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
                 switch (m.taskPunct) {
                     case BELIEF:
-                        break;
                     case QUESTION:
                         break;
                     case GOAL:

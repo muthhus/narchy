@@ -352,6 +352,10 @@ public class Derivation extends Unify implements TermContext {
     public int next() {
         return serial++;
     }
+
+    public int ttl() {
+        return versioning.ttl;
+    }
 }
 
 

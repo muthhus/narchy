@@ -33,7 +33,7 @@ import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.atom.AtomInt;
+import nars.term.atom.IntAtom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -842,7 +842,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
                     default:
                         throw new UnsupportedOperationException();
                 }
-                return table.truth(when, time(), dur(), this);
+                return table.truth(when, this);
             }
         }
         return null;
@@ -1264,7 +1264,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         }
 
 
-        if (term == null || (term instanceof Variable) || (isAbsolute(term)) || term instanceof AtomInt)
+        if (term == null || (term instanceof Variable) || (isAbsolute(term)) || term instanceof IntAtom)
             return null;
         return term;
     }
@@ -1567,6 +1567,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         if (concept == null)
             return null;
 
-        return ((BeliefTable)concept.table(punc)).match(when, time(), dur(), null, null, false, this);
+        return ((BeliefTable)concept.table(punc)).match(when, null, null, false, this);
     }
 }

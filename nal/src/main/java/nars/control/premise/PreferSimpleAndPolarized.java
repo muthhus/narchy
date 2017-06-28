@@ -20,7 +20,7 @@ import static nars.truth.TruthFunctions.w2c;
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
     /** value between 0 and 1.0, range for adjusting polarization (1f has no effect) */
-    final float minPolarizationFactor = 0.5f;
+    final float minPolarizationFactor = 0.75f;
 
 //    /** preference for polarity (includes conf) */
 //    public final FloatParam polarity = new FloatParam(0.5f, 0f, 1f);

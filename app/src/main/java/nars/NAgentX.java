@@ -165,6 +165,7 @@ abstract public class NAgentX extends NAgent {
         n.onCycle(nn -> {
             float lag = narLoop.lagSumThenClear() + a.running().lagSumThenClear();
             n.emotion.happy(-lag);
+            n.emotion.happy(n.emotion.busyPri.getSum()/50000f);
         });
         return n;
     }

@@ -37,6 +37,9 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     public int hash(int from, int to) {
         return ByteSeq.hash(bytes, from, to);
     }
+    public long hash64(int from, int to) {
+        return ByteSeq.hash64(bytes, from, to);
+    }
 
     @Override
     public boolean equals(Object obj) {

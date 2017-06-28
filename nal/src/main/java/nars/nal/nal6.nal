@@ -72,11 +72,11 @@
         (M ==> S), (M ==> (&&,(--,%S),A..+)), time(dtCombine) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(%M ==> %S), (%M ==> (||,%S,A..+)), time(dtCombine) |- (%M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-    (M ==> C), M, time(dtTaskExact) |- (M ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)
-        ((--,%M) ==> C), M, time(dtTaskExact) |- ((--,%M) ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)
+    (M ==> C), C, belief("&&"), time(dtTaskExact) |- (M ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)
+        ((--,%M) ==> C), C, belief("&&"), time(dtTaskExact) |- ((--,%M) ==>+- dropAnyConj(C)), (Belief:StructuralDeduction)
         //(M ==> (&&,(--,%S),A..+)), M, time(dtTaskExact) |- (M ==>+- (&&,A..+)), (Belief:StructuralDeduction)
-    (C ==> M), M, time(dtTaskExact) |- (dropAnyConj(C) ==>+- M), (Belief:StructuralDeduction)
-        (C ==> (--,%M)), M, time(dtTaskExact) |- (dropAnyConj(C) ==>+- (--,%M)), (Belief:StructuralDeduction)
+    (C ==> M), C, belief("&&"), time(dtTaskExact) |- (dropAnyConj(C) ==>+- M), (Belief:StructuralDeduction)
+        (C ==> (--,%M)), C, belief("&&"), time(dtTaskExact) |- (dropAnyConj(C) ==>+- (--,%M)), (Belief:StructuralDeduction)
         //((&&,(--,%S),A..+) ==> M), M, time(dtTaskExact) |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
 
 //// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////

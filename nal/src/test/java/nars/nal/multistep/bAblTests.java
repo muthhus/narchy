@@ -94,7 +94,7 @@ public class bAblTests extends AbstractNALTest {
                 .input("at(den,hallway,west).") //The den is east of the hallway.
                 .input("start(den,kitchen).") //How do you go from den to kitchen?
                 .input("$0.9 path(?a,?b,?c,?d)?")
-                .mustBelieve(4500, "path(id,west,neg,south)", 1f, 0.35f); //A:west,north
+                .mustBelieve(500, "path(id,west,neg,south)", 1f, 0.35f); //A:west,north
 
 
     }

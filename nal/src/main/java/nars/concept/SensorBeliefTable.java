@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
  */
 class SensorBeliefTable extends DefaultBeliefTable {
 
-    static final int durationsTolerance = 4;
+    static final int durationsTolerance = 1;
 
     private Task current;
 
@@ -26,12 +26,13 @@ class SensorBeliefTable extends DefaultBeliefTable {
     }
 
     @Override
-    public Truth truth(long when, long now, int dur, NAR nar) {
-        Truth x = super.truth(when, now, dur, nar);
+    public Truth truth(long when, NAR nar) {
+        Truth x = super.truth(when, nar);
         if (x!=null)
             return x;
 
         Task current = this.current;
+        int dur = nar.dur();
         if (current != null &&
                 current.start() <= when && when <= current.end() + durationsTolerance * dur) {
             return current.truth();
@@ -41,12 +42,13 @@ class SensorBeliefTable extends DefaultBeliefTable {
     }
 
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
-        Task x = super.match(when, now, dur, against, template, noOverlap, nar);
+    public Task match(long when, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
+        Task x = super.match(when, against, template, noOverlap, nar);
         if (x!=null)
             return x;
 
         Task current = this.current;
+        int dur = nar.dur();
         if (current != null &&
                 current.start() <= when && when <= current.end() + durationsTolerance * dur) {
             return current;

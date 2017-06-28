@@ -1,10 +1,12 @@
 package nars.index.term;
 
-import jcog.Util;
+import jcog.byt.DynByteSeq;
+import nars.IO;
 import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -12,47 +14,49 @@ import java.util.function.Predicate;
 
 /**
  * a lightweight, prototype compound, not fully constructed.
- *
+ * <p>
  * it is constructed incrementally by appending additional subterms.
- *
+ * <p>
  * it accumulates a rolling hash so it may be used as a key in a hash Map
- *
+ * <p>
  * TODO:
- *      VolumeLimitedIncrementalProtoCompound extends AppendProtoCompound
- *      etc...
+ * VolumeLimitedIncrementalProtoCompound extends AppendProtoCompound
+ * etc...
  */
-public class AppendProtoCompound implements ProtoCompound {
+public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements ProtoCompound {
 
     public final Op op;
     public final int dt;
 
-    @NotNull private Term[] subs = Term.EmptyArray;
+    @NotNull
+    private Term[] subs = Term.EmptyArray;
 
     int size;
+
     int hash;
-
-
 
     public AppendProtoCompound(Op op, int dt, @NotNull Term[] u) {
         this(op, dt, 0);
-        this.subs = u;
-        if ((this.size = u.length) > 0) {
-            int hash = this.hash;
-            for (Term x : u)
-                hash = Util.hashCombine(x.hashCode(), hash);
-            this.hash = hash;
-        }
+
+        this.subs = u; //zero-copy direct usage
+        size = u.length;
+        for (Term x : u)
+            appendKey(x);
     }
 
-    /** hash will be modified for each added subterm
-     *  @param initial_capacity estimated size, but will grow if exceeded
-     * */
+    /**
+     * hash will be modified for each added subterm
+     *
+     * @param initial_capacity estimated size, but will grow if exceeded
+     */
     public AppendProtoCompound(Op op, int dt, int initial_capacity) {
+        super(initial_capacity * 8);
         if (initial_capacity > 0)
             this.subs = new Term[initial_capacity];
         this.op = op;
         this.dt = dt;
-        this.hash = Util.hashCombine(dt, 1 + op.bit);
+        writeByte(op.ordinal());
+        writeInt(dt);
     }
 
     @Override
@@ -71,30 +75,54 @@ public class AppendProtoCompound implements ProtoCompound {
     }
 
 
-    /** safe for use during final build step */
-    @Override public Term[] subterms() {
+    /**
+     * safe for use during final build step
+     */
+    @Override
+    public Term[] subterms() {
+        Term[] tt;
         int s = this.size;
         @NotNull Term[] ss = this.subs;
         if (ss.length == s) {
-            return ss; //dont reallocate it's just fine to share
+            tt = ss;
+            //return ss; //dont reallocate it's just fine to share
         } else {
-            return this.subs = Arrays.copyOfRange(ss, 0, s); //trim
+            tt = Arrays.copyOfRange(ss, 0, s); //trim
         }
+
+        this.subs = null; //clear refernce to the array from this point
+        return tt;
     }
 
-    @Override public boolean AND(@NotNull Predicate<Term> t) {
+    /**
+     * hashes and prepares for use in hashmap
+     */
+    public AppendProtoCompound commit() {
+        compact();
+        this.hash = hash(0, len);
+        return this;
+    }
+
+    @Override
+    public int hashCode() {
+        return hash;
+    }
+
+    @Override
+    public boolean AND(@NotNull Predicate<Term> t) {
         for (Term x : subs) {
             //if (x == null)
-              //  break;
+            //  break;
             if (t.test(x)) return false;
         }
         return true;
     }
 
-    @Override public boolean OR(@NotNull Predicate<Term> t) {
+    @Override
+    public boolean OR(@NotNull Predicate<Term> t) {
         for (Term x : subs) {
             //if (x == null)
-              //  break;
+            //  break;
             if (t.test(x)) return true;
         }
         return false;
@@ -104,7 +132,7 @@ public class AppendProtoCompound implements ProtoCompound {
         int c = subs.length;
         int len = this.size;
         if (c == len) {
-            ensureCapacity(len, len + Math.max(1,(len /2)));
+            ensureCapacity(len, len + Math.max(1, (len / 2)));
         }
 
         _add(x);
@@ -114,7 +142,16 @@ public class AppendProtoCompound implements ProtoCompound {
 
     protected void _add(@NotNull Term x) {
         subs[size++] = x;
-        hash = Util.hashCombine(x.hashCode(), hash);
+        appendKey(x);
+    }
+
+    private void appendKey(@NotNull Term x) {
+        try {
+            IO.writeTerm(this, x);
+            writeByte(0); //separator
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     protected void ensureCapacity(int newCapacity) {
@@ -138,19 +175,15 @@ public class AppendProtoCompound implements ProtoCompound {
         }
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        AppendProtoCompound x = (AppendProtoCompound) obj;
-        return x.hash == hash && x.op == op && x.dt == dt && Util.equalArraysDirect(subs, x.subs);
-    }
+//    @Override
+//    public boolean equals(Object obj) {
+//        AppendProtoCompound x = (AppendProtoCompound) obj;
+//        return x.hash == hash && x.op == op && x.dt == dt && Arrays.equals(bytes, x.bytes);
+//                //Util.equalArraysDirect(subs, x.subs);
+//    }
 
     @Override
-    public int hashCode() {
-        return hash;
-    }
-
-
-    @Override public Term sub(int i) {
+    public Term sub(int i) {
         return subs[i];
     }
 

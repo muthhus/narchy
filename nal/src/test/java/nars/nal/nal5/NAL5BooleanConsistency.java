@@ -56,7 +56,7 @@ public class NAL5BooleanConsistency {
 //                    d.ask(s);
 //                }
 
-                d.run(1512);
+                d.run(512);
 
                 System.out.println(i + " " + j);
                 for (int k = 0, outcomesLength = outcomes.length; k < outcomesLength; k++) {

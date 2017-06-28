@@ -16,7 +16,7 @@ import nars.task.UnaryTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.AtomInt;
+import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -370,7 +370,7 @@ public class Activate extends UnaryTask<Task> {
             //assert(!(x instanceof UnnormalizedVariable));
 
 
-            if (x instanceof Variable || x instanceof AtomInt)
+            if (x instanceof Variable || x instanceof IntAtom)
                 return false;
 
             return true;

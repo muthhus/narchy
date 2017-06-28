@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.math.Interval;
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.Task;
 import nars.control.premise.Derivation;
 import nars.derive.meta.Conclude;
@@ -1019,7 +1020,8 @@ public interface TimeFunctions {
                 occReturn[1] = intersection.b;
             } else {
                 //not overlapping at all, compute point interpolation
-                //occReturn[0] = occInterpolate(t, b);
+                if (Param.ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS)
+                    occReturn[0] = occInterpolate(t, b);
 
                 return null;
             }

@@ -22,16 +22,16 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
     /** finds or generates the strongest match to the specified parameters.
      * Task against is an optional argument which can be used to compare internal temporal dt structure for similarity */
-    Task match(long when, long now, int dur, @Nullable Task against, NAR nar);
+    Task match(long when,  @Nullable Task against, NAR nar);
 
     /** estimates the truth value for the provided time.
      * the eternal table's top value, if existent, contributes a 'background'
      * level in interpolation.
      * */
-    Truth truth(long when, long now, int dur, EternalTable eternal);
+    Truth truth(long when, EternalTable eternal, NAR nar);
 
-    default Truth truth(long when, long now, int dur) {
-        return truth(when, now, dur, null);
+    default Truth truth(long when,  NAR nar) {
+        return truth(when, null, nar);
     }
 
     @Override
@@ -83,12 +83,12 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long when, long now, int dur, @Nullable Task against, NAR nar) {
+        public Task match(long when, @Nullable Task against, NAR nar) {
             return null;
         }
 
         @Override
-        public PreciseTruth truth(long when, long now, int dur, EternalTable eternal) {
+        public Truth truth(long when, EternalTable eternal, NAR nar) {
             return null;
         }
 

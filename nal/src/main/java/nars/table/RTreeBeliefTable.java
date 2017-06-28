@@ -33,7 +33,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int sampleRadius = 16;
+    static final int sampleRadius = 8;
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -225,16 +225,27 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private int capacity;
 
     @Override
-    public Truth truth(long when, long now, int dur, EternalTable eternal) {
+    public Truth truth(long when,  EternalTable eternal, NAR nar) {
+
+        long now = nar.time();
+        updateSignalTasks(now);
 
         @Nullable Task e = eternal != null ? eternal.strongest() : null;
 
         if (!tree.isEmpty()) {
-            updateSignalTasks(now);
 
-            List<TaskRegion> tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).list();
-            if (!tt.isEmpty())
+            int dur = nar.dur();
+
+            List<TaskRegion> tt = cursor(when - 1 * dur, when + 1 * dur).list();
+            if (!tt.isEmpty()) {
                 return TruthPolation.truth(e, when, dur, tt);
+            } else if (sampleRadius > 1) {
+                //expand region to max radius
+                tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).list();
+                if (!tt.isEmpty()) {
+                    return TruthPolation.truth(e, when, dur, tt);
+                }
+            }
 
         }
 
@@ -243,10 +254,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task against, NAR nar) {
+    public Task match(long when,  @Nullable Task against, NAR nar) {
+
+        long now = nar.time();
 
         updateSignalTasks(now);
 
+        int dur = nar.dur();
 
         FloatFunction<TaskRegion> wr = regionStrength(now, dur);
         MutableList<TaskRegion> tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).

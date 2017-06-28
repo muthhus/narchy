@@ -101,7 +101,7 @@ public class NAL6MultistepTest {
             n.run(100);
             burglary = n.concept("(burglary)");
             earthquake = n.concept("(earthquake)");            // burglary.print();  earthquake.print();
-            System.out.println("burglary=" + n.beliefTruth(burglary,0) + "\tearthquake=" + earthquake.beliefs().truth(Tense.ETERNAL, (long) 0, 0, n));
+            System.out.println("burglary=" + n.beliefTruth(burglary,0) + "\tearthquake=" + earthquake.beliefs().truth(Tense.ETERNAL, n));
         }
 
         //result from Probcog:  earthquake=23%, burglary=99%

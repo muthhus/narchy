@@ -4,7 +4,6 @@
  */
 package nars.control;
 
-import jcog.Util;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.NAR;
@@ -18,14 +17,12 @@ import nars.control.premise.Derivation;
 import nars.derive.DefaultDeriver;
 import nars.table.BeliefTable;
 import nars.task.DerivedTask;
-import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
 import java.util.function.Consumer;
 
 import static jcog.Util.or;
@@ -72,8 +69,10 @@ public class Premise extends Pri {
      * patham9 so https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj#L31
      * patham9 especially try to understand the "temporal temporal" case
      * patham9 its using the result of higher confidence
+     *
+     * returns ttl used, -1 if failed before starting
      */
-    public void run(NAR nar) {
+    public int run(NAR nar, int ttlMax) {
 
         nar.emotion.count("Premise_run");
 
@@ -81,7 +80,7 @@ public class Premise extends Pri {
         Task task = taskLink.get();
         float taskPri = task.pri();
         if (taskPri != taskPri)
-            return; //task deleted so completely erase this premise
+            return -1; //task deleted so completely erase this premise
 
 
         Term beliefTerm = termLink.get();
@@ -126,7 +125,7 @@ public class Premise extends Pri {
                         tryAnswer(reUnified, taskLink, match, nar);
                 } else {
                     long when = whenMatch(task, now);
-                    match = table.match(when, now, dur, task, (Compound) beliefTerm, true, nar);
+                    match = table.match(when, task, (Compound) beliefTerm, true, nar);
                 }
 
                 if (match != null && match.isBelief()) {
@@ -167,11 +166,14 @@ public class Premise extends Pri {
         d.restartB(task);
         d.restartC(this, belief, beliefTerm, parentTaskPri,
                 //Util.lerp(parentTaskPri, Param.UnificationTTLMin, Param.UnificationTTLMax)
-                Param.UnificationTTLMax
+                ttlMax
         );
 
-        DefaultDeriver.the.test(d);
 
+        DefaultDeriver.the.test(d);
+        int ttlAfter = d.ttl();
+
+        return ttlMax - ttlAfter;
 
 //        ITask[] r = d.flush(parentTaskPri);
 ////

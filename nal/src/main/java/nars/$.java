@@ -19,7 +19,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atom;
-import nars.term.atom.AtomInt;
+import nars.term.atom.IntAtom;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.util.CachedTermIndex;
@@ -684,7 +684,7 @@ public enum $ {
 
     @NotNull
     public static Atomic the(int v) {
-        return AtomInt.the((int) v);
+        return IntAtom.the((int) v);
     }
 
     @NotNull

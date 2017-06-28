@@ -68,7 +68,7 @@ abstract public class DynamicTruthModel {
             Truth nt;
             if (evi) {
                 //task
-                Task bt = ((BeliefTable)subConcept.table(beliefOrGoal ? BELIEF : GOAL)).match( when + dt, now, dur, null, (Compound)subterm, false, n);
+                Task bt = ((BeliefTable)subConcept.table(beliefOrGoal ? BELIEF : GOAL)).match( when + dt, null, (Compound)subterm, false, n);
                 if (bt == null) {
                     return null;
                 }

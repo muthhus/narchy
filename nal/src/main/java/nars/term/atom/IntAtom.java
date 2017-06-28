@@ -6,29 +6,29 @@ import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.ATOM;
 
-public class AtomInt implements Atomic {
+public class IntAtom implements Atomic {
 
     final static int RANK = Term.opX(ATOM, 2);
 
     public final int id;
 
     final static int MAX_CACHED_INTS = 16;
-    private static final AtomInt[] digits = new AtomInt[MAX_CACHED_INTS];
+    private static final IntAtom[] digits = new IntAtom[MAX_CACHED_INTS];
     static {
         for (int i = 0; i < MAX_CACHED_INTS; i++) {
-            digits[i] = new AtomInt(i);
+            digits[i] = new IntAtom(i);
         }
     }
 
-    public static AtomInt the(int i) {
+    public static IntAtom the(int i) {
         if (i >= 0 && i < MAX_CACHED_INTS) {
             return digits[i];
         } else {
-            return new AtomInt(i);
+            return new IntAtom(i);
         }
     }
 
-    AtomInt(int i) {
+    IntAtom(int i) {
         this.id = i;
     }
 
@@ -45,7 +45,7 @@ public class AtomInt implements Atomic {
 
     @Override
     public final boolean equals(Object obj) {
-        return obj instanceof AtomInt && id == ((AtomInt)obj).id;
+        return obj instanceof IntAtom && id == ((IntAtom)obj).id;
     }
 
     @Override public String toString() {

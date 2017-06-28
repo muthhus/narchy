@@ -94,7 +94,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                 long dist = a != z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a - when);
                 if (dist > 0) {
                     cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
-                    cw = 0; //immediate cut-off
+                    //cw = 0; //immediate cut-off
                 }
 
                 if (eternalizable(term())) {

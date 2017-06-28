@@ -135,11 +135,11 @@ public class DynamicBeliefTableTest {
 //            System.out.println( xtable.truth(when, template.dt(), true) + " " + xtable.generate(template, when));
 //        }
 
-        assertEquals(0.79f, xtable.generate($("((x) &&+6 (y))"), 0, 0, n).conf(), 0.05f);
-        assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0, 0, n).conf(), 0.05f); //best match to the input
-        assertEquals(0.79f, xtable.generate($("((x) &&+2 (y))"), 0, 0, n).conf(), 0.05f);
-        assertEquals(0.77f, xtable.generate($("((x) &&+0 (y))"), 0, 0, n).conf(), 0.05f);
-        assertEquals(0.62f, xtable.generate($("((x) &&-32 (y))"), 0, 0, n).conf(), 0.05f);
+        assertEquals(0.79f, xtable.generate($("((x) &&+6 (y))"), 0, n).conf(), 0.05f);
+        assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0,  n).conf(), 0.05f); //best match to the input
+        assertEquals(0.79f, xtable.generate($("((x) &&+2 (y))"),  0, n).conf(), 0.05f);
+        assertEquals(0.77f, xtable.generate($("((x) &&+0 (y))"),  0, n).conf(), 0.05f);
+        assertEquals(0.62f, xtable.generate($("((x) &&-32 (y))"), 0,  n).conf(), 0.05f);
 
 
     }
@@ -153,7 +153,7 @@ public class DynamicBeliefTableTest {
         int dur = n.dur();
 
         long when1 = n.time();
-        Truth t = prod.beliefs().truth(when1, when1, dur, n);
+        Truth t = prod.beliefs().truth(when1, n);
         System.out.println(t);
 
         CompoundConcept imgX = (CompoundConcept) n.conceptualize($("(x --> (/,f,_,y))"));
@@ -168,7 +168,7 @@ public class DynamicBeliefTableTest {
         n.run(16); //by now, structural decomposition should have also had the opportunity to derive the image
 
         long when = n.time();
-        Truth t2 = prod.beliefs().truth(when, when, dur, n);
+        Truth t2 = prod.beliefs().truth(when, n);
 
         assertEquals(t2, n.beliefTruth(imgX, n.time()));
         assertEquals(t2, n.beliefTruth(imgY, n.time()));
@@ -183,29 +183,29 @@ public class DynamicBeliefTableTest {
         nar.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f).run(1);
 
         CompoundConcept prod = (CompoundConcept) nar.concept($("(f-->(x, y))"));
-        Truth t = prod.beliefs().truth((long) 0, (long) 0, dur, nar);
+        Truth t = prod.beliefs().truth((long) 0, nar);
 
         CompoundConcept imgX = (CompoundConcept) nar.conceptualize($("((\\,f,_,y)-->x)"));
         assertNotNull(imgX);
-        Truth xb = imgX.beliefs().truth((long) 0, (long) 0, dur, nar);
+        Truth xb = imgX.beliefs().truth((long) 0, nar);
         assertNotNull(xb);
         assertEquals(t, xb);
 
         CompoundConcept imgY = (CompoundConcept) nar.conceptualize($("((\\,f,x,_)-->y)"));
-        assertEquals(t, imgY.beliefs().truth((long) 0, (long) 0, dur, nar));
+        assertEquals(t, imgY.beliefs().truth((long) 0, nar));
 
 
 
         nar.run(6); //by now, structural decomposition should have also had the opportunity to derive the image
 
-        Truth t2 = prod.beliefs().truth((long) 0, (long) 0, dur, nar);
+        Truth t2 = prod.beliefs().truth((long) 0, nar);
 
-        assertEquals(t2, imgX.beliefs().truth((long) 0, (long) 0, dur, nar));
+        assertEquals(t2, imgX.beliefs().truth((long) 0, nar));
         long when1 = nar.time();
-        assertNotEquals(t2, imgX.beliefs().truth(when1, when1, dur, nar));
-        assertEquals(t2, imgY.beliefs().truth((long) 0, (long) 0, dur, nar));
+        assertNotEquals(t2, imgX.beliefs().truth(when1, nar));
+        assertEquals(t2, imgY.beliefs().truth((long) 0, nar));
         long when = nar.time();
-        assertNotEquals(t2, imgY.beliefs().truth(when, when, dur, nar));
+        assertNotEquals(t2, imgY.beliefs().truth(when, nar));
 
     }
 
@@ -214,7 +214,7 @@ public class DynamicBeliefTableTest {
         String c = "(tetris-->(((0,(1,(1))),(0,(0,(1,(0)))))&((1,(0,(1))),(0,(0,(1,(0)))))))";
         n.believe(c);
         n.run(1);
-        @Nullable Task a = n.concept(c).beliefs().match((long) 0, (long) 0, 1, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), null, false, n);
+        @Nullable Task a = n.concept(c).beliefs().match((long) 0, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), null, false, n);
         //System.out.println(a);
         assertTrue(a.toString().endsWith(" (tetris-->(((0,(1,(1))),(0,(0,(1,(0)))))&((1,(0,(1))),(0,(0,(1,(0))))))). %1.0;.90%"));
 //        @Nullable Task b = n.concept(c).beliefs().match(10, 0, 1, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), false);

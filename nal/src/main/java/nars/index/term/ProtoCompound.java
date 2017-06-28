@@ -73,4 +73,6 @@ public interface ProtoCompound extends TermContainer {
     default boolean impossibleSubTermVolume(int otherTermVolume) {
         return false;
     }
+
+    ProtoCompound commit();
 }

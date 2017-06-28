@@ -461,7 +461,10 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task against, NAR nar) {
+    public Task match(long when,  @Nullable Task against, NAR nar) {
+
+        long now = nar.time();
+        int dur = nar.dur();
 
         //choose only top:
         //return maxBy(evidence(when, now, dur));
@@ -478,11 +481,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    public Truth truth(long when, long now, int dur, @Nullable EternalTable eternal) {
+    public Truth truth(long when,  @Nullable EternalTable eternal, NAR nar) {
 
         Truth x = TruthPolation.truth(
                 eternal != null ? eternal.strongest() : null,
-                when, dur, this);
+                when, nar.dur(), this);
 
         if (x==null || x.conf() < Param.TRUTH_EPSILON)
             return null; //cut-off

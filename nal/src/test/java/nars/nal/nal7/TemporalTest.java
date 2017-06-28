@@ -403,7 +403,7 @@ public class TemporalTest {
 
 
         //INTERMPOLATION APPLIED DURING REVISION:
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(ETERNAL, ETERNAL, 0, null, null, true, null).term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(ETERNAL, null, null, true, null).term().toString());
     }
 
     @Test
@@ -427,7 +427,7 @@ public class TemporalTest {
         cc.beliefs().print();
 
         //test belief match interpolated a result
-        assertEquals(correctMerge, cc.beliefs().match((long) 0, n.time(), this.n.dur(), null, null, true, n).term().toString());
+        assertEquals(correctMerge, cc.beliefs().match((long) 0, null, null, true, n).term().toString());
 
 
         //test merge after capacity shrink:
@@ -439,7 +439,7 @@ public class TemporalTest {
         //n.forEachTask(System.out::println);
 
         //INTERMPOLATION APPLIED AFTER REVECTION:
-        assertEquals(correctMerge, cc.beliefs().match((long) 0, n.time(), this.n.dur(), null, null, true, n).term().toString());
+        assertEquals(correctMerge, cc.beliefs().match((long) 0, null, null, true, n).term().toString());
     }
 
     @Test

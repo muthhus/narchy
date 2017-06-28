@@ -16,7 +16,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
 
-        float fps = 20f;
+        float fps = 5f;
 
 
         NAgentX.runRT((n)->{
@@ -47,11 +47,11 @@ public class FZero extends NAgentX {
 
 
         actionBipolar($.inh(Atomic.the("fwd"), id), (f) -> {
-            fz.vehicleMetrics[0][6] += (f*f) * 1f;
+            fz.vehicleMetrics[0][6] += (f) * 2f;
             return f;
         }).resolution.setValue(0.1f);
         actionBipolar($.inh(Atomic.the("rot"), id), (r) -> {
-            fz.playerAngle += (r*r*r) * 0.15f;
+            fz.playerAngle += (r*r*r) * 0.35f;
             return r;
         }).resolution.setValue(0.1f);
 

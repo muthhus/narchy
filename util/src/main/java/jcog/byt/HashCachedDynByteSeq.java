@@ -20,6 +20,7 @@ public class HashCachedDynByteSeq extends DynByteSeq {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
+        if (!(obj instanceof DynByteSeq)) return false;
         if (hash != obj.hashCode()) return false;
         return super.equals(obj);
     }

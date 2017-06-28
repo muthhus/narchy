@@ -78,24 +78,23 @@ public class TaskExecutor extends Executioner {
                 @Override
                 protected CLink<ITask> merge(@NotNull CLink<ITask> existing, @NotNull CLink<ITask> incoming, @Nullable MutableFloat overflowing) {
 
-                    if (existing.ref instanceof NALTask) {
-                        //maxMerge for NAL Tasks
-                        float before = existing.priElseZero();
-                        float inc = incoming.priSafe(0);
-                        float next = existing.priMax(inc);
-                        float overflow = inc - (next - before);
-                        if (overflow > 0) {
-                            pressurize(-overflow);
-                            if (overflowing != null) overflowing.add(overflow);
-                        }
-                        return existing; //the original instance
-                    } else {
+//                    if (existing.ref instanceof NALTask) {
+//                        //maxMerge for NAL Tasks
+//                        float before = existing.priElseZero();
+//                        float inc = incoming.priSafe(0);
+//                        float next = existing.priMax(inc);
+//                        float overflow = inc - (next - before);
+//                        if (overflow > 0) {
+//                            pressurize(-overflow);
+//                            if (overflowing != null) overflowing.add(overflow);
+//                        }
+//                        return existing; //the original instance
+//                    } else {
                         //plusMerge
                         return super.merge(existing, incoming, overflowing);
-                    }
+//                    }
 
 
-                    //return super.merge(existing, incoming, overflowing);
                 }
 
                 @Override
@@ -137,8 +136,8 @@ public class TaskExecutor extends Executioner {
         super();
         active.setCapacity(capacity);
 
-        int overCapacity = capacity * 1;
-        overflow = new DisruptorBlockingQueue(overCapacity*2);
+        int overCapacity = capacity / 2;
+        overflow = new DisruptorBlockingQueue(overCapacity);
     }
 
     public TaskExecutor(int capacity, float executedPerCycle) {

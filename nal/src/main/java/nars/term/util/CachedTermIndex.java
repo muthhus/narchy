@@ -46,7 +46,7 @@ public class CachedTermIndex extends StaticTermIndex {
         if (u.length < 2)
             return super.the(op, dt, u);
 
-        return terms.apply(new AppendProtoCompound(op, dt, u));
+        return terms.apply(new AppendProtoCompound(op, dt, u).commit());
     }
 
     @Override
@@ -58,7 +58,7 @@ public class CachedTermIndex extends StaticTermIndex {
 //            build.miss.increment();
 //            return super.the(c.op(), c.dt(), c.subterms()); //immediate construct
 //        } else {
-        return terms.apply(c);
+        return terms.apply(c.commit());
 //        }
     }
 

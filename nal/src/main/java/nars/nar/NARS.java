@@ -63,7 +63,7 @@ public class NARS extends NAR {
     private List<Loop> loops;
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024,  e) {
+        super(new CaffeineIndex(new DefaultConceptBuilder(), 64*1024,  e) {
 
 //                  @Override
 //                  protected void onBeforeRemove(Concept c) {
@@ -173,14 +173,13 @@ public class NARS extends NAR {
         );
 
         r.setAgent(
-                new NARMixAgent<>(new NARBuilder()
-                        .index(
-                                new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
-                                //new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
+//                new NARMixAgent<>(new NARBuilder()
+//                        .index(
+//                                new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
+//                                //new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
+//                        ).get(), r, this)
 
-                        ).get(), r, this)
-
-                //new HaiQMixAgent()
+                new HaiQMixAgent()
 
                 //new MultiHaiQMixAgent()
         );

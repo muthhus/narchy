@@ -39,16 +39,15 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
 
-    @Nullable
-    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, NAR nar) {
-        return generate(template, when, now, null, nar);
+    public DynamicBeliefTask generate( @NotNull Compound template, long when, NAR nar) {
+        return generate(template, when, null, nar);
     }
 
 
     @Nullable
-    public DynamicBeliefTask generate(@NotNull Compound template, long when, long now, @Nullable Priority b, NAR nar) {
+    public DynamicBeliefTask generate(@NotNull Compound template, long when, @Nullable Priority b, NAR nar) {
 
-        DynTruth yy = truth(when, template, true, nar);
+        DynTruth yy = truth(when,  template, true, nar);
         if (yy == null)
             return null;
 
@@ -67,31 +66,26 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             if (e > end) end = e;
         }
 
-        return yy.task(template, beliefOrGoal, now, start, end, b, nar);
+        return yy.task(template, beliefOrGoal, nar.time(), start, end, b, nar);
     }
 
     @Override
-    public Truth truth(long when, long now, int dur, NAR nar) {
-        DynTruth d = truth(when, now, term, false, nar);
+    public Truth truth(long when, NAR nar) {
+        DynTruth d = truth(when, term, false, nar);
         return Truth.maxConf(d != null ? d.truth() : null,
-                super.truth(when, now, dur, nar) /* includes only non-dynamic beliefs */);
+                super.truth(when, nar) /* includes only non-dynamic beliefs */);
     }
+
+
 
 
     @Nullable
     public DynTruth truth(long when, @NotNull Compound template, boolean evidence, NAR nar) {
-        return truth(when, nar.time(), template,  /*nar.concept(template)*/
-                evidence, nar);
-    }
-
-
-    @Nullable
-    DynTruth truth(long when, long now, @NotNull Compound template, boolean evidence, NAR nar) {
-        return model.eval(template, beliefOrGoal, when, now, evidence, nar); //newDyn(evidence);
+        return model.eval(template, beliefOrGoal, when, nar.time(), evidence, nar); //newDyn(evidence);
     }
 
     @Override
-    public Task match(long when, long now, int dur, @Nullable Task target, Compound template, boolean noOverlap, NAR nar) {
+    public Task match(long when, @Nullable Task target, Compound template, boolean noOverlap, NAR nar) {
         if (isEmpty())
             return null;
 
@@ -114,9 +108,9 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             }
         }
 
-        Task y = generate(template, when, now, nar);
+        Task y = generate(template, when, nar);
 
-        Task x = super.match(when, now, dur, target, template, noOverlap, nar);
+        Task x = super.match(when, target, template, noOverlap, nar);
 
         if (x == null) return y;
         if (y == null || x.equals(y)) return x;
@@ -130,6 +124,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 //        }
 
         //choose higher confidence
+        int dur = nar.dur();
         float xc = x.evi(when, dur);
         float yc = y.evi(when, dur);
         //if (!Util.equals(xc, yc, TRUTH_EPSILON)) {
