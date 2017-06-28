@@ -77,15 +77,22 @@ public class TaskExecutor extends Executioner {
 
                 @Override
                 protected CLink<ITask> merge(@NotNull CLink<ITask> existing, @NotNull CLink<ITask> incoming, @Nullable MutableFloat overflowing) {
-                    float before = existing.priElseZero();
-                    float inc = incoming.priSafe(0);
-                    float next = existing.priMax(inc);
-                    float overflow = inc - (next - before);
-                    if (overflow > 0) {
-                        pressurize(-overflow);
-                        if (overflowing!=null) overflowing.add(overflow);
+
+                    if (existing.ref instanceof NALTask) {
+                        //maxMerge for NAL Tasks
+                        float before = existing.priElseZero();
+                        float inc = incoming.priSafe(0);
+                        float next = existing.priMax(inc);
+                        float overflow = inc - (next - before);
+                        if (overflow > 0) {
+                            pressurize(-overflow);
+                            if (overflowing != null) overflowing.add(overflow);
+                        }
+                        return existing; //the original instance
+                    } else {
+                        //plusMerge
+                        return super.merge(existing, incoming, overflowing);
                     }
-                    return existing; //the original instance
 
 
                     //return super.merge(existing, incoming, overflowing);

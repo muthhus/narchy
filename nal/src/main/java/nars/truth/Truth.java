@@ -76,6 +76,10 @@ public interface Truth extends Truthed {
         }
     };
 
+    static float eternalize(float conf) {
+        return w2c(conf);
+    }
+
 //    Term Truth_TRUE = $.the("TRUE");
 //    Term Truth_FALSE = $.the("FALSE");
 //    Term Truth_UNSURE = $.the("UNSURE"); //only really valid for describing expectation, not frequency by itself

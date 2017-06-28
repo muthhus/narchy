@@ -22,6 +22,7 @@ import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
 import nars.control.NARMixAgent;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -174,8 +175,8 @@ public class NARS extends NAR {
         r.setAgent(
                 new NARMixAgent<>(new NARBuilder()
                         .index(
-                                //new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
-                                new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
+                                new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
+                                //new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
 
                         ).get(), r, this)
 
@@ -243,14 +244,14 @@ public class NARS extends NAR {
             int sub =
                     //random.nextInt(num);
                     Math.abs(Util.hashWangJenkins(x.hashCode())) % nar.num;
+            apply(x);
             return nar.sub.get(sub).run(x);
         }
 
 
-        public CLink<ITask> apply(CLink<ITask> x) {
+        public void apply(CLink<ITask> x) {
             if (x!=null && !x.isDeleted())
                 x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
-            return x;
         }
 
         @Override
@@ -363,9 +364,11 @@ public class NARS extends NAR {
 
         @Override
         protected void actuallyRun(CLink<ITask> x) {
-            ((RootExecutioner) exe).apply(x); //apply gain before running, because it may be an ephemeral task this would be the only point to affect it and its children
 
             super.actuallyRun(x);
+
+            ((RootExecutioner) exe).apply(x); //apply gain after running
+
         }
 
         @Override

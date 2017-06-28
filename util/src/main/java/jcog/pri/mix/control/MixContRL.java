@@ -50,11 +50,11 @@ import static jcog.Util.sqr;
 public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLink<X>> {
 
     public final MixChannel[] mix;
-    public final FloatParam priMin = new FloatParam(Pri.EPSILON, 0f, 1f);
+    public final FloatParam priMin = new FloatParam(Pri.EPSILON*4, 0f, 1f);
 
-    float dynamicRange = 8f;
-    public final FloatParam gainMin = new FloatParam(1/dynamicRange, 0f, 0f);
-    public final FloatParam gainMax = new FloatParam(dynamicRange, 0f, 16f);
+//    float dynamicRange = 4f;
+//    public final FloatParam gainMin = new FloatParam(1/dynamicRange, 0f, 0f);
+//    public final FloatParam gainMax = new FloatParam(dynamicRange, 0f, 16f);
 
     /** the tests to apply to input (doesnt include aux's which will already have applied their id)  */
     public  final AbstractClassifier<X>[] tests;
@@ -241,11 +241,12 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
 
             //preGain[0] += levels.get(size - 1); //bias
 
-            return Util.lerp(Util.sigmoid(preGain[0]), gainMin.floatValue(), gainMax.floatValue());
+            return
+//                    Util.lerp(Util.sigmoid(preGain[0]), gainMin.floatValue(), gainMax.floatValue())
 //                sqr( //l^4
-//                sqr(1f + preGain[0]) //l^2
+                sqr(1f + preGain[0]) //l^2
 //        )
-//                ;
+                ;
         } else {
             return 0;
         }

@@ -55,10 +55,6 @@ public enum TruthPolation {
         return truth(null, when, dur, Lists.newArrayList(tasks));
     }
 
-    public static float eternalize(float conf) {
-        return w2c(conf);
-    }
-
     /**
      * computes truth at a given time from iterative task samples
      * includes variance calculation for reduction of evidence in proportion to confusion/conflict
