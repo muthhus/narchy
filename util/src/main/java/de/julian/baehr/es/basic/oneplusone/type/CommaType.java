@@ -1,8 +1,8 @@
 package de.julian.baehr.es.basic.oneplusone.type;
 
-import java.util.List;
-
 import de.julian.baehr.es.basic.oneplusone.Individual;
+
+import java.util.List;
 
 public class CommaType implements IType{
 

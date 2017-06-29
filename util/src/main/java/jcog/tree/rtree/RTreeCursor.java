@@ -4,8 +4,6 @@ import jcog.list.FasterList;
 import jcog.util.UniqueRanker;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
-import org.eclipse.collections.api.tuple.primitive.ObjectFloatPair;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 
 import java.util.Collections;
 import java.util.Comparator;

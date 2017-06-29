@@ -1,13 +1,10 @@
 package jcog.meter.event;
 
 import com.google.common.base.Joiner;
-import jcog.Util;
-import org.eclipse.collections.api.iterator.FloatIterator;
 
 import java.io.*;
 import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 /** dead simple CSV logging */
 public class CSVOutput extends PrintStream {

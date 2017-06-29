@@ -1,24 +1,19 @@
 package nars.nar;
 
 
-import com.google.common.util.concurrent.MoreExecutors;
 import jcog.AffinityExecutor;
 import jcog.Loop;
 import jcog.Util;
-import jcog.bag.Bag;
 import jcog.math.FloatAveraged;
-import jcog.pri.PriReference;
 import jcog.pri.classify.EnumClassifier;
 import jcog.pri.mix.PSinks;
 import jcog.pri.mix.control.CLink;
-import jcog.pri.mix.control.HaiQMixAgent;
 import jcog.pri.mix.control.MixContRL;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Task;
 import nars.attention.Activate;
-import nars.concept.Concept;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
 import nars.control.NARMixAgent;
@@ -26,7 +21,6 @@ import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
 import nars.task.NALTask;
-import nars.term.Term;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
@@ -173,13 +167,13 @@ public class NARS extends NAR {
         );
 
         r.setAgent(
-//                new NARMixAgent<>(new NARBuilder()
-//                        .index(
-//                                new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
-//                                //new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
-//                        ).get(), r, this)
+                new NARMixAgent<>(new NARBuilder()
+                        .index(
+                                new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
+                                //new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
+                        ).get(), r, this)
 
-                new HaiQMixAgent()
+                //new HaiQMixAgent()
 
                 //new MultiHaiQMixAgent()
         );

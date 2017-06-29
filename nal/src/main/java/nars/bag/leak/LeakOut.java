@@ -1,6 +1,5 @@
 package nars.bag.leak;
 
-import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.PriArrayBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;

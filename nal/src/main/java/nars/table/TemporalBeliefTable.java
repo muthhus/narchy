@@ -3,7 +3,6 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

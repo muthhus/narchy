@@ -5,7 +5,6 @@ import nars.$;
 import nars.Param;
 import nars.Task;
 import nars.control.premise.Derivation;
-import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
@@ -105,7 +104,7 @@ public class Revision {
     }
 
 
-    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, int dur, Truth newTruth, boolean mergeOrChoose, Random rng) {
+    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, Truth newTruth, boolean mergeOrChoose, Random rng) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
@@ -282,7 +281,7 @@ public class Revision {
     /**
      * t is the target time of the new merged task
      */
-    public static Task merge(TemporalBeliefTable table, @NotNull Task a, @NotNull Task b, long now, int dur, float confMin, Random rng) {
+    public static Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, Random rng) {
 
 
         Interval ai = new Interval(a.start(), a.end());
@@ -368,6 +367,7 @@ public class Revision {
 
         newTruth = revise(a, b, factor, c2w(confMin));
 
+
 //            float conf = w2c(expected.evi() * factor);
 //            if (conf >= Param.TRUTH_EPSILON)
 //                newTruth = new PreciseTruth(expected.freq(), conf);
@@ -376,7 +376,7 @@ public class Revision {
 
 
         if (newTruth != null) {
-            return mergeInterpolate(a, b, start, end, now, dur, newTruth, true, rng);
+            return mergeInterpolate(a, b, start, end, now, newTruth, true, rng);
         }
 
         return null;

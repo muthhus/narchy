@@ -34,7 +34,7 @@ abstract public class DynamicTruthModel {
     };
 
     @Nullable
-    public DynTruth eval(Compound superterm, boolean beliefOrGoal, long when, long now, boolean stamp, NAR n) {
+    public DynTruth eval(Compound superterm, boolean beliefOrGoal, long when, boolean stamp, NAR n) {
 
         Term[] inputs = components(superterm);
 
@@ -66,9 +66,10 @@ abstract public class DynamicTruthModel {
             boolean evi = d.e != null;
 
             Truth nt;
+            Task bt = null;
             if (evi) {
                 //task
-                Task bt = ((BeliefTable)subConcept.table(beliefOrGoal ? BELIEF : GOAL)).match( when + dt, null, (Compound)subterm, false, n);
+                bt = ((BeliefTable)subConcept.table(beliefOrGoal ? BELIEF : GOAL)).match( when + dt, null, (Compound)subterm, false, n);
                 if (bt == null) {
                     return null;
                 }
@@ -77,17 +78,17 @@ abstract public class DynamicTruthModel {
                 if (nt==null)
                     return null;
 
-                d.e.add(bt);
-
             } else {
                 //truth only
                 nt = n.truth(subConcept, beliefOrGoal ? BELIEF : GOAL, when + dt);
             }
 
-            if (nt == null || !add(i, d, nt.negIf(negated), confMin)) {
+            if (nt == null || nt.conf() < n.confMin.floatValue() || !add(i, d, nt.negIf(negated), confMin)) {
                 return null;
             }
 
+            if (evi)
+                d.e.add(bt);
 
         }
 

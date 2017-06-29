@@ -31,12 +31,17 @@ public interface Atomic extends Term {
 
     @NotNull
     static Atomic the(@NotNull String id) {
-        assert(!id.isEmpty());
+        int l = id.length();
+        assert(l>0);
 
         //special cases
-        switch (id) {
-            case "_":
-                return Op.Imdex;
+        if (l ==1) {
+            switch (id.charAt(0)) {
+                case Op.ImdexSym:  return Op.Imdex;
+                case Op.NullSym:  return Op.Null;
+                case Op.TrueSym:  return Op.True;
+                case Op.FalseSym:  return Op.False;
+            }
         }
 
         //TODO handle negative ints prefixd with '-'

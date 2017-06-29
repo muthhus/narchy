@@ -81,7 +81,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Nullable
     public DynTruth truth(long when, @NotNull Compound template, boolean evidence, NAR nar) {
-        return model.eval(template, beliefOrGoal, when, nar.time(), evidence, nar); //newDyn(evidence);
+        return model.eval(template, beliefOrGoal, when, evidence, nar); //newDyn(evidence);
     }
 
     @Override

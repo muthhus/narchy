@@ -4,9 +4,7 @@ import jcog.tree.rtree.rect.RectDouble2D;
 import jcog.tree.rtree.util.Stats;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class SplitTest {
 

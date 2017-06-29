@@ -20,7 +20,6 @@
  */
 package nars.concept;
 
-import com.google.common.collect.Iterators;
 import jcog.bag.Bag;
 import jcog.pri.PriReference;
 import nars.NAR;
@@ -32,15 +31,12 @@ import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
-import nars.truth.Truth;
 import nars.util.SoftException;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;

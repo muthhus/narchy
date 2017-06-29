@@ -1,9 +1,9 @@
 package de.julian.baehr.es.basic.oneplusone.mutation;
 
-import java.util.Random;
-
 import de.julian.baehr.es.basic.oneplusone.IObjectiveFunction;
 import de.julian.baehr.es.basic.oneplusone.Individual;
+
+import java.util.Random;
 
 public class ConstantIsotropicGaussianMutation implements IMutationOperation{
 

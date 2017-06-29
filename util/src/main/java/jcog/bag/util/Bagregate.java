@@ -1,10 +1,8 @@
 package jcog.bag.util;
 
-import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.PriArrayBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import org.apache.commons.lang3.mutable.MutableFloat;

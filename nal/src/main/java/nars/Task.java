@@ -37,6 +37,7 @@ import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
+import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -670,13 +671,13 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     @Nullable
     default Truth truth(long when, int dur, float minConf) {
-        float cw = evi(when, dur);
-        if (cw == cw && cw > 0) {
+        float eve = evi(when, dur);
+        if (eve == eve && eve > 0) {
 
 
-            float conf = w2c(cw);
-            if (conf > minConf) {
-                return $.t(freq(), conf);
+            float minEve = c2w(minConf);
+            if (eve >=  minEve) {
+                return new PreciseTruth(freq(), eve, false);
 
                 //quantum entropy uncertainty:
 //                float ff = freq();

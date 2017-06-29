@@ -27,7 +27,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed, Consumer<
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 2;
+    private static final int maxSamples = 3;
 
     static final int TASKLINKS_SAMPLED = maxSamples * 1;
     static final int TERMLINKS_SAMPLED = maxSamples * 2;

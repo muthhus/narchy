@@ -176,8 +176,9 @@ public enum Op {
     /**
      * Image index ("imdex") symbol for products, and anonymous variable in products
      */
+    public final static char ImdexSym = '_';
     public static final Atomic Imdex =
-            new UnnormalizedVariable(Op.VAR_DEP, "_") {
+            new UnnormalizedVariable(Op.VAR_DEP, String.valueOf(ImdexSym)) {
 
                 final int RANK = Term.opX(VAR_PATTERN, 20 /* different from normalized variables with a subOp of 0 */);
 
@@ -187,15 +188,20 @@ public enum Op {
                 }
             };
 
+
+    public static final char TrueSym = '†';
+    public static final char FalseSym = 'Ø';
+    public static final char NullSym = (char)133 /* horizontal ellipsis */;
+
     /**
      * absolutely invalid
      */
-    public static final AtomicSingleton Null = new AtomicSingleton("Null");
+    public static final AtomicSingleton Null = new AtomicSingleton(String.valueOf(NullSym));
 
     /**
      * absolutely true
      */
-    public static final AtomicSingleton True = new AtomicSingleton("†") {
+    public static final AtomicSingleton True = new AtomicSingleton(String.valueOf(TrueSym)) {
         @NotNull
         @Override
         public Term unneg() {
@@ -206,7 +212,7 @@ public enum Op {
     /**
      * absolutely false
      */
-    public static final AtomicSingleton False = new AtomicSingleton("Ø") {
+    public static final AtomicSingleton False = new AtomicSingleton(String.valueOf(FalseSym)) {
         @NotNull
         @Override
         public Term unneg() {

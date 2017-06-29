@@ -3,7 +3,6 @@ package nars;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import jcog.Loop;
-import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -38,7 +37,6 @@ import static jcog.Texts.n2;
 import static nars.$.*;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * explicit management of sensor concepts and motor functions

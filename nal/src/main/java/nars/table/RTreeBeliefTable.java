@@ -1,6 +1,5 @@
 package nars.table;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import jcog.Util;
@@ -276,7 +275,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 Task a = tt.get(0).task;
                 Task b = tt.get(1).task;
 
-                Task c = Revision.merge(this, a, b, now, dur, Param.TRUTH_EPSILON, nar.random());
+                Task c = Revision.merge(a, b, now, Param.TRUTH_EPSILON, nar.random());
                 return c != null ? c : a;
         }
 
@@ -317,7 +316,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             int over = size() + 1 - capacity;
             if (over > 0) {
-                addAfterCompressing(tr, n, tree.model());
+                addAfterCompressing(tr, n);
             } else {
                 tree.addAsync(tr);
             }
@@ -343,7 +342,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * assumes called with writeLock
      */
-    private void addAfterCompressing(TaskRegion tr, NAR nar, Spatialization<TaskRegion> model) {
+    private void addAfterCompressing(TaskRegion tr, NAR nar) {
         //if (compressing.compareAndSet(false, true)) {
         try {
 
@@ -394,7 +393,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //
 //                    }
 
-                    if (toMerge != null && (activation = compressMerge(toMerge, now, dur, Param.TRUTH_EPSILON, nar.random())) != null) {
+                    if (toMerge != null && (activation = compressMerge(toMerge, now, dur, nar.confMin.floatValue(), nar.random())) != null) {
                         activations.add(activation);
                     } else if (toRemove != null) {
                         compressEvict(toRemove);
@@ -432,7 +431,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
 
         if (a != null && b != null) {
-            Task c = Revision.merge(this, a.task, b.task, now, dur, confMin, rng);
+            Task c = Revision.merge(a.task, b.task, now, confMin, rng);
             if (c != null) {
                 //already has write lock so just use non-async methods
                 remove(a);

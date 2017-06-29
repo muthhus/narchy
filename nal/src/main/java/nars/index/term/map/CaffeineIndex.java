@@ -4,7 +4,6 @@ import com.github.benmanes.caffeine.cache.*;
 import nars.NAR;
 import nars.Param;
 import nars.concept.PermanentConcept;
-import nars.concept.WiredConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;

@@ -1,18 +1,18 @@
 package de.julian.baehr.es.basic.oneplusone;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-import java.util.function.Supplier;
-import java.util.stream.LongStream;
-
 import de.julian.baehr.es.basic.oneplusone.mutation.IMutationOperation;
 import de.julian.baehr.es.basic.oneplusone.mutation.SelfadaptingOnePlusOne;
 import de.julian.baehr.es.basic.oneplusone.recombination.DominantRecombination;
 import de.julian.baehr.es.basic.oneplusone.recombination.IRecombinationOperator;
 import de.julian.baehr.es.basic.oneplusone.type.IType;
 import de.julian.baehr.es.basic.oneplusone.type.PlusType;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+import java.util.function.Supplier;
+import java.util.stream.LongStream;
 
 public class OnePlusOne {
 

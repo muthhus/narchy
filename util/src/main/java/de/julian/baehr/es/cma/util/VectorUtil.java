@@ -7,7 +7,6 @@ import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction
 
 import java.util.Arrays;
 import java.util.Random;
-import java.util.stream.DoubleStream;
 
 
 public class VectorUtil {

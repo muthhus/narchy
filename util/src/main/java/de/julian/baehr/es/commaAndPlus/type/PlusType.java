@@ -1,9 +1,9 @@
 package de.julian.baehr.es.commaAndPlus.type;
 
+import de.julian.baehr.es.commaAndPlus.Individual;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import de.julian.baehr.es.commaAndPlus.Individual;
 
 public class PlusType implements IType{
 

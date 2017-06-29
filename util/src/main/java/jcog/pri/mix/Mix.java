@@ -1,9 +1,6 @@
 package jcog.pri.mix;
 
-import jcog.list.FasterList;
-import jcog.meter.TelemetryRing;
 import jcog.pri.Priority;
-import jcog.pri.mix.control.CLink;
 
 import java.util.List;
 import java.util.Map;

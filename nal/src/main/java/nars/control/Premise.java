@@ -25,7 +25,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 

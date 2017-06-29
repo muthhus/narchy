@@ -1,15 +1,11 @@
 package de.julian.baehr.es.cma.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import jcog.Util;
 import jcog.tensor.Tensor;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 
+import java.util.Arrays;
 
 import static jcog.Util.floatToDoubleArray;
 

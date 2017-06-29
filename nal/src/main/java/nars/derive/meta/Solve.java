@@ -3,7 +3,6 @@ package nars.derive.meta;
 import nars.Op;
 import nars.control.premise.Derivation;
 import nars.term.Compound;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;

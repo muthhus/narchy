@@ -1,9 +1,5 @@
 package de.julian.baehr.es.commaAndPlus;
 
-import java.util.*;
-import java.util.function.Supplier;
-import java.util.stream.LongStream;
-
 import de.julian.baehr.es.commaAndPlus.recombine.Discrete;
 import de.julian.baehr.es.commaAndPlus.recombine.IRecombinator;
 import de.julian.baehr.es.commaAndPlus.recombine.Intermediate;
@@ -11,6 +7,10 @@ import de.julian.baehr.es.commaAndPlus.recombine.None;
 import de.julian.baehr.es.commaAndPlus.type.CommaType;
 import de.julian.baehr.es.commaAndPlus.type.IType;
 import jcog.Texts;
+
+import java.util.*;
+import java.util.function.Supplier;
+import java.util.stream.LongStream;
 
 public class Main {
 

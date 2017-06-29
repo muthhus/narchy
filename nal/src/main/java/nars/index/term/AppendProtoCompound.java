@@ -1,8 +1,5 @@
 package nars.index.term;
 
-import io.airlift.compress.snappy.SnappyCodec;
-import io.airlift.compress.snappy.SnappyCompressor;
-import io.airlift.compress.snappy.SnappyRawCompressor;
 import jcog.byt.DynByteSeq;
 import nars.IO;
 import nars.Op;

@@ -1,7 +1,5 @@
 package jcog;
 
-import com.google.common.base.Joiner;
-import com.google.common.primitives.Doubles;
 import jcog.list.FasterList;
 import jcog.meter.event.CSVOutput;
 import org.apache.commons.lang3.ArrayUtils;
@@ -23,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Stream;

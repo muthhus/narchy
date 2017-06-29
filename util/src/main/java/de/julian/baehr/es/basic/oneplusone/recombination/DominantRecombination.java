@@ -1,9 +1,9 @@
 package de.julian.baehr.es.basic.oneplusone.recombination;
 
+import de.julian.baehr.es.basic.oneplusone.Individual;
+
 import java.util.List;
 import java.util.Random;
-
-import de.julian.baehr.es.basic.oneplusone.Individual;
 
 public class DominantRecombination implements IRecombinationOperator{
 

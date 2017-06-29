@@ -12,7 +12,6 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.Null;
 import static nars.index.term.TermIndex.disallowTrueOrFalse;
 
 

@@ -1,14 +1,10 @@
 package jcog.util;
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
 
 /**

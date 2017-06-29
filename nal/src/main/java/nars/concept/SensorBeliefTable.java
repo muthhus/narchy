@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
  */
 class SensorBeliefTable extends DefaultBeliefTable {
 
-    static final int durationsTolerance = 1;
+    static final int durationsTolerance = 2;
 
     private Task current;
 

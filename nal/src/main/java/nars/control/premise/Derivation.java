@@ -218,7 +218,7 @@ public class Derivation extends Unify implements TermContext {
                 if (bstart != ETERNAL) {
 
                     long beliefTruthTime = belief.nearestStartOrEnd(tstart, task.end());
-                    beliefTruth = belief.truth(beliefTruthTime, dur, 0 /* confMin */); //project belief truth to task's time
+                    beliefTruth = belief.truth(beliefTruthTime, dur, nar.confMin.floatValue() /* confMin */); //project belief truth to task's time
                 }
             }
             this.beliefTruth = beliefTruth;

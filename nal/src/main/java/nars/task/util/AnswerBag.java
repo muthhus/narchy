@@ -1,6 +1,5 @@
 package nars.task.util;
 
-import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.PriArrayBag;
 import jcog.map.SynchronizedHashMap;
 import jcog.pri.PriReference;
