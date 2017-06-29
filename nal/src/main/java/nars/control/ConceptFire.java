@@ -22,12 +22,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
 
-public class ConceptFire extends UnaryTask<Concept> implements Termed, Consumer<DerivedTask> {
+public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 3;
+    private static final int maxSamples = 2;
 
     static final int TASKLINKS_SAMPLED = maxSamples * 1;
     static final int TERMLINKS_SAMPLED = maxSamples * 2;
@@ -39,27 +39,12 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed, Consumer<
             ThreadLocal.withInitial(LinkedHashMap::new);
 
 
-    transient private Map<DerivedTask, DerivedTask> results;
+
 
     public ConceptFire(Concept c, float pri) {
         super(c, pri);
     }
 
-    @Override
-    public void accept(DerivedTask nt) {
-        results.merge(nt, nt, (tt, pt) -> {
-            if (pt == null) {
-                //priSub(nt.priElseZero());
-                return nt;
-            } else {
-                //float ptBefore = pt.priElseZero();
-                pt.merge(nt);
-                //float ptAfter = pt.priElseZero();
-                //priSub(ptAfter - ptBefore);
-                return pt;
-            }
-        });
-    }
 
     @Override
     public ITask[] run(NAR nar) {
@@ -112,19 +97,38 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed, Consumer<
         float cost = 0;
                 //Math.min(this.samplesMax, terml.size() * taskl.size());
 
-        results = buffers.get();
-
+        Map<DerivedTask, DerivedTask> results = buffers.get();
+        Consumer<DerivedTask> x = (nt) -> results.merge(nt, nt, (tt, pt) -> {
+            if (pt == null) {
+                //priSub(nt.priElseZero());
+                return nt;
+            } else {
+                //float ptBefore = pt.priElseZero();
+                pt.merge(nt);
+                //float ptAfter = pt.priElseZero();
+                //priSub(ptAfter - ptBefore);
+                return pt;
+            }
+        });
         //float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
 
-        int ttlPerPremise = Param.UnificationTTLMax;
+        int ttlPerPremise =
+                //Param.UnificationTTLMax
+                (int)Math.ceil((0.75f * priElseZero() + 0.25f) * Param.UnificationTTLMax)
+        ;
+
         int maxTTL = maxSamples * ttlPerPremise;
         int ttl = maxTTL;
 
         int termlSize = terml.size();
+        if (termlSize == 0)
+            return null;
         float[] termlinkPri = new float[termlSize];
         for (int i = 0; i < termlSize; i++)
             termlinkPri[i] = terml.get(i).priElseZero();
         int tasklSize = taskl.size();
+        if (tasklSize == 0)
+            return null;
         float[] tasklinkPri = new float[tasklSize];
         for (int i = 0; i < tasklSize; i++)
             tasklinkPri[i] = taskl.get(i).priElseZero();
@@ -138,7 +142,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed, Consumer<
             int termlSelected = Util.decideRoulette(termlSize, (i) -> termlinkPri[i], rng);
             termlink = terml.get( termlSelected );
 
-            Premise p = new Premise(tasklink, termlink, this);
+            Premise p = new Premise(tasklink, termlink, x);
             premises++;
 
 

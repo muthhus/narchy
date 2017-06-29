@@ -28,8 +28,8 @@ public interface TaskTable  {
 
 
     static void activate(@NotNull Task t, float activation, @NotNull NAR n) {
-        if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))
-            n.eventTaskProcess.emit(/*post*/t); //suppress emitting re-activations
+       // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
+            n.eventTaskProcess.emit(/*post*/t);
         n.input(new Activate(t, activation));
     }
 

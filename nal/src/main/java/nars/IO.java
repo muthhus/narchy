@@ -41,6 +41,30 @@ import static nars.time.Tense.XTERNAL;
  */
 public class IO {
 
+    public interface TermEncoder {
+        default void write(Term x) {
+            write(x, new DynByteSeq(x.volume()*4 /* ESTIMATE */));
+        }
+        void write(Term x, DynByteSeq to);
+    }
+
+    public static class DefaultTermEncoder implements TermEncoder {
+
+        @Override
+        public void write(Term x, DynByteSeq to) {
+
+            try {
+                IO.writeTerm(to, x);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+//TODO
+//    public interface TermDecoder {
+//        void Term
+//    }
 
     public static final byte SPECIAL_OP = (byte) (Op.values().length + 1);
 

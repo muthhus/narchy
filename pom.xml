@@ -32,7 +32,8 @@
                     <version>2.20</version>
                     <configuration>
 
-                        <parallelOptimized>true</parallelOptimized>
+                        <parallel>true</parallel>
+                        <!--<parallelOptimized>true</parallelOptimized>-->
                         <!--<reuseForks>true</reuseForks>-->
                         <!--<useUnlimitedThreads>true</useUnlimitedThreads>-->
                         <!--<argLine>-Xmx512m</argLine>-->

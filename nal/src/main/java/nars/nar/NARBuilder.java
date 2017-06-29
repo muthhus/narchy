@@ -7,6 +7,7 @@ import nars.Param;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
@@ -28,7 +29,11 @@ import static nars.Op.BELIEF;
 
 public class NARBuilder {
 
-    private @NotNull Supplier<TermIndex> concepts = () -> new NARBuilder.BasicTermIndex(8 * 1024 );
+    private @NotNull Supplier<TermIndex> concepts = () ->
+            new CaffeineIndex(new DefaultConceptBuilder(), 4096, null)
+            //new NARBuilder.BasicTermIndex(8 * 1024 )
+    ;
+
 
     private @NotNull Time time = new CycleTime();
 
