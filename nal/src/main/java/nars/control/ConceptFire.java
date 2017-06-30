@@ -35,7 +35,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
      */
     private static final int maxSamples = 3;
 
-    static final int TASKLINKS_SAMPLED = maxSamples * 1;
+    static final int TASKLINKS_SAMPLED = maxSamples * 2;
     static final int TERMLINKS_SAMPLED = maxSamples * 2;
 
     //private static final float priMinAbsolute = Pri.EPSILON * 1;
@@ -83,7 +83,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
             return null;
         }
-        DecideRoulette<PriReference<Task>> taskl = new DecideRoulette(linearPri);
+        DecideRoulette<PriReference<Task>> taskl = new DecideRoulette(softMaxPri);
         tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
@@ -91,7 +91,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         }
 
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
-        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(linearPri);
+        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(softMaxPri);
         termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
         if (terml.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_termlinks_selected");
@@ -126,7 +126,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         });
         //float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
 
-        int ttlPerPremise = Param.UnificationStackMax;
+        int ttlPerPremise = Param.UnificationTTLMax;
         int maxTTL = (int) ceil(max(
                 1 * ttlPerPremise,
                 priElseZero() * maxSamples * ttlPerPremise

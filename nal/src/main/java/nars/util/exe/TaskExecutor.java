@@ -17,7 +17,6 @@ import nars.Task;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.truth.Truthed;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,7 +54,6 @@ public class TaskExecutor extends Executioner {
     public final FloatParam masterGain = new FloatParam(1f, 0f, 1f);
 
 
-    final DecideRoulette<CLink<ITask>> buffer = new DecideRoulette<>(CLink::priElseZero);
 
     public final Bag<ITask, CLink<ITask>> nal = new ArrayBag<>(0, PriMerge.max, new ConcurrentHashMap<>()) {
 
@@ -70,6 +68,7 @@ public class TaskExecutor extends Executioner {
             return l.ref;
         }
     };
+
 
     /**
      * active tasks
@@ -92,28 +91,6 @@ public class TaskExecutor extends Executioner {
                 @Override
                 public HijackBag commit(Consumer c) {
                     return this; //do nothing
-                }
-
-                @Override
-                protected CLink<ITask> merge(@NotNull CLink<ITask> existing, @NotNull CLink<ITask> incoming, @Nullable MutableFloat overflowing) {
-
-//                    if (existing.ref instanceof NALTask) {
-                    //maxMerge for NAL Tasks
-//                        float before = existing.priElseZero();
-//                        float inc = incoming.priSafe(0);
-//                        float next = existing.priMax(inc);
-//                        float overflow = inc - (next - before);
-//                        if (overflow > 0) {
-//                            pressurize(-overflow);
-//                            if (overflowing != null) overflowing.add(overflow);
-//                        }
-//                        return existing; //the original instance
-//                    } else {
-//                        plusMerge
-                    return super.merge(existing, incoming, overflowing);
-//                    }
-
-
                 }
 
 //                @Override
@@ -151,7 +128,10 @@ public class TaskExecutor extends Executioner {
 
 
             };
-    private float forgetEachPri;
+
+    final DecideRoulette<CLink<ITask>> activeBuffer = new DecideRoulette<>(CLink::priElseZero);
+
+    private float forgetEachActivePri;
 
 
     public TaskExecutor(int capacity) {
@@ -250,23 +230,23 @@ public class TaskExecutor extends Executioner {
             //EXEC
             float eFrac = ((float) toExe) / active.capacity();
             float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag) active).depressurize(eFrac) * (eFrac);
-            this.forgetEachPri =
+            this.forgetEachActivePri =
                     pAvg > Pri.EPSILON * 8 ? pAvg : 0;
                     //0;
 
-            buffer.clear();
+            activeBuffer.clear();
             active.sample(Math.min(active.size(), Math.max(1, toExe*2)), x -> {
-                if (forgetEachPri > 0) {
-                    x.priSub(forgetEachPri);
+                if (forgetEachActivePri > 0) {
+                    x.priSub(forgetEachActivePri);
                 }
-                buffer.add(x);
+                activeBuffer.add(x);
                 //(Consumer<? super CLink<ITask>>)(buffer::add)
             });
             for (int i = 0; i < toExe; i++) {
-                @Nullable CLink<ITask> x = buffer.decide(nar.random());
+                @Nullable CLink<ITask> x = activeBuffer.decide(nar.random());
                 actuallyRun(x);
-                if (forgetEachPri > 0) {
-                    x.priSub(forgetEachPri);
+                if (forgetEachActivePri > 0) {
+                    x.priSub(forgetEachActivePri);
                 }
             }
 
