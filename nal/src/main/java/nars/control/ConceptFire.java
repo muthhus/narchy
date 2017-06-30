@@ -3,6 +3,7 @@ package nars.control;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.decide.DecideRoulette;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import jcog.pri.Priority;
 import nars.$;
@@ -48,9 +49,13 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     public ConceptFire(Concept c, float pri) {
         super(c, pri);
+        assert(c.isNormalized()):
+                c + " not normalized";
     }
 
-
+    final static FloatFunction<? super PriReference> linearPri = (p) -> {
+        return Math.max(p.priElseZero(), Pri.EPSILON);
+    };
     final static FloatFunction<? super PriReference> softMaxPri = (p) -> {
         return (float)exp(p.priElseZero() / 0.5f /* temperature */);
     };
@@ -78,7 +83,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
             return null;
         }
-        DecideRoulette<PriReference<Task>> taskl = new DecideRoulette(softMaxPri);
+        DecideRoulette<PriReference<Task>> taskl = new DecideRoulette(linearPri);
         tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
@@ -86,7 +91,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         }
 
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
-        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(softMaxPri);
+        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(linearPri);
         termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
         if (terml.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_termlinks_selected");

@@ -32,7 +32,10 @@
                     <version>2.20</version>
                     <configuration>
 
-                        <parallel>true</parallel>
+                       <parallel>both</parallel>
+                        <threadCount>5</threadCount>
+                        <trimStackTrace>true</trimStackTrace>
+
                         <!--<parallelOptimized>true</parallelOptimized>-->
                         <!--<reuseForks>true</reuseForks>-->
                         <!--<useUnlimitedThreads>true</useUnlimitedThreads>-->

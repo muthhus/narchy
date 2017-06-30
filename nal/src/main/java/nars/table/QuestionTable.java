@@ -72,9 +72,23 @@ public interface QuestionTable extends TaskTable {
 
     class EmptyQuestionTable extends QuestionTable.NullQuestionTable {
 
+        final static HijackQuestionTable common = new HijackQuestionTable(1024, 3);
+
         @Override
         public void add(@NotNull Task t, TaskConcept c, NAR n) {
-            TaskTable.activate(t, t.priElseZero(), n);
+            Task e = common.get(t);
+            float activation = t.priElseZero();;
+            if (e ==null) {
+                common.put(t);
+
+
+                //TaskTable.activate(t, t.priElseZero(), n);
+            } else {
+                activation -= e.priElseZero();
+            }
+
+            if (activation > 0)
+                TaskTable.activate(t, activation, n, e==null);
         }
 
         @Override

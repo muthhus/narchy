@@ -16,8 +16,6 @@ public interface ITask extends Priority {
     /** special signal a task can return to signal it should be deleted after execution */
     ITask[] DeleteMe = new ITask[0];
 
-    /** special signal a task can return to signal it should be quietly removed from the bag (and not deleted or forgotten) */
-    ITask[] Disappear = new ITask[0];
 
 
     default byte punc() {

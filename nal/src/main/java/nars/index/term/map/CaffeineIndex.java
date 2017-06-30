@@ -57,7 +57,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
                 v.volume();
     };
 
-    private static final long cleanPeriod = 16 /* cycles */;
+
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
     public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, @Nullable Executor exe) {
@@ -113,16 +113,17 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     @Override
     public void start(NAR nar) {
         super.start(nar);
-        nar.onCycle(this::cleanUp);
+        //nar.onCycle(this::cleanUp);
     }
 
-    protected void cleanUp() {
-        if (nar.time() % cleanPeriod == 0) {
-            concepts.cleanUp();
-            if (subterms != null)
-                subterms.cleanUp();
-        }
-    }
+//private static final long cleanPeriod = 16 /* cycles */;
+//    protected void cleanUp() {
+//        if (nar.time() % cleanPeriod == 0) {
+//            concepts.cleanUp();
+//            if (subterms != null)
+//                subterms.cleanUp();
+//        }
+//    }
 
     @NotNull
     @Override

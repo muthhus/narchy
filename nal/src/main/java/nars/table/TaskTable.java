@@ -27,13 +27,14 @@ public interface TaskTable  {
     void add(@NotNull Task t, TaskConcept c, NAR n);
 
 
-    static void activate(@NotNull Task t, float activation, @NotNull NAR n) {
+    static void activate(@NotNull Task t, float activation, @NotNull NAR n, boolean taskProcess) {
        // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
         if (activation >= Pri.EPSILON) {
-            n.eventTaskProcess.emit(/*post*/t);
             Activate a = new Activate(t, activation);
-            a.run(n);
-            //n.input(a);
+            n.input(a);
+
+            if (taskProcess)
+                n.eventTaskProcess.emit(/*post*/t);
         }
     }
 

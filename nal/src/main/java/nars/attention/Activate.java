@@ -32,7 +32,7 @@ import static nars.time.Tense.ETERNAL;
 /**
  * activation from a point source to its subterm components (termlink templates)
  */
-public class Activate extends PLink<Task> /*extends UnaryTask<Task>*/ {
+public class Activate extends UnaryTask<Task> {
 
 
     /**
@@ -44,18 +44,10 @@ public class Activate extends PLink<Task> /*extends UnaryTask<Task>*/ {
 
     //@Override
     public ITask[] run(@NotNull NAR nar) {
-        ITask[] x = _run(nar);
-        if (x!=null && x.length >0)
-            nar.input(x);
-        return null;
-    }
-
-    ITask[] _run(@NotNull NAR nar) {
-
 
         float p = priElseZero();
 
-        if (p < Pri.EPSILON * 2 * id.volume())
+        if (p < Pri.EPSILON * 1 * id.volume())
             return null; //wait for more
 
         ITask[] activations = null;

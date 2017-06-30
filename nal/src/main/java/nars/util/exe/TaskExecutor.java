@@ -1,8 +1,8 @@
 package nars.util.exe;
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;
+import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
@@ -11,8 +11,8 @@ import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
 import jcog.pri.mix.control.CLink;
+import jcog.pri.op.PriMerge;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -22,6 +22,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -33,7 +34,7 @@ import static nars.Op.COMMAND;
  */
 public class TaskExecutor extends Executioner {
 
-//    private final DisruptorBlockingQueue<CLink<ITask>> overflow;
+    //    private final DisruptorBlockingQueue<CLink<ITask>> overflow;
     protected boolean trace;
 
     /**
@@ -55,6 +56,20 @@ public class TaskExecutor extends Executioner {
 
 
     final DecideRoulette<CLink<ITask>> buffer = new DecideRoulette<>(CLink::priElseZero);
+
+    public final Bag<ITask, CLink<ITask>> nal = new ArrayBag<>(0, PriMerge.max, new ConcurrentHashMap<>()) {
+
+        @Override
+        public float floatValueOf(CLink<ITask> x) {
+            return x.pri();
+        }
+
+        @Nullable
+        @Override
+        public ITask key(@NotNull CLink<ITask> l) {
+            return l.ref;
+        }
+    };
 
     /**
      * active tasks
@@ -83,7 +98,7 @@ public class TaskExecutor extends Executioner {
                 protected CLink<ITask> merge(@NotNull CLink<ITask> existing, @NotNull CLink<ITask> incoming, @Nullable MutableFloat overflowing) {
 
 //                    if (existing.ref instanceof NALTask) {
-                        //maxMerge for NAL Tasks
+                    //maxMerge for NAL Tasks
 //                        float before = existing.priElseZero();
 //                        float inc = incoming.priSafe(0);
 //                        float next = existing.priMax(inc);
@@ -95,7 +110,7 @@ public class TaskExecutor extends Executioner {
 //                        return existing; //the original instance
 //                    } else {
 //                        plusMerge
-                        return super.merge(existing, incoming, overflowing);
+                    return super.merge(existing, incoming, overflowing);
 //                    }
 
 
@@ -110,23 +125,23 @@ public class TaskExecutor extends Executioner {
 //                    return y;
 //                }
 
-                @Override
-                public void onRemoved(@NotNull CLink<ITask> value) {
-
-                    //DO NOTHING, DONT DELETE
-
-//                    if (value.priElseZero() >= Pri.EPSILON) {
-//                        if (overflow.remainingCapacity() < 1) {
-//                            overflow.poll(); //forget
-//                        }
-//                        overflow.offer(value); //save
-//                    } else {
-//                        CLink<ITask> x = overflow.poll();
-//                        if (x != null && x.priElseZero() >= Pri.EPSILON)
-//                            put(x); //restore
-//                    }
-                }
-
+//                @Override
+//                public void onRemoved(@NotNull CLink<ITask> value) {
+//
+//                    //DO NOTHING, DONT DELETE
+//
+////                    if (value.priElseZero() >= Pri.EPSILON) {
+////                        if (overflow.remainingCapacity() < 1) {
+////                            overflow.poll(); //forget
+////                        }
+////                        overflow.offer(value); //save
+////                    } else {
+////                        CLink<ITask> x = overflow.poll();
+////                        if (x != null && x.priElseZero() >= Pri.EPSILON)
+////                            put(x); //restore
+////                    }
+//                }
+//
 
                 @NotNull
                 @Override
@@ -142,6 +157,7 @@ public class TaskExecutor extends Executioner {
     public TaskExecutor(int capacity) {
         super();
         active.setCapacity(capacity);
+        nal.setCapacity(capacity);
 
         //int overCapacity = capacity / 2;
         //overflow = new DisruptorBlockingQueue(overCapacity);
@@ -190,6 +206,7 @@ public class TaskExecutor extends Executioner {
 
     @Override
     public void forEach(Consumer<ITask> each) {
+        nal.forEachKey(each);
         active.forEachKey(each);
     }
 
@@ -200,7 +217,6 @@ public class TaskExecutor extends Executioner {
     }
 
 
-
     protected void flush() {
         if (!busy.compareAndSet(false, true))
             return;
@@ -209,7 +225,7 @@ public class TaskExecutor extends Executioner {
 
             //active.commit(null);
 
-            int ps = active.size();
+            int ps = (nal.size() + active.size());
             if (ps == 0)
                 return;
 
@@ -223,9 +239,17 @@ public class TaskExecutor extends Executioner {
 
 
             toExe = Math.min(ps, toExe);
+            int toInput = toExe;
 
+
+            //INPUT
+            nal/*.commit()*/.pop(toInput, x -> {
+                actuallyRun(x);
+            });
+
+            //EXEC
             float eFrac = ((float) toExe) / active.capacity();
-            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag)active).depressurize(eFrac) * (eFrac);
+            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag) active).depressurize(eFrac) * (eFrac);
             this.forgetEachPri =
                     pAvg > Pri.EPSILON * 8 ? pAvg : 0;
                     //0;
@@ -239,7 +263,11 @@ public class TaskExecutor extends Executioner {
                 //(Consumer<? super CLink<ITask>>)(buffer::add)
             });
             for (int i = 0; i < toExe; i++) {
-                actuallyRun(buffer.decide(nar.random()));
+                @Nullable CLink<ITask> x = buffer.decide(nar.random());
+                actuallyRun(x);
+                if (forgetEachPri > 0) {
+                    x.priSub(forgetEachPri);
+                }
             }
 
             //active.sample(toExe, this::actuallyRun);
@@ -268,13 +296,13 @@ public class TaskExecutor extends Executioner {
         }
     }
 
-    protected void actuallyRun(CLink<ITask> x) {
+    protected void actuallyRun(CLink<? extends ITask> x) {
         ITask[] next;
         try {
             if (x == null) return; //HACK
 
             if (x.isDeleted()) {
-                next = ITask.Disappear; //causes removal below
+                next = null;
             } else {
                 next = x.ref.run(nar);
             }
@@ -282,15 +310,11 @@ public class TaskExecutor extends Executioner {
         } catch (Throwable e) {
             NAR.logger.error("{} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
             x.delete();
-            active.remove(x.ref);
             return;
         }
 
         if (next == ITask.DeleteMe) {
             x.delete();
-            active.remove(x.ref);
-        } else if (next == ITask.Disappear) {
-            active.remove(x.ref); //immediately but dont affect its budget
         } else {
             float g = masterGain.floatValue();
             if (g != 1)
@@ -300,7 +324,7 @@ public class TaskExecutor extends Executioner {
         actuallyFeedback(x, next);
     }
 
-    protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
+    protected void actuallyFeedback(CLink<? extends ITask> x, ITask[] next) {
         if (next != null && next.length > 0)
             nar.input(next);
     }
@@ -312,7 +336,11 @@ public class TaskExecutor extends Executioner {
             actuallyRun(input); //commands executed immediately
             return true;
         } else {
-            active.putAsync(input);
+            if (input.ref instanceof NALTask)
+                nal.putAsync(input);
+            else
+                active.putAsync(input);
+
             return true;//!= null;
         }
     }

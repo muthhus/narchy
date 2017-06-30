@@ -110,7 +110,7 @@ public class NARS extends NAR {
 
                 new EnumClassifier("type", new String[]{
                         "Belief", "Goal", "Question", "Quest",
-                        "ConceptFire"
+                        "ConceptFire", "Activate"
                 }, (x) -> {
 
                     if (x instanceof Task) {
@@ -127,6 +127,8 @@ public class NARS extends NAR {
                         }
                     } else if (x instanceof ConceptFire) {
                         return 4;
+                    }else if (x instanceof Activate) {
+                        return 5;
                     }
 
                     return -1;
@@ -220,11 +222,6 @@ public class NARS extends NAR {
         }
 
         @Override
-        public void start(NAR nar) {
-            super.start(nar);
-        }
-
-        @Override
         public void runLater(Runnable cmd) {
             passive.execute(cmd);
         }
@@ -240,7 +237,7 @@ public class NARS extends NAR {
         }
 
 
-        public void apply(CLink<ITask> x) {
+        public void apply(CLink<? extends ITask> x) {
             if (x!=null && !x.isDeleted())
                 x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
         }
@@ -271,9 +268,9 @@ public class NARS extends NAR {
                 if (lastCycle != null) {
                     //System.out.println(lastCycle + " " + lastCycle.isDone());
                     if (!lastCycle.isDone()) {
-                        //long start = System.currentTimeMillis();
+                        long start = System.currentTimeMillis();
                         lastCycle.join(); //wait for lastCycle's to finish
-                        //System.out.println("cycle lag: " + (System.currentTimeMillis() - start) + "ms");
+                        System.out.println("cycle lag: " + (System.currentTimeMillis() - start) + "ms");
                     }
 
                     lastCycle.reinitialize();
@@ -354,7 +351,7 @@ public class NARS extends NAR {
         }
 
         @Override
-        protected void actuallyRun(CLink<ITask> x) {
+        protected void actuallyRun(CLink<? extends ITask> x) {
 
             super.actuallyRun(x);
 
@@ -363,7 +360,7 @@ public class NARS extends NAR {
         }
 
         @Override
-        protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
+        protected void actuallyFeedback(CLink<? extends ITask> x, ITask[] next) {
             if (next != null)
                 NARS.this.input(next); //through post mix
         }

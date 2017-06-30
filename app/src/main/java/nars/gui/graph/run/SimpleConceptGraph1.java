@@ -222,7 +222,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
     public static void csvPriority(NAR n, String path) throws FileNotFoundException {
 
-        CSVOutput csv = new CSVOutput(new File(path), "time", "ALL_sumPri", "All_meanPri", "NAL_sumPri", "NAL_meanPri", "ConceptFire_sumPri", "ConceptFire_meanPri");
+        CSVOutput csv = new CSVOutput(new File(path), "time", "ALL_Pri", "NAL_Pri", "ConceptFire_Pri", "busy");
 
         MultiStatistics<ITask> exeTasks = new MultiStatistics<ITask>()
                 .classify("NALTask", x -> x instanceof NALTask)
@@ -234,14 +234,12 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                     nn.time(),
 
                     ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(0)).getSum(),
-                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(0)).getMean(),
 
                     ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(1)).getSum(),
-                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(1)).getMean(),
 
                     ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(2)).getSum(),
-                    ((MultiStatistics.BooleanClassifierWithStatistics)exeTasks.cond.get(2)).getMean()
 
+                    nn.emotion.busyVol.getSum()
             );
             exeTasks.clear();
         });

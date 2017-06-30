@@ -18,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -286,8 +285,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 }
             } else if (s > 1) {
                 //get some: choose random starting index, get the next consecutive values
-                max = Math.min(s, max);
-                for (int i = ThreadLocalRandom.current().nextInt(s), m = 0; m < max; m++) {
+                //max = Math.min(s, max);
+                for (int i = 0, m = 0; m < max; m++) {
                     Y lll = (Y) ll[i++];
                     if (lll != null)
                         if (!kontinue.test(lll))
@@ -308,14 +307,16 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         if (i < 0) {
             int s = size();
             if (s == 0) return;
-            else if (s == 1) i = 0;
-            else i = ThreadLocalRandom.current().nextInt(s);
+//            else if (s == 1) i = 0;
+//            else i = ThreadLocalRandom.current().nextInt(s);
+            i = 0;
         }
 
         boolean modified = false;
         BagCursorAction next = BagCursorAction.Next;
         int s;
-        while (!next.stop && (0 < (s = size()))) {
+        int count = 0;
+        while (!next.stop && (0 < (s = size())) && (count++ < s)) {
             if (i >= s) i = 0;
             Y x = get(i++);
 
@@ -346,7 +347,11 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     @Override
     public final Y put(@NotNull Y b, @Nullable MutableFloat overflow) {
 
-        float[] incoming = { priSafeOrZero(b) };
+        float p = priSafeOrZero(b);
+        if (p < Pri.EPSILON)
+            return null;
+
+        float[] incoming = {p};
 
         final boolean[] isNew = {false};
 

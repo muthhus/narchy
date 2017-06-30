@@ -77,8 +77,8 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
     public final FloatParam freqMax = new FloatParam(0.1f);
     final PSink in;
 
-    float beliefFactor = 1f;
-    float questionFactor = 0.5f;
+//    float beliefFactor = 1f;
+//    float questionFactor = 0.5f;
 
     /**
      * multiplier for he sensory task priority to determine inperienced task priority
