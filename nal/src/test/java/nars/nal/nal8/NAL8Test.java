@@ -776,7 +776,7 @@ public class NAL8Test extends AbstractNALTest {
                 .goal("(x)", Tense.Present, 1f, 0.9f)
                 .believe("((x)==>+3(y))")
                 .mustDesire(cycles, "(y)", 1f, 0.45f, 3)
-                .mustDesire(cycles, "(y)", 1f, 0.66f, ETERNAL)
+                //.mustDesire(cycles, "(y)", 1f, 0.66f, ETERNAL)
                 ;
     }
 

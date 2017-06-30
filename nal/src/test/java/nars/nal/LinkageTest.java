@@ -44,14 +44,17 @@ public class LinkageTest extends AbstractNALTest {
         });
     }
 
+
     @Override
-    public void start() {
-        tester = new TestNAR(nar()) {
+    public TestNAR test(NAR n) {
+        return new TestNAR(n) {
             @Override protected boolean requireConditions() {
                 return false;
             }
         };
     }
+
+
 
     public void ProperlyLinkedTest(@NotNull String premise1, @NotNull String premise2) throws Exception {
         TestNAR tester = test();

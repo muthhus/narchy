@@ -112,12 +112,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         });
         //float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
 
-        int ttlPerPremise =
-                //Param.UnificationTTLMax
-                (int)Math.ceil((0.75f * priElseZero() + 0.25f) * Param.UnificationTTLMax)
-        ;
-
-        int maxTTL = maxSamples * ttlPerPremise;
+        int ttlPerPremise = Param.UnificationStackMax;
+        int maxTTL = (int)Math.ceil(Math.max(
+                1 * ttlPerPremise,
+                priElseZero() * maxSamples * ttlPerPremise
+        ));
         int ttl = maxTTL;
 
         int termlSize = terml.size();

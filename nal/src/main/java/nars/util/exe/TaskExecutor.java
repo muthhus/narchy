@@ -80,18 +80,18 @@ public class TaskExecutor extends Executioner {
 
 //                    if (existing.ref instanceof NALTask) {
                         //maxMerge for NAL Tasks
-                        float before = existing.priElseZero();
-                        float inc = incoming.priSafe(0);
-                        float next = existing.priMax(inc);
-                        float overflow = inc - (next - before);
-                        if (overflow > 0) {
-                            pressurize(-overflow);
-                            if (overflowing != null) overflowing.add(overflow);
-                        }
-                        return existing; //the original instance
+//                        float before = existing.priElseZero();
+//                        float inc = incoming.priSafe(0);
+//                        float next = existing.priMax(inc);
+//                        float overflow = inc - (next - before);
+//                        if (overflow > 0) {
+//                            pressurize(-overflow);
+//                            if (overflowing != null) overflowing.add(overflow);
+//                        }
+//                        return existing; //the original instance
 //                    } else {
-                        //plusMerge
-//                        return super.merge(existing, incoming, overflowing);
+//                        plusMerge
+                        return super.merge(existing, incoming, overflowing);
 //                    }
 
 
@@ -258,10 +258,10 @@ public class TaskExecutor extends Executioner {
             if (x == null) return; //HACK
 
             if (x.isDeleted()) {
-                active.remove(x.ref);
+                next = ITask.Disappear; //causes removal below
+            } else {
+                next = x.ref.run(nar);
             }
-
-            next = x.ref.run(nar);
 
         } catch (Throwable e) {
             NAR.logger.error("{} {}", x, (Param.DEBUG) ? e : e.getMessage());
@@ -288,7 +288,7 @@ public class TaskExecutor extends Executioner {
     }
 
     protected void actuallyFeedback(CLink<ITask> x, ITask[] next) {
-        if (next != null)
+        if (next != null && next.length > 0)
             nar.input(next);
     }
 

@@ -14,16 +14,23 @@ import static nars.Op.ATOM;
  */
 public class Atom extends AtomicToString {
 
-
-    protected Atom(@NotNull String id) {
-        this.id = validateAtomID(id);
-        this.hash = super.hashCode();
-    }
-
     @NotNull public final String id;
 
     /** (cached for speed) */
-    final int hash;
+    transient final int hash;
+    transient final byte[] bytes;
+
+    protected Atom(@NotNull String id) {
+        this.id = validateAtomID(id);
+        this.bytes = id.getBytes();
+        this.hash = super.hashCode();
+    }
+
+    @Override
+    public byte[] bytes() {
+        return bytes;
+    }
+
 
     @NotNull
     private static String validateAtomID(@NotNull String id) {

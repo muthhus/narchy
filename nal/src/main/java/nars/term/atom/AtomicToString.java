@@ -1,6 +1,7 @@
 package nars.term.atom;
 
 import jcog.Util;
+import nars.IO;
 
 /**
  * an Atomic impl which relies on the value provided by toString()
@@ -19,6 +20,11 @@ public abstract class AtomicToString implements Atomic {
                         toString().equals(u.toString()
                 );
 
+    }
+
+    @Override
+    public byte[] bytes() {
+        return toString().getBytes(/*UTF8*/);
     }
 
     @Override abstract public String toString();

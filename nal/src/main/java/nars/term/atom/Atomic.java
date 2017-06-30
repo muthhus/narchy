@@ -20,6 +20,9 @@ import static java.lang.Integer.MIN_VALUE;
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
 
+    /** canonical byte representation of this atomic */
+    byte[] bytes();
+
     @Override
     default boolean OR(Predicate<Term> v) {
         return v.test(this);

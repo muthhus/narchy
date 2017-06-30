@@ -33,6 +33,16 @@ public class IntAtom implements Atomic {
     }
 
     @Override
+    public byte[] bytes() {
+        if (id >= 0 && id < 10) {
+            //HACK fast 1-digit
+            return new byte[] {(byte) ('0' + id)};
+        } //TODO fast 2-digit
+
+        return Integer.toString(id).getBytes(); //HACK TODO give IntTerm its own operator type so integer values can be stored compactly
+    }
+
+    @Override
     public final int opX() {
         return RANK;
     }

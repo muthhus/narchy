@@ -287,19 +287,7 @@ public class IO {
         out.writeByte(o.ordinal());
 
         if (term instanceof Atomic) {
-            switch (o) {
-                case VAR_DEP:
-                case VAR_INDEP:
-                case VAR_QUERY:
-                case VAR_PATTERN:
-                    out.writeByte(((AbstractVariable) term).id);
-                    break;
-                default:
-                    IO.writeUTF8WithPreLen(term.toString(), out);
-                    break;
-            }
-
-
+            out.write(((Atomic)term).bytes());
         } else {
 
             Compound c = (Compound) term;

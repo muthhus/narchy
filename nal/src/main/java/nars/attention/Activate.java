@@ -35,8 +35,6 @@ import static nars.time.Tense.ETERNAL;
 public class Activate extends UnaryTask<Task> {
 
 
-
-
     /**
      * runs the task activation procedure
      */
@@ -50,26 +48,28 @@ public class Activate extends UnaryTask<Task> {
 
         float p = priElseZero();
 
+        if (p < Pri.EPSILON * 2 * id.volume())
+            return null; //wait for more
+
         ITask[] activations = null;
-        if (p >= Pri.EPSILON) {
 
-            Task t = get();
-            Concept origin = t.concept(nar);
-            if (origin != null /*&& !origin.isDeleted()*/) {
-                TaskActivation a = new TaskActivation(nar, t, (TaskConcept) origin, p, levels(t.term()));
-                float remain = a.linkOverflow.floatValue();
-                float remaining = priSub(p - remain);
 
-                if (remaining >= Pri.EPSILON * get().complexity()) {
-                    a.activate.addToValue(origin, remaining); //transfer back to concept fire
-                }
+        Task t = get();
+        Concept origin = t.concept(nar);
+        if (origin != null /*&& !origin.isDeleted()*/) {
+            TaskActivation a = new TaskActivation(nar, t, (TaskConcept) origin, p, levels(t.term()));
+            float remain = a.linkOverflow.floatValue();
+            float remaining = priSub(p - remain);
 
-                //if (!a.activations.isEmpty()) //HACK
-                activations = a.activations();
-
+            if (remaining >= Pri.EPSILON * get().complexity()) {
+                a.activate.addToValue(origin, remaining); //transfer back to concept fire
             }
 
+            //if (!a.activations.isEmpty()) //HACK
+            activations = a.activations();
+
         }
+
 
 //        float memUsed = Util.memoryUsed();
 //        if (memUsed > 0.75f) {
@@ -255,7 +255,7 @@ public class Activate extends UnaryTask<Task> {
                                 ((Concept) target).templates() : //allow concept to override its templates
                                 target instanceof Compound ? ((Compound) target).subterms() : null;
 
-                if (t!=null) {
+                if (t != null) {
                     int ts = t.size();
                     if (ts > 0) {
                         float childScale = ((1f - momentum) * scale);
@@ -410,12 +410,12 @@ public class Activate extends UnaryTask<Task> {
                 linkOverflow.subtract(x);
             }
 
-            if (target.op()==NEG)
+            if (target.op() == NEG)
                 throw new RuntimeException("should not create NEG termlinks");
 
             recipient.termlinks()
                     .put(new PLink<>(target, pri), linkOverflow);
-                    //.putAsync(new PLink(target, pri));
+            //.putAsync(new PLink(target, pri));
         }
 
     }
