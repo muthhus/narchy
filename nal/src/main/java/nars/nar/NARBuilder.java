@@ -30,14 +30,14 @@ import static nars.Op.BELIEF;
 public class NARBuilder {
 
     private @NotNull Supplier<TermIndex> concepts = () ->
-            new CaffeineIndex(new DefaultConceptBuilder(), 4096, null)
+            new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
             //new NARBuilder.BasicTermIndex(8 * 1024 )
     ;
 
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(512, 0.25f);
+    private Supplier<Executioner> exe = () -> new TaskExecutor(256, 0.1f);
 
     private Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 

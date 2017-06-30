@@ -32,7 +32,7 @@ import static nars.Op.COMMAND;
  */
 public class TaskExecutor extends Executioner {
 
-    private final DisruptorBlockingQueue<CLink<ITask>> overflow;
+//    private final DisruptorBlockingQueue<CLink<ITask>> overflow;
     protected boolean trace;
 
     /**
@@ -59,7 +59,7 @@ public class TaskExecutor extends Executioner {
 //            new ArrayBag<>(PriMerge.plus, new ConcurrentHashMap<>()) {
 
 
-            new PriorityHijackBag<>(3) {
+            new PriorityHijackBag<>(4) {
                 @Override
                 protected final Consumer<CLink<ITask>> forget(float rate) {
                     return null;
@@ -79,19 +79,19 @@ public class TaskExecutor extends Executioner {
                 protected CLink<ITask> merge(@NotNull CLink<ITask> existing, @NotNull CLink<ITask> incoming, @Nullable MutableFloat overflowing) {
 
 //                    if (existing.ref instanceof NALTask) {
-//                        //maxMerge for NAL Tasks
-//                        float before = existing.priElseZero();
-//                        float inc = incoming.priSafe(0);
-//                        float next = existing.priMax(inc);
-//                        float overflow = inc - (next - before);
-//                        if (overflow > 0) {
-//                            pressurize(-overflow);
-//                            if (overflowing != null) overflowing.add(overflow);
-//                        }
-//                        return existing; //the original instance
+                        //maxMerge for NAL Tasks
+                        float before = existing.priElseZero();
+                        float inc = incoming.priSafe(0);
+                        float next = existing.priMax(inc);
+                        float overflow = inc - (next - before);
+                        if (overflow > 0) {
+                            pressurize(-overflow);
+                            if (overflowing != null) overflowing.add(overflow);
+                        }
+                        return existing; //the original instance
 //                    } else {
                         //plusMerge
-                        return super.merge(existing, incoming, overflowing);
+//                        return super.merge(existing, incoming, overflowing);
 //                    }
 
 
@@ -100,24 +100,27 @@ public class TaskExecutor extends Executioner {
                 @Override
                 public CLink<ITask> put(@NotNull CLink<ITask> x) {
                     CLink<ITask> y = super.put(x);
-                    if (y == null) {
-                        overflow.offer(x);
-                    }
+//                    if (y == null) {
+//                        overflow.offer(x);
+//                    }
                     return y;
                 }
 
                 @Override
                 public void onRemoved(@NotNull CLink<ITask> value) {
-                    if (value.priElseZero() >= Pri.EPSILON) {
-                        if (overflow.remainingCapacity() < 1) {
-                            overflow.poll(); //forget
-                        }
-                        overflow.offer(value); //save
-                    } else {
-                        CLink<ITask> x = overflow.poll();
-                        if (x != null && x.priElseZero() >= Pri.EPSILON)
-                            put(x); //restore
-                    }
+
+                    //DO NOTHING, DONT DELETE
+
+//                    if (value.priElseZero() >= Pri.EPSILON) {
+//                        if (overflow.remainingCapacity() < 1) {
+//                            overflow.poll(); //forget
+//                        }
+//                        overflow.offer(value); //save
+//                    } else {
+//                        CLink<ITask> x = overflow.poll();
+//                        if (x != null && x.priElseZero() >= Pri.EPSILON)
+//                            put(x); //restore
+//                    }
                 }
 
 
@@ -136,8 +139,8 @@ public class TaskExecutor extends Executioner {
         super();
         active.setCapacity(capacity);
 
-        int overCapacity = capacity / 2;
-        overflow = new DisruptorBlockingQueue(overCapacity);
+        //int overCapacity = capacity / 2;
+        //overflow = new DisruptorBlockingQueue(overCapacity);
     }
 
     public TaskExecutor(int capacity, float executedPerCycle) {

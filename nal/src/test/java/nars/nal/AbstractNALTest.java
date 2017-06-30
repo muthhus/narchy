@@ -31,13 +31,12 @@ public abstract class AbstractNALTest {
     }
 
     protected AbstractNALTest(Supplier<NAR> nar) {
-        Param.DEBUG = true;
         this.nar = nar;
     }
 
 
     public final TestNAR test() {
-        return tester;
+        return tester = new TestNAR(nar());
     }
     public final TestNAR test(NAR n) {
         return new TestNAR(n);
@@ -52,7 +51,7 @@ public abstract class AbstractNALTest {
 
     @Before
     public void start() {
-        tester = new TestNAR(nar());
+        tester = test();
     }
 
     @After
@@ -77,6 +76,7 @@ public abstract class AbstractNALTest {
                     if (level >= 7) {
                         new STMTemporalLinkage(n, 1, false);
                     }
+                    Param.DEBUG = true;
                     return n;
                 }
         ));

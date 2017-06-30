@@ -52,7 +52,9 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     final static Weigher<? super Term, ? super Termed> w = (k,v) -> {
         if (v instanceof PermanentConcept) return 0;
-        else return v.complexity();
+        else return
+                //v.complexity();
+                v.volume();
     };
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
@@ -86,7 +88,8 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
         Caffeine<Object, Object> subTermsBuilder = subCapacity > 0 ? Caffeine.newBuilder() : null;
 
         if (subCapacity > 0) {
-            subTermsBuilder.executor(exe);
+            if (exe!=null)
+                subTermsBuilder.executor(exe);
 
             if (subCapacity > 0)
                 subTermsBuilder.maximumSize(subCapacity);
