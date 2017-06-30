@@ -24,7 +24,7 @@ public class GenericCompoundDT extends ProxyCompound {
     public final int dt;
     private final int hashDT;
 
-    public GenericCompoundDT(GenericCompound base, int dt) {
+    public GenericCompoundDT(Compound base, int dt) {
         super(base);
 
         assert dt != DTERNAL : "use GenericCompound if dt==DTERNAL";
@@ -49,7 +49,7 @@ public class GenericCompoundDT extends ProxyCompound {
         }
 
         this.dt = dt;
-        this.hashDT = Util.hashCombine(base.hash, dt);
+        this.hashDT = Util.hashCombine(base.hashCode(), dt);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class GenericCompoundDT extends ProxyCompound {
     }
 
     @Override
-    public Term dt(int nextDT) {
+    public Compound dt(int nextDT) {
         if (nextDT == this.dt)
             return this;
 

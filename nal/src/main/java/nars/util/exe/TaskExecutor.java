@@ -6,6 +6,7 @@ import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
+import jcog.decide.DecideRoulette;
 import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
@@ -52,6 +53,9 @@ public class TaskExecutor extends Executioner {
 //    protected float forgetEachPri;
     public final FloatParam masterGain = new FloatParam(1f, 0f, 1f);
 
+
+    final DecideRoulette<CLink<ITask>> buffer = new DecideRoulette<>(CLink::priElseZero);
+
     /**
      * active tasks
      */
@@ -97,14 +101,14 @@ public class TaskExecutor extends Executioner {
 
                 }
 
-                @Override
-                public CLink<ITask> put(@NotNull CLink<ITask> x) {
-                    CLink<ITask> y = super.put(x);
-//                    if (y == null) {
-//                        overflow.offer(x);
-//                    }
-                    return y;
-                }
+//                @Override
+//                public CLink<ITask> put(@NotNull CLink<ITask> x) {
+//                    CLink<ITask> y = super.put(x);
+////                    if (y == null) {
+////                        overflow.offer(x);
+////                    }
+//                    return y;
+//                }
 
                 @Override
                 public void onRemoved(@NotNull CLink<ITask> value) {
@@ -226,7 +230,19 @@ public class TaskExecutor extends Executioner {
                     pAvg > Pri.EPSILON * 8 ? pAvg : 0;
                     //0;
 
-            active.sample(toExe, this::actuallyRun);
+            buffer.clear();
+            active.sample(Math.min(active.size(), Math.max(1, toExe*2)), x -> {
+                if (forgetEachPri > 0) {
+                    x.priSub(forgetEachPri);
+                }
+                buffer.add(x);
+                //(Consumer<? super CLink<ITask>>)(buffer::add)
+            });
+            for (int i = 0; i < toExe; i++) {
+                actuallyRun(buffer.decide(nar.random()));
+            }
+
+            //active.sample(toExe, this::actuallyRun);
 
 //            if (!toRemove.isEmpty()) {
 //                toRemove.clear(active::remove);
@@ -264,7 +280,7 @@ public class TaskExecutor extends Executioner {
             }
 
         } catch (Throwable e) {
-            NAR.logger.error("{} {}", x, (Param.DEBUG) ? e : e.getMessage());
+            NAR.logger.error("{} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
             x.delete();
             active.remove(x.ref);
             return;
@@ -279,9 +295,6 @@ public class TaskExecutor extends Executioner {
             float g = masterGain.floatValue();
             if (g != 1)
                 x.priMult(g);
-            if (forgetEachPri > 0) {
-                x.priSub(forgetEachPri);
-            }
         }
 
         actuallyFeedback(x, next);

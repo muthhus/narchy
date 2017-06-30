@@ -1307,14 +1307,14 @@ public enum Util {
         for (int i = 0; i < count; i++) {
             weight_sum += weight.valueOf(i);
         }
-        return selectRoulette(count, weight, weight_sum, rng);
+        return decideRoulette(count, weight, weight_sum, rng);
 
     }
 
     /**
      * faster if the sum is already known
      */
-    public static int selectRoulette(int count, IntToFloatFunction weight, float weight_sum, Random rng) {
+    public static int decideRoulette(int count, IntToFloatFunction weight, float weight_sum, Random rng) {
         // get a random value
         float value = rng.nextFloat() * weight_sum;
         // locate the random value based on the weights

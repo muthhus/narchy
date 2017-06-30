@@ -435,7 +435,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         while (!next.stop && nulls < c) {
             if (++i == c) i = 0; //modulo c
             V v = pop ? map.getAndSet(i, null) : map.get(i);
-            if (v != null) {
+            float p;
+            if (v != null && ((p= pri(v))==p /* not deleted*/)) {
                 next = each.next(v);
                 if (pop) {
                     modified = true;

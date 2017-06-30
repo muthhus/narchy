@@ -510,7 +510,7 @@ public enum Terms { ;
             if (available == 1) {
                 return new Term[]{oi[0].getOne()};
             } else if (available > 1) {
-                int selected = Util.selectRoulette(j[0], (i) -> oi[i].getTwo(), sum[0], rng);
+                int selected = Util.decideRoulette(j[0], (i) -> oi[i].getTwo(), sum[0], rng);
                 return new Term[]{oi[selected].getOne()};
             }
         }

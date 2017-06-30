@@ -102,9 +102,8 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
             x.delete();
         }
 
-        if (activation >= Pri.EPSILON) {
+        if (activation > 0)
             TaskTable.activate(y, activation, n);
-        }
     }
 
 

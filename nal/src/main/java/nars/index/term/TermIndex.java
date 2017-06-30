@@ -325,6 +325,10 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
 
+        if (modifications == 0 && op == src.op() && dt!=src.dt()) {
+            //juts change dt
+            return src.dt(dt);
+        }
         if (modifications > 0 || op != src.op() || dt != src.dt())
             return the(target);
         else

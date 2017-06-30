@@ -48,7 +48,7 @@ import static jcog.Util.sqr;
 public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLink<X>> {
 
     public final MixChannel[] mix;
-    public final FloatParam priMin = new FloatParam(Pri.EPSILON*4, 0f, 1f);
+    public final FloatParam priMin = new FloatParam(Pri.EPSILON, 0f, 1f);
 
 //    float dynamicRange = 4f;
 //    public final FloatParam gainMin = new FloatParam(1/dynamicRange, 0f, 0f);
@@ -226,11 +226,11 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
     public float gain(CLink<X> x) {
         float p = x.priElseZero();
         if (p > priMin.floatValue()) {
-            final float[] preGain = {0};
 
             for (ObjectIntPair<EnumClassifier<X>> c : dynTests) {
                 c.getOne().classify(x.ref, x, c.getTwo());
             }
+            final float[] preGain = {0};
 
             x.forEach((int i) -> {
                 mix[i].accept(p, false, true);
@@ -242,7 +242,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
             return
 //                    Util.lerp(Util.sigmoid(preGain[0]), gainMin.floatValue(), gainMax.floatValue())
 //                sqr( //l^4
-                sqr(1f + preGain[0]) //l^2
+                sqr(1f + Util.clamp(preGain[0], -1f, +1f)) //l^2
 //        )
                 ;
         } else {
@@ -272,6 +272,11 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
         this.agent = agent;
     }
 
+    protected float perceivedTraffic(float t) {
+        return t; //linear
+        //return (float) Math.log(1+t); //perceptual logarithmic decibel-like
+    }
+
     private void updateTraffic() {
         float totalInput = 0, totalActive = 0;
         float[] nextInput = this.nextInput.data;
@@ -279,8 +284,8 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
         float[] prevActive = this.nextActive.data.clone();
         for (int i = 0; i < dim; i++) {
             MixChannel mm = this.mix[i];
-            float ii = mm.input.sumThenClear();
-            float aa = mm.active.sumThenClear();
+            float ii = perceivedTraffic(mm.input.sumThenClear());
+            float aa = perceivedTraffic(mm.active.sumThenClear());
             nextInput[i] = ii;
             totalInput += ii;
             nextActive[i] = aa;

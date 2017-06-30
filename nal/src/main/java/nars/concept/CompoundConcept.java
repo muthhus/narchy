@@ -96,9 +96,10 @@ public class CompoundConcept implements Concept, Compound, Termlike {
 
     @Override
     public @NotNull Op op() {
-        Op t = term.op();
-        assert(t!=NEG); //HACK
-        return t;
+//        Op t = term.op();
+//        assert(t!=NEG); //HACK
+//        return t;
+        return term.op();
     }
 
 

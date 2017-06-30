@@ -29,8 +29,12 @@ public interface TaskTable  {
 
     static void activate(@NotNull Task t, float activation, @NotNull NAR n) {
        // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
+        if (activation >= Pri.EPSILON) {
             n.eventTaskProcess.emit(/*post*/t);
-        n.input(new Activate(t, activation));
+            Activate a = new Activate(t, activation);
+            a.run(n);
+            //n.input(a);
+        }
     }
 
     int capacity();

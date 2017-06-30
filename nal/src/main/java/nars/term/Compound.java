@@ -30,6 +30,7 @@ import nars.Op;
 import nars.index.term.TermContext;
 import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
+import nars.term.compound.GenericCompoundDT;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
@@ -643,6 +644,18 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     int dt();
 
+    @Override
+    default Compound dt(int dt) {
+
+        if (dt == DTERNAL)
+            return this;
+        else {
+            if (op().temporal || op().image)
+                return new GenericCompoundDT(this, dt);
+            else
+                return this; //maybe detect when this happens, could indicate an error
+        }
+    }
 
     /**
      * similar to a indexOf() call, this will search for a int[]
@@ -667,6 +680,7 @@ public interface Compound extends Term, IPair, TermContainer {
      * finds the first occurring index path to a recursive subterm equal
      * to 't'
      */
+
     static boolean pathFirst(@NotNull Compound container, @NotNull Term t, @NotNull ByteArrayList l) {
         int s = container.size();
         for (int i = 0; i < s; i++) {
@@ -885,7 +899,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     y = x;
                 } else if (y == Null) {
                     return Null;
-                } else if (x!=y) {
+                } else if (x != y) {
                     //the result comparing with the x
                     modified = true;
                 }
@@ -897,7 +911,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 @Nullable Term t;
 
                 t = index.the(op(), dt(), evalSubs);
-                if (t!=this)
+                if (t != this)
                     return t.eval(index);
                 //else {
                 //    continue;

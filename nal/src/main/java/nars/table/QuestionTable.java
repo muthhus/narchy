@@ -74,7 +74,7 @@ public interface QuestionTable extends TaskTable {
 
         @Override
         public void add(@NotNull Task t, TaskConcept c, NAR n) {
-            TaskTable.activate(t, t.pri(), n);
+            TaskTable.activate(t, t.priElseZero(), n);
         }
 
         @Override

@@ -2,7 +2,9 @@ package nars.control;
 
 import jcog.Util;
 import jcog.bag.Bag;
+import jcog.decide.DecideRoulette;
 import jcog.pri.PriReference;
+import jcog.pri.Priority;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -13,6 +15,7 @@ import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,12 +25,14 @@ import java.util.Map;
 import java.util.Random;
 import java.util.function.Consumer;
 
+import static java.lang.Math.*;
+
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 2;
+    private static final int maxSamples = 3;
 
     static final int TASKLINKS_SAMPLED = maxSamples * 1;
     static final int TERMLINKS_SAMPLED = maxSamples * 2;
@@ -45,6 +50,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         super(c, pri);
     }
 
+
+    final static FloatFunction<? super PriReference> softMaxPri = (p) -> {
+        return (float)exp(p.priElseZero() / 0.5f /* temperature */);
+    };
 
     @Override
     public ITask[] run(NAR nar) {
@@ -69,7 +78,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
             return null;
         }
-        List<PriReference<Task>> taskl = $.newArrayList();
+        DecideRoulette<PriReference<Task>> taskl = new DecideRoulette(softMaxPri);
         tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
@@ -77,7 +86,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         }
 
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
-        List<PriReference<Term>> terml = $.newArrayList();
+        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(softMaxPri);
         termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
         if (terml.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_termlinks_selected");
@@ -113,45 +122,30 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         //float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
 
         int ttlPerPremise = Param.UnificationStackMax;
-        int maxTTL = (int)Math.ceil(Math.max(
+        int maxTTL = (int) ceil(max(
                 1 * ttlPerPremise,
                 priElseZero() * maxSamples * ttlPerPremise
         ));
         int ttl = maxTTL;
 
-        int termlSize = terml.size();
-        if (termlSize == 0)
-            return null;
-        float[] termlinkPri = new float[termlSize];
-        for (int i = 0; i < termlSize; i++)
-            termlinkPri[i] = terml.get(i).priElseZero();
-        int tasklSize = taskl.size();
-        if (tasklSize == 0)
-            return null;
-        float[] tasklinkPri = new float[tasklSize];
-        for (int i = 0; i < tasklSize; i++)
-            tasklinkPri[i] = taskl.get(i).priElseZero();
 
         Random rng = nar.random();
         while (ttl > 0 /*samples++ < samplesMax*/) {
 
-            int tasklSelected = Util.decideRoulette(tasklSize, (i) -> tasklinkPri[i], rng);
+            int tasklSelected = taskl.decideWhich(rng);
             tasklink = taskl.get( tasklSelected );
 
-            int termlSelected = Util.decideRoulette(termlSize, (i) -> termlinkPri[i], rng);
+            int termlSelected = terml.decideWhich(rng);
             termlink = terml.get( termlSelected );
 
-            Premise p = new Premise(tasklink, termlink, x);
+            int ttlUsed = run(nar, tasklink, termlink, x, ttlPerPremise); //inline
             premises++;
-
-
-            int ttlUsed = p.run(nar, ttlPerPremise); //inline
 //            if (ttlUsed <= 0) {
 //                //failure penalty
 //                tasklinkPri[tasklSelected] *= 0.9f;
 //                termlinkPri[termlSelected] *= 0.9f;
 //            }
-            ttl -= Math.max(ttlUsed, ttlPerPremise/2);
+            ttl -= max(ttlUsed, ttlPerPremise/2);
 
         }
 
@@ -185,6 +179,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //        } else {
 //            return null;
 //        }
+    }
+
+    protected int run(NAR nar, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
+        Premise p = new Premise(tasklink, termlink, x);
+        return p.run(nar, ttlPerPremise);
     }
 
     @NotNull

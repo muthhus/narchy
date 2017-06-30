@@ -331,8 +331,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             return; //t==found
         }
 
-        if (activation >= Pri.EPSILON)
-            TaskTable.activate(t, activation, n);
+        TaskTable.activate(t, activation, n);
     }
 
     private void add(@NotNull Task t) {
@@ -405,7 +404,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                         activations.clear();
                 });
 
-                nar.input(activations);
+                activations.forEach(a -> a.run(nar));
+                //nar.input(activations);
+
 
 
             } finally{

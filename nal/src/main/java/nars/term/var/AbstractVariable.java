@@ -46,7 +46,7 @@ public abstract class AbstractVariable implements Variable {
 
     @Override
     public byte[] bytes() {
-        return new byte[] { (byte)id };
+        return new byte[] { (byte)(id) };
     }
 
     @Override

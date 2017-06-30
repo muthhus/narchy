@@ -108,17 +108,5 @@ public class GenericCompound implements Compound {
         return Compound.equals(this, that);
     }
 
-    /** creates a new instance with the given dt value */
-    @Override
-    public Compound dt(int dt) {
-        if (dt==DTERNAL)
-            return this;
-        else {
-            if (op.temporal || op.image)
-                return new GenericCompoundDT(this, dt);
-            else
-                return this; //maybe detect when this happens, could indicate an error
-        }
-    }
 
 }

@@ -43,8 +43,9 @@ public class IO {
 
     public interface TermEncoder {
         default void write(Term x) {
-            write(x, new DynByteSeq(x.volume()*4 /* ESTIMATE */));
+            write(x, new DynByteSeq(x.volume() * 4 /* ESTIMATE */));
         }
+
         void write(Term x, DynByteSeq to);
     }
 
@@ -165,14 +166,10 @@ public class IO {
 
         //out.writeLong(t.creation()); //put this last because it is the least useful really
 
-        writeTermStringUTF(out, t);
+        IO.writeUTF8WithPreLen(((Termed) t).term().toString(), out);
     }
 
-    public static void writeTermStringUTF(@NotNull DataOutput out, @NotNull Termed t) throws IOException {
-        IO.writeUTF8WithPreLen(t.term().toString(), out);
-    }
-
-//    public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {
+    //    public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {
 //
 //        //byte[] bb = s.getBytes(Charset.defaultCharset());
 //        byte[] bb = s.getBytes(Charset.defaultCharset()); //Hack.bytes(s);
@@ -276,23 +273,26 @@ public class IO {
             return;
         }
 
-        //HACK this should not be necessary
-        if (isSpecial(term)) {
-            out.writeByte(SPECIAL_OP);
-            IO.writeUTF8WithPreLen(term.toString(), out);
-            return;
-        }
 
         Op o = term.op();
         out.writeByte(o.ordinal());
 
-        if (term instanceof Atomic) {
-            out.write(((Atomic)term).bytes());
+        if (term instanceof AbstractVariable) {
+
+            out.writeByte(((AbstractVariable) term).id);
+
+        } else if (term instanceof Atomic) {
+
+            byte[] b = ((Atomic) term).bytes();
+            out.writeShort(b.length);
+            out.write(b);
+
         } else {
 
             Compound c = (Compound) term;
             writeTermContainer(out, c.subterms());
             writeCompoundSuffix(out, c.dt(), o);
+
         }
     }
 
@@ -772,9 +772,9 @@ public class IO {
         }
     }
 
-    public static void writeUTF8(String s, DataOutput o) throws IOException {
-        new Utf8Writer(o).write(s);
-    }
+//    public static void writeUTF8(String s, DataOutput o) throws IOException {
+//        new Utf8Writer(o).write(s);
+//    }
 
     public static void writeUTF8WithPreLen(String s, DataOutput o) throws IOException {
         DynByteSeq d = new DynByteSeq(s.length());
