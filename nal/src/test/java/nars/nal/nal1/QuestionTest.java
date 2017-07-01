@@ -134,7 +134,7 @@ public class QuestionTest {
     @Test public void questionDrivesInference() {
 
         final int[] dims = {3, 2};
-        final int timelimit = 1000;
+        final int timelimit = 1400;
 
         TaskStatistics withTasks = new TaskStatistics();
         TaskStatistics withoutTasks = new TaskStatistics();
@@ -145,7 +145,8 @@ public class QuestionTest {
             NAR d = new NARBuilder().get();
             d.random().setSeed(seed);
             d.nal(4);
-            d.termVolumeMax.setValue(24);
+            d.termVolumeMax.setValue(16);
+            d.truthResolution.setValue(0.1f);
             return d;
         };
 

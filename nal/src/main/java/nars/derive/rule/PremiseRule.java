@@ -1164,10 +1164,10 @@ public class PremiseRule extends GenericCompound {
         if (clone2 != null)
             w.accept(clone2, "C,T,question |- B");
 
-//        // T, C, [pre], task_is_question() |- B, [post]
-//        PremiseRule clone3 = clonePermutation(T, C, B, true, index);
-//        if (clone2 != null)
-//            w.accept(clone3, "T,C,question |- B");
+        // T, C, [pre], task_is_question() |- B, [post]
+        PremiseRule clone3 = clonePermutation(T, C, B, true, index);
+        if (clone2 != null)
+            w.accept(clone3, "T,C,question |- B");
     }
 
 

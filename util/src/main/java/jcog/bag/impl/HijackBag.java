@@ -432,12 +432,14 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         BagCursorAction next = BagCursorAction.Next;
         boolean modified = false;
         int nulls = 0; //emergency null counter
-        while (!next.stop && nulls < c) {
+        int startSize = size(), seen = 0;
+        while (!next.stop && nulls < c && seen < startSize) {
             if (++i == c) i = 0; //modulo c
             V v = pop ? map.getAndSet(i, null) : map.get(i);
             float p;
             if (v != null && ((p= pri(v))==p /* not deleted*/)) {
                 next = each.next(v);
+                seen++;
                 if (pop) {
                     modified = true;
                     if (_onRemoved(v) <= 0)

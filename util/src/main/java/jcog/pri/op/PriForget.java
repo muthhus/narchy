@@ -42,7 +42,7 @@ public class PriForget<P extends Priority> implements Consumer<P> {
 //        if (estimatedExcess > 0) {
 //            float presentAndFutureExcess = estimatedExcess;
             //* 2f; /* x 2 to apply to both the existing pressure and estimated future pressure */
-            float perMember = temperature * (p) / s;
+            float perMember = temperature * (p) / c;
             if (perMember >= priEpsilon)
                 return f.valueOf(perMember);
 //        }
