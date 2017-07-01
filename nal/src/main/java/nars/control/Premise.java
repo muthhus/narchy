@@ -73,7 +73,7 @@ public class Premise extends Pri {
      */
     public int run(NAR nar, int ttlMax) {
 
-        nar.emotion.count("Premise_run");
+        //nar.emotion.count("Premise_run");
 
         PriReference<Task> taskLink = this.taskLink;
         Task task = taskLink.get();

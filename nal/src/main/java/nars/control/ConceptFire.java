@@ -112,19 +112,22 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 //Math.min(this.samplesMax, terml.size() * taskl.size());
 
         Map<DerivedTask, DerivedTask> results = buffers.get();
-        Consumer<DerivedTask> x = (nt) -> results.merge(nt, nt, (tt, pt) -> {
-            if (pt == null) {
-                //priSub(nt.priElseZero());
-                return nt;
-            } else {
-                if (pt!=nt)
-                    pt.merge(nt);
+        Consumer<DerivedTask> x = (nt) -> results.merge(nt, nt, (prev, NT) -> {
+//            if (pt == null) {
+//                //priSub(nt.priElseZero());
+//                return nt;
+//            } else {
+//                if (tt!=nt)
+                    //pt.merge(nt);
+
+            prev.priMax(NT.priElseZero());
+            return prev;
                 //float ptBefore = pt.priElseZero();
 
                 //float ptAfter = pt.priElseZero();
                 //priSub(ptAfter - ptBefore);
-                return pt;
-            }
+//                return pt;
+//            }
         });
         //float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
 

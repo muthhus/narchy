@@ -252,7 +252,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     @NotNull
     @Override
     public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each, boolean pop) {
-        sample(each, -1, pop);
+        sample(each, 0, pop);
         return this;
     }
 

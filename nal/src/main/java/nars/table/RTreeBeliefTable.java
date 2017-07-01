@@ -3,7 +3,6 @@ package nars.table;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
 import jcog.Util;
-import jcog.pri.Pri;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
 import jcog.util.Top2;
@@ -17,6 +16,7 @@ import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.Tasked;
 import nars.task.TruthPolation;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
@@ -32,7 +32,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int sampleRadius = 8;
+    static final int[] sampleRadii = new int[] { 1, 4, 16, 128 };
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -235,14 +235,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             int dur = nar.dur();
 
-            List<TaskRegion> tt = cursor(when - 1 * dur, when + 1 * dur).list();
-            if (!tt.isEmpty()) {
-                return TruthPolation.truth(e, when, dur, tt);
-            } else if (sampleRadius > 1) {
-                //expand region to max radius
-                tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).list();
+            for (int r : sampleRadii) {
+                List<TaskRegion> tt = cursor(when - r * dur, when + r * dur).list();
                 if (!tt.isEmpty()) {
-                    return TruthPolation.truth(e, when, dur, tt);
+                    @Nullable PreciseTruth t = TruthPolation.truth(e, when, dur, tt);
+                    if (t!=null)
+                        return t;
                 }
             }
 
@@ -262,22 +260,30 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         int dur = nar.dur();
 
         FloatFunction<TaskRegion> wr = regionStrength(now, dur);
-        MutableList<TaskRegion> tt = cursor(when - sampleRadius * dur, when + sampleRadius * dur).
-                listSorted(t -> -wr.floatValueOf(t));
 
-        switch (tt.size()) {
-            case 0:
-                return null;
-            case 1:
-                return tt.get(0).task;
+        for (int r : sampleRadii) {
+            MutableList<TaskRegion> tt = cursor(when - r * dur, when + r * dur).
+                    listSorted(t -> -wr.floatValueOf(t));
+            if (!tt.isEmpty()) {
 
-            default:
-                Task a = tt.get(0).task;
-                Task b = tt.get(1).task;
+                switch (tt.size()) {
+                    case 0:
+                        return null;
+                    case 1:
+                        return tt.get(0).task;
 
-                Task c = Revision.merge(a, b, now, Param.TRUTH_EPSILON, nar.random());
-                return c != null ? c : a;
+                    default:
+                        Task a = tt.get(0).task;
+                        Task b = tt.get(1).task;
+
+                        Task c = Revision.merge(a, b, now, Param.TRUTH_EPSILON, nar.random());
+                        return c != null ? c : a;
+                }
+
+            }
         }
+
+        return null;
 
 
     }

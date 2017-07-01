@@ -82,7 +82,7 @@ public class NAL5Test extends AbstractNALTest {
     public void testImplBeliefPosPos() {
         //B, (A ==> C), belief(positive) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
         test()
-                .log()
+                //.log()
                 .believe("(b)")
                 .believe("((b)==>(c))", 1, 0.9f)
                 .mustBelieve(cycles, "(c)", 1.00f, 0.81f);
@@ -387,7 +387,7 @@ public class NAL5Test extends AbstractNALTest {
     public void conditional_abduction2_viaMultiConditionalSyllogism() {
         //((&&,M,A_1..n) ==> C), ((&&,A_1..n) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
         test()
-                .log()
+                //.log()
                 .believe("<(&&,<robin --> [withWings]>,<robin --> [chirping]>) ==> <robin --> bird>>") //.en("If robin is has wings and chirps, then robin is a bird")
                 .believe("<(&&,<robin --> [flying]>,<robin --> [withWings]>,<robin --> [chirping]>) ==> <robin --> bird>>") //.en("If robin can fly, has wings, and chirps, then robin is a bird");
                 .mustBelieve(cycles * 2, "<robin --> [flying]>",

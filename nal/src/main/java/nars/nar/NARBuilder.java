@@ -55,7 +55,7 @@ public class NARBuilder {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.9f);
+        n.goalConfidence(0.75f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 1;
@@ -70,7 +70,7 @@ public class NARBuilder {
         Inperience inp = new Inperience(n, 0.01f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(256, 0.25f);
+            n.addNAR(1024, 0.25f);
         }
 
 //        n.onTask(t -> {
