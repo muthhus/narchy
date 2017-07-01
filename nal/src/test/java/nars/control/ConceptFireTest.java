@@ -15,8 +15,6 @@ import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import static nars.$.$;

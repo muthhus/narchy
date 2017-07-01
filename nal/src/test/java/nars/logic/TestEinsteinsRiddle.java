@@ -1,11 +1,9 @@
 package nars.logic;
 
-import jcog.pri.mix.control.CLink;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.nar.NARBuilder;
-import nars.task.ITask;
 import nars.util.exe.TaskExecutor;
 import org.junit.Test;
 

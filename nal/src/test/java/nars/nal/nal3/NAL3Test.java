@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class NAL3Test extends AbstractNALTest {
 
-    public static final int cycles = 950;
+    public static final int cycles = 750;
 
     public NAL3Test(Supplier<NAR> b) { super(b); }
 
@@ -41,7 +41,6 @@ public class NAL3Test extends AbstractNALTest {
     @Test
     public void compound_composition_two_premises2()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("<sport --> competition>", 0.9f, 0.9f); //.en("Sport is a type of competition.");
         tester.believe("<chess --> competition>", 0.8f, 0.9f); //.en("Chess is a type of competition.");
         tester.mustBelieve(cycles, "<(|,chess,sport) --> competition>", 0.72f ,0.81f); //.en("If something is either chess or sport, then it is a competition.");

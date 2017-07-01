@@ -5,11 +5,9 @@ import nars.NAR;
 import nars.Task;
 import nars.attention.Activate;
 import nars.concept.TaskConcept;
-import nars.control.ConceptFire;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -39,7 +37,7 @@ public interface TaskTable  {
 //                n.input(a);
             }
 
-            if (taskProcess)
+            //if (taskProcess)
                 n.eventTaskProcess.emit(/*post*/t);
         }
     }

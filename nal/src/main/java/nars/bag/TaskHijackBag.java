@@ -1,7 +1,6 @@
 package nars.bag;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
-import jcog.pri.Pri;
 import jcog.pri.op.PriForget;
 import nars.NAR;
 import nars.Task;
@@ -103,7 +102,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         }
 
         if (activation > 0)
-            TaskTable.activate(y, activation, n, y==null);
+            TaskTable.activate(y, activation, n, y!=x);
     }
 
 

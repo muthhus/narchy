@@ -13,7 +13,6 @@ import nars.$;
 import nars.NAR;
 import nars.NARLoop;
 import nars.Task;
-import nars.attention.Activate;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.ConceptFire;
 import nars.control.NARMixAgent;

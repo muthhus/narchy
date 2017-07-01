@@ -8,34 +8,33 @@
     (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
     (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S & P) --> M), (Belief:Union)
     (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
-    (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S ~ P) --> M), (Belief:Difference)
+    (S --> M), (P --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S ~ P) --> M), (Belief:Difference)
 
     (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
     (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P | S)), (Belief:Union)
     (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P - S)), (Belief:Difference)
-    (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (S - P)), (Belief:Difference)
+    (M --> S), (M --> P), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (S - P)), (Belief:Difference)
 
 //raw product composition
     A, B, task("*"), belief("*") |- (A | B), (Belief:Intersection)
     A, B, task("*"), belief("*") |- (A & B), (Belief:Union)
     A, B, task("*"), belief("*") |- (A ~ B), (Belief:Difference)
-    A, B, task("*"), belief("*") |- (B ~ A), (Belief:Difference)
 //raw product decomposition ?
 
 //// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////
 //if (S --> M) is the case, and ((|,S,A..+) --> M) is not the case, then ((|,A..+) --> M) is not the case, hence Belief:DecomposePositiveNegativeNegative
 
-     (S --> M), ((|,S,A..+) --> M) |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative)
-     (S --> M), ((&,S,A..+) --> M) |- ((&,A..+) --> M), (Belief:DecomposeNegativePositivePositive)
+     (S --> M), ((|,S,A..+) --> M), task(".") |- ((|,A..+) --> M), (Belief:DecomposePositiveNegativeNegative)
+     (S --> M), ((&,S,A..+) --> M), task(".") |- ((&,A..+) --> M), (Belief:DecomposeNegativePositivePositive)
 
-     (M --> S), (M --> (&,S,A..+)) |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
-     (M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
+     (M --> S), (M --> (&,S,A..+)), task(".") |- (M --> (&,A..+)), (Belief:DecomposePositiveNegativeNegative)
+     (M --> S), (M --> (|,S,A..+)), task(".") |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
 
-     (S --> M), ((S ~ P) --> M) |- (P --> M), (Belief:DecomposePositiveNegativePositive)
-     (S --> M), ((P ~ S) --> M) |- (P --> M), (Belief:DecomposeNegativeNegativeNegative)
+     (S --> M), ((S ~ P) --> M), task(".") |- (P --> M), (Belief:DecomposePositiveNegativePositive)
+     (S --> M), ((P ~ S) --> M), task(".") |- (P --> M), (Belief:DecomposeNegativeNegativeNegative)
 
-     (M --> S), (M --> (S - P)) |- (M --> P), (Belief:DecomposePositiveNegativePositive)
-     (M --> S), (M --> (P - S)) |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
+     (M --> S), (M --> (S - P)), task(".") |- (M --> P), (Belief:DecomposePositiveNegativePositive)
+     (M --> S), (M --> (P - S)), task(".") |- (M --> P), (Belief:DecomposeNegativeNegativeNegative)
 
 
 //NAL3 single premise decompose

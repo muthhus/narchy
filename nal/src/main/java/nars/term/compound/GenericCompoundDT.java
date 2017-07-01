@@ -13,6 +13,7 @@ import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.CONJ;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -138,11 +139,26 @@ public class GenericCompoundDT extends ProxyCompound {
         if (nextDT == this.dt)
             return this;
 
-        if (op().commutative && !Op.concurrent(this.dt) && Op.concurrent(nextDT)) {
+        Op o = op();
+        if (o.commutative && !Op.concurrent(this.dt) && Op.concurrent(nextDT)) {
             //HACK reconstruct with sorted subterms. construct directly, bypassing ordinary TermBuilder
-            @NotNull TermContainer st = subterms();
+            TermContainer ms = subterms();
+            @NotNull TermContainer st = ms;
             if (!st.isSorted()) {
-                GenericCompound g = new GenericCompound(op(), TermVector.the(Terms.sorted(subterms().toArray())));
+                Term[] ts = Terms.sorted(ms.toArray());
+                if (ts.length == 1) {
+                    if (o == CONJ)
+                        return compoundOrNull(ts[0]);
+                    return null;
+                }
+
+                TermContainer tv;
+                if (ms.equalTerms(ts))
+                    tv = ms; //share
+                else
+                    tv = TermVector.the(ts);
+
+                GenericCompound g = new GenericCompound(o, tv);
                 if (nextDT != DTERNAL)
                     return new GenericCompoundDT(g, nextDT);
                 else

@@ -4,7 +4,6 @@ import jcog.bag.Bag;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.CompoundConcept;
-import nars.concept.Concept;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.nar.NARBuilder;
 import nars.term.Compound;

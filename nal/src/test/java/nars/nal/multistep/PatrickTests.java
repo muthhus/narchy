@@ -115,7 +115,7 @@ public class PatrickTests extends AbstractNALTest {
 
 
         TestNAR tt = test();
-        tt.nar.time.dur(25);
+        tt.nar.time.dur(5);
 
 //        tt.nar.onCycle(()->{
 //            System.err.println(tt.nar.time());

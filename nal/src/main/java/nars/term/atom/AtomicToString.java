@@ -1,7 +1,6 @@
 package nars.term.atom;
 
 import jcog.Util;
-import nars.IO;
 
 /**
  * an Atomic impl which relies on the value provided by toString()

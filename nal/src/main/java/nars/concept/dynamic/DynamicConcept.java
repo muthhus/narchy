@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 

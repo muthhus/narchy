@@ -8,7 +8,6 @@ import jcog.util.Top;
 import jcog.util.Top2;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.attention.Activate;
 import nars.concept.TaskConcept;

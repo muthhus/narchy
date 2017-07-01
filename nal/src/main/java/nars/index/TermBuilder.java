@@ -648,16 +648,16 @@ public abstract class TermBuilder {
 
     private Term compound(Op op, int dt, Set<Term> cs) {
         Term x = compound(op, cs);
-        if (dt!=DTERNAL && x instanceof GenericCompound) {
-            return ((GenericCompound)x).dt(dt);
+        if (dt!=DTERNAL && x instanceof Compound) {
+            return x.dt(dt);
         }
         return x;
     }
 
     private Term compound(Op op, int dt, Term... cs) {
         Term x = compound(op, cs);
-        if (dt!=DTERNAL && x instanceof GenericCompound) {
-            return ((GenericCompound)x).dt(dt);
+        if (dt!=DTERNAL && x instanceof Compound) {
+            return x.dt(dt);
         }
         return x;
     }
@@ -1256,7 +1256,7 @@ public abstract class TermBuilder {
         Term[] newSubs = oldSubs;
 
         Op o = c.op();
-        int pdt = !o.temporal ? c.dt() : DTERNAL; //preserve image dt
+        int pdt = !o.temporal ? c.dt() : XTERNAL; //preserve image dt
         if (st.hasAny(Op.TemporalBits)) {
 
             boolean subsChanged = false;
@@ -1307,10 +1307,11 @@ public abstract class TermBuilder {
 
                 Term s = newSubs[0];
                 newSubs = new Term[]{s, s};
-            } else {
+            }/* else {
                 if (o.temporal)
                     pdt = DTERNAL;
-            }
+            }*/
+
 //            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
 //                System.out.println("?");
 //            }

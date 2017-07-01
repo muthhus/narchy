@@ -857,9 +857,13 @@ public class TermReductionsTest {
                 $("((--,(out))&&(||,(happy),(out)))").toString());
     }
 
-    @Test public void taskWithFlattenedConunctions() {
+    @Test public void taskWithFlattenedConunctions() throws Narsese.NarseseException {
         //$0.0;NaN$ ((busyVol)&&((busyPri)&&(busyVol))). %.19;.10%  //<-- should not be allowed to be constructed
         //  instead should have been: (busyVol&&busyPri)
+
+        @NotNull Term x = $("((hear(what)&&(hear(is)&&(hear(is)&&(hear(what)&&(hear(is)&&(hear(is)&&(hear(what)&&(hear(is)&&(hear(is)&&(hear(is)&&hear(what))))))))))) ==>+153 hear(is)).");
+        System.out.println(x);
+        assertEquals("((hear(is)&&hear(what)) ==>+153 hear(is))", x.toString());
 
     }
 

@@ -9,7 +9,9 @@ import jcog.pri.op.PriMerge;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.nar.NARBuilder;
+import nars.op.stm.STMTemporalLinkage;
 import nars.term.Compound;
+import nars.time.RealTime;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -257,7 +259,8 @@ public class IRCNLP extends IRC {
 
         //Param.DEBUG = true;
 
-        NAR n = new NARBuilder().get();
+        NAR n = NARBuilder.newMultiThreadNAR(2, new RealTime.DS(true));
+
         /*@NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
             new RealTime.DS(true),
             new TaskExecutor(256, 0.25f));*/
@@ -266,7 +269,7 @@ public class IRCNLP extends IRC {
 //        n.addNAR(16, 0.25f);
         //n.addNAR(512, 0.25f);
 
-        n.startFPS(20f);
+        n.startFPS(5f);
         //n.log();
 
 
@@ -293,14 +296,16 @@ public class IRCNLP extends IRC {
             }
         });
 
+        n.log();
+
         new Thread(() -> {
             try {
 
                 for (int i = 0; i < 5; i++) {
-                    Hear.hear(n, "what is a sentence?", "", 100, 0.01f);
+                    Hear.hear(n, "do you know what is a sentence?", "", 20, 0.5f);
                     Util.sleep(1000);
 
-                    Hear.hear(n, "this is a sentence.", "", 100, 0.01f);
+                    Hear.hear(n, "i know that this is a sentence.", "", 20, 0.5f);
                     Util.sleep(1000);
                 }
 
@@ -313,6 +318,7 @@ public class IRCNLP extends IRC {
                 Util.sleep(500);
 
                 n.input("$0.9 hear(\"is\")! :|:");
+                n.input("$0.9 hear(#x)! :|:");
 
 
             } catch (Exception e) {

@@ -1,7 +1,5 @@
 package nars.control;
 
-import com.conversantmedia.util.concurrent.ConcurrentQueue;
-import com.conversantmedia.util.concurrent.MultithreadConcurrentQueue;
 import jcog.bag.Bag;
 import jcog.decide.DecideRoulette;
 import jcog.pri.PLink;
@@ -25,7 +23,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static java.lang.Math.*;
@@ -36,7 +33,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 2;
+    private static final int maxSamples = 4;
 
     static final int TASKLINKS_SAMPLED = maxSamples * 2;
     static final int TERMLINKS_SAMPLED = maxSamples * 2;

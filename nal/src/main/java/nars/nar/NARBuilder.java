@@ -30,14 +30,14 @@ import static nars.Op.BELIEF;
 public class NARBuilder {
 
     private @NotNull Supplier<TermIndex> concepts = () ->
-            new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
-            //new NARBuilder.BasicTermIndex(8 * 1024 )
+            //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
+            new NARBuilder.BasicTermIndex(8 * 1024 )
     ;
 
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(256, 0.2f);
+    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 0.5f);
 
     private Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 
@@ -64,8 +64,8 @@ public class NARBuilder {
         n.DEFAULT_QUEST_PRIORITY = 1;
         n.termVolumeMax.setValue(36);
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
-        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 5, true, 16f);
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, true);
+        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 4, true, 16f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 4);
 
