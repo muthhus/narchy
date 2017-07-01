@@ -135,6 +135,12 @@ public interface TimeFunctions {
         int dt;
         int ttd = taskTerm.dt();
         int btd = beliefTerm instanceof Compound ? ((Compound) beliefTerm).dt() : DTERNAL;
+
+        if (ttd == XTERNAL)
+            ttd = DTERNAL; //HACK
+        if (btd == XTERNAL)
+            btd = DTERNAL; //HACK
+
         if (ttd != DTERNAL && btd != DTERNAL) {
             switch (polarity) {
                 case -2:

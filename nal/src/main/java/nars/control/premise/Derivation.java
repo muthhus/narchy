@@ -200,8 +200,8 @@ public class Derivation extends Unify implements TermContext {
 
         this.belief = belief;
 
-        assert(beliefTerm.op()!=NEG): beliefTerm + " is negated";
-        this.beliefTerm = beliefTerm;
+        //assert(beliefTerm.op()!=NEG): beliefTerm + " is negated";
+        this.beliefTerm = beliefTerm.unneg();
 
 
         if (belief == null) {

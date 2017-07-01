@@ -42,18 +42,18 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", () -> fz.image, 28, 16)
-                .resolution(0.2f);
+        senseCamera("fz", () -> fz.image, 32, 20)
+                .resolution(0.1f);
 
 
         actionBipolar($.inh(Atomic.the("fwd"), id), (f) -> {
             fz.vehicleMetrics[0][6] += (f) * 2f;
             return f;
-        }).resolution.setValue(0.1f);
+        }).resolution.setValue(0.05f);
         actionBipolar($.inh(Atomic.the("rot"), id), (r) -> {
-            fz.playerAngle += (r*r*r) * 0.35f;
+            fz.playerAngle += (r*r*r) * 0.65f;
             return r;
-        }).resolution.setValue(0.1f);
+        }).resolution.setValue(0.05f);
 
         //keyboard-ish controls:
 //actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );

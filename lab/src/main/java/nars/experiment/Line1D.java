@@ -34,7 +34,7 @@ public class Line1D {
 
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.0002f; //in time units
+        float tHz = 0.02f; //in time units
         float yResolution = 0.04f; //in 0..1.0
         float periods = 132;
 
@@ -181,11 +181,11 @@ public class Line1D {
 //
                 NAR n = new NARBuilder().get();
 
-                new STMTemporalLinkage(n, 1, false);
+                new STMTemporalLinkage(n, 2, true);
                 n.time.dur(1);
-                n.termVolumeMax.set(32);
+                n.termVolumeMax.set(22);
                 n.beliefConfidence(0.9f);
-                n.goalConfidence(0.85f);
+                n.goalConfidence(0.5f);
                 n.onCycle((nn)->{
                     System.out.println(nn.emotion.summary());
                 });

@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
  */
 class SensorBeliefTable extends DefaultBeliefTable {
 
-    static final int durationsTolerance = 1;
+    static final int durationsTolerance = 2;
 
     private Task current;
 
@@ -32,9 +32,9 @@ class SensorBeliefTable extends DefaultBeliefTable {
             return x;
 
         Task current = this.current;
-        int dur = nar.dur();
         if (current != null &&
-                current.start() <= when && when <= current.end() + durationsTolerance * dur) {
+                current.start() <= when
+                && when <= current.end() + durationsTolerance * nar.dur()) {
             return current.truth();
         } else {
             return null;
@@ -48,10 +48,9 @@ class SensorBeliefTable extends DefaultBeliefTable {
             return x;
 
         Task current = this.current;
-        int dur = nar.dur();
         if (current != null &&
-                current.start() <= when &&
-                Math.abs( when - current.end() ) <= durationsTolerance * dur) {
+                current.start() <= when
+                && when <= current.end() + durationsTolerance * nar.dur()) {
             return current;
         } else {
             return null;

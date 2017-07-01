@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 
 public class NARBuilder {
 
@@ -64,8 +65,8 @@ public class NARBuilder {
         n.DEFAULT_QUEST_PRIORITY = 1;
         n.termVolumeMax.setValue(36);
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, true);
-        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 4, true, 16f);
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, true);
+        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 3, true, 16f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 4);
 

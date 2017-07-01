@@ -46,6 +46,8 @@ import static nars.Op.*;
 
 public interface Concept extends Termed {
 
+
+
     @NotNull Bag<Task,PriReference<Task>> tasklinks();
 
     @NotNull Bag<Term,PriReference<Term>> termlinks();
@@ -119,6 +121,8 @@ public interface Concept extends Termed {
         }
         return m;
     }
+
+    Concept[] EmptyArray = new Concept[0];
 
     /**
      * like Map.put for storing data in meta map

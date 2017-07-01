@@ -45,7 +45,7 @@ public interface NAct {
         });
         actions().add(m);
 
-        m.resolution.setValue(1f);
+        //m.resolution.setValue(1f);
 
         return m;
     }
@@ -139,7 +139,7 @@ public interface NAct {
             else
                 return null;
         });
-        m.resolution.setValue(0.5f);
+        //m.resolution.setValue(0.5f);
         addAction(m);
 
         return m;
@@ -196,7 +196,7 @@ public interface NAct {
 
             return $.t(f, nar().confDefault(GOAL));
         });
-        m.resolution.setValue(0.5f);
+        //m.resolution.setValue(0.5f);
 
         addAction(m);
 
