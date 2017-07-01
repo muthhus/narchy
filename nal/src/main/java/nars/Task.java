@@ -189,9 +189,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                 return fail(t, "Term exceeds maximum NAL level", safe);
         }
 
-        if (t.op().temporal && t.dt() == XTERNAL) {
-            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
-        }
+//        if (t.op().temporal && t.dt() == XTERNAL) {
+//            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
+//        }
 
         if (Param.DEBUG) {
             if (t.ORrecurse(Op::isAbsolute)) // t.contains(True) || t.contains(False))

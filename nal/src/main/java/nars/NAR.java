@@ -1227,6 +1227,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     @Nullable
     public Term conceptTerm(@NotNull Term term) {
 
+        term = term.unneg();
+
         if (term instanceof Atom)
             return term;
 
