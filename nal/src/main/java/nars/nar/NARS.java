@@ -110,10 +110,10 @@ public class NARS extends NAR {
 
                 new EnumClassifier("type", new String[]{
                         "Belief", "Goal", "Question", "Quest",
-                        "ConceptFire", "Activate"
+                        "ConceptFire"
                 }, (x) -> {
 
-                    if (x instanceof Task) {
+                    if (x instanceof NALTask) {
                         //NAL
                         switch (((Task) x).punc()) {
                             case BELIEF:
@@ -127,8 +127,6 @@ public class NARS extends NAR {
                         }
                     } else if (x instanceof ConceptFire) {
                         return 4;
-                    }else if (x instanceof Activate) {
-                        return 5;
                     }
 
                     return -1;
@@ -136,10 +134,13 @@ public class NARS extends NAR {
 
                 new EnumClassifier("complexity", 3, (t) -> {
                     if (t instanceof NALTask) {
-                        int c = ((NALTask) t).complexity();
-                        int m = termVolumeMax.intValue();
-                        if (c < m / 4) return 0;
-                        if (c < m / 2) return 1;
+                        int c = ((NALTask) t).
+                                volume();
+                                //complexity();
+//                        int m = termVolumeMax.intValue();
+//                        assert(m > 5);
+                        if (c < 5) return 0;
+                        if (c < 10) return 1;
                         return 2;
                     }
                     return -1;
@@ -148,8 +149,9 @@ public class NARS extends NAR {
                 new EnumClassifier("when", new String[]{"Present", "Future", "Past"}, (t) -> {
                     if (t instanceof NALTask) {
                         long now = time();
+                        int radius = 2;
                         long h = ((NALTask) t).nearestStartOrEnd(now);
-                        if (Math.abs(h - now) <= dur()) {
+                        if (Math.abs(h - now) <= dur() * radius) {
                             return 0; //present
                         } else if (h > now) {
                             return 1; //future

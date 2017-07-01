@@ -20,7 +20,7 @@ import static nars.truth.TruthFunctions.w2c;
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
     /** value between 0 and 1.0, range for adjusting polarization (1f has no effect) */
-    final float minPolarizationFactor = 0.75f;
+    final float minFactor = 0.75f;
 
 //    /** preference for polarity (includes conf) */
 //    public final FloatParam polarity = new FloatParam(0.5f, 0f, 1f);
@@ -71,12 +71,12 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
             d.parentPri;
             //d.premise.pri();
 
-        float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm);
+        float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm, minFactor);
         if (truth != null) { //belief and goal:
             p *= simplicityFactor;
-            float freqFactor = Util.lerp(polarization(truth.freq()), minPolarizationFactor, 1);
+            float freqFactor = Util.lerp(polarization(truth.freq()), minFactor, 1);
             p *= freqFactor;
-            float confFactor = evidencePreservationRelative(truth, d);
+            float confFactor = evidencePreservationRelative(truth, d, minFactor);
             p *= confFactor;
 
 //                    simplicity.floatValue() * simplicityFactorRelative(conclusion, punc, d.task, d.belief) +
@@ -124,7 +124,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
      *
      * @return a value between 0 and 1 that priority will be scaled by
      */
-    public static float simplicityFactorRelative(Compound conclusion, byte punc, Task task, @NotNull Term belief) {
+    public static float simplicityFactorRelative(Compound conclusion, byte punc, Task task, @NotNull Term belief, float minFactor) {
         float premCmp =
                 punc == BELIEF || punc == GOAL ?
                         task.complexity() + belief.complexity()
@@ -133,7 +133,7 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
                 ;
 
         float concCmp = conclusion.complexity();
-        return (premCmp / (premCmp + concCmp));
+        return minFactor + (1f-minFactor) * (premCmp / (premCmp + concCmp));
         //controls complexity decay rate
 //        int penaltyComplexity;
 //        if (punc == QUESTION || punc == QUEST) {
@@ -152,11 +152,11 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
 //        ;
     }
 
-    protected float evidencePreservationRelative(@NotNull Truth truth, @NotNull Derivation d) {
+    protected float evidencePreservationRelative(@NotNull Truth truth, @NotNull Derivation d, float minFactor) {
         float concEvi = truth.conf();
         float premiseEvi = d.premiseEvi > 0 ? w2c(d.premiseEvi) : 0;
         float evidenceShrink = (premiseEvi - concEvi) / ((premiseEvi + concEvi) / 2f);
-        return 1f / (1f + Math.max(0, evidenceShrink));
+        return minFactor + (1f-minFactor)*1f / (1f + Math.max(0, evidenceShrink));
     }
 
 }

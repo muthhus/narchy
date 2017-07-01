@@ -62,15 +62,15 @@ public class NARBuilder {
         n.DEFAULT_GOAL_PRIORITY = 1;
         n.DEFAULT_QUESTION_PRIORITY = 1;
         n.DEFAULT_QUEST_PRIORITY = 1;
-        n.termVolumeMax.setValue(40);
+        n.termVolumeMax.setValue(48);
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, false);
-        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 5, false, 16f);
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
+        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 5, true, 16f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(1024, 0.25f);
+            n.addNAR(256, 0.25f);
         }
 
 //        n.onTask(t -> {

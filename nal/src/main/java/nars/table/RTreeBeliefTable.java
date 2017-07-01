@@ -32,7 +32,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = new int[] { 1, 4, 16, 128 };
+    static final int[] sampleRadii = new int[] { 1, 4, 16, 128, 1024 };
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -235,8 +235,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             int dur = nar.dur();
 
+//            FloatFunction<TaskRegion> wr = regionStrength(now, dur);
+//            FloatFunction<TaskRegion> sort = t -> -wr.floatValueOf(t);
+
             for (int r : sampleRadii) {
-                List<TaskRegion> tt = cursor(when - r * dur, when + r * dur).list();
+
+                List<TaskRegion> tt = cursor(when - r * dur, when + r * dur)
+                        //.listSorted(sort)
+                        .list();
                 if (!tt.isEmpty()) {
                     @Nullable PreciseTruth t = TruthPolation.truth(e, when, dur, tt);
                     if (t!=null)
@@ -260,10 +266,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         int dur = nar.dur();
 
         FloatFunction<TaskRegion> wr = regionStrength(now, dur);
+        FloatFunction<TaskRegion> sort = t -> -wr.floatValueOf(t);
 
         for (int r : sampleRadii) {
             MutableList<TaskRegion> tt = cursor(when - r * dur, when + r * dur).
-                    listSorted(t -> -wr.floatValueOf(t));
+                    listSorted(sort);
             if (!tt.isEmpty()) {
 
                 switch (tt.size()) {
@@ -276,7 +283,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                         Task a = tt.get(0).task;
                         Task b = tt.get(1).task;
 
-                        Task c = Revision.merge(a, b, now, Param.TRUTH_EPSILON, nar.random());
+                        Task c = Revision.merge(a, b, now, nar.confMin.floatValue(), nar.random());
                         return c != null ? c : a;
                 }
 
@@ -316,13 +323,24 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     public void add(@NotNull Task t, TaskConcept c, NAR n) {
         float activation = t.priElseZero();
 
+        updateSignalTasks(n.time());
+
         TaskRegion tr = new TaskRegion(t);
         final Task found = find(tr);
         if (found == null) {
 
             int over = size() + 1 - capacity;
             if (over > 0) {
-                addAfterCompressing(tr, n);
+
+
+                List<Task> toActivate = addAfterCompressing(tr, n);
+
+                for (int i = 0, toActivateSize = toActivate.size(); i < toActivateSize; i++) {
+                    Task x = toActivate.get(i);
+
+                    n.input(Activate.activate(x, x.priElseZero(), c));
+                }
+
             } else {
                 tree.addAsync(tr);
             }
@@ -347,7 +365,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * assumes called with writeLock
      */
-    private void addAfterCompressing(TaskRegion tr, NAR nar) {
+    @NotNull private List<Task> addAfterCompressing(TaskRegion tr, NAR nar) {
         //if (compressing.compareAndSet(false, true)) {
         try {
 
@@ -365,7 +383,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             ConcurrentRTree<TaskRegion> lt = ((ConcurrentRTree) tree);
 
-            List<Activate> activations = $.newArrayList(1);
+            List<Task> toActivate = $.newArrayList(1);
             lt.withWriteLock((r) -> {
 
 
@@ -381,7 +399,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                         return; //failed to compress
 
                     //float confMin = toRemove != null ? toRemove.task.conf() : nar.confMin.floatValue();
-                    Activate activation = null;
+                    Task activation = null;
 
 //                    if (toRemove != null && toMerge!=null) {
 //                        Truth toRemoveNow = toRemove.task.truth(now, dur);
@@ -399,7 +417,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //                    }
 
                     if (toMerge != null && (activation = compressMerge(toMerge, now, dur, nar.confMin.floatValue(), nar.random())) != null) {
-                        activations.add(activation);
+                        toActivate.add(activation);
                     } else if (toRemove != null) {
                         compressEvict(toRemove);
                     }
@@ -407,18 +425,20 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     if (r.size() < capacity)
                         tree.add(tr);
                     else
-                        activations.clear();
+                        toActivate.clear();
                 });
 
-                nar.input(activations);
+                return toActivate;
+                //nar.input(toActivate);
 
             } finally{
                 //compressing.set(false);
             }
             //}
+
         }
 
-    private Activate compressMerge(Leaf<TaskRegion> l, long now, int dur, float confMin, Random rng) {
+    private Task compressMerge(Leaf<TaskRegion> l, long now, int dur, float confMin, Random rng) {
         short s = l.size;
         assert (s > 0);
 
@@ -443,8 +463,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 add(c);
 
                 //run but don't broadcast it
-                return new Activate(c, c.pri());  //TODO defer until out of this critical section?
-
+                return c;
 
                 //TaskTable.activate(c, c.pri(), nar);
             }

@@ -1,5 +1,8 @@
 package nars.control;
 
+import com.conversantmedia.util.concurrent.ConcurrentQueue;
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
+import com.conversantmedia.util.concurrent.MultithreadConcurrentQueue;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.decide.DecideRoulette;
@@ -20,10 +23,9 @@ import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static java.lang.Math.*;
@@ -44,13 +46,42 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     static final ThreadLocal<Map<DerivedTask, DerivedTask>> buffers =
             ThreadLocal.withInitial(LinkedHashMap::new);
 
-
+    private final ConcurrentQueue<BiConsumer<ConceptFire,NAR>> pending = new MultithreadConcurrentQueue<>(16);
 
 
     public ConceptFire(Concept c, float pri) {
+        this(c, pri, null);
+    }
+
+    public ConceptFire(Concept c, float pri, @Nullable BiConsumer<ConceptFire,NAR> onStartOrMerge) {
         super(c, pri);
         assert(c.isNormalized()):
                 c + " not normalized";
+
+        if (onStartOrMerge!=null) {
+            pending.offer(onStartOrMerge);
+        }
+    }
+
+    @Override
+    public boolean delete() {
+        if (super.delete()) {
+            pending.clear();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public ITask merge(ITask incoming) {
+        ConceptFire inc = (ConceptFire)incoming;
+
+        //transfer to this queue
+        BiConsumer<ConceptFire,NAR> r;
+        while ((r = inc.pending.poll())!=null)
+            pending.offer(r);
+
+        return super.merge(incoming);
     }
 
     final static FloatFunction<? super PriReference> linearPri = (p) -> {
@@ -77,6 +108,13 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //
 //
 //        final float minPri = priMinAbsolute;
+
+        
+
+        BiConsumer<ConceptFire,NAR> r = null;
+        while ((r = pending.poll())!=null)
+            r.accept(this, nar);
+
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks().commit();//.normalize(0.1f);
         if (tasklinks.isEmpty()) {

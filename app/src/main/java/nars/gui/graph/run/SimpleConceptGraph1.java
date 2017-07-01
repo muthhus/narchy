@@ -64,7 +64,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         NAR n = new NARBuilder().get();
         //n.DEFAULT_BELIEF_PRIORITY = 0.5f;
         //n.DEFAULT_QUESTION_PRIORITY = 0.5f;
-        float fps = 5f;
+        float fps = 1f;
 
         csvPriority(n, "/tmp/x.csv");
 
@@ -191,8 +191,8 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         //n.onCycle(nn->{System.out.println(nn.time() + "\n" + n.exe.stats() + "\n\n");});
 
-        //n.startFPS(fps).join();
-        n.run(600);
+        n.startFPS(fps).join();
+        //n.run(600);
 
 
 
@@ -222,7 +222,10 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
     public static void csvPriority(NAR n, String path) throws FileNotFoundException {
 
-        CSVOutput csv = new CSVOutput(new File(path), "time", "ALL_Pri", "NAL_Pri", "ConceptFire_Pri", "busy");
+        CSVOutput csv = new CSVOutput(
+                //new File(path),
+                System.out,
+                "time", "ALL_Pri", "NAL_Pri", "ConceptFire_Pri", "busy");
 
         MultiStatistics<ITask> exeTasks = new MultiStatistics<ITask>()
                 .classify("NALTask", x -> x instanceof NALTask)

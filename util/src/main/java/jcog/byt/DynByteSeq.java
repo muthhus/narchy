@@ -12,7 +12,7 @@ import java.util.Arrays;
  */
 public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
-    public static final int MIN_GROWTH_BYTES = 16;
+    public static final int MIN_GROWTH_BYTES = 8;
     protected byte[] bytes;
     public int len;
 

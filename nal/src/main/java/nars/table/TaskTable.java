@@ -1,14 +1,15 @@
 package nars.table;
 
-import jcog.Util;
 import jcog.pri.Pri;
 import nars.NAR;
 import nars.Task;
 import nars.attention.Activate;
 import nars.concept.TaskConcept;
+import nars.control.ConceptFire;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -30,8 +31,13 @@ public interface TaskTable  {
     static void activate(@NotNull Task t, float activation, @NotNull NAR n, boolean taskProcess) {
        // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
         if (activation >= Pri.EPSILON) {
-            Activate a = new Activate(t, activation);
-            n.input(a);
+            TaskConcept cc = t.concept(n, true);
+            if (cc!=null) {
+
+                n.input(Activate.activate(t, activation, cc));
+//                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
+//                n.input(a);
+            }
 
             if (taskProcess)
                 n.eventTaskProcess.emit(/*post*/t);

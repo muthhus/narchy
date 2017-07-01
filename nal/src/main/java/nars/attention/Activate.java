@@ -7,12 +7,11 @@ import jcog.pri.*;
 import nars.NAR;
 import nars.Task;
 import nars.concept.AtomConcept;
+import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.control.ConceptFire;
 import nars.task.ITask;
 import nars.task.TruthPolation;
-import nars.task.UnaryTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -25,6 +24,8 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
+
 import static jcog.math.Interval.unionLength;
 import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
@@ -32,54 +33,8 @@ import static nars.time.Tense.ETERNAL;
 /**
  * activation from a point source to its subterm components (termlink templates)
  */
-public class Activate extends UnaryTask<Task> {
+public class Activate /*extends UnaryTask<Task>*/ {
 
-
-    /**
-     * runs the task activation procedure
-     */
-    public Activate(@NotNull Task t, float pri) {
-        super(t, pri);
-    }
-
-    //@Override
-    public ITask[] run(@NotNull NAR nar) {
-
-        float p = priElseZero();
-
-        if (p < Pri.EPSILON * 1 * id.volume())
-            return null; //wait for more
-
-        ITask[] activations = null;
-
-
-        Task t = get();
-        Concept origin = t.concept(nar);
-        if (origin != null /*&& !origin.isDeleted()*/) {
-            TaskActivation a = new TaskActivation(nar, t, (TaskConcept) origin, p, levels(t.term()));
-            float remain = a.linkOverflow.floatValue();
-            float remaining = priSub(p - remain);
-
-            if (remaining >= Pri.EPSILON * get().complexity()) {
-                a.activate.addToValue(origin, remaining); //transfer back to concept fire
-            }
-
-            //if (!a.activations.isEmpty()) //HACK
-            activations = a.activations();
-
-        }
-
-
-//        float memUsed = Util.memoryUsed();
-//        if (memUsed > 0.75f) {
-//            System.err.println(memUsed + "  memory used!");
-//        }
-
-        delete();
-
-        return activations;
-
-    }
 
     public static int levels(@NotNull Compound host) {
         switch (host.op()) {
@@ -128,6 +83,61 @@ public class Activate extends UnaryTask<Task> {
         }
     }
 
+    public static ConceptFire activate(@NotNull Task t, float activation, Concept origin) {
+        if (origin instanceof CompoundConcept) {
+
+            return new ConceptFire(origin, activation, new ActivateSubterms(t, activation));
+        } else {
+            //atomic activation
+            return new ConceptFire(origin, activation); /*, () -> {
+
+            }*/
+        }
+    }
+
+    public static class ActivateSubterms implements BiConsumer<ConceptFire,NAR> {
+
+        private final float activation;
+        private final Task task;
+
+        public ActivateSubterms(@NotNull Task task, float activation) {
+            this.task = task;
+            this.activation = activation;
+        }
+
+        @Override
+        public void accept(ConceptFire originLink, NAR nar) {
+                        CompoundConcept origin = (CompoundConcept) originLink.get();
+
+            ITask[] activations = null;
+
+            //Concept origin = t.concept(nar, true);
+
+            origin.tasklinks().putAsync(new PLinkUntilDeleted<>(task, activation));
+
+            TaskActivation a = new TaskActivation(nar, task, origin, activation,
+                    //levels(t.term())
+                    1
+            );
+            float remain = a.linkOverflow.floatValue();
+            if (remain >= Pri.EPSILON) {
+                originLink.priAdd(remain);
+            }
+
+            //float remaining = priSub(activation - remain);
+
+//            if (remaining >= Pri.EPSILON * get().complexity()) {
+//                a.activate.addToValue(origin, remaining); //transfer back to concept fire
+//            }
+
+            //if (!a.activations.isEmpty()) //HACK
+            activations = a.activations();
+            if (activations != null)
+                nar.input(activations);
+
+        }
+    }
+
     public static class TaskActivation implements ObjectFloatProcedure<Termed> {
         static final ThreadLocal<ObjectFloatHashMap<Termed>> activationsSmall =
                 ThreadLocal.withInitial(() -> new SaneObjectFloatHashMap<>(16));
@@ -139,7 +149,7 @@ public class Activate extends UnaryTask<Task> {
         private final int maxDepth; //TODO subtract from this then it wont need stored
 
 
-        transient final protected TaskConcept origin;
+        transient final protected CompoundConcept origin;
 
         final MutableFloat linkOverflow = new MutableFloat(0);
 
@@ -170,7 +180,7 @@ public class Activate extends UnaryTask<Task> {
         final transient private NAR nar;
         transient private FasterList<ITask> activations;
 
-        public TaskActivation(NAR nar, Task t, TaskConcept origin, float p, int maxDepth) {
+        public TaskActivation(NAR nar, Task t, CompoundConcept origin, float p, int maxDepth) {
             this.maxDepth = maxDepth;
             this.nar = nar;
 
@@ -185,8 +195,10 @@ public class Activate extends UnaryTask<Task> {
             activate.clear();
             linkOverflow.setValue(0);
 
-            link(origin, p, 0);
-            nar.emotion.stress(linkOverflow);
+            //link(origin, p, 0);
+            linkSubterms(origin.subterms(), origin.size(), p, 0);
+
+            //nar.emotion.stress(linkOverflow);
 
         }
 
@@ -211,7 +223,7 @@ public class Activate extends UnaryTask<Task> {
             }
 
             if (c instanceof Concept)
-                activations.add(new ConceptFire((Concept) c, p));
+                activations.add(Activate.activate(task, p, (Concept) c));
 
 
             termBidi(c, TERMLINK_BALANCE, (1f - TERMLINK_BALANCE), p);

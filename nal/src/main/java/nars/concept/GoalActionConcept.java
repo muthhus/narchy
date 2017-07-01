@@ -12,6 +12,7 @@ import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
+import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -23,7 +24,9 @@ import static nars.Op.GOAL;
  */
 public class GoalActionConcept extends ActionConcept {
 
-    public final Signal feedback/*, feedbackGoal*/;
+    public final Signal feedback;
+    public final Signal feedbackGoal;
+
     private final FloatParam curiosity;
 
 
@@ -37,12 +40,13 @@ public class GoalActionConcept extends ActionConcept {
     public GoalActionConcept(@NotNull Compound c, @NotNull NAR n, FloatParam curiosity, @NotNull MotorFunction motor) {
         super(c,
                 new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable(c)),
-                null,
+                new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable(c)),
+                //null,
                 n);
 
         this.curiosity = curiosity;
         this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priorityDefault(BELIEF));
-        //this.feedbackGoal = new Signal(GOAL, resolution).pri(() -> n.priorityDefault(GOAL));
+        this.feedbackGoal = new Signal(GOAL, resolution).pri(() -> n.priorityDefault(GOAL));
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
@@ -62,34 +66,34 @@ public class GoalActionConcept extends ActionConcept {
         //float curiPeriod = 2; //TODO vary this
         float cur = curiosity.floatValue();
         if (nar.random().nextFloat() < cur) {
-            //inject curiosity
+            // curiosity override
 
             float curiConf =
-                    nar.confDefault(GOAL);
-                    //nar.confDefault(GOAL)/2f;
+                    //nar.confDefault(GOAL);
+                    nar.confDefault(GOAL) / 2f;
                     //nar.confMin.floatValue()*2f;
 
-            float cc =
-                    //curiConf;
-                    curiConf - (goal != null ? goal.conf() : 0);
-            if (cc > 0) {
+//            float cc =
+//                    //curiConf;
+//                    curiConf - (goal != null ? goal.conf() : 0);
+//            if (cc > 0) {
 
-                float f =
-                      Util.round(nar.random().nextFloat(), resolution.floatValue());
+            float f =
+                    Util.round(nar.random().nextFloat(), resolution.floatValue());
 //                    ((float)Math.sin(
 //                        hashCode() /* for phase shift */
 //                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
 
+            goal = $.t(f, curiConf);
 
-                Truth ct = $.t(f, cc);
-                goal = ct; //curiosity overrides goal
+//                Truth ct = $.t(f, cc);
+//                goal = ct; //curiosity overrides goal
 
 //                if (goal == null) {
 //                    goal = ct;
 //                } else {
 //                    goal = Revision.revise(goal, ct);
 //                }
-            }
         }
 
 
@@ -115,15 +119,18 @@ public class GoalActionConcept extends ActionConcept {
         //3. check previous signal belief
         Truth nextTruth =
                 beliefFeedback;
-                //beliefFeedback != null ? beliefFeedback : belief; //latch
+        //beliefFeedback != null ? beliefFeedback : belief; //latch
 
-        Task fb = feedback.set(this, nextTruth, nar.time::nextStamp, nar);
+        LongSupplier stamper = nar.time::nextStamp;
 
-        ((SensorBeliefTable)beliefs).commit(fb);
+        Task fb = feedback.set(this, nextTruth, stamper, nar);
+        ((SensorBeliefTable) beliefs).commit(fb);
 
 
 //        //HACK insert shadow goal
-        //Task fg = (goal!=null) ? feedbackGoal.set(this, fbt, nar) : feedbackGoal.current;
+        Task fg = feedbackGoal.set(this, goal, stamper, nar);
+        ((SensorBeliefTable) goals).commit(fg);
+
         //Task fg = null;
 
         //apply additional forgetting for past goals and beliefs, to promote future predictions
@@ -136,10 +143,9 @@ public class GoalActionConcept extends ActionConcept {
 //        beliefs().forEachTask(decay);
 //        goals().forEachTask(decay);
 
-        return Stream.of(fb).filter(Objects::nonNull);
+        return Stream.of(fb, fg).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);
     }
-
 
 
 //    Truth[] linkTruth(long when, long now, float minConf) {
