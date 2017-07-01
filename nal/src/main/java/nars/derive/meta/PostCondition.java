@@ -22,10 +22,13 @@ import static nars.term.atom.Atomic.the;
 public class PostCondition implements Serializable //since there can be multiple tasks derived per rule
 {
 
-    @NotNull public final Term pattern;
+    @NotNull
+    public final Term pattern;
 
-    @Nullable public final Term beliefTruth;
-    @Nullable public final Term goalTruth;
+    @Nullable
+    public final Term beliefTruth;
+    @Nullable
+    public final Term goalTruth;
 
     /**
      * minimum NAL level necessary to involve this postcondition
@@ -42,14 +45,14 @@ public class PostCondition implements Serializable //since there can be multiple
 
 
     public static final ImmutableSet<Atomic> reservedMetaInfoCategories = Sets.immutable.of(
-        the("Belief"),
-        the("Stamp"),
-        the("Goal"),
-        the("Order"),
-        the("Permute"),
-        the("Info"),
-        the("Event"),
-        the("Punctuation")
+            the("Belief"),
+            the("Stamp"),
+            the("Goal"),
+            the("Order"),
+            the("Permute"),
+            the("Info"),
+            the("Event"),
+            the("Punctuation")
     );
 
 
@@ -66,12 +69,13 @@ public class PostCondition implements Serializable //since there can be multiple
 
 
     /**
-     * @param rule             rule which contains and is constructing this postcondition
+     * @param rule      rule which contains and is constructing this postcondition
      * @param pattern
      * @param modifiers
      * @throws RuntimeException
      */
-    @NotNull public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term pattern,
+    @NotNull
+    public static PostCondition make(@NotNull PremiseRule rule, @NotNull Term pattern,
                                      @NotNull Term... modifiers) throws RuntimeException {
 
 
@@ -125,10 +129,12 @@ public class PostCondition implements Serializable //since there can be multiple
                     break;
 
                 case "Permute":
-                    if (which.equals(PostCondition.backward))
-                        rule.allowBackward = true;
-                    if (which.equals(PostCondition.swap))
+                    if (which.equals(PostCondition.backward)) {
+                        //rule.allowBackward = rule.allowForward = true;
+                    } else if (which.equals(PostCondition.swap)) {
                         rule.allowForward = true;
+                    } else
+                        throw new RuntimeException("illegal Permute opcode: " + which);
                     break;
 
 //                case "Order":
@@ -166,10 +172,10 @@ public class PostCondition implements Serializable //since there can be multiple
         PostCondition pc = new PostCondition(pattern, beliefTruth, goalTruth, puncOverride);
 
         if (!pc.modifiesPunctuation() && pattern instanceof Compound) {
-            assert !rule.getTask().equals(pattern):
-                "punctuation not modified yet rule task equals pattern";
-            assert !rule.getBelief().equals(pattern):
-                "punctuation not modified yet rule belief equals pattern";
+            assert !rule.getTask().equals(pattern) :
+                    "punctuation not modified yet rule task equals pattern";
+            assert !rule.getBelief().equals(pattern) :
+                    "punctuation not modified yet rule belief equals pattern";
         }
 
         if (pc.minNAL != 0)
@@ -179,11 +185,9 @@ public class PostCondition implements Serializable //since there can be multiple
     }
 
 
-
     public final boolean modifiesPunctuation() {
         return puncOverride > 0;
     }
-
 
 
     @NotNull
@@ -197,7 +201,6 @@ public class PostCondition implements Serializable //since there can be multiple
                 ", puncOverride=" + puncOverride +
                 '}';
     }
-
 
 
 }

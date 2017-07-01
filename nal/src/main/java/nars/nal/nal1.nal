@@ -22,24 +22,24 @@
 //                (A --> C)
 
 
-    // the second neqRCom() is to handle the backwards cases until a proper variable transform is implemented for those auto-generated rules
+    // the second neqRCom() is to handle the Backward cases until a proper variable transform is implemented for those auto-generated rules
 
-    (A --> B), (B --> C), neqRCom(A,C)   |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backwards)
-    (A --> B), (A --> C), neqRCom(B,C)   |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Backwards)
-    (A --> C), (B --> C), neqRCom(A,B)   |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Backwards)
-    (A --> B), (B --> C), neqRCom(A,C)   |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Backwards)
+    (A --> B), (B --> C), neqRCom(A,C)   |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)
+    (A --> B), (A --> C), neqRCom(B,C)   |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Swap)
+    (A --> C), (B --> C), neqRCom(A,B)   |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Swap)
+    (A --> B), (B --> C), neqRCom(A,C)   |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Swap)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
 
-    (P --> M), (S --> M), neqRCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak, Permute:Backwards)
-    (M --> P), (M --> S), neqRCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak, Permute:Backwards)
+    (P --> M), (S --> M), neqRCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak, Permute:Backward)
+    (M --> P), (M --> S), neqRCom(S,P) |- (P <-> S), (Belief:Comparison, Goal:Weak, Permute:Backward)
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
-    (M --> P), (S <-> M), neqRCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Permute:Backwards)
-    (P --> M), (S <-> M), neqRCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Permute:Backwards)
+    (M --> P), (S <-> M), neqRCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Permute:Backward)
+    (P --> M), (S <-> M), neqRCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Permute:Backward)
         //(M --> P), (S <-> M), belief(negative), neqRCom(S,P) |- (--,(S --> P)), (Belief:AnalogyPN, Goal:StrongPN)
         //(P --> M), (S <-> M), belief(negative), neqRCom(S,P) |- (--,(P --> S)), (Belief:AnalogyPN, Goal:StrongPN)
     (M <-> P), (S <-> M), neqRCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong)

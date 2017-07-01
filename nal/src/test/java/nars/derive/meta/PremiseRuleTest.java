@@ -153,7 +153,7 @@ public class PremiseRuleTest {
 //
 //    }
 
-    static final PremiseRuleSet permuter = new PremiseRuleSet(new PremiseRule[]{}, true);
+    static final PremiseRuleSet permuter = new PremiseRuleSet(true, new PremiseRule[]{});
 
     @Test
     public void testBackwardPermutations() throws Narsese.NarseseException {
@@ -165,7 +165,7 @@ public class PremiseRuleTest {
             System.out.println(Joiner.on('\n').join(s));
 
             //total variations from the one input:
-            assertEquals(4 /* negations */, s.size());
+            assertEquals(5, s.size());
 
 
 

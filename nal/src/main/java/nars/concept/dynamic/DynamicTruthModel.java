@@ -4,6 +4,7 @@ import jcog.list.FasterList;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
+import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
@@ -55,7 +56,7 @@ abstract public class DynamicTruthModel {
             if (!(subterm instanceof Compound))
                 continue;
 
-            TaskConcept subConcept = (TaskConcept) n.concept(subterm);
+            Concept subConcept = n.concept(subterm);
             if (subConcept == null)
                 return null;
 

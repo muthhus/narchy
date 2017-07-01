@@ -295,6 +295,7 @@ public class Premise extends Pri {
 
     public boolean accept(DerivedTask nt) {
         target.accept(nt);
-        return (priElseZero() > Pri.EPSILON);
+        //return (priElseZero() > Pri.EPSILON);
+        return true;
     }
 }

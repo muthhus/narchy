@@ -3,6 +3,8 @@ package nars.task;
 import jcog.bag.Bag;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
+import nars.concept.CompoundConcept;
+import nars.concept.Concept;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
@@ -17,6 +19,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 
@@ -225,8 +228,11 @@ public class RevisionTest {
     @Test public void testRevision2EternalImpl() throws Narsese.NarseseException {
         NAR n = newNAR(3)
             .input("(x ==> y). %1.0;0.9%",
-                   "(x ==> y). %0.0;0.9%" ).run(1);
-        Task t = n.concept("(x ==> y)").beliefs().match(ETERNAL, null, null, true, null);
+                   "(x ==> y). %0.0;0.9%" )
+                .run(1);
+        CompoundConcept c = (CompoundConcept) n.concept("(x ==> y)");
+        c.print();
+        Task t = n.match(c, BELIEF, ETERNAL);
         assertEquals(0.5f, t.freq(), 0.01f);
         assertEquals(0.947f, t.conf(), 0.01f);
     }

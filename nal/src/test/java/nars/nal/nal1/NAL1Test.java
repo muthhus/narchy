@@ -12,7 +12,7 @@ import java.util.function.Supplier;
 @RunWith(Parameterized.class)
 public class NAL1Test extends AbstractNALTest {
 
-    final int CYCLES = 250;
+    final int CYCLES = 650;
 
     public NAL1Test(Supplier<NAR> b) {
         super(b);
@@ -126,7 +126,6 @@ public class NAL1Test extends AbstractNALTest {
     @Test public void induction() {
         //(A --> C), (B --> C), neq(A,B) |- (B --> A), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
         test()
-
                 .believe("<parakeet --> bird>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
                 .believe("<pteradactyl --> bird>") //.en("Swan is a type of bird.");
                 .mustBelieve(CYCLES, "<parakeet --> pteradactyl>", 1, 0.42f)

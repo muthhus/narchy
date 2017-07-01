@@ -131,9 +131,9 @@ public class PremiseRuleSet {
 
 
     public PremiseRuleSet(@NotNull PremiseRule... rules) {
-        this(rules, false);
+        this(false, rules);
     }
-    public PremiseRuleSet(@NotNull PremiseRule[] rules, boolean permute) {
+    public PremiseRuleSet(boolean permute, @NotNull PremiseRule... rules) {
         this.patterns = new PatternTermIndex();
         this.rules = $.newArrayList(rules.length);
         for (PremiseRule p : rules) {

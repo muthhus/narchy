@@ -57,7 +57,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         return Math.max(p.priElseZero(), Pri.EPSILON);
     };
     final static FloatFunction<? super PriReference> softMaxPri = (p) -> {
-        return (float)exp(p.priElseZero() / 0.5f /* temperature */);
+        return (float)exp(p.priElseZero() * 3 /* / temperature */);
     };
 
     @Override
@@ -117,8 +117,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 //priSub(nt.priElseZero());
                 return nt;
             } else {
+                if (pt!=nt)
+                    pt.merge(nt);
                 //float ptBefore = pt.priElseZero();
-                pt.merge(nt);
+
                 //float ptAfter = pt.priElseZero();
                 //priSub(ptAfter - ptBefore);
                 return pt;
@@ -142,6 +144,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
             int termlSelected = terml.decideWhich(rng);
             termlink = terml.get( termlSelected );
+
 
             int ttlUsed = run(nar, tasklink, termlink, x, ttlPerPremise); //inline
             premises++;

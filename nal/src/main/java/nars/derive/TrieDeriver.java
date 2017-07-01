@@ -71,8 +71,8 @@ public class TrieDeriver implements Deriver {
     }
 
 
-    public static TrieDeriver get(String rule) throws Narsese.NarseseException {
-        return get(new PremiseRuleSet(PremiseRule.rule(rule)));
+    public static TrieDeriver get(String individualRule) throws Narsese.NarseseException {
+        return get(new PremiseRuleSet(true, PremiseRule.rule(individualRule)));
     }
 
     public TrieDeriver(BoolPred... root) {
