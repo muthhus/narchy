@@ -423,8 +423,8 @@ public interface Term extends Termlike, Comparable<Termlike> {
     }
 
     default Term dt(int dt) {
-        if (dt!=DTERNAL)
-            throw new UnsupportedOperationException("temporality not supported");
+//        if (dt!=DTERNAL)
+//            throw new UnsupportedOperationException("temporality not supported");
         return this;
     }
 

@@ -30,6 +30,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static nars.Op.*;
+import static nars.time.Tense.XTERNAL;
 
 
 /**
@@ -638,7 +639,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     /** non-zero or non-iternal dt disqualifies any reason for needing a TermSet */
     public static boolean mustSortAndUniquify(@NotNull Op op, int dt, int num) {
-        return num > 1 && op.commutative && concurrent(dt);
+        return num > 1 && op.commutative && (concurrent(dt));
     }
 
     @Override

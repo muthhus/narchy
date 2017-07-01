@@ -221,7 +221,7 @@ public class TaskExecutor extends Executioner {
             toExe = Math.min(ps, toExe);
             int toInput = nal.size();
 
-                Random rng = nar.random();
+                //Random rng = nar.random();
 
             //INPUT
             nal.commit(null).pop(toInput, this::actuallyRun);

@@ -60,7 +60,6 @@ public class TemporalInductionTest {
         //assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().top(n.time()).toStringWithoutBudget());
 
         //least relevant
-        int dur = n.dur();
         assertEquals("(b-->a). 0 %1.0;.90%", n.belief(c, 0).toStringWithoutBudget());
 
         //most current relevant overall:

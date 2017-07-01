@@ -33,7 +33,7 @@ public class PoleCart extends NAgentX {
             try {
                 NAgent a = new PoleCart(n);
                 //((RealTime)n.time).durFPS(80f);
-                n.termVolumeMax.setValue(24);
+                n.termVolumeMax.setValue(32);
                 //n.goalConfidence(0.75f);
                 return a;
             } catch (Exception e) {
@@ -44,7 +44,6 @@ public class PoleCart extends NAgentX {
         }, 20);
     }
 
-    private static final long serialVersionUID = 1L;
     private final JPanel panel;
 
     //next three are for double-buffering

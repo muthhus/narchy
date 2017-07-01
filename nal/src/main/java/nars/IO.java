@@ -279,7 +279,7 @@ public class IO {
 
         if (term instanceof AbstractVariable) {
 
-            out.writeByte(((AbstractVariable) term).id);
+            out.writeInt(((AbstractVariable) term).id);
 
         } else if (term instanceof Atomic) {
 

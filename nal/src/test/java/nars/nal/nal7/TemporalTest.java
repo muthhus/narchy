@@ -241,7 +241,7 @@ public class TemporalTest {
         //n.input("(((SELF,#1)-->at) &&+0 goto(#1)).");
 
 
-        n.cycle();
+        n.run(2);
 
         Concept a = n.concept("(((SELF,#1)-->at) && goto(#1)).");
         Concept a0 = n.concept("(goto(#1) && ((SELF,#1)-->at)).");
@@ -278,7 +278,7 @@ public class TemporalTest {
 
             Concept f = n.conceptualize($("(y " + op + "+- x)"));
 
-            assertTrue(e == f);
+            assertTrue(e + "==" +f , e == f);
         }
 
     }
@@ -365,14 +365,15 @@ public class TemporalTest {
 
         int indexSize = d.terms.size();
 
-        assertEquals(3, d.concept("(x==>y)").beliefs().size());
+        Concept xImplY = d.conceptualize($("(x==>y)"));
+        assertEquals(3, xImplY.beliefs().size());
 
         d.input("(x ==>+1 y). :|:"); //present
         d.cycle();
 
         //d.concept("(x==>y)").print();
 
-        assertEquals(4, d.concept("(x==>y)").beliefs().size());
+        assertEquals(4, xImplY.beliefs().size());
 
         assertEquals(indexSize, d.terms.size()); //remains same amount
 
@@ -588,8 +589,13 @@ public class TemporalTest {
 //        }
         //assertEquals("", $.terms.atemporalize())
         @NotNull Term a = $("(x && y)");
+
         Term b = $.$("(x &&+1 y)");
         assertEquals("(x&&y)", $.terms.atemporalize(b).toString());
+
+        Term c = $.$("(x &&+1 x)");
+        assertEquals("(x &&+- x)", $.terms.atemporalize(c).toString());
+
         assertTrue(Terms.equalAtemporally(a, b));
         //        if (as == bs) {
 //            return true;
@@ -662,7 +668,7 @@ public class TemporalTest {
     public void testAtemporalization1() throws Narsese.NarseseException {
         Term x = $("(((--,(tetris-->(_n,#2))) &&+1 $1) <=>+1 ($1 &&+0 (--,(tetris-->(_n,#2)))))");
         Term y = $.terms.atemporalize(x);
-        assertEquals("(($1&&(--,(tetris-->(_n,#2))))<=>($1&&(--,(tetris-->(_n,#2)))))", y.toString());
+        assertEquals("(($1&&(--,(tetris-->(_n,#2)))) <=>+- ($1&&(--,(tetris-->(_n,#2)))))", y.toString());
     }
 
 

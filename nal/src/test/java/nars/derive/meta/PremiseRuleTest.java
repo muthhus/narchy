@@ -165,7 +165,7 @@ public class PremiseRuleTest {
             System.out.println(Joiner.on('\n').join(s));
 
             //total variations from the one input:
-            assertEquals(5, s.size());
+            assertEquals(4, s.size());
 
 
 

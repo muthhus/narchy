@@ -347,8 +347,7 @@ public abstract class TermBuilder {
         return finish(TermContainer.mustSortAndUniquify(op, dt, args.length), op, dt, args);
     }
 
-    @NotNull
-    private Term finish(boolean sort, @NotNull Op op, int dt, @NotNull Term... args) {
+    @NotNull private Term finish(boolean sort, @NotNull Op op, int dt, @NotNull Term... args) {
         if (sort) {
             args = Terms.sorted(args);
         }
@@ -483,6 +482,10 @@ public abstract class TermBuilder {
     }
 
     private Term conjPost(Term x /* possibly a conjunction */) {
+
+        if (x == null)
+            return null;
+
         if (x.op()!=CONJ)
             return x;
 
@@ -549,7 +552,7 @@ public abstract class TermBuilder {
             if (n != 2)
                 throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
-            //preserve grouping (don't flatten) but use normal commutive ordering as dternal &&
+            //preserve grouping (don't flatten) but use given ordering
             return conjPost(finish(CONJ, XTERNAL, u));
         }
 
@@ -601,7 +604,7 @@ public abstract class TermBuilder {
 
         //TODO if there are no negations in u then an accelerated construction is possible
 
-        assert (u.length > 0 && dt == 0 || dt == DTERNAL); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
+        assert (u.length > 0 && (dt == 0 || dt == DTERNAL || dt == XTERNAL)); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
         ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length * 2);
 
@@ -647,19 +650,16 @@ public abstract class TermBuilder {
     }
 
     private Term compound(Op op, int dt, Set<Term> cs) {
-        Term x = compound(op, cs);
-        if (dt!=DTERNAL && x instanceof Compound) {
-            return x.dt(dt);
-        }
-        return x;
+//        Term x = compound(op, cs);
+//        if (dt!=DTERNAL && x instanceof Compound) {
+//            return x.dt(dt);
+//        }
+//        return x;
+        return compound(op, cs).dt(dt);
     }
 
-    private Term compound(Op op, int dt, Term... cs) {
-        Term x = compound(op, cs);
-        if (dt!=DTERNAL && x instanceof Compound) {
-            return x.dt(dt);
-        }
-        return x;
+    @NotNull private Term compound(Op op, int dt, Term... cs) {
+        return compound(op, cs).dt(dt);
     }
 
     /**
@@ -876,7 +876,7 @@ public abstract class TermBuilder {
 
                 //special case for implications: reduce to --predicate if the subject is False
                 if (isTrueOrFalse(subject /* antecedent */)) {
-                    if (concurrent(dt) || dt == XTERNAL)
+                    if (concurrent(dt))
                         return $.negIf(predicate, isFalse(subject));
                     else {
                         return Null; //no temporal basis
@@ -1256,7 +1256,8 @@ public abstract class TermBuilder {
         Term[] newSubs = oldSubs;
 
         Op o = c.op();
-        int pdt = !o.temporal ? c.dt() : XTERNAL; //preserve image dt
+        int cdt = c.dt();
+        int pdt = !o.temporal ? cdt : DTERNAL; //( !o.concurrent(cdt) ? XTERNAL : DTERNAL); //preserve image dt
         if (st.hasAny(Op.TemporalBits)) {
 
             boolean subsChanged = false;
@@ -1279,31 +1280,31 @@ public abstract class TermBuilder {
                 newSubs = maybeNewSubs;
         }
 
-        //resolve XTERNAL temporals to lexical order //TODO does this even matter?
-        if (pdt == XTERNAL /*&& cs == 2*/) {
-            if (newSubs[0].compareTo(newSubs[1]) > 0) {
-                newSubs = (newSubs == oldSubs) ? newSubs.clone() : newSubs;
-                Term x = newSubs[0];
-                newSubs[0] = newSubs[1];
-                newSubs[1] = x;
-            }
-        }
+//        //resolve XTERNAL temporals to lexical order //TODO does this even matter?
+//        if (pdt == XTERNAL && cs == 2*/) {
+//            if (newSubs[0].compareTo(newSubs[1]) > 0) {
+//                newSubs = (newSubs == oldSubs) ? newSubs.clone() : newSubs;
+//                Term x = newSubs[0];
+//                newSubs[0] = newSubs[1];
+//                newSubs[1] = x;
+//            }
+//        }
 
 
-        boolean dtChanged = (pdt != c.dt());
+        boolean dtChanged = (pdt != cdt);
         boolean subsChanged = (!Arrays.equals(newSubs, oldSubs));
 
         if (subsChanged || dtChanged) {
 
             if (o.temporal && (
                     (subsChanged && newSubs.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
-                            //||
-                    //(newSubs.length == 2 && !newSubs[0].equals(newSubs[1])) && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
-            )) {
+                            ||
+                    (newSubs.length == 2 && newSubs[0].equals(newSubs[1])))// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
+            ) {
 
 
-                if (pdt != DTERNAL)
-                    pdt = XTERNAL;
+
+                pdt = XTERNAL;
 
                 Term s = newSubs[0];
                 newSubs = new Term[]{s, s};

@@ -645,15 +645,23 @@ public interface Compound extends Term, IPair, TermContainer {
     int dt();
 
     @Override
-    default Compound dt(int dt) {
+    default Compound dt(int nextDT) {
 
-        if (dt == DTERNAL)
+        int dt = this.dt();
+
+        if (dt == nextDT)
             return this;
         else {
-            if (op().temporal || op().image)
-                return new GenericCompoundDT(this, dt);
-            else
-                return this; //maybe detect when this happens, could indicate an error
+            if (nextDT!=DTERNAL && (op().temporal || op().image)) {
+                //assert((op().temporal || op().image));
+                return new GenericCompoundDT(this, nextDT);
+            } else {
+                if (this instanceof GenericCompoundDT)
+                    return ((GenericCompoundDT)this).ref;
+                else {
+                    return this; //maybe detect when this happens, could indicate an error
+                }
+            }
         }
     }
 

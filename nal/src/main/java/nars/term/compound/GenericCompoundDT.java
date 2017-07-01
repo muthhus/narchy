@@ -1,6 +1,7 @@
 package nars.term.compound;
 
 import jcog.Util;
+import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;
@@ -134,38 +135,39 @@ public class GenericCompoundDT extends ProxyCompound {
         return dt;
     }
 
-    @Override
-    public Compound dt(int nextDT) {
-        if (nextDT == this.dt)
-            return this;
-
-        Op o = op();
-        if (o.commutative && !Op.concurrent(this.dt) && Op.concurrent(nextDT)) {
-            //HACK reconstruct with sorted subterms. construct directly, bypassing ordinary TermBuilder
-            TermContainer ms = subterms();
-            @NotNull TermContainer st = ms;
-            if (!st.isSorted()) {
-                Term[] ts = Terms.sorted(ms.toArray());
-                if (ts.length == 1) {
-                    if (o == CONJ)
-                        return compoundOrNull(ts[0]);
-                    return null;
-                }
-
-                TermContainer tv;
-                if (ms.equalTerms(ts))
-                    tv = ms; //share
-                else
-                    tv = TermVector.the(ts);
-
-                GenericCompound g = new GenericCompound(o, tv);
-                if (nextDT != DTERNAL)
-                    return new GenericCompoundDT(g, nextDT);
-                else
-                    return g;
-            }
-
-        }
-        return ref.dt(nextDT);
-    }
+//    @Override
+//    public Compound dt(int nextDT) {
+//        if (nextDT == this.dt)
+//            return this;
+//
+//        return compoundOrNull($.the(op(), nextDT, toArray()));
+//
+////        if (o.commutative && !Op.concurrent(this.dt) && Op.concurrent(nextDT)) {
+////            //HACK reconstruct with sorted subterms. construct directly, bypassing ordinary TermBuilder
+////            TermContainer ms = subterms();
+////            //@NotNull TermContainer st = ms;
+//////            if (!st.isSorted()) {
+//////                Term[] ts = Terms.sorted(ms.toArray());
+//////                if (ts.length == 1) {
+//////                    if (o == CONJ)
+//////                        return compoundOrNull(ts[0]);
+//////                    return null;
+//////                }
+//////
+//////                TermContainer tv;
+//////                if (ms.equalTerms(ts))
+//////                    tv = ms; //share
+//////                else
+//////                    tv = TermVector.the(ts);
+//////
+////                /*GenericCompound g =*/ return compoundOrNull($.the(o, nextDT, ms.toArray())); //new GenericCompound(o, tv);
+//////                if (nextDT != DTERNAL)
+//////                    return new GenericCompoundDT(g, nextDT);
+//////                else
+//////                    return g;
+//////            }
+////
+////        }
+////        return ref.dt(nextDT);
+//    }
 }
