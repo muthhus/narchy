@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static nars.time.Tense.DTERNAL;
+
 /**
  * a lightweight, prototype compound, not fully constructed.
  * <p>
@@ -98,9 +100,10 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
      */
     public AppendProtoCompound commit() {
         writeByte(op.ordinal());
-        writeInt(dt);
         for (Term x : subs)
             appendKey(x);
+        if (dt!=DTERNAL)
+            writeInt(dt);
 
         compact();
         this.hash = hash(0, len);

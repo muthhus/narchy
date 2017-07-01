@@ -49,6 +49,9 @@ public final class STMTemporalLinkage extends STM {
     @Override
     public final void accept(@NotNull Task t) {
 
+        if (!t.isBeliefOrGoal())
+            return;
+
         float strength = this.strength.floatValue();
         float tPri = t.priSafe(0);
         if (tPri == 0)

@@ -465,6 +465,13 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
     }
 
+    public Term retemporalize(@NotNull Term x) {
+        if (x instanceof Compound)
+            return retemporalize((Compound)x);
+        else
+            return x;
+    }
+
     public Compound retemporalize(@NotNull Compound x) {
         return retemporalize(x, retemporalizationDTERNAL);
     }

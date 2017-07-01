@@ -361,7 +361,8 @@ public class PremiseRuleSet {
 
         then.accept(r);
 
-        if (permuteForwards && r.allowForward && permuteSwap(r)) {
+        if (permuteForwards && r.allowForward) {
+
             PremiseRule bSwap = r.swapPermutation(index);
             if (bSwap != null)
                 then.accept(add(bSwap, src + ":forward", ur, index));
@@ -369,34 +370,6 @@ public class PremiseRuleSet {
 
     }
 
-    /**
-     * whether a rule will be forward permuted
-     */
-    static boolean permuteSwap(@NotNull PremiseRule r) {
-        boolean[] fwd = {true};
-//        r.recurseTerms((s) -> {
-//
-//            if (!fwd[0])
-//                return; //already disqualified
-//
-//
-//
-////            String x = s.toString().toLowerCase();
-////
-////            if ((x.contains("task(")) ||
-////                    (x.contains("belief(")) ||
-////                    (x.contains("punctuation(")) ||
-////                    //(x.contains("time(")) ||
-////                    //(x.contains("Identity")) ||
-////                    (x.contains("sub"))
-////                //(x.contains("Negation"))
-////
-////                    ) {
-////                fwd[0] = false;
-////            }
-//        });
-        return fwd[0];
-    }
 
 
     @Nullable

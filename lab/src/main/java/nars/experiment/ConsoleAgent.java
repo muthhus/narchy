@@ -125,7 +125,12 @@ public abstract class ConsoleAgent extends NAgentX {
                 @Override
                 protected float act() {
                     //copy
-                    return similarity(R.chars, W.chars);
+                    float s =  similarity(R.chars, W.chars);
+                    if (s == 1f)
+                        return +1f;
+                    else {
+                        return -1f + s;
+                    }
                 }
             };
 

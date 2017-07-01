@@ -240,8 +240,9 @@ public class NARS extends NAR {
 
 
         public void apply(CLink<? extends ITask> x) {
-            if (x!=null && !x.isDeleted())
+            if (x!=null && !x.isDeleted()) {
                 x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
+            }
         }
 
         @Override

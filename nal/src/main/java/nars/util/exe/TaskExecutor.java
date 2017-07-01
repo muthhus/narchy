@@ -21,6 +21,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -129,22 +130,22 @@ public class TaskExecutor extends Executioner {
 
             };
 
-    final DecideRoulette<CLink<ITask>> activeBuffer = new DecideRoulette<>(CLink::priElseZero);
+    //final DecideRoulette<CLink<ITask>> activeBuffer = new DecideRoulette<>(CLink::priElseZero);
 
     private float forgetEachActivePri;
 
 
-    public TaskExecutor(int capacity) {
+    public TaskExecutor(int capacity, int taskCapacity) {
         super();
         active.setCapacity(capacity);
-        nal.setCapacity(capacity);
+        nal.setCapacity(taskCapacity);
 
         //int overCapacity = capacity / 2;
         //overflow = new DisruptorBlockingQueue(overCapacity);
     }
 
     public TaskExecutor(int capacity, float executedPerCycle) {
-        this(capacity);
+        this(capacity, capacity * 2);
         exePerCycleMax.setValue(Math.ceil(capacity * executedPerCycle));
     }
 
@@ -219,13 +220,12 @@ public class TaskExecutor extends Executioner {
 
 
             toExe = Math.min(ps, toExe);
-            int toInput = toExe;
+            int toInput = nal.size();
 
+                Random rng = nar.random();
 
             //INPUT
-            nal/*.commit()*/.pop(toInput, x -> {
-                actuallyRun(x);
-            });
+            nal.commit(null).pop(toInput, this::actuallyRun);
 
             //EXEC
             float eFrac = ((float) toExe) / active.capacity();
@@ -234,21 +234,26 @@ public class TaskExecutor extends Executioner {
                     pAvg > Pri.EPSILON * 8 ? pAvg : 0;
                     //0;
 
-            activeBuffer.clear();
+            //activeBuffer.clear();
             active.sample(Math.min(active.size(), Math.max(1, toExe*2)), x -> {
+
+                actuallyRun(x);
+
                 if (forgetEachActivePri > 0) {
                     x.priSub(forgetEachActivePri);
                 }
-                activeBuffer.add(x);
+
+                //activeBuffer.add(x);
                 //(Consumer<? super CLink<ITask>>)(buffer::add)
             });
-            for (int i = 0; i < toExe; i++) {
-                @Nullable CLink<ITask> x = activeBuffer.decide(nar.random());
-                actuallyRun(x);
-                if (forgetEachActivePri > 0) {
-                    x.priSub(forgetEachActivePri);
-                }
-            }
+
+//            for (int i = 0; i < toExe; i++) {
+//                @Nullable CLink<ITask> x = activeBuffer.decide(rng);
+//                actuallyRun(x);
+//                if (forgetEachActivePri > 0) {
+//                    x.priSub(forgetEachActivePri);
+//                }
+//            }
 
             //active.sample(toExe, this::actuallyRun);
 
@@ -316,9 +321,9 @@ public class TaskExecutor extends Executioner {
             actuallyRun(input); //commands executed immediately
             return true;
         } else {
-            if (input.ref instanceof NALTask)
+            if (input.ref instanceof NALTask) {
                 nal.putAsync(input);
-            else
+            } else
                 active.putAsync(input);
 
             return true;//!= null;

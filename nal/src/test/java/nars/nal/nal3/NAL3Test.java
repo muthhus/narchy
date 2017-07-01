@@ -270,7 +270,6 @@ public class NAL3Test extends AbstractNALTest {
         //(M --> S), (M --> (|,S,A..+)) |- (M --> (|,A..+)), (Belief:DecomposeNegativePositivePositive)
 
         test()
-                //.log()
                 .believe("(a-->b)", 0.25f, 0.9f)
                 .believe("(a-->(|,b,c))", 0.25f, 0.9f)
                 .mustBelieve(cycles, "(a-->c)", 0.19f, 0.15f, ETERNAL);

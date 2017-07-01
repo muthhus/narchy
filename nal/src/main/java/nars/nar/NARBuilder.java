@@ -37,7 +37,7 @@ public class NARBuilder {
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(256, 0.25f);
+    private Supplier<Executioner> exe = () -> new TaskExecutor(256, 0.2f);
 
     private Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 
@@ -55,14 +55,14 @@ public class NARBuilder {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.75f);
+        n.goalConfidence(0.9f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 1;
         n.DEFAULT_GOAL_PRIORITY = 1;
         n.DEFAULT_QUESTION_PRIORITY = 1;
         n.DEFAULT_QUEST_PRIORITY = 1;
-        n.termVolumeMax.setValue(48);
+        n.termVolumeMax.setValue(36);
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
         MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 5, true, 16f);
@@ -70,7 +70,7 @@ public class NARBuilder {
         Inperience inp = new Inperience(n, 0.01f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(256, 0.25f);
+            n.addNAR(512, 0.1f);
         }
 
 //        n.onTask(t -> {

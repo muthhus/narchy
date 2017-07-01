@@ -1154,20 +1154,27 @@ public class PremiseRule extends GenericCompound {
         Term B = getBelief(); //Belief
         Term C = getConclusionTermPattern(); //Conclusion
 
-        // C, B, [pre], task_is_question() |- T, [post]
-        PremiseRule clone1 = clonePermutation(C, B, T, true, index);
-        if (clone1 != null)
-            w.accept(clone1, "C,B,question |- T");
+        {
+            // C, B, [pre], task_is_question() |- T, [post]
+            PremiseRule clone1 = clonePermutation(C, B, T, true, index);
+            if (clone1 != null)
+                w.accept(clone1, "C,B,question |- T");
+        }
 
-        // T, C, [pre], task_is_question() |- B, [post]
-        PremiseRule clone2 = clonePermutation(C, T, B, true, index);
-        if (clone2 != null)
-            w.accept(clone2, "C,T,question |- B");
+        {
+            // T, C, [pre], task_is_question() |- B, [post]
+            PremiseRule clone3 = clonePermutation(T, C, B, true, index);
+            if (clone3 != null)
+                w.accept(clone3, "T,C,question |- B");
+        }
 
-        // T, C, [pre], task_is_question() |- B, [post]
-        PremiseRule clone3 = clonePermutation(T, C, B, true, index);
-        if (clone2 != null)
-            w.accept(clone3, "T,C,question |- B");
+        //if needed, use Swap which would be applied before this recursively,
+//        // T, C, [pre], task_is_question() |- B, [post]
+//        PremiseRule clone2 = clonePermutation(C, T, B, true, index);
+//        if (clone2 != null)
+//            w.accept(clone2, "C,T,question |- B");
+
+
     }
 
 
@@ -1270,8 +1277,9 @@ public class PremiseRule extends GenericCompound {
 
         Map<Term, Term> m = new HashMap(3);
         m.put(getTask(), newT);
-        m.put(getBelief(), newB);
-        boolean swapTruth = (!question && getTask().equals(newB) && getBelief().equals(newT));
+        m.put(getBelief(), newB); //index.retemporalize(?
+
+        //boolean swapTruth = (!question && getTask().equals(newB) && getBelief().equals(newT));
 
         m.put(getConclusionTermPattern(), newR);
 
@@ -1292,20 +1300,23 @@ public class PremiseRule extends GenericCompound {
 
 
             //remove truth values and add '?' punct
-            TermContainer ss = ((Compound) newConclusion.sub(1)).subterms();
-            newConclusion = p(
-
-                    newConclusion.sub(0), $.p(ss.asFiltered((x) -> {
-                        return !(((Compound) x).op() == Op.INH && (
-                                ((Compound) x).sub(1).equals(BELIEF)
-                                        || ((Compound) x).sub(1).equals(GOAL)));
-                    }).append(QUESTION_PUNCTUATION))
-            );
+//            TermContainer ss = ((Compound) newConclusion.sub(1)).subterms();
+//            newConclusion = p(
+//
+//                    newConclusion.sub(0), $.p(ss.asFiltered((x) -> {
+//                        Compound cx = (Compound) x;
+//                        return !(cx.op() == Op.INH && (
+//                                cx.sub(1).equals(BELIEF)
+//                                        || cx.sub(1).equals(GOAL)));
+//                    }).append(QUESTION_PUNCTUATION))
+//            );
+            newConclusion = p(newConclusion.sub(0), p(QUESTION_PUNCTUATION));
 
         } else {
-            if (swapTruth) {
-                newConclusion = (Compound) index.transform(newConclusion, truthSwap);
-            }
+//            if (swapTruth) {
+//                newConclusion = (Compound) index.transform(newConclusion, truthSwap);
+//            }
+
 
             newPremise = pc; //same
         }

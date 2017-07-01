@@ -69,12 +69,12 @@ public abstract class AbstractNALTest {
 
         l.add(supply("Default[NAL<=" + level + ']', () -> {
                     NAR n = new NARBuilder().get();
-                    n.termVolumeMax.setValue(32);
+                    n.termVolumeMax.setValue(40);
                     n.nal(level);
-                    n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-                    n.DEFAULT_GOAL_PRIORITY = 0.5f;
-                    n.DEFAULT_QUEST_PRIORITY = 0.25f;
-                    n.DEFAULT_QUESTION_PRIORITY = 0.25f;
+//                    n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+//                    n.DEFAULT_GOAL_PRIORITY = 0.5f;
+//                    n.DEFAULT_QUEST_PRIORITY = 0.25f;
+//                    n.DEFAULT_QUESTION_PRIORITY = 0.25f;
                     if (level >= 7) {
                         new STMTemporalLinkage(n, 1, false);
                     }

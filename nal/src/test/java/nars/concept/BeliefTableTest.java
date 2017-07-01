@@ -157,7 +157,7 @@ public class BeliefTableTest  {
         Param.DEBUG = true;
 
         int maxBeliefs = 3; //includes 3 eternal beliefs we arent using:
-        NAR n = newNAR(maxBeliefs*2);
+        NAR n = newNAR(maxBeliefs);
         //((DefaultConceptState)n.terms.conceptBuilder().awake()).beliefsMaxTemp.set(maxBeliefs);
         n.time.dur(16);
 

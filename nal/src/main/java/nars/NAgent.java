@@ -101,7 +101,7 @@ abstract public class NAgent implements NSense, NAct {
      */
     public float reward;
     private Loop loop;
-    final private ConceptFire fireHappy;
+    //final private ConceptFire fireHappy;
 
 
 
@@ -139,7 +139,7 @@ abstract public class NAgent implements NSense, NAct {
             );
         //nar.goal(happy, 1f, nar.confDefault(GOAL)); //ETERNAL <- not safe to use yet
 
-        fireHappy = new ConceptFire(happy, 1f);
+        //fireHappy = Activation.get(happy, 1f, new ConceptFire(happy, 1f);
 
         curiosity = new FloatParam( 0.10f);
 
@@ -235,12 +235,12 @@ abstract public class NAgent implements NSense, NAct {
 
 
             predict.input(
-                Stream.of(happy.apply(nar), fireHappy)
+                /*Stream.of(*/happy.apply(nar)/*, fireHappy)*/
             );
 
             //contribution of this agent to the NAR's global happiness measurement
             //nar.emotion.happy(Util.sigmoid(reward));
-            nar.emotion.happy(dexterity()/nar.confDefault(GOAL));
+            nar.emotion.happy(dexterity() /* /nar.confDefault(GOAL) */);
 
 //              float dxm = c2w(dexterity());
 //            nar.emotion.happy(

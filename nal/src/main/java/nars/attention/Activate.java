@@ -84,15 +84,22 @@ public class Activate /*extends UnaryTask<Task>*/ {
     }
 
     public static ConceptFire activate(@NotNull Task t, float activation, Concept origin) {
-        if (origin instanceof CompoundConcept) {
 
-            return new ConceptFire(origin, activation, new ActivateSubterms(t, activation));
-        } else {
-            //atomic activation
-            return new ConceptFire(origin, activation); /*, () -> {
+        if (activation >= Pri.EPSILON) {
+            origin.tasklinks().putAsync(new PLinkUntilDeleted<>(t, activation));
 
-            }*/
+//            if (origin instanceof CompoundConcept) {
+//
+//                //return new ConceptFire(origin, activation, new ActivateSubterms(t, activation));
+//                return new ConceptFire(origin, activation);
+//            } else {
+//                //atomic activation
+                return new ConceptFire(origin, activation); /*, () -> {
+
+                }*/
+//            }
         }
+        return null;
     }
 
     public static class ActivateSubterms implements BiConsumer<ConceptFire,NAR> {
@@ -405,11 +412,11 @@ public class Activate /*extends UnaryTask<Task>*/ {
 
         void tasklink(Concept rcpt, float pri) {
 
-            rcpt.tasklinks().putAsync(
-                    //new RawPLink(value, pri),
-                    new PLinkUntilDeleted(task, pri)
-                    //new WeakPLinkUntilDeleted(task, pri),
-                    /*null*/);
+//            rcpt.tasklinks().putAsync(
+//                    //new RawPLink(value, pri),
+//                    new PLinkUntilDeleted(task, pri)
+//                    //new WeakPLinkUntilDeleted(task, pri),
+//                    /*null*/);
         }
 
         void termlink(Concept recipient, Term target, float pri) {

@@ -32,7 +32,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = new int[] { 1, 4, 16, 128, 1024 };
+    static final int[] sampleRadii = new int[] { 0, 1, 2, 4, 16, 64, 256, 1024 };
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -238,6 +238,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //            FloatFunction<TaskRegion> wr = regionStrength(now, dur);
 //            FloatFunction<TaskRegion> sort = t -> -wr.floatValueOf(t);
 
+            float confMin = nar.confMin.floatValue();
             for (int r : sampleRadii) {
 
                 List<TaskRegion> tt = cursor(when - r * dur, when + r * dur)
@@ -245,7 +246,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                         .list();
                 if (!tt.isEmpty()) {
                     @Nullable PreciseTruth t = TruthPolation.truth(e, when, dur, tt);
-                    if (t!=null)
+                    if (t!=null && t.conf() > confMin)
                         return t;
                 }
             }

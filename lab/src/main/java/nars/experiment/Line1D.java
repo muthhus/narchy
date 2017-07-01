@@ -12,6 +12,7 @@ import nars.Task;
 import nars.derive.DefaultDeriver;
 import nars.gui.Vis;
 import nars.nar.NARBuilder;
+import nars.op.stm.STMTemporalLinkage;
 import nars.test.agent.Line1DSimplest;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
@@ -33,7 +34,7 @@ public class Line1D {
 
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.001f; //in time units
+        float tHz = 0.0002f; //in time units
         float yResolution = 0.04f; //in 0..1.0
         float periods = 132;
 
@@ -77,7 +78,7 @@ public class Line1D {
 
                 a.target(
                         //Math.signum(Math.sin(a.nar.time() * tHz * 2 * PI) ) > 0 ? 1f : -1f
-                        Util.round((float)  ( 0.5f * Math.sin(a.nar.time() * tHz * 2 * PI) ), yResolution)
+                        Util.round((float)   ( 0.5f + 0.5f * Math.sin(a.nar.time() * tHz * 2 * PI) ), yResolution)
                         //(float) ( Math.sin(a.nar.time() * tHz * 2 * PI) )
                         //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                         //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
@@ -180,10 +181,11 @@ public class Line1D {
 //
                 NAR n = new NARBuilder().get();
 
-                n.time.dur(5);
+                new STMTemporalLinkage(n, 1, false);
+                n.time.dur(1);
                 n.termVolumeMax.set(32);
                 n.beliefConfidence(0.9f);
-                n.goalConfidence(0.75f);
+                n.goalConfidence(0.85f);
                 n.onCycle((nn)->{
                     System.out.println(nn.emotion.summary());
                 });
@@ -193,7 +195,7 @@ public class Line1D {
                     protected void onStart(Line1DSimplest a) {
                         new Thread(() -> {
                             //NAgentX.chart(a);
-                            int history = 2000;
+                            int history = 500;
                             window(
                                     row(
                                             conceptPlot(a.nar, Lists.newArrayList(
@@ -230,7 +232,7 @@ public class Line1D {
                 List<Plot2D> plots = $.newArrayList();
                 for (FloatSupplier t : concepts) {
                     Plot2D p = new Plot2D(plotHistory, Plot2D.Line);
-                    p.add(t.toString(), t::asFloat, -1f, 1f);
+                    p.add(t.toString(), t::asFloat, 0f, 1f);
                     grid.children.add(p);
                     plots.add(p);
                 }

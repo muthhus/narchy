@@ -26,12 +26,18 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     private final Op op;
     private final int hash;
 
+    /** cached */
+    transient private final int structure;
+
     public UnitCompound1(@NotNull Op op, @NotNull Term arg) {
         super(arg);
 
         this.op = op;
         this.hash = Util.hashCombine(hashCodeSubTerms(), op.ordinal());
+        this.structure = op.bit | arg.structure();
     }
+
+
 
 //    @Override
 //    public int init(@NotNull int[] meta) {
@@ -48,14 +54,14 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 
     @Override
     public int structure() {
-        return op.bit | super.structure();
+        return structure;
     }
 
     @Override
     public void init(@NotNull int[] meta) {
         sub.init(meta);
         meta[4]++; //for wrapping it
-        meta[5] |= op().bit;
+        meta[5] |= op.bit;
     }
 
     @Override
@@ -96,7 +102,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
     @Override
-    public @NotNull Op op() {
+    public final @NotNull Op op() {
         return op;
     }
 

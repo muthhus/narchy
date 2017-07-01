@@ -25,7 +25,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class QuestionTest {
 
-    final int withinCycles = 128;
+    final int withinCycles = 512;
 
     @Test
     public void whQuestionUnifyQueryVar() throws Narsese.NarseseException {

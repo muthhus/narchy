@@ -86,7 +86,8 @@ public class InterNARTest {
     }
 
     private static NAR newNAR() {
-        return new NARBuilder().index(new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024))).time(new RealTime.DSHalf(true)).exe(new TaskExecutor(256)).get();
+        return new NARBuilder().index(new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024))).time(new RealTime.DSHalf(true))
+                .exe(new TaskExecutor(256, 512)).get();
     }
 
     @Test

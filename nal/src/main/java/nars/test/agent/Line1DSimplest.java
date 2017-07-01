@@ -59,7 +59,7 @@ public class Line1DSimplest extends NAgent {
             switch (d) {
                 case -1:
                 case +1:
-                    this.o.setValue(Math.max(-1f, Math.min(1f, this.o.floatValue() + d * speed.floatValue() * 2)));
+                    this.o.setValue(Math.max(0, Math.min(1f, this.o.floatValue() + d * speed.floatValue())));
                     break;
             }
         });

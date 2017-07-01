@@ -33,7 +33,7 @@ public class NQuadsRDFTest {
     public void testSchema1() throws Exception {
 
         //Multi nar = new Multi(3,512,
-        Executioner e = new TaskExecutor(128);
+        Executioner e = new TaskExecutor(128, 512);
         NAR n = new NARBuilder().get();
 //                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
 //                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
