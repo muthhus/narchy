@@ -1,6 +1,7 @@
 
 package nars.web;
 
+import jcog.Loop;
 import jcog.Util;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.PriArrayBag;
@@ -9,11 +10,12 @@ import jcog.pri.op.PriMerge;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.nar.NARBuilder;
-import nars.op.stm.STMTemporalLinkage;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.time.RealTime;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
 import org.pircbotx.hooks.types.GenericMessageEvent;
@@ -23,6 +25,9 @@ import spacegraph.net.IRC;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+
+import static nars.Op.PROD;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * $0.9;0.9;0.99$
@@ -261,6 +266,8 @@ public class IRCNLP extends IRC {
 
         NAR n = NARBuilder.newMultiThreadNAR(2, new RealTime.DS(true));
 
+        n.termVolumeMax.setValue(28);
+
         /*@NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
             new RealTime.DS(true),
             new TaskExecutor(256, 0.25f));*/
@@ -287,44 +294,66 @@ public class IRCNLP extends IRC {
         Param.DEBUG = true;
 
         n.onTask(t -> {
-            if (t.isGoal()) {
-                 //feedback
-                if (t.term().subIs(Op.INH, 1, $.the("hear"))) {
-                    n.believe(t.term(), Tense.Present);
-                    System.err.println(t);
+            //if (t.isGoal()) {
+                //feedback
+            Compound tt = t.term();
+            long start = t.start();
+            if (start != ETERNAL) {
+                if (t.isBelief() && t.expectation() > 0.75f) {
+                    long now = n.time();
+                    int dur = n.dur();
+                    if (start >= now - dur) {
+                        if (tt.subIs(Op.INH, 1, $.the("hear"))) {
+                            if (tt.subIs(0, PROD) && tt.sub(0).subIs(0, Op.ATOM)) {
+                                speak(tt.sub(0).sub(0, null), start - now);
+                            }
+                        }
+                    }
                 }
             }
         });
 
-        n.log();
+        //n.log();
 
-        new Thread(() -> {
-            try {
+        for (int i = 0; i < 2; i++) {
+            Hear.hear(n, "do you know what is a sentence?", "", 100, 0.5f);
+            Util.sleep(1000);
 
-                for (int i = 0; i < 5; i++) {
-                    Hear.hear(n, "do you know what is a sentence?", "", 20, 0.5f);
-                    Util.sleep(1000);
+            Hear.hear(n, "i know that and this is a sentence.", "", 100, 0.5f);
+            Util.sleep(1000);
+        }
 
-                    Hear.hear(n, "i know that this is a sentence.", "", 20, 0.5f);
-                    Util.sleep(1000);
+        n.clear();
+
+        //n.input("$0.9 hear(#1)! :|:");
+
+        n.input("$0.9 hear(\"what\")! :|:");
+
+        Util.sleep(500);
+
+        n.input("$0.9 hear(\"is\")! :|:");
+
+        new Loop(1f) {
+
+            final Term[] promptWord = new Term[] {
+                    $.varDep(1),
+                    $.quote("and"),
+                    //$.quote("then")
+                    /* so, now, etc */
+            };
+
+            @Override
+            public boolean next() {
+                try {
+                    Term word = promptWord[n.random().nextInt(promptWord.length)];
+                    n.input("$0.9 hear(" + word + "). :|:");
+                } catch (Narsese.NarseseException e) {
+                    e.printStackTrace();
                 }
-
-                n.clear();
-
-                //n.input("$0.9 hear(#1)! :|:");
-
-                n.input("$0.9 hear(\"what\")! :|:");
-
-                Util.sleep(500);
-
-                n.input("$0.9 hear(\"is\")! :|:");
-                n.input("$0.9 hear(#x)! :|:");
-
-
-            } catch (Exception e) {
-                e.printStackTrace();
+                return true;
             }
-        }).start();
+        };
+
 
 //        Hear.wiki(n);
 //        n.on("say", (x, aa, nn) -> {
@@ -444,6 +473,16 @@ public class IRCNLP extends IRC {
 //        );
 
 
+    }
+
+    private static void speak(@Nullable Term sub, long delay) {
+        if (delay > 1) {
+            //TODO schedule for future
+            System.out.println("\t+" + delay + " " + sub);
+        }
+
+        //n.believe(tt, Tense.Present);
+        System.out.println(sub);
     }
 
     public void send(@NotNull String target, String l) {

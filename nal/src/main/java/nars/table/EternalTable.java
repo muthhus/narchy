@@ -381,10 +381,14 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                     //already present duplicate, so ignore
                     return;
                 } else if (revised.equals(input)) {
-                    float maxActivation = 1f - revised.priSafe(0);
-                    activation = Math.min(maxActivation, input.priSafe(0)); //absorb up to 1.0 max
-                    revised.priAdd(activation);
-                    activated = revised; //use previous value
+//                    float maxActivation = 1f - revised.priSafe(0);
+//                    activation = Math.min(maxActivation, input.priSafe(0)); //absorb up to 1.0 max
+                    float before = revised.priElseZero();
+                    revised.priMax(input.priElseZero());
+                    float after = revised.priElseZero();
+
+                    activated = revised;
+                    activation = after - before; //use previous value
                     input.delete();
                 } else {
                     //a novel revision

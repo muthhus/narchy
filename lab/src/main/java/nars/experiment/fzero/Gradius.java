@@ -53,7 +53,7 @@ public class Gradius extends NAgentX {
 
 
 
-        Scale camScaleLow = new Scale(() -> g.image, 24, 24);
+        Scale camScaleLow = new Scale(() -> g.image, 16, 16);
         for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[]{
                 R,
                 BufferedImageBitmap2D.ColorMode.B,
@@ -62,7 +62,7 @@ public class Gradius extends NAgentX {
             senseCamera("Gc" + cm.name(), /*"(G,c" + cm.name() + ")"*/
                     //(cm == R ? camScale : camScaleLow).filter(cm)
                     camScaleLow.filter(cm)
-            ).resolution(0.1f);
+            ).resolution(0.5f);
         }
 
         actionToggle($.inh(Atomic.the("fire"), id),

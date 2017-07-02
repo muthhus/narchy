@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static jcog.pri.op.PriMerge.max;
 import static jcog.pri.op.PriMerge.plus;
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
@@ -44,7 +45,8 @@ import static nars.time.Tense.DTERNAL;
  */
 public class DefaultConceptBuilder implements ConceptBuilder {
 
-    public static final PriMerge DEFAULT_BLEND = plus;
+    public static final PriMerge termlinkMerge = plus;
+    public static final PriMerge tasklinkMerge = max;
 
     public DefaultConceptBuilder() {
         this(
@@ -73,14 +75,14 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         if (v < 16) {
             Map sharedMap = newBagMap(v);
             @NotNull Bag<Term, PriReference<Term>> termbag =
-                    new CurveBag<>(0, DEFAULT_BLEND, sharedMap);
+                    new CurveBag<>(0, termlinkMerge, sharedMap);
             @NotNull Bag<Task, PriReference<Task>> taskbag =
-                    new CurveBag<>(0, DEFAULT_BLEND, sharedMap);
+                    new CurveBag<>(0, tasklinkMerge, sharedMap);
             return new Bag[]{termbag, taskbag};
         } else {
             return new Bag[]{
-                new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, 4),
-                new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, 4)
+                new DefaultHijackBag<>(DefaultConceptBuilder.termlinkMerge, 4),
+                new DefaultHijackBag<>(DefaultConceptBuilder.tasklinkMerge, 4)
             };
         }
 

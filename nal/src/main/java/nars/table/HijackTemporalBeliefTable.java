@@ -11,6 +11,7 @@ import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Stamp;
 import nars.truth.Truth;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
@@ -388,7 +389,14 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     }
 
-//    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
+    @Override
+    protected Task merge(@NotNull Task existing, @NotNull Task incoming, @Nullable MutableFloat overflowing) {
+        //return super.merge(existing, incoming, overflowing);
+        existing.priMax(incoming.priElseZero());
+        return existing;
+    }
+
+    //    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
 //        return x -> rankTemporalByConfidence(x, when, now, dur);
 //    }
 

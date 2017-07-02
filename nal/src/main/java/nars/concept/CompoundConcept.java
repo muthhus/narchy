@@ -192,13 +192,6 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         return false; //term.isTemporal();
     }
 
-    @Nullable
-    @Deprecated
-    @Override
-    public Term sub(int i, @Nullable Term ifOutOfBounds) {
-        return term.sub(i, ifOutOfBounds);
-    }
-
     @Deprecated
     @Override
     public boolean AND(@NotNull Predicate<Term> v) {

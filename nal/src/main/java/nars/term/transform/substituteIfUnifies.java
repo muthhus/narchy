@@ -91,8 +91,6 @@ abstract public class substituteIfUnifies extends Functor {
 //        }
 
         Term input = a.sub(0);
-        if (input instanceof AtomicSingleton)
-            return input;
 
         Term x = a.sub(1);
         Term y = a.sub(2);
@@ -105,7 +103,7 @@ abstract public class substituteIfUnifies extends Functor {
 //        if (y.equals(input))
 //            return failureTerm;
 
-        @Nullable Op op = unifying();
+        @Nullable Op op = null; // unifying();
 //        boolean hasAnyOp =
 //                (op==null && (x.vars() + x.varPattern()  > 0))
 //                ||

@@ -919,8 +919,14 @@ public interface Compound extends Term, IPair, TermContainer {
                 @Nullable Term t;
 
                 t = index.the(op(), dt(), evalSubs);
-                if (t != this)
-                    return t.eval(index);
+                if (!t.equals(this)) { //t != this) {
+                    try {
+                        return t.eval(index);
+                    } catch (StackOverflowError e) {
+                        throw new RuntimeException("stack overflow on eval: " + t);
+                    }
+                }
+
                 //else {
                 //    continue;
                 //}

@@ -274,6 +274,7 @@ public class TaskExecutor extends Executioner {
 //                sorted.forEach(this::actuallyRun);
 //            }
 
+          //Runtime.getRuntime().runFinalization();
 
         } finally {
             busy.set(false);

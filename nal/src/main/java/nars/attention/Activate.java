@@ -25,7 +25,7 @@ public class Activate /*extends UnaryTask<Task>*/ {
 //                //return new ConceptFire(origin, activation, new ActivateSubterms(t, activation));
 //                return new ConceptFire(origin, activation);
 //            } else {
-//                //atomic activation
+//                //atomic activation)
                 return new ConceptFire(origin, activation); /*, () -> {
 
                 }*/

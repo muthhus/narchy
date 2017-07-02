@@ -153,8 +153,8 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
 
     private void appendKey(@NotNull Term x) {
         try {
-            writeByte(0); //separator
             IO.writeTerm(this, x);
+            writeByte(0); //separator
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

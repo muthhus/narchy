@@ -79,7 +79,10 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
                 //new DenseIntUndirectedGraph(maxNodes);
         this.node = new Node[maxNodes];
         clear();
-
+     /** nodes should begin with randomized coordinates */
+        for (int i = 0; i < maxNodes; i++) {
+            node[i] = newNode(i, dimension);
+        }
 
         this.iteration = 0;
         this.dimension = dimension;
@@ -95,10 +98,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         setWinnerUpdateRate(0.05, 0.02);
 
 
-        /** nodes should begin with randomized coordinates */
-        for (int i = 0; i < maxNodes; i++) {
-            node[i] = newNode(i, dimension);
-        }
+
 
 
 //        pw = new PrintWriter("resources/output.txt");
@@ -117,7 +117,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
     public void clear() {
         e.clear();
-        Arrays.fill(node, null);
+        //Arrays.fill(node, null);
     }
 
     @NotNull
@@ -185,8 +185,9 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
 
 
         if (closest == -1 || nextClosestNode == -1) {
-            throw new RuntimeException("closest=" + closest + ", nextClosest=" + nextClosestNode);
+            //throw new RuntimeException("closest=" + closest + ", nextClosest=" + nextClosestNode);
             //return lastNode;
+            return null;
         }
 
         //update local error of the "winner"

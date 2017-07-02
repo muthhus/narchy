@@ -69,7 +69,7 @@ public abstract class AbstractNALTest {
 
         l.add(supply("Default[NAL<=" + level + ']', () -> {
                     NAR n = new NARBuilder().get();
-                    n.termVolumeMax.setValue(40);
+                    n.termVolumeMax.setValue(30);
                     n.nal(level);
 //                    n.DEFAULT_BELIEF_PRIORITY = 0.5f;
 //                    n.DEFAULT_GOAL_PRIORITY = 0.5f;

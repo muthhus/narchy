@@ -1,6 +1,7 @@
 package nars.term.container;
 
 import jcog.list.ArrayIterator;
+import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,13 +40,34 @@ public final class TermVector2 extends TermVector {
     }
 
     @Override
+    public boolean subIs(int i, Op o) {
+        switch (i) {
+            case 0: return x.op()==o;
+            case 1: return y.op()==o;
+            default:
+                return false;
+                //throw new ArrayIndexOutOfBoundsException();
+        }
+    }
+
+    @Override
+    public boolean subIs(int i, Term maybeEquals) {
+        switch (i) {
+            case 0: return x.equals(maybeEquals);
+            case 1: return y.equals(maybeEquals);
+            default:
+                return false;
+                //throw new ArrayIndexOutOfBoundsException();
+        }
+    }
+
+    @Override
     public boolean equals(@NotNull Object obj) {
         if (this == obj) return true;
         if (obj instanceof TermContainer) {
             if (hash == obj.hashCode()) {
                 TermContainer t = (TermContainer) obj;
-                if (t.size() == 2 && x.equals(t.sub(0)) && y.equals(t.sub(1)))
-                    return true;
+                return (t.size() == 2 && t.subIs(0, x) && t.subIs(1, y));
             }
         }
         return false;
