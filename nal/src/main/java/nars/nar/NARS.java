@@ -222,6 +222,7 @@ public class NARS extends NAR {
 
         }
 
+
         @Override
         public void runLater(Runnable cmd) {
             passive.execute(cmd);

@@ -201,6 +201,8 @@ public class TaskExecutor extends Executioner {
         if (!busy.compareAndSet(false, true))
             return;
 
+        //System.out.println(getClass() + " flush " + nal.size() + " " + active.size());
+
         try {
 
             //active.commit(null);

@@ -9,6 +9,7 @@ import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
+import nars.term.transform.substitute;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
@@ -29,6 +30,7 @@ public class Builtin {
             new intersect(),
             new differ(),
             new union(),
+            new substitute(),
 //            DepIndepVarIntroduction.the,
 
             //Functor.f0("date", () -> quote(new Date().toString())),
@@ -127,18 +129,25 @@ public class Builtin {
 
             int size = c.size();
 
-            Term[] x = c.toArray();
+            assert(size > 1);
+
             Term result;
             if (size == 2) {
                 int n = nar.random().nextInt(2);
-                result = Term.nullIfNull(x[n]);
+                result = Term.nullIfNull(c.sub(n));
             } else {
-                Term[] y = ArrayUtils.remove(x, nar.random().nextInt(size));
-                result = Term.nullIfNull(nar.terms.the(c.op(), c.dt(), y));
+                Term[] y = new Term[size-1];
+                int except = nar.random().nextInt(size);
+                for (int i = 0, j = 0; i < size; i++) {
+                    if (i!=except) {
+                        y[j++] = c.sub(i);
+                    }
+                }
+                result = Term.nullIfNull($.the(c.op(), c.dt(), y));
             }
 
-            if (result instanceof Variable)
-                return Null;
+//            if (result instanceof Variable)
+//                return Null;
 
             return result;
         }));

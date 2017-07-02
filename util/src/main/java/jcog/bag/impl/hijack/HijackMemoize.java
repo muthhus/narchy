@@ -112,7 +112,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
     //hit + miss + reject = total insertions
 
 
-    public HijackMemoize(int initialCapacity, int reprobes, @NotNull Function<K, V> f) {
+    public HijackMemoize(@NotNull Function<K, V> f, int initialCapacity, int reprobes) {
         super(reprobes);
         setCapacity(initialCapacity);
         this.func = f;
@@ -143,15 +143,15 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         super.setCapacity(i);
 
         float boost = i > 0 ?
-                0.02f
-                //(float) (1f / Math.sqrt(capacity()))
+                //0.02f
+                (float) (1f / Math.sqrt(capacity()))
                 : 0;
 
         //note: cut should probably be some factor less than 1/reprobes
         // for example, 1/(N*reprobes)
         // to ammortize additional attempts where the cut was not necessary
         //TODO make this a momentum parameter
-        float cut = boost/(reprobes-1);
+        float cut = boost / (reprobes);
 
         assert(cut > Pri.EPSILON);
 
@@ -207,7 +207,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
             HalfWeakPair h = new HalfWeakPair(k, v);
                     //new PLink<>(key, value)
                     //new WeakPLink<>(key, value)
-            h.setPri(this.CACHE_HIT_BOOST);
+            h.setPri(0.5f);
             if (put(h) != null) {
                 miss.inc();
             } else {

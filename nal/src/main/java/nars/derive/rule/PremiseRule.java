@@ -714,7 +714,7 @@ public class PremiseRule extends GenericCompound {
                 index,
                 constraints);
 
-        List<PostCondition> postConditions = newArrayList();
+        List<PostCondition> postConditions = newArrayList(postcons.length);
 
         for (int i = 0; i < postcons.length; ) {
             Term t = postcons[i++];
@@ -723,7 +723,7 @@ public class PremiseRule extends GenericCompound {
 
             Term[] modifiers = ((Compound) postcons[i++]).toArray();
 
-            postConditions.add(PostCondition.make(this, t, sorted(modifiers)));
+            postConditions.add(PostCondition.make(this, t, Terms.sorted(modifiers)));
         }
 
         if (taskPunc == 0) {

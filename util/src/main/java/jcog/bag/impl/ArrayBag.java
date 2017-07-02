@@ -18,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -32,7 +33,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     public final PriMerge mergeFunction;
 
-    final QueueLock<Y> toPut = new QueueLock<>((p) -> this.put(p, null));
+    final Consumer<Y> toPut;
 
     /**
      * inbound pressure sum since last commit
@@ -59,6 +60,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
         this.mergeFunction = mergeFunction;
         this.capacity = cap;
+        this.toPut = map instanceof ConcurrentMap ? new QueueLock<>(this::put) : this::put;
     }
 
     @Override

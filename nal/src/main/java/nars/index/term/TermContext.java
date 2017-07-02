@@ -25,12 +25,12 @@ public interface TermContext {
         return get(t, false);
     }
 
-    default Termed getIfPresentElse(@NotNull Term t) {
-        Termed y = get(t, false);
+    default Termed getIfPresentElse(@NotNull Term x) {
+        Termed y = get(x, false);
         if (y != null)
             return y;
         else
-            return t;
+            return x;
     }
 
 }

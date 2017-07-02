@@ -22,6 +22,8 @@ public interface ProtoCompound extends TermContainer {
 
     int dt();
 
+    ProtoCompound dt(int newDT);
+
 
     /** subterms as an array for construction */
     @NotNull Term[] subterms();

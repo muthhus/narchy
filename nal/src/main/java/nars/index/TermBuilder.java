@@ -549,10 +549,10 @@ public abstract class TermBuilder {
         }
 
         if (dt == XTERNAL) {
-            if (n != 2)
-                throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
+            assert(n==2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
             //preserve grouping (don't flatten) but use given ordering
+            Arrays.sort(u);
             return conjPost(finish(CONJ, XTERNAL, u));
         }
 
@@ -855,8 +855,13 @@ public abstract class TermBuilder {
                 }
 
                 if (dt == XTERNAL) {
-                    //create as-is
-                    return finish(op, XTERNAL, subject, predicate);
+
+                    //create as-is but in correct sort
+                    if (subject.compareTo(predicate)<=0)
+                        return finish(op, XTERNAL, subject, predicate);
+                    else
+                        return finish(op, XTERNAL, predicate, subject);
+
                 } else {
                     boolean equal = subject.equals(predicate);
                     if (concurrent(dt)) {

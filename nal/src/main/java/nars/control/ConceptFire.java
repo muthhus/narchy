@@ -17,6 +17,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +35,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 4;
+    private static final int maxSamples = 2;
 
     static final int TASKLINKS_SAMPLED = maxSamples * 2;
     static final int TERMLINKS_SAMPLED = maxSamples * 2;
@@ -150,7 +151,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
         if (templateConcepts==null) {
             if (ctpl != null) {
-                HashSet<Concept> templateConcepts = new HashSet(id.term().size());
+                Set<Concept> templateConcepts = new UnifiedSet(id.term().size());
                 ctpl.forEach(x -> {
                     Concept c = nar.conceptualize(x);
                     if (c != null)
@@ -216,10 +217,12 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             float eachActivation = totalActivation / templateConceptsCount;
             if (eachActivation >= Pri.EPSILON) {
                 for (Concept c : templateConcepts) {
-                    id.termlinks().put(new PLink(c, eachActivation));
-                    c.termlinks().put(new PLink(id, eachActivation));
+                    float momentum = 0.5f;
+                    id.termlinks().put(new PLink(c, eachActivation * (1f - momentum)));
+                    c.termlinks().put(new PLink(id, eachActivation * momentum));
                     nar.input(new ConceptFire(c, eachActivation));
                 }
+                //priSub(totalActivation);
             }
         }
 

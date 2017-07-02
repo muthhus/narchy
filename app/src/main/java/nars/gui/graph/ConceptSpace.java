@@ -55,9 +55,9 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 
 
 
-    public final HijackMemoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges = new HijackMemoize<>(4096, 2, (to) -> {
+    public final HijackMemoize<Pair<Concept, ConceptWidget /* target */>, ConceptWidget.TermEdge> edges = new HijackMemoize<>((to) -> {
         return edgeBuilder.apply(to.getTwo());
-    });
+    }, 4096, 2);
 
     void removeNode(ConceptFire concept) {
         space.remove(concept.term());

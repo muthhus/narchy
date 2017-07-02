@@ -11,6 +11,7 @@ import nars.index.TermBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.MapSubst1;
 import nars.term.transform.CompoundTransform;
@@ -287,9 +288,12 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         //int modifications = 0;
 
+        if (!t.testSuperTerm(src))
+            return src;
+
         boolean filterTrueFalse = disallowTrueOrFalse(op);
 
-        int s = src.size(), modifications = 0;
+        int s = src.size(), subtermMods = 0;
         AppendProtoCompound target = new AppendProtoCompound(op, dt, s);
         for (int i = 0; i < s; i++) {
 
@@ -316,7 +320,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
                 //if (x != y) { //must be refernce equality test for some variable normalization cases
                 //if (!x.equals(y)) { //must be refernce equality test for some variable normalization cases
-                modifications++;
+                subtermMods++;
 
             }
 
@@ -325,11 +329,11 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
 
-        if (modifications == 0 && op == src.op() && dt!=src.dt()) {
-            //juts change dt
-            return src.dt(dt);
-        }
-        if (modifications > 0 || op != src.op() || dt != src.dt())
+        //        if (subtermMods == 0 && !opMod && dtMod && (op.image || (op.temporal && concurrent(dt)==concurrent(src.dt()))) ) {
+//            //same concurrency, just change dt, keep subterms
+//            return src.dt(dt);
+//        }
+        if (subtermMods > 0 || op != src.op() || dt != src.dt())
             return the(target);
         else
             return src;

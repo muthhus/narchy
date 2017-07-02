@@ -3,7 +3,9 @@ package nars;
 
 import nars.index.term.TermContext;
 import nars.term.Compound;
+import nars.term.Functor;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.container.TermContainer;
@@ -346,20 +348,21 @@ public enum Op {
      * decode a term which may be a functor, return null if it isnt
      */
     @Nullable
-    public static Pair<Atomic, TermContainer> functor(@NotNull Term maybeOperation, TermContext index) {
+    public static Pair<Atomic, Compound> functor(@NotNull Term maybeOperation, TermContext index, boolean mustFunctor) {
         if (maybeOperation instanceof Compound && maybeOperation.hasAll(Op.OpBits)) {
             Compound c = (Compound) maybeOperation;
             if (c.op() == INH) {
                 Term s0 = c.sub(0);
-                if (s0.op() == PROD) {
+                if (s0 instanceof Compound && s0.op() == PROD) {
                     Term s1 = c.sub(1);
-                    if (s1.op() == ATOM) {
-                        Atomic ff = (Atomic) index.getIfPresentElse(s1);
-
-                        return Tuples.pair(
-                                ff,
-                                ((Compound) s0).subterms()
-                        );
+                    if (s1 instanceof Atom /*&& s1.op() == ATOM*/) {
+                        Atom ff = (Atom) index.getIfPresentElse(s1);
+                        if (!mustFunctor || ff instanceof Functor) {
+                            return Tuples.pair(
+                                    ff,
+                                    ((Compound) s0)
+                            );
+                        }
 
                     }
                 }
@@ -369,19 +372,20 @@ public enum Op {
     }
 
     @Nullable
-    public static Pair<Atomic, TermContainer> functor(Op cOp, @NotNull Term[] subs, TermContext index) {
+    public static Pair<Atomic, Compound> functor(Op cOp, @NotNull Term[] subs, TermContext index, boolean mustFunctor) {
         if (cOp == INH) {
             Term s0 = subs[0];
             if (s0.op() == PROD) {
                 Term s1 = subs[1];
                 if (s1.op() == ATOM) {
                     Atomic ff = (Atomic) index.getIfPresentElse(s1);
+                    if (!mustFunctor || ff instanceof Functor) {
+                        return Tuples.pair(
+                                ff,
+                                ((Compound) s0)
+                        );
 
-                    return Tuples.pair(
-                            ff,
-                            ((Compound) s0).subterms()
-                    );
-
+                    }
                 }
             }
 

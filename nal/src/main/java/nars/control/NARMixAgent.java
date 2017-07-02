@@ -32,7 +32,7 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
     private final FloatArrayList ins = new FloatArrayList();
     private final NAR controlled;
 
-    private final int cyclesPerFrame = 16;
+    private final int cyclesPerFrame = 4;
 
 //    public NARMixAgent(NAR controller, NAR controlled) {
 //        this(controller, ()->controlled.emotion.happy());
@@ -63,7 +63,7 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
         super("", controller);
 
         controller.truthResolution.setValue(0.05f);
-        controller.termVolumeMax.setValue(24);
+        controller.termVolumeMax.setValue(18);
         controller.DEFAULT_QUEST_PRIORITY = controller.DEFAULT_QUESTION_PRIORITY = 0.25f;
 
         this.controlled = controlled;

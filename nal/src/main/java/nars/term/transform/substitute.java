@@ -17,15 +17,13 @@ import static nars.Op.Null;
 
 public class substitute extends Functor {
 
-    @NotNull private final Derivation parent;
 
     final static Term STRICT = Atomic.the("strict");
 
     final static Atom func = (Atom) $.the("substitute");
 
-    public substitute(@NotNull Derivation parent) {
+    public substitute() {
         super(func);
-        this.parent = parent;
     }
 
     @Nullable @Override public Term apply(@NotNull TermContainer xx) {
@@ -62,7 +60,7 @@ public class substitute extends Functor {
 //                (hasYX ?
 //                    new MapSubstWithOverride(parent.yx, x, y) :
                     new MapSubst1(x,y) //optimized case
-                        .transform(input, parent.terms);
+                        .transform(input, $.terms);
 
         return (output != null) ? output : Null;
     }

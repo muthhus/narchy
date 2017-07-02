@@ -83,7 +83,7 @@ public class Hear extends Loop {
 
         onReset = nar.eventReset.on(this::onReset);
         tokens = msg;
-        context = who.isEmpty() ? null : $.the(who);
+        context = null; //TODO //who.isEmpty() ? null : $.the(who);
         //contextAnonymous = new Term[]{$.the("hear"), $.varDep(1), Op.Imdex};
         setPeriodMS(wordDelayMS);
     }
@@ -158,7 +158,7 @@ public class Hear extends Loop {
 
                 //System.out.println(strippedText);
 
-                Hear.hear(nar, strippedText, page, 25);
+                Hear.hear(nar, strippedText, page, 200, 0.1f);
 
                 Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 

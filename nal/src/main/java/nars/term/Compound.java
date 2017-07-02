@@ -940,11 +940,11 @@ public interface Compound extends Term, IPair, TermContainer {
         //check if this is a funct
         if (op() == INH) {
             //recursively compute contained subterm functors
-            org.eclipse.collections.api.tuple.Pair<Atomic, TermContainer> f =
-                    (evalSubs != null) ? (f = Op.functor(op(), evalSubs, index)) : Op.functor(this, index);
+            org.eclipse.collections.api.tuple.Pair<Atomic, Compound> f =
+                    (evalSubs != null) ? (f = Op.functor(op(), evalSubs, index, true)) : Op.functor(this, index, true);
 
-            if (f != null && f.getOne() instanceof Functor) {
-                TermContainer args = f.getTwo();
+            if (f != null /*&& f.getOne() instanceof Functor*/) {
+                TermContainer args = f.getTwo().subterms();
 
                 Term dy = ((Functor) f.getOne()).apply(args);
                 if (dy == null || dy == this) {

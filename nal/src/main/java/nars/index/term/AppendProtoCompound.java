@@ -5,6 +5,7 @@ import nars.IO;
 import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,10 +29,10 @@ import static nars.time.Tense.DTERNAL;
 public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements ProtoCompound {
 
     public final Op op;
-    public final int dt;
+    public int dt;
 
-    @NotNull
-    private Term[] subs = Term.EmptyArray;
+    @Nullable
+    private Term[] subs;
 
     int size;
 
@@ -75,9 +76,14 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
         return dt;
     }
 
+    @Override
+    public ProtoCompound dt(int newDT) {
+        this.dt = newDT;
+        return this;
+    }
 
     /**
-     * safe for use during final build step
+     * use only during actual build step; should not be called while being compared
      */
     @Override
     public Term[] subterms() {
@@ -91,7 +97,9 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
             tt = Arrays.copyOfRange(ss, 0, s); //trim
         }
 
+        compact(); //compact the key
         this.subs = null; //clear refernce to the array from this point
+
         return tt;
     }
 
@@ -105,14 +113,16 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
         if (dt!=DTERNAL)
             writeInt(dt);
 
-        compact();
         this.hash = hash(0, len);
+        if (this.hash==0) this.hash = 1;
         return this;
     }
 
     @Override
     public int hashCode() {
-        return hash;
+        int h = this.hash;
+        assert(h!=0);
+        return h;
     }
 
     @Override
@@ -193,10 +203,6 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
         return subs[i];
     }
 
-    @Override
-    public void forEach(Consumer<? super Term> action, int start, int stop) {
-        throw new UnsupportedOperationException("TODO");
-    }
 
     @Override
     public String toString() {
@@ -206,6 +212,12 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
                 ", subs=" + Arrays.toString(Arrays.copyOfRange(subs, 0, size)) + //HACK use more efficient string method
                 '}';
     }
+
+    @Override
+    public void forEach(Consumer<? super Term> action, int start, int stop) {
+        throw new UnsupportedOperationException("TODO");
+    }
+
 
     @NotNull
     @Override

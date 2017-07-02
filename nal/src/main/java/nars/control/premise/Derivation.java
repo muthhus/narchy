@@ -21,7 +21,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.NEG;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesDep;
@@ -106,7 +105,6 @@ public class Derivation extends Unify implements TermContext {
     public boolean cyclic, overlap;
     //public final float overlapAmount;
 
-    private final substitute _substitute;
     private final substituteIfUnifiesAny _substituteIfUnifiesAny;
     private final substituteIfUnifiesDep _substituteIfUnifiesDep;
     private int serial;
@@ -117,9 +115,6 @@ public class Derivation extends Unify implements TermContext {
     public Derivation() {
         super(null, VAR_PATTERN, null, Param.UnificationStackMax, 0);
 
-        _substitute = new substitute(this) {
-            @Override public boolean equals(Object u) { return this == u; }
-        };
         _substituteIfUnifiesAny = new substituteIfUnifiesAny(this) {
             @Override public boolean equals(Object u) { return this == u; }
         };
@@ -133,12 +128,12 @@ public class Derivation extends Unify implements TermContext {
     public Termed get(Term x, boolean createIfAbsent) {
         if (x instanceof Atom) {
             switch (x.toString()) {
-                case "substitute": return _substitute;
                 case "subIfUnifiesAny": return _substituteIfUnifiesAny;
                 case "subIfUnifiesDep": return _substituteIfUnifiesDep;
             }
+            return terms.get(x, createIfAbsent);
         }
-        return terms.get(x, createIfAbsent);
+        return x;
     }
 
     @Override

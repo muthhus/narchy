@@ -356,19 +356,25 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
     default public Term[] toArray() {
-        return toArray(null);
+        int s = size();
+        switch (s) {
+            case 0: return Term.EmptyArray;
+            case 1: return new Term[] { sub(0) };
+            case 2: return new Term[] { sub(0), sub(1) };
+            default:
+                return toArray(new Term[s], 0, s);
+        }
     }
 
-    default Term[] toArray(@Nullable Term[] x) {
-        int s = size();
-        if (s == 0)
-            return Term.EmptyArray;
+    default Term[] toArray(Term[] x, int from, int to) {
+//        if (s == 0)
+//            return Term.EmptyArray;
+//
+//        if (x == null || x.length!=s)
+//            x = new Term[s];
 
-        if (x == null || x.length!=s)
-            x = new Term[s];
-
-        for (int i = 0; i < s; i++)
-            x[i] = this.sub(i);
+        for (int i = from, j = 0; i < to; i++, j++)
+            x[j] = this.sub(i);
 
         return x;
     }
@@ -889,6 +895,20 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @Override default void recurseTerms(@NotNull Consumer<Term> v) {
         forEach(s -> s.recurseTerms(v));
+    }
+
+    /** returns a sorted and de-duplicated version of this container */
+    default TermContainer sorted() {
+        int s = size();
+        if (s <= 1)
+            return this;
+
+
+        Term[] tt = Terms.sorted(toArray());
+        if (equalTerms(tt))
+            return this;
+        else
+            return TermVector.the(tt);
     }
 
 }

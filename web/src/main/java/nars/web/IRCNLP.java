@@ -12,6 +12,7 @@ import nars.bag.leak.LeakOut;
 import nars.nar.NARBuilder;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.time.RealTime;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +54,7 @@ public class IRCNLP extends IRC {
 
     final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
     private final String[] channels;
+    private final MyLeakOut outleak;
 
     boolean trace;
 
@@ -82,7 +84,7 @@ public class IRCNLP extends IRC {
 //            }
 //        }).start();
 
-        new MyLeakOut(nar, channels);
+        outleak = new MyLeakOut(nar, channels);
 
 
         /*
@@ -129,12 +131,34 @@ public class IRCNLP extends IRC {
      */
     private class MyLeakOut extends LeakOut {
         private final NAR nar;
-        private final String[] channels;
+        public final String[] channels;
 
         public MyLeakOut(NAR nar, String... channels) {
             super(nar, 8, 1f);
             this.nar = nar;
             this.channels = channels;
+        }
+
+
+        String s = "";
+        int minSendLength = 16;
+
+        protected float send(Object o) {
+            Runnable r = null;
+            synchronized (channels) {
+                s += o.toString() + " ";
+                if (s.length() > minSendLength) {
+                    r = IRCNLP.this.send(channels, s);
+                    s = "";
+                }
+            }
+
+
+            if (r != null) {
+                nar.runLater(r);
+            }
+
+            return 1;
         }
 
         @Override
@@ -217,9 +241,10 @@ public class IRCNLP extends IRC {
 
     void hear(String text, String src) throws Narsese.NarseseException {
         Hear.hear(nar, text, src, (t) -> {
-            Compound f = $.func("SENTENCE", Hear.tokenize(t));
-            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f);
-            return null;
+            return new Hear(nar, Hear.tokenize(t), src, 100);
+//            Compound f = $.func("SENTENCE", Hear.tokenize(t));
+//            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f);
+//            return null;
         });
     }
 
@@ -266,7 +291,7 @@ public class IRCNLP extends IRC {
 
         NAR n = NARBuilder.newMultiThreadNAR(2, new RealTime.DS(true));
 
-        n.termVolumeMax.setValue(28);
+        n.termVolumeMax.setValue(48);
 
         /*@NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
             new RealTime.DS(true),
@@ -276,26 +301,25 @@ public class IRCNLP extends IRC {
 //        n.addNAR(16, 0.25f);
         //n.addNAR(512, 0.25f);
 
-        n.startFPS(5f);
-        //n.log();
+        n.startFPS(20f);
+        //n.logBudgetMin(System.out, 0.75f);
 
 
-//        IRCNLP bot = new IRCNLP(n,
-//                "exp" + Math.round(10000 * Math.random()),
-//
-//                "localhost", //"irc.freenode.net",
-//                //"#123xyz"
-//                //"#netention"
-//                "#x"
-//        );
+        IRCNLP bot = new IRCNLP(n,
+                "exp" + Math.round(10000 * Math.random()),
 
-        //bot.start();
+                "irc.freenode.net",
+                //"#123xyz"
+                "#netention"
+                //"#x"
+        );
 
-        Param.DEBUG = true;
+
+        //Param.DEBUG = true;
 
         n.onTask(t -> {
             //if (t.isGoal()) {
-                //feedback
+            //feedback
             Compound tt = t.term();
             long start = t.start();
             if (start != ETERNAL) {
@@ -305,7 +329,7 @@ public class IRCNLP extends IRC {
                     if (start >= now - dur) {
                         if (tt.subIs(Op.INH, 1, $.the("hear"))) {
                             if (tt.subIs(0, PROD) && tt.sub(0).subIs(0, Op.ATOM)) {
-                                speak(tt.sub(0).sub(0, null), start - now);
+                                speak(tt.sub(0).sub(0, null), start - now, bot);
                             }
                         }
                     }
@@ -323,21 +347,15 @@ public class IRCNLP extends IRC {
             Util.sleep(1000);
         }
 
-        n.clear();
+        //n.clear();
 
-        //n.input("$0.9 hear(#1)! :|:");
+        new Loop(1/15f) {
 
-        n.input("$0.9 hear(\"what\")! :|:");
-
-        Util.sleep(500);
-
-        n.input("$0.9 hear(\"is\")! :|:");
-
-        new Loop(1f) {
-
-            final Term[] promptWord = new Term[] {
+            final Term[] promptWord = new Term[]{
                     $.varDep(1),
                     $.quote("and"),
+                    $.quote("a"),
+                    $.quote("is"),
                     //$.quote("then")
                     /* so, now, etc */
             };
@@ -354,8 +372,10 @@ public class IRCNLP extends IRC {
             }
         };
 
+        Hear.wiki(n);
 
-//        Hear.wiki(n);
+        bot.start();
+
 //        n.on("say", (x, aa, nn) -> {
 //            String msg = Joiner.on(' ').join(
 //                Stream.of(aa).map(t -> {
@@ -475,18 +495,21 @@ public class IRCNLP extends IRC {
 
     }
 
-    private static void speak(@Nullable Term sub, long delay) {
+    private static void speak(@Nullable Term word, long delay, IRCNLP bot) {
+        if (word == null)
+            return;
+
         if (delay > 1) {
             //TODO schedule for future
-            System.out.println("\t+" + delay + " " + sub);
+            System.out.println("\t+" + delay + " " + word);
         }
 
         //n.believe(tt, Tense.Present);
-        System.out.println(sub);
+        String wordString = word instanceof Atom ? $.unquote(word) : word.toString();
+        System.out.println(wordString);
+        bot.outleak.send(wordString);
     }
 
-    public void send(@NotNull String target, String l) {
-        irc.send().message(target, l);
-    }
+
 
 }

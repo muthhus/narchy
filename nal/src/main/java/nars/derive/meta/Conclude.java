@@ -69,7 +69,7 @@ public final class Conclude extends AbstractPred<Derivation> {
         Term pp = p.pattern;
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
-        Pair<Atomic, TermContainer> outerFunctor = Op.functor(pp, $.terms);
+        Pair<Atomic, Compound> outerFunctor = Op.functor(pp, $.terms, false);
         if (outerFunctor != null && outerFunctor.getOne().toString().equals("varIntro")) {
             varIntro = true;
             pp = outerFunctor.getTwo().sub(0);
