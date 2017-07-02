@@ -283,7 +283,7 @@ public abstract class TermBuilder {
     }
 
     protected Compound newCompound(@NotNull Op op, Term[] subterms) {
-        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.length==1) {
+        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.length == 1) {
             return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
         }
         return newCompound(op, intern(subterms));
@@ -293,7 +293,7 @@ public abstract class TermBuilder {
      * directly constructs a new instance, applied at the end.
      */
     protected Compound newCompound(@NotNull Op op, TermContainer subterms) {
-        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.size()==1) {
+        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.size() == 1) {
             return new UnitCompound1(op, subterms.sub(0)); //HACK avoid creating the TermContainer if possible
         }
 
@@ -347,7 +347,8 @@ public abstract class TermBuilder {
         return finish(TermContainer.mustSortAndUniquify(op, dt, args.length), op, dt, args);
     }
 
-    @NotNull private Term finish(boolean sort, @NotNull Op op, int dt, @NotNull Term... args) {
+    @NotNull
+    private Term finish(boolean sort, @NotNull Op op, int dt, @NotNull Term... args) {
         if (sort) {
             args = Terms.sorted(args);
         }
@@ -486,7 +487,7 @@ public abstract class TermBuilder {
         if (x == null)
             return null;
 
-        if (x.op()!=CONJ)
+        if (x.op() != CONJ)
             return x;
 
         //conjunction/implication reduction:
@@ -497,7 +498,7 @@ public abstract class TermBuilder {
             int whichImpl = -1;
             for (int i = 0; i < c.size(); i++) {
                 if (c.subIs(i, Op.IMPL)) {
-                    if (whichImpl!=-1) {
+                    if (whichImpl != -1) {
                         //a 2nd implication was found; don't continue
                         whichImpl = -1;
                         break;
@@ -511,11 +512,11 @@ public abstract class TermBuilder {
                 int ww = whichImpl;
 //                Term[] precond = c.subterms().terms(
 //                        (IntObjectPredicate<Term>)((i,s)->(i != ww)));
-                Term implPre = ((Compound)c.sub(whichImpl)).sub(0);
-                Term implPost = ((Compound)c.sub(whichImpl)).sub(1);
-                Compound origImpl = (Compound)c.sub(ww);
+                Term implPre = ((Compound) c.sub(whichImpl)).sub(0);
+                Term implPost = ((Compound) c.sub(whichImpl)).sub(1);
+                Compound origImpl = (Compound) c.sub(ww);
                 Term newPre = replace(c, origImpl, implPre);
-                if (newPre!=null)
+                if (newPre != null)
                     return finish(IMPL, origImpl.dt(), newPre, implPost);
 
             }
@@ -549,10 +550,8 @@ public abstract class TermBuilder {
         }
 
         if (dt == XTERNAL) {
-            assert(n==2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
+            assert (n == 2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
-            //preserve grouping (don't flatten) but use given ordering
-            Arrays.sort(u);
             return conjPost(finish(CONJ, XTERNAL, u));
         }
 
@@ -565,7 +564,7 @@ public abstract class TermBuilder {
             //NON-COMMUTIVE
 
             //assert (n == 2);
-            if (n!=2) {
+            if (n != 2) {
                 throw new InvalidTermException(CONJ, u, "invalid non-commutive conjunction");
             }
 
@@ -658,7 +657,8 @@ public abstract class TermBuilder {
         return compound(op, cs).dt(dt);
     }
 
-    @NotNull private Term compound(Op op, int dt, Term... cs) {
+    @NotNull
+    private Term compound(Op op, int dt, Term... cs) {
         return compound(op, cs).dt(dt);
     }
 
@@ -791,7 +791,7 @@ public abstract class TermBuilder {
     @NotNull
     private Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
-        if (subject==Null || predicate==Null)
+        if (subject == Null || predicate == Null)
             return Null;
 
         switch (op) {
@@ -856,11 +856,8 @@ public abstract class TermBuilder {
 
                 if (dt == XTERNAL) {
 
-                    //create as-is but in correct sort
-                    if (subject.compareTo(predicate)<=0)
-                        return finish(op, XTERNAL, subject, predicate);
-                    else
-                        return finish(op, XTERNAL, predicate, subject);
+                    //create as-is
+                    return finish(op, XTERNAL, subject, predicate);
 
                 } else {
                     boolean equal = subject.equals(predicate);
@@ -929,16 +926,15 @@ public abstract class TermBuilder {
         }
 
 
-
         //factor out any common subterms iff concurrent
         if (concurrent(dt)) {
 
             Term pu = predicate.unneg();
             Term su = subject.unneg();
             //first layer only, not recursively
-            if ((pu.varPattern()==0 && (subject.equals(pu) || subject.containsRecursively(pu))) ||
-                (su.varPattern()==0 && (predicate.equals(su) || predicate.containsRecursively(su))) )
-                    //(!(su instanceof Variable) && predicate.contains(su)))
+            if ((pu.varPattern() == 0 && (subject.equals(pu) || subject.containsRecursively(pu))) ||
+                    (su.varPattern() == 0 && (predicate.equals(su) || predicate.containsRecursively(su))))
+                //(!(su instanceof Variable) && predicate.contains(su)))
                 return False; //cyclic
 
 //            if (subject.varPattern() == 0 && predicate.varPattern() == 0 &&
@@ -986,7 +982,8 @@ public abstract class TermBuilder {
                             int s0 = sss.size();
                             switch (s0) {
                                 case 0:
-                                    subject = True; break;
+                                    subject = True;
+                                    break;
                                 case 1:
                                     subject = sss.iterator().next();
                                     break;
@@ -1001,7 +998,8 @@ public abstract class TermBuilder {
                             int s0 = ppp.size();
                             switch (s0) {
                                 case 0:
-                                    predicate = True; break;
+                                    predicate = True;
+                                    break;
                                 case 1:
                                     predicate = ppp.iterator().next();
                                     break;
@@ -1152,9 +1150,9 @@ public abstract class TermBuilder {
 
         TreeSet<Term> args = new TreeSet<>();
         if (o1 == intersection) {
-            ((TermContainer)term1).forEach(args::add);
+            ((TermContainer) term1).forEach(args::add);
             if (o2 == intersection)
-                ((TermContainer)term2).forEach(args::add);
+                ((TermContainer) term2).forEach(args::add);
             else
                 args.add(term2);
         } else {
@@ -1257,32 +1255,32 @@ public abstract class TermBuilder {
             return c;
 
         TermContainer st = c.subterms();
-        Term[] oldSubs = st.toArray();
-        Term[] newSubs = oldSubs;
+        Term[] newSubs = null; //oldSubs.clone();
 
         Op o = c.op();
         int cdt = c.dt();
         int pdt = !o.temporal ? cdt : DTERNAL; //( !o.concurrent(cdt) ? XTERNAL : DTERNAL); //preserve image dt
+        int sts = st.size();
         if (st.hasAny(Op.TemporalBits)) {
 
             boolean subsChanged = false;
-            int cs = oldSubs.length;
-            Term[] maybeNewSubs = new Term[cs];
+            int cs = sts;
+            newSubs = new Term[cs];
             for (int i = 0; i < cs; i++) {
 
-                Term x = oldSubs[i], y;
+                Term x = st.sub(i), y;
                 if (x instanceof Compound) {
                     subsChanged |= (x != (y = atemporalize((Compound) x)));
                 } else {
                     y = x;
                 }
 
-                maybeNewSubs[i] = y;
+                newSubs[i] = y;
 
             }
 
-            if (subsChanged)
-                newSubs = maybeNewSubs;
+            if (!subsChanged)
+                newSubs = null;
         }
 
 //        //resolve XTERNAL temporals to lexical order //TODO does this even matter?
@@ -1297,26 +1295,39 @@ public abstract class TermBuilder {
 
 
         boolean dtChanged = (pdt != cdt);
-        boolean subsChanged = (!Arrays.equals(newSubs, oldSubs));
+        boolean subsChanged;
+//        if (dtChanged && pdt == XTERNAL) {
+//            if (newSubs == null) {
+//                newSubs = st.toArray(new Term[sts], 0, sts);
+//            }
+//            Arrays.sort(newSubs);
+//            subsChanged = !st.equalTerms(newSubs);
+//        } else {
+        subsChanged = newSubs != null && !st.equalTerms(newSubs);
+        //   }
 
         if (subsChanged || dtChanged) {
 
             if (o.temporal && (
                     (subsChanged && newSubs.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
                             ||
-                    (newSubs.length == 2 && newSubs[0].equals(newSubs[1])))// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
-            ) {
-
+                            (sts == 2 &&
+                                    reflex(st.sub(0), st.sub(1))
+                            ))// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
+                    ) {
 
 
                 pdt = XTERNAL;
 
-                Term s = newSubs[0];
-                newSubs = new Term[]{s, s};
+                newSubs = new Term[]{st.sub(0), st.sub(st.size() > 1 ? 1 : 0)};
+                if (o.commutative)
+                    Arrays.sort(newSubs);
+                subsChanged = true;
             }/* else {
                 if (o.temporal)
                     pdt = DTERNAL;
             }*/
+
 
 //            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
 //                System.out.println("?");
@@ -1327,8 +1338,11 @@ public abstract class TermBuilder {
                             :
                             c.dt(pdt)
             );
-            if (xx == null)
-                throw new InvalidTermException("unable to atemporalize", c);
+            if (xx == null && dtChanged && pdt == DTERNAL) {
+                //throw new InvalidTermException("unable to atemporalize", c);
+                return compoundOrNull(
+                        compound(o, XTERNAL, subsChanged ? newSubs : st.toArray()) );
+            }
 
 
             //if (c.isNormalized())
@@ -1344,6 +1358,14 @@ public abstract class TermBuilder {
         } else {
             return c;
         }
+    }
+
+    private static boolean reflex(@NotNull Term sub0, @NotNull Term sub1) {
+        sub0 = sub0.unneg();
+        sub1 = sub1.unneg();
+        return sub0.equals(sub1) ||
+                sub0.containsRecursively(sub1) ||
+                sub1.containsRecursively(sub0);
     }
 
     @NotNull

@@ -35,7 +35,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 2;
+    private static final int maxSamples = 1;
 
     static final int TASKLINKS_SAMPLED = maxSamples * 2;
     static final int TERMLINKS_SAMPLED = maxSamples * 2;
@@ -146,10 +146,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         ));
         int ttl = maxTTL;
 
-        TermContainer ctpl = id.templates();
+
 
 
         if (templateConcepts==null) {
+            TermContainer ctpl = id.templates();
             if (ctpl != null) {
                 Set<Concept> templateConcepts = new UnifiedSet(id.term().size());
                 ctpl.forEach(x -> {
@@ -190,8 +191,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 float tfaEach = tfa / templateConceptsCount;
                 if (tfaEach >= Pri.EPSILON) {
                     for (Concept c : templateConcepts)
-                        c.tasklinks().putAsync(new PLinkUntilDeleted<>(txx, tfaEach));
-
+                        c.tasklinks().putAsync(new PLink<>(txx, tfaEach));
                 }
             }
 

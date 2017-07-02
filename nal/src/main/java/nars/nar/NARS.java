@@ -1,7 +1,6 @@
 package nars.nar;
 
 
-import jcog.AffinityExecutor;
 import jcog.Loop;
 import jcog.Util;
 import jcog.math.FloatAveraged;
@@ -29,8 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -52,8 +50,9 @@ public class NARS extends NAR {
     public final List<SubExecutor> sub = $.newArrayList();
     public int num;
 
-    private AffinityExecutor pool;
+    //private AffinityExecutor pool;
     private List<Loop> loops;
+    private ExecutorService pool;
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
         super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024,  e) {
@@ -402,7 +401,10 @@ public class NARS extends NAR {
 
             int num = sub.size();
 
-            this.pool = new AffinityExecutor(self().toString());
+            this.pool = Executors.newFixedThreadPool(num);
+
+            //((ThreadPoolExecutor)pool).getThreadFactory().
+            //self().toString();
 
             this.loops = $.newArrayList(num);
             sub.forEach(s -> loops.add(s.start()));

@@ -1,5 +1,6 @@
 package nars.attention;
 
+import jcog.pri.PLink;
 import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.Pri;
 import nars.Task;
@@ -18,7 +19,7 @@ public class Activate /*extends UnaryTask<Task>*/ {
     public static ConceptFire activate(@NotNull Task t, float activation, Concept origin) {
 
         if (activation >= Pri.EPSILON) {
-            origin.tasklinks().putAsync(new PLinkUntilDeleted<>(t, activation));
+            origin.tasklinks().putAsync(new PLink<>(t, activation));
 
 //            if (origin instanceof CompoundConcept) {
 //

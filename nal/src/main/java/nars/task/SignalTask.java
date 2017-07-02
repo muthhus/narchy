@@ -20,6 +20,10 @@ public class SignalTask extends NALTask {
                 new long[] { stamp } /* TODO use an implementation which doenst need an array for this */ );
     }
 
+    @Override
+    public boolean eternalizable() {
+        return false;
+    }
 
     @Override public long end() {
         if (this.slidingEnd == ETERNAL)

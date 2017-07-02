@@ -28,7 +28,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
     //private static SensorConcept[][] concept;
     //private int afterlife = TIME_PER_FALL * tetris_height * tetris_width;
-    static boolean easy = false;
+    static boolean easy;
 
     private final TetrisState state;
 
@@ -500,13 +500,14 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //            s.show(1300, 900);
 //        }
 
-    public static void main(String[] args) throws Narsese.NarseseException {
+    public static void main(String[] args) {
         //Param.DEBUG = true;
 
 
         NAgentX.runRT((n) -> {
             Tetris a = null;
             try {
+                n.truthResolution.setValue(0.1f);
                 a = new MyTetris(n);
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();

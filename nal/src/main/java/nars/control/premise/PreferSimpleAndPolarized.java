@@ -20,7 +20,7 @@ import static nars.truth.TruthFunctions.w2c;
 public class PreferSimpleAndPolarized implements DerivationBudgeting {
 
     /** value between 0 and 1.0, range for adjusting polarization (1f has no effect) */
-    final float minFactor = 0.75f;
+    final float minFactor = 0.5f;
 
 //    /** preference for polarity (includes conf) */
 //    public final FloatParam polarity = new FloatParam(0.5f, 0f, 1f);
@@ -71,12 +71,12 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
             d.parentPri;
             //d.premise.pri();
 
-        float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm, minFactor);
+        float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm, 0);
         if (truth != null) { //belief and goal:
             p *= simplicityFactor;
             float freqFactor = Util.lerp(polarization(truth.freq()), minFactor, 1);
             p *= freqFactor;
-            float confFactor = evidencePreservationRelative(truth, d, minFactor);
+            float confFactor = evidencePreservationRelative(truth, d, 0);
             p *= confFactor;
 
 //                    simplicity.floatValue() * simplicityFactorRelative(conclusion, punc, d.task, d.belief) +

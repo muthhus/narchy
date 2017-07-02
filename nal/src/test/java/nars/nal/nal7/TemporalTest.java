@@ -41,7 +41,19 @@ public class TemporalTest {
 
     @Test
     public void testCoNegatedSubtermConcept() throws Narsese.NarseseException {
-        assertEquals("((--,(x))&&(x))", n.conceptualize(n.term("((x) &&+10 (--,(x)))")).toString());
+        assertEquals("((x) &&+- (x))", n.conceptualize(n.term("((x) &&+10 (x))")).toString());
+
+        assertEquals("((--,(x)) &&+- (x))", n.conceptualize(n.term("((x) &&+10 (--,(x)))")).toString());
+        assertEquals("((--,(x)) &&+- (x))", n.conceptualize(n.term("((x) &&-10 (--,(x)))")).toString());
+
+        assertEquals("((x) <=>+- (x))", n.conceptualize(n.term("((x) <=>+10 (--,(x)))")).toString());
+        assertEquals("((x) <=>+- (x))", n.conceptualize(n.term("((x) <=>-10 (--,(x)))")).toString());
+
+        assertEquals("((x) ==>+- (x))", n.conceptualize(n.term("((x) ==>+10 (x))")).toString());
+        assertEquals("((--,(x)) ==>+- (x))", n.conceptualize(n.term("((--,(x)) ==>+10 (x))")).toString());
+        assertEquals("((x) ==>+- (x))", n.conceptualize(n.term("((x) ==>+10 (--,(x)))")).toString());
+        assertEquals("((x) ==>+- (x))", n.conceptualize(n.term("((x) ==>-10 (--,(x)))")).toString());
+
     }
 
     @Test
@@ -284,9 +296,9 @@ public class TemporalTest {
     }
 
     @Nullable
-    static final Term A = Atomic.the("a");
+    static final Term A = $.the("a");
     @Nullable
-    static final Term B = Atomic.the("b");
+    static final Term B = $.the("b");
 
     @Test
     public void parseTemporalRelation() throws Narsese.NarseseException {
@@ -668,7 +680,7 @@ public class TemporalTest {
     public void testAtemporalization1() throws Narsese.NarseseException {
         Term x = $("(((--,(tetris-->(_n,#2))) &&+1 $1) <=>+1 ($1 &&+0 (--,(tetris-->(_n,#2)))))");
         Term y = $.terms.atemporalize(x);
-        assertEquals("(($1&&(--,(tetris-->(_n,#2)))) <=>+- ($1&&(--,(tetris-->(_n,#2)))))", y.toString());
+        assertEquals("(($1&&(--,(tetris-->(_n,#2))))<=>($1&&(--,(tetris-->(_n,#2)))))", y.toString());
     }
 
 

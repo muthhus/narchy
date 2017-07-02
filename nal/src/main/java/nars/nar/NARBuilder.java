@@ -56,7 +56,7 @@ public class NARBuilder {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.9f);
+        n.goalConfidence(0.1f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 1;

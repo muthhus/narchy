@@ -34,7 +34,7 @@ public class Line1D {
 
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.02f; //in time units
+        float tHz = 0.01f; //in time units
         float yResolution = 0.04f; //in 0..1.0
         float periods = 132;
 
@@ -42,6 +42,9 @@ public class Line1D {
 
         @Override
         public float floatValueOf(NAR n) {
+
+            n.truthResolution.setValue(0.25f);
+
             Line1DSimplest a = new Line1DSimplest(n) {
 
 //                final FloatAveraged rewardAveraged = new FloatAveraged(()->super.act(), 10);
@@ -51,6 +54,7 @@ public class Line1D {
             a.init();
 
             onStart(a);
+
 
 
             a.speed.setValue(yResolution);

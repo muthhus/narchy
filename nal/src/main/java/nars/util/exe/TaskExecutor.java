@@ -16,6 +16,7 @@ import nars.Task;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.truth.Truthed;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,19 +56,37 @@ public class TaskExecutor extends Executioner {
 
 
 
-    public final Bag<ITask, CLink<ITask>> nal = new ArrayBag<>(0, PriMerge.max, new ConcurrentHashMap<>()) {
+    public final Bag<ITask, CLink<ITask>> nal =
+            new PriorityHijackBag<ITask, CLink<ITask>>(4) {
+                @Override
+                protected Consumer<CLink<ITask>> forget(float rate) {
+                    return null;
+                }
 
-        @Override
-        public float floatValueOf(CLink<ITask> x) {
-            return x.pri();
-        }
+                @Override
+                protected CLink<ITask> merge(@NotNull CLink<ITask> existing, @NotNull CLink<ITask> incoming, @Nullable MutableFloat overflowing) {
+                    existing.priMax(incoming.priElseZero());
+                    return existing;
+                }
 
-        @Nullable
-        @Override
-        public ITask key(@NotNull CLink<ITask> l) {
-            return l.ref;
-        }
-    };
+                @Override
+                public ITask key(@NotNull CLink<ITask> value) {
+                    return value.ref;
+                }
+            };
+//            new ArrayBag<>(0, PriMerge.max, new ConcurrentHashMap<>()) {
+//
+//        @Override
+//        public float floatValueOf(CLink<ITask> x) {
+//            return x.pri();
+//        }
+//
+//        @Nullable
+//        @Override
+//        public ITask key(@NotNull CLink<ITask> l) {
+//            return l.ref;
+//        }
+//    };
 
 
     /**
@@ -144,7 +163,7 @@ public class TaskExecutor extends Executioner {
     }
 
     public TaskExecutor(int capacity, float executedPerCycle) {
-        this(capacity, capacity * 2);
+        this(capacity, capacity );
         exePerCycleMax.setValue(Math.ceil(capacity * executedPerCycle));
     }
 

@@ -121,9 +121,9 @@ abstract public class Loop implements Runnable {
         prevTime = System.currentTimeMillis();
 
         int periodMS;
+        long beforeTime = System.currentTimeMillis();
         while ((periodMS = this.periodMS.get()) >= 0) {
 
-            long beforeTime = periodMS > 0 ? System.currentTimeMillis() : -1;
 
             try {
 
@@ -156,8 +156,11 @@ abstract public class Loop implements Runnable {
 
                 Util.sleep((int)( periodMS - ((long) this.frameTime.getMean()) ));
 
+                beforeTime = System.currentTimeMillis();
+
             } else {
-                //Thread.yield();
+                Thread.yield();
+                //Thread.onSpinWait();
             }
 
 

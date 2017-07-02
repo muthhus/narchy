@@ -79,7 +79,7 @@ public interface NAct {
 
         return $.t(freq,
                 //nar().confMin.floatValue());
-                nar().confDefault(GOAL) /*d.conf()*/);
+                nar().confDefault(BELIEF) /*d.conf()*/);
     }
 
     /**
@@ -99,45 +99,54 @@ public interface NAct {
      * initial state is neutral.
      */
     @Nullable
-    default GoalActionConcept actionTriState(@NotNull Compound s, @NotNull IntPredicate i) {
-        final int[] state = {0};
-        GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
+    default GoalActionConcept actionTriState(@NotNull Compound cc, @NotNull IntPredicate i) {
+        //final int[] state = {0};
+        GoalActionConcept m = new GoalActionConcept(cc, this, (b, d) -> {
             //radius of center dead zone; diameter = 2x this
             float deadZoneFreqRadius =
                     //1/7f;
                     1f / 6;
 
 
-            int deltaState;
+
+            int s;
             if (d == null) {
-                deltaState = 0;
+                s = 0;
             } else {
                 float f = d.freq();
                 if (f > 0.5f + deadZoneFreqRadius)
-                    deltaState = +1;
+                    s = +1;
                 else if (f < 0.5f - deadZoneFreqRadius)
-                    deltaState = -1;
+                    s = -1;
                 else
-                    deltaState = 0;
+                    s = 0;
             }
 
+            if (i.test(s)) {
 
-            int curState = state[0];
-            state[0] = Math.min(Math.max(curState + deltaState, -1), +1);
+                //            int curState = state[0];
+                //            state[0] = Math.min(Math.max(curState + deltaState, -1), +1);
+                //
+                //            //float f = curState != state[0] ? (deltaState > 0 ? 1f : 0f) : 0.5f /* had no effect */;
+                float f;
+                switch (s) { //state[0]) {
+                    case -1:
+                        f = 0f;
+                        break;
+                    case 0:
+                        f = 0.5f;
+                        break;
+                    case +1:
+                        f = 1f;
+                        break;
+                    default:
+                        throw new RuntimeException();
+                }
 
-            //float f = curState != state[0] ? (deltaState > 0 ? 1f : 0f) : 0.5f /* had no effect */;
-            float f;
-            switch (state[0]) {
-                case -1: f = 0f; break;
-                case 0: f = 0.5f; break;
-                case +1: f = 1f; break;
-                default:
-                    throw new RuntimeException();
-            }
-            if (i.test(state[0]))
                 return $.t( f, nar().confDefault(BELIEF));
-            else
-                return null;
+            }
+
+            return null;
         });
         //m.resolution.setValue(0.5f);
         addAction(m);
@@ -194,7 +203,7 @@ public interface NAct {
                     throw new RuntimeException();
             }
 
-            return $.t(f, nar().confDefault(GOAL));
+            return $.t(f, nar().confDefault(BELIEF));
         });
         //m.resolution.setValue(0.5f);
 
@@ -248,7 +257,7 @@ public interface NAct {
                     //d!=null ?
                     $.t(f,
                             //d.conf()
-                            nar().confDefault(GOAL)
+                            nar().confDefault(BELIEF)
                     )
                     //: null
                     ;
@@ -374,7 +383,7 @@ public interface NAct {
             float f = update.valueOf(o);
             if (f != f)
                 f = 0.5f;
-            return $.t(f, nar().confDefault(GOAL));
+            return $.t(f, nar().confDefault(BELIEF));
         });
     }
 

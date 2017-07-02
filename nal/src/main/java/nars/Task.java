@@ -98,7 +98,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                     //cw = 0; //immediate cut-off
                 }
 
-                if (eternalizable(term())) {
+                if (eternalizable()) {
                     float et = t.eviEternalized();
                     if (et > cw)
                         cw = et;
@@ -112,7 +112,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     }
 
-    static boolean eternalizable(Term term) {
+    default boolean eternalizable() {
 
         return true;
         //return false;

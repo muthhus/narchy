@@ -27,6 +27,7 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.Param;
 import nars.index.term.TermContext;
 import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
@@ -184,14 +185,17 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @NotNull
     @Override
-    default public Term unneg() { //probably rarely called; UnitCompound1 should be used for NEG's
-        if (op() == NEG) {
-            Term x = sub(0);
-            if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
-                ((Compound) x).setNormalized();
-            }
-            return x;
-        }
+    default public Term unneg() {
+        //probably rarely called; UnitCompound1 should be used for NEG's
+        if (Param.DEBUG) assert(op()!=NEG); //HACK for detection
+
+//        if (op() == NEG) {
+//            Term x = sub(0);
+//            if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
+//                ((Compound) x).setNormalized();
+//            }
+//            return x;
+//        }
         return this;
     }
 
@@ -645,7 +649,7 @@ public interface Compound extends Term, IPair, TermContainer {
     int dt();
 
     @Override
-    default Compound dt(int nextDT) {
+    default Term dt(int nextDT) {
 
         int dt = this.dt();
 
@@ -657,7 +661,10 @@ public interface Compound extends Term, IPair, TermContainer {
                 return new GenericCompoundDT(this, nextDT);
             } else {
                 if (this instanceof GenericCompoundDT)
-                    return ((GenericCompoundDT)this).ref;
+                    if (Op.concurrent(dt) == Op.concurrent(nextDT))
+                        return ((GenericCompoundDT)this).ref; //fast
+                    else
+                        return $.the(op(), nextDT, toArray());
                 else {
                     return this; //maybe detect when this happens, could indicate an error
                 }

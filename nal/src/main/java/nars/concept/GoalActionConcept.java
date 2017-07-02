@@ -59,7 +59,7 @@ public class GoalActionConcept extends ActionConcept {
     public Stream<Task> apply(NAR nar) {
 
 
-        int dur = nar.dur();
+        //int dur = nar.dur();
         long now = nar.time();
 
         Truth goal = this.goals().truth(now, nar);
@@ -71,7 +71,7 @@ public class GoalActionConcept extends ActionConcept {
 
             float curiConf =
                     //nar.confDefault(GOAL);
-                    Math.max(goal!=null ? goal.conf() * CURIOSITY_CONF_FACTOR : 0, nar.confMin.floatValue());
+                    Math.max(goal!=null ? Math.min(nar.confDefault(GOAL),goal.conf()) * CURIOSITY_CONF_FACTOR : 0, nar.confMin.floatValue());
 
                     //nar.confMin.floatValue()*2f;
 
@@ -119,13 +119,11 @@ public class GoalActionConcept extends ActionConcept {
         //1. check feedback
         //2. check current belief
         //3. check previous signal belief
-        Truth nextTruth =
-                beliefFeedback;
         //beliefFeedback != null ? beliefFeedback : belief; //latch
 
         LongSupplier stamper = nar.time::nextStamp;
 
-        Task fb = feedback.set(this, nextTruth, stamper, nar);
+        Task fb = feedback.set(this, beliefFeedback, stamper, nar);
         ((SensorBeliefTable) beliefs).commit(fb);
 
 

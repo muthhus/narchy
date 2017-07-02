@@ -31,7 +31,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = new int[] { 0, 1, 2, 4, 16, 64 };
+    static final int[] sampleRadii = new int[] { /*0, 1,*/ 2, 4, 16, 64 };
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -159,7 +159,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     public RTreeBeliefTable() {
         this.tree = new ConcurrentRTree<>(
-                new RTree<>((t -> t), 2, 4, Spatialization.DefaultSplits.AXIAL) {
+                new RTree<>((t -> t), 3, 4, Spatialization.DefaultSplits.AXIAL) {
 
                     @Override
                     public boolean add(TaskRegion tr) {

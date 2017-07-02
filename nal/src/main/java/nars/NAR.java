@@ -121,7 +121,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     protected final NARLoop loop = new NARLoop(this);
 
-    @NotNull public final PSinks<ITask, CLink<ITask>> in;
+    @NotNull
+    public final PSinks<ITask, CLink<ITask>> in;
 
     public final void printConceptStatistics() {
         printConceptStatistics(System.out);
@@ -208,7 +209,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     protected PSinks<ITask, CLink<ITask>> newInputMixer() {
-        return new Mix<ITask,CLink<ITask>>() {
+        return new Mix<ITask, CLink<ITask>>() {
             @Override
             public CLink<ITask> apply(ITask iTask) {
                 return new CLink(iTask);
@@ -216,7 +217,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         };
     }
 
-    public PSink<ITask,CLink<ITask>> newInputChannel(Object id) {
+    public PSink<ITask, CLink<ITask>> newInputChannel(Object id) {
         return in.newStream(id, x -> input(x));
     }
 
@@ -300,7 +301,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
     @NotNull
     public <T extends Term> T term(@NotNull byte[] code) throws NarseseException {
-        return (T)IO.termFromBytes(code, terms);
+        return (T) IO.termFromBytes(code, terms);
     }
 
 
@@ -549,11 +550,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      */
     public final void input(@NotNull ITask... t) {
         for (ITask x : t)
-            if (x!=null) input(x);
+            if (x != null) input(x);
     }
 
     public void input(ITask unclassified) {
-        if (unclassified!=null)
+        if (unclassified != null)
             input(new CLink<>(unclassified));
     }
 
@@ -1159,8 +1160,11 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         }
     }
 
-    /** each concept task */
-    @NotNull public NAR forEachConceptTask(@NotNull Consumer<Task> each) {
+    /**
+     * each concept task
+     */
+    @NotNull
+    public NAR forEachConceptTask(@NotNull Consumer<Task> each) {
         return forEachConcept(c -> c.forEachTask(each));
     }
 
@@ -1207,18 +1211,15 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     @Nullable
-    private Concept concept(@NotNull Termed _termed, boolean createIfMissing) {
-
-        Term term = _termed.unneg();
-
-        if (term instanceof Concept) {
-            Concept ct = (Concept) term;
+    private Concept concept(@NotNull Termed t, boolean createIfMissing) {
+        if (t instanceof Concept) {
+            Concept ct = (Concept) t;
             if (!ct.isDeleted())
                 return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
             //otherwise if it is deleted, continue
         }
 
-        Term cterm = conceptTerm(term);
+        Term cterm = conceptTerm(t);
         return (cterm == null) ? null : terms.concept(cterm, createIfMissing);
     }
 
@@ -1226,9 +1227,10 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
      * returns the canonical Concept term for any given Term, or null if it is unconceptualizable
      */
     @Nullable
-    public Term conceptTerm(@NotNull Term term) {
+    public Term conceptTerm(@NotNull Termed termed) {
 
-        term = term.unneg();
+
+        Term term = termed.unneg();
 
         if (term instanceof Atom)
             return term;
@@ -1271,7 +1273,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
             return null;
         return term;
     }
-
 
 
     public NAR forEachTaskActive(@NotNull Consumer<ITask> recip) {
@@ -1545,7 +1546,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
 
-    @Nullable @Override
+    @Nullable
+    @Override
     public final Term the(@NotNull Op op, int dt, Term[] subs) {
         return terms.the(op, dt, subs);
     }
@@ -1555,21 +1557,28 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return terms.get(x, createIfAbsent);
     }
 
-    /** strongest matching belief for the target time */
+    /**
+     * strongest matching belief for the target time
+     */
     public Task belief(Compound c, long when) {
         return match(c, BELIEF, when);
     }
-    /** strongest matching goal for the target time */
+
+    /**
+     * strongest matching goal for the target time
+     */
     public final Task goal(Compound c, long when) {
         return match(c, GOAL, when);
     }
 
-    /** punc must be either BELIEF or GOAL */
+    /**
+     * punc must be either BELIEF or GOAL
+     */
     public Task match(Compound c, byte punc, long when) {
         Concept concept = concept(c);
         if (concept == null)
             return null;
 
-        return ((BeliefTable)concept.table(punc)).match(when, null, null, false, this);
+        return ((BeliefTable) concept.table(punc)).match(when, null, null, false, this);
     }
 }

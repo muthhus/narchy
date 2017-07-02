@@ -913,11 +913,11 @@ public class NAL7Test extends AbstractNALTest {
 
         t.dur(eventDT/2);
 
-        t.nar.onTask((tt)->{
-           if (tt.start() > t.nar.time()) {
-               System.out.println(tt.proof());
-           }
-        });
+//        t.nar.onTask((tt)->{
+//           if (tt.start() > t.nar.time()) {
+//               System.out.println(tt.proof());
+//           }
+//        });
 
         int x = 0;
         for (int i = 0; i < cycles; i++) {

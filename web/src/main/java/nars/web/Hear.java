@@ -37,7 +37,7 @@ public class Hear extends Loop {
     float confFactor = 1f;
 
     /** use 0 to disable the eternal off */
-    float offConf;
+    float offConf = 0.1f;
 
     public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) {
         return hear(nar ,msg ,src, wordDelayMS, 1f);
@@ -81,7 +81,7 @@ public class Hear extends Loop {
         super( );
         this.nar = nar;
 
-        onReset = nar.eventReset.on(this::onReset);
+        onReset = nar.eventReset.onWeak(this::onReset);
         tokens = msg;
         context = null; //TODO //who.isEmpty() ? null : $.the(who);
         //contextAnonymous = new Term[]{$.the("hear"), $.varDep(1), Op.Imdex};
@@ -125,7 +125,8 @@ public class Hear extends Loop {
             if (concept == null) {
                 //input a constant negative bias - we dont hear the word when it is not spoken
                 //only input when first conceptualized
-                nar.believe(term, Tense.Eternal, 0f, offConf);
+                nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
+                        term, Tense.Eternal, 0.5f, offConf);
             }
         }
 
@@ -158,7 +159,7 @@ public class Hear extends Loop {
 
                 //System.out.println(strippedText);
 
-                Hear.hear(nar, strippedText, page, 200, 0.1f);
+                Hear.hear(nar, strippedText, page, 100, 0.1f);
 
                 Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 

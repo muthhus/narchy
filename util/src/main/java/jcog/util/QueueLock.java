@@ -16,19 +16,19 @@ public class QueueLock<X> implements Consumer<X> {
 
     //public final Lock lock;
     public final AtomicBoolean busy;
-    public final ArrayBlockingQueue<X> queue;
+    public final BlockingQueue<X> queue;
     private final Consumer<X> proc;
 
     final static int concurrency = Runtime.getRuntime().availableProcessors();
 
     public QueueLock(Consumer<X> procedure) {
-        this(concurrency, procedure);
+        this(concurrency*2, procedure);
     }
 
     public QueueLock(int capacity, Consumer<X> procedure) {
         queue = //new DisruptorBlockingQueue<X>(capacity);
-                //new LinkedBlockingQueue<>(capacity);
-                new ArrayBlockingQueue<X>(capacity);
+                new LinkedBlockingQueue();
+                //new ArrayBlockingQueue<X>(capacity);
 
         //this.lock = lock;
         this.busy = new AtomicBoolean(false);

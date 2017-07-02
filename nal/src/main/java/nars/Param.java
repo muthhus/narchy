@@ -16,9 +16,9 @@ import static nars.Op.*;
  */
 public abstract class Param  {
 
-
-    /** belief projection lookahead time in premise formation, in multiples of duration */
-    public static final int PREDICTION_HORIZON = 4;
+//
+//    /** belief projection lookahead time in premise formation, in multiples of duration */
+//    public static final int PREDICTION_HORIZON = 4;
 
     public static final boolean ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS = false;
 
@@ -89,7 +89,7 @@ public abstract class Param  {
     public static final int STAMP_CAPACITY = 10;
 
     public final static int UnificationStackMax = 32;
-    public static final int UnificationConstraintsMax = 8;
+    public static final int UnificationConstraintsMax = 6;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
     public final static int BeliefMatchTTL = 24;

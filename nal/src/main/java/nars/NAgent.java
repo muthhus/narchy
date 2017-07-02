@@ -36,6 +36,7 @@ import static jcog.Texts.n2;
 import static nars.$.*;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * explicit management of sensor concepts and motor functions
@@ -585,22 +586,24 @@ abstract public class NAgent implements NSense, NAct {
      * see: http://www.dictionary.com/browse/dexterity?s=t
      */
     public float dexterity() {
-        final float[] m = {0};
         int n = actions.size();
+        if (n == 0)
+            return 0;
+
+        float m = 0;
         int dur = nar.dur();
         long now = nar.time();
         for (int i = 0; i < n; i++) {
             Truth g = nar.goalTruth(actions.get(i), now);
             float c;
             if (g!=null) {
-                c = g.conf();
+                c = g.evi();
             } else {
                 c = 0;
             }
-            m[0] += c;
+            m += c;
         }
-        float dex = (m[0] / n);
-        return dex;
+        return w2c(m / n /* avg */);
     }
 
 

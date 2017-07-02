@@ -2,7 +2,6 @@
 package nars.web;
 
 import jcog.Loop;
-import jcog.Util;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.PriArrayBag;
 import jcog.pri.PriReference;
@@ -15,6 +14,8 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.RealTime;
 import nars.time.Tense;
+import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -146,16 +147,21 @@ public class IRCNLP extends IRC {
         protected float send(Object o) {
             Runnable r = null;
             synchronized (channels) {
-                s += o.toString() + " ";
-                if (s.length() > minSendLength) {
-                    r = IRCNLP.this.send(channels, s);
-                    s = "";
+                String w = o.toString();
+                boolean punctuation = w.equals(".") || w.equals("!") || w.equals("?");
+                this.s += w;
+                if (!punctuation)
+                    s += " ";
+                if ((s.length() > 0 && punctuation) || this.s.length() > minSendLength) {
+                    r = IRCNLP.this.send(channels, this.s.trim());
+                    this.s = "";
                 }
             }
 
 
             if (r != null) {
-                nar.runLater(r);
+                r.run();
+                //nar.runLater(r);
             }
 
             return 1;
@@ -259,9 +265,9 @@ public class IRCNLP extends IRC {
         if (event instanceof MessageEvent) {
             MessageEvent pevent = (MessageEvent) event;
 
-//            if (pevent.getUser().equals(irc.getUserBot())) {
-//                return; //ignore own messages (echo)
-//            }
+            if (pevent.getUser().equals(irc.getUserBot())) {
+                return; //ignore own messages (echo)
+            }
 
             String msg = pevent.getMessage().trim();
 
@@ -289,9 +295,9 @@ public class IRCNLP extends IRC {
 
         //Param.DEBUG = true;
 
-        NAR n = NARBuilder.newMultiThreadNAR(2, new RealTime.DS(true));
+        NAR n = NARBuilder.newMultiThreadNAR(2, new RealTime.DSHalf(true));
 
-        n.termVolumeMax.setValue(48);
+        n.termVolumeMax.setValue(32);
 
         /*@NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
             new RealTime.DS(true),
@@ -301,7 +307,7 @@ public class IRCNLP extends IRC {
 //        n.addNAR(16, 0.25f);
         //n.addNAR(512, 0.25f);
 
-        n.startFPS(20f);
+        n.startFPS(25f);
         //n.logBudgetMin(System.out, 0.75f);
 
 
@@ -339,42 +345,44 @@ public class IRCNLP extends IRC {
 
         //n.log();
 
-        for (int i = 0; i < 2; i++) {
-            Hear.hear(n, "do you know what is a sentence?", "", 100, 0.5f);
-            Util.sleep(1000);
-
-            Hear.hear(n, "i know that and this is a sentence.", "", 100, 0.5f);
-            Util.sleep(1000);
-        }
+//        for (int i = 0; i < 2; i++) {
+//            Hear.hear(n, "do you know what is a sentence?", "", 100, 0.5f);
+//            Util.sleep(1000);
+//
+//            Hear.hear(n, "i know that and this is a sentence.", "", 100, 0.5f);
+//            Util.sleep(1000);
+//        }
 
         //n.clear();
 
-        new Loop(1/15f) {
-
-            final Term[] promptWord = new Term[]{
-                    $.varDep(1),
-                    $.quote("and"),
-                    $.quote("a"),
-                    $.quote("is"),
-                    //$.quote("then")
-                    /* so, now, etc */
-            };
-
-            @Override
-            public boolean next() {
-                try {
-                    Term word = promptWord[n.random().nextInt(promptWord.length)];
-                    n.input("$0.9 hear(" + word + "). :|:");
-                } catch (Narsese.NarseseException e) {
-                    e.printStackTrace();
-                }
-                return true;
-            }
-        };
+//        new Loop(1 / 15f) {
+//
+//            final Term[] promptWord = new Term[]{
+//                    $.varDep(1),
+//                    $.quote("and"),
+//                    $.quote("a"),
+//                    $.quote("is"),
+//                    //$.quote("then")
+//                    /* so, now, etc */
+//            };
+//
+//            @Override
+//            public boolean next() {
+//                try {
+//                    Term word = promptWord[n.random().nextInt(promptWord.length)];
+//                    n.input("$0.9 hear(" + word + "). :|:");
+//                } catch (Narsese.NarseseException e) {
+//                    e.printStackTrace();
+//                }
+//                return true;
+//            }
+//        };
 
         Hear.wiki(n);
+        //n.log();
 
         bot.start();
+
 
 //        n.on("say", (x, aa, nn) -> {
 //            String msg = Joiner.on(' ').join(
@@ -495,6 +503,81 @@ public class IRCNLP extends IRC {
 
     }
 
+    static final ImmutableSet<String> prepositions = Sets.immutable.of(("aboard\n" +
+            "about\n" +
+            "above\n" +
+            "across\n" +
+            "after\n" +
+            "against\n" +
+            "along\n" +
+            "amid\n" +
+            "among\n" +
+            "anti\n" +
+            "around\n" +
+            "as\n" +
+            "at\n" +
+            "before\n" +
+            "behind\n" +
+            "below\n" +
+            "beneath\n" +
+            "beside\n" +
+            "besides\n" +
+            "between\n" +
+            "beyond\n" +
+            "but\n" +
+            "by\n" +
+            "concerning\n" +
+            "considering\n" +
+            "despite\n" +
+            "down\n" +
+            "during\n" +
+            "except\n" +
+            "excepting\n" +
+            "excluding\n" +
+            "following\n" +
+            "for\n" +
+            "from\n" +
+            "in\n" +
+            "inside\n" +
+            "into\n" +
+            "like\n" +
+            "minus\n" +
+            "near\n" +
+            "of\n" +
+            "off\n" +
+            "on\n" +
+            "onto\n" +
+            "opposite\n" +
+            "outside\n" +
+            "over\n" +
+            "past\n" +
+            "per\n" +
+            "plus\n" +
+            "regarding\n" +
+            "round\n" +
+            "save\n" +
+            "since\n" +
+            "than\n" +
+            "through\n" +
+            "to\n" +
+            "toward\n" +
+            "towards\n" +
+            "under\n" +
+            "underneath\n" +
+            "unlike\n" +
+            "until\n" +
+            "up\n" +
+            "upon\n" +
+            "versus\n" +
+            "via\n" +
+            "with\n" +
+            "within\n" +
+            "without").split("\\r?\\n"));
+
+    /** http://www.really-learn-english.com/list-of-pronouns.html */
+    static final ImmutableSet<String> personalPronouns = Sets.immutable.of("i,you,he,she,it,we,they,me,him,her,us,them".split(","));
+
+
     private static void speak(@Nullable Term word, long delay, IRCNLP bot) {
         if (word == null)
             return;
@@ -502,14 +585,22 @@ public class IRCNLP extends IRC {
         if (delay > 1) {
             //TODO schedule for future
             System.out.println("\t+" + delay + " " + word);
+            return;
         }
 
         //n.believe(tt, Tense.Present);
         String wordString = word instanceof Atom ? $.unquote(word) : word.toString();
         System.out.println(wordString);
         bot.outleak.send(wordString);
-    }
 
+        if (prepositions.contains(wordString))
+            bot.nar.believe($.instprop(word, $.the("preposition")), Tense.Eternal);
+        if (personalPronouns.contains(wordString))
+            bot.nar.believe($.instprop(word, $.the("pronoun")), Tense.Eternal);
+
+
+
+    }
 
 
 }

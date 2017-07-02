@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
@@ -77,10 +78,7 @@ public class Premise extends Pri {
 
         PriReference<Task> taskLink = this.taskLink;
         Task task = taskLink.get();
-        float taskPri = task.pri();
-        if (taskPri != taskPri)
-            return -1; //task deleted so completely erase this premise
-
+        float taskPri = task.priElseZero();
 
         Term beliefTerm = termLink.get();
         Task belief = null;
@@ -153,8 +151,8 @@ public class Premise extends Pri {
 
         float parentTaskPri = beliefPriority != beliefPriority ? taskPri :
                 //Math.max
-                aveAri
-                //or
+                //aveAri
+                or
                         (taskPri, beliefPriority);
 
         //priMult(parentTaskPri);
