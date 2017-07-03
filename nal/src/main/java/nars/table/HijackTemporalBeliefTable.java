@@ -495,10 +495,12 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
                 eternal != null ? eternal.strongest() : null,
                 when, nar.dur(), this);
 
-        if (x==null || x.conf() < Param.TRUTH_EPSILON)
+        if (x != null && x.conf() >= Param.TRUTH_EPSILON) {
+            return x.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+        } else {
             return null; //cut-off
-        else
-            return x;
+        }
+
 
         //return Truth.maxConf(r, topEternal);
         //return (r == null && topEternal != null) ? topEternal.truth() : r;

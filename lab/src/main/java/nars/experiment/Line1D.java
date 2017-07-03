@@ -43,7 +43,7 @@ public class Line1D {
         @Override
         public float floatValueOf(NAR n) {
 
-            n.truthResolution.setValue(0.25f);
+            n.truthResolution.setValue(0.05f);
 
             Line1DSimplest a = new Line1DSimplest(n) {
 
@@ -63,7 +63,7 @@ public class Line1D {
             a.out.resolution.setValue(yResolution);
             a.in.resolution.setValue(yResolution);
             a.curiosity.setValue(
-                    0.05f
+                    0.1f
                     //(2/yResolution)*tHz);
             );
 

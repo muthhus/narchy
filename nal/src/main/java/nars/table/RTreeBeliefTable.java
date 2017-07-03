@@ -244,13 +244,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                         //.listSorted(sort)
                         .list();
                 if (!tt.isEmpty()) {
-                    @Nullable PreciseTruth t = TruthPolation.truth(e, when, dur, tt);
-                    if (t!=null && t.conf() > confMin)
-                        return t;
+                    //applying eternal should not influence the scan for temporal so it is left null here
+                    @Nullable PreciseTruth t = TruthPolation.truth(null, when, dur, tt);
+                    if (t!=null && t.conf() > confMin) {
+                        return t.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1f);
+                    }
                 }
             }
 
         }
+
 
         return e != null ? e.truth() : null;
 

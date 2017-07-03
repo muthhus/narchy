@@ -1017,25 +1017,37 @@ public interface TimeFunctions {
         boolean te = t.isEternal();
         boolean be = b != null ? b.isEternal() : true;
         if (te && !be) {
-            occReturn[0] = b.start();
-            occReturn[1] = b.end();
-        } else if (!te && be) {
-            occReturn[0] = t.start();
-            occReturn[1] = t.end();
-        } else if (!te && !be) {
-            Interval intersection = Interval.intersect(t.start(), t.end(), b.start(), b.end());
-            if (intersection != null) {
-                occReturn[0] = intersection.a;
-                occReturn[1] = intersection.b;
-            } else {
-                //not overlapping at all, compute point interpolation
-                if (Param.ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS)
-                    occReturn[0] = occInterpolate(t, b);
-
-                return null;
-            }
+            long ba = b.start();
+            long bz = b.end();
+            occReturn[0] = ba;
+            occReturn[1] = bz;
         } else {
-            occReturn[0] = occReturn[1] = ETERNAL;
+            long ta = t.start();
+            long tz = t.end();
+            if (!te && be) {
+                occReturn[0] = ta;
+                occReturn[1] = tz;
+            } else if (!te && !be) {
+
+                //TODO cache this in Derivation
+
+                long ba = b.start();
+                long bz = b.end();
+                Interval intersection = Interval.intersect(ta, tz, ba, bz);
+                if (intersection != null) {
+                    occReturn[0] = intersection.a;
+                    occReturn[1] = intersection.b;
+                } else {
+                    //not overlapping at all, compute point interpolation
+                    long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
+                    if (Param.ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS >= dist/p.dur);
+                        occReturn[0] = occInterpolate(t, b);
+
+                    return null;
+                }
+            } else {
+                occReturn[0] = occReturn[1] = ETERNAL;
+            }
         }
 
 //        long occ = occInterpolate(t, b); //reset

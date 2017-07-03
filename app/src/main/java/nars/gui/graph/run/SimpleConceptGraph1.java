@@ -20,7 +20,6 @@ import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -107,7 +106,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         NARSpace cs = new SimpleConceptGraph1(n,
-                () -> (((TaskExecutor) (n.exe)).active)
+                () -> (((TaskExecutor) (n.exe)).concepts)
                         .stream()
                         .map(x -> x.ref instanceof ConceptFire ? ((ConceptFire) x.ref) : null)
                         .filter(Objects::nonNull)

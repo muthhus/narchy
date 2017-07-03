@@ -186,6 +186,9 @@ public class Builtin {
             n.clear();
             n.runLater(() -> Command.log(n, "Ready. (" + n.terms.size() + " subconcepts)"));
         });
+        nar.on("top", (op, args, n) -> {
+            Command.log(n, n.emotion.summary() + " " + n.exe.toString());
+        });
 
 
 //        nar.on("top", (Operator) (op, args, n) -> {
@@ -196,7 +199,7 @@ public class Builtin {
 //
 //            if (args.length > 0 && args[0] instanceof Atom) {
 //                String query = $.unquote(args[0]).toLowerCase();
-//                n.forEachActiveConcept(bc -> {
+//                n.forEachTaskActive(bc -> {
 //                    String bs = bc.toString();
 //                    String cs = bs.toLowerCase();
 //                    if (cs.contains(query)) {

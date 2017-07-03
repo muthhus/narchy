@@ -12,7 +12,7 @@ public class TestDerivationBudgeting {
         double totalExe = 0;
 
         public InstrumentedExecutor(int capacity, float rate) {
-            super(capacity, rate);
+            super(capacity, capacity, rate);
         }
 
         //TODO keep this consistent with superclass's method which has changed since this was written:

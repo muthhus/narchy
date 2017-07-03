@@ -247,7 +247,7 @@ public class IRCNLP extends IRC {
 
     void hear(String text, String src) throws Narsese.NarseseException {
         Hear.hear(nar, text, src, (t) -> {
-            return new Hear(nar, Hear.tokenize(t), src, 100);
+            return new Hear(nar, Hear.tokenize(t), src, 50);
 //            Compound f = $.func("SENTENCE", Hear.tokenize(t));
 //            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f);
 //            return null;
@@ -317,6 +317,7 @@ public class IRCNLP extends IRC {
                 "irc.freenode.net",
                 //"#123xyz"
                 "#netention"
+                //"#nars"
                 //"#x"
         );
 

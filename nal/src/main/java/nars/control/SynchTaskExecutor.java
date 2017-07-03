@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public class SynchTaskExecutor extends TaskExecutor {
 
     public SynchTaskExecutor(int capacity, float rate) {
-        super(capacity, rate);
+        super(capacity, capacity, rate);
     }
 
     @Override

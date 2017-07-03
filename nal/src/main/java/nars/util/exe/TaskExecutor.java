@@ -2,7 +2,6 @@ package nars.util.exe;
 
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;
-import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
@@ -10,7 +9,6 @@ import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
 import jcog.pri.mix.control.CLink;
-import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
 import nars.task.ITask;
@@ -21,8 +19,6 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -41,7 +37,7 @@ public class TaskExecutor extends Executioner {
      * if < 0, executes them all. 0 pauses, and finite value > 0 will cause them to be sorted first if the value exceeds the limit
      * interpreted as its integer value, although currently it is FloatParam
      */
-    public final FloatParam exePerCycleMax = new FloatParam(-1);
+    public final FloatParam conceptsPerCycleMax = new FloatParam(-1);
 
 //    /**
 //     * temporary collection of tasks to remove after sampling
@@ -56,7 +52,7 @@ public class TaskExecutor extends Executioner {
 
 
 
-    public final Bag<ITask, CLink<ITask>> nal =
+    public final Bag<ITask, CLink<ITask>> tasks =
             new PriorityHijackBag<ITask, CLink<ITask>>(4) {
                 @Override
                 protected Consumer<CLink<ITask>> forget(float rate) {
@@ -92,7 +88,7 @@ public class TaskExecutor extends Executioner {
     /**
      * active tasks
      */
-    public final Bag<ITask, CLink<ITask>> active =
+    public final Bag<ITask, CLink<ITask>> concepts =
 //            new ArrayBag<>(PriMerge.plus, new ConcurrentHashMap<>()) {
 
 
@@ -153,18 +149,18 @@ public class TaskExecutor extends Executioner {
     private float forgetEachActivePri;
 
 
-    public TaskExecutor(int capacity, int taskCapacity) {
+    public TaskExecutor(int conceptCapacity, int taskCapacity) {
         super();
-        active.setCapacity(capacity);
-        nal.setCapacity(taskCapacity);
+        concepts.setCapacity(conceptCapacity);
+        tasks.setCapacity(taskCapacity);
 
         //int overCapacity = capacity / 2;
         //overflow = new DisruptorBlockingQueue(overCapacity);
     }
 
-    public TaskExecutor(int capacity, float executedPerCycle) {
-        this(capacity, capacity );
-        exePerCycleMax.setValue(Math.ceil(capacity * executedPerCycle));
+    public TaskExecutor(int conceptCapacity, int taskCapacity, float executedPerCycle) {
+        this(conceptCapacity, taskCapacity);
+        conceptsPerCycleMax.setValue(Math.ceil(conceptCapacity * executedPerCycle));
     }
 
     @Override
@@ -205,8 +201,8 @@ public class TaskExecutor extends Executioner {
 
     @Override
     public void forEach(Consumer<ITask> each) {
-        nal.forEachKey(each);
-        active.forEachKey(each);
+        tasks.forEachKey(each);
+        concepts.forEachKey(each);
     }
 
 
@@ -226,36 +222,36 @@ public class TaskExecutor extends Executioner {
 
             //active.commit(null);
 
-            int ps = (nal.size() + active.size());
+            int ps = (tasks.size() + concepts.size());
             if (ps == 0)
                 return;
 
             boolean t = this.trace;
             if (t)
-                active.print();
+                concepts.print();
 
-            int toExe = exePerCycleMax.intValue();
+            int toExe = conceptsPerCycleMax.intValue();
             if (toExe < 0)
-                toExe = active.capacity();
+                toExe = concepts.capacity();
 
 
             toExe = Math.min(ps, toExe);
-            int toInput = nal.size();
+            int toInput = tasks.size();
 
                 //Random rng = nar.random();
 
             //INPUT
-            nal.commit(null).pop(toInput, this::actuallyRun);
+            tasks.commit(null).pop(toInput, this::actuallyRun);
 
             //EXEC
-            float eFrac = ((float) toExe) / active.capacity();
-            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag) active).depressurize(eFrac) * (eFrac);
+            float eFrac = ((float) toExe) / concepts.capacity();
+            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag) concepts).depressurize(eFrac) * (eFrac);
             this.forgetEachActivePri =
                     pAvg > Pri.EPSILON * 8 ? pAvg : 0;
                     //0;
 
             //activeBuffer.clear();
-            active.sample(Math.min(active.size(), Math.max(1, toExe*2)), x -> {
+            concepts.sample(Math.min(concepts.size(), Math.max(1, toExe*2)), x -> {
 
                 actuallyRun(x);
 
@@ -343,9 +339,9 @@ public class TaskExecutor extends Executioner {
             return true;
         } else {
             if (input.ref instanceof NALTask) {
-                nal.putAsync(input);
+                tasks.putAsync(input);
             } else
-                active.putAsync(input);
+                concepts.putAsync(input);
 
             return true;//!= null;
         }
@@ -365,7 +361,7 @@ public class TaskExecutor extends Executioner {
                 .value("freq", Truthed::freq)
                 .value("conf", Truthed::conf);
 
-        active.forEachKey(x -> {
+        concepts.forEachKey(x -> {
             float p = x.pri();
             if (p != p)
                 return;

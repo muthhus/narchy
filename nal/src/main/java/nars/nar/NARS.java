@@ -197,9 +197,9 @@ public class NARS extends NAR {
     /**
      * default implementation convenience method
      */
-    public void addNAR(int capacity, float rate) {
+    public void addNAR(int conceptCapacity, int taskCapacity, float conceptRate) {
         synchronized (sub) {
-            SubExecutor x = new SubExecutor(capacity, rate);
+            SubExecutor x = new SubExecutor(conceptCapacity, taskCapacity, conceptRate);
             sub.add(x);
             num = sub.size();
         }
@@ -348,8 +348,8 @@ public class NARS extends NAR {
 
 
     class SubExecutor extends TaskExecutor {
-        public SubExecutor(int inputQueueCapacity, float exePct) {
-            super(inputQueueCapacity, exePct);
+        public SubExecutor(int conceptCapacity, int inputTaskCapacity, float exePct) {
+            super(conceptCapacity, inputTaskCapacity, exePct);
         }
 
         @Override

@@ -21,8 +21,7 @@ import static nars.truth.TruthFunctions.w2c;
  * https://en.wikipedia.org/wiki/Category:Intertemporal_economics
  * https://en.wikipedia.org/wiki/Discounted_utility
  */
-public enum TruthPolation {
-    ;
+public enum TruthPolation { ;
 
 
     /**
@@ -48,11 +47,6 @@ public enum TruthPolation {
         //return evi / (1f + dt / dur ); //first order decay
         //return evi / (1f + (dt*dt) / (dur*dur) ); //2nd order decay
 
-    }
-
-    @Nullable
-    public static PreciseTruth truth(long when, int dur, @NotNull Task... tasks) {
-        return truth(null, when, dur, Lists.newArrayList(tasks));
     }
 
     /**

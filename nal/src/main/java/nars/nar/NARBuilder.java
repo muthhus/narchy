@@ -38,7 +38,7 @@ public class NARBuilder {
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 0.2f);
+    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 256, 0.25f);
 
     private Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 
@@ -71,7 +71,7 @@ public class NARBuilder {
         Inperience inp = new Inperience(n, 0.01f, 4);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(512, 0.1f);
+            n.addNAR(512, 1024, 0.1f);
         }
 
 //        n.onTask(t -> {

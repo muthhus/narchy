@@ -20,7 +20,8 @@ public abstract class Param  {
 //    /** belief projection lookahead time in premise formation, in multiples of duration */
 //    public static final int PREDICTION_HORIZON = 4;
 
-    public static final boolean ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS = false;
+    /** max durations in time difference between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
+    public static final int ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS = 2;
 
     /**
      * use this for advanced error checking, at the expense of lower performance.

@@ -9,7 +9,6 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
-import nars.conceptualize.state.ConceptState;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.UnaryTask;
@@ -21,8 +20,6 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -49,13 +46,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //            ThreadLocal.withInitial(LinkedHashMap::new);
 
 
-
     public ConceptFire(Concept c, float pri) {
         super(c, pri);
         assert (c.isNormalized()) :
                 c + " not normalized";
     }
-
 
 
     final static FloatFunction<? super PriReference> linearPri = (p) -> {
@@ -147,21 +142,25 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         int ttl = maxTTL;
 
 
-
-
-        if (templateConcepts==null) {
+        if (templateConcepts == null) {
             TermContainer ctpl = id.templates();
             if (ctpl != null) {
                 Set<Concept> templateConcepts = new UnifiedSet(id.term().size());
-                ctpl.forEach(x -> {
+                Consumer<Term> templatize = x -> {
                     Concept c = nar.conceptualize(x);
                     if (c != null)
                         templateConcepts.add(c);
-                });
+                };
+                ctpl.forEach(templatize);
                 this.templateConcepts = templateConcepts.toArray(new Concept[templateConceptsCount = templateConcepts.size()]);
             } else {
-                templateConcepts = Concept.EmptyArray;
-                templateConceptsCount = 0;
+
+                //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
+
+//                templateConcepts = Concept.EmptyArray;
+//                templateConceptsCount = 0;
+                this.templateConcepts = Concept.EmptyArray;
+
             }
         }
 

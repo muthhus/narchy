@@ -55,6 +55,11 @@ public class GoalActionConcept extends ActionConcept {
     }
 
 
+    public GoalActionConcept resolution(float r) {
+        resolution.setValue(r);
+        return this;
+    }
+
     @Override
     public Stream<Task> apply(NAR nar) {
 

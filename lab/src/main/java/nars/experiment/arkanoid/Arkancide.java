@@ -19,7 +19,7 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam = true;
+    static boolean cam = false;
 
     public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
@@ -100,8 +100,8 @@ public class Arkancide extends NAgentX {
 
         maxPaddleSpeed = 40 * noid.BALL_VELOCITY;
 
-        float resX = Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
-        float resY = Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
+        float resX = 0.02f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
+        float resY = 0.02f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
 
@@ -132,12 +132,12 @@ public class Arkancide extends NAgentX {
             SpaceGraph.window(Vis.beliefCharts(100,
                     Lists.newArrayList(new Term[]{ab, a, b, c}),
                     nar), 600, 600);
-            nar.onTask(t -> {
-                if (t instanceof DerivedTask && t.isGoal()) {
-                    if (t.term().equals(ab))
-                        System.err.println(t.proof());
-                }
-            });
+//            nar.onTask(t -> {
+//                if (t instanceof DerivedTask && t.isGoal()) {
+//                    if (t.term().equals(ab))
+//                        System.err.println(t.proof());
+//                }
+//            });
         }
 
         /*action(new ActionConcept( $.func("dx", "paddleNext", "noid"), nar, (b, d) -> {
@@ -167,7 +167,9 @@ public class Arkancide extends NAgentX {
 //           }
                     return s;
 
-        });
+        }).resolution(0.1f);
+
+        nar.truthResolution.setValue(0.05f);
 
 //        Param.DEBUG = true;
 //        nar.onTask(x -> {

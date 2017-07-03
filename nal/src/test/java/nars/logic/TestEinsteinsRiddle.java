@@ -18,7 +18,7 @@ public class TestEinsteinsRiddle {
     @Test
     public void testRiddle1() throws IOException, Narsese.NarseseException {
         Param.DEBUG = true;
-        NAR n = new NARBuilder().exe(new TaskExecutor(256, 0.25f)).get();
+        NAR n = new NARBuilder().exe(new TaskExecutor(256, 256, 0.25f)).get();
 
         n.termVolumeMax.setValue(1024);
         n.log();

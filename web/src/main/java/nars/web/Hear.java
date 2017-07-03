@@ -37,7 +37,7 @@ public class Hear extends Loop {
     float confFactor = 1f;
 
     /** use 0 to disable the eternal off */
-    float offConf = 0.1f;
+    float offConf = 0f;
 
     public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) {
         return hear(nar ,msg ,src, wordDelayMS, 1f);
@@ -159,7 +159,7 @@ public class Hear extends Loop {
 
                 //System.out.println(strippedText);
 
-                Hear.hear(nar, strippedText, page, 100, 0.1f);
+                Hear.hear(nar, strippedText, page, 50, 0.1f);
 
                 Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 
