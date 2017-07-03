@@ -11,7 +11,6 @@ import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.transform.substitute;
 import nars.term.var.Variable;
-import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Assert;
 
 import static nars.Op.*;

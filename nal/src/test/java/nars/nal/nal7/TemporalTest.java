@@ -10,7 +10,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;

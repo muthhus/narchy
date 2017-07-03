@@ -1,7 +1,6 @@
 package nars.term.util;
 
 import jcog.bag.impl.hijack.HijackMemoize;
-import jcog.util.CaffeineMemoize;
 import jcog.util.Memoize;
 import nars.Op;
 import nars.Param;
@@ -15,8 +14,6 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Function;
 
 import static nars.Op.Null;
-import static nars.Op.concurrent;
-import static nars.time.Tense.DTERNAL;
 
 /**
  * memoizes term construction, in attempt to intern as much as possible (but not exhaustively)
@@ -46,8 +43,8 @@ public class CachedTermIndex extends StaticTermIndex {
 
     @Override
     public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term... u) {
-//        if (u.length < 2)
-//            return super.the(op, dt, u);
+        if (u.length < 2)
+            return super.the(op, dt, u);
 
 
         //return terms.apply(new AppendProtoCompound(op, dt, u).commit());
@@ -56,8 +53,8 @@ public class CachedTermIndex extends StaticTermIndex {
 
     @Override
     public Term the(ProtoCompound c) {
-//        if (c.size() < 2)
-//            return super.the(c);
+        if (c.size() < 2)
+            return super.the(c);
 
 //        if (!c.isDynamic()) {
 //            build.miss.increment();

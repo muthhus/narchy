@@ -7,7 +7,6 @@ import nars.Param;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
-import nars.index.term.map.CaffeineIndex;
 import nars.index.term.map.MapTermIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
@@ -26,7 +25,6 @@ import java.util.function.Supplier;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 
 public class NARBuilder {
 

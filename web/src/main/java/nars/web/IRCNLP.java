@@ -1,7 +1,6 @@
 
 package nars.web;
 
-import jcog.Loop;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.PriArrayBag;
 import jcog.pri.PriReference;

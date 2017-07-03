@@ -1,10 +1,8 @@
 package nars.gui;
 
 import jcog.event.On;
-import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import nars.NAR;
-import nars.concept.Concept;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;

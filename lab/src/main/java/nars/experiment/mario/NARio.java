@@ -13,10 +13,7 @@ import nars.video.PixelBag;
 
 import javax.swing.*;
 
-import java.io.FileNotFoundException;
-
 import static nars.$.$;
-import static nars.gui.graph.run.SimpleConceptGraph1.csvPriority;
 
 public class NARio extends NAgentX {
 

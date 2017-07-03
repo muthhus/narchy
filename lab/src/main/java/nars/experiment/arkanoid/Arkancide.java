@@ -7,7 +7,6 @@ import jcog.data.FloatParam;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;

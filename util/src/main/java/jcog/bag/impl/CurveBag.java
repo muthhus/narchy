@@ -4,10 +4,8 @@ import jcog.bag.Bag;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * ArrayBag with a randomized sampling range

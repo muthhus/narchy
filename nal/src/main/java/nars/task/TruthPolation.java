@@ -1,6 +1,5 @@
 package nars.task;
 
-import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.decide.DecideSoftmax;
 import nars.Task;

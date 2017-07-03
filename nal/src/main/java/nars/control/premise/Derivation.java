@@ -13,7 +13,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.subst.Unify;
-import nars.term.transform.substitute;
 import nars.term.util.InvalidTermException;
 import nars.term.var.CommonVariable;
 import nars.truth.Stamp;

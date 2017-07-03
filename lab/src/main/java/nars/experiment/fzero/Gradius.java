@@ -7,11 +7,8 @@ import nars.NAgentX;
 import nars.Narsese;
 import nars.term.atom.Atomic;
 import nars.video.BufferedImageBitmap2D;
-import nars.video.CameraSensor;
-import nars.video.PixelBag;
 import nars.video.Scale;
 
-import static java4k.gradius4k.Gradius4K.OBJ_Y;
 import static nars.video.BufferedImageBitmap2D.ColorMode.R;
 
 /**

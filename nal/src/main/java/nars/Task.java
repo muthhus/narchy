@@ -36,7 +36,6 @@ import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 

@@ -28,7 +28,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.TreeMap;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -55,7 +58,7 @@ public class NARS extends NAR {
     private ExecutorService pool;
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024,  e) {
+        super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024,  128*1024, e) {
 
 //                  @Override
 //                  protected void onBeforeRemove(Concept c) {

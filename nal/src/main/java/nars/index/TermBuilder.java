@@ -1005,6 +1005,8 @@ public abstract class TermBuilder {
                                     break;
                                 default:
                                     predicate = the(CONJ, cpred.dt(), ppp);
+                                    if (predicate == null)
+                                        return Null;
                                     break;
                             }
                         }

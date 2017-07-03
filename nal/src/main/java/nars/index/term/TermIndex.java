@@ -11,7 +11,6 @@ import nars.index.TermBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.MapSubst1;
 import nars.term.transform.CompoundTransform;

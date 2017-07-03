@@ -8,7 +8,6 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
-import nars.term.container.TermContainer;
 import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;

@@ -1,20 +1,15 @@
 package nars.term.compound;
 
 import jcog.Util;
-import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.term.Compound;
-import nars.term.Term;
-import nars.term.Terms;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.CONJ;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 

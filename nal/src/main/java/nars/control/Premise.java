@@ -27,7 +27,6 @@ import java.util.function.Consumer;
 
 import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
-import static nars.util.UtilityFunctions.aveAri;
 
 /**
  * NOTE: this currently isnt input to the NAR like ITask's are even though it inherits

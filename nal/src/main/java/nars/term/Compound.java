@@ -187,7 +187,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default public Term unneg() {
         //probably rarely called; UnitCompound1 should be used for NEG's
-        if (Param.DEBUG) assert(op()!=NEG); //HACK for detection
+        if (Param.DEBUG) assert (op() != NEG); //HACK for detection
 
 //        if (op() == NEG) {
 //            Term x = sub(0);
@@ -656,13 +656,13 @@ public interface Compound extends Term, IPair, TermContainer {
         if (dt == nextDT)
             return this;
         else {
-            if (nextDT!=DTERNAL && (op().temporal || op().image)) {
+            if (nextDT != DTERNAL && (op().temporal || op().image)) {
                 //assert((op().temporal || op().image));
                 return new GenericCompoundDT(this, nextDT);
             } else {
                 if (this instanceof GenericCompoundDT)
                     if (Op.concurrent(dt) == Op.concurrent(nextDT))
-                        return ((GenericCompoundDT)this).ref; //fast
+                        return ((GenericCompoundDT) this).ref; //fast
                     else
                         return $.the(op(), nextDT, toArray());
                 else {
@@ -896,6 +896,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     return outer;
             }
         }
+        @Nullable Term t = this;
 
         TermContainer tt = subterms();
 
@@ -911,7 +912,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     return Null;
                 Term y = x.eval(index);
                 if (y == null) {
-                    y = x;
+                    y = x; //if a functor returns null, it means unmodified
                 } else if (y == Null) {
                     return Null;
                 } else if (x != y) {
@@ -923,16 +924,9 @@ public interface Compound extends Term, IPair, TermContainer {
             }
 
             if (modified) {
-                @Nullable Term t;
 
                 t = index.the(op(), dt(), evalSubs);
-                if (!t.equals(this)) { //t != this) {
-                    try {
-                        return t.eval(index);
-                    } catch (StackOverflowError e) {
-                        throw new RuntimeException("stack overflow on eval: " + t);
-                    }
-                }
+
 
                 //else {
                 //    continue;
@@ -953,18 +947,30 @@ public interface Compound extends Term, IPair, TermContainer {
             if (f != null /*&& f.getOne() instanceof Functor*/) {
                 TermContainer args = f.getTwo().subterms();
 
-                Term dy = ((Functor) f.getOne()).apply(args);
-                if (dy == null || dy == this) {
-                    return this; //functor returning null return value means keep the original input term
-                } else {
-//                            if (dy.equals(this)) {
-//                                System.err.println("redundant instance detected: " + subject + " " + dy );
-//                                return this;
-//                            }
-                    return dy.eval(index); //recurse
-                }
+                t = ((Functor) f.getOne()).apply(args);
+//                if (dy == null || dy == this) {
+//                    return this; //functor returning null return value means keep the original input term
+//                } else {
+////                            if (dy.equals(this)) {
+////                                System.err.println("redundant instance detected: " + subject + " " + dy );
+////                                return this;
+////                            }
+//                    return dy.eval(index); //recurse
+//                }
             }
 
+        }
+
+
+        if (t == null)
+            return null;
+
+        if (t!=this && !t.equals(this)) { //t != this) {
+            try {
+                return t.eval(index);
+            } catch (StackOverflowError e) {
+                throw new RuntimeException("stack overflow on eval: " + t);
+            }
         }
 
         return this;

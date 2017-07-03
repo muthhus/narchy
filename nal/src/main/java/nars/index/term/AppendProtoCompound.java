@@ -4,6 +4,7 @@ import jcog.byt.DynByteSeq;
 import nars.IO;
 import nars.Op;
 import nars.term.Term;
+import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -107,11 +108,20 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
      * hashes and prepares for use in hashmap
      */
     public AppendProtoCompound commit() {
+
+        boolean commute = subs.length > 1 && op.commutative;
+        if (commute && op.temporal && !Op.concurrent(dt))
+            commute = false; //dont pre-commute
+        if (commute) {
+            subs = Terms.sorted(subs);
+            size = subs.length;
+        }
+
         writeByte(op.ordinal());
+        writeInt(dt);
         for (Term x : subs)
             appendKey(x);
-        if (dt!=DTERNAL)
-            writeInt(dt);
+//        if (dt!=DTERNAL)
 
         this.hash = hash(0, len);
         if (this.hash==0) this.hash = 1;

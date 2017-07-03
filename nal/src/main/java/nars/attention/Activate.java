@@ -1,6 +1,5 @@
 package nars.attention;
 
-import jcog.pri.PLink;
 import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.Pri;
 import nars.Task;

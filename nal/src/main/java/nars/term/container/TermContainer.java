@@ -30,7 +30,6 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static nars.Op.*;
-import static nars.time.Tense.XTERNAL;
 
 
 /**
