@@ -902,10 +902,11 @@ public interface Compound extends Term, IPair, TermContainer {
 
         Term[] evalSubs = null;
         //any contained evaluables
+        boolean modified = false;
+
         if (tt.hasAll(OpBits)) {
             int s = tt.size();
             evalSubs = new Term[s];
-            boolean modified = false;
             for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
                 Term x = tt.sub(i);
                 if (x == Null)
@@ -923,18 +924,6 @@ public interface Compound extends Term, IPair, TermContainer {
                 evalSubs[i] = y;
             }
 
-            if (modified) {
-
-                t = index.the(op(), dt(), evalSubs);
-
-
-                //else {
-                //    continue;
-                //}
-
-                //$.terms.the(op(), dt(), evalSubs) //evaluate in static context to absolutely avoid memoization?
-                //.eval(index);
-            }
         }
 
 
@@ -959,21 +948,21 @@ public interface Compound extends Term, IPair, TermContainer {
 //                }
             }
 
+        } else if (modified) {
+            t = index.the(op(), dt(), evalSubs);
         }
-
 
         if (t == null)
             return null;
 
-        if (t!=this && !t.equals(this)) { //t != this) {
-            try {
-                return t.eval(index);
-            } catch (StackOverflowError e) {
-                throw new RuntimeException("stack overflow on eval: " + t);
-            }
-        }
+        if (t == this || t.equals(this))
+            return this;
 
-        return this;
+        try {
+            return t.eval(index);
+        } catch (StackOverflowError e) {
+            throw new RuntimeException("stack overflow on eval: " + t);
+        }
     }
 
     @Nullable
