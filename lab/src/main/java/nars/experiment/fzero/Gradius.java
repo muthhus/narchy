@@ -26,7 +26,7 @@ public class Gradius extends NAgentX {
 
         this.g = new Gradius4K();
 
-        g.updateMS = 40;
+        g.updateMS = 20;
 
         //Scale cc = new Scale(() -> g.image, 96, 96);
         //senseCamera("(G)", cc);
