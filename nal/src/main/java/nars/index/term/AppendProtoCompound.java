@@ -4,6 +4,7 @@ import jcog.byt.DynByteSeq;
 import nars.IO;
 import nars.Op;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -44,8 +45,6 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
 
         this.subs = u; //zero-copy direct usage
         size = u.length;
-        for (Term x : u)
-            appendKey(x);
     }
 
     /**
@@ -54,7 +53,7 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
      * @param initial_capacity estimated size, but will grow if exceeded
      */
     public AppendProtoCompound(Op op, int dt, int initial_capacity) {
-        super(initial_capacity * 8);
+        super();
         if (initial_capacity > 0)
             this.subs = new Term[initial_capacity];
         this.op = op;
@@ -109,19 +108,23 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
      */
     public AppendProtoCompound commit() {
 
-        boolean commute = subs.length > 1 && op.commutative;
-        if (commute && op.temporal && !Op.concurrent(dt))
-            commute = false; //dont pre-commute
-        if (commute) {
-            subs = Terms.sorted(subs);
-            size = subs.length;
+        if (op!=null) {
+            boolean commute = subs.length > 1 && op.commutative;
+            if (commute && op.temporal && !Op.concurrent(dt))
+                commute = false; //dont pre-commute
+            if (commute) {
+                subs = Terms.sorted(subs);
+                size = subs.length;
+            }
         }
 
-        writeByte(op.ordinal());
-        writeInt(dt);
-        for (Term x : subs)
-            appendKey(x);
-//        if (dt!=DTERNAL)
+        this.bytes = new byte[subs.length * 8 /* estimate */];
+        {
+            writeByte(op != null ? op.ordinal() : Byte.MAX_VALUE);
+            writeInt(dt);
+            for (Term x : subs)
+                appendKey(x);
+        }
 
         this.hash = hash(0, len);
         if (this.hash==0) this.hash = 1;
@@ -155,14 +158,14 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
         return false;
     }
 
-    public boolean add(@NotNull Term x) {
+    public boolean add(@NotNull Termed x) {
         int c = subs.length;
         int len = this.size;
         if (c == len) {
             ensureCapacity(len, len + Math.max(1, (len / 2)));
         }
 
-        _add(x);
+        _add(x.term());
 
         return true;
     }

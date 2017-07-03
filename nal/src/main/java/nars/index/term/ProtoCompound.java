@@ -5,6 +5,7 @@ import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * a lightweight Compound builder
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface ProtoCompound extends TermContainer {
 
+    @Nullable
     @Override
     Op op();
 

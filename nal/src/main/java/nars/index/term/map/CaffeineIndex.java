@@ -125,36 +125,36 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 //        }
 //    }
 
-    @NotNull
-    @Override
-    public final TermContainer intern(@NotNull Term[] a) {
-
-        TermContainer v = super.intern(a);
-
-        if (subterms!=null) {
-            int len = a.length;
-            if (len < 1)
-                return v; //dont intern small or empty containers
-
-            //        //HACK
-            //        if (x instanceof EllipsisTransform || y instanceof EllipsisTransform)
-            //            return new TermVector2(x, y);
-
-            //        DynByteSeq d = new DynByteSeq(4 * len /* estimate */);
-            //        try {
-            //            IO.writeTermContainer(d, a);
-            //        } catch (IOException e) {
-            //            throw new RuntimeException(e);
-            //        }
-
-            return subterms.get(v, vv -> vv);
-        } else {
-            return v;
-        }
-
-
-        //return subterms!=null ? subterms.get(s, (ss) -> ss) :s;
-    }
+//    @NotNull
+//    @Override
+//    public final TermContainer intern(@NotNull Term[] a) {
+//
+//        TermContainer v = super.intern(a);
+//
+//        if (subterms!=null) {
+//            int len = a.length;
+//            if (len < 1)
+//                return v; //dont intern small or empty containers
+//
+//            //        //HACK
+//            //        if (x instanceof EllipsisTransform || y instanceof EllipsisTransform)
+//            //            return new TermVector2(x, y);
+//
+//            //        DynByteSeq d = new DynByteSeq(4 * len /* estimate */);
+//            //        try {
+//            //            IO.writeTermContainer(d, a);
+//            //        } catch (IOException e) {
+//            //            throw new RuntimeException(e);
+//            //        }
+//
+//            return subterms.get(v, vv -> vv);
+//        } else {
+//            return v;
+//        }
+//
+//
+//        //return subterms!=null ? subterms.get(s, (ss) -> ss) :s;
+//    }
 
     @Override
     public void remove(@NotNull Term x) {

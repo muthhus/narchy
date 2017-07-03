@@ -16,6 +16,10 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     protected byte[] bytes;
     public int len;
 
+    protected DynByteSeq() {
+        this.bytes = null;
+    }
+
     public DynByteSeq(int bufferSize) {
         this.bytes = new byte[bufferSize];
     }
@@ -105,10 +109,14 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     private int ensureSized(int extra) {
-        int space = this.bytes.length;
+        byte[] b = this.bytes;
+        int space = b!=null ? b.length : 0;
         int p = this.len;
         if (space - p <= extra) {
-            this.bytes = Arrays.copyOf(this.bytes, space + Math.max(extra, MIN_GROWTH_BYTES));
+            this.bytes =
+                    b!=null ?
+                        Arrays.copyOf(this.bytes, space + Math.max(extra, MIN_GROWTH_BYTES)) :
+                        new byte[extra];
         }
         return p;
     }

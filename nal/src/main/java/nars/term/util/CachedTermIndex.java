@@ -1,12 +1,15 @@
 package nars.term.util;
 
 import jcog.bag.impl.hijack.HijackMemoize;
+import jcog.util.CaffeineMemoize;
 import jcog.util.Memoize;
 import nars.Op;
 import nars.Param;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.ProtoCompound;
 import nars.term.Term;
+import nars.term.Termlike;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Function;
 
 import static nars.Op.Null;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * memoizes term construction, in attempt to intern as much as possible (but not exhaustively)
@@ -23,9 +27,15 @@ public class CachedTermIndex extends StaticTermIndex {
     final static Logger logger = LoggerFactory.getLogger(nars.term.util.CachedTermIndex.class);
 
     public static final StaticTermIndex _terms = new StaticTermIndex();
-    static final Function<ProtoCompound, Term> buildTerm = (C) -> {
+    static final Function<ProtoCompound, Termlike> buildTerm = (C) -> {
             try {
-                return _terms.the(C.op(), C.dt(), C.subterms());
+
+                Op o = C.op();
+                if (o!=null)
+                    return _terms.the(o, C.dt(), C.subterms());
+                else
+                    return _terms.intern(C.subterms());
+
             } catch (InvalidTermException e) {
                 if (Param.DEBUG_EXTRA)
                     logger.error("Term Build: {}, {}", C, e);
@@ -36,9 +46,9 @@ public class CachedTermIndex extends StaticTermIndex {
             }
         };
 
-    public static final Memoize<ProtoCompound, Term> terms =
-            new HijackMemoize<>(buildTerm, 384 * 1024, 4);
-            //CaffeineMemoize.build(buildTerm, 384 * 1024,  true /* Param.DEBUG*/ );
+    public static final Memoize<ProtoCompound, Termlike> terms =
+            //new HijackMemoize<>(buildTerm, 384 * 1024, 4);
+            CaffeineMemoize.build(buildTerm, 128 * 1024,  false /* Param.DEBUG*/ );
 
 
     @Override
@@ -49,6 +59,15 @@ public class CachedTermIndex extends StaticTermIndex {
 
         //return terms.apply(new AppendProtoCompound(op, dt, u).commit());
         return the(new AppendProtoCompound(op, dt, u));
+    }
+
+    @Override
+    public @NotNull TermContainer intern(@NotNull Term[] s) {
+        if (s.length < 2) {
+            return super.intern(s);
+        } else {
+            return (TermContainer) terms.apply(new AppendProtoCompound(null, DTERNAL, s).commit());
+        }
     }
 
     @Override
@@ -68,7 +87,7 @@ public class CachedTermIndex extends StaticTermIndex {
 //            return terms.apply(c.dt(DTERNAL).commit()).dt(cdt);
 //        }
 
-        return terms.apply(c.commit());
+        return (Term) terms.apply(c.commit());
 //        }
     }
 
