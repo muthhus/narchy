@@ -19,7 +19,7 @@ public class Activate /*extends UnaryTask<Task>*/ {
     public static ConceptFire activate(@NotNull Task t, float activation, Concept origin) {
 
         if (activation >= Pri.EPSILON) {
-            origin.tasklinks().putAsync(new PLink<>(t, activation));
+            origin.tasklinks().putAsync(new PLinkUntilDeleted<>(t, activation));
 
 //            if (origin instanceof CompoundConcept) {
 //

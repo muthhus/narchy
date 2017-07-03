@@ -302,10 +302,10 @@ public class Revision {
 //            float freqDiscount =
 //                    (1f - 0.5f * Math.abs(a.freq() - b.freq()));
 //
-//            float stampDiscount =
-////                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
-////                //TODO weight the contributed overlap amount by the relative confidence provided by each task
-//                    1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
+            float stampDiscount =
+//                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
+//                //TODO weight the contributed overlap amount by the relative confidence provided by each task
+                    1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
 //
 ////            //relate to loss of stamp when its capacity to contain the two incoming is reached
 ////            float stampCapacityDiscount =
@@ -352,7 +352,7 @@ public class Revision {
 //            if (endTruth == null)
 //                return null;
 
-        float factor = 1f;
+        float factor = 1f * stampDiscount;
 
 //            //the degree to which start truth and endtruth deviate from a horizontal line is the evidence reduction factor
 //            //this is because the resulting task is analogous to the horizontal line the endpoint values deviate from

@@ -191,7 +191,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 float tfaEach = tfa / templateConceptsCount;
                 if (tfaEach >= Pri.EPSILON) {
                     for (Concept c : templateConcepts)
-                        c.tasklinks().putAsync(new PLink<>(txx, tfaEach));
+                        c.tasklinks().putAsync(new PLinkUntilDeleted(txx, tfaEach));
                 }
             }
 
@@ -218,8 +218,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             if (eachActivation >= Pri.EPSILON) {
                 for (Concept c : templateConcepts) {
                     float momentum = 0.5f;
-                    id.termlinks().put(new PLink(c, eachActivation * (1f - momentum)));
-                    c.termlinks().put(new PLink(id, eachActivation * momentum));
+                    id.termlinks().putAsync(new PLink(c, eachActivation * (1f - momentum)));
+                    c.termlinks().putAsync(new PLink(id, eachActivation * momentum));
                     nar.input(new ConceptFire(c, eachActivation));
                 }
                 //priSub(totalActivation);
