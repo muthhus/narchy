@@ -200,7 +200,7 @@ public class IO {
 
     @NotNull
     public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
-        return $.v(o, in.readByte());
+        return $.v(o, in.readInt());
     }
 
     @NotNull
@@ -273,6 +273,11 @@ public class IO {
             return;
         }
 
+        if (term instanceof UnnormalizedVariable) {
+            out.writeByte(SPECIAL_OP);
+            out.write(((UnnormalizedVariable) term).bytes());
+            return;
+        }
 
         Op o = term.op();
         out.writeByte(o.ordinal());
@@ -283,9 +288,11 @@ public class IO {
 
         } else if (term instanceof Atomic) {
 
+
             byte[] b = ((Atomic) term).bytes();
             out.writeShort(b.length);
             out.write(b);
+
 
         } else {
 
@@ -479,7 +486,9 @@ public class IO {
         }
     }
 
-    public static DataInputStream input(@NotNull byte[] b) {
+    public static DataInput input(@NotNull byte[] b) {
+
+        //return ByteStreams.newDataInput(b);
         return new DataInputStream(new ByteArrayInputStream(b));
     }
 

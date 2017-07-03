@@ -72,8 +72,9 @@ public class TermIOTest {
         //Terms.printRecursive(System.out, (Term)copy, 10);
 
         //assertTrue(copy != orig);
-        assertEquals(copy, orig);
-        assertEquals(copy.hashCode(), orig.hashCode());
+        assertEquals(orig, copy);
+        assertEquals(orig.hashCode(), copy.hashCode());
+
         //assertEquals(copy.getClass(), orig.getClass());
     }
 
@@ -95,8 +96,9 @@ public class TermIOTest {
     }
     @Test
     public void testTermSerialization3() throws Narsese.NarseseException {
-        assertTermEqualSerialize("(#a --> b)");
+        assertTermEqualSerialize("(#1 --> b)");
     }
+
     @Test
     public void testTermSerialization3_2() throws Narsese.NarseseException {
         //multiple variables
