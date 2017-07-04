@@ -60,6 +60,8 @@ public class PSink<X extends Priority, Y extends Priority> extends FloatParam im
     }
 
     public final void input(X x) {
+        if (x == null)
+            return; //HACK
         target.accept(apply(x));
     }
 

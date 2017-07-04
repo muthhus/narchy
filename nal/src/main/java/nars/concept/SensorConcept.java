@@ -165,7 +165,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     @Nullable
     @Override
     public final Task apply(NAR nar) {
-        return sensor.apply(nar);
+        Task s = sensor.apply(nar);
+        return s;
     }
 
     public SensorConcept resolution(float r) {
