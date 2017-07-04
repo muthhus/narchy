@@ -333,7 +333,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 //            return src.dt(dt);
 //        }
         if (subtermMods > 0 || op != src.op() || dt != src.dt())
-            return the(target.commit(dt)).dt(dt);
+            return the(op, dt, target);
         else
             return src;
     }

@@ -1228,7 +1228,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(0, "((out) <=>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.35f /* decayed from: 0.81f*/, 16)
+                .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -1245,7 +1245,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(0, "(--(out) <=>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.35f /*0.81f*/, 16)
+                .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
     @Test public void conjDecoposeGoalAfter() {
@@ -1267,7 +1267,7 @@ public class NAL8Test extends AbstractNALTest {
         test()
                 .inputAt(3, "((a) ==>+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.4f /*0.81f*/, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 1f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL,  ETERNAL, 10);
     }
 
@@ -1284,7 +1284,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(6, "(--,(b))! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.48f, 6) //since b is not desired now, it should reverse predict the goal of (a)
+                .mustDesire(cycles, "(a)", 1f, 81f, 6) //since b is not desired now, it should reverse predict the goal of (a)
                 .mustNotOutput(cycles, "(a)", GOAL, new long[] { ETERNAL } );
     }
 

@@ -116,7 +116,7 @@ public interface Subst  {
         }
 
         int dt = curr.dt();
-        return index.the(next.commit(dt)).dt(dt);
+        return index.the(cop, dt, next);
     }
 
 

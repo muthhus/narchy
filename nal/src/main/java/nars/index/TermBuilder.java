@@ -6,7 +6,6 @@ import nars.derive.meta.match.Ellipsislike;
 import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.atom.IntAtom;
 import nars.term.compound.GenericCompound;
@@ -14,14 +13,14 @@ import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
-import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.TreeSet;
 
-import static java.util.Arrays.copyOfRange;
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
@@ -133,89 +132,59 @@ public abstract class TermBuilder {
     //}
 
 
-    /**
-     * should only be applied to subterms, not the outer-most compound
-     */
-    @NotNull
-    public Term productNormalize(@NotNull Term u) {
-        if (!(u instanceof Compound))
-            return u;
-
-        int b = u.structure();
-        if (!((b & Op.InhAndIMGbits) > 0) || !((b & INH.bit) > 0) || u.varPattern() > 0)
-            return u;
-
-        Term t = u.unneg();
-        boolean neg = (t != u);
-
-        if (t.op() == INH) {
-            Compound ct = (Compound) t;
-            Term[] sp = ct.toArray();
-            Term s = sp[0];
-            Op so = s.op();
-            Term p = sp[1];
-            Op po = p.op();
-            if (so == Op.IMGi && !po.image) {
-                Compound ii = (Compound) s;
-                t = the(Op.INH, ii.sub(0), imageUnwrapToProd(p, ii));
-            } else if (po == Op.IMGe && !so.image) {
-                Compound jj = (Compound) p;
-                t = the(Op.INH, imageUnwrapToProd(s, jj), jj.sub(0));
-            } else {
-                return u; //original value
-            }
-
-        }
-
-        return !neg ? t : $.neg(t);
-    }
-
-    @NotNull
-    private Term imageUnwrapToProd(Term p, @NotNull Compound ii) {
-        return the(Op.PROD, imageUnwrap(ii, p));
-    }
-
-    @NotNull
-    public static Term[] imageUnwrap(@NotNull Compound image, Term other) {
-        int l = image.size();
-        Term[] t = new Term[l];
-        int r = image.dt();
-        @NotNull Term[] imageTerms = image.toArray();
-        for (int i = 0 /* skip the first element of the image */, j = 0; j < l; ) {
-            t[j++] = ((j) == r) ? other : imageTerms[++i];
-        }
-        return t;
-    }
-
 //    /**
-//     * collection implementation of the conjunction true/false filter
+//     * should only be applied to subterms, not the outer-most compound
 //     */
 //    @NotNull
-//    private static Set<Term> conjTrueFalseFilter(@NotNull Set<Term> terms) {
-//        Iterator<Term> ii = terms.iterator();
-//        while (ii.hasNext()) {
-//            Term n = ii.next();
-//            if (isTrue(n))
-//                ii.remove();
-//            else if (isFalse(n))
-//                return Collections.emptySet();
+//    public Term productNormalize(@NotNull Term u) {
+//        if (!(u instanceof Compound))
+//            return u;
+//
+//        int b = u.structure();
+//        if (!((b & Op.InhAndIMGbits) > 0) || !((b & INH.bit) > 0) || u.varPattern() > 0)
+//            return u;
+//
+//        Term t = u.unneg();
+//        boolean neg = (t != u);
+//
+//        if (t.op() == INH) {
+//            Compound ct = (Compound) t;
+//            Term[] sp = ct.toArray();
+//            Term s = sp[0];
+//            Op so = s.op();
+//            Term p = sp[1];
+//            Op po = p.op();
+//            if (so == Op.IMGi && !po.image) {
+//                Compound ii = (Compound) s;
+//                t = the(Op.INH, ii.sub(0), imageUnwrapToProd(p, ii));
+//            } else if (po == Op.IMGe && !so.image) {
+//                Compound jj = (Compound) p;
+//                t = the(Op.INH, imageUnwrapToProd(s, jj), jj.sub(0));
+//            } else {
+//                return u; //original value
+//            }
+//
 //        }
-//        return terms;
+//
+//        return !neg ? t : $.neg(t);
 //    }
-
-
-
-
-
-    private static boolean hasImdex(@NotNull Term... r) {
-        for (Term x : r) {
-            //        if (t instanceof Compound) return false;
-//        byte[] n = t.bytes();
-//        if (n.length != 1) return false;
-            if (x.equals(Imdex)) return true;
-        }
-        return false;
-    }
+//
+//    @NotNull
+//    private Term imageUnwrapToProd(Term p, @NotNull Compound ii) {
+//        return the(Op.PROD, imageUnwrap(ii, p));
+//    }
+//
+//    @NotNull
+//    public static Term[] imageUnwrap(@NotNull Compound image, Term other) {
+//        int l = image.size();
+//        Term[] t = new Term[l];
+//        int r = image.dt();
+//        @NotNull Term[] imageTerms = image.toArray();
+//        for (int i = 0 /* skip the first element of the image */, j = 0; j < l; ) {
+//            t[j++] = ((j) == r) ? other : imageTerms[++i];
+//        }
+//        return t;
+//    }
 
 
     /**
@@ -249,17 +218,10 @@ public abstract class TermBuilder {
         return new GenericCompound(op, subterms);
     }
 
-
     @NotNull
     public final Term the(@NotNull Op op, @NotNull Term... tt) {
         return the(op, DTERNAL, tt);
     }
-
-
-
-
-
-
 
     /**
      * NOTE: terms must be sorted, if they need to be, before calling.
@@ -270,16 +232,8 @@ public abstract class TermBuilder {
         int s = args.length;
         assert (s != 0);
 
-
-//        if (s < op.minSize) {
-//            throw new RuntimeException("invalid size " + s + " for " + op);
-//        }
-//        //assert(s >= op.minSize);
-
         for (int i = 0; i < s; i++) {
             Term x = args[i];
-
-            //x = productNormalize(x);
 
             if (isAbsolute(x))
                 return Null; //may have become False through eval()
@@ -304,7 +258,6 @@ public abstract class TermBuilder {
         }
 
         return newCompound(op, args);
-        //}
     }
 
 
@@ -335,51 +288,11 @@ public abstract class TermBuilder {
 
 
 
-//    @NotNull
-//    private Term image(@NotNull Op o, @NotNull Term... res) {
-//
-//        int index = DTERNAL, j = 0;
-//        boolean hasPatternVar = false;
-//        for (Term x : res) {
-//            if (x.equals(Imdex)) {
-//                assert (index == DTERNAL);
-//                index = j;
-//            } else if (!hasPatternVar && x.varPattern() > 0) {
-//                hasPatternVar = true;
-//            }
-//            j++;
-//        }
-//
-//        Term[] ser;
-//        if (hasPatternVar && index == DTERNAL) {
-//            ser = res;
-//        } else {
-//
-//            if (index == DTERNAL)
-//                throw new InvalidTermException(o, DTERNAL, "image missing '_' (Imdex)", res);
-//
-//            int serN = res.length - 1;
-//            ser = new Term[serN];
-//            System.arraycopy(res, 0, ser, 0, index);
-//            System.arraycopy(res, index + 1, ser, index, (serN - index));
-//        }
-//
-//        return finish(o, index, ser);
-//    }
-
 
     public Term replace(@NotNull Term c, @NotNull Term x, @NotNull Term y) {
         return $.terms.replace(c, x, y);
     }
 
-
-
-
-
-    @NotNull
-    private Term compound(Op op, int dt, Term... cs) {
-        return compound(op, cs).dt(dt);
-    }
 
 
     /**

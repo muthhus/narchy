@@ -90,6 +90,11 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
         return tt;
     }
 
+    @Override
+    public Term[] toArray() {
+        return subs;
+    }
+
     public AppendProtoCompound commit(int commuteForDT) {
         boolean commute = false;
         if (commuteForDT!=DTERNAL && op!=null) {

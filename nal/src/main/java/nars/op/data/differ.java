@@ -1,6 +1,5 @@
 package nars.op.data;
 
-import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Functor;
