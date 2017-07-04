@@ -100,14 +100,11 @@ public final class Conclude extends AbstractPred<Derivation> {
         //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
-        TermIndex index = d.terms;
-
-
         Term b0 = this.conclusionPattern;
 
         for (int i = 0; i < 2; i++) { //repeat necessary for second-layer unification
             Term bp = b0;
-            b0 = compoundOrNull(d.transform(b0, index));
+            b0 = compoundOrNull(d.transform(b0, d));
             if (b0 == null || b0 == conclusionPattern)
                 return true;
             if (b0 == bp)

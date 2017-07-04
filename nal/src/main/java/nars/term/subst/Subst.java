@@ -5,6 +5,7 @@ import nars.control.premise.Derivation;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.PatternTermIndex;
+import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
@@ -40,7 +41,7 @@ public interface Subst  {
      * */
     boolean put(@NotNull Unify copied);
 
-    @Nullable default Term transform(@NotNull Term src, TermIndex index) {
+    @Nullable default Term transform(@NotNull Term src, TermContext index) {
         Term y = xy(src);
         if (y != null) {
             return y; //an assigned substitution, whether a variable or other type of term
@@ -116,7 +117,7 @@ public interface Subst  {
         }
 
         int dt = curr.dt();
-        return index.the(cop, dt, next);
+        return cop.the(dt, next.subterms());
     }
 
 

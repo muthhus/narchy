@@ -844,7 +844,7 @@ public enum Op {
     }
 
 
-    public Term the(int dt, Term... u) {
+    public Term the(int dt, @NotNull Term... u) {
         if (statement) {
             return statement(this, dt, u[0], u[1]);
         } else {

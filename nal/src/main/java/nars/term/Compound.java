@@ -894,7 +894,6 @@ public interface Compound extends Term, IPair, TermContainer {
                     return outer;
             }
         }
-        @Nullable Term t = this;
 
         TermContainer tt = subterms();
 
@@ -924,6 +923,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         }
 
+        @Nullable Term t = null;
 
         //check if this is a funct
         if (o == INH) {
@@ -935,6 +935,9 @@ public interface Compound extends Term, IPair, TermContainer {
                 TermContainer args = f.getTwo().subterms();
 
                 t = ((Functor) f.getOne()).apply(args);
+                if (t == null)
+                    modified = true; //create with evalsubs anyway
+
 //                if (dy == null || dy == this) {
 //                    return this; //functor returning null return value means keep the original input term
 //                } else {
@@ -946,14 +949,17 @@ public interface Compound extends Term, IPair, TermContainer {
 //                }
             }
 
-        } else if (modified) {
+        }
+
+        if (t == null && modified && evalSubs!=null) {
             t = o.the(dt(), evalSubs);
         }
 
         if (t == null)
-            return null;
+            return this;
 
         if (t.equals(this))
+        //if (t == this)
             return this;
 
         try {
