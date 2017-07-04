@@ -4,8 +4,6 @@ import nars.$;
 import nars.Op;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
-import nars.derive.meta.match.EllipsisTransform;
-import nars.derive.meta.match.ImageMatch;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
@@ -188,94 +186,94 @@ abstract public class PatternCompound extends GenericCompound {
 
     }
 
-    public static final class PatternCompoundWithEllipsisLinearImage extends PatternCompoundWithEllipsisLinearDT {
-
-        //private final int ellipseIndex;
-
-        public PatternCompoundWithEllipsisLinearImage(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
-            super(seed, ellipsis, subterms);
-            //this.ellipseIndex = indexOf(ellipsis);
-        }
-
-//        @Override
-//        protected boolean canMatch(@NotNull Compound y) {
-//            return super.canMatch(y);
+//    public static final class PatternCompoundWithEllipsisLinearImage extends PatternCompoundWithEllipsisLinearDT {
+//
+//        //private final int ellipseIndex;
+//
+//        public PatternCompoundWithEllipsisLinearImage(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+//            super(seed, ellipsis, subterms);
+//            //this.ellipseIndex = indexOf(ellipsis);
 //        }
+//
+////        @Override
+////        protected boolean canMatch(@NotNull Compound y) {
+////            return super.canMatch(y);
+////        }
+//
+////        @Override
+////        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
+////            return matchEllipsisWithImage(y) && super.matchEllipsis(y, subst);
+////        }
+//
+////        public boolean matchEllipsisWithImage(@NotNull Compound y) {
+////
+////            int xdt = dt();
+////
+////            //compare relation from beginning as in non-ellipsis case
+////            //OR compare relation from end
+////            return (ellipseIndex >= xdt) ? (xdt == y.dt()) : ((sizeCached - xdt) == (y.size() - y.dt()));
+////
+////        }
+//
+//
+//    }
 
+//    /**
+//     * does not compare specific image dt
+//     */
+//    public static final class PatternCompoundWithEllipsisLinearImageTransform extends PatternCompoundWithEllipsisLinear {
+//
+//        @NotNull
+//        private final EllipsisTransform ellipsisTransform;
+//
+//        public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @NotNull EllipsisTransform ellipsis, @NotNull TermContainer subterms) {
+//            super(seed, ellipsis, subterms);
+//            this.ellipsisTransform = ellipsis;
+//        }
+//
 //        @Override
 //        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
-//            return matchEllipsisWithImage(y) && super.matchEllipsis(y, subst);
-//        }
-
-//        public boolean matchEllipsisWithImage(@NotNull Compound y) {
 //
-//            int xdt = dt();
+//            //return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
+//            //public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull EllipsisTransform et, @NotNull Compound Y) {
 //
-//            //compare relation from beginning as in non-ellipsis case
-//            //OR compare relation from end
-//            return (ellipseIndex >= xdt) ? (xdt == y.dt()) : ((sizeCached - xdt) == (y.size() - y.dt()));
+//            EllipsisTransform et = this.ellipsisTransform;
+//            @NotNull Term from = et.from;
+//            if (from.equals(Op.Imdex)) {
+//                Term n = subst.xy(et.to);
+//                if (n != null /*&& !n.equals(y)*/) {
 //
-//        }
-
-
-    }
-
-    /**
-     * does not compare specific image dt
-     */
-    public static final class PatternCompoundWithEllipsisLinearImageTransform extends PatternCompoundWithEllipsisLinear {
-
-        @NotNull
-        private final EllipsisTransform ellipsisTransform;
-
-        public PatternCompoundWithEllipsisLinearImageTransform(@NotNull Compound seed, @NotNull EllipsisTransform ellipsis, @NotNull TermContainer subterms) {
-            super(seed, ellipsis, subterms);
-            this.ellipsisTransform = ellipsis;
-        }
-
-        @Override
-        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
-
-            //return subst.matchCompoundWithEllipsisTransform(this, (EllipsisTransform) ellipsis, y);
-            //public boolean matchCompoundWithEllipsisTransform(@NotNull Compound X, @NotNull EllipsisTransform et, @NotNull Compound Y) {
-
-            EllipsisTransform et = this.ellipsisTransform;
-            @NotNull Term from = et.from;
-            if (from.equals(Op.Imdex)) {
-                Term n = subst.xy(et.to);
-                if (n != null /*&& !n.equals(y)*/) {
-
-                    //the indicated term should be inserted
-                    //at the index location of the image
-                    //being processed. (this is the opposite
-                    //of the other condition of this if { })
-
-                    return matchEllipsedLinear(y, subst) &&
-                            subst.putXY(et,
-                                    ImageMatch.put(subst.xy(et), n, y));
-
-                }
-            } else {
-                Term n = subst.xy(from);
-//                if (n == null) {
-//                    //select at random TODO make termutator
-//                    int imageIndex = random.nextInt(Y.size());
-//                    return (putXY(et.from, Y.term(imageIndex)) && matchEllipsedLinear(X, e, Y)) &&
-//                            replaceXY(e, ImageMatch.take(term(e), imageIndex));
+//                    //the indicated term should be inserted
+//                    //at the index location of the image
+//                    //being processed. (this is the opposite
+//                    //of the other condition of this if { })
+//
+//                    return matchEllipsedLinear(y, subst) &&
+//                            subst.putXY(et,
+//                                    ImageMatch.put(subst.xy(et), n, y));
+//
 //                }
-
-                if (n != null /*&& n.op() != subst.type*/) {
-                    int imageIndex = y.indexOf(n);
-                    if (imageIndex != -1)
-                        return matchEllipsedLinear(y, subst) &&
-                                subst.putXY(et,
-                                        ImageMatch.take(subst.xy(et), imageIndex));
-                }
-            }
-            return false;
-        }
-
-    }
+//            } else {
+//                Term n = subst.xy(from);
+////                if (n == null) {
+////                    //select at random TODO make termutator
+////                    int imageIndex = random.nextInt(Y.size());
+////                    return (putXY(et.from, Y.term(imageIndex)) && matchEllipsedLinear(X, e, Y)) &&
+////                            replaceXY(e, ImageMatch.take(term(e), imageIndex));
+////                }
+//
+//                if (n != null /*&& n.op() != subst.type*/) {
+//                    int imageIndex = y.indexOf(n);
+//                    if (imageIndex != -1)
+//                        return matchEllipsedLinear(y, subst) &&
+//                                subst.putXY(et,
+//                                        ImageMatch.take(subst.xy(et), imageIndex));
+//                }
+//            }
+//            return false;
+//        }
+//
+//    }
 
     public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
 

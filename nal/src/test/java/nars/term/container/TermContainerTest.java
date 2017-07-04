@@ -1,10 +1,10 @@
 package nars.term.container;
 
-import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import org.junit.Test;
 
@@ -40,13 +40,13 @@ public class TermContainerTest {
         Compound container = $("{a,b}");
         Compound contained = $("{a}");
         assertTrue(
-            $.terms.union(container.op(), container, contained) == container
+            Terms.union(container.op(), container, contained) == container
         );
         assertTrue(
-            $.terms.union(contained.op(), contained, container) == container  //reverse
+            Terms.union(contained.op(), contained, container) == container  //reverse
         );
         assertTrue(
-            $.terms.union(container.op(), container, container) == container  //equal
+            Terms.union(container.op(), container, container) == container  //equal
         );
     }
 
@@ -63,7 +63,7 @@ public class TermContainerTest {
         Compound x = $("{x,y}");
         Compound y = $("{x,y}");
         assertTrue(
-                $.terms.intersect(x.op(), x, y) == x
+                Terms.intersect(x.op(), x, y) == x
         );
     }
 
@@ -72,9 +72,9 @@ public class TermContainerTest {
         Compound x = $("{e,f}");
         Compound y = $("{e,d}");
 
-        System.out.println($.terms.intersect(x.op(), x, y));
+        System.out.println(Terms.intersect(x.op(), x, y));
         System.out.println(Op.difference(x.op(), x, y));
-        System.out.println($.terms.union(x.op(), x, y));
+        System.out.println(Terms.union(x.op(), x, y));
 
     }
 

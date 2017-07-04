@@ -151,7 +151,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         // for example, 1/(N*reprobes)
         // to ammortize additional attempts where the cut was not necessary
         //TODO make this a momentum parameter
-        float cut = boost / (reprobes);
+        float cut = boost / (reprobes*2);
 
         assert(cut > Pri.EPSILON);
 

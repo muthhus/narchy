@@ -12,8 +12,8 @@ public class TaskPositive extends AtomicPred<Derivation> {
 
     @Override
     public boolean test(@NotNull Derivation m) {
-        Truth t = m.task.truth();
-        return (t!=null && t.freq() > 0.5f);
+        Truth t = m.taskTruth;
+        return (t!=null && t.freq() >= 0.5f);
     }
 
     @NotNull

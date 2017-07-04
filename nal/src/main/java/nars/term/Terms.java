@@ -15,21 +15,18 @@ import nars.term.container.TermVector;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
+import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Random;
-import java.util.Set;
-import java.util.SortedSet;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
-import static nars.Op.CONJ;
-import static nars.Op.NEG;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 
 /**
@@ -647,6 +644,101 @@ public enum Terms { ;
     @Nullable
     public static Term pred(@NotNull Termed statement) {
         return ((TermContainer) statement.term()).sub(1);
+    }
+
+    @NotNull
+    public static Term[] neg(@NotNull Term... modified) {
+        int l = modified.length;
+        Term[] u = new Term[l];
+        for (int i = 0; i < l; i++) {
+            u[i] = NEG.the(modified[i]);
+        }
+        return u;
+    }
+
+    /**
+     * for commutive conjunction
+     *
+     * @param dt will be either 0 or DTERNAL (commutive relation)
+     */
+    public static boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s) {
+        for (Term x : u) {
+            if (!flatten(op, dt, x, s))
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean flatten(@NotNull Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s) {
+        int l = u.size();
+        for (int i = 0; i < l; i++) {
+            if (!flatten(op, dt, u.sub(i), s))
+                return false;
+        }
+        return true;
+    }
+
+    public static boolean flattenMatchDT(int candidate, int target) {
+        if (candidate == target) return true;
+        if (target == 0 && candidate == DTERNAL)
+            return true; //promote to parallel
+        return false;
+    }
+
+    public static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
+        Op xo = x.op();
+
+        if ((xo == op) && flattenMatchDT(((Compound) x).dt(), dt)) {
+            return flatten(op, ((Compound) x).subterms(), dt, s); //recurse
+        } else {
+            byte polarity;
+            Term t;
+            if (xo == NEG) {
+                polarity = -1;
+                t = x.unneg();
+            } else {
+                polarity = +1;
+                t = x;
+            }
+            if (s.getIfAbsentPut(t, polarity) != polarity)
+                return false; //CoNegation
+        }
+        return true;
+    }
+
+    @NotNull
+    public static Term intersect(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
+        if (a.equals(b))
+            return a;
+
+        Term[] c = TermContainer.intersect(a, b);
+        return (c == null || c.length== 1) ? Null : (Compound)(o.the(c));
+    }
+
+    @NotNull
+    public static Compound union(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
+        if (a.equals(b))
+            return a;
+
+        TreeSet<Term> t = new TreeSet<>();
+        a.copyInto(t);
+        b.copyInto(t);
+        int as = a.size();
+        int bs = b.size();
+        int maxSize = Math.max(as, bs);
+        if (t.size() == maxSize) {
+            //the smaller is contained by the larger other
+            return as > bs ? a : b;
+        }
+        return (Compound) $.the(o, t);
+    }
+
+    public static boolean reflex(@NotNull Term sub0, @NotNull Term sub1) {
+        sub0 = sub0.unneg();
+        sub1 = sub1.unneg();
+        return sub0.equals(sub1) ||
+                sub0.containsRecursively(sub1) ||
+                sub1.containsRecursively(sub0);
     }
 
     interface SubtermScorer {

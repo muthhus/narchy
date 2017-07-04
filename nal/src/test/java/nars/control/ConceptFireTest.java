@@ -25,10 +25,10 @@ public class ConceptFireTest {
     @Test
     public void testConceptFireLinkSelection() throws Narsese.NarseseException {
         NAR nar = new NARBuilder().get();
-        nar.believe("a:b");
+        nar.input("$0.01 a:b."); //low priority so it doesnt affect links
         nar.run(1);
         Concept c = nar.concept("a:b");
-        for (int n = 0; n < 9; n++) {
+        for (int n = 0; n < 5; n++) {
             c.termlinks().put(new PLink<Term>($(n + ":a"), 0.1f * n));
         }
 
@@ -39,12 +39,12 @@ public class ConceptFireTest {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
                 if (termlink.get() instanceof Atom)
                     return 0 ; //ignore
-                s.addOccurrences(tasklink.get() + " " + termlink.get(), 1);
+                s.addOccurrences(/*tasklink.get() + " " +*/ termlink.get().toString(), 1);
                 return super.run(nar, tasklink, termlink, x, ttlPerPremise);
             }
         };
 
-        for (int i = 0; i < 2000; i++)
+        for (int i = 0; i < 100; i++)
             cf.run(nar);
 
         s.forEachWithOccurrences((x,o)->{
@@ -59,8 +59,8 @@ public class ConceptFireTest {
 
         ObjectIntPair<String> top = s.topOccurrences(1).get(0);
         ObjectIntPair<String> bottom = s.bottomOccurrences(1).get(0);
-        assertEquals("$.50 (b-->a). %1.0;.90% (a-->1)", bottom.getOne());
-        assertEquals("$.50 (b-->a). %1.0;.90% (a-->8)", top.getOne());
+        assertEquals("(a-->1)", bottom.getOne());
+        assertEquals("(a-->4)", top.getOne());
 
     }
 

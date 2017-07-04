@@ -14,10 +14,9 @@ public class BeliefPositive extends AtomicPred<Derivation> {
 
     @Override
     public boolean test(@NotNull Derivation m) {
-        Task B = m.belief;
+        Truth B = m.beliefTruth;
         if (B !=null) {
-            Truth t = B.truth();
-            return (t != null && t.freq() >= 0.5f);
+            return B.freq() >= 0.5f;
         }
         return false;
     }

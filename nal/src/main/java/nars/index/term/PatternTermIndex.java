@@ -1,6 +1,5 @@
 package nars.index.term;
 
-import nars.$;
 import nars.Op;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.PatternCompound;
@@ -117,17 +116,15 @@ public class PatternTermIndex extends MapTermIndex {
 
             return new PatternCompound.PatternCompoundWithEllipsisCommutive(seed, e, v);
         } else {
-            if (ellipsisTransform) {
-                if (!op.image && op != Op.PROD)
-                    throw new RuntimeException("imageTransform ellipsis must be in an Image or Product compound");
-
-                return new PatternCompound.PatternCompoundWithEllipsisLinearImageTransform(
-                        seed, (EllipsisTransform)e, v);
-            } else if (op.image) {
-                return new PatternCompound.PatternCompoundWithEllipsisLinearImage(seed, e, v);
-            } else {
+//            if (ellipsisTransform) {
+//                if (op != Op.PROD)
+//                    throw new RuntimeException("imageTransform ellipsis must be in an Image or Product compound");
+//
+//                return new PatternCompound.PatternCompoundWithEllipsisLinearImageTransform(
+//                        seed, (EllipsisTransform)e, v);
+//            } else {
                 return new PatternCompound.PatternCompoundWithEllipsisLinear(seed, e, v);
-            }
+//            }
         }
 
     }

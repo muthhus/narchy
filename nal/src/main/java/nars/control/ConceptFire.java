@@ -9,10 +9,10 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.UnaryTask;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
@@ -84,7 +84,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
             return null;
         }
-        DecideRoulette<PriReference<Task>> taskl = new DecideRoulette(softMaxPri);
+        DecideRoulette<PriReference<Task>> taskl = new DecideRoulette(linearPri);
         tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
@@ -92,7 +92,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         }
 
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
-        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(softMaxPri);
+        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(linearPri);
         termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
         if (terml.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_termlinks_selected");
@@ -153,6 +153,14 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                         templateConcepts.add(c);
                 };
                 ctpl.forEach(templatize);
+
+                //HACK one extra layer
+                ctpl.forEach(x -> {
+                   if (x instanceof Compound) {
+                       ((Compound)x).forEach(templatize);
+                   }
+                });
+
                 this.templateConcepts = templateConcepts.toArray(new Concept[templateConceptsCount = templateConcepts.size()]);
             } else {
 

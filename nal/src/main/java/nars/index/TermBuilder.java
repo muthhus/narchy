@@ -4,16 +4,15 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
-import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.TreeSet;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
@@ -255,78 +254,13 @@ public abstract class TermBuilder {
         return the(INH, the(SETe, subj), the(SETi, pred));
     }
 
-    @NotNull
-    public static Term[] neg(@NotNull Term... modified) {
-        int l = modified.length;
-        Term[] u = new Term[l];
-        for (int i = 0; i < l; i++) {
-            u[i] = NEG.the(modified[i]);
-        }
-        return u;
-    }
-
-
-
 
     public Term replace(@NotNull Term c, @NotNull Term x, @NotNull Term y) {
         return $.terms.replace(c, x, y);
     }
 
 
-
-    /**
-     * for commutive conjunction
-     *
-     * @param dt will be either 0 or DTERNAL (commutive relation)
-     */
-    public static boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s) {
-        for (Term x : u) {
-            if (!flatten(op, dt, x, s))
-                return false;
-        }
-        return true;
-    }
-
-    public static boolean flatten(@NotNull Op op, @NotNull TermContainer u, int dt, ObjectByteHashMap<Term> s) {
-        int l = u.size();
-        for (int i = 0; i < l; i++) {
-            if (!flatten(op, dt, u.sub(i), s))
-                return false;
-        }
-        return true;
-    }
-
-    public static boolean flattenMatchDT(int candidate, int target) {
-        if (candidate == target) return true;
-        if (target == 0 && candidate == DTERNAL)
-            return true; //promote to parallel
-        return false;
-    }
-
-    public static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
-        Op xo = x.op();
-
-        if ((xo == op) && flattenMatchDT(((Compound) x).dt(), dt)) {
-            return flatten(op, ((Compound) x).subterms(), dt, s); //recurse
-        } else {
-            byte polarity;
-            Term t;
-            if (xo == NEG) {
-                polarity = -1;
-                t = x.unneg();
-            } else {
-                polarity = +1;
-                t = x;
-            }
-            if (s.getIfAbsentPut(t, polarity) != polarity)
-                return false; //CoNegation
-        }
-        return true;
-    }
-
-
-
-//    /**
+    //    /**
 //     * whether to apply immediate transforms during compound building
 //     */
 //    protected boolean transformImmediates() {
@@ -339,35 +273,6 @@ public abstract class TermBuilder {
 //        return difference(setType, A, B);
 //    }
 
-
-
-    @NotNull
-    public static Term intersect(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
-        if (a.equals(b))
-            return a;
-
-        Term[] c = TermContainer.intersect(a, b);
-        return (c == null || c.length== 1) ? Null : (Compound)(o.the(c));
-    }
-
-
-    @NotNull
-    public static Compound union(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
-        if (a.equals(b))
-            return a;
-
-        TreeSet<Term> t = new TreeSet<>();
-        a.copyInto(t);
-        b.copyInto(t);
-        int as = a.size();
-        int bs = b.size();
-        int maxSize = Math.max(as, bs);
-        if (t.size() == maxSize) {
-            //the smaller is contained by the larger other
-            return as > bs ? a : b;
-        }
-        return (Compound) $.the(o, t);
-    }
 
     @NotNull
     public Term the(@NotNull Compound csrc, @NotNull Term... newSubs) {
@@ -481,7 +386,7 @@ public abstract class TermBuilder {
                     (subsChanged && newSubs.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
                             ||
                             (sts == 2 &&
-                                    reflex(st.sub(0), st.sub(1))
+                                    Terms.reflex(st.sub(0), st.sub(1))
                             ))// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
                     ) {
 
@@ -503,17 +408,19 @@ public abstract class TermBuilder {
 //            }
 
             Compound xx = compoundOrNull(
-                    subsChanged ? o.the(pdt, newSubs)
+                    Op.compound(o, pdt, subsChanged ?
+                        Op.subterms(newSubs)
                             :
-                    o.the(pdt, c.subterms().toArray()));
-                            //c.dt(pdt)
+                        c.subterms()  //o.the(pdt, c.subterms().toArray()));
+                    )
+            );
 
             if (xx == null) {
                 if (dtChanged) {
                     if (pdt == DTERNAL) {
                         //throw new InvalidTermException("unable to atemporalize", c);
                         @Nullable Compound x = compoundOrNull(
-                                o.the(XTERNAL, subsChanged ? newSubs : st.toArray()));
+                                Op.compound(o, XTERNAL, subsChanged ? Op.subterms(newSubs) : st));
                         return x != null ? x : Null;
                     }
                 }
@@ -537,14 +444,6 @@ public abstract class TermBuilder {
         } else {
             return c;
         }
-    }
-
-    private static boolean reflex(@NotNull Term sub0, @NotNull Term sub1) {
-        sub0 = sub0.unneg();
-        sub1 = sub1.unneg();
-        return sub0.equals(sub1) ||
-                sub0.containsRecursively(sub1) ||
-                sub1.containsRecursively(sub0);
     }
 
 

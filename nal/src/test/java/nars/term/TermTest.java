@@ -26,7 +26,6 @@ import nars.term.container.TermVector;
 import nars.term.container.TermVector1;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.TreeSet;

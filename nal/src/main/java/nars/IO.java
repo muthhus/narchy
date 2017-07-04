@@ -320,9 +320,7 @@ public class IO {
     }
 
     public static void writeCompoundSuffix(@NotNull DataOutput out, int dt, Op o) throws IOException {
-        if (o.image)
-            out.writeByte((byte) dt);
-        else if (o.temporal)
+        if (o.temporal)
             out.writeInt(dt);
     }
 
@@ -358,10 +356,7 @@ public class IO {
 
         int dt;
 
-        if (o.image) {
-            dt = in.readByte();
-            assert (dt >= 0);
-        } else if (o.temporal) {
+        if (o.temporal) {
             dt = in.readInt();
         } else {
             dt = DTERNAL;
@@ -943,9 +938,7 @@ public class IO {
                 if (subtermsRemain == 0) {
                     //end of compound:
                     Op ol = Op.values()[ll[0]];
-                    if (ol.image)
-                        i++; //skip image index byte
-                    else if (ol.temporal)
+                    if (ol.temporal)
                         i += 4; //skip temporal dt (32 bits)
                     level--;
                     continue pop; //see if the next level up is finished

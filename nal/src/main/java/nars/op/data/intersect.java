@@ -1,10 +1,10 @@
 package nars.op.data;
 
-import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
+import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 
 public class intersect extends Functor.BinaryFunctor {
@@ -17,7 +17,7 @@ public class intersect extends Functor.BinaryFunctor {
         if (a instanceof Compound && b instanceof Compound) {
             Op aop = a.op();
             if (b.op() == aop)
-                return $.terms.intersect(aop, (Compound) a, (Compound) b);
+                return Terms.intersect(aop, (Compound) a, (Compound) b);
         }
 
         return null;

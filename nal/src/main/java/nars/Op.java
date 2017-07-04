@@ -1,10 +1,9 @@
 package nars;
 
 
-import jcog.util.CaffeineMemoize;
+import jcog.bag.impl.hijack.HijackMemoize;
 import jcog.util.Memoize;
 import nars.derive.meta.match.Ellipsislike;
-import nars.index.TermBuilder;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.ProtoCompound;
 import nars.index.term.TermContext;
@@ -36,7 +35,7 @@ import java.util.*;
 import java.util.function.Function;
 
 import static java.util.Arrays.copyOfRange;
-import static nars.index.TermBuilder.flatten;
+import static nars.term.Terms.flatten;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
@@ -73,7 +72,7 @@ public enum Op {
         @Override
         public Term the(int dt, Term[] u) {
             assert (u.length == 1);
-            assert (dt == DTERNAL || dt == XTERNAL);
+            //assert (dt == DTERNAL || dt == XTERNAL);
             return neg(u[0]);
         }
     },
@@ -87,7 +86,7 @@ public enum Op {
     SECTe("&", true, 3, Args.GTETwo) {
         @Override
         public Term the(int dt, Term[] u) {
-            return newIntersection(u,
+            return intersect(u,
                     SECTe,
                     SETe,
                     SETi);
@@ -100,7 +99,7 @@ public enum Op {
     SECTi("|", true, 3, Args.GTETwo) {
         @Override
         public Term the(int dt, Term[] u) {
-            return newIntersection(u,
+            return intersect(u,
                     SECTi,
                     SETi,
                     SETe);
@@ -436,7 +435,7 @@ public enum Op {
         public Term the(int dt, Term... u) {
             assert (dt == DTERNAL);
             assert (u.length > 1 || u[0].op() == VAR_PATTERN);
-            return NEG.the(CONJ.the(TermBuilder.neg(u)));
+            return NEG.the(CONJ.the(Terms.neg(u)));
         }
 
     },
@@ -579,7 +578,6 @@ public enum Op {
     public final boolean var;
     public final boolean atomic;
     public final boolean statement;
-    public final boolean image;
 
     /**
      * whether this involves an additional numeric component: 'dt' (for temporals) or 'relation' (for images)
@@ -629,9 +627,7 @@ public enum Op {
         this.temporal = str.equals("&&") || str.equals("==>") || str.equals("<=>");
         //in(or(CONJUNCTION, IMPLICATION, EQUIV));
 
-        this.image = str.equals("/") || str.equals("\\");
-
-        this.hasNumeric = image || temporal;
+        this.hasNumeric = temporal;
 
         //negation does not contribute to structure vector
         this.bit = (1 << ordinal());
@@ -879,8 +875,8 @@ public enum Op {
     };
 
     public static final Memoize<ProtoCompound, Termlike> cache =
-            //new HijackMemoize<>(buildTerm, 384 * 1024, 4);
-            CaffeineMemoize.build(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
+            new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 4);
+            //CaffeineMemoize.build(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
 
 
     static TermContainer _subterms(@NotNull Term[] s) {
@@ -898,7 +894,7 @@ public enum Op {
 
 
     @NotNull
-    static Term compound(Op op, int dt, TermContainer subterms) {
+    public static Term compound(Op op, int dt, TermContainer subterms) {
         assert (!op.atomic);
         int s = subterms.size();
         assert (s > 0);
@@ -1245,6 +1241,7 @@ public enum Op {
         return compound(op, dt, subterms(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
     }
 
+
     /**
      * index of operators which are encoded by 1 byte: must be less than 31 because this is the range for control characters
      */
@@ -1252,7 +1249,6 @@ public enum Op {
     static final Op[] byteSymbols = new Op[numByteSymbols];
     static final ImmutableMap<String, Op> stringToOperator;
     //static final CharObjectHashMap<Op> _charToOperator = new CharObjectHashMap(values().length * 2);
-
 
     public static Op fromString(String s) {
         return stringToOperator.get(s);
@@ -1298,7 +1294,7 @@ public enum Op {
 
 
     @NotNull
-    private static Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
+    private static Term intersect(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
 
         int trues = 0;
         for (Term x : t) {
@@ -1340,14 +1336,14 @@ public enum Op {
                         single;
 
             case 2:
-                return newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
+                return intersect2(t[0], t[1], intersection, setUnion, setIntersection);
             default:
                 //HACK use more efficient way
-                Term a = newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
+                Term a = intersect2(t[0], t[1], intersection, setUnion, setIntersection);
 
-                Term b = newIntersection(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection);
+                Term b = intersect(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection);
 
-                return newIntersection2(a, b,
+                return intersect2(a, b,
                         intersection, setUnion, setIntersection
                 );
         }
@@ -1356,7 +1352,7 @@ public enum Op {
 
     @NotNull
     @Deprecated
-    private static Term newIntersection2(@NotNull Term term1, @NotNull Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
+    private static Term intersect2(@NotNull Term term1, @NotNull Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
 
         if (term1.equals(term2))
             return term1;
@@ -1366,13 +1362,13 @@ public enum Op {
 
         if ((o1 == setUnion) && (o2 == setUnion)) {
             //the set type that is united
-            return TermBuilder.union(setUnion, (Compound) term1, (Compound) term2);
+            return Terms.union(setUnion, (Compound) term1, (Compound) term2);
         }
 
 
         if ((o1 == setIntersection) && (o2 == setIntersection)) {
             //the set type which is intersected
-            return TermBuilder.intersect(setIntersection, (Compound) term1, (Compound) term2);
+            return Terms.intersect(setIntersection, (Compound) term1, (Compound) term2);
         }
 
         if (o2 == intersection && o1 != intersection) {

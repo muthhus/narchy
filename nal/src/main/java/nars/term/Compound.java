@@ -27,7 +27,6 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
-import nars.Param;
 import nars.index.term.TermContext;
 import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
@@ -373,10 +372,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
                 if ((xs = xsubs.size()) == ysubs.size()) {
 
-                    if (op.image) {
-                        if (dt() != y.dt())
-                            return false;
-                    } else if (op.temporal) {
+                    if (op.temporal) {
                         if (!matchTemporalDT(dt(), y.dt(), subst.dur))
                             return false;
 
@@ -657,7 +653,7 @@ public interface Compound extends Term, IPair, TermContainer {
             return this;
         else {
             Op op = op();
-            if (nextDT != DTERNAL && (op.temporal || op.image)) {
+            if (nextDT != DTERNAL && (op.temporal)) {
                 //assert((op().temporal || op().image));
                 return new GenericCompoundDT(this, nextDT);
             } else {
@@ -730,7 +726,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         if (other.size() == s) {
 
-            if (op.image || requireSameTime)
+            if (requireSameTime)
                 if (((Compound) other).dt() != dt())
                     return false;
 
@@ -885,7 +881,8 @@ public interface Compound extends Term, IPair, TermContainer {
             return this;
 
         //unwrap negation before recursion, it should be more efficient
-        if (op() == NEG) {
+        Op o = op();
+        if (o == NEG) {
             Compound inner = compoundOrNull(unneg());
             if (inner == null)
                 return this; //dont go further
@@ -929,10 +926,10 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
         //check if this is a funct
-        if (op() == INH) {
+        if (o == INH) {
             //recursively compute contained subterm functors
             org.eclipse.collections.api.tuple.Pair<Atomic, Compound> f =
-                    (evalSubs != null) ? (f = Op.functor(op(), evalSubs, index, true)) : Op.functor(this, index, true);
+                    (evalSubs != null) ? (f = Op.functor(o, evalSubs, index, true)) : Op.functor(this, index, true);
 
             if (f != null /*&& f.getOne() instanceof Functor*/) {
                 TermContainer args = f.getTwo().subterms();
@@ -950,13 +947,13 @@ public interface Compound extends Term, IPair, TermContainer {
             }
 
         } else if (modified) {
-            t = op().the(dt(), evalSubs);
+            t = o.the(dt(), evalSubs);
         }
 
         if (t == null)
             return null;
 
-        if (t == this || t.equals(this))
+        if (t.equals(this))
             return this;
 
         try {

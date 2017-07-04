@@ -5,7 +5,6 @@ import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
-import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -35,7 +34,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import static jcog.pri.op.PriMerge.max;
 import static jcog.pri.op.PriMerge.plus;
 import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
@@ -146,7 +144,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 Op so = subj.op();
                 Op po = pred.op();
 
-                if (dmt == null && (po.atomic || po.image || po == PROD)) {
+                if (dmt == null && (po.atomic || po == PROD)) {
                     if ((so == Op.SECTi) || (so == Op.SECTe) || (so == Op.DIFFi)) {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
@@ -177,7 +175,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                                 }
                             }
                         }
-                    } else if (po.image) {
+                    } /*else if (po.image) {
                         Compound img = (Compound) pred;
                         Term[] ee;
 
@@ -198,11 +196,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         Compound b = compoundOrNull(INH.the(DTERNAL, $.p(ee), img.sub(0)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
-                    }
+                    }*/
 
                 }
 
-                if (dmt == null && (so.atomic || so.image || so == PROD)) {
+                if (dmt == null && (so.atomic || so == PROD)) {
                     if ((po == Op.SECTi) || (po == Op.SECTe) || (po == DIFFe)) {
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
                         //(M --> P), (M --> S), notSet(S), notSet(P), neqCom(S,P) |- (M --> (P | S)), (Belief:Union)
@@ -233,7 +231,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                                 }
                             }
                         }
-                    } else if (so.image) {
+                    } /*else if (so.image) {
                         Compound img = (Compound) subj;
                         Term[] ee = new Term[img.size()];
 
@@ -248,7 +246,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         Compound b = compoundOrNull(INH.the(DTERNAL, img.sub(0), $.p(ee)));
                         if (b != null)
                             dmt = new DynamicTruthModel.Identity(t, b);
-                    }
+                    }*/
 
                 }
 

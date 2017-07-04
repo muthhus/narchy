@@ -62,12 +62,12 @@ public class EllipsisMatch extends ArrayTermVector implements Term {
             return EllipsisMatch.empty;
         }
 
-        if (!y.op().image) {
-            return match( y.toArraySubRange(from, to));
-        } else {
-            assert(to == y.size());
-            return ImageMatch.getRemaining(y, from);
-        }
+        return match( y.toArraySubRange(from, to));
+
+//        } else {
+//            assert(to == y.size());
+//            return ImageMatch.getRemaining(y, from);
+//        }
 
     }
 

@@ -37,13 +37,6 @@ public class GenericCompoundDT extends ProxyCompound {
             @NotNull TermContainer subterms = base.subterms();
             int size = subterms.size();
 
-            if (op.image) {
-                if (((dt < 0) || (dt > size)) && !(dt == DTERNAL && subterms.varPattern() > 0))
-                    throw new InvalidTermException(op, dt, "Invalid dt value for image", subterms.toArray());
-            } /*else {
-                if (subterms.containsRecursively(Op.Imdex))
-                    throw new InvalidTermException(op, dt, "Illegal Imdex in Subterms", subterms.toArray());
-            }*/
 
             if (op.temporal && (op != CONJ && size != 2))
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator", subterms.toArray());

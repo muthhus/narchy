@@ -175,9 +175,7 @@ public class TermKey extends HashCachedDynByteSeq {
 
         @NotNull Op o = c.op();
         out.writeByte(o.ordinal()); //put operator last
-        if (o.image) {
-            out.writeByte((byte) c.dt());
-        } else if (includeTemporal && o.temporal) {
+        if (includeTemporal && o.temporal) {
             out.writeInt(c.dt());
         }
 

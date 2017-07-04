@@ -4,6 +4,7 @@ import nars.concept.Concept;
 import nars.op.Command;
 import nars.op.Operator;
 import nars.op.data.*;
+import nars.op.data.intersect;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;

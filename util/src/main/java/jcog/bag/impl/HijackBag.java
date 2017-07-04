@@ -191,7 +191,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         try {
 
-            final int start = Math.abs(hash) % c; //Math.min(Math.abs(hash), Integer.MAX_VALUE - reprobes - 1); //dir ? iStart : (iStart + reprobes) - 1;
+            int start = (hash % c); //Math.min(Math.abs(hash), Integer.MAX_VALUE - reprobes - 1); //dir ? iStart : (iStart + reprobes) - 1;
+            if (start < 0)
+                start += c; //Fair wraparound
 
             if (mode != GET)
                 start(hash);

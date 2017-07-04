@@ -1,6 +1,5 @@
 package nars.table;
 
-import jcog.pri.Pri;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
