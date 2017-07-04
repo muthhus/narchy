@@ -19,7 +19,6 @@ import nars.term.util.InvalidTermException;
 import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
-import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
@@ -68,7 +67,7 @@ public enum Op {
         }
 
         @Override
-        public Term the(TermBuilder b, int dt, Term[] u) {
+        public Term the(int dt, Term[] u) {
             assert (u.length == 1);
             assert (dt == DTERNAL);
             return neg(u[0]);
@@ -83,11 +82,11 @@ public enum Op {
      */
     SECTe("&", true, 3, Args.GTETwo) {
         @Override
-        public Term the(TermBuilder b, int dt, Term[] u) {
-              return newIntersection(u,
-                        SECTe,
-                        SETe,
-                        SETi);
+        public Term the(int dt, Term[] u) {
+            return newIntersection(u,
+                    SECTe,
+                    SETe,
+                    SETi);
         }
     },
 
@@ -96,11 +95,11 @@ public enum Op {
      */
     SECTi("|", true, 3, Args.GTETwo) {
         @Override
-        public Term the(TermBuilder b, int dt, Term[] u) {
-                return newIntersection(u,
-                        SECTi,
-                        SETi,
-                        SETe);
+        public Term the(int dt, Term[] u) {
+            return newIntersection(u,
+                    SECTi,
+                    SETi,
+                    SETe);
         }
     },
 
@@ -109,7 +108,7 @@ public enum Op {
      */
     DIFFe("-", false, 3, Args.Two) {
         @Override
-        public Term the(TermBuilder b, int dt, Term[] u) {
+        public Term the(int dt, Term[] u) {
             return newDiff(this, u);
         }
     },
@@ -119,7 +118,7 @@ public enum Op {
      */
     DIFFi("~", false, 3, Args.Two) {
         @Override
-        public Term the(TermBuilder b, int dt, Term[] u) {
+        public Term the(int dt, Term[] u) {
             return newDiff(this, u);
         }
     },
@@ -182,12 +181,10 @@ public enum Op {
         }
 
         @Override
-        public Term the(TermBuilder builder, int dt, Term[] uu) {
-            Term[] u = conjTrueFalseFilter(uu);
+        public Term the(int dt, Term... uu) {
+            Term[] u = uu.length > 1 ? conjTrueFalseFilter(uu) : uu /* avoid true false filter if fall-through only-term anyway */;
 
             final int n = u.length;
-
-
             if (n == 1) {
                 Term only = u[0];
 
@@ -206,13 +203,13 @@ public enum Op {
             if (dt == XTERNAL) {
                 assert (n == 2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
-                return conjPost(builder.the(CONJ, XTERNAL,  u), builder);
+                return conjPost(CONJ.the(XTERNAL, u));
             }
 
             boolean commutive = concurrent(dt);
             if (commutive) {
 
-                return conjPost(junctionFlat(dt, builder, u), builder);
+                return conjPost(junctionFlat(dt, u));
 
             } else {
                 //NON-COMMUTIVE
@@ -224,8 +221,8 @@ public enum Op {
 
                 Term a = u[0];
                 Term b = u[1];
-                boolean equal = a.equals(b);
-                if (equal) {
+                boolean changed = false;
+                if (a.equals(b)) {
                     if (dt < 0) {
                         //make dt positive to avoid creating both (x &&+1 x) and (x &&-1 x)
                         dt = -dt;
@@ -238,10 +235,15 @@ public enum Op {
                         u[0] = u[1];
                         u[1] = x; //swap
                         dt = -dt; //and invert time
+                        changed = true;
                     }
                 }
 
-                return conjPost(builder.the(CONJ, dt, u), builder);
+                return conjPost(
+                        !changed ?
+                            build(CONJ, dt, TermVector.the(u)) :
+                            CONJ.the(dt, u)
+                );
 
             }
         }
@@ -251,7 +253,7 @@ public enum Op {
          * see: https://en.wikipedia.org/wiki/Boolean_algebra#Monotone_laws
          */
         @NotNull
-        private Term junctionFlat(int dt, TermBuilder builder, @NotNull Term... u) {
+        private Term junctionFlat(int dt, @NotNull final Term... u) {
 
             //TODO if there are no negations in u then an accelerated construction is possible
 
@@ -282,7 +284,7 @@ public enum Op {
                                 csi.remove();
 
                                 if (!disjSubs.isEmpty()) {
-                                    Term y = NEG.the(CONJ.the(builder, disj.dt(), disjSubs.toArray(new Term[disjSubs.size()])));
+                                    Term y = NEG.the(CONJ.the(disj.dt(), disjSubs.toArray(new Term[disjSubs.size()])));
                                     if (csa == null)
                                         csa = $.newArrayList(1);
                                     csa.add(y);
@@ -298,9 +300,9 @@ public enum Op {
                         return scs[0];
 
                     if (!Arrays.equals(scs, u))
-                        return CONJ.the(builder, dt, scs);
+                        return CONJ.the(dt, scs);
                     else
-                        return build(CONJ, dt, TermVector.the(scs));
+                        return  build(CONJ, dt, TermVector.the(scs));
                 }
             }
 
@@ -328,7 +330,7 @@ public enum Op {
         }
 
 
-        private Term conjPost(Term x /* possibly a conjunction */, TermBuilder builder) {
+        private Term conjPost(Term x /* possibly a conjunction */) {
 
             if (x == null)
                 return null;
@@ -361,9 +363,9 @@ public enum Op {
                     Term implPre = ((Compound) c.sub(whichImpl)).sub(0);
                     Term implPost = ((Compound) c.sub(whichImpl)).sub(1);
                     Compound origImpl = (Compound) c.sub(ww);
-                    Term newPre = builder.replace(c, origImpl, implPre);
+                    Term newPre = $.terms.replace(c, origImpl, implPre);
                     if (newPre != null)
-                        return builder.the(IMPL, origImpl.dt(), newPre, implPost);
+                        return IMPL.the(origImpl.dt(), newPre, implPost);
 
                 }
 
@@ -421,15 +423,10 @@ public enum Op {
     @Deprecated
     DISJ("||", true, 5, Args.GTETwo) {
         @Override
-        public @NotNull Term the(Term... u) {
-            assert (u.length > 1);
-            return NEG.the($.the(CONJ, TermBuilder.neg(u)));
-        }
-
-        @Override
-        public Term the(TermBuilder b, int dt, Term[] u) {
+        public Term the(int dt, Term... u) {
             assert (dt == DTERNAL);
-            return the(u);
+            assert (u.length > 1 || u[0].op() == VAR_PATTERN);
+            return NEG.the(CONJ.the(TermBuilder.neg(u)));
         }
 
     },
@@ -829,20 +826,16 @@ public enum Op {
 
 
     @NotNull
-    public Term the(Term... u) {
-        return the(u, $.terms);
+    public final Term the(Term... u) {
+        return the(DTERNAL, u);
     }
 
-    @NotNull
-    public final Term the(Term[] u, TermBuilder b) {
-        return the(b, DTERNAL, u);
-    }
 
-    public Term the(TermBuilder b, int dt, Term[] u) {
+    public Term the(int dt, Term... u) {
         if (statement) {
             return statement(this, dt, u[0], u[1]);
         } else {
-            return build(this, dt, b.subterms(commute(dt, u) ? Terms.sorted(u) : u));
+            return build(this, dt, TermVector.the(commute(dt, u) ? Terms.sorted(u) : u));
         }
     }
 
@@ -946,6 +939,9 @@ public enum Op {
         if (subject == Null || predicate == Null)
             return Null;
 
+        if (dt == XTERNAL)
+            return build(op, XTERNAL, TermVector.the(subject, predicate));
+
         switch (op) {
 
             case SIM:
@@ -1000,27 +996,20 @@ public enum Op {
                     predicate = predicate.unneg();
                 } else if (!subjNeg && predNeg) {
                     //factor out (--, ...)
-                    return $.neg(statement(op, dt, subject, predicate.unneg()));
+                    return NEG.the(op.the(dt, subject, predicate.unneg()));
                 } else if (subjNeg && !predNeg) {
                     //factor out (--, ...)
-                    return $.neg(statement(op, dt, subject.unneg(), predicate));
+                    return NEG.the(op.the(dt, subject.unneg(), predicate));
                 }
 
-                if (dt == XTERNAL) {
-
-                    //create as-is
-                    return $.the(op, XTERNAL, subject, predicate);
-
+                boolean equal = subject.equals(predicate);
+                if (concurrent(dt)) {
+                    if (equal) {
+                        return True;
+                    }
                 } else {
-                    boolean equal = subject.equals(predicate);
-                    if (concurrent(dt)) {
-                        if (equal) {
-                            return True;
-                        }
-                    } else {
-                        if (dt < 0 && equal) {
-                            dt = -dt; //use only the forward direction on a repeat
-                        }
+                    if (dt < 0 && equal) {
+                        dt = -dt; //use only the forward direction on a repeat
                     }
                 }
 
@@ -1046,30 +1035,26 @@ public enum Op {
 
                 if (predicate.op() == NEG) {
                     //negated predicate gets unwrapped to outside
-                    return NEG.the($.the(op, dt, subject, predicate.unneg()));
+                    return NEG.the(op.the(dt, subject, predicate.unneg()));
                 }
 
-                if (dt == XTERNAL) {
-                    //create as-is
-                    return $.the(op, XTERNAL, subject, predicate);
-                } else {
-                    if (concurrent(dt)) {
-                        if (subject.equals(predicate))
-                            return True;
-                    } //else: allow repeat
-                }
+
+                if (concurrent(dt)) {
+                    if (subject.equals(predicate))
+                        return True;
+                } //else: allow repeat
 
 
                 // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
-                if (dt != XTERNAL && predicate.op() == IMPL) {
+                if (predicate.op() == IMPL) {
                     Compound cpr = (Compound) predicate;
                     int cprDT = cpr.dt();
                     if (cprDT != XTERNAL) {
                         Term a = cpr.sub(0);
 
-                        subject = $.the(CONJ, dt, subject, a);
+                        subject = CONJ.the(dt, subject, a);
                         predicate = cpr.sub(1);
-                        return statement(IMPL, cprDT, subject, predicate);
+                        return IMPL.the(cprDT, subject, predicate);
                     }
                 }
 
@@ -1126,11 +1111,15 @@ public enum Op {
                     final Compound cpred = (Compound) predicate;
                     TermContainer preds = cpred.subterms();
 
-                    MutableSet<Term> common = TermContainer.intersect(subjs, preds);
-                    if (common != null && !common.isEmpty()) {
+                    Term[] common = TermContainer.intersect(subjs, preds);
+                    if (common != null) {
 
                         @NotNull Set<Term> sss = subjs.toSet();
-                        if (sss.removeAll(common)) {
+                        boolean modifiedS = false;
+                        for (Term cc : common)
+                            modifiedS |= sss.remove(cc);
+
+                        if (modifiedS) {
                             int s0 = sss.size();
                             switch (s0) {
                                 case 0:
@@ -1140,13 +1129,17 @@ public enum Op {
                                     subject = sss.iterator().next();
                                     break;
                                 default:
-                                    subject = $.the(CONJ, csub.dt(), sss);
+                                    subject = CONJ.the(/*DTERNAL?*/csub.dt(), Terms.sorted(sss));
                                     break;
                             }
                         }
 
                         @NotNull Set<Term> ppp = preds.toSet();
-                        if (ppp.removeAll(common)) {
+                        boolean modifiedP = false;
+                        for (Term cc : common)
+                            modifiedP |= ppp.remove(cc);
+
+                        if (modifiedP) {
                             int s0 = ppp.size();
                             switch (s0) {
                                 case 0:
@@ -1156,14 +1149,14 @@ public enum Op {
                                     predicate = ppp.iterator().next();
                                     break;
                                 default:
-                                    predicate = $.the(CONJ, cpred.dt(), ppp);
+                                    predicate = CONJ.the(cpred.dt(), Terms.sorted(ppp));
                                     if (predicate == null)
                                         return Null;
                                     break;
                             }
                         }
 
-                        return statement(op, dt, subject, predicate);
+                        return op.the(dt, subject, predicate);
                     }
                 }
             }
@@ -1249,7 +1242,7 @@ public enum Op {
     }
 
 
-        @NotNull
+    @NotNull
     private static Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
 
         int trues = 0;
@@ -1350,7 +1343,7 @@ public enum Op {
             args.add(term2);
         }
 
-        return build(intersection, DTERNAL, /*$.terms.subterms*/TermVector.the(args));
+        return build(intersection, DTERNAL, TermVector.the(args));
     }
 
 

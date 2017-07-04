@@ -69,7 +69,10 @@ public class CachedTermIndex extends StaticTermIndex {
     }
 
     Term _the(@NotNull Op op, int dt, @NotNull Term[] u) {
-        return ((Term)terms.apply(new AppendProtoCompound(op, u).commit(dt))).dt(dt);
+        return op.the(dt, u);
+//        return ((Term)terms.apply(
+//                //new AppendProtoCompound(op, u).commit(dt)
+//        )).dt(dt);
     }
 
 

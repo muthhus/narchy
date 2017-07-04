@@ -15,7 +15,6 @@ import org.junit.Test;
 import static nars.$.*;
 import static nars.$.t;
 import static nars.Op.*;
-import static nars.index.TermBuilder.imageUnwrap;
 import static nars.io.NarseseTest.assertInvalidTasks;
 import static nars.io.NarseseTest.assertInvalidTerms;
 import static nars.term.TermTest.*;
@@ -110,8 +109,8 @@ public class TermReductionsTest {
 
     @Test
     public void testInheritNegative() throws Narsese.NarseseException {
-        assertEquals("(--,(x-->y))", inh(neg($("x")), $("y")).toString()  );
-        assertEquals("(x-->y)", inh(neg($("x")), neg($("y"))).toString()  );
+        assertEquals("(--,(x-->y))", inh(neg($("x")), $("y")).toString());
+        assertEquals("(x-->y)", inh(neg($("x")), neg($("y"))).toString());
     }
 
     @Test
@@ -128,6 +127,7 @@ public class TermReductionsTest {
     public void testEquivalenceNegatedSubtermsDoubleNeg() throws Narsese.NarseseException {
         assertEquals(("((P)<=>(Q))"), $("((--,(P))<=>(--,(Q)))").toString());
     }
+
     @Test
     public void testSimilarityNegatedSubtermsDoubleNeg() throws Narsese.NarseseException {
         assertEquals(("((--,(P))<->(--,(Q)))"), $("((--,(P))<->(--,(Q)))").toString()); //SAME should not change
@@ -141,14 +141,18 @@ public class TermReductionsTest {
     public void testSimilarityNegatedSubterms() throws Narsese.NarseseException {
 //        assertEquals(("((P)<->(--,(Q)))"), $("((P)<->(--,(Q)))").toString());
 //        assertEquals(("((P)<->(--,(Q)))"), $("((--,(P))<->(Q))").toString());
-        assertEquals("((--,(Q))<->(P))", $("((P)<->(--,(Q)))").toString()); //NO change
+        assertEquals("((P)<->(--,(Q)))", $("((P)<->(--,(Q)))").toString()); //NO change
         assertEquals("((--,(P))<->(Q))", $("((--,(P))<->(Q))").toString()); //NO change
     }
-    @Test public void testEquivalenceNegatedSubterms() throws Narsese.NarseseException {
+
+    @Test
+    public void testEquivalenceNegatedSubterms() throws Narsese.NarseseException {
         assertEquals(("(--,((P)<=>(Q)))"), $("((P)<=>(--,(Q)))").toString());
         assertEquals(("(--,((P)<=>(Q)))"), $("((--,(P))<=>(Q))").toString());
     }
-    @Test public void testImplicationNegatedPredicate() throws Narsese.NarseseException {
+
+    @Test
+    public void testImplicationNegatedPredicate() throws Narsese.NarseseException {
         assertEquals("(--,((P)==>(Q)))", $("((P)==>(--,(Q)))").toString());
         assertEquals(("((--,(P))==>(Q))"), $("((--,(P))==>(Q))").toString()); //SAME should not change
     }
@@ -221,7 +225,9 @@ public class TermReductionsTest {
         assertEquals(pp, disj(pp, pp));
     }
 
-    @Ignore @Test public void testRepeatConjunctionTaskSimplification() throws Narsese.NarseseException {
+    @Ignore
+    @Test
+    public void testRepeatConjunctionTaskSimplification() throws Narsese.NarseseException {
         //the repeats in the conjunction term can be replaced with a single event with equivalent start/stop time
         assertEquals(
                 "$.50 (x). 0⋈10 %1.0;.90%",
@@ -485,22 +491,25 @@ public class TermReductionsTest {
         assertInvalidTerms("(a ==> (&&, a, b, c))");
     }
 
-    @Test public void testConegatedConjunctionTerms0() throws Narsese.NarseseException {
+    @Test
+    public void testConegatedConjunctionTerms0() throws Narsese.NarseseException {
         assertEquals(False, $("(#1 && (--,#1))"));
         assertEquals(False, $("(&&, #1, (--,#1), (x))"));
 
-        assertTrue( $("(#1 &&+1 (--,#1))") instanceof Compound);
-        assertTrue( $("((x) &&+1 --(x))") instanceof Compound);
+        assertTrue($("(#1 &&+1 (--,#1))") instanceof Compound);
+        assertTrue($("((x) &&+1 --(x))") instanceof Compound);
 
 
     }
 
 
-    @Test public void testConegatedConjunctionTerms01() throws Narsese.NarseseException {
+    @Test
+    public void testConegatedConjunctionTerms01() throws Narsese.NarseseException {
         assertEquals(False, parallel(varDep(1), neg(varDep(1))));
     }
 
-    @Test public void testInvalidStatementIndepVarTask() throws Narsese.NarseseException {
+    @Test
+    public void testInvalidStatementIndepVarTask() throws Narsese.NarseseException {
         Terminal t = new Terminal();
         try {
             t.inputAndGet("at($1,$2,$3)");
@@ -510,23 +519,29 @@ public class TermReductionsTest {
         }
     }
 
-    @Test public void testConegatedConjunctionTerms1() throws Narsese.NarseseException {
+    @Test
+    public void testConegatedConjunctionTerms1() throws Narsese.NarseseException {
         assertEquals($("((--,((y)&&(z)))&&(x))"), $("((x) && --((y) && (z)))"));
     }
-     @Test public void testConegatedConjunctionTerms0not() throws Narsese.NarseseException {
+
+    @Test
+    public void testConegatedConjunctionTerms0not() throws Narsese.NarseseException {
         //dont unwrap due to different 'dt'
         assertEquals("((--,((y) &&+0 (z)))&&(x))", $("((x)&&--((y) &&+0 (z)))").toString());
 
         assertEquals("((--,((y)&&(z))) &&+0 (x))", $("((x) &&+0 --((y) && (z)))").toString());
     }
-    @Test public void testConegatedConjunctionTerms1not() throws Narsese.NarseseException {
+
+    @Test
+    public void testConegatedConjunctionTerms1not() throws Narsese.NarseseException {
         //dont unwrap due to different 'dt'
         assertEquals("((--,((y) &&+1 (z)))&&(x))", $("((x)&&--((y) &&+1 (z)))").toString());
 
         assertEquals("((x) &&+1 (--,((y)&&(z))))", $("((x) &&+1 --((y) && (z)))").toString());
     }
 
-    @Test public void testConegatedConjunctionTerms2() throws Narsese.NarseseException {
+    @Test
+    public void testConegatedConjunctionTerms2() throws Narsese.NarseseException {
         //(x && not(x&&y)) |- x && not(y)
         assertEquals(
                 "(#1&&(--,(robin-->swimmer)))",
@@ -597,7 +612,8 @@ public class TermReductionsTest {
 
     }
 
-    @Test public void testRepeatInverseEquivalent() throws Narsese.NarseseException {
+    @Test
+    public void testRepeatInverseEquivalent() throws Narsese.NarseseException {
         assertEquals($("((a1) &&-1 (a1))"), $("((a1) &&+1 (a1))"));
         assertEquals($("((a1) <=>-1 (a1))"), $("((a1) <=>+1 (a1))"));
     }
@@ -616,14 +632,19 @@ public class TermReductionsTest {
     }
 
     @Test
-    public void testCoNegatedEqui() throws Narsese.NarseseException {
+    public void testXternalIsInvalidForTaskContent() {
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=>+- (a))"));
+    }
+
+    @Test
+    public void testCoNegatedEqui() throws Narsese.NarseseException {
 
         assertEquals(False, $("((--,(a)) <=> (a))"));
 
         assertEquals(False, $("((--,(a)) <=>+0 (a))"));
 
-        String e = "(--,((a) <=>+1 (a)))"; assertEquals(e, $(e).toString());
+        String e = "(--,((a) <=>+1 (a)))";
+        assertEquals(e, $(e).toString());
 
         //due to the unpaired $3
         assertInvalidTasks("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(--,isIn($3,xyz)))).");
@@ -639,30 +660,33 @@ public class TermReductionsTest {
 
     }
 
-    @Test public void testCoNegatedImplOK() throws Narsese.NarseseException {
+    @Test
+    public void testCoNegatedImplOK() throws Narsese.NarseseException {
         assertValid($("((--,(a)) ==>+1 (a))"));
         assertValid($("((--,a) ==>+1 a)"));
     }
-    @Test public void testCoNegatedEquiOK() throws Narsese.NarseseException {
+
+    @Test
+    public void testCoNegatedEquiOK() throws Narsese.NarseseException {
         assertValid($("((--,(a)) <=>+1 (a))"));
         assertValid($("((--,a) <=>+1 a)"));
     }
 
-    @Test public void testRepeatEvent() throws Narsese.NarseseException {
+    @Test
+    public void testRepeatEvent() throws Narsese.NarseseException {
         Terminal n = new Terminal();
 
-        for (String x : new String[] { "((a) ==>+1 (a))",
+        for (String x : new String[]{"((a) ==>+1 (a))",
             /*"((a) &&+1 (a))",*/ //<-- conjunction case is special, see repeating conjunction simplification test
-            "((a) <=>+1 (a))" }) {
+                "((a) <=>+1 (a))"}) {
             Term t = $(x);
             assertValid(t);
 
-            Task y = task((Compound)t, Op.BELIEF, t(1f,0.9f)).apply(n);
+            Task y = task((Compound) t, Op.BELIEF, t(1f, 0.9f)).apply(n);
 
             assertEquals(x, y.term().toString());
 
         }
-
 
 
     }
@@ -678,19 +702,26 @@ public class TermReductionsTest {
         //..
     }
 
-    @Test public void testSimEquivOfAbsoluteTrueNull1() throws Narsese.NarseseException {
+    @Test
+    public void testSimEquivOfAbsoluteTrueNull1() throws Narsese.NarseseException {
         assertEquals(True, sim(True, True));
     }
-    @Test public void testSimEquivOfAbsoluteTrueNull2() throws Narsese.NarseseException {
+
+    @Test
+    public void testSimEquivOfAbsoluteTrueNull2() throws Narsese.NarseseException {
         assertEquals(Null, sim(Null, Null));
     }
-    @Test public void testSimEquivOfAbsoluteTrueNull3() throws Narsese.NarseseException {
+
+    @Test
+    public void testSimEquivOfAbsoluteTrueNull3() throws Narsese.NarseseException {
         assertEquals(Null, sim(True, Null));
     }
-    @Test public void testSimEquivOfAbsoluteTrueNull4() throws Narsese.NarseseException {
-        assertEquals(Null, sim(neg(True),Null));
-        assertEquals(False, sim(True,False));
-        assertEquals(True, sim(neg(True),False));
+
+    @Test
+    public void testSimEquivOfAbsoluteTrueNull4() throws Narsese.NarseseException {
+        assertEquals(Null, sim(neg(True), Null));
+        assertEquals(False, sim(True, False));
+        assertEquals(True, sim(neg(True), False));
     }
 
     /**
@@ -766,12 +797,15 @@ public class TermReductionsTest {
         assertInvalidTerms("((--,(x)) ==> ((--,(y)) && (--,(x))))");
     }
 
-    @Test public void testImplInImplDTernal() throws Narsese.NarseseException {
+    @Test
+    public void testImplInImplDTernal() throws Narsese.NarseseException {
         assertEquals(
                 "(((--,(in))&&(happy))==>(out))",
                 $("((--,(in)) ==> ((happy)  ==> (out)))").toString());
     }
-    @Test public void testImplInImplDTemporal() throws Narsese.NarseseException {
+
+    @Test
+    public void testImplInImplDTemporal() throws Narsese.NarseseException {
         assertEquals(
                 "(((--,(in)) &&+1 (happy)) ==>+2 (out))",
                 $("((--,(in)) ==>+1 ((happy) ==>+2 (out)))").toString());
@@ -797,67 +831,16 @@ public class TermReductionsTest {
 
     }
 
-    @Test public void testImageUnwrap0() throws Narsese.NarseseException {
-        assertEquals("(a,b)",
-           p(imageUnwrap($("(\\,n,_,b)"), $("a"))).toString());
-    }
-    @Test public void testImageUnwrap1() throws Narsese.NarseseException {
-        assertEquals("(a,b)",
-            p(imageUnwrap($("(\\,n,a,_)"), $("b"))).toString());
-    }
-    @Test public void testImageUnwrap2() throws Narsese.NarseseException {
-        assertEquals("(a,b)",
-            p(imageUnwrap($("(/,n,_,b)"), $("a"))).toString());
-    }
-    @Test public void testImageUnwrap3() throws Narsese.NarseseException {
-        assertEquals(     "(a,b)",
-           p(imageUnwrap($("(/,n,a,_)"), $("b"))).toString());
-    }
 
-    @Test public void testImageInSubtermsProductNormalFormIntensional() throws Narsese.NarseseException {
-
-        //<neutralization --> (acid,base)>" //en("Neutralization is a relation between an acid and a base. ");
-        //  <(\,neutralization,acid,_) --> base> //en("Something that can be neutralized by an acid is a base.");
-        //  <(\,neutralization,_,base) --> acid> //en("Something that can neutralize a base is an acid.");
-        assertEquals(
-                "((x)==>(n-->(a,b)))",
-                $("((x)==>((\\,n,a,_)-->b))").toString());
-        assertEquals(
-                "((x)==>(n-->(a,b)))",
-                $("((x)==>((\\,n,_,b)-->a))").toString());
-    }
-
-    @Test public void testImageInSubtermsProductNormalFormExtensional() throws Narsese.NarseseException {
-        //<(acid,base) --> reaction> //en("An acid and a base can have a reaction.");
-        //  <base --> (/,reaction,acid,_)> //en("A base is something that has a reaction with an acid.");
-        //  <acid --> (/,reaction,_,base)> //en("Acid can react with base.");
-        assertEquals(
-                  "{r(a,b)}",
-                $("{(b-->(/,r,a,_))}").toString());
-
-        assertEquals(
-                  "{likes(cat,{sky})}",
-                $("{({sky}-->(/,likes,cat,_))}").toString());
-
-        assertEquals(
-                "(--,r(a,b))",
-                $("(--,(a-->(/,r,_,b)))").toString());
-
-    }
-    @Test public void testNegatedImageInSubtermsProductNormalForm() throws Narsese.NarseseException {
-        assertEquals(
-                  "{(--,r(a,b)),(z-->(x,y))}",
-                $("{ (--,(b-->(/,r,a,_))), ((\\,z,x,_)-->y) }").toString());
-
-    }
-
-    @Test public void testConjDisjNeg() throws Narsese.NarseseException {
+    @Test
+    public void testConjDisjNeg() throws Narsese.NarseseException {
         assertEquals(
                 "((--,(out))&&(happy))",
                 $("((--,(out))&&(||,(happy),(out)))").toString());
     }
 
-    @Test public void taskWithFlattenedConunctions() throws Narsese.NarseseException {
+    @Test
+    public void taskWithFlattenedConunctions() throws Narsese.NarseseException {
         //$0.0;NaN$ ((busyVol)&&((busyPri)&&(busyVol))). %.19;.10%  //<-- should not be allowed to be constructed
         //  instead should have been: (busyVol&&busyPri)
 
@@ -867,7 +850,8 @@ public class TermReductionsTest {
 
     }
 
-    @Test public void reduceComplex() throws Narsese.NarseseException {
+    @Test
+    public void reduceComplex() throws Narsese.NarseseException {
         String s = "(((rotate-->tetris) &&+2 (x-->tetris)) <=>+8236 ((--,(rotate-->tetris)) &&+3 (--,((--,(rotate-->tetris)) &&+0 ((rotate-->tetris)&&((x-->tetris)&&((rotate-->tetris)&&(x-->tetris))))))))";
 
         Term t = $(s);
@@ -878,14 +862,17 @@ public class TermReductionsTest {
                 t.toString());
     }
 
-    @Test public void testPromoteEternalToParallel() throws Narsese.NarseseException {
+    @Test
+    public void testPromoteEternalToParallel() throws Narsese.NarseseException {
         String s = "(a &&+0 (b && c))";
         assertEquals(
                 "( &&+0 ,a,b,c)",
                 $(s).toString()
         );
     }
-    @Test public void testPromoteEternalToParallelDont() throws Narsese.NarseseException {
+
+    @Test
+    public void testPromoteEternalToParallelDont() throws Narsese.NarseseException {
         String s = "(a && (b &&+0 c))";
         assertEquals(
                 "(a&&(b &&+0 c))",
@@ -893,47 +880,110 @@ public class TermReductionsTest {
         );
     }
 
-    @Test public void testCoNegatedConjunctionParallelEternal() throws Narsese.NarseseException {
+    @Test
+    public void testCoNegatedConjunctionParallelEternal() throws Narsese.NarseseException {
         //mix of parallel and eternal
         assertEquals(False,
-            $("((--,(happy-->noid)) &&+0 ((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))")
+                $("((--,(happy-->noid)) &&+0 ((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))")
         );
     }
 
-    @Test public void testCoNegatedImplication() throws Narsese.NarseseException {
+    @Test
+    public void testCoNegatedImplication() throws Narsese.NarseseException {
         assertEquals(False,
-            $("((--,$1) ==>+0 (((--,$1) &&+0 (--,#2)) &&+16 #2))")
+                $("((--,$1) ==>+0 (((--,$1) &&+0 (--,#2)) &&+16 #2))")
         );
     }
 
 
-    @Test public void testConjImplReduction1() throws Narsese.NarseseException {
+    @Test
+    public void testConjImplReduction1() throws Narsese.NarseseException {
         assertEquals(
                 "((inside(bob,office) &&+0 inside(john,playground))==>inside(bob,kitchen))",
                 $("(inside(bob,office) &&+0 (inside(john,playground)==>inside(bob,kitchen)))").toString()
         );
     }
 
-    @Test public void testConjImplReduction2() throws Narsese.NarseseException {
+    @Test
+    public void testConjImplReduction2() throws Narsese.NarseseException {
         //with some dt's
         assertEquals(
                 "((inside(bob,office) &&+1 inside(john,playground)) ==>+1 inside(bob,kitchen))",
                 $("(inside(bob,office) &&+1 (inside(john,playground) ==>+1 inside(bob,kitchen)))").toString()
         );
     }
-    @Test public void testConjImplReductionNeg2() throws Narsese.NarseseException {
+
+    @Test
+    public void testConjImplReductionNeg2() throws Narsese.NarseseException {
         //with some dt's
         assertEquals(
                 "((inside(bob,office) &&+1 (--,inside(john,playground))) ==>+1 inside(bob,kitchen))",
                 $("(inside(bob,office) &&+1 (--inside(john,playground) ==>+1 inside(bob,kitchen)))").toString()
         );
     }
-      @Test public void testConjImplReduction3() throws Narsese.NarseseException {
+
+    @Test
+    public void testConjImplReduction3() throws Narsese.NarseseException {
         //with some dt's
         assertEquals(
                 "((inside(john,playground) &&+1 inside(bob,office)) ==>-1 inside(bob,kitchen))",
                 $("(inside(bob,office) &&-1 (inside(john,playground) ==>-1 inside(bob,kitchen)))").toString()
         );
     }
+
+
+//        @Test public void testImageUnwrap0() throws Narsese.NarseseException {
+//        assertEquals("(a,b)",
+//           p(imageUnwrap($("(\\,n,_,b)"), $("a"))).toString());
+//    }
+//    @Test public void testImageUnwrap1() throws Narsese.NarseseException {
+//        assertEquals("(a,b)",
+//            p(imageUnwrap($("(\\,n,a,_)"), $("b"))).toString());
+//    }
+//    @Test public void testImageUnwrap2() throws Narsese.NarseseException {
+//        assertEquals("(a,b)",
+//            p(imageUnwrap($("(/,n,_,b)"), $("a"))).toString());
+//    }
+//    @Test public void testImageUnwrap3() throws Narsese.NarseseException {
+//        assertEquals(     "(a,b)",
+//           p(imageUnwrap($("(/,n,a,_)"), $("b"))).toString());
+//    }
+//
+//    @Test public void testImageInSubtermsProductNormalFormIntensional() throws Narsese.NarseseException {
+//
+//        //<neutralization --> (acid,base)>" //en("Neutralization is a relation between an acid and a base. ");
+//        //  <(\,neutralization,acid,_) --> base> //en("Something that can be neutralized by an acid is a base.");
+//        //  <(\,neutralization,_,base) --> acid> //en("Something that can neutralize a base is an acid.");
+//        assertEquals(
+//                "((x)==>(n-->(a,b)))",
+//                $("((x)==>((\\,n,a,_)-->b))").toString());
+//        assertEquals(
+//                "((x)==>(n-->(a,b)))",
+//                $("((x)==>((\\,n,_,b)-->a))").toString());
+//    }
+//
+//    @Test public void testImageInSubtermsProductNormalFormExtensional() throws Narsese.NarseseException {
+//        //<(acid,base) --> reaction> //en("An acid and a base can have a reaction.");
+//        //  <base --> (/,reaction,acid,_)> //en("A base is something that has a reaction with an acid.");
+//        //  <acid --> (/,reaction,_,base)> //en("Acid can react with base.");
+//        assertEquals(
+//                  "{r(a,b)}",
+//                $("{(b-->(/,r,a,_))}").toString());
+//
+//        assertEquals(
+//                  "{likes(cat,{sky})}",
+//                $("{({sky}-->(/,likes,cat,_))}").toString());
+//
+//        assertEquals(
+//                "(--,r(a,b))",
+//                $("(--,(a-->(/,r,_,b)))").toString());
+//
+//    }
+//    @Test public void testNegatedImageInSubtermsProductNormalForm() throws Narsese.NarseseException {
+//        assertEquals(
+//                  "{(--,r(a,b)),(z-->(x,y))}",
+//                $("{ (--,(b-->(/,r,a,_))), ((\\,z,x,_)-->y) }").toString());
+//
+//    }
 
 }

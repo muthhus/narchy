@@ -164,11 +164,22 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    static @Nullable MutableSet<Term> intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
+    /** returns sorted ready for commutive */
+    static @Nullable Term[] intersect(@NotNull TermContainer a, @NotNull TermContainer b) {
         if ((a.structure() & b.structure()) == 0)
             return null; //nothing in common
-        else
-            return Sets.intersect(a.toSet(), b.toSet());
+        else {
+            MutableSet<Term> si = Sets.intersect(a.toSet(), b.toSet());
+            int ssi = si.size();
+            if (ssi == 0)
+                return null;
+
+            Term[] c = si.toArray(new Term[si.size()]);
+            if (ssi > 1)
+                Arrays.sort(c);
+
+            return c;
+        }
     }
 
 //    Predicate2<Object, SetIterable> subtermIsCommon = (Object yy, SetIterable xx) -> {

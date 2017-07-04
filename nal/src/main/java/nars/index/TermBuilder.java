@@ -39,7 +39,7 @@ public abstract class TermBuilder {
      */
     @NotNull
     public Term the(@NotNull Op op, int dt, @NotNull Term... u) throws InvalidTermException {
-        return op.the(this, dt, u);
+        return op.the(dt, u);
     }
 
 //        int arity = u.length;
@@ -475,10 +475,8 @@ public abstract class TermBuilder {
         if (a.equals(b))
             return a;
 
-        MutableSet<Term> s = TermContainer.intersect(
-                /*(TermContainer)*/ a, /*(TermContainer)*/ b
-        );
-        return s == null || s.isEmpty() ? Null : (Compound) $.the(o, s);
+        Term[] c = TermContainer.intersect(a, b);
+        return (c == null || c.length== 1) ? Null : (Compound)(o.the(c));
     }
 
 

@@ -629,27 +629,27 @@ public class TermTest {
         assertEquals(((Compound) e1).subterms(), ((Compound) f1).subterms());
     }
 
-    @Test
-    public void testImageConstruction2() throws Narsese.NarseseException {
-        assertTrue($("(/,_,X,Y)").op().image);
-        assertFalse($("(X,Y)").op().image);
-
-        assertValidTermValidConceptInvalidTaskContent(()->imageExt(Atomic.the("X"), Atomic.the("Y")));
-        assertValidTermValidConceptInvalidTaskContent(()->imageInt(Atomic.the("X"), Atomic.the("Y")));
-
-        Term xx = $("(/,X,_)");
-        assertEquals("(/,X,_)", xx.toString());
-        assertEquals("(/,X,_)", imageExt($("X"), $("_")).toString());
-
-        assertEquals("(/,X,Y,_)", imageExt($("X"), $("Y"), $("_")).toString());
-        assertEquals("(/,X,_,Y)", imageExt($("X"), $("_"), $("Y")).toString());
-        assertEquals("(/,_,X,Y)", imageExt($("_"), $("X"), $("Y")).toString());
-
-        assertEquals("(\\,X,Y,_)", imageInt($("X"), $("Y"), $("_")).toString());
-        assertEquals("(\\,X,_,Y)", imageInt($("X"), $("_"), $("Y")).toString());
-        assertEquals("(\\,_,X,Y)", imageInt($("_"), $("X"), $("Y")).toString());
-
-    }
+//    @Test
+//    public void testImageConstruction2() throws Narsese.NarseseException {
+//        assertTrue($("(/,_,X,Y)").op().image);
+//        assertFalse($("(X,Y)").op().image);
+//
+//        assertValidTermValidConceptInvalidTaskContent(()->imageExt(Atomic.the("X"), Atomic.the("Y")));
+//        assertValidTermValidConceptInvalidTaskContent(()->imageInt(Atomic.the("X"), Atomic.the("Y")));
+//
+//        Term xx = $("(/,X,_)");
+//        assertEquals("(/,X,_)", xx.toString());
+//        assertEquals("(/,X,_)", imageExt($("X"), $("_")).toString());
+//
+//        assertEquals("(/,X,Y,_)", imageExt($("X"), $("Y"), $("_")).toString());
+//        assertEquals("(/,X,_,Y)", imageExt($("X"), $("_"), $("Y")).toString());
+//        assertEquals("(/,_,X,Y)", imageExt($("_"), $("X"), $("Y")).toString());
+//
+//        assertEquals("(\\,X,Y,_)", imageInt($("X"), $("Y"), $("_")).toString());
+//        assertEquals("(\\,X,_,Y)", imageInt($("X"), $("_"), $("Y")).toString());
+//        assertEquals("(\\,_,X,Y)", imageInt($("_"), $("X"), $("Y")).toString());
+//
+//    }
 
     public static void assertValid(Term o) {
         assertNotNull(o);
@@ -687,20 +687,20 @@ public class TermTest {
         }
     }
 
-    @Test
-    public void testImageInhConstruction() {
-        Compound p = $.p("a", "b", "c");
-        assertEquals("(a-->(/,_,b,c))", $.imge(0, p).toString());
-        assertEquals("(a-->(/,_,b,c))", $.image(0, p.toArray()).toString());
-        assertEquals("(b-->(/,a,_,c))", $.imge(1, p).toString());
-        assertEquals("(c-->(/,a,b,_))", $.imge(2, p).toString());
-
-        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p).toString());
-        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p.toArray()).toString());
-        assertEquals("((\\,a,_,c)-->b)", $.imgi(1, p).toString());
-        assertEquals("((\\,a,b,_)-->c)", $.imgi(2, p).toString());
-
-    }
+//    @Test
+//    public void testImageInhConstruction() {
+//        Compound p = $.p("a", "b", "c");
+//        assertEquals("(a-->(/,_,b,c))", $.imge(0, p).toString());
+//        assertEquals("(a-->(/,_,b,c))", $.image(0, p.toArray()).toString());
+//        assertEquals("(b-->(/,a,_,c))", $.imge(1, p).toString());
+//        assertEquals("(c-->(/,a,b,_))", $.imge(2, p).toString());
+//
+//        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p).toString());
+//        assertEquals("((\\,_,b,c)-->a)", $.imgi(0, p.toArray()).toString());
+//        assertEquals("((\\,a,_,c)-->b)", $.imgi(1, p).toString());
+//        assertEquals("((\\,a,b,_)-->c)", $.imgi(2, p).toString());
+//
+//    }
 
     @Test public void testStatemntString() {
         assertTrue(AB.op().statement);
@@ -708,112 +708,112 @@ public class TermTest {
         assertEquals("(a-->b)", AB.toString());
     }
 
-    @Test
-    public void testImageConstructionExt() throws Narsese.NarseseException {
-
-
-
-
-        assertEquals(
-            "(A-->(/,%1,_))", $("<A --> (/, %1, _)>").toString()
-        );
-        assertEquals(
-            "(A-->(/,_,%1))", $("<A --> (/, _, %1)>").toString()
-        );
+//    @Test
+//    public void testImageConstructionExt() throws Narsese.NarseseException {
+//
+//
+//
+//
 //        assertEquals(
-//                "(/,_,%X)", $("(/, _, %X)").toString()
+//            "(A-->(/,%1,_))", $("<A --> (/, %1, _)>").toString()
 //        );
+//        assertEquals(
+//            "(A-->(/,_,%1))", $("<A --> (/, _, %1)>").toString()
+//        );
+////        assertEquals(
+////                "(/,_,%X)", $("(/, _, %X)").toString()
+////        );
+//
+//        assertEquals(
+//                imageExt($("X"), $("_"), $("Y")), $("(/, X, _, Y)")
+//        );
+//        assertEquals(
+//                imageExt($("_"), $("X"), $("Y")), $("(/, _, X, Y)")
+//        );
+//        assertEquals(
+//                imageExt($("X"), $("Y"), $("_")), $("(/, X, Y, _)")
+//        );
+//    }
+//    @Test
+//    public void testImageConstructionInt() throws Narsese.NarseseException {
+//        assertEquals(
+//                imageInt($("X"), $("_"), $("Y")), $("(\\, X, _, Y)")
+//        );
+//        assertEquals(
+//                imageInt($("_"), $("X"), $("Y")), $("(\\, _, X, Y)")
+//        );
+//        assertEquals(
+//                imageInt($("X"), $("Y"), $("_")), $("(\\, X, Y, _)")
+//        );
+//    }
 
-        assertEquals(
-                imageExt($("X"), $("_"), $("Y")), $("(/, X, _, Y)")
-        );
-        assertEquals(
-                imageExt($("_"), $("X"), $("Y")), $("(/, _, X, Y)")
-        );
-        assertEquals(
-                imageExt($("X"), $("Y"), $("_")), $("(/, X, Y, _)")
-        );
-    }
-    @Test
-    public void testImageConstructionInt() throws Narsese.NarseseException {
-        assertEquals(
-                imageInt($("X"), $("_"), $("Y")), $("(\\, X, _, Y)")
-        );
-        assertEquals(
-                imageInt($("_"), $("X"), $("Y")), $("(\\, _, X, Y)")
-        );
-        assertEquals(
-                imageInt($("X"), $("Y"), $("_")), $("(\\, X, Y, _)")
-        );
-    }
-
-    @Test
-    public void testImageOrdering1() throws Narsese.NarseseException {
-        testImageOrdering('/');
-    }
-
-    @Test
-    public void testImageOrdering2() throws Narsese.NarseseException {
-        testImageOrdering('\\');
-    }
-
-    void testImageOrdering(char v) throws Narsese.NarseseException {
-        NAR n = new Terminal(16);
-
-        Termed<Compound> aa = n.term("(" + v + ",x, y, _)");
-        Compound a = aa.term();
-        Termed<Compound> bb = n.term("(" + v + ",x, _, y)");
-        Compound b = bb.term();
-        Termed<Compound> cc = n.term("(" + v + ",_, x, y)");
-        Compound c = cc.term();
-        assertNotEquals(a.dt(), b.dt());
-        assertNotEquals(b.dt(), c.dt());
-
-        assertNotEquals(a, b);
-        assertNotEquals(b, c);
-        assertNotEquals(a, c);
-
-        assertNotEquals(a.hashCode(), b.hashCode());
-        assertNotEquals(b.hashCode(), c.hashCode());
-        assertNotEquals(a.hashCode(), c.hashCode());
-
-        assertEquals(+1, a.compareTo(b));
-        assertEquals(-1, b.compareTo(a));
-
-        assertEquals(+1, a.compareTo(c));
-        assertEquals(-1, c.compareTo(a));
-
-        assertNotEquals(0, b.compareTo(c));
-        assertEquals(-c.compareTo(b), b.compareTo(c));
-
-
-    }
-
-    @Test
-    public void testImageStructuralVector() throws Narsese.NarseseException {
-
-        String i1 = "(/,x,y,_)";
-        String i2 = "(/,x,_,y)";
-        Compound a = testStructure(i1, "1000000000001");
-        Compound b = testStructure(i2, "1000000000001");
-
-        /*assertNotEquals("additional structure code in upper bits",
-                a.structure2(), b.structure2());*/
-        assertNotEquals(a.dt(), b.dt());
-        assertNotEquals("structure code influenced contentHash",
-                b.hashCode(), a.hashCode());
-
-        NAR n = new Terminal(8);
-        Termed<Compound> x3 = n.term('<' + i1 + " --> z>");
-        Termed<Compound> x4 = n.term('<' + i1 + " --> z>");
-
-        assertFalse("i2 is a possible subterm of x3, structurally, even if the upper bits differ",
-                x3.term().impossibleSubTermOrEquality(n.term(i2).term()));
-        assertFalse(
-                x4.term().impossibleSubTermOrEquality(n.term(i1).term()));
-
-
-    }
+//    @Test
+//    public void testImageOrdering1() throws Narsese.NarseseException {
+//        testImageOrdering('/');
+//    }
+//
+//    @Test
+//    public void testImageOrdering2() throws Narsese.NarseseException {
+//        testImageOrdering('\\');
+//    }
+//
+//    void testImageOrdering(char v) throws Narsese.NarseseException {
+//        NAR n = new Terminal(16);
+//
+//        Termed<Compound> aa = n.term("(" + v + ",x, y, _)");
+//        Compound a = aa.term();
+//        Termed<Compound> bb = n.term("(" + v + ",x, _, y)");
+//        Compound b = bb.term();
+//        Termed<Compound> cc = n.term("(" + v + ",_, x, y)");
+//        Compound c = cc.term();
+//        assertNotEquals(a.dt(), b.dt());
+//        assertNotEquals(b.dt(), c.dt());
+//
+//        assertNotEquals(a, b);
+//        assertNotEquals(b, c);
+//        assertNotEquals(a, c);
+//
+//        assertNotEquals(a.hashCode(), b.hashCode());
+//        assertNotEquals(b.hashCode(), c.hashCode());
+//        assertNotEquals(a.hashCode(), c.hashCode());
+//
+//        assertEquals(+1, a.compareTo(b));
+//        assertEquals(-1, b.compareTo(a));
+//
+//        assertEquals(+1, a.compareTo(c));
+//        assertEquals(-1, c.compareTo(a));
+//
+//        assertNotEquals(0, b.compareTo(c));
+//        assertEquals(-c.compareTo(b), b.compareTo(c));
+//
+//
+//    }
+//
+//    @Test
+//    public void testImageStructuralVector() throws Narsese.NarseseException {
+//
+//        String i1 = "(/,x,y,_)";
+//        String i2 = "(/,x,_,y)";
+//        Compound a = testStructure(i1, "1000000000001");
+//        Compound b = testStructure(i2, "1000000000001");
+//
+//        /*assertNotEquals("additional structure code in upper bits",
+//                a.structure2(), b.structure2());*/
+//        assertNotEquals(a.dt(), b.dt());
+//        assertNotEquals("structure code influenced contentHash",
+//                b.hashCode(), a.hashCode());
+//
+//        NAR n = new Terminal(8);
+//        Termed<Compound> x3 = n.term('<' + i1 + " --> z>");
+//        Termed<Compound> x4 = n.term('<' + i1 + " --> z>");
+//
+//        assertFalse("i2 is a possible subterm of x3, structurally, even if the upper bits differ",
+//                x3.term().impossibleSubTermOrEquality(n.term(i2).term()));
+//        assertFalse(
+//                x4.term().impossibleSubTermOrEquality(n.term(i1).term()));
+//
+//
+//    }
 
 
     @Test

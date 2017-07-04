@@ -209,7 +209,7 @@ public enum $ {
 
     @NotNull
     public static <T extends Term> T negIf(@NotNull Term x, boolean negate) {
-        return (T) (negate ? neg(x) : x);
+        return (T) (negate ? Op.NEG.the(x) : x);
     }
 
     @NotNull
