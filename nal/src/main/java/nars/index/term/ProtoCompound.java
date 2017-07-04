@@ -7,6 +7,8 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.time.Tense.DTERNAL;
+
 /**
  * a lightweight Compound builder
  *      - fast-write
@@ -21,11 +23,6 @@ public interface ProtoCompound extends TermContainer {
     @Nullable
     @Override
     Op op();
-
-    int dt();
-
-    ProtoCompound dt(int newDT);
-
 
     /** subterms as an array for construction */
     @NotNull Term[] subterms();
@@ -78,5 +75,9 @@ public interface ProtoCompound extends TermContainer {
         return false;
     }
 
-    ProtoCompound commit();
+    default ProtoCompound commit() {
+        return commit(DTERNAL);
+    }
+
+    ProtoCompound commit(int dt);
 }

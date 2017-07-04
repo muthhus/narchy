@@ -31,7 +31,6 @@ import static nars.time.Tense.DTERNAL;
 public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements ProtoCompound {
 
     public final Op op;
-    public int dt;
 
     @Nullable
     private Term[] subs;
@@ -40,11 +39,12 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
 
     int hash;
 
-    public AppendProtoCompound(Op op, int dt, @NotNull Term[] u) {
-        this(op, dt, 0);
 
-        this.subs = u; //zero-copy direct usage
-        size = u.length;
+    public AppendProtoCompound(Op op, @NotNull Term[] prepopulated) {
+        super();
+        this.op = op;
+        this.subs = prepopulated; //zero-copy direct usage
+        this.size = prepopulated.length;
     }
 
     /**
@@ -52,13 +52,11 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
      *
      * @param initial_capacity estimated size, but will grow if exceeded
      */
-    public AppendProtoCompound(Op op, int dt, int initial_capacity) {
+    public AppendProtoCompound(Op op, int initial_capacity) {
         super();
+        this.op = op;
         if (initial_capacity > 0)
             this.subs = new Term[initial_capacity];
-        this.op = op;
-        this.dt = dt;
-
     }
 
     @Override
@@ -69,17 +67,6 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
     @Override
     public Op op() {
         return op;
-    }
-
-    @Override
-    public int dt() {
-        return dt;
-    }
-
-    @Override
-    public ProtoCompound dt(int newDT) {
-        this.dt = newDT;
-        return this;
     }
 
     /**
@@ -103,25 +90,31 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
         return tt;
     }
 
+    public AppendProtoCompound commit(int commuteForDT) {
+        boolean commute = false;
+        if (commuteForDT!=DTERNAL && op!=null) {
+            commute = subs.length > 1 && op.commutative;
+            if (commute && op.temporal && !Op.concurrent(commuteForDT))
+                commute = false; //dont pre-commute
+        }
+        return commit(commute);
+    }
+
     /**
      * hashes and prepares for use in hashmap
      */
-    public AppendProtoCompound commit() {
+    public AppendProtoCompound commit(boolean commute) {
 
-        if (op!=null) {
-            boolean commute = subs.length > 1 && op.commutative;
-            if (commute && op.temporal && !Op.concurrent(dt))
-                commute = false; //dont pre-commute
+
             if (commute) {
                 subs = Terms.sorted(subs);
                 size = subs.length;
             }
-        }
+
 
         this.bytes = new byte[subs.length * 8 /* estimate */];
         {
             writeByte(op != null ? op.ordinal() : Byte.MAX_VALUE);
-            writeInt(dt);
             for (Term x : subs)
                 appendKey(x);
         }
@@ -221,7 +214,6 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
     public String toString() {
         return "AppendProtoCompound{" +
                 "op=" + op +
-                ", dt=" + dt +
                 ", subs=" + Arrays.toString(Arrays.copyOfRange(subs, 0, size)) + //HACK use more efficient string method
                 '}';
     }

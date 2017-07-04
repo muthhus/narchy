@@ -204,7 +204,7 @@ public enum $ {
 
     @NotNull
     public static <T extends Term> T neg(@NotNull Term x) {
-        return (T) terms.neg(x);
+        return (T) NEG.the(x);
     }
 
     @NotNull
@@ -501,7 +501,7 @@ public enum $ {
 
     @Nullable
     public static Term disj(@NotNull Term... a) {
-        return terms.disjunction(a);
+        return DISJ.the(a);
     }
 
 

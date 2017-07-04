@@ -145,7 +145,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     /**
      * attempt to insert a task; returns what was input or null if nothing changed (rejected)
      */
-    @Nullable void add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
+    void add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
 
     Task match(long when, Task question, @Nullable Compound template, boolean noOverlap, NAR nar);
 

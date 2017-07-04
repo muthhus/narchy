@@ -73,7 +73,7 @@ public interface Subst  {
 
         Op cop = curr.op();
 
-        AppendProtoCompound next = new AppendProtoCompound(cop, curr.dt(), len);
+        AppendProtoCompound next = new AppendProtoCompound(cop, len);
 
         //early prefilter for True/False subterms
         boolean filterTrueFalse = disallowTrueOrFalse(cop);
@@ -115,7 +115,8 @@ public interface Subst  {
 
         }
 
-        return index.the(next);
+        int dt = curr.dt();
+        return index.the(next.commit(dt)).dt(dt);
     }
 
 

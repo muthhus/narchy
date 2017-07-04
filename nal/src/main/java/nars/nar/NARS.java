@@ -58,7 +58,7 @@ public class NARS extends NAR {
     private ExecutorService pool;
 
     NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024,  128*1024, e) {
+        super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e) {
 
 //                  @Override
 //                  protected void onBeforeRemove(Concept c) {

@@ -81,8 +81,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return new Bag[]{termbag, taskbag};
         } else {
             return new Bag[]{
-                new DefaultHijackBag<>(DefaultConceptBuilder.termlinkMerge, 4),
-                new DefaultHijackBag<>(DefaultConceptBuilder.tasklinkMerge, 4)
+                    new DefaultHijackBag<>(DefaultConceptBuilder.termlinkMerge, 4),
+                    new DefaultHijackBag<>(DefaultConceptBuilder.tasklinkMerge, 4)
             };
         }
 
@@ -179,15 +179,21 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         }
                     } else if (po.image) {
                         Compound img = (Compound) pred;
-                        Term[] ee = new Term[img.size()];
+                        Term[] ee;
 
                         int relation = img.dt();
-                        int s = ee.length;
-                        for (int j = 1, i = 0; i < s; ) {
-                            if (j == relation)
-                                ee[i++] = subj;
-                            if (i < s)
-                                ee[i++] = img.sub(j++);
+                        if (relation != DTERNAL) {
+                            int s = img.size();
+                            ee = new Term[s];
+
+                            for (int j = 1, i = 0; i < s; ) {
+                                if (j == relation)
+                                    ee[i++] = subj;
+                                if (i < s)
+                                    ee[i++] = img.sub(j++);
+                            }
+                        } else {
+                            ee = t.toArray();
                         }
                         Compound b = compoundOrNull(nar.terms.the(INH, DTERNAL, $.p(ee), img.sub(0)));
                         if (b != null)

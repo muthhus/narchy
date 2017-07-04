@@ -46,21 +46,21 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     @Nullable
     public abstract Termed get(@NotNull Term key, boolean createIfMissing);
 
-    @Override
-    protected int dt(int dt) {
-        NAR n = this.nar;
-        if (n == null)
-            return dt;
-
-        switch (dt) {
-            case DTERNAL:
-            case XTERNAL:
-            case 0:
-                return dt; //no-change
-        }
-
-        return Math.abs(dt) < n.dur() ? 0 : dt;
-    }
+//    @Override
+//    protected int dt(int dt) {
+//        NAR n = this.nar;
+//        if (n == null)
+//            return dt;
+//
+//        switch (dt) {
+//            case DTERNAL:
+//            case XTERNAL:
+//            case 0:
+//                return dt; //no-change
+//        }
+//
+//        return Math.abs(dt) < n.dur() ? 0 : dt;
+//    }
 
     /**
      * sets or replaces the existing value, unless the existing value is a PermanentConcept it must not
@@ -149,7 +149,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
 
     public Term the(ProtoCompound t) {
-        return the(t.op(), t.dt(), t.subterms());
+        return the(t.op(), t.subterms());
     }
 
 //    @NotNull
@@ -293,7 +293,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
         boolean filterTrueFalse = disallowTrueOrFalse(op);
 
         int s = src.size(), subtermMods = 0;
-        AppendProtoCompound target = new AppendProtoCompound(op, dt, s);
+        AppendProtoCompound target = new AppendProtoCompound(op, s);
         for (int i = 0; i < s; i++) {
 
             Term x = src.sub(i), y;
@@ -333,7 +333,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 //            return src.dt(dt);
 //        }
         if (subtermMods > 0 || op != src.op() || dt != src.dt())
-            return the(target);
+            return the(target.commit(dt)).dt(dt);
         else
             return src;
     }

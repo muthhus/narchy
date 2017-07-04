@@ -3,7 +3,6 @@ package nars.index.term.map;
 import nars.conceptualize.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,27 +15,9 @@ public class MapTermIndex extends MaplikeTermIndex {
 
     protected final Map<Term,Termed> concepts;
 
-    @Nullable protected final Map<TermContainer,TermContainer> subterms;
-
     public MapTermIndex(@NotNull ConceptBuilder conceptBuilder, Map<Term, Termed> map) {
-        this(conceptBuilder, map, null);
-    }
-
-    public MapTermIndex(@NotNull ConceptBuilder conceptBuilder, Map<Term, Termed> map, @Nullable Map<TermContainer,TermContainer> subMap) {
         super(conceptBuilder);
         this.concepts = map;
-        this.subterms = subMap;
-    }
-
-    @Override
-    public final TermContainer intern(Term[] a) {
-        TermContainer s = super.intern(a);
-        if (subterms==null || a.length < 2)
-            return s;
-        else {
-            TermContainer r = subterms.putIfAbsent(s, s);
-            return r == null ? s : r;
-        }
     }
 
     @NotNull

@@ -7,7 +7,6 @@ import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,8 +26,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     /** holds compounds and subterm vectors */
     @NotNull public final Cache<Term, Termed> concepts;
 
-    @Nullable
-    private final Cache<TermContainer,TermContainer> subterms;
+
 
 
 
@@ -53,19 +51,14 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     final static Weigher<? super Term, ? super Termed> w = (k,v) -> {
         if (v instanceof PermanentConcept) return 0;
         else return
-                //v.complexity();
-                v.volume();
+                v.complexity();
+                //v.volume();
     };
 
 
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
     public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, @Nullable Executor exe) {
-        this(conceptBuilder, capacity, -1, exe);
-    }
-
-    /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, long subCapacity, @Nullable Executor exe) {
         super(conceptBuilder);
 
 
@@ -87,23 +80,9 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
             builder.executor(exe);
         }
 
-        Caffeine<Object, Object> subTermsBuilder = subCapacity > 0 ? Caffeine.newBuilder() : null;
-
-        if (subCapacity > 0) {
-            if (exe!=null)
-                subTermsBuilder.executor(exe);
-
-            if (subCapacity > 0)
-                subTermsBuilder.maximumSize(subCapacity);
-            else {
-                //subTermsBuilder.weakValues();
-                subTermsBuilder.softValues();
-            }
-        }
 
 
         this.concepts = builder.build();
-        this.subterms = subTermsBuilder!=null ? subTermsBuilder.build() : null;
 
         //else
           //  this.subterms = null;
@@ -217,7 +196,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     @Override
     public @NotNull String summary() {
         //CacheStats s = cache.stats();
-        String s = concepts.estimatedSize() + " concepts, " + (subterms!=null ? (subterms.estimatedSize() + " subterms") : "");
+        String s = concepts.estimatedSize() + " concepts, ";
 
         if (Param.DEBUG)
             s += ' ' + concepts.stats().toString();

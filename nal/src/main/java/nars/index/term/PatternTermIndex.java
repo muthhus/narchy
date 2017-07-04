@@ -30,8 +30,8 @@ public class PatternTermIndex extends MapTermIndex {
 
     public PatternTermIndex(int capacity) {
         super(ConceptBuilder.Null,
-            new HashMap<>(capacity),
-            new HashMap<>(capacity));
+            new HashMap<>(capacity)
+        );
 
     }
 

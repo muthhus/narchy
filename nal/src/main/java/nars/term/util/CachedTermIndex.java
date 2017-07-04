@@ -1,6 +1,5 @@
 package nars.term.util;
 
-import jcog.bag.impl.hijack.HijackMemoize;
 import jcog.util.CaffeineMemoize;
 import jcog.util.Memoize;
 import nars.Op;
@@ -17,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import java.util.function.Function;
 
 import static nars.Op.Null;
-import static nars.time.Tense.DTERNAL;
 
 /**
  * memoizes term construction, in attempt to intern as much as possible (but not exhaustively)
@@ -32,9 +30,9 @@ public class CachedTermIndex extends StaticTermIndex {
 
                 Op o = C.op();
                 if (o!=null)
-                    return _terms.the(o, C.dt(), C.subterms());
+                    return _terms.the(o, C.subterms());
                 else
-                    return _terms.intern(C.subterms());
+                    return _terms.subterms(C.subterms());
 
             } catch (InvalidTermException e) {
                 if (Param.DEBUG_EXTRA)
@@ -52,28 +50,33 @@ public class CachedTermIndex extends StaticTermIndex {
 
 
     @Override
+    public @NotNull TermContainer subterms(@NotNull Term[] s) {
+        if (s.length < 2) {
+            return super.subterms(s);
+        } else {
+            return (TermContainer) terms.apply(new AppendProtoCompound(null, s).commit());
+        }
+    }
+
+    @Override
     public @NotNull Term the(@NotNull Op op, int dt, @NotNull Term... u) {
         if (u.length < 2)
             return super.the(op, dt, u);
 
 
         //return terms.apply(new AppendProtoCompound(op, dt, u).commit());
-        return the(new AppendProtoCompound(op, dt, u));
+        return _the(op, dt, u);
     }
 
-    @Override
-    public @NotNull TermContainer intern(@NotNull Term[] s) {
-        if (s.length < 2) {
-            return super.intern(s);
-        } else {
-            return (TermContainer) terms.apply(new AppendProtoCompound(null, DTERNAL, s).commit());
-        }
+    Term _the(@NotNull Op op, int dt, @NotNull Term[] u) {
+        return ((Term)terms.apply(new AppendProtoCompound(op, u).commit(dt))).dt(dt);
     }
 
+
     @Override
-    public Term the(ProtoCompound c) {
-        if (c.size() < 2)
-            return super.the(c);
+    public Term the(ProtoCompound mustBeCommitedPriorToCall) {
+        if (mustBeCommitedPriorToCall.size() < 2)
+            return super.the(mustBeCommitedPriorToCall);
 
 //        if (!c.isDynamic()) {
 //            build.miss.increment();
@@ -87,7 +90,7 @@ public class CachedTermIndex extends StaticTermIndex {
 //            return terms.apply(c.dt(DTERNAL).commit()).dt(cdt);
 //        }
 
-        return (Term) terms.apply(c.commit());
+        return (Term) terms.apply(mustBeCommitedPriorToCall);
 //        }
     }
 
