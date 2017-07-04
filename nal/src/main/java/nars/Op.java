@@ -260,7 +260,7 @@ public enum Op {
             ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length * 2);
 
             if (flatten(CONJ, u, dt, s) && !s.isEmpty()) {
-                Set<Term> cs = junctionGroupNonDTSubterms(s, dt);
+                TreeSet<Term> cs = junctionGroupNonDTSubterms(s);
                 if (!cs.isEmpty()) {
 
 
@@ -282,7 +282,7 @@ public enum Op {
                                 csi.remove();
 
                                 if (!disjSubs.isEmpty()) {
-                                    Term y = NEG.the($.the(CONJ, disj.dt(), disjSubs));
+                                    Term y = NEG.the(CONJ.the(builder, disj.dt(), disjSubs.toArray(new Term[disjSubs.size()])));
                                     if (csa == null)
                                         csa = $.newArrayList(1);
                                     csa.add(y);
@@ -297,7 +297,10 @@ public enum Op {
                     if (scs.length == 1)
                         return scs[0];
 
-                    return build(CONJ, dt, builder.subterms(scs));
+                    if (!Arrays.equals(scs, u))
+                        return CONJ.the(builder, dt, scs);
+                    else
+                        return build(CONJ, dt, TermVector.the(scs));
                 }
             }
 
@@ -310,11 +313,10 @@ public enum Op {
          * flattening and intermpolation is prevented from destroying temporal
          * measurements.
          *
-         * @param innerDT will either 0 or DTERNAL (commutive relation)
          */
-        private @NotNull Set<Term> junctionGroupNonDTSubterms(@NotNull ObjectByteHashMap<Term> s, int innerDT) {
+        private @NotNull TreeSet<Term> junctionGroupNonDTSubterms(@NotNull ObjectByteHashMap<Term> s) {
 
-            Set<Term> outer = new HashSet(s.size());
+            TreeSet<Term> outer = new TreeSet();
 
             for (ObjectBytePair<Term> xn : s.keyValuesView()) {
                 Term x = xn.getOne();
