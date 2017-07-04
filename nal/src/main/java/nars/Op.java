@@ -164,7 +164,7 @@ public enum Op {
 
 
             if (dt == XTERNAL) {
-                assert (n == 2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
+                //assert (n == 2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
                 return conjPost(build(CONJ, XTERNAL, TermVector.the(u)));
             }

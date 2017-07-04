@@ -17,7 +17,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 500;
+    final int cycles = 750;
 
     public NAL6Test(Supplier<NAR> b) {
         super(b);
@@ -217,9 +217,9 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void multiple_variable_elimination()  {
         TestNAR tester = test();
-        tester.believe("<(&&,<$x --> key>,<$y --> lock>) ==> <$y --> (/,open,$x,_)>>"); //en("Every lock can be opened by every key.");
+        tester.believe("<(&&,<$x --> key>,<$y --> lock>) ==> open($x, $y)>"); //en("Every lock can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
-        tester.mustBelieve(cycles*2, "<<$1 --> key> ==> <{lock1} --> (/,open,$1,_)>>", 1.00f, 0.81f); //en("Lock-1 can be opened by every key.");
+        tester.mustBelieve(cycles*2, "<<$1 --> key> ==> open($1, {lock1})>", 1.00f, 0.81f); //en("Lock-1 can be opened by every key.");
 
     }
 
@@ -398,9 +398,9 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void second_level_variable_unification2()  {
         TestNAR tester = test();
-        tester.believe("<<$1 --> lock> ==> (&&,<#2 --> key>,<$1 --> (/,open,#2,_)>)>", 1.00f, 0.90f); //en("all locks are opened by some key");
+        tester.believe("<<$1 --> lock> ==> (&&,<#2 --> key>,open(#2,$1))>", 1.00f, 0.90f); //en("all locks are opened by some key");
         tester.believe("<{key1} --> key>", 1.00f, 0.90f); //en("key1 is a key");
-        tester.mustBelieve(cycles, "<<$1 --> lock> ==> <$1 --> (/,open,{key1},_)>>", 1.00f,
+        tester.mustBelieve(cycles, "<<$1 --> lock> ==> open({key1},$1)>", 1.00f,
                 0.81f
                 /*0.43f*/); //en("maybe all locks are opened by key1");
 
@@ -416,7 +416,7 @@ public class NAL6Test extends AbstractNALTest {
 //    @Test
 //    public void second_level_variable_unification2_clean()  {
 //        TestNAR tester = test();
-//        tester.believe("<<$1 --> x> ==> (&&,<#2 --> y>,<$1 --> (/,open,#2,_)>)>", 1.00f, 0.90f); //en("all xs are opened by some y");
+//        tester.believe("<<$1 --> x> ==> (&&,<#2 --> y>,open(#2,$1))>", 1.00f, 0.90f); //en("all xs are opened by some y");
 //        tester.believe("<{z} --> y>", 1.00f, 0.90f); //en("z is a y");
 //        tester.mustBelieve(cycles, "<<$1 --> x> ==> <$1 --> (/,open,{z},_)>>", 1.00f, 0.42f); //en("maybe all xs are opened by z");
 //
@@ -536,17 +536,17 @@ public class NAL6Test extends AbstractNALTest {
     }
 
 
-    @Test public void recursionSmall2() throws nars.Narsese.NarseseException {
-
-        test()
-        .believe("<0 --> n>", 1.0f, 0.9f)
-        .believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f)
-        .ask("<(/,next,(/,next,0,_),_) --> n>")
-        .mustBelieve(cycles*2, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f)
-        .mustBelieve(cycles*2, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f) //should work
-        //.mustBelieve(time, "((/,next,(/,next,(/,next,0,_),_),_)-->n).", 1.0f, 1.0f, finalConf, 1.0f)
-        ;
-    }
+//    @Test public void recursionSmall2() throws nars.Narsese.NarseseException {
+//
+//        test()
+//        .believe("<0 --> n>", 1.0f, 0.9f)
+//        .believe("<<$1 --> n> ==> <(/,next,$1,_) --> n>>", 1.0f, 0.9f)
+//        .ask("<(/,next,(/,next,0,_),_) --> n>")
+//        .mustBelieve(cycles*2, "<(/,next,0,_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f)
+//        .mustBelieve(cycles*2, "<(/,next,(/,next,0,_),_) --> n>", 1.0f, 1.0f, 0.73f, 1.0f) //should work
+//        //.mustBelieve(time, "((/,next,(/,next,(/,next,0,_),_),_)-->n).", 1.0f, 1.0f, finalConf, 1.0f)
+//        ;
+//    }
 
     @Test public void testDecomposeImplPred() {
         test()

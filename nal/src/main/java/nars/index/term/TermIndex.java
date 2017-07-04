@@ -1,9 +1,6 @@
 package nars.index.term;
 
-import nars.Builtin;
-import nars.NAR;
-import nars.Narsese;
-import nars.Op;
+import nars.*;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
@@ -492,7 +489,8 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
             if (ydt ==XTERNAL|| ydt ==DTERNAL) {
                 int zdt = r.dt(x);
                 if (ydt!=zdt)
-                    yy = compoundOrNull(transform(yy, zdt, CompoundTransform.Identity));
+                    //yy = compoundOrNull(transform(yy, zdt, CompoundTransform.Identity));
+                    yy = compoundOrNull($.the(yy.op(), zdt, yy.toArray()));
             }
             if (yy == null)
                 return null;

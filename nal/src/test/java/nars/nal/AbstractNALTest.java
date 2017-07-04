@@ -73,10 +73,10 @@ public abstract class AbstractNALTest {
                     n.nal(level);
 //                    n.DEFAULT_BELIEF_PRIORITY = 0.5f;
 //                    n.DEFAULT_GOAL_PRIORITY = 0.5f;
-//                    n.DEFAULT_QUEST_PRIORITY = 0.25f;
-//                    n.DEFAULT_QUESTION_PRIORITY = 0.25f;
+                    n.DEFAULT_QUEST_PRIORITY = 0.25f;
+                    n.DEFAULT_QUESTION_PRIORITY = 0.25f;
                     if (level >= 7) {
-                        new STMTemporalLinkage(n, 2, true);
+                        new STMTemporalLinkage(n, 2, false);
                     }
                     Param.DEBUG = true;
                     return n;
