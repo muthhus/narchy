@@ -9,6 +9,7 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.UnaryTask;
@@ -32,7 +33,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 1;
+    private static final int maxSamples = 2;
 
     static final int TASKLINKS_SAMPLED = maxSamples * 2;
     static final int TERMLINKS_SAMPLED = maxSamples * 2;

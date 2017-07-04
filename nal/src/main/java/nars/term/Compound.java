@@ -187,7 +187,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default public Term unneg() {
         //probably rarely called; UnitCompound1 should be used for NEG's
-        if (Param.DEBUG) assert (op() != NEG); //HACK for detection
+        //if (Param.DEBUG) assert (op() != NEG); //HACK for detection
 
 //        if (op() == NEG) {
 //            Term x = sub(0);

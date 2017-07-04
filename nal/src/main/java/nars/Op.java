@@ -1,13 +1,14 @@
 package nars;
 
 
+import jcog.util.CaffeineMemoize;
+import jcog.util.Memoize;
 import nars.derive.meta.match.Ellipsislike;
 import nars.index.TermBuilder;
+import nars.index.term.AppendProtoCompound;
+import nars.index.term.ProtoCompound;
 import nars.index.term.TermContext;
-import nars.term.Compound;
-import nars.term.Functor;
-import nars.term.Term;
-import nars.term.Terms;
+import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
@@ -27,9 +28,12 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.function.Function;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.index.TermBuilder.flatten;
@@ -69,7 +73,7 @@ public enum Op {
         @Override
         public Term the(int dt, Term[] u) {
             assert (u.length == 1);
-            assert (dt == DTERNAL);
+            assert (dt == DTERNAL || dt == XTERNAL);
             return neg(u[0]);
         }
     },
@@ -129,7 +133,6 @@ public enum Op {
     PROD("*", 4, Args.GTEZero),
 
 
-
     /**
      * conjunction
      */
@@ -144,7 +147,7 @@ public enum Op {
 
                 //preserve unitary ellipsis for patterns etc
                 return only instanceof Ellipsislike ?
-                        new GenericCompound(CONJ, TermVector.the(only)) //special
+                        new GenericCompound(CONJ, subterms(only)) //special
                         :
                         only;
 
@@ -157,7 +160,7 @@ public enum Op {
             if (dt == XTERNAL) {
                 //assert (n == 2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
-                return conjPost(build(CONJ, XTERNAL, TermVector.the(u)));
+                return conjPost(compound(CONJ, XTERNAL, subterms(u)));
             }
 
             boolean commutive = concurrent(dt);
@@ -195,7 +198,7 @@ public enum Op {
 
                 return conjPost(
                         !changed ?
-                                build(CONJ, dt, TermVector.the(u)) :
+                                compound(CONJ, dt, subterms(u)) :
                                 CONJ.the(dt, u)
                 );
 
@@ -256,7 +259,7 @@ public enum Op {
                     if (!Arrays.equals(scs, u))
                         return CONJ.the(dt, scs);
                     else
-                        return build(CONJ, dt, TermVector.the(scs));
+                        return compound(CONJ, dt, subterms(scs));
                 }
             }
 
@@ -672,7 +675,7 @@ public enum Op {
             case 1:
                 Term t0 = t[0];
                 return t0 instanceof Ellipsislike ?
-                        build(op, DTERNAL, TermVector.the(t0)) :
+                        compound(op, DTERNAL, subterms(t0)) :
                         Null;
             case 2:
                 Term et0 = t[0], et1 = t[1];
@@ -681,7 +684,7 @@ public enum Op {
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, (Compound) et0, (Compound) et1);
                 else
-                    return build(op, DTERNAL, TermVector.the(t));
+                    return compound(op, DTERNAL, subterms(t));
 
 
         }
@@ -849,12 +852,56 @@ public enum Op {
         if (statement) {
             return statement(this, dt, u[0], u[1]);
         } else {
-            return build(this, dt, TermVector.the(commute(dt, u) ? Terms.sorted(u) : u));
+            return compound(this, dt, subterms(commute(dt, u) ? Terms.sorted(u) : u));
         }
     }
 
+    final static Logger logger = LoggerFactory.getLogger(Op.class);
+
+    static final Function<ProtoCompound, Termlike> buildTerm = (C) -> {
+        try {
+
+            Op o = C.op();
+            if (o != null) {
+                throw new UnsupportedOperationException("TODO");
+                //return _terms.the(o, C.subterms());
+            } else
+                return _subterms(C.subterms());
+
+        } catch (InvalidTermException e) {
+            if (Param.DEBUG_EXTRA)
+                logger.error("Term Build: {}, {}", C, e);
+            return Null;
+        } catch (Throwable t) {
+            logger.error("{}", t);
+            return Null;
+        }
+    };
+
+    static final Memoize<ProtoCompound, Termlike> terms =
+            //new HijackMemoize<>(buildTerm, 384 * 1024, 4);
+            CaffeineMemoize.build(buildTerm, 128 * 1024, false /* Param.DEBUG*/);
+
+    /**
+     * override to possibly intern termcontainers
+     */
+
+    static TermContainer _subterms(@NotNull Term[] s) {
+        return TermVector.the(s);
+    }
+
+
+    static public @NotNull TermContainer subterms(@NotNull Term... s) {
+        if (s.length < 2) {
+            return _subterms(s);
+        } else {
+            return (TermContainer) terms.apply(new AppendProtoCompound(null, s).commit());
+        }
+    }
+
+
     @NotNull
-    static Term build(Op op, int dt, TermContainer subterms) {
+    static Term compound(Op op, int dt, TermContainer subterms) {
         assert (!op.atomic);
         int s = subterms.size();
         assert (s > 0);
@@ -864,9 +911,7 @@ public enum Op {
                 return new UnitCompound1(op, subterms.sub(0));
             }
             default: {
-
                 return new GenericCompound(op, subterms).dt(dt);
-
             }
         }
     }
@@ -953,7 +998,7 @@ public enum Op {
             return Null;
 
         if (dt == XTERNAL)
-            return build(op, XTERNAL, TermVector.the(subject, predicate));
+            return compound(op, XTERNAL, subterms(subject, predicate));
 
         switch (op) {
 
@@ -1200,7 +1245,7 @@ public enum Op {
 
         }
 
-        return build(op, dt, TermVector.the(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
+        return compound(op, dt, subterms(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
     }
 
     /**
@@ -1294,7 +1339,7 @@ public enum Op {
 
                 Term single = t[0];
                 return single instanceof Ellipsislike ?
-                        new GenericCompound(intersection, TermVector.the(single)) :
+                        new GenericCompound(intersection, subterms(single)) :
                         single;
 
             case 2:
@@ -1356,7 +1401,7 @@ public enum Op {
             args.add(term2);
         }
 
-        return build(intersection, DTERNAL, TermVector.the(args));
+        return compound(intersection, DTERNAL, subterms(Terms.sorted(args)));
     }
 
 

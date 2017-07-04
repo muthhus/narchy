@@ -1,5 +1,6 @@
 package nars.table;
 
+import jcog.pri.Pri;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
@@ -87,8 +88,7 @@ public interface QuestionTable extends TaskTable {
                 activation -= e.priElseZero();
             }
 
-            if (activation > 0)
-                TaskTable.activate(t, activation, n, e==null);
+            TaskTable.activate(t, activation, n, e==null);
         }
 
         @Override

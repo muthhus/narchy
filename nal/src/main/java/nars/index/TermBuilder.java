@@ -187,78 +187,72 @@ public abstract class TermBuilder {
 //    }
 
 
-    /**
-     * override to possibly intern termcontainers
-     */
-    @NotNull
-    public TermContainer subterms(@NotNull Term[] s) {
-        return TermVector.the(s);
-    }
-    public TermContainer subterms(@NotNull TreeSet<Term> s) {
-        return subterms(s.toArray(new Term[s.size()]));
-    }
+
+//    public TermContainer subterms(@NotNull TreeSet<Term> s) {
+//        return subterms(s.toArray(new Term[s.size()]));
+//    }
 
 
-    protected Compound newCompound(@NotNull Op op, Term[] subterms) {
-        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.length == 1) {
-            return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
-        }
-        return newCompound(op, subterms(subterms));
-    }
+//    protected Compound newCompound(@NotNull Op op, Term[] subterms) {
+//        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.length == 1) {
+//            return new UnitCompound1(op, subterms[0]); //HACK avoid creating the TermContainer if possible
+//        }
+//        return newCompound(op, subterms(subterms));
+//    }
 
-    /**
-     * directly constructs a new instance, applied at the end.
-     */
-    protected Compound newCompound(@NotNull Op op, TermContainer subterms) {
-        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.size() == 1) {
-            return new UnitCompound1(op, subterms.sub(0)); //HACK avoid creating the TermContainer if possible
-        }
-
-
-        return new GenericCompound(op, subterms);
-    }
+//    /**
+//     * directly constructs a new instance, applied at the end.
+//     */
+//    protected Compound newCompound(@NotNull Op op, TermContainer subterms) {
+//        if (!op.image && !(this instanceof PatternTermIndex) /* HACK */ && subterms.size() == 1) {
+//            return new UnitCompound1(op, subterms.sub(0)); //HACK avoid creating the TermContainer if possible
+//        }
+//
+//
+//        return new GenericCompound(op, subterms);
+//    }
 
     @NotNull
     public final Term the(@NotNull Op op, @NotNull Term... tt) {
         return the(op, DTERNAL, tt);
     }
 
-    /**
-     * NOTE: terms must be sorted, if they need to be, before calling.
-     */
-    @NotNull
-    protected Term compound(@NotNull Op op, @NotNull Term... args) {
-
-        int s = args.length;
-        assert (s != 0);
-
-        for (int i = 0; i < s; i++) {
-            Term x = args[i];
-
-            if (isAbsolute(x))
-                return Null; //may have become False through eval()
-
-            if ((i == 0) && (s == 1) && (op.minSize > 1) && !(x instanceof Ellipsislike)) {
-                //special case: allow for ellipsis to occupy one item even if minArity>1
-                return x;
-            }
-
-            args[i] = x;
-        }
-
-
-        if (s == 1 && op.minSize > 1) {
-
-            Term a0 = args[0];
-            if (!(a0 instanceof Ellipsislike)) {
-                //return null;
-                //throw new RuntimeException("invalid size " + s + " for " + op);
-                return a0; //reduction
-            }
-        }
-
-        return newCompound(op, args);
-    }
+//    /**
+//     * NOTE: terms must be sorted, if they need to be, before calling.
+//     */
+//    @NotNull
+//    protected Term compound(@NotNull Op op, @NotNull Term... args) {
+//
+//        int s = args.length;
+//        assert (s != 0);
+//
+//        for (int i = 0; i < s; i++) {
+//            Term x = args[i];
+//
+//            if (isAbsolute(x))
+//                return Null; //may have become False through eval()
+//
+//            if ((i == 0) && (s == 1) && (op.minSize > 1) && !(x instanceof Ellipsislike)) {
+//                //special case: allow for ellipsis to occupy one item even if minArity>1
+//                return x;
+//            }
+//
+//            args[i] = x;
+//        }
+//
+//
+//        if (s == 1 && op.minSize > 1) {
+//
+//            Term a0 = args[0];
+//            if (!(a0 instanceof Ellipsislike)) {
+//                //return null;
+//                //throw new RuntimeException("invalid size " + s + " for " + op);
+//                return a0; //reduction
+//            }
+//        }
+//
+//        return newCompound(op, args);
+//    }
 
 
     @NotNull
@@ -439,7 +433,7 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    public Compound atemporalize(final @NotNull Compound c) {
+    public Term atemporalize(final @NotNull Compound c) {
 
         if (!c.isTemporal())
             return c;
@@ -533,8 +527,9 @@ public abstract class TermBuilder {
                 if (dtChanged) {
                     if (pdt == DTERNAL) {
                         //throw new InvalidTermException("unable to atemporalize", c);
-                        return compoundOrNull(
+                        @Nullable Compound x = compoundOrNull(
                                 o.the(XTERNAL, subsChanged ? newSubs : st.toArray()));
+                        return x != null ? x : Null;
                     }
                 }
             }
@@ -549,6 +544,10 @@ public abstract class TermBuilder {
 
 
             //x = i.the(xx).term();
+            if (xx == null)
+                return Null;
+                //throw new NullPointerException();
+
             return xx;
         } else {
             return c;

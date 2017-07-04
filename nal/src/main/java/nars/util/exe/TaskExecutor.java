@@ -51,7 +51,6 @@ public class TaskExecutor extends Executioner {
     public final FloatParam masterGain = new FloatParam(1f, 0f, 1f);
 
 
-
     public final Bag<ITask, CLink<ITask>> tasks =
             new PriorityHijackBag<ITask, CLink<ITask>>(4) {
                 @Override
@@ -222,46 +221,57 @@ public class TaskExecutor extends Executioner {
 
             //active.commit(null);
 
-            int ps = (tasks.size() + concepts.size());
-            if (ps == 0)
-                return;
 
             boolean t = this.trace;
             if (t)
                 concepts.print();
 
-            int toExe = conceptsPerCycleMax.intValue();
-            if (toExe < 0)
-                toExe = concepts.capacity();
+            int toFire = conceptsPerCycleMax.intValue();
+            if (toFire < 0)
+                toFire = concepts.capacity();
 
 
-            toExe = Math.min(ps, toExe);
-            int toInput = tasks.size();
+            //Random rng = nar.random();
 
-                //Random rng = nar.random();
-
-            //INPUT
-            tasks.commit(null).pop(toInput, this::actuallyRun);
 
             //EXEC
-            float eFrac = ((float) toExe) / concepts.capacity();
+            float eFrac = ((float) toFire) / concepts.capacity();
             float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag) concepts).depressurize(eFrac) * (eFrac);
             this.forgetEachActivePri =
                     pAvg > Pri.EPSILON * 8 ? pAvg : 0;
-                    //0;
+            //0;
 
-            //activeBuffer.clear();
-            concepts.sample(Math.min(concepts.size(), Math.max(1, toExe*2)), x -> {
+            int inputBatch = 8, fireBatch = 8;
+            int toInput = tasks.size();
 
-                actuallyRun(x);
-
-                if (forgetEachActivePri > 0) {
-                    x.priSub(forgetEachActivePri);
+            do {
+                if (toInput > 0) {
+                    if (tasks.isEmpty()) toInput = 0;
+                    else {
+                        tasks.commit(null).pop(inputBatch, this::actuallyRun);
+                        toInput -= inputBatch;
+                    }
                 }
 
-                //activeBuffer.add(x);
-                //(Consumer<? super CLink<ITask>>)(buffer::add)
-            });
+                if (toFire > 0) {
+                    if (concepts.isEmpty()) toFire = 0;
+                    else {
+                        concepts.sample(fireBatch, x -> {
+
+                            actuallyRun(x);
+
+                            if (forgetEachActivePri > 0) {
+                                x.priSub(forgetEachActivePri);
+                            }
+
+                            //activeBuffer.add(x);
+                            //(Consumer<? super CLink<ITask>>)(buffer::add)
+                        });
+                        toFire -= fireBatch;
+                    }
+                }
+            } while (toFire > 0 || toInput > 0);
+
 
 //            for (int i = 0; i < toExe; i++) {
 //                @Nullable CLink<ITask> x = activeBuffer.decide(rng);
@@ -291,7 +301,7 @@ public class TaskExecutor extends Executioner {
 //                sorted.forEach(this::actuallyRun);
 //            }
 
-          //Runtime.getRuntime().runFinalization();
+            //Runtime.getRuntime().runFinalization();
 
         } finally {
             busy.set(false);

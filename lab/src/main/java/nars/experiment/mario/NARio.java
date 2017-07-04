@@ -193,6 +193,7 @@ public class NARio extends NAgentX {
             NAgentX x = null;
             try {
                 x = new NARio(n);
+                n.termVolumeMax.setValue(24);
                 x.trace = true;
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
@@ -220,7 +221,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 20);
+        }, 15);
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

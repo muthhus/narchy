@@ -14,16 +14,12 @@ import java.util.function.Consumer;
  */
 public abstract class MaplikeTermIndex extends CachedTermIndex {
 
-    //final static Logger logger = LoggerFactory.getLogger(MaplikeTermIndex.class);
-
     @NotNull
     protected final ConceptBuilder conceptBuilder;
-
 
     public MaplikeTermIndex(@NotNull ConceptBuilder conceptBuilder) {
         this.conceptBuilder = conceptBuilder;
     }
-
 
     @Override
     public final ConceptBuilder conceptBuilder() {
@@ -39,24 +35,4 @@ public abstract class MaplikeTermIndex extends CachedTermIndex {
         return next;
     };
 
-
-
-    //
-//    @Nullable
-//    @Override public final Compound normalize(@NotNull Compound x) {
-//
-//        if (x.isNormalized()) {
-//            return x;
-//        } else {
-//            return compoundOrNull(normalize.apply(x));
-//        }
-//    }
-
-
-    @Override
-    public @NotNull String summary() {
-        return "CACHE term=" + terms.summary()
-                //+ " normalize=" + normalize.summary()
-                ;
-    }
 }

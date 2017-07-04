@@ -1249,7 +1249,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
 
         if (term instanceof Compound) {
-            term = terms.atemporalize((Compound) term);
+            term = compoundOrNull(terms.atemporalize((Compound) term));
             if (term == null)
                 return null;
 

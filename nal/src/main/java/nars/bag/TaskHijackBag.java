@@ -92,7 +92,8 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         MutableFloat oo = new MutableFloat();
         @Nullable Task y = put(x, oo);
         if (y == null) {
-            activation = 0;//not inserted
+            //not inserted
+            return;
         } else {
             //fully inserted or merged with existing item, and activate only the absorbed amount
             activation -= oo.floatValue();
@@ -101,8 +102,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
             x.delete();
         }
 
-        if (activation > 0)
-            TaskTable.activate(y, activation, n, y!=x);
+        TaskTable.activate(y, activation, n, y!=x);
     }
 
 

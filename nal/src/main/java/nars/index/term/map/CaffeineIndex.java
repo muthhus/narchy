@@ -51,7 +51,8 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     final static Weigher<? super Term, ? super Termed> w = (k,v) -> {
         if (v instanceof PermanentConcept) return 0;
         else return
-                v.complexity();
+                (v.complexity() + v.volume())/2;
+                //v.complexity();
                 //v.volume();
     };
 

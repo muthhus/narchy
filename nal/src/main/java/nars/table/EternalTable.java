@@ -1,6 +1,7 @@
 package nars.table;
 
 import jcog.data.sorted.SortedArray;
+import jcog.pri.Pri;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -429,7 +430,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
 
-        assert(activation>=0);
         TaskTable.activate(activated, activation, nar, true);
     }
 
