@@ -268,7 +268,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertArrayEquals(
                 new Term[]{r, s},
-                ((Compound) terms.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).toArray()
+                ((Compound) Op.difference(Op.SETe, sete(r, p, q, s), sete(p, q))).toArray()
         );
     }
 
@@ -281,7 +281,7 @@ public class TermReductionsTest {
         //check consistency with differenceSorted
         assertEquals(
                 Null,
-                terms.difference(Op.SETe, sete(p, q), sete(p, q))
+                Op.difference(Op.SETe, sete(p, q), sete(p, q))
         );
     }
 
@@ -295,11 +295,11 @@ public class TermReductionsTest {
 
         assertEquals(
                 $("{Mars,Venus}"),
-                terms.difference(Op.SETe, $("{Mars,Pluto,Venus}"), $.<Compound>$("{Pluto,Saturn}"))
+                Op.difference(Op.SETe, $("{Mars,Pluto,Venus}"), $.<Compound>$("{Pluto,Saturn}"))
         );
         assertEquals(
                 $("{Saturn}"),
-                terms.difference(Op.SETe, $("{Pluto,Saturn}"), $.<Compound>$("{Mars,Pluto,Venus}"))
+                Op.difference(Op.SETe, $("{Pluto,Saturn}"), $.<Compound>$("{Mars,Pluto,Venus}"))
         );
 
 

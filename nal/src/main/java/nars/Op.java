@@ -32,6 +32,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.util.*;
 
+import static java.util.Arrays.copyOfRange;
 import static nars.index.TermBuilder.flatten;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -72,13 +73,6 @@ public enum Op {
             assert (dt == DTERNAL);
             return neg(u[0]);
         }
-
-        @Override
-        public @NotNull Term the(int dt, TermContainer subterms) {
-            assert (subterms.size() == 1);
-            assert (dt == DTERNAL);
-            return neg(subterms.sub(0));
-        }
     },
 
     INH("-->", 1, OpType.Statement, Args.Two),
@@ -87,22 +81,48 @@ public enum Op {
     /**
      * extensional intersection
      */
-    SECTe("&", true, 3, Args.GTETwo),
+    SECTe("&", true, 3, Args.GTETwo) {
+        @Override
+        public Term the(TermBuilder b, int dt, Term[] u) {
+              return newIntersection(u,
+                        SECTe,
+                        SETe,
+                        SETi);
+        }
+    },
 
     /**
      * intensional intersection
      */
-    SECTi("|", true, 3, Args.GTETwo),
+    SECTi("|", true, 3, Args.GTETwo) {
+        @Override
+        public Term the(TermBuilder b, int dt, Term[] u) {
+                return newIntersection(u,
+                        SECTi,
+                        SETi,
+                        SETe);
+        }
+    },
 
     /**
      * extensional difference
      */
-    DIFFe("-", false, 3, Args.Two),
+    DIFFe("-", false, 3, Args.Two) {
+        @Override
+        public Term the(TermBuilder b, int dt, Term[] u) {
+            return newDiff(this, u);
+        }
+    },
 
     /**
      * intensional difference
      */
-    DIFFi("~", false, 3, Args.Two),
+    DIFFi("~", false, 3, Args.Two) {
+        @Override
+        public Term the(TermBuilder b, int dt, Term[] u) {
+            return newDiff(this, u);
+        }
+    },
 
     /**
      * PRODUCT
@@ -161,13 +181,6 @@ public enum Op {
             return y;
         }
 
-
-        @Override
-        public @NotNull Term the(int dt, TermContainer subterms) {
-            return the($.terms, dt, subterms.toArray());
-        }
-
-
         @Override
         public Term the(TermBuilder builder, int dt, Term[] uu) {
             Term[] u = conjTrueFalseFilter(uu);
@@ -193,7 +206,7 @@ public enum Op {
             if (dt == XTERNAL) {
                 assert (n == 2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
-                return conjPost(builder.the(CONJ, u).dt(XTERNAL), builder);
+                return conjPost(builder.the(CONJ, XTERNAL,  u), builder);
             }
 
             boolean commutive = concurrent(dt);
@@ -228,7 +241,7 @@ public enum Op {
                     }
                 }
 
-                return conjPost(builder.the(CONJ, u).dt(dt), builder);
+                return conjPost(builder.the(CONJ, dt, u), builder);
 
             }
         }
@@ -269,7 +282,7 @@ public enum Op {
                                 csi.remove();
 
                                 if (!disjSubs.isEmpty()) {
-                                    Term y = NEG.the($.the(CONJ, disjSubs).dt(disj.dt()));
+                                    Term y = NEG.the($.the(CONJ, disj.dt(), disjSubs));
                                     if (csa == null)
                                         csa = $.newArrayList(1);
                                     csa.add(y);
@@ -284,7 +297,7 @@ public enum Op {
                     if (scs.length == 1)
                         return scs[0];
 
-                    return new GenericCompound(CONJ, builder.subterms(scs)).dt(dt);
+                    return build(CONJ, dt, builder.subterms(scs));
                 }
             }
 
@@ -348,7 +361,7 @@ public enum Op {
                     Compound origImpl = (Compound) c.sub(ww);
                     Term newPre = builder.replace(c, origImpl, implPre);
                     if (newPre != null)
-                        return builder.the(IMPL, newPre, implPost).dt(origImpl.dt());
+                        return builder.the(IMPL, origImpl.dt(), newPre, implPost);
 
                 }
 
@@ -407,21 +420,16 @@ public enum Op {
     DISJ("||", true, 5, Args.GTETwo) {
         @Override
         public @NotNull Term the(Term... u) {
-            assert(u.length > 1);
+            assert (u.length > 1);
             return NEG.the($.the(CONJ, TermBuilder.neg(u)));
         }
 
         @Override
         public Term the(TermBuilder b, int dt, Term[] u) {
-            assert(dt == DTERNAL);
+            assert (dt == DTERNAL);
             return the(u);
         }
 
-        @Override
-        public @NotNull Term the(int dt, TermContainer subterms) {
-            assert(dt == DTERNAL);
-            return the(subterms.toArray());
-        }
     },
 
     /**
@@ -641,6 +649,66 @@ public enum Op {
         return (dt == DTERNAL) || (dt == 0);
     }
 
+    @NotNull
+    private static Term newDiff(@NotNull Op op, @NotNull Term... t) {
+
+        //corresponding set type for reduction:
+        Op set = op == DIFFe ? SETe : SETi;
+
+        switch (t.length) {
+            case 1:
+                Term t0 = t[0];
+                return t0 instanceof Ellipsislike ?
+                        build(op, DTERNAL, TermVector.the(t0)) :
+                        Null;
+            case 2:
+                Term et0 = t[0], et1 = t[1];
+                if (et0.equals(et1) || et0.containsRecursively(et1) || et1.containsRecursively(et0))
+                    return Null;
+                else if ((et0.op() == set && et1.op() == set))
+                    return difference(set, (Compound) et0, (Compound) et1);
+                else
+                    return build(op, DTERNAL, TermVector.the(t));
+
+
+        }
+
+        throw new InvalidTermException(op, t, "diff requires 2 terms");
+
+    }
+
+    @NotNull
+    public static Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
+
+        if (a.equals(b))
+            return Null; //empty set
+
+        //quick test: intersect the mask: if nothing in common, then it's entirely the first term
+        if ((a.structure() & b.structure()) == 0) {
+            return a;
+        }
+
+        int size = a.size();
+        List<Term> terms = $.newArrayList(size);
+
+        for (int i = 0; i < size; i++) {
+            Term x = a.sub(i);
+            if (!b.contains(x)) {
+                terms.add(x);
+            }
+        }
+
+        int retained = terms.size();
+        if (retained == size) { //same as 'a'
+            return a;
+        } else if (retained == 0) {
+            return Null; //empty set
+        } else {
+            return o.the(terms.toArray(new Term[retained]));
+        }
+
+    }
+
 
     /**
      * decode a term which may be a functor, return null if it isnt
@@ -772,26 +840,24 @@ public enum Op {
         if (statement) {
             return statement(this, dt, u[0], u[1]);
         } else {
-            return the(dt, b.subterms(commute(dt, u) ? Terms.sorted(u) : u));
+            return build(this, dt, b.subterms(commute(dt, u) ? Terms.sorted(u) : u));
         }
     }
 
     @NotNull
-    public Term the(int dt, TermContainer subterms) {
-        assert (!atomic);
+    static Term build(Op op, int dt, TermContainer subterms) {
+        assert (!op.atomic);
         int s = subterms.size();
         assert (s > 0);
         switch (s) {
             case 1: {
                 assert (dt == DTERNAL);
-                return new UnitCompound1(this, subterms.sub(0));
+                return new UnitCompound1(op, subterms.sub(0));
             }
             default: {
-                if (statement) {
-                    return statement(this, dt, subterms.sub(0), subterms.sub(1));
-                } else {
-                    return new GenericCompound(this, subterms).dt(dt);
-                }
+
+                return new GenericCompound(op, subterms).dt(dt);
+
             }
         }
     }
@@ -871,6 +937,7 @@ public enum Op {
 //            return null;
 //        }
     }
+
     @NotNull
     static Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
@@ -982,7 +1049,7 @@ public enum Op {
 
                 if (dt == XTERNAL) {
                     //create as-is
-                    return $.the(op, subject, predicate).dt(XTERNAL);
+                    return $.the(op, XTERNAL, subject, predicate);
                 } else {
                     if (concurrent(dt)) {
                         if (subject.equals(predicate))
@@ -998,7 +1065,7 @@ public enum Op {
                     if (cprDT != XTERNAL) {
                         Term a = cpr.sub(0);
 
-                        subject = $.the(CONJ, subject, a).dt(dt);
+                        subject = $.the(CONJ, dt, subject, a);
                         predicate = cpr.sub(1);
                         return statement(IMPL, cprDT, subject, predicate);
                     }
@@ -1125,7 +1192,7 @@ public enum Op {
 
         }
 
-        return new GenericCompound(op, TermVector.the(subject, predicate)).dt(dt); //use the calculated ordering, not the TermContainer default for commutives
+        return build(op, dt, TermVector.the(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
     }
 
     /**
@@ -1177,6 +1244,111 @@ public enum Op {
 //            if (c!=0)
 //                Op._charToOperator.put(c, r);
 //        }
+    }
+
+
+        @NotNull
+    private static Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
+
+        int trues = 0;
+        for (Term x : t) {
+            if (isTrue(x)) {
+                //everything intersects with the "all", so remove this TRUE below
+                trues++;
+            } else if (isFalse(x)) {
+                return Null;
+            }
+        }
+        if (trues > 0) {
+            if (trues == t.length) {
+                return True; //all were true
+            } else if (t.length - trues == 1) {
+                //find the element which is not true and return it
+                for (Term x : t) {
+                    if (!isTrue(x))
+                        return x;
+                }
+            } else {
+                //filter the True statements from t
+                Term[] t2 = new Term[t.length - trues];
+                int yy = 0;
+                for (Term x : t) {
+                    if (!isTrue(x))
+                        t2[yy++] = x;
+                }
+                t = t2;
+            }
+        }
+
+        switch (t.length) {
+
+            case 1:
+
+                Term single = t[0];
+                return single instanceof Ellipsislike ?
+                        new GenericCompound(intersection, TermVector.the(single)) :
+                        single;
+
+            case 2:
+                return newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
+            default:
+                //HACK use more efficient way
+                Term a = newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
+
+                Term b = newIntersection(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection);
+
+                return newIntersection2(a, b,
+                        intersection, setUnion, setIntersection
+                );
+        }
+
+    }
+
+    @NotNull
+    @Deprecated
+    private static Term newIntersection2(@NotNull Term term1, @NotNull Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
+
+        if (term1.equals(term2))
+            return term1;
+
+        Op o1 = term1.op();
+        Op o2 = term2.op();
+
+        if ((o1 == setUnion) && (o2 == setUnion)) {
+            //the set type that is united
+            return TermBuilder.union(setUnion, (Compound) term1, (Compound) term2);
+        }
+
+
+        if ((o1 == setIntersection) && (o2 == setIntersection)) {
+            //the set type which is intersected
+            return TermBuilder.intersect(setIntersection, (Compound) term1, (Compound) term2);
+        }
+
+        if (o2 == intersection && o1 != intersection) {
+            //put them in the right order so everything fits in the switch:
+            Term x = term1;
+            term1 = term2;
+            term2 = x;
+            o2 = o1;
+            o1 = intersection;
+        }
+
+        //reduction between one or both of the intersection type
+
+        TreeSet<Term> args = new TreeSet<>();
+        if (o1 == intersection) {
+            ((TermContainer) term1).forEach(args::add);
+            if (o2 == intersection)
+                ((TermContainer) term2).forEach(args::add);
+            else
+                args.add(term2);
+        } else {
+            args.add(term1);
+            args.add(term2);
+        }
+
+        return build(intersection, DTERNAL, /*$.terms.subterms*/TermVector.the(args));
     }
 
 

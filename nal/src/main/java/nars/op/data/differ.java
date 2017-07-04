@@ -1,6 +1,7 @@
 package nars.op.data;
 
 import nars.$;
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
@@ -15,17 +16,18 @@ public class differ extends Functor.BinaryFunctor {
         super("differ");
     }
 
-    @NotNull
+
     @Override
     public Term apply(@NotNull Term a, @NotNull Term b) {
 
         if (a instanceof Compound && b instanceof Compound){
-            Term y = $.terms.difference(a.op(), (Compound) a, (Compound) b);
+            Term y = Op.difference(a.op(), (Compound) a, (Compound) b);
             if (y.equals(a))
                 return Null; //prevent identical fall-through
             return y;
         }
 
         return null;
+
     }
 }

@@ -2,6 +2,7 @@ package nars.term.container;
 
 import nars.$;
 import nars.Narsese;
+import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -54,7 +55,7 @@ public class TermContainerTest {
         Compound x = $("{x}");
         Compound y = $("{y}");
         assertTrue(
-                $.terms.difference(x.op(), x, y) == x
+                Op.difference(x.op(), x, y) == x
         );
     }
     @Test
@@ -72,7 +73,7 @@ public class TermContainerTest {
         Compound y = $("{e,d}");
 
         System.out.println($.terms.intersect(x.op(), x, y));
-        System.out.println($.terms.difference(x.op(), x, y));
+        System.out.println(Op.difference(x.op(), x, y));
         System.out.println($.terms.union(x.op(), x, y));
 
     }

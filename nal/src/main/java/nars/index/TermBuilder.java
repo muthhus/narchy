@@ -225,6 +225,9 @@ public abstract class TermBuilder {
     public TermContainer subterms(@NotNull Term[] s) {
         return TermVector.the(s);
     }
+    public TermContainer subterms(@NotNull TreeSet<Term> s) {
+        return subterms(s.toArray(new Term[s.size()]));
+    }
 
 
     protected Compound newCompound(@NotNull Op op, Term[] subterms) {
@@ -253,33 +256,6 @@ public abstract class TermBuilder {
     }
 
 
-    @NotNull
-    private Term newDiff(@NotNull Op op, @NotNull Term... t) {
-
-        //corresponding set type for reduction:
-        Op set = op == DIFFe ? SETe : SETi;
-
-        switch (t.length) {
-            case 1:
-                Term t0 = t[0];
-                return t0 instanceof Ellipsislike ?
-                        finish(op, t0) :
-                        Null;
-            case 2:
-                Term et0 = t[0], et1 = t[1];
-                if (et0.equals(et1) || et0.containsRecursively(et1) || et1.containsRecursively(et0))
-                    return Null;
-                else if ((et0.op() == set && et1.op() == set))
-                    return difference(set, (Compound) et0, (Compound) et1);
-                else
-                    return finish(op, t);
-
-
-        }
-
-        throw new InvalidTermException(op, t, "diff requires 2 terms");
-
-    }
 
 
     @NotNull
@@ -493,125 +469,21 @@ public abstract class TermBuilder {
 //    }
 
 
-    @NotNull
-    private Term newIntersection(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
-
-        int trues = 0;
-        for (Term x : t) {
-            if (isTrue(x)) {
-                //everything intersects with the "all", so remove this TRUE below
-                trues++;
-            } else if (isFalse(x)) {
-                return Null;
-            }
-        }
-        if (trues > 0) {
-            if (trues == t.length) {
-                return True; //all were true
-            } else if (t.length - trues == 1) {
-                //find the element which is not true and return it
-                for (Term x : t) {
-                    if (!isTrue(x))
-                        return x;
-                }
-            } else {
-                //filter the True statements from t
-                Term[] t2 = new Term[t.length - trues];
-                int yy = 0;
-                for (Term x : t) {
-                    if (!isTrue(x))
-                        t2[yy++] = x;
-                }
-                t = t2;
-            }
-        }
-
-        switch (t.length) {
-
-            case 1:
-
-                Term single = t[0];
-                return single instanceof Ellipsislike ?
-                        finish(intersection, single) :
-                        single;
-
-            case 2:
-                return newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
-            default:
-                //HACK use more efficient way
-                Term a = newIntersection2(t[0], t[1], intersection, setUnion, setIntersection);
-
-                Term b = newIntersection(copyOfRange(t, 2, t.length), intersection, setUnion, setIntersection);
-
-                return newIntersection2(a, b,
-                        intersection, setUnion, setIntersection
-                );
-        }
-
-    }
 
     @NotNull
-    @Deprecated
-    private Term newIntersection2(@NotNull Term term1, @NotNull Term term2, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
-
-        if (term1.equals(term2))
-            return term1;
-
-        Op o1 = term1.op();
-        Op o2 = term2.op();
-
-        if ((o1 == setUnion) && (o2 == setUnion)) {
-            //the set type that is united
-            return union(setUnion, (Compound) term1, (Compound) term2);
-        }
-
-
-        if ((o1 == setIntersection) && (o2 == setIntersection)) {
-            //the set type which is intersected
-            return intersect(setIntersection, (Compound) term1, (Compound) term2);
-        }
-
-        if (o2 == intersection && o1 != intersection) {
-            //put them in the right order so everything fits in the switch:
-            Term x = term1;
-            term1 = term2;
-            term2 = x;
-            o2 = o1;
-            o1 = intersection;
-        }
-
-        //reduction between one or both of the intersection type
-
-        TreeSet<Term> args = new TreeSet<>();
-        if (o1 == intersection) {
-            ((TermContainer) term1).forEach(args::add);
-            if (o2 == intersection)
-                ((TermContainer) term2).forEach(args::add);
-            else
-                args.add(term2);
-        } else {
-            args.add(term1);
-            args.add(term2);
-        }
-
-        return compound(intersection, args);
-    }
-
-
-    @NotNull
-    public Term intersect(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
+    public static Term intersect(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
         if (a.equals(b))
             return a;
 
         MutableSet<Term> s = TermContainer.intersect(
                 /*(TermContainer)*/ a, /*(TermContainer)*/ b
         );
-        return s == null || s.isEmpty() ? Null : (Compound) compound(o, s);
+        return s == null || s.isEmpty() ? Null : (Compound) $.the(o, s);
     }
 
 
     @NotNull
-    public Compound union(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
+    public static Compound union(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
         if (a.equals(b))
             return a;
 
@@ -625,7 +497,7 @@ public abstract class TermBuilder {
             //the smaller is contained by the larger other
             return as > bs ? a : b;
         }
-        return (Compound) compound(o, t);
+        return (Compound) $.the(o, t);
     }
 
     @NotNull
@@ -796,37 +668,6 @@ public abstract class TermBuilder {
                 sub1.containsRecursively(sub0);
     }
 
-    @NotNull
-    public Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
-
-        if (a.equals(b))
-            return Null; //empty set
-
-        //quick test: intersect the mask: if nothing in common, then it's entirely the first term
-        if ((a.structure() & b.structure()) == 0) {
-            return a;
-        }
-
-        int size = a.size();
-        List<Term> terms = $.newArrayList(size);
-
-        for (int i = 0; i < size; i++) {
-            Term x = a.sub(i);
-            if (!b.contains(x)) {
-                terms.add(x);
-            }
-        }
-
-        int retained = terms.size();
-        if (retained == size) { //same as 'a'
-            return a;
-        } else if (retained == 0) {
-            return Null; //empty set
-        } else {
-            return the(o, terms.toArray(new Term[retained]));
-        }
-
-    }
 
     public Term the(@NotNull Op op, int dt, Collection<Term> sub) {
         int ss = sub.size();
