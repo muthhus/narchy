@@ -419,8 +419,8 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events_with_variable_introduction() {
         TestNAR tester = test();
 
-        tester.input("<John --> (/,open,_,door)>. :|:");
-        tester.inputAt(2, "<John --> (/,enter,_,room)>. :|:");
+        tester.input("open(John,door). :|:");
+        tester.inputAt(2, "enter(John, room). :|:");
 
         //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
         tester.mustBelieve(cycles,

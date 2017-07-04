@@ -490,7 +490,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
                 int zdt = r.dt(x);
                 if (ydt!=zdt)
                     //yy = compoundOrNull(transform(yy, zdt, CompoundTransform.Identity));
-                    yy = compoundOrNull($.the(yy.op(), zdt, yy.toArray()));
+                    yy = compoundOrNull(yy.op().the(zdt, yy.toArray()));
             }
             if (yy == null)
                 return null;

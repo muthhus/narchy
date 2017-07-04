@@ -115,7 +115,7 @@ public class PatrickTests extends AbstractNALTest {
 
 
         TestNAR tt = test();
-        //tt.nar.time.dur(10);
+        tt.nar.time.dur(2);
 
 //        tt.nar.onCycle(()->{
 //            System.err.println(tt.nar.time());
@@ -134,7 +134,7 @@ public class PatrickTests extends AbstractNALTest {
         );
         //tt.log();
 
-        tt.mustDesire(2500, "lighter(I, toothbrush)", 1f,
+        tt.mustDesire(3500, "lighter(I, toothbrush)", 1f,
                 0.19f,
 /*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 

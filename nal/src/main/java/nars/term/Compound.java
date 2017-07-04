@@ -68,7 +68,7 @@ public interface Compound extends Term, IPair, TermContainer {
     static boolean equals(Compound a, @Nullable Object b) {
         if (a == b)
             return true;
-        if (a.hashCode()!=b.hashCode())
+        if (a.hashCode() != b.hashCode())
             return false;
 
 
@@ -85,10 +85,10 @@ public interface Compound extends Term, IPair, TermContainer {
 
         return
                 (a.subterms().equals(bc.subterms()))
-                &&
-                (a.op() == bc.op())
-                &&
-                (a.dt() == bc.dt())
+                        &&
+                        (a.op() == bc.op())
+                        &&
+                        (a.dt() == bc.dt())
                 ;
 
         //subterm sharing:
@@ -655,13 +655,17 @@ public interface Compound extends Term, IPair, TermContainer {
             Op op = op();
             if (nextDT != DTERNAL && (op.temporal)) {
                 //assert((op().temporal || op().image));
-                return new GenericCompoundDT(this, nextDT);
+                Compound b = this instanceof GenericCompoundDT ? ((GenericCompoundDT) this).ref : this;
+//                if (!concurrent(nextDT)) {
+//                    //check ordering
+//                }
+                return new GenericCompoundDT(b, nextDT);
             } else {
                 if (this instanceof GenericCompoundDT)
                     if (Op.concurrent(dt) == Op.concurrent(nextDT))
                         return ((GenericCompoundDT) this).ref; //fast
                     else
-                        return $.the(op, nextDT, toArray());
+                        return op.the(nextDT, toArray());
                 else {
                     return this; //maybe detect when this happens, could indicate an error
                 }
@@ -951,15 +955,11 @@ public interface Compound extends Term, IPair, TermContainer {
 
         }
 
-        if (t == null && modified && evalSubs!=null) {
+        if (t == null && modified && evalSubs != null) {
             t = o.the(dt(), evalSubs);
         }
 
-        if (t == null)
-            return this;
-
-        if (t.equals(this))
-        //if (t == this)
+        if (t == null || t==this || t.equals(this))
             return this;
 
         try {

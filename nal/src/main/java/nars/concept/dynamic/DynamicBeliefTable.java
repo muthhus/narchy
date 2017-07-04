@@ -91,10 +91,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
         if (template == null) {
             if (target!=null) {
-                template =
-                        nar.terms.retemporalize(target.term(),
-                                target.isEternal() ?
-                                        nar.terms.retemporalizationDTERNAL : nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
+                template = target.term();
 
             }
             if (template == null) {
@@ -107,6 +104,12 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
                 }
             }
         }
+
+        template = nar.terms.retemporalize(template,
+                target==null || target.isEternal() ?
+                nar.terms.retemporalizationDTERNAL : nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
+        if (template == null)
+            return null; //??
 
         Task y = generate(template, when, nar);
 
