@@ -1,6 +1,7 @@
 package nars.term.container;
 
 import com.google.common.base.Joiner;
+import nars.Op;
 import nars.Param;
 import nars.term.Term;
 import nars.term.Terms;
@@ -90,7 +91,7 @@ public abstract class TermVector implements TermContainer {
     }
 
     public static TermContainer the(@NotNull Collection<? extends Term> t) {
-        return TermVector.the((Term[]) t.toArray(new Term[t.size()]));
+        return Op.subterms((Term[]) t.toArray(new Term[t.size()]));
     }
 
 

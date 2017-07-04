@@ -11,8 +11,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface TermContext {
 
-    /** TODO rename: eval( */
-    @Nullable Term the(@NotNull Op op, int dt, Term[] subs);
 
     /** TODO rename: eval( */
     @Nullable Termed get(Term x, boolean createIfAbsent);
@@ -25,12 +23,12 @@ public interface TermContext {
         return get(t, false);
     }
 
-    default Termed getIfPresentElse(@NotNull Term x) {
-        Termed y = get(x, false);
+    default Termed getIfPresentElse(@NotNull Term _else) {
+        Termed y = get(_else, false);
         if (y != null)
             return y;
         else
-            return x;
+            return _else;
     }
 
 }

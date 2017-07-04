@@ -878,13 +878,10 @@ public enum Op {
         }
     };
 
-    static final Memoize<ProtoCompound, Termlike> terms =
+    public static final Memoize<ProtoCompound, Termlike> cache =
             //new HijackMemoize<>(buildTerm, 384 * 1024, 4);
-            CaffeineMemoize.build(buildTerm, 128 * 1024, false /* Param.DEBUG*/);
+            CaffeineMemoize.build(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
 
-    /**
-     * override to possibly intern termcontainers
-     */
 
     static TermContainer _subterms(@NotNull Term[] s) {
         return TermVector.the(s);
@@ -895,7 +892,7 @@ public enum Op {
         if (s.length < 2) {
             return _subterms(s);
         } else {
-            return (TermContainer) terms.apply(new AppendProtoCompound(null, s).commit());
+            return (TermContainer) cache.apply(new AppendProtoCompound(null, s).commit());
         }
     }
 

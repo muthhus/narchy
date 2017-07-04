@@ -2,17 +2,11 @@ package nars.index;
 
 import nars.$;
 import nars.Op;
-import nars.derive.meta.match.Ellipsislike;
-import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.atom.IntAtom;
-import nars.term.compound.GenericCompound;
-import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
-import nars.term.util.InvalidTermException;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,16 +26,7 @@ import static nars.time.Tense.XTERNAL;
 public abstract class TermBuilder {
 
 
-
-    /**
-     * main entry point for compound construction - creates an immutable result
-     */
-    @NotNull
-    public Term the(@NotNull Op op, int dt, @NotNull Term... u) throws InvalidTermException {
-        return op.the(dt, u);
-    }
-
-//        int arity = u.length;
+    //        int arity = u.length;
 //        switch (op) {
 ////            case INT:
 ////            case INTRANGE:
@@ -214,7 +199,7 @@ public abstract class TermBuilder {
 
     @NotNull
     public final Term the(@NotNull Op op, @NotNull Term... tt) {
-        return the(op, DTERNAL, tt);
+        return op.the(DTERNAL, tt);
     }
 
 //    /**
@@ -386,12 +371,12 @@ public abstract class TermBuilder {
 
     @NotNull
     public Term the(@NotNull Compound csrc, @NotNull Term... newSubs) {
-        return the(csrc.op(), csrc.dt(), newSubs);
+        return csrc.op().the(csrc.dt(), newSubs);
     }
 
     @NotNull
     public Term the(@NotNull Op op, int dt, @NotNull TermContainer newSubs) {
-        return the(op, dt, newSubs.toArray());
+        return op.the(dt, newSubs.toArray());
     }
 
 
@@ -565,7 +550,8 @@ public abstract class TermBuilder {
 
     public Term the(@NotNull Op op, int dt, Collection<Term> sub) {
         int ss = sub.size();
-        return the(op, dt, sub.toArray(new Term[ss]));
+        @NotNull Term[] u = sub.toArray(new Term[ss]);
+        return op.the(dt, u);
     }
 
 

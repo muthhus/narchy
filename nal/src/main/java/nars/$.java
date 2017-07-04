@@ -22,7 +22,7 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
-import nars.term.util.CachedTermIndex;
+import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
 import nars.term.var.VarPattern;
@@ -30,7 +30,6 @@ import nars.term.var.Variable;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.util.JsonCompound;
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -610,7 +609,7 @@ public enum $ {
 
     @NotNull
     public static Term the(@NotNull Op op, int dt, @NotNull Term... subterms) {
-        return terms.the(op, dt, subterms);
+        return op.the(dt, subterms);
     }
 
     @Nullable
@@ -737,9 +736,7 @@ public enum $ {
     /**
      * static storeless term builder
      */
-    public static final CachedTermIndex terms =
-            new CachedTermIndex();
-            //new StaticTermIndex();
+    public static final StaticTermIndex terms = new StaticTermIndex();
 
     /**
      * determines if the string is invalid as an unquoted term according to the characters present

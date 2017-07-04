@@ -311,15 +311,14 @@ public class MySTMClustered extends STMClustered {
 
 
             return normalizedOrNull(
-                    index.the(CONJ, dt, $.negIf(early.term(), negated),
-                            $.negIf(late.term(), negated)), index);
+                    CONJ.the(dt, $.negIf(early.term(), negated), $.negIf(late.term(), negated)), index);
 
         } else {
 
             Term[] u = Util.map((tx) -> $.negIf(tx.term(), negated), new Term[uu.length], uu);
 
             //just assume they occurr simultaneously
-            return normalizedOrNull(index.the(CONJ, 0, u), index);
+            return normalizedOrNull(CONJ.the(0, u), index);
         }
     }
 }

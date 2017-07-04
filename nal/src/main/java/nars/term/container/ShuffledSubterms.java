@@ -17,7 +17,7 @@ public final class ShuffledSubterms extends ShuffledPermutations implements Term
     public final TermContainer srcsubs;
 
     public ShuffledSubterms(Random rng, Term[] subterms) {
-        this(rng, TermVector.the(subterms));
+        this(rng, TermVector.the(subterms) /* must be unique, private instance */);
     }
 
     public ShuffledSubterms(Random rng, TermContainer subterms) {

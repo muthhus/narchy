@@ -950,7 +950,7 @@ public interface Compound extends Term, IPair, TermContainer {
             }
 
         } else if (modified) {
-            t = index.the(op(), dt(), evalSubs);
+            t = op().the(dt(), evalSubs);
         }
 
         if (t == null)

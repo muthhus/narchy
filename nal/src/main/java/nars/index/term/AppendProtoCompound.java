@@ -74,6 +74,8 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
      */
     @Override
     public Term[] subterms() {
+        compact(); //compact the key
+
         Term[] tt;
         int s = this.size;
         @NotNull Term[] ss = this.subs;
@@ -84,7 +86,6 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
             tt = Arrays.copyOfRange(ss, 0, s); //trim
         }
 
-        compact(); //compact the key
         this.subs = null; //clear refernce to the array from this point
 
         return tt;

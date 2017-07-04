@@ -1545,13 +1545,6 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         return self;
     }
 
-
-    @Nullable
-    @Override
-    public final Term the(@NotNull Op op, int dt, Term[] subs) {
-        return terms.the(op, dt, subs);
-    }
-
     @Override
     public final Termed get(Term x, boolean createIfAbsent) {
         return terms.get(x, createIfAbsent);

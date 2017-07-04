@@ -835,7 +835,7 @@ public class PremiseRule extends GenericCompound {
                                     occReturn[0] += a;
                                     b -= a;
                                 }
-                                derived = compoundOrNull(p.terms.the(CONJ, b-a, A, B));
+                                derived = compoundOrNull(CONJ.the(b - a, A, B));
                                 break;
                             default:
                                 assert(derived.dt()==DTERNAL);

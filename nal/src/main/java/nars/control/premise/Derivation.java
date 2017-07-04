@@ -135,12 +135,6 @@ public class Derivation extends Unify implements TermContext {
         return x;
     }
 
-    @Override
-    public Term the(@NotNull Op op, int dt, Term[] subs) {
-        return terms.the(op, dt, subs);
-    }
-
-
     /** concept-scope
      * @param n*/
     @NotNull public void restartA(NAR n) {

@@ -41,8 +41,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     @NotNull
     @Deprecated
     default public TermContainer append(@NotNull Term x) {
-
-        return TermVector.the(ArrayUtils.add(toArray(), x));
+        return Op.subterms(ArrayUtils.add(toArray(), x));
     }
 
     //TODO optionally allow atomic structure positions to differ
@@ -686,7 +685,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull
     static TermContainer the(@NotNull Op op, int dt, @NotNull Term... tt) {
-        return TermVector.the(theTermArray(op, dt, tt));
+        return Op.subterms(theTermArray(op, dt, tt));
     }
 
     @NotNull
@@ -989,7 +988,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (equalTerms(tt))
             return this;
         else
-            return TermVector.the(tt);
+            return Op.subterms(tt);
     }
 
 }

@@ -367,7 +367,7 @@ public class IO {
             dt = DTERNAL;
         }
 
-        Term y = t.the(o, dt, v);
+        Term y = o.the(dt, v);
         if (isAbsolute(y))
             throw new InvalidTermException(o, dt, v, "invalid term");
 

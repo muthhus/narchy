@@ -1248,14 +1248,14 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
-    @Test public void conjDecoposeGoalAfter() {
+    @Test public void conjDecomposeGoalAfter() {
         test()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
                 .mustDesire(cycles, "(a)", 1f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
-    @Test public void conjDecoposeGoalAfterPosNeg() {
+    @Test public void conjDecomposeGoalAfterPosNeg() {
         test()
                 .inputAt(3, "(--(a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
@@ -1263,7 +1263,7 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(a)", GOAL,  ETERNAL);
     }
 
-    @Test public void implDecoposeGoalAfterPosPos() {
+    @Test public void implDecomposeGoalAfterPosPos() {
         test()
                 .inputAt(3, "((a) ==>+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
@@ -1271,7 +1271,7 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(a)", GOAL,  ETERNAL, 10);
     }
 
-    @Test public void implDecoposeGoalAfterPosNeg() {
+    @Test public void implDecomposeGoalAfterPosNeg() {
         test()
                 .inputAt(3, "(--(a) ==>+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
@@ -1279,7 +1279,7 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(a)", GOAL,  ETERNAL, 10);
     }
 
-    @Test public void conjDecoposeGoalAfterNegNeg() {
+    @Test public void conjDecomposeGoalAfterNegNeg() {
         test()
                 .log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
@@ -1288,7 +1288,7 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(a)", GOAL, new long[] { ETERNAL } );
     }
 
-    @Test public void conjDecoposeGoalBefore() {
+    @Test public void conjDecomposeGoalBefore() {
         test()
                 .log()
                 .inputAt(3, "((a) &&+3 (b)). :|:")

@@ -160,12 +160,12 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
     @NotNull
     public final Term the(@NotNull Compound csrc, @NotNull Term... args) {
-        return csrc.equalTerms(args) ? csrc : the(csrc.op(), csrc.dt(), args);
+        return csrc.equalTerms(args) ? csrc : csrc.op().the(csrc.dt(), args);
     }
 
     @NotNull
     public final Term the(@NotNull Compound csrc, int newDT) {
-        return csrc.dt() == newDT ? csrc : the(csrc.op(), newDT, csrc.toArray());
+        return csrc.dt() == newDT ? csrc : csrc.op().the(newDT, csrc.toArray());
     }
 
 //    @Override
@@ -389,7 +389,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
         if (!changed)
             return csrc;
 
-        return the(csrc.op(), csrc.dt(), target);
+        return csrc.op().the(csrc.dt(), target);
     }
 
 
