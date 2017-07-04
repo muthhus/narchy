@@ -125,11 +125,12 @@ public class Builtin {
             if (t.op() != CONJ)
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
-            Compound c = compoundOrNull(t);  //for use in deriver, fail if any variable parameters
+            Compound c = (Compound)t;  //for use in deriver, fail if any variable parameters
 
             int size = c.size();
 
-            assert(size > 1);
+            if (size == 0)
+                return Null;
 
             Term result;
             if (size == 2) {

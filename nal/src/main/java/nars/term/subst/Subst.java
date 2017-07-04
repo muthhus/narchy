@@ -115,8 +115,7 @@ public interface Subst  {
 
         }
 
-        int dt = curr.dt();
-        return cop.the(dt, next.subterms());
+        return cop.the(curr.dt(), next.subterms());
     }
 
 

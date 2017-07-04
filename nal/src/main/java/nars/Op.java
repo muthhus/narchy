@@ -905,10 +905,15 @@ public enum Op {
     }
 
 
-    @NotNull
-    public static Term compound(Op op, int dt, TermContainer subterms) {
+
+    @NotNull public static Term compound(Op op, int dt, TermContainer subterms) {
         assert (!op.atomic);
-        Term x = (Term) cache.apply(new AppendProtoCompound(op, subterms).commit());
+        AppendProtoCompound apc = new AppendProtoCompound(op, subterms);
+        return the(apc, dt);
+    }
+
+    @NotNull public static Term the(AppendProtoCompound apc, int dt) {
+        Term x = (Term) cache.apply(apc.commit());
         if (dt!=DTERNAL && x instanceof Compound)
             return x.dt(dt);
         else
@@ -943,6 +948,8 @@ public enum Op {
      * specifier for any NAL level
      */
     public static final int ANY_LEVEL = 0;
+
+
 
 
     /**
@@ -997,7 +1004,7 @@ public enum Op {
             return Null;
 
         if (dt == XTERNAL) {
-            return compound(op, XTERNAL, subterms(op != EQUI || subject.compareTo(predicate) > 0 ?
+            return compound(op, XTERNAL, subterms(op != EQUI || subject.compareTo(predicate) <= 0 ?
                     new Term[]{subject, predicate} :
                     new Term[]{predicate, subject}));
         }

@@ -147,11 +147,6 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 //        return False; //place a False placeholder so that a repeat call will not have to discover this manually
 //    }
 
-
-    public Term the(ProtoCompound t) {
-        return the(t.op(), t.subterms());
-    }
-
 //    @NotNull
 //    public final Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
 //        if (csrc.subterms().equals(newSubs)) {

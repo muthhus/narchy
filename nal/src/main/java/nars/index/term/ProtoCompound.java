@@ -3,7 +3,9 @@ package nars.index.term;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Termlike;
+import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,6 +21,43 @@ import static nars.time.Tense.DTERNAL;
  *
  */
 public interface ProtoCompound extends TermContainer {
+
+//    public static class TermContainerProtoCompound implements ProtoCompound {
+//
+//        final Op op;
+//
+//        public TermContainerProtoCompound(Op op) {
+//            this.op = op;
+//        }
+//
+//        @Override
+//        public @Nullable Op op() {
+//            return op;
+//        }
+//
+//        @NotNull
+//        @Override
+//        public Term[] subterms() {
+//            return new Term[0];
+//        }
+//
+//        @Override
+//        public int size() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public Term sub(int i) {
+//            return null;
+//        }
+//
+//        @Override
+//        public ProtoCompound commit(int dt) {
+//            return null;
+//        }
+//
+//
+//    }
 
     @Nullable
     @Override
