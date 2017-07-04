@@ -57,7 +57,7 @@ public enum Op {
                 if (x.op() == NEG)
                     return x.unneg();
             } else if (x instanceof AtomicSingleton) {
-                if (x.equals(False)) return True;
+                if (isFalse(x)) return True;
                 if (isTrue(x)) return False;
                 else return Null;
             }
@@ -128,15 +128,6 @@ public enum Op {
      */
     PROD("*", 4, Args.GTEZero),
 
-    /**
-     * extensional image
-     */
-    IMGe("/", 4, Args.GTEOne),
-
-    /**
-     * intensional image
-     */
-    IMGi("\\", 4, Args.GTEOne),
 
 
     /**
@@ -347,7 +338,8 @@ public enum Op {
                 Compound cx = (Compound) x;
                 Compound c = cx;
                 int whichImpl = -1;
-                for (int i = 0; i < c.size(); i++) {
+                int cs = c.size();
+                for (int i = 0; i < cs; i++) {
                     if (c.subIs(i, Op.IMPL)) {
                         if (whichImpl != -1) {
                             //a 2nd implication was found; don't continue
@@ -360,13 +352,11 @@ public enum Op {
 
                 if (whichImpl != -1) {
 
-                    int ww = whichImpl;
 //                Term[] precond = c.subterms().terms(
 //                        (IntObjectPredicate<Term>)((i,s)->(i != ww)));
                     Compound css = (Compound) c.sub(whichImpl);
                     Term implPre = css.sub(0);
                     Term implPost = css.sub(1);
-                    assert (!implPre.equals(implPost));
                     Term other;
                     if (x.size() == 2) {
                         other = x.sub(1 - whichImpl, null);
@@ -447,6 +437,15 @@ public enum Op {
         }
 
     },
+//    /**
+//     * extensional image
+//     */
+//    IMGe("/", 4, Args.GTEOne),
+//
+//    /**
+//     * intensional image
+//     */
+//    IMGi("\\", 4, Args.GTEOne),
 
     /**
      * for ellipsis, when seen as a term
@@ -458,8 +457,6 @@ public enum Op {
 
     public static final int OpBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
     public static final int EvalBits = OpBits; //just an alias for code readabiliy
-
-    public static final int InhAndIMGbits = Op.or(Op.INH, Op.IMGe, Op.IMGi);
 
     public static final byte BELIEF = '.';
     public static final byte QUESTION = '?';
@@ -930,7 +927,6 @@ public enum Op {
     public static final int SetsBits = or(Op.SETe, Op.SETi);
     public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
     public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
-    public static final int ImageBits = or(Op.IMGe, Op.IMGi);
     public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);
 
 

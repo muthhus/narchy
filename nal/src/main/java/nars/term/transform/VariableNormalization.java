@@ -57,7 +57,10 @@ public class VariableNormalization extends VariableTransform implements Function
     @NotNull
     @Override
     public Variable apply(@NotNull Variable x) {
-        return newVariable(x, ++count);
+        @NotNull Variable y = newVariable(x, ++count);
+        if (y == x)
+            count--; //undo increment
+        return y;
     }
 
     @Override

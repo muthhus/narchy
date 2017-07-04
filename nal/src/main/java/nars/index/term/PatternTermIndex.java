@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import nars.$;
 import nars.Op;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.PatternCompound;
@@ -24,15 +25,8 @@ import static nars.Op.NEG;
  */
 public class PatternTermIndex extends MapTermIndex {
 
-    @Deprecated public PatternTermIndex() {
-        this(1024);
-    }
-
-    public PatternTermIndex(int capacity) {
-        super(ConceptBuilder.Null,
-            new HashMap<>(capacity)
-        );
-
+    public PatternTermIndex() {
+        super(ConceptBuilder.Null, new HashMap<>(/*capacity*/) );
     }
 
     @Override
@@ -81,7 +75,6 @@ public class PatternTermIndex extends MapTermIndex {
 
 
         TermContainer v = (changed ? TermVector.the(TermContainer.theTermArray(x.op(), x.dt(), bb)) : s);
-
 
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
@@ -137,6 +130,10 @@ public class PatternTermIndex extends MapTermIndex {
             }
         }
 
+    }
+
+    public @NotNull Term normalizeRule(@NotNull Compound ss) {
+        return get(transform(ss, new PremiseRule.PremiseRuleVariableNormalization()), true).term();
     }
 
 }

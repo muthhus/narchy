@@ -93,12 +93,12 @@ public class EllipsisTest {
 
                             assertEquals(getExpectedUniqueTerms(arity), varArgs.size());
 
-                            Set<Term> varArgTerms = $.newHashSet(1);
                             Term u = xy(varArgs);
                             if (u == null) {
                                 u = varArgs;
                             }
 
+                            Set<Term> varArgTerms = $.newHashSet(1);
                             if (u instanceof EllipsisMatch) {
                                 EllipsisMatch m = (EllipsisMatch)u;
                                 Collections.addAll(varArgTerms, m.terms);
@@ -173,7 +173,9 @@ public class EllipsisTest {
             this.prefix = prefix;
             this.suffix = suffix;
             this.ellipsisTerm = ellipsisTerm;
-            p = (Compound) new PatternTermIndex().get(getPattern(prefix, suffix), true).term();
+            p = (Compound) new PatternTermIndex().normalizeRule(
+                    getPattern(prefix, suffix)
+            );
         }
 
 

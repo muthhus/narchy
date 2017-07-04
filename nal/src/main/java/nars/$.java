@@ -589,15 +589,7 @@ public enum $ {
         return the(DIFFe, a, b);
     }
 
-    @Nullable
-    public static Term imge(Term... x) {
-        return the(IMGe, x);
-    }
 
-    @Nullable
-    public static Term imgi(Term... x) {
-        return the(IMGi, x);
-    }
 
     @Nullable
     public static Term secte(Term... x) {
@@ -714,86 +706,6 @@ public enum $ {
         //  }
     }
 
-
-    @Nullable
-    public static Term inhImageExt(@NotNull Compound x, @Nullable Term y, @NotNull Atomic oper) {
-        Term[] args = x.toArray();
-        Term[] aa = ArrayUtils.add(args, 0, oper);
-        return inh(y, imageMask(aa.length - 1, true, aa));
-        /*return inh(
-                y,
-                imge(x, operation.term(1)  )
-        );*/
-    }
-
-    /**
-     * Try to make an Image from a Product and a relation. Called by the logic rules.
-     *
-     * @param product  The product
-     * @param relation The relation (the operator)
-     * @param index    The index of the place-holder (variable)
-     * @return A compound generated or a term it reduced to
-     */
-    @Nullable
-    public static Term imge(@NotNull Compound product, @NotNull Term relation) {
-        int pl = product.size();
-//        if (relation.op(PRODUCT)) {
-//            Compound p2 = (Compound) relation;
-//            if ((pl == 2) && (p2.size() == 2)) {
-//                if ((index == 0) && product.term(1).equals(p2.term(1))) { // (/,_,(*,a,b),b) is reduced to a
-//                    return p2.term(0);
-//                }
-//                if ((index == 1) && product.term(0).equals(p2.term(0))) { // (/,(*,a,b),a,_) is reduced to b
-//                    return p2.term(1);
-//                }
-//            }
-//        }
-        /*Term[] argument =
-            builder.concat(new Term[] { relation }, product.cloneTerms()
-        );*/
-        Term[] argument = new Term[pl];
-        argument[0] = relation;
-        System.arraycopy(product.toArray(), 0, argument, 1, pl - 1);
-
-        return image(0, true, argument);
-        //return the(IMGe, argument);
-    }
-
-    @Nullable
-    public static Compound image(int relation, Term... elements) {
-        return image(relation, true, elements);
-    }
-
-    @Nullable
-    public static Compound imgi(int relation, Term... elements) {
-        return image(relation, false, elements);
-    }
-
-    @Nullable
-    public static Compound image(int relation, boolean ext, @NotNull Term... elements) {
-        Term img = imageMask(relation, ext, elements);
-
-        Term related = elements[relation];
-        return ext ? $.inh(related, img) : $.inh(img, related);
-    }
-
-    @Nullable
-    public static Term imageMask(int relation, boolean ext, @NotNull Term[] elements) {
-        Term[] elementsMasked = ArrayUtils.remove(elements, relation);
-        return the(ext ? IMGe : IMGi, relation, elementsMasked);
-    }
-
-    @Nullable
-    public static Compound imge(int relation, @NotNull Compound product) {
-        assert (product.op() == Op.PROD);
-        return image(relation, true, product.toArray());
-    }
-
-    @Nullable
-    public static Compound imgi(int relation, @NotNull Compound product) {
-        assert (product.op() == Op.PROD);
-        return image(relation, false, product.toArray());
-    }
 
     @Nullable
     public static Truth t(float f, float c) {

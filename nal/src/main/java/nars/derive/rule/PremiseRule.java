@@ -432,15 +432,9 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public final PremiseRule normalizeRule(@NotNull PatternTermIndex index) {
-
-        //HACK
-        Compound ss = (Compound) index.transform(this, UppercaseAtomsToPatternVariables);
-
-        Term tt = index.transform(ss, new PremiseRuleVariableNormalization());
-
-        Compound premiseComponents = (Compound) index.get(tt, true);
-
-        return new PremiseRule(premiseComponents);
+        return new PremiseRule((Compound)index.normalizeRule(
+                (Compound) index.transform(this, UppercaseAtomsToPatternVariables)
+        ));
     }
 
 
@@ -1333,7 +1327,7 @@ public class PremiseRule extends GenericCompound {
         public static final int ELLIPSIS_TRANSFORM_ID_OFFSET = 3 * 256;
 
         public PremiseRuleVariableNormalization() {
-            super(new UnifiedMap<>(8));
+            super(new UnifiedMap<>(4));
         }
 
         public static AbstractVariable varPattern(int i) {
@@ -1366,7 +1360,9 @@ public class PremiseRule extends GenericCompound {
                         , ep.minArity);
             } else if (x instanceof Ellipsis) {
 
-                throw new UnsupportedOperationException("?");
+                return x;
+
+                //throw new UnsupportedOperationException("?");
 //                int idOffset;
 //                if (v instanceof EllipsisTransform) {
 //                    idOffset = ELLIPSIS_TRANSFORM_ID_OFFSET;

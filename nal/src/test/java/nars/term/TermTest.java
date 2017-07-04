@@ -48,18 +48,6 @@ public class TermTest {
         Param.DEBUG = true;
     }
 
-
-    @Nullable
-    public static Compound imageInt(Term... x) {
-        return (Compound) $.the(IMGi, x);
-    }
-
-    @Nullable
-    public static Compound imageExt(Term... x) {
-        return (Compound) $.the(IMGe, x);
-    }
-
-
     protected void assertEquivalentTerm(@NotNull String term1String, @NotNull String term2String) {
         try {
 
@@ -615,41 +603,7 @@ public class TermTest {
 //
 //    }
 
-    @Test
-    public void testImageConstruction() throws Narsese.NarseseException {
-        Term e1 = imageExt($("X"), $("Y"), $("_"));
-        Term e2 = imageExt($("X"), $("Y"), Op.Imdex);
-        assertEquals(e1, e2);
 
-        Term f1 = imageInt($("X"), $("Y"), $("_"));
-        Term f2 = imageInt($("X"), $("Y"), Op.Imdex);
-        assertEquals(f1, f2);
-
-        assertNotEquals(e1, f1);
-        assertEquals(((Compound) e1).subterms(), ((Compound) f1).subterms());
-    }
-
-//    @Test
-//    public void testImageConstruction2() throws Narsese.NarseseException {
-//        assertTrue($("(/,_,X,Y)").op().image);
-//        assertFalse($("(X,Y)").op().image);
-//
-//        assertValidTermValidConceptInvalidTaskContent(()->imageExt(Atomic.the("X"), Atomic.the("Y")));
-//        assertValidTermValidConceptInvalidTaskContent(()->imageInt(Atomic.the("X"), Atomic.the("Y")));
-//
-//        Term xx = $("(/,X,_)");
-//        assertEquals("(/,X,_)", xx.toString());
-//        assertEquals("(/,X,_)", imageExt($("X"), $("_")).toString());
-//
-//        assertEquals("(/,X,Y,_)", imageExt($("X"), $("Y"), $("_")).toString());
-//        assertEquals("(/,X,_,Y)", imageExt($("X"), $("_"), $("Y")).toString());
-//        assertEquals("(/,_,X,Y)", imageExt($("_"), $("X"), $("Y")).toString());
-//
-//        assertEquals("(\\,X,Y,_)", imageInt($("X"), $("Y"), $("_")).toString());
-//        assertEquals("(\\,X,_,Y)", imageInt($("X"), $("_"), $("Y")).toString());
-//        assertEquals("(\\,_,X,Y)", imageInt($("_"), $("X"), $("Y")).toString());
-//
-//    }
 
     public static void assertValid(Term o) {
         assertNotNull(o);

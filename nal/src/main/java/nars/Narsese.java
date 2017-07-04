@@ -833,7 +833,6 @@ public class Narsese extends BaseParser<Object> {
                         SECTe.str, SECTi.str,
                         DIFFe.str, DIFFi.str,
                         PROD.str,
-                        IMGe.str, IMGi.str,
 
                         INH.str,
 

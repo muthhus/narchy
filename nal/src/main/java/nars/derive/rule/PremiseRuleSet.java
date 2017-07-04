@@ -95,7 +95,7 @@ public class PremiseRuleSet {
     @NotNull
     public static PremiseRuleSet rules(boolean permute, String... name) {
 
-        PatternTermIndex p = new PatternTermIndex(1024);
+        PatternTermIndex p = new PatternTermIndex();
         PremiseRuleSet rs = new PremiseRuleSet(
                 Stream.of(name).flatMap(n -> {
 

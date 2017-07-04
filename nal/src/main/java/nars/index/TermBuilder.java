@@ -526,13 +526,17 @@ public abstract class TermBuilder {
             Compound xx = compoundOrNull(
                     subsChanged ? o.the(pdt, newSubs)
                             :
-                            o.the(pdt, c.subterms().toArray()));
+                    o.the(pdt, c.subterms().toArray()));
                             //c.dt(pdt)
 
-            if (xx == null && dtChanged && pdt == DTERNAL) {
-                //throw new InvalidTermException("unable to atemporalize", c);
-                return compoundOrNull(
-                        o.the(XTERNAL, subsChanged ? newSubs : st.toArray()) );
+            if (xx == null) {
+                if (dtChanged) {
+                    if (pdt == DTERNAL) {
+                        //throw new InvalidTermException("unable to atemporalize", c);
+                        return compoundOrNull(
+                                o.the(XTERNAL, subsChanged ? newSubs : st.toArray()));
+                    }
+                }
             }
 
 

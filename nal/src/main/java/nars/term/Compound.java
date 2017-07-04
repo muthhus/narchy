@@ -69,6 +69,8 @@ public interface Compound extends Term, IPair, TermContainer {
     static boolean equals(Compound a, @Nullable Object b) {
         if (a == b)
             return true;
+        if (a.hashCode()!=b.hashCode())
+            return false;
 
 
         Compound bc;
@@ -83,13 +85,11 @@ public interface Compound extends Term, IPair, TermContainer {
         }
 
         return
-                (a.hashCode() == b.hashCode())
-                        &&
-                        (a.op() == bc.op())
-                        &&
-                        (a.dt() == bc.dt())
-                        &&
-                        (a.subterms().equals(bc.subterms()))
+                (a.subterms().equals(bc.subterms()))
+                &&
+                (a.op() == bc.op())
+                &&
+                (a.dt() == bc.dt())
                 ;
 
         //subterm sharing:
@@ -656,7 +656,8 @@ public interface Compound extends Term, IPair, TermContainer {
         if (dt == nextDT)
             return this;
         else {
-            if (nextDT != DTERNAL && (op().temporal || op().image)) {
+            Op op = op();
+            if (nextDT != DTERNAL && (op.temporal || op.image)) {
                 //assert((op().temporal || op().image));
                 return new GenericCompoundDT(this, nextDT);
             } else {
@@ -664,7 +665,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     if (Op.concurrent(dt) == Op.concurrent(nextDT))
                         return ((GenericCompoundDT) this).ref; //fast
                     else
-                        return $.the(op(), nextDT, toArray());
+                        return $.the(op, nextDT, toArray());
                 else {
                     return this; //maybe detect when this happens, could indicate an error
                 }

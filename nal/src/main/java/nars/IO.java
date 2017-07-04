@@ -583,10 +583,7 @@ public class IO {
                 case PROD:
                     productAppend(c, p);
                     return;
-                case IMGi:
-                case IMGe:
-                    imageAppend(c, p);
-                    return;
+
                 //case INHERIT: inheritAppend(c, p, pretty); return;
                 //case SIMILAR: similarAppend(c, p, pretty); return;
 
@@ -678,38 +675,6 @@ public class IO {
             p.append(Op.COMPOUND_TERM_CLOSER);
         }
 
-        static void imageAppend(@NotNull Compound image, @NotNull Appendable p) throws IOException {
-
-            int len = image.size();
-
-            p.append(Op.COMPOUND_TERM_OPENER);
-            p.append(image.op().str);
-
-            int relationIndex = image.dt();
-            int i;
-            for (i = 0; i < len; i++) {
-                Term tt = image.sub(i);
-
-                p.append(Op.ARGUMENT_SEPARATOR);
-                //if (pretty) p.append(' ');
-
-                if (i == relationIndex) {
-                    p.append(Op.IMAGE_PLACE_HOLDER);
-                    p.append(Op.ARGUMENT_SEPARATOR);
-                    //if (pretty) p.append(' ');
-                }
-
-                tt.append(p);
-            }
-            if (i == relationIndex) {
-                p.append(Op.ARGUMENT_SEPARATOR);
-                //if (pretty) p.append(' ');
-                p.append(Op.IMAGE_PLACE_HOLDER);
-            }
-
-            p.append(Op.COMPOUND_TERM_CLOSER);
-
-        }
 
         static void setAppend(@NotNull Compound set, @NotNull Appendable p) throws IOException {
 
