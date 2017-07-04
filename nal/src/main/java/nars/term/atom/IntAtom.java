@@ -14,6 +14,7 @@ public class IntAtom implements Atomic {
 
     final static int MAX_CACHED_INTS = 16;
     private static final IntAtom[] digits = new IntAtom[MAX_CACHED_INTS];
+
     static {
         for (int i = 0; i < MAX_CACHED_INTS; i++) {
             digits[i] = new IntAtom(i);
@@ -34,12 +35,14 @@ public class IntAtom implements Atomic {
 
     @Override
     public byte[] bytes() {
-        if (id >= 0 && id < 10) {
-            //fast 1-digit
-            return new byte[] {(byte) ('0' + id)};
-        } else if (id >= 0 && id < 100) {
-            //fast 2-digit
-            return new byte[] { (byte)('0' + (id / 10)), (byte)('0' + (id % 10)) };
+        if (id >= 0) {
+            if (id < 10) {
+                //fast 1-digit
+                return new byte[]{(byte) ('0' + id)};
+            } else if (id < 100) {
+                //fast 2-digit
+                return new byte[]{(byte) ('0' + (id / 10)), (byte) ('0' + (id % 10))};
+            }
         }
 
         return Integer.toString(id).getBytes(); //HACK TODO give IntTerm its own operator type so integer values can be stored compactly
@@ -58,10 +61,11 @@ public class IntAtom implements Atomic {
 
     @Override
     public final boolean equals(Object obj) {
-        return obj instanceof IntAtom && id == ((IntAtom)obj).id;
+        return obj instanceof IntAtom && id == ((IntAtom) obj).id;
     }
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
         return Integer.toString(id);
     }
 

@@ -512,10 +512,9 @@ public class NAL6Test extends AbstractNALTest {
     @Test //see discussion on https://groups.google.com/forum/#!topic/open-nars/1TmvmQx2hMk
     public void strong_elimination()  {
         TestNAR tester = test();
-        tester.log();
         tester.believe("((test($a,is,cat) && sentence($a,is,$b)) ==> ($a --> $b))");
         tester.believe("test(tim,is,cat)");
-        tester.mustBelieve(cycles*2, "(sentence(tim,is,$1) ==> (tim --> $1))", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+        tester.mustBelieve(cycles, "(sentence(tim,is,$1) ==> (tim --> $1))", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
 
     }
 

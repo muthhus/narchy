@@ -267,11 +267,11 @@ public class IO {
 //        if (isAbsolute(term))
 //            throw new IOException("absolute leak");
 
-        if (term instanceof SerialCompound) {
-            //it's already serialized in a SerialCompound
-            ((SerialCompound) term).appendTo(out);
-            return;
-        }
+//        if (term instanceof SerialCompound) {
+//            //it's already serialized in a SerialCompound
+//            ((SerialCompound) term).appendTo(out);
+//            return;
+//        }
 
         if (term instanceof UnnormalizedVariable) {
             out.writeByte(SPECIAL_OP);
@@ -298,7 +298,7 @@ public class IO {
 
             Compound c = (Compound) term;
             writeTermContainer(out, c.subterms());
-            writeCompoundSuffix(out, c.dt(), o);
+            writeCompoundSuffix(out, c, o);
 
         }
     }
@@ -317,6 +317,11 @@ public class IO {
         for (Term x : subterms) {
             writeTerm(out, x);
         }
+    }
+
+    public static void writeCompoundSuffix(@NotNull DataOutput out, Compound c, Op o) throws IOException {
+        if (o.temporal)
+            out.writeInt(c.dt());
     }
 
     public static void writeCompoundSuffix(@NotNull DataOutput out, int dt, Op o) throws IOException {

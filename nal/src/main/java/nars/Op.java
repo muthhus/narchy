@@ -185,7 +185,7 @@ public enum Op {
                         dt = -dt;
                     }
                 } else {
-                    if (a.compareTo(b) > 0) {
+                    if (a.compareTo(b) < 0) {
                         //ensure lexicographic ordering
 
                         Term x = u[0];
@@ -392,12 +392,20 @@ public enum Op {
     /**
      * intensional set
      */
-    SETi("[", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
+    SETi("[", true, 2, Args.GTEOne) {
+        @Override public boolean isSet() {
+            return true;
+        }
+    },
 
     /**
      * extensional set
      */
-    SETe("{", true, 2, Args.GTEOne), //OPENER also functions as the symbol for the entire compound
+    SETe("{", true, 2, Args.GTEOne) {
+        @Override public boolean isSet() {
+            return true;
+        }
+    },
 
 
     /**
@@ -909,10 +917,10 @@ public enum Op {
     @NotNull public static Term compound(Op op, int dt, TermContainer subterms) {
         assert (!op.atomic);
         AppendProtoCompound apc = new AppendProtoCompound(op, subterms);
-        return the(apc, dt);
+        return compound(apc, dt);
     }
 
-    @NotNull public static Term the(AppendProtoCompound apc, int dt) {
+    @NotNull public static Term compound(AppendProtoCompound apc, int dt) {
         Term x = (Term) cache.apply(apc.commit());
         if (dt!=DTERNAL && x instanceof Compound)
             return x.dt(dt);
@@ -927,9 +935,8 @@ public enum Op {
         return in(bit, vector);
     }
 
-    @Deprecated
     public boolean isSet() {
-        return in(SetsBits);
+        return false;
     }
 
 
