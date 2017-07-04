@@ -21,7 +21,7 @@ import java.util.Set;
 abstract public class PatternCompound extends GenericCompound {
 
     public final int sizeCached;
-    public final int structureCached;
+    public final int structureNecessary;
     public final boolean commutativeCached;
     private final int dt;
     private final int hashDT;
@@ -36,7 +36,7 @@ abstract public class PatternCompound extends GenericCompound {
         this.hashDT = seed.hashCode();
 
         sizeCached = seed.size();
-        structureCached =
+        structureNecessary =
                 //seed.structure() & ~(Op.VariableBits);
                 seed.structure() & ~(Op.VAR_PATTERN.bit);
         commutativeCached = super.isCommutative();
@@ -60,7 +60,7 @@ abstract public class PatternCompound extends GenericCompound {
 
     @Override
     public final int structure() {
-        return structureCached;
+        return structureNecessary;
     }
 
 
@@ -81,7 +81,7 @@ abstract public class PatternCompound extends GenericCompound {
 
         @Override
         public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
-            return op == y.op() && y.hasAll(structureCached) && matchEllipsis((Compound) y, subst);
+            return op == y.op() && y.hasAll(structureNecessary) && matchEllipsis((Compound) y, subst);
         }
 
 

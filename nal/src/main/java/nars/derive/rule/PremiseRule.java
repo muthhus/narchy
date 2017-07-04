@@ -432,7 +432,7 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public final PremiseRule normalizeRule(@NotNull PatternTermIndex index) {
-        return new PremiseRule((Compound)index.normalizeRule(
+        return new PremiseRule((Compound)index.pattern(
                 (Compound) index.transform(this, UppercaseAtomsToPatternVariables)
         ));
     }
@@ -1336,10 +1336,10 @@ public class PremiseRule extends GenericCompound {
 
         @NotNull
         @Override
-        protected Variable newVariable(@NotNull Variable x, int serial) {
+        protected Variable newVariable(@NotNull Variable x) {
 
 
-            int actualSerial = serial;
+            int actualSerial = count;
 
             if (x instanceof Ellipsis.EllipsisTransformPrototype) {
                 //special
@@ -1382,7 +1382,7 @@ public class PremiseRule extends GenericCompound {
             } else {
                 return v(v.op(), actualSerial);
             }*/
-            return super.newVariable(x, actualSerial);
+            return super.newVariable(x);
         }
 
 //        @Override

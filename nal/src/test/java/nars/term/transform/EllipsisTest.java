@@ -173,7 +173,7 @@ public class EllipsisTest {
             this.prefix = prefix;
             this.suffix = suffix;
             this.ellipsisTerm = ellipsisTerm;
-            p = (Compound) new PatternTermIndex().normalizeRule(
+            p = (Compound) new PatternTermIndex().pattern(
                     getPattern(prefix, suffix)
             );
         }

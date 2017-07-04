@@ -25,7 +25,7 @@ import java.util.function.Function;
  */
 public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
 
-    int count;
+    protected int count;
 
     @NotNull
     public final Map<Variable /* Input Variable */, Variable /*Variable*/> map;
@@ -57,10 +57,8 @@ public class VariableNormalization extends VariableTransform implements Function
     @NotNull
     @Override
     public Variable apply(@NotNull Variable x) {
-        @NotNull Variable y = newVariable(x, ++count);
-        if (y == x)
-            count--; //undo increment
-        return y;
+        ++count;
+        return newVariable(x);
     }
 
     @Override
@@ -76,12 +74,12 @@ public class VariableNormalization extends VariableTransform implements Function
     }
 
     @NotNull
-    protected Variable newVariable(@NotNull Variable x, int serial) {
+    protected Variable newVariable(@NotNull Variable x) {
         Variable y;
         if (x instanceof UnnormalizedVariable) {
-            y = ((UnnormalizedVariable) x).normalize(serial); //HACK
+            y = ((UnnormalizedVariable) x).normalize(count); //HACK
         } else {
-            y = $.v(x.op(), serial);
+            y = $.v(x.op(), count);
             //y = y.equals(x) ? x : y; //attempt to use the original if they are equal, this can help prevent unnecessary transforms etc
         }
 

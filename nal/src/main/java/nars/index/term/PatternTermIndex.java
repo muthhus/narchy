@@ -132,8 +132,9 @@ public class PatternTermIndex extends MapTermIndex {
 
     }
 
-    public @NotNull Term normalizeRule(@NotNull Compound ss) {
-        return get(transform(ss, new PremiseRule.PremiseRuleVariableNormalization()), true).term();
+    /** returns an normalized, optimized pattern term for the given compound */
+    public @NotNull Compound pattern(@NotNull Compound ss) {
+        return (Compound) get(transform(ss, new PremiseRule.PremiseRuleVariableNormalization()), true).term();
     }
 
 }
