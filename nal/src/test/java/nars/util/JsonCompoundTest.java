@@ -63,7 +63,7 @@ public class JsonCompoundTest {
                 "   ] }";
         NAR d = new NARBuilder().get();
         d.log();
-        d.believe($.inh((Compound)$.fromJSON(j), "x"));
+        d.believe($.inh($.fromJSON(j), "x"));
         d.run(1000);
     }
 }

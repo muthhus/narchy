@@ -231,10 +231,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (!timeMatches(task))
             return false;
 
-        if (!task.term().equals(term))
-            return false;
-
-        return true;
+        return task.term().equals(term);
     }
 
     private boolean truthMatches(@NotNull Truthed task) {
@@ -248,10 +245,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
                 return false;
 
             float fr = tt.freq();
-            if ((fr > freqMax) || (fr < freqMin))
-                return false;
-
-            return true;
+            return (!(fr > freqMax)) && (!(fr < freqMin));
         } else {
             return task.truth()==null;
         }

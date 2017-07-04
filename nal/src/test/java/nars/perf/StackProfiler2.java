@@ -238,10 +238,7 @@ public class StackProfiler2 implements InternalProfiler {
     }
 
     public boolean exclude(String className) {
-        if (excludePackageNames.has(className, TrieMatch.STARTS_WITH)) {
-            return true;
-        }
-        return false;
+        return excludePackageNames.has(className, TrieMatch.STARTS_WITH);
     }
 
 

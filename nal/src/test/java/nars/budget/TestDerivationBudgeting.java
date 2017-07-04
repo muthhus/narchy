@@ -8,8 +8,8 @@ public class TestDerivationBudgeting {
 
     static class InstrumentedExecutor extends TaskExecutor {
 
-        double totalIn = 0;
-        double totalExe = 0;
+        double totalIn;
+        double totalExe;
 
         public InstrumentedExecutor(int capacity, float rate) {
             super(capacity, capacity, rate);

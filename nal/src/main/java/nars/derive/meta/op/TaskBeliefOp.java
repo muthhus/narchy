@@ -24,8 +24,6 @@ public final class TaskBeliefOp extends AbstractPred<Derivation> {
     public boolean test(Derivation derivation) {
         if (task && derivation.termSub0op != op)
             return false;
-        if (belief && derivation.termSub1op != op)
-            return false;
-        return true;
+        return !belief || derivation.termSub1op == op;
     }
 }

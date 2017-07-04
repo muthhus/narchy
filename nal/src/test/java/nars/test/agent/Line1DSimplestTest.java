@@ -310,7 +310,7 @@ public class Line1DSimplestTest {
 
         //this.activeTasks = activeTasks;
         NAR n = new NARBuilder().get();
-        n.on("say", (Operator) (op, args, nar) -> {
+        n.on("say", (op, args, nar) -> {
             if (!(args[0] instanceof Variable))
                 try {
                     n.inputAt(Math.round(nar.time()+nar.dur()), "say(" +  args[0] + "). :|:");

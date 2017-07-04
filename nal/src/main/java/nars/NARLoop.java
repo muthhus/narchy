@@ -16,7 +16,7 @@ public class NARLoop extends Loop {
 
 
     private static final int framesPerLoop = 1;
-    private long cycles = 0;
+    private long cycles;
 
 
     /**

@@ -1285,7 +1285,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(6, "(--,(b))! :|:")
                 .mustDesire(cycles, "(a)", 1f, 81f, 6) //since b is not desired now, it should reverse predict the goal of (a)
-                .mustNotOutput(cycles, "(a)", GOAL, new long[] { ETERNAL } );
+                .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
 
     @Test public void conjDecomposeGoalBefore() {
@@ -1294,7 +1294,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(a)! :|:")
                 .mustDesire(cycles, "(b)", 1f, 0.48f, 16)
-                .mustNotOutput(cycles, "(b)", GOAL, new long[] { 3L, 0L, 10L, ETERNAL } );
+                .mustNotOutput(cycles, "(b)", GOAL, 3L, 0L, 10L, ETERNAL);
     }
     @Test public void deriveNegInhGoal() {
         test()

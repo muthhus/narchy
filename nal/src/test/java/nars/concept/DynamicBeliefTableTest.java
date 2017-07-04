@@ -84,11 +84,9 @@ public class DynamicBeliefTableTest {
         }
 
         //test negation:
-        {
-            Concept ccn = n.conceptualize($("(&&, a:x, (--, a:y), a:z)"));
-            Truth nown = n.beliefTruth(ccn, n.time());
-            assertTrue($.t(0f, 0.73f).equals(nown, 0.01f));
-        }
+        Concept ccn = n.conceptualize($("(&&, a:x, (--, a:y), a:z)"));
+        Truth nown = n.beliefTruth(ccn, n.time());
+        assertTrue($.t(0f, 0.73f).equals(nown, 0.01f));
 
         n.clear();
 
@@ -117,17 +115,15 @@ public class DynamicBeliefTableTest {
 //        }
 
         DynamicBeliefTable xtable = (DynamicBeliefTable) ((cc).beliefs());
-        {
-            Compound template = $("((x) &&+4 (y))");
+        Compound template = $("((x) &&+4 (y))");
 
-            DynTruth xt = xtable.truth(0, template, true, n);
-            assertNotNull(xt);
-            assertTrue(xt.truth().toString(), $.t(1f, 0.83f).equals(xt.truth(), 0.05f));
+        DynTruth xt = xtable.truth(0, template, true, n);
+        assertNotNull(xt);
+        assertTrue(xt.truth().toString(), $.t(1f, 0.83f).equals(xt.truth(), 0.05f));
 
 //            for (int i = -4; i <= n.time() + 4; i++) {
 //                System.out.println(i + ": " + xtable.truth(i, template.dt(), true) + " " + xtable.generate(template, i));
 //            }
-        }
 
 //        long when = 0;
 //        for (int i = 0; i <= 8; i++) {

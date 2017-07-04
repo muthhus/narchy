@@ -33,7 +33,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     public final PriMerge mergeFunction;
 
-    final Consumer<Y> toPut;
+    //final Consumer<Y> toPut;
 
     /**
      * inbound pressure sum since last commit
@@ -60,7 +60,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
         this.mergeFunction = mergeFunction;
         this.capacity = cap;
-        this.toPut = map instanceof ConcurrentMap ? new QueueLock<>(this::put) : this::put;
+        //this.toPut = map instanceof ConcurrentMap ? new QueueLock<>(this::put) : this::put;
     }
 
     @Override
@@ -289,7 +289,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             } else if (s > 1) {
                 //get some: choose random starting index, get the next consecutive values
                 max = Math.min(s, max);
-                for (int i = ThreadLocalRandom.current().nextInt(s), m = 0; m < max; m++) {
+                for (int i =
+                     (this instanceof CurveBag ? rng(s) : 0 )
+                     , m = 0; m < max; m++) {
                     Y lll = (Y) ll[i++];
                     if (lll != null)
                         if (!kontinue.test(lll))
@@ -299,6 +301,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             }
         }
         return this;
+    }
+
+    public int rng(int s) {
+        return ThreadLocalRandom.current().nextInt(s);
     }
 
     /**
@@ -311,7 +317,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             int s = size();
             if (s == 0) return;
             else if (s == 1) i = 0;
-            else i = ThreadLocalRandom.current().nextInt(s);
+            else i = rng(s);
             //i = 0;
         }
 
@@ -346,10 +352,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 //        }
     }
 
-    @Override
-    public final void putAsync(@NotNull Y b) {
-        toPut.accept(b);
-    }
+//    @Override
+//    public final void putAsync(@NotNull Y b) {
+//        toPut.accept(b);
+//    }
 
     @Override
     public final Y put(@NotNull Y b, @Nullable MutableFloat overflow) {

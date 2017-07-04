@@ -143,7 +143,7 @@ public class StampTest {
         long[] a = { 1, 2, 10, 11 };
         long[] b = { 3, 5, 7, 22 };
         assertEquals(
-                new LongArrayList(new long[] { 1, 2, 3, 5}),
+                new LongArrayList(1, 2, 3, 5),
                 new LongArrayList(zipReverse(a, b, 4)));
     }
 

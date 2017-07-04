@@ -32,16 +32,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
 
     final boolean measure(@NotNull Derivation m, byte punc) {
-        if (!_measure(m, punc)) {
-//            m.truth(
-//                    null,
-//                    (byte)0,
-//                    null
-//            );
-            return false;
-        } else {
-            return true;
-        }
+        return _measure(m, punc);
     }
     final boolean _measure(@NotNull Derivation m, byte punct) {
 

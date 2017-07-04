@@ -77,10 +77,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
 
     @Override
     public boolean removeTask(Task x) {
-        if (remove(x) != null) {
-            return true;
-        }
-        return false;
+        return remove(x) != null;
     }
 
     @Override

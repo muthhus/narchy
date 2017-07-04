@@ -860,8 +860,7 @@ public enum Op {
 
             Op o = C.op();
             if (o != null) {
-                throw new UnsupportedOperationException("TODO");
-                //return _terms.the(o, C.subterms());
+                return _compound(o, C.subterms());
             } else
                 return _subterms(C.subterms());
 
@@ -875,9 +874,21 @@ public enum Op {
         }
     };
 
+    private static Term _compound(Op o, Term[] subterms) {
+        int s = subterms.length;
+        assert (s > 0);
+        switch (s) {
+            case 1:
+                return new UnitCompound1(o, subterms[0]);
+
+            default:
+                return new GenericCompound(o, subterms(subterms));
+        }
+    }
+
     public static final Memoize<ProtoCompound, Termlike> cache =
             new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 4);
-            //CaffeineMemoize.build(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
+    //CaffeineMemoize.build(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
 
 
     static TermContainer _subterms(@NotNull Term[] s) {
@@ -886,28 +897,22 @@ public enum Op {
 
 
     static public @NotNull TermContainer subterms(@NotNull Term... s) {
-        if (s.length < 2) {
-            return _subterms(s);
-        } else {
+//        if (s.length < 2) {
+//            return _subterms(s);
+//        } else {
             return (TermContainer) cache.apply(new AppendProtoCompound(null, s).commit());
-        }
+//        }
     }
 
 
     @NotNull
     public static Term compound(Op op, int dt, TermContainer subterms) {
         assert (!op.atomic);
-        int s = subterms.size();
-        assert (s > 0);
-        switch (s) {
-            case 1: {
-                assert (dt == DTERNAL);
-                return new UnitCompound1(op, subterms.sub(0));
-            }
-            default: {
-                return new GenericCompound(op, subterms).dt(dt);
-            }
-        }
+        Term x = (Term) cache.apply(new AppendProtoCompound(op, subterms).commit());
+        if (dt!=DTERNAL && x instanceof Compound)
+            return x.dt(dt);
+        else
+            return x;
     }
 
     /**
@@ -992,9 +997,9 @@ public enum Op {
             return Null;
 
         if (dt == XTERNAL) {
-            return compound(op, XTERNAL, subterms(op!=EQUI || subject.compareTo(predicate) > 0 ?
-                    new Term[] { subject, predicate } :
-                    new Term[] { predicate, subject } ));
+            return compound(op, XTERNAL, subterms(op != EQUI || subject.compareTo(predicate) > 0 ?
+                    new Term[]{subject, predicate} :
+                    new Term[]{predicate, subject}));
         }
 
         switch (op) {

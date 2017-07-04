@@ -26,7 +26,7 @@ public class NARTestBenchmark {
 //    }
 
     @Benchmark
-    @BenchmarkMode(value = Mode.AverageTime)
+    @BenchmarkMode(Mode.AverageTime)
     public void testExample() throws InitializationError {
         RunNotifier n = new RunNotifier();
         new BlockJUnit4ClassRunnerWithParametersFactory().createRunnerForTestWithParameters(new TestWithParameters(

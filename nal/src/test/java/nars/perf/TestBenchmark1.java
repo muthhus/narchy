@@ -38,7 +38,7 @@ public class TestBenchmark1 {
 //    }
 
     @Benchmark
-    @BenchmarkMode(value = Mode.SingleShotTime)
+    @BenchmarkMode(Mode.SingleShotTime)
     public void testExecution() throws Narsese.NarseseException {
         NAR n = new NARBuilder().get();
         //n.log();

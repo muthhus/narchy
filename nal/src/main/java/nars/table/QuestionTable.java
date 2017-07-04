@@ -25,7 +25,7 @@ public interface QuestionTable extends TaskTable {
 
     @NotNull QuestionTable Null = new NullQuestionTable();
 
-    static class NullQuestionTable implements QuestionTable {
+    class NullQuestionTable implements QuestionTable {
 
         @Override
         public void add(@NotNull Task t, TaskConcept c, NAR n) {
@@ -77,7 +77,7 @@ public interface QuestionTable extends TaskTable {
         @Override
         public void add(@NotNull Task t, TaskConcept c, NAR n) {
             Task e = common.get(t);
-            float activation = t.priElseZero();;
+            float activation = t.priElseZero();
             if (e ==null) {
                 common.put(t);
 

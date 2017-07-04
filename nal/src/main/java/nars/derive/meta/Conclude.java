@@ -4,7 +4,6 @@ import jcog.pri.Priority;
 import nars.*;
 import nars.control.premise.Derivation;
 import nars.derive.rule.PremiseRule;
-import nars.index.term.TermIndex;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;

@@ -110,7 +110,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
             //ensures sure only the thread successful in changing the map instance is the one responsible for repopulating it,
             //in the case of 2 simultaneous threads deciding to allocate a replacement:
-            AtomicReferenceArray<V> next = newCapacity != 0 ? new AtomicReferenceArray<V>(newCapacity) : EMPTY_ARRAY;
+            AtomicReferenceArray<V> next = newCapacity != 0 ? new AtomicReferenceArray<>(newCapacity) : EMPTY_ARRAY;
             if (next == this.map.updateAndGet((x) -> {
                 if (x.length() != newCapacity) {
                     prev[0] = x;
@@ -175,7 +175,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         if (c == 0)
             return null;
 
-        V toAdd = null, toRemove = null, toReturn = null;
 
 
         final int hash = k.hashCode(); /*hash(x)*/
@@ -189,11 +188,12 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             incomingPri = Float.POSITIVE_INFINITY; /* shouldnt be used */
         }
 
+        V toAdd = null, toRemove = null, toReturn = null;
         try {
 
             int start = (hash % c); //Math.min(Math.abs(hash), Integer.MAX_VALUE - reprobes - 1); //dir ? iStart : (iStart + reprobes) - 1;
             if (start < 0)
-                start += c; //Fair wraparound
+                start += c; //Fair wraparound: ex, -1 -> (c-1)
 
             if (mode != GET)
                 start(hash);
@@ -393,9 +393,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         pressurize(pri(v));
 
-        V y = update(k, v, PUT, overflowing);
-
-        return y;
+        return update(k, v, PUT, overflowing);
     }
 
 
@@ -411,13 +409,13 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     @Override
     @NotNull
-    public HijackBag<K, V> sample(Bag.BagCursor<? super V> each) {
+    public HijackBag<K, V> sample(@NotNull Bag.BagCursor<? super V> each) {
         return sample(each, false);
     }
 
     @Override
     @NotNull
-    public HijackBag<K, V> sample(Bag.BagCursor<? super V> each, boolean pop) {
+    public HijackBag<K, V> sample(@NotNull Bag.BagCursor<? super V> each, boolean pop) {
 
         int s = size();
         if (s <= 0)
@@ -482,6 +480,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return stream().iterator();
     }
 
+    @Override
     public Stream<V> stream() {
         AtomicReferenceArray<V> map = this.map.get();
         return IntStream.range(0, map.length()).mapToObj(map::get).filter(Objects::nonNull);
@@ -546,7 +545,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     public HijackBag<K, V> commit(@Nullable Consumer<V> update) {
 
 
-        try {
+//        try {
             if (update != null) {
                 update(update);
             }
@@ -589,9 +588,9 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                 this.min = this.max = 0;
             }
 
-        } finally {
-            //   busy.set(false);
-        }
+//        } finally {
+//            //   busy.set(false);
+//        }
 
         return this;
     }

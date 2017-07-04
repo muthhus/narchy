@@ -102,6 +102,7 @@ public class TaskExecutor extends Executioner {
                     return this; //do nothing
                 }
 
+                @NotNull
                 @Override
                 public HijackBag commit(Consumer c) {
                     return this; //do nothing

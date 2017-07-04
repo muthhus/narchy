@@ -6,6 +6,7 @@ import nars.Op;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,6 +60,13 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
             this.subs = new Term[initial_capacity];
     }
 
+    public AppendProtoCompound(Op op, TermContainer subterms) {
+        this(op, subterms.size());
+        for (int i  = 0; i < (size = subs.length); i++) /* (has been set in superconstructor)*/
+            subs[i] = subterms.sub(i);
+
+    }
+
     @Override
     public int size() {
         return size;
@@ -96,6 +104,7 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
         return subs;
     }
 
+    @Override
     public AppendProtoCompound commit(int commuteForDT) {
         boolean commute = false;
         if (commuteForDT!=DTERNAL && op!=null) {
@@ -119,11 +128,9 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
 
 
         this.bytes = new byte[subs.length * 8 /* estimate */];
-        {
-            writeByte(op != null ? op.ordinal() : Byte.MAX_VALUE);
-            for (Term x : subs)
-                appendKey(x);
-        }
+        writeByte(op != null ? op.ordinal() : Byte.MAX_VALUE);
+        for (Term x : subs)
+            appendKey(x);
 
         this.hash = hash(0, len);
         if (this.hash==0) this.hash = 1;

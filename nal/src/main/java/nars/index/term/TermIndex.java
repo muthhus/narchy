@@ -1,6 +1,9 @@
 package nars.index.term;
 
-import nars.*;
+import nars.Builtin;
+import nars.NAR;
+import nars.Narsese;
+import nars.Op;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;

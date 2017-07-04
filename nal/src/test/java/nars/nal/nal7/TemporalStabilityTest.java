@@ -16,7 +16,7 @@ abstract public class TemporalStabilityTest {
 
     Set<Task> irregular = $.newHashSet(1);
 
-    private boolean stopOnFirstError = true;
+    private final boolean stopOnFirstError = true;
 
     public void test(int cycles, @NotNull NAR n) throws Narsese.NarseseException {
 

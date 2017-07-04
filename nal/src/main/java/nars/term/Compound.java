@@ -655,7 +655,8 @@ public interface Compound extends Term, IPair, TermContainer {
             Op op = op();
             if (nextDT != DTERNAL && (op.temporal)) {
                 //assert((op().temporal || op().image));
-                Compound b = this instanceof GenericCompoundDT ? ((GenericCompoundDT) this).ref : this;
+                Compound b = this instanceof GenericCompoundDT ?
+                        ((GenericCompoundDT) this).ref : this;
 //                if (!concurrent(nextDT)) {
 //                    //check ordering
 //                }

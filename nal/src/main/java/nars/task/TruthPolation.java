@@ -55,7 +55,7 @@ public enum TruthPolation { ;
      * additionally, the variance is weighted by the contributor's confidences
      */
     public static class TruthPolationBasic implements Consumer<Tasked> {
-        float eviSum = 0, wFreqSum = 0;
+        float eviSum, wFreqSum;
         final long when;
         final int dur;
 
@@ -94,7 +94,7 @@ public enum TruthPolation { ;
 
         final long when;
         final int dur;
-        Truth best = null;
+        Truth best;
 
         public TruthPolationGreedy(long when, int dur) {
             this.when = when;
@@ -192,9 +192,9 @@ public enum TruthPolation { ;
      * additionally, the variance is weighted by the contributor's confidences
      */
     public static class TruthPolationWithVariance implements Consumer<Tasked> {
-        float eviSum = 0, wFreqSum = 0;
-        float meanSum = 0.5f, deltaSum = 0;
-        int count = 0;
+        float eviSum, wFreqSum;
+        float meanSum = 0.5f, deltaSum;
+        int count;
 
         final long when;
         final int dur;

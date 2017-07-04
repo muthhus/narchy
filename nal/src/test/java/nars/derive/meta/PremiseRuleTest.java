@@ -153,7 +153,7 @@ public class PremiseRuleTest {
 //
 //    }
 
-    static final PremiseRuleSet permuter = new PremiseRuleSet(true, new PremiseRule[]{});
+    static final PremiseRuleSet permuter = new PremiseRuleSet(true);
 
     @Test
     public void testBackwardPermutations() throws Narsese.NarseseException {

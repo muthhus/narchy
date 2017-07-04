@@ -174,11 +174,7 @@ public class Revision {
                         x[i] = intermpolate(ca.sub(i), cb.sub(i), aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
                     }
 
-                    return $.the(
-                            ca.op(), /* although parallel could be maintained if this happens by choosing dt between a and b */
-                            ca.dt(), //incase 'a' is an image
-                            x
-                    );
+                    return ca.op().the( ca.dt(), x );
                 }
             }
         }
@@ -223,7 +219,7 @@ public class Revision {
             b0 = b.sub(1);
             b1 = b.sub(0);
         }
-        return $.the(a.op(), dt,
+        return a.op().the(dt,
                 intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose),
                 intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng, mergeOrChoose));
 

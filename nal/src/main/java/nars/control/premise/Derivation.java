@@ -37,9 +37,9 @@ public class Derivation extends Unify implements TermContext {
     public float truthResolution;
     public float confMin;
 
-    @Nullable public Truth concTruth = null;
-    public byte concPunc = 0;
-    @Nullable public long[] concEvidence = null;
+    @Nullable public Truth concTruth;
+    public byte concPunc;
+    @Nullable public long[] concEvidence;
 
 
 

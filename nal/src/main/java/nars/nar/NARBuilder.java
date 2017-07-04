@@ -38,7 +38,7 @@ public class NARBuilder {
 
     private Supplier<Executioner> exe = () -> new TaskExecutor(128, 256, 0.25f);
 
-    private Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
+    private final Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 
     public static NARS newMultiThreadNAR(int threads, Time clock) {
 //        Default nar =

@@ -53,7 +53,7 @@ public class TermVectorTest {
 //                    throw new RuntimeException("atom name too long");
 
         //  }
-        Compound b = (Compound) $.impl(Atomic.the("a"), Atomic.the("b"));
+        Compound b = $.impl(Atomic.the("a"), Atomic.the("b"));
 
         assertEquals(a.subterms(), b.subterms());
         assertEquals(a.subterms().hashCode(), b.subterms().hashCode());

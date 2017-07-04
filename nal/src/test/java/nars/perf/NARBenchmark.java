@@ -24,13 +24,13 @@ public class NARBenchmark {
         //n.derivedActivation.setValue(0.5f);
         //n.nal(4);
 
-        new DeductiveMeshTest(n, new int[]{16, 16});
+        new DeductiveMeshTest(n, 16, 16);
         new DeductiveChainTest(n, 10, 9999991, (x, y) -> $.p($.the(x), $.the(y)));
     }
 
 
     @Benchmark
-    @BenchmarkMode(value = Mode.AverageTime)
+    @BenchmarkMode(Mode.AverageTime)
     public void deductiveChainTest1() {
         n.run(2000);
     }
