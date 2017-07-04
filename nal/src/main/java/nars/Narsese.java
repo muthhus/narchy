@@ -14,7 +14,6 @@ import com.github.fge.grappa.support.Var;
 import com.github.fge.grappa.transform.ParserTransformer;
 import jcog.Texts;
 import nars.derive.meta.match.Ellipsis;
-import nars.index.TermBuilder;
 import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
@@ -124,8 +123,6 @@ public class Narsese extends BaseParser<Object> {
 //    static final ThreadLocal<Map<Pair<Op, List>, Term>> vectorTerms = ThreadLocal.withInitial(() ->
 //            new CapacityLinkedHashMap<Pair<Op, List>, Term>(512));
 
-
-    public TermBuilder T = $.terms; //HACK
 
     @NotNull
     public static Narsese the() {
@@ -489,7 +486,7 @@ public class Narsese extends BaseParser<Object> {
                                         MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false)
                                 ),
 
-                                push(T.the(INH, (Term) pop(), (Term) pop()))
+                                push($.terms.the(INH, (Term) pop(), (Term) pop()))
 
                         ),
 
@@ -561,7 +558,7 @@ public class Narsese extends BaseParser<Object> {
                 s(),
                 COMPOUND_TERM_CLOSER,
 
-                push(T.the(CONJ, 0, ((Compound) popTerm(CONJ)).subterms()) /* HACK construct a dt=0 copy */)
+                push($.terms.the(CONJ, 0, ((Compound) popTerm(CONJ)).subterms()) /* HACK construct a dt=0 copy */)
         );
     }
 
@@ -590,7 +587,7 @@ public class Narsese extends BaseParser<Object> {
 
     @Nullable
     Term TemporalRelationBuilder(Term pred, int cycles, Op o, Term subj) {
-        return T.the(o, cycles, subj, pred);
+        return $.terms.the(o, cycles, subj, pred);
     }
 
     public final static String invalidCycleDeltaString = Integer.toString(Integer.MIN_VALUE);
@@ -726,7 +723,7 @@ public class Narsese extends BaseParser<Object> {
     Rule ColonReverseInheritance() {
         return sequence(
                 Term(false, true), ':', Term(),
-                push(T.the(INH, the(pop()), the(pop())))
+                push($.terms.the(INH, the(pop()), the(pop())))
         );
     }
 
@@ -1039,10 +1036,8 @@ public class Narsese extends BaseParser<Object> {
         if (op == null)
             op = PROD;
 
-        return T.the(op, DTERNAL, vectorterms);
+        return $.terms.the(op, DTERNAL, vectorterms);
     }
-
-
 
 
 //    @Nullable
@@ -1128,40 +1123,36 @@ public class Narsese extends BaseParser<Object> {
      */
     public static void tasks(String input, Consumer<Task> c, NAR m) throws NarseseException {
         @NotNull Narsese p = the();
-        p.T = m.terms;
-        try {
 
-            int parsedTasks = 0;
+        int parsedTasks = 0;
 
-            ParsingResult r = p.inputParser.run(input);
+        ParsingResult r = p.inputParser.run(input);
 
-            int size = r.getValueStack().size();
+        int size = r.getValueStack().size();
 
-            for (int i = size - 1; i >= 0; i--) {
-                Object o = r.getValueStack().peek(i);
+        for (int i = size - 1; i >= 0; i--) {
+            Object o = r.getValueStack().peek(i);
 
-                Object[] y;
-                if (o instanceof Task) {
-                    y = (new Object[]{o});
-                } else if (o instanceof Object[]) {
-                    y = ((Object[]) o);
-                } else {
-                    throw new NarseseException("Parse error: " + input);
-                }
-
-                Task t = decodeTask(m, y);
-                if (t != null) {
-                    c.accept(t);
-                    parsedTasks++;
-                }
+            Object[] y;
+            if (o instanceof Task) {
+                y = (new Object[]{o});
+            } else if (o instanceof Object[]) {
+                y = ((Object[]) o);
+            } else {
+                throw new NarseseException("Parse error: " + input);
             }
 
-            if (parsedTasks == 0)
-                throw new NarseseException("nothing parsed: " + input);
-
-        } finally {
-            p.T = $.terms;
+            Task t = decodeTask(m, y);
+            if (t != null) {
+                c.accept(t);
+                parsedTasks++;
+            }
         }
+
+        if (parsedTasks == 0)
+            throw new NarseseException("nothing parsed: " + input);
+
+
     }
 
 
@@ -1288,21 +1279,18 @@ public class Narsese extends BaseParser<Object> {
 
     @NotNull
     public Term term(String s, @Nullable TermIndex index, boolean normalize) throws NarseseException {
-        T = index;
-        try {
-            Term y = term(s);
-            if (normalize && y instanceof Compound) {
-                return nullIfNull(index.normalize((Compound) y));
-            } else {
-                Termed existing = index.get(y, false);
-                if (existing == null)
-                    return y;
-                else
-                    return existing.term();
-            }
-        } finally {
-            T = $.terms;
+
+        Term y = term(s);
+        if (normalize && y instanceof Compound) {
+            return nullIfNull(index.normalize((Compound) y));
+        } else {
+            Termed existing = index.get(y, false);
+            if (existing == null)
+                return y;
+            else
+                return existing.term();
         }
+
 
     }
 

@@ -258,28 +258,7 @@ public abstract class TermBuilder {
 
 
 
-    @NotNull
-    private Term finish(@NotNull Op op, @NotNull Term... args) {
-        return finish(op, DTERNAL, args);
-    }
 
-    @NotNull
-    private Term finish(@NotNull Op op, int dt, @NotNull Term... args) {
-        return finish(TermContainer.mustSortAndUniquify(op, dt, args.length), op, dt, args);
-    }
-
-    @NotNull
-    private Term finish(boolean sort, @NotNull Op op, int dt, @NotNull Term... args) {
-        if (sort) {
-            args = Terms.sorted(args);
-        }
-        return compound(op, dt, args);
-    }
-
-    @NotNull
-    private Term compound(@NotNull Op op, @NotNull Set<Term> argsToBeSorted) {
-        return compound(op, Terms.sorted(argsToBeSorted));
-    }
 
 
     /**
@@ -356,37 +335,37 @@ public abstract class TermBuilder {
 
 
 
-    @NotNull
-    private Term image(@NotNull Op o, @NotNull Term... res) {
-
-        int index = DTERNAL, j = 0;
-        boolean hasPatternVar = false;
-        for (Term x : res) {
-            if (x.equals(Imdex)) {
-                assert (index == DTERNAL);
-                index = j;
-            } else if (!hasPatternVar && x.varPattern() > 0) {
-                hasPatternVar = true;
-            }
-            j++;
-        }
-
-        Term[] ser;
-        if (hasPatternVar && index == DTERNAL) {
-            ser = res;
-        } else {
-
-            if (index == DTERNAL)
-                throw new InvalidTermException(o, DTERNAL, "image missing '_' (Imdex)", res);
-
-            int serN = res.length - 1;
-            ser = new Term[serN];
-            System.arraycopy(res, 0, ser, 0, index);
-            System.arraycopy(res, index + 1, ser, index, (serN - index));
-        }
-
-        return finish(o, index, ser);
-    }
+//    @NotNull
+//    private Term image(@NotNull Op o, @NotNull Term... res) {
+//
+//        int index = DTERNAL, j = 0;
+//        boolean hasPatternVar = false;
+//        for (Term x : res) {
+//            if (x.equals(Imdex)) {
+//                assert (index == DTERNAL);
+//                index = j;
+//            } else if (!hasPatternVar && x.varPattern() > 0) {
+//                hasPatternVar = true;
+//            }
+//            j++;
+//        }
+//
+//        Term[] ser;
+//        if (hasPatternVar && index == DTERNAL) {
+//            ser = res;
+//        } else {
+//
+//            if (index == DTERNAL)
+//                throw new InvalidTermException(o, DTERNAL, "image missing '_' (Imdex)", res);
+//
+//            int serN = res.length - 1;
+//            ser = new Term[serN];
+//            System.arraycopy(res, 0, ser, 0, index);
+//            System.arraycopy(res, index + 1, ser, index, (serN - index));
+//        }
+//
+//        return finish(o, index, ser);
+//    }
 
 
     public Term replace(@NotNull Term c, @NotNull Term x, @NotNull Term y) {
@@ -632,14 +611,15 @@ public abstract class TermBuilder {
 //            }
 
             Compound xx = compoundOrNull(
-                    subsChanged ? compound(o, newSubs).dt(pdt)
+                    subsChanged ? o.the(pdt, newSubs)
                             :
-                            c.dt(pdt)
-            );
+                            o.the(pdt, c.subterms().toArray()));
+                            //c.dt(pdt)
+
             if (xx == null && dtChanged && pdt == DTERNAL) {
                 //throw new InvalidTermException("unable to atemporalize", c);
                 return compoundOrNull(
-                        compound(o, XTERNAL, subsChanged ? newSubs : st.toArray()) );
+                        o.the(XTERNAL, subsChanged ? newSubs : st.toArray()) );
             }
 
 

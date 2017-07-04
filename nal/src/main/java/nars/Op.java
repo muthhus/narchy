@@ -143,43 +143,6 @@ public enum Op {
      * conjunction
      */
     CONJ("&&", true, 5, Args.GTETwo) {
-        /**
-         * array implementation of the conjunction true/false filter
-         */
-        @NotNull
-        private Term[] conjTrueFalseFilter(@NotNull Term... u) {
-            int trues = 0; //# of True subterms that can be eliminated
-            for (Term x : u) {
-                if (isTrue(x)) {
-                    trues++;
-                } else if (isFalse(x)) {
-
-                    //false subterm in conjunction makes the entire condition false
-                    //this will eventually reduce diectly to false in this method's only callee HACK
-                    return FalseArray;
-                }
-            }
-
-            if (trues == 0)
-                return u;
-
-            int ul = u.length;
-            if (ul == trues)
-                return TrueArray; //reduces to an Imdex itself
-
-            Term[] y = new Term[ul - trues];
-            int j = 0;
-            for (int i = 0; j < y.length; i++) {
-                Term uu = u[i];
-                if (!isTrue(uu)) // && (!uu.equals(False)))
-                    y[j++] = uu;
-            }
-
-            assert (j == y.length);
-
-            return y;
-        }
-
         @Override
         public Term the(int dt, Term... uu) {
             Term[] u = uu.length > 1 ? conjTrueFalseFilter(uu) : uu /* avoid true false filter if fall-through only-term anyway */;
@@ -203,7 +166,7 @@ public enum Op {
             if (dt == XTERNAL) {
                 assert (n == 2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
-                return conjPost(CONJ.the(XTERNAL, u));
+                return conjPost(build(CONJ, XTERNAL, TermVector.the(u)));
             }
 
             boolean commutive = concurrent(dt);
@@ -241,8 +204,8 @@ public enum Op {
 
                 return conjPost(
                         !changed ?
-                            build(CONJ, dt, TermVector.the(u)) :
-                            CONJ.the(dt, u)
+                                build(CONJ, dt, TermVector.the(u)) :
+                                CONJ.the(dt, u)
                 );
 
             }
@@ -302,11 +265,48 @@ public enum Op {
                     if (!Arrays.equals(scs, u))
                         return CONJ.the(dt, scs);
                     else
-                        return  build(CONJ, dt, TermVector.the(scs));
+                        return build(CONJ, dt, TermVector.the(scs));
                 }
             }
 
             return False;
+        }
+
+        /**
+         * array implementation of the conjunction true/false filter
+         */
+        @NotNull
+        private Term[] conjTrueFalseFilter(@NotNull Term... u) {
+            int trues = 0; //# of True subterms that can be eliminated
+            for (Term x : u) {
+                if (isTrue(x)) {
+                    trues++;
+                } else if (isFalse(x)) {
+
+                    //false subterm in conjunction makes the entire condition false
+                    //this will eventually reduce diectly to false in this method's only callee HACK
+                    return FalseArray;
+                }
+            }
+
+            if (trues == 0)
+                return u;
+
+            int ul = u.length;
+            if (ul == trues)
+                return TrueArray; //reduces to an Imdex itself
+
+            Term[] y = new Term[ul - trues];
+            int j = 0;
+            for (int i = 0; j < y.length; i++) {
+                Term uu = u[i];
+                if (!isTrue(uu)) // && (!uu.equals(False)))
+                    y[j++] = uu;
+            }
+
+            assert (j == y.length);
+
+            return y;
         }
 
         /**
@@ -330,19 +330,22 @@ public enum Op {
         }
 
 
-        private Term conjPost(Term x /* possibly a conjunction */) {
+        private Term conjPost(final Term x /* possibly a conjunction */) {
 
             if (x == null)
                 return null;
 
-            if (x.op() != CONJ)
+            Op xo = x.op();
+            if (xo != CONJ)
                 return x;
+
 
             //conjunction/implication reduction:
             if (x.hasAny(IMPL)) {
                 //if there is only one implication subterm, then fold into that.
                 //if there are more than one, don't do anything (for now)
-                Compound c = ((Compound) x);
+                Compound cx = (Compound) x;
+                Compound c = cx;
                 int whichImpl = -1;
                 for (int i = 0; i < c.size(); i++) {
                     if (c.subIs(i, Op.IMPL)) {
@@ -360,12 +363,26 @@ public enum Op {
                     int ww = whichImpl;
 //                Term[] precond = c.subterms().terms(
 //                        (IntObjectPredicate<Term>)((i,s)->(i != ww)));
-                    Term implPre = ((Compound) c.sub(whichImpl)).sub(0);
-                    Term implPost = ((Compound) c.sub(whichImpl)).sub(1);
-                    Compound origImpl = (Compound) c.sub(ww);
-                    Term newPre = $.terms.replace(c, origImpl, implPre);
-                    if (newPre != null)
-                        return IMPL.the(origImpl.dt(), newPre, implPost);
+                    Compound css = (Compound) c.sub(whichImpl);
+                    Term implPre = css.sub(0);
+                    Term implPost = css.sub(1);
+                    assert (!implPre.equals(implPost));
+                    Term other;
+                    if (x.size() == 2) {
+                        other = x.sub(1 - whichImpl, null);
+                    } else {
+                        //more than 2
+                        @NotNull Set<Term> ss = cx.toSet();
+                        if (ss.remove(css))
+                            other = x.op().the(cx.dt(), Terms.sorted(ss) /* assumes commutive since > 2 */);
+                        else {
+                            throw new RuntimeException("shouldnt happen");
+                        }
+                    }
+                    Term newPre = CONJ.the(
+                            cx.dt(),
+                            other, implPre);
+                    return IMPL.the(css.dt(), newPre, implPost);
 
                 }
 

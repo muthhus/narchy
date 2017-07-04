@@ -496,8 +496,8 @@ public class TermReductionsTest {
         assertEquals(False, $("(#1 && (--,#1))"));
         assertEquals(False, $("(&&, #1, (--,#1), (x))"));
 
-        assertTrue($("(#1 &&+1 (--,#1))") instanceof Compound);
         assertTrue($("((x) &&+1 --(x))") instanceof Compound);
+        assertTrue($("(#1 &&+1 (--,#1))") instanceof Compound);
 
 
     }

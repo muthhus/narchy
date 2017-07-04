@@ -477,47 +477,47 @@ public class NarseseTest {
         assertEquals('"' + ff + '"', a.toString());
     }
 
-    @Test
-    public void testImageIndex() throws Narsese.NarseseException {
-        for (char c : new char[] { '/', '\\'}) {
-            {
-                Compound t = term("(" + c + ",open,$1,_)");
-                assertEquals("(" + c + ",open,$1,_)", t.toString());
-                assertEquals("index psuedo-term should not count toward its size", 2, t.size());
-            }
-
-            Compound t = term("(" + c + ",open,_,$1)");
-            assertEquals("(" + c + ",open,_,$1)", t.toString());
-            assertEquals("index psuedo-term should not count toward its size", 2, t.size());
-        }
-    }
-
-    @Test
-    public void testImageExtRel0() throws Narsese.NarseseException { testImageExtRel("(a-->(/,_,y,z))", 0); }
-    @Test
-    public void testImageIntRel0() throws Narsese.NarseseException { testImageIntRel("((\\,_,y,z)-->a)", 0); }
-
-    @Test
-    public void testImageExtRel1() throws Narsese.NarseseException { testImageExtRel("(a-->(/,x,_,z))", 1); }
-    @Test
-    public void testImageIntRel1() throws Narsese.NarseseException { testImageIntRel("((\\,x,_,z)-->a)", 1); }
-
-    @Test
-    public void testImageExtRel2() throws Narsese.NarseseException { testImageExtRel("(a-->(/,x,y,_))", 2); }
-    @Test
-    public void testImageIntRel2() throws Narsese.NarseseException { testImageIntRel("((\\,x,y,_)-->a)", 2); }
-
-    private void testImageIntRel(@NotNull String imageTerm, int relationIndexExpected) throws Narsese.NarseseException {
-        Compound ti = term(imageTerm);
-        assertEquals(relationIndexExpected, ((Compound)ti.sub(0)).dt()  );
-        assertEquals(imageTerm, ti.toString());
-    }
-
-    private void testImageExtRel(@NotNull String imageTerm, int relationIndexExpected) throws Narsese.NarseseException {
-        Compound ti = term(imageTerm);
-        assertEquals(relationIndexExpected, ((Compound)ti.sub(1)).dt() );
-        assertEquals(imageTerm, ti.toString());
-    }
+//    @Test
+//    public void testImageIndex() throws Narsese.NarseseException {
+//        for (char c : new char[] { '/', '\\'}) {
+//            {
+//                Compound t = term("(" + c + ",open,$1,_)");
+//                assertEquals("(" + c + ",open,$1,_)", t.toString());
+//                assertEquals("index psuedo-term should not count toward its size", 2, t.size());
+//            }
+//
+//            Compound t = term("(" + c + ",open,_,$1)");
+//            assertEquals("(" + c + ",open,_,$1)", t.toString());
+//            assertEquals("index psuedo-term should not count toward its size", 2, t.size());
+//        }
+//    }
+//
+//    @Test
+//    public void testImageExtRel0() throws Narsese.NarseseException { testImageExtRel("(a-->(/,_,y,z))", 0); }
+//    @Test
+//    public void testImageIntRel0() throws Narsese.NarseseException { testImageIntRel("((\\,_,y,z)-->a)", 0); }
+//
+//    @Test
+//    public void testImageExtRel1() throws Narsese.NarseseException { testImageExtRel("(a-->(/,x,_,z))", 1); }
+//    @Test
+//    public void testImageIntRel1() throws Narsese.NarseseException { testImageIntRel("((\\,x,_,z)-->a)", 1); }
+//
+//    @Test
+//    public void testImageExtRel2() throws Narsese.NarseseException { testImageExtRel("(a-->(/,x,y,_))", 2); }
+//    @Test
+//    public void testImageIntRel2() throws Narsese.NarseseException { testImageIntRel("((\\,x,y,_)-->a)", 2); }
+//
+//    private void testImageIntRel(@NotNull String imageTerm, int relationIndexExpected) throws Narsese.NarseseException {
+//        Compound ti = term(imageTerm);
+//        assertEquals(relationIndexExpected, ((Compound)ti.sub(0)).dt()  );
+//        assertEquals(imageTerm, ti.toString());
+//    }
+//
+//    private void testImageExtRel(@NotNull String imageTerm, int relationIndexExpected) throws Narsese.NarseseException {
+//        Compound ti = term(imageTerm);
+//        assertEquals(relationIndexExpected, ((Compound)ti.sub(1)).dt() );
+//        assertEquals(imageTerm, ti.toString());
+//    }
 
     private void taskParses(@NotNull String s) throws Narsese.NarseseException {
         Task t = task(s);

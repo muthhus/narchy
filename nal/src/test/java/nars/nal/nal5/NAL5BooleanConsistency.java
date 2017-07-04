@@ -31,7 +31,7 @@ public class NAL5BooleanConsistency {
             for (int j = 0; j < 2; j++) {
                 NAR d = new NARBuilder().get();
                 d.nal(7);
-                d.termVolumeMax.setValue(18);
+                d.termVolumeMax.setValue(24);
 
                 String[] outcomes = {
                         "(x-->(0,0))",

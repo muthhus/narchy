@@ -144,70 +144,7 @@ public class DynamicBeliefTableTest {
 
     }
 
-    @Test public void testDynamicProductImageExtensional() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
 
-        n.believe($("f(x,y)"), (long)0, 1f, 0.9f).run(1);
-
-        CompoundConcept prod = (CompoundConcept) n.concept($("f(x, y)"));
-        int dur = n.dur();
-
-        long when1 = n.time();
-        Truth t = prod.beliefs().truth(when1, n);
-        System.out.println(t);
-
-        CompoundConcept imgX = (CompoundConcept) n.conceptualize($("(x --> (/,f,_,y))"));
-        assertEquals(t, n.beliefTruth(imgX, n.time()));
-
-
-        CompoundConcept imgY = (CompoundConcept) n.conceptualize($("(y --> (/,f,x,_))"));
-        assertEquals(t, n.beliefTruth(imgY, n.time()));
-
-
-
-        n.run(16); //by now, structural decomposition should have also had the opportunity to derive the image
-
-        long when = n.time();
-        Truth t2 = prod.beliefs().truth(when, n);
-
-        assertEquals(t2, n.beliefTruth(imgX, n.time()));
-        assertEquals(t2, n.beliefTruth(imgY, n.time()));
-
-    }
-
-    @Test public void testDynamicProductImageIntensional() throws Narsese.NarseseException {
-        NAR nar = new NARBuilder().get();
-        int dur = 9;
-        nar.time.dur(dur);
-
-        nar.believe($("(f-->(x,y))"), (long)0, 1f, 0.9f).run(1);
-
-        CompoundConcept prod = (CompoundConcept) nar.concept($("(f-->(x, y))"));
-        Truth t = prod.beliefs().truth((long) 0, nar);
-
-        CompoundConcept imgX = (CompoundConcept) nar.conceptualize($("((\\,f,_,y)-->x)"));
-        assertNotNull(imgX);
-        Truth xb = imgX.beliefs().truth((long) 0, nar);
-        assertNotNull(xb);
-        assertEquals(t, xb);
-
-        CompoundConcept imgY = (CompoundConcept) nar.conceptualize($("((\\,f,x,_)-->y)"));
-        assertEquals(t, imgY.beliefs().truth((long) 0, nar));
-
-
-
-        nar.run(6); //by now, structural decomposition should have also had the opportunity to derive the image
-
-        Truth t2 = prod.beliefs().truth((long) 0, nar);
-
-        assertEquals(t2, imgX.beliefs().truth((long) 0, nar));
-        long when1 = nar.time();
-        assertNotEquals(t2, imgX.beliefs().truth(when1, nar));
-        assertEquals(t2, imgY.beliefs().truth((long) 0, nar));
-        long when = nar.time();
-        assertNotEquals(t2, imgY.beliefs().truth(when, nar));
-
-    }
 
     @Test public void testAnswerTemplateWithVar() throws Narsese.NarseseException {
         NAR n = new NARBuilder().get();

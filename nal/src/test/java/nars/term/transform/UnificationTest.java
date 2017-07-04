@@ -754,110 +754,110 @@ public class UnificationTest {
                 "(a, %X..+, d)",
                 "(a, b, c, d)", true);
     }
-
-    @Test
-    public void patternImage() {
-        test(Op.VAR_DEP,
-                "<A --> (/, n, _, #X)>",
-                "<A --> (/, n, _, B)>", true);
-
-        test(Op.VAR_DEP,
-                "<A --> (/, #X, _, n)>",
-                "<A --> (/, B, _, n)>", true);
-
-        test(Op.VAR_DEP,
-                "<A --> (/, x, #X, _)>",
-                "<A --> (/, x, _, B)>", false);
-
-
+//
+//    @Test
+//    public void patternImage() {
+//        test(Op.VAR_DEP,
+//                "<A --> (/, n, _, #X)>",
+//                "<A --> (/, n, _, B)>", true);
+//
+//        test(Op.VAR_DEP,
+//                "<A --> (/, #X, _, n)>",
+//                "<A --> (/, B, _, n)>", true);
+//
+//        test(Op.VAR_DEP,
+//                "<A --> (/, x, #X, _)>",
+//                "<A --> (/, x, _, B)>", false);
+//
+//
+////        test(Op.VAR_PATTERN,
+////                "(&&,<F --> A>,<%X --> (/,E, _,C,D)>)",
+////                "(&&,<F --> A>,<E --> (/,E,_,C,D)>)", true);
+////        test(Op.VAR_PATTERN,
+////                "(&&,<F --> A>,<%X --> (/,C,D,_)>)",
+////                "(&&,<F --> A>,<E --> (/,C,D,_)>)", true);
+////        test(Op.VAR_PATTERN,
+////                "(&&,<F --> A>,<D --> (/,C,%X, _)>)",
+////                "(&&,<F --> A>,<D --> (/,C,E, _)>)", true);
+//
+//    }
+//
+//    @Test
+//    public void testImage2ShouldNotMatch() {
 //        test(Op.VAR_PATTERN,
-//                "(&&,<F --> A>,<%X --> (/,E, _,C,D)>)",
-//                "(&&,<F --> A>,<E --> (/,E,_,C,D)>)", true);
+//                "(/, %X, _)",
+//                "(/, _, A)", false);
+//    }
+//
+//    @Test
+//    public void ellipsisImage1() {
 //        test(Op.VAR_PATTERN,
-//                "(&&,<F --> A>,<%X --> (/,C,D,_)>)",
-//                "(&&,<F --> A>,<E --> (/,C,D,_)>)", true);
+//                "<A --> (/, z, _, %X..+)>",
+//                "<A --> (/, z, _, B)>", true);
+//    }
+//
+//    @Test
+//    public void ellipsisImage2() {
 //        test(Op.VAR_PATTERN,
-//                "(&&,<F --> A>,<D --> (/,C,%X, _)>)",
-//                "(&&,<F --> A>,<D --> (/,C,E, _)>)", true);
-
-    }
-
-    @Test
-    public void testImage2ShouldNotMatch() {
-        test(Op.VAR_PATTERN,
-                "(/, %X, _)",
-                "(/, _, A)", false);
-    }
-
-    @Test
-    public void ellipsisImage1() {
-        test(Op.VAR_PATTERN,
-                "<A --> (/, z, _, %X..+)>",
-                "<A --> (/, z, _, B)>", true);
-    }
-
-    @Test
-    public void ellipsisImage2() {
-        test(Op.VAR_PATTERN,
-                "<A --> (/, z, _, %X..+)>",
-                "<A --> (/, z, _, B,C)>", true);
-
-    }
-
-    @Test
-    public void testEllipsisImage2a() {
-        test(Op.VAR_PATTERN,
-                "(/,_, B, %X..+)",
-                "(/,_, B, C, D)", true);
-    }
-
-    @Test
-    public void testEllipsisImage2b() {
-        test(Op.VAR_PATTERN,
-                "(/,_, %X..+)",
-                "(/,_, B, C, D)", true);
-    }
-
-    @Test
-    public void testEllipsisImage2c() {
-        test(Op.VAR_PATTERN,
-                "<A --> (/, z, _, B, %X..+)>",
-                "<A --> (/, z, _, B, C, D)>", true);
-    }
-
-    @Test
-    public void testEllipsisImage2d() {
-        test(Op.VAR_PATTERN,
-                "<A --> (/, z, _, E, %X..+)>",
-                "<A --> (/, z, _, B, C, D)>", false);
-    }
-
-    @Test
-    public void testEllipsisImage2e() {
-        test(Op.VAR_PATTERN,
-                "<A --> (/, B, _, %X..+)>",
-                "<A --> (/, B, _, C, D)>", true);
-    }
-
-
-    @Ignore
-    @Test
-    public void testImageRelationAfterEllipsis() {
-        test(Op.VAR_PATTERN,
-                "<A --> (/, B, %X..+, _)>",
-                "<A --> (/, B, C, D, _)>", true);
-        test(Op.VAR_PATTERN,
-                "<A --> (/, B, %X..+, _)>",
-                "<A --> (/, B, C, _, D)>", false);
-    }
-
-    @Ignore
-    @Test
-    public void testInnerEllipsis() {
-        test(Op.VAR_PATTERN,
-                "<A --> (/, B, %X..+, E, _)>",
-                "<A --> (/, B, C, D, E, _)>", true);
-    }
+//                "<A --> (/, z, _, %X..+)>",
+//                "<A --> (/, z, _, B,C)>", true);
+//
+//    }
+//
+//    @Test
+//    public void testEllipsisImage2a() {
+//        test(Op.VAR_PATTERN,
+//                "(/,_, B, %X..+)",
+//                "(/,_, B, C, D)", true);
+//    }
+//
+//    @Test
+//    public void testEllipsisImage2b() {
+//        test(Op.VAR_PATTERN,
+//                "(/,_, %X..+)",
+//                "(/,_, B, C, D)", true);
+//    }
+//
+//    @Test
+//    public void testEllipsisImage2c() {
+//        test(Op.VAR_PATTERN,
+//                "<A --> (/, z, _, B, %X..+)>",
+//                "<A --> (/, z, _, B, C, D)>", true);
+//    }
+//
+//    @Test
+//    public void testEllipsisImage2d() {
+//        test(Op.VAR_PATTERN,
+//                "<A --> (/, z, _, E, %X..+)>",
+//                "<A --> (/, z, _, B, C, D)>", false);
+//    }
+//
+//    @Test
+//    public void testEllipsisImage2e() {
+//        test(Op.VAR_PATTERN,
+//                "<A --> (/, B, _, %X..+)>",
+//                "<A --> (/, B, _, C, D)>", true);
+//    }
+//
+//
+//    @Ignore
+//    @Test
+//    public void testImageRelationAfterEllipsis() {
+//        test(Op.VAR_PATTERN,
+//                "<A --> (/, B, %X..+, _)>",
+//                "<A --> (/, B, C, D, _)>", true);
+//        test(Op.VAR_PATTERN,
+//                "<A --> (/, B, %X..+, _)>",
+//                "<A --> (/, B, C, _, D)>", false);
+//    }
+//
+//    @Ignore
+//    @Test
+//    public void testInnerEllipsis() {
+//        test(Op.VAR_PATTERN,
+//                "<A --> (/, B, %X..+, E, _)>",
+//                "<A --> (/, B, C, D, E, _)>", true);
+//    }
 
     @Test
     public void ellipsisSequence() {

@@ -21,7 +21,6 @@ public class SerialCompoundTest {
         //testSerialize("\"sdhfdkjsf\"");
         testSerialize("a:b");
         testSerialize("(a ==>+1 b)");
-        testSerialize("(x --> (/, a, _, c))");
         testSerialize("(&&,(MedicalCode-->MedicalIntangible),(MedicalIntangible-->#1),(SuperficialAnatomy-->#1),label(MedicalCode,MedicalCode),label(MedicalIntangible,MedicalIntangible),label(SuperficialAnatomy,SuperficialAnatomy))");
 
     }

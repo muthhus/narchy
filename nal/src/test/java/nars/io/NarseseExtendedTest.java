@@ -244,12 +244,12 @@ public class NarseseExtendedTest {
     }
 
     @Test public void testImdex() throws Narsese.NarseseException {
-        Compound x = term("<acid --> (/,reaction,_,base)>");
-        //Terms.printRecursive(System.out, x);
-        assertEquals("(acid-->(/,reaction,_,base))",
-                x.toString());
-        assertTrue(x.vars()==0);
-        assertFalse(x.containsRecursively(Op.Imdex));
+//        Compound x = term("<acid --> (/,reaction,_,base)>");
+//        //Terms.printRecursive(System.out, x);
+//        assertEquals("(acid-->(/,reaction,_,base))",
+//                x.toString());
+//        assertTrue(x.vars()==0);
+//        assertFalse(x.containsRecursively(Op.Imdex));
 
         //test that the imdex is allowed in term identifiers
         assertEquals(

@@ -381,16 +381,16 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void second_level_variable_unification()  {
         TestNAR tester = test();
-        tester.believe("(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.90f); //en("there is a lock which is opened by all keys");
+        tester.believe("(&&,<#1 --> lock>,<<$2 --> key> ==> open($2, #1)>)", 1.00f, 0.90f); //en("there is a lock which is opened by all keys");
         tester.believe("<{key1} --> key>", 1.00f, 0.90f); //en("key1 is a key");
-        tester.mustBelieve(cycles*2, "(&&,<#1 --> lock>,<#1 --> (/,open,{key1},_)>)", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+        tester.mustBelieve(cycles*2, "(&&,<#1 --> lock>,open({key1}, #1))", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
     }
     @Test
     public void second_level_variable_unification_neg()  {
         TestNAR tester = test();
-        tester.believe("(&&,<#1 --> lock>,<--($2 --> key) ==> <#1 --> (/,open,$2,_)>>)");
+        tester.believe("(&&,<#1 --> lock>,<--($2 --> key) ==> open($2, #1)>)");
         tester.believe("--({key1} --> key)");
-        tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<#1 --> (/,open,{key1},_)>)", 1.00f, 0.81f);
+        tester.mustBelieve(cycles, "(&&,<#1 --> lock>,open({key1}, #1))", 1.00f, 0.81f);
     }
 
 
