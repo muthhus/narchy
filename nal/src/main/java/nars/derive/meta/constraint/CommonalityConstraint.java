@@ -24,31 +24,37 @@ public abstract class CommonalityConstraint extends MatchConstraint {
         if (x == null)
             return false; //not invalid until both are present to be compared
 
-        boolean result;
-
         if (x.equals(y)) {
-            result = true;
-        } else {
-            if (y instanceof Compound) {
-                Compound C = (Compound) y;
-                result = x instanceof Compound ?
-                        invalid((Compound) x, C)
-                        :
-                        invalid(/*(Term)*/x, C);
-            } else {
-                result = invalid(x, y);
-            }
+            return true;
         }
-        return result;
 
+        if (y instanceof Compound) {
+            Compound C = (Compound) y;
+            return x instanceof Compound ?
+                    invalid((Compound) x, C)
+                    :
+                    invalid(/*(Term)*/x, C);
+        } else {
+            return invalid(x, y);
+        }
     }
 
-    /** equality will have already been tested prior to calling this */
-    @NotNull protected abstract boolean invalid(Term x, Term y);
 
-    /** equality will have already been tested prior to calling this */
-    @NotNull protected abstract boolean invalid(Compound x, Compound y);
+    /**
+     * equality will have already been tested prior to calling this
+     */
+    @NotNull
+    protected abstract boolean invalid(Term x, Term y);
 
-    /** equality will have already been tested prior to calling this */
-    @NotNull protected abstract boolean invalid(Term x, Compound y);
+    /**
+     * equality will have already been tested prior to calling this
+     */
+    @NotNull
+    protected abstract boolean invalid(Compound x, Compound y);
+
+    /**
+     * equality will have already been tested prior to calling this
+     */
+    @NotNull
+    protected abstract boolean invalid(Term x, Compound y);
 }

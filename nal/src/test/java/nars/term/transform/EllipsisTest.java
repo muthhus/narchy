@@ -173,7 +173,7 @@ public class EllipsisTest {
             this.prefix = prefix;
             this.suffix = suffix;
             this.ellipsisTerm = ellipsisTerm;
-            p = (Compound) new PatternTermIndex().pattern(
+            p = new PatternTermIndex().pattern(
                     getPattern(prefix, suffix)
             );
         }
@@ -252,7 +252,7 @@ public class EllipsisTest {
         @Override
         public Compound getResult() throws Narsese.NarseseException {
             final PatternTermIndex pi = new PatternTermIndex();
-            return (Compound) pi.normalize(pi.term("<%1 --> (" + ellipsisTerm +  ")>")).term();
+            return pi.normalize(pi.term("<%1 --> (" + ellipsisTerm +  ")>")).term();
         }
 
     }
@@ -391,10 +391,10 @@ public class EllipsisTest {
     }
 
     static void testCombinations(Compound X, @NotNull Compound Y, int expect) {
-        X = (Compound) new PatternTermIndex().get(X, true).term();
+        X = new PatternTermIndex().pattern(X);
         //Y = (Compound) new PatternIndex().the(Y).term();
 
-        for (int seed = 0; seed < 1 /*expect*5*/; seed++) {
+        for (int seed = 0; seed < 3 /*expect*5*/; seed++) {
 
             Set<String> results = $.newHashSet(0);
 

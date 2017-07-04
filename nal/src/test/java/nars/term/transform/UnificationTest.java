@@ -26,7 +26,7 @@ import static org.junit.Assert.*;
 public class UnificationTest {
 
     private TestNAR t;
-    final static int cycles = 10;
+    final static int cycles = 1;
 
     @Before
     public void start() {
@@ -56,8 +56,7 @@ public class UnificationTest {
             if (type == Op.VAR_PATTERN) {
 
                 //special handling
-                final PatternTermIndex pi = new PatternTermIndex();
-                t1 = pi.pattern($.$(s1));
+                t1 = new PatternTermIndex().pattern($.$(s1));
 
             } else {
                 nar.question(s1);
@@ -377,7 +376,7 @@ public class UnificationTest {
                 true);
     }
 
-    @Ignore
+
     @Test
     public void pattern_trySubs_Pattern_Var_2_setComplex0_5_s() {
         //may require more termutation matches than default is set but it should work if it had all
@@ -390,8 +389,8 @@ public class UnificationTest {
     @Test
     public void pattern_trySubs_Pattern_Var_2_setComplex0_5_r() {
         test(Op.VAR_PATTERN,
-                "{<{%1,x} --> on>, c}",
-                "{<{z,x} --> on>, c}",
+                "{on:{%1,x}, c}",
+                "{on:{z,x}, c}",
                 true);
     }
 
@@ -437,16 +436,9 @@ public class UnificationTest {
                 true);
     }
 
-    @Ignore
-    @Test
-    public void pattern_trySubs_set2_1() {
-        test(Op.VAR_PATTERN,
-                "{a,b}", "{%1,b}",
-                true);
-    }
 
     @Test
-    public void pattern_trySubs_set2_1_reverse() {
+    public void pattern_trySubs_set2_1() {
         test(Op.VAR_PATTERN,
                 "{%1,b}", "{a,b}",
                 true);

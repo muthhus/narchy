@@ -332,7 +332,7 @@ public class LinkageTest extends AbstractNALTest {
     public void Indirect_Linkage_NAL6_variable_elimination_deduction() throws Exception {
         ProperlyLinkedIndirectlyTest(
                 "<lock1 --> lock>",
-                "<(&&, open($2, $1), <#1 --> lock>) ==> <$2 --> key>>");
+                "<(&&, open($2, #1), <#1 --> lock>) ==> <$2 --> key>>");
     }
 
     @Test

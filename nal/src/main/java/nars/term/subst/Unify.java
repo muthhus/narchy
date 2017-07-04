@@ -59,7 +59,9 @@ public abstract class Unify implements Termutator, Subst {
     @NotNull
     public final VersionMap<Term, Term> xy;
 
-    /** temporal tolerance */
+    /**
+     * temporal tolerance
+     */
     public int dur = 0;
 
 
@@ -68,9 +70,8 @@ public abstract class Unify implements Termutator, Subst {
     }
 
     /**
-     *
      * @param terms
-     * @param type if null, unifies any variable type.  if non-null, only unifies that type
+     * @param type       if null, unifies any variable type.  if non-null, only unifies that type
      * @param random
      * @param versioning
      */
@@ -140,23 +141,7 @@ public abstract class Unify implements Termutator, Subst {
                 if (!finish) {
                     result = true; //return to callee to continue in subsequent operation
                 } else {
-                    int ts = termutes.size();
-                    if (ts == 0) {
-                        result = onMatch();
-                    } else {
-
-                        List<Termutator> t = $.newArrayList(ts+1);
-                        t.addAll(termutes);
-
-                        //shuffle the ordering of the termutes themselves
-                        if (ts > 1)
-                            Collections.shuffle(t, random);
-
-                        t.add(this); //append call-back at the end
-
-                        result = mutate(this, t, -2);
-
-                    }
+                    result = tryMatch();
                 }
 
             } else {
@@ -169,13 +154,26 @@ public abstract class Unify implements Termutator, Subst {
             finish = true;
         }
 
-        if (finish) {
-            //revert(s); //else: allows the set constraints to continue
-            this.termutes.clear();
-        }
-
         return result;
+    }
 
+    private boolean tryMatch() {
+        int ts = termutes.size();
+        if (ts == 0)
+            return onMatch();
+
+        //TODO use Termutator[] not List
+        List<Termutator> t = $.newArrayList(ts + 1);
+        t.addAll(termutes);
+        termutes.clear();
+
+        //shuffle the ordering of the termutes themselves
+        if (ts > 1)
+            Collections.shuffle(t, random);
+
+        t.add(this); //append call-back at the end
+
+        return mutate(this, t, -2);
     }
 
 
@@ -189,7 +187,7 @@ public abstract class Unify implements Termutator, Subst {
         return (seq == -2) ?
                 f.mutate(n, -1) //start combinatorial recurse
                 :
-                f.onMatch(); //end combinatorial recurse
+                f.tryMatch(); //continue combinatorial recurse
     }
 
 
@@ -213,10 +211,6 @@ public abstract class Unify implements Termutator, Subst {
     }
 
 
-
-
-
-
     @Nullable
     public Term resolve(@NotNull Term x) {
         return transform(x, terms);
@@ -234,8 +228,6 @@ public abstract class Unify implements Termutator, Subst {
     public boolean isEmpty() {
         throw new UnsupportedOperationException("slow");
     }
-
-
 
 
     /**
@@ -303,7 +295,7 @@ public abstract class Unify implements Termutator, Subst {
                 MatchConstraint cc = constraints.get(i);
                 if (cc == null) /* why null? */
                     throw new NullPointerException();
-                    //break;
+                //break;
                 if (cc.invalid(x, Unify.this))
                     return false;
             }

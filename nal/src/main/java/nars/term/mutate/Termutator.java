@@ -33,17 +33,17 @@ public interface Termutator {
             return y instanceof Term ? (Term)y : $.p(y.toArray());
         }
 
-        public AbstractTermutator(TermContainer... keyComponents) {
+        AbstractTermutator(TermContainer... keyComponents) {
             this(Util.map(AbstractTermutator::wrap, new Term[keyComponents.length], keyComponents));
         }
 
 
-        public AbstractTermutator(Term... keyComponents) {
+        AbstractTermutator(Term... keyComponents) {
             this(new GenericCompound(Op.PROD, TermVector.the(keyComponents))); //fast create on-heap instance
                     //$.p(keyComponents));
         }
 
-        public AbstractTermutator(Compound key) {
+        AbstractTermutator(Compound key) {
             super(key);
         }
     }
