@@ -5,7 +5,7 @@ import com.jcraft.jsch.JSchException;
 import com.jogamp.newt.event.KeyEvent;
 import org.fusesource.jansi.AnsiOutputStream;
 import spacegraph.SpaceGraph;
-import spacegraph.net.SSH;
+import spacegraph.net.SSHClient;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -28,13 +28,13 @@ public class SSHConsole extends ConsoleTerminal {
 
     final PipedOutputStream ins = new PipedOutputStream();
 
-    private final SSH ssh;
+    private final SSHClient ssh;
 
 
     public SSHConsole(String user, String host, String password, int cols, int rows) throws IOException, JSchException {
         super(cols, rows);
 
-        ssh = new SSH("gest", "localhost", "tseg",
+        ssh = new SSHClient("gest", "localhost", "tseg",
 
                 new PipedInputStream(ins),
 
