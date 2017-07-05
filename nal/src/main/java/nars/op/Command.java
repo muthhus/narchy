@@ -73,6 +73,9 @@ abstract public class Command extends AtomConcept implements PermanentConcept {
     public static void log(NAR nar, @NotNull String... msg) {
         nar.input( Command.logTask(nar.time(), $.the(msg)) );
     }
+    public static void log(NAR nar, @NotNull Object x) {
+        nar.input( Command.logTask(nar.time(), $.the(x.toString())) );
+    }
 
 
 }

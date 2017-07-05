@@ -71,13 +71,13 @@ public class PreferSimpleAndPolarized implements DerivationBudgeting {
             d.parentPri;
             //d.premise.pri();
 
-        float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm, 0);
+        float simplicityFactor = simplicityFactorRelative(conclusion, punc, d.task, d.beliefTerm, 0.5f);
         if (truth != null) { //belief and goal:
             p *= simplicityFactor;
             float freqFactor = Util.lerp(polarization(truth.freq()), minFactor, 1);
             p *= freqFactor;
-            float confFactor = evidencePreservationRelative(truth, d, 0.5f);
-            p *= confFactor;
+            float eviFactor = evidencePreservationRelative(truth, d, 0f);
+            p *= eviFactor;
 
 //                    simplicity.floatValue() * simplicityFactorRelative(conclusion, punc, d.task, d.belief) +
 //                 polarity.floatValue()   * truth.polarization();

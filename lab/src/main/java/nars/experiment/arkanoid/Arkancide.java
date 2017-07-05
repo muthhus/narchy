@@ -166,9 +166,9 @@ public class Arkancide extends NAgentX {
 //           }
                     return s;
 
-        }).resolution(0.1f);
+        });///.resolution(0.1f);
 
-        nar.truthResolution.setValue(0.05f);
+        //nar.truthResolution.setValue(0.05f);
 
 //        Param.DEBUG = true;
 //        nar.onTask(x -> {
