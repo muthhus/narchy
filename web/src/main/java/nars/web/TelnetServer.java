@@ -3,6 +3,7 @@ package nars.web;
 import com.googlecode.lanterna.TerminalPosition;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
+import com.googlecode.lanterna.graphics.Scrollable;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.table.Table;
@@ -23,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -70,7 +72,7 @@ public class TelnetServer {
 
         public void run() {
             this.nar = new NARBuilder().get();
-            nar.startFPS(1f);
+            nar.startFPS(3f);
 
             Screen screen = null;
             try {
@@ -104,27 +106,40 @@ public class TelnetServer {
                 );
 
 
-                final BasicWindow window = new BasicWindow("Text GUI over Telnet");
+                final BasicWindow window = new BasicWindow();
+                window.setHints(Collections.singletonList(Window.Hint.FULL_SCREEN));
 
-                Panel p = new Panel();
 
+                Panel p = new Panel(new BorderLayout());
 
-                final Table<String> table = new Table<String>("Column 1", "Column 2", "Column 3");
+                //p.setSize(new TerminalSize(screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows())); //TODO update with resize
+
+                final Table<String> table = new Table<String>("Pri", "Term", "Truth");
+                table.setCellSelection(true);
+
                 final TableModel<String> model = table.getTableModel();
-                model.addRow("Row1", "Row1", "Row1");
-                model.addRow("Row2", "Row2", "Row2");
-                model.addRow("Row3", "Row3", "Row3");
-                int maxRows = 128;
+//                model.addRow("Row1", "Row1", "Row1");
+//                model.addRow("Row2", "Row2", "Row2");
+//                model.addRow("Row3", "Row3", "Row3");
+
+
+                int maxRows = 24;
                 nar.onTask(t -> {
-                    if (model.getRowCount() > maxRows) {
-                        model.removeRow(0);
-                    }
-                    model.addRow(
-                            Texts.n4(t.pri()),
-                            t.term().toString(),
-                            t.punc() + " " + t.truth());
+                    table.getTextGUI().getGUIThread().invokeLater(()->{
+
+                        if (model.getRowCount()+1 >= maxRows) {
+                            model.removeRow(0);
+                        }
+                        model.addRow(
+                                Texts.n4(t.pri()),
+                                t.term().toString() + Character.valueOf((char) t.punc()),
+                                t.truth()!=null ? t.truth().toString() : "");
+                        //table.setViewTopRow(Math.max(0,model.getRowCount()-table.getVisibleRows()));
+
+                    });
+//                    synchronized (model) {
+//                    }
                 });
-                p.addComponent(table);
 
 //                p.setLayoutManager(new LinearLayout(Direction.VERTICAL));
 //                p.addComponent(new Button("Button", () -> {
@@ -138,16 +153,19 @@ public class TelnetServer {
                 final TextBox textBox = new TextBox(new TerminalSize(20, 2)) {
                     @Override
                     public synchronized Result handleKeyStroke(KeyStroke keyStroke) {
+                        Result r = super.handleKeyStroke(keyStroke);
                         if (keyStroke.getKeyType() == KeyType.Enter) {
                             String t = getText();
                             setText("");
+                            setCaretPosition(0);
+
                             try {
                                 nar.input(t);
                             } catch (Narsese.NarseseException e) {
                                 e.printStackTrace();
                             }
                         }
-                        return super.handleKeyStroke(keyStroke);
+                        return r;
                     }
                     //                    @Override
 //                    public Result handleKeyStroke(KeyStroke keyStroke) {
@@ -162,10 +180,9 @@ public class TelnetServer {
 //                        }
 //                    }
                 };
+                textBox.takeFocus();
 
 
-
-                p.addComponent(textBox.withBorder(Borders.singleLine("Text editor")));
 
 //                p.addComponent(new AbstractInteractableComponent() {
 //                    String text = "Press any key";
@@ -207,7 +224,10 @@ public class TelnetServer {
 //                    }
 //                }.withBorder(Borders.singleLine("Custom component")));
 
-                p.addComponent(new Button("Close", window::close));
+                p.addComponent(table, BorderLayout.Location.CENTER);
+                p.addComponent(textBox.withBorder(Borders.singleLine("in")), BorderLayout.Location.BOTTOM);
+                //p.addComponent(new Button("end", window::close));
+
                 window.setComponent(p);
 
                 textGUI.addWindowAndWait(window);
