@@ -237,7 +237,8 @@ public class Derivation extends Unify implements TermContext {
 
 
         //remove common variable entries because they will just consume memory if retained as empty
-        xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);
+        //xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);
+        xy.map.clear();
 
         termutes.clear();
 

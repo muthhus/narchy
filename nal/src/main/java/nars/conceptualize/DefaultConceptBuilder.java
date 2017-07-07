@@ -43,7 +43,7 @@ import static nars.time.Tense.DTERNAL;
  */
 public class DefaultConceptBuilder implements ConceptBuilder {
 
-    public static final PriMerge termlinkMerge = plus;
+    public static final PriMerge termlinkMerge = max;
     public static final PriMerge tasklinkMerge = max;
 
     public DefaultConceptBuilder() {

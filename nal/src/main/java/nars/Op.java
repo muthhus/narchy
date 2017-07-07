@@ -1269,6 +1269,8 @@ public enum Op {
 
         }
 
+
+
         return compound(op, dt, subterms(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
     }
 
