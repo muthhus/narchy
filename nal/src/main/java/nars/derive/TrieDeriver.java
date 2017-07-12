@@ -56,15 +56,16 @@ public class TrieDeriver implements Deriver {
 
                 PremiseRule existing = trie.put(c, rule);
 
-                /*if (existing != null)
-                    throw new RuntimeException("Duplicate condition sequence:\n\t" + c + "\n\t" + existing);*/
-
+                if (existing != null) {
+                    throw new RuntimeException("Duplicate condition sequence:\n\t" + c + "\n\t" + existing);
+                }
 //                    if (existing != null && s != existing && existing.equals(s)) {
 //                        System.err.println("DUPL: " + existing);
 //                        System.err.println("      " + existing.getSource());
 //                        System.err.println("EXST: " + s.getSource());
 //                        System.err.println();
 //                    }
+//                }
             }
         }
     }

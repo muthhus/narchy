@@ -8,12 +8,12 @@
     (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
     (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S & P) --> M), (Belief:Union)
     (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
-    (S --> M), (P --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S ~ P) --> M), (Belief:Difference)
+    (P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S ~ P) --> M), (Belief:Difference)
 
     (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P & S)), (Belief:Intersection)
     (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P | S)), (Belief:Union)
     (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (P - S)), (Belief:Difference)
-    (M --> S), (M --> P), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (S - P)), (Belief:Difference)
+    (M --> P), (M --> S), task("."), notSet(S), notSet(P), neqRCom(S,P) |- (M --> (S - P)), (Belief:Difference)
 
 //raw product composition
     A, B, task("*"), belief("*") |- (A | B), (Belief:Intersection)
