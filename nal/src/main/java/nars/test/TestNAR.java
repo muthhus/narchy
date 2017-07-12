@@ -393,15 +393,15 @@ public class TestNAR {
      * tests for any truth value at the given occurrences
      */
     @NotNull
-    public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, byte punc, @NotNull long... occs) {
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, @NotNull long... occs) {
         assert(occs.length > 0);
         for (long occ : occs)
-            mustNotOutput(withinCycles, sentenceTerm, punc, 0, 1, 0, 1, occ);
+            mustNotOutput(withinCycles, term, punc, 0, 1, 0, 1, occ);
         return this;
     }
 
     @NotNull
-    public TestNAR mustNotOutput(long withinCycles, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
         if (freqMin < 0 || freqMin > 1f || freqMax < 0 || freqMax > 1f || confMin < 0 || confMin > 1f || confMax < 0 || confMax > 1f || freqMin != freqMin || freqMax != freqMax)
             throw new UnsupportedOperationException();
 
@@ -409,7 +409,7 @@ public class TestNAR {
             long time = nar.time();
             return mustEmit(outputEvents,
                     time, time + withinCycles,
-                    sentenceTerm, punc, freqMin, freqMax, confMin,
+                    term, punc, freqMin, freqMax, confMin,
                     confMax, occ, occ, false);
         } catch (Narsese.NarseseException e) {
             throw new RuntimeException(e);

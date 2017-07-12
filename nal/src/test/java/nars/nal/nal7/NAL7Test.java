@@ -51,8 +51,15 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(10, "x:after. :|:")
                 .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0, 10)
                 .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0, 10)
+
+                //equivalent:
                 .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)
+                .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)
+
+                //equivalent:
                 .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
+                .mustBelieve(cycles, "(x:before &&+10 x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
+
         ;
     }
 
@@ -256,9 +263,9 @@ public class NAL7Test extends AbstractNALTest {
 
 
                 .mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f)
-                .mustBelieve(cycles, "((($1,room) --> enter) ==>-9 (($1,key) --> hold))", 0.8f, 0.42f)
-                .mustBelieve(cycles, "((($1,key) --> hold) <=>+9 (($1,room) --> enter))", 0.73f, 0.44f)
-                .mustNotOutput(cycles, "((($1,key) --> hold) <=>-9 (($1,room) --> enter))", BELIEF, ETERNAL); //test correct dt polarity
+                .mustBelieve(cycles, "(enter($1,room) ==>-9 hold($1,key) )", 0.8f, 0.42f)
+                .mustBelieve(cycles,   "(hold($1,key) <=>+9 enter($1,room) )", 0.73f, 0.44f)
+                .mustNotOutput(cycles, "(hold($1,key) <=>-9 enter($1,room))", BELIEF, ETERNAL); //test correct dt polarity
 
     }
 

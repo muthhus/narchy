@@ -1375,7 +1375,7 @@ public interface TimeFunctions {
 //        }
         if (derived.dt() != dt) {
             TermContainer ds = derived.subterms();
-            @NotNull Compound n = compoundOrNull(p.terms.the(o, dt, ds));
+            @NotNull Compound n = compoundOrNull(derived.dt(dt)); //compoundOrNull(p.terms.the(o, dt, ds));
             if (n == null)
                 return null; //throw new InvalidTermException(o, dt, ds, "Untemporalizable to new DT");
 
