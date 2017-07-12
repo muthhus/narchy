@@ -17,6 +17,7 @@ import nars.term.util.InvalidTermException;
 import nars.term.var.CommonVariable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -108,6 +109,7 @@ public class Derivation extends Unify implements TermContext {
     private final substituteIfUnifiesDep _substituteIfUnifiesDep;
     private int serial;
     public float parentPri;
+    private short[] cause;
 
 
     /** if using this, must set: nar, index, random, DerivationBudgeting */
@@ -148,8 +150,22 @@ public class Derivation extends Unify implements TermContext {
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
     }
 
-    /** tasklink scope */
-    @NotNull public void restartB(@NotNull Task task) {
+    /** tasklink/termlink scope */
+    @NotNull public Derivation restartB(@NotNull Premise p, Task task, Task belief, Term beliefTerm, float parentTaskPri, int ttl) {
+
+        assert(ttl >= 0);
+
+        revert(0);
+
+        //remove common variable entries because they will just consume memory if retained as empty
+        //xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);
+        xy.map.clear();
+
+        termutes.clear();
+
+        forEachMatch = null;
+
+
 
         this.task = task;
 
@@ -162,17 +178,6 @@ public class Derivation extends Unify implements TermContext {
         Op tOp = tt.op();
         this.termSub0op = (byte) tOp.ordinal();
         this.termSub0opBit = tOp.bit;
-
-    }
-
-
-    /** termlink scope */
-    @NotNull public Derivation restartC(@NotNull Premise p, Task belief, Term beliefTerm, float parentTaskPri, int ttl) {
-
-        assert(ttl >= 0);
-
-        revert(0);
-
 
         this.concTruth = null;
         this.concPunc = 0;
@@ -235,14 +240,20 @@ public class Derivation extends Unify implements TermContext {
 
         this.parentPri = parentTaskPri;
 
+        short[] taskCause = task.cause();
+        short[] beliefCause = belief!=null ?  belief.cause() : ArrayUtils.EMPTY_SHORT_ARRAY;
 
-        //remove common variable entries because they will just consume memory if retained as empty
-        //xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);
-        xy.map.clear();
+        //HACK
+        if (taskCause.length > 0 && beliefCause.length > 0) {
+            //HACK zip
+            this.cause = new short[] { taskCause[0], beliefCause[0] };
+        } else if (taskCause.length > 0) {
+            this.cause = new short[] { taskCause[0] };
+        } else if (beliefCause.length > 0) {
+            this.cause = new short[] { beliefCause[0] };
+        }
 
-        termutes.clear();
 
-        forEachMatch = null;
 
         return this;
     }
@@ -346,6 +357,12 @@ public class Derivation extends Unify implements TermContext {
     public int ttl() {
         return versioning.ttl;
     }
+
+    /** forms a new cause by appending a cause ID to the derivation's cause */
+    public short[] cause(short c) {
+        return ArrayUtils.add(this.cause, c);
+    }
+
 }
 
 

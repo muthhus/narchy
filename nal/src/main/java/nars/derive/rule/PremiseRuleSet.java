@@ -92,10 +92,11 @@ public class PremiseRuleSet {
 //        this(parse(load(ruleStrings), patterns), patterns);
 //    }
 
+    static final PatternTermIndex p = new PatternTermIndex();
+
     @NotNull
     public static PremiseRuleSet rules(boolean permute, String... name) {
 
-        PatternTermIndex p = new PatternTermIndex();
         PremiseRuleSet rs = new PremiseRuleSet(
                 Stream.of(name).flatMap(n -> {
 
@@ -111,7 +112,7 @@ public class PremiseRuleSet {
 
                         }
                 )
-            , p, permute
+                , p, permute
         );
 
         logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
@@ -133,6 +134,7 @@ public class PremiseRuleSet {
     public PremiseRuleSet(@NotNull PremiseRule... rules) {
         this(false, rules);
     }
+
     public PremiseRuleSet(boolean permute, @NotNull PremiseRule... rules) {
         this.patterns = new PatternTermIndex();
         this.rules = $.newArrayList(rules.length);
@@ -320,7 +322,7 @@ public class PremiseRuleSet {
     }
 
     void permuteBackward(String src, @NotNull PatternTermIndex index, @NotNull Collection<PremiseRule> ur, @NotNull PremiseRule r) {
-        if (permuteBackwards && r.allowBackward) {
+        if (permuteBackwards && r.permuteBackward) {
 
             r.backwardPermutation(index, (q, reason) -> {
                 PremiseRule b = add(q, src + ':' + reason, ur, index);
@@ -361,7 +363,7 @@ public class PremiseRuleSet {
 
         then.accept(r);
 
-        if (permuteForwards && r.allowForward) {
+        if (permuteForwards && r.permuteForward) {
 
             PremiseRule bSwap = r.swapPermutation(index);
             if (bSwap != null)
@@ -369,7 +371,6 @@ public class PremiseRuleSet {
         }
 
     }
-
 
 
     @Nullable

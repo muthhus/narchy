@@ -3,13 +3,11 @@ package nars.derive;
 import jcog.Util;
 import jcog.trie.TrieNode;
 import nars.$;
-import nars.Narsese;
 import nars.Op;
 import nars.control.premise.Derivation;
 import nars.derive.meta.*;
-import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
-import nars.derive.meta.op.MatchOneSubtermPrototype;
+import nars.derive.meta.op.MatchTerm;
 import nars.derive.meta.op.MatchTermPrototype;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
@@ -19,9 +17,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -47,12 +47,11 @@ public class TrieDeriver implements Deriver {
         @Override
         public void index(@Nullable PremiseRule rule) {
 
-            if (rule == null || rule.POST == null)
-                throw new RuntimeException("Null rule");
+            assert (rule != null && rule.POST != null) : "Null rule:" + rule;
 
-            for (PostCondition result : rule.POST) {
+            for (PostCondition p : rule.POST) {
 
-                List<Term> c = rule.conditions(result);
+                List<Term> c = rule.conditions(p);
 
                 PremiseRule existing = trie.put(c, rule);
 
@@ -71,12 +70,42 @@ public class TrieDeriver implements Deriver {
     }
 
 
-    public static TrieDeriver get(String individualRule) throws Narsese.NarseseException {
-        return get(new PremiseRuleSet(true, PremiseRule.rule(individualRule)));
+//    public static TrieDeriver get(String individualRule) throws Narsese.NarseseException {
+//        return get(new PremiseRuleSet(true, PremiseRule.rule(individualRule)));
+//    }
+
+
+    public TrieDeriver(PremiseRuleSet r) {
+
+        //return Collections.unmodifiableList(premiseRules);
+        final TermTrie<Term, PremiseRule> trie = new TermPremiseRuleTermTrie(r);
+
+        Compiler c = new Compiler();
+
+        @NotNull List<BoolPred> bb = c.subtree(trie.trie.root);
+        BoolPred[] roots = bb.toArray(new BoolPred[bb.size()]);
+
+        for (int i = 0; i < roots.length; i++)
+            roots[i] = c.build(roots[i]);
+
+        this.pred = Fork.compile(roots);
+
     }
 
-    public TrieDeriver(BoolPred... root) {
-        this.pred = Fork.compile(root);
+    public void forEachConclusion(Consumer<Conclude> p) {
+        forEach(pred, (x) -> {
+            if (x instanceof MatchTerm) {
+                @Nullable BoolPred y = (((MatchTerm) x).eachMatch);
+                if (y instanceof Fork) {
+                    ((Fork)y).subterms().forEach(z -> forEach(z, p));
+                    //forEach(, p);
+                } else if (y instanceof Conclude) {
+                    Conclude c = (Conclude)y;
+                    if (c != null)
+                        p.accept(c);
+                }
+            }
+        });
     }
 
     @Override
@@ -84,33 +113,6 @@ public class TrieDeriver implements Deriver {
         return pred.test(d);
     }
 
-    public static TrieDeriver get(@NotNull PremiseRuleSet ruleset) {
-
-        //return Collections.unmodifiableList(premiseRules);
-        final TermTrie<Term, PremiseRule> trie = new TermPremiseRuleTermTrie(ruleset);
-
-        Compiler c = new Compiler();
-
-        @NotNull List<BoolPred> bb = c.subtree(trie.trie.root);
-        BoolPred[] roots = bb.toArray(new BoolPred[bb.size()]);
-
-        for (int i = 0; i < roots.length; i++) {
-            roots[i] = c.build(roots[i]);
-        }
-
-        return new TrieDeriver(Fork.compile(roots));
-
-        /*
-        for (ProcTerm<PremiseMatch> p : roots) {
-            try {
-                compile(p);
-            } catch (Exception e) {
-                e.printStackTrace();
-                System.exit(1);
-            }
-        }
-        */
-    }
 
 //    static class StackFrame {
 //        private final int i;
@@ -252,6 +254,84 @@ public class TrieDeriver implements Deriver {
 
     }
 
+    static void forEach(Object p, @NotNull Consumer out) {
+        out.accept(p);
+
+        /*if (p instanceof IfThen) {
+
+            IfThen it = (IfThen) p;
+
+            TermTrie.indent(indent);
+            out.println(Util.className(p) + " (");
+            print(it.cond, out, indent + 2);
+
+            TermTrie.indent(indent);
+            out.println(") ==> {");
+
+            print(it.conseq, out, indent + 2);
+            TermTrie.indent(indent);
+            out.println("}");
+
+        } *//*else if (p instanceof If) {
+
+            indent(indent); out.println(Util.className(p) + " {");
+            {
+                If it = (If) p;
+                print(it.cond, out, indent + 2);
+            }
+            indent(indent); out.println("}");
+
+        }  else */
+        if (p instanceof AndCondition) {
+            //TermTrie.indent(indent);
+            //out.println("and {");
+            AndCondition ac = (AndCondition) p;
+            for (BoolPred b : ac.termCache) {
+                forEach(b, out);
+            }
+        } else if (p instanceof Fork) {
+            //TermTrie.indent(indent);
+            //out.println(Util.className(p) + " {");
+            Fork ac = (Fork) p;
+            for (BoolPred b : ac.cached) {
+                forEach(b, out);
+            }
+//            TermTrie.indent(indent);
+//            out.println("}");
+
+        } else if (p instanceof PatternOpSwitch) {
+            PatternOpSwitch sw = (PatternOpSwitch) p;
+            //TermTrie.indent(indent);
+            //out.println("SubTermOp" + sw.subterm + " {");
+            int i = -1;
+            for (BoolPred b : sw.proc) {
+                i++;
+                if (b == null) continue;
+
+                //TermTrie.indent(indent + 2);
+                //out.println('"' + Op.values()[i].toString() + "\": {");
+                //print(b, out, indent + 4);
+                forEach(b, out);
+                //TermTrie.indent(indent + 2);
+                //out.println("}");
+
+            }
+//            TermTrie.indent(indent);
+//            out.println("}");
+        } else {
+
+            if (p instanceof MatchTermPrototype)
+                throw new UnsupportedOperationException();
+            //((MatchTermPrototype) p).build();
+
+//            TermTrie.indent(indent);
+//            out.println( /*Util.className(p) + ": " +*/ p);
+
+        }
+
+
+    }
+
     public void print(@NotNull PrintStream out) {
         print(pred, out, 0);
 
@@ -284,10 +364,10 @@ public class TrieDeriver implements Deriver {
                     bb.add(branch);
             });
 
-            return optimize(bb);
+            return compileSwitch(bb);
         }
 
-        protected static List<BoolPred> optimize(List<BoolPred> bb) {
+        protected static List<BoolPred> compileSwitch(List<BoolPred> bb) {
 
             bb = factorSubOpToSwitch(bb, 0, 2);
             bb = factorSubOpToSwitch(bb, 1, 2);
@@ -346,15 +426,13 @@ public class TrieDeriver implements Deriver {
                 AndCondition ac = (AndCondition) p;
                 BoolPred[] termCache = ac.termCache;
                 for (int i = 0; i < termCache.length; i++) {
-                    BoolPred b = termCache[i];
-                    termCache[i] = build(b);
+                    termCache[i] = build(termCache[i]);
                 }
             } else if (p instanceof Fork) {
                 Fork ac = (Fork) p;
                 BoolPred[] termCache = ac.cached;
                 for (int i = 0; i < termCache.length; i++) {
-                    BoolPred b = termCache[i];
-                    termCache[i] = build(b);
+                    termCache[i] = build(termCache[i]);
                 }
 
             } else if (p instanceof PatternOpSwitch) {
@@ -384,9 +462,9 @@ public class TrieDeriver implements Deriver {
 //        }
 //    }
 
-        public interface CauseEffect extends BiConsumer<Term, Term> {
-
-        }
+//        public interface CauseEffect extends BiConsumer<Term, Term> {
+//
+//        }
 
 //    public static Term recurse(Term pred, Term curr, @NotNull CauseEffect each) {
 //
@@ -488,59 +566,13 @@ public class TrieDeriver implements Deriver {
             ccc.addAll(cond);
             if (conseq != null)
                 ccc.add(conseq);
-            return AndCondition.the(compileAnd(ccc));
+            return AndCondition.the(AndCondition.compile(ccc));
             //
             //        } else {
             //            /*if (conseq!=null)
             //                throw new RuntimeException();*/
             //            return conseq;
             //        }
-        }
-
-        /**
-         * combine certain types of items in an AND expression
-         */
-        static List<BoolPred> compileAnd(List<BoolPred> ccc) {
-            if (ccc.size() == 1)
-                return ccc;
-
-            SortedSet<MatchConstraint> constraints = new TreeSet<MatchConstraint>((a,b) -> {
-                if (a.equals(b)) return 0;
-                int i = Integer.compare(a.cost(), b.cost());
-                return i == 0 ? a.compareTo(b) : i;
-            });
-            Iterator<BoolPred> il = ccc.iterator();
-            while (il.hasNext()) {
-                BoolPred c = il.next();
-                if (c instanceof MatchConstraint) {
-                    constraints.add((MatchConstraint) c);
-                    il.remove();
-                }
-            }
-
-
-            if (!constraints.isEmpty()) {
-
-
-                int iMatchTerm = -1; //first index of a MatchTerm op, if any
-                for (int j = 0, cccSize = ccc.size(); j < cccSize; j++) {
-                    BoolPred c = ccc.get(j);
-                    if ((c instanceof MatchOneSubtermPrototype || c instanceof Fork) && iMatchTerm == -1) {
-                        iMatchTerm = j;
-                    }
-                }
-                if (iMatchTerm == -1)
-                    iMatchTerm = ccc.size();
-
-                //1. sort the constraints and add them at the end
-                int c = constraints.size();
-                if (c > 1) {
-                    ccc.add(iMatchTerm, new MatchConstraint.CompoundConstraint(constraints.toArray(new MatchConstraint[c])));
-                } else
-                    ccc.add(iMatchTerm, constraints.iterator().next()); //just add the singleton at the end
-            }
-
-            return ccc;
         }
 
         //    //TODO not complete

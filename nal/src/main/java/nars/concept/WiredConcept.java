@@ -3,9 +3,14 @@ package nars.concept;
 import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Param;
+import nars.Task;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * base class for concepts which are more or less programmatically "hard-wired" into
@@ -30,6 +35,25 @@ public class WiredConcept extends TaskConcept implements PermanentConcept {
     protected WiredConcept(@NotNull Compound term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
         super(term, beliefs, goals, n);
         resolution.setValue(n.truthResolution);
+    }
+
+    @Override
+    public float value(@NotNull Task t, float activation, NAR n) {
+        byte p = t.punc();
+        if (p == BELIEF || p == GOAL) {// isGoal()) {
+            //example value function
+            long s = t.end();
+
+            long now = n.time();
+            long relevantTime = p == GOAL ?
+                    now - n.dur() : //present or future goal
+                    now; //future belief prediction
+
+            if (s!=ETERNAL && s > relevantTime) //present or future TODO irrelevance discount for far future
+                return (float) Math.sqrt(t.conf());
+        }
+
+        return 0;
     }
 
 //    @Override

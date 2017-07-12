@@ -1093,4 +1093,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         return x == ETERNAL || Math.abs(x - when) <= dur;
     }
 
+    short[] cause();
+
 }

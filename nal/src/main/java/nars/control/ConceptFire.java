@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.decide.DecideRoulette;
 import jcog.pri.PLink;
@@ -24,7 +25,8 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static java.lang.Math.*;
+import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 import static nars.Param.UnificationTTLMax;
 
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
@@ -52,10 +54,38 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     }
 
 
-    public static ConceptFire activate(@NotNull Task t, float activation, Concept origin) {
+    public static ConceptFire activate(@NotNull Task t, float activation, Concept origin, NAR n) {
 
         if (activation >= EPSILON) {
+
+            short[] x = t.cause();
+            if (x.length > 0) {
+                float v = origin.value(t, activation, n);
+
+                float boost = 0;
+                float vPer = v/x.length;
+                for (short c : x) {
+                    Cause cc = n.causes.get(c);
+                    boost += cc.floatValue();
+                    if (v != 0) {
+                        cc.apply(vPer);
+                    }
+                }
+
+                if (boost!=0) {
+                    float b = Util.clamp(boost + 1f, 0.25f, 2f);
+                    t.priMult(b);
+                    if (t.priElseZero() < EPSILON)
+                        return null;
+                }
+
+            } /*else {
+                if (t.stamp().length > 1)
+                    System.out.println(t + " has no cause");
+            }*/
+
             origin.tasklinks().putAsync(new PLinkUntilDeleted<>(t, activation));
+
 
 //            if (origin instanceof CompoundConcept) {
 //
@@ -63,7 +93,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //                return new ConceptFire(origin, activation);
 //            } else {
 //                //atomic activation)
-                return new ConceptFire(origin, activation); /*, () -> {
+            return new ConceptFire(origin, activation); /*, () -> {
 
                 }*/
 //            }
@@ -286,10 +316,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         for (int i = 0; i < cs; i++) {
             Term x = ctpl.sub(i);
             @Nullable Concept c = nar.conceptualize(x);
-            if (c!=null) {
+            if (c != null) {
                 tc.add(c);
                 if (layersRemain > 0 && c instanceof Compound) {
-                    templates(tc, c.templates(), nar, layersRemain-1);
+                    templates(tc, c.templates(), nar, layersRemain - 1);
                 }
             } else {
                 tc.add(x.unneg()); //variable or other non-concept term

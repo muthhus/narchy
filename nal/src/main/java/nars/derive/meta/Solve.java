@@ -8,6 +8,8 @@ import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Supplier;
+
 import static nars.Op.*;
 
 /**

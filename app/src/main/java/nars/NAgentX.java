@@ -28,6 +28,7 @@ import java.util.function.Supplier;
 import static nars.gui.Vis.label;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
+import static spacegraph.widget.meter.MatrixView.bipolar1;
 
 /**
  * Extensions to NAgent interface:
@@ -115,6 +116,8 @@ abstract public class NAgentX extends NAgent {
         MixContRL m = (MixContRL) n.in;
         window(row(
 
+                causePlot(a.nar),
+
                 mixPlot(a, m, HISTORY),
 
                 col(
@@ -168,6 +171,11 @@ abstract public class NAgentX extends NAgent {
             n.emotion.happy(n.emotion.busyPri.getSum()/50000f);
         });
         return n;
+    }
+
+    private static Surface causePlot(NAR nar) {
+        int s = nar.causes.size();
+        return new MatrixView((i) -> nar.causes.get(i).floatValue(), s, (int)Math.max(1, Math.sqrt(s)), bipolar1);
     }
 
     private static void chart(NARS n, NAgent a) {

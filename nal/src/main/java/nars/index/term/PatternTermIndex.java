@@ -52,7 +52,7 @@ public class PatternTermIndex extends MapTermIndex {
         for (int i = 0; i < ss; i++) {
             Term a = s.sub(i);
 
-            Term b;
+            Termed b;
             if (a instanceof Compound) {
 
                 if (!canBuildConcept(a) || a.isTemporal()) {
@@ -61,15 +61,15 @@ public class PatternTermIndex extends MapTermIndex {
                 } else {
                     /*if (b != a && a.isNormalized())
                         ((GenericCompound) b).setNormalized();*/
-                    b = get(a, true).term();
+                    b = get(a, true);
                 }
             } else {
-                b = get(a, true).term();
+                b = get(a, true);
             }
             if (a != b) {
                 changed = true;
             }
-            bb[i] = b;
+            bb[i] = b.term();
         }
 
 

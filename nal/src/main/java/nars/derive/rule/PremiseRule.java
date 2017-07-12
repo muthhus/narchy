@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
@@ -51,11 +52,10 @@ public class PremiseRule extends GenericCompound {
 
     static final Term TaskAny = $.func("task", Atomic.the("any"));
     static final Term QUESTION_PUNCTUATION = $.inh(Atomic.the("Question"), Atomic.the("Punctuation"));
-    static final Atomic BELIEF = Atomic.the("Belief");
-    static final Atomic GOAL = Atomic.the("Goal");
 
-    public boolean allowBackward = false;
-    public boolean allowForward = false;
+
+    public boolean permuteBackward = false;
+    public boolean permuteForward = false;
 
 
     /**
@@ -76,22 +76,24 @@ public class PremiseRule extends GenericCompound {
 
     public String source;
 
-    @Nullable public MatchTaskBelief match;
+    @Nullable
+    private MatchTaskBelief match;
 
-    @Nullable private TimeFunctions timeFunction = TimeFunctions.Auto;
+    @Nullable
+    private TimeFunctions timeFunction = TimeFunctions.Auto;
 
     /**
      * unless time(raw), projected belief truth will be used by default
      */
     boolean beliefProjected = true;
 
-    @Nullable
-    private static final CompoundTransform truthSwap = new PremiseTruthTransform(true, true) {
-        @Override
-        public Term apply(@NotNull Term func) {
-            return Atomic.the(func.toString() + 'X');
-        }
-    };
+//    @Nullable
+//    private static final CompoundTransform truthSwap = new PremiseTruthTransform(true, true) {
+//        @Override
+//        public Term apply(@NotNull Term func) {
+//            return Atomic.the(func.toString() + 'X');
+//        }
+//    };
 
     /**
      * for printing complex terms as a recursive tree
@@ -313,17 +315,15 @@ public class PremiseRule extends GenericCompound {
         if ((p.beliefTruth != null) && !p.beliefTruth.equals(TruthOperator.NONE) && (belief == null)) {
             throw new RuntimeException("unknown BeliefFunction: " + p.beliefTruth);
         }
-        TruthOperator desire = GoalFunction.get(p.goalTruth);
-        if ((p.goalTruth != null) && !p.goalTruth.equals(TruthOperator.NONE) && (desire == null)) {
-            throw new RuntimeException("unknown DesireFunction: " + p.goalTruth);
+        TruthOperator goal = GoalFunction.get(p.goalTruth);
+        if ((p.goalTruth != null) && !p.goalTruth.equals(TruthOperator.NONE) && (goal == null)) {
+            throw new RuntimeException("unknown GoalFunction: " + p.goalTruth);
         }
 
-        Conclude der = new Conclude(rule, p,
-                belief, desire,
-                temporalizer);
+        Conclude der = new Conclude(rule, p.pattern, belief, goal, temporalizer);
 
         String beliefLabel = belief != null ? belief.toString() : "_";
-        String goalLabel = desire != null ? desire.toString() : "_";
+        String goalLabel = goal != null ? goal.toString() : "_";
 
         List<Term> args = $.newArrayList(
                 $.the(beliefLabel),
@@ -338,8 +338,8 @@ public class PremiseRule extends GenericCompound {
         Compound ii = $.func("truth", args);
 
         return puncOverride == 0 ?
-                new SolvePuncFromTask(ii, der, belief, desire, beliefProjected) :
-                new SolvePuncOverride(ii, der, puncOverride, belief, desire, beliefProjected);
+                new SolvePuncFromTask(ii, der, belief, goal, beliefProjected) :
+                new SolvePuncOverride(ii, der, puncOverride, belief, goal, beliefProjected);
 
 
     }
@@ -430,7 +430,7 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public final PremiseRule normalizeRule(@NotNull PatternTermIndex index) {
-        return new PremiseRule((Compound)index.pattern(
+        return new PremiseRule((Compound) index.pattern(
                 (Compound) index.transform(this, UppercaseAtomsToPatternVariables)
         ));
     }
@@ -640,7 +640,7 @@ public class PremiseRule extends GenericCompound {
                             break;
 
                         //HACK do somethign other than duplciate this with the "task" select below, and also generalize to all ops
-                         case "\"*\"":
+                        case "\"*\"":
                             pres.add(new TaskBeliefOp(PROD, false, true));
                             break;
                         case "\"&&\"":
@@ -703,7 +703,6 @@ public class PremiseRule extends GenericCompound {
 
         this.match = new MatchTaskBelief(
                 getTask(), getBelief(), //HACK
-                index,
                 constraints);
 
         List<PostCondition> postConditions = newArrayList(postcons.length);
@@ -801,7 +800,7 @@ public class PremiseRule extends GenericCompound {
                                 return null;
                             int relOccShift = p.taskTerm.subtermTime(zr);
                             if (relOccShift != DTERNAL)
-                                occReturn[0] -= ( relOccShift - p.taskTerm.dtRange());
+                                occReturn[0] -= (relOccShift - p.taskTerm.dtRange());
 
                             @Nullable Term yr = p.resolve(y).eval(p.terms);
                             if (yr == null)
@@ -819,8 +818,8 @@ public class PremiseRule extends GenericCompound {
                     TimeFunctions.shiftIfImmediate(p, occReturn, derived);
 
                     //HACK retemporalize a non-temporal conjunction result
-                    if (p.taskTerm.op() == CONJ && p.taskTerm.dt()!=DTERNAL &&
-                        derived.op() == CONJ && derived.dt()==DTERNAL) {
+                    if (p.taskTerm.op() == CONJ && p.taskTerm.dt() != DTERNAL &&
+                            derived.op() == CONJ && derived.dt() == DTERNAL) {
 
                         switch (derived.size()) {
                             case 2:
@@ -828,7 +827,7 @@ public class PremiseRule extends GenericCompound {
                                 int a = p.taskTerm.subtermTime(A);
                                 Term B = derived.sub(1);
                                 int b = p.taskTerm.subtermTime(B);
-                                if ((a > 0) && (occReturn[0]!=ETERNAL)) {
+                                if ((a > 0) && (occReturn[0] != ETERNAL)) {
                                     //shift ahead, aligning the first subterm with its position in the task
                                     occReturn[0] += a;
                                     b -= a;
@@ -836,7 +835,7 @@ public class PremiseRule extends GenericCompound {
                                 derived = compoundOrNull(CONJ.the(b - a, A, B));
                                 break;
                             default:
-                                assert(derived.dt()==DTERNAL);
+                                assert (derived.dt() == DTERNAL);
                                 derived = compoundOrNull(p.terms.the(derived, 0));
                                 break;
                         }
@@ -863,7 +862,7 @@ public class PremiseRule extends GenericCompound {
                                 occ -= relOccShift;
                         }
                     } else {
-                        if (p.belief!=null) {
+                        if (p.belief != null) {
                             if ((occ = p.belief.start()) != ETERNAL)
                                 temporal = true;
                         } else {
@@ -1065,7 +1064,7 @@ public class PremiseRule extends GenericCompound {
         if (derived == null)
             return null;
 
-        if (occReturn[0] == ETERNAL && (!p.task.isEternal() && (p.belief == null || !p.belief.isEternal()  )))
+        if (occReturn[0] == ETERNAL && (!p.task.isEternal() && (p.belief == null || !p.belief.isEternal())))
             return null; //no temporal basis
 
         return derived;
@@ -1132,10 +1131,10 @@ public class PremiseRule extends GenericCompound {
      * supply to the consumer
      * <p>
      * ex:
-     * (A --> B), (B --> C), not_equal(A,C) |- (A --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     * (A --> B), (B --> C), not_equal(A,C) |- (A --> C), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
      * 1. Deriving of backward inference rules, since Derive:AllowBackward it allows deriving:
-     * (A --> B), (A --> C), not_equal(A,C), task("?") |- (B --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
-     * (A --> C), (B --> C), not_equal(A,C), task("?") |- (A --> B), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     * (A --> B), (A --> C), not_equal(A,C), task("?") |- (B --> C), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
+     * (A --> C), (B --> C), not_equal(A,C), task("?") |- (A --> B), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
      * so each premise gets exchanged with the conclusion in order to form a own rule,
      * additionally task("?") is added to ensure that the derived rule is only used in backward inference.
      */
@@ -1185,7 +1184,7 @@ public class PremiseRule extends GenericCompound {
      * supply to the consumer
      * <p>
      * 2. Deriving of forward inference rule by swapping the premises since !s.contains("task(") && !s.contains("after(") && !s.contains("measure_time(") && !s.contains("Structural") && !s.contains("Identity") && !s.contains("Negation"):
-     * (B --> C), (A --> B), not_equal(A,C) |- (A --> C), (Truth:Deduction, Desire:Strong, Derive:AllowBackward)
+     * (B --> C), (A --> B), not_equal(A,C) |- (A --> C), (Truth:Deduction, Goal:Strong, Derive:AllowBackward)
      * <p>
      * after generating, these are then backward permuted
      */

@@ -3,6 +3,7 @@ package spacegraph.widget.meter;
 import com.jogamp.opengl.GL2;
 import jcog.math.FloatSupplier;
 import jcog.tensor.ArrayTensor;
+import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import spacegraph.render.Draw;
 import spacegraph.widget.Widget;
 
@@ -80,7 +81,7 @@ public class MatrixView extends Widget {
         this.view = view != null ? view : ((ViewFunction2D) this);
     }
 
-    static final ViewFunction1D bipolar1 = (x, gl) -> {
+    public static final ViewFunction1D bipolar1 = (x, gl) -> {
         Draw.colorBipolar(gl, x);
         return 0;
     };
@@ -90,7 +91,7 @@ public class MatrixView extends Widget {
     };
 
     public MatrixView(float[] d, boolean bipolar) {
-        this(d, 1, bipolar ? bipolar1 : unipolar1 );
+        this(d, 1, bipolar ? bipolar1 : unipolar1);
     }
 
     public MatrixView(float[] d, int stride, ViewFunction1D view) {
@@ -98,6 +99,16 @@ public class MatrixView extends Widget {
             int i = y * stride + x;
             if (i < d.length)
                 return view.update(d[i], gl);
+            else
+                return Float.NaN;
+        });
+    }
+
+    public MatrixView(IntToFloatFunction d, int len, int stride, ViewFunction1D view) {
+        this((int) Math.floor(((float) len) / stride), stride, (x, y, gl) -> {
+            int i = y * stride + x;
+            if (i < len)
+                return view.update(d.valueOf(i), gl);
             else
                 return Float.NaN;
         });

@@ -3,14 +3,15 @@ package nars.derive.meta;
 import com.google.common.collect.Lists;
 import nars.Op;
 import nars.control.premise.Derivation;
+import nars.derive.meta.constraint.MatchConstraint;
+import nars.derive.meta.op.MatchOneSubtermPrototype;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermVector;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by me on 12/31/15.
@@ -28,6 +29,50 @@ public final class AndCondition extends GenericCompound implements BoolPred<Deri
         this.termCache = p.toArray(new BoolPred[p.size()]);
         if (termCache.length < 2)
             throw new RuntimeException("unnecessary use of AndCondition");
+    }
+
+
+
+    /**
+     * combine certain types of items in an AND expression
+     */
+    public static List<BoolPred> compile(List<BoolPred> p) {
+        if (p.size() == 1)
+            return p;
+
+        SortedSet<MatchConstraint> constraints = new TreeSet<MatchConstraint>(MatchConstraint.costComparator);
+        Iterator<BoolPred> il = p.iterator();
+        while (il.hasNext()) {
+            BoolPred c = il.next();
+            if (c instanceof MatchConstraint) {
+                constraints.add((MatchConstraint) c);
+                il.remove();
+            }
+        }
+
+
+        if (!constraints.isEmpty()) {
+
+
+            int iMatchTerm = -1; //first index of a MatchTerm op, if any
+            for (int j = 0, cccSize = p.size(); j < cccSize; j++) {
+                BoolPred c = p.get(j);
+                if ((c instanceof MatchOneSubtermPrototype || c instanceof Fork) && iMatchTerm == -1) {
+                    iMatchTerm = j;
+                }
+            }
+            if (iMatchTerm == -1)
+                iMatchTerm = p.size();
+
+            //1. sort the constraints and add them at the end
+            int c = constraints.size();
+            if (c > 1) {
+                p.add(iMatchTerm, new MatchConstraint.CompoundConstraint(constraints.toArray(new MatchConstraint[c])));
+            } else
+                p.add(iMatchTerm, constraints.iterator().next()); //just add the singleton at the end
+        }
+
+        return p;
     }
 
 

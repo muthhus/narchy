@@ -130,9 +130,9 @@ public class PostCondition implements Serializable //since there can be multiple
 
                 case "Permute":
                     if (which.equals(PostCondition.backward)) {
-                        rule.allowBackward = true;
+                        rule.permuteBackward = true;
                     } else if (which.equals(PostCondition.swap)) {
-                        rule.allowForward = true;
+                        rule.permuteForward = true;
                     } else
                         throw new RuntimeException("illegal Permute opcode: " + which);
                     break;

@@ -8,7 +8,6 @@ import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
-import nars.index.term.PatternTermIndex;
 import nars.term.Term;
 import nars.term.compound.ProxyCompound;
 import org.jetbrains.annotations.NotNull;
@@ -32,14 +31,14 @@ public class MatchTaskBelief extends ProxyCompound implements BoolPred<Derivatio
 //    public final Term term;
 
 
-    public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
+    public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull SortedSet<MatchConstraint> constraints) {
         super( $.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ) );
 
         List<BoolPred> pre = $.newArrayList();
 
         List<BoolPred> post = $.newArrayList();
 
-        compile(taskPattern, beliefPattern, pre, post, index, constraints);
+        compile(taskPattern, beliefPattern, pre, post, constraints);
 
         this.pre = pre;
         this.constraints = constraints; //sorted, at the end of the preMatch
@@ -77,7 +76,7 @@ public class MatchTaskBelief extends ProxyCompound implements BoolPred<Derivatio
 
     private static void compile(@NotNull Term task, @NotNull Term belief,
                                 @NotNull List<BoolPred> pre, @NotNull List<BoolPred> code,
-                                @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
+                                @NotNull SortedSet<MatchConstraint> constraints) {
 
         //BoolPredicate preGuard = null;
 
@@ -120,13 +119,13 @@ public class MatchTaskBelief extends ProxyCompound implements BoolPred<Derivatio
 //            pre.add(preGuard);
 
         //default case: exhaustively match both, with appropriate pruning guard preconditions
-        compileTaskBelief(pre, code, task, belief, index, constraints);
+        compileTaskBelief(pre, code, task, belief, constraints);
 
 
     }
 
     private static void compileTaskBelief(@NotNull List<BoolPred> pre,
-                                          @NotNull List<BoolPred> code, @Nullable Term task, @Nullable Term belief, @NotNull PatternTermIndex index, @NotNull SortedSet<MatchConstraint> constraints) {
+                                          @NotNull List<BoolPred> code, @Nullable Term task, @Nullable Term belief, @NotNull SortedSet<MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 
@@ -169,20 +168,20 @@ public class MatchTaskBelief extends ProxyCompound implements BoolPred<Derivatio
 
             if (taskFirst(task, belief)) {
                 //task first
-                code.add(new MatchOneSubtermPrototype(task, 0, false, index));
-                code.add(new MatchOneSubtermPrototype(belief, 1, true, index));
+                code.add(new MatchOneSubtermPrototype(task, 0, false));
+                code.add(new MatchOneSubtermPrototype(belief, 1, true));
             } else {
                 //belief first
-                code.add(new MatchOneSubtermPrototype(belief, 1, false, index));
-                code.add(new MatchOneSubtermPrototype(task, 0, true, index));
+                code.add(new MatchOneSubtermPrototype(belief, 1, false));
+                code.add(new MatchOneSubtermPrototype(task, 0, true));
             }
 
         } else if (belief!=null) {
             //match belief only
-            code.add(new MatchOneSubtermPrototype(belief, 1, true, index));
+            code.add(new MatchOneSubtermPrototype(belief, 1, true));
         } else if (task!=null) {
             //match task only
-            code.add(new MatchOneSubtermPrototype(task, 0, true, index));
+            code.add(new MatchOneSubtermPrototype(task, 0, true));
         } else {
             throw new RuntimeException("invalid");
         }

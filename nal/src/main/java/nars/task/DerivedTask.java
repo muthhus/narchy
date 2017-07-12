@@ -13,10 +13,13 @@ import org.jetbrains.annotations.Nullable;
  */
 public class DerivedTask extends NALTask {
 
+
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Compound tc, byte punct, @Nullable Truth truth, @NotNull Derivation p, long start, long end) {
+    public DerivedTask(@NotNull Compound tc, byte punct, @Nullable Truth truth, @NotNull Derivation p, long start, long end, short rule) {
         super(tc, punct, truth, p.time, start, end, p.concEvidence);
+
+        this.cause = p.cause(rule);
 
 
 //        if (!isBeliefOrGoal() || tc.term().dt()!=DTERNAL) {

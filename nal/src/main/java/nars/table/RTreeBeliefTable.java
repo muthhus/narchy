@@ -341,7 +341,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 for (int i = 0, toActivateSize = toActivate.size(); i < toActivateSize; i++) {
                     Task x = toActivate.get(i);
 
-                    n.input(ConceptFire.activate(x, x.priElseZero(), c));
+                    n.input(ConceptFire.activate(x, x.priElseZero(), c, n));
                 }
 
             } else {

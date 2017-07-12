@@ -327,6 +327,8 @@ public interface Concept extends Termed, Termlike {
     /** can return null if no templates */
     @Nullable TermContainer templates();
 
+
+
     /**
      * Created by me on 9/13/16.
      */
@@ -348,5 +350,9 @@ public interface Concept extends Termed, Termlike {
             return "InvalidConceptTerm: " + term + " (" + term.getClass() + "): " + reason;
         }
 
+    }
+
+    default float value(@NotNull Task t, float activation, NAR n) {
+        return (-t.volume()*activation)/4000f;
     }
 }

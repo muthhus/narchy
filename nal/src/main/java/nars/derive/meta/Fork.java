@@ -2,8 +2,10 @@ package nars.derive.meta;
 
 import nars.control.premise.Derivation;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +22,7 @@ public class Fork extends GenericCompound implements BoolPred<Derivation> {
     public final BoolPred<Derivation>[] cached;
 
     public Fork(@NotNull BoolPred[] actions) {
-        super(CONJ, TermContainer.the(CONJ, DTERNAL, (Term[]) actions));
+        super(CONJ, TermVector.the(Terms.sorted((Term[]) actions)));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
         this.cached = actions;

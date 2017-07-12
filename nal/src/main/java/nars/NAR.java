@@ -17,12 +17,15 @@ import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.conceptualize.state.ConceptState;
+import nars.control.Cause;
 import nars.control.ConceptFire;
 import nars.control.premise.DerivationBudgeting;
 import nars.control.premise.PreferSimpleAndPolarized;
 import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
+import nars.derive.meta.Conclude;
+import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.op.Command;
@@ -127,7 +130,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     @NotNull
     public final PSinks<ITask, CLink<ITask>> in;
 
-    private Deriver deriver;
+    private TrieDeriver deriver;
 
     public final void printConceptStatistics() {
         printConceptStatistics(System.out);
@@ -199,7 +202,23 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         this.in = newInputMixer();
 
         this.level = 8;
-        this.deriver = TrieDeriver.get(DefaultDeriver.rules);
+
+        //this.deriver = new TrieDeriver(DefaultDeriver.rules);
+        this.deriver = new TrieDeriver( PremiseRuleSet.rules(true,
+                        "nal1.nal",
+                        //"nal4.nal",
+                        "nal6.nal",
+                        "misc.nal",
+                        "induction.nal",
+                        "nal2.nal",
+                        "nal3.nal"
+            ) );
+        deriver.forEachConclusion((Conclude x) -> {
+            if (x.cause != null) // a re-used copy from rule permutes? TODO why?
+                return;
+            //assert(x.cause == null);
+            x.cause = newCause(x);
+        });
 
         this.time = time;
 
@@ -212,6 +231,15 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         time.clear();
 
         exe.start(this);
+    }
+
+    public final List<Cause> causes = $.newArrayList(512);
+
+    private Cause newCause(Object x) {
+        short next = (short)causes.size();
+        Cause c = new Cause(next, x);
+        causes.add(c);
+        return c;
     }
 
     protected PSinks<ITask, CLink<ITask>> newInputMixer() {
@@ -893,6 +921,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         time.cycle();
 
         emotion.cycle();
+
+        causes.forEach(c -> c.forget(0.99f));
 
         exe.cycle(this);
     }

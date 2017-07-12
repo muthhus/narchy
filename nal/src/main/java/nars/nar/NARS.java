@@ -184,12 +184,6 @@ public class NARS extends NAR {
         return r;
     }
 
-    @Override
-    public void input(ITask unclassified) {
-        if (unclassified == null)
-            return;
-        super.input(unclassified);
-    }
 
     @Override
     public void input(@NotNull CLink<ITask> partiallyClassified) {

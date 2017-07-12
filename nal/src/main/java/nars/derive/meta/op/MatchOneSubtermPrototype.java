@@ -18,7 +18,7 @@ public final class MatchOneSubtermPrototype extends MatchTermPrototype {
 
     private final boolean finish;
 
-    public MatchOneSubtermPrototype(@NotNull Term x, int subterm, boolean finish, @NotNull PatternTermIndex index) {
+    public MatchOneSubtermPrototype(@NotNull Term x, int subterm, boolean finish) {
         super( $.func(subterm==0 ? "task" : "belief", id(x)), x );
         this.subterm = subterm;
         this.finish = finish;

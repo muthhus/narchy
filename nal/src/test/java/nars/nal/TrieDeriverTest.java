@@ -9,14 +9,14 @@ import org.junit.Test;
  */
 public class TrieDeriverTest {
 
-    final static TrieDeriver d =
-            //(TrieDeriver) Deriver.get("nal1.nal");
-            //(TrieDeriver) DefaultDeriver.the;
-            TrieDeriver.get(DefaultDeriver.rules);
+//    final static TrieDeriver d =
+//            //(TrieDeriver) Deriver.get("nal1.nal");
+//            //(TrieDeriver) DefaultDeriver.the;
+//            new TrieDeriver(DefaultDeriver.rules);
 
     @Test public void printCompiledRuleTree() {
 
-        d.print(System.out);
+        new TrieDeriver(DefaultDeriver.rules).print(System.out);
 
 
     }

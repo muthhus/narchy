@@ -2,6 +2,7 @@ package nars.derive.meta;
 
 import jcog.pri.Priority;
 import nars.*;
+import nars.control.Cause;
 import nars.control.premise.Derivation;
 import nars.derive.rule.PremiseRule;
 import nars.op.DepIndepVarIntroduction;
@@ -9,6 +10,8 @@ import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
+import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
 import nars.time.TimeFunctions;
@@ -20,6 +23,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
@@ -50,21 +55,24 @@ public final class Conclude extends AbstractPred<Derivation> {
 
     public final TruthOperator belief, goal;
 
+    public Cause cause;
 
-    //private final ImmutableSet<Term> uniquePatternVar;
+    /** serial for uniqueness */
+    final static AtomicInteger serial = new AtomicInteger(1);
 
-
-    public Conclude(@NotNull PremiseRule rule, @NotNull PostCondition p,
+    public Conclude(@NotNull PremiseRule rule, @NotNull Term conclusionPattern,
                     @Nullable TruthOperator belief, @Nullable TruthOperator goal,
                     @NotNull TimeFunctions time) {
-        super($.func("derive", p.pattern, $.the("time" + time.toString())));
+        super($.func((Atomic)$.the("derive"), $.the(serial.incrementAndGet()),
+               conclusionPattern, $.the("time" + time.toString())));
 
         this.rule = rule;
+        this.time = time;
 
         this.belief = belief;
         this.goal = goal;
 
-        Term pp = p.pattern;
+        Term pp = conclusionPattern;
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
         Pair<Atomic, Compound> outerFunctor = Op.functor(pp, $.terms, false);
@@ -76,9 +84,6 @@ public final class Conclude extends AbstractPred<Derivation> {
         }
 
         this.conclusionPattern = pp;
-
-        //this.uniquePatternVar = Terms.unique(term, (Term x) -> x.op() == VAR_PATTERN);
-        this.time = time;
 
 
     }
@@ -251,8 +256,8 @@ public final class Conclude extends AbstractPred<Derivation> {
 
                     DerivedTask t =
                             Param.DEBUG ?
-                                    new DebugDerivedTask(C, punc, truth, d, start, end) :
-                                    new DerivedTask(C, punc, truth, d, start, end);
+                                    new DebugDerivedTask(C, punc, truth, d, start, end, cause.id) :
+                                    new DerivedTask(C, punc, truth, d, start, end, cause.id);
 
                     if (t.equals(d.task) || t.equals(d.belief)) {
                         return true; //created a duplicate of the task

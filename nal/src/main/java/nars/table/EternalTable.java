@@ -6,6 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.TaskConcept;
+import nars.control.Cause;
 import nars.task.Revision;
 import nars.task.RevisionTask;
 import nars.term.Compound;
@@ -277,6 +278,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 nar.time(),
                 ETERNAL, ETERNAL);
         r.setPri(BudgetFunctions.fund(1f,false,oldBelief,newBelief));
+        r.cause = Cause.zip(newBelief, oldBelief);
 
         if (Param.DEBUG)
             r.log("Insertion Revision");

@@ -4,6 +4,7 @@ import jcog.math.Interval;
 import nars.$;
 import nars.Param;
 import nars.Task;
+import nars.control.Cause;
 import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
@@ -145,7 +146,8 @@ public class Revision {
                 now, start, end,
                 Stamp.zip(a.stamp(), b.stamp(), aProp) //get a stamp collecting all evidence from the table, since it all contributes to the result
         );
-        t.setPri(a.priSafe(0) + b.priSafe(0));
+        t.setPri(a.priElseZero() + b.priElseZero());
+        t.cause = Cause.zip(a, b);
         //t.log("Revection Merge");
         return t;
     }

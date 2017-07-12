@@ -158,8 +158,8 @@ public class Premise  {
         Derivation d = derivation.get();
 
         d.restartA(nar, now, dur);
-        d.restartB(task);
-        d.restartC(this, belief, beliefTerm, parentTaskPri,
+
+        d.restartB(this, task, belief, beliefTerm, parentTaskPri,
                 //Util.lerp(parentTaskPri, Param.UnificationTTLMin, Param.UnificationTTLMax)
                 ttlMax
         );

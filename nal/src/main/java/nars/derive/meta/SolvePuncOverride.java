@@ -5,6 +5,8 @@ import nars.term.Compound;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.function.Supplier;
+
 /**
  * Created by me on 5/26/16.
  */

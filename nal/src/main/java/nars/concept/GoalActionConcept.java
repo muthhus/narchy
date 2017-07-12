@@ -17,6 +17,7 @@ import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
+import static nars.time.Tense.ETERNAL;
 
 
 /**
@@ -153,7 +154,8 @@ public class GoalActionConcept extends ActionConcept {
     }
 
 
-//    Truth[] linkTruth(long when, long now, float minConf) {
+
+    //    Truth[] linkTruth(long when, long now, float minConf) {
 //        List<Truth> belief = $.newArrayList(0);
 //        List<Truth> goal = $.newArrayList(0);
 //

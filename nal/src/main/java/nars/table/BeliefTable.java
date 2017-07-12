@@ -4,6 +4,7 @@ import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
+import nars.control.Cause;
 import nars.task.AnswerTask;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -231,7 +232,8 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                         answer,
                         question,
                         aProj, now, when, when, 0.5f);
-                a.setPri(answer.priSafe(0));
+                a.setPri(answer.priElseZero());
+                a.cause = Cause.zip(question, answer);
 
                 //            if (Param.DEBUG)
                 //                a.log("Answer Projected");

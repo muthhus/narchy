@@ -7,11 +7,13 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
+import nars.control.Cause;
 import nars.term.Compound;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,6 +68,10 @@ public final class DynTruth implements Truthed {
         //return e == null ? null :
         return Stamp.zip(e);
     }
+    @Nullable
+    public short[] cause() {
+        return e != null ? Cause.zip(e) : ArrayUtils.EMPTY_SHORT_ARRAY;
+    }
 
     @Override
     @Nullable
@@ -118,6 +124,7 @@ public final class DynTruth implements Truthed {
 
         DynamicBeliefTask dyn = new DynamicBeliefTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, cre, start, end /*+ dur*/, evidence());
+        dyn.cause = cause();
         dyn.setPri(priority);
 
         //        if (srcCopy == null) {

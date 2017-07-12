@@ -8,6 +8,7 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,12 @@ public class NALTask extends Pri implements Task {
     public final DiscreteTruth truth;
     public final byte punc;
     private final long creation, start, end;
+
     public final long[] stamp;
+
+    /** TODO final */
+    public short[] cause = ArrayUtils.EMPTY_SHORT_ARRAY;
+
     final int hash;
 
     public Map meta;
@@ -41,6 +47,7 @@ public class NALTask extends Pri implements Task {
             if (truth == null)
                 throw new InvalidTaskException(term, "null truth");
         }
+
 
 //        //special case: simplify repeating conjunction of events
 //        if (term.op() == CONJ) {
@@ -177,6 +184,10 @@ public class NALTask extends Pri implements Task {
         return stamp;
     }
 
+    @Override
+    public short[] cause() {
+        return cause;
+    }
 
     @Override
     public boolean delete() {

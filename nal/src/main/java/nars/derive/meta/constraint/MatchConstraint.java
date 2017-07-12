@@ -10,6 +10,8 @@ import nars.term.subst.Unify;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Comparator;
+
 
 public abstract class MatchConstraint extends ProxyCompound implements BoolPred<Derivation> {
 
@@ -20,7 +22,9 @@ public abstract class MatchConstraint extends ProxyCompound implements BoolPred<
         this.target = target;
     }
 
-    /** cost of testing this, for sorting. higher value will be tested later than lower */
+    /**
+     * cost of testing this, for sorting. higher value will be tested later than lower
+     */
     public int cost() {
         return 0;
     }
@@ -31,13 +35,20 @@ public abstract class MatchConstraint extends ProxyCompound implements BoolPred<
         return p.addConstraint(this);
     }
 
+
+    public static final Comparator<MatchConstraint> costComparator = (a, b) -> {
+        if (a.equals(b)) return 0;
+        int i = Integer.compare(a.cost(), b.cost());
+        return i == 0 ? a.compareTo(b) : i;
+    };
+
     public static class CompoundConstraint extends AbstractPred<Derivation> {
 
 
         private final MatchConstraint[] cache;
 
         public CompoundConstraint(MatchConstraint[] c) {
-            super($.func("MatchConstraint", c ));
+            super($.func("MatchConstraint", c));
             this.cache = c;
         }
 

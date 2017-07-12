@@ -32,7 +32,7 @@ public interface TaskTable  {
             TaskConcept cc = t.concept(n, true);
             if (cc!=null) {
 
-                n.input(ConceptFire.activate(t, activation, cc));
+                n.input(ConceptFire.activate(t, activation, cc, n));
 //                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
 //                n.input(a);
             }

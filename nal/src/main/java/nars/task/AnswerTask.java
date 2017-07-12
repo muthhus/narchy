@@ -15,8 +15,9 @@ public class AnswerTask extends NALTask {
 //    @Nullable
 //    protected Task aBelief, bBelief;
 
-    public AnswerTask(@NotNull Compound term, byte punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
+    AnswerTask(@NotNull Compound term, byte punc, Truth conclusion, long creationTime, long start, long end, long[] evidence) {
         super(term, punc, conclusion, creationTime, start, end, evidence);
+
     }
 
     public AnswerTask(@NotNull Compound term, @NotNull Task aBelief, @NotNull Task bBelief, Truth conclusion, long creationTime, long start, long end, float evidenceBalance) {

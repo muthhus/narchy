@@ -44,7 +44,7 @@ public class ConceptFireTest {
             }
         };
 
-        for (int i = 0; i < 100; i++)
+        for (int i = 0; i < 200; i++)
             cf.run(nar);
 
         s.forEachWithOccurrences((x,o)->{

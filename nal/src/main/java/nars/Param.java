@@ -20,8 +20,9 @@ public abstract class Param  {
 //    /** belief projection lookahead time in premise formation, in multiples of duration */
 //    public static final int PREDICTION_HORIZON = 4;
 
-    /** max durations in time difference between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
-    public static final int ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS = 2;
+    /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
+    public static final int ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS = 1;
+
 
     /**
      * use this for advanced error checking, at the expense of lower performance.
@@ -88,6 +89,7 @@ public abstract class Param  {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
+    public static final int CAUSE_CAPACITY = 5;
 
     public final static int UnificationStackMax = 32;
     public static final int UnificationConstraintsMax = 6;
