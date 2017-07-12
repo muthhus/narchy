@@ -1,11 +1,14 @@
 package nars.term;
 
 import nars.Op;
+import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** has, or is associated with a specific term */
 public interface Termed<T extends Term> /* TODO finish implementing: extends Termlike */ {
+
+
 
     @NotNull T term();
 
@@ -49,4 +52,5 @@ public interface Termed<T extends Term> /* TODO finish implementing: extends Ter
         return term().unneg();
     }
 
+    Termed[] EmptyArray = new Termed[0];
 }

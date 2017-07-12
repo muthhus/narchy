@@ -37,8 +37,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     static final int TASKLINKS_SAMPLED = maxSamples * 3;
     static final int TERMLINKS_SAMPLED = maxSamples * 3;
-    private Termed[] templateConcepts;
-    private int templateConceptsCount;
+    private Termed[] templates;
 
     //private static final float priMinAbsolute = Pri.EPSILON * 1;
     //private static final float momentum = 0.75f;
@@ -142,34 +141,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         ));
 
 
-        if (templateConcepts == null) {
-            TermContainer ctpl = id.templates();
-            if (ctpl != null) {
-                Set<Termed> tc = new UnifiedSet(id.term().size());
-                Consumer<Term> templatize = x -> {
-                    Concept c = nar.conceptualize(x);
-                    tc.add(c!=null ? c : x.unneg());
-                };
-                ctpl.forEach(templatize);
-
-                //HACK one extra layer
-                ctpl.forEach(x -> {
-                   if (x instanceof Compound) {
-                       ((Compound)x).forEach(templatize);
-                   }
-                });
-
-                this.templateConcepts = tc.toArray(new Termed[templateConceptsCount = tc.size()]);
-            } else {
-
-                //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
-
-//                templateConcepts = Concept.EmptyArray;
-//                templateConceptsCount = 0;
-                this.templateConcepts = Concept.EmptyArray;
-
-            }
+        if (this.templates == null) {
+            this.templates = templates(id, nar);
         }
+
+        int templateConceptsCount = templates.length;
 
         float totalActivation = 0;//tasklink activation
         int penalty = UnificationTTLMax / 2;
@@ -197,9 +173,9 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             if (templateConceptsCount > 0) {
                 float tfaEach = tfa / templateConceptsCount;
                 if (tfaEach >= Pri.EPSILON) {
-                    for (Termed c : templateConcepts)
+                    for (Termed c : templates)
                         if (c instanceof Concept)
-                            ((Concept)c).tasklinks().putAsync(new PLinkUntilDeleted(txx, tfaEach));
+                            ((Concept) c).tasklinks().putAsync(new PLinkUntilDeleted(txx, tfaEach));
                 }
             }
 
@@ -225,12 +201,12 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             float eachActivation = (/*priElseZero() **/ totalActivation) / templateConceptsCount;
             if (eachActivation >= Pri.EPSILON) {
                 float momentum = 0.5f;
-                for (Termed c : templateConcepts) {
+                for (Termed c : templates) {
 
 
                     boolean concept = c instanceof Concept;
                     if (concept) {
-                        Concept cc = (Concept)c;
+                        Concept cc = (Concept) c;
                         cc.termlinks().putAsync(new PLink(id, eachActivation * momentum));
                         nar.input(new ConceptFire(cc, eachActivation));
                     }
@@ -276,6 +252,39 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //        }
     }
 
+    public static Termed[] templates(Concept id, NAR nar) {
+        TermContainer ctpl = id.templates();
+        if (ctpl != null) {
+            Set<Termed> tc = new UnifiedSet(id.volume() /* estimate */);
+            templates(tc, ctpl, nar, layers(id));
+            return tc.toArray(new Termed[tc.size()]);
+        } else {
+
+            //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
+
+//                templateConcepts = Concept.EmptyArray;
+//                templateConceptsCount = 0;
+            return Termed.EmptyArray;
+        }
+    }
+
+    private static void templates(Set<Termed> tc, TermContainer ctpl, NAR nar, int layersRemain) {
+
+        int cs = ctpl.size();
+        for (int i = 0; i < cs; i++) {
+            Term x = ctpl.sub(i);
+            @Nullable Concept c = nar.conceptualize(x);
+            if (c!=null) {
+                tc.add(c);
+                if (layersRemain > 0 && c instanceof Compound) {
+                    templates(tc, c.templates(), nar, layersRemain-1);
+                }
+            } else {
+                tc.add(x.unneg()); //variable or other non-concept term
+            }
+        }
+    }
+
     protected int run(NAR nar, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
         Premise p = new Premise(tasklink, termlink, x);
         return p.run(nar, ttlPerPremise);
@@ -285,6 +294,53 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     @Override
     public final Term term() {
         return id.term();
+    }
+
+    static int layers(@NotNull Termed host) {
+        switch (host.op()) {
+
+            case PROD:
+
+            case SETe:
+            case SETi:
+
+//            case IMGe:
+//            case IMGi:
+//                return 1;
+
+            case DIFFe:
+            case DIFFi:
+            case SECTi:
+            case SECTe:
+                return 1;
+
+            case SIM:
+                return 2;
+
+            case INH:
+                return 3;
+
+            case EQUI:
+                return 3;
+
+            case IMPL:
+                return 3;
+
+            case CONJ:
+                return 3;
+
+//                int s = host.size();
+//                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
+//                    int vars = host.vars();
+//                    return (vars > 0) ? 3 : 2;
+//                } else {
+//                    return 2;
+//                    //return (vars > 0) ? 2 : 1; //prevent long conjunctions from creating excessive templates
+//                }
+
+            default:
+                throw new UnsupportedOperationException("unhandled operator type: " + host.op());
+        }
     }
 
 }

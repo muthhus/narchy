@@ -97,10 +97,10 @@ public class Arkancide extends NAgentX {
         };
 
 
-        maxPaddleSpeed = 40 * noid.BALL_VELOCITY;
+        maxPaddleSpeed = 20 * noid.BALL_VELOCITY;
 
-        float resX = 0.02f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
-        float resY = 0.02f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
+        float resX = 0.01f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
+        float resY = 0.01f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
 
@@ -117,7 +117,7 @@ public class Arkancide extends NAgentX {
 
         if (numeric) {
             SensorConcept a = senseNumber("noid:px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            SensorConcept ab = senseNumber("noid:dx", (() -> Math.sqrt /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth())));
+            SensorConcept ab = senseNumber("noid:dx", (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth())));
             SensorConcept b = senseNumber("noid:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
             SensorConcept c = senseNumber("noid:by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
             //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX)).resolution(0.25f);

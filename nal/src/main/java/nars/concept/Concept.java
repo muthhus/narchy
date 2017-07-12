@@ -30,6 +30,7 @@ import nars.table.QuestionTable;
 import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import nars.util.SoftException;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
@@ -44,7 +45,7 @@ import java.util.function.Supplier;
 
 import static nars.Op.*;
 
-public interface Concept extends Termed {
+public interface Concept extends Termed, Termlike {
 
 
 
