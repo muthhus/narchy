@@ -76,11 +76,9 @@ public class PremiseRule extends GenericCompound {
 
     public String source;
 
-    public
-    @Nullable
-    MatchTaskBelief match;
+    @Nullable public MatchTaskBelief match;
 
-    private @Nullable TimeFunctions timeFunction = TimeFunctions.Auto;
+    @Nullable private TimeFunctions timeFunction = TimeFunctions.Auto;
 
     /**
      * unless time(raw), projected belief truth will be used by default

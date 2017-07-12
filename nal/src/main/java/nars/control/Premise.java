@@ -15,6 +15,7 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.control.premise.Derivation;
 import nars.derive.DefaultDeriver;
+import nars.derive.Deriver;
 import nars.table.BeliefTable;
 import nars.task.DerivedTask;
 import nars.term.Compound;
@@ -39,7 +40,7 @@ import static nars.time.Tense.ETERNAL;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise extends Pri {
+public class Premise  {
 
     final PriReference<Task> taskLink;
     final PriReference<Term> termLink;
@@ -50,7 +51,6 @@ public class Premise extends Pri {
     transient private final Consumer<DerivedTask> target;
 
     public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> target) {
-        super(0);
         this.taskLink = tasklink;
         this.termLink = termlink;
         this.target = target;
@@ -79,9 +79,12 @@ public class Premise extends Pri {
         Task task = taskLink.get();
         float taskPri = task.priElseZero();
 
+        int dur = nar.dur();
+        long now = nar.time();
+
+
         Term beliefTerm = termLink.get();
         Task belief = null;
-
         if (beliefTerm instanceof Compound) {
 
             Compound taskTerm = task.term();
@@ -109,10 +112,8 @@ public class Premise extends Pri {
                                 beliefConcept.goals() :
                                 beliefConcept.beliefs();
 
-                int dur = nar.dur();
 
                 Task match;
-                long now = nar.time();
 
                 if (task.isQuestOrQuestion()) {
                     long when = whenAnswer(task, now);
@@ -154,11 +155,9 @@ public class Premise extends Pri {
                 or
                         (taskPri, beliefPriority);
 
-        //priMult(parentTaskPri);
-
         Derivation d = derivation.get();
 
-        d.restartA(nar);
+        d.restartA(nar, now, dur);
         d.restartB(task);
         d.restartC(this, belief, beliefTerm, parentTaskPri,
                 //Util.lerp(parentTaskPri, Param.UnificationTTLMin, Param.UnificationTTLMax)
@@ -166,20 +165,17 @@ public class Premise extends Pri {
         );
 
 
-        DefaultDeriver.the.test(d);
+        nar.deriver().test(d);
         int ttlAfter = d.ttl();
 
         return ttlMax - ttlAfter;
 
-//        ITask[] r = d.flush(parentTaskPri);
-////
-//        return r;
     }
 
     /**
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
-    protected static long whenMatch(Task task, long now) {
+    static long whenMatch(Task task, long now) {
         if (task.isEternal()) {
             return ETERNAL;
         } else //if (task.isInput()) {

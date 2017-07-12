@@ -137,13 +137,13 @@ public class Derivation extends Unify implements TermContext {
 
     /** concept-scope
      * @param n*/
-    @NotNull public void restartA(NAR n) {
+    @NotNull public void restartA(NAR n, long when, int dur) {
         this.nar = n;
         this.terms = n.terms;
         this.budgeting = n.budgeting;
         this.random = n.random();
-        this.time = nar.time();
-        this.dur = nar.dur();
+        this.time = when;
+        this.dur = dur;
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
     }

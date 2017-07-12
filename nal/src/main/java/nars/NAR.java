@@ -20,6 +20,9 @@ import nars.conceptualize.state.ConceptState;
 import nars.control.ConceptFire;
 import nars.control.premise.DerivationBudgeting;
 import nars.control.premise.PreferSimpleAndPolarized;
+import nars.derive.DefaultDeriver;
+import nars.derive.Deriver;
+import nars.derive.TrieDeriver;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.op.Command;
@@ -124,6 +127,8 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     @NotNull
     public final PSinks<ITask, CLink<ITask>> in;
 
+    private Deriver deriver;
+
     public final void printConceptStatistics() {
         printConceptStatistics(System.out);
     }
@@ -194,6 +199,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         this.in = newInputMixer();
 
         this.level = 8;
+        this.deriver = TrieDeriver.get(DefaultDeriver.rules);
 
         this.time = time;
 
@@ -1574,4 +1580,9 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         return ((BeliefTable) concept.table(punc)).match(when, null, null, false, this);
     }
+
+    public Deriver deriver() {
+        return deriver;
+    }
+
 }

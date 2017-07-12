@@ -6,8 +6,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.derive.DefaultDeriver;
-import nars.derive.Deriver;
 import nars.index.term.map.MapTermIndex;
 import nars.nar.NARBuilder;
 import nars.time.RealTime;
@@ -26,10 +24,6 @@ import static org.junit.Assert.assertTrue;
  * Created by me on 7/8/16.
  */
 public class InterNARTest {
-
-    static {
-        Deriver x = DefaultDeriver.the;
-    }
 
     void testAB(BiConsumer<NAR, NAR> beforeConnect, BiConsumer<InterNAR, InterNAR> afterConnect) {
 

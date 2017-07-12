@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import static nars.$.$;
 import static nars.Op.QUESTION;
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.*;
 
 /**
@@ -45,21 +46,21 @@ public class DynamicBeliefTableTest {
         n.believe("x:b", 1f, 0.9f);
         n.believe("y:b", 1f, 0.9f);
         n.believe("z:b", 0f, 0.9f);
-        n.run(1);
-        long now = n.time();
-        int dur = n.dur();
-        assertTrue(n.conceptualize($("((x|y)-->a)")).beliefs() instanceof DynamicBeliefTable);
-        assertEquals($.t(1f,0.81f), n.beliefTruth("((x|y)-->a)", now));
-        assertEquals($.t(0f,0.81f), n.beliefTruth(n.conceptualize($("((x|z)-->a)")), now));
-        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("((x&z)-->a)")), now));
-        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("(b --> (x|y))")), now));
-        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("(b --> (x|z))")), now));
-        assertEquals($.t(0f,0.81f), n.beliefTruth(n.conceptualize($("(b --> (x&z))")), now));
+        n.run(2);
+        for (long now : new long[] { 0, n.time() /* 2 */, ETERNAL }) {
+            assertTrue(n.conceptualize($("((x|y)-->a)")).beliefs() instanceof DynamicBeliefTable);
+            assertEquals($.t(1f, 0.81f), n.beliefTruth("((x|y)-->a)", now));
+            assertEquals($.t(0f, 0.81f), n.beliefTruth(n.conceptualize($("((x|z)-->a)")), now));
+            assertEquals($.t(1f, 0.81f), n.beliefTruth(n.conceptualize($("((x&z)-->a)")), now));
+            assertEquals($.t(1f, 0.81f), n.beliefTruth(n.conceptualize($("(b --> (x|y))")), now));
+            assertEquals($.t(1f, 0.81f), n.beliefTruth(n.conceptualize($("(b --> (x|z))")), now));
+            assertEquals($.t(0f, 0.81f), n.beliefTruth(n.conceptualize($("(b --> (x&z))")), now));
 
-        Concept xIntNegY = n.conceptualize($("((x|(--,y))-->a)"));
-        assertTrue(xIntNegY instanceof DynamicConcept);
-        assertEquals($.t(0f,0.81f), n.beliefTruth(xIntNegY, now));
-        assertEquals($.t(1f,0.81f), n.beliefTruth(n.conceptualize($("((x|(--,z))-->a)")), now));
+            Concept xIntNegY = n.conceptualize($("((x|(--,y))-->a)"));
+            assertTrue(xIntNegY instanceof DynamicConcept);
+            assertEquals($.t(0f, 0.81f), n.beliefTruth(xIntNegY, now));
+            assertEquals($.t(1f, 0.81f), n.beliefTruth(n.conceptualize($("((x|(--,z))-->a)")), now));
+        }
     }
 
     @Test

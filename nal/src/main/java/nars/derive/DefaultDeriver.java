@@ -1,5 +1,7 @@
 package nars.derive;
 
+import nars.derive.rule.PremiseRuleSet;
+
 /**
  * implementation of a simple distributor of derivation across rulesets
  *
@@ -19,8 +21,8 @@ package nars.derive;
  */
 public class DefaultDeriver  {
 
-    public static final Deriver the =
-              (TrieDeriver) Deriver.get(
+    public static final PremiseRuleSet rules =
+            PremiseRuleSet.rules(true,
                         "nal1.nal",
                         //"nal4.nal",
                         "nal6.nal",
@@ -28,7 +30,11 @@ public class DefaultDeriver  {
                         "induction.nal",
                         "nal2.nal",
                         "nal3.nal"
-                );
+            );
+
+//    public static final Deriver the =
+//              (TrieDeriver) Deriver.get(
+//                );
 
 //            //new DefaultDeriver();
 //

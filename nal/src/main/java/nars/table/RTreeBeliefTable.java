@@ -9,8 +9,8 @@ import jcog.util.Top2;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.attention.Activate;
 import nars.concept.TaskConcept;
+import nars.control.ConceptFire;
 import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.Tasked;
@@ -341,7 +341,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 for (int i = 0, toActivateSize = toActivate.size(); i < toActivateSize; i++) {
                     Task x = toActivate.get(i);
 
-                    n.input(Activate.activate(x, x.priElseZero(), c));
+                    n.input(ConceptFire.activate(x, x.priElseZero(), c));
                 }
 
             } else {

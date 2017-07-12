@@ -16,7 +16,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,12 +52,24 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     }
 
 
-    final static FloatFunction<? super PriReference> linearPri = (p) -> {
-        return Math.max(p.priElseZero(), Pri.EPSILON);
-    };
-    final static FloatFunction<? super PriReference> softMaxPri = (p) -> {
-        return (float) exp(p.priElseZero() * 3 /* / temperature */);
-    };
+    public static ConceptFire activate(@NotNull Task t, float activation, Concept origin) {
+
+        if (activation >= EPSILON) {
+            origin.tasklinks().putAsync(new PLinkUntilDeleted<>(t, activation));
+
+//            if (origin instanceof CompoundConcept) {
+//
+//                //return new ConceptFire(origin, activation, new ActivateSubterms(t, activation));
+//                return new ConceptFire(origin, activation);
+//            } else {
+//                //atomic activation)
+                return new ConceptFire(origin, activation); /*, () -> {
+
+                }*/
+//            }
+        }
+        return null;
+    }
 
     @Override
     public ITask[] run(NAR nar) {
@@ -83,7 +94,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
             return null;
         }
-        DecideRoulette<PriReference<Task>> taskl = new DecideRoulette(linearPri);
+
+        DecideRoulette<PriReference<Task>> taskl = new DecideRoulette(DecideRoulette.linearPri);
         tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
@@ -91,7 +103,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         }
 
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
-        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(linearPri);
+        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(DecideRoulette.linearPri);
         termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
         if (terml.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_termlinks_selected");

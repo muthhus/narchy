@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
  */
 public class TrieDeriver implements Deriver {
 
-    public final PremiseRuleSet rules;
     private BoolPred<Derivation> pred;
 
 
@@ -77,7 +76,6 @@ public class TrieDeriver implements Deriver {
 
     public TrieDeriver(BoolPred... root) {
         this.pred = Fork.compile(root);
-        this.rules = null;
     }
 
     @Override

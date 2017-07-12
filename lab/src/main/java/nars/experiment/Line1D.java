@@ -9,7 +9,6 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.derive.DefaultDeriver;
 import nars.gui.Vis;
 import nars.nar.NARBuilder;
 import nars.op.stm.STMTemporalLinkage;
@@ -109,7 +108,6 @@ public class Line1D {
         public static void main(String[] args) {
 
             Param.ANSWER_REPORTING = false;
-            Object d = DefaultDeriver.the;
 
             int maxIterations = 1024;
             int repeats = 2;

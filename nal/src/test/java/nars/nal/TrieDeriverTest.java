@@ -11,7 +11,8 @@ public class TrieDeriverTest {
 
     final static TrieDeriver d =
             //(TrieDeriver) Deriver.get("nal1.nal");
-            (TrieDeriver) DefaultDeriver.the;
+            //(TrieDeriver) DefaultDeriver.the;
+            TrieDeriver.get(DefaultDeriver.rules);
 
     @Test public void printCompiledRuleTree() {
 

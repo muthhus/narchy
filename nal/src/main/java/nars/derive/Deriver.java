@@ -29,10 +29,11 @@ public interface Deriver extends Predicate<Derivation> {
 //    Cache<String, Deriver> derivers = Caffeine.newBuilder().build();
 //    Function<String,Deriver> loader = (s) -> new TrieDeriver(PremiseRuleSet.rules(s));
 
-    @NotNull
-    static Deriver get(String... path) {
-        return TrieDeriver.get(PremiseRuleSet.rules(true, path));
-    }
+//    @NotNull
+//    static Deriver get(String... path) {
+//        PremiseRuleSet rules = PremiseRuleSet.rules(true, path);
+//        return TrieDeriver.get(rules);
+//    }
 
 
 

@@ -3,8 +3,8 @@ package nars.table;
 import jcog.pri.Pri;
 import nars.NAR;
 import nars.Task;
-import nars.attention.Activate;
 import nars.concept.TaskConcept;
+import nars.control.ConceptFire;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -32,7 +32,7 @@ public interface TaskTable  {
             TaskConcept cc = t.concept(n, true);
             if (cc!=null) {
 
-                n.input(Activate.activate(t, activation, cc));
+                n.input(ConceptFire.activate(t, activation, cc));
 //                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
 //                n.input(a);
             }
