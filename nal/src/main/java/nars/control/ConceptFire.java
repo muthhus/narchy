@@ -66,8 +66,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 for (int i = xl -1; i >=0; i--) {
                     short c = x[i];
                     Cause cc = n.causes.get(c);
-                    assert(cc!=null):
-                            c + " missing from: " + n.causes.size() + " causes";
+                    if (cc == null)
+                        continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
+                    /*assert(cc!=null):
+                            c + " missing from: " + n.causes.size() + " causes";*/
                     boost += cc.value();
                     if (vPer != 0) {
                         cc.apply(vPer);

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;
+import static nars.conceptualize.state.ConceptState.Deleted;
 import static nars.table.QuestionTable.Unstored;
 
 /**
@@ -102,19 +103,20 @@ public class TaskConcept extends CompoundConcept {
     public ConceptState state(@NotNull ConceptState p) {
         ConceptState current = this.state;
         if (current != p) {
-            super.state(p);
+            if (super.state(p)!=Deleted) { //dont bother shrinking to zero capacity on delete. potentially supports fast immediate recovery
 
-            int be = p.beliefCap(this, true, true);
-            int bt = p.beliefCap(this, true, false);
+                int be = p.beliefCap(this, true, true);
+                int bt = p.beliefCap(this, true, false);
 
-            int ge = p.beliefCap(this, false, true);
-            int gt = p.beliefCap(this, false, false);
+                int ge = p.beliefCap(this, false, true);
+                int gt = p.beliefCap(this, false, false);
 
-            beliefCapacity(be, bt, ge, gt);
-            questions().capacity(p.questionCap(true));
-            quests().capacity(p.questionCap(false));
+                beliefCapacity(be, bt, ge, gt);
+                questions().capacity(p.questionCap(true));
+                quests().capacity(p.questionCap(false));
+            }
         }
-        return current;
+        return p;
     }
 
 

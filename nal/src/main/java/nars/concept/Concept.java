@@ -142,13 +142,14 @@ public interface Concept extends Termed, Termlike {
 
     default void delete(@NotNull NAR nar) {
 
-        termlinks().clear();
-        tasklinks().clear();
+//        termlinks().clear();
+//        tasklinks().clear();
+//
+//        beliefs().clear();
+//        goals().clear();
+//        questions().clear();
+//        quests().clear();
 
-        beliefs().clear();
-        goals().clear();
-        questions().clear();
-        quests().clear();
 
         state(ConceptState.Deleted);
 

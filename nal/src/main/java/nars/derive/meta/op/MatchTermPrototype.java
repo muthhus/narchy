@@ -1,11 +1,9 @@
 package nars.derive.meta.op;
 
+import com.google.common.collect.Lists;
 import nars.$;
 import nars.control.premise.Derivation;
-import nars.derive.meta.AtomicPred;
-import nars.derive.meta.BoolPred;
-import nars.derive.meta.Conclude;
-import nars.derive.meta.Fork;
+import nars.derive.meta.*;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -84,10 +82,13 @@ abstract public class MatchTermPrototype extends AtomicPred<Derivation> {
                     om = null;
                     break;
                 case 1:
-                    om = conclude.iterator().next();
+                    om = cause(conclude.iterator().next());
                     break;
                 default:
-                    om = Fork.compile(conclude.toArray(new Conclude[conclude.size()]));
+                    om = Fork.compile(
+                        conclude.stream().map(this::cause).toArray(BoolPred[]::new)
+                        //conclude.toArray(new Conclude[conclude.size()])
+                    );
                     break;
             }
 
@@ -99,6 +100,13 @@ abstract public class MatchTermPrototype extends AtomicPred<Derivation> {
         }
 
         return build(this.eachMatch);
+    }
+
+    private BoolPred cause(Conclude c) {
+        return AndCondition.the( Lists.newArrayList(
+            new RegisterCause(),
+            c
+        ) );
     }
 
     @NotNull

@@ -23,6 +23,7 @@ import nars.control.premise.PreferSimpleAndPolarized;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
 import nars.derive.meta.Conclude;
+import nars.derive.meta.op.RegisterCause;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
@@ -214,7 +215,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 "nal3.nal"
         );
         this.deriver = new TrieDeriver(rules);
-        deriver.forEachConclusion((Conclude x) -> {
+        deriver.forEachCause((RegisterCause x) -> {
             if (x.cause != null) // a re-used copy from rule permutes? TODO why?
                 return;
             //assert(x.cause == null);

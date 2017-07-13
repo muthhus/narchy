@@ -315,18 +315,6 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-    @Test public void desiredFeedbackReversedIntoGoalEternal()  {
-        TestNAR tester = test();
-        tester.input("<y --> (/,exe,x,_)>!");
-        tester.mustDesire(55, "exe(x, y)", 1.0f, 0.9f);
-    }
-
-
-    @Ignore @Test public void desiredFeedbackReversedIntoGoalNow()  {
-        TestNAR tester = test();
-        tester.input("<y --> (/,exe,x,_)>! :|:");
-        tester.mustDesire(55, "exe(x, y)", 1.0f, 0.9f, 0);
-    }
 
 
     @Test
@@ -340,35 +328,8 @@ public class NAL8Test extends AbstractNALTest {
 
     }
 
-    @Test public void testExecutionResultConstant() {
-        test()
-            //.log()
-            .input("<z --> (/,exe,x,_)>! :|:")
-            .mustDesire(128, "exe(x, z)", 1.0f, 0.9f, 0);
-    }
 
-    @Test public void testExecutionResult()  {
-        test()
-                
-            .input("<#1 --> (/,exe,x,_)>! :|:")
-            .mustDesire(64, "exe(x, #1)", 1.0f, 0.9f, 0);
 
-        //if (!(tester.nar instanceof SingleStepNAR)) {
-        //tester.nar;
-        //tester.mustBelieve(250, "exe(x, a)", 1.0f, 0.99f, 10);
-        //        tester.mustBelieve(26, "<a --> (/, ^exe, x, _)>",
-        //                exeFunc.getResultFrequency(),
-        //                exeFunc.getResultConfidence(),
-        //                exeFunc.getResultFrequency(),
-        //                exeFunc.getResultConfidence(),
-        //                6);
-//            tester.nar.onEachFrame(n -> {
-//                if (n.time() > 8)
-//                    assertEquals(1, exeCount);
-//            });
-        //}
-
-    }
 
 
 
@@ -1142,8 +1103,7 @@ public class NAL8Test extends AbstractNALTest {
     @Test public void testGoalEquivComponent() {
         test()
                 .input("(happy)!")
-                .input("((happy) <=>+0 ((--,(x))&&(--,(out)))).")
-                //.mustDesire(cycles, "((--,(x))&&(--,(out)))", 1f, 0.81f);
+                .input("((happy) <=>+0 ((--,(x)) &| (--,(out)))).")
                 .mustDesire(cycles, "((--,(x)) &| (--,(out)))", 1f, 0.81f);
     }
     @Test public void testGoalEquivComponentNeg() {

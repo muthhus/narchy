@@ -367,9 +367,10 @@ public class TermTest {
         }
     }
 
+    final NAR n = new Terminal(256);
+
     protected void testTermEquality(@NotNull String s, boolean normalize) throws Narsese.NarseseException {
 
-        NAR n = new Terminal(16);
 
         Term a = n.term(s).term();
 

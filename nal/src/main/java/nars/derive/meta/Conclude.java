@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
@@ -51,16 +52,12 @@ public final class Conclude extends AbstractPred<Derivation> {
 
     public final TruthOperator belief, goal;
 
-    public Cause cause;
-
-    /** serial for uniqueness */
-    //final static AtomicInteger serial = new AtomicInteger(1);
 
     public Conclude(@NotNull PremiseRule rule, @NotNull Term conclusionPattern,
                     @Nullable TruthOperator belief, @Nullable TruthOperator goal,
                     @NotNull TimeFunctions time) {
-        super($.func((Atomic)$.the("derive"),
-               conclusionPattern, $.the("time" + time.toString())));
+        super($.func((Atomic)$.the("conc"),
+               conclusionPattern, $.the(/*"time" + */time.toString())));
 
         this.rule = rule;
         this.time = time;
@@ -250,8 +247,8 @@ public final class Conclude extends AbstractPred<Derivation> {
 
                     DerivedTask t =
                             Param.DEBUG ?
-                                    new DebugDerivedTask(C, punc, truth, d, start, end, cause.id) :
-                                    new DerivedTask(C, punc, truth, d, start, end, cause.id);
+                                    new DebugDerivedTask(C, punc, truth, d, start, end, d.cause.id) :
+                                    new DerivedTask(C, punc, truth, d, start, end, d.cause.id);
 
                     if (t.equals(d.task) || t.equals(d.belief)) {
                         return true; //created a duplicate of the task

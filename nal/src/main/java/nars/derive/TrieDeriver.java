@@ -9,6 +9,7 @@ import nars.derive.meta.*;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.derive.meta.op.MatchTerm;
 import nars.derive.meta.op.MatchTermPrototype;
+import nars.derive.meta.op.RegisterCause;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.term.Term;
@@ -92,18 +93,10 @@ public class TrieDeriver implements Deriver {
 
     }
 
-    public void forEachConclusion(Consumer<Conclude> p) {
-        forEach(pred, (x) -> {
-            if (x instanceof MatchTerm) {
-                @Nullable BoolPred y = (((MatchTerm) x).eachMatch);
-                if (y instanceof Fork) {
-                    ((Fork)y).subterms().forEach(z -> forEach(z, p));
-                    //forEach(, p);
-                } else if (y instanceof Conclude) {
-                    Conclude c = (Conclude)y;
-                    if (c != null)
-                        p.accept(c);
-                }
+    public void forEachCause(Consumer<RegisterCause> p) {
+        forEach(pred, (c) -> {
+            if (c instanceof RegisterCause) {
+                p.accept((RegisterCause) c);
             }
         });
     }
@@ -318,6 +311,8 @@ public class TrieDeriver implements Deriver {
             }
 //            TermTrie.indent(indent);
 //            out.println("}");
+        } else if (p instanceof MatchTerm) {
+            forEach(((MatchTerm) p).eachMatch, out);
         } else {
 
             if (p instanceof MatchTermPrototype)
@@ -326,6 +321,7 @@ public class TrieDeriver implements Deriver {
 
 //            TermTrie.indent(indent);
 //            out.println( /*Util.className(p) + ": " +*/ p);
+
 
         }
 

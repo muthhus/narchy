@@ -19,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static nars.conceptualize.state.ConceptState.Deleted;
+
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
 public class CompoundConcept implements Concept, Compound, Termlike {
 
@@ -35,7 +37,7 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     private @Nullable Map meta;
 
     @NotNull
-    protected transient ConceptState state = ConceptState.Deleted;
+    protected transient ConceptState state = Deleted;
 
 
     /**
@@ -58,7 +60,7 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         this.taskLinks = taskLinks;
 
 
-        this.state = ConceptState.Deleted;
+        this.state = Deleted;
     }
 
     @Override
@@ -149,11 +151,12 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     public ConceptState state(@NotNull ConceptState p) {
         ConceptState current = this.state;
         if (current != p) {
-            this.state = p;
-            termlinks().setCapacity(p.linkCap(this, true));
-            tasklinks().setCapacity(p.linkCap(this, false));
+            if ((this.state = p)!=Deleted) { //dont bother shrinking to zero capacity on delete. potentially supports fast immediate recovery
+                termlinks().setCapacity(p.linkCap(this, true));
+                tasklinks().setCapacity(p.linkCap(this, false));
+            }
         }
-        return current;
+        return p;
     }
 
     @Override

@@ -38,20 +38,20 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     /** creates a new functor from a term name and a lambda */
-    public static Concept f(@NotNull String termAtom, @NotNull Function<TermContainer, Term> f) {
+    public static LambdaFunctor f(@NotNull String termAtom, @NotNull Function<TermContainer, Term> f) {
         return f(fName(termAtom), f);
     }
 
     /** creates a new functor from a term name and a lambda */
-    public static Concept f(@NotNull Atom termAtom, @NotNull Function<TermContainer, Term> f) {
+    public static LambdaFunctor f(@NotNull Atom termAtom, @NotNull Function<TermContainer, Term> f) {
         return new LambdaFunctor(termAtom, f);
     }
 
-    public static Concept f(@NotNull String termAtom, int arityRequired, @NotNull Function<TermContainer, Term> ff) {
+    public static LambdaFunctor f(@NotNull String termAtom, int arityRequired, @NotNull Function<TermContainer, Term> ff) {
         return f(fName(termAtom), arityRequired, ff);
     }
 
-    public static Concept f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<TermContainer, Term> ff) {
+    public static LambdaFunctor f(@NotNull Atom termAtom, int arityRequired, @NotNull Function<TermContainer, Term> ff) {
         return f(termAtom, (tt)->{
             if (tt.size()!=arityRequired)
                 return null;
@@ -62,15 +62,15 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     /** zero argument (void) functor (convenience method) */
-    public static Concept f0(@NotNull Atom termAtom, @NotNull Supplier<Term> ff) {
+    public static LambdaFunctor f0(@NotNull Atom termAtom, @NotNull Supplier<Term> ff) {
         return f(termAtom, 0, (tt)-> ff.get());
     }
 
-    public static Concept f0(@NotNull String termAtom, @NotNull Supplier<Term> ff) {
+    public static LambdaFunctor f0(@NotNull String termAtom, @NotNull Supplier<Term> ff) {
         return f0(fName(termAtom), ff);
     }
 
-    public static Concept f0(@NotNull String termAtom, @NotNull Runnable ff) {
+    public static LambdaFunctor f0(@NotNull String termAtom, @NotNull Runnable ff) {
         return f0(fName(termAtom), ()-> {
             ff.run();
             return null;
@@ -78,14 +78,14 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     /** one argument functor (convenience method) */
-    public static Concept f1(@NotNull Atom termAtom, @NotNull Function<Term, Term> ff) {
+    public static LambdaFunctor f1(@NotNull Atom termAtom, @NotNull Function<Term, Term> ff) {
         return f(termAtom, 1, (tt)-> ff.apply(tt.sub(0)));
     }
 
-    public static <X extends Term> Concept f1(@NotNull String termAtom, @NotNull Function<X, Term> ff) {
+    public static <X extends Term> LambdaFunctor f1(@NotNull String termAtom, @NotNull Function<X, Term> ff) {
         return f1(fName(termAtom), safeFunctor(ff));
     }
-    public static <X extends Term> Concept f1Const(@NotNull String termAtom, @NotNull Function<X, Term> ff) {
+    public static <X extends Term> LambdaFunctor f1Const(@NotNull String termAtom, @NotNull Function<X, Term> ff) {
         return f1(fName(termAtom), safeFunctor(ff));
     }
 
@@ -95,7 +95,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
     /** a functor involving a concept resolved by the 1st argument term */
-    public static Concept f1Concept(@NotNull String termAtom, NAR nar, @NotNull BiFunction<Concept, NAR, Term> ff) {
+    public static LambdaFunctor f1Concept(@NotNull String termAtom, NAR nar, @NotNull BiFunction<Concept, NAR, Term> ff) {
         return f1(fName(termAtom), t -> {
             Concept c = nar.concept(t);
             if (c!=null) {
@@ -108,12 +108,12 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
 
 
     /** two argument functor (convenience method) */
-    public static Concept f2(@NotNull Atom termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
+    public static LambdaFunctor f2(@NotNull Atom termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
         return f(termAtom, 2, (tt)-> ff.apply(tt.sub(0), tt.sub(1)));
     }
 
     /** two argument functor (convenience method) */
-    public static Concept f2(@NotNull String termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
+    public static LambdaFunctor f2(@NotNull String termAtom, @NotNull BiFunction<Term, Term, Term> ff) {
         return f2(fName(termAtom), ff);
     }
 

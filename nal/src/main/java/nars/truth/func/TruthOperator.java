@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +23,7 @@ public interface TruthOperator {
             table.put(Atomic.the(tm.toString() + "PN"), new NegatedBeliefTruth(tm));
             table.put(Atomic.the(tm.toString() + "NN"), new NegatedTruths(tm));
             table.put(Atomic.the(tm.toString() + "NX"), new NegatedTaskTruth(new SwappedTruth(tm)));
+            table.put(Atomic.the(tm.toString() + "Depolarized"), new DepolarizedTruth(tm));
         }
     }
 
@@ -111,6 +113,36 @@ public interface TruthOperator {
 
         @NotNull @Override public final String toString() {
             return o + "PN";
+        }
+
+        @Override public boolean allowOverlap() {  return o.allowOverlap();         }
+
+        @Override public boolean single() {
+            return o.single();
+        }
+    }
+    /** for when a conclusion's subterms have already been negated accordingly, so that conclusion confidence is positive and maximum
+            //TASK      BELIEF      TRUTH
+            //positive  positive    ___PP
+            //positive  negative    ___PN
+            //negative  positive    ___NP
+            //negative  negative    ___NN
+     */
+    final class DepolarizedTruth implements TruthOperator {
+
+        @NotNull private final TruthOperator o;
+
+        public DepolarizedTruth(@NotNull TruthOperator o) {
+            this.o = o;
+        }
+
+        @Override @Nullable public Truth apply(@Nullable Truth T, @Nullable Truth B, NAR m, float minConf) {
+            return ((B == null) || (T == null)) ? null :
+                    o.apply(T.negIf(T.isNegative()), B.negIf(B.isNegative()), m, minConf);
+        }
+
+        @NotNull @Override public final String toString() {
+            return o + "Depolarized";
         }
 
         @Override public boolean allowOverlap() {  return o.allowOverlap();         }

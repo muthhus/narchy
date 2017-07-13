@@ -49,6 +49,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public class PremiseRule extends GenericCompound {
 
+    public static final Atomic Task = Atomic.the("task"), Belief = Atomic.the("belief");
     static final Term TaskAny = $.func("task", Atomic.the("any"));
     static final Term QUESTION_PUNCTUATION = $.inh(Atomic.the("Question"), Atomic.the("Punctuation"));
 
@@ -311,7 +312,6 @@ public class PremiseRule extends GenericCompound {
     public static Solve solve(@NotNull PostCondition p, @NotNull PremiseRule rule,
                               @NotNull TimeFunctions temporalizer, boolean beliefProjected) {
 
-
         byte puncOverride = p.puncOverride;
 
         TruthOperator belief = BeliefFunction.get(p.beliefTruth);
@@ -333,7 +333,7 @@ public class PremiseRule extends GenericCompound {
                 $.the(goalLabel)
         );
         if (puncOverride != 0)
-            args.add($.the("conc" + ((char) puncOverride)));
+            args.add($.quote(/*"conc" +*/ ((char) puncOverride)));
 
         if (!beliefProjected)
             args.add($.the("unproj"));

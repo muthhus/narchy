@@ -15,13 +15,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+import static nars.conceptualize.state.ConceptState.Deleted;
+
 
 public class AtomConcept extends Atom implements Concept {
 
     private final Bag<Term,PriReference<Term>> termLinks;
     private final Bag<Task,PriReference<Task>> taskLinks;
 
-    @NotNull private transient ConceptState state = ConceptState.Deleted;
+    @NotNull private transient ConceptState state = Deleted;
 
     @Nullable
     private Map meta;
@@ -36,7 +38,7 @@ public class AtomConcept extends Atom implements Concept {
         this.termLinks = termLinks;
         this.taskLinks = taskLinks;
 
-        this.state = ConceptState.Deleted;
+        this.state = Deleted;
     }
 
     @Override
@@ -59,11 +61,12 @@ public class AtomConcept extends Atom implements Concept {
     public ConceptState state(@NotNull ConceptState p) {
         ConceptState current = this.state;
         if (current!=p) {
-            this.state = p;
-            termlinks().setCapacity(p.linkCap(this, true));
-            tasklinks().setCapacity(p.linkCap(this, false));
+            if ((this.state = p)!=Deleted) { //dont bother shrinking to zero capacity on delete. potentially supports fast immediate recovery
+                termlinks().setCapacity(p.linkCap(this, true));
+                tasklinks().setCapacity(p.linkCap(this, false));
+            }
         }
-        return current;
+        return p;
     }
 
 

@@ -1,6 +1,7 @@
 package jcog.data.sorted;
 
 import jcog.Util;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,11 +48,9 @@ import java.util.function.Consumer;
 public class SortedArray<E> implements Iterable<E> {
 
 
-    final static Object[] zeroList = new Object[0];
-
     public static final int binarySearchThreshold = 8;
 
-    public Object[] list = zeroList;
+    public Object[] list = ArrayUtils.EMPTY_OBJECT_ARRAY;
 
     protected int size;
 
@@ -105,7 +104,7 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     public void clear() {
-        this.list = zeroList;
+        this.list = ArrayUtils.EMPTY_OBJECT_ARRAY;
         this.size = 0;
 
     }
@@ -140,12 +139,12 @@ public class SortedArray<E> implements Iterable<E> {
 
 
     public SortedArray() {
-        this((E[]) zeroList); //builder.apply(initialCapacity);
+        //this((E[]) ArrayUtils.EMPTY_OBJECT_ARRAY); //builder.apply(initialCapacity);
     }
 
-    public SortedArray(E[] array) {
-        this.list = array;
-    }
+//    public SortedArray(E[] array) {
+//        this.list = array;
+//    }
 
 
     @Override
@@ -255,7 +254,8 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     protected static int grow(int oldSize) {
-        return oldSize == 0 ? 4 : oldSize * 2;
+        return oldSize + 2;
+        //return oldSize == 0 ? 4 : oldSize * 2;
     }
 
     public E removeLast() {

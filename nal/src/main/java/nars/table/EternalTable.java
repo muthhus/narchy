@@ -106,7 +106,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         if (wasCapacity != c) {
 
             synchronized (this) {
-                if (wasCapacity == c)
+                if (capacity == c)
                     return; //already set
 
                 this.capacity = c;
@@ -213,7 +213,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         Truth newBeliefTruth = newBelief.truth();
 
-        int dur = nar.dur();
+        //int dur = nar.dur();
 
         for (int i = 0; i < bsize; i++) {
             Task x = (Task) list[i];

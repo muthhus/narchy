@@ -1,14 +1,14 @@
 package nars.control.premise;
 
-import nars.NAR;
-import nars.Op;
-import nars.Param;
-import nars.Task;
+import nars.*;
+import nars.control.Cause;
 import nars.control.Premise;
 import nars.derive.meta.BoolPred;
+import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
+import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
@@ -104,23 +104,33 @@ public class Derivation extends Unify implements TermContext {
     public boolean cyclic, overlap;
     //public final float overlapAmount;
 
-    private final substituteIfUnifiesAny _substituteIfUnifiesAny;
-    private final substituteIfUnifiesDep _substituteIfUnifiesDep;
+    private final Functor substituteIfUnifiesAny, substituteIfUnifiesDep, polarize;
     private int serial;
     public float parentPri;
-    private short[] cause;
+    private short[] parentCause;
+    public Cause cause;
 
 
     /** if using this, must set: nar, index, random, DerivationBudgeting */
     public Derivation() {
         super(null, VAR_PATTERN, null, Param.UnificationStackMax, 0);
 
-        _substituteIfUnifiesAny = new substituteIfUnifiesAny(this) {
+
+        substituteIfUnifiesAny = new substituteIfUnifiesAny(this) {
             @Override public boolean equals(Object u) { return this == u; }
         };
-        _substituteIfUnifiesDep = new substituteIfUnifiesDep(this) {
+        substituteIfUnifiesDep = new substituteIfUnifiesDep(this) {
             @Override public boolean equals(Object u) { return this == u; }
         };
+        polarize = Functor.f2("polarize", (subterm, whichTask)->{
+            Truth compared;
+            if (whichTask.equals(PremiseRule.Task)) {
+                compared = taskTruth;
+            } else {
+                compared = beliefTruth;
+            }
+            return compared.isNegative() ? $.neg(subterm) : subterm;
+        });
     }
 
 
@@ -128,8 +138,9 @@ public class Derivation extends Unify implements TermContext {
     public Termed get(Term x, boolean createIfAbsent) {
         if (x instanceof Atom) {
             switch (x.toString()) {
-                case "subIfUnifiesAny": return _substituteIfUnifiesAny;
-                case "subIfUnifiesDep": return _substituteIfUnifiesDep;
+                case "subIfUnifiesAny": return substituteIfUnifiesAny;
+                case "subIfUnifiesDep": return substituteIfUnifiesDep;
+                case "polarize": return polarize;
             }
             return terms.get(x, createIfAbsent);
         }
@@ -155,6 +166,8 @@ public class Derivation extends Unify implements TermContext {
         assert(ttl >= 0);
 
         revert(0);
+
+        this.cause = null;
 
         //remove common variable entries because they will just consume memory if retained as empty
         //xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);
@@ -245,11 +258,11 @@ public class Derivation extends Unify implements TermContext {
         //HACK
         if (taskCause.length > 0 && beliefCause.length > 0) {
             //HACK zip
-            this.cause = new short[] { taskCause[0], beliefCause[0] };
+            this.parentCause = new short[] { taskCause[0], beliefCause[0] };
         } else if (taskCause.length > 0) {
-            this.cause = new short[] { taskCause[0] };
+            this.parentCause = new short[] { taskCause[0] };
         } else if (beliefCause.length > 0) {
-            this.cause = new short[] { beliefCause[0] };
+            this.parentCause = new short[] { beliefCause[0] };
         }
 
 
@@ -359,7 +372,7 @@ public class Derivation extends Unify implements TermContext {
 
     /** forms a new cause by appending a cause ID to the derivation's cause */
     public short[] cause(short c) {
-        return ArrayUtils.add(this.cause, c);
+        return ArrayUtils.add(this.parentCause, c);
     }
 
 }

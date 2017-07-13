@@ -1,6 +1,5 @@
 package nars.derive.meta;
 
-import nars.Op;
 import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -32,17 +31,14 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
 
     final boolean measure(@NotNull Derivation m, byte punc) {
-        return _measure(m, punc);
-    }
-    final boolean _measure(@NotNull Derivation m, byte punct) {
 
         boolean single;
         Truth t;
 
-        switch (punct) {
+        switch (punc) {
             case BELIEF:
             case GOAL:
-                TruthOperator f = (punct == BELIEF) ? belief : goal;
+                TruthOperator f = (punc == BELIEF) ? belief : goal;
                 if (f == null)
                     return false; //there isnt a truth function for this punctuation
 
@@ -81,7 +77,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
                         break;
                     case GOAL:
                     case QUEST:
-                        punct = QUEST; //apply similar behavior for Question to Quests
+                        punc = QUEST; //apply similar behavior for Question to Quests
                         break;
                 }
 
@@ -90,7 +86,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 break;
 
             default:
-                throw new Op.InvalidPunctuationException(punct);
+                throw new InvalidPunctuationException(punc);
         }
 
         @Nullable long[] ev = single ? m.evidenceSingle() : m.evidenceDouble();
@@ -101,7 +97,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
         m.truth(
             t,
-            punct,
+                punc,
             ev
         );
         return true;
