@@ -43,7 +43,7 @@ public class BagTest {
 
 
 
-    public static void testBasicInsertionRemoval(Bag<String,PriReference<String>> c) {
+    static void testBasicInsertionRemoval(Bag<String,PriReference<String>> c) {
 
 
         assertEquals(1, c.capacity());
@@ -52,8 +52,8 @@ public class BagTest {
             assertTrue(c.isEmpty());
         }
 
-        //insert an item with zero budget
-        c.put(new PLink("x", 0));
+        //insert an item with (nearly) zero budget
+        c.put(new PLink("x", 2 * Pri.EPSILON));
         c.commit();
 
         assertEquals(1, c.size());

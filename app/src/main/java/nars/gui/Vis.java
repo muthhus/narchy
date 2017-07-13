@@ -221,7 +221,7 @@ public class Vis {
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
                 () -> (((TaskExecutor) (n.exe)).concepts)
                         .stream()
-                        .map(x -> x.ref instanceof ConceptFire ? ((ConceptFire) x.ref) : null)
+                        .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
                 /* TODO */, 128, 256, 2, 7);

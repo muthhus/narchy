@@ -10,8 +10,6 @@ import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
 import nars.time.TimeFunctions;
@@ -23,8 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;

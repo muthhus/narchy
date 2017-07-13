@@ -10,8 +10,6 @@ import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class Cause extends AtomicDouble /* value */ {
@@ -51,14 +49,15 @@ public class Cause extends AtomicDouble /* value */ {
         boolean remain;
         main: do {
             remain = false;
-            for (Task x : s) {
+            for (int i = 0, sSize = s.size(); i < sSize; i++) {
+                Task x = s.get(i);
                 short[] c = x.cause();
                 int cl = c.length;
                 if (cl >= n) {
-                    l.add( c[cl - n] );
+                    l.add(c[cl - n]);
                     if (++ls >= maxLen)
                         break main;
-                    remain |= cl >= (n+1);
+                    remain |= (cl >= (n + 1));
                 }
             }
             n++;
@@ -68,17 +67,20 @@ public class Cause extends AtomicDouble /* value */ {
 
         short[] ll = l.toArray();
         ArrayUtils.reverse(ll);
+        assert(ll.length <= maxLen);
         return ll;
     }
 
     public void apply(float v) {
-        next += v;
+        addAndGet(v);
     }
 
     public void commit(float decayRate) {
-        float n = this.next;
-        this.next = 0;
-        set(Util.clamp((floatValue() + n) * decayRate, -2f, +2f));
+        float n = (float) this.getAndSet(0);
+        this.next = (Util.clamp((next * decayRate + n), -1f, +2f));
     }
 
+    public float value() {
+        return next;
+    }
 }

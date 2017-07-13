@@ -11,7 +11,6 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
-import nars.term.compound.SerialCompound;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import nars.term.var.AbstractVariable;

@@ -10,6 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -23,43 +25,51 @@ import static jcog.data.LabeledSupplier.supply;
 public abstract class AbstractNALTest {
 
 
-    private final NAR nar;
-    protected TestNAR tester;
+    protected final TestNAR tester;
 
 //    protected AbstractNALTest(NAR nar) {
 //        this(() -> nar);
 //    }
+    protected AbstractNALTest() {
+        //this.nar = null;
+        tester = new TestNAR(new NARBuilder().get());
+    }
 
     protected AbstractNALTest(Supplier<NAR> nar) {
-        this.nar = nar.get();
+        this();
+        //this.nar = nar;
     }
 
 
-    public TestNAR test() {
-        return tester = test(nar());
-    }
-    public TestNAR test(NAR n) {
-        return new TestNAR(n);
+    @NotNull public TestNAR test() {
+        return tester;
     }
 
+//    public TestNAR test(NAR n) {
+//        return new TestNAR(n);
+//    }
 
-    public NAR nar() {
-        return nar;
-        //return nar.get();
-    }
+
+//    public NAR nar() {
+//        //return nar;
+//        return nar.get();
+//    }
 
 
     @Before
     public void start() {
-        tester = test();
+        //assert(tester==null);
+        //tester = test(nar.get());
+
     }
 
     @After
     public void end() {
         tester.run();
+        //tester = null;
     }
 
-    @NotNull
+    //@NotNull
     @Deprecated
     public static Iterable<Supplier<NAR>> nars(int level) {
 

@@ -12,10 +12,10 @@ import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.transform.substitute;
 import nars.term.var.Variable;
-import org.junit.Assert;
+
 
 import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Built-in functors, ie. the standard core function set
@@ -162,8 +162,8 @@ public class Builtin {
 
         nar.on("assertEquals", (op, args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
-            Assert.assertEquals(/*msg,*/ 2, args.length);
-            Assert.assertEquals(/*msg,*/ args[0], args[1]);
+            assertEquals(/*msg,*/ 2, args.length);
+            assertEquals(/*msg,*/ args[0], args[1]);
         });
 
         nar.on(Functor.f0("self", nar::self));

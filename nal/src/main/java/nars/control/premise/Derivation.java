@@ -14,7 +14,6 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.subst.Unify;
 import nars.term.util.InvalidTermException;
-import nars.term.var.CommonVariable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;

@@ -1,6 +1,5 @@
 package nars.control;
 
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.decide.DecideRoulette;
 import jcog.pri.PLink;
@@ -25,9 +24,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static java.lang.Math.ceil;
-import static java.lang.Math.max;
-import static java.lang.Math.tanh;
+import static java.lang.Math.*;
 import static nars.Param.UnificationTTLMax;
 
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
@@ -35,7 +32,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 1;
+    private static final int maxSamples = 2;
 
     static final int TASKLINKS_SAMPLED = maxSamples * 3;
     static final int TERMLINKS_SAMPLED = maxSamples * 3;
@@ -65,11 +62,15 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
                 float boost = 0;
                 float vPer = v/x.length; if (Math.abs(vPer) < EPSILON) vPer = 0;
-                for (short c : x) {
+                for (int i = x.length-1; i >=0; i--) {
+                    short c = x[i];
                     Cause cc = n.causes.get(c);
-                    boost += cc.floatValue();
+                    assert(cc!=null):
+                            c + " missing from: " + n.causes.size() + " causes";
+                    boost += cc.value();
                     if (vPer != 0) {
                         cc.apply(vPer);
+                        //vPer *= 0.9f; //HACK decay in reverse
                     }
                 }
 

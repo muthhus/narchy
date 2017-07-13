@@ -2,7 +2,6 @@ package nars.task;
 
 import nars.Task;
 import nars.control.premise.Derivation;
-import nars.derive.rule.PremiseRule;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

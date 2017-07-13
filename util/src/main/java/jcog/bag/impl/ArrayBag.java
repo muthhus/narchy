@@ -57,9 +57,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     public ArrayBag(@Deprecated int cap, PriMerge mergeFunction, @NotNull Map<X, Y> map) {
         super(new SortedPLinks(), map);
-
         this.mergeFunction = mergeFunction;
-        this.capacity = cap;
+        setCapacity(cap);
+
+        //this.capacity = cap;
         //this.toPut = map instanceof ConcurrentMap ? new QueueLock<>(this::put) : this::put;
     }
 

@@ -175,7 +175,7 @@ abstract public class NAgentX extends NAgent {
 
     private static Surface causePlot(NAR nar) {
         int s = nar.causes.size();
-        return new MatrixView((i) -> nar.causes.get(i).floatValue(), s, (int)Math.max(1, Math.sqrt(s)), bipolar1);
+        return new MatrixView((i) -> nar.causes.get(i).value(), s, (int)Math.max(1, Math.sqrt(s)), bipolar1);
     }
 
     private static void chart(NARS n, NAgent a) {

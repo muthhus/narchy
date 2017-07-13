@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.nar.NARBuilder;
-import nars.op.Operator;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import org.junit.Ignore;

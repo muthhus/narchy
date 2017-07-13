@@ -45,14 +45,14 @@ public class LinkageTest extends AbstractNALTest {
     }
 
 
-    @Override
-    public TestNAR test(NAR n) {
-        return new TestNAR(n) {
-            @Override protected boolean requireConditions() {
-                return false;
-            }
-        };
-    }
+//    @Override
+//    public TestNAR test(NAR n) {
+//        return new TestNAR(n) {
+//            @Override protected boolean requireConditions() {
+//                return false;
+//            }
+//        };
+//    }
 
 
 

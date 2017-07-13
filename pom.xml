@@ -34,12 +34,12 @@
 
                         <trimStackTrace>true</trimStackTrace>
 
-                        <!--<parallelOptimized>true</parallelOptimized>-->
-                        <!--<reuseForks>true</reuseForks>-->
+                        <reuseForks>true</reuseForks>
                         <!--<useUnlimitedThreads>true</useUnlimitedThreads>-->
-                        <!--<argLine>-Xmx512m</argLine>-->
+                        <!--<parallelOptimized>true</parallelOptimized>-->
+                        <argLine>-Xmx200m</argLine>
 
-                        <skipTests>true</skipTests> <!-- WARNING -->
+                        <!--<skipTests>true</skipTests> &lt;!&ndash; WARNING &ndash;&gt;-->
 
 
                         <redirectTestOutputToFile>false</redirectTestOutputToFile>
@@ -47,6 +47,27 @@
                         <disableXmlReport>true</disableXmlReport>
                         <detail>false</detail>
                     </configuration>
+                    <dependencies>
+                        <!-- https://mvnrepository.com/artifact/org.junit.platform/junit-platform-surefire-provider -->
+                        <dependency>
+                            <groupId>org.junit.platform</groupId>
+                            <artifactId>junit-platform-surefire-provider</artifactId>
+                            <version>1.0.0-M5</version>
+                        </dependency>
+
+                        <dependency>
+                            <groupId>org.junit.jupiter</groupId>
+                            <artifactId>junit-jupiter-engine</artifactId>
+                            <version>5.0.0-M5</version>
+                        </dependency>
+                        <!-- https://mvnrepository.com/artifact/org.junit.vintage/junit-vintage-engine -->
+                        <dependency>
+                            <groupId>org.junit.vintage</groupId>
+                            <artifactId>junit-vintage-engine</artifactId>
+                            <version>4.12.0-M5</version>
+                        </dependency>
+
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -58,11 +79,17 @@
                 <version>3.6.1</version>
                 <configuration>
                     <debug>true</debug>
-                    <debuglevel>lines,vars,source</debuglevel>
-                    <fork>false</fork>
+                    <!--<debuglevel>lines,vars,source</debuglevel>-->
+                    <!--<fork>true</fork>-->
                     <showWarnings>false</showWarnings>
-                    <useIncrementalCompilation>true</useIncrementalCompilation>
+                    <verbose>false</verbose>
+
+                    <useIncrementalCompilation>false</useIncrementalCompilation>
+                    <!--<useIncrementalCompilation>true</useIncrementalCompilation>-->
                     <failOnError>false</failOnError>
+
+                    <staleMillis>2</staleMillis>
+
 
                 </configuration>
             </plugin>
@@ -75,28 +102,24 @@
             <!--</plugin>-->
 
 
-
-
             <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-jar-plugin</artifactId>-->
-                <!--<version>3.0.1</version>-->
-                <!--<configuration>-->
-                    <!--<archive>-->
-                        <!--<manifest>-->
-                            <!--<addClasspath>true</addClasspath>-->
-                            <!--<mainClass>nars.Repl</mainClass>-->
-                            <!--<classpathPrefix>lib/</classpathPrefix>-->
-                            <!--<classpathLayoutType>repository</classpathLayoutType>-->
-                        <!--</manifest>-->
-                    <!--</archive>-->
-                <!--</configuration>-->
+            <!--<groupId>org.apache.maven.plugins</groupId>-->
+            <!--<artifactId>maven-jar-plugin</artifactId>-->
+            <!--<version>3.0.1</version>-->
+            <!--<configuration>-->
+            <!--<archive>-->
+            <!--<manifest>-->
+            <!--<addClasspath>true</addClasspath>-->
+            <!--<mainClass>nars.Repl</mainClass>-->
+            <!--<classpathPrefix>lib/</classpathPrefix>-->
+            <!--<classpathLayoutType>repository</classpathLayoutType>-->
+            <!--</manifest>-->
+            <!--</archive>-->
+            <!--</configuration>-->
             <!--</plugin>-->
 
         </plugins>
     </build>
-
-
 
 
     <modules>

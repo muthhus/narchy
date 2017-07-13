@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
-import static nars.time.Tense.ETERNAL;
 
 
 /**

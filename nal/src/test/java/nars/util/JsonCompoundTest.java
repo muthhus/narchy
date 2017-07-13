@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Narsese;
 import nars.nar.NARBuilder;
 import nars.task.util.TaskRule;
-import nars.term.Compound;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
 import org.junit.Test;

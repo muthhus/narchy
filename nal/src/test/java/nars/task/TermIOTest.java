@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
  */
 public class TermIOTest {
 
-    final NAR nar = new Terminal();
+    final static NAR nar = new Terminal();
 
     void assertEqualSerialize(@NotNull Object orig) {
         //final IO.DefaultCodec codec = new IO.DefaultCodec(nar.index);

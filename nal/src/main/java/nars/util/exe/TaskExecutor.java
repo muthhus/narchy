@@ -8,7 +8,6 @@ import jcog.data.FloatParam;
 import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
-import jcog.pri.mix.control.CLink;
 import nars.NAR;
 import nars.Task;
 import nars.task.ITask;
@@ -30,7 +29,7 @@ import static nars.Op.COMMAND;
  */
 public class TaskExecutor extends Executioner {
 
-    //    private final DisruptorBlockingQueue<CLink<ITask>> overflow;
+    //    private final DisruptorBlockingQueue<ITask> overflow;
     protected boolean trace;
 
     /**
@@ -51,34 +50,34 @@ public class TaskExecutor extends Executioner {
     public final FloatParam masterGain = new FloatParam(1f, 0f, 1f);
 
 
-    public final Bag<ITask, CLink<ITask>> tasks =
-            new PriorityHijackBag<ITask, CLink<ITask>>(4) {
+    public final Bag<ITask, ITask> tasks =
+            new PriorityHijackBag<ITask, ITask>(4) {
                 @Override
-                protected Consumer<CLink<ITask>> forget(float rate) {
+                protected Consumer<ITask> forget(float rate) {
                     return null;
                 }
 
                 @Override
-                protected CLink<ITask> merge(@NotNull CLink<ITask> existing, @NotNull CLink<ITask> incoming, @Nullable MutableFloat overflowing) {
+                protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
                     existing.priMax(incoming.priElseZero());
                     return existing;
                 }
 
                 @Override
-                public ITask key(@NotNull CLink<ITask> value) {
-                    return value.ref;
+                public ITask key(@NotNull ITask value) {
+                    return value;
                 }
             };
 //            new ArrayBag<>(0, PriMerge.max, new ConcurrentHashMap<>()) {
 //
 //        @Override
-//        public float floatValueOf(CLink<ITask> x) {
+//        public float floatValueOf(ITask x) {
 //            return x.pri();
 //        }
 //
 //        @Nullable
 //        @Override
-//        public ITask key(@NotNull CLink<ITask> l) {
+//        public ITask key(@NotNull ITask l) {
 //            return l.ref;
 //        }
 //    };
@@ -87,18 +86,18 @@ public class TaskExecutor extends Executioner {
     /**
      * active tasks
      */
-    public final Bag<ITask, CLink<ITask>> concepts =
+    public final Bag<ITask, ITask> concepts =
 //            new ArrayBag<>(PriMerge.plus, new ConcurrentHashMap<>()) {
 
 
             new PriorityHijackBag<>(4) {
                 @Override
-                protected final Consumer<CLink<ITask>> forget(float rate) {
+                protected final Consumer<ITask> forget(float rate) {
                     return null;
                 }
 
                 @Override
-                public Bag<ITask, CLink<ITask>> commit() {
+                public Bag<ITask, ITask> commit() {
                     return this; //do nothing
                 }
 
@@ -109,8 +108,8 @@ public class TaskExecutor extends Executioner {
                 }
 
 //                @Override
-//                public CLink<ITask> put(@NotNull CLink<ITask> x) {
-//                    CLink<ITask> y = super.put(x);
+//                public ITask put(@NotNull ITask x) {
+//                    ITask y = super.put(x);
 ////                    if (y == null) {
 ////                        overflow.offer(x);
 ////                    }
@@ -118,7 +117,7 @@ public class TaskExecutor extends Executioner {
 //                }
 
 //                @Override
-//                public void onRemoved(@NotNull CLink<ITask> value) {
+//                public void onRemoved(@NotNull ITask value) {
 //
 //                    //DO NOTHING, DONT DELETE
 //
@@ -128,7 +127,7 @@ public class TaskExecutor extends Executioner {
 ////                        }
 ////                        overflow.offer(value); //save
 ////                    } else {
-////                        CLink<ITask> x = overflow.poll();
+////                        ITask x = overflow.poll();
 ////                        if (x != null && x.priElseZero() >= Pri.EPSILON)
 ////                            put(x); //restore
 ////                    }
@@ -137,14 +136,14 @@ public class TaskExecutor extends Executioner {
 
                 @NotNull
                 @Override
-                public final ITask key(CLink<ITask> value) {
-                    return value.ref;
+                public final ITask key(ITask value) {
+                    return value;
                 }
 
 
             };
 
-    //final DecideRoulette<CLink<ITask>> activeBuffer = new DecideRoulette<>(CLink::priElseZero);
+    //final DecideRoulette<ITask> activeBuffer = new DecideRoulette<>(CLink::priElseZero);
 
     private float forgetEachActivePri;
 
@@ -266,7 +265,7 @@ public class TaskExecutor extends Executioner {
                             }
 
                             //activeBuffer.add(x);
-                            //(Consumer<? super CLink<ITask>>)(buffer::add)
+                            //(Consumer<? super ITask>)(buffer::add)
                         });
                         toFire -= fireBatch;
                     }
@@ -275,7 +274,7 @@ public class TaskExecutor extends Executioner {
 
 
 //            for (int i = 0; i < toExe; i++) {
-//                @Nullable CLink<ITask> x = activeBuffer.decide(rng);
+//                @Nullable ITask x = activeBuffer.decide(rng);
 //                actuallyRun(x);
 //                if (forgetEachActivePri > 0) {
 //                    x.priSub(forgetEachActivePri);
@@ -309,7 +308,7 @@ public class TaskExecutor extends Executioner {
         }
     }
 
-    protected void actuallyRun(CLink<? extends ITask> x) {
+    protected void actuallyRun(ITask x) {
         ITask[] next;
         try {
             if (x == null) return; //HACK
@@ -317,7 +316,7 @@ public class TaskExecutor extends Executioner {
             if (x.isDeleted()) {
                 next = null;
             } else {
-                next = x.ref.run(nar);
+                next = x.run(nar);
             }
 
         } catch (Throwable e) {
@@ -337,19 +336,19 @@ public class TaskExecutor extends Executioner {
         actuallyFeedback(x, next);
     }
 
-    protected void actuallyFeedback(CLink<? extends ITask> x, ITask[] next) {
+    protected void actuallyFeedback(ITask x, ITask[] next) {
         if (next != null && next.length > 0)
             nar.input(next);
     }
 
 
     @Override
-    public boolean run(@NotNull CLink<ITask> input) {
-        if (input.ref.punc() == COMMAND) {
+    public boolean run(@NotNull ITask input) {
+        if (input.punc() == COMMAND) {
             actuallyRun(input); //commands executed immediately
             return true;
         } else {
-            if (input.ref instanceof NALTask) {
+            if (input instanceof NALTask) {
                 tasks.putAsync(input);
             } else
                 concepts.putAsync(input);

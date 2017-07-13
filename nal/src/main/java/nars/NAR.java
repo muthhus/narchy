@@ -12,7 +12,6 @@ import jcog.pri.Priority;
 import jcog.pri.mix.Mix;
 import jcog.pri.mix.PSink;
 import jcog.pri.mix.PSinks;
-import jcog.pri.mix.control.CLink;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
@@ -21,7 +20,6 @@ import nars.control.Cause;
 import nars.control.ConceptFire;
 import nars.control.premise.DerivationBudgeting;
 import nars.control.premise.PreferSimpleAndPolarized;
-import nars.derive.DefaultDeriver;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
 import nars.derive.meta.Conclude;
@@ -128,7 +126,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     protected final NARLoop loop = new NARLoop(this);
 
     @NotNull
-    public final PSinks<ITask, CLink<ITask>> in;
+    public final PSinks<ITask, ITask> in;
 
     private TrieDeriver deriver;
 
@@ -204,7 +202,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.level = 8;
 
         //this.deriver = new TrieDeriver(DefaultDeriver.rules);
-        this.deriver = new TrieDeriver(PremiseRuleSet.rules(true,
+        PremiseRuleSet rules = PremiseRuleSet.rules(true,
                 "nal1.nal",
                 //"nal4.nal",
                 "nal6.nal",
@@ -212,7 +210,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 "induction.nal",
                 "nal2.nal",
                 "nal3.nal"
-        ));
+        );
+        this.deriver = new TrieDeriver(rules);
         deriver.forEachConclusion((Conclude x) -> {
             if (x.cause != null) // a re-used copy from rule permutes? TODO why?
                 return;
@@ -237,31 +236,31 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     private Cause newCause(Object x) {
         synchronized (causes) {
-            short next = (short) causes.size();
+            short next = (short) (causes.size());
             Cause c = new Cause(next, x);
             causes.add(c);
             return c;
         }
     }
 
-    protected PSinks<ITask, CLink<ITask>> newInputMixer() {
-        return new Mix<ITask, CLink<ITask>>() {
+    protected PSinks<ITask,ITask> newInputMixer() {
+        return new Mix<ITask, ITask>() {
             @Override
-            public CLink<ITask> apply(ITask iTask) {
-                return new CLink(iTask);
+            public ITask apply(ITask iTask) {
+                return iTask;
             }
         };
     }
 
-    public PSink<ITask, CLink<ITask>> newInputChannel(Object id) {
+    public PSink<ITask,ITask> newInputChannel(Object id) {
 
         Cause c = newCause(id);
-        short[] cs = new short[c.id];
+        short[] cs = new short[] { c.id };
 
         return in.newStream(id, x -> {
-            if (x.ref instanceof NALTask) {
+            if (x instanceof NALTask) {
                 //assert (((NALTask) x.ref).cause.length == 0);
-                ((NALTask) x.ref).cause = cs;
+                ((NALTask) x).cause = cs;
             }
             input(x);
         });
@@ -599,13 +598,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             if (x != null) input(x);
     }
 
-    public void input(ITask unclassified) {
-        if (unclassified != null)
-            input(new CLink<>(unclassified));
-    }
-
-    public void input(@NotNull CLink<ITask> partiallyClassified) {
-        exe.run(partiallyClassified);
+    public void input(ITask x) {
+        if (x!=null)
+            exe.run(x);
     }
 
 
@@ -934,7 +929,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         emotion.cycle();
 
-        causes.forEach(c -> c.commit(0.99f));
+        causes.forEach(c -> c.commit(0.98f));
 
         exe.cycle(this);
     }

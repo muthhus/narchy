@@ -20,8 +20,8 @@ import java.util.function.Consumer;
 import static java.lang.Float.NaN;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 
 /**
@@ -578,7 +578,7 @@ public class TestNAR {
     public TestNAR run(long finalCycle, boolean testAndPrintReport /* for use with JUnit */) {
 
         if (requireConditions())
-            assertTrue("No conditions tested", !requires.isEmpty() || !disqualifies.isEmpty());
+            assert(!requires.isEmpty() || !disqualifies.isEmpty()):"no conditions tested";
 
 
         //TODO cache requires & logger, it wont change often

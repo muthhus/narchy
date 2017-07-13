@@ -101,14 +101,14 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
 
 //        SpaceGraph.window(
-//            new TaskTreeChart(Iterables.transform(te.active, (CLink<ITask> x)-> x.ref), 32, n),
+//            new TaskTreeChart(Iterables.transform(te.active, (CLink<ITask> x)-> x), 32, n),
 //            500, 500
 //        );
 
         NARSpace cs = new SimpleConceptGraph1(n,
                 () -> (((TaskExecutor) (n.exe)).concepts)
                         .stream()
-                        .map(x -> x.ref instanceof ConceptFire ? ((ConceptFire) x.ref) : null)
+                        .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
                 /* TODO */, 64, 64, 7, 15);

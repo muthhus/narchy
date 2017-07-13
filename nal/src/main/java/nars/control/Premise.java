@@ -4,7 +4,6 @@
  */
 package nars.control;
 
-import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
@@ -14,8 +13,6 @@ import nars.budget.BudgetFunctions;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.control.premise.Derivation;
-import nars.derive.DefaultDeriver;
-import nars.derive.Deriver;
 import nars.table.BeliefTable;
 import nars.task.DerivedTask;
 import nars.term.Compound;
@@ -26,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 

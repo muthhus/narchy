@@ -2,7 +2,6 @@ package nars.derive.meta.op;
 
 import nars.$;
 import nars.derive.meta.BoolPred;
-import nars.index.term.PatternTermIndex;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

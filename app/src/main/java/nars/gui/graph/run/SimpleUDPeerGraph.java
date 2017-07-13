@@ -36,7 +36,7 @@ public class SimpleUDPeerGraph {
         SimpleConceptGraph1 s = new SimpleConceptGraph1(n,
                 () -> (((TaskExecutor) (n.exe)).concepts)
                         .stream()
-                        .map(x -> x.ref instanceof ConceptFire ? ((ConceptFire) x.ref) : null)
+                        .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
                 /* TODO */, population+1, population+1, 4, 8);

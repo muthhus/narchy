@@ -24,13 +24,13 @@ public class NAL8OldTest extends AbstractNALTest {
         return AbstractNALTest.nars(8);
     }
 
-    @Override
-    public NAR nar() {
-        NAR n = super.nar();
-
-
-        return n;
-    }
+//    @Override
+//    public NAR nar() {
+//        NAR n = super.nar();
+//
+//
+//        return n;
+//    }
 
 
 

@@ -3,22 +3,12 @@ package nars.nar;
 
 import jcog.Loop;
 import jcog.Util;
-import jcog.math.FloatAveraged;
-import jcog.pri.classify.EnumClassifier;
-import jcog.pri.mix.PSinks;
-import jcog.pri.mix.control.CLink;
-import jcog.pri.mix.control.MixContRL;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
-import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.control.ConceptFire;
-import nars.control.NARMixAgent;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
-import nars.task.NALTask;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
@@ -36,7 +26,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
-import static nars.Op.*;
 
 /**
  * recursive cluster of NAR's
@@ -186,7 +175,7 @@ public class NARS extends NAR {
 
 
 //    @Override
-//    public void input(@NotNull CLink<ITask> partiallyClassified) {
+//    public void input(@NotNull ITask partiallyClassified) {
 //        ((MixContRL) in).test(partiallyClassified);
 //        super.input(partiallyClassified);
 //    }
@@ -225,7 +214,7 @@ public class NARS extends NAR {
         }
 
         @Override
-        public boolean run(@NotNull CLink<ITask> x) {
+        public boolean run(@NotNull ITask x) {
             NARS nar = (NARS) this.nar;
             int sub =
                     //random.nextInt(num);
@@ -359,7 +348,7 @@ public class NARS extends NAR {
 //        }
 
         @Override
-        protected void actuallyFeedback(CLink<? extends ITask> x, ITask[] next) {
+        protected void actuallyFeedback(ITask x, ITask[] next) {
             if (next != null)
                 NARS.this.input(next); //through post mix
         }

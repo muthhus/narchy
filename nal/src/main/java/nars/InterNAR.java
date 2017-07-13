@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.net.UDPeer;
 import jcog.pri.PriReference;
 import jcog.pri.mix.PSink;
-import jcog.pri.mix.control.CLink;
 import nars.bag.leak.LeakOut;
 import nars.task.ITask;
 import nars.task.LambdaQuestionTask;
@@ -31,7 +30,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 
     public final NAR nar;
     public final LeakOut out;
-    private final PSink<ITask, CLink<ITask>> receive;
+    private final PSink<ITask, ITask> receive;
 
 
     public InterNAR(NAR nar) throws IOException {
