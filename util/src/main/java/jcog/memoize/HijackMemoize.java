@@ -1,12 +1,12 @@
-package jcog.bag.impl.hijack;
+package jcog.memoize;
 
 import jcog.Texts;
 import jcog.bag.impl.HijackBag;
+import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.MwCounter;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
 import jcog.random.XorShift128PlusRandom;
-import jcog.util.Memoize;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

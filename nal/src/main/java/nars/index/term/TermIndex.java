@@ -393,12 +393,12 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
     /** un-normalized */
     @NotNull public Term termRaw(@NotNull String termToParse) throws Narsese.NarseseException {
-        return Narsese.the().term(termToParse, this, false);
+        return Narsese.term(termToParse, this, false);
     }
 
     /** normalized */
     @NotNull public <T extends Term> T term(@NotNull String termToParse) throws Narsese.NarseseException {
-        return (T) (Narsese.the().term(termToParse, this, true));
+        return (T) (Narsese.term(termToParse, this, true));
     }
 
 

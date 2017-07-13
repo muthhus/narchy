@@ -1,4 +1,4 @@
-package jcog.util;
+package jcog.memoize;
 
 import java.util.function.Function;
 

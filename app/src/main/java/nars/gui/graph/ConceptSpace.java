@@ -1,6 +1,6 @@
 package nars.gui.graph;
 
-import jcog.bag.impl.hijack.HijackMemoize;
+import jcog.memoize.HijackMemoize;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.concept.Concept;

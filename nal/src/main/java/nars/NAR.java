@@ -1279,7 +1279,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public Term conceptTerm(@NotNull Term term) {
 
         if (term instanceof Compound) {
-            term = term.unneg();
+            term = compoundOrNull(term.unneg());
+            if (term == null) return null;
 
             term = compoundOrNull(terms.atemporalize((Compound) term));
             if (term == null) return null;

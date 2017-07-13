@@ -1302,17 +1302,18 @@ public class Narsese extends BaseParser<Object> {
 
 
     @NotNull
-    public Term term(String s, @Nullable TermIndex index, boolean normalize) throws NarseseException {
+    public static Term term(String s, @Nullable TermIndex index, boolean normalize) throws NarseseException {
 
         Term y = term(s);
         if (normalize && y instanceof Compound) {
             return nullIfNull(index.normalize((Compound) y));
         } else {
-            Termed existing = index.get(y, false);
-            if (existing == null)
-                return y;
-            else
-                return existing.term();
+            return y;
+//            Termed existing = index.get(y, false);
+//            if (existing == null)
+//                return y;
+//            else
+//                return existing.term();
         }
 
 

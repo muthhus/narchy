@@ -1,8 +1,9 @@
 package nars;
 
 
-import jcog.bag.impl.hijack.HijackMemoize;
-import jcog.util.Memoize;
+import jcog.memoize.CaffeineMemoize;
+import jcog.memoize.Memoize;
+import jcog.memoize.NullMemoize;
 import nars.derive.meta.match.Ellipsislike;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.ProtoCompound;
@@ -142,7 +143,7 @@ public enum Op implements $ {
 
             if (dt == XTERNAL) {
                 //leave un-sorted, un-de-duplicated
-                return conjPost(compound(CONJ, XTERNAL, subterms(u)));
+                return conjImplReduction(compound(CONJ, XTERNAL, subterms(u)));
             }
 
             final int n = u.length;
@@ -168,7 +169,7 @@ public enum Op implements $ {
             boolean commutive = concurrent(dt);
             if (commutive) {
 
-                return conjPost(junctionFlat(dt, u));
+                return conjImplReduction(junctionFlat(dt, u));
 
             } else {
                 //NON-COMMUTIVE
@@ -198,7 +199,7 @@ public enum Op implements $ {
                     }
                 }
 
-                return conjPost(
+                return conjImplReduction(
                         !changed ?
                                 compound(CONJ, dt, subterms(u)) :
                                 CONJ.the(dt, u)
@@ -325,15 +326,15 @@ public enum Op implements $ {
 
         }
 
-        private Term conjPost(final Term x /* possibly a conjunction */) {
+        /** a combination nconjunction/implication reduction */
+        private Term conjImplReduction(final Term x /* possibly a conjunction */) {
 
             Op xo = x.op();
             if (xo != CONJ || !x.hasAny(IMPL))
                 return x; //fall-through
 
-            //conjunction/implication reduction:
 
-            //if there is only one implication subterm, then fold into that.
+            //if there is only one implication subterm (first layer only), then fold into that.
             final Compound conj = (Compound) x;
             int whichImpl = -1;
             int conjSize = conj.size();
@@ -346,12 +347,15 @@ public enum Op implements $ {
                     implication = (Compound) conj.sub(whichImpl);
                     implDT = implication.dt();
                     if (implDT == XTERNAL) {
-                        //dont proceed any further
+                        //dont proceed any further if XTERNAL
                         return x;
                     }
                     break;
                 }
             }
+
+            if (implication==null)
+                return x;
 
             Term others;
             int conjDT = conj.dt();
@@ -891,8 +895,10 @@ public enum Op implements $ {
     }
 
     public static final Memoize<ProtoCompound, Termlike> cache =
-            new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 4);
-    //CaffeineMemoize.build(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
+            //new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 4);
+            CaffeineMemoize.build(buildTerm, 32 * 1024, false /* Param.DEBUG*/);
+            //CaffeineMemoize.build(buildTerm, -1 /* softref */, true /* Param.DEBUG*/);
+            //new NullMemoize<>(buildTerm);
 
 
     static TermContainer _subterms(@NotNull Term[] s) {
