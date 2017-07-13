@@ -13,7 +13,6 @@ import nars.term.container.TermContainer;
 import nars.term.transform.substitute;
 import nars.term.var.Variable;
 
-
 import static nars.Op.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

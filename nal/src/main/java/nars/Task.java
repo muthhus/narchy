@@ -864,57 +864,58 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     @Deprecated
     @Nullable
     static Compound content(@Nullable final Term r, NAR nar) {
-        if (r == null)
-            return null;
-
-        //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
-        boolean negated;
-        Term s = r;
-        if (r.op() == NEG) {
-            s = r.unneg();
-            if (s instanceof Variable)
-                return null; //throw new InvalidTaskException(r, "unwrapped variable"); //should have been prevented earlier
-
-            negated = true;
-            if (s instanceof Compound) {
-                return (Compound) r; //its normal compound inside the negation, handle it in Task constructor
-            }
-        } else if (r instanceof Compound) {
-            return (Compound) r; //do not uncompress any further
-        } else if (r instanceof Variable) {
-            return null;
-        } else {
-            negated = false;
-        }
-
-        if (!(s instanceof Compound)) {
-            Compound t = compoundOrNull(nar.post(s));
-            if (t == null)
-                return null; //throw new InvalidTaskException(r, "undecompressible");
-            else
-                return (Compound) $.negIf(t, negated); //done
+        return compoundOrNull(r);
+//        if (r == null)
+//            return null;
+//
+//        //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
+//        boolean negated;
+//        Term s = r;
+//        if (r.op() == NEG) {
+//            s = r.unneg();
+//            if (s instanceof Variable)
+//                return null; //throw new InvalidTaskException(r, "unwrapped variable"); //should have been prevented earlier
+//
+//            negated = true;
+//            if (s instanceof Compound) {
+//                return (Compound) r; //its normal compound inside the negation, handle it in Task constructor
+//            }
+//        } else if (r instanceof Compound) {
+//            return (Compound) r; //do not uncompress any further
+//        } else if (r instanceof Variable) {
+//            return null;
+//        } else {
+//            negated = false;
+//        }
+//
+//        if (!(s instanceof Compound)) {
+//            Compound t = compoundOrNull(nar.post(s));
+//            if (t == null)
+//                return null; //throw new InvalidTaskException(r, "undecompressible");
 //            else
-//            else if (s.op()==NEG)
-//                return (Compound) $.negIf(post(s.unneg(), nar));
-//            else
-//                return (Compound) $.negIf(s, negated);
-        }
-        //its a normal negated compound, which will be unnegated in task constructor
-        return (Compound) s;
+//                return (Compound) $.negIf(t, negated); //done
+////            else
+////            else if (s.op()==NEG)
+////                return (Compound) $.negIf(post(s.unneg(), nar));
+////            else
+////                return (Compound) $.negIf(s, negated);
+//        }
+//        //its a normal negated compound, which will be unnegated in task constructor
+//        return (Compound) s;
     }
 
-    /**
-     * returns the time separating this task from a target time. if the target occurrs
-     * during this task, the distance is zero. if this task is eternal, then ETERNAL is returned
-     */
-    default long timeDistance(long t) {
-        long s = start();
-        if (s == ETERNAL) return ETERNAL;
-        long e = end();
-        if ((t >= s) || (t <= e)) return 0;
-        else if (t > e) return t - e;
-        else return s - t;
-    }
+//    /**
+//     * returns the time separating this task from a target time. if the target occurrs
+//     * during this task, the distance is zero. if this task is eternal, then ETERNAL is returned
+//     */
+//    default long timeDistance(long t) {
+//        long s = start();
+//        if (s == ETERNAL) return ETERNAL;
+//        long e = end();
+//        if ((t >= s) || (t <= e)) return 0;
+//        else if (t > e) return t - e;
+//        else return s - t;
+//    }
 
     @Override
     default ITask[] run(@NotNull NAR n) {

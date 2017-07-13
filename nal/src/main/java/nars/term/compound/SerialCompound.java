@@ -18,6 +18,7 @@ import java.io.IOException;
 import static nars.time.Tense.DTERNAL;
 
 /**
+ * TODO
  * compound which is stored simply as a byte[] of its serialization
  * which is optimized for streaming and lazy/de-duplicated batched construction
  * purposes.

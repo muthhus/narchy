@@ -80,8 +80,6 @@ public final class Conclude extends AbstractPred<Derivation> {
         }
 
         this.conclusionPattern = pp;
-
-
     }
 
 
@@ -107,7 +105,7 @@ public final class Conclude extends AbstractPred<Derivation> {
             b0 = compoundOrNull(d.transform(b0, d));
             if (b0 == null || b0 == conclusionPattern)
                 return true;
-            if (b0 == bp)
+            if (b0.equals(bp))// == bp)
                 break; //no change
         }
 

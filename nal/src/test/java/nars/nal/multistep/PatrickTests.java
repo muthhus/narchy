@@ -8,10 +8,6 @@ import nars.nar.NARBuilder;
 import nars.test.TestNAR;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.function.Supplier;
 
 import static nars.$.$;
 

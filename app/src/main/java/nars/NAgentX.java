@@ -2,7 +2,6 @@ package nars;
 
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
-import jcog.tensor.ArrayTensor;
 import nars.gui.Vis;
 import nars.nar.NARBuilder;
 import nars.nar.NARS;
@@ -13,7 +12,6 @@ import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
-import spacegraph.render.Draw;
 import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.MatrixView;
 import spacegraph.widget.meter.Plot2D;

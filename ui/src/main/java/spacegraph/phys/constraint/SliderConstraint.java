@@ -42,7 +42,7 @@ import spacegraph.phys.solve.JacobianEntry;
 // JAVA NOTE: SliderConstraint from 2.71
 
 /**
- *
+ * UNTESTED
  * @author jezek2
  */
 public class SliderConstraint extends TypedConstraint {

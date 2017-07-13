@@ -1,6 +1,7 @@
 package jcog.math;
 
 import org.apache.commons.math3.util.ArithmeticUtils;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 
 import java.util.NoSuchElementException;
 
@@ -37,7 +38,7 @@ public class Permutations {
 			ind[i] = i;
 		}
 		count = -1;
-		num = (int) ArithmeticUtils.factorial(size);
+		num = (int) CombinatoricsUtils.factorial(size);
 
 		return this;
 	}

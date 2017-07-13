@@ -1,6 +1,5 @@
 package nars;
 
-import com.github.fge.grappa.Grappa;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
 import com.github.fge.grappa.matchers.base.Matcher;
@@ -492,7 +491,7 @@ public class Narsese extends BaseParser<Object> {
                                         MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false)
                                 ),
 
-                                push($.terms.the(INH, (Term) pop(), (Term) pop()))
+                                push($.the(INH, (Term) pop(), (Term) pop()))
 
                         ),
 

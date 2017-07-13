@@ -88,32 +88,32 @@ abstract public class SortedListTable<X, Y> extends ArrayListTable<X, Y> impleme
 
 
 
-    @Nullable
-    @Override
-    @Deprecated protected Y addItem(@NotNull Y i) {
-        int cap = capacity();
-        if (cap < 1) {
-            return i; //bounce
-        }
-
-        int size = size();
-
-        Y displaced = null;
-
-        if (size == cap) {
-            Y last = items.last();
-            if (Float.compare(floatValueOf(last), floatValueOf(i)) < 0) {
-                //insufficient rank, bounce
-                return i;
-            }
-
-            displaced = items.removeLast(); //remove last
-        }
-
-        items.add(i, this);
-
-        return displaced;
-    }
+//    @Nullable
+//    @Override
+//    @Deprecated protected Y addItem(@NotNull Y i) {
+//        int cap = capacity();
+//        if (cap < 1) {
+//            return i; //bounce
+//        }
+//
+//        int size = size();
+//
+//        Y displaced = null;
+//
+//        if (size == cap) {
+//            Y last = items.last();
+//            if (Float.compare(floatValueOf(last), floatValueOf(i)) < 0) {
+//                //insufficient rank, bounce
+//                return i;
+//            }
+//
+//            displaced = items.removeLast(); //remove last
+//        }
+//
+//        items.add(i, this);
+//
+//        return displaced;
+//    }
 
     @NotNull
     @Deprecated public List<Y> listCopy() {

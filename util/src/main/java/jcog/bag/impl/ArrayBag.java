@@ -10,7 +10,6 @@ import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
 import jcog.pri.op.PriMerge;
 import jcog.table.SortedListTable;
-import jcog.util.QueueLock;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -422,11 +420,11 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     }
 
 
-    @Nullable
-    @Override
-    protected Y addItem(@NotNull Y i) {
-        throw new UnsupportedOperationException();
-    }
+//    @Nullable
+//    @Override
+//    protected Y addItem(@NotNull Y i) {
+//        throw new UnsupportedOperationException();
+//    }
 
 
     @Override

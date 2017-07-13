@@ -1,10 +1,10 @@
 package nars;
 
+import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.ConsoleAppender;
 import com.google.common.base.Strings;
-import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import jcog.Texts;
 import jcog.Util;
@@ -36,9 +36,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 import javax.script.ScriptEngineManager;
-import java.lang.ref.Reference;
-import java.lang.ref.SoftReference;
-import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -64,18 +61,18 @@ import static nars.time.Tense.DTERNAL;
  *                                              NARquery
  *                                          Core Utility Class
  */
-public enum $ {
-    ;
+public interface $ {
 
-    public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
-    public static final Function<Object, Term> ToStringToTerm = (x) -> Atomic.the(x.toString());
+
+//    public static final org.slf4j.Logger logger = LoggerFactory.getLogger($.class);
+//    public static final Function<Object, Term> ToStringToTerm = (x) -> Atomic.the(x.toString());
 
     @NotNull
     public static <T extends Term> T $(@NotNull String term) throws Narsese.NarseseException {
         return terms.term(term);
     }
 
-    public static <T extends Term> T $safe(@NotNull String term)  {
+    public static <T extends Term> T $safe(@NotNull String term) {
         try {
             return $(term);
         } catch (Narsese.NarseseException e) {
@@ -89,7 +86,7 @@ public enum $ {
 
     final static Atom emptyQuote = (Atom) Atomic.the("\"\"");
 
-    final static Escaper quoteEscaper = Escapers.builder().addEscape('\"', "\\\"").build();
+    final static Escapers.Builder quoteEscaper = Escapers.builder().addEscape('\"', "\\\"");
 
 
     @NotNull
@@ -108,7 +105,7 @@ public enum $ {
                 //already quoted the empty string
             }
         } else {
-            s = ("\"" + quoteEscaper.escape(s) + '"');
+            s = ("\"" + quoteEscaper.build().escape(s) + '"');
         }
 
         return Atomic.the(s);
@@ -123,8 +120,6 @@ public enum $ {
             x[i] = Atomic.the(id[i]);
         return x;
     }
-
-
 
 
     @NotNull
@@ -310,17 +305,17 @@ public enum $ {
      */
     @Nullable
     public static <T extends Term> T inst(@NotNull Term subj, Term pred) {
-        return (T) terms.inst(subj, pred);
+        return (T) terms.the(INH, terms.the(SETe, subj), pred);
     }
 
     @Nullable
     public static <T extends Term> T instprop(@NotNull Term subject, @NotNull Term predicate) {
-        return (T) terms.instprop(subject, predicate);
+        return (T) terms.the(INH, terms.the(SETe, subject), terms.the(SETi, predicate));
     }
 
     @Nullable
     public static <T extends Term> T prop(Term subject, Term predicate) {
-        return (T) terms.prop(subject, predicate);
+        return (T) terms.the(INH, subject, terms.the(SETi, predicate));
     }
 
 //    public static Term term(final Op op, final Term... args) {
@@ -504,37 +499,37 @@ public enum $ {
     }
 
 
-    @NotNull
-    public static final ch.qos.logback.classic.Logger LOG;
-    static {
-        Thread.currentThread().setName("$");
+    Logging logging = new Logging();
 
-        //http://logback.qos.ch/manual/layouts.html
-
-        LOG = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-        LoggerContext loggerContext = LOG.getLoggerContext();
-        // we are not interested in auto-configuration
-        loggerContext.reset();
-
-        PatternLayoutEncoder logEncoder = new PatternLayoutEncoder();
-        logEncoder.setContext(loggerContext);
-        //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
-        logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
-
-        logEncoder.start();
-
-
-
+    static class Logging {
         {
-            ConsoleAppender c = new ConsoleAppender();
-            c.setContext(loggerContext);
-            c.setEncoder(logEncoder);
-            c.setImmediateFlush(false);
-            //c.setWithJansi(true);
-            c.start();
+            Thread.currentThread().setName("$");
 
-            LOG.addAppender(c);
-        }
+            //http://logback.qos.ch/manual/layouts.html
+
+            Logger LOG = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+            LoggerContext loggerContext = LOG.getLoggerContext();
+            // we are not interested in auto-configuration
+            loggerContext.reset();
+
+            PatternLayoutEncoder logEncoder = new PatternLayoutEncoder();
+            logEncoder.setContext(loggerContext);
+            //logEncoder.setPattern("\\( %highlight(%level),%green(%thread),%yellow(%logger{0}) \\): \"%message\".%n");
+            logEncoder.setPattern("\\( %green(%thread),%highlight(%logger{0}) \\): \"%message\".%n");
+
+            logEncoder.start();
+
+
+            {
+                ConsoleAppender c = new ConsoleAppender();
+                c.setContext(loggerContext);
+                c.setEncoder(logEncoder);
+                c.setImmediateFlush(false);
+                //c.setWithJansi(true);
+                c.start();
+
+                LOG.addAppender(c);
+            }
 
 //            SyslogAppender syslog = new SyslogAppender();
 //            syslog.setPort(5000);
@@ -565,6 +560,8 @@ public enum $ {
 //        } catch (Throwable t) {
 //            System.err.println("Logging Disabled: " + t);
 //        }
+        }
+
     }
 
 
@@ -587,7 +584,6 @@ public enum $ {
     public static Term diffe(Term a, Term b) {
         return the(DIFFe, a, b);
     }
-
 
 
     @Nullable
@@ -732,30 +728,10 @@ public enum $ {
     }
 
 
-
     /**
      * static storeless term builder
      */
     public static final StaticTermIndex terms = new StaticTermIndex();
-
-    /**
-     * determines if the string is invalid as an unquoted term according to the characters present
-     */
-    public static boolean isQuoteNecessary(@NotNull CharSequence t) {
-        int len = t.length();
-
-        if (len > 1 && (t.charAt(0) == '\"') &&
-                (t.charAt(len -1) == '\"'))
-            return false; //already quoted
-
-        for (int i = 0; i < len; i++) {
-            char c = t.charAt(i);
-            if (!Narsese.isValidAtomChar(c))
-                return true;
-        }
-
-        return false;
-    }
 
     @NotNull
     public static Atomic the(@NotNull byte[] id) {
@@ -823,67 +799,68 @@ public enum $ {
 //        if (capacity < 4) {
 //            return new UnifiedSet(0);
 //        } else {
-            //return new UnifiedSet(capacity);
-            //return new SimpleHashSet(capacity);
-            return new HashSet(capacity);
-            //return new LinkedHashSet(capacity);
+        //return new UnifiedSet(capacity);
+        //return new SimpleHashSet(capacity);
+        return new HashSet(capacity);
+        //return new LinkedHashSet(capacity);
 //        }
     }
 
-    @NotNull
-    public static <X> Set<X> newHashSet(@NotNull Collection<X> values) {
-        Set<X> s = newHashSet(values.size());
-        s.addAll(values);
-        return s;
-    }
+//    @NotNull
+//    public static <X> Set<X> newHashSet(@NotNull Collection<X> values) {
+//        Set<X> s = newHashSet(values.size());
+//        s.addAll(values);
+//        return s;
+//    }
 
-    public static @Nullable <C> Reference<C> reference(@Nullable C s) {
-        return s == null ? null :
-                //new SoftReference<>(s);
-                //new WeakReference<>(s);
-                Param.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
-    }
+//    public static @Nullable <C> Reference<C> reference(@Nullable C s) {
+//        return s == null ? null :
+//                //new SoftReference<>(s);
+//                //new WeakReference<>(s);
+//                Param.DEBUG ? new SoftReference<>(s) : new WeakReference<>(s);
+//    }
 
-    @Nullable
-    public static <C> Reference<C>[] reference(@Nullable C[] s) {
-        int l = Util.lastNonNull((Object[]) s);
-        if (l > -1) {
-            l++;
-            Reference<C>[] rr = new Reference[l];
-            for (int i = 0; i < l; i++) {
-                rr[i] = reference(s[i]);
-            }
-            return rr;
-        }
-        return null;
-    }
+//    @Nullable
+//    public static <C> Reference<C>[] reference(@Nullable C[] s) {
+//        int l = Util.lastNonNull((Object[]) s);
+//        if (l > -1) {
+//            l++;
+//            Reference<C>[] rr = new Reference[l];
+//            for (int i = 0; i < l; i++) {
+//                rr[i] = reference(s[i]);
+//            }
+//            return rr;
+//        }
+//        return null;
+//    }
 
-    public static void dereference(@NotNull Reference[] p) {
-        for (int i = 0; i < p.length; i++) {
-            Reference x = p[i];
-            if (x != null)
-                x.clear();
-            p[i] = null;
-        }
-    }
-
-    @Nullable
-    public static <C> C dereference(@Nullable Reference<C> s) {
-        return s == null ? null : s.get();
-    }
-
-    @Nullable
-    public static <C> C dereference(@Nullable Reference<C>[] s, int index) {
-        if (s == null || index >= s.length) return null;
-        return dereference(s[index]);
-    }
+//    public static void dereference(@NotNull Reference[] p) {
+//        for (int i = 0; i < p.length; i++) {
+//            Reference x = p[i];
+//            if (x != null)
+//                x.clear();
+//            p[i] = null;
+//        }
+//    }
+//
+//    @Nullable
+//    public static <C> C dereference(@Nullable Reference<C> s) {
+//        return s == null ? null : s.get();
+//    }
+//
+//    @Nullable
+//    public static <C> C dereference(@Nullable Reference<C>[] s, int index) {
+//        if (s == null || index >= s.length) return null;
+//        return dereference(s[index]);
+//    }
 
 
     @NotNull
     public static <X> List<X> newArrayList(@NotNull X... x) {
-        FasterList<X> l = (FasterList) $.newArrayList(x.length);
-        l.addAll(x);
-        return l;
+        return new FasterList(x);
+//        FasterList<X> l = (FasterList) $.newArrayList(x.length);
+//        l.addAll(x);
+//        return l;
     }
 
     public static Compound pRadix(int x, int radix, int maxX) {
@@ -946,19 +923,19 @@ public enum $ {
 //        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(logClass)).setLevel(l);
 //    }
 
-    @NotNull
-    public static TaskBuilder command(@NotNull Compound op) {
-        //TODO use lightweight CommandTask impl without all the logic metadata
-        TaskBuilder t = new TaskBuilder(op, COMMAND, null);
-        t.setPri(1f);
-        return t;
-    }
-
-    @NotNull
-    public static TaskBuilder command(@NotNull String functor, Term... args) {
-        //TODO use lightweight CommandTask impl without all the logic metadata
-        return command(func(functor, args));
-    }
+//    @NotNull
+//    public static TaskBuilder command(@NotNull Compound op) {
+//        //TODO use lightweight CommandTask impl without all the logic metadata
+//        TaskBuilder t = new TaskBuilder(op, COMMAND, null);
+//        t.setPri(1f);
+//        return t;
+//    }
+//
+//    @NotNull
+//    public static TaskBuilder command(@NotNull String functor, Term... args) {
+//        //TODO use lightweight CommandTask impl without all the logic metadata
+//        return command(func(functor, args));
+//    }
 
     @NotNull
     public static String unquote(@NotNull Term s) {
@@ -979,7 +956,7 @@ public enum $ {
     /**
      * instantiate new Javascript context
      */
-    public final static NashornScriptEngine JS() {
+    public static NashornScriptEngine JS() {
         return (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
     }
 
@@ -992,13 +969,13 @@ public enum $ {
     }
 
     public static <X> BoolPred<X> AND(BoolPred<X> a, BoolPred<X> b) {
-        return new LambdaPred<X>((Compound)$.conj(a, b), (X x) -> {
+        return new LambdaPred<X>((Compound) $.conj(a, b), (X x) -> {
             return a.test(x) && b.test(x);
         });
     }
 
     public static <X> BoolPred<X> OR(BoolPred<X> a, BoolPred<X> b) {
-        return new LambdaPred<X>((Compound)$.disj(a, b), (X x) -> {
+        return new LambdaPred<X>((Compound) $.disj(a, b), (X x) -> {
             return a.test(x) || b.test(x);
         });
     }

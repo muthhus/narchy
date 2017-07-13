@@ -22,7 +22,6 @@ import com.metamx.collections.spatial.split.LinearGutmanSplitStrategy;
 import junit.framework.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.util.Random;
 

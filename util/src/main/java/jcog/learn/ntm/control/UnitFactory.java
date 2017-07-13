@@ -7,7 +7,7 @@ public class UnitFactory {
     @Deprecated public static Unit[] getVector(int vectorSize) {
         Unit[] vector = new Unit[vectorSize];
         for (int i = 0;i < vectorSize;i++) {
-            vector[i] = new Unit(0.0);
+            vector[i] = new Unit();
         }
         return vector;
     }

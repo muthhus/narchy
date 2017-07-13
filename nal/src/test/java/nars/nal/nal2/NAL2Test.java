@@ -1,14 +1,9 @@
 package nars.nal.nal2;
 
 
-import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.function.Supplier;
 
 //@RunWith(Parameterized.class)
 public class NAL2Test extends AbstractNALTest {

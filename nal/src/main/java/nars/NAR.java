@@ -115,7 +115,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     @NotNull
-    private Term self = Param.randomSelf();
+    private Term self;
 
 
     /**
@@ -195,6 +195,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.random = rng;
 
         this.exe = exe;
+
+        this.self = Param.randomSelf();
 
         this.emotion = new Emotion();
         this.in = newInputMixer();
@@ -1142,6 +1144,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return this;
     }
 
+    /**
+     * TODO this needs refactoring to use a central scheduler
+     */
     @NotNull
     public NAR inputAt(long time, @NotNull String... tt) throws NarseseException {
         //LongPredicate timeCondition = t -> t == time;

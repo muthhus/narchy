@@ -35,12 +35,12 @@ public abstract class CollectorMap<K, V> {
      */
     abstract protected Object _items();
 
-    /**
-     * implementation for adding the value to another collecton (called internally)
-     * returns null if successful, non-null if an item was displaced it will be that item
-     */
-    @Nullable
-    protected abstract V addItem(@NotNull V e);
+//    /**
+//     * implementation for adding the value to another collecton (called internally)
+//     * returns null if successful, non-null if an item was displaced it will be that item
+//     */
+//    @Nullable
+//    protected abstract V addItem(@NotNull V e);
 
     /**
      * implementation for removing the value to another collecton (called internally)

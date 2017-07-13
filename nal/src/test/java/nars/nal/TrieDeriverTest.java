@@ -1,6 +1,5 @@
 package nars.nal;
 
-import nars.derive.TrieDeriver;
 import org.junit.Test;
 
 /**

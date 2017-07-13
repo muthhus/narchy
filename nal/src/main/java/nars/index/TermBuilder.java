@@ -239,25 +239,9 @@ public abstract class TermBuilder {
 //    }
 
 
-    @NotNull
-    public Term inst(Term subj, Term pred) {
-        return the(INH, the(SETe, subj), pred);
-    }
-
-    @NotNull
-    public Term prop(Term subj, Term pred) {
-        return the(INH, subj, the(SETi, pred));
-    }
-
-    @NotNull
-    public Term instprop(@NotNull Term subj, @NotNull Term pred) {
-        return the(INH, the(SETe, subj), the(SETi, pred));
-    }
-
-
-    public Term replace(@NotNull Term c, @NotNull Term x, @NotNull Term y) {
-        return $.terms.replace(c, x, y);
-    }
+//    public Term replace(@NotNull Term c, @NotNull Term x, @NotNull Term y) {
+//        return $.terms.replace(c, x, y);
+//    }
 
 
     //    /**

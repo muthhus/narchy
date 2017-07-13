@@ -19,10 +19,8 @@ public class substitute extends Functor {
 
     final static Term STRICT = Atomic.the("strict");
 
-    final static Atom func = (Atom) $.the("substitute");
-
     public substitute() {
-        super(func);
+        super((Atom) $.the("substitute"));
     }
 
     @Nullable @Override public Term apply(@NotNull TermContainer xx) {

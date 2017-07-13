@@ -63,15 +63,15 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
     protected abstract boolean listRemove(V removed);
 
 
-    @Nullable
-    @Override
-    protected V addItem(@NotNull V i) {
-        if (isFull())
-            throw new RuntimeException("table full");
-
-        listAdd(i);
-        return null;
-    }
+//    @Nullable
+//    @Override
+//    protected V addItem(@NotNull V i) {
+//        if (isFull())
+//            throw new RuntimeException("table full");
+//
+//        listAdd(i);
+//        return null;
+//    }
 
     protected abstract void listAdd(V i);
 

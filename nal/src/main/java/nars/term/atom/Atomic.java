@@ -2,6 +2,7 @@ package nars.term.atom;
 
 import jcog.Texts;
 import nars.$;
+import nars.Narsese;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
@@ -55,7 +56,7 @@ public interface Atomic extends Term {
                 return IntAtom.the(i); //parsed as integer, so
         }
 
-        if ($.isQuoteNecessary(id))
+        if (isQuoteNecessary(id))
             return $.quote(id);
 
 
@@ -142,4 +143,25 @@ public interface Atomic extends Term {
     default boolean subIs(int i, Op o) {
         return false;
     }
+
+    /**
+     * determines if the string is invalid as an unquoted term according to the characters present
+     */
+    static boolean isQuoteNecessary(@NotNull CharSequence t) {
+        int len = t.length();
+
+        if (len > 1 && (t.charAt(0) == '\"') &&
+                (t.charAt(len - 1) == '\"'))
+            return false; //already quoted
+
+        for (int i = 0; i < len; i++) {
+            char c = t.charAt(i);
+            if (!Narsese.isValidAtomChar(c))
+                return true;
+        }
+
+        return false;
+    }
+
+
 }
