@@ -448,8 +448,8 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
             if (++i == c) i = 0; //modulo c
         }
 
-        if (modified)
-            commit(null);
+//        if (modified)
+//            commit(null);
 
         return this;
     }

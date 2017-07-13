@@ -5,7 +5,6 @@ import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.io.NarseseTest;
 import nars.nar.NARBuilder;
-import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -28,14 +27,16 @@ import static org.junit.Assert.*;
 
 public class TemporalTest {
 
-    @NotNull NAR n = new NARBuilder().get();
+    @NotNull
+    static final NAR n = new NARBuilder().get();
 
 
     @Test
     public void parsedCorrectOccurrenceTime() throws Narsese.NarseseException {
+        long now = n.time();
         Task t = n.inputAndGet("<a --> b>. :\\:");
-        assertEquals(0, t.creation());
-        assertEquals(-(1 /*n.duration()*/), t.start());
+        assertEquals(now, t.creation());
+        assertEquals(now - 1, t.start());
     }
 
     @Test
@@ -66,9 +67,10 @@ public class TemporalTest {
         assertInvalidTask("((x) &&+0 (--,(x))).");
     }
 
+
     public void assertInvalidTask(@NotNull String ss) {
         try {
-            Narsese.the().task(ss, new Terminal());
+            Narsese.the().task(ss, n);
             assertTrue(false);
         } catch (Exception e) {
             assertTrue(true);
@@ -289,7 +291,7 @@ public class TemporalTest {
 
             Concept f = n.conceptualize($("(y " + op + "+- x)"));
 
-            assertTrue(e + "==" +f , e == f);
+            assertTrue(e + "==" + f, e == f);
         }
 
     }
@@ -364,31 +366,35 @@ public class TemporalTest {
 
     @Test
     public void testConceptualization() throws Narsese.NarseseException {
-        NAR d = new NARBuilder().get();
+        //NAR n = new NARBuilder().get();
 
-        d.input("(x ==>+0 y)."); //eternal
-        d.input("(x ==>+1 y)."); //eternal
+        n.input("(x ==>+0 y)."); //eternal
+        n.input("(x ==>+1 y)."); //eternal
 
         //d.index().print(System.out);
         //d.concept("(x==>y)").print();
 
-        d.cycle();
+        n.run(2);
 
-        int indexSize = d.terms.size();
 
-        Concept xImplY = d.conceptualize($("(x==>y)"));
+
+        Concept xImplY = n.conceptualize($("(x==>y)"));
         assertEquals(3, xImplY.beliefs().size());
 
-        d.input("(x ==>+1 y). :|:"); //present
-        d.cycle();
+        int indexSize = n.terms.size();
+        n.terms.print(System.out);
+
+        n.input("(x ==>+1 y). :|:"); //present
+        n.cycle();
 
         //d.concept("(x==>y)").print();
 
         assertEquals(4, xImplY.beliefs().size());
 
-        assertEquals(indexSize, d.terms.size()); //remains same amount
+        n.terms.print(System.out);
+        assertEquals(indexSize, n.terms.size()); //remains same amount
 
-        d.concept("(x==>y)").print();
+        n.concept("(x==>y)").print();
     }
 
 
@@ -551,6 +557,7 @@ public class TemporalTest {
         //2 unique impl concepts created
         assertEquals(
                 //"[(#1==>x), (#1==>y), ((--,(y==>#1))&&(--,(#1==>y))), ((x==>#1)&&(#1==>x)), (x<=>y), (x==>#1), (x==>y), (y==>#1), (y==>x), x, y]"
+                //"[((x)<=>(y)), ((x)==>(y)), ((y)<=>(x)), ((y)==>(x)), (x), (y), x, y]"
                 "[((x)<=>(y)), ((x)==>(y)), ((y)==>(x)), (x), (y), x, y]"
                 , d.toString());
     }
@@ -753,6 +760,7 @@ public class TemporalTest {
         Term xz = $.terms.retemporalize(t, $.terms.retemporalizationZero);
         assertEquals("((--,(happy)) &&+0 (--,((--,(o)) &&+0 (happy))))", xz.toString());
     }
+
     @Test
     public void testRetermporalization2() throws Narsese.NarseseException {
         String su = "((--,(happy)) &&+- (--,((--,(o))&&+-(happy))))";

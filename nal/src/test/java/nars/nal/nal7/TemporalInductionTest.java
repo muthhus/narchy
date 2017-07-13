@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by me on 6/8/15.
@@ -51,6 +52,7 @@ public class TemporalInductionTest {
         //n.forEachActiveConcept(Concept::print);
 
         TaskConcept c = (TaskConcept) n.concept("a:b");
+        assertNotNull(c);
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
 
         BeliefTable b = c.beliefs();

@@ -159,7 +159,7 @@ public enum Op implements $ {
             if (dt == XTERNAL) {
                 //assert (n == 2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
 
-                //Arrays.sort(u); //sort but dont deduplicate
+                Arrays.sort(u); //sort but dont deduplicate
                 return conjPost(compound(CONJ, XTERNAL, subterms(u)));
             }
 
@@ -1011,9 +1011,9 @@ public enum Op implements $ {
             return Null;
 
         if (dt == XTERNAL) {
-            return compound(op, XTERNAL, //subterms(op != EQUI || subject.compareTo(predicate) <= 0 ?
-                    subterms(subject, predicate));
-                    //new Term[]{predicate, subject}));
+            return compound(op, XTERNAL, op != EQUI || subject.compareTo(predicate) <= 0 ?
+                    subterms(subject, predicate):
+                    subterms(predicate,subject));
         }
 
         switch (op) {
