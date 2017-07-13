@@ -431,7 +431,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
 
-        TaskTable.activate(activated, activation, nar);
+        if (activated!=null)
+            TaskTable.activate(activated, activation, nar);
     }
 
 

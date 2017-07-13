@@ -111,10 +111,15 @@ public class RTree<T> implements Space<T> {
     @Override
     public boolean add(@NotNull final T t) {
         int before = size;
-        root = root.add(t, this, model);
-        int after = size;
-        assert (after == before || after == before + 1) : "after=" + after + ", before=" + before;
-        return after > before;
+        Node<T, ?> nextRoot = root.add(t, this, model);
+        if (nextRoot!=null) {
+            this.root = nextRoot;
+            int after = size;
+            assert (after == before || after == before + 1) : "after=" + after + ", before=" + before;
+            return after > before;
+        } else {
+            return false; //duplicate or merged
+        }
     }
 
 

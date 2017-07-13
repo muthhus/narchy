@@ -164,8 +164,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             @Override
             public void merge(TaskRegion found, TaskRegion incoming) {
 
+                if (found.task == incoming.task)
+                    return; //same instance
 
-                //MERGE
                 float activation = incoming.task.priElseZero();
                 float before = found.task.priElseZero();
                 float after = found.task.priAdd(activation);
@@ -183,7 +184,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     public boolean add(TaskRegion tr) {
                         Task task = tr.task;
                         if (task instanceof SignalTask) {
-                            ongoing.add(tr);
+                            if (!ongoing.add(tr))
+                                return false; //already in
                         }
 
                         if (super.add(tr)) {

@@ -39,12 +39,14 @@ public class RTreeBeliefTableTest {
 
         Task b = $.belief(x, 0f, 0.9f).time(3).apply(n); b.pri(0.5f);
         t.add(b, X, n);
+        assertEquals(2, t.size());
+
         Task c = $.belief(x, 0.1f, 0.9f).time(3).apply(n); c.pri(0.5f);
         t.add(c, X, n);
+        assertEquals(3, t.size());
 
         Task d = $.belief(x, 0.1f, 0.9f).time(0,3, 4).apply(n); d.pri(0.5f);
         t.add(d, X, n);
-
         assertEquals(4, t.size()); //no change for inserted duplicate
 
         t.print(System.out);

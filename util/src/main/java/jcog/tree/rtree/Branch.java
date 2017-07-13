@@ -70,7 +70,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
      * @param n node to be added (can be leaf or branch)
      * @return position of the added node
      */
-    public int addChild(final Node<T, ?> n) {
+    public int addChild(@NotNull final Node<T, ?> n) {
         if (size < child.length) {
             child[size++] = n;
 
@@ -116,10 +116,12 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
             Node ci = child[i];
             if (ci.region().contains(tRect)) {
                 //check for existing item
-                if (ci.contains(t, model))
-                    return this; // duplicate detected (subtree not changed)
+//                if (ci.contains(t, model))
+//                    return this; // duplicate detected (subtree not changed)
 
                 Node<T, ?> m = ci.add(t, this, model);
+                if (m == null)
+                    return null; //merged
                 if (reportNextSizeDelta(parent)) {
                     child[i] = m;
                     grow(m); //subtree was changed
@@ -139,7 +141,12 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
             final int bestLeaf = chooseLeaf(t, tRect, parent, model);
 
-            child[bestLeaf] = child[bestLeaf].add(t, this, model);
+            Node<T, ?> nextBest = child[bestLeaf].add(t, this, model);
+            if (nextBest == null) {
+                return null; //merged
+            }
+
+            child[bestLeaf] = nextBest;
 
             if (reportNextSizeDelta(parent)) {
                 grow(bestLeaf);
@@ -157,6 +164,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
             } else {
                 //duplicate was found in sub-tree but we checked for duplicates above
                 assert(false);
+                //return null;
             }
 
             return this;

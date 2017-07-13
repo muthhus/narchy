@@ -90,6 +90,7 @@ public interface Node<L, V> extends Nodelike<L> {
      *  @param l      - value to add to index
      * @param parent - the callee which is the parent of this instance
      * @param model
+     * @return null if Leaf merged it with existing item
      */
     Node<L, ?> add(L l, Nodelike<L> parent, Spatialization<L> model);
 

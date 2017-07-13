@@ -242,6 +242,7 @@ public class TaskExecutor extends Executioner {
                     pAvg > Pri.EPSILON * 8 ? pAvg : 0;
             //0;
 
+            tasks.commit(null);
 
             do {
 

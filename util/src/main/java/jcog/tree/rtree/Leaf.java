@@ -23,6 +23,7 @@ package jcog.tree.rtree;
 import jcog.tree.rtree.util.CounterNode;
 import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -88,7 +89,7 @@ public class Leaf<T> implements Node<T, T> {
 
             return next;
         } else {
-            return this;
+            return null;
         }
     }
 
@@ -118,8 +119,6 @@ public class Leaf<T> implements Node<T, T> {
         for (int i = 0; i < size; i++) {
             T d = data[i];
             if (d.equals(t)) {
-                if (d == t)
-                    return true; //same instance
                 model.merge(d, t);
                 return true;
             }
