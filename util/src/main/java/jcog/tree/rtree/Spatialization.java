@@ -45,6 +45,11 @@ public class Spatialization<T> {
         return region(c).perimeter();
     }
 
+    /** called when add encounters an equivalent (but different) instance */
+    public void merge(T existing, T incoming) {
+
+    }
+
     /**
      * Different methods for splitting nodes in an RTree.
      */

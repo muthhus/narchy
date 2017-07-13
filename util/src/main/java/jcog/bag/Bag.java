@@ -181,12 +181,12 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         return sampleOrPop(true, max, each);
     }
 
-    default Bag<K, V> sampleOrPop(boolean sampleOrPop, int max, Consumer<? super V> each) {
+    default Bag<K, V> sampleOrPop(boolean pop, int max, Consumer<? super V> each) {
         final int[] count = {max};
         return sample((x) -> {
             each.accept(x);
             return ((count[0]--) > 0) ? Next : Bag.BagCursorAction.Stop;
-        }, sampleOrPop);
+        }, pop);
     }
     @Nullable
     default V maxBy(FloatFunction<V> rank) {

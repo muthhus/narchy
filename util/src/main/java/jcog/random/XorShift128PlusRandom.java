@@ -84,7 +84,7 @@ public class XorShift128PlusRandom extends Random {
 	@Override
 	public int nextInt( int n ) {
 
-		int v = (int)(Math.abs(nextLong())%n);
+		int v = Math.abs( (int)(nextLong()) % n );
 		//if (v >= n || v < 0)
 			//throw new UnsupportedOperationException();
 		return v;

@@ -29,6 +29,8 @@ import static nars.Op.COMMAND;
  */
 public class TaskExecutor extends Executioner {
 
+    int inputBatch = 8, fireBatch = 8;
+
     //    private final DisruptorBlockingQueue<ITask> overflow;
     protected boolean trace;
 
@@ -226,51 +228,55 @@ public class TaskExecutor extends Executioner {
             if (t)
                 concepts.print();
 
-            int toFire = conceptsPerCycleMax.intValue();
-            if (toFire < 0)
-                toFire = concepts.capacity();
+            final int[] toFire = {conceptsPerCycleMax.intValue()};
+            final int[] toInput = {conceptsPerCycleMax.intValue()};
 
 
             //Random rng = nar.random();
 
 
             //EXEC
-            float eFrac = ((float) toFire) / concepts.capacity();
+            float eFrac = ((float) toFire[0]) / concepts.capacity();
             float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag) concepts).depressurize(eFrac) * (eFrac);
             this.forgetEachActivePri =
                     pAvg > Pri.EPSILON * 8 ? pAvg : 0;
             //0;
 
-            int inputBatch = 8, fireBatch = 8;
-            int toInput = tasks.size();
 
             do {
-                if (toInput > 0) {
-                    if (tasks.isEmpty()) toInput = 0;
-                    else {
-                        tasks.commit(null).pop(inputBatch, this::actuallyRun);
-                        toInput -= inputBatch;
-                    }
+
+
+                toFire[0] = Math.min(toFire[0], concepts.size());
+                if (toFire[0] > 0) {
+
+                    concepts.sample(toFire[0], x -> {
+
+                        actuallyRun(x);
+
+
+                        if (forgetEachActivePri > 0) {
+                            x.priSub(forgetEachActivePri);
+                        }
+
+                        --toFire[0];
+
+                        //activeBuffer.add(x);
+                        //(Consumer<? super ITask>)(buffer::add)
+                    });
+
                 }
 
-                if (toFire > 0) {
-                    if (concepts.isEmpty()) toFire = 0;
-                    else {
-                        concepts.sample(fireBatch, x -> {
+                toInput[0] = Math.min(toInput[0], tasks.size());
+                if (toInput[0] > 0) {
 
-                            actuallyRun(x);
+                    tasks.pop(toInput[0], x -> {
+                        actuallyRun(x);
+                        --toInput[0];
+                    });
 
-                            if (forgetEachActivePri > 0) {
-                                x.priSub(forgetEachActivePri);
-                            }
-
-                            //activeBuffer.add(x);
-                            //(Consumer<? super ITask>)(buffer::add)
-                        });
-                        toFire -= fireBatch;
-                    }
                 }
-            } while (toFire > 0 || toInput > 0);
+
+            } while (toFire[0] > 0 || toInput[0] > 0);
 
 
 //            for (int i = 0; i < toExe; i++) {

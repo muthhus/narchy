@@ -26,7 +26,7 @@ import static nars.time.Tense.ETERNAL;
 @RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 350;
+    final int cycles = 550;
 
     public NAL7Test(Supplier<NAR> b) {
         super(b);
@@ -264,7 +264,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 .mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f)
                 .mustBelieve(cycles, "(enter($1,room) ==>-9 hold($1,key) )", 0.8f, 0.42f)
-                .mustBelieve(cycles,   "(hold($1,key) <=>+9 enter($1,room) )", 0.73f, 0.44f)
+                .mustBelieve(cycles, "(hold($1,key) <=>+9 enter($1,room) )", 0.73f, 0.44f)
                 .mustNotOutput(cycles, "(hold($1,key) <=>-9 enter($1,room))", BELIEF, ETERNAL); //test correct dt polarity
 
     }
@@ -281,20 +281,20 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void inference_on_tense_reverse() {
         test()
-            .input("(hold($x, key) ==>+7 enter($x, room)).")
-            .input("enter(John, room). :|:")
-            .mustBelieve(cycles, "hold(John,key)",
-                    1.00f, 0.45f, -7);
+                .input("(hold($x, key) ==>+7 enter($x, room)).")
+                .input("enter(John, room). :|:")
+                .mustBelieve(cycles, "hold(John,key)",
+                        1.00f, 0.45f, -7);
     }
 
     @Test
     public void inference_on_tense_reverse_novar() {
         test()
-            //.log()
-            .input("(hold(John, key) ==>+7 enter(John, room)).")
-            .input("enter(John, room). :|:")
-            .mustBelieve(cycles, "hold(John,key)",
-                    1.00f, 0.45f, -7);
+                //.log()
+                .input("(hold(John, key) ==>+7 enter(John, room)).")
+                .input("enter(John, room). :|:")
+                .mustBelieve(cycles, "hold(John,key)",
+                        1.00f, 0.45f, -7);
     }
 
     @Test
@@ -352,20 +352,19 @@ public class NAL7Test extends AbstractNALTest {
         tester.inputAt(4, "<(John,room) --> enter>. :|:");
 
         tester.mustBelieve(cycles, "(((John, door) --> open) ==>+4 ((John, room) --> enter))",
-                1.00f, 0.45f, 0,4);
+                1.00f, 0.45f, 0, 4);
 
     }
 
     @Test
     public void induction_on_events3() {
-        TestNAR tester = test();
-
-        tester.input("open(John,door). :|:");
-        tester.inputAt(4, "enter(John,room). :|:");
-
-        tester.mustBelieve(cycles, "(open(John, door) <=>+4 enter(John, room))",
-                1.00f, 0.45f,
-                0,4);
+        test()
+                .log()
+                .input("open(John,door). :|:")
+                .inputAt(4, "enter(John,room). :|:")
+                .mustBelieve(cycles, "(open(John, door) <=>+4 enter(John, room))",
+                        1.00f, 0.45f,
+                        0, 4);
 
     }
 
@@ -378,7 +377,7 @@ public class NAL7Test extends AbstractNALTest {
 
         tester.mustBelieve(cycles, "(<door --> open> <=>+1 <room --> enter>)",
                 1.00f, 0.45f,
-                1,2);
+                1, 2);
     }
 
     @Test
@@ -432,7 +431,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.mustBelieve(cycles,
                 "(enter($1,room) <=>-2 open($1,door))",
                 1.00f, 0.45f,
-                0,2
+                0, 2
         );
 
     }
@@ -443,7 +442,7 @@ public class NAL7Test extends AbstractNALTest {
         TestNAR tester = test();
 
         //tester;
-        tester.input("open(John, door).. :|:");
+        tester.input("open(John, door). :|:");
         tester.inputAt(2, "enter(John, room). :|:");
 
 
@@ -451,7 +450,7 @@ public class NAL7Test extends AbstractNALTest {
                 "((open($1,door) ==>+2 enter($1, room))",
                 1.00f,
                 0.45f /* 0.45f */,
-                0,2
+                0, 2
         );
 
         //REVERSE:
@@ -585,11 +584,11 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void variable_elimination_on_temporal_statements() {
         test()
-            //.log()
-            .inputAt(0, "(on({t002},#1) &&+0 at(SELF,#1)). :|:")
-            .inputAt(1, "((on($1,#2) &&+0 at(SELF,#2)) ==>+0 reachable(SELF,$1)).")
-            .mustBelieve(cycles, "reachable(SELF,{t002})",
-                    1.0f, 0.81f, 0);
+                //.log()
+                .inputAt(0, "(on({t002},#1) &&+0 at(SELF,#1)). :|:")
+                .inputAt(1, "((on($1,#2) &&+0 at(SELF,#2)) ==>+0 reachable(SELF,$1)).")
+                .mustBelieve(cycles, "reachable(SELF,{t002})",
+                        1.0f, 0.81f, 0);
 
     }
 
@@ -898,11 +897,11 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testIntersectionTemporalFar() {
         test()
-            .dur(2)
-            //.log()
-            .inputAt(0, "(x --> a). :|:")
-            .inputAt(3, "(y --> a). :|:")
-            .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.70f, 2)
+                .dur(2)
+                //.log()
+                .inputAt(0, "(x --> a). :|:")
+                .inputAt(3, "(y --> a). :|:")
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.70f, 2)
         ;
     }
 
@@ -917,7 +916,7 @@ public class NAL7Test extends AbstractNALTest {
         TestNAR t = test();
         //((FrameTime)t.nar.time).dur(eventDT);
 
-        t.dur(eventDT/2);
+        t.dur(eventDT / 2);
 
 //        t.nar.onTask((tt)->{
 //           if (tt.start() > t.nar.time()) {
@@ -928,20 +927,20 @@ public class NAL7Test extends AbstractNALTest {
         int x = 0;
         for (int i = 0; i < cycles; i++) {
 
-            if (i == cycles-1) {
-                $.task($("(y)"), QUESTION, null).time(0, x, x+2*eventDT).setPriThen(1f).apply(t.nar);
+            if (i == cycles - 1) {
+                $.task($("(y)"), QUESTION, null).time(0, x, x + 2 * eventDT).setPriThen(1f).apply(t.nar);
             }
 
             t
-                .inputAt(x, "(x). :|:")
-                .inputAt(x + eventDT, "(y). :|:");
+                    .inputAt(x, "(x). :|:")
+                    .inputAt(x + eventDT, "(y). :|:");
 
 
-            x+= 2 * eventDT;
+            x += 2 * eventDT;
         }
 
-        t.mustBelieve(x-1, "(x)", 1f, 0.73f, x)
-            .mustBelieve(x-1, "(y)", 1f, 0.73f, x + eventDT);
+        t.mustBelieve(x - 1, "(x)", 1f, 0.73f, x)
+                .mustBelieve(x - 1, "(y)", 1f, 0.73f, x + eventDT);
     }
 
     @Test
@@ -1178,8 +1177,8 @@ public class NAL7Test extends AbstractNALTest {
             |- (d -->e) @ 10, not 19
         */
         test()
-                .input( "(((a-->b) &&+1 (b-->c)) &&+9 (d-->e)). :|:")
-                .input(  "((a-->b) &&+1 (b-->c)). :|:")
+                .input("(((a-->b) &&+1 (b-->c)) &&+9 (d-->e)). :|:")
+                .input("((a-->b) &&+1 (b-->c)). :|:")
                 .mustBelieve(cycles, "(d-->e)", 1f, 0.73f, 10 /* 10? */)
         ;
     }
@@ -1254,7 +1253,8 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Ignore
-    @Test public void testImplInductionAndConjReduction() {
+    @Test
+    public void testImplInductionAndConjReduction() {
         /*
         test for 2 things:
             a) the inducted implication should not lose its temporal information in the result
@@ -1271,7 +1271,8 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
-    @Test public void testCorrectGoalOccAndDuration() throws Narsese.NarseseException {
+    @Test
+    public void testCorrectGoalOccAndDuration() throws Narsese.NarseseException {
         /*
         $1.0 (happy-->dx)! 1751 %.46;.15% {1753: _gpeß~Èkw;_gpeß~Èky} (((%1-->%2),(%3-->%2),neqRCom(%1,%3)),((%1-->%3),((Induction-->Belief),(Weak-->Goal),(Backwards-->Permute))))
             $NaN (happy-->noid)! 1754⋈1759 %1.0;.90% {1748: _gpeß~Èky}
@@ -1279,9 +1280,9 @@ public class NAL7Test extends AbstractNALTest {
          */
         test()
 //            .log()
-            .input( new NALTask($("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[] { 100 }).pri(0.5f))
-            .input( new NALTask($("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[] { 101 }).pri(0.5f))
-            .mustDesire(cycles, "(a-->c)", 1f, 0.4f, 10, 20)
+                .input(new NALTask($("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
+                .input(new NALTask($("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
+                .mustDesire(cycles, "(a-->c)", 1f, 0.4f, 10, 20)
         ;
 
     }

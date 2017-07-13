@@ -115,7 +115,17 @@ public class Leaf<T> implements Node<T, T> {
 
     @Override
     public boolean contains(T t, Spatialization<T> model) {
-        return size>0 && OR(e -> e == t || e.equals(t));
+        for (int i = 0; i < size; i++) {
+            T d = data[i];
+            if (d.equals(t)) {
+                if (d == t)
+                    return true; //same instance
+                model.merge(d, t);
+                return true;
+            }
+        }
+        return false;
+        //return size>0 && OR(e -> e == t || e.equals(t));
     }
 
 

@@ -1082,7 +1082,7 @@ public enum Op implements $ {
                         return True;
                     }
                 } else {
-                    if (subject.compareTo(predicate) > 0) {
+                    if (!equal && subject.compareTo(predicate) > 0) {
                         //swap
                         Term x = subject;
                         subject = predicate;

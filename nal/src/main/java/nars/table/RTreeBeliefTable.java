@@ -31,7 +31,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = { /*0,*/ 1, 2, 4, 16, 64 };
+    static final int[] sampleRadii = { /*0,*/ 1, 2, 4, 16, 64};
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -62,7 +62,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         public double cost() {
             return (1f + 0.5f * Util.sigmoid(range(0))) *
                     Util.sqr(1f + (float) range(1)) *
-                    (1f + 0.5f * range(2)) ;
+                    (1f + 0.5f * range(2));
         }
 
         @Override
@@ -155,20 +155,43 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     final Set<TaskRegion> ongoing = Sets.newConcurrentHashSet();
 
     private long lastUpdate = Long.MIN_VALUE;
+    private transient NAR nar = null;
     //private final AtomicBoolean compressing = new AtomicBoolean(false);
 
     public RTreeBeliefTable() {
-        this.tree = new ConcurrentRTree<>(
-                new RTree<>((t -> t), 3, 4, Spatialization.DefaultSplits.AXIAL) {
+        Spatialization<TaskRegion> model = new Spatialization<TaskRegion>((t -> t), Spatialization.DefaultSplits.AXIAL, 3, 4) {
+
+            @Override
+            public void merge(TaskRegion found, TaskRegion incoming) {
+
+
+                //MERGE
+                float activation = incoming.task.priElseZero();
+                float before = found.task.priElseZero();
+                float after = found.task.priAdd(activation);
+                activation = (after - before);
+                incoming.task.delete();
+
+                TaskTable.activate(found.task, activation, nar);
+            }
+        };
+
+        this.tree = new ConcurrentRTree<TaskRegion>(
+                new RTree<TaskRegion>(model) {
 
                     @Override
                     public boolean add(TaskRegion tr) {
                         Task task = tr.task;
                         if (task instanceof SignalTask) {
-                            if (!ongoing.add(tr))
-                                return false; //should already be present
+                            ongoing.add(tr);
                         }
-                        return super.add(tr);
+
+                        if (super.add(tr)) {
+                            //new insertion
+                            TaskTable.activate(tr.task, tr.task.priElseZero(), nar);
+                            return true;
+                        }
+                        return false;
                     }
 
                     @Override
@@ -226,7 +249,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private int capacity;
 
     @Override
-    public Truth truth(long when,  EternalTable eternal, NAR nar) {
+    public Truth truth(long when, EternalTable eternal, NAR nar) {
 
         long now = nar.time();
         updateSignalTasks(now);
@@ -249,7 +272,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 if (!tt.isEmpty()) {
                     //applying eternal should not influence the scan for temporal so it is left null here
                     @Nullable PreciseTruth t = TruthPolation.truth(null, when, dur, tt);
-                    if (t!=null && t.conf() > confMin) {
+                    if (t != null && t.conf() > confMin) {
                         return t.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1f);
                     }
                 }
@@ -263,7 +286,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     @Override
-    public Task match(long when,  @Nullable Task against, NAR nar) {
+    public Task match(long when, @Nullable Task against, NAR nar) {
 
         long now = nar.time();
 
@@ -327,18 +350,17 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     @Override
     public void add(@NotNull Task x, TaskConcept c, NAR n) {
-        float activation = x.priElseZero();
 
         updateSignalTasks(n.time());
 
-        TaskRegion tr = new TaskRegion(x);
-        final Task y = find(tr);
-        if (y == null) {
+        this.nar = n;
 
+        TaskRegion tr = new TaskRegion(x);
+        if (tree.add(tr)) {
+
+            //check capacity overage
             int over = size() + 1 - capacity;
             if (over > 0) {
-
-
                 List<Task> toActivate = addAfterCompressing(tr, n);
 
                 for (int i = 0, toActivateSize = toActivate.size(); i < toActivateSize; i++) {
@@ -346,24 +368,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                     n.input(ConceptFire.activate(ii, ii.priElseZero(), c, n));
                 }
-
-            } else {
-                tree.addAsync(tr);
             }
-
-
-        } else if (x!=y) {
-            //MERGE
-            float before = y.priElseZero();
-            float after = y.priAdd(activation);
-            activation = (after - before);
-            x.delete();
-            x = y;
-        } else {
-            return; //t==found
         }
-
-        TaskTable.activate(x, activation, n, y==null);
     }
 
     private void add(@NotNull Task t) {
@@ -373,7 +379,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * assumes called with writeLock
      */
-    @NotNull private List<Task> addAfterCompressing(TaskRegion tr, NAR nar) {
+    @NotNull
+    private List<Task> addAfterCompressing(TaskRegion tr, NAR nar) {
         //if (compressing.compareAndSet(false, true)) {
         try {
 
@@ -395,19 +402,19 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             lt.withWriteLock((r) -> {
 
 
-                    Top<TaskRegion> deleteVictim = new Top<>(weakestTask);
-                    Top<Leaf<TaskRegion>> mergeVictim = new Top<>(weakestRegion);
+                Top<TaskRegion> deleteVictim = new Top<>(weakestTask);
+                Top<Leaf<TaskRegion>> mergeVictim = new Top<>(weakestRegion);
 
-                    compressNext(tree.root(), deleteVictim, mergeVictim, inputConf, nar);
+                compressNext(tree.root(), deleteVictim, mergeVictim, inputConf, nar);
 
-                    //decide to remove or merge:
-                    @Nullable TaskRegion toRemove = deleteVictim.the;
-                    @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
-                    if (toRemove == null && toMerge==null)
-                        return; //failed to compress
+                //decide to remove or merge:
+                @Nullable TaskRegion toRemove = deleteVictim.the;
+                @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
+                if (toRemove == null && toMerge == null)
+                    return; //failed to compress
 
-                    //float confMin = toRemove != null ? toRemove.task.conf() : nar.confMin.floatValue();
-                    Task activation = null;
+                //float confMin = toRemove != null ? toRemove.task.conf() : nar.confMin.floatValue();
+                Task activation = null;
 
 //                    if (toRemove != null && toMerge!=null) {
 //                        Truth toRemoveNow = toRemove.task.truth(now, dur);
@@ -424,27 +431,27 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //
 //                    }
 
-                    if (toMerge != null && (activation = compressMerge(toMerge, now, dur, nar.confMin.floatValue(), nar.random())) != null) {
-                        toActivate.add(activation);
-                    } else if (toRemove != null) {
-                        compressEvict(toRemove);
-                    }
+                if (toMerge != null && (activation = compressMerge(toMerge, now, dur, nar.confMin.floatValue(), nar.random())) != null) {
+                    toActivate.add(activation);
+                } else if (toRemove != null) {
+                    compressEvict(toRemove);
+                }
 
-                    if (r.size() < capacity)
-                        tree.add(tr);
-                    else
-                        toActivate.clear();
-                });
+                if (r.size() < capacity)
+                    tree.add(tr);
+                else
+                    toActivate.clear();
+            });
 
-                return toActivate;
-                //nar.input(toActivate);
+            return toActivate;
+            //nar.input(toActivate);
 
-            } finally{
-                //compressing.set(false);
-            }
-            //}
-
+        } finally {
+            //compressing.set(false);
         }
+        //}
+
+    }
 
     private Task compressMerge(Leaf<TaskRegion> l, long now, int dur, float confMin, Random rng) {
         short s = l.size;
@@ -536,9 +543,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 }
             }
 
-            if (weakest.a!=null)
+            if (weakest.a != null)
                 compressNext(weakest.a, deleteVictims, mergeVictims, inputConf, nar);
-            if (weakest.b!=null)
+            if (weakest.b != null)
                 compressNext(weakest.b, deleteVictims, mergeVictims, inputConf, nar);
         }
     }
@@ -576,11 +583,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     1f / (1f + awayFromNow)) //min
                     * //AND
                     (1f + 0.5f * Util.clamp(
-                          (-1.0f * (cb.freqMax - cb.freqMin)) +  //max
-                            (-0.5f * (cb.confMax - cb.confMin)) +  //max
-                            (-1.0f * cb.confMax) + //max
-                            (-1.0f * timeSpanFactor),  //max: prefer smaller time spans
-                    -1f, +1f))
+                            (-1.0f * (cb.freqMax - cb.freqMin)) +  //max
+                                    (-0.5f * (cb.confMax - cb.confMin)) +  //max
+                                    (-1.0f * cb.confMax) + //max
+                                    (-1.0f * timeSpanFactor),  //max: prefer smaller time spans
+                            -1f, +1f))
                     ;
         };
     }

@@ -228,10 +228,13 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (!truthMatches(task))
             return false;
 
+        if (!task.term().equals(term))
+            return false;
+
         if (!timeMatches(task))
             return false;
 
-        return task.term().equals(term);
+        return true;
     }
 
     private boolean truthMatches(@NotNull Truthed task) {
@@ -264,8 +267,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     final boolean creationTimeMatches() {
         long now = nar.time();
-        return !(((creationStart != -1) && (now < creationStart)) ||
-                ((creationEnd != -1) && (now > creationEnd)));
+        return (((creationStart == -1) || (now >= creationStart)) &&
+                ((creationEnd == -1) || (now <= creationEnd)));
     }
 
     protected boolean occurrenceTimeMatches(@NotNull Task t) {

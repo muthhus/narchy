@@ -87,7 +87,7 @@ public interface QuestionTable extends TaskTable {
                 activation -= e.priElseZero();
             }
 
-            TaskTable.activate(t, activation, n, e==null);
+            TaskTable.activate(t, activation, n);
         }
 
         @Override
