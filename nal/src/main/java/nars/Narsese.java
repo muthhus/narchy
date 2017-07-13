@@ -482,16 +482,17 @@ public class Narsese extends BaseParser<Object> {
                                 //Term(false, false), //<-- allows non-atom terms for operator names
                                 //Atom(), //push(nonNull($.oper((String)pop()))), // <-- allows only atoms for operator names, normal
 
-                                push($.the(pop())),
 
                                 COMPOUND_TERM_OPENER, s(),
+
+                                //push((pop())),
 
                                 firstOf(
                                         seq(COMPOUND_TERM_CLOSER, push(Terms.ZeroProduct)),// nonNull($.exec((Term)pop())) )),
                                         MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false)
                                 ),
 
-                                push($.the(INH, (Term) pop(), (Term) pop()))
+                                push($.the(INH, (Term) pop(), (Term) $.the(pop())))
 
                         ),
 
@@ -517,27 +518,31 @@ public class Narsese extends BaseParser<Object> {
 
                         ),
 
-                        //deprecated form: <a --> b>
-                        seq(STATEMENT_OPENER,
-                                MultiArgTerm(null, STATEMENT_CLOSER, false, true)
-                        ),
 
-                        //negation shorthand
-                        seq(NEG.str, s(), Term(), push(
-                                $.neg( /*$.$(*/ (Term) pop()))),
+
 
                         NumberAtom(),
 
                         Atom(),
 
-                        Variable()
+                        Variable(),
 
+
+
+                        //negation shorthand
+                        seq(NEG.str, s(), Term(), push( $.neg( /*$.$(*/ (Term) pop()))),
+
+                       //deprecated form: <a --> b>
+                        seq(STATEMENT_OPENER,
+                                MultiArgTerm(null, STATEMENT_CLOSER, false, true)
+                        )
                 ),
 
-                //ATOM
-                push((pop())),
+                s(),
 
-                s()
+                //ATOM
+                push((pop()))
+
         );
     }
 
@@ -728,7 +733,11 @@ public class Narsese extends BaseParser<Object> {
     Rule ColonReverseInheritance() {
         return sequence(
                 Term(false, true), ':', Term(),
-                push($.terms.the(INH, the(pop()), the(pop())))
+
+                push($.inh(the(pop()), the(pop())))
+                ///*push(Compound.class), */push(the(pop())), push(the(pop())),
+               // popTerm(Op.INH)
+
         );
     }
 
@@ -755,16 +764,16 @@ public class Narsese extends BaseParser<Object> {
                 Variable(), "..",
                 firstOf(
 
-                        seq("_=", Term(false, false), "..+",
-                                swap(2),
-                                push(new Ellipsis.EllipsisTransformPrototype(/*Op.VAR_PATTERN,*/
-                                        (Variable) pop(), Op.Imdex, (Term) pop()))
-                        ),
-                        seq(Term(false, false), "=_..+",
-                                swap(2),
-                                push(new Ellipsis.EllipsisTransformPrototype(/*Op.VAR_PATTERN,*/
-                                        (Variable) pop(), (Term) pop(), Op.Imdex))
-                        ),
+//                        seq("_=", Term(false, false), "..+",
+//                                swap(2),
+//                                push(new Ellipsis.EllipsisTransformPrototype(/*Op.VAR_PATTERN,*/
+//                                        (Variable) pop(), Op.Imdex, (Term) pop()))
+//                        ),
+//                        seq(Term(false, false), "=_..+",
+//                                swap(2),
+//                                push(new Ellipsis.EllipsisTransformPrototype(/*Op.VAR_PATTERN,*/
+//                                        (Variable) pop(), (Term) pop(), Op.Imdex))
+//                        ),
                         seq("+",
                                 push(new Ellipsis.EllipsisPrototype(Op.VAR_PATTERN, (UnnormalizedVariable) pop(), 1))
                         ),

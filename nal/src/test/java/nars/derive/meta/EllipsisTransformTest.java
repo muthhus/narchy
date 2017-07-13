@@ -38,25 +38,25 @@ public class EllipsisTransformTest {
     }
 
 
-    @Test public void testEllipsisTransform() throws Narsese.NarseseException {
-        String s = "%A..%B=_..+";
-        Ellipsis.EllipsisTransformPrototype unnormalized = $.$(s);
-        assertEquals("%A..%B=_..+", unnormalized.toString());
-
-        assertNotNull(unnormalized);
-        assertEquals($.$("%B"), unnormalized.from);
-        assertEquals(Imdex, unnormalized.to);
-
-        TermIndex i = new PatternTermIndex();
-
-        Term u = i.transform(
-                $.p(unnormalized), new PremiseRule.PremiseRuleVariableNormalization());
-        Object tt = ((Compound)u).sub(0);
-
-        assertEquals("(%1074136071..%2=_..+)", u.toString());
-
-        EllipsisTransform ttt = (EllipsisTransform) tt;
-        assertEquals($.$("%2").toString(), ttt.from.toString());
-        assertEquals(Imdex, ttt.to);
-    }
+//    @Test public void testEllipsisTransform() throws Narsese.NarseseException {
+//        String s = "%A..%B=_..+";
+//        Ellipsis.EllipsisTransformPrototype unnormalized = $.$(s);
+//        assertEquals("%A..%B=_..+", unnormalized.toString());
+//
+//        assertNotNull(unnormalized);
+//        assertEquals($.$("%B"), unnormalized.from);
+//        assertEquals(Imdex, unnormalized.to);
+//
+//        TermIndex i = new PatternTermIndex();
+//
+//        Term u = i.transform(
+//                $.p(unnormalized), new PremiseRule.PremiseRuleVariableNormalization());
+//        Object tt = ((Compound)u).sub(0);
+//
+//        assertEquals("(%1074136071..%2=_..+)", u.toString());
+//
+//        EllipsisTransform ttt = (EllipsisTransform) tt;
+//        assertEquals($.$("%2").toString(), ttt.from.toString());
+//        assertEquals(Imdex, ttt.to);
+//    }
 }
