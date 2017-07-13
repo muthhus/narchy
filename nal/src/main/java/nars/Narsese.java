@@ -1,5 +1,8 @@
 package nars;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
 import com.github.fge.grappa.matchers.base.Matcher;
@@ -23,7 +26,6 @@ import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.var.UnnormalizedVariable;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
@@ -92,7 +94,7 @@ public class Narsese extends BaseParser<Object> {
 
     //These should be set to something like RecoveringParseRunner for performance
     private final ParseRunner inputParser = new MyParseRunner(Input());
-    private final ParseRunner singleTermParser = new MyParseRunner(Term());
+
     //private final ParseRunner singleTaskRuleParser = new ListeningParseRunner3(TaskRule());
 
     //private final Map<String,Term> termCache = new HashMap();
@@ -122,6 +124,13 @@ public class Narsese extends BaseParser<Object> {
             }
     );
 
+    static final ThreadLocal<ParseRunner> singleTermParsers = ThreadLocal.withInitial(
+            //() -> Grappa.createParser(Narsese.class)
+            () -> {
+                Narsese n = parsers.get();
+                return new MyParseRunner(n.Term());
+            }
+    );
 //    static final ThreadLocal<Map<Pair<Op, List>, Term>> vectorTerms = ThreadLocal.withInitial(() ->
 //            new CapacityLinkedHashMap<Pair<Op, List>, Term>(512));
 
@@ -519,8 +528,6 @@ public class Narsese extends BaseParser<Object> {
                         ),
 
 
-
-
                         NumberAtom(),
 
                         Atom(),
@@ -528,11 +535,10 @@ public class Narsese extends BaseParser<Object> {
                         Variable(),
 
 
-
                         //negation shorthand
-                        seq(NEG.str, s(), Term(), push( $.neg( /*$.$(*/ (Term) pop()))),
+                        seq(NEG.str, s(), Term(), push($.neg( /*$.$(*/ (Term) pop()))),
 
-                       //deprecated form: <a --> b>
+                        //deprecated form: <a --> b>
                         seq(STATEMENT_OPENER,
                                 MultiArgTerm(null, STATEMENT_CLOSER, false, true)
                         )
@@ -736,7 +742,7 @@ public class Narsese extends BaseParser<Object> {
 
                 push($.inh(the(pop()), the(pop())))
                 ///*push(Compound.class), */push(the(pop())), push(the(pop())),
-               // popTerm(Op.INH)
+                // popTerm(Op.INH)
 
         );
     }
@@ -1262,32 +1268,37 @@ public class Narsese extends BaseParser<Object> {
      * parse one term NOT NORMALIZED
      */
     @NotNull
-    public Term term(CharSequence s) throws NarseseException {
-
-        Exception errorCause = null;
-        ParsingResult r = null;
-
+    public static Term term(String s) throws NarseseException {
+        Exception ee = null;
         try {
-
-            r = singleTermParser.run(s);
-
-            ValueStack stack = r.getValueStack();
-
-            if (stack.size() == 1) {
-                Object x = stack.pop();
-
-                if (x instanceof String)
-                    return Atomic.the((String) x);
-                else if (x instanceof Term)
-                    return (Term) x;
-
-            }
+            Term x = singleTerms.get(s);
+            if (x != null && x != Null)
+                return x;
         } catch (Exception e) {
-            errorCause = e;
+            ee = e;
         }
-
-        throw new NarseseException(s.toString(), r, errorCause);
+        throw new NarseseException(s.toString(), null, ee);
     }
+
+    static LoadingCache<String, Term> singleTerms = Caffeine.newBuilder().maximumSize(8192)
+            .build((s) -> {
+                ParsingResult r = //parsers.get().singleTermParser.run(s);
+                        singleTermParsers.get().run(s);
+
+                ValueStack stack = r.getValueStack();
+
+                if (stack.size() == 1) {
+                    Object x = stack.pop();
+
+                    if (x instanceof String)
+                        return Atomic.the((String) x);
+                    else if (x instanceof Term)
+                        return (Term) x;
+                }
+
+                return Null;
+            });
+
 
 
     @NotNull
