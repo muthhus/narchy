@@ -3,6 +3,7 @@ package nars;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.fge.grappa.annotations.Cached;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
 import com.github.fge.grappa.matchers.base.Matcher;
@@ -446,7 +447,7 @@ public class Narsese extends BaseParser<Object> {
         return o != null ? o : new MiniNullPointerException();
     }
 
-    //@Cached
+    @Cached
     Rule Term(boolean oper, boolean meta) {
         /*
                  <term> ::= <word>                             // an atomic constant term
@@ -1280,7 +1281,7 @@ public class Narsese extends BaseParser<Object> {
         throw new NarseseException(s.toString(), null, ee);
     }
 
-    static LoadingCache<String, Term> singleTerms = Caffeine.newBuilder().maximumSize(8192)
+    static LoadingCache<String, Term> singleTerms = Caffeine.newBuilder().maximumSize(32*1024)
             .build((s) -> {
                 ParsingResult r = //parsers.get().singleTermParser.run(s);
                         singleTermParsers.get().run(s);

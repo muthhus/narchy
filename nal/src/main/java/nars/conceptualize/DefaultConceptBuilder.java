@@ -47,8 +47,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
         this(
-                new DefaultConceptState("sleep", 64, 64, 5, 32, 32),
-                new DefaultConceptState("awake", 64, 64, 5, 32, 32)
+                new DefaultConceptState("sleep", 48, 48, 5, 24, 24),
+                new DefaultConceptState("awake", 48, 48, 5, 24, 24)
         );
     }
 
@@ -69,7 +69,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
-        if (v < 12) {
+        if (v < 8) {
             Map sharedMap = newBagMap(v);
             @NotNull Bag<Term, PriReference<Term>> termbag =
                     new CurveBag<>(0, termlinkMerge, sharedMap);
@@ -78,8 +78,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return new Bag[]{termbag, taskbag};
         } else {
             return new Bag[]{
-                    new DefaultHijackBag<>(DefaultConceptBuilder.termlinkMerge, 3),
-                    new DefaultHijackBag<>(DefaultConceptBuilder.tasklinkMerge, 3)
+                    new DefaultHijackBag<>(DefaultConceptBuilder.termlinkMerge, 4),
+                    new DefaultHijackBag<>(DefaultConceptBuilder.tasklinkMerge, 4)
             };
         }
 
@@ -289,7 +289,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @Override
     public TemporalBeliefTable newTemporalBeliefTable(Compound c) {
-        if (c.complexity() < 8) {
+        if (c.complexity() < 16) {
             return new RTreeBeliefTable();
         } else {
             return new HijackTemporalBeliefTable();

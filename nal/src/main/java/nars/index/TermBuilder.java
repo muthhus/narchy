@@ -366,24 +366,29 @@ public abstract class TermBuilder {
 
             if (o.temporal) {// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
 
+                boolean reflexive = false;
                 //introduce an XTERNAL temporal placeholder in the following conditions
                 if ((subsChanged && newSubs.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
                         ||
                         (sts == 2 &&
 
-                                //repeat or non-lexical ordering for commutive compound; must re-arrange
-                                (o.commutative && (st.sub(0).compareTo(st.sub(1)) >= 0))
+                                (reflexive = Terms.reflex(st.sub(0), st.sub(1)))
 
                                 ||
 
-                                Terms.reflex(st.sub(0), st.sub(1))))
+                                //repeat or non-lexical ordering for commutive compound; must re-arrange
+                                (o.commutative && (st.sub(0).compareTo(st.sub(1)) >= 0))
+
+
+
+                                ))
 
 
                 // && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
                 {
 
 
-                    pdt = DTERNAL;
+                    pdt = reflexive ? XTERNAL : DTERNAL /* if non-reflexive, try to use ordinary DTERNAL */;
                     if (!dtChanging)
                         dtChanging = pdt != cdt; //in case that now the dt has changed
 

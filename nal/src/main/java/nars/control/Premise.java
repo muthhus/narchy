@@ -23,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
+import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
@@ -148,8 +149,8 @@ public class Premise  {
 
         float parentTaskPri = beliefPriority != beliefPriority ? taskPri :
                 //max
-                aveAri
-                //or
+                //aveAri
+                or
                         (taskPri, beliefPriority);
 
         Derivation d = derivation.get();

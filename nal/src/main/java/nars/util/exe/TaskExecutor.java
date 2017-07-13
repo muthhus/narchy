@@ -29,7 +29,7 @@ import static nars.Op.COMMAND;
  */
 public class TaskExecutor extends Executioner {
 
-    int inputBatch = 8, fireBatch = 8;
+    int inputBatch = 8, fireBatch = 32;
 
     //    private final DisruptorBlockingQueue<ITask> overflow;
     protected boolean trace;
@@ -38,7 +38,7 @@ public class TaskExecutor extends Executioner {
      * if < 0, executes them all. 0 pauses, and finite value > 0 will cause them to be sorted first if the value exceeds the limit
      * interpreted as its integer value, although currently it is FloatParam
      */
-    public final FloatParam conceptsPerCycleMax = new FloatParam(-1);
+    public final FloatParam conceptsPerCycleMax = new FloatParam();
 
 //    /**
 //     * temporary collection of tasks to remove after sampling
@@ -151,16 +151,12 @@ public class TaskExecutor extends Executioner {
 
 
     public TaskExecutor(int conceptCapacity, int taskCapacity) {
-        super();
-        concepts.setCapacity(conceptCapacity);
-        tasks.setCapacity(taskCapacity);
-
-        //int overCapacity = capacity / 2;
-        //overflow = new DisruptorBlockingQueue(overCapacity);
+        this(conceptCapacity, taskCapacity, 1f);
     }
 
     public TaskExecutor(int conceptCapacity, int taskCapacity, float executedPerCycle) {
-        this(conceptCapacity, taskCapacity);
+        concepts.setCapacity(conceptCapacity);
+        tasks.setCapacity(taskCapacity);
         conceptsPerCycleMax.setValue(Math.ceil(conceptCapacity * executedPerCycle));
     }
 
@@ -239,10 +235,10 @@ public class TaskExecutor extends Executioner {
             float eFrac = ((float) toFire[0]) / concepts.capacity();
             float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag) concepts).depressurize(eFrac) * (eFrac);
             this.forgetEachActivePri =
-                    pAvg > Pri.EPSILON * 8 ? pAvg : 0;
+                    pAvg >= Pri.EPSILON ? pAvg : 0;
             //0;
 
-            tasks.commit(null);
+            //tasks.commit(null);
 
             do {
 
@@ -250,7 +246,7 @@ public class TaskExecutor extends Executioner {
                 toFire[0] = Math.min(toFire[0], concepts.size());
                 if (toFire[0] > 0) {
 
-                    concepts.sample(toFire[0], x -> {
+                    concepts.sample(Math.min(fireBatch, toFire[0]), x -> {
 
                         actuallyRun(x);
 
@@ -270,7 +266,7 @@ public class TaskExecutor extends Executioner {
                 toInput[0] = Math.min(toInput[0], tasks.size());
                 if (toInput[0] > 0) {
 
-                    tasks.pop(toInput[0], x -> {
+                    tasks.pop(Math.min(inputBatch, toInput[0]), x -> {
                         actuallyRun(x);
                         --toInput[0];
                     });

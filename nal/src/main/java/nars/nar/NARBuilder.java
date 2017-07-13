@@ -36,7 +36,7 @@ public class NARBuilder {
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 256, 0.25f);
+    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 64, 0.5f);
 
     private final Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 

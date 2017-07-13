@@ -896,7 +896,7 @@ public enum Op implements $ {
 
     public static final Memoize<ProtoCompound, Termlike> cache =
             //new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 4);
-            CaffeineMemoize.build(buildTerm, 32 * 1024, false /* Param.DEBUG*/);
+            CaffeineMemoize.build(buildTerm, 64 * 1024, false /* Param.DEBUG*/);
             //CaffeineMemoize.build(buildTerm, -1 /* softref */, true /* Param.DEBUG*/);
             //new NullMemoize<>(buildTerm);
 
