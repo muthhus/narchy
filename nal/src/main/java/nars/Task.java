@@ -15,7 +15,6 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.*;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;

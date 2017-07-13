@@ -1,6 +1,5 @@
 package jcog.math;
 
-import org.apache.commons.math3.util.ArithmeticUtils;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 
 import java.util.NoSuchElementException;

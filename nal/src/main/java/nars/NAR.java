@@ -22,7 +22,6 @@ import nars.control.premise.DerivationBudgeting;
 import nars.control.premise.PreferSimpleAndPolarized;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.Conclude;
 import nars.derive.meta.op.RegisterCause;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.TermContext;

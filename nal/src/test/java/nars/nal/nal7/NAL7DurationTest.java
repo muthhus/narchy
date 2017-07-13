@@ -22,7 +22,7 @@ public class NAL7DurationTest {
 
     @Test
     public void testLinearTruthpolation() throws Narsese.NarseseException {
-        Terminal n = new Terminal();
+        NAR n = new NARBuilder().get();
         n.time.dur(5);
         n.run(10);
         n.inputAt(10, "(x). :|:");
@@ -66,10 +66,10 @@ public class NAL7DurationTest {
         n.inputAt(10,"a:y. :|:");
         n.run(128);
 
-        assertDuration(n, "((x|y)-->a)", 5, 5);
-        assertDuration(n, "((x&y)-->a)", 5, 5);
-        assertDuration(n, "((y~x)-->a)", 5, 5);
-        assertDuration(n, "((x~y)-->a)", 5, 5);
+        assertDuration(n, "a:(x|y)", 5, 5);
+        assertDuration(n, "a:(x&y)", 5, 5);
+        assertDuration(n, "a:(y~x)", 5, 5);
+        assertDuration(n, "a:(x~y)", 5, 5);
         assertDuration(n, "(x<->y)", 5, 5);
 
         //n.concept("(x-->a)").print();

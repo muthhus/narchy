@@ -36,7 +36,10 @@ import java.util.*;
 import java.util.function.BiConsumer;
 
 import static java.util.Collections.addAll;
-import static nars.$.*;
+import static nars.$.newArrayList;
+import static nars.$.newHashSet;
+import static nars.$.p;
+import static nars.$.v;
 import static nars.Op.*;
 import static nars.derive.rule.PremiseRuleSet.parse;
 import static nars.term.Terms.*;

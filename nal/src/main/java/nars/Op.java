@@ -1082,13 +1082,13 @@ public enum Op implements $ {
                         return True;
                     }
                 } else {
-                    if (!equal && subject.compareTo(predicate) > 0) {
-                        //swap
-                        Term x = subject;
-                        subject = predicate;
-                        predicate = x;
-                        dt = -dt;
-                    }
+//                    if (!equal && subject.compareTo(predicate) > 0) {
+//                        //swap
+//                        Term x = subject;
+//                        subject = predicate;
+//                        predicate = x;
+//                        dt = -dt;
+//                    }
 
                     if (equal && dt < 0) {
                         dt = -dt; //use only the forward direction on a repeat
@@ -1253,18 +1253,19 @@ public enum Op implements $ {
 
         if (op.commutative) {
 
-            //normalize co-negation
-            boolean sn = subject.op() == NEG;
-            boolean pn = predicate.op() == NEG;
-
-            if ((sn == pn) && (subject.compareTo(predicate) > 0)) {
+//            //normalize co-negation
+//            boolean sn = subject.op() == NEG;
+//            boolean pn = predicate.op() == NEG;
+//
+            if (/*(sn == pn) && */(subject.compareTo(predicate) > 0)) {
                 Term x = predicate;
                 predicate = subject;
                 subject = x;
-                if (!concurrent(dt))
+                if (dt!=XTERNAL && !concurrent(dt))
                     dt = -dt;
             }
 
+            assert(subject.compareTo(predicate) <= 0);
             //System.out.println( "\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
 
         }

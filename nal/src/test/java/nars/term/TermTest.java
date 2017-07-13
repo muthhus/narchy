@@ -46,11 +46,11 @@ public class TermTest {
     static {
         Param.DEBUG = true;
     }
+    static final NAR n = new Terminal(256);
 
     protected void assertEquivalentTerm(@NotNull String term1String, @NotNull String term2String) {
         try {
 
-            NAR n = new Terminal(16);
 
             Termed term1 = n.term(term1String);
             Termed term2 = n.term(term2String);
@@ -112,10 +112,11 @@ public class TermTest {
         assertTrue($.sete(Atomic.the("x"), Atomic.the("y")).isCommutative());
     }
 
+
+
     @Test
     public void testTermSort() throws Exception {
 
-        NAR n = new Terminal(16);
 
         Term a = n.term("a").term();
         Term b = n.term("b").term();
@@ -135,7 +136,6 @@ public class TermTest {
 
     @Test
     public void testConjunction1Term() throws Narsese.NarseseException {
-        NAR n = new Terminal(16);
 
         assertEquals("a", n.term("(&&,a)").toString());
         assertEquals("x(a)", n.term("(&&,x(a))").toString());
@@ -146,7 +146,6 @@ public class TermTest {
 
     @Test
     public void testConjunctionTreeSet() throws Narsese.NarseseException {
-        NAR n = new Terminal(16);
 
         //these 2 representations are equal, after natural ordering
         String term1String = "<#1 --> (&,boy,(/,taller_than,{Tom},_))>";
@@ -195,7 +194,6 @@ public class TermTest {
 
     @Test
     public void testUnconceptualizedTermInstancing() throws Narsese.NarseseException {
-        NAR n = new Terminal(7);
 
         String term1String = "<a --> b>";
         Term term1 = n.term(term1String).term();
@@ -249,8 +247,6 @@ public class TermTest {
 
         String t = "($1-->({place4}~$1))";
 
-        NAR n = new Terminal(8);
-
 
         try {
             Task x = n.inputAndGet(t + '.');
@@ -292,8 +288,6 @@ public class TermTest {
 
     @Test
     public void testParseOperationInFunctionalForm() {
-
-        NAR n = new Terminal(8);
 
 //        assertFalse(Op.isOperation(n.term("(a,b)")));
 //        assertFalse(Op.isOperation(n.term("^wonder")));
@@ -345,7 +339,7 @@ public class TermTest {
 
     @Test
     public void termEqualityWithQueryVariables() throws Narsese.NarseseException {
-        NAR n = new Terminal(8);
+
         String a = "<?1-->bird>";
         assertEquals(n.term(a), n.term(a));
         String b = "<bird-->?1>";
@@ -367,7 +361,6 @@ public class TermTest {
         }
     }
 
-    final NAR n = new Terminal(256);
 
     protected void testTermEquality(@NotNull String s, boolean normalize) throws Narsese.NarseseException {
 
@@ -446,8 +439,6 @@ public class TermTest {
     @Test
     public void termEqualityWithMixedVariables() throws Narsese.NarseseException {
 
-        NAR n = new Terminal(16);
-
         String s = "(&&, <<$1 --> key> ==> <#2 --> (/, open, $1, _)>>, <#2 --> lock>)";
         Termed a = n.term(s);
 
@@ -525,7 +516,7 @@ public class TermTest {
 
     @Test
     public void testTermComplexityMass() throws Narsese.NarseseException {
-        NAR n = new Terminal(8);
+
 
         testTermComplexityMass(n, "x", 1, 1);
 
@@ -566,7 +557,7 @@ public class TermTest {
 
     @NotNull
     public <C extends Compound> C testStructure(@NotNull String term, String bits) throws Narsese.NarseseException {
-        NAR n = new Terminal(16);
+
         C a = (C) n.term(term).term();
         assertEquals(bits, toBinaryString(a.structure()));
         assertEquals(term, a.toString());
@@ -772,14 +763,12 @@ public class TermTest {
 
     @Test
     public void testSubTermStructure() throws Narsese.NarseseException {
-        NAR n = new Terminal(16);
         assertTrue( AB.term().impossibleSubTerm( AB.term() ) );
         assertTrue( !AB.hasAll(n.term("<a-->#b>").term().structure()) );
     }
 
     @Test
     public void testCommutativeWithVariableEquality() throws Narsese.NarseseException {
-        NAR n = new Terminal(16);
 
         Termed a = n.term("<(&&, <#1 --> M>, <#2 --> M>) ==> <#2 --> nonsense>>");
         Termed b = n.term("<(&&, <#2 --> M>, <#1 --> M>) ==> <#2 --> nonsense>>");

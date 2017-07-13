@@ -296,7 +296,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         int dur = nar.dur();
 
-        FloatFunction<TaskRegion> wr = regionStrength(now, dur);
+        FloatFunction<TaskRegion> wr = regionStrength(when, dur);
         FloatFunction<TaskRegion> sort = t -> -wr.floatValueOf(t);
 
         for (int r : sampleRadii) {

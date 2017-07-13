@@ -12,8 +12,25 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static nars.$.*;
+import static nars.$.$;
+import static nars.$.conj;
+import static nars.$.diffe;
+import static nars.$.diffi;
+import static nars.$.disj;
+import static nars.$.equi;
+import static nars.$.impl;
+import static nars.$.inh;
+import static nars.$.neg;
+import static nars.$.p;
+import static nars.$.parallel;
+import static nars.$.secte;
+import static nars.$.secti;
+import static nars.$.sete;
+import static nars.$.seti;
+import static nars.$.sim;
 import static nars.$.t;
+import static nars.$.task;
+import static nars.$.varDep;
 import static nars.Op.*;
 import static nars.io.NarseseTest.assertInvalidTasks;
 import static nars.io.NarseseTest.assertInvalidTerms;
@@ -139,9 +156,7 @@ public class TermReductionsTest {
 
     @Test
     public void testSimilarityNegatedSubterms() throws Narsese.NarseseException {
-//        assertEquals(("((P)<->(--,(Q)))"), $("((P)<->(--,(Q)))").toString());
-//        assertEquals(("((P)<->(--,(Q)))"), $("((--,(P))<->(Q))").toString());
-        assertEquals("((P)<->(--,(Q)))", $("((P)<->(--,(Q)))").toString()); //NO change
+        assertEquals("((--,(Q))<->(P))", $("((P)<->(--,(Q)))").toString()); //NO change
         assertEquals("((--,(P))<->(Q))", $("((--,(P))<->(Q))").toString()); //NO change
     }
 

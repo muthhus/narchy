@@ -2,6 +2,7 @@ package nars.nal.nal7;
 
 import nars.NAR;
 import nars.Narsese;
+import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.nar.NARBuilder;
 import nars.nar.Terminal;
@@ -39,9 +40,10 @@ public class TemporalInductionTest {
 
     @Test public void testTemporalRevision() throws Narsese.NarseseException {
 
-        NAR n = new Terminal();
+        NAR n = new NARBuilder().get();
         n.time.dur(6);
 
+        n.log();
         //TextOutput.out(n);
 
         n.input("a:b. %1.0|0.9%");
@@ -49,23 +51,26 @@ public class TemporalInductionTest {
         n.input("a:b. %0.0|0.9%");
         n.run(1);
 
-        //n.forEachActiveConcept(Concept::print);
+        //n.forEachConcept(Concept::print);
 
         TaskConcept c = (TaskConcept) n.concept("a:b");
         assertNotNull(c);
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
 
         BeliefTable b = c.beliefs();
+        b.print();
         assertEquals(2, b.size());
 
         //when originality is considered:
         //assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().top(n.time()).toStringWithoutBudget());
 
+        //most current relevant overall:
+        assertEquals("(b-->a). 5 %0.0;.90%", n.belief(c, n.time()).toStringWithoutBudget());
+
+
         //least relevant
         assertEquals("(b-->a). 0 %1.0;.90%", n.belief(c, 0).toStringWithoutBudget());
 
-        //most current relevant overall:
-        assertEquals("(b-->a). 5 %0.0;.90%", n.belief(c, n.time()).toStringWithoutBudget());
     }
 
     @Test public void testTemporalRevisionOfTemporalRelation() throws Narsese.NarseseException {

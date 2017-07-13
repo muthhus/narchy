@@ -1,6 +1,5 @@
 package nars.index;
 
-import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
@@ -14,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static nars.Op.*;
+import static nars.Op.Null;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
