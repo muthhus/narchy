@@ -1253,8 +1253,13 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(a)! :|:")
-                .mustDesire(cycles, "(b)", 1f, 0.48f, 16)
-                .mustNotOutput(cycles, "(b)", GOAL, 3L, 0L, 10L, ETERNAL);
+                .mustDesire(cycles, "(b)", 1f, 0.81f, 16)
+                .mustNotOutput(cycles, "(b)", GOAL, 3L, 0L, 10L, ETERNAL)
+
+                //'a' only occurs at 3, and 'b' only occurs at 6. any other occurrences are faulty:
+                .mustNotOutput(cycles, "(a)", BELIEF, 5, 6, ETERNAL)
+                .mustNotOutput(cycles, "(b)", BELIEF, 3, 7, ETERNAL)
+        ;
     }
     @Test public void deriveNegInhGoal() {
         test()

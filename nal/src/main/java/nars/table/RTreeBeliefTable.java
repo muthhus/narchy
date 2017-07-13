@@ -326,14 +326,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     @Override
-    public void add(@NotNull Task t, TaskConcept c, NAR n) {
-        float activation = t.priElseZero();
+    public void add(@NotNull Task x, TaskConcept c, NAR n) {
+        float activation = x.priElseZero();
 
         updateSignalTasks(n.time());
 
-        TaskRegion tr = new TaskRegion(t);
-        final Task found = find(tr);
-        if (found == null) {
+        TaskRegion tr = new TaskRegion(x);
+        final Task y = find(tr);
+        if (y == null) {
 
             int over = size() + 1 - capacity;
             if (over > 0) {
@@ -342,9 +342,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 List<Task> toActivate = addAfterCompressing(tr, n);
 
                 for (int i = 0, toActivateSize = toActivate.size(); i < toActivateSize; i++) {
-                    Task x = toActivate.get(i);
+                    Task ii = toActivate.get(i);
 
-                    n.input(ConceptFire.activate(x, x.priElseZero(), c, n));
+                    n.input(ConceptFire.activate(ii, ii.priElseZero(), c, n));
                 }
 
             } else {
@@ -352,16 +352,18 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
 
 
-        } else if (t!=found) {
+        } else if (x!=y) {
             //MERGE
-            float before = found.priElseZero();
-            float after = found.priAdd(activation);
-            activation -= (after - before);
+            float before = y.priElseZero();
+            float after = y.priAdd(activation);
+            activation = (after - before);
+            x.delete();
+            x = y;
         } else {
             return; //t==found
         }
 
-        TaskTable.activate(t, activation, n, found==null);
+        TaskTable.activate(x, activation, n, y==null);
     }
 
     private void add(@NotNull Task t) {

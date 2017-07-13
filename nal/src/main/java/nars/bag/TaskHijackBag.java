@@ -91,11 +91,9 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         if (y == null) {
             //not inserted
             return;
-        } else {
+        } else if (y!=x) {
             //fully inserted or merged with existing item, and activate only the absorbed amount
-            activation -= oo.floatValue();
-        }
-        if (y!=x) {
+            activation = y.priElseZero() - activation;
             x.delete();
         }
 
