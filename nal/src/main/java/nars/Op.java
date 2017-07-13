@@ -982,7 +982,7 @@ public enum Op {
     }
 
 
-    public static final int SetsBits = or(Op.SETe, Op.SETi);
+    public static final int SetBits = or(Op.SETe, Op.SETi);
     public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
     public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
     public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);

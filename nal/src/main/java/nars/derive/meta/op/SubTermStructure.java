@@ -15,7 +15,7 @@ import java.util.List;
 public final class SubTermStructure extends AtomicPred<Derivation> {
 
     /** higher number means a stucture with more enabled bits will be decomposed to its components */
-    public static final int SPLIT_THRESHOLD = 3;
+    public static final int SPLIT_THRESHOLD = 2;
 
     public final int subterm;
     public final int bits;

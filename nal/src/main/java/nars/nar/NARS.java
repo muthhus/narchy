@@ -100,96 +100,96 @@ public class NARS extends NAR {
                 rng);
     }
 
-    @Override
-    protected PSinks newInputMixer() {
-        MixContRL<ITask> r = new MixContRL<>(20f,
-                null,
+//    @Override
+//    protected PSinks newInputMixer() {
+//        MixContRL<ITask> r = new MixContRL<>(20f,
+//                null,
+//
+//                FloatAveraged.averaged(emotion.happy.sumIntegrator()::sumThenClear, 1),
+//
+//                8,
+//
+//                new EnumClassifier("type", new String[]{
+//                        "Belief", "Goal", "Question", "Quest",
+//                        "ConceptFire"
+//                }, (x) -> {
+//
+//                    if (x instanceof NALTask) {
+//                        //NAL
+//                        switch (((Task) x).punc()) {
+//                            case BELIEF:
+//                                return 0;
+//                            case GOAL:
+//                                return 1;
+//                            case QUESTION:
+//                                return 2;
+//                            case QUEST:
+//                                return 3;
+//                        }
+//                    } else if (x instanceof ConceptFire) {
+//                        return 4;
+//                    }
+//
+//                    return -1;
+//                }),
+//
+//                new EnumClassifier("complexity", 3, (t) -> {
+//                    if (t instanceof NALTask) {
+//                        int c = ((NALTask) t).
+//                                volume();
+//                                //complexity();
+////                        int m = termVolumeMax.intValue();
+////                        assert(m > 5);
+//                        if (c < 5) return 0;
+//                        if (c < 10) return 1;
+//                        return 2;
+//                    }
+//                    return -1;
+//                }),
+//
+//                new EnumClassifier("when", new String[]{"Present", "Future", "Past"}, (t) -> {
+//                    if (t instanceof NALTask) {
+//                        long now = time();
+//                        int radius = 2;
+//                        long h = ((NALTask) t).nearestStartOrEnd(now);
+//                        if (Math.abs(h - now) <= dur() * radius) {
+//                            return 0; //present
+//                        } else if (h > now) {
+//                            return 1; //future
+//                        } else {
+//                            return 2; //past
+//                        }
+//                    }
+//                    return -1;
+//                }, true)
+//
+////            new MixRouter.Classifier<>("original",
+////                    (x) -> x.stamp().length <= 2),
+////            new MixRouter.Classifier<>("unoriginal",
+////                    (x) -> x.stamp().length > 2),
+//        );
+//
+//        r.setAgent(
+//                new NARMixAgent<>(new NARBuilder()
+//                        .index(
+//                                new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
+//                                //new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
+//                        ).get(), r, this)
+//
+//                //new HaiQMixAgent()
+//
+//                //new MultiHaiQMixAgent()
+//        );
+//
+//        return r;
+//    }
 
-                FloatAveraged.averaged(emotion.happy.sumIntegrator()::sumThenClear, 1),
 
-                8,
-
-                new EnumClassifier("type", new String[]{
-                        "Belief", "Goal", "Question", "Quest",
-                        "ConceptFire"
-                }, (x) -> {
-
-                    if (x instanceof NALTask) {
-                        //NAL
-                        switch (((Task) x).punc()) {
-                            case BELIEF:
-                                return 0;
-                            case GOAL:
-                                return 1;
-                            case QUESTION:
-                                return 2;
-                            case QUEST:
-                                return 3;
-                        }
-                    } else if (x instanceof ConceptFire) {
-                        return 4;
-                    }
-
-                    return -1;
-                }),
-
-                new EnumClassifier("complexity", 3, (t) -> {
-                    if (t instanceof NALTask) {
-                        int c = ((NALTask) t).
-                                volume();
-                                //complexity();
-//                        int m = termVolumeMax.intValue();
-//                        assert(m > 5);
-                        if (c < 5) return 0;
-                        if (c < 10) return 1;
-                        return 2;
-                    }
-                    return -1;
-                }),
-
-                new EnumClassifier("when", new String[]{"Present", "Future", "Past"}, (t) -> {
-                    if (t instanceof NALTask) {
-                        long now = time();
-                        int radius = 2;
-                        long h = ((NALTask) t).nearestStartOrEnd(now);
-                        if (Math.abs(h - now) <= dur() * radius) {
-                            return 0; //present
-                        } else if (h > now) {
-                            return 1; //future
-                        } else {
-                            return 2; //past
-                        }
-                    }
-                    return -1;
-                }, true)
-
-//            new MixRouter.Classifier<>("original",
-//                    (x) -> x.stamp().length <= 2),
-//            new MixRouter.Classifier<>("unoriginal",
-//                    (x) -> x.stamp().length > 2),
-        );
-
-        r.setAgent(
-                new NARMixAgent<>(new NARBuilder()
-                        .index(
-                                new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
-                                //new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
-                        ).get(), r, this)
-
-                //new HaiQMixAgent()
-
-                //new MultiHaiQMixAgent()
-        );
-
-        return r;
-    }
-
-
-    @Override
-    public void input(@NotNull CLink<ITask> partiallyClassified) {
-        ((MixContRL) in).test(partiallyClassified);
-        super.input(partiallyClassified);
-    }
+//    @Override
+//    public void input(@NotNull CLink<ITask> partiallyClassified) {
+//        ((MixContRL) in).test(partiallyClassified);
+//        super.input(partiallyClassified);
+//    }
 
     /**
      * default implementation convenience method
@@ -230,16 +230,16 @@ public class NARS extends NAR {
             int sub =
                     //random.nextInt(num);
                     Math.abs(Util.hashWangJenkins(x.hashCode())) % nar.num;
-            apply(x);
+            //apply(x);
             return nar.sub.get(sub).run(x);
         }
 
 
-        public void apply(CLink<? extends ITask> x) {
-            if (x!=null && !x.isDeleted()) {
-                x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
-            }
-        }
+//        public void apply(CLink<? extends ITask> x) {
+//            if (x!=null && !x.isDeleted()) {
+//                x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
+//            }
+//        }
 
         @Override
         public void stop() {
@@ -349,14 +349,14 @@ public class NARS extends NAR {
             super(conceptCapacity, inputTaskCapacity, exePct);
         }
 
-        @Override
-        protected void actuallyRun(CLink<? extends ITask> x) {
-
-            super.actuallyRun(x);
-
-            ((RootExecutioner) exe).apply(x); //apply gain after running
-
-        }
+//        @Override
+//        protected void actuallyRun(CLink<? extends ITask> x) {
+//
+//            super.actuallyRun(x);
+//
+//            ((RootExecutioner) exe).apply(x); //apply gain after running
+//
+//        }
 
         @Override
         protected void actuallyFeedback(CLink<? extends ITask> x, ITask[] next) {

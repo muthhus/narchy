@@ -16,27 +16,25 @@
 //Set Composition
 //  'setext()' and 'setint()' predicates used here instead of ordinary term pattern matching for efficiency reasons
 
-    (C --> A), (C --> B), setext(A,B) |- (C --> union(A,B)), (Belief:Union)
-    (C --> A), (C --> B), setext(A,B) |- (C --> intersect(A,B)), (Belief:Intersection)
-    (C --> A), (C --> B), setext(A,B) |- (C --> differ(A,B)), (Belief:Difference)
+    (C --> A), (C --> B), neq(A,B),setext(A),setext(B) |- (C --> union(A,B)), (Belief:Union)
+    (C --> A), (C --> B), neq(A,B),setext(A),setext(B) |- (C --> intersect(A,B)), (Belief:Intersection)
+    (C --> A), (C --> B), neq(A,B),setext(A),setext(B) |- (C --> differ(A,B)), (Belief:Difference)
 
-    (C --> A), (C --> B), setint(A,B) |- (C --> union(A,B)), (Belief:Intersection)
-    (C --> A), (C --> B), setint(A,B) |- (C --> intersect(A,B)), (Belief:Union)
-    (C --> A), (C --> B), setint(A,B) |- (C --> differ(A,B)), (Belief:Difference)
+    (C --> A), (C --> B), neq(A,B),setint(A),setint(B) |- (C --> union(A,B)), (Belief:Intersection)
+    (C --> A), (C --> B), neq(A,B),setint(A),setint(B) |- (C --> intersect(A,B)), (Belief:Union)
+    (C --> A), (C --> B), neq(A,B),setint(A),setint(B) |- (C --> differ(A,B)), (Belief:Difference)
 
-    (A --> C), (B --> C), setext(A,B) |- (intersect(A,B) --> C), (Belief:Union)
-    (A --> C), (B --> C), setext(A,B) |- (union(A,B) --> C), (Belief:Intersection)
-    (A --> C), (B --> C), setext(A,B) |- (differ(A,B) --> C), (Belief:Difference)
+    (A --> C), (B --> C), neq(A,B),setext(A),setext(B) |- (intersect(A,B) --> C), (Belief:Union)
+    (A --> C), (B --> C), neq(A,B),setext(A),setext(B) |- (union(A,B) --> C), (Belief:Intersection)
+    (A --> C), (B --> C), neq(A,B),setext(A),setext(B) |- (differ(A,B) --> C), (Belief:Difference)
 
-    (A --> C), (B --> C), setint(A,B) |- (union(A,B) --> C), (Belief:Union)
-    (A --> C), (B --> C), setint(A,B) |- (intersect(A,B) --> C), (Belief:Intersection)
-    (A --> C), (B --> C), setint(A,B) |- (differ(A,B) --> C), (Belief:Difference)
+    (A --> C), (B --> C), neq(A,B),setint(A),setint(B) |- (union(A,B) --> C), (Belief:Union)
+    (A --> C), (B --> C), neq(A,B),setint(A),setint(B) |- (intersect(A,B) --> C), (Belief:Intersection)
+    (A --> C), (B --> C), neq(A,B),setint(A),setint(B) |- (differ(A,B) --> C), (Belief:Difference)
 
 //Set Decomposition
 
-    (C --> {X,A..+}), X |- (C --> {X}), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    (C --> [X,A..+]), X |- (C --> [X]), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    ({X,A..+} --> C), X |- ({X} --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-    ([X,A..+] --> C), X |- ([X] --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (C --> X), X, set(X) |- (C --> dropAnyConj(X)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    (X --> C), X, set(X) |- (dropAnyConj(X) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 

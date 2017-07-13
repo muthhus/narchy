@@ -39,7 +39,7 @@ public class LinkageTest extends AbstractNALTest {
     public static Iterable<Supplier> configurations() {
         return Lists.newArrayList(() -> {
             NAR d = new NARBuilder().get();
-            d.nal(6);
+            //d.nal(6);
             return d;
         });
     }

@@ -28,6 +28,7 @@ import java.util.function.Consumer;
 
 import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
+import static nars.util.UtilityFunctions.aveAri;
 
 /**
  * NOTE: this currently isnt input to the NAR like ITask's are even though it inherits
@@ -150,9 +151,9 @@ public class Premise  {
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
         float parentTaskPri = beliefPriority != beliefPriority ? taskPri :
-                //Math.max
-                //aveAri
-                or
+                //max
+                aveAri
+                //or
                         (taskPri, beliefPriority);
 
         Derivation d = derivation.get();

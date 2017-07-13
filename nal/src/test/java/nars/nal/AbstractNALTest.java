@@ -23,15 +23,15 @@ import static jcog.data.LabeledSupplier.supply;
 public abstract class AbstractNALTest {
 
 
-    private final Supplier<NAR> nar;
+    private final NAR nar;
     protected TestNAR tester;
 
-    protected AbstractNALTest(NAR nar) {
-        this(() -> nar);
-    }
+//    protected AbstractNALTest(NAR nar) {
+//        this(() -> nar);
+//    }
 
     protected AbstractNALTest(Supplier<NAR> nar) {
-        this.nar = nar;
+        this.nar = nar.get();
     }
 
 
@@ -44,8 +44,8 @@ public abstract class AbstractNALTest {
 
 
     public NAR nar() {
-        //return the
-        return nar.get();
+        return nar;
+        //return nar.get();
     }
 
 
@@ -76,7 +76,7 @@ public abstract class AbstractNALTest {
                     n.DEFAULT_QUEST_PRIORITY = 0.25f;
                     n.DEFAULT_QUESTION_PRIORITY = 0.25f;
                     if (level >= 7) {
-                        new STMTemporalLinkage(n, 2, false);
+                        new STMTemporalLinkage(n, 1, false);
                     }
                     Param.DEBUG = true;
                     return n;

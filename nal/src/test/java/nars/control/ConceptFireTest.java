@@ -29,7 +29,7 @@ public class ConceptFireTest {
         nar.run(1);
         Concept c = nar.concept("a:b");
         for (int n = 0; n < 5; n++) {
-            c.termlinks().put(new PLink<Term>($(n + ":a"), 0.1f * n));
+            c.termlinks().put(new PLink<Term>($(n + ":a"), 0.2f * n));
         }
 
         HashBag<String> s = new HashBag();

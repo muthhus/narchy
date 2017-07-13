@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 import static java.util.Collections.addAll;
 import static nars.$.*;
@@ -232,6 +231,8 @@ public class PremiseRule extends GenericCompound {
 
         put(events.class, rank--);
 
+        put(TaskBeliefHas.class, rank--);
+
         put(SubTermStructure.class, rank--);
 
         put(TaskPositive.class, rank--); //includes both positive or negative
@@ -258,6 +259,8 @@ public class PremiseRule extends GenericCompound {
 
         if ((b == TaskPositive.the) || (b == TaskNegative.the)) return TaskPositive.class;
         if ((b == BeliefPositive.thePos) || (b == BeliefPositive.theNeg)) return BeliefPositive.class;
+
+        if (b.getClass() == TaskBeliefHas.class) return TaskBeliefHas.class;
 
         if (b == TaskPunctuation.Goal) return TaskPunctuation.class;
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
@@ -526,29 +529,22 @@ public class PremiseRule extends GenericCompound {
                     break;
 
                 case "notSet":
-                    opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.SetsBits);
+                    opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.SetBits);
+                    break;
+
+                case "set":
+                    pres.add(new TaskBeliefHas(Op.SetBits, taskTermPattern.contains(X), beliefTermPattern.contains(X)));
+                    constraints.add(new OpInConstraint(X, Op.SETi, Op.SETe));
                     break;
 
                 case "setext":
-                    //assumes arity=2 but arity=1 support can be written
-                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
-                    neq(constraints, X, Y);
+                    pres.add(new TaskBeliefHas(Op.SETe.bit, taskTermPattern.contains(X), beliefTermPattern.contains(X)));
                     constraints.add(new OpConstraint(X, Op.SETe));
-                    constraints.add(new OpConstraint(Y, Op.SETe));
-                    pres.addAll(SubTermStructure.get(0, Op.SETe.bit));
-                    pres.addAll(SubTermStructure.get(1, Op.SETe.bit));
-                    ////additionally prohibits the two terms being equal
                     break;
 
                 case "setint":
-                    //assumes arity=2 but arity=1 support can be written
-                    //neqPrefilter(pres, taskTermPattern, beliefTermPattern, X, Y, neq);
-                    neq(constraints, X, Y);
-                    constraints.add(new OpConstraint(Y, Op.SETi));
+                    pres.add(new TaskBeliefHas(Op.SETi.bit, taskTermPattern.contains(X), beliefTermPattern.contains(X)));
                     constraints.add(new OpConstraint(X, Op.SETi));
-                    pres.addAll(SubTermStructure.get(0, Op.SETi.bit));
-                    pres.addAll(SubTermStructure.get(1, Op.SETi.bit));
-                    //additionally prohibits the two terms being equal
                     break;
 
 

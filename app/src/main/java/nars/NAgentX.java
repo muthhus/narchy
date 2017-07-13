@@ -113,54 +113,54 @@ abstract public class NAgentX extends NAgent {
         chart(n, a);
 
         int HISTORY = 24;
-        MixContRL m = (MixContRL) n.in;
+        //MixContRL m = (MixContRL) n.in;
         window(row(
 
                 causePlot(a.nar),
 
-                mixPlot(a, m, HISTORY),
+                //mixPlot(a, m, HISTORY),
 
                 col(
-                        row(
-                                new Plot2D(HISTORY, Plot2D.Line)
-                                        .on(a::onFrame),
-                                new Plot2D(HISTORY, Plot2D.Line)
-                                        .add("happy", () -> m.lastScore)
-                                        .on(a::onFrame)
-                        ),
+//                        row(
+////                                new Plot2D(HISTORY, Plot2D.Line)
+////                                        .on(a::onFrame),
+//                                new Plot2D(HISTORY, Plot2D.Line)
+//                                        .add("happy", () -> m.lastScore)
+//                                        .on(a::onFrame)
+//                        )
 
-//                        new MatrixView(m.traffic, 4, (x, gl) -> {
+////                        new MatrixView(m.traffic, 4, (x, gl) -> {
+////                            Draw.colorGrays(gl, x);
+////                            return 0;
+////                        }),
+//                        MatrixView.get((ArrayTensor) m.agentIn, 4, (x, gl) -> {
 //                            Draw.colorGrays(gl, x);
 //                            return 0;
 //                        }),
-                        MatrixView.get((ArrayTensor) m.agentIn, 4, (x, gl) -> {
-                            Draw.colorGrays(gl, x);
-                            return 0;
-                        }),
 
 
-//                        new MatrixView(new RingBufferTensor(m.agentIn, 2), 2, (x, gl) -> {
-//                                    Draw.colorGrays(gl, x);
-//                                    return 0;
-//                                })
+////                        new MatrixView(new RingBufferTensor(m.agentIn, 2), 2, (x, gl) -> {
+////                                    Draw.colorGrays(gl, x);
+////                                    return 0;
+////                                })
 
 
-//                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.W),
-//                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
-//
-//                        row(
-//                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[0].q),
-//                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[1].q),
-//                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[2].q),
-//                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
-//                        ),
+////                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.W),
+////                        new MatrixView(((MultiHaiQMixAgent) m.agent).sharedPerception.y, false),
+////
+////                        row(
+////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[0].q),
+////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[1].q),
+////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[2].q),
+////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
+////                        ),
 
-                        //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
+                       // //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
 
-                        MatrixView.get(m.mixControl, 4, (x, gl) -> {
-                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
-                            return 0;
-                        })
+//                        MatrixView.get(m.mixControl, 4, (x, gl) -> {
+//                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
+//                            return 0;
+//                        })
                 )
         ), 800, 800);
 

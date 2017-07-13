@@ -164,8 +164,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     @Override
                     public boolean add(TaskRegion tr) {
                         Task task = tr.task;
-                        if (task instanceof SignalTask)
-                            ongoing.add(tr);
+                        if (task instanceof SignalTask) {
+                            if (!ongoing.add(tr))
+                                return false; //should already be present
+                        }
                         return super.add(tr);
                     }
 
@@ -176,7 +178,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                             if (task instanceof SignalTask)
                                 ongoing.remove(tr);
                             return true;
-                        } else return false;
+                        } else
+                            return false;
                     }
                 });
     }

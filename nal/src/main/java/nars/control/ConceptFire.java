@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 
 import static java.lang.Math.ceil;
 import static java.lang.Math.max;
+import static java.lang.Math.tanh;
 import static nars.Param.UnificationTTLMax;
 
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
@@ -63,19 +64,20 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 float v = origin.value(t, activation, n);
 
                 float boost = 0;
-                float vPer = v/x.length;
+                float vPer = v/x.length; if (Math.abs(vPer) < EPSILON) vPer = 0;
                 for (short c : x) {
                     Cause cc = n.causes.get(c);
                     boost += cc.floatValue();
-                    if (v != 0) {
+                    if (vPer != 0) {
                         cc.apply(vPer);
                     }
                 }
 
                 if (boost!=0) {
-                    float b = Util.clamp(boost + 1f, 0.25f, 2f);
-                    t.priMult(b);
-                    if (t.priElseZero() < EPSILON)
+                    float b = (float)tanh(boost*0.5f)+1f;
+                    activation *= b;
+                    //t.priMult(b);
+                    if (/*t.priElseZero()*/ activation < EPSILON)
                         return null;
                 }
 
@@ -317,9 +319,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             Term x = ctpl.sub(i);
             @Nullable Concept c = nar.conceptualize(x);
             if (c != null) {
-                tc.add(c);
-                if (layersRemain > 0 && c instanceof Compound) {
-                    templates(tc, c.templates(), nar, layersRemain - 1);
+                if (tc.add(c)) {
+                    if (layersRemain > 0 && c instanceof Compound) {
+                        templates(tc, c.templates(), nar, layersRemain - 1);
+                    }
                 }
             } else {
                 tc.add(x.unneg()); //variable or other non-concept term

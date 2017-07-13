@@ -712,7 +712,7 @@ public enum Terms { ;
             return a;
 
         Term[] c = TermContainer.intersect(a, b);
-        return (c == null || c.length== 1) ? Null : (Compound)(o.the(c));
+        return (c == null || c.length == 0) ? Null : (Compound)(o.the(c));
     }
 
     @NotNull

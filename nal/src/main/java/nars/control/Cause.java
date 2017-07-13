@@ -1,6 +1,7 @@
 package nars.control;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import jcog.Util;
 import jcog.list.FasterList;
 import nars.Param;
 import nars.Task;
@@ -16,6 +17,8 @@ import java.util.List;
 public class Cause extends AtomicDouble /* value */ {
     public final short id;
     public final Object x;
+
+    float next = 0;
 
     public Cause(short id, Object x) {
         super(0);
@@ -69,11 +72,13 @@ public class Cause extends AtomicDouble /* value */ {
     }
 
     public void apply(float v) {
-        addAndGet(v);
+        next += v;
     }
 
-    public void forget(float decayRate) {
-        set(get() * decayRate);
+    public void commit(float decayRate) {
+        float n = this.next;
+        this.next = 0;
+        set(Util.clamp((floatValue() + n) * decayRate, -2f, +2f));
     }
 
 }

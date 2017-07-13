@@ -6,7 +6,7 @@
 //// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
 //If S is a special case of P, and P is a special case of S, then S and P are similar
 
-    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong, Permute:Swap)
+    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong)
 
 //// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
 
@@ -38,8 +38,8 @@
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
-    (M --> P), (S <-> M), neqRCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Permute:Backward)
-    (P --> M), (S <-> M), neqRCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Permute:Backward)
+    (M --> P), (S <-> M), neqRCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Permute:Backward, Permute:Swap)
+    (P --> M), (S <-> M), neqRCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Permute:Backward, Permute:Swap)
         //(M --> P), (S <-> M), belief(negative), neqRCom(S,P) |- (--,(S --> P)), (Belief:AnalogyPN, Goal:StrongPN)
         //(P --> M), (S <-> M), belief(negative), neqRCom(S,P) |- (--,(P --> S)), (Belief:AnalogyPN, Goal:StrongPN)
     (M <-> P), (S <-> M), neqRCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong, Permute:Backward)

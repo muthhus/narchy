@@ -93,7 +93,7 @@ import static org.fusesource.jansi.Ansi.ansi;
  * <p>
  * Memory is serializable so it can be persisted and transported.
  */
-public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<NAR>, TermContext {
+public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles<NAR>, TermContext {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
     static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
@@ -204,15 +204,15 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
         this.level = 8;
 
         //this.deriver = new TrieDeriver(DefaultDeriver.rules);
-        this.deriver = new TrieDeriver( PremiseRuleSet.rules(true,
-                        "nal1.nal",
-                        //"nal4.nal",
-                        "nal6.nal",
-                        "misc.nal",
-                        "induction.nal",
-                        "nal2.nal",
-                        "nal3.nal"
-            ) );
+        this.deriver = new TrieDeriver(PremiseRuleSet.rules(true,
+                "nal1.nal",
+                //"nal4.nal",
+                "nal6.nal",
+                "misc.nal",
+                "induction.nal",
+                "nal2.nal",
+                "nal3.nal"
+        ));
         deriver.forEachConclusion((Conclude x) -> {
             if (x.cause != null) // a re-used copy from rule permutes? TODO why?
                 return;
@@ -236,10 +236,12 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     public final List<Cause> causes = $.newArrayList(512);
 
     private Cause newCause(Object x) {
-        short next = (short)causes.size();
-        Cause c = new Cause(next, x);
-        causes.add(c);
-        return c;
+        synchronized (causes) {
+            short next = (short) causes.size();
+            Cause c = new Cause(next, x);
+            causes.add(c);
+            return c;
+        }
     }
 
     protected PSinks<ITask, CLink<ITask>> newInputMixer() {
@@ -252,7 +254,17 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
     }
 
     public PSink<ITask, CLink<ITask>> newInputChannel(Object id) {
-        return in.newStream(id, x -> input(x));
+
+        Cause c = newCause(id);
+        short[] cs = new short[c.id];
+
+        return in.newStream(id, x -> {
+            if (x.ref instanceof NALTask) {
+                //assert (((NALTask) x.ref).cause.length == 0);
+                ((NALTask) x.ref).cause = cs;
+            }
+            input(x);
+        });
     }
 
 
@@ -797,7 +809,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 //
 
     @Override
-    public final void accept(@NotNull Task task) {
+    public final void accept(@NotNull ITask task) {
         input(task);
     }
 
@@ -922,7 +934,7 @@ public class NAR extends Param implements Consumer<Task>, NARIn, NAROut, Cycles<
 
         emotion.cycle();
 
-        causes.forEach(c -> c.forget(0.99f));
+        causes.forEach(c -> c.commit(0.99f));
 
         exe.cycle(this);
     }

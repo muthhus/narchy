@@ -353,6 +353,6 @@ public interface Concept extends Termed, Termlike {
     }
 
     default float value(@NotNull Task t, float activation, NAR n) {
-        return (-t.volume()*activation)/4000f;
+        return (-t.volume() * activation)/4000f;
     }
 }

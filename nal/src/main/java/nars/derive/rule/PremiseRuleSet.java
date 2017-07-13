@@ -92,10 +92,10 @@ public class PremiseRuleSet {
 //        this(parse(load(ruleStrings), patterns), patterns);
 //    }
 
-    static final PatternTermIndex p = new PatternTermIndex();
 
     @NotNull
     public static PremiseRuleSet rules(boolean permute, String... name) {
+    final PatternTermIndex p = new PatternTermIndex();
 
         PremiseRuleSet rs = new PremiseRuleSet(
                 Stream.of(name).flatMap(n -> {

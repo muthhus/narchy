@@ -185,9 +185,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         int s = size();
         if (s > 0) {
             UnifiedSet u = new UnifiedSet(s);
-            forEach(x -> {
-                if (ifTrue.test(x)) u.add(x);
-            });
+            for (int i = 0; i < s; i++) {
+                @NotNull Term x = sub(i);
+                if (ifTrue.test(x))
+                    u.add(x);
+            }
             return u;
         } else {
             return Collections.emptySet();
@@ -208,12 +210,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if ((a.structure() & b.structure()) == 0)
             return null; //nothing in common
         else {
-            MutableSet<Term> si = Sets.intersect(a.toSet(), b.toSet());
+            //TODO sort a and b so that less comparisons are made (ie. if b is smaller than a, compute a.toSet() first
+            Set<Term> as = a.toSet();
+            Set<Term> si = b.toSet(as::contains); //(MutableSet<Term>) as Sets.intersect(a.toSet(), b.toSet());
             int ssi = si.size();
             if (ssi == 0)
                 return null;
 
-            Term[] c = si.toArray(new Term[si.size()]);
+            Term[] c = si.toArray(new Term[ssi]);
             if (ssi > 1)
                 Arrays.sort(c);
 

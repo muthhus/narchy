@@ -58,12 +58,12 @@ public final class Conclude extends AbstractPred<Derivation> {
     public Cause cause;
 
     /** serial for uniqueness */
-    final static AtomicInteger serial = new AtomicInteger(1);
+    //final static AtomicInteger serial = new AtomicInteger(1);
 
     public Conclude(@NotNull PremiseRule rule, @NotNull Term conclusionPattern,
                     @Nullable TruthOperator belief, @Nullable TruthOperator goal,
                     @NotNull TimeFunctions time) {
-        super($.func((Atomic)$.the("derive"), $.the(serial.incrementAndGet()),
+        super($.func((Atomic)$.the("derive"),
                conclusionPattern, $.the("time" + time.toString())));
 
         this.rule = rule;
@@ -244,7 +244,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                     long s = start; start = end; end = s; //swap
                 }
 
-                float priority = d.budgeting.budget(d, C, truth, punc, start, end);
+                float priority = d.parentPri; //d.budgeting.budget(d, C, truth, punc, start, end);
                 if (priority == priority) {
 
                     if (priority < Priority.EPSILON) {

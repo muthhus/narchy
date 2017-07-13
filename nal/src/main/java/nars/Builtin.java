@@ -115,27 +115,34 @@ public class Builtin {
             }));
 
 
-        /** remove an element from a commutive conjunction, at random, and try re-creating
+        /**
+         * TODO rename this to 'dropAnyCommutive'
+         * remove an element from a commutive conjunction (or set), at random, and try re-creating
          * the compound. wont necessarily work in all situations.
          * TODO move the type restriction to another functor to wrap this
          *
          * this also filter a single variable (depvar) from being a result
          */
         nar.on(Functor.f1((Atom) $.the("dropAnyConj"), (Term t) -> {
-            if (t.op() != CONJ)
+            Op oo = t.op();
+            if (!oo.in(CONJ.bit | SETi.bit | SETe.bit))
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
             Compound c = (Compound)t;  //for use in deriver, fail if any variable parameters
 
             int size = c.size();
 
-            if (size == 0)
+            if (size < 2)
                 return Null;
 
             Term result;
             if (size == 2) {
                 int n = nar.random().nextInt(2);
-                result = Term.nullIfNull(c.sub(n));
+                result = Term.nullIfNull(
+                        oo.isSet() ?
+                                oo.the(c.sub(n)) :
+                                c.sub(n) //CONJ
+                        );
             } else {
                 Term[] y = new Term[size-1];
                 int except = nar.random().nextInt(size);

@@ -12,6 +12,7 @@ import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
 import com.github.fge.grappa.transform.ParserTransformer;
+import com.google.common.collect.Lists;
 import jcog.Texts;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.term.TermIndex;
@@ -29,6 +30,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -283,12 +285,11 @@ public class Narsese extends BaseParser<Object> {
 
                 optional(Budget(budget)),
 
-                Term(true, false),
-                term.set(the(pop())),
+                Term(true, false), term.set(the(pop())),
 
                 s(),
 
-                optional(SentencePunctuation(punc), s()),
+                SentencePunctuation(punc), s(),
 
                 optional(Tense(tense), s()),
 
@@ -413,8 +414,12 @@ public class Narsese extends BaseParser<Object> {
 //        );
 //    }
 
+    static final ArrayList<String> puncStr = Lists.newArrayList(".", "?", "!", "@", ";");
+
     Rule SentencePunctuation(Var<Character> punc) {
-        return sequence(anyOf(".?!@;"), punc.set(matchedChar()));
+
+        return sequence(trie(".", "?", "!", "@", ";"), punc.set(matchedChar()));
+        //return sequence(anyOf(".?!@;"), punc.set(matchedChar()));
     }
 
 
@@ -1336,6 +1341,54 @@ public class Narsese extends BaseParser<Object> {
 //        return null;
 //    }
 
+
+//	/* The main method! */
+//	public static void main(final String... args) {
+//		/* The class of our parser */
+//		final Class<Narsese> parserClass = Narsese.class;
+//
+//		/* The constructor repository for our parser */
+//		final ParseNodeConstructorProvider repository
+//				= new ParseNodeConstructorProvider(parserClass);
+//
+//		/* The grappa parser! */
+//        Narsese parser = Narsese.parsers.get();
+//
+//
+//		/* The runner that listens for events from the parser */
+////		final ParseRunner runner
+////				= new ParseRunner(parser.Term());
+//
+//		/* The class that will build the parse tree */
+//		final ParseTreeBuilder listener
+//				= new ParseTreeBuilder(repository);
+//
+////		/* Register the parse tree builder to the runner. This must be done before you run. */
+////		runner.registerListener(listener);
+////		/* Run on the given input. */
+////		runner.run("a:b");
+//
+//		/* Get the root node of the parse tree built. */
+//		final ParseNode rootNode = listener.getTree();
+//		System.out.println(rootNode);
+//
+//		/* Create a visitor runner, and provide the root node to start visiting from. */
+//		//VisitorRunner visitorRunner = new VisitorRunner(rootNode);
+//
+////		/* Create a visitor */
+////		ExampleVisitor v = new ExampleVisitor();
+////
+////		/* Register your visitor. */
+////		visitorRunner.registerVisitor(v);
+//
+//		/* Run the visitors on the parse tree using a defined traversal order. The default is a
+//		post order traversal, here we specify a pre order traversal. A third option is breadth
+//		first traversal. */
+//		//visitorRunner.run(VisitOrder.PREORDER);
+//
+//		/* Done! */
+////		System.out.println(v.getSillySentence());
+//	}
 
     //    /**
 //     * interactive parse test

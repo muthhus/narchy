@@ -4,7 +4,6 @@ import nars.control.premise.Derivation;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.compound.GenericCompound;
-import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -12,10 +11,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static nars.Op.CONJ;
-import static nars.time.Tense.DTERNAL;
 
 
-/** parallel branching */
+/**
+ * parallel branching
+ */
 public class Fork extends GenericCompound implements BoolPred<Derivation> {
 
     @NotNull
@@ -43,13 +43,17 @@ public class Fork extends GenericCompound implements BoolPred<Derivation> {
         for (int i = 0; i < branches; i++) {
 
             //try {
-                cached[(start + i) % branches].test(m);
+            cached[start].test(m);
+
             /*} catch (Throwable t) {
                 m.logger.error("{}", t); //HACK
             }*/
 
             if (!m.revert(now))
                 return false;
+
+            if (++start == branches)
+                start = 0;
         }
 
         return true;
@@ -59,11 +63,15 @@ public class Fork extends GenericCompound implements BoolPred<Derivation> {
         return compile(t.toArray(new BoolPred[t.size()]));
     }
 
-    @Nullable public static BoolPred<Derivation> compile(@NotNull BoolPred<Derivation>[] n) {
+    @Nullable
+    public static BoolPred<Derivation> compile(@NotNull BoolPred<Derivation>[] n) {
         switch (n.length) {
-            case 0: return null;
-            case 1: return n[0];
-            default: return new Fork(n);
+            case 0:
+                return null;
+            case 1:
+                return n[0];
+            default:
+                return new Fork(n);
         }
     }
 
