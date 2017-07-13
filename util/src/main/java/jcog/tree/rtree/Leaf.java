@@ -72,7 +72,7 @@ public class Leaf<T> implements Node<T, T> {
     @Override
     public Node<T, ?> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
 
-        if (!contains(t, model)) {
+        if (parent!=null && !contains(t, model)) {
             Node<T, ?> next;
 
             if (size < model.max) {
@@ -89,7 +89,8 @@ public class Leaf<T> implements Node<T, T> {
 
             return next;
         } else {
-            return null;
+
+            return (parent==null && contains(t, model)) ? null : this;
         }
     }
 

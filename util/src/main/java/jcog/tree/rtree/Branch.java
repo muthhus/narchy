@@ -112,6 +112,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
         final HyperRegion tRect = model.region(t);
 
+        //MERGE STAGE:
         for (int i = 0; i < size; i++) {
             Node ci = child[i];
             if (ci.region().contains(tRect)) {
@@ -119,16 +120,22 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 //                if (ci.contains(t, model))
 //                    return this; // duplicate detected (subtree not changed)
 
-                Node<T, ?> m = ci.add(t, this, model);
+                Node<T, ?> m = ci.add(t, null, model);
                 if (m == null)
                     return null; //merged
-                if (reportNextSizeDelta(parent)) {
-                    child[i] = m;
-                    grow(m); //subtree was changed
-                    return this;
-                }
+//                if (reportNextSizeDelta(parent)) {
+//                    child[i] = m;
+//                    grow(m); //subtree was changed
+//                    return this;
+//                }
             }
         }
+
+        if (parent == null)
+            return this; //done for this stage
+
+
+        //INSERTION STAGE:
 
         if (size < child.length) {
 

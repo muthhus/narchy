@@ -25,6 +25,7 @@ import jcog.tree.rtree.util.Stats;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.block.comparator.primitive.FloatFunctionComparator;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -88,11 +89,13 @@ public interface Node<L, V> extends Nodelike<L> {
     /**
      * Add t to the index
      *  @param l      - value to add to index
-     * @param parent - the callee which is the parent of this instance
+     * @param parent - the callee which is the parent of this instance.
+     *                  if parent is null, indicates it is in the 'merge attempt' stage
+     *                  if parent is non-null, in the 'insertion attempt' stage
      * @param model
      * @return null if Leaf merged it with existing item
      */
-    Node<L, ?> add(L l, Nodelike<L> parent, Spatialization<L> model);
+    @Nullable Node<L, ?> add(@NotNull L l, @Nullable Nodelike<L> parent, @NotNull Spatialization<L> model);
 
     /**
      * Remove t from the index

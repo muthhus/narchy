@@ -27,17 +27,22 @@ public class SplitTest {
                     int i = 0;
                     for (RectDouble2D r : rects) {
                         boolean added = rTree.add(r);
-                        if (!added)
+                        if (!added) {
                             rTree.add(r); //for debugging: try again and see what happened
+                            fail();
+                        }
                         assertTrue(added);
-                        i++;
-                        assertEquals(i, rTree.size());
+                        assertEquals(++i, rTree.size());
                         //assertEquals(i, rTree.stats().getEntryCount());
 
                         boolean tryAddingAgainToTestForNonMutation = rTree.add(r);
+                        if (tryAddingAgainToTestForNonMutation) {
+                            rTree.add(r); //for debugging: try again and see what happened
+                            fail();
+                        }
+                        assertFalse(i + "==?" + rTree.size() , tryAddingAgainToTestForNonMutation); //reinsertion of existing element will not affect size and will return false here
                         assertEquals(i, rTree.size()); //reinsertion should cause no change in size
                         //assertEquals(i, rTree.stats().getEntryCount());
-                        assertFalse(tryAddingAgainToTestForNonMutation); //reinsertion of existing element will not affect size and will return false here
                     }
 
                     assertEquals(entryCount, rTree.size());

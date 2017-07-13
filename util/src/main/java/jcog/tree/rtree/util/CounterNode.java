@@ -57,7 +57,7 @@ public final class CounterNode<T> implements Node<T, Object> {
 
     @Override
     public Node<T, ?> add(T t, Nodelike<T> parent, Spatialization<T> model) {
-        return this.node.add(t, this, model);
+        return this.node.add(t, parent!=null ? this : null, model);
     }
 
     @Override
