@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -27,12 +25,24 @@ public abstract class AbstractNALTest {
 
     protected final TestNAR tester;
 
-//    protected AbstractNALTest(NAR nar) {
+    //    protected AbstractNALTest(NAR nar) {
 //        this(() -> nar);
 //    }
     protected AbstractNALTest() {
         //this.nar = null;
-        tester = new TestNAR(new NARBuilder().get());
+
+        NAR n = new NARBuilder().get();
+        n.termVolumeMax.setValue(30);
+        //n.nal(level);
+//                    n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+//                    n.DEFAULT_GOAL_PRIORITY = 0.5f;
+        n.DEFAULT_QUEST_PRIORITY = 0.25f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.25f;
+        //if (level >= 7) {
+            new STMTemporalLinkage(n, 1, false);
+        //}
+        Param.DEBUG = true;
+        tester = new TestNAR(n);
     }
 
     protected AbstractNALTest(Supplier<NAR> nar) {
@@ -41,7 +51,8 @@ public abstract class AbstractNALTest {
     }
 
 
-    @NotNull public TestNAR test() {
+    @NotNull
+    public TestNAR test() {
         return tester;
     }
 
@@ -58,6 +69,7 @@ public abstract class AbstractNALTest {
 
     @Before
     public void start() {
+        //System.out.println(tester);
         //assert(tester==null);
         //tester = test(nar.get());
 

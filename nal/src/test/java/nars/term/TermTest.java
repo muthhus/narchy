@@ -809,10 +809,9 @@ public class TermTest {
     }
 
     public void testUniqueHash(@NotNull String a, @NotNull String b) throws Narsese.NarseseException {
-        NAR n = new Terminal(16);
 
-        int h1 = n.term(a).hashCode();
-        int h2 = n.term(b).hashCode();
+        int h1 = t.term(a).hashCode();
+        int h2 = t.term(b).hashCode();
         assertNotEquals(h1, h2);
     }
 

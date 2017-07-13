@@ -13,17 +13,17 @@ import java.util.function.Supplier;
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
-@RunWith(Parameterized.class)
+//@RunWith(Parameterized.class)
 public class NAL5Test extends AbstractNALTest {
 
-    public NAL5Test(Supplier<NAR> b) {
-        super(b);
-    }
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Iterable configurations() {
-        return AbstractNALTest.nars(5);
-    }
+//    public NAL5Test(Supplier<NAR> b) {
+//        super(b);
+//    }
+//
+//    @Parameterized.Parameters(name = "{0}")
+//    public static Iterable configurations() {
+//        return AbstractNALTest.nars(5);
+//    }
 
     final int cycles = 750;
 

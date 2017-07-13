@@ -514,7 +514,7 @@ public class TermReductionsTest {
         try {
             t.inputAndGet("at($1,$2,$3)");
             assertTrue(false);
-        } catch (InvalidTaskException e) {
+        } catch (Narsese.NarseseException | InvalidTaskException e) {
             assertTrue(true);
         }
     }

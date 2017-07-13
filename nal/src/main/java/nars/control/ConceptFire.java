@@ -57,12 +57,13 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         if (activation >= EPSILON) {
 
             short[] x = t.cause();
-            if (x.length > 0) {
+            int xl = x.length;
+            if (xl > 0) {
                 float v = origin.value(t, activation, n);
 
                 float boost = 0;
-                float vPer = v/x.length; if (Math.abs(vPer) < EPSILON) vPer = 0;
-                for (int i = x.length-1; i >=0; i--) {
+                float vPer = v/ xl; if (Math.abs(vPer) < EPSILON) vPer = 0;
+                for (int i = xl -1; i >=0; i--) {
                     short c = x[i];
                     Cause cc = n.causes.get(c);
                     assert(cc!=null):

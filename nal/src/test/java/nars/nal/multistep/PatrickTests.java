@@ -18,18 +18,18 @@ import static nars.$.$;
 /**
  * see Natural_Language_Processing2.md
  */
-@RunWith(Parameterized.class)
+//@RunWith(Parameterized.class)
 public class PatrickTests extends AbstractNALTest {
 
-    public PatrickTests(Supplier<NAR> b) {
-        super(b);
-    }
-
-    @Parameterized.Parameters(name = "{index}:{0}")
-    public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(8);
-    }
-
+//    public PatrickTests(Supplier<NAR> b) {
+//        super(b);
+//    }
+//
+//    @Parameterized.Parameters(name = "{0}")
+//    public static Iterable<Supplier<NAR>> configurations() {
+//        return AbstractNALTest.nars(8);
+//    }
+//
 
     @Test
     public void testExample1() {
