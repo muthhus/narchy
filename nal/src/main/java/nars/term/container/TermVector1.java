@@ -9,6 +9,7 @@ import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -63,6 +64,11 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
+    public boolean isTemporal() {
+        return sub.isTemporal();
+    }
+
+    @Override
     public boolean subIs(int i, Op o) {
         return i == 0 && sub.op() == o;
     }
@@ -94,6 +100,11 @@ public class TermVector1 implements TermContainer {
 
     @Override @NotNull public Set<Term> toSet() {
         return Sets.mutable.of(sub);
+    }
+
+    @Override
+    public @NotNull Set<Term> toSet(Predicate<Term> ifTrue) {
+        return ifTrue.test(sub) ? toSet() : Collections.emptySet();
     }
 
     @NotNull

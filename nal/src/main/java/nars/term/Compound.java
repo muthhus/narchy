@@ -752,9 +752,10 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean isTemporal() {
-        return (isAny(Op.TemporalBits) && (dt() != DTERNAL))
-                ||
-                (hasAny(Op.TemporalBits) && subterms().isTemporal());
+        return hasAny(Op.TemporalBits) &&
+                    (isAny(Op.TemporalBits) && (dt() != DTERNAL))
+                    ||
+                    ( subterms().isTemporal() );
     }
 
     @Override

@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.Collection;
 
 import static nars.Op.Null;
 import static nars.term.Terms.compoundOrNull;
@@ -170,7 +169,6 @@ public abstract class TermBuilder {
 //    }
 
 
-
 //    public TermContainer subterms(@NotNull TreeSet<Term> s) {
 //        return subterms(s.toArray(new Term[s.size()]));
 //    }
@@ -268,9 +266,6 @@ public abstract class TermBuilder {
     }
 
 
-
-
-
     @Nullable
     public Term the(@NotNull Object o) {
         if (o instanceof Term)
@@ -311,14 +306,18 @@ public abstract class TermBuilder {
         if (!c.isTemporal())
             return c;
 
-        TermContainer st = c.subterms();
         Term[] newSubs = null; //oldSubs.clone();
 
         Op o = c.op();
         int cdt = c.dt();
         int pdt = !o.temporal ? cdt : DTERNAL; //( !o.concurrent(cdt) ? XTERNAL : DTERNAL); //preserve image dt
+
+
+        TermContainer st = c.subterms();
         int sts = st.size();
         if (st.hasAny(Op.TemporalBits)) {
+
+            //atemporalize subterms first
 
             boolean subsChanged = false;
             int cs = sts;
@@ -351,8 +350,8 @@ public abstract class TermBuilder {
 //        }
 
 
-        boolean dtChanged = (pdt != cdt);
-        boolean subsChanged;
+        boolean dtChanging = (pdt != cdt);
+        boolean subsChanged = (newSubs != null) && !st.equalTerms(newSubs);
 //        if (dtChanged && pdt == XTERNAL) {
 //            if (newSubs == null) {
 //                newSubs = st.toArray(new Term[sts], 0, sts);
@@ -360,81 +359,77 @@ public abstract class TermBuilder {
 //            Arrays.sort(newSubs);
 //            subsChanged = !st.equalTerms(newSubs);
 //        } else {
-        subsChanged = newSubs != null && !st.equalTerms(newSubs);
+
         //   }
 
-        if (subsChanged || dtChanged) {
+        if (subsChanged || dtChanging) {
 
-            if (o.temporal && (
-                    (subsChanged && newSubs.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
-                            ||
-                            (sts == 2 &&
-                                    Terms.reflex(st.sub(0), st.sub(1))
-                            ))// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
-                    ) {
+            if (o.temporal) {// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
+
+                //introduce an XTERNAL temporal placeholder in the following conditions
+                if ((subsChanged && newSubs.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
+                        ||
+                        (sts == 2 &&
+
+                                //repeat or non-lexical ordering for commutive compound; must re-arrange
+                                (o.commutative && (st.sub(0).compareTo(st.sub(1)) >= 0))
+
+                                ||
+
+                                Terms.reflex(st.sub(0), st.sub(1))))
 
 
-                pdt = XTERNAL;
+                // && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
+                {
 
-                newSubs = new Term[]{st.sub(0), st.sub(st.size() > 1 ? 1 : 0)};
-                if (o.commutative)
-                    Arrays.sort(newSubs);
-                subsChanged = true;
-            }/* else {
-                if (o.temporal)
+
                     pdt = DTERNAL;
-            }*/
+                    if (!dtChanging)
+                        dtChanging = pdt != cdt; //in case that now the dt has changed
 
+                    newSubs = new Term[]{st.sub(0), st.sub(sts > 1 ? 1 : 0)};
+                    if (o.commutative)
+                        Arrays.sort(newSubs);
 
-//            if (o.temporal && newSubs!=null && newSubs.size() == 1) {
-//                System.out.println("?");
-//            }
+                    if (!subsChanged)
+                        subsChanged = newSubs.length != sts || !st.equalTerms(newSubs);
 
-            Compound xx = compoundOrNull(
-                    Op.compound(o, pdt, subsChanged ?
-                        Op.subterms(newSubs)
-                            :
-                        c.subterms()  //o.the(pdt, c.subterms().toArray()));
-                    )
-            );
-
-            if (xx == null) {
-                if (dtChanged) {
-                    if (pdt == DTERNAL) {
-                        //throw new InvalidTermException("unable to atemporalize", c);
-                        @Nullable Compound x = compoundOrNull(
-                                Op.compound(o, XTERNAL, subsChanged ? Op.subterms(newSubs) : st));
-                        return x != null ? x : Null;
-                    }
                 }
             }
+        }
 
-
-            //if (c.isNormalized())
-            //xx.setNormalized();
-
-            //Termed exxist = get(xx, false); //early exit: atemporalized to a concept already, so return
-            //if (exxist!=null)
-            //return exxist.term();
-
-
-            //x = i.the(xx).term();
-            if (xx == null)
-                return Null;
-                //throw new NullPointerException();
-
-            return xx;
-        } else {
+        if (!subsChanged && !dtChanging) {
             return c;
         }
+
+
+        Compound xx = compoundOrNull(
+                o.the(pdt, subsChanged ?
+                        newSubs
+                        :
+                        c.toArray()
+                )
+        );
+
+
+        if (xx == null && pdt == DTERNAL) {
+
+            //as a last resort, use the XTERNAL form to allow it
+            //TODO decide if all commutive temporal concepts (&&, <=>) should be named by their raw XTERNAL form
+
+            xx = compoundOrNull(
+                    Op.compound(o, XTERNAL, subsChanged ? Op.subterms(newSubs) : st));
+        }
+
+        if (xx == null)
+            return Null; //failed to atemporalize
+        else
+            return xx;
     }
 
 
-    public Term the(@NotNull Op op, int dt, Collection<Term> sub) {
-        int ss = sub.size();
-        @NotNull Term[] u = sub.toArray(new Term[ss]);
-        return op.the(dt, u);
+    @NotNull
+    public Term atemporalize(@NotNull Term t) {
+        return t instanceof Compound ? atemporalize((Compound) t) : t;
     }
-
-
 }

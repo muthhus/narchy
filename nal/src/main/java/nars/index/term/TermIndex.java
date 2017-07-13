@@ -391,13 +391,13 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     }
 
 
-    @NotNull
-    public Term parseRaw(@NotNull String termToParse) throws Narsese.NarseseException {
+    /** un-normalized */
+    @NotNull public Term termRaw(@NotNull String termToParse) throws Narsese.NarseseException {
         return Narsese.the().term(termToParse, this, false);
     }
 
-    @NotNull
-    public <T extends Term> T term(@NotNull String termToParse) throws Narsese.NarseseException {
+    /** normalized */
+    @NotNull public <T extends Term> T term(@NotNull String termToParse) throws Narsese.NarseseException {
         return (T) (Narsese.the().term(termToParse, this, true));
     }
 
@@ -436,12 +436,6 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     @Nullable
     public final Term replace(@NotNull Term src, @NotNull Term from, @NotNull Term to) {
         return new MapSubst1(from, to).transform(src, this);
-    }
-
-
-    @NotNull
-    public Term atemporalize(@NotNull Term t) {
-        return t instanceof Compound ? atemporalize((Compound) t) : t;
     }
 
 

@@ -34,7 +34,7 @@ public class TemporalTest {
     @Test
     public void parsedCorrectOccurrenceTime() throws Narsese.NarseseException {
         long now = n.time();
-        Task t = n.inputAndGet("<a --> b>. :\\:");
+        Task t = n.inputAndGet("b:a. :\\:");
         assertEquals(now, t.creation());
         assertEquals(now - 1, t.start());
     }
@@ -285,13 +285,27 @@ public class TemporalTest {
 
             assertTrue(c == d);
 
-            Concept e = n.conceptualize($("(x " + op + "+- y)"));
+            Term e0 = $("(x " + op + "+- y)");
+            assertEquals("(x " + op + "+- y)", e0.toString());
+            Concept e = n.conceptualize(e0);
 
             assertTrue(d == e);
 
-            Concept f = n.conceptualize($("(y " + op + "+- x)"));
+            Term f0 = $("(y " + op + "+- x)");
+            assertEquals("(y " + op + "+- x)", f0.toString());
+            Concept f = n.conceptualize(f0);
+
 
             assertTrue(e + "==" + f, e == f);
+
+            //repeat
+            Concept g = n.conceptualize($("(x " + op + "+- x)"));
+            assertEquals("(x " + op + "+- x)", g.toString());
+
+            //co-negation
+            Concept h = n.conceptualize($("(x " + op + "+- (--,x))"));
+            assertEquals("(x " + op + "+- (--,x))", h.toString());
+
         }
 
     }

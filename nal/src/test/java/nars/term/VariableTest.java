@@ -137,7 +137,7 @@ public class VariableTest {
 
     private static Compound raw(String a) {
         try {
-            return (Compound) $.terms.parseRaw(a);
+            return (Compound) $.terms.termRaw(a);
         } catch (Narsese.NarseseException e) {
             assertTrue(false);
             return null;

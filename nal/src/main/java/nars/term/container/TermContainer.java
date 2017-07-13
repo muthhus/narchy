@@ -406,6 +406,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
+    /** an array of the subterms */
     default public Term[] toArray() {
         int s = size();
         switch (s) {

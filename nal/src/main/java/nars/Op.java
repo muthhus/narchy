@@ -137,30 +137,32 @@ public enum Op implements $ {
      */
     CONJ("&&", true, 5, Args.GTETwo) {
         @Override
-        public Term the(int dt, Term... uu) {
-            Term[] u = uu.length > 1 ? conjTrueFalseFilter(uu) : uu /* avoid true false filter if fall-through only-term anyway */;
-
-            final int n = u.length;
-            if (n == 1) {
-                Term only = u[0];
-
-                //preserve unitary ellipsis for patterns etc
-                return only instanceof Ellipsislike ?
-                        new GenericCompound(CONJ, subterms(only)) //special
-                        :
-                        only;
-
-            }
-
-            if (n == 0)
-                return Null;
-
+        public Term the(int dt, Term... u) {
+            //Term[] u = uu.length > 1 ? conjTrueFalseFilter(uu) : uu /* avoid true false filter if fall-through only-term anyway */;
 
             if (dt == XTERNAL) {
-                //assert (n == 2); //throw new InvalidTermException(CONJ, XTERNAL, "XTERNAL only applies to 2 subterms, as dt placeholder", u);
-
-                Arrays.sort(u); //sort but dont deduplicate
+                //leave un-sorted, un-de-duplicated
                 return conjPost(compound(CONJ, XTERNAL, subterms(u)));
+            }
+
+            final int n = u.length;
+            switch (n) {
+
+                case 0:
+                    return Null; //shouldnt happen
+
+                case 1:
+                    Term only = u[0];
+                    //preserve unitary ellipsis for patterns etc
+                    return only instanceof Ellipsislike ?
+                            new GenericCompound(CONJ, subterms(only)) //special; preserve the surrounding conjunction
+                            :
+                            only;
+
+                default:
+                    //continue below
+                    break;
+
             }
 
             boolean commutive = concurrent(dt);
@@ -323,67 +325,53 @@ public enum Op implements $ {
 
         }
 
-
         private Term conjPost(final Term x /* possibly a conjunction */) {
 
-            if (x == null)
-                return null;
-
             Op xo = x.op();
-            if (xo != CONJ)
-                return x;
-
+            if (xo != CONJ || !x.hasAny(IMPL))
+                return x; //fall-through
 
             //conjunction/implication reduction:
-            if (x.hasAny(IMPL)) {
-                //if there is only one implication subterm, then fold into that.
-                //if there are more than one, don't do anything (for now)
-                Compound cx = (Compound) x;
-                Compound c = cx;
-                int whichImpl = -1;
-                int cs = c.size();
-                for (int i = 0; i < cs; i++) {
-                    if (c.subIs(i, Op.IMPL)) {
-                        if (whichImpl != -1) {
-                            //a 2nd implication was found; don't continue
-                            whichImpl = -1;
-                            break;
-                        }
-                        whichImpl = i;
+
+            //if there is only one implication subterm, then fold into that.
+            final Compound conj = (Compound) x;
+            int whichImpl = -1;
+            int conjSize = conj.size();
+            Compound implication = null;
+            int implDT = XTERNAL;
+            for (int i = 0; i < conjSize; i++) {
+                if (conj.subIs(i, Op.IMPL)) {
+                    //only handle the first implication in this iteration
+                    whichImpl = i;
+                    implication = (Compound) conj.sub(whichImpl);
+                    implDT = implication.dt();
+                    if (implDT == XTERNAL) {
+                        //dont proceed any further
+                        return x;
                     }
+                    break;
                 }
-
-                if (whichImpl != -1) {
-
-//                Term[] precond = c.subterms().terms(
-//                        (IntObjectPredicate<Term>)((i,s)->(i != ww)));
-                    Compound css = (Compound) c.sub(whichImpl);
-                    Term implPre = css.sub(0);
-                    Term implPost = css.sub(1);
-                    Term other;
-                    if (x.size() == 2) {
-                        other = x.sub(1 - whichImpl, null);
-                    } else {
-                        //more than 2
-                        @NotNull Set<Term> ss = cx.toSet();
-                        if (ss.remove(css))
-                            other = x.op().the(cx.dt(), Terms.sorted(ss) /* assumes commutive since > 2 */);
-                        else {
-                            throw new RuntimeException("shouldnt happen");
-                        }
-                    }
-                    Term newPre = CONJ.the(
-                            cx.dt(),
-                            other, implPre);
-                    return IMPL.the(css.dt(), newPre, implPost);
-
-                }
-
             }
 
-            return x;
-        }
+            Term others;
+            int conjDT = conj.dt();
+            if (conjSize == 2) {
+                others = x.sub(1 - whichImpl, null);
+            } else {
+                //more than 2; group them as one term
+                @NotNull TreeSet<Term> ss = conj.toSortedSet();
+                assert(ss.remove(implication)): "must have removed something";
 
+                others = xo.the(conjDT, Terms.sorted(ss) /* assumes commutive since > 2 */);
+            }
+
+            return IMPL.the(implDT,
+                    /* new, factored precondition */
+                        CONJ.the(conjDT, others, implication.sub(0) /* impl precond */),
+
+                    implication.sub(1) /* impl postcondition */
+            );
+        }
     },
 
     //SPACE("+", true, 7, Args.GTEOne),
@@ -393,7 +381,8 @@ public enum Op implements $ {
      * intensional set
      */
     SETi("[", true, 2, Args.GTEOne) {
-        @Override public boolean isSet() {
+        @Override
+        public boolean isSet() {
             return true;
         }
     },
@@ -402,7 +391,8 @@ public enum Op implements $ {
      * extensional set
      */
     SETe("{", true, 2, Args.GTEOne) {
-        @Override public boolean isSet() {
+        @Override
+        public boolean isSet() {
             return true;
         }
     },
@@ -853,6 +843,12 @@ public enum Op implements $ {
     }
 
 
+    public Term the(int dt, @NotNull Collection<Term> sub) {
+        int ss = sub.size();
+        @NotNull Term[] u = sub.toArray(new Term[ss]);
+        return the(dt, u);
+    }
+
     public Term the(int dt, @NotNull Term... u) {
         if (statement) {
             return statement(this, dt, u[0], u[1]);
@@ -908,21 +904,22 @@ public enum Op implements $ {
 //        if (s.length < 2) {
 //            return _subterms(s);
 //        } else {
-            return (TermContainer) cache.apply(new AppendProtoCompound(null, s).commit());
+        return (TermContainer) cache.apply(new AppendProtoCompound(null, s).commit());
 //        }
     }
 
 
-
-    @NotNull public static Term compound(Op op, int dt, TermContainer subterms) {
+    @NotNull
+    public static Term compound(Op op, int dt, TermContainer subterms) {
         assert (!op.atomic);
         AppendProtoCompound apc = new AppendProtoCompound(op, subterms);
         return compound(apc, dt);
     }
 
-    @NotNull public static Term compound(AppendProtoCompound apc, int dt) {
+    @NotNull
+    public static Term compound(AppendProtoCompound apc, int dt) {
         Term x = (Term) cache.apply(apc.commit());
-        if (dt!=DTERNAL && x instanceof Compound)
+        if (dt != DTERNAL && x instanceof Compound)
             return x.dt(dt);
         else
             return x;
@@ -955,8 +952,6 @@ public enum Op implements $ {
      * specifier for any NAL level
      */
     public static final int ANY_LEVEL = 0;
-
-
 
 
     /**
@@ -1011,9 +1006,9 @@ public enum Op implements $ {
             return Null;
 
         if (dt == XTERNAL) {
-            return compound(op, XTERNAL, op != EQUI || subject.compareTo(predicate) <= 0 ?
-                    subterms(subject, predicate):
-                    subterms(predicate,subject));
+            return compound(op, XTERNAL, //op != EQUI || subject.compareTo(predicate) <= 0 ?
+                    subterms(subject, predicate));
+            //subterms(predicate,subject));
         }
 
         switch (op) {
@@ -1261,15 +1256,14 @@ public enum Op implements $ {
                 Term x = predicate;
                 predicate = subject;
                 subject = x;
-                if (dt!=XTERNAL && !concurrent(dt))
+                if (dt != XTERNAL && !concurrent(dt))
                     dt = -dt;
             }
 
-            assert(subject.compareTo(predicate) <= 0);
+            assert (subject.compareTo(predicate) <= 0);
             //System.out.println( "\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
 
         }
-
 
 
         return compound(op, dt, subterms(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives

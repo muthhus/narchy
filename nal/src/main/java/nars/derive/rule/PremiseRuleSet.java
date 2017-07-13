@@ -276,13 +276,13 @@ public class PremiseRuleSet {
         }
 
         String A = '(' + ab[0].trim() + ')';
-        Term a = index.parseRaw(A);
+        Term a = index.termRaw(A);
         if (!(a instanceof Compound)) {
             throw new Narsese.NarseseException("Left rule component must be compound: " + src);
         }
 
         String B = '(' + ab[1].trim() + ')';
-        Term b = index.parseRaw(B);
+        Term b = index.termRaw(B);
         if (!(b instanceof Compound)) {
             throw new Narsese.NarseseException("Right rule component must be compound: " + src);
         }

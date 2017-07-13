@@ -19,7 +19,6 @@ import static nars.time.Tense.DTERNAL;
 
 /**
  * Compound inheriting directly from TermVector1
- * NOT READY YET
  */
 public class UnitCompound1 extends TermVector1 implements Compound {
 
@@ -46,6 +45,12 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 //        return hash;
 //    }
 
+
+    @NotNull
+    @Override
+    public Term[] toArray() {
+        return new Term[] { sub };
+    }
 
     @Override
     public @NotNull Term unneg() {
@@ -112,10 +117,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         return new SubtermView(this);
     }
 
-    @Override
-    public boolean isTemporal() {
-        return sub.isTemporal();
-    }
+
 
 
     @Override

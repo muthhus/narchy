@@ -71,7 +71,7 @@ public class IntAtom implements Atomic {
 
     @Override
     public @NotNull Op op() {
-        return ATOM;
+        return ATOM; //TODO add its own Op
     }
 
     @Override

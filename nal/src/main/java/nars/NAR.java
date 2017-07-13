@@ -38,6 +38,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.atom.AtomicSingleton;
 import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -1254,71 +1255,49 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * resolves a term to its Concept; if it doesnt exist, its construction will be attempted
      */
     @Nullable
-    public Concept conceptualize(@NotNull Termed termed) {
+    public final Concept conceptualize(@NotNull Termed termed) {
         return concept(termed, true);
     }
 
     @Nullable
-    private Concept concept(@NotNull Termed t, boolean createIfMissing) {
-        if (t instanceof Concept) {
-            Concept ct = (Concept) t;
+    private Concept concept(@NotNull Termed x, boolean createIfMissing) {
+        if (x instanceof Concept) {
+            Concept ct = (Concept) x;
             if (!ct.isDeleted())
                 return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
             //otherwise if it is deleted, continue
         }
 
-        Term cterm = conceptTerm(t);
-        return (cterm == null) ? null : terms.concept(cterm, createIfMissing);
+        Term y = conceptTerm(x.term());
+        return (y == null) ? null : terms.concept(y, createIfMissing);
     }
 
     /**
      * returns the canonical Concept term for any given Term, or null if it is unconceptualizable
      */
     @Nullable
-    public Term conceptTerm(@NotNull Termed termed) {
-
-
-        Term term = termed.unneg();
-
-        if (term instanceof Atom)
-            return term;
-
-        if (term instanceof Variable) {
-            return null;
-        }
-
-//        Term termPre = null;
-//        while (term instanceof Compound && termPre != term) {
-//            //shouldnt need to check for this here
-//            if (isTrueOrFalse(term))
-//                throw new UnsupportedOperationException();
-
-//            termPre = term;
-
+    public Term conceptTerm(@NotNull Term term) {
 
         if (term instanceof Compound) {
+            term = term.unneg();
+
             term = compoundOrNull(terms.atemporalize((Compound) term));
-            if (term == null)
-                return null;
+            if (term == null) return null;
 
             //atemporalizing can reset normalization state of the result instance
             //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
             term = compoundOrNull(terms.normalize((Compound) term));
-            if (term == null)
-                return null;
+            if (term == null) return null;
 
-            term = compoundOrNull(term.unneg());
-//                    if (nterm == null) {
-//                        concepts.normalize((Compound)term);
-//                        return null;
-//                    }
+            term = compoundOrNull(term.unneg() /* once again to be sure */ );
+            if (term == null) return null;
 
         }
 
-
-        if (term == null || (term instanceof Variable) || (isAbsolute(term)) || term instanceof IntAtom)
+        if (term instanceof Variable || term instanceof IntAtom || term instanceof AtomicSingleton)
             return null;
+
         return term;
     }
 

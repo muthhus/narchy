@@ -2,10 +2,8 @@ package nars.nal.nal7;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.nar.NARBuilder;
-import nars.nar.Terminal;
 import nars.table.BeliefTable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

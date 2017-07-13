@@ -1049,7 +1049,7 @@ public class Narsese extends BaseParser<Object> {
         if (op == null)
             op = PROD;
 
-        return $.terms.the(op, DTERNAL, vectorterms);
+        return op.the(DTERNAL, vectorterms);
     }
 
 

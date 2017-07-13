@@ -255,7 +255,7 @@ public class IO {
     @Nullable
     static Term readSpecialTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
         try {
-            return t.parseRaw(in.readUTF());
+            return t.termRaw(in.readUTF());
         } catch (Narsese.NarseseException e) {
             throw new IOException(e);
         }
