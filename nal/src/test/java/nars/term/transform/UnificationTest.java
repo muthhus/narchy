@@ -25,6 +25,10 @@ import static org.junit.Assert.*;
 public class UnificationTest {
 
     final static int cycles = 1;
+    static {
+        Param.DEBUG = true;
+    }
+
 //
 //    @Before
 //    public void start() {

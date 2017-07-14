@@ -34,7 +34,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
      */
     private static final int maxSamples = 2;
 
-    static final int TASKLINKS_SAMPLED = 3;
+    static final int TASKLINKS_SAMPLED = 4;
     static final int TERMLINKS_SAMPLED = 4;
     private Termed[] templates;
 

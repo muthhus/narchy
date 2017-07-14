@@ -65,8 +65,8 @@ public class TermVector1 implements TermContainer {
 
     @Override
     public final @NotNull Term sub(int i) {
-        if (i != 0)
-            throw new ArrayIndexOutOfBoundsException();
+        assert(i == 0);
+        //if (i != 0) throw new ArrayIndexOutOfBoundsException();
         return sub;
     }
 

@@ -149,8 +149,8 @@ public class Premise  {
 
         float parentTaskPri = beliefPriority != beliefPriority ? taskPri :
                 //max
-                //aveAri
-                or
+                aveAri
+                //or
                         (taskPri, beliefPriority);
 
         Derivation d = derivation.get();

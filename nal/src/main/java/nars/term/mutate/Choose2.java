@@ -6,6 +6,7 @@ import nars.$;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.term.Term;
+import nars.term.container.ArrayTermVector;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
@@ -39,7 +40,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
 
         int yFreeSize = yFree.size();
 
-        this.yy = new ShuffledSubterms(f.random, yFree.toArray(new Term[yFreeSize]));
+        this.yy = new ShuffledSubterms(f.random, new ArrayTermVector(yFree));
 
         this.comb = new Combinations(yFreeSize, 2);
     }

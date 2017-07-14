@@ -3,9 +3,9 @@ package nars;
 
 import jcog.memoize.CaffeineMemoize;
 import jcog.memoize.Memoize;
-import jcog.memoize.NullMemoize;
 import nars.derive.meta.match.Ellipsislike;
 import nars.index.term.AppendProtoCompound;
+import nars.index.term.NonInternable;
 import nars.index.term.ProtoCompound;
 import nars.index.term.TermContext;
 import nars.term.*;
@@ -14,6 +14,7 @@ import nars.term.atom.Atomic;
 import nars.term.atom.AtomicSingleton;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.UnitCompound1;
+import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
@@ -354,7 +355,7 @@ public enum Op implements $ {
                 }
             }
 
-            if (implication==null)
+            if (implication == null)
                 return x;
 
             Term others;
@@ -364,14 +365,14 @@ public enum Op implements $ {
             } else {
                 //more than 2; group them as one term
                 @NotNull TreeSet<Term> ss = conj.toSortedSet();
-                assert(ss.remove(implication)): "must have removed something";
+                assert (ss.remove(implication)) : "must have removed something";
 
                 others = xo.the(conjDT, Terms.sorted(ss) /* assumes commutive since > 2 */);
             }
 
             return IMPL.the(implDT,
                     /* new, factored precondition */
-                        CONJ.the(conjDT, others, implication.sub(0) /* impl precond */),
+                    CONJ.the(conjDT, others, implication.sub(0) /* impl precond */),
 
                     implication.sub(1) /* impl postcondition */
             );
@@ -897,8 +898,8 @@ public enum Op implements $ {
     public static final Memoize<ProtoCompound, Termlike> cache =
             //new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 4);
             CaffeineMemoize.build(buildTerm, 64 * 1024, false /* Param.DEBUG*/);
-            //CaffeineMemoize.build(buildTerm, -1 /* softref */, true /* Param.DEBUG*/);
-            //new NullMemoize<>(buildTerm);
+    //CaffeineMemoize.build(buildTerm, -1 /* softref */, true /* Param.DEBUG*/);
+    //new NullMemoize<>(buildTerm);
 
 
     static TermContainer _subterms(@NotNull Term[] s) {
@@ -910,6 +911,11 @@ public enum Op implements $ {
 //        if (s.length < 2) {
 //            return _subterms(s);
 //        } else {
+
+
+        if (!NonInternable.internable(s))
+            return new ArrayTermVector(s);
+
         return (TermContainer) cache.apply(new AppendProtoCompound(null, s).commit());
 //        }
     }

@@ -1,11 +1,14 @@
 package nars.term.mutate;
 
+import nars.term.Term;
+import nars.term.container.ArrayTermVector;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by me on 12/22/15.
@@ -16,6 +19,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
     private final TermContainer y;
     private final TermContainer x;
 
+    /** important note: using raw Set<Term> here to avoid the clobbering of PatternCompound subterms if interned with current impl */
     public CommutivePermutations(@NotNull TermContainer x, @NotNull TermContainer y) {
         super(x, y);
         this.y = y;

@@ -4,7 +4,6 @@ import nars.Op;
 import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.PatternCompound;
 import nars.derive.meta.match.Ellipsis;
-import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.map.MapTermIndex;
 import nars.term.Compound;
@@ -96,23 +95,23 @@ public class PatternTermIndex extends MapTermIndex {
 
 
         //this.ellipsisTransform = hasEllipsisTransform(this);
-        boolean hasEllipsisTransform = false;
-        int xs = seed.size();
-        for (int i = 0; i < xs; i++) {
-            if (seed.sub(i) instanceof EllipsisTransform) {
-                hasEllipsisTransform = true;
-                break;
-            }
-        }
+        //boolean hasEllipsisTransform = false;
+        //int xs = seed.size();
+//        for (int i = 0; i < xs; i++) {
+//            if (seed.sub(i) instanceof EllipsisTransform) {
+//                hasEllipsisTransform = true;
+//                break;
+//            }
+//        }
 
         Op op = seed.op();
 
-        boolean ellipsisTransform = hasEllipsisTransform;
-        boolean commutative = (!ellipsisTransform && op.commutative);
+        //boolean ellipsisTransform = hasEllipsisTransform;
+        boolean commutative = (/*!ellipsisTransform && */op.commutative);
 
         if (commutative) {
-            if (ellipsisTransform)
-                throw new RuntimeException("commutative is mutually exclusive with ellipsisTransform");
+//            if (ellipsisTransform)
+//                throw new RuntimeException("commutative is mutually exclusive with ellipsisTransform");
 
             return new PatternCompound.PatternCompoundWithEllipsisCommutive(seed, e, v);
         } else {

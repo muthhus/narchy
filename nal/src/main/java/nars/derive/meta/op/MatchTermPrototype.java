@@ -16,7 +16,7 @@ import java.util.Set;
  *
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
-abstract public class MatchTermPrototype extends AtomicPred<Derivation> {
+abstract public class MatchTermPrototype extends AbstractPred<Derivation> {
 
     @Nullable
     private BoolPred eachMatch;
@@ -33,7 +33,7 @@ abstract public class MatchTermPrototype extends AtomicPred<Derivation> {
     private final Set<Conclude> conclude = $.newHashSet(1);
 
     public MatchTermPrototype(@NotNull Compound id, Term pattern) {
-
+        super(id);
         this.id = this.pid = id;
 
         this.pattern = pattern;
@@ -60,11 +60,6 @@ abstract public class MatchTermPrototype extends AtomicPred<Derivation> {
 //    }
 
 
-    @NotNull
-    @Override
-    public final String toString() {
-        return id.toString();
-    }
 
     /** add a derivation handler to be applied after a rule match */
     public void derive(Conclude x) {
@@ -93,8 +88,8 @@ abstract public class MatchTermPrototype extends AtomicPred<Derivation> {
             }
 
 
-            this.id = om!=null ? $.func("MatchTerm",  pid , om) :
-                                 $.func( "MatchTerm", pid );
+            this.ref = this.id = om!=null ? $.func("MatchTerm", pid, om) :
+                                 $.func( "MatchTerm", pid);
 
             this.eachMatch = om;
         }

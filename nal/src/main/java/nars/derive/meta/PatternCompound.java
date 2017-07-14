@@ -4,6 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
+import nars.index.term.NonInternable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
@@ -18,7 +19,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-abstract public class PatternCompound extends GenericCompound {
+abstract public class PatternCompound extends GenericCompound implements NonInternable  {
 
     public final int sizeCached;
     public final int structureNecessary;

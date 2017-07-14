@@ -916,19 +916,23 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
             Set<Term> xs = /*toSorted*/toSet();
             Set<Term> ys = y./*toSorted*/toSet();
-            xs.removeIf(s -> !subst.matchType(s) && ys.remove(s));
+            //xs.removeIf(s -> !subst.matchType(s) && ys.remove(s));
+            xs.removeIf(ys::remove);
+            ys.removeIf(xs::remove);
 
-            //special case
-            {
-                //ex: {x,%1} vs. {x,z} --- there is actually no combination here
-                //Predicate<Term> notType = (x) -> !subst.matchType(x);
-                if (xs.size() == 1 && ys.size() == 1) {
-                    return subst.unify(xs.iterator().next(), ys.iterator().next());
-                }
-            }
 
             //subst.termutes.add(new CommutivePermutations(TermVector.the(xs), TermVector.the(ys)));
-            subst.termutes.add(new CommutivePermutations(this, y));
+            if (xs.size()==1 && ys.size()==1) {
+                //special case
+                //ex: {x,%1} vs. {x,z} --- there is actually no combination here
+                //Predicate<Term> notType = (x) -> !subst.matchType(x);
+                return subst.unify(xs.iterator().next(), ys.iterator().next());
+            } else {
+                subst.termutes.add(new CommutivePermutations(
+                        TermVector.the(xs),
+                        TermVector.the(ys)
+                ));
+            }
             return true;
         }
         return false;

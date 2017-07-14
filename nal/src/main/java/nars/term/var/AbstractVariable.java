@@ -66,27 +66,29 @@ public abstract class AbstractVariable implements Variable {
     @Override
     public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
 
-        if (equals(y))
-            return true;
+        if (y instanceof Variable) {
+            if (equals(y))
+                return true;
 
-        Op xo = op();
-        if (y.op() == xo) {
+            Op xo = op();
+            if (y.op() == xo) {
 
-            if (this instanceof CommonVariable) {
-                if (((CommonVariable)this).common(y))
-                    return true;
+                if (this instanceof CommonVariable) {
+                    if (((CommonVariable) this).common(y))
+                        return true;
+                }
+
+                if (y instanceof CommonVariable) {
+                    if (((CommonVariable) y).common(this))
+                        return true;
+                }
+
+                //TODO check if this is already a common variable containing y
+                return subst.putCommon(this, (Variable) y);
             }
-
-            if (y instanceof CommonVariable) {
-                if (((CommonVariable)y).common(this))
-                    return true;
-            }
-
-            //TODO check if this is already a common variable containing y
-            return subst.putCommon(this, (Variable)y);
         }
 
-        if (subst.matchType(xo)
+        if (subst.matchType(op())
                 //&& !subst.matchType(y) //note: the !subst.matchType(y) subcondition is an attempt at preventing infinite cycles of variable references
                 ) {
             return subst.putXY(this, y);

@@ -73,26 +73,26 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         }
     }
 
-    public static class EllipsisTransformPrototype extends UnnormalizedVariable {
-
-        //public final Variable name;
-        public final Term from, to;
-
-        public EllipsisTransformPrototype(/*Op type, */@NotNull Variable name, Term from, Term to) {
-            super(Op.VAR_PATTERN,
-                    name.toString()
-                            + ".." + from + '=' + to + "..+");
-            //this.name = name;
-            this.from = from;
-            this.to = to;
-        }
-
-        @Override public @NotNull Variable normalize(int serial) {
-            //throw new RuntimeException("n/a");
-            return this; //ignore
-        }
-
-    }
+//    public static class EllipsisTransformPrototype extends UnnormalizedVariable {
+//
+//        //public final Variable name;
+//        public final Term from, to;
+//
+//        public EllipsisTransformPrototype(/*Op type, */@NotNull Variable name, Term from, Term to) {
+//            super(Op.VAR_PATTERN,
+//                    name.toString()
+//                            + ".." + from + '=' + to + "..+");
+//            //this.name = name;
+//            this.from = from;
+//            this.to = to;
+//        }
+//
+//        @Override public @NotNull Variable normalize(int serial) {
+//            //throw new RuntimeException("n/a");
+//            return this; //ignore
+//        }
+//
+//    }
 
 
     protected Ellipsis(@NotNull AbstractVariable target, int minArity) {

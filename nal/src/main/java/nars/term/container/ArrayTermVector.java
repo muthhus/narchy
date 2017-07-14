@@ -4,6 +4,7 @@ import jcog.list.ArrayIterator;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -18,6 +19,10 @@ public class ArrayTermVector extends TermVector {
 
     @NotNull
     public final Term[] terms;
+
+    public ArrayTermVector(@NotNull Collection<Term> terms) {
+        this(terms.toArray(new Term[terms.size()]));
+    }
 
     public ArrayTermVector(@NotNull Term... terms) {
          super(terms);

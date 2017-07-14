@@ -47,7 +47,7 @@ public class ProxyTerm<T extends Term> implements Term {
 
     @Override
     public boolean equals(Object obj) {
-        return ref == obj || ref.equals(obj);
+        return ref.equals(obj);
     }
 
     @Override

@@ -9,7 +9,6 @@ import nars.control.premise.Derivation;
 import nars.derive.meta.*;
 import nars.derive.meta.constraint.*;
 import nars.derive.meta.match.Ellipsis;
-import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.op.*;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
@@ -1323,7 +1322,7 @@ public class PremiseRule extends GenericCompound {
         public static final int ELLIPSIS_TRANSFORM_ID_OFFSET = 3 * 256;
 
         public PremiseRuleVariableNormalization() {
-            super(new UnifiedMap<>(4));
+            super(new UnifiedMap<>());
         }
 
         public static AbstractVariable varPattern(int i) {
@@ -1337,19 +1336,20 @@ public class PremiseRule extends GenericCompound {
 
             int actualSerial = count;
 
-            if (x instanceof Ellipsis.EllipsisTransformPrototype) {
-                //special
-
-                Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype) x;
-
-//                Term from = ep.from;
-//                if (from != Op.Imdex) from = applyAfter((GenericVariable)from);
-//                Term to = ep.to;
-//                if (to != Op.Imdex) to = applyAfter((GenericVariable)to);
+//            if (x instanceof Ellipsis.EllipsisTransformPrototype) {
+//                //special
 //
-                return EllipsisTransform.make(varPattern(actualSerial + ELLIPSIS_TRANSFORM_ID_OFFSET), ep.from, ep.to, this);
-
-            } else if (x instanceof Ellipsis.EllipsisPrototype) {
+//                Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype) x;
+//
+////                Term from = ep.from;
+////                if (from != Op.Imdex) from = applyAfter((GenericVariable)from);
+////                Term to = ep.to;
+////                if (to != Op.Imdex) to = applyAfter((GenericVariable)to);
+////
+//                return EllipsisTransform.make(varPattern(actualSerial + ELLIPSIS_TRANSFORM_ID_OFFSET), ep.from, ep.to, this);
+//
+//            } else
+            if (x instanceof Ellipsis.EllipsisPrototype) {
                 Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype) x;
                 return Ellipsis.EllipsisPrototype.make(actualSerial +
                                 (ep.minArity == 0 ? ELLIPSIS_ZERO_OR_MORE_ID_OFFSET : ELLIPSIS_ONE_OR_MORE_ID_OFFSET) //these need to be distinct

@@ -358,10 +358,13 @@ public interface Compound extends Term, IPair, TermContainer {
     default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
 
 
+
         if (ty instanceof Compound) {
+            if (equals(ty))
+                return true;
 
             if (!subst.freeVars(this))
-                return equals(ty); //no free vars, the only way unification can proceed is if equal
+                return false; //no free vars, the only way unification can proceed is if equal
 
             Op op = op();
             if (op != ty.op())

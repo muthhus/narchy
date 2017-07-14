@@ -6,7 +6,6 @@ import nars.control.premise.Derivation;
 import nars.derive.meta.BoolPred;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.match.Ellipsis;
-import nars.derive.meta.match.EllipsisTransform;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.term.Term;
 import nars.term.compound.ProxyCompound;
@@ -196,10 +195,10 @@ public class MatchTaskBelief extends ProxyCompound implements BoolPred<Derivatio
 
 
         Ellipsis taskEllipsis = Ellipsis.firstEllipsisRecursive(task);
-        if (taskEllipsis instanceof EllipsisTransform) {
-            //belief must be matched first especially for EllipsisTransform
-            return false;
-        }
+//        if (taskEllipsis instanceof EllipsisTransform) {
+//            //belief must be matched first especially for EllipsisTransform
+//            return false;
+//        }
 
         if (belief.size() == 0) {
             return false;

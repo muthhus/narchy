@@ -15,17 +15,16 @@ import java.util.function.Supplier;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(Parameterized.class)
 public class NAL3Test extends AbstractNALTest {
 
-    public static final int cycles = 400;
+    public static final int cycles = 500;
 
-    public NAL3Test(Supplier<NAR> b) { super(b); }
-
-    @Parameterized.Parameters(name= "{0}")
-    public static Iterable configurations() {
-        return AbstractNALTest.nars(3);
-    }
+//    public NAL3Test(Supplier<NAR> b) { super(b); }
+//
+//    @Parameterized.Parameters(name= "{0}")
+//    public static Iterable configurations() {
+//        return AbstractNALTest.nars(3);
+//    }
 
 
     @Test
