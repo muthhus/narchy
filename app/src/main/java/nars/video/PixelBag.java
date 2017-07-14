@@ -188,7 +188,7 @@ public abstract class PixelBag implements Bitmap2D {
                 float dx = Math.abs(lx - cx);
                 float distFromCenterSq = dx * dx + yDistFromCenterSq; //manhattan distance from center
 
-                float clarity = lerp(distFromCenterSq / maxCenterDistanceSq, maxClarity, minClarity);
+                float clarity = (float) lerp(Math.sqrt(distFromCenterSq / maxCenterDistanceSq), maxClarity, minClarity);
                 if (rng.nextFloat() > clarity)
                     continue;
 

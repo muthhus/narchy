@@ -1,6 +1,7 @@
 package jcog.util;
 
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
 
@@ -8,11 +9,14 @@ public class UniqueRanker<T> implements Comparator<T> {
 
     private final FloatFunction<T> function;
 
-    public UniqueRanker(FloatFunction<T> function) {
+    public UniqueRanker(@NotNull FloatFunction<T> function) {
         this.function = function;
     }
 
-    public int compare(T o1, T o2) {
+    public int compare(@NotNull T o1, @NotNull T o2) {
+//        if (o2 == null) //why
+//            return -1;
+
         if (o1.equals(o2)) return 0;
 
         float one = this.function.floatValueOf(o1);

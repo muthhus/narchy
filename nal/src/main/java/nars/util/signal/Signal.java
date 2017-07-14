@@ -23,7 +23,7 @@ public class Signal {
     final int MAX_PERCEPT_DURATIONS =
             //0;
             //Integer.MAX_VALUE;
-            64;
+            16;
 
 
     public FloatSupplier pri;

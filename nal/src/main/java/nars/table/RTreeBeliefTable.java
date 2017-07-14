@@ -31,11 +31,11 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = { /*1,*/ 2, 4, 16, 64 };
-    final static int maxSamplesTruthpolated = 8;
+    static final int[] sampleRadii = { 0, 1, 2, 4, 8 };
+    final static int maxSamplesTruthpolated = 5;
 
     /** proportional to capacity (not size) */
-    final static float enoughSamplesRate = 0.2f;
+    final static float enoughSamplesRate = 0.1f;
 
 
     public static class TaskRegion implements HyperRegion, Tasked {

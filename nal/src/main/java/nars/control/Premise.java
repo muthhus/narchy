@@ -4,9 +4,9 @@
  */
 package nars.control;
 
+import jcog.Util;
 import jcog.pri.PriReference;
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
@@ -23,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static jcog.Util.or;
 import static nars.time.Tense.ETERNAL;
 import static nars.util.UtilityFunctions.aveAri;
 
@@ -31,14 +30,14 @@ import static nars.util.UtilityFunctions.aveAri;
  * NOTE: this currently isnt input to the NAR like ITask's are even though it inherits
  * from that superclass. this is temporary until the Premise behavior is determined
  * to be either reified or virtual (executed within a conceptfire execution only)
- *
+ * <p>
  * Defines the conditions used in an instance of a derivation
  * Contains the information necessary for generating derivation Tasks via reasoning rules.
  * <p>
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise  {
+public class Premise {
 
     final PriReference<Task> taskLink;
     final PriReference<Term> termLink;
@@ -66,7 +65,7 @@ public class Premise  {
      * patham9 so https://github.com/opennars/opennars2/blob/a143162a559e55c456381a95530d00fee57037c4/src/nal/deriver/projection_eternalization.clj#L31
      * patham9 especially try to understand the "temporal temporal" case
      * patham9 its using the result of higher confidence
-     *
+     * <p>
      * returns ttl used, -1 if failed before starting
      */
     public int run(NAR nar, int ttlMax) {
@@ -116,7 +115,7 @@ public class Premise  {
                 if (task.isQuestOrQuestion()) {
                     long when = whenAnswer(task, now);
                     match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
-                    if (match!=null)
+                    if (match != null)
                         tryAnswer(reUnified, taskLink, match, nar);
                 } else {
                     long when = whenMatch(task, now);
@@ -150,8 +149,8 @@ public class Premise  {
         float parentTaskPri = beliefPriority != beliefPriority ? taskPri :
                 //max
                 aveAri
-                //or
-                        (taskPri, beliefPriority);
+                        //or
+                                (taskPri, beliefPriority);
 
         Derivation d = derivation.get();
 
@@ -198,16 +197,19 @@ public class Premise  {
 
 
     static boolean tryAnswer(boolean reUnified, PriReference<Task> question /* or quest */, @NotNull Task answer, NAR nar) {
+
         Task Q = question.get();
-        Compound questionTerm = Q.term();
-        Compound answerTerm = answer.term();
-        if (!reUnified && !nar.conceptTerm(answerTerm).equals(nar.conceptTerm(questionTerm))) {
-            //see if belief unifies with task (in reverse of previous unify)
-            if (questionTerm.varQuery() == 0 || (unify(answerTerm, questionTerm, nar) == null)) {
-                return false;
+
+        if (!reUnified) {
+            Compound questionTerm = Q.term();
+            Compound answerTerm = answer.term();
+            if (!nar.conceptTerm(answerTerm).equals(nar.conceptTerm(questionTerm))) {
+                //see if belief unifies with task (in reverse of previous unify)
+                if (questionTerm.varQuery() == 0 || (unify(answerTerm, questionTerm, nar) == null)) {
+                    return false;
+                }
             }
         }
-
 
         @Nullable Task answered = Q.onAnswered(answer, nar);
 
@@ -216,7 +218,10 @@ public class Premise  {
             //transfer budget from question to answer
             //float qBefore = taskBudget.priSafe(0);
             //float aBefore = answered.priSafe(0);
-            BudgetFunctions.fund(question, answered, (float) Math.sqrt(answered.conf()), false);
+            BudgetFunctions.fund(question, answered,
+                    /*Util.sqr*/(answered.conf()),
+                    false);
+
             //(1f - taskBudget.qua())
             //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
 
@@ -257,16 +262,17 @@ public class Premise  {
     @Nullable
     private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
 
-        if (q.op() != a.op())
+        if (q.op() != a.op() /*|| q.size() != a.size()*/)
             return null; //fast-fail: no chance
 
         final Compound[] result = {null};
-        new UnifySubst(Op.VAR_QUERY, nar, (aa) -> {
+        new UnifySubst(null /* match anything */, nar, (aa) -> {
             if (aa instanceof Compound) {
 
-                aa = aa.eval(nar.terms);
-
                 if (!aa.equals(a)) {
+
+                    aa = aa.eval(nar.terms);
+
                     result[0] = ((Compound) aa);
                     return false; //only this match
                 }
@@ -274,7 +280,7 @@ public class Premise  {
 
             return true; //keep trying
 
-        }, Param.BeliefMatchTTL).unifyAll(a, q);
+        }, Param.BeliefMatchTTL).unifyAll(q, a);
 
         return result[0];
 

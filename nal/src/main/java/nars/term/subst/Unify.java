@@ -99,6 +99,7 @@ public abstract class Unify implements Termutator, Subst {
     public abstract boolean onMatch();
 
     public final boolean mutate(List<Termutator> chain, int next) {
+        versioning.tick();
         return chain.get(++next).mutate(this, chain, next);
     }
 

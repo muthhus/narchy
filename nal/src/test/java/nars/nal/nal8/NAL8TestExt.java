@@ -17,17 +17,11 @@ import static nars.time.Tense.ETERNAL;
  * Additional experimental tests,
  */
 @Ignore
-@RunWith(Parameterized.class)
 public class NAL8TestExt extends AbstractNALTest {
 
         final int cycles = 96; //150 worked for most of the initial NAL8 tests converted
 
-        public NAL8TestExt(Supplier<NAR> b) { super(b); }
 
-        @Parameterized.Parameters(name = "{0}")
-        public static Iterable configurations() {
-            return AbstractNALTest.nars(8);
-        }
 
 
 

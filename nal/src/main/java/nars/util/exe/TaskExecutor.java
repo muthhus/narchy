@@ -29,7 +29,8 @@ import static nars.Op.COMMAND;
  */
 public class TaskExecutor extends Executioner {
 
-    int inputBatch = 24, fireBatch = 6;
+    int inputBatch = 32;
+    int fireBatch = 4;
 
     //    private final DisruptorBlockingQueue<ITask> overflow;
     protected boolean trace;
@@ -193,7 +194,7 @@ public class TaskExecutor extends Executioner {
 //        super.stop();
 //    }
 
-    AtomicBoolean busy = new AtomicBoolean(false);
+    final AtomicBoolean busy = new AtomicBoolean(false);
 
 
     @Override
@@ -225,7 +226,6 @@ public class TaskExecutor extends Executioner {
                 concepts.print();
 
             final int[] toFire = {conceptsPerCycleMax.intValue()};
-            final int[] toInput = {conceptsPerCycleMax.intValue()};
 
 
             //Random rng = nar.random();
@@ -243,37 +243,27 @@ public class TaskExecutor extends Executioner {
             do {
 
 
-                toFire[0] = Math.min(toFire[0], concepts.size());
-                if (toFire[0] > 0) {
+                concepts.sample(fireBatch, x -> {
 
-                    concepts.sample(Math.min(fireBatch, toFire[0]), x -> {
-
-                        actuallyRun(x);
+                    actuallyRun(x);
 
 
-                        if (forgetEachActivePri > 0) {
-                            x.priSub(forgetEachActivePri);
-                        }
+                    if (forgetEachActivePri > 0) {
+                        x.priSub(forgetEachActivePri);
+                    }
 
-                        --toFire[0];
+                    --toFire[0];
 
-                        //activeBuffer.add(x);
-                        //(Consumer<? super ITask>)(buffer::add)
-                    });
+                    //activeBuffer.add(x);
+                    //(Consumer<? super ITask>)(buffer::add)
+                });
 
-                }
 
-                toInput[0] = Math.min(toInput[0], tasks.size());
-                if (toInput[0] > 0) {
+                //input a batch of tasks
+                tasks.pop(inputBatch, this::actuallyRun);
 
-                    tasks.pop(Math.min(inputBatch, toInput[0]), x -> {
-                        actuallyRun(x);
-                        --toInput[0];
-                    });
 
-                }
-
-            } while (toFire[0] > 0 || toInput[0] > 0);
+            } while (--toFire[0] /* decrement to fire if nothing else than to prevent infinite stall */ > 0 /*|| toInput[0] > 0*/);
 
 
 //            for (int i = 0; i < toExe; i++) {

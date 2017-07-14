@@ -25,7 +25,7 @@ public class UnifySubst extends Unify {
     int matches;
 
     public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target, int ttl) {
-        super(n.terms, varType, n.random(), Param.SubUnificationStackMax, ttl);
+        super(n.terms, varType, n.random(), Param.UnificationStackMax, ttl);
 
         this.nar = n;
         this.target = target;

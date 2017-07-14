@@ -12,27 +12,16 @@ import java.util.function.Supplier;
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
-@RunWith(Parameterized.class)
 public class NAL4NewTest extends AbstractNALTest {
 
 
     public static final int CYCLES = 450;
-
-    public NAL4NewTest(Supplier<NAR> b) {
-        super(b);
-    }
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Iterable configurations() {
-        return AbstractNALTest.nars(4);
-    }
 
 
     @Test
     public void testCompositionFromProductInh() throws nars.Narsese.NarseseException {
         //((A..+) --> Z), (X --> Y), contains(A..+,X), task("?") |- ((A..+) --> (substitute(A..+,X,Y))), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
         test()
-                .log()
                 .believe("(soda --> acid)", 1.0f, 0.9f)
                 .ask("((drink,soda) --> ?death)")
                 .mustBelieve(CYCLES, "((drink,soda) --> (drink,acid))", 1.0f, 0.81f);

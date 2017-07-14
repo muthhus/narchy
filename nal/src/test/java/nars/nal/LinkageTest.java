@@ -33,7 +33,7 @@ public class LinkageTest extends AbstractNALTest {
 
     int runCycles = 15;
 
-    public LinkageTest(Supplier<NAR> b) { super(b); }
+    public LinkageTest(Supplier<NAR> b) { super(); }
 
     @Parameterized.Parameters(name= "{0}")
     public static Iterable<Supplier> configurations() {

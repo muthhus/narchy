@@ -50,8 +50,8 @@ public class NARio extends NAgentX {
         mario.start();
 
 
-        PixelBag cc = PixelBag.of(() -> mario.image, 32, 24);
-        cc.setClarity(0.5f, 0.9f);
+        PixelBag cc = PixelBag.of(() -> mario.image, 36, 28);
+        cc.setClarity(0.8f, 0.95f);
 
 //        try {
 //            csvPriority(nar, "/tmp/x.csv");
@@ -79,7 +79,7 @@ public class NARio extends NAgentX {
         });
 
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
-        sc.resolution(0.1f);
+        sc.resolution(0.04f);
         //sc.pri(0.1f);
 
 //        CameraSensor ccAe = senseCameraReduced($.the("narioAE"), cc, 16)

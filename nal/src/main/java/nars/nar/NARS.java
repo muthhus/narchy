@@ -36,7 +36,7 @@ public class NARS {
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(64, 64, 0.2f);
+    private Supplier<Executioner> exe = () -> new TaskExecutor(256, 256, 0.2f);
 
     private final Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 
@@ -54,22 +54,22 @@ public class NARS {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.5f);
+        n.goalConfidence(0.75f);
 
 
-        n.DEFAULT_BELIEF_PRIORITY = 1;
-        n.DEFAULT_GOAL_PRIORITY = 1;
-        n.DEFAULT_QUESTION_PRIORITY = 1;
-        n.DEFAULT_QUEST_PRIORITY = 1;
-        n.termVolumeMax.setValue(32);
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        n.DEFAULT_GOAL_PRIORITY = 0.6f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.3f;
+        n.DEFAULT_QUEST_PRIORITY = 0.4f;
+        n.termVolumeMax.setValue(36);
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
-        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 3, true, 16f);
+        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, true, 32f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
-        Inperience inp = new Inperience(n, 0.01f, 4);
+        Inperience inp = new Inperience(n, 0.01f, 8);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(512, 1024, 0.1f);
+            n.addNAR(256, 512, 0.2f);
         }
 
 //        n.onTask(t -> {

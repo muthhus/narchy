@@ -11,18 +11,9 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-@RunWith(Parameterized.class)
 public class NAL4MultistepTest extends AbstractNALTest {
 
 
-    public NAL4MultistepTest(Supplier<NAR> b) {
-        super(b);
-    }
-
-    @Parameterized.Parameters(name = "{index}:{0}")
-    public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(4);
-    }
 
     @Test
     public void nal4_everyday_reasoning() throws Narsese.NarseseException {

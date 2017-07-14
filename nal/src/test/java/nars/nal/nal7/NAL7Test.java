@@ -19,23 +19,15 @@ import java.util.function.Supplier;
 import static nars.$.$;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by me on 1/9/16.
  */
-@RunWith(Parameterized.class)
 public class NAL7Test extends AbstractNALTest {
 
     final int cycles = 550;
 
-    public NAL7Test(Supplier<NAR> b) {
-        super(b);
-    }
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Iterable configurations() {
-        return AbstractNALTest.nars(7);
-    }
 
     @Test
     public void induction_on_events() {
@@ -1137,7 +1129,13 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Test
-    public void testInductionIntervalMerge2() {
+    public void testInductionIntervalMerge2() throws Narsese.NarseseException {
+
+        //1. test correct parse of the 3-ary parallel conj
+        assertEquals("((a) &&+2 (&|,(b),(c),(d)))",
+                      $("((a) &&+2 (((b) &| (c)) &| (d)) )"));
+
+
         test()
                 .inputAt(1, "((a) &&+2 (c)). :|:")
                 .inputAt(3, "((b) &&+0 (d)). :|:")

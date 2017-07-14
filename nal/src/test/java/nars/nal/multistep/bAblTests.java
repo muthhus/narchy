@@ -15,27 +15,18 @@ import static nars.Op.BELIEF;
 /**
  * see bAbl.nal
  */
-@RunWith(Parameterized.class)
 public class bAblTests extends AbstractNALTest {
 
-    public bAblTests(Supplier<NAR> b) {
-        super(b);
-    }
 
-    @Parameterized.Parameters(name = "{index}:{0}")
-    public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(8);
-    }
 
-    @Ignore
     @Test
     public void test1() throws nars.Narsese.NarseseException {
 
         test()
-                .believe("in({john},{playground})") //john is in the playground.
+                .believe("in(john,playground)") //john is in the playground.
                 .believe("in(bob,office)") //Bob is in the office.
-                .ask("in({john},{?where})") //Where is john?
-                .mustBelieve(100, "in({john},{playground})", 1f, 0.73f) //note that the 0.90 conf result should have been provided as an answer to the question, not as a belief. the 0.73 conf version is a side effect so we'll test for that at least
+                .ask("in(john,?where)") //Where is john?
+                .mustBelieve(100, "in(john,playground)", 1f, 0.73f) //note that the 0.90 conf result should have been provided as an answer to the question, not as a belief. the 0.73 conf version is a side effect so we'll test for that at least
         ;
 
 

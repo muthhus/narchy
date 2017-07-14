@@ -95,4 +95,18 @@ public class Versioned<X>
 
     }
 
+    public void pop() {
+
+            //if (size > 0) { //HACK wtf would it be empty
+//                Object removed =
+//                    items[--size];
+
+        items[--size] = null;
+
+//                if (removed == null) {
+//                    throw new NullPointerException();
+//                }
+            //}
+
+    }
 }

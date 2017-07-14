@@ -9,19 +9,10 @@ import org.junit.runners.Parameterized;
 
 import java.util.function.Supplier;
 
-@RunWith(Parameterized.class)
 public class NAL1Test extends AbstractNALTest {
 
     final int CYCLES = 1250;
 
-    public NAL1Test(Supplier<NAR> b) {
-        super(b);
-    }
-
-    @Parameterized.Parameters(name = "{index}:{0}")
-    public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(1);
-    }
 //
 //                new Supplier[]{
 //                //{new Default()},

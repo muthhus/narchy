@@ -49,8 +49,8 @@ public abstract class Param  {
 
 
 
-    /** determines if an input goal or command operation task executes */
-    public static float EXECUTION_THRESHOLD = 0.666f;
+//    /** determines if an input goal or command operation task executes */
+//    public static float EXECUTION_THRESHOLD = 0.666f;
 
     public static boolean ANSWER_REPORTING = true;
 
@@ -91,17 +91,15 @@ public abstract class Param  {
     public static final int STAMP_CAPACITY = 10;
     public static final int CAUSE_CAPACITY = 10;
 
-    public final static int UnificationStackMax = 24;
+    public final static int UnificationStackMax = 32;
     public static final int UnificationConstraintsMax = 8;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 24;
+    public final static int BeliefMatchTTL = 96;
 
     /** 'time to live', unification steps until unification is stopped */
     public final static int UnificationTTLMax = BeliefMatchTTL * 4;
 
-
-    public final static int SubUnificationStackMax = UnificationStackMax/2;
 
 
     public static int DEFAULT_NAL_LEVEL = 8;

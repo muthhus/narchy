@@ -221,7 +221,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     public class PixelConcept extends SensorConcept {
 
 //        //private final int x, y;
-        private final TermContainer templates;
+        //private final TermContainer templates;
 
         public PixelConcept(Compound cell, int x, int y) {
             super(cell, nar, null, brightnessTruth);
@@ -239,13 +239,14 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //                if (y < h-1) s.add( concept(x, y+1) );
 //
 //                return TermVector.the(s);
-            this.templates = new PixelNeighborsXYRandom(x, y, w, h, 1);
+
+            //this.templates = new PixelNeighborsXYRandom(x, y, w, h, 1);
         }
 
-        @Override
-        public TermContainer templates() {
-            return templates;
-        }
+//        @Override
+//        public TermContainer templates() {
+//            return templates;
+//        }
 
 
         //        @Override

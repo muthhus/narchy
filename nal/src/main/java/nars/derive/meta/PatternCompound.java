@@ -13,6 +13,7 @@ import nars.term.mutate.Choose1;
 import nars.term.mutate.Choose2;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Set;
@@ -413,6 +414,12 @@ abstract public class PatternCompound extends GenericCompound implements NonInte
                     if (yFree.size() == 1)
                         return subst.putXY(theFreeX, yFree.first());
                     else {
+                        @Nullable Term theFreeXassigned = subst.xy(theFreeX);
+                        if (theFreeXassigned!=null) {
+                            if (yFree.contains(theFreeXassigned))
+                                return true; //already assigned, do not create a termute loop
+                        }
+
                         subst.termutes.add(new Choose1(ellipsis, theFreeX, yFree));
                         return true;
                     }

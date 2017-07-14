@@ -40,26 +40,22 @@ public class Versioning extends
 
         while (c-- > 0) {
 
-            Versioned versioned =
-                    removeLast();
-                    //remove(--s);
+            //Versioned versioned =
+                    //removeLast();
 
-            if (versioned == null) {
-                throw new NullPointerException();
-                //continue;
-            }
+            Versioned versioned = items[--size];
+            items[size] = null; //GC help
+
+
+
+//            if (versioned == null) {
+//                throw new NullPointerException();
+//                //continue;
+//            }
 
             //if (!versioned.isEmpty()) { //HACK wtf would it be empty
-            int vs = versioned.size();
-            if (vs > 0) { //HACK wtf would it be empty
-                Object removed =
-                    // versioned.remove(vs - 1);
-                    versioned.removeLast();
 
-                if (removed == null) {
-                    throw new NullPointerException();
-                }
-            }
+            versioned.pop();
 
             //}
             //assert(removed!=null);

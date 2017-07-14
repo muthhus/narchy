@@ -24,7 +24,6 @@ public class NAL7DurationTest {
     public void testLinearTruthpolation() throws Narsese.NarseseException {
         NAR n = new NARS().get();
         n.time.dur(5);
-        n.run(10);
         n.inputAt(10, "(x). :|:");
         n.run(10);
         //with duration = 5, the evidence surrounding a point

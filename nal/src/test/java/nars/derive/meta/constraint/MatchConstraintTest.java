@@ -9,9 +9,7 @@ import org.junit.Test;
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
-/**
- * Created by me on 5/3/17.
- */
+
 public class MatchConstraintTest {
 
     final static int CYCLES = 1024;
@@ -24,7 +22,7 @@ public class MatchConstraintTest {
             $.04;.75$ happy(L). 497⋈512 %.55;.75% {497⋈512: æ0IáËÑþKÄ}
             $.05;.53$ ((L)-->(o-(i-happy))). 527 %.54;.53% {527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÉ;æ0IáËÑþKÌ} Dynamic
         */
-        new TestNAR(AbstractNALTest.nars(4).iterator().next().get())
+        new TestNAR(new NARS().get())
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("((L)-->(o-(i-happy)))", 1f, 0.9f)
                 .mustNotOutput(CYCLES, "((o-(i-happy))-->happy)", BELIEF, ETERNAL);
@@ -39,7 +37,6 @@ public class MatchConstraintTest {
             $.05;.53$ ((L)-->(o-(i-happy))). 527 %.54;.53% {527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÉ;æ0IáËÑþKÌ} Dynamic
         */
         new TestNAR(new NARS().get())
-                .log()
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("((L)-->(o-(i-happy)))", 1f, 0.9f)
                 .mustNotOutput(CYCLES, "((o-(i-happy))-->happy)", BELIEF, ETERNAL);

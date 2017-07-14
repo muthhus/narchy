@@ -13,17 +13,7 @@ import static nars.test.DeductiveChainTest.inh;
 
 //import static nars.util.meter.experiment.DeductiveChainTest.inh;
 
-@RunWith(Parameterized.class)
 public class NAL1MultistepTest extends AbstractNALTest {
-
-    public NAL1MultistepTest(Supplier<NAR> b) {
-        super(b);
-    }
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Iterable<Supplier<NAR>> configurations() {
-        return AbstractNALTest.nars(1);
-    }
 
 
     @Test public void multistep2() {

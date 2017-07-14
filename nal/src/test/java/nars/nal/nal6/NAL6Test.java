@@ -13,20 +13,10 @@ import java.util.function.Supplier;
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
-@RunWith(Parameterized.class)
 public class NAL6Test extends AbstractNALTest {
 
 
     final int cycles = 750;
-
-    public NAL6Test(Supplier<NAR> b) {
-        super(b);
-    }
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Iterable configurations() {
-        return AbstractNALTest.nars(6);
-    }
 
     @Test
     public void variable_unification1()  {

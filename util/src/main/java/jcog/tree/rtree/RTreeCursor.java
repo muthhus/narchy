@@ -131,6 +131,7 @@ public class RTreeCursor<T> {
                 if (++j >= a.size()) {
                     a = null; //no more nodes after this one
                     l = null;
+                    return endOfData();
                 } else {
                     l = a.get(j); //next
                     i = 0;
@@ -138,10 +139,7 @@ public class RTreeCursor<T> {
 
             }
 
-            if (a == null) {
-                endOfData();
-            }
-
+            //assert(next!=null);
             return next;
         }
     }

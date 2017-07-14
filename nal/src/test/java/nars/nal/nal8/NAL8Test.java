@@ -19,18 +19,9 @@ import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 
-@RunWith(Parameterized.class)
 public class NAL8Test extends AbstractNALTest {
 
     final int cycles = 400;
-
-    public NAL8Test(Supplier<NAR> b) { super(b); }
-
-    @Parameterized.Parameters(name = "{0}")
-    public static Iterable configurations() {
-        return AbstractNALTest.nars(8);
-    }
-
 
     @Test
     public void subsent_1()  {
