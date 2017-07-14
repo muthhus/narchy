@@ -31,9 +31,11 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = { /*1, 2,*/ 4, 16, 32 };
-    final static int maxSampled = 8;
-    final static float enoughSamplesRate = 0.1f;
+    static final int[] sampleRadii = { /*1,*/ 2, 4, 16, 64 };
+    final static int maxSamplesTruthpolated = 8;
+
+    /** proportional to capacity (not size) */
+    final static float enoughSamplesRate = 0.2f;
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -52,7 +54,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         @Override
         public boolean equals(Object obj) {
-            return this == obj || (task != null && Objects.equals(task, ((TaskRegion) obj).task));
+            return obj != null && (this == obj || (task != null && Objects.equals(task, ((TaskRegion) obj).task)));
         }
 
         @Override
@@ -262,6 +264,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         Task ete = eternal != null ? eternal.strongest() : null;
         @Nullable Task e = ete;
 
+        int ss = size();
         if (!tree.isEmpty()) {
 
             int dur = nar.dur();
@@ -271,9 +274,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task));
 
             float confMin = nar.confMin.floatValue();
-            int enoughSampled = Math.round(Math.max(1, enoughSamplesRate * capacity));
+            int enoughSampled = Math.min(ss, Math.round(Math.max(1, enoughSamplesRate * capacity)));
 
-            Ordering<TaskRegion> ss = RTreeCursor.ordering(strongestTask);
             RTreeCursor<TaskRegion> c = null;
             for (int r : sampleRadii) {
 
@@ -290,7 +292,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             if (c != null && c.size() > 0) {
 
-                List<TaskRegion> tt = c.topSorted(ss, maxSampled);
+
+                List<TaskRegion> tt = c.topSorted(strongestTask, maxSamplesTruthpolated);
                 int tts = tt.size();
                 if (tts > 0) {
                     //applying eternal should not influence the scan for temporal so it is left null here

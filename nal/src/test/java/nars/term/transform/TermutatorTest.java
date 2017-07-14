@@ -2,6 +2,7 @@ package nars.term.transform;
 
 import com.google.common.collect.Lists;
 import jcog.random.XorShift128PlusRandom;
+import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.Param;
@@ -41,7 +42,7 @@ public class TermutatorTest {
 
         assertTermutatorProducesUniqueResults(
                 new Choose1(e1, p2,
-                        p("a", "b").toSet()), 2);
+                        p("a", "b").toSortedSet()), 2);
 
     }
 
@@ -50,7 +51,7 @@ public class TermutatorTest {
 
         assertTermutatorProducesUniqueResults(
                 new Choose1(e1, p2,
-                        p("a", "b", "c").toSet()), 3);
+                        p("a", "b", "c").toSortedSet()), 3);
     }
 
     @Test
@@ -58,7 +59,7 @@ public class TermutatorTest {
 
         assertTermutatorProducesUniqueResults(
                 new Choose1(e1, p2,
-                        p("a", "b", "c", "d").toSet()), 4);
+                        p("a", "b", "c", "d").toSortedSet()), 4);
     }
 
 
@@ -79,7 +80,7 @@ public class TermutatorTest {
 
 
     static final Variable p2= v(Op.VAR_PATTERN, 2);
-    static final Collection<Term> p2p3 = Lists.newArrayList( p2, v(Op.VAR_PATTERN, 3) );
+    static final SortedSet<Term> p2p3 = $.pStack( p2, v(Op.VAR_PATTERN, 3) ).toSortedSet();
 
     @Test public void testChoose2_2() {
 
@@ -88,14 +89,14 @@ public class TermutatorTest {
         assertTermutatorProducesUniqueResults(
                 new Choose2(unifier, e1,
                         p2p3,
-                        p("a", "b").toSet()), 2);
+                        p("a", "b").toSortedSet()), 2);
     }
 
     @Test public void testChoose2_3() {
 
         assertTermutatorProducesUniqueResults(
                 new Choose2(unifier, e1, p2p3,
-                        p("a", "b", "c").toSet()), 6);
+                        p("a", "b", "c").toSortedSet()), 6);
     }
     @Test public void testChoose2_4() {
 
@@ -105,7 +106,7 @@ public class TermutatorTest {
                     assertTermutatorProducesUniqueResults(
                             new Choose2(unifier, e1,
                                     p2p3,
-                                    p("a", "b", "c", "d").toSet()), 12)
+                                    p("a", "b", "c", "d").toSortedSet()), 12)
             );
         }
 

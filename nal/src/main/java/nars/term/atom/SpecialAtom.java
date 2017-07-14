@@ -8,9 +8,9 @@ import org.jetbrains.annotations.NotNull;
 
 
 /** special */
-public class AtomicSingleton extends Atom {
+public class SpecialAtom extends Atom {
 
-    public AtomicSingleton(@NotNull String id) {
+    public SpecialAtom(@NotNull String id) {
         super(id);
     }
 

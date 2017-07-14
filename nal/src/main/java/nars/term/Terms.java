@@ -8,6 +8,7 @@ import nars.$;
 import nars.Op;
 import nars.index.term.TermIndex;
 import nars.term.atom.Atom;
+import nars.term.atom.SpecialAtom;
 import nars.term.compound.GenericCompound;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
@@ -629,6 +630,12 @@ public enum Terms { ;
         //1. deduplicated
         Term[] x = s.toArray(new Term[s.size()]);
 
+//        //filter any True, False, or Null's - return as an innocuous one element poison-pill array
+//        for (Term t : x) {
+//            if (t instanceof SpecialAtom)
+//                return new Term[] { t };
+//        }
+
         //2. sorted
         if ((x.length >= 2) && (!(s instanceof SortedSet)))
             Arrays.sort(x);
@@ -686,6 +693,17 @@ public enum Terms { ;
     }
 
     public static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
+        if (x instanceof SpecialAtom) {
+
+            if (x == True)
+                return true; //silently ignore
+
+            if (x == False)
+                return s.getIfAbsentPut(False, (byte) +1) == (byte) +1; //attempt to mark a False, for the chance it may become inverted and disappear rather than aborting any further construction here
+
+            return false; //x must be Null
+        }
+
         Op xo = x.op();
 
         if ((xo == op) && flattenMatchDT(((Compound) x).dt(), dt)) {

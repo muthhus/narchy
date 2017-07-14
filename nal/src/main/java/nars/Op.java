@@ -11,7 +11,7 @@ import nars.index.term.TermContext;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicSingleton;
+import nars.term.atom.SpecialAtom;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.UnitCompound1;
 import nars.term.container.ArrayTermVector;
@@ -61,7 +61,7 @@ public enum Op implements $ {
                 // (--,(--,P)) = P
                 if (x.op() == NEG)
                     return x.unneg();
-            } else if (x instanceof AtomicSingleton) {
+            } else if (x instanceof SpecialAtom) {
                 if (isFalse(x)) return True;
                 if (isTrue(x)) return False;
                 else return Null;
@@ -238,14 +238,14 @@ public enum Op implements $ {
 
                         if (x.op() == NEG && x.subIs(0, CONJ)) { //DISJUNCTION
                             Compound disj = (Compound) x.unneg();
-                            Set<Term> disjSubs = disj.toSet();
+                            SortedSet<Term> disjSubs = disj.toSortedSet();
                             //factor out occurrences of the disj's contents outside the disjunction, so remove from inside it
                             if (disjSubs.removeAll(cs)) {
                                 //reconstruct disj if changed
                                 csi.remove();
 
                                 if (!disjSubs.isEmpty()) {
-                                    Term y = NEG.the(CONJ.the(disj.dt(), disjSubs.toArray(new Term[disjSubs.size()])));
+                                    Term y = NEG.the(CONJ.the(disj.dt(), Terms.sorted(disjSubs)));
                                     if (csa == null)
                                         csa = $.newArrayList(1);
                                     csa.add(y);
@@ -256,10 +256,10 @@ public enum Op implements $ {
                     if (csa != null)
                         cs.addAll(csa);
 
-                    Term[] scs = Terms.sorted(cs);
-                    if (scs.length == 1)
-                        return scs[0];
+                    if (cs.size() == 1)
+                        return cs.first();
 
+                    Term[] scs = Terms.sorted(cs);
                     if (!Arrays.equals(scs, u))
                         return CONJ.the(dt, scs);
                     else
@@ -526,11 +526,11 @@ public enum Op implements $ {
     /**
      * absolutely invalid
      */
-    public static final AtomicSingleton Null = new AtomicSingleton(String.valueOf(NullSym));
+    public static final SpecialAtom Null = new SpecialAtom(String.valueOf(NullSym));
     /**
      * absolutely false
      */
-    public static final AtomicSingleton False = new AtomicSingleton(String.valueOf(FalseSym)) {
+    public static final SpecialAtom False = new SpecialAtom(String.valueOf(FalseSym)) {
         @NotNull
         @Override
         public Term unneg() {
@@ -540,7 +540,7 @@ public enum Op implements $ {
     /**
      * absolutely true
      */
-    public static final AtomicSingleton True = new AtomicSingleton(String.valueOf(TrueSym)) {
+    public static final SpecialAtom True = new SpecialAtom(String.valueOf(TrueSym)) {
         @NotNull
         @Override
         public Term unneg() {
@@ -725,7 +725,7 @@ public enum Op implements $ {
     }
 
     public static boolean isAbsolute(@NotNull Term x) {
-        return x instanceof AtomicSingleton;
+        return x instanceof SpecialAtom;
     }
 
     public static boolean isTrueOrFalse(@NotNull Term x) {
@@ -855,7 +855,8 @@ public enum Op implements $ {
         return null;
     }
 
-    private static Term _compound(Op o, Term[] subterms) {
+
+    public static Term _compound(Op o, Term... subterms) {
         int s = subterms.length;
         assert (s > 0);
         switch (s) {

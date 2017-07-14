@@ -406,7 +406,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    /** an array of the subterms */
+    /**
+     * an array of the subterms
+     */
     default public Term[] toArray() {
         int s = size();
         switch (s) {
@@ -687,8 +689,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-
-
     @NotNull
     static Term[] theTermArray(@NotNull Op op, int dt, @NotNull Term... tt) {
         return mustSortAndUniquify(op, dt, tt.length) ?
@@ -898,10 +898,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
                 //begin at random offset to shuffle the order of the match sequence
                 int j = u.random.nextInt(s);
-                for (int i = 0; i < s; i++) {
+                for (int i = s - 1; i >= 0; i--) {
                     if (!u.unify(sub(j), Y.sub(j)))
                         return false;
-                    if (++j == s)
+                    if (i > 0 && ++j == s)
                         j = 0;
                 }
                 return true;
@@ -912,41 +912,46 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     default boolean unifyCommute(TermContainer y, @NotNull Unify subst) {
         //if there are no variables of the matching type, then it seems CommutivePermutations wouldnt match anyway
-        if (unifyPossible(subst.type)) {
+        if (!unifyPossible(subst.type)) {
+            return false;
+        }
 
-            Set<Term> xs = /*toSorted*/toSet();
-            Set<Term> ys = y./*toSorted*/toSet();
-            //xs.removeIf(s -> !subst.matchType(s) && ys.remove(s));
-            xs.removeIf(ys::remove);
-            ys.removeIf(xs::remove);
+        //lexic sorted so that the formed termutator has a canonical representation, preventing permuted duplicates in the termute chain
+        SortedSet<Term> xs = /*toSorted*/toSortedSet();
+        SortedSet<Term> ys = y./*toSorted*/toSortedSet();
+        //xs.removeIf(s -> !subst.matchType(s) && ys.remove(s));
+        xs.removeIf(ys::remove);
+
+        //subst.termutes.add(new CommutivePermutations(TermVector.the(xs), TermVector.the(ys)));
+        int xss = xs.size();
+        int yss = ys.size();
 
 
-            //subst.termutes.add(new CommutivePermutations(TermVector.the(xs), TermVector.the(ys)));
-            if (xs.size()==1 && ys.size()==1) {
-                //special case
-                //ex: {x,%1} vs. {x,z} --- there is actually no combination here
-                //Predicate<Term> notType = (x) -> !subst.matchType(x);
-                return subst.unify(xs.iterator().next(), ys.iterator().next());
-            } else {
-                subst.termutes.add(new CommutivePermutations(
-                        TermVector.the(xs),
-                        TermVector.the(ys)
-                ));
+        if (yss == 1) {
+            //special case
+            //  ex: {x,%1} vs. {x,z} --- there is actually no combination here
+            //  Predicate<Term> notType = (x) -> !subst.matchType(x);
+            //another case:
+            //  xss > 1, yss=1: because of duplicates in ys that were removed; instead apply ys.first() to each of xs
+            //  note for validation: the reverse will not work (trying to assign multiple different terms to the same variable in x)
+            Term yy = ys.first();
+            for (Term x : xs) {
+                if (!subst.unify(x, yy))
+                    return false;
             }
+            return true; //they all unified
+        } else if (yss == xss) {
+
+            subst.termutes.add(new CommutivePermutations(
+                    TermVector.the(xs), TermVector.the(ys)
+            ));
             return true;
+        } else /* yss!=xss */ {
+            return false; //TODO this may possibly be handled
         }
-        return false;
     }
 
 
-    default boolean recurseSubTerms(BiPredicate<Term, Compound> whileTrue, Compound parent) {
-        int s = size();
-        for (int i = 0; i < s; i++) {
-            if (!sub(i).recurseTerms(whileTrue, parent))
-                return false;
-        }
-        return true;
-    }
 
     /**
      * match a range of subterms of Y.
@@ -961,34 +966,43 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
             Term[] l = new Term[to - from];
 
-            int x = 0, y = from;
+            int y = from;
             for (int i = 0; i < s; i++) {
-                l[x++] = sub(y++);
+                l[i] = sub(y++);
             }
 
             return l;
         }
     }
 
+    default boolean recurseSubTerms(BiPredicate<Term, Compound> whileTrue, Compound parent) {
+        int s = size();
+        for (int i = 0; i < s; i++) {
+            if (!sub(i).recurseTerms(whileTrue, parent))
+                return false;
+        }
+        return true;
+    }
     @Override
     default void recurseTerms(@NotNull Consumer<Term> v) {
+
         forEach(s -> s.recurseTerms(v));
     }
 
-    /**
-     * returns a sorted and de-duplicated version of this container
-     */
-    default TermContainer sorted() {
-        int s = size();
-        if (s <= 1)
-            return this;
-
-
-        Term[] tt = Terms.sorted(toArray());
-        if (equalTerms(tt))
-            return this;
-        else
-            return Op.subterms(tt);
-    }
+//    /**
+//     * returns a sorted and de-duplicated version of this container
+//     */
+//    default TermContainer sorted() {
+//        int s = size();
+//        if (s <= 1)
+//            return this;
+//
+//
+//        Term[] tt = Terms.sorted(toArray());
+//        if (equalTerms(tt))
+//            return this;
+//        else
+//            return Op.subterms(tt);
+//    }
 
 }

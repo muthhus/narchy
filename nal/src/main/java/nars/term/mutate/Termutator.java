@@ -4,6 +4,7 @@ import jcog.Util;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;
+import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.ProxyCompound;
@@ -27,24 +28,20 @@ public interface Termutator {
         return -1; /* unknown */
     }
 
-    abstract class AbstractTermutator extends ProxyCompound implements Termutator {
+    abstract class AbstractTermutator extends ProxyTerm implements Termutator {
 
         protected static Term wrap(TermContainer y) {
             return y instanceof Term ? (Term)y : $.p(y.toArray());
         }
 
-        AbstractTermutator(TermContainer... keyComponents) {
-            this(Util.map(AbstractTermutator::wrap, new Term[keyComponents.length], keyComponents));
-        }
+//        AbstractTermutator(TermContainer... keyComponents) {
+//            this(Util.map(AbstractTermutator::wrap, new Term[keyComponents.length], keyComponents));
+//        }
 
 
         AbstractTermutator(Term... keyComponents) {
-            this(new GenericCompound(Op.PROD, TermVector.the(keyComponents))); //fast create on-heap instance
-                    //$.p(keyComponents));
+            super(keyComponents.length == 1 ? keyComponents[0] : $.pStack(keyComponents));
         }
 
-        AbstractTermutator(Compound key) {
-            super(key);
-        }
     }
 }

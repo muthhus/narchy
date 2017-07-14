@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.SortedSet;
 
 /**
  * Created by me on 12/22/15.
@@ -32,8 +33,8 @@ public class Choose2 extends Termutator.AbstractTermutator {
     @NotNull
     private final ShuffledSubterms yy;
 
-    public Choose2(@NotNull Unify f, @NotNull Ellipsis xEllipsis, @NotNull Collection<Term> x, @NotNull Collection<Term> yFree) {
-        super($.sete(x), xEllipsis, $.sete(yFree));
+    public Choose2(@NotNull Unify f, @NotNull Ellipsis xEllipsis, @NotNull SortedSet<Term> x, @NotNull SortedSet<Term> yFree) {
+        super($.p(x), xEllipsis, $.p(yFree));
         this.f = f;
         this.xEllipsis = xEllipsis;
         this.x = x.toArray(new Term[x.size()]);

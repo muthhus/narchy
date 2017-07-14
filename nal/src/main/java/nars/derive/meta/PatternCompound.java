@@ -401,7 +401,7 @@ abstract public class PatternCompound extends GenericCompound implements NonInte
         /**
          * toMatch matched into some or all of Y's terms
          */
-        boolean matchEllipsisCommutive(@NotNull Unify subst, @NotNull Set<Term> xFree, @NotNull Set<Term> yFree) {
+        boolean matchEllipsisCommutive(@NotNull Unify subst, @NotNull SortedSet<Term> xFree, @NotNull SortedSet<Term> yFree) {
             int xs = xFree.size();
 
             switch (xs) {
@@ -409,9 +409,9 @@ abstract public class PatternCompound extends GenericCompound implements NonInte
                     //match everything
                     return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
                 case 1:
-                    Term theFreeX = xFree.iterator().next();
+                    Term theFreeX = xFree.first();
                     if (yFree.size() == 1)
-                        return subst.putXY(theFreeX, yFree.iterator().next());
+                        return subst.putXY(theFreeX, yFree.first());
                     else {
                         subst.termutes.add(new Choose1(ellipsis, theFreeX, yFree));
                         return true;

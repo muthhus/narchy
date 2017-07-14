@@ -91,13 +91,15 @@ public class RTreeCursor<T> {
 
         return ordering(cmp).greatestOf(iterator, max);
     }
-   public List<T> topSorted(Ordering<T> cmp, int max) {
+
+    public List<T> topSorted(Ordering<T> cmp, int max) {
         return cmp.greatestOf(iterator(), max);
     }
 
     public static <T> Ordering<T> ordering(Comparator<T> cmp) {
         return Ordering.from(cmp);
     }
+
     public static <T> Ordering<T> ordering(FloatFunction<T> cmp) {
         return Ordering.from(new UniqueRanker<>(cmp));
     }
@@ -107,8 +109,10 @@ public class RTreeCursor<T> {
     }
 
 
-    /** untested */
-    private class RCursorIterator<T> extends AbstractIterator<T> {
+    /**
+     * untested
+     */
+    private static final class RCursorIterator<T> extends AbstractIterator<T> {
 
         List<Leaf<T>> a;
         Leaf<T> l;
@@ -119,26 +123,22 @@ public class RTreeCursor<T> {
             this.l = a.get(0);
         }
 
-        @Override protected T computeNext() {
-            @NotNull T next = l.get(i++);
-            if (i >= l.size) {
+        @Override
+        protected T computeNext() {
+            @NotNull T next = l.get(i);
+            if (++i >= l.size) {
 
-                if (a!=null) {
-                    ++j;
-                    i = 0;
+                if (++j >= a.size()) {
+                    a = null; //no more nodes after this one
                     l = null;
-                    if (j >= a.size()-1) {
-                        a = null; //no more nodes after this one
-                    } else {
-                        l = a.get(j); //next
-                    }
-
                 } else {
-                    l = null; //no more items in the last node
+                    l = a.get(j); //next
+                    i = 0;
                 }
+
             }
 
-            if (a == null && l == null) {
+            if (a == null) {
                 endOfData();
             }
 

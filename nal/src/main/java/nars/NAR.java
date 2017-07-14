@@ -38,7 +38,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicSingleton;
+import nars.term.atom.SpecialAtom;
 import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -1296,7 +1296,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         }
 
-        if (term instanceof Variable || term instanceof IntAtom || term instanceof AtomicSingleton)
+        if (term instanceof Variable || term instanceof IntAtom || term instanceof SpecialAtom)
             return null;
 
         return term;

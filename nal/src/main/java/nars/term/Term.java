@@ -21,13 +21,12 @@
 package nars.term;
 
 
-import com.google.common.collect.TreeTraverser;
 import jcog.data.array.IntArrays;
 import nars.$;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
-import nars.term.atom.AtomicSingleton;
+import nars.term.atom.SpecialAtom;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
@@ -43,7 +42,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -419,7 +417,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
     /** if filterTrueFalse is false, only filters Null's */
     static boolean filterAbsolute(@NotNull Term u, boolean filterTrueFalse) {
-        return u instanceof AtomicSingleton && (filterTrueFalse || (u == Null));
+        return u instanceof SpecialAtom && (filterTrueFalse || (u == Null));
     }
 
     default Term dt(int dt) {

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 /**
  * choose 1 at a time from a set of N, which means iterating up to N
@@ -23,13 +24,11 @@ public class Choose1 extends Termutator.AbstractTermutator {
     @NotNull
     private final Term[] yy;
 
-    public Choose1(Ellipsis xEllipsis, Term x, @NotNull Set<Term> yFree) {
-        super(x, xEllipsis, $.sete(yFree));
+    public Choose1(Ellipsis xEllipsis, Term x, @NotNull SortedSet<Term> yFree) {
+        super(x, xEllipsis, $.p(yFree));
 
-        int ysize = yFree.size();
-        if (ysize < 2) {
-            throw new RuntimeException(yFree + " offers no choice");
-        }
+        int ysize = yFree.size();  assert(ysize >= 2): yFree + " must offer choice";
+
         yy = yFree.toArray(new Term[ysize]);
         //this.yFree = yFree;
 

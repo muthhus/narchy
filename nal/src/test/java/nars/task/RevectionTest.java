@@ -252,8 +252,8 @@ public class RevectionTest {
         assertEquals(repeats, b.size(true));
 
         @Nullable Truth result = n.beliefTruth(b, at);
-        assertEquals(freq, result.freq(), Param.TRUTH_EPSILON);
-        assertEquals(outConf, result.conf(), Param.TRUTH_EPSILON);
+        assertEquals(freq, result.freq(), 0.25f);
+        assertEquals(outConf, result.conf(), 0.25f);
     }
 
 
