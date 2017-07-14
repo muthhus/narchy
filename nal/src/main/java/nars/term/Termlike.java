@@ -142,10 +142,10 @@ public interface Termlike extends Termed {
     boolean ORrecurse(@NotNull Predicate<Term> v);
 
 
-    /** returns the number of subterms (1st layer) having the provided operator */
-    default int subCount(Op o) {
-        return 0;
-    }
+//    /** returns the number of subterms (1st layer) having the provided operator */
+//    default int subCount(Op o) {
+//        return 0;
+//    }
 
     /** total # of variables, excluding pattern variables */
     default int vars() {

@@ -8,6 +8,7 @@ import nars.Op;
 import nars.Param;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.index.term.TermIndex;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.mutate.Termutator;
 import nars.term.var.CommonVariable;
@@ -250,6 +251,15 @@ public abstract class Unify implements Termutator, Subst {
 
     public final boolean live() {
         return versioning.live();
+    }
+
+
+    /** weather the given term has any potential free variables that could be assigned in unification */
+    public boolean freeVars(Term x) {
+        return type == null ?
+                (x.volume() > x.complexity()) /* any variable, including pattern */
+                    :
+                (x.hasAny(type));
     }
 
 

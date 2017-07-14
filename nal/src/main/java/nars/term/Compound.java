@@ -357,27 +357,27 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
 
+
         if (ty instanceof Compound) {
 
-            //if (equals(ty)) return true;
-
-            Compound y = (Compound) ty;
+            if (!subst.freeVars(this))
+                return equals(ty); //no free vars, the only way unification can proceed is if equal
 
             Op op = op();
-
-            int xs;
-            if (op != y.op())
+            if (op != ty.op())
                 return false;
 
+            int xs;
+            if ((xs = size()) != ty.size())
+                return false;
+
+            Compound y = (Compound) ty;
             TermContainer xsubs = subterms();
             TermContainer ysubs = y.subterms();
 
-            if ((xs = xsubs.size()) != ysubs.size())
-                return false;
 
             if (op.temporal &&!matchTemporalDT(dt(), y.dt(), subst.dur))
                 return false;
-
 
             //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
             if (isCommutative()) {

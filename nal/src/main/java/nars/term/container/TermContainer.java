@@ -122,25 +122,25 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                                 (OR(Termlike::isDynamic))); /* possible function in subterms */
     }
 
-    @Override
-    default int subCount(Op o) {
-        if (!hasAll(o.bit))
-            return 0; //structure doesnt contain that op
-
-        switch (o) {
-            case VAR_DEP:
-                return varDep();
-            case VAR_INDEP:
-                return varIndep();
-            case VAR_QUERY:
-                return varQuery();
-            case VAR_PATTERN:
-                return varPattern();
-        }
-        return intValue(0, (sum, x) -> {
-            return (x.op() == o) ? (sum + 1) : sum;
-        });
-    }
+//    @Override
+//    default int subCount(Op o) {
+//        if (!hasAll(o.bit))
+//            return 0; //structure doesnt contain that op
+//
+//        switch (o) {
+//            case VAR_DEP:
+//                return varDep();
+//            case VAR_INDEP:
+//                return varIndep();
+//            case VAR_QUERY:
+//                return varQuery();
+//            case VAR_PATTERN:
+//                return varPattern();
+//        }
+//        return intValue(0, (sum, x) -> {
+//            return (x.op() == o) ? (sum + 1) : sum;
+//        });
+//    }
 
     /**
      * int reduction operation
