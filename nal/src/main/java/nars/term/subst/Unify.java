@@ -194,7 +194,7 @@ public abstract class Unify implements Termutator, Subst {
 
 
     public final boolean unify(@NotNull Term x, @NotNull Term y) {
-        return x.unify(y, this);
+        return versioning.tick() && x.unify(y, this);
     }
 
     public final boolean matchType(@NotNull Term y) {
@@ -248,10 +248,6 @@ public abstract class Unify implements Termutator, Subst {
         return versioning.revert(then);
     }
 
-
-    public final boolean live() {
-        return versioning.live();
-    }
 
 
     /** weather the given term has any potential free variables that could be assigned in unification */

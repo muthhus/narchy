@@ -115,12 +115,7 @@ public class Versioning extends
 //    }
 
     public final boolean tick() {
-        if (ttl <= 0)
-            return false;
-        else {
-            --ttl;
-            return true;
-        }
+        return (ttl-- > 0);
     }
 
     public final boolean live() {

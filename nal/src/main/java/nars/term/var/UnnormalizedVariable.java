@@ -2,6 +2,7 @@ package nars.term.var;
 
 import nars.$;
 import nars.Op;
+import nars.index.term.NonInternable;
 import nars.term.Term;
 import nars.term.atom.AtomicToString;
 import org.jetbrains.annotations.NotNull;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Unnormalized, labeled variable
  */
-public class UnnormalizedVariable extends AtomicToString implements Variable {
+public class UnnormalizedVariable extends AtomicToString implements Variable, NonInternable {
 
     @NotNull
     public final Op type;

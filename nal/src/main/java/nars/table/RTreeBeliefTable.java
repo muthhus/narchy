@@ -233,7 +233,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     r.updateOngoingTask();
 
                     boolean readded = tree.add(r);
-                    assert(readded);
+                    //assert(readded);
 
                     return false; //keep tracking
                 } else {

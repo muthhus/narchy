@@ -36,7 +36,7 @@ public class NARS {
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 64, 0.5f);
+    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 64, 0.2f);
 
     private final Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 

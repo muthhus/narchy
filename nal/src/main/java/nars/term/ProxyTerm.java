@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.Op;
+import nars.index.term.NonInternable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +13,7 @@ import java.util.function.Predicate;
 /**
  * Created by me on 3/26/17.
  */
-public class ProxyTerm<T extends Term> implements Term {
+public class ProxyTerm<T extends Term> implements Term, NonInternable {
 
     public /*HACK make unpublic */ T ref;
 

@@ -35,7 +35,7 @@ public class Line1D {
     static class Line1DExperiment implements FloatFunction<NAR> {
         float tHz = 0.01f; //in time units
         float yResolution = 0.04f; //in 0..1.0
-        float periods = 132;
+        float periods = 532;
 
         final int runtime = Math.round(periods /tHz);
 
@@ -183,11 +183,11 @@ public class Line1D {
 //
                 NAR n = new NARS().get();
 
-                new STMTemporalLinkage(n, 2, true);
-                n.time.dur(1);
+                new STMTemporalLinkage(n, 2, false);
+                n.time.dur(2);
                 n.termVolumeMax.set(22);
                 n.beliefConfidence(0.9f);
-                n.goalConfidence(0.5f);
+                n.goalConfidence(0.75f);
                 n.onCycle((nn)->{
                     System.out.println(nn.emotion.summary());
                 });
@@ -197,7 +197,7 @@ public class Line1D {
                     protected void onStart(Line1DSimplest a) {
                         new Thread(() -> {
                             //NAgentX.chart(a);
-                            int history = 500;
+                            int history = 800;
                             window(
                                     row(
                                             conceptPlot(a.nar, Lists.newArrayList(
