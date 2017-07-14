@@ -166,7 +166,7 @@ public interface Space<T> extends Nodelike<T> {
     }
 
     default RTreeCursor<T> cursor(HyperRegion start) {
-        return new RTreeCursor<>(this, start);
+        return new RTreeCursor<>(this).in(start);
     }
 
     @NotNull Node<T, ?> root();

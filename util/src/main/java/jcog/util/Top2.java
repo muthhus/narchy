@@ -5,7 +5,7 @@ import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import java.util.function.Consumer;
 
 /**
- * Created by me on 3/14/17.
+ * @see TopKSelector (guava)
  */
 public final class Top2<T> implements Consumer<T> {
 

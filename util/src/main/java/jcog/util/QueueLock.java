@@ -1,5 +1,7 @@
 package jcog.util;
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
+import com.google.common.collect.EvictingQueue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.BlockingQueue;
@@ -25,7 +27,8 @@ public class QueueLock<X> implements Consumer<X> {
     }
 
     public QueueLock(int capacity, Consumer<X> procedure) {
-        queue = //new DisruptorBlockingQueue<X>(capacity);
+        queue = //new EvictingQueue<>(capacity);
+                //new DisruptorBlockingQueue<>(capacity);
                 new LinkedBlockingQueue();
                 //new ArrayBlockingQueue<X>(capacity);
 

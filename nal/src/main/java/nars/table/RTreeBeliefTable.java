@@ -1,9 +1,9 @@
 package nars.table;
 
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import jcog.Util;
-import jcog.pri.Pri;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
 import jcog.util.Top2;
@@ -19,14 +19,11 @@ import nars.task.TruthPolation;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
-import org.eclipse.collections.api.list.MutableList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -34,7 +31,9 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = { /*0,*/ 1, 2, 4, 16, 64};
+    static final int[] sampleRadii = { /*1, 2,*/ 4, 16, 32 };
+    final static int maxSampled = 8;
+    final static float enoughSamplesRate = 0.1f;
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -260,25 +259,44 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         long now = nar.time();
         updateSignalTasks(now);
 
-        @Nullable Task e = eternal != null ? eternal.strongest() : null;
+        Task ete = eternal != null ? eternal.strongest() : null;
+        @Nullable Task e = ete;
 
         if (!tree.isEmpty()) {
 
             int dur = nar.dur();
 
-//            FloatFunction<TaskRegion> wr = regionStrength(now, dur);
-//            FloatFunction<TaskRegion> sort = t -> -wr.floatValueOf(t);
+
+            FloatFunction<Task> ts = taskStrength(when, dur);
+            FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task));
 
             float confMin = nar.confMin.floatValue();
+            int enoughSampled = Math.round(Math.max(1, enoughSamplesRate * capacity));
+
+            Ordering<TaskRegion> ss = RTreeCursor.ordering(strongestTask);
+            RTreeCursor<TaskRegion> c = null;
             for (int r : sampleRadii) {
 
-                List<TaskRegion> tt = cursor(when - r * dur, when + r * dur)
-                        //.listSorted(sort)
-                        .list();
-                if (!tt.isEmpty()) {
+                long from = when - r * dur;
+                long to = when + r * dur;
+                if (c == null)
+                    c = cursor(from, to);
+                else
+                    c.in(timeRange(from, to)); //recycle
+
+                if (c.size() >= enoughSampled)
+                    break;
+            }
+
+            if (c != null && c.size() > 0) {
+
+                List<TaskRegion> tt = c.topSorted(ss, maxSampled);
+                int tts = tt.size();
+                if (tts > 0) {
                     //applying eternal should not influence the scan for temporal so it is left null here
-                    @Nullable PreciseTruth t = TruthPolation.truth(null, when, dur, tt);
-                    if (t != null && t.conf() > confMin) {
+                    @Nullable PreciseTruth t = TruthPolation.truth(
+                            ete, when, dur, tt);
+                    if (t != null /*&& t.conf() >= confMin*/) {
                         return t.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1f);
                     }
                 }
@@ -304,8 +322,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         FloatFunction<TaskRegion> sort = t -> -wr.floatValueOf(t);
 
         for (int r : sampleRadii) {
-            MutableList<TaskRegion> tt = cursor(when - r * dur, when + r * dur).
-                    listSorted(sort);
+            List<TaskRegion> tt = cursor(when - r * dur, when + r * dur)
+                    .topSorted(sort, 2);
+
             if (!tt.isEmpty()) {
 
                 switch (tt.size()) {
@@ -649,9 +668,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         return tree.remove(new TaskRegion(x));
     }
 
-    public boolean remove(TaskRegion x) {
+    public void remove(TaskRegion x) {
         x.task.delete();
-        return tree.remove(x);
+        tree.removeAsync(x);
     }
 
     public void removeAsync(TaskRegion x) {

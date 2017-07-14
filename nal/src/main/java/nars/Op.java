@@ -419,6 +419,9 @@ public enum Op implements $ {
     //-------------
     //NONE('\u2205', Op.ANY, null),
 
+    INT("+", Op.ANY_LEVEL, OpType.Other) {
+
+    },
 
     VAR_PATTERN('%', Op.ANY_LEVEL, OpType.Variable),
 
@@ -524,18 +527,6 @@ public enum Op implements $ {
      * absolutely invalid
      */
     public static final AtomicSingleton Null = new AtomicSingleton(String.valueOf(NullSym));
-
-    /**
-     * absolutely true
-     */
-    public static final AtomicSingleton True = new AtomicSingleton(String.valueOf(TrueSym)) {
-        @NotNull
-        @Override
-        public Term unneg() {
-            return False;
-        }
-    };
-
     /**
      * absolutely false
      */
@@ -546,43 +537,122 @@ public enum Op implements $ {
             return True;
         }
     };
-
+    /**
+     * absolutely true
+     */
+    public static final AtomicSingleton True = new AtomicSingleton(String.valueOf(TrueSym)) {
+        @NotNull
+        @Override
+        public Term unneg() {
+            return False;
+        }
+    };
     public static final Term[] TrueArray = {True};
     public static final Term[] FalseArray = {False};
+    /**
+     * specifier for any NAL level
+     */
+    public static final int ANY_LEVEL = 0;
+    public static final int SetBits = or(Op.SETe, Op.SETi);
+    public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
+    public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
+    public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);
+    public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
+    final static Logger logger = LoggerFactory.getLogger(Op.class);
+    static final Function<ProtoCompound, Termlike> buildTerm = (C) -> {
+        try {
 
+            Op o = C.op();
+            if (o != null) {
+                return _compound(o, C.subterms());
+            } else
+                return _subterms(C.subterms());
+
+        } catch (InvalidTermException e) {
+            if (Param.DEBUG_EXTRA)
+                logger.error("Term Build: {}, {}", C, e);
+            return Null;
+        } catch (Throwable t) {
+            logger.error("{}", t);
+            return Null;
+        }
+    };
+    public static final Memoize<ProtoCompound, Termlike> cache =
+            //new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 4);
+            CaffeineMemoize.build(buildTerm, 64 * 1024, false /* Param.DEBUG*/);
+    /**
+     * index of operators which are encoded by 1 byte: must be less than 31 because this is the range for control characters
+     */
+    static final int numByteSymbols = 15;
+    static final Op[] byteSymbols = new Op[numByteSymbols];
+    static final ImmutableMap<String, Op> stringToOperator;
+    private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
+    private static final int InvalidImplicationSubj = or(EQUI, IMPL);
+    private static final int InvalidImplicationPred = or(EQUI);
+
+    static {
+        for (Op o : Op.values()) {
+            int l = o.minLevel;
+            if (l < 0) l = 0; //count special ops as level 0, so they can be detected there
+            for (int i = l; i <= 8; i++) {
+                NALLevelEqualAndAbove[i] |= o.bit;
+            }
+        }
+
+        final Map<String, Op> _stringToOperator = new HashMap<>(values().length * 2);
+
+        //Setup NativeOperator String index hashtable
+        for (Op r : Op.values()) {
+            _stringToOperator.put(r.toString(), r);
+            int ordinal = r.ordinal();
+            if (ordinal < 15)
+                Op.byteSymbols[ordinal] = r;
+        }
+        stringToOperator = Maps.immutable.ofMap(_stringToOperator);
+
+        //System.out.println(Arrays.toString(byteSymbols));
+
+        //VERIFICATION: Look for any empty holes in the byteSymbols table, indicating that the representation is not contigous
+        //index 0 is always 0 to maintain \0's semantics
+        //if # of operators are reduced in the future, then this will report that the table size should be reduced (avoiding unnecessary array lookups)
+        for (int i = 1; i < Op.byteSymbols.length; i++) {
+            if (null == Op.byteSymbols[i])
+                throw new RuntimeException("Invalid byteSymbols encoding: index " + i + " is null");
+        }
+
+//        //Setup NativeOperator Character index hashtable
+//        for (Op r : Op.values()) {
+//            char c = r.ch;
+//            if (c!=0)
+//                Op._charToOperator.put(c, r);
+//        }
+    }
 
     /**
      * string representation
      */
     @NotNull
     public final String str;
-
     /**
      * character representation if symbol has length 1; else ch = 0
      */
     public final char ch;
-
     public final OpType type;
-
     /**
      * arity limits, range is inclusive >= <=
      * -1 for unlimited
      */
     public final int minSize, maxSize;
-
-
     /**
      * minimum NAL level required to use this operate, or 0 for N/A
      */
     public final int minLevel;
-
     public final boolean commutative;
     public final boolean temporal;
     public final int bit;
     public final boolean var;
     public final boolean atomic;
     public final boolean statement;
-
     /**
      * whether this involves an additional numeric component: 'dt' (for temporals) or 'relation' (for images)
      */
@@ -592,9 +662,17 @@ public enum Op implements $ {
         this(c, minLevel, type, Args.None);
     }
 
+    /*
+    used only by Termlike.hasAny
+    public static boolean hasAny(int existing, int possiblyIncluded) {
+        return (existing & possiblyIncluded) != 0;
+    }*/
+
+
     Op(@NotNull String s, boolean commutative, int minLevel, @NotNull IntIntPair size) {
         this(s, commutative, minLevel, OpType.Other, size);
     }
+
 
     Op(char c, int minLevel, OpType type, @NotNull IntIntPair size) {
         this(Character.toString(c), minLevel, type, size);
@@ -608,9 +686,11 @@ public enum Op implements $ {
         this(string, false /* non-commutive */, minLevel, type, Args.None);
     }
 
+
     Op(@NotNull String string, int minLevel, OpType type, @NotNull IntIntPair size) {
         this(string, false /* non-commutive */, minLevel, type, size);
     }
+
 
     Op(@NotNull String string, boolean commutative, int minLevel, OpType type, @NotNull IntIntPair size) {
 
@@ -640,7 +720,6 @@ public enum Op implements $ {
 
     }
 
-
     public static boolean hasAll(int existing, int possiblyIncluded) {
         return ((existing | possiblyIncluded) == existing);
     }
@@ -660,6 +739,8 @@ public enum Op implements $ {
     public static boolean isFalse(@NotNull Term x) {
         return x == False;
     }
+    //CaffeineMemoize.build(buildTerm, -1 /* softref */, true /* Param.DEBUG*/);
+    //new NullMemoize<>(buildTerm);
 
     public static boolean concurrent(int dt) {
         return (dt == DTERNAL) || (dt == 0);
@@ -725,7 +806,6 @@ public enum Op implements $ {
 
     }
 
-
     /**
      * decode a term which may be a functor, return null if it isnt
      */
@@ -775,114 +855,6 @@ public enum Op implements $ {
         return null;
     }
 
-    /*
-    used only by Termlike.hasAny
-    public static boolean hasAny(int existing, int possiblyIncluded) {
-        return (existing & possiblyIncluded) != 0;
-    }*/
-
-
-    @NotNull
-    @Override
-    public String toString() {
-        return str;
-    }
-
-
-    /**
-     * writes this operator to a Writer in (human-readable) expanded UTF16 mode
-     */
-    public final void append(@NotNull Compound c, @NotNull Appendable w) throws IOException {
-        append(c, w, false);
-    }
-
-    /**
-     * writes this operator to a Writer in (human-readable) expanded UTF16 mode
-     */
-    public final void append(@NotNull Compound c, @NotNull Appendable w, boolean invertDT) throws IOException {
-        int t = c.dt();
-        boolean hasTime = t != Tense.DTERNAL;
-
-        if (hasTime)
-            w.append(' ');
-
-        char ch = this.ch;
-        if (ch == 0)
-            w.append(str);
-        else
-            w.append(ch);
-
-        if (hasTime) {
-
-            if (invertDT)
-                t = -t;
-
-            if (t >= 0) w.append('+');
-            String ts;
-            if (t == XTERNAL)
-                ts = "-";
-            else
-                ts = Integer.toString(t);
-            w.append(ts).append(' ');
-        }
-    }
-
-    public boolean commute(int dt, Term[] u) {
-        if (commutative) {
-            if (temporal) {
-                /*if (dt == XTERNAL) {
-
-                }*/
-                if (!Op.concurrent(dt))
-                    return false;
-            }
-            return true;
-        }
-        return false;
-    }
-
-
-    @NotNull
-    public final Term the(Term... u) {
-        return the(DTERNAL, u);
-    }
-
-
-    public Term the(int dt, @NotNull Collection<Term> sub) {
-        int ss = sub.size();
-        @NotNull Term[] u = sub.toArray(new Term[ss]);
-        return the(dt, u);
-    }
-
-    public Term the(int dt, @NotNull Term... u) {
-        if (statement) {
-            return statement(this, dt, u[0], u[1]);
-        } else {
-            return compound(this, dt, subterms(commute(dt, u) ? Terms.sorted(u) : u));
-        }
-    }
-
-    final static Logger logger = LoggerFactory.getLogger(Op.class);
-
-    static final Function<ProtoCompound, Termlike> buildTerm = (C) -> {
-        try {
-
-            Op o = C.op();
-            if (o != null) {
-                return _compound(o, C.subterms());
-            } else
-                return _subterms(C.subterms());
-
-        } catch (InvalidTermException e) {
-            if (Param.DEBUG_EXTRA)
-                logger.error("Term Build: {}, {}", C, e);
-            return Null;
-        } catch (Throwable t) {
-            logger.error("{}", t);
-            return Null;
-        }
-    };
-
     private static Term _compound(Op o, Term[] subterms) {
         int s = subterms.length;
         assert (s > 0);
@@ -895,17 +867,9 @@ public enum Op implements $ {
         }
     }
 
-    public static final Memoize<ProtoCompound, Termlike> cache =
-            //new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 4);
-            CaffeineMemoize.build(buildTerm, 64 * 1024, false /* Param.DEBUG*/);
-    //CaffeineMemoize.build(buildTerm, -1 /* softref */, true /* Param.DEBUG*/);
-    //new NullMemoize<>(buildTerm);
-
-
     static TermContainer _subterms(@NotNull Term[] s) {
         return TermVector.the(s);
     }
-
 
     static public @NotNull TermContainer subterms(@NotNull Term... s) {
 //        if (s.length < 2) {
@@ -919,7 +883,6 @@ public enum Op implements $ {
         return (TermContainer) cache.apply(new AppendProtoCompound(null, s).commit());
 //        }
     }
-
 
     @NotNull
     public static Term compound(Op op, int dt, TermContainer subterms) {
@@ -937,18 +900,6 @@ public enum Op implements $ {
             return x;
     }
 
-    /**
-     * true if matches any of the on bits of the vector
-     */
-    public final boolean in(int vector) {
-        return in(bit, vector);
-    }
-
-    public boolean isSet() {
-        return false;
-    }
-
-
     static boolean in(int needle, int haystack) {
         return (needle & haystack) == needle;
     }
@@ -959,47 +910,6 @@ public enum Op implements $ {
             bits |= n.bit;
         return bits;
     }
-
-    /**
-     * specifier for any NAL level
-     */
-    public static final int ANY_LEVEL = 0;
-
-
-    /**
-     * top-level Op categories
-     */
-    public enum OpType {
-        Statement,
-        Variable,
-        Other
-    }
-
-
-    enum Args {
-        ;
-        static final IntIntPair None = pair(0, 0);
-        static final IntIntPair One = pair(1, 1);
-        static final IntIntPair Two = pair(2, 2);
-
-        static final IntIntPair GTEZero = pair(0, -1);
-        static final IntIntPair GTEOne = pair(1, -1);
-        static final IntIntPair GTETwo = pair(2, -1);
-
-    }
-
-
-    public static final int SetBits = or(Op.SETe, Op.SETi);
-    public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
-    public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
-    public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);
-
-
-    public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
-
-    private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
-    private static final int InvalidImplicationSubj = or(EQUI, IMPL);
-    private static final int InvalidImplicationPred = or(EQUI);
 
     static boolean validEquivalenceTerm(@NotNull Term t) {
         //return !t.opUnneg().in(InvalidEquivalenceTerm);
@@ -1281,57 +1191,9 @@ public enum Op implements $ {
         return compound(op, dt, subterms(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
     }
 
-
-    /**
-     * index of operators which are encoded by 1 byte: must be less than 31 because this is the range for control characters
-     */
-    static final int numByteSymbols = 15;
-    static final Op[] byteSymbols = new Op[numByteSymbols];
-    static final ImmutableMap<String, Op> stringToOperator;
-    //static final CharObjectHashMap<Op> _charToOperator = new CharObjectHashMap(values().length * 2);
-
     public static Op fromString(String s) {
         return stringToOperator.get(s);
     }
-
-    static {
-        for (Op o : Op.values()) {
-            int l = o.minLevel;
-            if (l < 0) l = 0; //count special ops as level 0, so they can be detected there
-            for (int i = l; i <= 8; i++) {
-                NALLevelEqualAndAbove[i] |= o.bit;
-            }
-        }
-
-        final Map<String, Op> _stringToOperator = new HashMap<>(values().length * 2);
-
-        //Setup NativeOperator String index hashtable
-        for (Op r : Op.values()) {
-            _stringToOperator.put(r.toString(), r);
-            int ordinal = r.ordinal();
-            if (ordinal < 15)
-                Op.byteSymbols[ordinal] = r;
-        }
-        stringToOperator = Maps.immutable.ofMap(_stringToOperator);
-
-        //System.out.println(Arrays.toString(byteSymbols));
-
-        //VERIFICATION: Look for any empty holes in the byteSymbols table, indicating that the representation is not contigous
-        //index 0 is always 0 to maintain \0's semantics
-        //if # of operators are reduced in the future, then this will report that the table size should be reduced (avoiding unnecessary array lookups)
-        for (int i = 1; i < Op.byteSymbols.length; i++) {
-            if (null == Op.byteSymbols[i])
-                throw new RuntimeException("Invalid byteSymbols encoding: index " + i + " is null");
-        }
-
-//        //Setup NativeOperator Character index hashtable
-//        for (Op r : Op.values()) {
-//            char c = r.ch;
-//            if (c!=0)
-//                Op._charToOperator.put(c, r);
-//        }
-    }
-
 
     @NotNull
     private static Term intersect(@NotNull Term[] t, @NotNull Op intersection, @NotNull Op setUnion, @NotNull Op setIntersection) {
@@ -1437,6 +1299,115 @@ public enum Op implements $ {
         return compound(intersection, DTERNAL, subterms(Terms.sorted(args)));
     }
 
+    @NotNull
+    @Override
+    public String toString() {
+        return str;
+    }
+
+    /**
+     * writes this operator to a Writer in (human-readable) expanded UTF16 mode
+     */
+    public final void append(@NotNull Compound c, @NotNull Appendable w) throws IOException {
+        append(c, w, false);
+    }
+
+    /**
+     * writes this operator to a Writer in (human-readable) expanded UTF16 mode
+     */
+    public final void append(@NotNull Compound c, @NotNull Appendable w, boolean invertDT) throws IOException {
+        int t = c.dt();
+        boolean hasTime = t != Tense.DTERNAL;
+
+        if (hasTime)
+            w.append(' ');
+
+        char ch = this.ch;
+        if (ch == 0)
+            w.append(str);
+        else
+            w.append(ch);
+
+        if (hasTime) {
+
+            if (invertDT)
+                t = -t;
+
+            if (t >= 0) w.append('+');
+            String ts;
+            if (t == XTERNAL)
+                ts = "-";
+            else
+                ts = Integer.toString(t);
+            w.append(ts).append(' ');
+        }
+    }
+
+    public boolean commute(int dt, Term[] u) {
+        if (commutative) {
+            if (temporal) {
+                /*if (dt == XTERNAL) {
+
+                }*/
+                if (!Op.concurrent(dt))
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    @NotNull
+    public final Term the(Term... u) {
+        return the(DTERNAL, u);
+    }
+
+    public Term the(int dt, @NotNull Collection<Term> sub) {
+        int ss = sub.size();
+        @NotNull Term[] u = sub.toArray(new Term[ss]);
+        return the(dt, u);
+    }
+
+    public Term the(int dt, @NotNull Term... u) {
+        if (statement) {
+            return statement(this, dt, u[0], u[1]);
+        } else {
+            return compound(this, dt, subterms(commute(dt, u) ? Terms.sorted(u) : u));
+        }
+    }
+
+    /**
+     * true if matches any of the on bits of the vector
+     */
+    public final boolean in(int vector) {
+        return in(bit, vector);
+    }
+
+    public boolean isSet() {
+        return false;
+    }
+
+
+    /**
+     * top-level Op categories
+     */
+    public enum OpType {
+        Statement,
+        Variable,
+        Other
+    }
+
+    enum Args {
+        ;
+        static final IntIntPair None = pair(0, 0);
+        static final IntIntPair One = pair(1, 1);
+        static final IntIntPair Two = pair(2, 2);
+
+        static final IntIntPair GTEZero = pair(0, -1);
+        static final IntIntPair GTEOne = pair(1, -1);
+        static final IntIntPair GTETwo = pair(2, -1);
+
+    }
 
     public static class InvalidPunctuationException extends RuntimeException {
         public InvalidPunctuationException(byte c) {

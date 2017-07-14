@@ -402,10 +402,10 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return (maybeNull==null) ? Null : maybeNull;
     }
 
-    /** https://google.github.io/guava/releases/snapshot/api/docs/com/google/common/collect/TreeTraverser.html */
-    default TreeTraverser<Term> termverse() {
-        return TreeTraverser.using(x -> x instanceof Compound ? ((Compound)x).subterms() : Collections.emptyList());
-    }
+//    /** https://google.github.io/guava/releases/snapshot/api/docs/com/google/common/collect/TreeTraverser.html */
+//    default TreeTraverser<Term> termverse() {
+//        return TreeTraverser.using(x -> x instanceof Compound ? ((Compound)x).subterms() : Collections.emptyList());
+//    }
 
     /** opX function */
     static int opX(Op o, byte subOp) {

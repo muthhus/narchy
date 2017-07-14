@@ -1,14 +1,16 @@
 package nars.term.atom;
 
+import com.google.common.primitives.Ints;
 import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.ATOM;
+import static nars.Op.INT;
 
+/** 32-bit signed integer */
 public class IntAtom implements Atomic {
 
-    final static int RANK = Term.opX(ATOM, 2);
 
     public final int id;
 
@@ -35,21 +37,22 @@ public class IntAtom implements Atomic {
 
     @Override
     public byte[] bytes() {
-        if (id >= 0) {
-            if (id < 10) {
-                //fast 1-digit
-                return new byte[]{(byte) ('0' + id)};
-            } else if (id < 100) {
-                //fast 2-digit
-                return new byte[]{(byte) ('0' + (id / 10)), (byte) ('0' + (id % 10))};
-            }
-        }
-
-        return Integer.toString(id).getBytes(); //HACK TODO give IntTerm its own operator type so integer values can be stored compactly
+        return Ints.toByteArray(id);
+//        if (id >= 0) {
+//            if (id < 10) {
+//                //fast 1-digit
+//                return new byte[]{(byte) ('0' + id)};
+//            } else if (id < 100) {
+//                //fast 2-digit
+//                return new byte[]{(byte) ('0' + (id / 10)), (byte) ('0' + (id % 10))};
+//            }
+//        }
+//
+//        return Integer.toString(id).getBytes(); //HACK TODO give IntTerm its own operator type so integer values can be stored compactly
     }
 
-    @Override
-    public final int opX() {
+    final static int RANK = Term.opX(INT, 0);
+    @Override public final int opX() {
         return RANK;
     }
 
@@ -61,7 +64,7 @@ public class IntAtom implements Atomic {
 
     @Override
     public final boolean equals(Object obj) {
-        return obj instanceof IntAtom && id == ((IntAtom) obj).id;
+        return this == obj || (obj instanceof IntAtom && id == ((IntAtom) obj).id);
     }
 
     @Override
@@ -71,7 +74,7 @@ public class IntAtom implements Atomic {
 
     @Override
     public @NotNull Op op() {
-        return ATOM; //TODO add its own Op
+        return INT;
     }
 
     @Override

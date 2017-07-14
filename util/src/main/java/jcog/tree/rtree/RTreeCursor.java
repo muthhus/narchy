@@ -1,38 +1,54 @@
 package jcog.tree.rtree;
 
+import com.google.common.collect.AbstractIterator;
+import com.google.common.collect.Ordering;
 import jcog.list.FasterList;
 import jcog.util.UniqueRanker;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
 
 public class RTreeCursor<T> {
 
     private final Space<T> space;
-    List<Leaf<T>> starts = new FasterList();
+    List<Leaf<T>> active = new FasterList();
+    int size = 0;
 
-    public RTreeCursor(Space<T> space, HyperRegion start) {
+    public RTreeCursor(Space<T> space) {
         this.space = space;
-        go(start);
     }
 
-    protected void go(HyperRegion region) {
-        starts.clear();
+    public RTreeCursor<T> in(HyperRegion region) {
+
+        this.size = 0;
+        this.active = new FasterList();
+
         space.intersectingNodes(region, (n) -> {
             if (n instanceof Leaf)
-                starts.add((Leaf) n);
+                addLeaf((Leaf) n);
             return true;
         });
-        if (starts.isEmpty() && space.root().isLeaf())
-            starts.add((Leaf)space.root());
+        Node<T, ?> root = space.root();
+        if (active.isEmpty() && root.isLeaf())
+            addLeaf((Leaf) root);
+
+        return this;
+    }
+
+    private void addLeaf(Leaf n) {
+        active.add(n);
+        size += n.size;
     }
 
     public void forEach(Consumer<? super T> each) {
-        starts.forEach(n -> {
+        active.forEach(n -> {
             n.forEach(each);
         });
     }
@@ -41,6 +57,15 @@ public class RTreeCursor<T> {
         FasterList<T> l = new FasterList();
         forEach(l::add);
         return l;
+    }
+
+    @Nullable
+    protected Iterator<T> iterator() {
+
+        if (size == 0)
+            return null;
+
+        return new RCursorIterator<>(active);
     }
 
 
@@ -55,5 +80,69 @@ public class RTreeCursor<T> {
         return l;
     }
 
-    //listSorted(ranking, topN)...
+    public List<T> topSorted(FloatFunction<T> ranker, int max) {
+        return topSorted(new UniqueRanker<>(ranker), max);
+    }
+
+    public List<T> topSorted(Comparator<T> cmp, int max) {
+
+        Iterator<T> iterator = iterator();
+        if (iterator == null) return Collections.emptyList();
+
+        return ordering(cmp).greatestOf(iterator, max);
+    }
+   public List<T> topSorted(Ordering<T> cmp, int max) {
+        return cmp.greatestOf(iterator(), max);
+    }
+
+    public static <T> Ordering<T> ordering(Comparator<T> cmp) {
+        return Ordering.from(cmp);
+    }
+    public static <T> Ordering<T> ordering(FloatFunction<T> cmp) {
+        return Ordering.from(new UniqueRanker<>(cmp));
+    }
+
+    public int size() {
+        return size;
+    }
+
+
+    /** untested */
+    private class RCursorIterator<T> extends AbstractIterator<T> {
+
+        List<Leaf<T>> a;
+        Leaf<T> l;
+        int i = 0, j = 0;
+
+        public RCursorIterator(List<Leaf<T>> active) {
+            this.a = active;
+            this.l = a.get(0);
+        }
+
+        @Override protected T computeNext() {
+            @NotNull T next = l.get(i++);
+            if (i >= l.size) {
+
+                if (a!=null) {
+                    ++j;
+                    i = 0;
+                    l = null;
+                    if (j >= a.size()-1) {
+                        a = null; //no more nodes after this one
+                    } else {
+                        l = a.get(j); //next
+                    }
+
+                } else {
+                    l = null; //no more items in the last node
+                }
+            }
+
+            if (a == null && l == null) {
+                endOfData();
+            }
+
+            return next;
+        }
+    }
 }
