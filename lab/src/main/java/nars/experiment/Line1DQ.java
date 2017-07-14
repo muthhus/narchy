@@ -4,7 +4,7 @@ import jcog.Util;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.test.agent.Line1DSimplest;
 
 public class Line1DQ {
@@ -13,7 +13,7 @@ public class Line1DQ {
     public static void main(String[] args) throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         //n.log();
         n.time.dur(5);
 

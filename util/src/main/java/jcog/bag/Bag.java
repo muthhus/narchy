@@ -312,7 +312,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         if (x == null)
             return ifMissing;
         else
-            return priSafe(x, ifMissing);
+            return priElse(x, ifMissing);
     }
 
     default boolean active(@NotNull V key) {
@@ -321,12 +321,12 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         //return priSafe(key, -1) >= 0;
     }
 
-    default float priSafeOrZero(@NotNull V key) {
-        return priSafe(key, 0);
+    default float priElseZero(@NotNull V key) {
+        return priElse(key, 0);
     }
 
 
-    default float priSafe(@NotNull V key, float valueIfMissing) {
+    default float priElse(@NotNull V key, float valueIfMissing) {
         float p = pri(key);
         return (p == p) ? p : valueIfMissing;
     }
@@ -354,7 +354,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     //@Override abstract public void forEach(final Consumer<? super V> action);
     default float priSum() {
         float[] total = {0};
-        forEach(v -> total[0] = total[0] + priSafe(v, 0));
+        forEach(v -> total[0] = total[0] + priElse(v, 0));
         return total[0];
     }
 
@@ -378,7 +378,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     default float priMin() {
         float[] min = {Float.POSITIVE_INFINITY};
         forEach(b -> {
-            float p = priSafe(b, Float.POSITIVE_INFINITY);
+            float p = priElse(b, Float.POSITIVE_INFINITY);
             if (p < min[0]) min[0] = p;
         });
         float m = min[0];
@@ -393,7 +393,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     default float priMax() {
         float[] max = {Float.NEGATIVE_INFINITY};
         forEach(b -> {
-            float p = priSafe(b, Float.NEGATIVE_INFINITY);
+            float p = priElse(b, Float.NEGATIVE_INFINITY);
             if (p > max[0]) max[0] = p;
         });
         float m = max[0];
@@ -491,7 +491,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     default double[] priHistogram(@NotNull double[] x) {
         int bins = x.length;
         forEach(budget -> {
-            float p = priSafe(budget, 0);
+            float p = priElse(budget, 0);
             int b = Util.bin(p, bins - 1);
             x[b]++;
         });

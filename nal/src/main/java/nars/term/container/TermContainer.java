@@ -169,7 +169,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             forEach(u::add);
             return u;
         } else {
-            return Collections.emptySet();
+            return new UnifiedSet(0);
         }
 //        return new DirectArrayUnenforcedSet<Term>(Terms.sorted(toArray())) {
 //            @Override
@@ -687,10 +687,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    @NotNull
-    static TermContainer the(@NotNull Op op, int dt, @NotNull Term... tt) {
-        return Op.subterms(theTermArray(op, dt, tt));
-    }
+
 
     @NotNull
     static Term[] theTermArray(@NotNull Op op, int dt, @NotNull Term... tt) {
@@ -919,12 +916,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
             Set<Term> xs = /*toSorted*/toSet();
             Set<Term> ys = y./*toSorted*/toSet();
-            forEach(s -> {
-                if (!subst.matchType(s)) {
-                    ys.remove(s);
-                    xs.remove(s);
-                }
-            });
+            xs.removeIf(s -> !subst.matchType(s) && ys.remove(s));
 
             //special case
             {

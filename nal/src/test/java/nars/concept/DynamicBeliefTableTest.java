@@ -7,7 +7,7 @@ import nars.Task;
 import nars.concept.dynamic.DynTruth;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.concept.dynamic.DynamicConcept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +25,7 @@ public class DynamicBeliefTableTest {
 
     @Test
     public void testDynamicConjunction2() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.believe("a:x", 1f, 0.9f);
         n.believe("a:y", 1f, 0.9f);
         n.believe("b:x", 0f, 0.9f);
@@ -39,7 +39,7 @@ public class DynamicBeliefTableTest {
     }
     @Test
     public void testDynamicIntersection() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.believe("a:x", 1f, 0.9f);
         n.believe("a:y", 1f, 0.9f);
         n.believe("a:z", 0f, 0.9f);
@@ -65,7 +65,7 @@ public class DynamicBeliefTableTest {
 
     @Test
     public void testDynamicConjunction3() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.believe("a:x", 1f, 0.9f);
         n.believe("a:y", 1f, 0.9f);
         n.believe("a:z", 1f, 0.9f);
@@ -101,7 +101,7 @@ public class DynamicBeliefTableTest {
 
     @Test
     public void testDynamicConjunction2Temporal() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.believe($("(x)"), (long)0, 1f, 0.9f);
         n.believe($("(y)"), (long)4, 1f, 0.9f);
         n.run(2);
@@ -144,7 +144,7 @@ public class DynamicBeliefTableTest {
 
 
     @Test public void testAnswerTemplateWithVar() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         String c = "(tetris-->(((0,(1,(1))),(0,(0,(1,(0)))))&((1,(0,(1))),(0,(0,(1,(0)))))))";
         n.believe(c);
         n.run(1);

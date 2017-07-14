@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.junit.runner.Description;
@@ -113,7 +113,7 @@ public class TestAggregator extends RunListener {
     }
     public static void main(String[] args) throws Narsese.NarseseException {
         //this.activeTasks = activeTasks;
-        NAR da = new NARBuilder().get();
+        NAR da = new NARS().get();
         //da.memory.realTime();
         NAR nar = da;
         nar.log();

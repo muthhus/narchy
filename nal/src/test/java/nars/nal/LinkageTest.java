@@ -8,7 +8,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;
@@ -38,7 +38,7 @@ public class LinkageTest extends AbstractNALTest {
     @Parameterized.Parameters(name= "{0}")
     public static Iterable<Supplier> configurations() {
         return Lists.newArrayList(() -> {
-            NAR d = new NARBuilder().get();
+            NAR d = new NARS().get();
             //d.nal(6);
             return d;
         });
@@ -430,7 +430,7 @@ public class LinkageTest extends AbstractNALTest {
     @Test
     public void Variable_Normalization_1() throws Exception {
         //this.activeTasks = activeTasks;
-        NAR tester = new NARBuilder().get();
+        NAR tester = new NARS().get();
         String nonsense = "<(&&,<#1 --> M>,<#2 --> M>) ==> <#1 --> nonsense>>";
         tester.believe(nonsense); //.en("If robin is a type of bird then robin can fly.");
         tester.run(1);

@@ -9,7 +9,7 @@ import nars.Narsese;
 import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.gui.Vis;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Termed;
 import nars.time.RealTime;
 import spacegraph.Ortho;
@@ -108,7 +108,7 @@ public class TetriSchool implements Runnable {
 
         NAR n =
                 //NAgents.newAlann();
-                NARBuilder.newMultiThreadNAR(3,
+                NARS.newMultiThreadNAR(3,
                     new RealTime.DS(true)
                 ).startPeriodMS(40).nar;
 

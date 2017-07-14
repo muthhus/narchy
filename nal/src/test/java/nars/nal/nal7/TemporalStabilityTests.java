@@ -3,7 +3,7 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.jetbrains.annotations.NotNull;
@@ -99,39 +99,39 @@ public class TemporalStabilityTests {
     };
 
     @Test public void testTemporalStabilityInh3() throws Narsese.NarseseException {
-        new T1(inheritencer, 1, 2, 5).test(200, new NARBuilder().get());
+        new T1(inheritencer, 1, 2, 5).test(200, new NARS().get());
     }
 
     @Test public void testTemporalStabilityImpl() throws Narsese.NarseseException {
-        new T1(implicator, 1, 2, 5).test(200, new NARBuilder().get());
+        new T1(implicator, 1, 2, 5).test(200, new NARS().get());
     }
     @Test public void testTemporalStabilityProd() throws Narsese.NarseseException {
-        new T1(productor, 1, 2, 5).test(200, new NARBuilder().get());
+        new T1(productor, 1, 2, 5).test(200, new NARS().get());
     }
     @Test public void testTemporalStabilityBiProd() throws Narsese.NarseseException {
-        new T1(biproductor, 1, 2, 5).test(200, new NARBuilder().get());
+        new T1(biproductor, 1, 2, 5).test(200, new NARS().get());
     }
     @Test public void testTemporalStabilityLinkedProd() throws Narsese.NarseseException {
-        new T1(linkedproductor, 1, 2, 5).test(200, new NARBuilder().get());
+        new T1(linkedproductor, 1, 2, 5).test(200, new NARS().get());
     }
 
     @Test public void testTemporalStabilityLinkedInh() throws Narsese.NarseseException {
-        new T1(linkedinh, 1, 2, 5).test(200, new NARBuilder().get());
+        new T1(linkedinh, 1, 2, 5).test(200, new NARS().get());
     }
     @Test public void testTemporalStabilityLinkedImpl() throws Narsese.NarseseException {
-        new T1(linkedimpl, 1, 2, 5).test(200, new NARBuilder().get());
+        new T1(linkedimpl, 1, 2, 5).test(200, new NARS().get());
     }
     @Test public void testTemporalStabilityLinkedTemporalConj() throws Narsese.NarseseException {
-        new T1(linkedTempConj, 1, 2, 5).test(200, new NARBuilder().get());
+        new T1(linkedTempConj, 1, 2, 5).test(200, new NARS().get());
     }
     @Test public void testTemporalStabilityLinkedImplExt() throws Narsese.NarseseException {
-        new T1(linkedimpl, 1, 2, 5).test(200, new NARBuilder().get());
+        new T1(linkedimpl, 1, 2, 5).test(200, new NARS().get());
     }
     @Test public void testTemporalStabilityLinkedImplExt2() throws Narsese.NarseseException {
 
         //Param.DEBUG = true;
 
-        @NotNull NAR n = new NARBuilder().get();
+        @NotNull NAR n = new NARS().get();
         int time = 80;
         T1 a = new T1(linkedimpl, 1, 2, 5, 10);
         T1 b = new T1(linkedinh, 1, 2, 5, 10);

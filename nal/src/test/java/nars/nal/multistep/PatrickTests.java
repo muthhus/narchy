@@ -4,7 +4,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.test.TestNAR;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -163,7 +163,7 @@ public class PatrickTests extends AbstractNALTest {
         the strongest hypothesis based on the last two inputs where neither a nor b "leaded to" c.
          */
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.DEFAULT_BELIEF_PRIORITY = 0.01f;
         n.termVolumeMax.setValue(16);
 
@@ -202,7 +202,7 @@ public class PatrickTests extends AbstractNALTest {
     public void testPixelImage() throws Narsese.NarseseException {
 
         //this.activeTasks = activeTasks;
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         //n.log();
         //n.truthResolution.setValue(0.05f);
         n.termVolumeMax.setValue(60);

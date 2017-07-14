@@ -11,7 +11,7 @@ import nars.gui.NARChart;
 import nars.gui.NARSpace;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
@@ -60,7 +60,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         Param.DEBUG = false;
 
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         //n.DEFAULT_BELIEF_PRIORITY = 0.5f;
         //n.DEFAULT_QUESTION_PRIORITY = 0.5f;
         float fps = 20f;

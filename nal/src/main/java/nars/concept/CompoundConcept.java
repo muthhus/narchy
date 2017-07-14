@@ -91,7 +91,8 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     @NotNull
     @Override
     public Compound term() {
-        return term;
+        return this;
+        //return term;
     }
 
     @Override

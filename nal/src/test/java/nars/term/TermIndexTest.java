@@ -8,7 +8,7 @@ import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MaplikeTermIndex;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.nar.Terminal;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +30,7 @@ public class TermIndexTest {
     @Test
     public void testTaskTermSharing1() throws Narsese.NarseseException {
 
-        NAR t = new NARBuilder().get();
+        NAR t = new NARS().get();
 
         String term = "<a --> b>.";
 
@@ -79,7 +79,7 @@ public class TermIndexTest {
 //    }
     @Ignore @Test public void testTermSharing5c() throws Narsese.NarseseException {
         testIndex(
-                new NARBuilder.BasicTermIndex(1024)
+                new NARS.BasicTermIndex(1024)
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }
@@ -189,7 +189,7 @@ public class TermIndexTest {
     @Test
     public void testRuleTermsAddedToMemoryTermIndex() {
         //this.activeTasks = activeTasks;
-        NAR d = new NARBuilder().get();
+        NAR d = new NARS().get();
         Set<Term> t = new TreeSet();
         d.terms.forEach(x -> t.add(x.term()));
 
@@ -234,7 +234,7 @@ public class TermIndexTest {
     }
 
     public static void testCommonPrefix(boolean direction) {
-        MaplikeTermIndex i = (MaplikeTermIndex)(new NARBuilder().get().terms);
+        MaplikeTermIndex i = (MaplikeTermIndex)(new NARS().get().terms);
         Atomic sui = Atomic.the("substituteIfUnifies");
         Atomic su = Atomic.the("substitute");
 

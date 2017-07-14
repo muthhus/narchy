@@ -3,7 +3,7 @@ package nars.nal.nal8;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import org.junit.Test;
 
 public class OperatorTest {
@@ -16,7 +16,7 @@ public class OperatorTest {
 
         Param.DEBUG = true;
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.log();
         n.input("(slice((a,b,c),2)).");
         n.input("assertEquals(c, slice((a,b,c),add(1,1)));");

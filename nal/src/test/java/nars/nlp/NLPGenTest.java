@@ -2,7 +2,7 @@ package nars.nlp;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.util.NLPGen;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -17,7 +17,7 @@ public class NLPGenTest {
 
     final NLPGen g = new NLPGen();
 
-    NAR n = new NARBuilder().get();
+    NAR n = new NARS().get();
 
     @Test
     public void testSimple1() throws Narsese.NarseseException {

@@ -2,7 +2,7 @@ package nars.nal.nal6;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -57,7 +57,7 @@ public class QueryVariableTest {
 
         AtomicBoolean valid = new AtomicBoolean();
 
-        NAR nar = new NARBuilder().get();
+        NAR nar = new NARS().get();
 
         Compound beliefTerm = compoundOrNull(nar.term(beliefString));
         assertNotNull(beliefTerm);
@@ -84,7 +84,7 @@ public class QueryVariableTest {
 
 
         //this.activeTasks = activeTasks;
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.nal(2);
         n
                 //.log()

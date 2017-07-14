@@ -7,7 +7,7 @@ import nars.Param;
 import nars.Task;
 import nars.bag.leak.Leak;
 import nars.bag.leak.LeakOut;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;
@@ -210,7 +210,7 @@ public class IRCAgent extends IRC {
 
         //Param.DEBUG = true;
 
-        @NotNull NAR n = new NARBuilder().get(); //TODO
+        @NotNull NAR n = new NARS().get(); //TODO
                 //newRealtimeNAR(1024, 25, 2);
 
 

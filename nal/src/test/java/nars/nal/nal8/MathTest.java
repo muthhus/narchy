@@ -4,7 +4,7 @@ package nars.nal.nal8;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import org.junit.Test;
 
 public class MathTest {
@@ -19,7 +19,7 @@ public class MathTest {
     @Test
     public void testImplVarAdd1() throws Narsese.NarseseException {
         Param.DEBUG = true;
-        NAR t = new NARBuilder().get();
+        NAR t = new NARS().get();
         //t.log();
         //t.input("i:{0,1,2,3,4}.");
         //t.input("i:{0,1,2}.");

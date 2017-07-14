@@ -285,11 +285,11 @@ public class Derivation extends Unify implements TermContext {
 
         boolean finish = (this.forEachMatch = eachMatch)!=null;
 
-        boolean result = unify(x, y, !finish, finish);
+        boolean result = unify(x, y, finish);
 
         this.forEachMatch = null;
 
-        return result;
+        return !finish || result;
     }
 
     @Override public final boolean onMatch() {
@@ -297,7 +297,7 @@ public class Derivation extends Unify implements TermContext {
             forEachMatch.test(this);
         } catch (InvalidTermException | InvalidTaskException t) {
             if (Param.DEBUG_EXTRA) {
-                logger.error("Derivation onMatch {}", t.getMessage());
+                logger.error("Derivation onMatch {}", t);
             }
         }
         //return  (--matchesRemain > 0) && ;

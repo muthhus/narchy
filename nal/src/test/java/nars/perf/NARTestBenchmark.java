@@ -2,7 +2,7 @@ package nars.perf;
 
 import com.google.common.collect.Lists;
 import nars.nal.nal1.NAL1Test;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import org.junit.runner.notification.RunNotifier;
 import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.TestClass;
@@ -30,7 +30,7 @@ public class NARTestBenchmark {
     public void testExample() throws InitializationError {
         RunNotifier n = new RunNotifier();
         new BlockJUnit4ClassRunnerWithParametersFactory().createRunnerForTestWithParameters(new TestWithParameters(
-            "x", new TestClass(NAL1Test.class), Lists.newArrayList( (Supplier)(()-> new NARBuilder().get()) )
+            "x", new TestClass(NAL1Test.class), Lists.newArrayList( (Supplier)(()-> new NARS().get()) )
         )).run(n);
     }
 

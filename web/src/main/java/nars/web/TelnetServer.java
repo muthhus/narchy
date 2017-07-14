@@ -16,7 +16,7 @@ import com.googlecode.lanterna.terminal.ansi.TelnetTerminalServer;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.op.Command;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class TelnetServer {
 
 
     static void onConnect(final TelnetTerminal terminal) {
-        NAR nar = new NARBuilder().get();
+        NAR nar = new NARS().get();
         Hear.wiki(nar);
         new TelnetSession(terminal, nar).start();
     }

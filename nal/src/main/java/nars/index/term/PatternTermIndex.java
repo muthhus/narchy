@@ -81,7 +81,7 @@ public class PatternTermIndex extends MapTermIndex {
                 new PatternCompound.PatternCompoundSimple(x, v);
     }
 
-    static protected boolean canBuildConcept(@NotNull Term y) {
+    static boolean canBuildConcept(@NotNull Term y) {
         if (y instanceof Compound) {
             return y.op() != NEG;
         } else {

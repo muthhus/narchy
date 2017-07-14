@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.concept.Concept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -24,7 +24,7 @@ public class ConceptFireTest {
 
     @Test
     public void testConceptFireLinkSelection() throws Narsese.NarseseException {
-        NAR nar = new NARBuilder().get();
+        NAR nar = new NARS().get();
         nar.input("$0.01 a:b."); //low priority so it doesnt affect links
         nar.run(1);
         Concept c = nar.concept("a:b");

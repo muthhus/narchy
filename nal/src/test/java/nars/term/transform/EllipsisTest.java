@@ -12,7 +12,7 @@ import nars.derive.meta.match.EllipsisZeroOrMore;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -50,7 +50,7 @@ public class EllipsisTest {
         default Set<Term> test(int arity, int repeats) throws Narsese.NarseseException {
             Set<Term> selectedFixed = $.newHashSet(arity);
 
-            TermIndex index = new NARBuilder.BasicTermIndex(1024);
+            TermIndex index = new NARS.BasicTermIndex(1024);
 
             Compound y = getMatchable(arity);
             assertNotNull(y);

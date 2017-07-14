@@ -10,7 +10,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.gui.Vis;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.op.stm.STMTemporalLinkage;
 import nars.test.agent.Line1DSimplest;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -114,7 +114,7 @@ public class Line1D {
 
             Optimize<NAR> o = new MeshOptimize<NAR>("d1", () -> {
 
-                NAR n = new NARBuilder().get();
+                NAR n = new NARS().get();
                 n.random().setSeed(System.nanoTime());
 
                 n.time.dur(1);
@@ -181,7 +181,7 @@ public class Line1D {
 //                        new TaskExecutor(256, 0.5f)
 //                );
 //
-                NAR n = new NARBuilder().get();
+                NAR n = new NARS().get();
 
                 new STMTemporalLinkage(n, 2, true);
                 n.time.dur(1);

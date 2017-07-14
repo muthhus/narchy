@@ -357,43 +357,38 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
 
-
         if (ty instanceof Compound) {
+
+            //if (equals(ty)) return true;
 
             Compound y = (Compound) ty;
 
             Op op = op();
 
             int xs;
-            if (op == y.op()) {
+            if (op != y.op())
+                return false;
 
-                TermContainer xsubs = subterms();
-                TermContainer ysubs = y.subterms();
+            TermContainer xsubs = subterms();
+            TermContainer ysubs = y.subterms();
 
-                if ((xs = xsubs.size()) == ysubs.size()) {
+            if ((xs = xsubs.size()) != ysubs.size())
+                return false;
 
-                    if (op.temporal) {
-                        if (!matchTemporalDT(dt(), y.dt(), subst.dur))
-                            return false;
+            if (op.temporal &&!matchTemporalDT(dt(), y.dt(), subst.dur))
+                return false;
 
-                        //fast test for subterm equality because the compound may not be equal (different but matching dt)
-                        if (xsubs.equals(ysubs)) {
-                            return true;
-                        }
-                    }
 
-                    return
-                            isCommutative() ?
-                                    xsubs.unifyCommute(ysubs, subst) :
-                                    xsubs.unifyLinear(ysubs, subst);
-                }
+            //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
+            if (isCommutative()) {
+                return xsubs.unifyCommute(ysubs, subst);
+            } else {
+                return xsubs.equals(ysubs) || xsubs.unifyLinear(ysubs, subst);
             }
 
         } else if (ty instanceof Abbreviation.AliasConcept) {
             Compound abbreviated = ((Abbreviation.AliasConcept) ty).abbr.term();
-            if (abbreviated.equals(this) || unify(abbreviated, subst)) {
-                return true;
-            }
+            return abbreviated.equals(this) || unify(abbreviated, subst);
         }
 
         return false;

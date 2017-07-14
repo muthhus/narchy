@@ -15,11 +15,6 @@ public abstract class GenericNormalizedVariable extends AbstractVariable {
     }
 
 
-
-    public int[] unhashMultiVar() {
-        return new int[] { (hash & 0xff)-1, (((hash >> 8) & 0xff)-1) };
-    }
-
     /** form a unique hash of 2 component variables
      *  this limits # of variables to 127 (or is it the full 255) per term */
     public static int hashMultiVar(int a, int b) {

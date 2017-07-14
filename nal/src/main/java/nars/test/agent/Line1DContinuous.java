@@ -6,7 +6,7 @@ import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.atom.Atomic;
 
 import java.util.Arrays;
@@ -187,7 +187,7 @@ public class Line1DContinuous extends NAgent {
 
     public static void main(String[] args) {
 
-        NAR nar = new NARBuilder().get();
+        NAR nar = new NARS().get();
         nar.termVolumeMax.set(32);
 
 

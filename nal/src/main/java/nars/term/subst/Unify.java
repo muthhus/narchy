@@ -117,22 +117,23 @@ public abstract class Unify implements Termutator, Subst {
         return xy.get(t);
     }
 
-    public final Unify unifyAll(@NotNull Term x, @NotNull Term y) {
-        unify(x, y, false, true);
-        return this;
-    }
 
     protected final void set(@NotNull Term t) {
         xy.putConstant(t, t);
     }
 
+
+
+    public final boolean unifyAll(@NotNull Term x, @NotNull Term y) {
+        return unify(x, y, true);
+    }
     /**
      * unifies the next component, which can either be at the start (true, false), middle (false, false), or end (false, true)
      * of a matching context
      * <p>
      * setting finish=false allows matching in pieces before finishing
      */
-    public boolean unify(@NotNull Term x, @NotNull Term y, boolean start, boolean finish) {
+    public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
         boolean result;
         try {
@@ -192,11 +193,7 @@ public abstract class Unify implements Termutator, Subst {
 
 
     public final boolean unify(@NotNull Term x, @NotNull Term y) {
-
-        return x.equals(y)
-                ||
-                x.unify(y, this)
-                ;
+        return x.unify(y, this);
     }
 
     public final boolean matchType(@NotNull Term y) {

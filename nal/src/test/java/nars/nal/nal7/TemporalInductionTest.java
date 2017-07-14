@@ -3,7 +3,7 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.TaskConcept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.table.BeliefTable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class TemporalInductionTest {
         String task = "<a --> b>. :|:";
         String task2 = "<c --> d>. :|:";
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         //TextOutput.out(n);
 
@@ -38,7 +38,7 @@ public class TemporalInductionTest {
 
     @Test public void testTemporalRevision() throws Narsese.NarseseException {
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.time.dur(6);
 
         n.log();
@@ -73,7 +73,7 @@ public class TemporalInductionTest {
 
     @Test public void testTemporalRevisionOfTemporalRelation() throws Narsese.NarseseException {
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         //TextOutput.out(n);
 
@@ -88,7 +88,7 @@ public class TemporalInductionTest {
     }
     @Test public void testQuestionProjection() throws Narsese.NarseseException {
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         n.log();
 
@@ -111,7 +111,7 @@ public class TemporalInductionTest {
 
     @Test public void testInductionStability() throws Narsese.NarseseException {
         //two entirely disjoint events, and all inductable beliefs from them, should produce a finite system that doesn't explode
-        NAR d = new NARBuilder().get();
+        NAR d = new NARS().get();
         d.input("a:b. :|:");
         d.run(5);
         d.input("c:d. :|:");

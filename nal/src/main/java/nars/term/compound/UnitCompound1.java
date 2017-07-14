@@ -46,11 +46,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 //    }
 
 
-    @NotNull
-    @Override
-    public Term[] toArray() {
-        return new Term[] { sub };
-    }
+
 
     @Override
     public @NotNull Term unneg() {
@@ -58,14 +54,15 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
     @Override
-    public int structure() {
+    public final int structure() {
         return structure;
     }
 
+
+
     @Override
     public void init(@NotNull int[] meta) {
-        sub.init(meta);
-        meta[4]++; //for wrapping it
+        super.init(meta);
         meta[5] |= op.bit;
     }
 
@@ -82,7 +79,7 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     }
 
     @Override
-    public int hashCodeSubTerms() {
+    public final int hashCodeSubTerms() {
         return super.hashCode();
     }
 
@@ -91,12 +88,12 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     public boolean equals(@Nullable Object that) {
         if (this == that) return true;
 
-        if (!(that instanceof Compound)) {
-            return false;
+        if (that instanceof Compound && hash == that.hashCode()) {
+            Compound t = (Compound) that;
+            return (op == t.op()) && (t.size() == 1) && /*&& (t.dt() == DTERNAL) &&*/ sub.equals(t.sub(0));
         }
 
-        Compound t = (Compound) that;
-        return hash == that.hashCode() && (op == t.op()) && (t.size() == 1) && /*&& (t.dt() == DTERNAL) &&*/ sub.equals(t.sub(0));
+        return false;
     }
 
 

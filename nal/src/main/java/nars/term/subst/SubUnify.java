@@ -91,17 +91,17 @@ public class SubUnify extends Unify {
         return false;
     }
 
-    public void tryMatch(@NotNull Term x, @NotNull Term y) {
+    public boolean tryMatch(@NotNull Term x, @NotNull Term y) {
         this.xterm = null;
         this.result = null;
-        unify(x, y, true, true);
+        return unify(x, y, true);
     }
 
     @Nullable
     public Term tryMatch(@Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
         this.xterm = xterm;
         this.result = null;
-        unify(x, y, true, true);
+        unify(x, y, true);
         return result;
     }
 

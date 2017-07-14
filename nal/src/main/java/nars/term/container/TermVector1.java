@@ -30,6 +30,13 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
+    public void init(@NotNull int[] meta) {
+        sub.init(meta);
+        meta[4]++; //for wrapping it
+    }
+
+
+    @Override
     public int hashCode() {
         return hash1;
     }
@@ -37,9 +44,9 @@ public class TermVector1 implements TermContainer {
     @Override
     public boolean equals(@NotNull Object obj) {
         if (this == obj) return true;
-        if (obj instanceof TermContainer) {
+        if (obj instanceof TermContainer && hash1== obj.hashCode()) {
             TermContainer t = (TermContainer) obj;
-            if (hash1 == t.hashCode() && t.size()==1 && sub.equals(t.sub(0)))
+            if (t.size() == 1 && sub.equals(t.sub(0)))
                 return true;
         }
         return false;
@@ -53,12 +60,12 @@ public class TermVector1 implements TermContainer {
     @NotNull
     @Override
     public Term[] toArray() {
-        return new Term[] {sub};
+        return new Term[]{sub};
     }
 
     @Override
     public final @NotNull Term sub(int i) {
-        if (i!=0)
+        if (i != 0)
             throw new ArrayIndexOutOfBoundsException();
         return sub;
     }
@@ -78,13 +85,19 @@ public class TermVector1 implements TermContainer {
         return i == 0 && sub.equals(x);
     }
 
-    /** vol and complexity are reported as if they were already part of an enclosing Compound */
-    @Override public int volume() {
+    /**
+     * vol and complexity are reported as if they were already part of an enclosing Compound
+     */
+    @Override
+    public int volume() {
         return sub.volume() + 1;
     }
 
-    /** vol and complexity are reported as if they were already part of an enclosing Compound */
-    @Override public int complexity() {
+    /**
+     * vol and complexity are reported as if they were already part of an enclosing Compound
+     */
+    @Override
+    public int complexity() {
         return sub.complexity() + 1;
     }
 
@@ -98,7 +111,9 @@ public class TermVector1 implements TermContainer {
         return 1;
     }
 
-    @Override @NotNull public Set<Term> toSet() {
+    @Override
+    @NotNull
+    public Set<Term> toSet() {
         return Sets.mutable.of(sub);
     }
 
@@ -113,7 +128,8 @@ public class TermVector1 implements TermContainer {
         return "(" + sub + ')';
     }
 
-    @Override public void recurseTerms(@NotNull Consumer<Term> v) {
+    @Override
+    public void recurseTerms(@NotNull Consumer<Term> v) {
         sub.recurseTerms(v);
     }
 
@@ -148,7 +164,7 @@ public class TermVector1 implements TermContainer {
 
     @Override
     public void forEach(@NotNull Consumer<? super Term> action, int start, int stop) {
-        if (start != 0 || stop!= 0)
+        if (start != 0 || stop != 0)
             throw new ArrayIndexOutOfBoundsException();
         forEach(action);
     }
@@ -171,7 +187,9 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public boolean OR(@NotNull Predicate<Term> p) { return p.test(sub);    }
+    public boolean OR(@NotNull Predicate<Term> p) {
+        return p.test(sub);
+    }
 
     @Override
     public boolean AND(@NotNull Predicate<Term> p) {
@@ -202,7 +220,6 @@ public class TermVector1 implements TermContainer {
     public int vars() {
         return sub.vars();
     }
-
 
 
 }

@@ -9,8 +9,8 @@ import nars.Param;
 import nars.concept.Concept;
 import nars.concept.GoalActionConcept;
 import nars.gui.Vis;
-import nars.nar.NARBuilder;
 import nars.nar.NARS;
+import nars.nar.MultiNAR;
 import nars.task.DerivedTask;
 import nars.task.NALTask;
 import nars.term.Compound;
@@ -40,7 +40,7 @@ public class MIDI {
     float volume[] = new float[128];
 
     public MIDI() throws LineUnavailableException {
-        NARS nar = NARBuilder.newMultiThreadNAR(3,
+        MultiNAR nar = NARS.newMultiThreadNAR(3,
                 new RealTime.DS(true).durFPS(10f)
         );
         nar.termVolumeMax.setValue(16);

@@ -7,7 +7,7 @@ import jcog.pri.PriReference;
 import jcog.pri.Priority;
 import nars.*;
 import nars.concept.PermanentConcept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.Variable;
@@ -445,7 +445,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
 
 
     public static void main(String[] args) throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         Compressor c = new Compressor(n, "_", 4, 8, 0.5f, 8, 32);
 
         n.onTask(x -> {

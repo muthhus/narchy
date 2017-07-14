@@ -296,13 +296,13 @@ public class IO {
         } else {
 
             Compound c = (Compound) term;
-            writeTermContainer(out, c.subterms());
+            writeTermContainer(out, c);
             writeCompoundSuffix(out, c, o);
 
         }
     }
 
-    public static void writeTermContainer(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
+    static void writeTermContainer(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
         int siz = c.size();
 
         out.writeByte(siz);

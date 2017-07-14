@@ -2,7 +2,7 @@ package nars.nal.multistep;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import org.junit.Test;
 
 /**
@@ -12,7 +12,7 @@ public class STRIPSTest {
 
     @Test
     public void testBanana1() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.log();
         n.input(
                 /*

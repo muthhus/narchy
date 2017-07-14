@@ -2,7 +2,7 @@ package nars.nal.nal8;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.time.Tense;
 import org.junit.Test;
 
@@ -42,7 +42,7 @@ public class QuestTest {
 
     public void testQuest(boolean goalFirst, int timeBetween, int timeAfter) throws Narsese.NarseseException {
         //Param.DEBUG = true;
-        final NAR nar = new NARBuilder().get();
+        final NAR nar = new NARS().get();
         //nar.log();
 
         AtomicBoolean valid = new AtomicBoolean(false);

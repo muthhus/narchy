@@ -2,7 +2,7 @@ package nars.op.java;
 
 import jcog.tree.interval.IntervalTree;
 import nars.*;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.op.in.ChangedTextInput;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
@@ -34,7 +34,7 @@ public class Predict_NARS_Core {
         float discretization = 7f;
 
         //this.activeTasks = activeTasks;
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         //n.shortTermMemoryHistory.set(3);
         //n.param.duration.set(duration);
         //n.param.noiseLevel.set(0);

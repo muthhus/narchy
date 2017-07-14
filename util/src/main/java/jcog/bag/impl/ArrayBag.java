@@ -99,13 +99,13 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     /**
      * returns true unless failed to add during 'add' operation or becomes empty
+     * call within synchronized
      */
     @Override
     protected boolean updateItems(@Nullable Y toAdd) {
 
         int c = capacity();
         List<Y> pendingRemoval = null;
-        boolean result;
         int additional = (toAdd != null) ? 1 : 0;
 
         int s = size();
@@ -115,34 +115,29 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         int needsRemoved = nextSize - c;
         if (needsRemoved > 0) {
 
-            synchronized (items) {
-                pendingRemoval = new FasterList(needsRemoved);
-                clean(toAdd, s, nextSize - c, pendingRemoval);
-            }
+            pendingRemoval = new FasterList(needsRemoved);
+            clean(toAdd, s, nextSize - c, pendingRemoval);
 
 
             pendingRemoval.forEach(this::onRemoved); //execute outside of synchronization
 
+            s = size();
 
         }
 
 
         if (toAdd != null) {
-            int ss = size();
-            if (ss < c) {
-                synchronized (items) {
-                    items.add(toAdd, this);
-                }
-                result = true;
+            if (s < c) {
+                items.add(toAdd, this);
+
+                return true;
             } else {
                 //throw new RuntimeException("list became full during insert");
-                result = false;
+                return false;
             }
         } else {
-            result = size() > 0;
+            return s > 0;
         }
-
-        return result;
     }
 
     private void clean(@Nullable Y toAdd, int s, int minRemoved, List<Y> trash) {
@@ -193,11 +188,11 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
 
     static boolean cmpGT(@Nullable Object o1, @Nullable Object o2) {
-        return cmpGT((Prioritized)o1, (Prioritized)o2);
+        return cmpGT((Prioritized) o1, (Prioritized) o2);
     }
 
     static boolean cmpGT(@Nullable Object o1, @Nullable float o2) {
-        return cmpGT((Prioritized)o1, o2);
+        return cmpGT((Prioritized) o1, o2);
     }
 
     /**
@@ -244,9 +239,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     }
 
 
-
-
-
     /**
      * iterates in sorted order, descending
      */
@@ -278,19 +270,18 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             Object[] ll = oo;
             if (s == 1) {
                 //get the only
-                kontinue.test((Y)ll[0]);
+                kontinue.test((Y) ll[0]);
             } else if (s == max) {
                 //get all
                 for (int i = 0; i < s; i++) {
-                    if (!kontinue.test((Y)ll[i]))
+                    if (!kontinue.test((Y) ll[i]))
                         break;
                 }
             } else if (s > 1) {
                 //get some: choose random starting index, get the next consecutive values
                 max = Math.min(s, max);
                 for (int i =
-                     (this instanceof CurveBag ? rng(s) : 0 )
-                     , m = 0; m < max; m++) {
+                     (this instanceof CurveBag ? rng(s) : 0), m = 0; m < max; m++) {
                     Y lll = (Y) ll[i++];
                     if (lll != null)
                         if (!kontinue.test(lll))
@@ -357,65 +348,67 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 //    }
 
     @Override
-    public final Y put(@NotNull Y b, @Nullable MutableFloat overflow) {
+    public final Y put(@NotNull final Y x, @Nullable final MutableFloat overflow) {
 
-        float p = priSafeOrZero(b);
+        final float p = priElseZero(x);
         if (p < Pri.EPSILON)
             return null;
 
-        float[] incoming = {p};
+        float[] incomingPri = {-p};
 
-        final boolean[] isNew = {false};
 
-        X key = key(b);
-        Y v = map.compute(key, (kk, existing) -> {
-            Y res;
+        X key = key(x);
 
-            if (existing != null) {
-                //MERGE
-                res = existing;
-                float oo = existing != b ? mergeFunction.merge(
-                        (Priority) /* HACK */ existing, b)
-                        : incoming[0] /* all of it if identical */;
-                if (oo > Pri.EPSILON) {
-                    incoming[0] -= oo; //release any unabsorbed pressure
-                    if (overflow != null) overflow.add(oo);
-                }
+        Y y = map.merge(key, x, (existing, incoming) -> {
 
-            } else {
-                //NEW
+            incomingPri[0] *= -1; //upright
 
-                if (size() >= capacity && incoming[0] < priMinFast(-1)) {
-                    res = null; //failed insert
-                } else {
-                    isNew[0] = true;
-                    res = b;
-                }
+            float oo = existing != incoming ?
+                            mergeFunction.merge((Priority) existing /* HACK */, incoming)
+                                :
+                            incomingPri[0] /* all of it if identical */;
+
+            if (oo >= Pri.EPSILON) {
+                incomingPri[0] -= oo; //release any unabsorbed pressure
             }
 
-            return res;
+            return existing;
         });
 
-        pressurize(incoming[0]);
+        if (incomingPri[0] < 0) {
 
-        if (v == null) {
-            return null; //rejected
-        }
+            pressurize(p); //absorb pressure even if it's about to get removed
 
-        if (isNew[0]) {
-            boolean added = updateItems(v); //attempt new insert
-            if (!added) {
-                map.remove(key);
-                return null; //reject
-            } else {
-                onAdded(v);
+            synchronized(items) {
+                //check if it can actually exist here
+                if ((size() >= capacity && p < priMinFast(-1)) || !updateItems(y)) {
+                    map.remove(key);
+                    return null;
+                }
             }
 
+            onAdded(y);
+            return y;
+
         } else {
-            unsorted.set(true); //merging may have shifted ordering, so sort later
+
+            float activated = incomingPri[0];
+
+            if (activated >= Pri.EPSILON) {
+
+                unsorted.set(true); //merging may have shifted ordering, so sort later
+
+                pressurize(activated);
+
+                if (overflow != null) {
+                    float oo = p - activated;
+                    if (oo >= Pri.EPSILON)
+                        overflow.add(oo);
+                }
+            }
         }
 
-        return v;
+        return y;
 
     }
 
@@ -499,19 +492,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 //        unsorted.set(true);
 //        sort();
 //    }
-
-    protected void sort() {
-        int s = size();
-        if (s > 1 && items.list.length > 1) {
-            synchronized (items) {
-                Object[] a = items.list;
-                if (a.length > 1) { //test again
-                    int[] stack = new int[sortSize(s) /* estimate */];
-                    qsort(stack, a, 0 /*dirtyStart - 1*/, (s - 1));
-                }
-            }
-        }
-    }
 
     static int sortSize(int s) {
         //TODO get a better calculation; this is an estimate, probably some ~log2(size) relationship
@@ -624,25 +604,25 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         ensureSorted();
 
         Object[] x = items.array();
-        if (x.length > 0) {
-            for (Object a : (x)) {
-                if (a != null) {
-                    Y b = (Y) a;
-                    float p = b.pri();
-                    if (p == p) {
-                        action.accept(b);
-                        if (--max <= 0)
-                            break;
-                    }
+        for (Object a : (x)) {
+            if (a != null) {
+                Y b = (Y) a;
+                float p = b.pri();
+                if (p == p) {
+                    action.accept(b);
+                    if (--max <= 0)
+                        break;
                 }
-
             }
+
+
         }
 
     }
 
     @Override
     public void forEachKey(@NotNull Consumer<? super X> each) {
+
         forEach(x -> each.accept(key(x)));
     }
 
@@ -677,7 +657,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                     Prioritized swap = (Prioritized) c[j];
                     i = j - 1;
                     float swapV = pCmp(swap);
-                    while (i >= left && cmpGT((Prioritized)c[i], swapV)) {
+                    while (i >= left && cmpGT((Prioritized) c[i], swapV)) {
                         swap(c, i + 1, i);
                         i--;
                     }
@@ -711,7 +691,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 float tempV = pCmp(temp);
 
                 while (true) {
-                    while (i < cLenMin1 && cmpLT((Prioritized)c[++i], tempV)) ;
+                    while (i < cLenMin1 && cmpLT((Prioritized) c[++i], tempV)) ;
                     while (cmpGT(c[--j], tempV)) ;
                     if (j < i) {
                         break;
@@ -786,17 +766,26 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         return super.toString() + '{' + items.getClass().getSimpleName() + '}';
     }
 
-    protected void ensureSorted() {
+    void ensureSorted() {
         if (unsorted.compareAndSet(true, false)) {
-            sort();
+
+            Object[] il = items.list;
+            if (il.length > 1) {
+                synchronized (items) {
+                    final int s = size();
+                    if (s > 1) { //test again
+                        int[] stack = new int[sortSize(s) /* estimate */];
+                        qsort(stack, il, 0 /*dirtyStart - 1*/, (s - 1));
+                    }
+                }
+            }
         }
     }
 
     @Override
     public float priMax() {
-        Y y;
         ensureSorted();
-        y = items.first();
+        Y y = items.first();
         return y != null ? y.priSafe(0) : 0f;
     }
 

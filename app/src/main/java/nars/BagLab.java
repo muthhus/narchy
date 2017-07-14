@@ -82,7 +82,7 @@ public class BagLab  {
 
                         Object val = ((AtomicReferenceArray) m).get(i);
                         if (val != null)
-                            p = bag.priSafe(val, 0);
+                            p = bag.priElse(val, 0);
                     }
                 }
                 Draw.colorBipolar(gl, p);

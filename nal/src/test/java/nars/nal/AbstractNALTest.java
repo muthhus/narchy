@@ -3,7 +3,7 @@ package nars.nal;
 import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.op.stm.STMTemporalLinkage;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
@@ -31,8 +31,8 @@ public abstract class AbstractNALTest {
     protected AbstractNALTest() {
         //this.nar = null;
 
-        NAR n = new NARBuilder().get();
-        n.termVolumeMax.setValue(24);
+        NAR n = new NARS().get();
+        n.termVolumeMax.setValue(32);
         //n.nal(level);
 //                    n.DEFAULT_BELIEF_PRIORITY = 0.5f;
 //                    n.DEFAULT_GOAL_PRIORITY = 0.5f;
@@ -90,7 +90,7 @@ public abstract class AbstractNALTest {
 
 
         l.add(supply("Default[NAL<=" + level + ']', () -> {
-                    NAR n = new NARBuilder().get();
+                    NAR n = new NARS().get();
                     n.termVolumeMax.setValue(30);
                     n.nal(level);
 //                    n.DEFAULT_BELIEF_PRIORITY = 0.5f;

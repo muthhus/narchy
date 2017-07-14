@@ -173,9 +173,7 @@ public interface Termlike extends Termed {
 
 
     default boolean unifyPossible(@Nullable Op t) {
-        return (t == Op.VAR_PATTERN) ?
-                (varPattern() > 0) :
-                hasAny(t == null ? Op.VariableBits : t.bit);
+        return (t == null) ? hasAny(Op.VariableBits) : hasAny(t);
     }
 
     /** used to decide if a compound is "potentially" dynamic, or

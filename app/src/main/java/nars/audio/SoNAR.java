@@ -5,7 +5,7 @@ import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.audio.Audio;
@@ -208,7 +208,7 @@ public class SoNAR extends TimerTask {
     }
 
     public static void main(String[] args) throws LineUnavailableException, InterruptedException, Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         //n.log();
         n.input("a:b. :|: (--,b:c). c:d. d:e. (--,e:f). f:g. b:f. a:g?");

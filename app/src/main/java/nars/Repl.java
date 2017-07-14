@@ -1,7 +1,7 @@
 package nars;
 
 import jcog.Util;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import org.fusesource.jansi.AnsiConsole;
 import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
@@ -121,7 +121,7 @@ public class Repl {
         //Default e = new Default();
         //new InterNAR2(e, 15000);
 
-        NAR d = new NARBuilder().get();
+        NAR d = new NARS().get();
         //InterNAR2 ii = new InterNAR2(d, 15001);
         //ii.connect("tcp://localhost:15000");
 

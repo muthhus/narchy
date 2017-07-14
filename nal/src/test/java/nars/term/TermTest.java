@@ -18,7 +18,7 @@ package nars.term;
 
 import nars.*;
 import nars.concept.Concept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.nar.Terminal;
 import nars.term.atom.Atomic;
 import nars.term.container.ArrayTermVector;
@@ -367,7 +367,7 @@ public class TermTest {
 
         Term a = n.term(s).term();
 
-        NAR n2 = new NARBuilder().get();
+        NAR n2 = new NARS().get();
         Term b = n.term(s).term();
 
         //assertTrue(a != b);
@@ -442,7 +442,7 @@ public class TermTest {
         String s = "(&&, <<$1 --> key> ==> <#2 --> (/, open, $1, _)>>, <#2 --> lock>)";
         Termed a = n.term(s);
 
-        NAR n2 = new NARBuilder().get();
+        NAR n2 = new NARS().get();
         Termed b = n2.term(s);
 
         //assertTrue(a != b);

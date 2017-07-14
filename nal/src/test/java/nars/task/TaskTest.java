@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.nar.Terminal;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;
@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 public class TaskTest {
 
     @Test public void testTenseEternality() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         String s = "<a --> b>.";
 
@@ -118,7 +118,7 @@ public class TaskTest {
 
     @Test
     public void inputTwoUniqueTasksDef() throws Narsese.NarseseException {
-        inputTwoUniqueTasks(new NARBuilder().get());
+        inputTwoUniqueTasks(new NARS().get());
     }
     /*@Test public void inputTwoUniqueTasksSolid() {
         inputTwoUniqueTasks(new Solid(4, 1, 1, 1, 1, 1));
@@ -159,7 +159,7 @@ public class TaskTest {
 
         //Param.DEBUG = true;
         //this.activeTasks = activeTasks;
-        NAR d = new NARBuilder().get();
+        NAR d = new NARS().get();
         //d.log();
         d.nal(2);
         d.input("<a --> b>.", "<b --> c>.");

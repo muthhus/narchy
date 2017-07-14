@@ -3,7 +3,7 @@ package nars.test;
 import nars.$;
 import nars.NAR;
 import nars.Param;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -97,7 +97,7 @@ public class DeductiveMeshTest {
 
 
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         //n.nal(5);
         n.logBudgetMin(System.out, 0.1f);
 

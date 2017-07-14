@@ -7,7 +7,7 @@ import nars.Narsese;
 import nars.Param;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.MapTermIndex;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.time.RealTime;
 import nars.time.Tense;
 import nars.util.exe.TaskExecutor;
@@ -80,7 +80,7 @@ public class InterNARTest {
     }
 
     private static NAR newNAR() {
-        return new NARBuilder().index(new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024))).time(new RealTime.DSHalf(true))
+        return new NARS().index(new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024))).time(new RealTime.DSHalf(true))
                 .exe(new TaskExecutor(256, 512)).get();
     }
 

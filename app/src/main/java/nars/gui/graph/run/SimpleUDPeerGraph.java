@@ -9,7 +9,7 @@ import nars.concept.Concept;
 import nars.control.ConceptFire;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
@@ -29,7 +29,7 @@ public class SimpleUDPeerGraph {
 
     public static void main(String[] args) throws IOException {
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         int population = 256;
 

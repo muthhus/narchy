@@ -4,7 +4,7 @@ package nars.term;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.test.analyze.EventCount;
 import org.junit.Test;
 
@@ -19,15 +19,15 @@ public class NALLevelTest {
     public void testLevel1vs8() throws Narsese.NarseseException {
         Param.DEBUG = true;
 
-        NAR nDefault = new NARBuilder().get();
+        NAR nDefault = new NARS().get();
         assertEquals(Param.DEFAULT_NAL_LEVEL, nDefault.level());
 
-        NAR n1 = new NARBuilder().get();
+        NAR n1 = new NARS().get();
         n1.nal(1);
         EventCount n1Count = new EventCount(n1);
         assertEquals(1, n1.level());
 
-        NAR n8 = new NARBuilder().get();
+        NAR n8 = new NARS().get();
         n8.nal(8);
         EventCount n8Count = new EventCount(n8);
 

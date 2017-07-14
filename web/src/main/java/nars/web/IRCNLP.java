@@ -7,7 +7,7 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.*;
 import nars.bag.leak.LeakOut;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -294,7 +294,7 @@ public class IRCNLP extends IRC {
 
         //Param.DEBUG = true;
 
-        NAR n = NARBuilder.newMultiThreadNAR(2, new RealTime.DSHalf(true));
+        NAR n = NARS.newMultiThreadNAR(2, new RealTime.DSHalf(true));
 
         n.termVolumeMax.setValue(32);
 

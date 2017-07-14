@@ -3,8 +3,8 @@ package nars;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.gui.Vis;
-import nars.nar.NARBuilder;
 import nars.nar.NARS;
+import nars.nar.MultiNAR;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.truth.Truth;
@@ -101,7 +101,7 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        NARS n = NARBuilder.newMultiThreadNAR(4, clock);
+        MultiNAR n = NARS.newMultiThreadNAR(4, clock);
 
         NAgent a = init.apply(n);
         //a.trace = true;
@@ -176,14 +176,14 @@ abstract public class NAgentX extends NAgent {
         return new MatrixView((i) -> nar.causes.get(i).value(), s, (int)Math.max(1, Math.sqrt(s)), bipolar1);
     }
 
-    private static void chart(NARS n, NAgent a) {
+    private static void chart(MultiNAR n, NAgent a) {
         window(new NARSView(n, a), 600, 600);
     }
 
     public static class NARSView extends Grid {
 
 
-        public NARSView(NARS n, NAgent a) {
+        public NARSView(MultiNAR n, NAgent a) {
             super(
                     //new MixBoard(n, n.in),
                     //new MixBoard(n, n.nalMix), //<- currently dont use this it will itnerfere with the stat collection

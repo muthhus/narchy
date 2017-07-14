@@ -1,7 +1,7 @@
 package nars.rdfowl;
 
 import nars.NAR;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
 import org.junit.Ignore;
@@ -21,7 +21,7 @@ public class NQuadsRDFTest {
 
     @Test
     public void test1() throws Exception {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         //n.stdout();
         NQuadsRDF.input(n, "<http://example.org/#spiderman> <http://xmlns.com/foaf/0.1/name> \"Человек-паук\"@ru .");
         n.run(1);
@@ -34,7 +34,7 @@ public class NQuadsRDFTest {
 
         //Multi nar = new Multi(3,512,
         Executioner e = new TaskExecutor(128, 512);
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 //                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
 //                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
 //                new CycleTime(), e

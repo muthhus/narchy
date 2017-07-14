@@ -118,7 +118,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
      * @return whether unification succeeded
      */
     default boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        return false;
+        return equals(y);
     }
 
 
@@ -342,14 +342,14 @@ public interface Term extends Termlike, Comparable<Termlike> {
             Compound cx = (Compound) this;
             Compound cy = (Compound) y;
 
-            TermContainer cxx = cx.subterms();
-            TermContainer cyy = cy.subterms();
+//            TermContainer cxx = cx.subterms();
+//            TermContainer cyy = cy.subterms();
 
-            if (!cxx.equals(cyy)) {
-                int c = TermContainer.compare(cxx, cyy);
+            //if (!cx.equals(cy)) {
+                int c = TermContainer.compare(cx, cy);
                 if (c != 0)
                     return c;
-            }
+            //}
 
             return Integer.compare(cx.dt(), cy.dt());
 

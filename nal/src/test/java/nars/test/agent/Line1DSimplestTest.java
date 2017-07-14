@@ -4,7 +4,7 @@ import jcog.list.FasterList;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import org.junit.Ignore;
@@ -30,7 +30,7 @@ public class Line1DSimplestTest {
         float c = 0.9f;
 
         //this.activeTasks = activeTasks;
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.termVolumeMax.setValue(8);
 
         int BETWEEN = 32;
@@ -91,7 +91,7 @@ public class Line1DSimplestTest {
     @Test
     public void testSimple1() throws Narsese.NarseseException {
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
 
         Line1DSimplest a = new Line1DSimplest(n);
@@ -131,7 +131,7 @@ public class Line1DSimplestTest {
 
         Param.ANSWER_REPORTING = false;
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         n.truthResolution.setValue(0.01f);
         n.termVolumeMax.setValue(16);
@@ -197,7 +197,7 @@ public class Line1DSimplestTest {
 
 
         //this.activeTasks = activeTasks;
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
 
 
@@ -308,7 +308,7 @@ public class Line1DSimplestTest {
         Param.DEBUG = true;
 
         //this.activeTasks = activeTasks;
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.on("say", (op, args, nar) -> {
             if (!(args[0] instanceof Variable))
                 try {

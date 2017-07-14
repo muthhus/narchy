@@ -8,7 +8,7 @@ import nars.$;
 import nars.InterNAR;
 import nars.NAR;
 import nars.NARLoop;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.op.Command;
 import nars.term.Term;
 import nars.time.RealTime;
@@ -101,7 +101,7 @@ public class NARWeb extends WebServer {
 
 
         NAR nar =
-                NARBuilder.newMultiThreadNAR(3, new RealTime.DSHalf(false));
+                NARS.newMultiThreadNAR(3, new RealTime.DSHalf(false));
 
         //nar.log();
 

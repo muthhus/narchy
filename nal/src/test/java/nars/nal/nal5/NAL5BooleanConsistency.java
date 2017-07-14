@@ -2,7 +2,7 @@ package nars.nal.nal5;
 
 import nars.*;
 import nars.concept.Concept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ public class NAL5BooleanConsistency {
 
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++) {
-                NAR d = new NARBuilder().get();
+                NAR d = new NARS().get();
                 d.nal(7);
                 d.termVolumeMax.setValue(24);
 

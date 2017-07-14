@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.concept.Concept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.time.Tense;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class NAL6MultistepTest {
 //                query(burglary).
 //                query(earthquake).
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         //d.log();
         n.input(
                 "(burglary). %0.7;0.9%",
@@ -81,7 +81,7 @@ public class NAL6MultistepTest {
 //                query(burglary).
 //                query(earthquake).
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         //d.log();
         n.input(
                 "(burglary).   %0.7;0.9%",

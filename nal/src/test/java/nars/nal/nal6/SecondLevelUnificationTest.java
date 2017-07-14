@@ -2,7 +2,7 @@ package nars.nal.nal6;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import org.junit.Test;
 
 /**
@@ -14,7 +14,7 @@ public class SecondLevelUnificationTest {
     @Test
     public void test1() throws Narsese.NarseseException {
         //this.activeTasks = activeTasks;
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         //n.log();
 //        n.eventTaskRemoved.on(t -> {
@@ -29,7 +29,7 @@ public class SecondLevelUnificationTest {
     @Test
     public void test2() throws Narsese.NarseseException {
         //this.activeTasks = activeTasks;
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         //n.log();
 //        n.eventTaskRemoved.on(t -> {

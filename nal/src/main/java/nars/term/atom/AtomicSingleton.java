@@ -40,7 +40,8 @@ public class AtomicSingleton extends Atom {
 
     @Override
     public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        throw new UnsupportedOperationException("AtomicSingleton leak");
+        return this == y;
+        //throw new UnsupportedOperationException("AtomicSingleton leak");
         //return false;
     }
 

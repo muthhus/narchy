@@ -2,7 +2,7 @@ package nars.budget;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ public class TaskBudgetingTest {
     public void structuralDeduction1() throws Narsese.NarseseException {
 
 
-        NAR d = new NARBuilder().get();
+        NAR d = new NARS().get();
 
 
         d.log();

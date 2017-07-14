@@ -90,11 +90,11 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     }
 
-    @Override
-    public void start(NAR nar) {
-        super.start(nar);
-        //nar.onCycle(this::cleanUp);
-    }
+//    @Override
+//    public void start(NAR nar) {
+//        super.start(nar);
+//        //nar.onCycle(this::cleanUp);
+//    }
 
 //private static final long cleanPeriod = 16 /* cycles */;
 //    protected void cleanUp() {

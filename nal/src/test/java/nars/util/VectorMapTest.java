@@ -2,7 +2,7 @@ package nars.util;
 
 import jcog.learn.Autoencoder;
 import nars.NAR;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.util.data.UniformVector;
 import nars.util.data.VectorMap;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ import org.junit.Test;
 public class VectorMapTest {
 
     @NotNull
-    NAR n = new NARBuilder().get();
+    NAR n = new NARS().get();
 
     @Test
     public void testUniformVector() {

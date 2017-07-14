@@ -3,7 +3,7 @@ package nars.nal;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 
 /**
  * Created by me on 1/28/16.
@@ -117,7 +117,7 @@ public class TuffySmokesTest {
         //Global.DEBUG = true;
 
         //this.activeTasks = activeTasks;
-        n = new NARBuilder().get();
+        n = new NARS().get();
         //n.conceptActivation.setValue(0.75f);
         //n.conceptRemembering.setValue(12);
 

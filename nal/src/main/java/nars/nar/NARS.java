@@ -1,457 +1,530 @@
 package nars.nar;
 
-
-import jcog.Loop;
-import jcog.Util;
-import nars.$;
+import jcog.learn.lstm.SimpleLSTM;
+import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
-import nars.NARLoop;
+import nars.Param;
+import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.map.CaffeineIndex;
-import nars.task.ITask;
+import nars.index.term.TermIndex;
+import nars.index.term.map.MapTermIndex;
+import nars.op.mental.Inperience;
+import nars.op.stm.MySTMClustered;
+import nars.op.stm.STMTemporalLinkage;
+import nars.time.CycleTime;
 import nars.time.Time;
 import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
+import org.apache.commons.math3.util.MathArrays;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Random;
-import java.util.TreeMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
+import static jcog.Texts.n2;
+import static jcog.Texts.n4;
+import static nars.Op.BELIEF;
 
-/**
- * recursive cluster of NAR's
- * <sseehh> any hierarchy can be defined including nars within nars within nars
- * <sseehh> each nar runs in its own thread
- * <sseehh> they share concepts
- * <sseehh> but not the importance of concepts
- * <sseehh> each one has its own concept attention
- * <sseehh> link attention is currently shared but ill consider if this needs changing
- */
-public class NARS extends NAR {
+public class NARS {
+
+    private @NotNull Supplier<TermIndex> concepts = () ->
+            //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
+            new NARS.BasicTermIndex(16 * 1024 )
+    ;
 
 
-    public final List<SubExecutor> sub = $.newArrayList();
-    public int num;
+    private @NotNull Time time = new CycleTime();
 
-    //private AffinityExecutor pool;
-    private List<Loop> loops;
-    private ExecutorService pool;
+    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 64, 0.5f);
 
-    NARS(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e) {
+    private final Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 
-//                  @Override
-//                  protected void onBeforeRemove(Concept c) {
-//
-//                      //victimize neighbors
-//                      PriReference<Term> mostComplex = c.termlinks().maxBy((x -> x.get().volume()));
-//                      if (mostComplex!=null) shrink(mostComplex.get());
-//
-//                      PriReference<Task> mostComplexTa = c.tasklinks().maxBy((x -> x.get().volume()));
-//                      if (mostComplexTa!=null) shrink(mostComplexTa.get());
-//
-//                  }
-//
-//                  private void shrink(Term term) {
-//                      Concept n = nar.concept(term);
-//                      if (n != null) {
-//                          shrink(n);
-//                      }
-//                  }
-//
-//                  private void shrink(Task task) {
-//                      Concept n = task.concept(nar);
-//                      if (n != null) {
-//                          shrink(n);
-//                      }
-//                  }
-//
-//                  private void shrink(Concept n) {
-//                      int ntl = n.termlinks().capacity();
-//                      if (ntl > 0) {
-//                          n.termlinks().setCapacity(ntl - 1);
-//                      }
-//                  }
-//
-//
+    public static MultiNAR newMultiThreadNAR(int threads, Time clock) {
+//        Default nar =
+//                NARBuilder.newMultiThreadNAR(1, clock, true);
+        MultiNAR n = new MultiNAR(clock, new XorShift128PlusRandom(), 1);
 
-              }, e, time,
-            //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
-                rng);
-    }
-
-//    @Override
-//    protected PSinks newInputMixer() {
-//        MixContRL<ITask> r = new MixContRL<>(20f,
-//                null,
-//
-//                FloatAveraged.averaged(emotion.happy.sumIntegrator()::sumThenClear, 1),
-//
-//                8,
-//
-//                new EnumClassifier("type", new String[]{
-//                        "Belief", "Goal", "Question", "Quest",
-//                        "ConceptFire"
-//                }, (x) -> {
-//
-//                    if (x instanceof NALTask) {
-//                        //NAL
-//                        switch (((Task) x).punc()) {
-//                            case BELIEF:
-//                                return 0;
-//                            case GOAL:
-//                                return 1;
-//                            case QUESTION:
-//                                return 2;
-//                            case QUEST:
-//                                return 3;
-//                        }
-//                    } else if (x instanceof ConceptFire) {
-//                        return 4;
-//                    }
-//
-//                    return -1;
-//                }),
-//
-//                new EnumClassifier("complexity", 3, (t) -> {
-//                    if (t instanceof NALTask) {
-//                        int c = ((NALTask) t).
-//                                volume();
-//                                //complexity();
-////                        int m = termVolumeMax.intValue();
-////                        assert(m > 5);
-//                        if (c < 5) return 0;
-//                        if (c < 10) return 1;
-//                        return 2;
-//                    }
-//                    return -1;
-//                }),
-//
-//                new EnumClassifier("when", new String[]{"Present", "Future", "Past"}, (t) -> {
-//                    if (t instanceof NALTask) {
-//                        long now = time();
-//                        int radius = 2;
-//                        long h = ((NALTask) t).nearestStartOrEnd(now);
-//                        if (Math.abs(h - now) <= dur() * radius) {
-//                            return 0; //present
-//                        } else if (h > now) {
-//                            return 1; //future
-//                        } else {
-//                            return 2; //past
-//                        }
-//                    }
-//                    return -1;
-//                }, true)
-//
-////            new MixRouter.Classifier<>("original",
-////                    (x) -> x.stamp().length <= 2),
-////            new MixRouter.Classifier<>("unoriginal",
-////                    (x) -> x.stamp().length > 2),
-//        );
-//
-//        r.setAgent(
-//                new NARMixAgent<>(new NARBuilder()
-//                        .index(
-//                                new HijackTermIndex(new DefaultConceptBuilder(), 8*1024, 3)
-//                                //new CaffeineIndex(new DefaultConceptBuilder(), -1, MoreExecutors.newDirectExecutorService())
-//                        ).get(), r, this)
-//
-//                //new HaiQMixAgent()
-//
-//                //new MultiHaiQMixAgent()
-//        );
-//
-//        return r;
-//    }
+//        DefaultConceptState conceptState = (DefaultConceptState) ((DefaultConceptBuilder) n.terms.conceptBuilder()).awake();
+//        conceptState.beliefsMaxTemp.set(32);
+//        conceptState.goalsMaxTemp.set(32);
 
 
-//    @Override
-//    public void input(@NotNull ITask partiallyClassified) {
-//        ((MixContRL) in).test(partiallyClassified);
-//        super.input(partiallyClassified);
-//    }
+        n.confMin.setValue(0.01f);
+        n.truthResolution.setValue(0.01f);
 
-    /**
-     * default implementation convenience method
-     */
-    public void addNAR(int conceptCapacity, int taskCapacity, float conceptRate) {
-        synchronized (sub) {
-            SubExecutor x = new SubExecutor(conceptCapacity, taskCapacity, conceptRate);
-            sub.add(x);
-            num = sub.size();
+        n.beliefConfidence(0.9f);
+        n.goalConfidence(0.5f);
+
+
+        n.DEFAULT_BELIEF_PRIORITY = 1;
+        n.DEFAULT_GOAL_PRIORITY = 1;
+        n.DEFAULT_QUESTION_PRIORITY = 1;
+        n.DEFAULT_QUEST_PRIORITY = 1;
+        n.termVolumeMax.setValue(32);
+
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
+        MySTMClustered stm = new MySTMClustered(n, 256, BELIEF, 3, true, 16f);
+        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
+        Inperience inp = new Inperience(n, 0.01f, 4);
+
+        for (int i = 0; i < threads; i++) {
+            n.addNAR(512, 1024, 0.1f);
         }
+
+//        n.onTask(t -> {
+//           if (t instanceof DerivedTask && t.isBeliefOrGoal()) {
+//               n.emotion.happy(t.conf()/(threads * 300)); //learned something
+//           }
+//        });
+
+        return n;
     }
 
 
-    private static class RootExecutioner extends Executioner implements Runnable {
+    public NARS index(@NotNull TermIndex concepts) {
+        this.concepts = () -> concepts;
+        return this;
+    }
 
-        private final int passiveThreads;
+    public NARS time(@NotNull Time time) {
+        this.time = time;
+        return this;
+    }
 
-        public ForkJoinTask lastCycle;
+    public NARS exe(Executioner exe) {
+        this.exe = () -> exe;
+        return this;
+    }
 
-        final ForkJoinPool passive;
+    public NAR get() {
+        return new NAR(concepts.get(), exe.get(), time, rng.get());
+    }
 
-        public RootExecutioner(int passiveThreads) {
-            this.passiveThreads = passiveThreads;
-            passive = new ForkJoinPool(passiveThreads, defaultForkJoinWorkerThreadFactory,
-                    null, true /* async */);
+    class NARTune implements Runnable {
+        private final NAR nar;
+        final static int outputs = 4, inputs = outputs;
+        private final SimpleLSTM net;
+
+        double[] prev, next, predict;
+        private final float alpha = 0.05f;
+
+        public NARTune(NAR nar) {
+
+            this.nar = nar;
+
+            prev = new double[inputs];
+            next = new double[outputs];
+            predict = new double[outputs];
+
+            this.net = new SimpleLSTM(nar.random(), inputs, outputs, /* estimate: */ inputs * outputs * 2);
+
+            nar.onCycle(this);
 
         }
 
-
-        @Override
-        public void runLater(Runnable cmd) {
-            passive.execute(cmd);
-        }
-
-        @Override
-        public boolean run(@NotNull ITask x) {
-            NARS nar = (NARS) this.nar;
-            int sub =
-                    //random.nextInt(num);
-                    Math.abs(Util.hashWangJenkins(x.hashCode())) % nar.num;
-            //apply(x);
-            return nar.sub.get(sub).run(x);
-        }
-
-
-//        public void apply(CLink<? extends ITask> x) {
-//            if (x!=null && !x.isDeleted()) {
-//                x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
-//            }
-//        }
-
-        @Override
-        public void stop() {
-            lastCycle = null;
-            super.stop();
-        }
-
-        final AtomicBoolean busy = new AtomicBoolean(false);
-
-        @Override
-        public void cycle(@NotNull NAR nar) {
-
-
-//            int waitCycles = 0;
-//            while (!passive.isQuiescent()) {
-//                Util.pauseNext(waitCycles++);
-//            }
-
-            if (!busy.compareAndSet(false, true))
-                return; //already in the cycle
-
-            ((NARS) nar).nextCycle();
-            try {
-
-                if (lastCycle != null) {
-                    //System.out.println(lastCycle + " " + lastCycle.isDone());
-                    if (!lastCycle.isDone()) {
-                        long start = System.currentTimeMillis();
-                        lastCycle.join(); //wait for lastCycle's to finish
-                        System.out.println("cycle lag: " + (System.currentTimeMillis() - start) + "ms");
-                    }
-
-                    lastCycle.reinitialize();
-                    passive.execute(lastCycle);
-
-                    ((NARS) nar).nextCycle();
-
-                } else {
-                    lastCycle = passive.submit(this);
-                }
-            } finally {
-                busy.set(false);
-            }
-        }
-
-        /**
-         * dont call directly
-         */
         @Override
         public void run() {
-            nar.eventCycleStart.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
-        }
+            double[] current = new double[outputs];
+            current[0] = nar.emotion.learningVol();
+            current[1] = nar.emotion.busyVol.getMean() / Param.COMPOUND_VOLUME_MAX;
+            current[2] = nar.emotion.busyPri.getMean();
+            current[3] = nar.emotion.confident.getMean();
 
-        @Override
-        public int concurrency() {
-            return passiveThreads + 2; //TODO calculate based on # of sub-NAR's but definitely is concurrent so we add 1 here in case passive=1
-        }
+            double error = MathArrays.distance1(predict, current);
 
-        @Override
-        public boolean concurrent() {
-            return true;
-        }
+            double[] predictNext = net.learn(prev, current, alpha);
 
-        @Override
-        public void forEach(Consumer<ITask> each) {
-            ((NARS) nar).sub.forEach(s -> s.forEach(each));
-        }
+            System.out.println(n2(error) + " err\t" + n4(prev) + " -|> " + n4(current) + " ->? " + n4(predictNext));
 
-    }
-
-    protected void nextCycle() {
-//        if (!((HijackMemoize)truthCache).isEmpty()) {
-//            System.out.println("Truth Cache: " + truthCache.summary());
-//        } else {
-//            truthCache.summary(); //HACK to call stat reset
-//        }
-//
-//        truthCache.clear();
-    }
-
-//    /** temporary 1-cycle old cache of truth calculations */
-//    final Memoize<Pair<Termed, ByteLongPair>, Truth> truthCache =
-//            new HijackMemoize<>(2048, 3,
-//                    k -> {
-//                        Truth x = super.truth(k.getOne(), k.getTwo().getOne(), k.getTwo().getTwo());
-//                        if (x == null)
-//                            return Truth.Null;
-//                        return x;
-//                    }
-//            );
-//
-//    @Override
-//    public @Nullable Truth truth(@Nullable Termed concept, byte punc, long when) {
-//        Pair<Termed, ByteLongPair> key = Tuples.pair(concept, PrimitiveTuples.pair(punc, when));
-//        Truth t = truthCache.apply(key);
-//        if (t == Truth.Null) {
-//            return null;
-//        }
-//        return t;
-//        //return truthCache.computeIfAbsent(key, k -> super.truth(k.getOne(), k.getTwo().getOne(), k.getTwo().getTwo()));
-//        //return super.truth(concept, punc, when);
-//    }
-
-
-    class SubExecutor extends TaskExecutor {
-        public SubExecutor(int conceptCapacity, int inputTaskCapacity, float exePct) {
-            super(conceptCapacity, inputTaskCapacity, exePct);
-        }
-
-//        @Override
-//        protected void actuallyRun(CLink<? extends ITask> x) {
-//
-//            super.actuallyRun(x);
-//
-//            ((RootExecutioner) exe).apply(x); //apply gain after running
-//
-//        }
-
-        @Override
-        protected void actuallyFeedback(ITask x, ITask[] next) {
-            if (next != null)
-                NARS.this.input(next); //through post mix
-        }
-
-        @Override
-        public void runLater(@NotNull Runnable r) {
-            pool.execute(r); //use the common threadpool
-        }
-
-        public Loop start() {
-            start(NARS.this);
-            Loop l = new Loop(0) {
-                @Override
-                public boolean next() {
-                    flush();
-                    return true;
-                }
-            };
-            return l;
+            System.arraycopy(predictNext, 0, predict, 0, outputs);
+            System.arraycopy(current, 0, prev, 0, outputs);
         }
     }
 
+    /**
+     * suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution
+     */
+    public static class BasicTermIndex extends MapTermIndex {
 
-    public NARS(@NotNull Time time, @NotNull Random rng, int passiveThreads) {
-        this(time, rng, new RootExecutioner(passiveThreads));
-    }
-
-
-    @Override
-    public NARLoop startPeriodMS(int ms) {
-        assert (!this.loop.isRunning());
-
-        synchronized (terms) {
-
-            exe.start(this);
-
-            int num = sub.size();
-
-            this.pool = Executors.newFixedThreadPool(num);
-
-            //((ThreadPoolExecutor)pool).getThreadFactory().
-            //self().toString();
-
-            this.loops = $.newArrayList(num);
-            sub.forEach(s -> loops.add(s.start()));
-
-            loops.forEach(pool::execute);
+        public BasicTermIndex(int capacity) {
+            this(capacity, new DefaultConceptBuilder());
         }
 
-        return super.startPeriodMS(ms);
-    }
-
-    @Override
-    public void stop() {
-        synchronized (terms) {
-            if (!this.loop.isRunning())
-                return;
-
-            super.stop();
-
-            loops.forEach(Loop::stop);
-            this.loops = null;
-
-            this.pool.shutdownNow();
-            this.pool = null;
-
+        public BasicTermIndex(int capacity, ConceptBuilder cb) {
+            super(
+                    cb,
+                    new HashMap<>(capacity/*, 0.9f*/)
+                    //new UnifiedMap(capacity, 0.9f),
+                    //new UnifiedMap(capacity, 0.9f)
+                    //new ConcurrentHashMap<>(capacity),
+                    //new ConcurrentHashMap<>(capacity)
+                    //new ConcurrentHashMapUnsafe(capacity)
+            );
         }
     }
-
-    public TreeMap<String, Object> stats() {
-        synchronized (terms) {
-            TreeMap<String, Object> m = new TreeMap();
-
-            m.put("now", new Date());
-
-            m.put("terms", terms.summary());
-            return m;
-        }
-    }
-
-//    public static void main(String[] args) {
-//
-//        NARS n = new NARS(
-//                new RealTime.DSHalf(true),
-//                new XorShift128PlusRandom(1), 2);
-//
-//
-//        n.addNAR(2048);
-//        n.addNAR(2048);
-//
-//        //n.log();
-//
-//        new DeductiveMeshTest(n, 5, 5);
-//
-//        n.start();
-//
-//        for (int i = 0; i < 10; i++) {
-//            System.out.println(n.stats());
-//            Util.sleep(500);
-//        }
-//
-//        n.stop();
-//    }
-//
-
 }
+
+
+//        if (threads == -1)
+//            threads = 1;
+//                    //(int) Math.ceil(Runtime.getRuntime().availableProcessors()-2);
+//
+//        Executioner exe = new TaskExecutor(128);
+////                threads == 1 ?
+////                        new BufferedSynchronousExecutor() :
+////                        new MultiThreadExecutor(threads,2);
+//
+//        //exe = new InstrumentedExecutor(exe, 8);
+//
+//
+//        final int reprobes = 3;
+//
+//        //Multi nar = new Multi(3,512,
+//        DefaultConceptBuilder cb = new DefaultConceptBuilder(
+//                new DefaultConceptState("sleep", 16, 16, 3, 24, 16),
+//                new DefaultConceptState("awake", 32, 32, 3, 24, 16)
+//        ) {
+//            @Override
+//            public <X> X withBags(Term t, BiFunction<Bag<Term, PriReference<Term>>, Bag<Task, PriReference<Task>>, X> f) {
+//                Bag<Term, PriReference<Term>> termlink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+//                Bag<Task, PriReference<Task>> tasklink = new DefaultHijackBag<>(DefaultConceptBuilder.DEFAULT_BLEND, reprobes);
+//                return f.apply(termlink, tasklink);
+//            }
+//
+//            @NotNull
+//            @Deprecated @Override
+//            public <X> Bag<X, PriReference<X>> newBag(@NotNull Map m, PriMerge blend) {
+//                return new DefaultHijackBag<>(blend, reprobes);
+//            }
+//        };
+//
+//
+//        int maxConcepts = 192 * 1024;
+//
+//
+//        Default nar = new Default(
+//
+//                //new HijackTermIndex(cb, maxConcepts, reprobes)
+//
+//                //new NullTermIndex(cb)
+//
+//                new CaffeineIndex(cb, /* -1 */ maxConcepts * 6 /* by weight */, -1, exe)
+//                    //null /* null = fork join common pool */
+//
+//
+////              new TreeTermIndex(new DefaultConceptBuilder(), 300000, 32 * 1024, 3)
+//                ,time,
+//                exe) {
+//
+////            @Override
+////            public Bag<Concept,PLink<Concept>> newConceptBag(int initialCapacity) {
+////                return new PLinkHijackBag(initialCapacity, reprobes);
+////            }
+//
+////            @Override
+////            public Deriver newDeriver() {
+////                //return new InstrumentedDeriver((TrieDeriver) (DefaultDeriver.the));
+////                return Deriver.get("induction.nal", "nal6.nal");
+////            }
+//
+////            @Override
+////            public PreferSimpleAndPolarized newDerivationBudgeting() {
+////                return new PreferSimpleAndPolarized() {
+////                    @Override
+////                    public Priority budget(@NotNull Derivation d, @NotNull Compound conclusion, @Nullable Truth truth, byte punc, long start, long end) {
+////                        Priority p = super.budget(d, conclusion, truth, punc, start, end);
+////                        if (start!=ETERNAL && start >= dur() + time()) {
+////                            p.priMult(2);
+////                        }
+////                        return p;
+////                    }
+////                };
+////            }
+//
+//
+//            //            @Override
+////            public MatrixPremiseBuilder newPremiseBuilder() {
+////                return new MatrixPremiseBuilder() {
+////                    @Override
+////                    public @NotNull Premise newPremise(@NotNull Termed c, @NotNull Task task, Term beliefTerm, Task belief, float pri, float qua) {
+////                        return new PreferSimpleAndConfidentPremise(c, task, beliefTerm, belief, pri, qua) {
+////                            @Override
+////                            protected float priFactor(Compound conclusion, @Nullable Truth truth, byte punc, Task task, Task belief) {
+////                                float p = super.priFactor(conclusion, truth, punc, task, belief);
+////
+////                                if (punc == GOAL)
+////                                    return 1f;
+////
+////                                switch (conclusion.op()) {
+////                                    case NEG:
+////                                        throw new RuntimeException("shouldnt happen");
+////
+////                                    case INH:
+////                                        if (Op.isOperation(conclusion))
+////                                            p *= 1f;
+////                                        else
+////                                            p *= 0.8f;
+////                                        break;
+////
+////                                    case CONJ:
+////                                        if (conclusion.vars() > 0)
+////                                            p*=1f;
+////                                        else
+////                                            p*=0.8f;
+////                                        break;
+////
+////                                    case EQUI:
+////                                    case IMPL:
+////                                        p *= 1f;
+////                                        break;
+////                                    default:
+////                                        p *= 0.8f;
+////                                        break;
+////                                }
+////                                return p;
+////                            }
+////                        };
+////                    }
+////                };
+////            }
+//
+////            final static int COMPRESS_ABOVE_COMPLEXITY = 16;
+////            final Compressor compressor = new Compressor(this, "_",
+////                    4, 20,
+////                    0.25f, 64, 16);
+////
+////            @Override
+////            public Task pre(@NotNull Task t) {
+////                if (!t.isInput() && t.volume() > COMPRESS_ABOVE_COMPLEXITY) {
+////                    return compressor.encode(t);
+////                } else {
+////                    //@NotNull Task encoded = compressor.encode(t);
+//////                    if (!encoded.equals(t))
+//////                        process(t); //input both forms
+////                    //return encoded;
+////
+////                    return t; //dont affect input
+////                }
+////            }
+////
+////            @NotNull
+////            @Override
+////            public Term pre(@NotNull Term t) {
+////                if (t.volume() > COMPRESS_ABOVE_COMPLEXITY)
+////                    return compressor.encode(t);
+////                else
+////                    return t;
+////            }
+////
+////            @NotNull
+////            @Override
+////            public Task post(@NotNull Task t) {
+////                return compressor.decode(t);
+////            }
+////
+////            @Override
+////            @NotNull
+////            public Term post(@NotNull Term t) {
+////                return compressor.decode(t);
+////            }
+////
+////
+//        };
+//
+//        nar.beliefConfidence(0.9f);
+//        nar.goalConfidence(0.9f);
+//
+//        //nar.stmLinkage.capacity.set(0);
+//
+//        nar.confMin.setValue(0.01f);
+//        nar.truthResolution.setValue(0.01f);
+//        float p = 1f;
+//        nar.DEFAULT_BELIEF_PRIORITY = 0.75f * p;
+//        nar.DEFAULT_GOAL_PRIORITY = 1f * p;
+//        nar.DEFAULT_QUESTION_PRIORITY = 0.5f * p;
+//        nar.DEFAULT_QUEST_PRIORITY = 0.5f * p;
+//        nar.termVolumeMax.setValue(72);
+//
+//        //NARTune tune = new NARTune(nar);
+//
+//        MySTMClustered stm = new MySTMClustered(nar, 64, BELIEF, 3, true, 16);
+//        MySTMClustered stmGoal = new MySTMClustered(nar, 32, GOAL, 2, true, 16);
+//
+////        Abbreviation abbr = new Abbreviation(nar, "the",
+////                4, 16,
+////                0.02f, 32);
+//
+//        //new Inperience(nar, 0.25f, 6);
+//
+////        //causal accelerator
+////        nar.onTask(t -> {
+////
+////            switch (t.op()) {
+////                case IMPL:
+////                    //decompose with Goal:Induction
+////                    if (t.isBelief()) {
+////                        Term subj = t.term(0);
+////                        Term pred = t.term(1);
+////                        if (pred instanceof Compound && (subj.vars() == 0) && (pred.vars() == 0)) {
+////                            Concept postconditionConcept = nar.concept(pred);
+////
+////                            //if (pred.equals(a1.term()) || pred.equals(a2.term())) {
+////                            boolean negate = false;
+////                            if (subj.op() == NEG) {
+////                                subj = subj.unneg();
+////                                negate = true;
+////                            }
+////                            Concept preconditionConcept = nar.concept(subj);
+////                            if (preconditionConcept != null) {
+////
+////                                int dt = t.dt();
+////                                if (dt == DTERNAL)
+////                                    dt = 0;
+////
+////                                for (long when : new long[]{t.occurrence(),
+////                                        nar.time(), nar.time() + 1, nar.time() + 2 //, nar.time() + 200, nar.time() + 300}
+////                                }) {
+////
+////                                    if (when == ETERNAL)
+////                                        continue;
+////
+////                                    //TODO project, not just eternalize for other times
+////                                    Truth tt = when != t.occurrence() ? t.truth().eternalize() : t.truth();
+////
+////                                    if (!(postconditionConcept instanceof SensorConcept)) {
+////                                        {
+////                                            Task preconditionBelief = preconditionConcept.beliefs().top(when);
+////                                            if (preconditionBelief != null) {
+////                                                Truth postcondition = BeliefFunction.Deduction.apply(preconditionBelief.truth().negated(negate), tt, nar, nar.confMin.floatValue());
+////                                                if (postcondition != null) {
+////                                                    Task m = new GeneratedTask(pred, '.', postcondition.truth())
+////                                                            .evidence(Stamp.zip(t, preconditionBelief))
+////                                                            .budget(t.budget())
+////                                                            .time(nar.time(), when + dt)
+////                                                            .log("Causal Accel");
+////                                                    nar.inputLater(m);
+////                                                }
+////                                            }
+////                                        }
+////                                        {
+////                                            Task preconditionGoal = preconditionConcept.goals().top(when);
+////                                            if (preconditionGoal != null) {
+////                                                Truth postcondition = GoalFunction.Induction.apply(preconditionGoal.truth().negated(negate), tt, nar, nar.confMin.floatValue());
+////                                                if (postcondition != null) {
+////                                                    Task m = new GeneratedTask(pred, '!', postcondition.truth())
+////                                                            .evidence(Stamp.zip(t, preconditionGoal))
+////                                                            .budget(t.budget())
+////                                                            .time(nar.time(), when + dt)
+////                                                            .log("Causal Accel");
+////                                                    nar.inputLater(m);
+////                                                }
+////                                            }
+////                                        }
+////                                    }
+////                                }
+////                            }
+////                            //}
+////                        }
+////                    }
+////                    break;
+////            }
+////        });
+//
+//
+//        return nar;
+
+
+//    static NAR newALANN(@NotNull Time time, int cores, int coreSize, int coreFires, int coreThreads, int auxThreads) {
+//
+//        Executioner exe = auxThreads == 1 ? new SynchronousExecutor() {
+//            @Override public int concurrency() {
+//                return auxThreads + coreThreads;
+//            }
+//        } : new MultiThreadExecutioner(auxThreads, 1024 * auxThreads).sync(false);
+//
+//        NAR n = new NAR(time,
+//                    new CaffeineIndex(new DefaultConceptBuilder(), 128 * 1024, false, exe),
+//                        //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 512 * 1024, 1024 * 32, 3),
+//                    new XorShift128PlusRandom(1),
+//                    exe
+//        );
+//
+//        new STMTemporalLinkage(n, 2);
+//
+//        n.setControl(new AlannControl(n, cores, coreSize, coreFires, coreThreads));
+//
+//        return n;
+//    }
+
+//    NAR get();
+//
+//    //Control getControl(NAR n);
+//    //n.setControl(getControl(n));
+//
+//    Executioner getExec();
+//
+//    Time getTime();
+//
+//    TermIndex getIndex();
+//
+//    Random getRandom();/* {
+//        return new XorShift128PlusRandom(1);
+//    }*/
+
+//    class MutableNARBuilder implements NARBuilder {
+//
+//
+//        private Executioner exec;
+//        private Time time;
+//        private TermIndex index;
+//        private Random rng;
+//
+//        @Override
+//        public NAR get() {
+//            NAR n = new NAR(getTime(), getIndex(), getRandom(), getExec());
+//
+//            return n;
+//        }
+//
+//        public MutableNARBuilder exec(Executioner exec) {
+//            this.exec = exec;
+//            return this;
+//        }
+//
+//        public MutableNARBuilder time(Time time) {
+//            this.time = time;
+//            return this;
+//        }
+//
+//        public MutableNARBuilder index(TermIndex index) {
+//            this.index = index;
+//            return this;
+//        }
+//
+//        public MutableNARBuilder random(Random rng) {
+//            this.rng = rng;
+//            return this;
+//        }
+//
+//        @Override
+//        public Executioner getExec() {
+//            return exec;
+//        }
+//
+//        @Override
+//        public Time getTime() {
+//            return time;
+//        }
+//
+//        @Override
+//        public TermIndex getIndex() {
+//            return index;
+//        }
+//
+//        @Override
+//        public Random getRandom() {
+//            return rng;
+//        }
+//    }
+

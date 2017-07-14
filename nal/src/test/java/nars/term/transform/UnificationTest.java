@@ -2,7 +2,7 @@ package nars.term.transform;
 
 import nars.*;
 import nars.index.term.PatternTermIndex;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -11,7 +11,6 @@ import nars.test.TestNAR;
 import nars.util.signal.RuleTest;
 import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -25,43 +24,42 @@ import static org.junit.Assert.*;
  */
 public class UnificationTest {
 
-    private TestNAR t;
     final static int cycles = 1;
-
-    @Before
-    public void start() {
-        t = new TestNAR(
-                //new Terminal()
-                new NARBuilder().get() //TODO return to using Terminal as a demo of its minimal functionality
-        );
-    }
-
-    public TestNAR test() {
-        return t;
-    }
+//
+//    @Before
+//    public void start() {
+//        t = new TestNAR(
+//                //new Terminal()
+//                new NARBuilder().get() //TODO return to using Terminal as a demo of its minimal functionality
+//        );
+//    }
+//
+//    public TestNAR test() {
+//        return t;
+//    }
 
 
     @NotNull
     Unify test(@NotNull Op type, @NotNull String s1, @NotNull String s2, boolean shouldSub) {
 
         //Param.DEBUG = true;
-        TestNAR test = test();
-        NAR nar = test.nar;
+
+        NAR nar = new NARS().get();
 
 
         Termed t1;
 
         try {
 
+            Compound ps1 = nar.terms.termRaw(s1);
+
             if (type == Op.VAR_PATTERN) {
-
-                //special handling
-                t1 = new PatternTermIndex().pattern($.$(s1));
-
+                t1 = new PatternTermIndex().pattern(ps1); //special handling
             } else {
                 nar.question(s1);
-                t1 = nar.conceptualize(nar.term(s1));
+                t1 = nar.conceptualize(ps1);
             }
+
             assertNotNull(t1);
 
             nar.question(s2);
@@ -71,10 +69,12 @@ public class UnificationTest {
             Termed t2 = nar.concept(s2);
             assertNotNull(t2);
             Set<Term> t1u = ((Compound) t1).recurseTermsToSet(type);
+            assertTrue(t1u.size() > 0);
             Set<Term> t2u = ((Compound) t2).recurseTermsToSet(type);
+            assertTrue(t2u.size() == 0);
 
-            int n1 = Sets.difference(t1u, t2u).size();
-            int n2 = Sets.difference(t2u, t1u).size();
+            int n1 = t1u.size(); //Sets.difference(t1u, t2u).size();
+//            int n2 = Sets.difference(t2u, t1u).size();
 
             //a somewhat strict lower bound
             //int power = 4 * (1 + t1.volume() * t2.volume());
@@ -82,7 +82,6 @@ public class UnificationTest {
 
             AtomicBoolean subbed = new AtomicBoolean(false);
 
-            final Termed finalT = t1;
             Unify sub = new Unify($.terms, type,
                     nar.random(), Param.UnificationStackMax, Param.UnificationTTLMax) {
 
@@ -99,14 +98,14 @@ public class UnificationTest {
                             return true;
                         });
 
-                        if ((t2 instanceof Compound) && (finalT instanceof Compound)) {
+                        if ((t2 instanceof Compound) && (t1 instanceof Compound)) {
                             if (/*((n2) <= (yx.size())*/
                                     (n1) <= (xy.size())) {
                                 subbed.set(true);
 
-                            } else {
+                            } /*else {
                                 System.out.println("incomplete:\n\t" + xy);
-                            }
+                            }*/
                         } else {
                             subbed.set(true);
                         }
@@ -121,7 +120,7 @@ public class UnificationTest {
                         //assertFalse("match found but should not have", true);
                     }
 
-                    return false;
+                    return false; //done
                 }
             };
             sub.unifyAll(t1.term(), t2.term());
@@ -544,7 +543,7 @@ public class UnificationTest {
     public void posNegQuestion() {
         //((p1, (--,p1), task("?")), (p1, (<BeliefNegation --> Truth>, <Judgment --> Punctuation>)))
         //  ((a:b, (--,a:b), task("?")), (a:b, (<BeliefNegation --> Truth>, <Judgment --> Punctuation>)))
-        RuleTest.get(test(),
+        RuleTest.get(new TestNAR(new NARS().get()),
                 "a:b?", "(--,a:b).",
                 "a:b.",
                 0, 0, 0.9f, 0.9f);
@@ -693,7 +692,7 @@ public class UnificationTest {
 
     @Test
     public void ellipsisCommutiveRepeat2_a() {
-        //no X which can match exactly in both
+        //b, c, d -  which can match exactly in both
         test(Op.VAR_PATTERN,
                 "{{a, %X..+}, {z, %X..+}}",
                 "{{a, b, c, d}, {z, b, c, d}}", true);
@@ -867,7 +866,7 @@ public class UnificationTest {
 
     void testIntroduction(String subj, Op relation, String pred, String belief, @NotNull String concl) {
 
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.nal(6);
 
         new TestNAR(n)

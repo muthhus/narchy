@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 abstract public class PatternCompound extends GenericCompound {
 
@@ -313,7 +315,7 @@ abstract public class PatternCompound extends GenericCompound {
             //);
             //public final boolean matchEllipsedCommutative(@NotNull Compound X, @NotNull Ellipsis Xellipsis, @NotNull Compound Y) {
 
-            Set<Term> xFree = $.newHashSet(0); //Global.newHashSet(0);
+            SortedSet<Term> xFree = new TreeSet();//$.newHashSet(0); //Global.newHashSet(0);
 
             //constant terms which have been verified existing in Y and will not need matched
             Set<Term> alreadyInY = $.newHashSet(0);
@@ -324,11 +326,13 @@ abstract public class PatternCompound extends GenericCompound {
 
             int s = size();
             int dir = subst.random.nextBoolean() ? +1 : -1;
-            int i = subst.random.nextInt(s);
-            int ik = i;
+            int ik = subst.random.nextInt(s);
             for (int k = 0; k < s; k++, ik += dir) {
-                if (ik < 0) ik += s;
-                else ik = ik % s;
+
+                //loop
+                if (ik == -1) ik = s-1;
+                else if (ik == s) ik = 0;
+
                 Term x = sub(ik);
 
                 //boolean xVar = x.op() == type;
@@ -367,7 +371,7 @@ abstract public class PatternCompound extends GenericCompound {
 
             }
 
-            Set<Term> yFree = y.toSet();
+            SortedSet<Term> yFree = y.toSortedSet();
 
             if (ellipsisMatched) {
                 //Xellipsis = null;
@@ -375,9 +379,11 @@ abstract public class PatternCompound extends GenericCompound {
             } else {
 
                 if (!yFree.isEmpty()) {
-                    yFree.removeIf(alreadyInY::contains);
+                    if (!alreadyInY.isEmpty())
+                        yFree.removeIf(alreadyInY::contains);
 
-                    xFree.removeIf(yFree::remove); //eliminated
+                    if (!yFree.isEmpty())
+                        xFree.removeIf(yFree::remove); //eliminated
                 }
 
                 int numRemainingForEllipsis = yFree.size() - xFree.size();
@@ -403,7 +409,8 @@ abstract public class PatternCompound extends GenericCompound {
                     return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
                 case 1:
                     Term theFreeX = xFree.iterator().next();
-                    if (yFree.size() == 1) return subst.putXY(theFreeX, yFree.iterator().next());
+                    if (yFree.size() == 1)
+                        return subst.putXY(theFreeX, yFree.iterator().next());
                     else {
                         subst.termutes.add(new Choose1(ellipsis, theFreeX, yFree));
                         return true;

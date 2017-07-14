@@ -12,7 +12,10 @@ public final class CommonVariable extends GenericNormalizedVariable {
         super(type, hashMultiVar(a, b));
     }
 
-    @Override public int opX() { return Term.opX(op(), 1 /* different from normalized variables with a subOp of 0 */);    }
+    @Override
+    public int opX() {
+        return Term.opX(op(), 1 /* different from normalized variables with a subOp of 0 */);
+    }
 
     public static @NotNull Variable common(@NotNull Variable A, @NotNull Variable B) {
 
@@ -63,13 +66,13 @@ public final class CommonVariable extends GenericNormalizedVariable {
             //one or both of these will not fit in a normalized variable,
             //so default to a String-based generic variable
             return $.v(A.op(),
-                    A.toString().substring(1) /* remove leading variable char */  +
+                    A.toString().substring(1) /* remove leading variable char */ +
                             B.toString()
             );
             //throw new RuntimeException("variable oob");
         }
 
-        assert(a!=b);
+        assert (a != b);
 
         //lexical ordering: swap
         if (b > a) {
@@ -80,11 +83,25 @@ public final class CommonVariable extends GenericNormalizedVariable {
 
         Op type = A.op();
 
-        assert(B.op()==type);
+        assert (B.op() == type);
 
 
-            return new CommonVariable(type, a, b);
+        return new CommonVariable(type, a, b);
 
+    }
+
+    public boolean common(@NotNull Term y) {
+        int h = y.hashCode();
+
+        int v1 = (hash & 0xff) - 1; //unhash
+        if (v1 == h)
+            return true;
+
+        int v2 = ((hash >> 8) & 0xff) - 1; //unhash
+        if (v2 == h)
+            return true;
+
+        return false;
     }
 
 

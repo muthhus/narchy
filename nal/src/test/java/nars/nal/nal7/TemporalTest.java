@@ -4,7 +4,7 @@ import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.io.NarseseTest;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -20,6 +20,7 @@ import java.util.TreeSet;
 
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
+import static nars.term.container.TermContainer.theTermArray;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.*;
@@ -28,7 +29,7 @@ import static org.junit.Assert.*;
 public class TemporalTest {
 
     @NotNull
-    static final NAR n = new NARBuilder().get();
+    static final NAR n = new NARS().get();
 
 
     @Test
@@ -181,13 +182,18 @@ public class TemporalTest {
         testParse("(goto(a)&&at(SELF,b))");
     }
 
+    @NotNull
+    static TermContainer the(@NotNull Op op, int dt, @NotNull Term... tt) {
+        return Op.subterms(theTermArray(op, dt, tt));
+    }
+
     @Test
     public void testCommutiveTemporalityDepVar0() throws Narsese.NarseseException {
         Term t0 = n.term("((SELF,#1)-->at)").term();
         Term t1 = n.term("goto(#1)").term();
         assertEquals(
-                TermContainer.the(Op.CONJ, DTERNAL, t0, t1),
-                TermContainer.the(Op.CONJ, DTERNAL, t1, t0)
+                the(Op.CONJ, DTERNAL, t0, t1),
+                the(Op.CONJ, DTERNAL, t1, t0)
         );
     }
 
@@ -235,7 +241,7 @@ public class TemporalTest {
 
     @Test
     public void testCommutiveTemporalityConcepts() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         n.log();
 
@@ -269,7 +275,7 @@ public class TemporalTest {
 
     @Test
     public void testCommutiveTemporalityConcepts2() throws Narsese.NarseseException {
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
 
         for (String op : new String[]{"&&", "<=>"}) {
             Concept a = n.conceptualize($("(x " + op + "   y)"));
@@ -415,7 +421,7 @@ public class TemporalTest {
     @Test
     public void testConceptualizationIntermpolationEternal() throws Narsese.NarseseException {
 
-        NAR d = new NARBuilder().get();
+        NAR d = new NARS().get();
         d.believe("((a ==>+2 b)-->[pill])");
         d.believe("((a ==>+6 b)-->[pill])"); //same concept
         d.run(1);
@@ -561,7 +567,7 @@ public class TemporalTest {
     @Test
     public void testNonCommutivityImplConcept() throws Narsese.NarseseException {
         Param.DEBUG = true;
-        NAR n = new NARBuilder().get();
+        NAR n = new NARS().get();
         n.input("((x) ==>+5 (y)).", "((y) ==>-5 (x)).");
         n.run(155);
 

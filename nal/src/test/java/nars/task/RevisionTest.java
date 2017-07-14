@@ -5,7 +5,7 @@ import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.conceptualize.state.DefaultConceptState;
-import nars.nar.NARBuilder;
+import nars.nar.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -29,7 +29,7 @@ public class RevisionTest {
 
     public static NAR newNAR(int maxBeliefs) {
         //this.activeTasks = activeTasks;
-        NAR d = new NARBuilder().get();
+        NAR d = new NARS().get();
         d.nal(7);// {
 
         /*
