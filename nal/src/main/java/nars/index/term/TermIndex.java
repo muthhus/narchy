@@ -327,8 +327,10 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 //            //same concurrency, just change dt, keep subterms
 //            return src.dt(dt);
 //        }
-        if (subtermMods > 0 || op != src.op() || dt != src.dt())
+        if (subtermMods > 0 || op != src.op()/* || dt != src.dt()*/)
             return the(op, dt, target);
+        else if (dt != src.dt())
+            return src.dt(dt);
         else
             return src;
     }

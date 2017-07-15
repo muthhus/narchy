@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
     @Override
     public int opX() {
-        return Atom.AtomOpX; //HACK
+        return Atom.AtomString; //HACK
     }
 
     @Override

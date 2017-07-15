@@ -1737,7 +1737,9 @@ public enum Util {
         return x;
     }
 
-    /** returns amount of memory used as a value between 0 and 100% (1.0) */
+    /**
+     * returns amount of memory used as a value between 0 and 100% (1.0)
+     */
     public static float memoryUsed() {
         Runtime runtime = Runtime.getRuntime();
         long total = runtime.totalMemory(); // current heap allocated to the VM process
@@ -1749,4 +1751,19 @@ public enum Util {
         //logger.warn("max={}k, used={}k {}%, free={}k", max/1024, total/1024, Texts.n2(100f * ratio), free/1024);
         return ratio;
     }
+
+    /**
+     * reverse a subarray in place
+     * indices are inclusive, so be careful the 'j' param may need -1
+     */
+    public static void reverse(Object[] array, int i, int j) {
+        while (j > i) {
+            Object tmp = array[j];
+            array[j] = array[i];
+            array[i] = tmp;
+            j--;
+            i++;
+        }
+    }
+
 }

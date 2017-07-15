@@ -22,8 +22,6 @@ import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.IntAtom;
 import nars.term.compound.GenericCompound;
-import nars.term.compound.UnitCompound1;
-import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
@@ -241,24 +239,11 @@ public interface $ {
      * quickly creates a product on the stack, bypassing any memoization
      */
     public static Compound pStack(@NotNull Term... subs) {
-        return compoundStack(Op.PROD, subs);
-    }
-   public static Compound pStack(@NotNull TermContainer subs) {
-        return compoundStack(Op.PROD, subs);
-    }
-    public static Compound compoundStack(Op o, Term... subterms) {
-        int s = subterms.length;
-        switch (s) {
-            case 1: return new UnitCompound1(o, subterms[0]);
-            default: return new GenericCompound(o, new ArrayTermVector(subterms));
-        }
+        return new GenericCompound(PROD, Op.subtermsNew(subs));
     }
 
-    public static Compound compoundStack(Op o, TermContainer subterms) {
-        switch (subterms.size()) {
-            case 1: return new UnitCompound1(o, subterms.sub(0));
-            default:return new GenericCompound(o, subterms);
-        }
+    public static Compound pStack(@NotNull TermContainer subs) {
+        return new GenericCompound(PROD, subs);
     }
 
     @NotNull

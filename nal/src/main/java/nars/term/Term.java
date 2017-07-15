@@ -25,7 +25,7 @@ import nars.$;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
-import nars.term.atom.SpecialAtom;
+import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
@@ -406,7 +406,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
 //    }
 
     /** opX function */
-    static int opX(Op o, byte subOp) {
+    private static int opX(Op o, byte subOp) {
         return o.ordinal() << 8 | subOp;
     }
 
@@ -417,7 +417,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
     /** if filterTrueFalse is false, only filters Null's */
     static boolean filterAbsolute(@NotNull Term u, boolean filterTrueFalse) {
-        return u instanceof SpecialAtom && (filterTrueFalse || (u == Null));
+        return u instanceof Bool && (filterTrueFalse || (u == Null));
     }
 
     default Term dt(int dt) {

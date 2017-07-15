@@ -408,6 +408,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     /**
      * an array of the subterms
+     * for now, an instance should not allow callee to modify any internal immutable state by not returning a clone of an array field
      */
     default public Term[] toArray() {
         int s = size();
@@ -424,6 +425,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default Term[] toArray(Term[] x, int from, int to) {
+
 //        if (s == 0)
 //            return Term.EmptyArray;
 //

@@ -44,6 +44,8 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -358,7 +360,6 @@ public interface Compound extends Term, IPair, TermContainer {
     default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
 
 
-
         if (ty instanceof Compound) {
             if (equals(ty))
                 return true;
@@ -379,7 +380,7 @@ public interface Compound extends Term, IPair, TermContainer {
             TermContainer ysubs = y.subterms();
 
 
-            if (op.temporal &&!matchTemporalDT(dt(), y.dt(), subst.dur))
+            if (op.temporal && !matchTemporalDT(dt(), y.dt(), subst.dur))
                 return false;
 
             //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
@@ -751,9 +752,9 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default boolean isTemporal() {
         return hasAny(Op.TemporalBits) &&
-                    (isAny(Op.TemporalBits) && (dt() != DTERNAL))
-                    ||
-                    ( subterms().isTemporal() );
+                (isAny(Op.TemporalBits) && (dt() != DTERNAL))
+                ||
+                (subterms().isTemporal());
     }
 
     @Override
@@ -902,75 +903,71 @@ public interface Compound extends Term, IPair, TermContainer {
             }
         }
 
-        TermContainer tt = subterms();
+        //TermContainer tt = subterms();
 
-        Term[] evalSubs = null;
+        @NotNull final Term[] xy = toArray();
         //any contained evaluables
-        boolean modified = false;
+        boolean subsModified = false;
 
-        if (tt.hasAll(OpBits)) {
-            int s = tt.size();
-            evalSubs = new Term[s];
-            for (int i = 0, evalSubsLength = evalSubs.length; i < evalSubsLength; i++) {
-                Term x = tt.sub(i);
-                if (x == Null)
-                    return Null;
+        if (subterms().hasAll(OpBits)) {
+            int s = xy.length;
+            for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
+                Term x = xy[i];
                 Term y = x.eval(index);
                 if (y == null) {
-                    y = x; //if a functor returns null, it means unmodified
-                } else if (y == Null) {
-                    return Null;
+                    //if a functor returns null, it means unmodified
                 } else if (x != y) {
                     //the result comparing with the x
-                    modified = true;
+                    subsModified = true;
+                    xy[i] = y;
                 }
-
-                evalSubs[i] = y;
             }
-
         }
 
-        @Nullable Term t = null;
 
-        //check if this is a funct
+        //recursively compute contained subterm functors
         if (o == INH) {
-            //recursively compute contained subterm functors
-            org.eclipse.collections.api.tuple.Pair<Atomic, Compound> f =
-                    (evalSubs != null) ? (f = Op.functor(o, evalSubs, index, true)) : Op.functor(this, index, true);
-
-            if (f != null /*&& f.getOne() instanceof Functor*/) {
-                TermContainer args = f.getTwo().subterms();
-
-                t = ((Functor) f.getOne()).apply(args);
-                if (t == null)
-                    modified = true; //create with evalsubs anyway
-
-//                if (dy == null || dy == this) {
-//                    return this; //functor returning null return value means keep the original input term
-//                } else {
-////                            if (dy.equals(this)) {
-////                                System.err.println("redundant instance detected: " + subject + " " + dy );
-////                                return this;
-////                            }
-//                    return dy.eval(index); //recurse
-//                }
+            Term possibleArgs = xy[0];
+            if (possibleArgs instanceof Compound && possibleArgs.op() == PROD) {
+                Term possibleFunc = xy[1];
+                if (possibleFunc instanceof Atomic && possibleFunc.op() == ATOM) {
+                    Atomic ff = (Atomic) index.getIfPresentElse(possibleFunc);
+                    if (ff instanceof Functor) {
+                        Term t = ((Functor) ff).apply(((Compound) possibleArgs).subterms());
+                        if (t != null)
+                            return t;
+                    }
+                }
             }
-
         }
 
-        if (t == null && modified && evalSubs != null) {
-            t = o.the(dt(), evalSubs);
+        if (!subsModified)
+            return this;
+
+
+        Term u;
+        if (subsModified) {
+            u = o.the(dt(), xy);
+            if (!(u instanceof Compound))
+                return u; //atomic, including Bool short-circuits on invalid term
+        } else {
+            return this;
         }
 
-        if (t == null || t==this || t.equals(this))
+
+        if (u.equals(this))
             return this;
 
         try {
-            return t.eval(index);
+            return u.eval(index);
         } catch (StackOverflowError e) {
-            throw new RuntimeException("stack overflow on eval: " + t);
+            logger.error("eval stack overflow: {} -> {}", this, u);
+            return Null;
+            //throw new RuntimeException("stack overflow on eval : " + t);
         }
     }
+
+    final static Logger logger = LoggerFactory.getLogger(Compound.class);
 
     @Nullable
     default Term commonParent(List<byte[]> subpaths) {

@@ -1,5 +1,7 @@
 package jcog.list;
 
+import jcog.Util;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.impl.list.mutable.FastList;
@@ -432,6 +434,12 @@ public class FasterList<X> extends FastList<X> {
         if (s > 0) {
             Arrays.fill(this.items, 0, size, null);
             this.size = 0;
+        }
+    }
+
+    public void reverse() {
+        if (size>1) {
+            Util.reverse(items, 0, size-1);
         }
     }
 

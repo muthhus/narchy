@@ -83,6 +83,12 @@ public class TemporalTest {
         assertEquals("((x)==>(y))", n.conceptualize(n.term("((x) ==>+10 (y))")).toString());
     }
 
+    @Test public void testAtemporalization2() throws Narsese.NarseseException {
+        Compound x = $("((--,(($1&&nario(29,25)) ==>+1412 ((--,nario(9,13)) &&+29 $1))) &&+1418 (--,nario(9,13)))");
+        Term y = $.terms.atemporalize(x);
+        assertEquals("",y);
+    }
+
     @Test
     public void testAtemporalizationSharesNonTemporalSubterms() throws Narsese.NarseseException {
 

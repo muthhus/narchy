@@ -8,7 +8,7 @@ import nars.$;
 import nars.Op;
 import nars.index.term.TermIndex;
 import nars.term.atom.Atom;
-import nars.term.atom.SpecialAtom;
+import nars.term.atom.Bool;
 import nars.term.compound.GenericCompound;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
@@ -693,7 +693,7 @@ public enum Terms { ;
     }
 
     public static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
-        if (x instanceof SpecialAtom) {
+        if (x instanceof Bool) {
 
             if (x == True)
                 return true; //silently ignore

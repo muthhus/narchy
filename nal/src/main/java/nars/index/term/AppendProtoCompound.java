@@ -101,7 +101,7 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
 
     @Override
     public Term[] toArray() {
-        return subs;
+        return subs.clone();
     }
 
     @Override

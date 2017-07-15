@@ -60,7 +60,7 @@ public class ArrayTermVector extends TermVector {
     }
 
     @NotNull @Override public final Term[] toArray() {
-        return terms;
+        return terms.clone();
     }
 
     @Override

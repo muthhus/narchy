@@ -1,10 +1,7 @@
 package nars;
 
 
-import com.google.common.collect.MinMaxPriorityQueue;
-import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
-import com.google.common.collect.SortedSetMultimap;
 import com.google.common.primitives.Longs;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
@@ -42,7 +39,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.SpecialAtom;
+import nars.term.atom.Bool;
 import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -53,10 +50,8 @@ import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.exe.Executioner;
 import org.apache.commons.math3.stat.Frequency;
-import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
-import org.eclipse.collections.impl.multimap.set.sorted.SynchronizedPutTreeSortedSetMultimap;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
@@ -1293,7 +1288,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         }
 
-        if (term instanceof Variable || term instanceof IntAtom || term instanceof SpecialAtom)
+        if (term instanceof Variable || term instanceof IntAtom || term instanceof Bool)
             return null;
 
         return term;

@@ -36,12 +36,7 @@ public class UnifySubst extends Unify {
     public boolean unify(@NotNull Term x, @NotNull Term y,  boolean finish) {
         this.a = x;
         this.matches = 0;
-
-        if (x.unifyPossible(type) || y.unifyPossible(type)) { //no need to unify if there is actually no variable
-            return super.unify(x, y, finish);
-        }
-
-        return false;
+        return super.unify(x, y, finish);
     }
 
 

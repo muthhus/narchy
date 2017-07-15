@@ -1,6 +1,5 @@
 package nars;
 
-import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.fge.grappa.annotations.Cached;
@@ -18,12 +17,12 @@ import com.github.fge.grappa.support.Var;
 import com.github.fge.grappa.transform.ParserTransformer;
 import com.google.common.collect.Lists;
 import jcog.Texts;
+import jcog.list.FasterList;
 import nars.derive.meta.match.Ellipsis;
 import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.var.UnnormalizedVariable;
@@ -575,7 +574,7 @@ public class Narsese extends BaseParser<Object> {
                 s(),
                 COMPOUND_TERM_CLOSER,
 
-                push($.terms.the(CONJ, 0, ((Compound) popTerm(CONJ)).subterms()) /* HACK construct a dt=0 copy */)
+                push(CONJ.the(0, popTerms(null)) /* HACK construct a dt=0 copy */)
         );
     }
 
@@ -907,7 +906,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    static final Object functionalForm = new Object();
+    private static final Object functionalForm = new Object();
 
     /**
      * list of terms prefixed by a particular compound term operate
@@ -1001,12 +1000,26 @@ public class Narsese extends BaseParser<Object> {
 
         //System.err.println(getContext().getValueStack());
 
+        Op[] opp = new Op[1];
+        opp[0] = op;
+        List<Term> vectorterms = popTerms(opp);
+        op = opp[0];
+
+        if (op == null)
+            op = PROD;
+
+        return op.the(DTERNAL, vectorterms);
+    }
+
+    List<Term> popTerms(Op[] op /* hint */) {
+
+        FasterList tt = new FasterList(1);
+
         ArrayValueStack<Object> stack = (ArrayValueStack) getContext().getValueStack();
 
 //        if (stack.isEmpty())
 //            return null;
 
-        List vectorterms = $.newArrayList(stack.size());
 
         while (!stack.isEmpty()) {
             Object p = pop();
@@ -1025,7 +1038,7 @@ public class Narsese extends BaseParser<Object> {
 
 
             if (p == functionalForm) {
-                op = ATOM;
+                op[0] = ATOM;
                 break;
             }
 
@@ -1035,9 +1048,9 @@ public class Narsese extends BaseParser<Object> {
             if (p instanceof String) {
                 //throw new RuntimeException("string not expected here");
                 //Term t = $.the((String) p);
-                vectorterms.add(Atomic.the((String) p));
+                tt.add(Atomic.the((String) p));
             } else if (p instanceof Term) {
-                vectorterms.add(p);
+                tt.add(p);
             } else if (p instanceof Op) {
 
 //                if (op != null) {
@@ -1047,16 +1060,13 @@ public class Narsese extends BaseParser<Object> {
 //                    throw new NarseseException("Too many operators involved: " + op + ',' + p + " in " + stack + ':' + vectorterms);
 //                }
 
-                op = (Op) p;
+                op[0] = (Op) p;
             }
         }
 
-        Collections.reverse(vectorterms);
+        tt.reverse();
 
-        if (op == null)
-            op = PROD;
-
-        return op.the(DTERNAL, vectorterms);
+        return tt;
     }
 
 
@@ -1281,7 +1291,7 @@ public class Narsese extends BaseParser<Object> {
         throw new NarseseException(s.toString(), null, ee);
     }
 
-    static LoadingCache<String, Term> singleTerms = Caffeine.newBuilder().maximumSize(32*1024)
+    static LoadingCache<String, Term> singleTerms = Caffeine.newBuilder().maximumSize(32 * 1024)
             .build((s) -> {
                 ParsingResult r = //parsers.get().singleTermParser.run(s);
                         singleTermParsers.get().run(s);
@@ -1299,7 +1309,6 @@ public class Narsese extends BaseParser<Object> {
 
                 return Null;
             });
-
 
 
     @NotNull

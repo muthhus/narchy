@@ -301,57 +301,39 @@ public abstract class TermBuilder {
 
 
     @NotNull
-    public Term atemporalize(final @NotNull Compound c) {
+    public Term atemporalize(final @NotNull Compound x) {
 
-        if (!c.isTemporal())
-            return c;
+        if (!x.isTemporal())
+            return x;
 
-        Term[] newSubs = null; //oldSubs.clone();
+        Term[] s = x.toArray();
 
-        Op o = c.op();
-        int cdt = c.dt();
-        int pdt = !o.temporal ? cdt : DTERNAL; //( !o.concurrent(cdt) ? XTERNAL : DTERNAL); //preserve image dt
-
-
-        TermContainer st = c.subterms();
-        int sts = st.size();
-        if (st.hasAny(Op.TemporalBits)) {
+        //1. determine if any subterms (excluding the term itself) get rewritten
+        boolean subsChanged = false;
+        if (x.subterms().hasAny(Op.TemporalBits)) {
 
             //atemporalize subterms first
 
-            boolean subsChanged = false;
-            int cs = sts;
-            newSubs = new Term[cs];
+            int cs = s.length;
             for (int i = 0; i < cs; i++) {
 
-                Term x = st.sub(i), y;
-                if (x instanceof Compound) {
-                    subsChanged |= (x != (y = atemporalize((Compound) x)));
-                } else {
-                    y = x;
+                Term xi = s[i];
+                if (xi instanceof Compound) {
+                    Term yi = atemporalize((Compound) xi);
+                    if (!xi.equals(yi)) {
+                        s[i] = yi;
+                        subsChanged = true;
+                    }
                 }
-
-                newSubs[i] = y;
-
             }
-
-            if (!subsChanged)
-                newSubs = null;
         }
 
-//        //resolve XTERNAL temporals to lexical order //TODO does this even matter?
-//        if (pdt == XTERNAL && cs == 2*/) {
-//            if (newSubs[0].compareTo(newSubs[1]) > 0) {
-//                newSubs = (newSubs == oldSubs) ? newSubs.clone() : newSubs;
-//                Term x = newSubs[0];
-//                newSubs[0] = newSubs[1];
-//                newSubs[1] = x;
-//            }
-//        }
 
+        //2. anonymize the term itself if anything has changed.
+        Op o = x.op();
+        int dt = x.dt();
+        int nextDT = !o.temporal ? dt : DTERNAL;
 
-        boolean dtChanging = (pdt != cdt);
-        boolean subsChanged = (newSubs != null) && !st.equalTerms(newSubs);
 //        if (dtChanged && pdt == XTERNAL) {
 //            if (newSubs == null) {
 //                newSubs = st.toArray(new Term[sts], 0, sts);
@@ -362,74 +344,80 @@ public abstract class TermBuilder {
 
         //   }
 
-        if (subsChanged || dtChanging) {
+        //if (subsChanged || dtChanging) {
 
             if (o.temporal) {// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
 
                 boolean reflexive = false;
                 //introduce an XTERNAL temporal placeholder in the following conditions
-                if ((subsChanged && newSubs.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
+                if ((subsChanged && s.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
                         ||
-                        (sts == 2 &&
+                        (s.length == 2 && (
 
-                                (reflexive = Terms.reflex(st.sub(0), st.sub(1)))
+                                (reflexive = Terms.reflex(s[0], s[1]))
 
                                 ||
 
                                 //repeat or non-lexical ordering for commutive compound; must re-arrange
-                                (o.temporal && o.commutative && (st.sub(0).compareTo(st.sub(1)) >= 0))
+                                (o.temporal && o.commutative && (s[0].compareTo(s[1]) >= 0))
 
 
 
-                                ))
+                                )))
 
 
                 // && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
                 {
 
 
-                    pdt = reflexive ? XTERNAL : DTERNAL /* if non-reflexive, try to use ordinary DTERNAL */;
-                    if (!dtChanging)
-                        dtChanging = pdt != cdt; //in case that now the dt has changed
+                    nextDT = reflexive ? XTERNAL : DTERNAL /* if non-reflexive, try to use ordinary DTERNAL */;
 
-                    newSubs = new Term[]{st.sub(0), st.sub(sts > 1 ? 1 : 0)};
-                    if (o.commutative)
-                        Arrays.sort(newSubs);
+                    if (s.length > 1) {
+                        Term[] t = { s[0], s[1] };
+                        if (o.commutative)
+                            Arrays.sort(t);
 
-                    if (!subsChanged)
-                        subsChanged = newSubs.length != sts || !st.equalTerms(newSubs);
+                        if (!subsChanged)
+                            subsChanged = !Arrays.equals(s, t);
+
+                        s = t;
+
+                    } else {
+                        s = new Term[] { s[0], s[0] /* repeated */ };
+                        subsChanged = true;
+                    }
 
                 }
             }
-        }
+        //}
+
+        boolean dtChanging = (nextDT != dt);
 
         if (!subsChanged && !dtChanging) {
-            return c;
+            return x; //no change is necessary
         }
 
-
-        Compound xx = compoundOrNull(
-                o.the(pdt, subsChanged ?
-                        newSubs
-                        :
-                        c.toArray()
-                )
+        Compound y = compoundOrNull(
+            subsChanged?  o.the(nextDT, s) : x.dt(nextDT)
         );
 
+        if (y == null) {
+            if (nextDT == DTERNAL) {
 
-        if (xx == null && pdt == DTERNAL) {
+                //as a last resort, use the XTERNAL form to allow it
+                //TODO decide if all commutive temporal concepts (&&, <=>) should be named by their raw XTERNAL form
 
-            //as a last resort, use the XTERNAL form to allow it
-            //TODO decide if all commutive temporal concepts (&&, <=>) should be named by their raw XTERNAL form
+                nextDT = XTERNAL;
+                y = compoundOrNull(
+                        subsChanged?  o.the(nextDT, s) : x.dt(nextDT)
+                );
+            }
 
-            xx = compoundOrNull(
-                    Op.compound(o, XTERNAL, subsChanged ? Op.subterms(newSubs) : st));
+            if (y == null)
+                return Null; //failed to atemporalize
         }
 
-        if (xx == null)
-            return Null; //failed to atemporalize
-        else
-            return xx;
+        return y;
     }
 
 

@@ -21,10 +21,6 @@ public class GenericCompoundDT extends ProxyCompound {
     public final int dt;
     private final int hashDT;
 
-    public GenericCompoundDT(Op op, int dt, TermContainer subs) {
-        this(new GenericCompound(op, subs), dt);
-    }
-
     public GenericCompoundDT(Compound base, int dt) {
         super(base);
 

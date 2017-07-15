@@ -111,7 +111,8 @@ public class UnitCompound1 extends TermVector1 implements Compound {
     @Deprecated /* HACK */
     @Override
     public @NotNull TermContainer subterms() {
-        return new SubtermView(this);
+        return new TermVector1(sub);
+        //return new SubtermView(this);
     }
 
 
@@ -138,98 +139,103 @@ public class UnitCompound1 extends TermVector1 implements Compound {
         return DTERNAL;
     }
 
-    private static final class SubtermView implements TermContainer {
-        private final UnitCompound1 c;
-
-        public SubtermView(UnitCompound1 c) {
-            this.c = c;
-        }
-
-        @Override
-        public boolean isTemporal() {
-            return c.sub.isTemporal();
-        }
-
-        @Override
-        public int vars() {
-            return c.sub.vars();
-        }
-
-        @Override
-        public int varQuery() {
-            return c.sub.varQuery();
-        }
-
-        @Override
-        public int varDep() {
-            return c.sub.varDep();
-        }
-
-        @Override
-        public int varIndep() {
-            return c.sub.varIndep();
-        }
-
-        @Override
-        public int varPattern() {
-            return c.varPattern();
-        }
-
-
-        @Override
-        public int structure() {
-            return c.sub.structure();
-        }
-
-        @Override
-        public int volume() {
-            return c.volume();
-        }
-
-        @Override
-        public int complexity() {
-            return c.complexity();
-        }
-
-        @Override
-        public @NotNull Term sub(int i) {
-            assert(i == 0);
-            return c.sub;
-        }
-
-        @Override
-        public int hashCode() {
-            return c.hashCodeSubTerms();
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) return true;
-
-            if (obj instanceof TermContainer) {
-                TermContainer t = (TermContainer) obj;
-                if (t.size() == 1) {
-                    return c.sub.equals(t.sub(0));
-                }
-            }
-            return false;
-        }
-
-        @Override
-        public void forEach(Consumer<? super Term> action, int start, int stop) {
-            assert(start == 0 && stop == 1);
-            action.accept(c.sub);
-        }
-
-        @NotNull
-        @Override
-        public Iterator<Term> iterator() {
-            return singletonIterator(c.sub);
-        }
-
-        @Override
-        public int size() {
-            return 1;
-        }
-    }
+//    private static final class SubtermView implements TermContainer {
+//        private final UnitCompound1 c;
+//
+//        public SubtermView(UnitCompound1 c) {
+//            this.c = c;
+//        }
+//
+//        @Override
+//        public Term[] toArray() {
+//            return new Term[]{c.sub};
+//        }
+//
+//        @Override
+//        public boolean isTemporal() {
+//            return c.sub.isTemporal();
+//        }
+//
+//        @Override
+//        public int vars() {
+//            return c.sub.vars();
+//        }
+//
+//        @Override
+//        public int varQuery() {
+//            return c.sub.varQuery();
+//        }
+//
+//        @Override
+//        public int varDep() {
+//            return c.sub.varDep();
+//        }
+//
+//        @Override
+//        public int varIndep() {
+//            return c.sub.varIndep();
+//        }
+//
+//        @Override
+//        public int varPattern() {
+//            return c.varPattern();
+//        }
+//
+//
+//        @Override
+//        public int structure() {
+//            return c.sub.structure();
+//        }
+//
+//        @Override
+//        public int volume() {
+//            return c.volume();
+//        }
+//
+//        @Override
+//        public int complexity() {
+//            return c.complexity();
+//        }
+//
+//        @Override
+//        public @NotNull Term sub(int i) {
+//            assert(i == 0);
+//            return c.sub;
+//        }
+//
+//        @Override
+//        public int hashCode() {
+//            return c.hashCodeSubTerms();
+//        }
+//
+//        @Override
+//        public boolean equals(Object obj) {
+//            if (this == obj) return true;
+//
+//            if (obj instanceof TermContainer) {
+//                TermContainer t = (TermContainer) obj;
+//                if (t.size() == 1) {
+//                    return c.sub.equals(t.sub(0));
+//                }
+//            }
+//            return false;
+//        }
+//
+//        @Override
+//        public void forEach(Consumer<? super Term> action, int start, int stop) {
+//            assert(start == 0 && stop == 1);
+//            action.accept(c.sub);
+//        }
+//
+//        @NotNull
+//        @Override
+//        public Iterator<Term> iterator() {
+//            return singletonIterator(c.sub);
+//        }
+//
+//        @Override
+//        public int size() {
+//            return 1;
+//        }
+//    }
 }

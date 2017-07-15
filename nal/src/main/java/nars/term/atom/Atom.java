@@ -64,9 +64,9 @@ public class Atom extends AtomicToString {
         return id;
     }
 
-    public final static int AtomOpX = Term.opX(ATOM, 1);
-    @Override public final int opX() {
-        return AtomOpX;
+    public final static int AtomString = Term.opX(ATOM, 1);
+    @Override public int opX() {
+        return AtomString;
     }
 
     @NotNull

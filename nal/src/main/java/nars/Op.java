@@ -11,10 +11,9 @@ import nars.index.term.TermContext;
 import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.SpecialAtom;
+import nars.term.atom.Bool;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.UnitCompound1;
-import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.util.InvalidTermException;
@@ -61,7 +60,7 @@ public enum Op implements $ {
                 // (--,(--,P)) = P
                 if (x.op() == NEG)
                     return x.unneg();
-            } else if (x instanceof SpecialAtom) {
+            } else if (x instanceof Bool) {
                 if (isFalse(x)) return True;
                 if (isTrue(x)) return False;
                 else return Null;
@@ -139,25 +138,21 @@ public enum Op implements $ {
      */
     CONJ("&&", true, 5, Args.GTETwo) {
         @Override
-        public Term the(int dt, Term... u) {
+        public Term the(int dt, Term... tt) {
             //Term[] u = uu.length > 1 ? conjTrueFalseFilter(uu) : uu /* avoid true false filter if fall-through only-term anyway */;
 
-            if (dt == XTERNAL) {
-                //leave un-sorted, un-de-duplicated
-                return conjImplReduction(compound(CONJ, XTERNAL, subterms(u)));
-            }
 
-            final int n = u.length;
+            final int n = tt.length;
             switch (n) {
 
                 case 0:
                     return Null; //shouldnt happen
 
                 case 1:
-                    Term only = u[0];
+                    Term only = tt[0];
                     //preserve unitary ellipsis for patterns etc
                     return only instanceof Ellipsislike ?
-                            new GenericCompound(CONJ, subterms(only)) //special; preserve the surrounding conjunction
+                            new UnitCompound1(CONJ, only) //special; preserve the surrounding conjunction
                             :
                             only;
 
@@ -167,21 +162,43 @@ public enum Op implements $ {
 
             }
 
+
+            int absoluteness = 0;
+            for (Term t : tt) {
+                if (t instanceof Bool) {
+                    if (t == Null) return Null;
+                    if (t == False) {
+                        absoluteness = -1;
+                    } else if (t == True) {
+                        if (absoluteness>=0)
+                            absoluteness = +1; //only if not false, so false overrides
+                    }
+                }
+            }
+            if (absoluteness == -1) return False;
+            if (absoluteness == +1) return True;
+
+
+            if (dt == XTERNAL) {
+                //leave un-sorted, un-de-duplicated
+                return conjImplReduction(compound(CONJ, XTERNAL, subterms(tt)));
+            }
+
             boolean commutive = concurrent(dt);
             if (commutive) {
 
-                return conjImplReduction(junctionFlat(dt, u));
+                return conjImplReduction(junctionFlat(dt, tt));
 
             } else {
                 //NON-COMMUTIVE
 
                 //assert (n == 2);
                 if (n != 2) {
-                    throw new InvalidTermException(CONJ, u, "invalid non-commutive conjunction");
+                    throw new InvalidTermException(CONJ, tt, "invalid non-commutive conjunction");
                 }
 
-                Term a = u[0];
-                Term b = u[1];
+                Term a = tt[0];
+                Term b = tt[1];
                 boolean changed = false;
                 if (a.equals(b)) {
                     if (dt < 0) {
@@ -192,9 +209,9 @@ public enum Op implements $ {
                     if (a.compareTo(b) > 0) {
                         //ensure lexicographic ordering
 
-                        Term x = u[0];
-                        u[0] = u[1];
-                        u[1] = x; //swap
+                        Term x = tt[0];
+                        tt[0] = tt[1];
+                        tt[1] = x; //swap
                         dt = -dt; //and invert time
                         changed = true;
                     }
@@ -202,8 +219,8 @@ public enum Op implements $ {
 
                 return conjImplReduction(
                         !changed ?
-                                compound(CONJ, dt, subterms(u)) :
-                                CONJ.the(dt, u)
+                                compound(CONJ, dt, subterms(tt)) :
+                                CONJ.the(dt, tt)
                 );
 
             }
@@ -526,11 +543,18 @@ public enum Op implements $ {
     /**
      * absolutely invalid
      */
-    public static final SpecialAtom Null = new SpecialAtom(String.valueOf(NullSym));
+    public static final Bool Null = new Bool(String.valueOf(NullSym)) {
+
+        @Override
+        public @NotNull Term unneg() {
+            return this;
+        }
+    };
+
     /**
      * absolutely false
      */
-    public static final SpecialAtom False = new SpecialAtom(String.valueOf(FalseSym)) {
+    public static final Bool False = new Bool(String.valueOf(FalseSym)) {
         @NotNull
         @Override
         public Term unneg() {
@@ -540,7 +564,7 @@ public enum Op implements $ {
     /**
      * absolutely true
      */
-    public static final SpecialAtom True = new SpecialAtom(String.valueOf(TrueSym)) {
+    public static final Bool True = new Bool(String.valueOf(TrueSym)) {
         @NotNull
         @Override
         public Term unneg() {
@@ -564,9 +588,9 @@ public enum Op implements $ {
 
             Op o = C.op();
             if (o != null) {
-                return _compound(o, C.subterms());
+                return compoundNew(o, C.subterms());
             } else
-                return _subterms(C.subterms());
+                return subtermsNew(C.subterms());
 
         } catch (InvalidTermException e) {
             if (Param.DEBUG_EXTRA)
@@ -640,7 +664,6 @@ public enum Op implements $ {
     public final OpType type;
     /**
      * arity limits, range is inclusive >= <=
-     * -1 for unlimited
      */
     public final int minSize, maxSize;
     /**
@@ -725,7 +748,7 @@ public enum Op implements $ {
     }
 
     public static boolean isAbsolute(@NotNull Term x) {
-        return x instanceof SpecialAtom;
+        return x instanceof Bool;
     }
 
     public static boolean isTrueOrFalse(@NotNull Term x) {
@@ -833,32 +856,13 @@ public enum Op implements $ {
         return null;
     }
 
-    @Nullable
-    public static Pair<Atomic, Compound> functor(Op cOp, @NotNull Term[] subs, TermContext index, boolean mustFunctor) {
-        if (cOp == INH) {
-            Term s0 = subs[0];
-            if (s0.op() == PROD) {
-                Term s1 = subs[1];
-                if (s1.op() == ATOM) {
-                    Atomic ff = (Atomic) index.getIfPresentElse(s1);
-                    if (!mustFunctor || ff instanceof Functor) {
-                        return Tuples.pair(
-                                ff,
-                                ((Compound) s0)
-                        );
 
-                    }
-                }
-            }
+    public static Term compoundNew(Op o, Term... subterms) {
 
-        }
-        return null;
-    }
-
-
-    public static Term _compound(Op o, Term... subterms) {
         int s = subterms.length;
-        assert (s > 0);
+        assert(o.maxSize >= s): "subterm overflow: " + o + " " + Arrays.toString(subterms);
+        assert(o.minSize <= s): "subterm underflow: " + o + " " + Arrays.toString(subterms);
+
         switch (s) {
             case 1:
                 return new UnitCompound1(o, subterms[0]);
@@ -868,21 +872,29 @@ public enum Op implements $ {
         }
     }
 
-    static TermContainer _subterms(@NotNull Term[] s) {
+    static TermContainer subtermsNew(@NotNull Term[] s) {
         return TermVector.the(s);
     }
 
-    static public @NotNull TermContainer subterms(@NotNull Term... s) {
+    static public @NotNull TermContainer subterms(@NotNull Term... x) {
 //        if (s.length < 2) {
 //            return _subterms(s);
 //        } else {
 
+        boolean internable = true;
+        for (Term y : x) {
+            if (!(y instanceof NonInternable)) { //"must not intern non-internable" + y + "(" +y.getClass() + ")";
+                internable = false;
+                break;
+            }
+        }
 
-        if (!NonInternable.internable(s))
-            return new ArrayTermVector(s);
+        if (internable) {
+            return (TermContainer) cache.apply(new AppendProtoCompound(null, x).commit());
+        } else {
+            return subtermsNew(x);
+        }
 
-        return (TermContainer) cache.apply(new AppendProtoCompound(null, s).commit());
-//        }
     }
 
     @NotNull
@@ -1235,7 +1247,7 @@ public enum Op implements $ {
 
                 Term single = t[0];
                 return single instanceof Ellipsislike ?
-                        new GenericCompound(intersection, subterms(single)) :
+                        new UnitCompound1(intersection, single) :
                         single;
 
             case 2:
@@ -1369,7 +1381,7 @@ public enum Op implements $ {
         return the(dt, u);
     }
 
-    public Term the(int dt, @NotNull Term... u) {
+    @NotNull public Term the(int dt, @NotNull Term... u) {
         if (statement) {
             return statement(this, dt, u[0], u[1]);
         } else {
@@ -1404,9 +1416,9 @@ public enum Op implements $ {
         static final IntIntPair One = pair(1, 1);
         static final IntIntPair Two = pair(2, 2);
 
-        static final IntIntPair GTEZero = pair(0, -1);
-        static final IntIntPair GTEOne = pair(1, -1);
-        static final IntIntPair GTETwo = pair(2, -1);
+        static final IntIntPair GTEZero = pair(0, Param.COMPOUND_SUBTERMS_MAX);
+        static final IntIntPair GTEOne = pair(1, Param.COMPOUND_SUBTERMS_MAX);
+        static final IntIntPair GTETwo = pair(2, Param.COMPOUND_SUBTERMS_MAX);
 
     }
 
