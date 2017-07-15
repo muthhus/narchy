@@ -4,7 +4,6 @@ import jcog.Texts;
 import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
-import jcog.pri.Priority;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
@@ -174,8 +173,18 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     @Nullable
     static boolean taskContentValid(@NotNull Compound t, byte punc, @Nullable NAR nar, boolean safe) {
+
+        if (t.op() == NEG) {
+            //must be applied before instantiating Task
+            return fail(t, "negation operator invalid for term", safe);
+        }
+
         if (!t.isNormalized())
             return fail(t, "Task Term not a normalized Compound", safe);
+
+        if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
+            return fail(t, "Belief or goal with query variable", safe);
+        }
 
         if (nar != null) {
             int maxVol = nar.termVolumeMax.intValue();
@@ -191,15 +200,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 //            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
 //        }
 
-        if (Param.DEBUG) {
-            if (t.ORrecurse(Op::isAbsolute)) // t.contains(True) || t.contains(False))
-                throw new InvalidTaskException(t, "term contains True or False");
-        }
-
-        if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
-            return fail(t, "Belief or goal with query variable", safe);
-        }
-
+        Term c = $.terms.atemporalize(t);
+        if (!(c instanceof Compound))
+            throw new InvalidTaskException(t, "no associated concept");
 
         return taskStatementValid(t, punc, safe);
     }
@@ -391,7 +394,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     }
 
 
-    /** to the interval [x,y] */
+    /**
+     * to the interval [x,y]
+     */
     default long nearestStartOrEnd(long x, long y) {
         long a = this.start();
         if (a == ETERNAL)
@@ -406,8 +411,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                 //HACK there is probably a better way
                 long u = nearestStartOrEnd(a, b, x);
                 long v = nearestStartOrEnd(a, b, y);
-                if (Math.min(Math.abs(u-a),Math.abs(u-b)) <
-                    Math.min(Math.abs(v-a),Math.abs(v-b))) {
+                if (Math.min(Math.abs(u - a), Math.abs(u - b)) <
+                        Math.min(Math.abs(v - a), Math.abs(v - b))) {
                     return u;
                 } else {
                     return v;
@@ -674,7 +679,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
 
             float minEve = c2w(minConf);
-            if (eve >=  minEve) {
+            if (eve >= minEve) {
                 return new PreciseTruth(freq(), eve, false);
 
                 //quantum entropy uncertainty:
@@ -733,8 +738,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     }
 
 
-
-    @Deprecated @Nullable
+    @Deprecated
+    @Nullable
     static NALTask clone(@NotNull Task x, @NotNull Compound newContent) {
 
         boolean negated = (newContent.op() == NEG);
@@ -821,7 +826,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 //        }
 //    }
 
-    default boolean contains(long when) {
+    default boolean during(long when) {
         long start = start();
 
         if (start == when) return true;
@@ -835,53 +840,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         return false;
     }
 
-    /**
-     * prepares a term for use as a Task's content
-     */
-    @Deprecated
-    @Nullable
-    static Compound content(@Nullable final Term r, NAR nar) {
-        return compoundOrNull(r);
-//        if (r == null)
-//            return null;
-//
-//        //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
-//        boolean negated;
-//        Term s = r;
-//        if (r.op() == NEG) {
-//            s = r.unneg();
-//            if (s instanceof Variable)
-//                return null; //throw new InvalidTaskException(r, "unwrapped variable"); //should have been prevented earlier
-//
-//            negated = true;
-//            if (s instanceof Compound) {
-//                return (Compound) r; //its normal compound inside the negation, handle it in Task constructor
-//            }
-//        } else if (r instanceof Compound) {
-//            return (Compound) r; //do not uncompress any further
-//        } else if (r instanceof Variable) {
-//            return null;
-//        } else {
-//            negated = false;
-//        }
-//
-//        if (!(s instanceof Compound)) {
-//            Compound t = compoundOrNull(nar.post(s));
-//            if (t == null)
-//                return null; //throw new InvalidTaskException(r, "undecompressible");
-//            else
-//                return (Compound) $.negIf(t, negated); //done
-////            else
-////            else if (s.op()==NEG)
-////                return (Compound) $.negIf(post(s.unneg(), nar));
-////            else
-////                return (Compound) $.negIf(s, negated);
-//        }
-//        //its a normal negated compound, which will be unnegated in task constructor
-//        return (Compound) s;
-    }
-
-//    /**
+    //    /**
 //     * returns the time separating this task from a target time. if the target occurrs
 //     * during this task, the distance is zero. if this task is eternal, then ETERNAL is returned
 //     */
@@ -1025,6 +984,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
         boolean negated = false;
 
+        if ((cc = normalizedOrNull(cc, index)) == null)
+            return null;
+
         if (cc.op() == NEG) {
             cc = compoundOrNull(cc.unneg());
             if (cc == null)
@@ -1032,9 +994,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
             negated = !negated;
         }
-
-        if ((cc = normalizedOrNull(cc, index)) == null)
-            return null;
 
         if (Task.taskContentValid(cc, punc, null, true))
             return PrimitiveTuples.pair(cc, negated);

@@ -1,4 +1,4 @@
-package nars.nal.nal7;
+package nars.term;
 
 import nars.*;
 import nars.concept.CompoundConcept;
@@ -84,9 +84,28 @@ public class TemporalTest {
     }
 
     @Test public void testAtemporalization2() throws Narsese.NarseseException {
-        Compound x = $("((--,(($1&&nario(29,25)) ==>+1412 ((--,nario(9,13)) &&+29 $1))) &&+1418 (--,nario(9,13)))");
+        assertEquals("(y &&+- (--,y))", $.terms.atemporalize($("(y &&+3 (--,y))")).toString());
+    }
+    @Test public void testAtemporalization3() throws Narsese.NarseseException {
+        assertEquals("",
+                $.terms.atemporalize($("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))")).toString());
+    }
+
+    @Test public void testAtemporalization4() throws Narsese.NarseseException {
+        //maintain temporal information that would otherwise be factored out if non-temporal
+        assertEquals("(($1 && x) ==>+- ($1 && y))",
+                $.terms.atemporalize($("(($1 && x) ==>+1 ($1 &&+1 y))")).toString());
+    }
+
+    @Test public void testAtemporalization5() throws Narsese.NarseseException {
+        assertEquals("((x==>y) &&+- y)",
+                $.terms.atemporalize($("((x==>y) &&+1 y)")).toString());
+    }
+
+    @Test public void testAtemporalization6() throws Narsese.NarseseException {
+        Compound x = $("((--,(($1&&x) ==>+1 ((--,y) &&+2 $1))) &&+3 (--,y))");
         Term y = $.terms.atemporalize(x);
-        assertEquals("",y);
+        assertEquals("((--,(($1&&x) ==> ((--,y) && $1))) && (--,y))",y);
     }
 
     @Test

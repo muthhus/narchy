@@ -343,7 +343,7 @@ public class IO {
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
             Term read = (s[i] = readTerm(in, t));
-            if (read == null || isAbsolute(read))
+            if (read == null || bool(read))
                 throw new InvalidTermException(Op.PROD /* consider the termvector as a product */, s, "invalid");
         }
 
@@ -368,7 +368,7 @@ public class IO {
         }
 
         Term y = o.the(dt, v);
-        if (isAbsolute(y))
+        if (bool(y))
             throw new InvalidTermException(o, dt, v, "invalid term");
 
 //        if (key == null)

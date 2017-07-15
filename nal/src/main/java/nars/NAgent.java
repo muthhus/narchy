@@ -14,8 +14,8 @@ import jcog.pri.mix.PSink;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
-import nars.task.GeneratedTask;
 import nars.task.ITask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -692,7 +692,8 @@ abstract public class NAgent implements NSense, NAct {
 
         term = nar.terms.normalize(term);
 
-        GeneratedTask t = new GeneratedTask(term, punct, tFinal, now, start, end, new long[]{nar.time.nextStamp()});
+        NALTask t = new NALTask(term, punct, tFinal, now, start, end
+                , new long[]{nar.time.nextStamp()});
         t.setPri(nar.priorityDefault(punct));
         return t;
     }

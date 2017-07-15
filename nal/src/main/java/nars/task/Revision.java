@@ -141,7 +141,7 @@ public class Revision {
         }
 
 
-        RevisionTask t = new RevisionTask(cc, a.punc(),
+        NALTask t = new NALTask(cc, a.punc(),
                 newTruth,
                 now, start, end,
                 Stamp.zip(a.stamp(), b.stamp(), aProp) //get a stamp collecting all evidence from the table, since it all contributes to the result

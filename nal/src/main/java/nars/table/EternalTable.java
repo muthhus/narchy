@@ -7,9 +7,10 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.TaskConcept;
 import nars.control.Cause;
+import nars.task.NALTask;
 import nars.task.Revision;
-import nars.task.RevisionTask;
 import nars.term.Compound;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
@@ -124,9 +125,10 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
     @Override
     public void forEachTask(Consumer<? super Task> x) {
-        super.forEach((y) -> { if (!y.isDeleted()) x.accept(y); } );
+        super.forEach((y) -> {
+            if (!y.isDeleted()) x.accept(y);
+        });
     }
-
 
 
     //    @Override
@@ -164,7 +166,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         return iterator();
     }
 
-    /** for ranking purposes */
+    /**
+     * for ranking purposes
+     */
     public final float floatValueOf(@NotNull Task w) {
         //return rankEternalByConfAndOriginality(w);
         return -w.conf();
@@ -243,7 +247,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             Truth oldBeliefTruth = x.truth();
 
-            Truth c = Revision.revise(newBeliefTruth, oldBeliefTruth, 1f, conclusion == null ?  0 : conclusion.evi());
+            Truth c = Revision.revise(newBeliefTruth, oldBeliefTruth, 1f, conclusion == null ? 0 : conclusion.evi());
 
             //avoid a weak or duplicate truth
             if (c == null || c.equals(oldBeliefTruth) || c.equals(newBeliefTruth))
@@ -272,12 +276,14 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         if (t == null)
             return null;
 
-        RevisionTask r = new RevisionTask(t,
-                newBelief, oldBelief,
+        NALTask r = new NALTask(t,
+                newBelief.punc(),
                 conclusion,
                 nar.time(),
-                ETERNAL, ETERNAL);
-        r.setPri(BudgetFunctions.fund(1f,false,oldBelief,newBelief));
+                ETERNAL, ETERNAL,
+                Stamp.zip(oldBelief.stamp(), newBelief.stamp(), 0.5f /* TODO proportionalize */)
+        );
+        r.setPri(BudgetFunctions.fund(1f, false, oldBelief, newBelief));
         r.cause = Cause.zip(newBelief, oldBelief);
 
         if (Param.DEBUG)
@@ -431,11 +437,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
 
-        if (activated!=null)
+        if (activated != null)
             TaskTable.activate(activated, activation, nar);
     }
-
-
 
 
     /**
@@ -479,8 +483,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         et.put(input);
 
     }
-
-
 
 
 }

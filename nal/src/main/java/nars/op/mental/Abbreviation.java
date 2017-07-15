@@ -16,7 +16,7 @@ import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
-import nars.task.GeneratedTask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -90,7 +90,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
     @Override
     protected void in(@NotNull Task task, @NotNull Consumer<PriReference<Compound>> each) {
 
-        if (task instanceof AbbreviationTask)
+        if (task.meta(Abbreviation.class)==null)
             return;
 
         Priority b = task.priority().clonePri();
@@ -205,12 +205,13 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
                     //logger.info("{} <=== {}", alias, abbreviatedTerm);
                     Compound abbreviatedTerm = abbreviated.term();
 
-                    Task abbreviationTask = new AbbreviationTask(
+                    Task abbreviationTask = new NALTask(
                             abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
                             nar.time(), ETERNAL, ETERNAL,
-                            new long[]{nar.time.nextStamp()}, abbreviatedTerm, aliasTerm
+                            new long[]{nar.time.nextStamp()}
                     );
-                    abbreviationTask.log("Abbreviate");
+                    abbreviationTask.meta(Abbreviation.class, new Term[] { abbreviatedTerm, aliasTerm.term() });
+                    abbreviationTask.log("Abbreviate"); //, abbreviatedTerm, aliasTerm
                     abbreviationTask.priority().setPri(b);
                     abbreviationTask.priority();
 //        if (srcCopy == null) {
@@ -418,31 +419,31 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
     }
 
 
-    public static class AbbreviationTask extends GeneratedTask {
-
-        @NotNull
-        private final Compound abbreviated;
-        @NotNull
-        private final Term alias;
-
-        public AbbreviationTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] evidence, @NotNull Compound abbreviated, @NotNull Termed alias) {
-            super(term, punc, truth, creation, start, end, evidence);
-            this.abbreviated = abbreviated;
-            this.alias = alias.term();
-        }
-
-
-//        @Override
-//        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
+//    public static class AbbreviationTask extends NALTask {
 //
-//            super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
+//        @NotNull
+//        private final Compound abbreviated;
+//        @NotNull
+//        private final Term alias;
 //
-//
-//            if (deltaConfidence == deltaConfidence /* wasn't deleted, even for questions */ && !isDeleted()) {
-//                @Nullable Concept c = concept(nar);
-//                c.put(Abbreviation.class, alias);
-//
-//            }
+//        public AbbreviationTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] evidence, @NotNull Compound abbreviated, @NotNull Termed alias) {
+//            super(term, punc, truth, creation, start, end, evidence);
+//            this.abbreviated = abbreviated;
+//            this.alias = alias.term();
 //        }
-    }
+//
+//
+////        @Override
+////        public void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, @NotNull NAR nar) {
+////
+////            super.feedback(delta, deltaConfidence, deltaSatisfaction, nar);
+////
+////
+////            if (deltaConfidence == deltaConfidence /* wasn't deleted, even for questions */ && !isDeleted()) {
+////                @Nullable Concept c = concept(nar);
+////                c.put(Abbreviation.class, alias);
+////
+////            }
+////        }
+//    }
 }

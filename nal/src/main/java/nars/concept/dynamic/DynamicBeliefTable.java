@@ -7,7 +7,7 @@ import nars.Task;
 import nars.concept.TaskConcept;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
-import nars.task.AnswerTask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -24,9 +24,9 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
-        if (input instanceof AnswerTask) {
-            return; //dont insert its own dynamic belief task, causing a feedback loop
-        }
+//        if (input instanceof AnswerTask) {
+//            return; //dont insert its own dynamic belief task, causing a feedback loop
+//        }
 
         super.add(input, concept, nar);
     }
@@ -39,13 +39,13 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
 
-    public DynamicBeliefTask generate( @NotNull Compound template, long when, NAR nar) {
+    public NALTask generate( @NotNull Compound template, long when, NAR nar) {
         return generate(template, when, null, nar);
     }
 
 
     @Nullable
-    public DynamicBeliefTask generate(@NotNull Compound template, long when, @Nullable Priority b, NAR nar) {
+    public NALTask generate(@NotNull Compound template, long when, @Nullable Priority b, NAR nar) {
 
         DynTruth yy = truth(when,  template, true, nar);
         if (yy == null)

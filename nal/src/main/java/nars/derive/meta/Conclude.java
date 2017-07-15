@@ -54,8 +54,8 @@ public final class Conclude extends AbstractPred<Derivation> {
     public Conclude(@NotNull PremiseRule rule, @NotNull Term conclusionPattern,
                     @Nullable TruthOperator belief, @Nullable TruthOperator goal,
                     @NotNull TimeFunctions time) {
-        super($.func((Atomic)$.the("conc"),
-               conclusionPattern, $.the(/*"time" + */time.toString())));
+        super($.func((Atomic) $.the("conc"),
+                conclusionPattern, $.the(/*"time" + */time.toString())));
 
         this.rule = rule;
         this.time = time;
@@ -84,7 +84,7 @@ public final class Conclude extends AbstractPred<Derivation> {
      */
     @Override
     public final boolean test(@NotNull Derivation d) {
-         NAR nar = d.nar;
+        NAR nar = d.nar;
 
         if (rule.minNAL > nar.level())  //HACK
             return true;
@@ -114,7 +114,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 
             @NotNull final long[] occ;
 
-            final Compound c2;
+            Compound c2;
             if (d.temporal) {
                 //            if (nar.level() < 7)
                 //                throw new NAR.InvalidTaskException(content, "invalid NAL level");
@@ -125,7 +125,44 @@ public final class Conclude extends AbstractPred<Derivation> {
                 Compound temporalized;
                 boolean negated;
                 if (o == NEG) {
-                    temporalized = Task.content(c1.unneg(), nar);
+                    //        if (r == null)
+//            return null;
+//
+//        //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
+//        boolean negated;
+//        Term s = r;
+//        if (r.op() == NEG) {
+//            s = r.unneg();
+//            if (s instanceof Variable)
+//                return null; //throw new InvalidTaskException(r, "unwrapped variable"); //should have been prevented earlier
+//
+//            negated = true;
+//            if (s instanceof Compound) {
+//                return (Compound) r; //its normal compound inside the negation, handle it in Task constructor
+//            }
+//        } else if (r instanceof Compound) {
+//            return (Compound) r; //do not uncompress any further
+//        } else if (r instanceof Variable) {
+//            return null;
+//        } else {
+//            negated = false;
+//        }
+//
+//        if (!(s instanceof Compound)) {
+//            Compound t = compoundOrNull(nar.post(s));
+//            if (t == null)
+//                return null; //throw new InvalidTaskException(r, "undecompressible");
+//            else
+//                return (Compound) $.negIf(t, negated); //done
+////            else
+////            else if (s.op()==NEG)
+////                return (Compound) $.negIf(post(s.unneg(), nar));
+////            else
+////                return (Compound) $.negIf(s, negated);
+//        }
+//        //its a normal negated compound, which will be unnegated in task constructor
+//        return (Compound) s;
+                    temporalized = compoundOrNull(c1.unneg());
                     if (temporalized == null) {
                         temporalized = c1; //use as-is since it cant be decompressed unnegated
                         negated = false;
@@ -201,6 +238,16 @@ public final class Conclude extends AbstractPred<Derivation> {
                 c2 = c1;
             }
 
+            if (varIntro) {
+                Compound Cv = normalizedOrNull(DepIndepVarIntroduction.varIntro(c2, nar), d.terms,
+                        d.temporal ? d.terms.retemporalizationZero : d.terms.retemporalizationDTERNAL //select between eternal and parallel depending on the premises's temporality
+                );
+
+                if (Cv == null || Cv.equals(c2) /* keep only if it differs */)
+                    return true;
+
+                c2 = Cv;
+            }
 
             byte punc = d.concPunc;
             @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2, punc, d.terms);
@@ -208,29 +255,15 @@ public final class Conclude extends AbstractPred<Derivation> {
 
                 boolean negating = c3n.getTwo();
 
-                Compound C = c3n.getOne();
-                if (varIntro) {
-                    Compound Cv = normalizedOrNull(DepIndepVarIntroduction.varIntro(C, nar), d.terms,
-                            d.temporal ? d.terms.retemporalizationZero : d.terms.retemporalizationDTERNAL //select between eternal and parallel depending on the premises's temporality
-                    );
+                final Compound C = c3n.getOne();
 
-                    if (Cv == null || Cv.equals(C) /* keep only if it differs */)
-                        return true;
-                    else {
-                        C = Cv;
-                        if (C.op()==NEG) {
-                            C = compoundOrNull(C.unneg()); //argh
-                            if (C == null)
-                                return true;
-                            negating = !negating;
-                        }
-                    }
-                }
 
                 long start = occ[0];
                 long end = occ[1];
                 if (start != ETERNAL && end < start) { //why?
-                    long s = start; start = end; end = s; //swap
+                    long s = start;
+                    start = end;
+                    end = s; //swap
                 }
 
                 float priority = d.parentPri; //d.budgeting.budget(d, C, truth, punc, start, end);

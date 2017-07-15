@@ -12,7 +12,6 @@ import nars.derive.meta.OccurrenceSolver;
 import nars.derive.rule.PremiseRule;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
@@ -985,7 +984,7 @@ public interface TimeFunctions {
             //set subterm 1's DT
             Term newSubterm1 = p.terms.the((Compound) derived.sub(1), postDT);
 
-            if (isAbsolute(newSubterm1))
+            if (bool(newSubterm1))
                 return null;
 
             derived = compoundOrNull(

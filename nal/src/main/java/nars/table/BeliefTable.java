@@ -5,8 +5,9 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.control.Cause;
-import nars.task.AnswerTask;
+import nars.task.NALTask;
 import nars.term.Compound;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -208,13 +209,13 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         if (answer == null || answer.isDeleted())
             return null;
 
-        boolean novel = (answer instanceof AnswerTask); //includes: answers, revision, or dynamic
+        boolean novel = true; //(answer instanceof AnswerTask); //includes: answers, revision, or dynamic
                     //&& !(answer instanceof DynamicBeliefTask);
 
 
         //project if different occurrence
-        long answerStart = answer.start();
-        if (answerStart!=ETERNAL && answerStart != when) {
+
+        if (!answer.isEternal() && !answer.during(when)) {
 
             if (when == ETERNAL)
                 when = now;
@@ -227,11 +228,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                 if (at==null)
                     return null;
 
-                AnswerTask a = new AnswerTask(
+                NALTask a = new NALTask(
                         at,
-                        answer,
-                        question,
-                        aProj, now, when, when, 0.5f);
+                        answer.punc(),
+                        aProj, now, when, when,
+                        Stamp.zip(answer.stamp(), question.stamp(), 0.5f));
                 a.setPri(answer.priElseZero());
                 a.cause = Cause.zip(question, answer);
 

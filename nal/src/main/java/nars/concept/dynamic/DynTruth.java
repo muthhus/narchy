@@ -8,6 +8,7 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.control.Cause;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
@@ -85,7 +86,7 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    @Nullable public DynamicBeliefTask task(@NotNull Compound c, boolean beliefOrGoal, long cre, long start, long end, @Nullable Priority b, NAR nar) {
+    public NALTask task(@NotNull Compound c, boolean beliefOrGoal, long cre, long start, long end, @Nullable Priority b, NAR nar) {
 
         Truth tr = truth();
         if (tr == null)
@@ -105,8 +106,6 @@ public final class DynTruth implements Truthed {
         if (null == (c = nar.terms.retemporalize(c, nar.terms.retemporalizationZero)))
             return null;
 
-        if (null == (c = Task.content(c, nar)))
-            return null;
 
         // then if the term is valid, see if it is valid for a task
         if (!Task.taskContentValid(c, beliefOrGoal ? BELIEF : GOAL, null, true)) {
@@ -122,7 +121,7 @@ public final class DynTruth implements Truthed {
             tr = tr.negated();
         }
 
-        DynamicBeliefTask dyn = new DynamicBeliefTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
+        NALTask dyn = new NALTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,
                 tr, cre, start, end /*+ dur*/, evidence());
         dyn.cause = cause();
         dyn.setPri(priority);

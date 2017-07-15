@@ -10,7 +10,7 @@ import nars.NAR;
 import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.index.term.TermIndex;
-import nars.task.GeneratedTask;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Stamp;
@@ -242,7 +242,7 @@ public class MySTMClustered extends STMClustered {
                             int uuLen = uu.length;
                             long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
 
-                            Task m = new GeneratedTask(cp.getOne(), punc,
+                            Task m = new NALTask(cp.getOne(), punc,
                                     $.t(finalFreq, conf).negIf(cp.getTwo()), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
                             float maxPri = new FasterList<>(uuLen, uu)

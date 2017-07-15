@@ -8,6 +8,7 @@ import jcog.pri.Priority;
 import nars.*;
 import nars.concept.PermanentConcept;
 import nars.nar.NARS;
+import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.Variable;
@@ -69,7 +70,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
         byte[] decoded;
 
         private final float score;
-        private AbbreviationTask relation;
+        private NALTask relation;
 
         Abbr(Compound decompressed, float initialPri) {
             super(decompressed, 0 );
@@ -103,11 +104,12 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
             ec.put(encode, this);
             dc.put(decode, this);
 
-            relation = new AbbreviationTask(
+            relation = new NALTask(
                     s, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
                     nar.time(), ETERNAL, ETERNAL,
-                    new long[]{nar.time.nextStamp()}, decompressed, compressed
+                    new long[]{nar.time.nextStamp()}
             );
+            relation.meta(Abbreviation.class, new Term[] { decompressed, compressed } );
             relation.log("Abbreviate");
             relation.budget(nar);
             nar.input(relation);
@@ -116,7 +118,7 @@ public class Compressor extends Abbreviation /* implements RemovalListener<Compo
         }
 
         public void stop() {
-            AbbreviationTask r = this.relation;
+            NALTask r = this.relation;
             if (r !=null) {
                 this.relation = null;
 

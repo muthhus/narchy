@@ -61,8 +61,8 @@ public enum Op implements $ {
                 if (x.op() == NEG)
                     return x.unneg();
             } else if (x instanceof Bool) {
-                if (isFalse(x)) return True;
-                if (isTrue(x)) return False;
+                if (x == False) return True;
+                if (x == True) return False;
                 else return Null;
             }
 
@@ -294,9 +294,9 @@ public enum Op implements $ {
         private Term[] conjTrueFalseFilter(@NotNull Term... u) {
             int trues = 0; //# of True subterms that can be eliminated
             for (Term x : u) {
-                if (isTrue(x)) {
+                if (x == True) {
                     trues++;
-                } else if (isFalse(x)) {
+                } else if (x == False) {
 
                     //false subterm in conjunction makes the entire condition false
                     //this will eventually reduce diectly to false in this method's only callee HACK
@@ -315,7 +315,7 @@ public enum Op implements $ {
             int j = 0;
             for (int i = 0; j < y.length; i++) {
                 Term uu = u[i];
-                if (!isTrue(uu)) // && (!uu.equals(False)))
+                if (!(uu == True)) // && (!uu.equals(False)))
                     y[j++] = uu;
             }
 
@@ -747,21 +747,14 @@ public enum Op implements $ {
         return ((existing | possiblyIncluded) == existing);
     }
 
-    public static boolean isAbsolute(@NotNull Term x) {
+    public static boolean bool(@NotNull Term x) {
         return x instanceof Bool;
     }
 
     public static boolean isTrueOrFalse(@NotNull Term x) {
-        return isTrue(x) || isFalse(x);
+        return x == True || x == False;
     }
 
-    public static boolean isTrue(@NotNull Term x) {
-        return x == True;
-    }
-
-    public static boolean isFalse(@NotNull Term x) {
-        return x == False;
-    }
     //CaffeineMemoize.build(buildTerm, -1 /* softref */, true /* Param.DEBUG*/);
     //new NullMemoize<>(buildTerm);
 
@@ -952,7 +945,7 @@ public enum Op implements $ {
 
                 if (subject.equals(predicate))
                     return True;
-                if (isAbsolute(subject) || isAbsolute(predicate))
+                if (bool(subject) || bool(predicate))
                     return False;
                 break;
 
@@ -985,7 +978,7 @@ public enum Op implements $ {
                 //if (isFalse(predicate)) return neg(subject);
                 if (concurrent(dt) && subject.equals(predicate))
                     return True;
-                if (isTrue(subject) || isFalse(subject))
+                if (subject == True || subject == False)
                     return False; //otherwise they are absolutely inequal
 
                 if (!validEquivalenceTerm(subject))
@@ -1032,12 +1025,12 @@ public enum Op implements $ {
                 //special case for implications: reduce to --predicate if the subject is False
                 if (isTrueOrFalse(subject /* antecedent */)) {
                     if (concurrent(dt))
-                        return $.negIf(predicate, isFalse(subject));
+                        return $.negIf(predicate, subject == False);
                     else {
                         return Null; //no temporal basis
                     }
                 }
-                if (isAbsolute(predicate /* consequence */))
+                if (bool(predicate /* consequence */))
                     return Null;
                 if (subject.hasAny(InvalidImplicationSubj))
                     return Null; //throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
@@ -1057,18 +1050,18 @@ public enum Op implements $ {
                 } //else: allow repeat
 
 
-                // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
-                if (predicate.op() == IMPL) {
-                    Compound cpr = (Compound) predicate;
-                    int cprDT = cpr.dt();
-                    if (cprDT != XTERNAL) {
-                        Term a = cpr.sub(0);
-
-                        subject = CONJ.the(dt, subject, a);
-                        predicate = cpr.sub(1);
-                        return IMPL.the(cprDT, subject, predicate);
-                    }
-                }
+//                // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
+//                if (predicate.op() == IMPL) {
+//                    Compound cpr = (Compound) predicate;
+//                    int cprDT = cpr.dt();
+//                    if (cprDT != XTERNAL) {
+//                        Term a = cpr.sub(0);
+//
+//                        subject = CONJ.the(dt, subject, a);
+//                        predicate = cpr.sub(1);
+//                        return IMPL.the(cprDT, subject, predicate);
+//                    }
+//                }
 
 
                 break;
@@ -1213,10 +1206,10 @@ public enum Op implements $ {
 
         int trues = 0;
         for (Term x : t) {
-            if (isTrue(x)) {
+            if (x == True) {
                 //everything intersects with the "all", so remove this TRUE below
                 trues++;
-            } else if (isFalse(x)) {
+            } else if (x == False) {
                 return Null;
             }
         }
@@ -1226,7 +1219,7 @@ public enum Op implements $ {
             } else if (t.length - trues == 1) {
                 //find the element which is not true and return it
                 for (Term x : t) {
-                    if (!isTrue(x))
+                    if (!(x == True))
                         return x;
                 }
             } else {
@@ -1234,7 +1227,7 @@ public enum Op implements $ {
                 Term[] t2 = new Term[t.length - trues];
                 int yy = 0;
                 for (Term x : t) {
-                    if (!isTrue(x))
+                    if (!(x == True))
                         t2[yy++] = x;
                 }
                 t = t2;

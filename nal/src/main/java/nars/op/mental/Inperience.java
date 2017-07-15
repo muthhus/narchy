@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
+import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.term.atom.Atomic.the;
 import static nars.time.Tense.ETERNAL;
@@ -164,7 +165,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
     protected void in(Task task, @NotNull Consumer<PriReference<Task>> each) {
 
 
-        if (task.isCommand() || task.isInput() || task instanceof Abbreviation.AbbreviationTask
+        if (task.isCommand() || task.isInput()
             /*|| task instanceof InperienceTask*/) //for disabling recursive inperience
             return;
 
@@ -225,7 +226,44 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
         Task task = b.get();
 
         //try {
-        Compound r = normalizedOrNull(Task.content(reify(task, nar.self()), nar), nar.terms);
+        //        if (r == null)
+//            return null;
+//
+//        //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
+//        boolean negated;
+//        Term s = r;
+//        if (r.op() == NEG) {
+//            s = r.unneg();
+//            if (s instanceof Variable)
+//                return null; //throw new InvalidTaskException(r, "unwrapped variable"); //should have been prevented earlier
+//
+//            negated = true;
+//            if (s instanceof Compound) {
+//                return (Compound) r; //its normal compound inside the negation, handle it in Task constructor
+//            }
+//        } else if (r instanceof Compound) {
+//            return (Compound) r; //do not uncompress any further
+//        } else if (r instanceof Variable) {
+//            return null;
+//        } else {
+//            negated = false;
+//        }
+//
+//        if (!(s instanceof Compound)) {
+//            Compound t = compoundOrNull(nar.post(s));
+//            if (t == null)
+//                return null; //throw new InvalidTaskException(r, "undecompressible");
+//            else
+//                return (Compound) $.negIf(t, negated); //done
+////            else
+////            else if (s.op()==NEG)
+////                return (Compound) $.negIf(post(s.unneg(), nar));
+////            else
+////                return (Compound) $.negIf(s, negated);
+//        }
+//        //its a normal negated compound, which will be unnegated in task constructor
+//        return (Compound) s;
+        Compound r = normalizedOrNull(compoundOrNull(reify(task, nar.self())), nar.terms);
         if (r != null) {
 
             long now = nar.time();
@@ -239,10 +277,12 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
             }
 
             in.input(
-                new InperienceTask(r,
+                new NALTask(r, BELIEF,
                     new DiscreteTruth(1, nar.confDefault(Op.BELIEF)),
-                    now, start, end, task
-                ).pri(task.priElseZero() * priFactor)
+                    now, start, end, task.stamp()
+                )
+                    .log("Inperience")
+                    .pri(task.priElseZero() * priFactor)
             );
 
             return 1;
@@ -308,19 +348,18 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
         return NON_INNATE_BELIEF_ATOMICs[r.nextInt(NON_INNATE_BELIEF_ATOMICs.length)];
     }
 
-    private static class InperienceTask extends NALTask {
-
-        public InperienceTask(Compound r, Truth t, long now, long start, long end, Task task) {
-            super(r, Op.BELIEF, t, now, start, end, task.stamp());
-            log("Inperience");
-        }
-
-        @Override
-        public ITask[] run(NAR n) {
-            logger.info(" {}", this);
-            return super.run(n);
-        }
-    }
+//    private static class InperienceTask extends NALTask {
+//
+//        public InperienceTask(Compound r, Truth t, long now, long start, long end, Task task) {
+//            super(r, Op.BELIEF, t, now, start, end, task.stamp());
+//        }
+//
+//        @Override
+//        public ITask[] run(NAR n) {
+//            logger.info(" {}", this);
+//            return super.run(n);
+//        }
+//    }
 
 //    public static boolean random(@NotNull Random r, float prob, int volume) {
 //        return r.nextFloat()*volume <= prob;

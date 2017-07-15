@@ -7,7 +7,6 @@ import nars.Narsese;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.nar.Terminal;
-import nars.task.AnswerTask;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -87,7 +86,7 @@ public class RTreeBeliefTableTest {
         MultiStatistics<Task> m = new MultiStatistics<Task>()
             .classify("input", (t) -> t.isInput())
             .classify("derived", (t) -> t instanceof DerivedTask)
-            .classify("revised", (t) -> t instanceof AnswerTask)
+//            .classify("revised", (t) -> t instanceof AnswerTask)
             .value("pri", (t) -> t.pri())
             .value2D("truth", (t) -> new float[] { t.freq(), t.conf() })
             .value("freqErr", (t) -> Math.abs( ((t.freq()-0.5f)*2f) - func.valueOf(t.mid())) )

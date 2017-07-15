@@ -109,7 +109,44 @@ public class TaskRule extends TaskMatch {
         Compound y = compoundOrNull(new MapSubst(xy).transform(output, nar.terms));
         if (y==null) return;
 
-        y = Task.content(y, nar);
+        //        if (r == null)
+//            return null;
+//
+//        //unnegate and check for an apparent atomic term which may need decompressed in order to be the task's content
+//        boolean negated;
+//        Term s = r;
+//        if (r.op() == NEG) {
+//            s = r.unneg();
+//            if (s instanceof Variable)
+//                return null; //throw new InvalidTaskException(r, "unwrapped variable"); //should have been prevented earlier
+//
+//            negated = true;
+//            if (s instanceof Compound) {
+//                return (Compound) r; //its normal compound inside the negation, handle it in Task constructor
+//            }
+//        } else if (r instanceof Compound) {
+//            return (Compound) r; //do not uncompress any further
+//        } else if (r instanceof Variable) {
+//            return null;
+//        } else {
+//            negated = false;
+//        }
+//
+//        if (!(s instanceof Compound)) {
+//            Compound t = compoundOrNull(nar.post(s));
+//            if (t == null)
+//                return null; //throw new InvalidTaskException(r, "undecompressible");
+//            else
+//                return (Compound) $.negIf(t, negated); //done
+////            else
+////            else if (s.op()==NEG)
+////                return (Compound) $.negIf(post(s.unneg(), nar));
+////            else
+////                return (Compound) $.negIf(s, negated);
+//        }
+//        //its a normal negated compound, which will be unnegated in task constructor
+//        return (Compound) s;
+        y = compoundOrNull(y);
         if (y==null) return;
 
         y = nar.terms.normalize(y);

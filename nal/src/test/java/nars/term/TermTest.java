@@ -48,6 +48,7 @@ public class TermTest {
     }
     static final NAR n = new Terminal(256);
 
+
     protected void assertEquivalentTerm(@NotNull String term1String, @NotNull String term2String) {
         try {
 
@@ -76,6 +77,11 @@ public class TermTest {
         assertEquals(0, term2.compareTo(term1));
         assertEquals(0, term1.compareTo(term1));
         assertEquals(0, term2.compareTo(term2));
+    }
+
+    @Test public void testInstantiateBoolsFromEquivString() {
+        for (Term b : new Term[] { True, False, Null })
+            assertTrue(b == $.the(b.toString()));
     }
 
     @Test
@@ -598,7 +604,7 @@ public class TermTest {
 
     public static void assertValid(Term o) {
         assertNotNull(o);
-        assertTrue(!isAbsolute(o));
+        assertTrue(!bool(o));
     }
 
     public static void assertValidTermValidConceptInvalidTaskContent(@NotNull Supplier<Term> o) {

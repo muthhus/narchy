@@ -2,10 +2,12 @@ package nars.task;
 
 import jcog.Util;
 import jcog.pri.Pri;
+import nars.$;
 import nars.Param;
 import nars.Task;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
@@ -68,15 +70,7 @@ public class NALTask extends Pri implements Task {
 //            }
 //        }
 
-        //finally, unwrap negation and invert truth
-        if (term.op() == NEG) {
-            term = compoundOrNull(term.unneg());
-            if (term == null)
-                throw new InvalidTaskException(term, "became non-compound on un-negation");
 
-            if (truth != null)
-                truth = truth.negated();
-        }
 
 
 
