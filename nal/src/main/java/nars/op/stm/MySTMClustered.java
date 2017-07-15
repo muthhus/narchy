@@ -237,7 +237,7 @@ public class MySTMClustered extends STMClustered {
                         if (conj == null)
                             return null;
 
-                        @Nullable ObjectBooleanPair<Compound> cp = Task.tryContent(conj, punc, nar.terms);
+                        @Nullable ObjectBooleanPair<Compound> cp = Task.tryContent(conj, punc, nar.terms, true);
                         if (cp != null) {
                             int uuLen = uu.length;
                             long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK

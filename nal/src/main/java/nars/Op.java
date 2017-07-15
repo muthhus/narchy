@@ -1,6 +1,7 @@
 package nars;
 
 
+import jcog.Util;
 import jcog.memoize.CaffeineMemoize;
 import jcog.memoize.Memoize;
 import nars.derive.meta.match.Ellipsislike;
@@ -163,25 +164,48 @@ public enum Op implements $ {
             }
 
 
-            int absoluteness = 0;
+            int absoluteness = 0, trues = 0;
             for (Term t : tt) {
                 if (t instanceof Bool) {
                     if (t == Null) return Null;
                     if (t == False) {
                         absoluteness = -1;
                     } else if (t == True) {
-                        if (absoluteness>=0)
+                        trues++;
+                        if (absoluteness >= 0)
                             absoluteness = +1; //only if not false, so false overrides
                     }
                 }
             }
             if (absoluteness == -1) return False;
-            if (absoluteness == +1) return True;
+            if (absoluteness == +1) {
+                if (concurrent(dt)) {
+
+                    //TODO special case where only one item is left, can avoid reconstructing
+
+                    //filter out all boolean terms
+
+                    Term[] y = new Term[tt.length - trues];
+                    int j = 0;
+                    for (int i = 0; j < y.length; i++) {
+                        Term uu = tt[i];
+                        if (!(uu == True)) // && (!uu.equals(False)))
+                            y[j++] = uu;
+                    }
+
+                    assert (j == y.length);
+
+                    return CONJ.the(dt, y);
+                } else {
+                    //nothing we can really do. maybe insert a depvar
+                    return Null;
+                }
+            }
 
 
             if (dt == XTERNAL) {
                 //leave un-sorted, un-de-duplicated
-                return conjImplReduction(compound(CONJ, XTERNAL, subterms(tt)));
+                return /*conjImplReduction*/(compound(CONJ, XTERNAL, subterms(tt)));
             }
 
             boolean commutive = concurrent(dt);
@@ -199,7 +223,6 @@ public enum Op implements $ {
 
                 Term a = tt[0];
                 Term b = tt[1];
-                boolean changed = false;
                 if (a.equals(b)) {
                     if (dt < 0) {
                         //make dt positive to avoid creating both (x &&+1 x) and (x &&-1 x)
@@ -213,14 +236,11 @@ public enum Op implements $ {
                         tt[0] = tt[1];
                         tt[1] = x; //swap
                         dt = -dt; //and invert time
-                        changed = true;
                     }
                 }
 
-                return conjImplReduction(
-                        !changed ?
-                                compound(CONJ, dt, subterms(tt)) :
-                                CONJ.the(dt, tt)
+                return /*conjImplReduction*/(
+                        compound(CONJ, dt, subterms(tt))
                 );
 
             }
@@ -287,42 +307,42 @@ public enum Op implements $ {
             return False;
         }
 
-        /**
-         * array implementation of the conjunction true/false filter
-         */
-        @NotNull
-        private Term[] conjTrueFalseFilter(@NotNull Term... u) {
-            int trues = 0; //# of True subterms that can be eliminated
-            for (Term x : u) {
-                if (x == True) {
-                    trues++;
-                } else if (x == False) {
-
-                    //false subterm in conjunction makes the entire condition false
-                    //this will eventually reduce diectly to false in this method's only callee HACK
-                    return FalseArray;
-                }
-            }
-
-            if (trues == 0)
-                return u;
-
-            int ul = u.length;
-            if (ul == trues)
-                return TrueArray; //reduces to an Imdex itself
-
-            Term[] y = new Term[ul - trues];
-            int j = 0;
-            for (int i = 0; j < y.length; i++) {
-                Term uu = u[i];
-                if (!(uu == True)) // && (!uu.equals(False)))
-                    y[j++] = uu;
-            }
-
-            assert (j == y.length);
-
-            return y;
-        }
+//        /**
+//         * array implementation of the conjunction true/false filter
+//         */
+//        @NotNull
+//        private Term[] conjTrueFalseFilter(@NotNull Term... u) {
+//            int trues = 0; //# of True subterms that can be eliminated
+//            for (Term x : u) {
+//                if (x == True) {
+//                    trues++;
+//                } else if (x == False) {
+//
+//                    //false subterm in conjunction makes the entire condition false
+//                    //this will eventually reduce diectly to false in this method's only callee HACK
+//                    return FalseArray;
+//                }
+//            }
+//
+//            if (trues == 0)
+//                return u;
+//
+//            int ul = u.length;
+//            if (ul == trues)
+//                return TrueArray; //reduces to an Imdex itself
+//
+//            Term[] y = new Term[ul - trues];
+//            int j = 0;
+//            for (int i = 0; j < y.length; i++) {
+//                Term uu = u[i];
+//                if (!(uu == True)) // && (!uu.equals(False)))
+//                    y[j++] = uu;
+//            }
+//
+//            assert (j == y.length);
+//
+//            return y;
+//        }
 
         /**
          * this is necessary to keep term structure consistent for intermpolation.
@@ -387,17 +407,21 @@ public enum Op implements $ {
                 others = xo.the(conjDT, Terms.sorted(ss) /* assumes commutive since > 2 */);
             }
 
-            return IMPL.the(implDT,
-                    /* new, factored precondition */
-                    CONJ.the(conjDT, others, implication.sub(0) /* impl precond */),
+            @NotNull Term ib = implication.sub(1); /* impl postcondition */
+            Term ia =
+                    CONJ.the(conjDT, others, implication.sub(0) /* impl precond */);
+            if (ia instanceof Bool) {
+                if (ia == True) //TODO maybe only applies to concurrent dt's
+                    return ib; //reduce to consequence
+                else
+                    return Null; //false or null
+            }
 
-                    implication.sub(1) /* impl postcondition */
-            );
+            return IMPL.the(implDT, ia, ib);
         }
     },
 
     //SPACE("+", true, 7, Args.GTEOne),
-
 
     /**
      * intensional set
@@ -772,7 +796,7 @@ public enum Op implements $ {
             case 1:
                 Term t0 = t[0];
                 return t0 instanceof Ellipsislike ?
-                        compound(op, DTERNAL, subterms(t0)) :
+                        new UnitCompound1(op, t0) :
                         Null;
             case 2:
                 Term et0 = t[0], et1 = t[1];
@@ -853,8 +877,8 @@ public enum Op implements $ {
     public static Term compoundNew(Op o, Term... subterms) {
 
         int s = subterms.length;
-        assert(o.maxSize >= s): "subterm overflow: " + o + " " + Arrays.toString(subterms);
-        assert(o.minSize <= s): "subterm underflow: " + o + " " + Arrays.toString(subterms);
+        assert (o.maxSize >= s) : "subterm overflow: " + o + " " + Arrays.toString(subterms);
+        assert (o.minSize <= s) : "subterm underflow: " + o + " " + Arrays.toString(subterms);
 
         switch (s) {
             case 1:
@@ -976,10 +1000,18 @@ public enum Op implements $ {
                 //if (isTrue(predicate)) return subject;
                 //if (isFalse(subject)) return neg(predicate);
                 //if (isFalse(predicate)) return neg(subject);
-                if (concurrent(dt) && subject.equals(predicate))
-                    return True;
-                if (subject == True || subject == False)
-                    return False; //otherwise they are absolutely inequal
+                if (concurrent(dt)) {
+                    if (subject.equals(predicate))
+                        return True;
+
+                } else {
+                    if (isTrueOrFalse(subject))
+                        return subject == predicate ? True : False;
+                    if (isTrueOrFalse(predicate))
+                        return False;
+
+                    //but allow ordinary term equality (across non-commutive 'dt')
+                }
 
                 if (!validEquivalenceTerm(subject))
                     throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
@@ -1050,18 +1082,18 @@ public enum Op implements $ {
                 } //else: allow repeat
 
 
-//                // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
-//                if (predicate.op() == IMPL) {
-//                    Compound cpr = (Compound) predicate;
-//                    int cprDT = cpr.dt();
-//                    if (cprDT != XTERNAL) {
-//                        Term a = cpr.sub(0);
-//
-//                        subject = CONJ.the(dt, subject, a);
-//                        predicate = cpr.sub(1);
-//                        return IMPL.the(cprDT, subject, predicate);
-//                    }
-//                }
+                // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
+                if (predicate.op() == IMPL) {
+                    Compound cpr = (Compound) predicate;
+                    int cprDT = cpr.dt();
+                    //if (cprDT != XTERNAL) {
+                    Term a = cpr.sub(0);
+
+                    subject = CONJ.the(dt, subject, a);
+                    predicate = cpr.sub(1);
+                    return IMPL.the(cprDT, subject, predicate);
+                    //}
+                }
 
 
                 break;
@@ -1155,11 +1187,10 @@ public enum Op implements $ {
                                     break;
                                 default:
                                     predicate = CONJ.the(cpred.dt(), Terms.sorted(ppp));
-                                    if (predicate == null)
-                                        return Null;
                                     break;
                             }
                         }
+
 
                         return op.the(dt, subject, predicate);
                     }
@@ -1374,7 +1405,8 @@ public enum Op implements $ {
         return the(dt, u);
     }
 
-    @NotNull public Term the(int dt, @NotNull Term... u) {
+    @NotNull
+    public Term the(int dt, @NotNull Term... u) {
         if (statement) {
             return statement(this, dt, u[0], u[1]);
         } else {

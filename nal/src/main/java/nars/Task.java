@@ -977,7 +977,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
      * necessitating an inversion of truth when constructing a Task with the input term
      */
     @Nullable
-    static ObjectBooleanPair<Compound> tryContent(@NotNull Term t, byte punc, TermIndex index) {
+    static ObjectBooleanPair<Compound> tryContent(@NotNull Term t, byte punc, TermIndex index, boolean safe) {
         @Nullable Compound cc = compoundOrNull(t);
         if (cc == null)
             return null;
@@ -995,7 +995,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
             negated = !negated;
         }
 
-        if (Task.taskContentValid(cc, punc, null, true))
+        if (Task.taskContentValid(cc, punc, null, safe))
             return PrimitiveTuples.pair(cc, negated);
         else
             return null;

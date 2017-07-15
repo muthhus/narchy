@@ -52,6 +52,7 @@ import nars.util.exe.Executioner;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
+import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
@@ -536,16 +537,18 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @Nullable
-    public Task input(float pri, Compound term, byte punc, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
+    public Task input(float pri, @NotNull Compound term, byte punc, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
 
-        if (term == null) {
-            throw new NullPointerException("null task term");
-        }
+
+        ObjectBooleanPair<Compound> b = Task.tryContent(term, punc, terms, false);
+        term = b.getOne();
+        if (b.getTwo())
+            freq = 1f - freq;
 
         DiscreteTruth tr = new DiscreteTruth(freq, conf, confMin.floatValue());
-        if (tr == null) {
+        if (tr == null)
             throw new InvalidTaskException(term, "insufficient confidence");
-        }
+
 
         Task y = new NALTask((Compound) term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[]{time.nextStamp()});
         y.setPri(pri);

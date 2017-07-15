@@ -98,8 +98,11 @@ public class TemporalTest {
     }
 
     @Test public void testAtemporalization5() throws Narsese.NarseseException {
+        Term c = $("(y &&+- (x==>y))");
+        assertTrue(c instanceof Compound);
+
         assertEquals("((x==>y) &&+- y)",
-                $.terms.atemporalize($("((x==>y) &&+1 y)")).toString());
+                $.terms.atemporalize(c).toString());
     }
 
     @Test public void testAtemporalization6() throws Narsese.NarseseException {
@@ -708,7 +711,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertTrue(Terms.equalAtemporally($("(x && (y ==> z))"), $.$("(x &&+1 (y ==> z))")));
+        //assertTrue(Terms.equalAtemporally($("(x && (y ==> z))"), $.$("(x &&+1 (y ==> z))")));
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
