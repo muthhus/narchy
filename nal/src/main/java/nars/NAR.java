@@ -4,10 +4,12 @@ package nars;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
+import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
+import jcog.meter.event.Histogram;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
@@ -48,6 +50,7 @@ import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.exe.Executioner;
+import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
@@ -132,12 +135,16 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     private TrieDeriver deriver;
 
-    public final Map<String, Double> conceptStats() {
+    /** creates a snapshot statistics object */
+    public synchronized SortedMap<String, Object> stats() {
+
         //Frequency complexity = new Frequency();
         Frequency clazz = new Frequency();
         Frequency policy = new Frequency();
-        Frequency volume = new Frequency();
         Frequency rootOp = new Frequency();
+
+        ShortCountsHistogram volume = new ShortCountsHistogram(1);
+
         AtomicInteger i = new AtomicInteger(0);
 
         LongSummaryStatistics beliefs = new LongSummaryStatistics();
@@ -153,7 +160,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         forEachConcept(c -> {
             i.incrementAndGet();
             //complexity.addValue(c.complexity());
-            volume.addValue(c.volume());
+            volume.recordValue(c.volume());
             rootOp.addValue(c.op());
             clazz.addValue(c.getClass().toString());
 
@@ -175,15 +182,23 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         });
 
-        Map<String,Double> x = new TreeMap();
-        x.put("concept sum", (double)i.get());
+        SortedMap<String, Object> x = new TreeMap();
 
-        x.put("termlink sum", ((double)termlinksUsed.getSum()));
-        x.put("tasklink sum", ((double)tasklinksUsed.getSum()));
-        x.put("belief sum", ((double)beliefs.getSum()));
-        x.put("goal sum", ((double)goals.getSum()));
+        x.put("time system", new Date());
+        x.put("time", time());
 
-        x.put("termlink usage", ((double)termlinksUsed.getSum()) / termlinksCap.getSum());
+        x.put("emotion", emotion.summary());
+
+        x.put("terms", terms.summary());
+
+        x.put("concept sum", (double) i.get());
+
+        x.put("termlink sum", ((double) termlinksUsed.getSum()));
+        x.put("tasklink sum", ((double) tasklinksUsed.getSum()));
+        x.put("belief sum", ((double) beliefs.getSum()));
+        x.put("goal sum", ((double) goals.getSum()));
+
+        x.put("termlink usage", ((double) termlinksUsed.getSum()) / termlinksCap.getSum());
 
         //x.put("volume mean", volume.);
 //
@@ -191,11 +206,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //        x.put("taskLinksUsed", tasklinksUsed);
 //        x.put("taskLinksCapacity", tasklinksCap);
 
-        //x.put("Complexity", complexity);
-        //x.put("policy", policy);
-        //x.put("rootOp", rootOp);
-        //x.put("volume", volume);
-        //x.put("class", clazz);
+        Util.toMap(policy, "concept state", x::put);
+        Util.toMap(rootOp, "concept op", x::put);
+        Util.toMap(volume, "concept volume", x::put);
+        Util.toMap(clazz, "concept class", x::put);
+
         return x;
     }
 
@@ -261,7 +276,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         short[] cs = new short[]{ci};
 
         return new PSink<ITask, ITask>(id, this::input) {
-            @Override public ITask apply(ITask x) {
+            @Override
+            public ITask apply(ITask x) {
                 if (x instanceof NALTask) {
                     //assert (((NALTask) x.ref).cause.length == 0);
                     NALTask t = (NALTask) x;

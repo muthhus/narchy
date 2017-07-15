@@ -81,8 +81,20 @@ public class OptiUnit<T> extends RunListener {
 
         @Override
         public void evaluate() throws Throwable {
+            try {
+                set();
+                run.evaluate();
+            } catch (Throwable t) {
+                get();
+                throw t;
+            }
+        }
+
+        public void set() {
             this.set.accept(test, method);
-            run.evaluate();
+        }
+
+        public void get() {
             this.get.accept(test, method);
         }
 

@@ -446,17 +446,6 @@ public class MultiNAR extends NAR {
         }
     }
 
-    public TreeMap<String, Object> stats() {
-        synchronized (terms) {
-            TreeMap<String, Object> m = new TreeMap();
-
-            m.put("now", new Date());
-
-            m.put("terms", terms.summary());
-            return m;
-        }
-    }
-
 //    public static void main(String[] args) {
 //
 //        NARS n = new NARS(

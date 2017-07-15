@@ -13,6 +13,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.SortedMap;
 
 import static nars.$.$;
 import static nars.Op.*;
@@ -30,13 +31,18 @@ public class NAL7Test extends AbstractNALTest {
         new OptiUnit<NAL7Test>((x,m)->{
 
             x.test.trace = false;
-            x.cycles = 1;
-            x.nar.termVolumeMax.setValue(10);
+            x.cycles = 40;
+            x.nar.termVolumeMax.setValue(28);
 
         }, (x, m) -> {
 
-            Map<String, Double> cstat = x.nar.conceptStats();
-            System.out.println(cstat);
+            SortedMap<String, Object> stat = x.nar.stats();
+
+            System.out.println(x + " " + m);
+            stat.forEach((k,v) -> {
+                System.out.println(k + "\t" + v);
+            });
+            System.out.println("\n");
 
         }, NAL7Test.class);
     }

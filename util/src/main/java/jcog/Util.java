@@ -31,7 +31,11 @@ import jcog.list.FasterList;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
 import jcog.pri.Priority;
+import org.HdrHistogram.AbstractHistogram;
+import org.HdrHistogram.Histogram;
+import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.block.function.primitive.DoubleToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
@@ -1764,6 +1768,18 @@ public enum Util {
             j--;
             i++;
         }
+    }
+
+    public static void toMap(Frequency f, String header, BiConsumer<String, Object> x) {
+        f.entrySetIterator().forEachRemaining((e) -> {
+            x.accept(header + " " + e.getKey(), e.getValue() );
+        });
+    }
+
+    public static void toMap(AbstractHistogram h, String header, BiConsumer<String, Object> x) {
+        h.percentiles(1).iterator().forEachRemaining(p -> {
+           x.accept(header + " " + p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + " ", p.getCountAddedInThisIterationStep());
+        });
     }
 
 }
