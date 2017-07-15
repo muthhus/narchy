@@ -15,6 +15,9 @@
  */
 package jcog.bloom;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+
 /**
  * Murmur3 32 and 128 bit variants.
  * 32-bit Java port of https://code.google.com/p/smhasher/source/browse/trunk/MurmurHash3.cpp#94
@@ -22,13 +25,7 @@ package jcog.bloom;
  */
 public enum Murmur3Hash {
     ;
-    // Constants for 32 bit variant
-    private static final int C1_32 = 0xcc9e2d51;
-    private static final int C2_32 = 0x1b873593;
-    private static final int R1_32 = 15;
-    private static final int R2_32 = 13;
-    private static final int M_32 = 5;
-    private static final int N_32 = 0xe6546b64;
+
 
     // Constants for 128 bit variant
     private static final long C1 = 0x87c37b91114253d5L;
@@ -41,73 +38,13 @@ public enum Murmur3Hash {
     private static final int N2 = 0x38495ab5;
 
     private static final int DEFAULT_SEED = 0;
+    private static final int SEED = 0x0;
+    private static final int AVALANCHING_MULTIPLIER1 = 0xcc9e2d51;
+    private static final int AVALANCHING_MULTIPLIER2 = 0x1b873593;
+    private static final int BLOCK_OFFSET = 0xe6546b64;
+    private static final int FINAL_AVALANCHING_MULTIPLIER1 = 0x85ebca6b;
+    private static final int FINAL_AVALANCHING_MULTIPLIER2 = 0xc2b2ae35;
 
-    /**
-     * Murmur3 32-bit variant.
-     *
-     * @param data - input byte array
-     * @return - hashcode
-     */
-    public static int hash32(byte[] data) {
-        return hash32(data, data.length, DEFAULT_SEED);
-    }
-
-    /**
-     * Murmur3 32-bit variant.
-     *
-     * @param data   - input byte array
-     * @param length - length of array
-     * @param seed   - seed. (default 0)
-     * @return - hashcode
-     */
-    public static int hash32(byte[] data, int length, int seed) {
-        int hash = seed;
-        int nblocks = length >> 2;
-
-        // body
-        for (int i = 0; i < nblocks; i++) {
-            int i_4 = i << 2;
-            int k = (data[i_4] & 0xff)
-                    | ((data[i_4 + 1] & 0xff) << 8)
-                    | ((data[i_4 + 2] & 0xff) << 16)
-                    | ((data[i_4 + 3] & 0xff) << 24);
-
-            // mix functions
-            k *= C1_32;
-            k = Integer.rotateLeft(k, R1_32);
-            k *= C2_32;
-            hash ^= k;
-            hash = Integer.rotateLeft(hash, R2_32) * M_32 + N_32;
-        }
-
-        // tail
-        int idx = nblocks << 2;
-        int k1 = 0;
-        switch (length - idx) {
-            case 3:
-                k1 ^= data[idx + 2] << 16;
-            case 2:
-                k1 ^= data[idx + 1] << 8;
-            case 1:
-                k1 ^= data[idx];
-
-                // mix functions
-                k1 *= C1_32;
-                k1 = Integer.rotateLeft(k1, R1_32);
-                k1 *= C2_32;
-                hash ^= k1;
-        }
-
-        // finalization
-        hash ^= length;
-        hash ^= (hash >>> 16);
-        hash *= 0x85ebca6b;
-        hash ^= (hash >>> 13);
-        hash *= 0xc2b2ae35;
-        hash ^= (hash >>> 16);
-
-        return hash;
-    }
 
     /**
      * Murmur3 64-bit variant. This is essentially MSB 8 bytes of Murmur3 128-bit variant.
@@ -315,4 +252,129 @@ public enum Murmur3Hash {
         h ^= (h >>> 33);
         return h;
     }
+
+    public static int hash(byte[] data) {
+        ByteBuffer buffer = ByteBuffer
+                .wrap(data)
+                .order(ByteOrder.LITTLE_ENDIAN); // produce same output than reference implementation
+
+        // initialisation
+        int length = data.length;
+        int hash = SEED;
+
+        // full blocks
+        int numberOfBlocks = length / 4;
+        for (int i = 0; i < numberOfBlocks * 4; i += 4) {
+            int block = buffer.getInt(i);
+
+            block *= AVALANCHING_MULTIPLIER1;
+            block = Integer.rotateLeft(block, 15);
+            block *= AVALANCHING_MULTIPLIER2;
+
+            hash ^= block;
+            hash = Integer.rotateLeft(hash, 13);
+            hash = 5 * hash + BLOCK_OFFSET;
+        }
+
+        // fractioned end-block
+        int leftOverLength = length % 4;
+        int block = 0;
+        switch (leftOverLength) {
+            case 3:
+                block ^= buffer.get(length - 1) << 16;
+            case 2:
+                block ^= buffer.get(length - 2) << 8;
+            case 1:
+                block ^= buffer.get(length - 3);
+                block *= AVALANCHING_MULTIPLIER1;
+                block = Integer.rotateLeft(block, 15);
+                block *= AVALANCHING_MULTIPLIER2;
+                hash ^= block;
+        }
+
+        // finalisation
+        hash ^= length;
+        hash ^= hash >>> 16;
+        hash *= FINAL_AVALANCHING_MULTIPLIER1;
+        hash ^= hash >>> 13;
+        hash *= FINAL_AVALANCHING_MULTIPLIER2;
+        hash ^= hash >>> 16;
+
+        return hash;
+    }
 }
+
+
+    // Constants for 32 bit variant
+//    private static final int C1_32 = 0xcc9e2d51;
+//    private static final int C2_32 = 0x1b873593;
+//    private static final int R1_32 = 15;
+//    private static final int R2_32 = 13;
+//    private static final int M_32 = 5;
+//    private static final int N_32 = 0xe6546b64;
+//    /**
+//     * Murmur3 32-bit variant.
+//     *
+//     * @param data - input byte array
+//     * @return - hashcode
+//     */
+//    public static int hash32(byte[] data) {
+//        return hash32(data, data.length, DEFAULT_SEED);
+//    }
+
+//    /**
+//     * Murmur3 32-bit variant.
+//     *
+//     * @param data   - input byte array
+//     * @param length - length of array
+//     * @param seed   - seed. (default 0)
+//     * @return - hashcode
+//     */
+//    public static int hash32(byte[] data, int length, int seed) {
+//        int hash = seed;
+//        int nblocks = length >> 2;
+//
+//        // body
+//        for (int i = 0; i < nblocks; i++) {
+//            int i_4 = i << 2;
+//            int k = (data[i_4] & 0xff)
+//                    | ((data[i_4 + 1] & 0xff) << 8)
+//                    | ((data[i_4 + 2] & 0xff) << 16)
+//                    | ((data[i_4 + 3] & 0xff) << 24);
+//
+//            // mix functions
+//            k *= C1_32;
+//            k = Integer.rotateLeft(k, R1_32);
+//            k *= C2_32;
+//            hash ^= k;
+//            hash = Integer.rotateLeft(hash, R2_32) * M_32 + N_32;
+//        }
+//
+//        // tail
+//        int idx = nblocks << 2;
+//        int k1 = 0;
+//        switch (length - idx) {
+//            case 3:
+//                k1 ^= data[idx + 2] << 16;
+//            case 2:
+//                k1 ^= data[idx + 1] << 8;
+//            case 1:
+//                k1 ^= data[idx];
+//
+//                // mix functions
+//                k1 *= C1_32;
+//                k1 = Integer.rotateLeft(k1, R1_32);
+//                k1 *= C2_32;
+//                hash ^= k1;
+//        }
+//
+//        // finalization
+//        hash ^= length;
+//        hash ^= (hash >>> 16);
+//        hash *= 0x85ebca6b;
+//        hash ^= (hash >>> 13);
+//        hash *= 0xc2b2ae35;
+//        hash ^= (hash >>> 16);
+//
+//        return hash;
+//    }

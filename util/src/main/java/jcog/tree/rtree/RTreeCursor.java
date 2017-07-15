@@ -76,7 +76,7 @@ public class RTreeCursor<T> {
 
     public FasterList<T> listSorted(Comparator<T> ranker) {
         FasterList<T> l = list();
-        Collections.sort(l, ranker);
+        l.sort(ranker);
         return l;
     }
 

@@ -43,7 +43,7 @@ public class NARS {
     public static MultiNAR newMultiThreadNAR(int threads, Time clock) {
 //        Default nar =
 //                NARBuilder.newMultiThreadNAR(1, clock, true);
-        MultiNAR n = new MultiNAR(clock, new XorShift128PlusRandom(), 1);
+        MultiNAR n = new MultiNAR(clock, new XorShift128PlusRandom());
 
 //        DefaultConceptState conceptState = (DefaultConceptState) ((DefaultConceptBuilder) n.terms.conceptBuilder()).awake();
 //        conceptState.beliefsMaxTemp.set(32);

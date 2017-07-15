@@ -24,6 +24,7 @@ public class TagDigest extends TinyCountingTable implements TagSet, Serializable
     /**
      * sets the priority of a tag
      */
+    @Override
     public boolean pri(String tag, float pri) {
         float existing = pri(tag);
         if (Util.equals(existing, pri, 1f/PRI_GRANULARITY))
@@ -36,6 +37,7 @@ public class TagDigest extends TinyCountingTable implements TagSet, Serializable
     /**
      * gets the priority of a value
      */
+    @Override
     public float pri(String tag) {
         long p = get(tag);
         return p / ((float) PRI_GRANULARITY);

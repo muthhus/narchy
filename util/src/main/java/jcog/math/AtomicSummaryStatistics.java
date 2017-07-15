@@ -78,6 +78,7 @@ public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure,
 //          TODO impl
 //    }
 
+    @Override
     public final void accept(double value) {
         if (value != value)
             return; //filter any NaN coming from outside

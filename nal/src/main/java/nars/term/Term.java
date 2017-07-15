@@ -21,7 +21,6 @@
 package nars.term;
 
 
-import jcog.data.array.IntArrays;
 import nars.$;
 import nars.Op;
 import nars.index.term.TermContext;
@@ -32,6 +31,7 @@ import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.list.primitive.ImmutableByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
@@ -269,7 +269,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
      */
     @Nullable
     default byte[] pathTo(@NotNull Term subterm) {
-        return subterm.equals(this) ? IntArrays.EMPTY_BYTES : null;
+        return subterm.equals(this) ? ArrayUtils.EMPTY_BYTE_ARRAY : null;
     }
 
     @NotNull

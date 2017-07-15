@@ -1,7 +1,11 @@
 package nars;
 
 
+import com.google.common.collect.MinMaxPriorityQueue;
+import com.google.common.collect.Multimaps;
 import com.google.common.collect.Sets;
+import com.google.common.collect.SortedSetMultimap;
+import com.google.common.primitives.Longs;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -49,7 +53,11 @@ import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.exe.Executioner;
 import org.apache.commons.math3.stat.Frequency;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.Twin;
+import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
+import org.eclipse.collections.impl.multimap.set.sorted.SynchronizedPutTreeSortedSetMultimap;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,6 +66,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -928,13 +937,28 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     @NotNull
     public final void cycle() {
+
         time.cycle();
+
+
+        LongObjectPair<Runnable> next;
+        long now = time();
+        while ((next = scheduled.peek())!=null) {
+            if (next.getOne() <= now) {
+                exe.runLater(next.getTwo());
+                scheduled.poll();
+            } else {
+                break; //wait till another time
+            }
+        }
 
         emotion.cycle();
 
         causes.forEach(c -> c.commit(0.98f));
 
         exe.cycle(this);
+
+
     }
 
 
@@ -1150,25 +1174,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     @NotNull
     public NAR inputAt(long time, @NotNull String... tt) throws NarseseException {
-        //LongPredicate timeCondition = t -> t == time;
-
         List<Task> yy = newArrayList(tt.length);
-        for (String s : tt) {
-            tasks(s).forEach(x -> {
-                long xs = x.start();
-                long xe = x.end();
-                Task y = Task.clone(x, time, xs != ETERNAL ? time : ETERNAL, xs != ETERNAL ? time + (xe - xs) : ETERNAL);
-                yy.add(y);
-            });
-        }
-
-//        //set the appropriate creation and occurrence times
-//        for (Task y : x) {
-//            TaskBuilder my = (TaskBuilder) y;
-//            my.setCreationTime(time);
-//            if (my.start() != ETERNAL)
-//                my.occurr(time);
-//        }
+        for (String s : tt)
+            yy.addAll(tasks(s));
 
         inputAt(time, yy.toArray(new Task[yy.size()]));
         return this;
@@ -1179,39 +1187,28 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     public void inputAt(long when, @NotNull ITask... x) {
         long now = time();
-        if (when < now) {
-            //past
-            throw new RuntimeException("can not input at a past time");
-        } else if (when == now) {
-            //current cycle
+        if (when <= now) {
+            //past or current cycle
             input(x);
         } else {
-
-            //future
-//            if (Param.DEBUG) {
-//                for (Task t : x)
-//                    ((ImmutableTask) t).log("Scheduled");
-//            }
-
-
-            Consumer<NAR> z = new Consumer<NAR>() {
-                @Override
-                public void accept(NAR m) {
-                    //if (timeCondition.test(m.time())) {
-                    if (m.time() == when) {
-                        eventCycleStart.disable((Consumer) this);
-                        m.input(x);
-                    }
-                }
-            };
-            eventCycleStart.enable(z);
-
+            at(when, () -> input(x));
         }
     }
 
-    /**
-     * each concept task
-     */
+    final PriorityBlockingQueue<LongObjectPair<Runnable>> scheduled =
+            new PriorityBlockingQueue<LongObjectPair<Runnable>>(32, (a,b)->{
+        int c = Longs.compare(a.getOne(), b.getOne());
+        if (c == 0)
+            return -1; //maintains uniqueness in case they occupy the same time
+        else
+            return c;
+    });
+
+    /** schedule a task to be executed no sooner than a given NAR time */
+    public void at(long when, Runnable then) {
+        scheduled.add(PrimitiveTuples.pair(when, then));
+    }
+
     @NotNull
     public NAR forEachConceptTask(@NotNull Consumer<Task> each) {
         return forEachConcept(c -> c.forEachTask(each));

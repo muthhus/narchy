@@ -1,6 +1,5 @@
 package nars.term.mutate;
 
-import jcog.data.array.IntArrays;
 import jcog.math.Combinations;
 import nars.$;
 import nars.derive.meta.match.Ellipsis;
@@ -10,6 +9,7 @@ import nars.term.container.ArrayTermVector;
 import nars.term.container.ShuffledSubterms;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -76,7 +76,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
 
             int c0 = c[0];
             int c1 = c[1];
-            IntArrays.reverse(c); //swap to try the reverse next iteration
+            ArrayUtils.reverse(c); //swap to try the reverse next iteration
 
             Term y1 = yy.sub(c0);
 

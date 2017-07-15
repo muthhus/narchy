@@ -37,6 +37,7 @@ import static nars.time.Tense.XTERNAL;
  * Created by me on 5/29/16.
  *
  * @see: RLP classes: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/RLP.java
+ * TODO use http://google.github.io/guava/releases/snapshot/api/docs/com/google/common/io/ByteStreams.html
  */
 public class IO {
 

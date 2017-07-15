@@ -624,13 +624,13 @@ public enum Texts {
         if (msec < 3000) return String.format("%.2f", msec / 1000d);
         if (msec < 60 * 1000) return (msec / 1000) + "s";
         long sec = msec / 1000;
-        if (sec < 5 * 60) return (sec / 60) +  "m" + (sec % 60) + "s";
+        if (sec < 5 * 60) return (sec / 60) +  "m" + (sec % 60) + 's';
         long min = sec / 60;
         if (min < 60) return min + "m";
         long hour = min / 60;
-        if (min < 24 * 60) return hour + "h" + (min % 60) + "m";
+        if (min < 24 * 60) return hour + "h" + (min % 60) + 'm';
         long day = hour / 24;
-        return day + "d" + (day % 24) + "h";
+        return day + "d" + (day % 24) + 'h';
     }
 
     /** from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java */

@@ -6,6 +6,7 @@ import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
+import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;
@@ -40,14 +41,27 @@ public class MultiNAR extends NAR {
 
 
     public final List<SubExecutor> sub = $.newArrayList();
-    public int num;
 
     //private AffinityExecutor pool;
     private List<Loop> loops;
-    private ExecutorService pool;
+
+
+    /** foreground: the independent, preallocated, high frequency worker threads ; a fixed threadpool */
+    private ExecutorService working;
+
+
+    /** background: misc tasks to finish before starting next cycle */
+    final static int passiveThreads = 2;
+    final ForkJoinPool passive;
+    private int num;
 
     MultiNAR(@NotNull Time time, @NotNull Random rng, Executioner e) {
-        super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e) {
+        this(time, rng, new ForkJoinPool(passiveThreads, defaultForkJoinWorkerThreadFactory,
+                    null, true /* async */), e);
+    }
+
+    MultiNAR(@NotNull Time time, @NotNull Random rng, ForkJoinPool passive, Executioner e) {
+        super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, passive) {
 
 //                  @Override
 //                  protected void onBeforeRemove(Concept c) {
@@ -87,6 +101,10 @@ public class MultiNAR extends NAR {
               }, e, time,
             //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
                 rng);
+
+        this.passive = passive;
+
+
     }
 
 //    @Override
@@ -185,42 +203,53 @@ public class MultiNAR extends NAR {
      */
     public void addNAR(int conceptCapacity, int taskCapacity, float conceptRate) {
         synchronized (sub) {
-            SubExecutor x = new SubExecutor(conceptCapacity, taskCapacity, conceptRate);
-            sub.add(x);
-            num = sub.size();
+            sub.add( new SubExecutor(conceptCapacity, taskCapacity, conceptRate) );
+            this.num = sub.size();
         }
+
     }
 
 
     private static class RootExecutioner extends Executioner implements Runnable {
 
-        private final int passiveThreads;
 
         public ForkJoinTask lastCycle;
+        private ForkJoinPool passive;
 
-        final ForkJoinPool passive;
 
-        public RootExecutioner(int passiveThreads) {
-            this.passiveThreads = passiveThreads;
-            passive = new ForkJoinPool(passiveThreads, defaultForkJoinWorkerThreadFactory,
-                    null, true /* async */);
+
+        public RootExecutioner() {
 
         }
 
+        @Override
+        public void start(NAR nar) {
+            this.passive = ((MultiNAR)nar).passive;
+            super.start(nar);
+
+        }
 
         @Override
         public void runLater(Runnable cmd) {
-            passive.execute(cmd);
+            ((MultiNAR)nar).passive.execute(cmd);
         }
 
         @Override
         public boolean run(@NotNull ITask x) {
-            MultiNAR nar = (MultiNAR) this.nar;
+
+            List<SubExecutor> workers = ((MultiNAR) nar).sub;
+            int num = workers.size();
+            if (num == 0) {
+                //HACK do nothing because the workers havent started yet?
+                return false;
+            }
+
+
             int sub =
                     //random.nextInt(num);
-                    Math.abs(Util.hashWangJenkins(x.hashCode())) % nar.num;
+                    Math.abs(Util.hashWangJenkins(x.hashCode())) % num;
             //apply(x);
-            return nar.sub.get(sub).run(x);
+            return workers.get(sub).run(x);
         }
 
 
@@ -258,7 +287,7 @@ public class MultiNAR extends NAR {
                     if (!lastCycle.isDone()) {
                         long start = System.currentTimeMillis();
                         lastCycle.join(); //wait for lastCycle's to finish
-                        System.out.println("cycle lag: " + (System.currentTimeMillis() - start) + "ms");
+                        logger.info("cycle lag {}", (System.currentTimeMillis() - start) + "ms");
                     }
 
                     lastCycle.reinitialize();
@@ -284,7 +313,7 @@ public class MultiNAR extends NAR {
 
         @Override
         public int concurrency() {
-            return passiveThreads + 2; //TODO calculate based on # of sub-NAR's but definitely is concurrent so we add 1 here in case passive=1
+            return 2; //TODO calculate based on # of sub-NAR's but definitely is concurrent so we add 1 here in case passive=1
         }
 
         @Override
@@ -355,7 +384,7 @@ public class MultiNAR extends NAR {
 
         @Override
         public void runLater(@NotNull Runnable r) {
-            pool.execute(r); //use the common threadpool
+            passive.execute(r); //use the common threadpool
         }
 
         public Loop start() {
@@ -372,8 +401,8 @@ public class MultiNAR extends NAR {
     }
 
 
-    public MultiNAR(@NotNull Time time, @NotNull Random rng, int passiveThreads) {
-        this(time, rng, new RootExecutioner(passiveThreads));
+    public MultiNAR(@NotNull Time time, @NotNull Random rng) {
+        this(time, rng, new RootExecutioner());
     }
 
 
@@ -387,7 +416,7 @@ public class MultiNAR extends NAR {
 
             int num = sub.size();
 
-            this.pool = Executors.newFixedThreadPool(num);
+            this.working = Executors.newFixedThreadPool(num);
 
             //((ThreadPoolExecutor)pool).getThreadFactory().
             //self().toString();
@@ -395,7 +424,7 @@ public class MultiNAR extends NAR {
             this.loops = $.newArrayList(num);
             sub.forEach(s -> loops.add(s.start()));
 
-            loops.forEach(pool::execute);
+            loops.forEach(working::execute);
         }
 
         return super.startPeriodMS(ms);
@@ -412,8 +441,8 @@ public class MultiNAR extends NAR {
             loops.forEach(Loop::stop);
             this.loops = null;
 
-            this.pool.shutdownNow();
-            this.pool = null;
+            this.working.shutdownNow();
+            this.working = null;
 
         }
     }

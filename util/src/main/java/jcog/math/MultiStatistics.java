@@ -32,7 +32,7 @@ public class MultiStatistics<X> implements Consumer<X> {
         public String toString() {
             long N = getN();
             return id + ": " +
-                    (N > 0 ? (N +":" + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum() + ":" + super.toString())
+                    (N > 0 ? (N +":" + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum() + ':' + super.toString())
                         :
                         "none")
                     ;
@@ -91,7 +91,7 @@ public class MultiStatistics<X> implements Consumer<X> {
         }
         @Override
         public String toString() {
-            return id + ": #" + getN() +":" + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum();
+            return id + ": #" + getN() + ':' + getMin() + ".." + getMax() + ", avg=" + getMean() + ", sum=" + getSum();
         }
 
         @Override
@@ -154,7 +154,7 @@ public class MultiStatistics<X> implements Consumer<X> {
 
         @Override
         public String toString() {
-            return id + " " + stats.snapshot().toString();
+            return id + ' ' + stats.snapshot().toString();
         }
 
         @Override

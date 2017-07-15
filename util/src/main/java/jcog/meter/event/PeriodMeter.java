@@ -123,12 +123,12 @@ public class PeriodMeter extends FunctionMeter<Double> {
     }
 
     public String toString(int decimals) {
-        return id + "{" +
+        return id + '{' +
                 Util.secondStr(stat.getMean(), decimals) + "AVG" +
                     ((stat instanceof DescriptiveStatistics) ?
                         ("") :
                         (" x " + stat.getN() + "~= " + Util.secondStr(stat.getSum(), decimals)))
-                 + "}";
+                 + '}';
     }
 
     public String toStringMicro() {

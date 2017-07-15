@@ -86,9 +86,9 @@ public class GraphIO {
             while (it.hasNext()) {
                 final int j = it.next();
                 if (g.directed())
-                    out.println(i + " -> " + j + ";");
+                    out.println(i + " -> " + j + ';');
                 else if (i <= j)
-                    out.println(i + " -- " + j + ";");
+                    out.println(i + " -- " + j + ';');
             }
         }
 
@@ -129,14 +129,14 @@ public class GraphIO {
 
         out.println("*Vertices " + g.size());
         for (int i = 0; i < g.size(); ++i)
-            out.println((i + 1) + " \"" + (i + 1) + "\"");
+            out.println((i + 1) + " \"" + (i + 1) + '"');
 
         out.println("*Arcs");
         for (int i = 0; i < g.size(); ++i) {
             Iterator it = g.getNeighbours(i).iterator();
             while (it.hasNext()) {
                 out.println((i + 1) + " " +
-                        (((Integer) it.next()).intValue() + 1) + " 1");
+                        ((Integer) it.next() + 1) + " 1");
             }
         }
         out.println("*Edges");
@@ -156,7 +156,7 @@ public class GraphIO {
             out.print(" " + (i + 1));
             Iterator it = g.getNeighbours(i).iterator();
             while (it.hasNext()) {
-                out.print(" " + (((Integer) it.next()).intValue() + 1));
+                out.print(" " + ((Integer) it.next() + 1));
             }
             out.println();
         }
@@ -177,7 +177,7 @@ public class GraphIO {
             BitSet bs = new BitSet(g.size());
             Iterator it = g.getNeighbours(i).iterator();
             while (it.hasNext()) {
-                bs.set(((Integer) it.next()).intValue());
+                bs.set((Integer) it.next());
             }
             for (int j = 0; j < g.size(); ++j) {
                 out.print(bs.get(j) ? " 1" : " 0");
@@ -208,7 +208,7 @@ public class GraphIO {
         for (int i = 0; i < g.size(); ++i) {
             Iterator it = g.getNeighbours(i).iterator();
             while (it.hasNext()) {
-                out.print((((Integer) it.next()).intValue() + 1) + " ");
+                out.print(((Integer) it.next() + 1) + " ");
             }
             out.println();
         }
@@ -241,7 +241,7 @@ public class GraphIO {
      *                  returned graph will be undirected.
      */
     public static Graph readNewscastGraph(String file, int direction)
-            throws IOException {
+            throws IOException, java.io.FileNotFoundException {
 
         NeighbourListGraph gr = new NeighbourListGraph(direction != 2);
         FileInputStream fis = new FileInputStream(file);

@@ -51,7 +51,7 @@ class Memoizer implements InvocationHandler {
      */
     public static Object memoize(final Object origin, //
                                  final int maxElements, final long expireMillis) //
-            throws InstantiationException, IllegalAccessException {
+    {
         final Class<?> clazz = origin.getClass();
         final Memoizer memoizer = new Memoizer(origin, maxElements, expireMillis);
         return Proxy.newProxyInstance(clazz.getClassLoader(), //
@@ -101,7 +101,7 @@ class Memoizer implements InvocationHandler {
     }
 
     private Object invoke(final Method method, final Object[] args) //
-            throws Throwable {
+            throws Throwable, IllegalAccessException, IllegalArgumentException {
         try {
             return method.invoke(object, args);
         } catch (InvocationTargetException e) {
@@ -169,6 +169,7 @@ class Memoizer implements InvocationHandler {
         public static class SampleSlowImpl implements SampleInterface {
             private static final Charset UTF8 = Charset.forName("UTF-8");
 
+            @Override
             public String hash(final String in) throws NoSuchAlgorithmException {
                 final MessageDigest md = MessageDigest.getInstance("SHA-512");
                 final byte[] buf = md.digest(in.getBytes(UTF8));
@@ -188,7 +189,7 @@ class Memoizer implements InvocationHandler {
         /**
          * Simple Test / Benchmark
          */
-        public static void main(final String[] args) throws Throwable {
+        public static void main(final String[] args) throws InstantiationException, IllegalAccessException, NoSuchAlgorithmException {
             final int TOTAL = (int) 1e6;
             final String TEST_TEXT = "hello world";
             final int cacheElements = 1024;
@@ -208,7 +209,7 @@ class Memoizer implements InvocationHandler {
                     test.hash(TEST_TEXT);
                 }
                 diff = System.currentTimeMillis() - ts;
-                System.out.println(hdr + "\t" + "diff=" + diff + "ms" + "\t" + //
+                System.out.println(hdr + '\t' + "diff=" + diff + "ms" + '\t' + //
                         test.hash(TEST_TEXT));
             }
         }

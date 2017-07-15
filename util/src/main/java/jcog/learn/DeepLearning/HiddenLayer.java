@@ -3,7 +3,8 @@ package jcog.learn.DeepLearning;
 import java.util.Random;
 import java.util.function.DoubleFunction;
 
-import static jcog.learn.DeepLearning.utils.*;
+import static jcog.learn.DeepLearning.utils.binomial;
+import static jcog.learn.DeepLearning.utils.uniform;
 
 public class HiddenLayer {
     public int n_in;
@@ -38,14 +39,14 @@ public class HiddenLayer {
         else this.b = b;
 
         if (activation == null || activation.equals("sigmoid")) {
-            this.activation = (double x) -> sigmoid(x);
-            this.dactivation = (double x) -> dsigmoid(x);
+            this.activation = utils::sigmoid;
+            this.dactivation = utils::dsigmoid;
         } else if (activation.equals("tanh")) {
-            this.activation = (double x) -> tanh(x);
-            this.dactivation = (double x) -> dtanh(x);
+            this.activation = utils::tanh;
+            this.dactivation = utils::dtanh;
         } else if (activation.equals("ReLU")) {
-            this.activation = (double x) -> ReLU(x);
-            this.dactivation = (double x) -> dReLU(x);
+            this.activation = utils::ReLU;
+            this.dactivation = utils::dReLU;
         } else {
             throw new IllegalArgumentException("activation function not supported");
         }

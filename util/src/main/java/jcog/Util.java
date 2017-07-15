@@ -1145,11 +1145,11 @@ public enum Util {
                                           BiConsumer<X, DataOutput> encoder,
                                           Function<DataInput, X> decoder,
                                           Logger logger
-    ) throws IOException {
+    ) throws IOException, FileNotFoundException {
 
         long lastModified = f.lastModified();
         long size = f.length();
-        String suffix = "_" + f.getName() + "_" + lastModified + "_" + size;
+        String suffix = '_' + f.getName() + '_' + lastModified + '_' + size;
 
         List<X> buffer = new FasterList(1024 /* estimate */);
 
@@ -1494,9 +1494,7 @@ public enum Util {
 
                 Object sourceValue = f.get(source);
                 f.set(dest, sourceValue);
-            } catch (IllegalArgumentException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
+            } catch (IllegalArgumentException | IllegalAccessException e) {
                 e.printStackTrace();
             }
         }
@@ -1517,8 +1515,7 @@ public enum Util {
             else
                 fields = clazz.getDeclaredFields();
 
-            for (int i = 0; i < fields.length; i++)
-                result.add(fields[i]);
+            Collections.addAll(result, fields);
 
             clazz = clazz.getSuperclass();
         }
@@ -1562,7 +1559,7 @@ public enum Util {
         else {
             switch (decimals) {
                 case 0:
-                    return Texts.n2(s) + "s";
+                    return Texts.n2(s) + 's';
                 case 3:
                     return Texts.n2(s * 1000) + "ms";
                 case 6:
@@ -1651,11 +1648,11 @@ public enum Util {
     /**
      * msgpack deserialization
      */
-    public static <X> X fromBytes(byte[] msgPacked, Class<? extends X> type) throws IOException {
+    public static <X> X fromBytes(byte[] msgPacked, Class<? extends X> type) throws IOException, com.fasterxml.jackson.core.JsonParseException, com.fasterxml.jackson.databind.JsonMappingException {
         return msgPackMapper/*.reader(type)*/.readValue(msgPacked, type);
     }
 
-    public static <X> X fromBytes(byte[] msgPacked, int len, Class<? extends X> type) throws IOException {
+    public static <X> X fromBytes(byte[] msgPacked, int len, Class<? extends X> type) throws IOException, com.fasterxml.jackson.core.JsonParseException, com.fasterxml.jackson.databind.JsonMappingException {
         return msgPackMapper/*.reader(type)*/.readValue(msgPacked, 0, len, type);
     }
 

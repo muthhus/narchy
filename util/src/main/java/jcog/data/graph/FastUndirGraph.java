@@ -60,7 +60,7 @@ public class FastUndirGraph extends ConstUndirGraph {
 
         for (int i = 0; i < max; ++i) {
             for (Integer out : g.getNeighbours(i)) {
-                int j = out.intValue();
+                int j = out;
                 if (!g.isEdge(j, i))
                     in[j].add(i);
                 // But always add the link to the triangle

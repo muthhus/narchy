@@ -183,7 +183,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
     default Bag<K, V> sampleOrPop(boolean pop, int max, Consumer<? super V> each) {
         final int[] count = {max};
-        return sample((x) -> {
+        return sample(x -> {
             each.accept(x);
             return ((count[0]--) > 0) ? Next : Bag.BagCursorAction.Stop;
         }, pop);
@@ -571,7 +571,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
         @NotNull
         @Override
-        public Bag sample(@NotNull Bag.@NotNull BagCursor each, boolean pop) {
+        public Bag sample(@NotNull Bag.BagCursor each, boolean pop) {
             return this;
         }
 

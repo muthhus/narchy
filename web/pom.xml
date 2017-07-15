@@ -191,18 +191,6 @@
             </plugin>
 
 
-            <!--&lt;!&ndash; Configure Java compiler to use Java 8 syntax  &ndash;&gt;-->
-            <!--<plugin>-->
-            <!--<artifactId>maven-compiler-plugin</artifactId>-->
-            <!--<version>3.5.1</version>-->
-            <!--<configuration>-->
-            <!--<source>${java.version}</source>-->
-            <!--<target>${java.version}</target>-->
-            <!--<useIncrementalCompilation>true</useIncrementalCompilation>-->
-            <!--<fork>true</fork>-->
-
-            <!--</configuration>-->
-            <!--</plugin>-->
 
 
             <!--<plugin>-->

@@ -97,7 +97,7 @@ public class MarkovTrack extends MarkovChain<MarkovTrack.MidiMessageWrapper> {
         MidiSystem.write(s, fileType, file);
     }
 
-    public class MidiMessageWrapper implements Comparable<MidiMessageWrapper> {
+    public static class MidiMessageWrapper implements Comparable<MidiMessageWrapper> {
         private final MidiMessage mMessage;
 
         public MidiMessageWrapper(MidiMessage msg) {
@@ -126,12 +126,7 @@ public class MarkovTrack extends MarkovChain<MarkovTrack.MidiMessageWrapper> {
                 } else if (theirmsg[i] > mymsg[i]) return -1;
             }
 
-            if (mymsg.length > theirmsg.length) {
-                return 1;
-            } else if (mymsg.length < theirmsg.length) return -1;
-            else {
-                return 0;
-            }
+            return Integer.compare(mymsg.length, theirmsg.length);
         }
 
         public boolean equals(Object o) {
@@ -155,7 +150,7 @@ public class MarkovTrack extends MarkovChain<MarkovTrack.MidiMessageWrapper> {
         }
 
         public String toString() {
-            String out = new String();
+            String out = "";
             for (int i = 0; i < mMessage.getLength(); i++) {
                 out += String.format("%x", mMessage.getMessage()[i]);
                 if (i < mMessage.getLength() - 1) out += " ";

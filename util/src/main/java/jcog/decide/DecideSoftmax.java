@@ -73,9 +73,7 @@ public class DecideSoftmax implements Deciding {
                 mot[i] = Util.normalize(motivation[i], min, max);
             }
         } else {
-            for (int i = 0; i < actions; i++) {
-                mot[i] = motivation[i]; //use the value directly
-            }
+            System.arraycopy(motivation, 0, mot, 0, actions);
         }
 
         /* http://www.cse.unsw.edu.au/~cs9417ml/RL1/source/RLearner.java */

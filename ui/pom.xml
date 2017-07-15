@@ -15,13 +15,6 @@
     </parent>
 
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
-        <maven.compiler.source>1.9</maven.compiler.source>
-        <maven.compiler.target>1.9</maven.compiler.target>
-    </properties>
-
 
     <licenses>
         <license>

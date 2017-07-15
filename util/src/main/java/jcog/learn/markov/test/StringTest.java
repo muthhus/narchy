@@ -23,7 +23,7 @@ public class StringTest {
         long dt = System.currentTimeMillis() - start;
 
         for (String word : phrase) {
-            System.out.print(word + " ");
+            System.out.print(word + ' ');
         }
         System.out.println();
 

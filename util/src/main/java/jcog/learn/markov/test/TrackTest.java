@@ -43,11 +43,7 @@ public class TrackTest {
         try {
             seq = MidiSystem.getSequence(f);
             fmt = MidiSystem.getMidiFileFormat(f);
-        } catch (InvalidMidiDataException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-            System.exit(1);
-        } catch (IOException e1) {
+        } catch (InvalidMidiDataException | IOException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
             System.exit(1);
@@ -65,8 +61,7 @@ public class TrackTest {
                 System.out.printf("Writing output-%d.mid...\n", i);
                 System.out.println("Complexity: " + track.getNodeCount());
                 track.exportTrack(String.format("output-%d.mid", i), fmt.getDivisionType(), fmt.getResolution(), fmt.getType(), tracks[1].size());
-            } catch (InvalidMidiDataException e) {
-            } catch (IOException e) {
+            } catch (InvalidMidiDataException | IOException e) {
             } catch (OutOfMemoryError e) {
                 System.err.println("\tFAIL");
                 File error = new File("error-" + i + ".txt");

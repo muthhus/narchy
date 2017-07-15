@@ -624,7 +624,7 @@ public final class SloppyMath {
 	 * @return The hypergeometric value
 	 */
   public static double hypergeometric(int k, int n, int r, int m) {
-    if (k < 0 || r > n || m > n || n <= 0 || m < 0 | r < 0) {
+    if (k < 0 || r > n || m > n || n <= 0 || m < 0 || r < 0) {
       throw new IllegalArgumentException("Invalid hypergeometric");
     }
 

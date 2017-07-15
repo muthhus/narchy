@@ -51,7 +51,7 @@ public class HashMapTagSet implements TagSet, Serializable {
 
     @Override
     public String toString() {
-        return id + "=" + data.toString();
+        return id + '=' + data.toString();
     }
 
     @NotNull

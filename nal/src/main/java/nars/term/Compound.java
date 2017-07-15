@@ -21,7 +21,6 @@
 package nars.term;
 
 import jcog.Util;
-import jcog.data.array.IntArrays;
 import jcog.data.sexpression.IPair;
 import jcog.data.sexpression.Pair;
 import nars.$;
@@ -34,6 +33,7 @@ import nars.term.compound.GenericCompoundDT;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
@@ -266,7 +266,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Nullable
     default byte[] pathTo(@NotNull Term subterm) {
-        if (subterm.equals(this)) return IntArrays.EMPTY_BYTES;
+        if (subterm.equals(this)) return ArrayUtils.EMPTY_BYTE_ARRAY;
         //if (!containsRecursively(subterm)) return null;
         return pathTo(new ByteArrayList(0), this, subterm);
     }

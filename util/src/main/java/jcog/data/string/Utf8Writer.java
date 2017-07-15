@@ -53,7 +53,7 @@ public final class Utf8Writer  {
                 (((lastUTF16CodePoint & 0x3ff) << 10) | (c & 0x3ff)) + 0x10000;
 
             if (uc < 0 || uc >= 0x200000) {
-                throw new IOException("Atttempting to write invalid Unicode code point '" + uc + "'");
+                throw new IOException("Atttempting to write invalid Unicode code point '" + uc + '\'');
             }
 
             out.write(0xF0 | (uc >> 18));

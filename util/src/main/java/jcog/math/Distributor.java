@@ -38,12 +38,7 @@ public final class Distributor {
 
     private static final Map<Integer,Distributor> distributors = new HashMap(8);
     public static Distributor get(int range) {
-        Distributor d = distributors.get(range);
-        if (d==null) {
-            d = new Distributor(range);
-            distributors.put(range, d);
-        }
-        return d;
+        return distributors.computeIfAbsent(range, Distributor::new);
     }
     
     /**

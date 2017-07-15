@@ -45,7 +45,7 @@ public class NeuralGasMap extends NeuralGasNet<NeuralGasMap.AENode> {
             enc.randomize();
     }
 
-    public class AENode extends Node {
+    public static class AENode extends Node {
 
         public float[] center;
 

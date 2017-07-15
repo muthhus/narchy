@@ -4,7 +4,7 @@ import java.util.Random;
 
 //Extremely fast, medium quality randomness: http://www.javamex.com/tutorials/random_numbers/java_util_random_subclassing.shtml
 public class XORShiftRandom extends Random {
-    
+
     //public static final XORShiftRandom global = new XORShiftRandom();
 
 
@@ -30,7 +30,6 @@ public class XORShiftRandom extends Random {
         x &= ((1L << nbits) - 1);
         return x;
     }
-
 
 
     @Override

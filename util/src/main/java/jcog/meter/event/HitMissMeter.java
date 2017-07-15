@@ -70,7 +70,7 @@ public class HitMissMeter extends FunctionMeter<Double> {
         if (autoReset) {
             reset();
         }
-        return Double.valueOf(r);
+        return (double) r;
     }
 
     /** whether to reset the hit count after the count is stored in the Metrics */

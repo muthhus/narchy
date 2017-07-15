@@ -16,7 +16,6 @@ public class HiddenLayerDiscrete extends HiddenLayer {
     public HiddenLayerDiscrete(int n_in, int n_out, double[][] W, double[] b, Random rng) {
         super(n_in, n_out, W, b, rng, null);
 
-        this.N = N;
         this.n_in = n_in;
         this.n_out = n_out;
 

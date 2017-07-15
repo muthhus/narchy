@@ -39,7 +39,7 @@ public class MLP {
             hidden_layer_input = new double[n_in];
             logistic_layer_input = new double[n_hidden];
 
-            for(int j=0; j<n_in; j++) hidden_layer_input[j] = train_X[n][j];
+            System.arraycopy(train_X[n], 0, hidden_layer_input, 0, n_in);
 
             // forward hiddenLayer
             hiddenLayer.forward(hidden_layer_input, logistic_layer_input);

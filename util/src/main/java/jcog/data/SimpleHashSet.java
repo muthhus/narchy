@@ -1,7 +1,6 @@
 package jcog.data;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A simple HashSet, save 25% memory.
@@ -52,7 +51,7 @@ public class SimpleHashSet<T> extends AbstractSet<T> implements Cloneable {
 
     public SimpleHashSet(Collection<? extends T> collection) {
         this(collection.size() < 6 ? 11 : collection.size() * 2);
-        addAll(collection.stream().collect(Collectors.toList()));
+        addAll(collection);
     }
 
     public static int roundUpToPowerOfTwo(int i) {
@@ -247,9 +246,7 @@ public class SimpleHashSet<T> extends AbstractSet<T> implements Cloneable {
         result.makeTable(mTable.length);
         result.mSize = 0;
 
-        for (T t : this) {
-            result.add(t);
-        }
+        result.addAll(this);
         return result;
     }
 

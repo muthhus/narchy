@@ -72,7 +72,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
         @Override
         public String toString() {
-            return "$" + n4(pri) + " " +  key;
+            return '$' + n4(pri) + ' ' +  key;
         }
 
         @Override
@@ -255,6 +255,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
     /**
      * clears the statistics
      */
+    @Override
     public String summary() {
         StringBuilder sb = new StringBuilder(64);
         sb.append("N=").append(size()).append(' ');

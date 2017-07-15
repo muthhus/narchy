@@ -163,7 +163,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
             }
         }
         for (; j < dim; ) {
-            mix[j++] = new MixChannel("aux" + "_" +j);
+            mix[j++] = new MixChannel("aux" + '_' +j);
         }
 
 
@@ -315,7 +315,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
     }
 
     public String summary() {
-        return IntStream.range(0, dim).mapToObj(i -> id(i) + " " + n4(trafficInput(i)) + "->" + n4(trafficActive(i))).collect(Collectors.joining(", "));
+        return IntStream.range(0, dim).mapToObj(i -> id(i) + ' ' + n4(trafficInput(i)) + "->" + n4(trafficActive(i))).collect(Collectors.joining(", "));
     }
 
 

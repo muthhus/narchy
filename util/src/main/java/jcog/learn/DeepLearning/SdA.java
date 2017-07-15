@@ -68,13 +68,13 @@ public class SdA {
 
                         if(l == 0) {
                             layer_input = new double[n_ins];
-                            for(int j=0; j<n_ins; j++) layer_input[j] = train_X[n][j];
+                            System.arraycopy(train_X[n], 0, layer_input, 0, n_ins);
                         } else {
                             if(l == 1) prev_layer_input_size = n_ins;
                             else prev_layer_input_size = hidden_layer_sizes[l-2];
 
                             prev_layer_input = new double[prev_layer_input_size];
-                            for(int j=0; j<prev_layer_input_size; j++) prev_layer_input[j] = layer_input[j];
+                            System.arraycopy(layer_input, 0, prev_layer_input, 0, prev_layer_input_size);
 
                             layer_input = new double[hidden_layer_sizes[l-1]];
 
@@ -104,10 +104,10 @@ public class SdA {
                 for(int i=0; i<n_layers; i++) {
                     if(i == 0) {
                         prev_layer_input = new double[n_ins];
-                        for(int j=0; j<n_ins; j++) prev_layer_input[j] = train_X[n][j];
+                        System.arraycopy(train_X[n], 0, prev_layer_input, 0, n_ins);
                     } else {
                         prev_layer_input = new double[hidden_layer_sizes[i-1]];
-                        for(int j=0; j<hidden_layer_sizes[i-1]; j++) prev_layer_input[j] = layer_input[j];
+                        System.arraycopy(layer_input, 0, prev_layer_input, 0, hidden_layer_sizes[i - 1]);
                     }
 
                     layer_input = new double[hidden_layer_sizes[i]];
@@ -126,7 +126,7 @@ public class SdA {
         double[] layer_input = new double[0];
         // int prev_layer_input_size;
         double[] prev_layer_input = new double[n_ins];
-        for(int j=0; j<n_ins; j++) prev_layer_input[j] = x[j];
+        System.arraycopy(x, 0, prev_layer_input, 0, n_ins);
 
         double linear_output;
 
@@ -147,8 +147,7 @@ public class SdA {
 
             if(i < n_layers-1) {
                 prev_layer_input = new double[sigmoid_layers[i].n_out];
-                for(int j=0; j<sigmoid_layers[i].n_out; j++)
-                    prev_layer_input[j] = layer_input[j];
+                System.arraycopy(layer_input, 0, prev_layer_input, 0, sigmoid_layers[i].n_out);
             }
         }
 

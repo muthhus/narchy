@@ -127,7 +127,7 @@ public class UDPeer extends UDP {
         while ((me = rng.nextInt()) == UNKNOWN_ID) ;
         this.me = me;
 
-        this.logger = LoggerFactory.getLogger(getClass().getSimpleName() + ":" + name());
+        this.logger = LoggerFactory.getLogger(getClass().getSimpleName() + ':' + name());
 
         them = new HijackBag<Integer, UDProfile>(3) {
 
@@ -437,7 +437,7 @@ public class UDPeer extends UDP {
     }
 
     public String summary() {
-        return c + ", connected to " + them.size() + " peers, (avg latency=" + latencyAvg() + ")";
+        return c + ", connected to " + them.size() + " peers, (avg latency=" + latencyAvg() + ')';
     }
 
     /**
@@ -670,7 +670,7 @@ public class UDPeer extends UDP {
         @Override
         public String toString() {
 
-            return BinTxt.toString(id()).toString() + ' ' +
+            return BinTxt.toString(id()) + ' ' +
                     ((char) cmd()) + '+' + ttl() +
                     '[' + dataLength() + ']';
 
@@ -835,7 +835,7 @@ public class UDPeer extends UDP {
     /**
      * profile of another peer
      */
-    public class UDProfile {
+    public static class UDProfile {
         public final InetSocketAddress addr;
 
         final static int PING_WINDOW = 8;
@@ -889,7 +889,7 @@ public class UDPeer extends UDP {
 
         @Override
         public String toString() {
-            return name() + "{" +
+            return name() + '{' +
                     "addr=" + addr +
                     ", ping=" + latency +
                     ", can=" + can +

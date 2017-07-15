@@ -428,9 +428,9 @@ public enum LongArrays {
 
     @SuppressWarnings("unchecked")
     private static int med3(long[] x, int a, int b, int c) {
-        int ab = ((x[a]) < (x[b]) ? -1 : ((x[a]) == (x[b]) ? 0 : 1));
-        int ac = ((x[a]) < (x[c]) ? -1 : ((x[a]) == (x[c]) ? 0 : 1));
-        int bc = ((x[b]) < (x[c]) ? -1 : ((x[b]) == (x[c]) ? 0 : 1));
+        int ab = (Long.compare(x[a], x[b]));
+        int ac = (Long.compare(x[a], x[c]));
+        int bc = (Long.compare(x[b], x[c]));
         return (ab < 0 ?
                 (bc < 0 ? b : ac < 0 ? c : a) :
                 (bc > 0 ? b : ac > 0 ? c : a));
@@ -474,11 +474,11 @@ public enum LongArrays {
         int a = from, b = a, c = to - 1, d = c;
         while (true) {
             int comparison;
-            while (b <= c && (comparison = ((x[b]) < (v) ? -1 : ((x[b]) == (v) ? 0 : 1))) <= 0) {
+            while (b <= c && (comparison = (Long.compare(x[b], v))) <= 0) {
                 if (comparison == 0) swap(x, a++, b);
                 b++;
             }
-            while (c >= b && (comparison = ((x[c]) < (v) ? -1 : ((x[c]) == (v) ? 0 : 1))) >= 0) {
+            while (c >= b && (comparison = (Long.compare(x[c], v))) >= 0) {
                 if (comparison == 0) swap(x, c, d--);
                 c--;
             }

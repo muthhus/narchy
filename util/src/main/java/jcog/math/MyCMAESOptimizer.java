@@ -747,6 +747,7 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
         /**
          * {@inheritDoc}
          */
+        @Override
         public int compareTo(DoubleIndex o) {
             return Double.compare(value, o.value);
         }

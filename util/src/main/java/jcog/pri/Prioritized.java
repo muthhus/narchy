@@ -34,6 +34,7 @@ public interface Prioritized extends Deleteable {
      * returns false if already deleted (allowing overriding subclasses to know if they shold also delete) */
     boolean delete();
 
+    @Override
     boolean isDeleted();
 //    default boolean isDeleted() {
 //        float p = pri();

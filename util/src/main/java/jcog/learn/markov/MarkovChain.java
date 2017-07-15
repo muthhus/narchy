@@ -484,7 +484,7 @@ public class MarkovChain<T> {
             return choice.node;
         }
 
-        private Edge chooseEdge(Random RNG, List<Edge> edges) {
+        private static Edge chooseEdge(Random RNG, List<Edge> edges) {
             if (edges.size() == 1)
                 return edges.get(0);
 

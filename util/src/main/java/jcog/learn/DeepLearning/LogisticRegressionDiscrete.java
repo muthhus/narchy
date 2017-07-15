@@ -16,6 +16,7 @@ public class LogisticRegressionDiscrete extends LogisticRegression {
         b = new double[this.n_out];
     }
 
+    @Override
     public double[] train(double[] x, double[] y, double lr) {
         double[] p_y_given_x = new double[n_out];
         double[] dy = new double[n_out];

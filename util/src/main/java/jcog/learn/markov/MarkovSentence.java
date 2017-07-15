@@ -52,7 +52,7 @@ public class MarkovSentence extends MarkovChain<String> {
      */
     public void parseSentence(String sentence)  {
         List<Twokenize.Span> phrase = Twokenize.twokenize(sentence);
-        learn(Iterables.transform(phrase, x -> x.toString()));
+        learn(Iterables.transform(phrase, Twokenize.Span::toString));
     }
 
 
@@ -71,7 +71,7 @@ public class MarkovSentence extends MarkovChain<String> {
         List<String> phrase = generate(len);
 
         // Get our StringBuffer ready and calculate the size beforehand BECAUSE IT'S SO MUCH FASTER.
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int sz = phrase.size();
 
         // Iterate over the ArrayList.
@@ -83,7 +83,7 @@ public class MarkovSentence extends MarkovChain<String> {
             if (i == 0) word = word.substring(0, 1).toUpperCase() + word.substring(1);
 
             // Add a space if it isn't the last word.
-            if (i != sz - 1) word = word + " ";
+            if (i != sz - 1) word = word + ' ';
 
             sb.append(word);
         }

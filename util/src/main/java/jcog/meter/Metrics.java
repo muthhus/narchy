@@ -6,7 +6,6 @@
 package jcog.meter;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Iterators;
 import jcog.Texts;
 import jcog.meter.event.DoubleMeter;
@@ -18,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.Predicate;
 
 /**
  * A tabular data store where each (# indexed) column represents a different
@@ -590,7 +590,7 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         out.println("@DATA");
         for (Object[] x : this) {
             if (p!=null)
-                if (!p.apply(x)) continue;
+                if (!p.test(x)) continue;
             for (int i = 0; i < numColumns; i++) {
                 if (i < x.length) {
                     Object y = x[i];

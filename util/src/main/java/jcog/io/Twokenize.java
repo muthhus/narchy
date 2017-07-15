@@ -447,7 +447,7 @@ public enum Twokenize {
      * Tokenizes tweet texts on standard input, tokenizations on standard
      * output. Input and output UTF-8.
      */
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, java.io.UnsupportedEncodingException {
         BufferedReader input = new BufferedReader(new InputStreamReader(in, "UTF-8"));
         PrintStream output = new PrintStream(out, true, "UTF-8");
         String line;

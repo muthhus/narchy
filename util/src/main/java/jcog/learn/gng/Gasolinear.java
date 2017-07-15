@@ -15,7 +15,7 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DNode> {
 
     boolean needsSort = true;
 
-    public class Sorted1DNode extends Node {
+    public static class Sorted1DNode extends Node {
         public int order = -1;
         public Sorted1DNode(int id) {
             super(id, 1);

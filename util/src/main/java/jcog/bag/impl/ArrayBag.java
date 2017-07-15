@@ -105,7 +105,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     protected boolean updateItems(@Nullable Y toAdd) {
 
         int c = capacity();
-        List<Y> pendingRemoval = null;
+        List<Y> pendingRemoval;
         int additional = (toAdd != null) ? 1 : 0;
 
         int s = size();
@@ -301,7 +301,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      * @param each
      * @param startingIndex if negative, a random starting location is used
      */
-    protected void sample(@NotNull Bag.@NotNull BagCursor<? super Y> each, int startingIndex, boolean pop) {
+    protected void sample(@NotNull Bag.BagCursor<? super Y> each, int startingIndex, boolean pop) {
         int i = startingIndex;
         if (i < 0) {
             int s = size();
@@ -311,7 +311,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             //i = 0;
         }
 
-        boolean modified = false;
+        //boolean modified = false;
         BagCursorAction next = BagCursorAction.Next;
 
         int count = 0;
@@ -327,7 +327,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                     x = remove(key(x));
                     if (x == null)
                         continue;
-                    modified = true;
+                    //modified = true;
                 }
 
                 next = each.next(x);

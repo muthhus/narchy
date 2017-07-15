@@ -64,8 +64,7 @@ public class FPGrow {
         if (isSingleBranch(root)) {
             FPNode curr = root;
 
-            ArrayList<FPNode> path = new ArrayList<>();
-            path.addAll(curr.children.values());
+            ArrayList<FPNode> path = new ArrayList<>(curr.children.values());
 
             List<List<FPNode>> combinations = new ArrayList<>();
             combinations(path, combinations);
@@ -135,7 +134,7 @@ public class FPGrow {
      * @param path
      * @param combinations
      */
-    private void combinations(ArrayList<FPNode> path, List<List<FPNode>> combinations) {
+    private static void combinations(ArrayList<FPNode> path, List<List<FPNode>> combinations) {
         int length = path.size();
         if (length == 0) return;
         double c = Math.pow(2, length);
@@ -153,7 +152,7 @@ public class FPGrow {
     }
 
 
-    private FPNode buildTree(List<List<String>> transactions, final Map<String, Integer> itemCount, final Map<String, FPNode> headerTable) {
+    private static FPNode buildTree(List<List<String>> transactions, final Map<String, Integer> itemCount, final Map<String, FPNode> headerTable) {
         FPNode root = new FPNode("ROOT");
         root.parent = null;
 
@@ -190,7 +189,7 @@ public class FPGrow {
 
     }
 
-    private boolean isSingleBranch(FPNode root) {
+    private static boolean isSingleBranch(FPNode root) {
         boolean rect = true;
         while (!root.children.isEmpty()) {
             if (root.children.size() > 1) {
@@ -204,7 +203,7 @@ public class FPGrow {
     }
 
 
-    private HashMap<String, Integer> count(List<List<String>> transactions) {
+    private static HashMap<String, Integer> count(List<List<String>> transactions) {
         HashMap<String, Integer> itemCount = new HashMap<String, Integer>();
         transactions.stream().flatMap(Collection::stream).forEach(item ->
                 itemCount.compute(item, (i, v) -> (v == null) ? 1 : v + 1)
@@ -220,7 +219,7 @@ public class FPGrow {
      * @return
      * @throws IOException
      */
-    private List<List<String>> load(String filename) throws IOException {
+    private static List<List<String>> load(String filename) throws IOException, java.io.FileNotFoundException {
         BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
         List<List<String>> transactions = new ArrayList<>();
 
@@ -246,19 +245,19 @@ public class FPGrow {
      *
      * @param headers
      */
-    private void testHeadTable(HashMap<String, FPNode> headers) {
+    private static void testHeadTable(HashMap<String, FPNode> headers) {
         if (headers == null) return;
         for (Entry<String, FPNode> entry : headers.entrySet()) {
             String headerName = entry.getKey();
             int supp = headers.get(headerName).support;
-            StringBuffer buff = new StringBuffer();
+            StringBuilder buff = new StringBuilder();
             FPNode currPointer = entry.getValue().next;
             while (currPointer != null) {
-                buff.append(currPointer.itemName + "(" + currPointer.support + ")---->");
+                buff.append(currPointer.itemName).append('(').append(currPointer.support).append(")---->");
                 currPointer = currPointer.next;
             }
 
-            System.out.println(headerName + "(" + supp + ") : " + buff.toString());
+            System.out.println(headerName + '(' + supp + ") : " + buff);
         }
     }
 
@@ -275,7 +274,7 @@ public class FPGrow {
                 return;
             int support = entry.getValue();
             float supportPct = entry.getValue() / count;
-            System.out.println(n4(supportPct) + "\t" + Arrays.toString(rule.toArray()));
+            System.out.println(n4(supportPct) + '\t' + Arrays.toString(rule.toArray()));
         });
     }
 
@@ -296,7 +295,7 @@ public class FPGrow {
     public static void main(String[] args) throws IOException {
         FPGrow model = new FPGrow();
 
-        model.grow(model.load("/home/me/Downloads/FPGrowth-master/data/census-sample20.dat"));
+        model.grow(FPGrow.load("/home/me/Downloads/FPGrowth-master/data/census-sample20.dat"));
 
         /*
         example file:
@@ -329,7 +328,7 @@ public class FPGrow {
 
         @Override
         public String toString() {
-            return "FPNode [support=" + support + ", itemName=" + itemName + "]";
+            return "FPNode [support=" + support + ", itemName=" + itemName + ']';
         }
 
         public void attach(FPNode t) {

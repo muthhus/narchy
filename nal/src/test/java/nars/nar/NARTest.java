@@ -1,5 +1,6 @@
 package nars.nar;
 
+import com.google.common.primitives.Longs;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
@@ -158,4 +159,24 @@ public class NARTest {
 
 
     }
+
+    @Test public void testCycleScheduling() {
+        NAR n = new NARS().get();
+
+        final int[] runs = {0};
+
+        long[] events = {2, 4, 4 /* test repeat */};
+        for (long w : events) {
+            n.at(w, () -> {
+                assertEquals(w, n.time());
+                runs[0]++;
+            });
+        }
+
+        n.run(1); assertEquals(0, runs[0]); /* nothing yet in that 1st cycle */
+
+
+        n.run((int)Longs.max(events) ); assertEquals(events.length, runs[0]);
+    }
+
 }

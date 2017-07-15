@@ -188,7 +188,7 @@ public class Blobs {
      * {@inheritDoc}
      */
     public InputStream get(String id)
-            throws AmbiguousIdException, IOException {
+            throws AmbiguousIdException, FileNotFoundException {
         prepare();
         id = prepareId(id);
         File file = getFileFor(id);

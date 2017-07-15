@@ -102,7 +102,7 @@ public class GraphAlgorithms {
         int c2[] = new int[g.size()];
         for (int i = 0; i < c1.length; ++i) c2[i] = c1[i] = WHITE;
         c2[0] = c1[0] = BLACK;
-        Collection<Integer> neighbours = null;
+        Collection<Integer> neighbours;
         int black = 1;
 
         int k = 0;
@@ -187,8 +187,8 @@ public class GraphAlgorithms {
         color[from] = GREY;
 
         while (!q.isEmpty()) {
-            u = q.remove(0).intValue();
-            du = q.remove(0).intValue();
+            u = q.remove(0);
+            du = q.remove(0);
 
             for (int j : g.getNeighbours(u)) {
                 if (color[j] == WHITE) {
@@ -273,7 +273,7 @@ public class GraphAlgorithms {
         Hashtable<Integer, Integer> ht = new Hashtable<Integer, Integer>();
         for (j = 0; j < g.size(); ++j) {
             Integer num = ht.get(color[j]);
-            if (num == null) ht.put(color[j], Integer.valueOf(1));
+            if (num == null) ht.put(color[j], 1);
             else ht.put(color[j], num + 1);
         }
 

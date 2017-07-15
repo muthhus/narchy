@@ -23,10 +23,10 @@ public class BasicTest {
         }
 
         String word;
-        String phrase = new String();
+        String phrase = "";
         int i = 0;
         while ((word = chain.next(10)) != null) {
-            phrase += word + " ";
+            phrase += word + ' ';
             i++;
         }
         System.out.println(phrase);

@@ -13,7 +13,7 @@ import java.security.*;
 public class Crypto {
 
     public static void generatePubandPrivateKeyFiles(String path, String id)
-            throws NoSuchAlgorithmException, NoSuchProviderException, IOException {
+            throws NoSuchAlgorithmException, NoSuchProviderException, IOException, java.io.FileNotFoundException {
         SecureRandom r = new SecureRandom();
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
         keyGen.initialize(1024, r);

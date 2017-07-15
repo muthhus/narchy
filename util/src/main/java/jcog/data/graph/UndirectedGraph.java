@@ -72,8 +72,7 @@ public class UndirectedGraph implements Graph {
     @Override
     public Collection<Integer> getNeighbours(int i) {
 
-        Set<Integer> result = new HashSet<Integer>();
-        result.addAll(g.getNeighbours(i));
+        Set<Integer> result = new HashSet<Integer>(g.getNeighbours(i));
         final int max = g.size();
         for (int j = 0; j < max; ++j) {
             if (g.isEdge(j, i)) result.add(j);

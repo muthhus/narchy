@@ -52,7 +52,7 @@ public class ArrayTensor implements
 
     @Override
     public String toString() {
-        return Arrays.toString(shape) + "<" + Texts.n4(data) + ">";
+        return Arrays.toString(shape) + '<' + Texts.n4(data) + '>';
     }
 
     @Override
@@ -116,6 +116,7 @@ public class ArrayTensor implements
         }
     }
 
+    @Override
     public int index(int... coord) {
         int f = coord[0];
         for (int s = 1, iLength = shape.length; s < iLength; s++) {

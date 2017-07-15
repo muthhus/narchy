@@ -141,7 +141,7 @@ public class Optimize<X> {
 
 
             if (trace)
-                csv.out(ArrayUtils.add(point, (double)score));
+                csv.out(ArrayUtils.add(point, score));
                 //System.out.println(Joiner.on(",").join(Doubles.asList(point)) + ",\t" + score);
 
             experiments.add(pair((double) score, point));
@@ -243,7 +243,7 @@ public class Optimize<X> {
             System.out.println("score=" + optimal.getSecond());
             double[] p = optimal.getPoint();
             for (int i = 0; i < p.length; i++) {
-                System.out.println(tweaks.get(i).id + " " + p[i]);
+                System.out.println(tweaks.get(i).id + ' ' + p[i]);
             }
 
         }

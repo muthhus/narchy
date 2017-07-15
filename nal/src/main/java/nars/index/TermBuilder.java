@@ -377,7 +377,7 @@ public abstract class TermBuilder {
                                 ||
 
                                 //repeat or non-lexical ordering for commutive compound; must re-arrange
-                                (o.commutative && (st.sub(0).compareTo(st.sub(1)) >= 0))
+                                (o.temporal && o.commutative && (st.sub(0).compareTo(st.sub(1)) >= 0))
 
 
 

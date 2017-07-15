@@ -92,7 +92,7 @@ public final class AxialSplitLeaf<T> implements Split<T> {
                 }
             }
         }
-        assert (target.size() == (to - from)) : target.size() + " isnt " + (to - from) + " " + Arrays.toString(leaf.data) + " -> " + Arrays.toString(sortedSrc);
+        assert (target.size() == (to - from)) : target.size() + " isnt " + (to - from) + ' ' + Arrays.toString(leaf.data) + " -> " + Arrays.toString(sortedSrc);
     }
 
 

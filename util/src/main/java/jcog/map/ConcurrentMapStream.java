@@ -91,15 +91,13 @@ public class ConcurrentMapStream<K, V> extends ConcurrentHashMap<K, ConcurrentMa
 //
         @Override
         public int compareTo(RankedItem<T> o) {
-            double x = o.doubleValue();
-            double y = doubleValue();
-            return x < y?-1:(x == y?0:1);
+            return Double.compare(o.doubleValue(), doubleValue());
         }
 
         public String toString() {
             StringBuilder sb = new StringBuilder();
             sb.append(this.the);
-            sb.append(":");
+            sb.append(':');
             sb.append(this.doubleValue());
 //            sb.append(", Error: ");
 //            sb.append(this.error);
@@ -166,12 +164,12 @@ public class ConcurrentMapStream<K, V> extends ConcurrentHashMap<K, ConcurrentMa
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[");
+        sb.append('[');
         for (RankedItem entry : values()) {
-            sb.append("(" + entry.doubleValue() + ": " + entry.the + "),");
+            sb.append("(").append(entry.doubleValue()).append(": ").append(entry.the).append("),");
         }
         sb.deleteCharAt(sb.length() - 1);
-        sb.append("]");
+        sb.append(']');
         return sb.toString();
     }
 

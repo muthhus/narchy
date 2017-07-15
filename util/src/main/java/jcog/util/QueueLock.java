@@ -1,7 +1,5 @@
 package jcog.util;
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
-import com.google.common.collect.EvictingQueue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.BlockingQueue;

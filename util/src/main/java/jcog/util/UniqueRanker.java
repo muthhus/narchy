@@ -13,6 +13,7 @@ public class UniqueRanker<T> implements Comparator<T> {
         this.function = function;
     }
 
+    @Override
     public int compare(@NotNull T o1, @NotNull T o2) {
 //        if (o2 == null) //why
 //            return -1;

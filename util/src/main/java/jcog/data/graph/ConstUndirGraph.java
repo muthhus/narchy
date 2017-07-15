@@ -105,8 +105,7 @@ public class ConstUndirGraph implements Graph {
     @Override
     public Collection<Integer> getNeighbours(int i) {
 
-        List<Integer> result = new ArrayList<Integer>();
-        result.addAll(g.getNeighbours(i));
+        List<Integer> result = new ArrayList<Integer>(g.getNeighbours(i));
         if (in != null) result.addAll(in[i]);
         return Collections.unmodifiableCollection(result);
     }

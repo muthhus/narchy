@@ -732,31 +732,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         return this;
     }
 
-    @Nullable
-    static NALTask clone(@NotNull Task x, long created, long start, long end) {
-        Priority b = x.priority().clonePri(); //snapshot its budget
-        if (b.isDeleted())
-            return null;
 
-        NALTask y = new NALTask(x.term(), x.punc(), x.truth(), created, start, end, x.stamp());
-        y.setPri(b);
-        //        if (srcCopy == null) {
-//            delete();
-//        } else {
-//            float p = srcCopy.priSafe(-1);
-//            if (p < 0) {
-//                delete();
-//            } else {
-//                setPriority(p);
-//            }
-//        }
-//
-//        return this;
-        y.meta = x.meta();
-        return y;
-    }
 
-    @Nullable
+    @Deprecated @Nullable
     static NALTask clone(@NotNull Task x, @NotNull Compound newContent) {
 
         boolean negated = (newContent.op() == NEG);
@@ -934,7 +912,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                     x.eval(n.terms)
             );
 
-            if (y != x) {
+            if (!x.equals(y)) {
                 if (y == null)
                     throw new InvalidTaskException(this, "un-evaluable");
 

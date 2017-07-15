@@ -50,7 +50,7 @@ public class SortedArray<E> implements Iterable<E> {
 
     public static final int binarySearchThreshold = 8;
 
-    public Object[] list = ArrayUtils.EMPTY_OBJECT_ARRAY;
+    public E[] list = (E[]) ArrayUtils.EMPTY_OBJECT_ARRAY;
 
     protected int size;
 
@@ -104,7 +104,7 @@ public class SortedArray<E> implements Iterable<E> {
     }
 
     public void clear() {
-        this.list = ArrayUtils.EMPTY_OBJECT_ARRAY;
+        this.list = (E[]) ArrayUtils.EMPTY_OBJECT_ARRAY;
         this.size = 0;
 
     }
@@ -213,15 +213,16 @@ public class SortedArray<E> implements Iterable<E> {
         if (l.length == s) {
             Object[] newList = newArray(Math.max(l.length, s));
             System.arraycopy(l, 0, newList, 0, s);
-            this.list = l = newList;
+            this.list = (E[]) (l = newList);
         }
         l[this.size++] = e;
     }
 
     public void addInternal(int index, E e) {
-        if (index > -1 && index < this.size) {
+        int s = this.size;
+        if (index > -1 && index < s) {
             this.addAtIndex(index, e);
-        } else if (index == this.size) {
+        } else if (index == s) {
             this.addInternal(e);
         }
 //		else

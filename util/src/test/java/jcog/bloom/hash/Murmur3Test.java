@@ -1,5 +1,6 @@
 package jcog.bloom.hash;
 
+import jcog.bloom.Murmur3Hash;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

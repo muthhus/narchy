@@ -164,7 +164,7 @@ public class Histogram  {
                 p(toMicros.apply(percentile(1)));
     }
 
-    private String p(double v) {
+    private static String p(double v) {
         return v < 0.1 ? String.format("%.3f", v) :
                 v < 1 ? String.format("%.2f", v) :
                         v < 10 ? String.format("%.1f", v) :
