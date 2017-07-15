@@ -6,7 +6,6 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.core.ConsoleAppender;
 import com.google.common.base.Strings;
 import com.google.common.escape.Escapers;
-import jcog.Texts;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.pri.Pri;
@@ -994,20 +993,21 @@ public interface $ {
     }
 
     public static int intValue(Term intTerm) throws NumberFormatException {
-        if (intTerm instanceof Atom) {
-            String xs = intTerm.toString();
-            return Texts.i(xs);
-        } else {
-            throw new NumberFormatException();
-        }
+        if (intTerm instanceof IntAtom)
+            return ((IntAtom) intTerm).id;
+//        if (intTerm instanceof Atom) {
+//            String xs = intTerm.toString();
+//            return Texts.i(xs);
+//        } else {
+        throw new NumberFormatException();
+        //   }
     }
 
     public static int intValue(Term intTerm, int ifNotInt) {
-        if (intTerm instanceof Atom) {
-            return Texts.i(intTerm.toString(), ifNotInt);
-        } else {
+        if (intTerm instanceof IntAtom)
+            return ((IntAtom) intTerm).id;
+        else
             return ifNotInt;
-        }
     }
 
     public static Term fromJSON(String j) {

@@ -215,7 +215,9 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
         //project if different occurrence
 
-        if (!answer.isEternal() && !answer.during(when)) {
+        boolean relevantTime = answer.during(when);
+
+        if (/*!answer.isEternal() && */!relevantTime) {
 
             if (when == ETERNAL)
                 when = now;
@@ -243,7 +245,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             }
         }
 
-        if (novel && question.isQuestOrQuestion() &&
+        if (novel && relevantTime && question.isQuestOrQuestion() &&
                 nar.conceptTerm(question.term()).equals(beliefConcept)
             ) {
             nar.input(answer);

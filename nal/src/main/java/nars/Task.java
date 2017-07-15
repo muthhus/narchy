@@ -828,16 +828,17 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     default boolean during(long when) {
         long start = start();
-
-        if (start == when) return true;
-
         if (start != ETERNAL) {
+            if (start == when)
+                return true;
             if (when >= start) {
                 if (when <= end())
                     return true;
             }
+            return false;
+        } else {
+            return true;
         }
-        return false;
     }
 
     //    /**

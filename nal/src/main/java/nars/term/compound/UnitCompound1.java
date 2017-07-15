@@ -10,10 +10,8 @@ import nars.term.container.TermVector1;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.function.Consumer;
 
-import static com.google.common.collect.Iterators.singletonIterator;
 import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 

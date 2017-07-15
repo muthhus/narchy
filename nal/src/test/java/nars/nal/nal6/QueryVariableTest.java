@@ -53,7 +53,7 @@ public class QueryVariableTest {
 
     void testQuestionAnswer(@NotNull String beliefString, @NotNull String question) throws Narsese.NarseseException {
 
-        int time = 4096;
+        int time = 128;
 
         AtomicBoolean valid = new AtomicBoolean();
 

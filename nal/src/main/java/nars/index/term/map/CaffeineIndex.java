@@ -1,7 +1,6 @@
 package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
-import nars.NAR;
 import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;

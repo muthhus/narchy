@@ -4,9 +4,6 @@ import com.google.common.base.Joiner;
 import nars.Param;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.function.IntFunction;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**

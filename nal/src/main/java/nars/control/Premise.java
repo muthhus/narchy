@@ -4,7 +4,6 @@
  */
 package nars.control;
 
-import jcog.Util;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Param;
@@ -112,11 +111,17 @@ public class Premise {
 
                 Task match;
 
-                if (task.isQuestOrQuestion()) {
+                if (task.isQuestOrQuestion() && (reUnified || beliefConcept.term().equals(nar.conceptTerm(taskTerm)))) {
+//                            //see if belief unifies with task (in reverse of previous unify)
+//                            if (questionTerm.varQuery() == 0 || (unify((Compound)beliefConcept.term(), questionTerm, nar) == null)) {
+//
+//                            } else {
+//
+//                            }
                     long when = whenAnswer(task, now);
                     match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
                     if (match != null)
-                        tryAnswer(reUnified, taskLink, match, nar);
+                        tryAnswer(taskLink, match, nar);
                 } else {
                     long when = whenMatch(task, now);
                     match = table.match(when, task, (Compound) beliefTerm, true, nar);
@@ -133,14 +138,18 @@ public class Premise {
             belief = null;
 
         float beliefPriority;
-        if (belief != null) {
+        if (belief != null)
+
+        {
             beliefPriority = belief.pri();
             if (beliefPriority != beliefPriority) {
                 belief = null; //belief was deleted
             } else {
                 beliefTerm = belief.term();
             }
-        } else {
+        } else
+
+        {
             beliefPriority = Float.NaN;
         }
 
@@ -162,7 +171,10 @@ public class Premise {
         );
 
 
-        nar.deriver().test(d);
+        nar.deriver().
+
+                test(d);
+
         int ttlAfter = d.ttl();
 
         return ttlMax - ttlAfter;
@@ -196,20 +208,10 @@ public class Premise {
     }
 
 
-    static boolean tryAnswer(boolean reUnified, PriReference<Task> question /* or quest */, @NotNull Task answer, NAR nar) {
+    static boolean tryAnswer(PriReference<Task> question /* or quest */, @NotNull Task answer, NAR nar) {
 
         Task Q = question.get();
 
-        if (!reUnified) {
-            Compound questionTerm = Q.term();
-            Compound answerTerm = answer.term();
-            if (!nar.conceptTerm(answerTerm).equals(nar.conceptTerm(questionTerm))) {
-                //see if belief unifies with task (in reverse of previous unify)
-                if (questionTerm.varQuery() == 0 || (unify(answerTerm, questionTerm, nar) == null)) {
-                    return false;
-                }
-            }
-        }
 
         @Nullable Task answered = Q.onAnswered(answer, nar);
 
@@ -225,8 +227,8 @@ public class Premise {
             //(1f - taskBudget.qua())
             //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
 
-            if (Q.isInput())
-                nar.eventTaskProcess.emit(answer);
+      //      if (Q.isInput())
+        //        nar.eventTaskProcess.emit(answer);
 
             return true;
 

@@ -1,7 +1,6 @@
 package nars.table;
 
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import jcog.Util;
 import jcog.tree.rtree.*;
@@ -31,7 +30,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = { 0, 1, 2, 4, 8 };
+    static final int[] sampleRadii = { 0, 2, 4 };
     final static int maxSamplesTruthpolated = 5;
 
     /** proportional to capacity (not size) */

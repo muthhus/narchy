@@ -575,7 +575,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         assert ((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
 
         return inputAndGet(
-                new NALTask(term, punc, null,
+                new NALTask((Compound)term.unneg(), punc, null,
                         time(), when, when,
                         new long[]{time.nextStamp()}
                 ).budget(this)

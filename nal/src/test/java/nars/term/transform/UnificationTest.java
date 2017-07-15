@@ -9,7 +9,6 @@ import nars.term.Termed;
 import nars.term.subst.Unify;
 import nars.test.TestNAR;
 import nars.util.signal.RuleTest;
-import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;

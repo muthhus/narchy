@@ -12,7 +12,6 @@ import nars.term.subst.Unify;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.SortedSet;
 

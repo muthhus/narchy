@@ -14,9 +14,9 @@ public class UniqueRanker<T> implements Comparator<T> {
     }
 
     @Override
-    public int compare(@NotNull T o1, @NotNull T o2) {
-//        if (o2 == null) //why
-//            return -1;
+    public int compare(T o1, @NotNull T o2) {
+        if (o2 == null) //why
+            return -1;
 
         if (o1.equals(o2)) return 0;
 

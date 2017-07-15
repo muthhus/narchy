@@ -6,7 +6,6 @@ import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.NARLoop;
-import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
 import nars.task.ITask;

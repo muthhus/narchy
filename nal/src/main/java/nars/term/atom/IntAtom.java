@@ -5,7 +5,6 @@ import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.Op.ATOM;
 import static nars.Op.INT;
 
 /** 32-bit signed integer */

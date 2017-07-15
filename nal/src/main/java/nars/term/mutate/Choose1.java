@@ -9,7 +9,6 @@ import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Set;
 import java.util.SortedSet;
 
 /**

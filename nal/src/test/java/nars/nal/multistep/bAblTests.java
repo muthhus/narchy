@@ -1,14 +1,8 @@
 package nars.nal.multistep;
 
-import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.function.Supplier;
 
 import static nars.Op.BELIEF;
 

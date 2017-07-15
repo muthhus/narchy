@@ -3,8 +3,10 @@ package nars.term.var;
 import nars.$;
 import nars.Op;
 import nars.index.term.NonInternable;
+import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.atom.AtomicToString;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -97,8 +99,13 @@ public class UnnormalizedVariable extends AtomicToString implements Variable, No
         return str;
     }
 
-//    @Override
-//    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-//        throw new UnsupportedOperationException();
-//    }
+    @Override
+    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Term eval(TermContext index) {
+        throw new UnsupportedOperationException();
+    }
 }

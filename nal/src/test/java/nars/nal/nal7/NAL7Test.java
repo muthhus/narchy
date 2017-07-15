@@ -1,7 +1,6 @@
 package nars.nal.nal7;
 
 import nars.$;
-import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.nal.AbstractNALTest;
@@ -11,10 +10,6 @@ import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.function.Supplier;
 
 import static nars.$.$;
 import static nars.Op.*;

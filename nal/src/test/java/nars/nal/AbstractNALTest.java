@@ -6,7 +6,6 @@ import nars.op.stm.STMTemporalLinkage;
 import nars.test.TestNAR;
 import org.jetbrains.annotations.NotNull;
 import org.junit.After;
-import org.junit.Ignore;
 
 /**
  * Created by me on 2/10/15.
@@ -21,13 +20,10 @@ public abstract class AbstractNALTest {
     }
 
 
-
-    @NotNull
-    public TestNAR test() {
-        assert (test == null);
+    public AbstractNALTest() {
 
         NAR n = new NARS().get();
-        n.termVolumeMax.setValue(36);
+        n.termVolumeMax.setValue(28);
         //n.nal(level);
 //                    n.DEFAULT_BELIEF_PRIORITY = 0.5f;
 //                    n.DEFAULT_GOAL_PRIORITY = 0.5f;
@@ -38,6 +34,11 @@ public abstract class AbstractNALTest {
         //}
 
         test = new TestNAR(n);
+    }
+
+    @NotNull
+    public TestNAR test() {
+
         return test;
     }
 

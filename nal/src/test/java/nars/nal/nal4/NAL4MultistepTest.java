@@ -1,15 +1,10 @@
 package nars.nal.nal4;
 
-import nars.NAR;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.function.Supplier;
 
 public class NAL4MultistepTest extends AbstractNALTest {
 

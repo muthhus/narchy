@@ -30,13 +30,13 @@ public class NARS {
 
     private @NotNull Supplier<TermIndex> concepts = () ->
             //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
-            new NARS.BasicTermIndex(16 * 1024 )
+            new NARS.BasicTermIndex(1 * 1024 )
     ;
 
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(256, 256, 0.2f);
+    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 32, 0.1f);
 
     private final Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 

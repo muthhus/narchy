@@ -1,7 +1,6 @@
 package nars;
 
 
-import jcog.Util;
 import jcog.memoize.CaffeineMemoize;
 import jcog.memoize.Memoize;
 import nars.derive.meta.match.Ellipsislike;
@@ -469,13 +468,13 @@ public enum Op implements $ {
 
     //VIRTUAL TERMS
     @Deprecated
-    INSTANCE("-{-", 2, OpType.Statement),
+    INSTANCE("-{-", 2, OpType.Statement, Args.Two),
 
     @Deprecated
-    PROPERTY("-]-", 2, OpType.Statement),
+    PROPERTY("-]-", 2, OpType.Statement, Args.Two),
 
     @Deprecated
-    INSTANCE_PROPERTY("{-]", 2, OpType.Statement),
+    INSTANCE_PROPERTY("{-]", 2, OpType.Statement, Args.Two),
 
     @Deprecated
     DISJ("||", true, 5, Args.GTETwo) {
@@ -900,7 +899,7 @@ public enum Op implements $ {
 
         boolean internable = true;
         for (Term y : x) {
-            if (!(y instanceof NonInternable)) { //"must not intern non-internable" + y + "(" +y.getClass() + ")";
+            if (y instanceof NonInternable) { //"must not intern non-internable" + y + "(" +y.getClass() + ")";
                 internable = false;
                 break;
             }
@@ -975,10 +974,11 @@ public enum Op implements $ {
 
             case INH:
 
-                if (subject.equals(predicate)) //equal test first to allow, ex: False<->False to result in True
-                    return True;
                 if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
                     return False;
+                if (subject.equals(predicate)) //equal test first to allow, ex: False<->False to result in True
+                    return True;
+
 
                 boolean sNeg = subject.op() == NEG;
                 boolean pNeg = predicate.op() == NEG;
@@ -1000,9 +1000,14 @@ public enum Op implements $ {
                 //if (isTrue(predicate)) return subject;
                 //if (isFalse(subject)) return neg(predicate);
                 //if (isFalse(predicate)) return neg(subject);
+                if (subject.equals(predicate))
+                    return True;
+
                 if (concurrent(dt)) {
-                    if (subject.equals(predicate))
-                        return True;
+                    if (subject == True) return predicate;
+                    if (subject == False) return NEG.the(predicate);
+                    if (predicate == True) return subject;
+                    if (predicate == False) return NEG.the(subject);
 
                 } else {
                     if (isTrueOrFalse(subject))
@@ -1032,11 +1037,7 @@ public enum Op implements $ {
                 }
 
                 boolean equal = subject.equals(predicate);
-                if (concurrent(dt)) {
-                    if (equal) {
-                        return True;
-                    }
-                } else {
+                if (!concurrent(dt)) {
 //                    if (!equal && subject.compareTo(predicate) > 0) {
 //                        //swap
 //                        Term x = subject;
@@ -1151,7 +1152,7 @@ public enum Op implements $ {
                     Term[] common = TermContainer.intersect(subjs, preds);
                     if (common != null) {
 
-                        @NotNull Set<Term> sss = subjs.toSet();
+                        @NotNull Set<Term> sss = subjs.toSortedSet();
                         boolean modifiedS = false;
                         for (Term cc : common)
                             modifiedS |= sss.remove(cc);
@@ -1171,7 +1172,7 @@ public enum Op implements $ {
                             }
                         }
 
-                        @NotNull Set<Term> ppp = preds.toSet();
+                        @NotNull SortedSet<Term> ppp = preds.toSortedSet();
                         boolean modifiedP = false;
                         for (Term cc : common)
                             modifiedP |= ppp.remove(cc);
@@ -1219,7 +1220,7 @@ public enum Op implements $ {
                     dt = -dt;
             }
 
-            assert (subject.compareTo(predicate) <= 0);
+            //assert (subject.compareTo(predicate) <= 0);
             //System.out.println( "\t" + subject + " " + predicate + " " + subject.compareTo(predicate) + " " + predicate.compareTo(subject));
 
         }

@@ -1,13 +1,8 @@
 package nars.nal.nal1;
 
-import nars.NAR;
 import nars.nal.AbstractNALTest;
 import nars.test.DeductiveChainTest;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import java.util.function.Supplier;
 
 import static nars.test.DeductiveChainTest.inh;
 

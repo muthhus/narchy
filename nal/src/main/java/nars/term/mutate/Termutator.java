@@ -1,15 +1,9 @@
 package nars.term.mutate;
 
-import jcog.Util;
 import nars.$;
-import nars.Op;
-import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.Term;
-import nars.term.compound.GenericCompound;
-import nars.term.compound.ProxyCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.subst.Unify;
 
 import java.util.List;
