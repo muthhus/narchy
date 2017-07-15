@@ -1,6 +1,7 @@
 package nars;
 
 
+import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import jcog.data.MutableInteger;
@@ -10,9 +11,7 @@ import jcog.event.Topic;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
-import jcog.pri.mix.Mix;
 import jcog.pri.mix.PSink;
-import jcog.pri.mix.PSinks;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
@@ -49,6 +48,7 @@ import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.exe.Executioner;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
@@ -62,7 +62,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -131,16 +130,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     protected final NARLoop loop = new NARLoop(this);
 
-    @NotNull
-    public final PSinks<ITask, ITask> in;
-
     private TrieDeriver deriver;
 
-    public final void printConceptStatistics() {
-        printConceptStatistics(System.out);
-    }
-
-    public void printConceptStatistics(PrintStream out) {
+    public final Map<String, Double> conceptStats() {
         //Frequency complexity = new Frequency();
         Frequency clazz = new Frequency();
         Frequency policy = new Frequency();
@@ -182,17 +174,29 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             }
 
         });
-        out.println("Total Concepts:\n" + i.get());
-        out.println("\ntermLinksUsed:\n" + termlinksUsed);
-        out.println("\ntermLinksCapacity:\n" + termlinksCap);
-        out.println("\ntaskLinksUsed:\n" + tasklinksUsed);
-        out.println("\ntaskLinksCapacity:\n" + tasklinksCap);
-        //out.println("\nComplexity:\n" + complexity);
-        out.println("\npolicy:\n" + policy);
-        out.println("\nrootOp:\n" + rootOp);
-        out.println("\nvolume:\n" + volume);
-        out.println("\nclass:\n" + clazz);
 
+        Map<String,Double> x = new TreeMap();
+        x.put("concept sum", (double)i.get());
+
+        x.put("termlink sum", ((double)termlinksUsed.getSum()));
+        x.put("tasklink sum", ((double)tasklinksUsed.getSum()));
+        x.put("belief sum", ((double)beliefs.getSum()));
+        x.put("goal sum", ((double)goals.getSum()));
+
+        x.put("termlink usage", ((double)termlinksUsed.getSum()) / termlinksCap.getSum());
+
+        //x.put("volume mean", volume.);
+//
+//        x.put("termLinksCapacity", termlinksCap);
+//        x.put("taskLinksUsed", tasklinksUsed);
+//        x.put("taskLinksCapacity", tasklinksCap);
+
+        //x.put("Complexity", complexity);
+        //x.put("policy", policy);
+        //x.put("rootOp", rootOp);
+        //x.put("volume", volume);
+        //x.put("class", clazz);
+        return x;
     }
 
 
@@ -205,7 +209,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.self = Param.randomSelf();
 
         this.emotion = new Emotion();
-        this.in = newInputMixer();
 
         this.level = 8;
 
@@ -251,27 +254,25 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
-    protected PSinks<ITask,ITask> newInputMixer() {
-        return new Mix<ITask, ITask>() {
-            @Override
-            public ITask apply(ITask iTask) {
-                return iTask;
-            }
-        };
-    }
-
-    public PSink<ITask,ITask> newInputChannel(Object id) {
+    public PSink<ITask, ITask> newInputChannel(Object id) {
 
         Cause c = newCause(id);
-        short[] cs = new short[] { c.id };
+        short ci = c.id;
+        short[] cs = new short[]{ci};
 
-        return in.newStream(id, x -> {
-            if (x instanceof NALTask) {
-                //assert (((NALTask) x.ref).cause.length == 0);
-                ((NALTask) x).cause = cs;
+        return new PSink<ITask, ITask>(id, this::input) {
+            @Override public ITask apply(ITask x) {
+                if (x instanceof NALTask) {
+                    //assert (((NALTask) x.ref).cause.length == 0);
+                    NALTask t = (NALTask) x;
+                    if (t.cause == null)
+                        t.cause = cs;
+                    else
+                        t.cause = ArrayUtils.add(t.cause, 0 /* prepend */, ci);
+                }
+                return x;
             }
-            input(x);
-        });
+        };
     }
 
 
@@ -575,7 +576,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         assert ((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
 
         return inputAndGet(
-                new NALTask((Compound)term.unneg(), punc, null,
+                new NALTask((Compound) term.unneg(), punc, null,
                         time(), when, when,
                         new long[]{time.nextStamp()}
                 ).budget(this)
@@ -609,7 +610,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     public void input(ITask x) {
-        if (x!=null)
+        if (x != null)
             exe.run(x);
     }
 
@@ -938,19 +939,20 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle();
 
+        emotion.cycle();
 
-        LongObjectPair<Runnable> next;
-        long now = time();
-        while ((next = scheduled.peek())!=null) {
-            if (next.getOne() <= now) {
-                exe.runLater(next.getTwo());
-                scheduled.poll();
-            } else {
-                break; //wait till another time
+        if (!scheduled.isEmpty()) {
+            LongObjectPair<Runnable> next;
+            long now = time();
+            while ((next = scheduled.peek()) != null) {
+                if (next.getOne() <= now) {
+                    exe.runLater(next.getTwo());
+                    scheduled.poll();
+                } else {
+                    break; //wait till another time
+                }
             }
         }
-
-        emotion.cycle();
 
         causes.forEach(c -> c.commit(0.98f));
 
@@ -1193,16 +1195,18 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
-    final PriorityBlockingQueue<LongObjectPair<Runnable>> scheduled =
-            new PriorityBlockingQueue<LongObjectPair<Runnable>>(32, (a,b)->{
-        int c = Longs.compare(a.getOne(), b.getOne());
-        if (c == 0)
-            return -1; //maintains uniqueness in case they occupy the same time
-        else
-            return c;
-    });
+    final MinMaxPriorityQueue<LongObjectPair<Runnable>> scheduled =
+            MinMaxPriorityQueue.orderedBy((LongObjectPair<Runnable> a, LongObjectPair<Runnable> b) -> {
+                int c = Longs.compare(a.getOne(), b.getOne());
+                if (c == 0)
+                    return -1; //maintains uniqueness in case they occupy the same time
+                else
+                    return c;
+            }).create();
 
-    /** schedule a task to be executed no sooner than a given NAR time */
+    /**
+     * schedule a task to be executed no sooner than a given NAR time
+     */
     public void at(long when, Runnable then) {
         scheduled.add(PrimitiveTuples.pair(when, then));
     }
@@ -1286,7 +1290,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             term = compoundOrNull(terms.normalize((Compound) term));
             if (term == null) return null;
 
-            term = compoundOrNull(term.unneg() /* once again to be sure */ );
+            term = compoundOrNull(term.unneg() /* once again to be sure */);
             if (term == null) return null;
 
         }

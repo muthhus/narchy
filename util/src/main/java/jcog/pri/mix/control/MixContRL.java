@@ -333,7 +333,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
             MixChannel mm = this.mix[id];
             mm.id = x.toString();
 
-            PSink<X,CLink<X>> p = new PSink<X,CLink<X>>(x, xx -> new CLink<>(xx, id), each);
+            PSink<X,CLink<X>> p = new PSink<X,CLink<X>>(x, each);
 
 
             this.aux.add(p);

@@ -42,7 +42,7 @@ public class NAL1Test extends AbstractNALTest {
 
         String belief = "<bird --> swimmer>";
 
-        test()
+        test
 
                 .mustBelieve(4, belief, 0.87f, 0.91f)
                 .believe(belief)                 //.en("bird is a type of swimmer.");
@@ -54,7 +54,7 @@ public class NAL1Test extends AbstractNALTest {
     @Test
     public void deduction()  {
 
-        test().
+        test.
                 believe("<bird --> animal>")
                 /*.en("bird is a type of animal.")
                 .es("bird es un tipo de animal.")
@@ -79,7 +79,7 @@ public class NAL1Test extends AbstractNALTest {
 //                .mustBelieve(time, "<chess --> sport>", 0.90f, 0.45f)
 //        //.en("chess is a type of competition.");
 
-        test()
+        test
                 .believe("<sport --> competition>", 1f, 0.9f)
                 .believe("<chess --> competition>", 0.90f, 0.9f)
                 .mustBelieve(CYCLES, "<chess --> sport>", 1f, 0.42f)
@@ -97,7 +97,7 @@ public class NAL1Test extends AbstractNALTest {
          */
         //(A --> B), (A --> C), neq(B,C) |- (C --> B), (Belief:Abduction, Desire:Weak, Derive:AllowBackward)
 
-        test()
+        test
             .believe("<swan --> swimmer>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
             .believe("<swan --> bird>") //.en("Swan is a type of bird.");
             .mustBelieve(CYCLES, "<bird --> swimmer>", 0.90f, 0.45f) //.en("I guess bird is a type of swimmer.");
@@ -111,7 +111,8 @@ public class NAL1Test extends AbstractNALTest {
 
     @Test public void induction() {
         //(A --> C), (B --> C), neq(A,B) |- (B --> A), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
-        test()
+
+        test
                 .believe("<parakeet --> bird>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
                 .believe("<pteradactyl --> bird>") //.en("Swan is a type of bird.");
                 .mustBelieve(CYCLES, "<parakeet --> pteradactyl>", 1, 0.42f)
@@ -123,7 +124,7 @@ public class NAL1Test extends AbstractNALTest {
     @Test
     public void exemplification()  {
 
-        test()
+        test
 
             .believe("<robin --> bird>")
             .believe("<bird --> animal>")
@@ -134,7 +135,7 @@ public class NAL1Test extends AbstractNALTest {
     @Test
     public void conversion() throws nars.Narsese.NarseseException {
 
-        TestNAR test = test();
+        TestNAR test = this.test;
         test.believe("<bird --> swimmer>")
             .ask("<swimmer --> bird>") //.en("Is swimmer a type of bird?");
             .mustOutput(CYCLES, "<swimmer --> bird>. %1.00;0.47%");
@@ -146,7 +147,7 @@ public class NAL1Test extends AbstractNALTest {
     @Test
     public void backwardInference() throws nars.Narsese.NarseseException {
 
-        test()
+        test
                 .believe("<bird --> swimmer>", 1.0f, 0.8f) //Bird is a type of swimmer
                 .ask(    "<?1 --> swimmer>") //What is a type of swimmer?
                 .mustOutput(CYCLES, "<?1 --> bird>?") //.en("What is a type of bird?");

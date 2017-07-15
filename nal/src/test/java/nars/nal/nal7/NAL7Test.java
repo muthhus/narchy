@@ -7,9 +7,12 @@ import nars.nal.AbstractNALTest;
 import nars.task.NALTask;
 import nars.test.TestNAR;
 import nars.time.Tense;
+import nars.util.OptiUnit;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.Map;
 
 import static nars.$.$;
 import static nars.Op.*;
@@ -21,8 +24,22 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL7Test extends AbstractNALTest {
 
-    final int cycles = 550;
+    int cycles = 150;
 
+    public static void main(String[] args) {
+        new OptiUnit<NAL7Test>((x,m)->{
+
+            x.test.trace = false;
+            x.cycles = 1;
+            x.nar.termVolumeMax.setValue(10);
+
+        }, (x, m) -> {
+
+            Map<String, Double> cstat = x.nar.conceptStats();
+            System.out.println(cstat);
+
+        }, NAL7Test.class);
+    }
 
     @Test
     public void induction_on_events() {
@@ -33,7 +50,7 @@ public class NAL7Test extends AbstractNALTest {
         //    P, S, after(Task,Belief), notConjunction(P), notConjunction(S),  measure_time(I), notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |-
         //              (&/,S,I,P), (Belief:Intersection)
 
-        test()
+        test
                 .input("x:before. :|:")
                 .inputAt(10, "x:after. :|:")
                 .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0, 10)
@@ -52,7 +69,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events_neg() {
-        test()
+
+        test
                 .input("--x:before. :|:")
                 .inputAt(10, "x:after. :|:")
                 .mustBelieve(cycles, "(--x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0, 10)
@@ -64,7 +82,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events_neg2() {
-        test()
+
+        test
                 .input("x:before. :|:")
                 .inputAt(10, "--x:after. :|:")
                 .mustBelieve(cycles, "(x:before ==>+10 x:after)", 0.00f, 0.45f /*abductionConf*/, 0, 10)
@@ -77,7 +96,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void temporal_explification() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("(<($x, room) --> enter> ==>-5 <($x, door) --> open>)", 0.9f, 0.9f);
         tester.believe("(<($y, door) --> open> ==>-5 <($y, key) --> hold>)", 0.8f, 0.9f);
 
@@ -88,7 +108,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void temporal_analogy() {
-        test()
+
+        test
                 //.log()
                 .believe("( open($x, door) ==>+5 enter($x, room) )", 0.95f, 0.9f)
                 .believe("( enter($x, room) <=>+0 leave($x, corridor_100) )", 1.0f, 0.9f)
@@ -109,7 +130,8 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     void testTemporalRevision(int delay, float freq, float conf, @NotNull String belief) {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
         tester.input(belief + ". :|: %1.00;0.65%");
         tester.inputAt(delay, belief + ". :|: %0.5;0.70%");
@@ -120,7 +142,8 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testSumNeg() {
         //(P ==> M), (M ==> S), neq(S,P), dt(sumNeg) |- (S ==> P), (Belief:Exemplification, Derive:AllowBackward)
-        test()
+
+        test
 
                 .believe("(x ==>+2 y)")
                 .believe("(y ==>+3 z)")
@@ -131,7 +154,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testSum() {
-        test()
+
+        test
 
                 .believe("(x ==>+2 y)")
                 .believe("(y ==>+3 z)")
@@ -141,7 +165,8 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testBminT() {
         //(P ==> M), (S ==> M), neq(S,P), dt(bmint) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
-        test()
+
+        test
 
                 .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
                 .believe("(x ==>+2 y)")
@@ -155,7 +180,8 @@ public class NAL7Test extends AbstractNALTest {
         //y..x
         //y.z
         //  zx
-        test()
+
+        test
                 //.log()
                 .believe("(y ==>+3 x)")
                 .believe("(y ==>+2 z)")
@@ -217,7 +243,8 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void intervalPreserve_and_shift_occurence() {
         int time = cycles;
-        test()
+
+        test
 
                 //.input("X:x.") //shouldnt be necessary
                 .inputAt(1, "(X:x &&+1 (Y:y &&+2 Z:z)). :|:")
@@ -233,7 +260,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void temporal_deduction() {
-        test()
+
+        test
                 .believe("(enter($x, room) ==>-3 open($x, door))", 0.9f, 0.9f)
                 .believe("(open($y, door) ==>-4 hold($y, key))", 0.8f, 0.9f)
                 .mustBelieve(cycles, "(enter($1,room) ==>-7 hold($1,key))", 0.72f, 0.58f)
@@ -242,7 +270,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void temporal_induction_comparison() {
-        test()
+
+        test
 
                 // hold ==>+4 open ==>+5 enter
                 .believe("((( $x, door) --> open) ==>+5 (( $x, room) --> enter))", 0.9f, 0.9f)
@@ -258,8 +287,9 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void inference_on_tense() {
-        test()
-                .log()
+
+        test
+                //.log()
                 .input("((($x, key) --> hold) ==>+3 (($x, room) --> enter)).")
                 .input("<(John, key) --> hold>. :|:")
                 .mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 3);
@@ -267,7 +297,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void inference_on_tense_reverse() {
-        test()
+
+        test
                 .input("(hold($x, key) ==>+7 enter($x, room)).")
                 .input("enter(John, room). :|:")
                 .mustBelieve(cycles, "hold(John,key)",
@@ -276,7 +307,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void inference_on_tense_reverse_novar() {
-        test()
+
+        test
                 //.log()
                 .input("(hold(John, key) ==>+7 enter(John, room)).")
                 .input("enter(John, room). :|:")
@@ -286,7 +318,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void inference_on_tense_3() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
         tester.mustBelieve(cycles, "<(John,room) --> enter>",
                 1.00f, 0.81f, 3);
@@ -299,7 +332,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void inference_on_tense_4() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         //tester;
 
         tester.believe("(((John,key) --> hold) ==>+3 ((John,room) --> enter))");
@@ -310,7 +344,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events_0() {
-        test()
+
+        test
 
                 .input("open(John,door). :|:")
                 .inputAt(4, "enter(John,room). :|:")
@@ -320,7 +355,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events_0_neg() {
-        test()
+
+        test
                 //.log()
                 .input("(--,open(John,door)). :|:")
                 .inputAt(4, "enter(John,room). :|:")
@@ -333,7 +369,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events2() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
         tester.input("<(John,door) --> open>. :|:");
         tester.inputAt(4, "<(John,room) --> enter>. :|:");
@@ -345,8 +382,9 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events3() {
-        test()
-                .log()
+
+        test
+                //.log()
                 .input("open(John,door). :|:")
                 .inputAt(4, "enter(John,room). :|:")
                 .mustBelieve(cycles, "(open(John, door) <=>+4 enter(John, room))",
@@ -357,7 +395,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events3_simple() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
         tester.inputAt(1, "<door --> open>. :|:");
         tester.inputAt(2, "<room --> enter>. :|:");
@@ -370,8 +409,9 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void induction_on_events3_simple_reversed() {
         //TESTS COMMUTIVITY
-        test()
-                .log()
+
+        test
+                
                 .inputAt(0, "<room --> enter>. :|:")
                 .inputAt(4, "<door --> open>. :|:")
                 .mustBelieve(cycles, "(open:door <=>-4 enter:room)",
@@ -409,7 +449,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events_with_variable_introduction() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
         tester.input("open(John,door). :|:");
         tester.inputAt(2, "enter(John, room). :|:");
@@ -426,7 +467,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events_with_variable_introduction2() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
         //tester;
         tester.input("open(John, door). :|:");
@@ -451,7 +493,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void induction_on_events_composition_pre() {
-        test()
+
+        test
 
                 .input("hold(John,key). :|:")
                 .input("(open(John,door) <-> enter(John,room)). :|:")
@@ -494,7 +537,8 @@ public class NAL7Test extends AbstractNALTest {
 //    }
 
     private void compositionTest(int t, int dt) {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.inputAt(t, "hold(John,key). :|:");
         tester.inputAt(t, "(open(John,door) ==>+" + dt + " enter(John,room)). :|:");
 
@@ -527,7 +571,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void variable_introduction_on_events() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
         tester.input("at(SELF,{t003}). :|:");
         tester.inputAt(4, "on({t002},{t003}). :|:");
@@ -546,7 +591,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void variable_introduction_on_events_with_negation() {
-        test()
+
+        test
 
                 //
                 .input("(--,a:x). :|: %0.9;0.8% ")
@@ -570,8 +616,8 @@ public class NAL7Test extends AbstractNALTest {
     //    //TODO: investigate
     @Test
     public void variable_elimination_on_temporal_statements() {
-        test()
-                //.log()
+
+        test
                 .inputAt(0, "(on({t002},#1) &&+0 at(SELF,#1)). :|:")
                 .inputAt(1, "((on($1,#2) &&+0 at(SELF,#2)) ==>+0 reachable(SELF,$1)).")
                 .mustBelieve(cycles, "reachable(SELF,{t002})",
@@ -589,7 +635,7 @@ public class NAL7Test extends AbstractNALTest {
             $.50;.50;.95$ (p2). 0+0 %1.0;.90% {0+0: 5} Input
             $.75;.06;.12$ ((p2) ==>+0 (--,(p3))). 1-1 %1.0;.45% {1-1: 5;7} ((%1,%2,time(dtAfterReverse),neq(%1,%2),notImplicationOrEquivalence(%1),notImplicationOrEquivalence(%2)),((%2==>%1),((Abduction-->Belief)))) */
 
-        test()
+        test
 
                 .inputAt(0, "(a). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
@@ -617,7 +663,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testEternalImplicationDecompositionIsntEternal() {
-        test()
+
+        test
 
                 .inputAt(0, "(a). :|:")
                 .inputAt(0, "((a) ==>+1 (b)).") //ETERNAL impl
@@ -628,7 +675,7 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testImplicationDecompositionContradictionFairness() {
 
-        test()
+        test
 
                 .inputAt(0, "(b). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
@@ -644,7 +691,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void temporalOrder() {
-        test()
+
+        test
 
                 .input("(<m --> M> ==>+5 <p --> P>).")
                 .inputAt(10, "(<s --> S> <=>+0 <m --> M>). %0.9;0.9%")
@@ -658,7 +706,8 @@ public class NAL7Test extends AbstractNALTest {
             $.50;.50;.95$ (c-->d). 5+0 %1.0;.90% {5+0: 3} Input
             $1.0;.13;.24$ (c-->a). 3-1 %1.0;.45% {3-1: 1;2} (((%1-->%2),(%3-->%1),neq(%2,%3)),((%2-->%3),((Exemplification-->Belief),(Weak-->Desire),(AllowBackward-->Derive))))
         */
-        test()
+
+        test
                 .inputAt(2, "a:x. :|: %1.0;0.45%")
                 .inputAt(5, "b:x. :|: %1.0;0.90%")
                 .mustBelieve(cycles, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2, 5)
@@ -676,7 +725,8 @@ public class NAL7Test extends AbstractNALTest {
             $0.0;.50;.50$ (p4)? 0+22 {0+22: a} FIFO Forgot
             $.26;.39;.95$ (--,(p4)). 1+0 %1.0;.90% {1+0: j} Input
         */
-        test()
+
+        test
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
                 .mustNotOutput(cycles, "(x)", BELIEF, 0f, 0.89f, 0f, 0.91f, 10)
@@ -687,7 +737,8 @@ public class NAL7Test extends AbstractNALTest {
     public void testComparison1_Eternal() {
         /* (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
            (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward) */
-        test()
+
+        test
                 .input("(p ==>+1 m).")
                 .input("(s ==>+4 m).")
                 .mustBelieve(cycles, "(s <=>+3 p).", 1f, 0.45f);
@@ -697,7 +748,8 @@ public class NAL7Test extends AbstractNALTest {
     public void testComparison1_Temporal() {
         /* (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
            (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward) */
-        test()
+
+        test
 
                 .input("(p ==>+1 m).")
                 .inputAt(5, "(s ==>+4 m). :|:")
@@ -707,7 +759,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testComparison2() {
-        test()
+
+        test
                 .input("(m ==>+1 p).")
                 .input("(m ==>+4 s).")
                 .mustBelieve(cycles, "(p <=>+3 s).", 1f, 0.45f);
@@ -726,7 +779,8 @@ public class NAL7Test extends AbstractNALTest {
             $1.0;.07;.10$ ((d-->c) ==>-3 (c-->b)). 6-4 %1.0;.45% {6-4: 2;3} ((%1,%2,time(dtAfterReverse),neq(%1,%2),notImplicationOrEquivalence(%1),notImplicationOrEquivalence(%2)),((%2==>%1),((Abduction-->Belief))))
                 $.50;.50;.95$ (c-->b). 2+0 %1.0;.90% {2+0: 2} Input
                 $.50;.50;.95$ (d-->c). 5+0 %1.0;.90% {5+0: 3} Input*/
-        test()
+
+        test
 
                 .inputAt(2, "(a-->b). :|:")
                 .inputAt(5, "(d-->c). :|:")
@@ -739,7 +793,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testDecomposeConjunctionTemporal() {
-        test()
+
+        test
                 .input("((x) &&+0 (y)). :|:")
                 .mustBelieve(cycles, "(x)", 1f, 0.81f, 0)
                 .mustBelieve(cycles, "(y)", 1f, 0.81f, 0);
@@ -747,7 +802,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testDecomposeConjunctionEmbedded() {
-        test()
+
+        test
                 .input("(((x) &&+1 (y)) &&+1 (z)). :|:")
                 .mustBelieve(cycles, "((x) &&+1 (y))", 1f, 0.81f, 0, 1)
                 .mustBelieve(cycles, "((y) &&+1 (z))", 1f, 0.81f, 1, 2)
@@ -756,7 +812,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testDecomposeConjunctionEmbedded2() {
-        test()
+
+        test
                 .input("((z) &&+1 ((x) &&+1 (y))). :|:")
                 .mustBelieve(cycles, "((x) &&+1 (y))", 1f, 0.81f, 1, 2)
                 .mustBelieve(cycles, "((z) &&+2 (y))", 1f, 0.81f, 0, 2)
@@ -765,7 +822,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testDecomposeConjunctionEmbeddedInnerCommute() {
-        test()
+
+        test
                 .input("((&&,a,b,c) &&+1 z). :|:")
                 .mustBelieve(cycles, "(a &&+1 z)", 1f, 0.81f, 0, 1)
                 .mustBelieve(cycles, "(b &&+1 z)", 1f, 0.81f, 0, 1)
@@ -775,7 +833,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testWTFDontDecomposeConjunctionDTERNAL() {
-        test()
+
+        test
                 .input("((x)&&(y)). :|:")
                 .mustBelieve(cycles, "(x)", 1f, 0.81f, 0)
                 .mustBelieve(cycles, "(y)", 1f, 0.81f, 0);
@@ -791,7 +850,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testDecomposeConjunctionQuestion() {
-        test()
+
+        test
 
                 .input("((x) &&+5 (y))? :|:")
                 .mustOutput(0, cycles, "(x)", QUESTION, Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0)
@@ -801,7 +861,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testDecomposeConjunctionQuest() {
-        test()
+
+        test
                 //
                 .input("((x) &&+5 (y))@ :|:")
                 .mustOutput(0, cycles, "(x)", QUEST, Float.NaN, Float.NaN, Float.NaN, Float.NaN, 0)
@@ -815,7 +876,7 @@ public class NAL7Test extends AbstractNALTest {
         //$.50;.50;.90$ (I-->sad). 1+0 %0.0;.90%
         //dont derive: (I-->sad). %.94;.04%  via rule: <(&&,(--,%X),%A..+), X, time(decomposeTask) |- (--,%X), (Belief:StructuralDeduction)>:Negated
 
-        test()
+        test
 
                 .inputAt(0, "((I-->happy) &&+0 (I-->neutral)). :|: %0.06;0.90%")
                 .inputAt(0, "(I-->sad). :|: %0.0;0.90%")
@@ -839,7 +900,7 @@ public class NAL7Test extends AbstractNALTest {
                 ((I-->happy) &&+0 (I-->neutral)). 0+0 %.06;.90% {0+0: 1} Narsese
                 NOT: (I-->sad). 5-5 %.94;.02%*/
 
-        test()
+        test
 
                 .inputAt(0, "((--,(I-->sad)) <=>+0 (x)). :|: %0.06;0.90%")
                 .inputAt(0, "(x). :|: %0.06;0.90%")
@@ -854,12 +915,13 @@ public class NAL7Test extends AbstractNALTest {
      */
     @Test
     public void testConjSubsetDecomposition() throws Narsese.NarseseException {
-        test()
+
+        test
                 //.nar.input( $.task( (Compound)$.parallel( $("(x)"), $("(y)"), $("(z)")), BELIEF, 1f, 0.9f) )
                 //
                 .nar.believe($.parallel($("(x)"), $("(y)"), $("(z)")), 3, 1f, 0.9f);
 
-        test()
+        test
                 .mustBelieve(cycles, "((x) &&+0 (y))", 1f, 0.81f, 3)
                 .mustBelieve(cycles, "((y) &&+0 (z))", 1f, 0.81f, 3)
                 .mustBelieve(cycles, "((x) &&+0 (z))", 1f, 0.81f, 3)
@@ -870,7 +932,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testIntersectionTemporalNear() {
-        test()
+
+        test
                 .dur(2)
                 .inputAt(0, "(x --> a). :|:")
                 .inputAt(1, "(y --> a). :|:")
@@ -883,9 +946,9 @@ public class NAL7Test extends AbstractNALTest {
      */
     @Test
     public void testIntersectionTemporalFar() {
-        test()
+
+        test
                 .dur(2)
-                //.log()
                 .inputAt(0, "(x --> a). :|:")
                 .inputAt(3, "(y --> a). :|:")
                 .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.70f, 2)
@@ -900,7 +963,7 @@ public class NAL7Test extends AbstractNALTest {
         int eventDT = 16;
         int cycles = 10;
 
-        TestNAR t = test();
+        TestNAR t = test;
         //((FrameTime)t.nar.time).dur(eventDT);
 
         t.dur(eventDT / 2);
@@ -934,7 +997,7 @@ public class NAL7Test extends AbstractNALTest {
     public void multiConditionSyllogismPre() {
         //    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
 
-        test()
+        test
                 .input("hold(key). :|:")
                 .input("((hold(#x) && open(door)) ==> enter(room)). :|:")
                 .mustBelieve(cycles, "(open(door) ==> enter(room))",
@@ -947,7 +1010,7 @@ public class NAL7Test extends AbstractNALTest {
     public void multiConditionSyllogismPost() {
         //    Y, ((&&,X,A..+) ==> B), time(dtBeliefExact), notImplEqui(A..+) |- subIfUnifiesAny(((&&,A..+) ==>+- B),X,Y), (Belief:Deduction)
 
-        test()
+        test
                 .input("hold(key). :|:")
                 .input("(goto(door) ==> (hold(#x) && open(door))). :|:")
                 .mustBelieve(cycles, "(goto(door) ==> open(door))",
@@ -958,7 +1021,8 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void preconImplyConjPre() {
         //implication-based composition
-        test()
+
+        test
                 .input("(x ==>+2 a). :|:")
                 .input("(y ==>+3 a). :|:")
                 .mustBelieve(cycles, "((y &&+1 x) ==>+2 a)", 1.00f, 0.81f, 0) //correct conj sub-term DT
@@ -970,7 +1034,8 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void preconImplyConjPost() {
         //implication-based composition
-        test()
+
+        test
                 .input("(a ==>+2 x). :|:")
                 .input("(a ==>+3 y). :|:")
                 .mustBelieve(cycles, "(a ==>+2 (x &&+1 y))", 1.00f, 0.81f, 0) //correct conj sub-term DT
@@ -982,7 +1047,8 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void preconImplyConjPost2() {
         //implication-based composition
-        test()
+
+        test
                 .input("(a ==>+2 x). :|:")
                 .input("(a ==>-3 y). :|:")
                 .mustBelieve(cycles, "(a ==>-3 (y &&+5 x))", 1.00f, 0.81f, 0) //correct conj sub-term DT
@@ -991,7 +1057,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testReverseImpl() {
-        test()
+
+        test
                 .believe("((x) ==>+5 (y))")
                 .believe("((y) ==>-5 (x))")
                 .mustBelieve(cycles, "((x) <=>+5 (y))", 1f, 0.81f)
@@ -1000,7 +1067,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testPreconditionCombine() {
-        test()
+
+        test
                 .believe("((x) ==>+5 (z))")
                 .believe("((y) ==>+5 (z))")
                 .mustBelieve(cycles, "( ((x) &&+0 (y)) ==>+5 (z))", 1f, 0.81f);
@@ -1008,7 +1076,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testPreconditionCombineVarying() { //may be equivalent to another case
-        test()
+
+        test
                 .believe("((x) ==>+5 (z))")
                 .believe("((y) ==>+3 (z))")
                 .mustBelieve(cycles, "( ((x) &&+2 (y)) ==>+3 (z))", 1f, 0.81f);
@@ -1016,7 +1085,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testPreconditionCombineNeg() { //may be equivalent to another case
-        test()
+
+        test
                 .believe("((x) ==>+5 (z))")
                 .believe("(--(y) ==>+5 (z))")
                 .mustBelieve(cycles, "( ((x) &&+0 --(y)) ==>+5 (z))", 1f, 0.81f);
@@ -1024,7 +1094,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testPropositionalDecompositionPositive() { //may be equivalent to another case
-        test()
+
+        test
                 .believe("(s)")
                 .believe("((s) && (a))")
                 .mustBelieve(cycles, "(a)", 1f, 0.81f);
@@ -1065,7 +1136,8 @@ public class NAL7Test extends AbstractNALTest {
         // x +20 e
         // b +10 x
         //   -> b +30 e
-        test()
+
+        test
                 //.log()
                 .believe("((b-->x) ==>+10 (c-->x))")
                 .believe("((e-->x) ==>-20 (c-->x))")
@@ -1082,7 +1154,8 @@ public class NAL7Test extends AbstractNALTest {
             $.50;.90$ (d-->e). 10 %1.0;.90% {10: 8} Scheduled
             $.11;.81$ ((a-->b) &&+4 (c==>d)). 1⋈5 %1.0;.81% {1⋈5: 3;5} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(dtAfter)),((%1 &&+- %2),((Intersection-->Belief))))
         */
-        test()
+
+        test
                 .inputAt(1, "((a-->b) &&+4 (c-->d)). :|:")
                 .inputAt(10, "(d-->e). :|:")
                 .mustBelieve(cycles, "(((a-->b) &&+4 (c-->#1)) &&+5 (#1-->e))", 1f, 0.81f, 1, 10)
@@ -1097,8 +1170,9 @@ public class NAL7Test extends AbstractNALTest {
             $.48;.90$ (a==>b). 1 %1.0;.90% {1: 1}
             $.12;.81$ ((b-->#1) &&+3 (#1-->d)). 2⋈5 %1.0;.81% {2⋈5: 6;7} ((%1,%2,task(positive),belief(positive),task("."),time(raw),time(dtAfterOrEternal),neqAndCom(%1,%2)),(varIntro((%1 &&+- %2)),((Intersection-->Belief))))
         */
-        test()
-                .log()
+
+        test
+                //.log()
                 .inputAt(1, "(a). :|:")
                 .inputAt(2, "((b) &&+3 (d)). :|:")
                 .mustBelieve(cycles, "(((a) &&+1 (b)) &&+3 (d))", 1f, 0.81f, 1, 5)
@@ -1113,7 +1187,8 @@ public class NAL7Test extends AbstractNALTest {
         3: b
         5: c
         */
-        test()
+
+        test
                 .inputAt(1, "((a) &&+5 (c)). :|:")
                 .inputAt(3, "(b). :|:")
                 .mustBelieve(cycles * 2,
@@ -1131,7 +1206,7 @@ public class NAL7Test extends AbstractNALTest {
                       $("((a) &&+2 (((b) &| (c)) &| (d)) )"));
 
 
-        test()
+        test
                 .inputAt(1, "((a) &&+2 (c)). :|:")
                 .inputAt(3, "((b) &&+0 (d)). :|:")
                 .mustBelieve(cycles,
@@ -1142,17 +1217,19 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testInductionIntervalMerge3() {
-        test()
+
+        test
                 .inputAt(1, "(((a) &&+3 (c)) &&+4 (e)). :|:")
                 .inputAt(4, "(b). :|:")
-                .mustBelieve(cycles * 4,
+                .mustBelieve(cycles,
                         "(((a) &&+3 ((b) &| (c))) &&+4 (e))",
                         1f, 0.81f, 1, 8);
     }
 
     @Test
     public void testInductionIntervalMerge3Neg() {
-        test()
+
+        test
                 .inputAt(1, "(--((a) &&+3 --(c)) &&+4 (e)). :|:")
                 .inputAt(4, "(b). :|:")
                 .mustBelieve(cycles,
@@ -1169,7 +1246,8 @@ public class NAL7Test extends AbstractNALTest {
         $.03;.40$ ((d&&((a-->b) &&+1 (b-->c))) ==>+8 e). 1 %1.0;.42% {1: 4;5;6} ((%1,%2,belief(positive),task("."),time(raw),time(dtAfterReverse),notEqui(%1),notImplEqui(%2)),((%2 ==>+- %1),((Abduction-->Belief))))
             |- (d -->e) @ 10, not 19
         */
-        test()
+
+        test
                 .input("(((a-->b) &&+1 (b-->c)) &&+9 (d-->e)). :|:")
                 .input("((a-->b) &&+1 (b-->c)). :|:")
                 .mustBelieve(cycles, "(d-->e)", 1f, 0.73f, 10 /* 10? */)
@@ -1183,7 +1261,8 @@ public class NAL7Test extends AbstractNALTest {
         $.03;.40$ ((d&&((a-->b) &&+1 (b-->c))) ==>+8 e). 1 %1.0;.42% {1: 4;5;6} ((%1,%2,belief(positive),task("."),time(raw),time(dtAfterReverse),notEqui(%1),notImplEqui(%2)),((%2 ==>+- %1),((Abduction-->Belief))))
             |- (d -->e) @ 10, not 19
         */
-        test()
+
+        test
                 .inputAt(1, "(((d&&((a-->b) &&+1 (b-->c))) ==>+8 e) &&+9 (d-->e)). :|:")
                 .inputAt(1, "((d&&((a-->b) &&+1 (b-->c))) ==>+8 e). :|:")
                 .mustBelieve(cycles, "(d-->e)", 1f, 0.45f /*0.73f*/, 11 /* 10? */)
@@ -1197,7 +1276,8 @@ public class NAL7Test extends AbstractNALTest {
          $.50;.90$ ((reshape(I,$1) &&+0 ($1-->[pliable])) ==>+10 ($1-->[hardened])). %1.0;.90% {0: 5}
          $.41;.81$ (($1-->[heated]) ==>+10 ($1-->[pliable])). %1.0;.81% {1: 3;4} ((%1,(%2<=>%3),neqCom(%1,%3),neq(%1,%2),time(beliefDTSimultaneous)),(substitute(%1,%2,%3,strict),((Intersection-->Belief),(Strong-->Goal))))
          */
-        test()
+
+        test
                 .input("((reshape(I,$1) &&+0 ($1-->[pliable])) ==>+10 ($1-->[hardened])).")
                 .input("(($1-->[heated]) ==>+10 ($1-->[pliable])).")
 
@@ -1237,7 +1317,8 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void testDecomposeImplPred() {
-        test()
+
+        test
                 .believe("( (a,#b) ==>+0 ( ( (x,#b) &| y) &| z ) )", Tense.Present, 1f, 0.9f)
                 .mustBelieve(cycles, "( (a,#b) ==>+0 (x,#b) )", 1f, 0.73f, 0)
                 .mustBelieve(cycles, "( (a,#b) ==>+0 y )", 1f, 0.73f, 0)
@@ -1271,7 +1352,8 @@ public class NAL7Test extends AbstractNALTest {
             $NaN (happy-->noid)! 1754⋈1759 %1.0;.90% {1748: _gpeß~Èky}
             $1.0 (dx-->noid). 1743⋈1763 %.46;.90% {1743: _gpeß~Èkw}
          */
-        test()
+
+        test
 //            .log()
                 .input(new NALTask($("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
                 .input(new NALTask($("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))

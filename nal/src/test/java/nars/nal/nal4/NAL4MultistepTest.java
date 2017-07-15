@@ -16,7 +16,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
         //Global.DEBUG = true;
 
-        TestNAR tester = test();
+        TestNAR tester = test;
 
         tester.nar.truthResolution.setValue(0.25f);
 
@@ -43,7 +43,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
         //Global.DEBUG = true;
 
-        TestNAR tester = test();
+        TestNAR tester = test;
         tester.believe("<sky --> blue>",1.0f,0.9f); //en("the sky is blue");
         //tester.believe("<tom --> cat>",1.0f,0.9f); //en("tom is a cat");
         //tester.believe("<(tom,sky) --> likes>",1.0f,0.9f); //en("tom likes the sky");
@@ -65,7 +65,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
         //Global.DEBUG = true;
 
-        TestNAR tester = test();
+        TestNAR tester = test;
         //tester.nar.log();
         tester.believe("<sky --> blue>",1.0f,0.9f); //en("the sky is blue");
         tester.believe("<tom --> cat>",1.0f,0.9f); //en("tom is a cat");

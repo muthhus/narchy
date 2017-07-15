@@ -245,7 +245,7 @@ public class TaskExecutor extends Executioner {
 
                 concepts.sample(fireBatch, x -> {
 
-                    actuallyRun(x);
+                    execute(x);
 
 
                     if (forgetEachActivePri > 0) {
@@ -260,7 +260,7 @@ public class TaskExecutor extends Executioner {
 
 
                 //input a batch of tasks
-                tasks.pop(inputBatch, this::actuallyRun);
+                tasks.pop(inputBatch, this::execute);
 
 
             } while (--toFire[0] /* decrement to fire if nothing else than to prevent infinite stall */ > 0 /*|| toInput[0] > 0*/);
@@ -301,7 +301,7 @@ public class TaskExecutor extends Executioner {
         }
     }
 
-    protected void actuallyRun(ITask x) {
+    protected void execute(ITask x) {
         ITask[] next;
         try {
             if (x == null) return; //HACK
@@ -313,7 +313,7 @@ public class TaskExecutor extends Executioner {
             }
 
         } catch (Throwable e) {
-            NAR.logger.error("{} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
+            NAR.logger.error("exe {} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
             x.delete();
             return;
         }
@@ -338,7 +338,7 @@ public class TaskExecutor extends Executioner {
     @Override
     public boolean run(@NotNull ITask input) {
         if (input.punc() == COMMAND) {
-            actuallyRun(input); //commands executed immediately
+            execute(input); //commands executed immediately
             return true;
         } else {
             if (input instanceof NALTask) {

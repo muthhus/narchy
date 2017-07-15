@@ -57,10 +57,12 @@ public class LinkageTest extends AbstractNALTest {
 
 
     public void ProperlyLinkedTest(@NotNull String premise1, @NotNull String premise2) throws Exception {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe(premise1); //.en("If robin is a type of bird then robin can fly.");
         tester.believe(premise2); //.en("Robin is a type of bird.");
-        tester.run(runCycles);
+
+        tester.run(runCycles, false);
 
         Concept ret = tester.nar.concept(premise1);
         boolean passed = false;
@@ -99,7 +101,7 @@ public class LinkageTest extends AbstractNALTest {
     public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, byte punc, @NotNull String spremise2) throws Exception {
 
 
-        NAR nar = test().nar;
+        NAR nar = test.nar;
 
         //nar.log();
 
@@ -215,7 +217,8 @@ public class LinkageTest extends AbstractNALTest {
 
     //interlinked with an intermediate concept, this is needed in order to select one as task and the other as belief
     public void ProperlyLinkedIndirectlyLayer2Test(@NotNull String premise1, @NotNull String premise2) throws Exception {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe(premise1); //.en("If robin is a type of bird then robin can fly.");
         tester.believe(premise2); //.en("Robin is a type of bird.");
         tester.nar.run(1);
@@ -388,7 +391,8 @@ public class LinkageTest extends AbstractNALTest {
     }
 
     public void testConceptFormed(@NotNull String s) throws Exception {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe(s,1.0f,0.9f);
         tester.nar.run(1);
         Concept ret = tester.nar.concept(s);

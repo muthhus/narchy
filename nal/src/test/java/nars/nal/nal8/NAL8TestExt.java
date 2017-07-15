@@ -41,7 +41,8 @@ public class NAL8TestExt extends AbstractNALTest {
 
     @Test public void subsent_1_even_simpler()  {
         int time = cycles * 4;
-        test()
+
+        test
                 //.log()
                 .input("at:t1. :|:") //@ 0
                 .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1)).")
@@ -53,7 +54,8 @@ public class NAL8TestExt extends AbstractNALTest {
     }
     @Test public void subsent_1_even_simplerGoal()  {
         int time = cycles * 16;
-        test()
+
+        test
                 //.log()
                 .input("at:t1. :|:") //@ 0
                 .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1))!")
@@ -64,7 +66,8 @@ public class NAL8TestExt extends AbstractNALTest {
 
     @Test
     public void subsent_simultaneous()  {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
         //TODO decide correct parentheses ordering
 

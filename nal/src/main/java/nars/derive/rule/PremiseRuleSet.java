@@ -115,9 +115,9 @@ public class PremiseRuleSet {
                 , p, permute
         );
 
-        logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
+        //logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
         if (rs.errors[0] > 0) {
-            logger.warn("\t{} errors={}", name, rs.errors[0]);
+            logger.error("{} errors={}", name, rs.errors[0]);
         }
 
         return rs;

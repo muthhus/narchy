@@ -21,7 +21,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void revision() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.mustBelieve(cycles, "<robin <-> swan>", 0.87f, 0.91f);//;//Robin is probably similar to swan.");
         tester.believe("<robin <-> swan>");//;//Robin is similar to swan.");
         tester.believe("<robin <-> swan>", 0.1f, 0.6f);
@@ -29,7 +30,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void comparison() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<swan --> swimmer>", 0.9f, 0.9f);//Swan is a type of swimmer.");
         tester.believe("<swan --> bird>");//Swan is a type of bird.");
         tester.mustBelieve(cycles, "<bird <-> swimmer>", 0.9f, 0.45f);//I guess that bird is similar to swimmer.");
@@ -38,7 +40,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void comparison2() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<sport --> competition>"); //Sport is a type of competition.");
         tester.believe("<chess --> competition>", 0.9f, 0.9f);//Chess is a type of competition.");
         tester.mustBelieve(cycles, "<chess <-> sport>", 0.9f, 0.45f);//I guess chess is similar to sport.");
@@ -58,7 +61,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void analogy() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<swan --> swimmer>");//Swan is a type of swimmer.");
         tester.believe("<gull <-> swan>");//Gull is similar to swan.");
         tester.mustBelieve(cycles, "<gull --> swimmer>", 1.0f, 0.81f);//I think gull is a type of swimmer.");
@@ -67,7 +71,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void analogy2() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<gull --> swimmer>");//Gull is a type of swimmer.");
         tester.believe("<gull <-> swan>");//Gull is similar to swan.");
         tester.mustBelieve(cycles, "<swan --> swimmer>", 1.0f, 0.81f);//I believe a swan is a type of swimmer.");
@@ -76,7 +81,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void resemblance() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         //tester.log();
         tester.believe("<robin <-> swan>");//Robin is similar to swan.");
         tester.believe("<gull <-> swan>");//Gull is similar to swan.");
@@ -86,7 +92,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void inheritanceToSimilarity() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<swan --> bird>");//Swan is a type of bird. ");
         tester.believe("<bird --> swan>", 0.1f, 0.9f);//Bird is not a type of swan.");
         tester.mustBelieve(cycles, "<bird <-> swan>", 0.1f, 0.81f);//Bird is different from swan.");
@@ -95,7 +102,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void inheritanceToSimilarity2() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<swan --> bird>");//Swan is a type of bird.");
         tester.believe("<bird <-> swan>", 0.1f, 0.9f);//Bird is different from swan.");
         tester.mustBelieve(cycles * 4, "<bird --> swan>", 0.1f, 0.73f);//Bird is probably not a type of swan.");
@@ -103,7 +111,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void inheritanceToSimilarity3() throws nars.Narsese.NarseseException {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<swan --> bird>", 0.9f, 0.9f);//Swan is a type of bird.");
         tester.ask("<bird <-> swan>");//Is bird similar to swan?");
         tester.mustBelieve(cycles, "<bird <-> swan>", 0.9f, 0.45f);//I guess that bird is similar to swan.");
@@ -112,7 +121,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void inheritanceToSimilarity4() throws nars.Narsese.NarseseException {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<bird <-> swan>", 0.9f, 0.9f);//a bird is similar to a swan.");
         tester.ask("<swan --> bird>");//Is swan a type of bird?");
         tester.mustBelieve(cycles, "<swan --> bird>", 0.9f, 0.81f);//A swan is a type of bird.");
@@ -147,7 +157,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void setDefinition() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
         tester.believe("<{Tweety} --> {Birdie}>");//Tweety is Birdie.");
         tester.mustBelieve(cycles, "<{Tweety} <-> {Birdie}>", 1.0f, 0.9f);//Birdie is similar to Tweety.");
@@ -157,7 +168,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void setDefinition2() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<[smart] --> [bright]>");//Smart thing is a type of bright thing.");
         tester.mustBelieve(cycles, "<[bright] <-> [smart]>", 1.0f, 0.9f);//Bright thing is similar to smart thing.");
 
@@ -165,7 +177,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void setDefinition3() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<{Birdie} <-> {Tweety}>");//Birdie is similar to Tweety.");
         tester.mustBelieve(cycles, "<Birdie <-> Tweety>", 1.0f, 0.9f);//Birdie is similar to Tweety.");
         tester.mustBelieve(cycles, "<{Tweety} --> {Birdie}>", 1.0f, 0.9f);//Tweety is Birdie.");
@@ -174,7 +187,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void setDefinition4() {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<[bright] <-> [smart]>");//Bright thing is similar to smart thing.");
         tester.mustBelieve(cycles, "<bright <-> smart>", 1.0f, 0.9f);//Bright is similar to smart.");
         tester.mustBelieve(cycles, "<[bright] --> [smart]>", 1.0f, 0.9f);//Bright thing is a type of smart thing.");
@@ -183,7 +197,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void structureTransformation() throws nars.Narsese.NarseseException {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<Birdie <-> Tweety>", 0.9f, 0.9f);//Birdie is similar to Tweety.");
         tester.ask("<{Birdie} <-> {Tweety}>");//Is Birdie similar to Tweety?");
         tester.mustBelieve(cycles, "<{Birdie} <-> {Tweety}>", 0.9f, 0.9f);//Birdie is similar to Tweety.");
@@ -192,7 +207,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void structureTransformation2() throws nars.Narsese.NarseseException {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<bright <-> smart>", 0.9f, 0.9f);//Bright is similar to smart.");
         tester.ask("<[bright] --> [smart]>");//Is bright thing a type of smart thing?");
         tester.mustBelieve(cycles, "<[bright] --> [smart]>", 0.9f, 0.9f);//Bright thing is a type of smart thing.");
@@ -205,7 +221,8 @@ public class NAL2Test extends AbstractNALTest {
         <bright <-> smart>. %0.9;0.9%
         <{bright} --> {smart}>?
          */
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<bright <-> smart>", 0.9f, 0.9f);//Bright is similar to smart.");
         tester.ask("<{bright} --> {smart}>");//Is bright thing a type of smart thing?");
         tester.mustBelieve(cycles, "<{bright} --> {smart}>", 0.9f, 0.9f);//Bright thing is a type of smart thing.");
@@ -214,7 +231,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void backwardInference() throws nars.Narsese.NarseseException {
-        TestNAR tester = test();
+
+        TestNAR tester = test;
 
 
         //<bird --> swimmer>. <{?x} --> swimmer>?
@@ -232,7 +250,8 @@ public class NAL2Test extends AbstractNALTest {
         //((<p1 --> p2>, <p2 <-> p3>, not_equal(p3, p1)),
         //      (<p1 --> p3>,
         //        TestNAR tester = test();
-        TestNAR tester = test();
+
+        TestNAR tester = test;
         tester.believe("<p1 --> p2>");
         tester.believe("<p2 <-> p3>");
         tester.mustBelieve(cycles, "<p1 --> p3>",
@@ -242,7 +261,8 @@ public class NAL2Test extends AbstractNALTest {
 
     @Test
     public void testUnion() {
-        test()
+
+        test
             .believe("a:{x}.")
             .believe("a:{y}.")
             .mustBelieve(cycles, "a:{x,y}", 1.0f, 0.81f);

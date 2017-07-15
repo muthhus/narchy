@@ -43,7 +43,8 @@ public class PatrickTests extends AbstractNALTest {
         <(*,(*,cat,eats),?what) --> REPRESENT>?
         //RESULT: <(*,(*,cat,eats),(*,ANIMAL,EATING)) --> REPRESENT>. %1.00;0.73%
          */
-        TestNAR tt = test();
+
+        TestNAR tt = test;
         tt
 //.log()
                 .believe("(((/,REPRESENT,_,$3):$1 && (/,REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
@@ -110,7 +111,7 @@ public class PatrickTests extends AbstractNALTest {
         */
 
 
-        TestNAR tt = test();
+        TestNAR tt = test;
         tt.nar.time.dur(2);
 
 //        tt.nar.onCycle(()->{

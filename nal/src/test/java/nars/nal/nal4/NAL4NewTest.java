@@ -16,7 +16,8 @@ public class NAL4NewTest extends AbstractNALTest {
     @Test
     public void testCompositionFromProductInh() throws nars.Narsese.NarseseException {
         //((A..+) --> Z), (X --> Y), contains(A..+,X), task("?") |- ((A..+) --> (substitute(A..+,X,Y))), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-        test()
+
+        test
                 .believe("(soda --> acid)", 1.0f, 0.9f)
                 .ask("((drink,soda) --> ?death)")
                 .mustBelieve(CYCLES, "((drink,soda) --> (drink,acid))", 1.0f, 0.81f);
@@ -24,7 +25,8 @@ public class NAL4NewTest extends AbstractNALTest {
 
     @Test
     public void testCompositionFromProductSim() throws nars.Narsese.NarseseException {
-        test()
+
+        test
                 .believe("(soda <-> deadly)", 1.0f, 0.9f)
                 .ask("((soda,food) <-> #x)")
                 .mustBelieve(CYCLES, "((soda,food) <-> (deadly,food))", 1.0f, 0.81f);
@@ -32,7 +34,8 @@ public class NAL4NewTest extends AbstractNALTest {
 
     @Test
     public void testIntersectionOfProductSubterms1() {
-        test()
+
+        test
                 .believe("f(x)", 1.0f, 0.9f)
                 .believe("f(y)", 1.0f, 0.9f)
                 .mustBelieve(CYCLES, "f:((x)&(y))", 1.0f, 0.81f);
@@ -40,7 +43,8 @@ public class NAL4NewTest extends AbstractNALTest {
 
     @Test
     public void testIntersectionOfProductSubterms2() {
-        test()
+
+        test
                 .believe("f(x,z)", 1.0f, 0.9f)
                 .believe("f(y,z)", 1.0f, 0.9f)
                 .mustBelieve(CYCLES * 16, "f:((x,z)&(y,z))", 1.0f, 0.81f);
@@ -57,7 +61,8 @@ public class NAL4NewTest extends AbstractNALTest {
             $.04;.75$ happy(L). 497⋈512 %.55;.75% {497⋈512: æ0IáËÑþKÄ}
             $.05;.53$ ((L)-->(o-(i-happy))). 527 %.54;.53% {527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÉ;æ0IáËÑþKÌ} Dynamic
         */
-        test()
+
+        test
                 .log()
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("((L)-->(o-(i-happy)))", 1f, 0.9f)

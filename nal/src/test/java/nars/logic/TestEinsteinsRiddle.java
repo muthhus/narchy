@@ -27,7 +27,6 @@ public class TestEinsteinsRiddle {
             resource.openStream()
         );
         n.run(128);
-        n.printConceptStatistics();
 
 
 

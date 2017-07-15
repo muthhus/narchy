@@ -14,15 +14,13 @@ import java.util.stream.Stream;
 public class PSink<X extends Priority, Y extends Priority> extends FloatParam implements Function<X, Y>, Consumer<X> {
 
     public final Object id;
-    private final Function<X, Y> transfer;
     private final Consumer<Y> target;
 
     float minThresh = Pri.EPSILON;
 
-    public PSink(Object id, Function<X, Y> transfer, Consumer<Y> target) {
+    public PSink(Object id, Consumer<Y> target) {
         super(1f, 0f, 2f);
         this.id = id;
-        this.transfer = transfer;
         this.target = target;
     }
 
@@ -36,7 +34,7 @@ public class PSink<X extends Priority, Y extends Priority> extends FloatParam im
     }
 
     @Override public Y apply(X x) {
-        return transfer.apply(x);
+        return (Y)x;
     }
 
 //    public Y[] apply(X[] x) {

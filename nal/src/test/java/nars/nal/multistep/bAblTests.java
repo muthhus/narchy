@@ -16,7 +16,7 @@ public class bAblTests extends AbstractNALTest {
     @Test
     public void test1() throws nars.Narsese.NarseseException {
 
-        test()
+        test
                 .believe("in(john,playground)") //john is in the playground.
                 .believe("in(bob,office)") //Bob is in the office.
                 .ask("in(john,?where)") //Where is john?
@@ -42,7 +42,7 @@ public class bAblTests extends AbstractNALTest {
         //background knowledge (multiple input for priority boost to have the answer faster ^^)
         //if something is picked, it means that the object which is picked is where the person is
 
-        TestNAR t = test();
+        TestNAR t = test;
 
         t.nar.truthResolution.setValue(0.25f);
         t.nar.termVolumeMax.setValue(28);
@@ -67,7 +67,8 @@ public class bAblTests extends AbstractNALTest {
     public void test19() throws nars.Narsese.NarseseException {
 
         //(19) Path Finding
-        TestNAR t = test();
+
+        TestNAR t = test;
         t.nar.termVolumeMax.setValue(40);
         t.nar.truthResolution.setValue(0.25f);
 
