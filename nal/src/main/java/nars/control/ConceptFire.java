@@ -90,7 +90,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                     System.out.println(t + " has no cause");
             }*/
 
-            origin.tasklinks().putAsync(new PLinkUntilDeleted<>(t, activation));
+            origin.tasklinks().putAsync(
+                //new PLinkUntilDeleted<>(t, activation)
+                new PLink<>(t, activation)
+            );
 
 
 //            if (origin instanceof CompoundConcept) {

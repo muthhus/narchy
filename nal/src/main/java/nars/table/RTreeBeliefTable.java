@@ -174,7 +174,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 float before = found.task.priElseZero();
                 float after = found.task.priAdd(activation);
                 activation = (after - before);
-                incoming.task.delete();
 
                 TaskTable.activate(found.task, activation, nar);
             }
@@ -258,7 +257,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     public Truth truth(long when, EternalTable eternal, NAR nar) {
 
         long now = nar.time();
-        updateSignalTasks(now);
+
+        //updateSignalTasks(now);
 
         Task ete = eternal != null ? eternal.strongest() : null;
         @Nullable Task e = ete;
@@ -316,7 +316,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         long now = nar.time();
 
-        updateSignalTasks(now);
+        //updateSignalTasks(now);
 
         int dur = nar.dur();
 
@@ -666,17 +666,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     @Override
     public boolean removeTask(Task x) {
-        x.delete();
         return tree.remove(new TaskRegion(x));
     }
 
     public void remove(TaskRegion x) {
-        x.task.delete();
         tree.removeAsync(x);
     }
 
     public void removeAsync(TaskRegion x) {
-        x.task.delete();
         tree.removeAsync(x);
     }
 

@@ -24,6 +24,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     @Override
     public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
+        if (!input.isInput())
+            return;
 //        if (input instanceof AnswerTask) {
 //            return; //dont insert its own dynamic belief task, causing a feedback loop
 //        }

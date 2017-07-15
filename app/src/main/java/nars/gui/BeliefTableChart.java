@@ -352,7 +352,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             //conf = (conf - confMinMax[0]) / (confMinMax[1] - confMinMax[0]);
 
             /** smudge a low confidence task across more of the frequency range */
-            final float ph = Util.lerp(conf,0.5f, /* down to */ baseTaskSize/64f );
+            final float ph = Util.lerp(conf,0.2f, /* down to */ baseTaskSize/64f );
 
             float start, end;
             if (showEternal && eternal) {

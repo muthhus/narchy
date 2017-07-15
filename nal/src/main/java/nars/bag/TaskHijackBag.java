@@ -44,7 +44,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
 
     @Override
     public void onRemoved(@NotNull Task t) {
-        t.delete();
+        //t.delete();
     }
 
     @NotNull
@@ -94,7 +94,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         } else if (y!=x) {
             //fully inserted or merged with existing item, and activate only the absorbed amount
             activation = y.priElseZero() - activation;
-            x.delete();
+            //x.delete();
         }
 
         TaskTable.activate(y, activation, n);
