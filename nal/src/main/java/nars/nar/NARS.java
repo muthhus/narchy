@@ -54,8 +54,8 @@ public class NARS {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.9f);
-        n.goalConfidence(0.75f);
+        n.beliefConfidence(0.5f);
+        n.goalConfidence(0.25f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 0.2f;
@@ -65,12 +65,12 @@ public class NARS {
         n.termVolumeMax.setValue(32);
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
-        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, true, 32f);
+        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, true, 16f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 8);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(256, 512, 0.2f);
+            n.addNAR(256, 32, 0.05f);
         }
 
 //        n.onTask(t -> {

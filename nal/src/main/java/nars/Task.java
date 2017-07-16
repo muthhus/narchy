@@ -873,12 +873,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
             );
 
             if (!x.equals(y)) {
-                if (y == null)
-                    throw new InvalidTaskException(this, "un-evaluable");
-
-
-                if (!x.equals(y)) {
-                    NALTask inputY = clone(this, y);
+                @Nullable ObjectBooleanPair<Compound> yy = tryContent(y, punc(), n.terms, true);
+                if (yy != null) {
+                    NALTask inputY = clone(this, $.negIf(yy.getOne(), yy.getTwo() /* HACK */));
                     assert (inputY != null);
 
                     delete(); //transfer control to transformation result

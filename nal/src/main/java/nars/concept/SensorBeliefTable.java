@@ -27,34 +27,34 @@ class SensorBeliefTable extends DefaultBeliefTable {
 
     @Override
     public Truth truth(long when, NAR nar) {
-        Truth x = super.truth(when, nar);
-        if (x!=null)
-            return x;
+        Truth tabled = super.truth(when, nar);
 
         Task current = this.current;
-        if (current != null &&
-                current.start() <= when
-                && when <= current.end() + durationsTolerance * nar.dur()) {
-            return current.truth();
+        if (latches(when, nar, current)) {
+            return Truth.maxConf(tabled, current.truth());
         } else {
-            return null;
+            return tabled;
         }
     }
 
     @Override
     public Task match(long when, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
-        Task x = super.match(when, against, template, noOverlap, nar);
-        if (x!=null)
-            return x;
+        Task tabled = super.match(when, against, template, noOverlap, nar);
 
         Task current = this.current;
-        if (current != null &&
-                current.start() <= when
-                && when <= current.end() + durationsTolerance * nar.dur()) {
+        if (latches(when, nar, current)) {
+            if (tabled!=null && tabled.conf() >= current.conf())
+                    return tabled;
             return current;
         } else {
-            return null;
+            return tabled;
         }
 
+    }
+
+    static boolean latches(long when, NAR nar, Task current) {
+        return current != null &&
+                current.start() <= when
+                && when <= current.end() + durationsTolerance * nar.dur();
     }
 }

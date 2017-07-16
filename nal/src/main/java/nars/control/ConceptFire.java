@@ -34,11 +34,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 1;
+    private static final int maxSamples = 2;
 
-    static final int TASKLINKS_SAMPLED = 2;
-    static final int TERMLINKS_SAMPLED = 2;
-    private Termed[] templates;
+    static final int TASKLINKS_SAMPLED = 3;
+    static final int TERMLINKS_SAMPLED = 3;
 
     //private static final float priMinAbsolute = Pri.EPSILON * 1;
     //private static final float momentum = 0.75f;
@@ -115,6 +114,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     @Override
     public ITask[] run(NAR nar) {
+
+        final float pri = priElseZero();
+        if (pri < Pri.EPSILON)
+            return null;
+
 
         Term thisTerm = id.term();
 
@@ -203,7 +207,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
 
         //float totalActivation = 0;//tasklink activation
-        int penalty = UnificationTTLMax / 2;
+        int penalty = UnificationTTLMax / (2 * maxSamples);
 
         Random rng = nar.random();
         while (ttl > 0 /*samples++ < samplesMax*/) {
@@ -224,46 +228,56 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 continue;
             }
 
-            //totalActivation += tfa;
-
-            //local tasklink to subterms
-            Termed[] localTemplates = templates(id, nar);
-            float txaEach = task.priElseZero()/localTemplates.length;
-            for (Termed x : localTemplates) {
-                if (x instanceof Concept)
-                    ((Concept)x).tasklinks().putAsync(
-                        new PLink(task, txaEach)
-                    );
-            }
-
-
 
             TaskConcept taskConcept = task.concept(nar);
             if (taskConcept == null)
                 continue; //hrm
 
-            this.templates = templates(taskConcept, nar);
-            int templateConceptsCount = this.templates.length; //TODO this should be adjusted for subterms which are not concepts
+            //tasklink activates local subterms and their reverse termlinks to this
+            Termed[] localTemplates = templates(id, nar);
+            float txaEach = pri/localTemplates.length;
+            for (Termed x : localTemplates) {
+                if (x instanceof Concept) {
+                    Concept localSubConcept = (Concept) x;
+                    localSubConcept.tasklinks().putAsync(
+                            new PLink(task, txaEach / 2)
+                    );
+                    localSubConcept.termlinks().putAsync(
+                        new PLink(thisTerm, txaEach/2)
+                    );
+                }
+            }
 
-            //if (templateConceptsCount > 0) {
+            {
+                Termed[] taskTemplates = templates(taskConcept, nar);
 
-                float momentum = 0.5f;
-                float eachActivation = task.priElseZero() / templateConceptsCount;
-                for (Termed c : this.templates) {
+                //if (templateConceptsCount > 0) {
+
+                //float momentum = 0.5f;
+                float taskTemplateActivation = pri / taskTemplates.length;
+                for (Termed c : taskTemplates) {
+
+                    //this concept activates task templates and termlinks to them
                     if (c instanceof Concept) {
                         Concept cc = (Concept) c;
-                        cc.termlinks().putAsync(new PLink(thisTerm, eachActivation * momentum));
-                        nar.input(new ConceptFire(cc, eachActivation));
+                        cc.termlinks().putAsync(
+                                new PLink(thisTerm, taskTemplateActivation / 2)
+                        );
+                        nar.input(new ConceptFire(cc, taskTemplateActivation));
+
+//                        //reverse termlink from task template to this concept
+//                        //maybe this should be allowed for non-concept subterms
+//                        id.termlinks().putAsync(new PLink(c, taskTemplateActivation / 2)
+//                                //(concept ? (1f - momentum) : 1))
+//                        );
+
                     }
 
-                    //incoming termlink
-                    id.termlinks().putAsync(new PLink(c, eachActivation * (1f - momentum))
-                            //(concept ? (1f - momentum) : 1))
-                    );
+
 
                 }
 
-
+            }
 
             if (terml.isEmpty())
                 break;

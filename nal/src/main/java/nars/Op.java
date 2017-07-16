@@ -70,6 +70,11 @@ public enum Op implements $ {
 
         }
 
+        public Term the(Term... u) {
+            assert (u.length == 1);
+            return neg(u[0]);
+        }
+
         @Override
         public Term the(int dt, Term[] u) {
             assert (u.length == 1);
@@ -956,11 +961,8 @@ public enum Op implements $ {
         if (subject == Null || predicate == Null)
             return Null;
 
-        if (dt == XTERNAL) {
-            return compound(op, XTERNAL, //op != EQUI || subject.compareTo(predicate) <= 0 ?
-                    subterms(subject, predicate));
-            //subterms(predicate,subject));
-        }
+
+        boolean polarity = true;
 
         switch (op) {
 
@@ -996,44 +998,56 @@ public enum Op implements $ {
 
             case EQUI:
 
-                //if (isTrue(subject)) return predicate;
-                //if (isTrue(predicate)) return subject;
-                //if (isFalse(subject)) return neg(predicate);
-                //if (isFalse(predicate)) return neg(subject);
-                if (subject.equals(predicate))
-                    return True;
-
                 if (concurrent(dt)) {
                     if (subject == True) return predicate;
                     if (subject == False) return NEG.the(predicate);
                     if (predicate == True) return subject;
                     if (predicate == False) return NEG.the(subject);
-
                 } else {
-                    if (isTrueOrFalse(subject))
-                        return subject == predicate ? True : False;
-                    if (isTrueOrFalse(predicate))
-                        return False;
-
-                    //but allow ordinary term equality (across non-commutive 'dt')
+                    if (subject == True || subject == False || predicate == True || predicate == False)
+                        return Null; //no temporal basis
                 }
+
+
+                boolean sn = subject.op() == NEG;
+                boolean pn = predicate.op() == NEG;
+                if (sn && pn) {
+                    subject = subject.unneg();
+                    predicate = predicate.unneg();
+                } else if (sn && !pn) {
+                    subject = subject.unneg();
+                    polarity = !polarity;
+                } else if (!sn && pn) {
+                    predicate = predicate.unneg();
+                    polarity = !polarity;
+                }
+
+                if (concurrent(dt) && subject.equals(predicate))
+                    return polarity ? True : False;
+                //else not concurrent and equivalent, allow
+
 
                 if (!validEquivalenceTerm(subject))
                     throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
                 if (!validEquivalenceTerm(predicate))
                     throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
 
-                boolean subjNeg = subject.op() == NEG;
-                boolean predNeg = predicate.op() == NEG;
-                if (subjNeg && predNeg) {
-                    subject = subject.unneg();
-                    predicate = predicate.unneg();
-                } else if (!subjNeg && predNeg) {
-                    //factor out (--, ...)
-                    return NEG.the(op.the(dt, subject, predicate.unneg()));
-                } else if (subjNeg && !predNeg) {
-                    //factor out (--, ...)
-                    return NEG.the(op.the(dt, subject.unneg(), predicate));
+//                boolean subjNeg = subject.op() == NEG;
+//                boolean predNeg = predicate.op() == NEG;
+//                if (subjNeg && predNeg) {
+//                    subject = subject.unneg();
+//                    predicate = predicate.unneg();
+//                } else if (!subjNeg && predNeg) {
+//                    //factor out (--, ...)
+//                    return NEG.the(op.the(dt, subject, predicate.unneg()));
+//                } else if (subjNeg && !predNeg) {
+//                    //factor out (--, ...)
+//                    return NEG.the(op.the(dt, subject.unneg(), predicate));
+//                }
+                if (dt == XTERNAL) {
+                    return compound(op, XTERNAL, //op != EQUI || subject.compareTo(predicate) <= 0 ?
+                            subterms(subject, predicate));
+                    //subterms(predicate,subject));
                 }
 
                 boolean equal = subject.equals(predicate);
@@ -1063,8 +1077,9 @@ public enum Op implements $ {
                         return Null; //no temporal basis
                     }
                 }
-                if (bool(predicate /* consequence */))
+                if (bool(predicate /* absolute truth is immutable so it can not be the consequence of anything mutable */))
                     return Null;
+
                 if (subject.hasAny(InvalidImplicationSubj))
                     return Null; //throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
                 if (predicate.hasAny(InvalidImplicationPred))
@@ -1073,13 +1088,14 @@ public enum Op implements $ {
 
                 if (predicate.op() == NEG) {
                     //negated predicate gets unwrapped to outside
-                    return NEG.the(op.the(dt, subject, predicate.unneg()));
+                    predicate = predicate.unneg();
+                    polarity = !polarity;
                 }
 
 
                 if (concurrent(dt)) {
                     if (subject.equals(predicate))
-                        return True;
+                        return polarity ? True : False;
                 } //else: allow repeat
 
 
@@ -1092,7 +1108,7 @@ public enum Op implements $ {
 
                     subject = CONJ.the(dt, subject, a);
                     predicate = cpr.sub(1);
-                    return IMPL.the(cprDT, subject, predicate);
+                    return $.negIf(IMPL.the(cprDT, subject, predicate), !polarity);
                     //}
                 }
 
@@ -1226,7 +1242,11 @@ public enum Op implements $ {
         }
 
 
-        return compound(op, dt, subterms(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
+        Term x = compound(op, dt, subterms(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
+        if (polarity)
+            return x;
+        else
+            return NEG.the(x);
     }
 
     public static Op fromString(String s) {
@@ -1396,7 +1416,7 @@ public enum Op implements $ {
     }
 
     @NotNull
-    public final Term the(Term... u) {
+    public Term the(Term... u) {
         return the(DTERNAL, u);
     }
 

@@ -258,7 +258,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         long now = nar.time();
 
-        //updateSignalTasks(now);
+        updateSignalTasks(now);
 
         Task ete = eternal != null ? eternal.strongest() : null;
         @Nullable Task e = ete;
@@ -316,7 +316,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         long now = nar.time();
 
-        //updateSignalTasks(now);
+        updateSignalTasks(now);
 
         int dur = nar.dur();
 

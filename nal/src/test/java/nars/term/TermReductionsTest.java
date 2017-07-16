@@ -140,10 +140,6 @@ public class TermReductionsTest {
     }
 
 
-    @Test
-    public void testEquivalenceNegatedSubtermsDoubleNeg() throws Narsese.NarseseException {
-        assertEquals(("((P)<=>(Q))"), $("((--,(P))<=>(--,(Q)))").toString());
-    }
 
     @Test
     public void testSimilarityNegatedSubtermsDoubleNeg() throws Narsese.NarseseException {
@@ -164,6 +160,8 @@ public class TermReductionsTest {
     public void testEquivalenceNegatedSubterms() throws Narsese.NarseseException {
         assertEquals(("(--,((P)<=>(Q)))"), $("((P)<=>(--,(Q)))").toString());
         assertEquals(("(--,((P)<=>(Q)))"), $("((--,(P))<=>(Q))").toString());
+        assertEquals(("((P) <=>+1 (Q))"), $("((--,(P)) <=>+1 (--,(Q)))").toString());
+        assertEquals(("((P)<=>(Q))"), $("((--,(P))<=>(--,(Q)))").toString());
     }
 
     @Test
@@ -683,8 +681,8 @@ public class TermReductionsTest {
 
     @Test
     public void testCoNegatedEquiOK() throws Narsese.NarseseException {
-        assertValid($("((--,(a)) <=>+1 (a))"));
-        assertValid($("((--,a) <=>+1 a)"));
+        assertEquals("(--,((a) <=>+1 (a)))", $("((--,(a)) <=>+1 (a))").toString());
+        assertEquals("(--,(a <=>+1 a))", $("((--,a) <=>+1 a)").toString());
     }
 
     @Test
@@ -693,9 +691,7 @@ public class TermReductionsTest {
 
         for (String x : new String[]{
                 "((a) ==>+1 (a))",
-                "((--,(a)) ==>+1 (a))",
                 "((a) <=>+1 (a))",
-                "((--,(a)) <=>+1 (a))"
 
             /*"((a) &&+1 (a))",*/ //<-- conjunction case is special, see repeating conjunction simplification test
         }) {

@@ -16,7 +16,7 @@ import static jcog.pri.op.PriMerge.max;
 import static nars.Op.*;
 
 /**
- * NAR Parameters which can be changed during runtime.
+ * NAR Parameters
  */
 public abstract class Param  {
 
@@ -34,11 +34,18 @@ public abstract class Param  {
 
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
-            //Util::or;
-            //Util::aveAri
-            Util::and;
+            Util::or;     //Util::aveAri
+            //Util::and;
             //Math::min;
             //Math::max;
+
+    /** maximum time that a signal task can latch its last value before it becomes unknown */
+    public final static int SIGNAL_LATCH_TIME =
+                    //0;
+                    //Integer.MAX_VALUE;
+                    128;
+
+
 
 
     /**

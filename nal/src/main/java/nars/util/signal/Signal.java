@@ -2,6 +2,7 @@ package nars.util.signal;
 
 import jcog.math.FloatSupplier;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.task.SignalTask;
 import nars.term.Compound;
@@ -19,11 +20,6 @@ import static nars.time.Tense.ETERNAL;
  * input signal
  */
 public class Signal {
-
-    final int MAX_PERCEPT_DURATIONS =
-            //0;
-            //Integer.MAX_VALUE;
-            16;
 
 
     public FloatSupplier pri;
@@ -70,7 +66,7 @@ public class Signal {
         if (this.current != null) {
 
             this.current.setEnd(now);
-            boolean finish = current.isDeleted() || ( MAX_PERCEPT_DURATIONS!=Integer.MAX_VALUE && (now - current.start() >= (nar.dur() * MAX_PERCEPT_DURATIONS)));
+            boolean finish = current.isDeleted() || ( Param.SIGNAL_LATCH_TIME !=Integer.MAX_VALUE && (now - current.start() >= (nar.dur() * Param.SIGNAL_LATCH_TIME)));
             if (finish) {
                 this.current = null;
             }
