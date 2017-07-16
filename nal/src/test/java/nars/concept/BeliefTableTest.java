@@ -104,7 +104,6 @@ public class BeliefTableTest  {
         BeliefTable beliefs = b.concept().beliefs();
 
         assertEquals(0.5, beliefs.match(ETERNAL, null, null, true, null).conf(), 0.001);
-        int dur = n.dur();
         assertEquals(0.5, n.beliefTruth(b, n.time()).conf(), 0.001);
         assertEquals(1, beliefs.size());
 

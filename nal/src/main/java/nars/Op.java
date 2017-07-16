@@ -1,7 +1,6 @@
 package nars;
 
 
-import jcog.memoize.CaffeineMemoize;
 import jcog.memoize.HijackMemoize;
 import jcog.memoize.Memoize;
 import nars.derive.meta.match.Ellipsislike;
@@ -216,7 +215,7 @@ public enum Op implements $ {
             boolean commutive = concurrent(dt);
             if (commutive) {
 
-                return conjImplReduction(junctionFlat(dt, tt));
+                return implInConjReduction(junctionFlat(dt, tt));
 
             } else {
                 //NON-COMMUTIVE
@@ -244,7 +243,7 @@ public enum Op implements $ {
                     }
                 }
 
-                return /*conjImplReduction*/(
+                return implInConjReduction(
                         compound(CONJ, dt, subterms(tt))
                 );
 
@@ -370,7 +369,7 @@ public enum Op implements $ {
         }
 
         /** a combination nconjunction/implication reduction */
-        private Term conjImplReduction(final Term x /* possibly a conjunction */) {
+        private Term implInConjReduction(final Term x /* possibly a conjunction */) {
 
             Op xo = x.op();
             if (xo != CONJ || !x.hasAny(IMPL))

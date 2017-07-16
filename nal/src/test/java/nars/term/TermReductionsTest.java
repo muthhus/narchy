@@ -943,8 +943,9 @@ public class TermReductionsTest {
     public void testConjImplReduction3() throws Narsese.NarseseException {
         //with some dt's
         assertEquals(
-                "((inside(john,playground) &&+1 inside(bob,office)) ==>-1 inside(bob,kitchen))",
-                $("(inside(bob,office) &&-1 (inside(john,playground) ==>-1 inside(bob,kitchen)))").toString()
+                //"((j ==>-1 k) &&+1 b)",
+                "((j &&+1 b) ==>-1 k)",
+                $( "(b &&-1 (j ==>-1 k))").toString()
         );
     }
 

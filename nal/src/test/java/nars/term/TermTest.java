@@ -368,7 +368,7 @@ public class TermTest {
     }
 
 
-    protected void testTermEquality(@NotNull String s, boolean normalize) throws Narsese.NarseseException {
+    protected void testTermEquality(@NotNull String s, boolean conceptualize) throws Narsese.NarseseException {
 
 
         Term a = n.term(s).term();
@@ -389,7 +389,7 @@ public class TermTest {
         assertEquals(a.compareTo(a), a.compareTo(b));
         assertEquals(0, b.compareTo(a));
 
-        if (normalize) {
+        if (conceptualize) {
             Concept n2a = n2.conceptualize(a);
             assertNotNull(a + " should conceptualize", n2a);
             assertNotNull(b);
@@ -432,14 +432,14 @@ public class TermTest {
     }
 
     @Test
-    public void termEqualityWithVariables3() {
-        testTermEquality("(&&, x, <#2 --> lock>)");
-        testTermEquality("(&&, x, <#1 --> lock>)");
+    public void termEqualityWithVariables3() throws Narsese.NarseseException {
+        testTermEquality("(&&, x, <#2 --> lock>)", false);
+        testTermEquality("(&&, x, <#1 --> lock>)", false);
     }
 
     @Test
-    public void termEqualityWithVariables4() {
-        testTermEquality("(&&, <<$1 --> key> ==> <#2 --> ( open, $1 )>>, <#2 --> lock>)");
+    public void termEqualityWithVariables4() throws Narsese.NarseseException {
+        testTermEquality("(&&, <<$1 --> key> ==> <#2 --> ( open, $1 )>>, <#2 --> lock>)", false);
     }
 
     @Test
