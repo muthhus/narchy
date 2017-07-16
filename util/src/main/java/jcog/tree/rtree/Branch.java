@@ -39,11 +39,11 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     private final Node<T, ?>[] child;
 
     short childDiff;
-    private HyperRegion mbr;
+    private HyperRegion region;
     short size;
 
     public Branch(int cap) {
-        this.mbr = null;
+        this.region = null;
         this.size = 0;
         this.child = new Node[cap];
     }
@@ -75,7 +75,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
             child[size++] = n;
 
             HyperRegion nr = n.region();
-            mbr = mbr != null ? mbr.mbr(nr) : nr;
+            region = region != null ? region.mbr(nr) : nr;
             return size - 1;
         } else {
             throw new RuntimeException("Too many children");
@@ -95,7 +95,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     @NotNull
     @Override
     public HyperRegion region() {
-        return mbr;
+        return region;
     }
 
     /**
@@ -193,7 +193,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     }
 
     private void grow(Node<T, ?> node) {
-        mbr = mbr.mbr(node.region());
+        region = region.mbr(node.region());
     }
 
     @Override
@@ -219,7 +219,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                 return child[0];
             }
 
-            mbr = child[0].region();
+            region = child[0].region();
             for (int i = 1; i < size; i++) {
                 grow(child[i]);
             }
@@ -247,7 +247,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                 found = true;
             }
             if (i == 0) {
-                mbr = child[0].region();
+                region = child[0].region();
             } else {
                 grow(child[i]);
             }
@@ -361,18 +361,15 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     @Override
     public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
-        if (!region().intersects(rect))
+        if (!region.intersects(rect) || !t.test(this))
             return;
 
         Node<T, ?>[] children = this.child;
         short s = this.size;
         for (int i = 0; i < s; i++) {
             Node<T, ?> c = children[i];
-            if (c!=null && c.region().intersects(rect)) {
-                if (!t.test(c))
-                    return;
+            if (c!=null)
                 c.intersectingNodes(rect, t, model);
-            }
         }
     }
 
@@ -392,7 +389,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     @Override
     public String toString() {
-        return "Branch" + '{' + mbr + 'x' + size + ":\n\t" + Joiner.on("\n\t").skipNulls().join(child) + "\n}";
+        return "Branch" + '{' + region + 'x' + size + ":\n\t" + Joiner.on("\n\t").skipNulls().join(child) + "\n}";
     }
 
 

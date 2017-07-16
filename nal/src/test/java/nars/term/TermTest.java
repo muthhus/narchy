@@ -439,13 +439,13 @@ public class TermTest {
 
     @Test
     public void termEqualityWithVariables4() {
-        testTermEquality("(&&, <<$1 --> key> ==> <#2 --> (/, open, $1, _)>>, <#2 --> lock>)");
+        testTermEquality("(&&, <<$1 --> key> ==> <#2 --> ( open, $1 )>>, <#2 --> lock>)");
     }
 
     @Test
     public void termEqualityWithMixedVariables() throws Narsese.NarseseException {
 
-        String s = "(&&, <<$1 --> key> ==> <#2 --> (/, open, $1, _)>>, <#2 --> lock>)";
+        String s = "(&&, <<$1 --> key> ==> <#2 --> ( open, $1 )>>, <#2 --> lock>)";
         Termed a = n.term(s);
 
         NAR n2 = new NARS().get();

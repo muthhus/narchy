@@ -320,12 +320,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         int dur = nar.dur();
 
-        FloatFunction<TaskRegion> wr = regionStrength(when, dur);
-        FloatFunction<TaskRegion> sort = t -> -wr.floatValueOf(t);
+
+        FloatFunction<Task> ts = taskStrength(when, dur);
+        FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task);
 
         for (int r : sampleRadii) {
-            List<TaskRegion> tt = cursor(when - r * dur, when + r * dur)
-                    .topSorted(sort, 2);
+            RTreeCursor<TaskRegion> ct = cursor(when - r * dur, when + r * dur);
+            if (ct.size()==0)
+                continue;
+
+            List<TaskRegion> tt = ct.topSorted(strongestTask, 2);
 
             if (!tt.isEmpty()) {
 
@@ -421,7 +425,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             FloatFunction<Task> ts = taskStrength(now, dur);
             FloatFunction<TaskRegion> weakestTask = (t -> -ts.floatValueOf(t.task));
             FloatFunction<TaskRegion> rs = regionStrength(now, dur);
-            FloatFunction<Leaf<TaskRegion>> weakestRegion = (l) -> l.size * -rs.floatValueOf((TaskRegion) l.bounds);
+            FloatFunction<Leaf<TaskRegion>> weakestRegion = (l) -> l.size * -rs.floatValueOf((TaskRegion) l.region);
 
             ConcurrentRTree<TaskRegion> lt = ((ConcurrentRTree) tree);
 

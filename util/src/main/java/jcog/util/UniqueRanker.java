@@ -14,14 +14,16 @@ public class UniqueRanker<T> implements Comparator<T> {
     }
 
     @Override
-    public int compare(T o1, @NotNull T o2) {
-        if (o2 == null) //why
-            return -1;
+    public int compare(@NotNull T o1, @NotNull T o2) {
+
 
         if (o1.equals(o2)) return 0;
 
         float one = this.function.floatValueOf(o1);
         float two = this.function.floatValueOf(o2);
+
+        //System.out.println("compare: " + o1 + "=" + one + "\t" + o2 + "=" + two);
+
         int x = Float.compare(one, two);
         if (x == 0) {
 

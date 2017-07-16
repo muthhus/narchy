@@ -39,10 +39,10 @@ public class Leaf<T> implements Node<T, T> {
 
     public final T[] data;
     public short size;
-    public HyperRegion bounds;
+    public HyperRegion region;
 
     protected Leaf(int mMax) {
-        this.bounds = null;
+        this.region = null;
         this.data = (T[]) new Object[mMax];
         this.size = 0;
     }
@@ -76,7 +76,7 @@ public class Leaf<T> implements Node<T, T> {
 
             if (size < model.max) {
                 final HyperRegion tRect = model.region(t);
-                bounds = bounds != null ? bounds.mbr(tRect) : tRect;
+                region = region != null ? region.mbr(tRect) : tRect;
 
                 data[size++] = t;
 
@@ -156,7 +156,7 @@ public class Leaf<T> implements Node<T, T> {
             size -= nRemoved;
             parent.reportSizeDelta(-nRemoved);
 
-            bounds = size > 0 ? HyperRegion.mbr(model.region, data, size) : null;
+            region = size > 0 ? HyperRegion.mbr(model.region, data, size) : null;
 
         }
 
@@ -187,7 +187,7 @@ public class Leaf<T> implements Node<T, T> {
                 data[i] = tnew;
             }
 
-            bounds = i == 0 ? model.region(data[0]) : bounds.mbr(model.region(data[i]));
+            region = i == 0 ? model.region(data[0]) : region.mbr(model.region(data[i]));
         }
 
         return this;
@@ -208,7 +208,8 @@ public class Leaf<T> implements Node<T, T> {
 
     @Override
     public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
-
+        if (region.contains(rect) || region.intersects(rect))
+            t.test(this);
     }
 
 
@@ -226,7 +227,7 @@ public class Leaf<T> implements Node<T, T> {
     @NotNull
     @Override
     public HyperRegion region() {
-        return bounds;
+        return region;
     }
 
 
@@ -312,6 +313,6 @@ public class Leaf<T> implements Node<T, T> {
 
     @Override
     public String toString() {
-        return "Leaf" + '{' + bounds + 'x' + size + '}';
+        return "Leaf" + '{' + region + 'x' + size + '}';
     }
 }

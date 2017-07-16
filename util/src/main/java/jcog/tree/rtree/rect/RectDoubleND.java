@@ -158,7 +158,7 @@ public class RectDoubleND implements HyperRegion<DoubleND>, Serializable {
         if (max == Double.POSITIVE_INFINITY)
             return min;
 
-        return (max + min) / 2f;
+        return (max + min) / 2;
     }
 
     public DoubleND center() {

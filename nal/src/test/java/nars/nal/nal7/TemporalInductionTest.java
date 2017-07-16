@@ -39,7 +39,7 @@ public class TemporalInductionTest {
     @Test public void testTemporalRevision() throws Narsese.NarseseException {
 
         NAR n = new NARS().get();
-        n.time.dur(6);
+        n.time.dur(1);
 
         n.log();
         //TextOutput.out(n);
@@ -47,6 +47,8 @@ public class TemporalInductionTest {
         n.input("a:b. %1.0|0.9%");
         n.run(5);
         n.input("a:b. %0.0|0.9%");
+        n.run(5);
+        n.input("a:b. %0.5|0.9%");
         n.run(1);
 
         //n.forEachConcept(Concept::print);
@@ -57,13 +59,13 @@ public class TemporalInductionTest {
 
         BeliefTable b = c.beliefs();
         b.print();
-        assertEquals(2, b.size());
+        assertEquals(3, b.size());
 
         //when originality is considered:
         //assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().top(n.time()).toStringWithoutBudget());
 
         //most current relevant overall:
-        assertEquals("(b-->a). 5 %0.0;.90%", n.belief(c, n.time()).toStringWithoutBudget());
+        assertEquals("(b-->a). 5 %0.0;.90%", n.belief(c, 5).toStringWithoutBudget());
 
 
         //least relevant

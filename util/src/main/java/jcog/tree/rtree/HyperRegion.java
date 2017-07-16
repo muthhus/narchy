@@ -135,14 +135,16 @@ public interface HyperRegion<X> {
         return true;
     }
 
+
     /**
-     * Determines if this HyperRect contains or intersects parameter HyperRect
+     * Determines if this HyperRect intersects parameter HyperRect
      *
      * @param r - HyperRect to test
      * @return true if intersects, false otherwise
      */
     default boolean intersects(HyperRegion<X> x) {
         int d = dim();
+//            if (min.coord[i] > x.max.coord[i] || x.min.coord[i] > max.coord[i])
         for (int i = 0; i < d; i++)
             if (coord(false, i) > x.coord(true, i) ||
                     coord(true, i) < x.coord(false, i))

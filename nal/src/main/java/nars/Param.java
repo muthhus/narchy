@@ -36,8 +36,8 @@ public abstract class Param  {
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
             //Util::or;
-            //UtilityFunctions::aveAri;
-            Util::and;
+            UtilityFunctions::aveAri;
+            //Util::and;
             //Math::min;
             //Math::max;
 

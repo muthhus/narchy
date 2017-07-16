@@ -3,6 +3,8 @@ package jcog.tree.rtree;
 import com.google.common.collect.AbstractIterator;
 import com.google.common.collect.Ordering;
 import jcog.list.FasterList;
+import jcog.util.Top;
+import jcog.util.Top2;
 import jcog.util.UniqueRanker;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.list.MutableList;
@@ -18,7 +20,7 @@ import java.util.function.Consumer;
 public class RTreeCursor<T> {
 
     private final Space<T> space;
-    List<Leaf<T>> active = new FasterList();
+    FasterList<Leaf<T>> active = new FasterList();
     int size = 0;
 
     public RTreeCursor(Space<T> space) {
@@ -27,17 +29,18 @@ public class RTreeCursor<T> {
 
     public RTreeCursor<T> in(HyperRegion region) {
 
-        this.size = 0;
-        this.active = new FasterList();
+        if (size!=0) {
+            this.size = 0;
+            this.active = new FasterList();
+        } else {
+            this.active.clearFast(); //to be sure
+        }
 
         space.intersectingNodes(region, (n) -> {
             if (n instanceof Leaf)
                 addLeaf((Leaf) n);
             return true;
         });
-        Node<T, ?> root = space.root();
-        if (active.isEmpty() && root.isLeaf())
-            addLeaf((Leaf) root);
 
         return this;
     }
@@ -80,16 +83,21 @@ public class RTreeCursor<T> {
         return l;
     }
 
-    public List<T> topSorted(FloatFunction<T> ranker, int max) {
-        return topSorted(new UniqueRanker<>(ranker), max);
-    }
 
-    public List<T> topSorted(Comparator<T> cmp, int max) {
+    public List<T> topSorted(FloatFunction<T> ranker, int max) {
+
+        assert(max > 0);
 
         Iterator<T> iterator = iterator();
         if (iterator == null) return Collections.emptyList();
 
-        return ordering(cmp).greatestOf(iterator, max);
+        if (max == 1) {
+            return new Top<T>(ranker).of(iterator).toList();
+        } else if (max == 2) {
+            return new Top2<T>(ranker).of(iterator).toList();
+        } else {
+            return ordering(new UniqueRanker(ranker)).greatestOf(iterator, max);
+        }
     }
 
     public List<T> topSorted(Ordering<T> cmp, int max) {
@@ -109,6 +117,7 @@ public class RTreeCursor<T> {
     }
 
 
+
     /**
      * untested
      */
@@ -125,23 +134,21 @@ public class RTreeCursor<T> {
 
         @Override
         protected T computeNext() {
+            if (a == null)
+                return endOfData();
+
             @NotNull T next = l.get(i);
             if (++i >= l.size) {
 
                 if (++j >= a.size()) {
                     a = null; //no more nodes after this one
-                    l = null;
-                    return endOfData();
+                    l = null; //the next call will terminate it
                 } else {
                     l = a.get(j); //next
                     i = 0;
                 }
 
             }
-
-            //assert(next!=null);
-            if (next == null)
-                return endOfData(); //HACK
 
             return next;
         }
