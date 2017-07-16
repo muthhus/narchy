@@ -25,23 +25,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL7Test extends AbstractNALTest {
 
-    int cycles = 150;
+    public int cycles = 150;
 
-    public static void main(String[] args) {
-        new OptiUnit<NAL7Test>((x,m)->{
 
-            x.test.trace = false;
-            x.cycles = 40;
-            x.nar.termVolumeMax.setValue(28);
-
-        }, (x, m) -> {
-
-            //SortedMap<String, Object> stat = x.nar.stats();
-
-            System.out.println("#" + x + " " + m);
-            SortedMap<String, Object> stat = x.nar.stats(System.out);
-
-        }, NAL7Test.class);
+    public void cycles(int numCycles) {
+        this.cycles = numCycles;
     }
 
     @Test

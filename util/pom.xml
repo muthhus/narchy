@@ -237,18 +237,6 @@
         <!---->
         <!--</dependency>-->
 
-        <!--<dependency>-->
-        <!--<groupId>ognl</groupId>-->
-        <!--<artifactId>ognl</artifactId>-->
-        <!--<version>3.1.12</version>-->
-        <!---->
-        <!--<exclusions>-->
-        <!--<exclusion>-->
-        <!--<artifactId>javassist</artifactId>-->
-        <!--<groupId>org.javassist</groupId>-->
-        <!--</exclusion>-->
-        <!--</exclusions>-->
-        <!--</dependency>-->
 
         <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.addthis/stream-lib &ndash;&gt;-->
         <!--<dependency>-->

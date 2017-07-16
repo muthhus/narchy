@@ -39,7 +39,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 */
 public abstract class Unify implements Termutator, Subst {
 
-    public final static Logger logger = LoggerFactory.getLogger(Unify.class);
+    protected final static Logger logger = LoggerFactory.getLogger(Unify.class);
 
     @NotNull
     public Random random;

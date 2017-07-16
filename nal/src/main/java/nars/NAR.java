@@ -968,12 +968,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             }
         }
 
-        causeValue.forEach(c -> c.commit(0.98f));
+        valueUpdate();
 
         exe.cycle(this);
 
 
     }
+
 
 
     /**
@@ -1659,7 +1660,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             boost += cc.value();
             if (vPer != 0) {
                 cc.apply(vPer);
-                //vPer *= 0.9f; //HACK decay in reverse
             }
         }
 
@@ -1673,6 +1673,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             causeValue.add(c);
             return c;
         }
+    }
+
+    public void valueUpdate() {
+        causeValue.forEach(c -> c.commit(0.995f));
     }
 
 }

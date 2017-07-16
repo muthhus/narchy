@@ -101,7 +101,7 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        MultiNAR n = NARS.newMultiThreadNAR(4, clock);
+        MultiNAR n = NARS.newMultiThreadNAR(3, clock);
 
         NAgent a = init.apply(n);
         //a.trace = true;

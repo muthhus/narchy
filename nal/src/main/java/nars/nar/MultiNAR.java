@@ -52,7 +52,6 @@ public class MultiNAR extends NAR {
     /** background: misc tasks to finish before starting next cycle */
     final static int passiveThreads = 2;
     final ForkJoinPool passive;
-    private int num;
 
     MultiNAR(@NotNull Time time, @NotNull Random rng, Executioner e) {
         this(time, rng, new ForkJoinPool(passiveThreads, defaultForkJoinWorkerThreadFactory,
@@ -60,7 +59,7 @@ public class MultiNAR extends NAR {
     }
 
     MultiNAR(@NotNull Time time, @NotNull Random rng, ForkJoinPool passive, Executioner e) {
-        super(new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, passive) {
+        super(new CaffeineIndex(new DefaultConceptBuilder(), 256*1024, passive) {
 
 //                  @Override
 //                  protected void onBeforeRemove(Concept c) {
@@ -203,7 +202,6 @@ public class MultiNAR extends NAR {
     public void addNAR(int conceptCapacity, int taskCapacity, float conceptRate) {
         synchronized (sub) {
             sub.add( new SubExecutor(conceptCapacity, taskCapacity, conceptRate) );
-            this.num = sub.size();
         }
 
     }

@@ -25,7 +25,7 @@ import static jcog.Texts.n4;
  *
  * https://prometheus.io/docs/practices/instrumentation/
  */
-public final class Emotion   {
+public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 
 
     /** priority rate of Task processing attempted */
