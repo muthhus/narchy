@@ -150,7 +150,7 @@ public class RTreeCursor<T> {
 
             }
 
-            return next;
+            return next!=null ? next : endOfData(); //why null?
         }
     }
 }

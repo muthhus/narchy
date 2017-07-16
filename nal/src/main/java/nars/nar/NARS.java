@@ -38,7 +38,7 @@ public class NARS {
     private @NotNull Time time = new CycleTime();
 
     private Supplier<Executioner> exe = () ->
-            new TaskExecutor(128, 32, 0.1f);
+            new TaskExecutor(128, 64, 0.1f);
 
     private final Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 
@@ -74,7 +74,7 @@ public class NARS {
         Inperience inp = new Inperience(n, 0.01f, 8);
 
         for (int i = 0; i < threads; i++) {
-            n.addNAR(256, 32, 0.02f);
+            n.addNAR(256, 64, 0.1f);
         }
 
 //        n.onTask(t -> {
