@@ -65,6 +65,9 @@ public class TestNAR {
     private boolean exitOnAllSuccess = true;
     private boolean requireConditions = true;
 
+    /** 0 = hasnt been determined yet, -1 = failure, +1 = success */
+    public int score = 0;
+
     public TestNAR(@NotNull NAR nar) {
         this.outputEvents = new Topic[]{
                 //nar.memory.eventDerived,
@@ -149,6 +152,8 @@ public class TestNAR {
                 success = false;
             }
         }
+
+        this.score = success ? +1 : -1;
 
         if (testAndPrintReport) {
 

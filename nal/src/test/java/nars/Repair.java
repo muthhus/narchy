@@ -6,6 +6,7 @@ import nars.nal.nal6.NAL6Test;
 import nars.nal.nal7.NAL7Test;
 import nars.util.OptiUnit;
 
+import java.io.FileNotFoundException;
 import java.util.SortedMap;
 
 public class Repair {
@@ -14,7 +15,7 @@ public class Repair {
         NAL1Test.class, NAL2Test.class, NAL6Test.class
     };
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         new OptiUnit<NAL7Test>((NAL7Test x) -> {
 
             //SortedMap<String, Object> stat = x.nar.stats();
@@ -29,14 +30,10 @@ public class Repair {
 
             x.test.trace = false;
 
-            OptiUnit.TweakMap t = new OptiUnit.TweakMap(x);
-            t.set("cycles", 28);
-            t.call("nar.termVolumeMax.setValue", 28);
-
-            System.out.println(t);
-
-            return t;
-
-        });
+            return new OptiUnit.Tweaks<>(x)
+                .set("cycles", 5)
+                .call("nar.termVolumeMax.setValue", 28)
+            ;
+        }).print(System.out);
     }
 }

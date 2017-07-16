@@ -3,7 +3,10 @@ package nars.util;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
+import jcog.Util;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
+import nars.$;
+import org.jetbrains.annotations.Nullable;
 import org.junit.internal.runners.model.ReflectiveCallable;
 import org.junit.internal.runners.statements.Fail;
 import org.junit.runner.Runner;
@@ -21,50 +24,77 @@ import org.slf4j.LoggerFactory;
 import javax.script.Bindings;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
-import java.util.Arrays;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class OptiUnit<T> extends RunListener {
 
-    final ListMultimap<SortedMap<String, Object>, SortedMap<String, Object>> log =
-            MultimapBuilder.hashKeys().arrayListValues().build();
+//    final ListMultimap<SortedMap<String, Object>, SortedMap<String, Object>> log =
+//            MultimapBuilder.hashKeys().arrayListValues().build();
+
+    final List<Experiment> log = Collections.synchronizedList($.newArrayList());
 
     private final Class<? extends T>[] tests;
     private final Function<T, SortedMap<String, Object>> get;
 
+    //JUnit specific:
+    private final RunNotifier rn;
+
+
+
 
     /**
      * records modifications to an object
+     * for an immutable representation of experiment's preconditions, etc.
+     *
+     *      * invoke method with arguments
+     *      * set field value
+     *
+     * each action consists of a key and value pair.  the order they are applied
+     * should not matter, and so the keys will be stored sorted lexicographically
+     *
+     * it uses nashorn javascript engine to evaluate the generated expressions
+     * upon the given object.
+     *
      */
-    public static class TweakMap<X> extends TreeMap<String, Object> {
+    public static class Tweaks<X> extends TreeMap<String, Object> {
 
-        private final Object obj;
+        private Object obj;
 
         static final ScriptEngineManager engineManager = new ScriptEngineManager();
         static final NashornScriptEngine JS = (NashornScriptEngine) engineManager.getEngineByName("nashorn");
-        private final Bindings ctx;
+        private final Bindings ctx = JS.createBindings();
 
 
-        public TweakMap(Object obj) {
-            this.obj = obj;
-
-
-            ctx = JS.createBindings();
-            ctx.put("thiz", obj);
+        public Tweaks() {
+            this(null);
         }
 
-        public void set(String fieldExpression, Object value) {
+        public Tweaks(@Nullable X obj) {
+            to(obj);
+        }
+
+        public Tweaks<X> to(@Nullable X obj) {
+            ctx.put("thiz", this.obj = obj);
+            return this;
+        }
+
+        public Tweaks<X> set(String fieldExpression, Object value) {
             try {
                 JS.eval("thiz." + fieldExpression + " = " + value, ctx);
                 put(fieldExpression, value);
             } catch (ScriptException e) {
                 e.printStackTrace();
             }
+            return this;
         }
 //
-        public void call(String methodExpression, Object... param) {
+        public Tweaks<X> call(String methodExpression, Object... param) {
             String paramStr = Joiner.on(",").join(param);
             try {
                 JS.eval("thiz." + methodExpression + "(" + paramStr + ")", ctx);
@@ -72,6 +102,7 @@ public class OptiUnit<T> extends RunListener {
             } catch (ScriptException e) {
                 e.printStackTrace();
             }
+            return this;
         }
 
 //        public void setField(String field, Object value) {
@@ -89,65 +120,42 @@ public class OptiUnit<T> extends RunListener {
     public OptiUnit(Function<T, SortedMap<String, Object>> get, Class<? extends T>... tests) {
         this.get = get;
         this.tests = tests;
+
+        rn = new RunNotifier();
+        rn.addListener(this);
     }
 
-    public void run(Function<T, SortedMap<String, Object>> set) {
+    public OptiUnit<T> run(Function<T, SortedMap<String, Object>> setup) {
         try {
+            new Suite(new BuildMyRunners(setup), tests).run(rn);
 
-            RunNotifier rn = new RunNotifier();
-            rn.addListener(this);
-
-            new Suite(new RunnerBuilder() {
-                @Override
-                public Runner runnerForClass(Class<?> testClass) throws Throwable {
-                    return new BlockJUnit4ClassRunner(testClass) {
-
-                        @Override
-                        protected Statement methodBlock(FrameworkMethod method) {
-
-                            Object test;
-                            try {
-                                test = new ReflectiveCallable() {
-                                    @Override
-                                    protected Object runReflectiveCall() throws Throwable {
-                                        return createTest();
-                                    }
-                                }.run();
-                            } catch (Throwable e) {
-                                return new Fail(e);
-                            }
-
-                            Statement statement = methodInvoker(method, test);
-                            statement = possiblyExpectingExceptions(method, test, statement);
-                            statement = withPotentialTimeout(method, test, statement);
-                            statement = withBefores(method, test, statement);
-                            statement = withAfters(method, test, statement);
-                            //statement = withRules(method, test, statement);
-
-                            return new Experiment(test, method, statement, set, get);
-                        }
-                    };
-                }
-            }, tests).run(rn);
-
-        } catch (InitializationError initializationError) {
-            initializationError.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
+            logger.error(" {}", t);
         }
+
+        return this;
     }
 
 
     public class Experiment<S/*,E */> extends Statement {
 
+        public final String id;
 
-        private final Statement run;
         private final S subject;
-        private final FrameworkMethod experiment;
 
         private final Function<S, SortedMap<String, Object>> setCause;
         private final Function<S, SortedMap<String, Object>> getEffect;
 
-        SortedMap<String, Object> cause = null;
-        SortedMap<String, Object> effect = null;
+        public SortedMap<String, Object> cause = null;
+        public SortedMap<String, Object> effect = null;
+
+        //JUnit specific:
+        private final Statement run;
+        private final FrameworkMethod experiment;
+
+        private boolean traceErrors = false;
+
 
         /**
          * @param instance
@@ -158,12 +166,26 @@ public class OptiUnit<T> extends RunListener {
          */
         public Experiment(S instance, FrameworkMethod experiment, Statement s, Function<S, SortedMap<String, Object>> setCause, Function<S, SortedMap<String, Object>> getEffect) {
             super();
+            this.id = experiment.toString() + " " + Util.UUIDbase64();
             this.run = s;
             this.experiment = experiment;
             this.subject = instance;
             this.setCause = setCause;
             this.getEffect = getEffect;
+        }
 
+        public void print(PrintStream p) {
+            p.println(id);
+            BiConsumer<String, Object> printKeyValue = (k, v) -> {
+                p.append(k).append('\t').append(toString(v)).append('\n');
+            };
+            cause.forEach(printKeyValue);
+            effect.forEach(printKeyValue);
+            p.println();
+        }
+
+        public String toString(Object v) {
+            return v.toString();
         }
 
         @Override
@@ -172,26 +194,82 @@ public class OptiUnit<T> extends RunListener {
             try {
                 cause = setCause.apply(subject);
 
-                cause.put("_", experiment.toString());
-
                 run.evaluate();
-            } catch (Throwable t) {
+            }
+            catch (Throwable t) {
                 error = t;
             }
+
             effect = getEffect.apply(subject);
 
-            if (error != null)
-                logger.error("{} {}", error);
+            log.add(this);
 
 
-            logger.info(" {}\n\t{}", cause, effect);
-            log.put(cause, effect);
+            if (error != null && traceErrors)
+                logger.trace("{} {}", error);
+
         }
 
 
     }
 
     final static Logger logger = LoggerFactory.getLogger(OptiUnit.class);
+
+    private class MyRunner extends BlockJUnit4ClassRunner {
+
+        private final Function<T, SortedMap<String, Object>> set;
+
+        public MyRunner(Class<?> testClass, Function<T, SortedMap<String, Object>> set) throws InitializationError {
+            super(testClass);
+            this.set = set;
+        }
+
+        @Override
+        protected Statement methodBlock(FrameworkMethod method) {
+
+            Object test;
+            try {
+                test = new ReflectiveCallable() {
+                    @Override
+                    protected Object runReflectiveCall() throws Throwable {
+                        return createTest();
+                    }
+                }.run();
+            } catch (Throwable e) {
+                return new Fail(e);
+            }
+
+            Statement statement = methodInvoker(method, test);
+            statement = possiblyExpectingExceptions(method, test, statement);
+            statement = withPotentialTimeout(method, test, statement);
+            statement = withBefores(method, test, statement);
+            statement = withAfters(method, test, statement);
+            //statement = withRules(method, test, statement);
+
+            return new Experiment(test, method, statement, set, get);
+        }
+    }
+
+    private class BuildMyRunners extends RunnerBuilder {
+        private final Function<T, SortedMap<String, Object>> set;
+
+        public BuildMyRunners(Function<T, SortedMap<String, Object>> set) {
+            this.set = set;
+        }
+
+        @Override
+        public Runner runnerForClass(Class<?> testClass) throws Throwable {
+            return new MyRunner(testClass, set);
+        }
+    }
+
+   public void print(File out) throws FileNotFoundException {
+        print(new PrintStream(new FileOutputStream(out)));
+    }
+
+    public void print(PrintStream out) {
+        log.forEach(e -> e.print(out));
+    }
 
 //    abstract public static interface Experiment<O,P> {
 //

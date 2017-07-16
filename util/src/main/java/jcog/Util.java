@@ -1783,7 +1783,15 @@ public enum Util {
         });
     }
 
-    public static void toMap(AbstractHistogram h, String header, BiConsumer<String, Object> x) {
+    public static void toMap(AbstractHistogram h, String header, int linearStep, BiConsumer<String, Object> x) {
+        h.linearBucketValues(linearStep).iterator().forEachRemaining((p)->{
+           x.accept(header + " [" +
+                   p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
+                   p.getCountAddedInThisIterationStep());
+        });
+    }
+
+    public static void toMapPercentile(AbstractHistogram h, String header, BiConsumer<String, Object> x) {
         h.percentiles(1).iterator().forEachRemaining(p -> {
            x.accept(header + " [" +
                    p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',

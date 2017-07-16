@@ -66,7 +66,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -149,7 +148,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         ShortCountsHistogram volume = new ShortCountsHistogram(2);
 
-        AtomicInteger i = new AtomicInteger(0);
+        //AtomicInteger i = new AtomicInteger(0);
 
         LongSummaryStatistics beliefs = new LongSummaryStatistics();
         LongSummaryStatistics goals = new LongSummaryStatistics();
@@ -158,12 +157,15 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         Histogram termlinkCount = new Histogram(1);
         Histogram tasklinkCount = new Histogram(1);
-        LongSummaryStatistics termlinksCap = new LongSummaryStatistics();
-        LongSummaryStatistics tasklinksCap = new LongSummaryStatistics();
+//        LongSummaryStatistics termlinksCap = new LongSummaryStatistics();
+//        LongSummaryStatistics tasklinksCap = new LongSummaryStatistics();
 
 
         forEachConcept(c -> {
-            i.incrementAndGet();
+
+            if ((c instanceof Functor))
+                return;
+
             //complexity.addValue(c.complexity());
             volume.recordValue(c.volume());
             rootOp.addValue(c.op());
@@ -172,25 +174,24 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             @Nullable ConceptState p = c.state();
             policy.addValue(p != null ? p.toString() : "null");
 
-            if (!(c instanceof Functor)) {
-                termlinksCap.accept(c.termlinks().capacity());
-                termlinkCount.recordValue(c.termlinks().size());
-                tasklinksCap.accept(c.tasklinks().capacity());
-                tasklinkCount.recordValue(c.tasklinks().size());
+            //termlinksCap.accept(c.termlinks().capacity());
+            termlinkCount.recordValue(c.termlinks().size());
 
-                beliefs.accept(c.beliefs().size());
-                goals.accept(c.goals().size());
-                questions.accept(c.questions().size());
-                quests.accept(c.quests().size());
+            //tasklinksCap.accept(c.tasklinks().capacity());
+            tasklinkCount.recordValue(c.tasklinks().size());
 
-            }
+            beliefs.accept(c.beliefs().size());
+            goals.accept(c.goals().size());
+            questions.accept(c.questions().size());
+            quests.accept(c.quests().size());
 
         });
 
         SortedMap<String, Object> x = new TreeMap();
 
-        x.put("time real", new Date());
-        x.put("time inner", time());
+        //x.put("time real", new Date());
+
+        x.put("time", time());
 
         emotion.stat(x);
 
@@ -201,11 +202,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         x.put("task belief count", ((double) beliefs.getSum()));
         x.put("task goal count", ((double) goals.getSum()));
 
-        Util.toMap(tasklinkCount, "tasklink count", x::put);
-        x.put("tasklink usage", ((double) tasklinkCount.getTotalCount()) / tasklinksCap.getSum());
+        Util.toMap(tasklinkCount, "tasklink count", 4, x::put);
+        //x.put("tasklink usage", ((double) tasklinkCount.getTotalCount()) / tasklinksCap.getSum());
         x.put("tasklink count", ((double) tasklinkCount.getTotalCount()));
-        Util.toMap(termlinkCount, "termlink count", x::put);
-        x.put("termlink usage", ((double) termlinkCount.getTotalCount()) / termlinksCap.getSum());
+        Util.toMap(termlinkCount, "termlink count", 4, x::put);
+        //x.put("termlink usage", ((double) termlinkCount.getTotalCount()) / termlinksCap.getSum());
         x.put("termlink count", ((double) termlinkCount.getTotalCount()));
 
         //x.put("volume mean", volume.);
@@ -214,10 +215,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //        x.put("taskLinksUsed", tasklinksUsed);
 //        x.put("taskLinksCapacity", tasklinksCap);
 
-        Util.toMap(policy, "concept state", x::put);
-        Util.toMap(rootOp, "concept op", x::put);
-        Util.toMap(volume, "concept volume", x::put);
-        Util.toMap(clazz, "concept class", x::put);
+        //Util.toMap(policy, "concept state", x::put);
+
+        //Util.toMap(rootOp, "concept op", x::put);
+
+        Util.toMap(volume, "concept volume", 4, x::put);
+
+        //Util.toMap( clazz, "concept class", x::put);
 
         return x;
     }
@@ -976,7 +980,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-
     /**
      * Runs multiple frames, unless already running (then it return -1).
      *
@@ -1637,10 +1640,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return stat;
     }
 
-    /** table of values influencing reasoner heuristics */
+    /**
+     * table of values influencing reasoner heuristics
+     */
     public final FasterList<Cause> causeValue = new FasterList(512);
 
-    /** returns the sum of the current values (applied after adding the increment) */
+    /**
+     * returns the sum of the current values (applied after adding the increment)
+     */
     public float value(short[] causes, float inc) {
 
         float boost = 0;
