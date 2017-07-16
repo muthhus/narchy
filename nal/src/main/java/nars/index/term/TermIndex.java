@@ -459,35 +459,26 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
     }
 
-    public Term retemporalize(@NotNull Term x) {
-        if (x instanceof Compound)
-            return retemporalize((Compound)x);
-        else
-            return x;
-    }
-
-    public Compound retemporalize(@NotNull Compound x) {
-        return retemporalize(x, retemporalizationDTERNAL);
-    }
 
 
     @Nullable
     public Compound retemporalize(@NotNull Compound x, Retemporalization r) {
 
-        Term y = transform(x, r);
+        int rootDT = x.dt();
+        Term y = transform(x, (rootDT ==XTERNAL) ? r.dtIfXternal : rootDT, r);
         if (!(y instanceof Compound)) {
             return null;
         } else {
             Compound yy = (Compound)y;
-            int ydt = yy.dt();
-            if (ydt ==XTERNAL|| ydt ==DTERNAL) {
-                int zdt = r.dt(x);
-                if (ydt!=zdt)
-                    //yy = compoundOrNull(transform(yy, zdt, CompoundTransform.Identity));
-                    yy = compoundOrNull(yy.op().the(zdt, yy.toArray()));
-            }
-            if (yy == null)
-                return null;
+//            int ydt = yy.dt();
+//            if (ydt ==XTERNAL|| ydt ==DTERNAL) {
+//                int zdt = r.dt(x);
+//                if (ydt!=zdt)
+//                    //yy = compoundOrNull(transform(yy, zdt, CompoundTransform.Identity));
+//                    yy = compoundOrNull(yy.op().the(zdt, yy.toArray()));
+//            }
+//            if (yy == null)
+//                return null;
             return normalize(yy);
         }
 
@@ -513,13 +504,13 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         @Override
         public boolean testSuperTerm(@NotNull Compound c) {
-            return c instanceof Compound && c.hasAny(TemporalBits);
+            return (c.hasAny(Op.TemporalBits));
         }
 
         @Nullable
         @Override
         public Term apply(@Nullable Compound parent, @NotNull Term term) {
-            if (term instanceof Compound) {
+            if (term instanceof Compound && term.hasAny(Op.TemporalBits)) {
                 Compound x = (Compound) term;
                 return transform(x, dt(x), this);
             }
@@ -528,8 +519,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         public int dt(@NotNull Compound x) {
             int dt = x.dt();
-            Op o = x.op();
-            return dt!=XTERNAL && (!o.temporal || !concurrent(dt)) ? dt : dtIfXternal;
+            return dt==XTERNAL ? dtIfXternal : dt;
         }
     }
 }

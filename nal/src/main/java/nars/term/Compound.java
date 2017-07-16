@@ -646,34 +646,26 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Term dt(int nextDT) {
 
-        int dt = this.dt();
-
-        if (dt == nextDT)
-            return this;
-        else {
+        int dt;
+        if (op().temporal && nextDT != (dt = this.dt())) {
             Op op = op();
-            if (nextDT != DTERNAL && (op.temporal)) {
-                //assert((op().temporal || op().image));
-                Compound b = this instanceof GenericCompoundDT ?
-                        ((GenericCompoundDT) this).ref : this;
+            Compound b = this instanceof GenericCompoundDT ?
+                    ((GenericCompoundDT) this).ref : this;
 
-//                if (nextDT!=XTERNAL && b.isCommutative() && !concurrent(nextDT)) {
-//                    //check ordering
-//                    if (!b.sub(0).equals(sub(0))) //swapped
-//                        nextDT = -nextDT;
-//                }
+            if ((nextDT != XTERNAL && !concurrent(nextDT)) && size() > 2)
+                return Null; //tried to temporalize what can only be commutive
+
+            if (nextDT!=DTERNAL)
                 return new GenericCompoundDT(b, nextDT);
-            } else {
-                if (this instanceof GenericCompoundDT)
-                    if (Op.concurrent(dt) == Op.concurrent(nextDT))
-                        return ((GenericCompoundDT) this).ref; //fast
-                    else
-                        return op.the(nextDT, toArray());
-                else {
-                    return this; //maybe detect when this happens, could indicate an error
-                }
+            else {
+                return op.the(nextDT, toArray());
             }
+
+        } else {
+            return this;
         }
+
+
     }
 
     /**

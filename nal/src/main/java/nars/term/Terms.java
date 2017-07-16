@@ -580,47 +580,6 @@ public enum Terms { ;
 
 
 
-    public static boolean equalAtemporally(@NotNull Termed a, @NotNull Termed b) {
-        return equal(a.term(), b.term(), false, false);
-    }
-
-    public static boolean equal(@NotNull Term a, @NotNull Term b, boolean sameTemporality, boolean samePolarity) {
-        return equal(a, b, sameTemporality, samePolarity, false);
-    }
-
-    /**
-     * equal atemporally AND with any outer negations removed
-     *
-     * @param samePolarity whether the top-level polarity should be ignored (auto-unnegate)
-     */
-    public static boolean equal(@NotNull Term a, @NotNull Term b, boolean sameTemporality, boolean samePolarity, boolean ignoreVariables) {
-
-        if (a == b)
-            return true;
-
-        if (!samePolarity) {
-            a = a.unneg();
-            b = b.unneg();
-        }
-
-        if (a.equals(b))
-            return true;
-
-        if (a.op() == b.op()) {
-            if (!ignoreVariables) {
-                if (!sameTemporality) {
-                    return ((a.structure() == b.structure()) &&
-                            (a.volume() == b.volume()) &&
-                            $.terms.atemporalize(b).equals($.terms.atemporalize(a)));
-                }
-            } else {
-                return $.terms.atemporalize(a).equalsIgnoringVariables($.terms.atemporalize(b), sameTemporality);
-            }
-        }
-
-        return false;
-
-    }
 
     /**
      * a Set is already duplicate free, so just sort it

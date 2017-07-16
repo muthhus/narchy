@@ -642,7 +642,6 @@ public enum Op implements $ {
     private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
     private static final int InvalidImplicationSubj = or(EQUI, IMPL);
     private static final int InvalidImplicationPred = or(EQUI);
-    public static int temporals = or(IMPL,EQUI,CONJ);
 
     static {
         for (Op o : Op.values()) {

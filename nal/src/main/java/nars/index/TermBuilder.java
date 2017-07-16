@@ -280,28 +280,17 @@ public abstract class TermBuilder {
 
     public Atomic the(@NotNull Number o) {
 
-//        if (o instanceof Byte) return the(o.intValue());
-//        if (o instanceof Short) return the(o.intValue());
         if (o instanceof Integer) return IntAtom.the(o.intValue());
-//
-//        if (o instanceof Long) {
-//            if (((int) o) == o.longValue())
-//                return the(o.intValue());
-//            else
-//                return Atomic.the(Long.toString((long) o));
-//        }
-//
-//        if ((o instanceof Float) || (o instanceof Double))
-//            return the(o.floatValue());
 
         return Atomic.the(o.toString());
+
     }
 
 
     @NotNull
     public Term atemporalize(final @NotNull Compound x) {
 
-        if (!x.hasAny(Op.temporals))// isTemporal())
+        if (!x.hasAny(Op.TemporalBits))// isTemporal())
             return x;
 
         Term[] s = x.toArray();
@@ -334,46 +323,12 @@ public abstract class TermBuilder {
         int dt = x.dt();
         int nextDT = !o.temporal ? dt : DTERNAL;
 
-//        if (dtChanged && pdt == XTERNAL) {
-//            if (newSubs == null) {
-//                newSubs = st.toArray(new Term[sts], 0, sts);
-//            }
-//            Arrays.sort(newSubs);
-//            subsChanged = !st.equalTerms(newSubs);
-//        } else {
+        if (o.temporal)
+            nextDT = XTERNAL;
 
-        //   }
+        if (o.temporal && s.length <= 2) {
 
-        //if (subsChanged || dtChanging) {
-
-        if (o.temporal) {// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
-
-//            boolean reflexive = false;
-//            //introduce an XTERNAL temporal placeholder in the following conditions
-//            if ((subsChanged && s.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
-//                    ||
-//                    (s.length == 2 &&
-//
-//                            (
-//                                    /*(reflexive = Terms.reflex(s[0], s[1]))
-//
-//                                    ||*/
-//
-//                                    //repeat or non-lexical ordering for commutive compound; must re-arrange
-//                                    (o.temporal && o.commutative && (s[0].compareTo(s[1]) >= 0))
-//
-//
-//                    )))
-//
-//
-//            // && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
-//            {
-
-
-            nextDT = XTERNAL; // reflexive ? XTERNAL : DTERNAL /* if non-reflexive, try to use ordinary DTERNAL */;
-
-
-            if (s.length == 2 && s[0].equals(s[1])) {
+            if (s[0].equals(s[1])) {
                 s = new Term[]{s[0], s[0] /* repeated */};
                 subsChanged = true;
             } else if (o.commutative) {
@@ -381,10 +336,7 @@ public abstract class TermBuilder {
                     s = new Term[]{s[1], s[0]};
                     subsChanged = true;
                 }
-
             }
-
-
         }
 
         boolean dtChanging = (nextDT != dt);
@@ -396,21 +348,6 @@ public abstract class TermBuilder {
         Compound y = compoundOrNull(
                 subsChanged ? o.the(nextDT, s) : x.dt(nextDT)
         );
-
-//        if (y == null) {
-//
-//            //as a last resort, use the XTERNAL form to allow it
-//            //TODO decide if all commutive temporal concepts (&&, <=>) should be named by their raw XTERNAL form
-//
-//            nextDT = XTERNAL;
-//            y = compoundOrNull(
-//                    subsChanged ? o.the(nextDT, s) : x.dt(nextDT)
-//            );
-//
-//
-//            if (y == null)
-//                return Null; //failed to atemporalize
-//        }
 
         return y;
     }
