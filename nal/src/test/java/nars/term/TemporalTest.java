@@ -82,8 +82,9 @@ public class TemporalTest {
     @Test public void testAtemporalization2() throws Narsese.NarseseException {
         assertEquals("(y &&+- (--,y))", $.terms.atemporalize($("(y &&+3 (--,y))")).toString());
     }
+
     @Test public void testAtemporalization3() throws Narsese.NarseseException {
-        assertEquals("",
+        assertEquals("(--,((x &&+- $1) ==>+- ($1 &&+- (--,y))))",
                 $.terms.atemporalize($("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))")).toString());
     }
 
@@ -107,7 +108,7 @@ public class TemporalTest {
     @Test public void testAtemporalization6() throws Narsese.NarseseException {
         Compound x = $("((--,(($1&&x) ==>+1 ((--,y) &&+2 $1))) &&+3 (--,y))");
         Term y = $.terms.atemporalize(x);
-        assertEquals("((--,(($1&&x) ==> ((--,y) && $1))) && (--,y))",y);
+        assertEquals("((--,y) &&+- (--,((x &&+- $1) ==>+- ($1 &&+- (--,y)))))",y);
     }
 
     @Test
@@ -121,10 +122,10 @@ public class TemporalTest {
         @NotNull Compound aa = a.term();
         assertNotNull(aa);
 
-        @Nullable Concept na = a.concept(n);
+        @Nullable Concept na = a.concept(n, true);
         assertNotNull(na);
 
-        @Nullable Concept nc = c.concept(n);
+        @Nullable Concept nc = c.concept(n, true);
         assertNotNull(nc);
 
         assertTrue(na == nc);
@@ -134,7 +135,7 @@ public class TemporalTest {
 //        System.out.println(b.concept(n));
 //        System.out.println(c.concept(n));
 
-        assertTrue(b.concept(n).term(0).equals(c.concept(n).term(0)));
+        assertTrue(b.concept(n, true).term(0).equals(c.concept(n, true).term(0)));
 
     }
 
@@ -326,9 +327,9 @@ public class TemporalTest {
 
             Term f0 = $("(y " + op + "+- x)");
             assertEquals("(y " + op + "+- x)", f0.toString());
+            assertEquals("(x " + op + "+- y)", n.terms.atemporalize(f0).toString());
+
             Concept f = n.conceptualize(f0);
-
-
             assertTrue(e + "==" + f, e == f);
 
             //repeat
@@ -337,7 +338,11 @@ public class TemporalTest {
 
             //co-negation
             Concept h = n.conceptualize($("(x " + op + "+- (--,x))"));
-            assertEquals("(x " + op + "+- (--,x))", h.toString());
+            assertEquals( (g.op() != Op.EQUI)?
+                    "(x " + op + "+- (--,x))" :
+                    "(x " + op + "+- x)", h.toString());
+
+
 
         }
 
@@ -656,7 +661,7 @@ public class TemporalTest {
         @NotNull Term a = $("(x && y)");
 
         Term b = $.$("(x &&+1 y)");
-        assertEquals("(x&&y)", $.terms.atemporalize(b).toString());
+        assertEquals("(x &&+- y)", $.terms.atemporalize(b).toString());
 
         Term c = $.$("(x &&+1 x)");
         assertEquals("(x &&+- x)", $.terms.atemporalize(c).toString());

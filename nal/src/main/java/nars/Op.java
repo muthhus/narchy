@@ -2,6 +2,7 @@ package nars;
 
 
 import jcog.memoize.CaffeineMemoize;
+import jcog.memoize.HijackMemoize;
 import jcog.memoize.Memoize;
 import nars.derive.meta.match.Ellipsislike;
 import nars.index.term.AppendProtoCompound;
@@ -630,8 +631,8 @@ public enum Op implements $ {
         }
     };
     public static final Memoize<ProtoCompound, Termlike> cache =
-            //new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 4);
-            CaffeineMemoize.build(buildTerm, 64 * 1024, false /* Param.DEBUG*/);
+            new HijackMemoize<>(buildTerm, 256 * 1024 + 1, 3);
+            //CaffeineMemoize.build(buildTerm, 64 * 1024, false /* Param.DEBUG*/);
     /**
      * index of operators which are encoded by 1 byte: must be less than 31 because this is the range for control characters
      */
@@ -641,6 +642,7 @@ public enum Op implements $ {
     private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
     private static final int InvalidImplicationSubj = or(EQUI, IMPL);
     private static final int InvalidImplicationPred = or(EQUI);
+    public static int temporals = or(IMPL,EQUI,CONJ);
 
     static {
         for (Op o : Op.values()) {

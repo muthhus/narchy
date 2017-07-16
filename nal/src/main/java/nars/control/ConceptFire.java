@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.bag.Bag;
 import jcog.decide.DecideRoulette;
 import jcog.pri.PLink;
@@ -17,6 +18,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import org.apache.commons.math3.util.FastMath;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,27 +62,12 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             short[] x = t.cause();
             int xl = x.length;
             if (xl > 0) {
-                float v = origin.value(t, activation, n);
+                float taskValue = origin.value(t, activation, n);
 
-                float boost = 0;
-                float vPer = v / xl;
-                if (Math.abs(vPer) < EPSILON) vPer = 0;
-                for (int i = xl - 1; i >= 0; i--) {
-                    short c = x[i];
-                    Cause cc = n.causes.get(c);
-                    if (cc == null)
-                        continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
-                    /*assert(cc!=null):
-                            c + " missing from: " + n.causes.size() + " causes";*/
-                    boost += cc.value();
-                    if (vPer != 0) {
-                        cc.apply(vPer);
-                        //vPer *= 0.9f; //HACK decay in reverse
-                    }
-                }
+                float gain = n.value(x, taskValue);
+                if (gain != 0) {
 
-                if (boost != 0) {
-                    float b = (float) tanh(boost * 0.5f) + 1f;
+                    float b = Util.tanhFast( gain ) + 1f;
                     activation *= b;
                     //t.priMult(b);
                     if (/*t.priElseZero()*/ activation < EPSILON)
@@ -195,19 +182,16 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         //float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
 
         int ttlPerPremise = UnificationTTLMax;
-        int ttl = (int) ceil(max(
-                1 * ttlPerPremise,
-                priElseZero() * maxSamples * ttlPerPremise
-        ));
+        int ttl = ttlPerPremise * Util.lerp(priElseZero(), 1, maxSamples);
 
 
 //        if (this.templates == null) {
 //            this.templates = templates(id, nar);
 //        }
 
+        Termed[] localTemplates = templates(id, nar);
 
-        //float totalActivation = 0;//tasklink activation
-        int penalty = UnificationTTLMax / (2 * maxSamples);
+        int penalty = Math.max(1, UnificationTTLMax / (2 * maxSamples));
 
         Random rng = nar.random();
         while (ttl > 0 /*samples++ < samplesMax*/) {
@@ -222,6 +206,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 continue;
             }
 
+
+
             float tfa = task.priElseZero();
             if (tfa < Pri.EPSILON) {
                 ttl -= penalty;
@@ -229,41 +215,43 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             }
 
 
-            TaskConcept taskConcept = task.concept(nar);
-            if (taskConcept == null)
-                continue; //hrm
-
             //tasklink activates local subterms and their reverse termlinks to this
-            Termed[] localTemplates = templates(id, nar);
-            float txaEach = pri/localTemplates.length;
+            float tfaEach = tfa / localTemplates.length;
             for (Termed x : localTemplates) {
                 if (x instanceof Concept) {
                     Concept localSubConcept = (Concept) x;
                     localSubConcept.tasklinks().putAsync(
-                            new PLink(task, txaEach / 2)
+                            new PLink(task, tfaEach)
                     );
                     localSubConcept.termlinks().putAsync(
-                        new PLink(thisTerm, txaEach/2)
+                            new PLink(thisTerm, tfaEach)
                     );
+                    nar.input(new ConceptFire(localSubConcept, tfaEach));
                 }
+
+
+
             }
 
-            {
-                Termed[] taskTemplates = templates(taskConcept, nar);
+            TaskConcept taskConcept = task.concept(nar, true);
+            if (taskConcept == null)
+                continue; //hrm
 
-                //if (templateConceptsCount > 0) {
+            Termed[] taskTemplates = templates(taskConcept, nar);
 
-                //float momentum = 0.5f;
-                float taskTemplateActivation = pri / taskTemplates.length;
-                for (Termed c : taskTemplates) {
+            //if (templateConceptsCount > 0) {
 
-                    //this concept activates task templates and termlinks to them
-                    if (c instanceof Concept) {
-                        Concept cc = (Concept) c;
-                        cc.termlinks().putAsync(
-                                new PLink(thisTerm, taskTemplateActivation / 2)
-                        );
-                        nar.input(new ConceptFire(cc, taskTemplateActivation));
+            //float momentum = 0.5f;
+            float taskTemplateActivation = pri / taskTemplates.length;
+            for (Termed c : taskTemplates) {
+
+                //this concept activates task templates and termlinks to them
+                if (c instanceof Concept) {
+                    Concept cc = (Concept) c;
+                    cc.termlinks().putAsync(
+                            new PLink(thisTerm, taskTemplateActivation)
+                    );
+                    nar.input(new ConceptFire(cc, taskTemplateActivation));
 
 //                        //reverse termlink from task template to this concept
 //                        //maybe this should be allowed for non-concept subterms
@@ -271,11 +259,9 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //                                //(concept ? (1f - momentum) : 1))
 //                        );
 
-                    }
-
-
-
                 }
+
+
 
             }
 
@@ -286,13 +272,15 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
 
             int ttlUsed = run(nar, tasklink, termlink, nar::input, ttlPerPremise); //inline
-            premises++;
 //            if (ttlUsed <= 0) {
 //                //failure penalty
 //                tasklinkPri[tasklSelected] *= 0.9f;
 //                termlinkPri[termlSelected] *= 0.9f;
 //            }
-            ttl -= max(ttlUsed, penalty);
+
+            //ttl -= max(ttlUsed, penalty); //stingy
+            ttl -= ttlPerPremise; //fair disbursement
+            premises++;
 
         }
 

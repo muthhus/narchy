@@ -327,10 +327,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         return appendTo(new StringBuilder(), memory, showStamp);
     }
 
-    @Nullable
-    default TaskConcept concept(@NotNull NAR n) {
-        return concept(n, true);
-    }
 
     @Nullable
     default TaskConcept concept(@NotNull NAR n, boolean conceptualize) {
@@ -378,7 +374,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     @Nullable
     default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (isInput()) {
-            TaskConcept concept = concept(nar);
+            TaskConcept concept = concept(nar, true);
             if (concept != null) {
                 ArrayBag<Task, PriReference<Task>> answers = concept.computeIfAbsent(Op.QUESTION, () ->
                         new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));

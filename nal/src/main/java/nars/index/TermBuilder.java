@@ -3,15 +3,12 @@ package nars.index;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Arrays;
 
 import static nars.Op.Null;
 import static nars.term.Terms.compoundOrNull;
@@ -304,7 +301,7 @@ public abstract class TermBuilder {
     @NotNull
     public Term atemporalize(final @NotNull Compound x) {
 
-        if (!x.isTemporal())
+        if (!x.hasAny(Op.temporals))// isTemporal())
             return x;
 
         Term[] s = x.toArray();
@@ -351,47 +348,44 @@ public abstract class TermBuilder {
 
         if (o.temporal) {// && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
 
-            boolean reflexive = false;
-            //introduce an XTERNAL temporal placeholder in the following conditions
-            if ((subsChanged && s.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
-                    ||
-                    (s.length == 2 && (
+//            boolean reflexive = false;
+//            //introduce an XTERNAL temporal placeholder in the following conditions
+//            if ((subsChanged && s.length == 1) //it was a repeat which collapsed, so use XTERNAL and repeat the subterm
+//                    ||
+//                    (s.length == 2 &&
+//
+//                            (
+//                                    /*(reflexive = Terms.reflex(s[0], s[1]))
+//
+//                                    ||*/
+//
+//                                    //repeat or non-lexical ordering for commutive compound; must re-arrange
+//                                    (o.temporal && o.commutative && (s[0].compareTo(s[1]) >= 0))
+//
+//
+//                    )))
+//
+//
+//            // && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
+//            {
 
-                            (reflexive = Terms.reflex(s[0], s[1]))
 
-                                    ||
-
-                                    //repeat or non-lexical ordering for commutive compound; must re-arrange
-                                    (o.temporal && o.commutative && (s[0].compareTo(s[1]) >= 0))
+            nextDT = XTERNAL; // reflexive ? XTERNAL : DTERNAL /* if non-reflexive, try to use ordinary DTERNAL */;
 
 
-                    )))
-
-
-            // && newSubs[0].unneg().equals(newSubs[1].unneg())  //preserve co-negation
-            {
-
-
-                nextDT = reflexive ? XTERNAL : DTERNAL /* if non-reflexive, try to use ordinary DTERNAL */;
-
-                if (s.length > 1) {
-                    Term[] t = {s[0], s[1]};
-                    if (o.commutative)
-                        Arrays.sort(t);
-
-                    if (!subsChanged)
-                        subsChanged = !Arrays.equals(s, t);
-
-                    s = t;
-
-                } else {
-                    s = new Term[]{s[0], s[0] /* repeated */};
+            if (s.length == 2 && s[0].equals(s[1])) {
+                s = new Term[]{s[0], s[0] /* repeated */};
+                subsChanged = true;
+            } else if (o.commutative) {
+                if (s[0].compareTo(s[1]) > 0) { //lexical sort
+                    s = new Term[]{s[1], s[0]};
                     subsChanged = true;
                 }
 
             }
+
+
         }
-        //}
 
         boolean dtChanging = (nextDT != dt);
 
@@ -403,20 +397,20 @@ public abstract class TermBuilder {
                 subsChanged ? o.the(nextDT, s) : x.dt(nextDT)
         );
 
-        if (y == null) {
-
-            //as a last resort, use the XTERNAL form to allow it
-            //TODO decide if all commutive temporal concepts (&&, <=>) should be named by their raw XTERNAL form
-
-            nextDT = XTERNAL;
-            y = compoundOrNull(
-                    subsChanged ? o.the(nextDT, s) : x.dt(nextDT)
-            );
-
-
-            if (y == null)
-                return Null; //failed to atemporalize
-        }
+//        if (y == null) {
+//
+//            //as a last resort, use the XTERNAL form to allow it
+//            //TODO decide if all commutive temporal concepts (&&, <=>) should be named by their raw XTERNAL form
+//
+//            nextDT = XTERNAL;
+//            y = compoundOrNull(
+//                    subsChanged ? o.the(nextDT, s) : x.dt(nextDT)
+//            );
+//
+//
+//            if (y == null)
+//                return Null; //failed to atemporalize
+//        }
 
         return y;
     }

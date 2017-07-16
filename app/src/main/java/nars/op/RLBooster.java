@@ -40,7 +40,7 @@ public class RLBooster implements Consumer<NAgent> {
 
         List<SensorConcept> sc = $.newArrayList();
         env.sense(env.nar, 0).forEach(x -> {
-            sc.add((SensorConcept) ((NALTask)x).concept(env.nar));
+            sc.add((SensorConcept) ((NALTask)x).concept(env.nar, true));
         });
         if (env instanceof NAgentX) {
             ((NAgentX) env).cam.values().forEach(c -> {

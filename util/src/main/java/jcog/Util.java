@@ -1791,4 +1791,15 @@ public enum Util {
         });
     }
 
+    /** pretty close
+     * http://www.musicdsp.org/showone.php?id=238
+     * https://en.wikipedia.org/wiki/Pad%C3%A9_approximant
+     * http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiJ4KigyNyt4KngpLygyNys5KngqeCkiLCJjb2xvciI6IiMxQjM3QTgifSx7InR5cGUiOjAsImVxIjoidGFuaCh4KSIsImNvbG9yIjoiIzVBQzIzQSJ9LHsidHlwZSI6MTAwMCwid2luZG93IjpbIi0xLjczMzE5OTc5MDA3OTk5NjIiLCIwLjAxMTYzMDY3MzkyMDAwMDI3OCIsIi0xLjA2MTExNDM0NzUxOTk5OCIsIjAuMDEyNjI3NDc2NDgwMDAwNjc3Il19XQ--
+     * */
+    public static float tanhFast(float x) {
+        if (x <= -3) return -1f;
+        if (x >= 3f) return +1f;
+        return x * ( 27 + x * x ) / ( 27 + 9 * x * x );
+    }
+
 }

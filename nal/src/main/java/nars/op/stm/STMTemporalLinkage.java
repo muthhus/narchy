@@ -73,14 +73,14 @@ public final class STMTemporalLinkage extends STM {
         /** current task's... */
         float interStrength = tPri * u.priSafe(0) * strength;
         if (interStrength >= Pri.EPSILON) {
-            Concept ac = t.concept(nar);
+            Concept ac = t.concept(nar, false);
             if (ac != null) {
-                Concept bc = u.concept(nar);
+                Concept bc = u.concept(nar, false);
                 if (bc != null && !bc.equals(ac)) { //null or same concept?
 
                     //TODO handle overflow?
-                    bc.termlinks().put(new PLink(ac, interStrength));
-                    ac.termlinks().put(new PLink(bc, interStrength));
+                    bc.termlinks().put(new PLink(ac.term(), interStrength));
+                    ac.termlinks().put(new PLink(bc.term(), interStrength));
 
                     //tasklinks, not sure:
                     //        tgtConcept.tasklinks().put( new RawPLink(srcTask, scaleSrcTgt));

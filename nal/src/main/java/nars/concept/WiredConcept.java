@@ -44,13 +44,15 @@ public class WiredConcept extends TaskConcept implements PermanentConcept {
             //example value function
             long s = t.end();
 
-            long now = n.time();
-            long relevantTime = p == GOAL ?
-                    now - n.dur() : //present or future goal
-                    now; //future belief prediction
+            if (s!=ETERNAL) {
+                long now = n.time();
+                long relevantTime = p == GOAL ?
+                        now - n.dur() : //present or future goal
+                        now; //future belief prediction
 
-            if (s!=ETERNAL && s > relevantTime) //present or future TODO irrelevance discount for far future
-                return 0.5f + t.conf();
+                if (s > relevantTime) //present or future TODO irrelevance discount for far future
+                    return (float) (0.25f + Math.pow(t.conf(), 0.25f));
+            }
         }
 
         //return super.value(t, activation, n);

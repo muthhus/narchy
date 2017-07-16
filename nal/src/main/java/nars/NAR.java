@@ -9,6 +9,7 @@ import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
+import jcog.list.FasterList;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
@@ -72,6 +73,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static jcog.pri.Priority.EPSILON;
 import static nars.$.$;
 import static nars.$.newArrayList;
 import static nars.Op.*;
@@ -264,16 +266,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         exe.start(this);
     }
 
-    public final List<Cause> causes = $.newArrayList(512);
-
-    private Cause newCause(Object x) {
-        synchronized (causes) {
-            short next = (short) (causes.size());
-            Cause c = new Cause(next, x);
-            causes.add(c);
-            return c;
-        }
-    }
 
     public PSink<ITask, ITask> newInputChannel(Object id) {
 
@@ -976,7 +968,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             }
         }
 
-        causes.forEach(c -> c.commit(0.98f));
+        causeValue.forEach(c -> c.commit(0.98f));
 
         exe.cycle(this);
 
@@ -1313,8 +1305,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
             //if (wasNormalized) {
-                term = compoundOrNull(terms.normalize((Compound) term));
-                if (term == null) return null;
+            term = compoundOrNull(terms.normalize((Compound) term));
+            if (term == null) return null;
             //}
 
             term = compoundOrNull(term.unneg() /* once again to be sure */);
@@ -1643,4 +1635,44 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         return stat;
     }
+
+    /** table of values influencing reasoner heuristics */
+    public final FasterList<Cause> causeValue = new FasterList(512);
+
+    /** returns the sum of the current values (applied after adding the increment) */
+    public float value(short[] causes, float inc) {
+
+        float boost = 0;
+        int xl = causes.length;
+
+        float vPer = inc / xl;
+        if (Math.abs(vPer) < EPSILON)
+            vPer = 0;
+
+        for (int i = xl - 1; i >= 0; i--) {
+            short c = causes[i];
+            Cause cc = this.causeValue.get(c);
+            if (cc == null)
+                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
+                    /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
+
+            boost += cc.value();
+            if (vPer != 0) {
+                cc.apply(vPer);
+                //vPer *= 0.9f; //HACK decay in reverse
+            }
+        }
+
+        return boost;
+    }
+
+    private Cause newCause(Object x) {
+        synchronized (causeValue) {
+            short next = (short) (causeValue.size());
+            Cause c = new Cause(next, x);
+            causeValue.add(c);
+            return c;
+        }
+    }
+
 }
