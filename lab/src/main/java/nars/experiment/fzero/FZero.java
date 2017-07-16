@@ -16,7 +16,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
 
-        float fps = 5f;
+        float fps = 10f;
 
 
         NAgentX.runRT((n)->{
@@ -43,17 +43,17 @@ public class FZero extends NAgentX {
         this.fz = new FZeroGame();
 
         senseCamera("fz", () -> fz.image, 32, 20)
-                .resolution(0.1f);
+                .resolution(0.2f);
 
 
         actionBipolar($.inh(Atomic.the("fwd"), id), (f) -> {
-            fz.vehicleMetrics[0][6] += (f) * 2f;
+            fz.vehicleMetrics[0][6] += (f) * 1f;
             return f;
-        }).resolution.setValue(0.05f);
+        }).resolution.setValue(0.01f);
         actionBipolar($.inh(Atomic.the("rot"), id), (r) -> {
-            fz.playerAngle += (r*r*r) * 0.65f;
+            fz.playerAngle += (r*r*r) * 0.35f;
             return r;
-        }).resolution.setValue(0.05f);
+        }).resolution.setValue(0.01f);
 
         //keyboard-ish controls:
 //actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );

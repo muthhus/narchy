@@ -426,7 +426,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test
             .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001})))! :|:")
-            .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
+            .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.81f, 0)
             .mustNotOutput(cycles, "hold(SELF,{t002})", GOAL, ETERNAL);
     }
 
@@ -437,7 +437,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test
             .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001}))). :|:")
-            .mustBelieve(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
+            .mustBelieve(cycles, "hold(SELF,{t002})", 1.0f, 0.81f, 0)
             .mustBelieve(cycles, "(at(SELF,{t001}) &&+5 open({t001}))", 1.0f, 0.81f, 5, 10)
         ;
     }

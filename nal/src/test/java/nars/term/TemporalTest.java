@@ -159,7 +159,7 @@ public class TemporalTest {
                 nt.toString());
 
         //assertNotNull(n.conceptualize(nt, UnitBudget.One));
-        assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt).toString());
+        assertEquals("( &&+- ,do(that),(a),(b))", n.conceptualize(nt).toString());
 
         //assertEquals("(&&,do(that),(a),(b))", n.conceptualize(nt, UnitBudget.One).toString()); ????????
 
@@ -820,6 +820,8 @@ public class TemporalTest {
         assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", t.toString());
         Term xe = $.terms.retemporalize(t, $.terms.retemporalizationDTERNAL);
         assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", xe.toString());
+
+        //TODO this will require a refactor allowing arbitrary function mapping matched dt source value to a target dt
         Term xz = $.terms.retemporalize(t, $.terms.retemporalizationZero);
         assertEquals("((--,(happy)) &&+0 (--,((--,(o)) &&+0 (happy))))", xz.toString());
     }

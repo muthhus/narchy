@@ -376,12 +376,12 @@ public interface Compound extends Term, IPair, TermContainer {
                 return false;
 
             Compound y = (Compound) ty;
+            if (op.temporal && !matchTemporalDT(this, y, subst.dur))
+                return false;
+
             TermContainer xsubs = subterms();
             TermContainer ysubs = y.subterms();
 
-
-            if (op.temporal && !matchTemporalDT(dt(), y.dt(), subst.dur))
-                return false;
 
             //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
             if (isCommutative()) {
@@ -400,9 +400,12 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     //TODO generalize
-    static boolean matchTemporalDT(int a, int b, int dur) {
-        if (a == XTERNAL || b == XTERNAL) return true;
-        if (a == DTERNAL || b == DTERNAL) return true;
+    static boolean matchTemporalDT(Compound aa, Compound bb, int dur) {
+        int a = aa.dt();
+        if (a == XTERNAL || a == DTERNAL) return true;
+        int b = bb.dt();
+        if (b == XTERNAL || b == DTERNAL) return true;
+
         return Math.abs(a - b) <= dur;
     }
 
