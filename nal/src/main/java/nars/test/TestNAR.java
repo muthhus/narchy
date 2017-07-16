@@ -184,9 +184,9 @@ public class TestNAR {
             if (trace != null)
                 logger.trace("{}", trace.getBuffer());
 
-            if (!success) {
-                nar.stats(System.out);
-            }
+
+            nar.stats(System.out);
+            
 
         }
 

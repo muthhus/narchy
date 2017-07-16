@@ -35,12 +35,12 @@ public class ConceptFireTest {
         HashBag<String> s = new HashBag();
         ConceptFire cf = new ConceptFire(c, 1f) {
             @Override
-            protected int run(NAR nar, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
+            protected int premise(NAR nar, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
                 if (termlink.get() instanceof Atom)
                     return 0 ; //ignore
                 s.addOccurrences(/*tasklink.get() + " " +*/ termlink.get().toString(), 1);
-                return super.run(nar, tasklink, termlink, x, ttlPerPremise);
+                return super.premise(nar, tasklink, termlink, x, ttlPerPremise);
             }
         };
 

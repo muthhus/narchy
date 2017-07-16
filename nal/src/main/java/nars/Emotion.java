@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.SortedMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -30,6 +31,9 @@ public final class Emotion   {
     /** priority rate of Task processing attempted */
     public final Counter busyPri = new StepCounter(NiNner.id("busyPri"));
 
+    public final Counter conceptFires = new BasicCounter(NiNner.id("concept fire runs"));
+    public final Counter conceptActivations = new BasicCounter(NiNner.id("concept fire activates"));
+    public final Counter conceptFirePremises  = new BasicCounter(NiNner.id("concept fire premises"));
 
     @NotNull
     public final BufferedFloatGuage busyVol;
@@ -250,6 +254,14 @@ public final class Emotion   {
 //                + "," + dRewardPos.belief(nar.time()) +
 //                "," + dRewardNeg.belief(nar.time());
 
+    }
+
+    public void stat(SortedMap<String, Object> x) {
+        //TODO reflect
+        for (Counter c : new Counter[] { conceptFires, conceptActivations, conceptFirePremises } )
+            x.put(c.getConfig().getName(), c.getValue());
+
+        x.put("emotion", summary());
     }
 
 //    public void count(String id) {

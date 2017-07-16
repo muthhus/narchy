@@ -27,6 +27,9 @@ public interface TaskTable  {
 
 
     static void activate(@NotNull Task t, float activation, @NotNull NAR n) {
+        activate(t, activation, n, true);
+    }
+    static void activate(@NotNull Task t, float activation, @NotNull NAR n, boolean process) {
        // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
         if (activation >= Pri.EPSILON) {
             TaskConcept cc = t.concept(n, true);
@@ -37,7 +40,7 @@ public interface TaskTable  {
 //                n.input(a);
             }
 
-            //if (taskProcess)
+            if (process)
                 n.eventTaskProcess.emit(/*post*/t);
         }
     }

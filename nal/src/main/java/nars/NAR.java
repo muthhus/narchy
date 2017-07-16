@@ -192,11 +192,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         x.put("time real", new Date());
         x.put("time inner", time());
 
-        x.put("emotion", emotion.summary());
+        emotion.stat(x);
 
-        x.put("term index", terms.summary());
+        //x.put("term index", terms.summary());
 
-        //x.put("concept count", (double) i.get());
+        x.put("concept count", terms.size());
 
         x.put("task belief count", ((double) beliefs.getSum()));
         x.put("task goal count", ((double) goals.getSum()));

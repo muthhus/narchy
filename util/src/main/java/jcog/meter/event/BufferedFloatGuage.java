@@ -5,7 +5,9 @@ import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
 import java.io.Serializable;
 
-/** buffers the result to avoid returning an incomplete value */
+/** buffers the result to avoid returning an incomplete value
+ *  NOT thread safe
+ * */
 public class BufferedFloatGuage implements FloatProcedure, Serializable {
 
     final RecycledSummaryStatistics data = new RecycledSummaryStatistics();

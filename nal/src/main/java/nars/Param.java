@@ -8,6 +8,7 @@ import jcog.util.FloatFloatToFloatFunction;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
+import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,23 +28,24 @@ public abstract class Param  {
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 1;
 
-    public static final PriMerge termlinkMerge = PriMerge.max;
-    public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
+    public static final PriMerge termlinkMerge = PriMerge.plus;
+    public static final PriMerge tasklinkMerge = PriMerge.plus; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptMerge = PriMerge.plus;
 
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
-            Util::or;     //Util::aveAri
-            //Util::and;
+            //Util::or;
+            //UtilityFunctions::aveAri;
+            Util::and;
             //Math::min;
             //Math::max;
 
-    /** maximum time that a signal task can latch its last value before it becomes unknown */
+    /** maximum time (in durations) that a signal task can latch its last value before it becomes unknown */
     public final static int SIGNAL_LATCH_TIME =
                     //0;
                     //Integer.MAX_VALUE;
-                    128;
+                    16;
 
 
 
@@ -66,7 +68,7 @@ public abstract class Param  {
     public static final int COMPOUND_SUBTERMS_MAX = 127;
 
     /** how many answers to record per input question task (in its concept's answer bag) */
-    public static final int MAX_INPUT_ANSWERS = 16;
+    public static final int MAX_INPUT_ANSWERS = 8;
 
     /** max retries for termpolation to produce a valid task content result during revision */
     public static final int MAX_TERMPOLATE_RETRIES = 2;
@@ -114,16 +116,16 @@ public abstract class Param  {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 10;
+    public static final int CAUSE_CAPACITY = 4;
 
     public final static int UnificationStackMax = 32;
     public static final int UnificationConstraintsMax = 8;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 64;
+    public final static int BeliefMatchTTL = 48;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTLMax = BeliefMatchTTL * 4;
+    public final static int UnificationTTLMax = BeliefMatchTTL * 2;
 
 
 

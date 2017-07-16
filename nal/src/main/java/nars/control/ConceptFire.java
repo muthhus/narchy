@@ -32,10 +32,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 4;
+    private static final int maxSamples = 8;
 
-    static final int TASKLINKS_SAMPLED = 4;
-    static final int TERMLINKS_SAMPLED = 4;
+    static final int TASKLINKS_SAMPLED = 6;
+    static final int TERMLINKS_SAMPLED = 6;
 
     //private static final float priMinAbsolute = Pri.EPSILON * 1;
     //private static final float momentum = 0.75f;
@@ -52,6 +52,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
 
     public static ConceptFire activate(@NotNull Task t, float activation, Concept origin, NAR n) {
+
 
         if (activation >= EPSILON) {
 
@@ -87,6 +88,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //                return new ConceptFire(origin, activation);
 //            } else {
 //                //atomic activation)
+
+            n.emotion.conceptActivations.increment();
             return new ConceptFire(origin, activation); /*, () -> {
 
                 }*/
@@ -102,6 +105,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         if (pri < Pri.EPSILON)
             return null;
 
+        nar.emotion.conceptFires.increment();
 
         Term thisTerm = id.term();
 
@@ -267,7 +271,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             termlink = terml.get(termlSelected);
 
 
-            int ttlUsed = run(nar, tasklink, termlink, nar::input, ttlPerPremise); //inline
+            int ttlUsed = premise(nar, tasklink, termlink, nar::input, ttlPerPremise); //inline
 //            if (ttlUsed <= 0) {
 //                //failure penalty
 //                tasklinkPri[tasklSelected] *= 0.9f;
@@ -373,9 +377,12 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         }
     }
 
-    protected int run(NAR nar, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
+    protected int premise(NAR nar, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
         Premise p = new Premise(tasklink, termlink, x);
-        return p.run(nar, ttlPerPremise);
+        int ttl = p.run(nar, ttlPerPremise);
+        //TODO record ttl usage
+        nar.emotion.conceptFirePremises.increment();
+        return ttl;
     }
 
     @NotNull
