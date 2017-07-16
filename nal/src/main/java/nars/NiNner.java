@@ -28,7 +28,7 @@ import static java.util.Collections.singleton;
 /**
  * inner sense: low-level internal experience
  */
-public class NiNner extends ConcurrentMonitorRegistry {
+public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
 
     static final Logger logger = LoggerFactory.getLogger(NiNner.class);
 
@@ -37,6 +37,7 @@ public class NiNner extends ConcurrentMonitorRegistry {
     private On onCycle = null;
 
     public NiNner(NAR n) {
+        super("NAR." + n.self().toString());
         this.nar = n;
 
 //        this.poller =
@@ -45,7 +46,7 @@ public class NiNner extends ConcurrentMonitorRegistry {
 
         //register(monitor("emotion", nar.emotion));
         register(Monitors.newObjectMonitor("emotion", nar.emotion));
-
+        register(new BasicGauge<>(id("concepts"), nar.terms::size));
 
         {
             MetricObserver obs = new PrintStreamMetricObserver("x", nar.time, System.out);
@@ -55,12 +56,11 @@ public class NiNner extends ConcurrentMonitorRegistry {
             scheduler.start();
 
 
-            MetricObserver transform = new CounterToRateMetricTransform(
-                    obs, 1, TimeUnit.SECONDS);
+//            MetricObserver transform = new CounterToRateMetricTransform(
+//                    obs, 1, TimeUnit.SECONDS);
             PollRunnable task = new PollRunnable(
                     new MonitorRegistryMetricPoller(this),
-                    BasicMetricFilter.MATCH_ALL,
-                    transform);
+                    BasicMetricFilter.MATCH_ALL, obs);
             scheduler.addPoller(task, 2, TimeUnit.SECONDS);
         }
     }
