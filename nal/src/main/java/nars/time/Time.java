@@ -1,11 +1,13 @@
 package nars.time;
 
+import com.netflix.servo.util.Clock;
+
 import java.io.Serializable;
 
 /**
  * Time state
  */
-public interface Time extends Serializable {
+public interface Time extends Clock, Serializable {
 
     //Timer real = new Timer("Realtime");
 
@@ -17,7 +19,7 @@ public interface Time extends Serializable {
     /**
      * returns the current time, as measured in units determined by this clock
      */
-    long time();
+    long now();
 
     /**
      * returns a new stamp evidence id

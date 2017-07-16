@@ -60,7 +60,7 @@ public abstract class RealTime implements Time {
 
 
     @Override
-    public final long time() {
+    public final long now() {
         return t;
     }
 

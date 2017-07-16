@@ -41,7 +41,7 @@ public class CycleTime implements Time {
     }
 
     @Override
-    public final long time() {
+    public final long now() {
         return t;
     }
 

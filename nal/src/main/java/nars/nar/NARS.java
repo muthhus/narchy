@@ -3,6 +3,7 @@ package nars.nar;
 import jcog.learn.lstm.SimpleLSTM;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
+import nars.NiNner;
 import nars.Param;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
@@ -64,6 +65,9 @@ public class NARS {
         n.DEFAULT_QUEST_PRIORITY = 0.1f;
         n.termVolumeMax.setValue(40);
 
+        NiNner nin = new NiNner(n);
+        nin.start();
+
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
         MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, true, 16f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
@@ -102,46 +106,46 @@ public class NARS {
         return new NAR(concepts.get(), exe.get(), time, rng.get());
     }
 
-    class NARTune implements Runnable {
-        private final NAR nar;
-        final static int outputs = 4, inputs = outputs;
-        private final SimpleLSTM net;
-
-        double[] prev, next, predict;
-        private final float alpha = 0.05f;
-
-        public NARTune(NAR nar) {
-
-            this.nar = nar;
-
-            prev = new double[inputs];
-            next = new double[outputs];
-            predict = new double[outputs];
-
-            this.net = new SimpleLSTM(nar.random(), inputs, outputs, /* estimate: */ inputs * outputs * 2);
-
-            nar.onCycle(this);
-
-        }
-
-        @Override
-        public void run() {
-            double[] current = new double[outputs];
-            current[0] = nar.emotion.learningVol();
-            current[1] = nar.emotion.busyVol.getMean() / Param.COMPOUND_VOLUME_MAX;
-            current[2] = nar.emotion.busyPri.getMean();
-            current[3] = nar.emotion.confident.getMean();
-
-            double error = MathArrays.distance1(predict, current);
-
-            double[] predictNext = net.learn(prev, current, alpha);
-
-            System.out.println(n2(error) + " err\t" + n4(prev) + " -|> " + n4(current) + " ->? " + n4(predictNext));
-
-            System.arraycopy(predictNext, 0, predict, 0, outputs);
-            System.arraycopy(current, 0, prev, 0, outputs);
-        }
-    }
+//    class NARTune implements Runnable {
+//        private final NAR nar;
+//        final static int outputs = 4, inputs = outputs;
+//        private final SimpleLSTM net;
+//
+//        double[] prev, next, predict;
+//        private final float alpha = 0.05f;
+//
+//        public NARTune(NAR nar) {
+//
+//            this.nar = nar;
+//
+//            prev = new double[inputs];
+//            next = new double[outputs];
+//            predict = new double[outputs];
+//
+//            this.net = new SimpleLSTM(nar.random(), inputs, outputs, /* estimate: */ inputs * outputs * 2);
+//
+//            nar.onCycle(this);
+//
+//        }
+//
+//        @Override
+//        public void run() {
+//            double[] current = new double[outputs];
+//            current[0] = nar.emotion.learningVol();
+//            current[1] = nar.emotion.busyVol.getMean() / Param.COMPOUND_VOLUME_MAX;
+//            current[2] = nar.emotion.busyPri.getMean();
+//            current[3] = nar.emotion.confident.getMean();
+//
+//            double error = MathArrays.distance1(predict, current);
+//
+//            double[] predictNext = net.learn(prev, current, alpha);
+//
+//            System.out.println(n2(error) + " err\t" + n4(prev) + " -|> " + n4(current) + " ->? " + n4(predictNext));
+//
+//            System.arraycopy(predictNext, 0, predict, 0, outputs);
+//            System.arraycopy(current, 0, prev, 0, outputs);
+//        }
+//    }
 
     /**
      * suitable for single-thread, testing use only. provides no limitations on size so it will grow unbounded. use with caution

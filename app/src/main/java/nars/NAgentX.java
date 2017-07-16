@@ -165,8 +165,8 @@ abstract public class NAgentX extends NAgent {
         NARLoop narLoop = a.startRT(fps, endTime);
         n.onCycle(nn -> {
             float lag = narLoop.lagSumThenClear() + a.running().lagSumThenClear();
-            n.emotion.happy(-lag);
-            n.emotion.happy(n.emotion.busyPri.getSum()/50000f);
+            //n.emotion.happy(-lag);
+            //n.emotion.happy(n.emotion.busyPri.getSum()/50000f);
         });
         return n;
     }

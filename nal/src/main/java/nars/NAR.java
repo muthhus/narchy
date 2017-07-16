@@ -1471,7 +1471,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     public final long time() {
-        return time.time();
+        return time.now();
     }
 
 

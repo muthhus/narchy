@@ -69,8 +69,8 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
         this.controlled = controlled;
 //        senseNumber(p("happy"),
 //                new FloatPolarNormalized(controlled.emotion::happy));
-        senseNumber(p("busyPri"),
-                new FloatNormalized(controlled.emotion.busyPri::getSum));
+//        senseNumber(p("busyPri"),
+//                new FloatNormalized(controlled.emotion.busyPri::getSum));
         senseNumber(p("busyVol"),
                 new FloatNormalized(controlled.emotion.busyVol::getSum));
 

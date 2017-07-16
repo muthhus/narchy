@@ -1,8 +1,14 @@
 package nars;
 
+import com.netflix.servo.BasicMonitorRegistry;
+import com.netflix.servo.monitor.BasicCounter;
+import com.netflix.servo.monitor.Counter;
+import com.netflix.servo.monitor.MonitorConfig;
+import com.netflix.servo.monitor.StepCounter;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.meter.event.BufferedFloatGuage;
 import nars.term.Compound;
+import nars.util.ConcurrentMonitorRegistry;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,13 +21,16 @@ import static jcog.Texts.n4;
 
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values
+ *
+ * https://prometheus.io/docs/practices/instrumentation/
  */
-public final class Emotion implements Serializable {
+public final class Emotion   {
 
 
     /** priority rate of Task processing attempted */
-    @NotNull
-    public final BufferedFloatGuage busyPri;
+    public final Counter busyPri = new StepCounter(NiNner.id("busyPri"));
+
+
     @NotNull
     public final BufferedFloatGuage busyVol;
 
@@ -49,7 +58,7 @@ public final class Emotion implements Serializable {
     public final BufferedFloatGuage errrVol;
 
 
-    final Map<String,AtomicInteger> counts = new ConcurrentHashMap<>();
+//    final Map<String,AtomicInteger> counts = new ConcurrentHashMap<>();
 
     //private transient final Logger logger;
 
@@ -65,7 +74,6 @@ public final class Emotion implements Serializable {
 
         //logger = LoggerFactory.getLogger(class);
 
-        this.busyPri = new BufferedFloatGuage("busyP");
         this.busyVol = new BufferedFloatGuage("busyV");
 
         this.learnPri = new BufferedFloatGuage("learnP");
@@ -88,7 +96,6 @@ public final class Emotion implements Serializable {
         _happy = (float) happy.getSum();
         happy.clear();
 
-        busyPri.clear();
         busyVol.clear();
 
         learnPri.clear();
@@ -102,9 +109,9 @@ public final class Emotion implements Serializable {
 
     }
 
-    public void clearCounts() {
-        counts.values().forEach(x -> x.set(0));
-    }
+//    public void clearCounts() {
+//        counts.values().forEach(x -> x.set(0));
+//    }
 
     /** percentage of business which was not frustration, by aggregate volume */
     public float learningVol() {
@@ -114,13 +121,6 @@ public final class Emotion implements Serializable {
         return 0;
     }
 
-    /** percentage of business which was not frustration, by aggregate priority */
-    public float learningPri() {
-        double v = busyPri.getSum();
-        if (v > 0)
-            return (float) (learnPri.getSum() / v);
-        return 0;
-    }
 
     public float erring() {
         return errrVol.getSum() / busyVol.getSum();
@@ -185,7 +185,7 @@ public final class Emotion implements Serializable {
     }
 
     @Deprecated public void busy(float pri, int vol) {
-        busyPri.accept( pri );
+        busyPri.increment( Math.round(pri * 1000) );
         busyVol.accept( vol );
     }
 
@@ -234,9 +234,9 @@ public final class Emotion implements Serializable {
                 //.append(" alrt=").append(n4(alert.getSum()))
                 ;
 
-        counts.forEach((k,v) -> {
-            sb.append(' ').append(k).append('=').append(v.get());
-        });
+//        counts.forEach((k,v) -> {
+//            sb.append(' ').append(k).append('=').append(v.get());
+//        });
         return sb.toString();
 
 
@@ -252,15 +252,15 @@ public final class Emotion implements Serializable {
 
     }
 
-    public void count(String id) {
-        AtomicInteger c = counts.get(id);
-        if (c == null) {
-            c = new AtomicInteger(1);
-            counts.put(id, c);
-        } else {
-            c.incrementAndGet();
-        }
-    }
+//    public void count(String id) {
+//        AtomicInteger c = counts.get(id);
+//        if (c == null) {
+//            c = new AtomicInteger(1);
+//            counts.put(id, c);
+//        } else {
+//            c.incrementAndGet();
+//        }
+//    }
 
 
 
