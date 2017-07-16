@@ -140,6 +140,9 @@ public class RTreeCursor<T> {
             }
 
             //assert(next!=null);
+            if (next == null)
+                return endOfData(); //HACK
+
             return next;
         }
     }

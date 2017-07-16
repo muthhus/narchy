@@ -184,6 +184,10 @@ public class TestNAR {
             if (trace != null)
                 logger.trace("{}", trace.getBuffer());
 
+            if (!success) {
+                nar.stats(System.out);
+            }
+
         }
 
         assertTrue(success);

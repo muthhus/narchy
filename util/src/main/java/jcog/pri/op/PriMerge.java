@@ -30,6 +30,7 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
     float merge(Priority existing, Prioritized incoming);
 
 
+
     @Nullable
     @Override
     default Priority apply(@NotNull Priority existing, @NotNull Prioritized incoming) {

@@ -3,12 +3,16 @@ package nars;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
+import jcog.pri.op.PriMerge;
+import jcog.util.FloatFloatToFloatFunction;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static jcog.pri.op.PriMerge.avg;
+import static jcog.pri.op.PriMerge.max;
 import static nars.Op.*;
 
 /**
@@ -21,7 +25,20 @@ public abstract class Param  {
 //    public static final int PREDICTION_HORIZON = 4;
 
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
-    public static final int ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS = 1;
+    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 1;
+
+    public static final PriMerge termlinkMerge = PriMerge.max;
+    public static final PriMerge tasklinkMerge = PriMerge.avg; //not safe to plus without enough headroom
+    public static final PriMerge taskMerge = PriMerge.max;
+    public static final PriMerge conceptMerge = PriMerge.plus;
+
+    /** used on premise formation  */
+    public static final FloatFloatToFloatFunction tasktermLinkCombine =
+            //Util::or;
+            //Util::aveAri
+            Util::and;
+            //Math::min;
+            //Math::max;
 
 
     /**
@@ -53,6 +70,7 @@ public abstract class Param  {
 //    public static float EXECUTION_THRESHOLD = 0.666f;
 
     public static boolean ANSWER_REPORTING = true;
+
 
 
     /**
@@ -95,10 +113,10 @@ public abstract class Param  {
     public static final int UnificationConstraintsMax = 8;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 32;
+    public final static int BeliefMatchTTL = 64;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTLMax = BeliefMatchTTL * 3;
+    public final static int UnificationTTLMax = BeliefMatchTTL * 4;
 
 
 

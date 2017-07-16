@@ -4,9 +4,9 @@ import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.pri.PriReference;
-import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.Task;
 import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
@@ -42,9 +42,6 @@ import static nars.time.Tense.DTERNAL;
  */
 public class DefaultConceptBuilder implements ConceptBuilder {
 
-    public static final PriMerge termlinkMerge = max;
-    public static final PriMerge tasklinkMerge = max;
-
     public DefaultConceptBuilder() {
         this(
                 new DefaultConceptState("sleep", 48, 48, 5, 24, 24),
@@ -72,14 +69,14 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         if (v < 8) {
             Map sharedMap = newBagMap(v);
             @NotNull Bag<Term, PriReference<Term>> termbag =
-                    new CurveBag<>(0, termlinkMerge, sharedMap);
+                    new CurveBag<>(0, Param.termlinkMerge, sharedMap);
             @NotNull Bag<Task, PriReference<Task>> taskbag =
-                    new CurveBag<>(0, tasklinkMerge, sharedMap);
+                    new CurveBag<>(0, Param.tasklinkMerge, sharedMap);
             return new Bag[]{termbag, taskbag};
         } else {
             return new Bag[]{
-                    new DefaultHijackBag<>(DefaultConceptBuilder.termlinkMerge, 4),
-                    new DefaultHijackBag<>(DefaultConceptBuilder.tasklinkMerge, 4)
+                    new DefaultHijackBag<>(Param.termlinkMerge, 4),
+                    new DefaultHijackBag<>(Param.tasklinkMerge, 4)
             };
         }
 
@@ -115,7 +112,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         if (!validForTask) {
             return newCompound(tt, newLinkBags(tt));
         } else {
-            return newTask(tt, newLinkBags(tt));
+            return newTask(tt);
         }
     }
 
@@ -130,7 +127,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         return new CompoundConcept(t, bags);
     }
 
-    private TaskConcept newTask(@NotNull Compound t, Bag... bags) {
+    private TaskConcept newTask(@NotNull Compound t) {
         DynamicTruthModel dmt = null;
 
         switch (t.op()) {

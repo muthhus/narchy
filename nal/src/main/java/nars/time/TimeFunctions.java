@@ -1039,7 +1039,7 @@ public interface TimeFunctions {
                 } else {
                     //not overlapping at all, compute point interpolation
                     long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
-                    if (Param.ALLOW_NON_ADJACENT_TEMPORAL_DERIVATIONS >= dist/p.dur);
+                    if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= dist/p.dur);
                         occReturn[0] = occInterpolate(t, b);
 
                     return null;

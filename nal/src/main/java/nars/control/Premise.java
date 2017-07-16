@@ -137,12 +137,12 @@ public class Premise {
         if (belief != null && belief.equals(task)) //do not repeat the same task for belief
             belief = null;
 
-        float beliefPriority;
+        float beliefPri;
         if (belief != null)
 
         {
-            beliefPriority = belief.pri();
-            if (beliefPriority != beliefPriority) {
+            beliefPri = belief.pri();
+            if (beliefPri != beliefPri) {
                 belief = null; //belief was deleted
             } else {
                 beliefTerm = belief.term();
@@ -150,22 +150,19 @@ public class Premise {
         } else
 
         {
-            beliefPriority = Float.NaN;
+            beliefPri = Float.NaN;
         }
 
         //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
-        float parentTaskPri = beliefPriority != beliefPriority ? taskPri :
-                //max
-                aveAri
-                        //or
-                                (taskPri, beliefPriority);
+        float premisePri = beliefPri != beliefPri ? taskPri :
+                Param.tasktermLinkCombine.apply(taskPri, beliefPri);
 
         Derivation d = derivation.get();
 
         d.restartA(nar, now, dur);
 
-        d.restartB(this, task, belief, beliefTerm, parentTaskPri,
+        d.restartB(this, task, belief, beliefTerm, premisePri,
                 //Util.lerp(parentTaskPri, Param.UnificationTTLMin, Param.UnificationTTLMax)
                 ttlMax
         );

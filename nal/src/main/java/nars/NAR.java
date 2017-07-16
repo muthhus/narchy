@@ -9,7 +9,6 @@ import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
-import jcog.meter.event.Histogram;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
@@ -50,6 +49,7 @@ import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Cycles;
 import nars.util.exe.Executioner;
+import org.HdrHistogram.Histogram;
 import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.Frequency;
@@ -135,7 +135,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     private TrieDeriver deriver;
 
-    /** creates a snapshot statistics object */
+    /**
+     * creates a snapshot statistics object
+     */
     public synchronized SortedMap<String, Object> stats() {
 
         //Frequency complexity = new Frequency();
@@ -143,7 +145,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         Frequency policy = new Frequency();
         Frequency rootOp = new Frequency();
 
-        ShortCountsHistogram volume = new ShortCountsHistogram(1);
+        ShortCountsHistogram volume = new ShortCountsHistogram(2);
 
         AtomicInteger i = new AtomicInteger(0);
 
@@ -152,10 +154,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         LongSummaryStatistics questions = new LongSummaryStatistics();
         LongSummaryStatistics quests = new LongSummaryStatistics();
 
+        Histogram termlinkCount = new Histogram(1);
+        Histogram tasklinkCount = new Histogram(1);
         LongSummaryStatistics termlinksCap = new LongSummaryStatistics();
-        LongSummaryStatistics termlinksUsed = new LongSummaryStatistics();
         LongSummaryStatistics tasklinksCap = new LongSummaryStatistics();
-        LongSummaryStatistics tasklinksUsed = new LongSummaryStatistics();
+
 
         forEachConcept(c -> {
             i.incrementAndGet();
@@ -169,9 +172,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
             if (!(c instanceof Functor)) {
                 termlinksCap.accept(c.termlinks().capacity());
-                termlinksUsed.accept(c.termlinks().size());
+                termlinkCount.recordValue(c.termlinks().size());
                 tasklinksCap.accept(c.tasklinks().capacity());
-                tasklinksUsed.accept(c.tasklinks().size());
+                tasklinkCount.recordValue(c.tasklinks().size());
 
                 beliefs.accept(c.beliefs().size());
                 goals.accept(c.goals().size());
@@ -184,21 +187,24 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         SortedMap<String, Object> x = new TreeMap();
 
-        x.put("time system", new Date());
-        x.put("time", time());
+        x.put("time real", new Date());
+        x.put("time inner", time());
 
         x.put("emotion", emotion.summary());
 
-        x.put("terms", terms.summary());
+        x.put("term index", terms.summary());
 
-        x.put("concept sum", (double) i.get());
+        //x.put("concept count", (double) i.get());
 
-        x.put("termlink sum", ((double) termlinksUsed.getSum()));
-        x.put("tasklink sum", ((double) tasklinksUsed.getSum()));
-        x.put("belief sum", ((double) beliefs.getSum()));
-        x.put("goal sum", ((double) goals.getSum()));
+        x.put("task belief count", ((double) beliefs.getSum()));
+        x.put("task goal count", ((double) goals.getSum()));
 
-        x.put("termlink usage", ((double) termlinksUsed.getSum()) / termlinksCap.getSum());
+        Util.toMap(tasklinkCount, "tasklink count", x::put);
+        x.put("tasklink usage", ((double) tasklinkCount.getTotalCount()) / tasklinksCap.getSum());
+        x.put("tasklink count", ((double) tasklinkCount.getTotalCount()));
+        Util.toMap(termlinkCount, "termlink count", x::put);
+        x.put("termlink usage", ((double) termlinkCount.getTotalCount()) / termlinksCap.getSum());
+        x.put("termlink count", ((double) termlinkCount.getTotalCount()));
 
         //x.put("volume mean", volume.);
 //
@@ -1294,6 +1300,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public Term conceptTerm(@NotNull Term term) {
 
         if (term instanceof Compound) {
+
+            //boolean wasNormalized = term.isNormalized();
+
             term = compoundOrNull(term.unneg());
             if (term == null) return null;
 
@@ -1303,8 +1312,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             //atemporalizing can reset normalization state of the result instance
             //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
-            term = compoundOrNull(terms.normalize((Compound) term));
-            if (term == null) return null;
+            //if (wasNormalized) {
+                term = compoundOrNull(terms.normalize((Compound) term));
+                if (term == null) return null;
+            //}
 
             term = compoundOrNull(term.unneg() /* once again to be sure */);
             if (term == null) return null;
@@ -1622,4 +1633,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return deriver;
     }
 
+    public SortedMap<String, Object> stats(PrintStream out) {
+
+        SortedMap<String, Object> stat = stats();
+        stat.forEach((k, v) -> {
+            System.out.println(k.replace(" ", "/") + "\t" + v);
+        });
+        System.out.println("\n");
+
+        return stat;
+    }
 }

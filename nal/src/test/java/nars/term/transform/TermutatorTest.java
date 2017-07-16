@@ -28,8 +28,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class TermutatorTest {
 
+    final int TTL = Param.UnificationTTLMax * 4;
+
     final Unify unifier = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1),
-            Param.UnificationStackMax, Param.UnificationTTLMax *4) {
+            Param.UnificationStackMax, TTL) {
         @Override
         public boolean onMatch() {
 
@@ -145,10 +147,15 @@ public class TermutatorTest {
         //int blocked = 0;
         final int[] duplicates = {0};
 
+        unifier.versioning.setTTL(TTL);
+
         t.mutate(unifier, Lists.newArrayList( t, new Termutator() {
 
             @Override public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
-                if (s.add( f.xy.toString() )) {
+                TreeMap t = new TreeMap(); //use treemap for sorted keys
+                f.xy.map.forEach(t::put);
+
+                if (s.add( t.toString() )) {
                     actual[0]++;
                 } else {
                     duplicates[0]++;

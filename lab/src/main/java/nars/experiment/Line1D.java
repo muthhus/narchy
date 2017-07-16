@@ -184,10 +184,10 @@ public class Line1D {
                 NAR n = new NARS().get();
 
                 //new STMTemporalLinkage(n, 2, false);
-                n.time.dur(2);
+                n.time.dur(1);
                 n.termVolumeMax.set(22);
                 n.beliefConfidence(0.9f);
-                n.goalConfidence(0.75f);
+                n.goalConfidence(0.5f);
                 n.onCycle((nn)->{
                     System.out.println(nn.emotion.summary());
                 });

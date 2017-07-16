@@ -1610,8 +1610,15 @@ public enum Util {
 //        }
 //        return 1.0f - product;
 //    }
+
+    /** a and b should be in 0..1.0 unit domain; output will also */
     public static float or(float a, float b) {
         return 1.0f - ((1.0f - a) * (1.0f - b));
+    }
+
+    /** a and b should be in 0..1.0 unit domain; output will also */
+    public static float and(float a, float b) {
+        return a * b;
     }
 
     public static float or(float a, float b, float c) {
@@ -1778,7 +1785,9 @@ public enum Util {
 
     public static void toMap(AbstractHistogram h, String header, BiConsumer<String, Object> x) {
         h.percentiles(1).iterator().forEachRemaining(p -> {
-           x.accept(header + " " + p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + " ", p.getCountAddedInThisIterationStep());
+           x.accept(header + " [" +
+                   p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
+                   p.getCountAddedInThisIterationStep());
         });
     }
 

@@ -23,25 +23,25 @@ import java.util.function.DoubleFunction;
  * Created by peter on 10/07/15.
  */
 // TODO add a dummy histogram.
-public class Histogram  {
+public class RawHistogram {
     private final int fractionBits;
     private final int powersOf2;
     private long totalCount, overRange;
     private int[] sampleCount;
     private final long floor;
 
-    public Histogram() {
+    public RawHistogram() {
         this(42, 4);
     }
 
-    public Histogram(int powersOf2, int fractionBits) {
+    public RawHistogram(int powersOf2, int fractionBits) {
         this.powersOf2 = powersOf2;
         this.fractionBits = fractionBits;
         sampleCount = new int[powersOf2 << fractionBits];
         floor = Double.doubleToRawLongBits(1) >> (52 - fractionBits);
     }
 
-    public void add(Histogram h) {
+    public void add(RawHistogram h) {
         assert powersOf2 == h.powersOf2;
         assert fractionBits == h.fractionBits;
         totalCount += h.totalCount;

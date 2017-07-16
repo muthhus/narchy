@@ -36,13 +36,10 @@ public class NAL7Test extends AbstractNALTest {
 
         }, (x, m) -> {
 
-            SortedMap<String, Object> stat = x.nar.stats();
+            //SortedMap<String, Object> stat = x.nar.stats();
 
-            System.out.println(x + " " + m);
-            stat.forEach((k,v) -> {
-                System.out.println(k + "\t" + v);
-            });
-            System.out.println("\n");
+            System.out.println("#" + x + " " + m);
+            SortedMap<String, Object> stat = x.nar.stats(System.out);
 
         }, NAL7Test.class);
     }

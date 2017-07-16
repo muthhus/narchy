@@ -129,7 +129,7 @@ public class PatrickTests extends AbstractNALTest {
                 "<toothbrush --> [unscrews]>! :|:" //make something that is here a screwdriver
                 //"<toothbrush --> here>. :|:" //there is a toothbrush here NOW
         );
-        //tt.log();
+        tt.log();
 
         tt.mustDesire(3500, "lighter(I, toothbrush)", 1f,
                 0.18f,

@@ -329,7 +329,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     @Nullable
     default TaskConcept concept(@NotNull NAR n) {
-        return concept(n, false);
+        return concept(n, true);
     }
 
     @Nullable

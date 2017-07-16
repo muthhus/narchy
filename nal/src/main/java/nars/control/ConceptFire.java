@@ -9,6 +9,7 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.UnaryTask;
@@ -23,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static java.lang.Math.*;
 import static nars.Param.UnificationTTLMax;
@@ -32,10 +34,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 2;
+    private static final int maxSamples = 1;
 
-    static final int TASKLINKS_SAMPLED = 4;
-    static final int TERMLINKS_SAMPLED = 4;
+    static final int TASKLINKS_SAMPLED = 2;
+    static final int TERMLINKS_SAMPLED = 2;
     private Termed[] templates;
 
     //private static final float priMinAbsolute = Pri.EPSILON * 1;
@@ -62,8 +64,9 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                 float v = origin.value(t, activation, n);
 
                 float boost = 0;
-                float vPer = v/ xl; if (Math.abs(vPer) < EPSILON) vPer = 0;
-                for (int i = xl -1; i >=0; i--) {
+                float vPer = v / xl;
+                if (Math.abs(vPer) < EPSILON) vPer = 0;
+                for (int i = xl - 1; i >= 0; i--) {
                     short c = x[i];
                     Cause cc = n.causes.get(c);
                     if (cc == null)
@@ -77,8 +80,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                     }
                 }
 
-                if (boost!=0) {
-                    float b = (float)tanh(boost*0.5f)+1f;
+                if (boost != 0) {
+                    float b = (float) tanh(boost * 0.5f) + 1f;
                     activation *= b;
                     //t.priMult(b);
                     if (/*t.priElseZero()*/ activation < EPSILON)
@@ -91,8 +94,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             }*/
 
             origin.tasklinks().putAsync(
-                //new PLinkUntilDeleted<>(t, activation)
-                new PLink<>(t, activation)
+                    //new PLinkUntilDeleted<>(t, activation)
+                    new PLink<>(t, activation)
             );
 
 
@@ -112,6 +115,8 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
     @Override
     public ITask[] run(NAR nar) {
+
+        Term thisTerm = id.term();
 
         //nar.emotion.count("ConceptFire_run_attempt");
 
@@ -192,13 +197,12 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         ));
 
 
-        if (this.templates == null) {
-            this.templates = templates(id, nar);
-        }
+//        if (this.templates == null) {
+//            this.templates = templates(id, nar);
+//        }
 
-        int templateConceptsCount = templates.length;
 
-        float totalActivation = 0;//tasklink activation
+        //float totalActivation = 0;//tasklink activation
         int penalty = UnificationTTLMax / 2;
 
         Random rng = nar.random();
@@ -208,27 +212,57 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             tasklink = taskl.get(tasklSelected);
 
             @Nullable PriReference<Task> tll = tasklink;
-            Task txx = tll.get();
-            if (txx == null) {
+            Task task = tll.get();
+            if (task == null) {
                 ttl -= penalty;
                 continue;
             }
 
-            float tfa = txx.priElseZero();
+            float tfa = task.priElseZero();
             if (tfa < Pri.EPSILON) {
                 ttl -= penalty;
                 continue;
             }
 
-            totalActivation += tfa;
-            if (templateConceptsCount > 0) {
-                float tfaEach = tfa / templateConceptsCount;
-                if (tfaEach >= Pri.EPSILON) {
-                    for (Termed c : templates)
-                        if (c instanceof Concept)
-                            ((Concept) c).tasklinks().putAsync(new PLinkUntilDeleted(txx, tfaEach));
-                }
+            //totalActivation += tfa;
+
+            //local tasklink to subterms
+            Termed[] localTemplates = templates(id, nar);
+            float txaEach = task.priElseZero()/localTemplates.length;
+            for (Termed x : localTemplates) {
+                if (x instanceof Concept)
+                    ((Concept)x).tasklinks().putAsync(
+                        new PLink(task, txaEach)
+                    );
             }
+
+
+
+            TaskConcept taskConcept = task.concept(nar);
+            if (taskConcept == null)
+                continue; //hrm
+
+            this.templates = templates(taskConcept, nar);
+            int templateConceptsCount = this.templates.length; //TODO this should be adjusted for subterms which are not concepts
+
+            //if (templateConceptsCount > 0) {
+
+                float momentum = 0.5f;
+                float eachActivation = task.priElseZero() / templateConceptsCount;
+                for (Termed c : this.templates) {
+                    if (c instanceof Concept) {
+                        Concept cc = (Concept) c;
+                        cc.termlinks().putAsync(new PLink(thisTerm, eachActivation * momentum));
+                        nar.input(new ConceptFire(cc, eachActivation));
+                    }
+
+                    //incoming termlink
+                    id.termlinks().putAsync(new PLink(c, eachActivation * (1f - momentum))
+                            //(concept ? (1f - momentum) : 1))
+                    );
+
+                }
+
 
 
             if (terml.isEmpty())
@@ -248,26 +282,29 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
         }
 
-        if (templateConceptsCount > 0) {
-            float eachActivation = (/*priElseZero() **/ totalActivation) / templateConceptsCount;
-            if (eachActivation >= Pri.EPSILON) {
-                float momentum = 0.5f;
-                for (Termed c : templates) {
-
-
-                    boolean concept = c instanceof Concept;
-                    if (concept) {
-                        Concept cc = (Concept) c;
-                        cc.termlinks().putAsync(new PLink(id, eachActivation * momentum));
-                        nar.input(new ConceptFire(cc, eachActivation));
-                    }
-                    id.termlinks().putAsync(new PLink(c, eachActivation * (1f - momentum))
-                            //(concept ? (1f - momentum) : 1))
-                    );
-                }
-                //priSub(totalActivation);
-            }
-        }
+//        if (templateConceptsCount > 0) {
+//            float eachActivation = (/*priElseZero() **/ totalActivation) / templateConceptsCount;
+//            if (eachActivation >= Pri.EPSILON) {
+//                float momentum = 0.5f;
+//                for (Termed c : templates) {
+//
+//
+//                    //outgoing termlink, tasklink, and activation
+//                    boolean concept = c instanceof Concept;
+//                    if (concept) {
+//                        Concept cc = (Concept) c;
+//                        cc.termlinks().putAsync(new PLink(thisTerm, eachActivation * momentum));
+//                        nar.input(new ConceptFire(cc, eachActivation));
+//                    }
+//
+//                    //incoming termlink
+//                    id.termlinks().putAsync(new PLink(c, eachActivation * (1f - momentum))
+//                            //(concept ? (1f - momentum) : 1))
+//                    );
+//                }
+//                //priSub(totalActivation);
+//            }
+//        }
 
         nar.terms.commit(id); //index cache update
 
@@ -303,7 +340,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //        }
     }
 
-    public static Termed[] templates(Concept id, NAR nar) {
+    public static Termed[] templates(@NotNull Concept id, NAR nar) {
         TermContainer ctpl = id.templates();
         if (ctpl != null) {
             Set<Termed> tc = new UnifiedSet(id.volume() /* estimate */);

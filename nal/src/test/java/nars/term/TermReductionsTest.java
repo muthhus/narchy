@@ -691,11 +691,16 @@ public class TermReductionsTest {
     public void testRepeatEvent() throws Narsese.NarseseException {
         Terminal n = new Terminal();
 
-        for (String x : new String[]{"((a) ==>+1 (a))",
+        for (String x : new String[]{
+                "((a) ==>+1 (a))",
+                "((--,(a)) ==>+1 (a))",
+                "((a) <=>+1 (a))",
+                "((--,(a)) <=>+1 (a))"
+
             /*"((a) &&+1 (a))",*/ //<-- conjunction case is special, see repeating conjunction simplification test
-                "((a) <=>+1 (a))"}) {
+        }) {
             Term t = $(x);
-            assertValid(t);
+            assertTrue(x + " :: "  + t , t instanceof Compound);
 
             Task y = task((Compound) t, Op.BELIEF, t(1f, 0.9f)).apply(n);
 

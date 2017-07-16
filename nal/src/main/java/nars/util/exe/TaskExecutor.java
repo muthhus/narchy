@@ -9,6 +9,7 @@ import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -62,7 +63,7 @@ public class TaskExecutor extends Executioner {
 
                 @Override
                 protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
-                    existing.priMax(incoming.priElseZero());
+                    Param.taskMerge.merge(existing, incoming);
                     return existing;
                 }
 
@@ -97,6 +98,13 @@ public class TaskExecutor extends Executioner {
                 @Override
                 protected final Consumer<ITask> forget(float rate) {
                     return null;
+                }
+
+
+                @Override
+                protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
+                    Param.conceptMerge.merge(existing, incoming);
+                    return existing;
                 }
 
                 @Override
@@ -218,7 +226,7 @@ public class TaskExecutor extends Executioner {
 
         try {
 
-            //active.commit(null);
+
 
 
             boolean t = this.trace;
@@ -236,9 +244,9 @@ public class TaskExecutor extends Executioner {
             float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag) concepts).depressurize(eFrac) * (eFrac);
             this.forgetEachActivePri =
                     pAvg >= Pri.EPSILON ? pAvg : 0;
-            //0;
 
-            //tasks.commit(null);
+
+            concepts.commit();
 
             do {
 

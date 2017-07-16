@@ -30,13 +30,14 @@ public class NARS {
 
     private @NotNull Supplier<TermIndex> concepts = () ->
             //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
-            new NARS.BasicTermIndex(1 * 1024 )
+            new NARS.BasicTermIndex(2 * 1024 )
     ;
 
 
     private @NotNull Time time = new CycleTime();
 
-    private Supplier<Executioner> exe = () -> new TaskExecutor(128, 32, 0.1f);
+    private Supplier<Executioner> exe = () ->
+            new TaskExecutor(128, 32, 0.2f);
 
     private final Supplier<Random> rng = () -> new XorShift128PlusRandom(1);
 
@@ -57,11 +58,11 @@ public class NARS {
         n.goalConfidence(0.75f);
 
 
-        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        n.DEFAULT_GOAL_PRIORITY = 0.6f;
-        n.DEFAULT_QUESTION_PRIORITY = 0.3f;
-        n.DEFAULT_QUEST_PRIORITY = 0.4f;
-        n.termVolumeMax.setValue(36);
+        n.DEFAULT_BELIEF_PRIORITY = 0.2f;
+        n.DEFAULT_GOAL_PRIORITY = 0.2f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        n.DEFAULT_QUEST_PRIORITY = 0.1f;
+        n.termVolumeMax.setValue(32);
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
         MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, true, 32f);
