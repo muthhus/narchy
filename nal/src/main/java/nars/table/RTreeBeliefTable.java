@@ -256,6 +256,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public Truth truth(long when, EternalTable eternal, NAR nar) {
 
+        if (size()==0)
+            return null;
+
         long now = nar.time();
 
         updateSignalTasks(now);
@@ -313,6 +316,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     @Override
     public Task match(long when, @Nullable Task against, NAR nar) {
+
+        if (size()==0)
+            return null;
 
         long now = nar.time();
 

@@ -358,6 +358,6 @@ public interface Concept extends Termed, Termlike {
 
         return -t.volume() * (1f - (t.isBeliefOrGoal() ? t.conf() : 0.5f)
                 //* activation
-        )/4000f;
+        )/1000f;
     }
 }

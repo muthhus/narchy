@@ -207,8 +207,8 @@ public class Leaf<T> implements Node<T, T> {
     }
 
     @Override
-    public void intersectingNodes(HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
-        if (region.contains(rect) || region.intersects(rect))
+    public void intersectingNodes(@NotNull HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
+        if (size > 0 && (region.contains(rect) || region.intersects(rect)))
             t.test(this);
     }
 
