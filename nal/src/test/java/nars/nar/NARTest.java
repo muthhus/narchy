@@ -2,6 +2,7 @@ package nars.nar;
 
 import com.google.common.primitives.Longs;
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.concept.Concept;
 import nars.term.Termed;

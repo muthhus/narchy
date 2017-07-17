@@ -1,6 +1,6 @@
 package nars.derive.meta.constraint;
 
-import nars.nar.NARS;
+import nars.NARS;
 import nars.test.TestNAR;
 import org.junit.Ignore;
 import org.junit.Test;

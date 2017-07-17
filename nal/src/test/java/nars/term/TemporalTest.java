@@ -3,7 +3,7 @@ package nars.term;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;

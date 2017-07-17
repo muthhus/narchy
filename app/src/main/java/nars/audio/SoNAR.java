@@ -5,7 +5,7 @@ import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.audio.Audio;

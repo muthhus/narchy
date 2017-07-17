@@ -1,6 +1,6 @@
 package nars.experiment.rover;
 
-import nars.nar.NARS;
+import nars.NARS;
 import spacegraph.SimpleSpatial;
 import spacegraph.SpaceGraph;
 import spacegraph.phys.Dynamic;

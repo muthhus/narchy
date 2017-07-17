@@ -7,7 +7,7 @@ import nars.Narsese;
 import nars.Task;
 import nars.concept.Concept;
 import nars.control.premise.Derivation;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.term.atom.Atom;

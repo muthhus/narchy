@@ -7,7 +7,7 @@ import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;
 import nars.concept.FuzzyScalarConcepts;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.nar.Terminal;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;

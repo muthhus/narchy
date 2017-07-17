@@ -6,9 +6,10 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MaplikeTermIndex;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.nar.Terminal;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -79,7 +80,7 @@ public class TermIndexTest {
 //    }
     @Ignore @Test public void testTermSharing5c() throws Narsese.NarseseException {
         testIndex(
-                new NARS.BasicTermIndex(1024)
+                new BasicTermIndex(1024)
         );
         //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
     }

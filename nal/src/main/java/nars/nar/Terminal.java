@@ -2,9 +2,10 @@ package nars.nar;
 
 import jcog.random.XORShiftRandom;
 import nars.NAR;
+import nars.index.term.BasicTermIndex;
 import nars.time.CycleTime;
 import nars.time.Time;
-import nars.util.exe.TaskExecutor;
+import nars.nar.exe.BufferedExecutioner;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -26,7 +27,7 @@ public class Terminal extends NAR {
     }
 
     public Terminal(int capacity, @NotNull Random random, @NotNull Time time) {
-        super(new NARS.BasicTermIndex(capacity), new TaskExecutor(capacity, capacity), time, random);
+        super(new BasicTermIndex(capacity), new BufferedExecutioner(capacity, capacity), time, random);
     }
 
 }

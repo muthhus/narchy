@@ -7,7 +7,7 @@ import nars.Task;
 import nars.concept.dynamic.DynTruth;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.concept.dynamic.DynamicConcept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;

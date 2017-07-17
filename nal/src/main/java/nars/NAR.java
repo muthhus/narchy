@@ -47,7 +47,7 @@ import nars.time.Time;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Cycles;
-import nars.util.exe.Executioner;
+import nars.nar.exe.Executioner;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.lang3.ArrayUtils;

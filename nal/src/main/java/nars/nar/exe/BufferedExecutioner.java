@@ -1,6 +1,7 @@
-package nars.util.exe;
+package nars.nar.exe;
 
 import com.google.common.base.Joiner;
+import jcog.Loop;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
@@ -28,10 +29,11 @@ import static nars.Op.COMMAND;
 /**
  * Buffers all executions between each cycle in order to remove duplicates
  */
-public class TaskExecutor extends Executioner {
+public class BufferedExecutioner extends Executioner {
 
-    int inputBatch = 32;
-    int fireBatch = 16;
+    @Deprecated int inputBatch = 32;
+    @Deprecated int fireBatch = 16;
+
 
     //    private final DisruptorBlockingQueue<ITask> overflow;
     protected boolean trace;
@@ -159,11 +161,11 @@ public class TaskExecutor extends Executioner {
     private float forgetEachActivePri;
 
 
-    public TaskExecutor(int conceptCapacity, int taskCapacity) {
+    public BufferedExecutioner(int conceptCapacity, int taskCapacity) {
         this(conceptCapacity, taskCapacity, 1f);
     }
 
-    public TaskExecutor(int conceptCapacity, int taskCapacity, float executedPerCycle) {
+    public BufferedExecutioner(int conceptCapacity, int taskCapacity, float executedPerCycle) {
         concepts.setCapacity(conceptCapacity);
         tasks.setCapacity(taskCapacity);
         conceptsPerCycleMax.setValue(Math.ceil(conceptCapacity * executedPerCycle));
@@ -195,6 +197,8 @@ public class TaskExecutor extends Executioner {
         super.start(nar);
         flush(); //<- may not be necessary
     }
+
+
 
 //    @Override
 //    public void stop() {

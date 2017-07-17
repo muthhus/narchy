@@ -9,8 +9,8 @@ import nars.concept.Concept;
 import nars.control.ConceptFire;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
-import nars.nar.NARS;
-import nars.util.exe.TaskExecutor;
+import nars.NARS;
+import nars.nar.exe.BufferedExecutioner;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 import spacegraph.math.v2;
@@ -34,7 +34,7 @@ public class SimpleUDPeerGraph {
         int population = 256;
 
         SimpleConceptGraph1 s = new SimpleConceptGraph1(n,
-                () -> (((TaskExecutor) (n.exe)).concepts)
+                () -> (((BufferedExecutioner) (n.exe)).concepts)
                         .stream()
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)

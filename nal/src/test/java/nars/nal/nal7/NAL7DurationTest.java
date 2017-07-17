@@ -7,7 +7,7 @@ import nars.Narsese;
 import nars.Task;
 import nars.concept.Concept;
 import nars.concept.dynamic.DynamicBeliefTable;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.nar.Terminal;
 import org.junit.Test;
 

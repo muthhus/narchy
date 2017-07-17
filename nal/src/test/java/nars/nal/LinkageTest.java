@@ -8,7 +8,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.var.Variable;

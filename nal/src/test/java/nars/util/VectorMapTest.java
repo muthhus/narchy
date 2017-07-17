@@ -2,7 +2,7 @@ package nars.util;
 
 import jcog.learn.Autoencoder;
 import nars.NAR;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.util.data.UniformVector;
 import nars.util.data.VectorMap;
 import org.jetbrains.annotations.NotNull;

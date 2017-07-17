@@ -16,7 +16,7 @@ import com.googlecode.lanterna.terminal.ansi.TelnetTerminalServer;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.op.Command;
 import org.slf4j.LoggerFactory;
 

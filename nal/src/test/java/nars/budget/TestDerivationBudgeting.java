@@ -1,12 +1,12 @@
 package nars.budget;
 
-import nars.util.exe.TaskExecutor;
+import nars.nar.exe.BufferedExecutioner;
 
 
 
 public class TestDerivationBudgeting {
 
-    static class InstrumentedExecutor extends TaskExecutor {
+    static class InstrumentedExecutor extends BufferedExecutioner {
 
         double totalIn;
         double totalExe;

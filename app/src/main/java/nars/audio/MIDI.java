@@ -9,13 +9,11 @@ import nars.Param;
 import nars.concept.Concept;
 import nars.concept.GoalActionConcept;
 import nars.gui.Vis;
-import nars.nar.NARS;
 import nars.nar.MultiNAR;
 import nars.task.DerivedTask;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.time.RealTime;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
@@ -40,9 +38,7 @@ public class MIDI {
     float volume[] = new float[128];
 
     public MIDI() throws LineUnavailableException {
-        MultiNAR nar = NARS.newMultiThreadNAR(3,
-                new RealTime.DS(true).durFPS(10f)
-        );
+        MultiNAR nar = null;
         nar.termVolumeMax.setValue(16);
 
         Param.DEBUG = true;

@@ -7,11 +7,9 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.*;
 import nars.bag.leak.LeakOut;
-import nars.nar.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.time.RealTime;
 import nars.time.Tense;
 import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
@@ -294,7 +292,7 @@ public class IRCNLP extends IRC {
 
         //Param.DEBUG = true;
 
-        NAR n = NARS.newMultiThreadNAR(2, new RealTime.DSHalf(true));
+        NAR n = null;
 
         n.termVolumeMax.setValue(32);
 

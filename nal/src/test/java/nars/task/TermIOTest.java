@@ -2,7 +2,7 @@ package nars.task;
 
 import com.google.common.collect.Sets;
 import nars.*;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;

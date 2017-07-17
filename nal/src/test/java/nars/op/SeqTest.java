@@ -6,7 +6,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;

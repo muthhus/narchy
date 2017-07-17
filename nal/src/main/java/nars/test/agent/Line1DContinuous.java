@@ -6,7 +6,7 @@ import nars.NAgent;
 import nars.Param;
 import nars.concept.ActionConcept;
 import nars.concept.SensorConcept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.term.atom.Atomic;
 
 import java.util.Arrays;

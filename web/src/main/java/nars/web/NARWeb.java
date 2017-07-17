@@ -8,10 +8,8 @@ import nars.$;
 import nars.InterNAR;
 import nars.NAR;
 import nars.NARLoop;
-import nars.nar.NARS;
 import nars.op.Command;
 import nars.term.Term;
-import nars.time.RealTime;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -101,7 +99,7 @@ public class NARWeb extends WebServer {
 
 
         NAR nar =
-                NARS.newMultiThreadNAR(3, new RealTime.DSHalf(false));
+                null;
 
         //nar.log();
 

@@ -2,12 +2,10 @@ package nars.nal;
 
 import nars.NAR;
 import nars.Param;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.op.stm.STMTemporalLinkage;
 import nars.test.TestNAR;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
 
 /**
  * Created by me on 2/10/15.

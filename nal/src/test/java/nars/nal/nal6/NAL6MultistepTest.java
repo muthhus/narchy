@@ -2,11 +2,9 @@ package nars.nal.nal6;
 
 import nars.NAR;
 import nars.Narsese;
-import nars.Param;
 import nars.concept.Concept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.time.Tense;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

@@ -3,8 +3,11 @@ package nars;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.gui.Vis;
-import nars.nar.NARS;
 import nars.nar.MultiNAR;
+import nars.nar.exe.MultiExecutioner;
+import nars.op.mental.Inperience;
+import nars.op.stm.MySTMClustered;
+import nars.op.stm.STMTemporalLinkage;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.truth.Truth;
@@ -23,7 +26,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import static nars.gui.Vis.label;
+import static nars.Op.BELIEF;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.*;
 import static spacegraph.widget.meter.MatrixView.bipolar1;
@@ -101,7 +104,33 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        MultiNAR n = NARS.newMultiThreadNAR(3, clock);
+        NAR n = new NARS().exe(
+                new MultiExecutioner((i) ->
+                        new MultiExecutioner.Worker(256, 32, 0.05f),
+                        3, 2))
+                .time(clock).get();
+        n.confMin.setValue(0.01f);
+        n.truthResolution.setValue(0.01f);
+
+        n.beliefConfidence(0.9f);
+        n.goalConfidence(0.75f);
+
+
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        n.DEFAULT_GOAL_PRIORITY = 0.5f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.25f;
+        n.DEFAULT_QUEST_PRIORITY = 0.25f;
+        n.termVolumeMax.setValue(40);
+
+        NiNner nin = new NiNner(n);
+        nin.start();
+
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
+        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, true, 16f);
+        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
+        Inperience inp = new Inperience(n, 0.01f, 8);
+
+
 
         NAgent a = init.apply(n);
         //a.trace = true;
@@ -153,7 +182,7 @@ abstract public class NAgentX extends NAgent {
 ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
 ////                        ),
 
-                       // //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
+                        // //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
 
 //                        MatrixView.get(m.mixControl, 4, (x, gl) -> {
 //                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
@@ -173,17 +202,17 @@ abstract public class NAgentX extends NAgent {
 
     private static Surface causePlot(NAR nar) {
         int s = nar.causeValue.size();
-        return new MatrixView((i) -> nar.causeValue.get(i).value(), s, (int)Math.max(1, Math.sqrt(s)), bipolar1);
+        return new MatrixView((i) -> nar.causeValue.get(i).value(), s, (int) Math.max(1, Math.sqrt(s)), bipolar1);
     }
 
-    private static void chart(MultiNAR n, NAgent a) {
+    private static void chart(NAR n, NAgent a) {
         window(new NARSView(n, a), 600, 600);
     }
 
     public static class NARSView extends Grid {
 
 
-        public NARSView(MultiNAR n, NAgent a) {
+        public NARSView(NAR n, NAgent a) {
             super(
                     //new MixBoard(n, n.in),
                     //new MixBoard(n, n.nalMix), //<- currently dont use this it will itnerfere with the stat collection

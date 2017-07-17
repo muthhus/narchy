@@ -11,12 +11,12 @@ import nars.gui.NARChart;
 import nars.gui.NARSpace;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.util.exe.TaskExecutor;
+import nars.nar.exe.BufferedExecutioner;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 
@@ -106,7 +106,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         NARSpace cs = new SimpleConceptGraph1(n,
-                () -> (((TaskExecutor) (n.exe)).concepts)
+                () -> (((BufferedExecutioner) (n.exe)).concepts)
                         .stream()
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)

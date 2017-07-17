@@ -1,9 +1,9 @@
 package nars.rdfowl;
 
 import nars.NAR;
-import nars.nar.NARS;
-import nars.util.exe.Executioner;
-import nars.util.exe.TaskExecutor;
+import nars.NARS;
+import nars.nar.exe.Executioner;
+import nars.nar.exe.BufferedExecutioner;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ public class NQuadsRDFTest {
     public void testSchema1() throws Exception {
 
         //Multi nar = new Multi(3,512,
-        Executioner e = new TaskExecutor(128, 512);
+        Executioner e = new BufferedExecutioner(128, 512);
         NAR n = new NARS().get();
 //                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
 //                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),

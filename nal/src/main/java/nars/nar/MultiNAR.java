@@ -1,27 +1,15 @@
 package nars.nar;
 
 
-import jcog.Loop;
-import jcog.Util;
-import nars.$;
 import nars.NAR;
-import nars.NARLoop;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.map.CaffeineIndex;
-import nars.task.ITask;
 import nars.time.Time;
-import nars.util.exe.Executioner;
-import nars.util.exe.TaskExecutor;
+import nars.nar.exe.Executioner;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
+import java.util.concurrent.*;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 
@@ -37,27 +25,19 @@ import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFacto
 public class MultiNAR extends NAR {
 
 
-    public final List<SubExecutor> sub = $.newArrayList();
-
-    //private AffinityExecutor pool;
-    private List<Loop> loops;
-
-
-    /** foreground: the independent, preallocated, high frequency worker threads ; a fixed threadpool */
-    private ExecutorService working;
-
-
-    /** background: misc tasks to finish before starting next cycle */
+    /**
+     * background: misc tasks to finish before starting next cycle
+     */
     final static int passiveThreads = 2;
-    final ForkJoinPool passive;
+
 
     MultiNAR(@NotNull Time time, @NotNull Random rng, Executioner e) {
         this(time, rng, new ForkJoinPool(passiveThreads, defaultForkJoinWorkerThreadFactory,
-                    null, true /* async */), e);
+                null, true /* async */), e);
     }
 
     MultiNAR(@NotNull Time time, @NotNull Random rng, ForkJoinPool passive, Executioner e) {
-        super(new CaffeineIndex(new DefaultConceptBuilder(), 256*1024, passive) {
+        super(new CaffeineIndex(new DefaultConceptBuilder(), 256 * 1024, passive) {
 
 //                  @Override
 //                  protected void onBeforeRemove(Concept c) {
@@ -95,10 +75,8 @@ public class MultiNAR extends NAR {
 //
 
               }, e, time,
-            //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
+                //new HijackTermIndex(new DefaultConceptBuilder(), 128 * 1024, 4),
                 rng);
-
-        this.passive = passive;
 
 
     }
@@ -194,129 +172,18 @@ public class MultiNAR extends NAR {
 //        super.input(partiallyClassified);
 //    }
 
-    /**
-     * default implementation convenience method
-     */
-    public void addNAR(int conceptCapacity, int taskCapacity, float conceptRate) {
-        synchronized (sub) {
-            sub.add( new SubExecutor(conceptCapacity, taskCapacity, conceptRate) );
-        }
-
-    }
-
-
-    private static class RootExecutioner extends Executioner implements Runnable {
-
-        public ForkJoinTask lastCycle;
-        private ForkJoinPool passive;
-        private SubExecutor[] workers;
-        private int num;
-
-        @Override
-        public void start(NAR nar) {
-            this.passive = ((MultiNAR)nar).passive;
-            super.start(nar);
-
-            List<SubExecutor> ww = ((MultiNAR) nar).sub;
-            num = ww.size();
-            assert(num > 0);
-
-            workers = ww.toArray(new SubExecutor[num]);
-        }
-
-        @Override
-        public void runLater(Runnable cmd) {
-            ((MultiNAR)nar).passive.execute(cmd);
-        }
-
-        @Override
-        public void run(@NotNull ITask x) {
-            int sub = worker(x);
-            workers[sub].run(x);
-        }
-
-        public int worker(@NotNull ITask x) {
-            return Math.abs(Util.hashWangJenkins(x.hashCode())) % num;
-        }
-
-
-//        public void apply(CLink<? extends ITask> x) {
-//            if (x!=null && !x.isDeleted()) {
-//                x.priMult(((MixContRL) (((NARS) nar).in)).gain(x));
-//            }
+//    /**
+//     * default implementation convenience method
+//     */
+//    public void addNAR(int conceptCapacity, int taskCapacity, float conceptRate) {
+//        synchronized (sub) {
+//            sub.add( new SubExecutor(conceptCapacity, taskCapacity, conceptRate) );
 //        }
-
-        @Override
-        public void stop() {
-            super.stop();
-            lastCycle = null;
-            workers = null;
-            num = 0;
-        }
-
-        final AtomicBoolean busy = new AtomicBoolean(false);
-
-        @Override
-        public void cycle(@NotNull NAR nar) {
+//
+//    }
 
 
-//            int waitCycles = 0;
-//            while (!passive.isQuiescent()) {
-//                Util.pauseNext(waitCycles++);
-//            }
-
-            if (!busy.compareAndSet(false, true))
-                return; //already in the cycle
-
-
-            try {
-
-                if (lastCycle != null) {
-                    //System.out.println(lastCycle + " " + lastCycle.isDone());
-                    if (!lastCycle.isDone()) {
-                        long start = System.currentTimeMillis();
-                        lastCycle.join(); //wait for lastCycle's to finish
-                        logger.info("cycle lag {}", (System.currentTimeMillis() - start) + "ms");
-                    }
-
-                    lastCycle.reinitialize();
-                    passive.execute(lastCycle);
-
-
-                } else {
-                    lastCycle = passive.submit(this);
-                }
-            } finally {
-                busy.set(false);
-            }
-        }
-
-        /**
-         * dont call directly
-         */
-        @Override
-        public void run() {
-            nar.eventCycleStart.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
-        }
-
-        @Override
-        public int concurrency() {
-            return 1 + num; //TODO calculate based on # of sub-NAR's but definitely is concurrent so we add 1 here in case passive=1
-        }
-
-        @Override
-        public boolean concurrent() {
-            return true;
-        }
-
-        @Override
-        public void forEach(Consumer<ITask> each) {
-            ((MultiNAR) nar).sub.forEach(s -> s.forEach(each));
-        }
-
-    }
-
-//    /** temporary 1-cycle old cache of truth calculations */
+    //    /** temporary 1-cycle old cache of truth calculations */
 //    final Memoize<Pair<Termed, ByteLongPair>, Truth> truthCache =
 //            new HijackMemoize<>(2048, 3,
 //                    k -> {
@@ -340,90 +207,8 @@ public class MultiNAR extends NAR {
 //    }
 
 
-    class SubExecutor extends TaskExecutor {
-        public SubExecutor(int conceptCapacity, int inputTaskCapacity, float exePct) {
-            super(conceptCapacity, inputTaskCapacity, exePct);
-        }
-
-//        @Override
-//        protected void actuallyRun(CLink<? extends ITask> x) {
-//
-//            super.actuallyRun(x);
-//
-//            ((RootExecutioner) exe).apply(x); //apply gain after running
-//
-//        }
-
-        @Override
-        protected void actuallyFeedback(ITask x, ITask[] children) {
-            if (children != null)
-                MultiNAR.this.input(children); //through post mix
-        }
-
-        @Override
-        public void runLater(@NotNull Runnable r) {
-            passive.execute(r); //use the common threadpool
-        }
-
-        public Loop start() {
-            start(MultiNAR.this);
-            Loop l = new Loop(0) {
-                @Override
-                public boolean next() {
-                    flush();
-                    return true;
-                }
-            };
-            return l;
-        }
-    }
 
 
-    public MultiNAR(@NotNull Time time, @NotNull Random rng) {
-        this(time, rng, new RootExecutioner());
-    }
-
-
-    @Override
-    public NARLoop startPeriodMS(int ms) {
-        assert (!this.loop.isRunning());
-
-        synchronized (terms) {
-
-            exe.start(this);
-
-            int num = sub.size();
-
-            this.working = Executors.newFixedThreadPool(num);
-
-            //((ThreadPoolExecutor)pool).getThreadFactory().
-            //self().toString();
-
-            this.loops = $.newArrayList(num);
-            sub.forEach(s -> loops.add(s.start()));
-
-            loops.forEach(working::execute);
-        }
-
-        return super.startPeriodMS(ms);
-    }
-
-    @Override
-    public void stop() {
-        synchronized (terms) {
-            if (!this.loop.isRunning())
-                return;
-
-            super.stop();
-
-            loops.forEach(Loop::stop);
-            this.loops = null;
-
-            this.working.shutdownNow();
-            this.working = null;
-
-        }
-    }
 
 //    public static void main(String[] args) {
 //

@@ -7,7 +7,7 @@ import nars.Param;
 import nars.Task;
 import nars.bag.leak.Leak;
 import nars.bag.leak.LeakOut;
-import nars.nar.NARS;
+import nars.NARS;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;

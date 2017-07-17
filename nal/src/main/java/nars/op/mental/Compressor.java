@@ -7,7 +7,7 @@ import jcog.pri.PriReference;
 import jcog.pri.Priority;
 import nars.*;
 import nars.concept.PermanentConcept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;

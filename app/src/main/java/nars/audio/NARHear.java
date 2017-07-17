@@ -8,8 +8,6 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Narsese;
 import nars.concept.SensorConcept;
-import nars.nar.NARS;
-import nars.time.RealTime;
 import spacegraph.SpaceGraph;
 import spacegraph.audio.AudioSource;
 import spacegraph.audio.WaveCapture;
@@ -28,7 +26,7 @@ import static spacegraph.layout.Grid.row;
 public class NARHear extends NAgent {
 
     public static void main(String[] args) {
-        new NARHear(NARS.newMultiThreadNAR(2, new RealTime.CS(true).durSeconds(0.2f))).startRT(20);
+        new NARHear(null).startRT(20);
     }
 
     public NARHear(NAR nar) {

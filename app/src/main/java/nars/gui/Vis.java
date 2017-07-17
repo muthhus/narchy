@@ -14,7 +14,7 @@ import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.util.exe.TaskExecutor;
+import nars.nar.exe.BufferedExecutioner;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.AbstractSpace;
 import spacegraph.Ortho;
@@ -219,7 +219,7 @@ public class Vis {
 
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                () -> (((TaskExecutor) (n.exe)).concepts)
+                () -> (((BufferedExecutioner) (n.exe)).concepts)
                         .stream()
                         .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
                         .filter(Objects::nonNull)

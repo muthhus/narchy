@@ -4,7 +4,7 @@ import com.google.common.base.Joiner;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 import org.junit.runner.Description;

@@ -3,7 +3,7 @@ package nars.perf;
 
 import nars.$;
 import nars.NAR;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.test.DeductiveChainTest;
 import nars.test.DeductiveMeshTest;
 import org.openjdk.jmh.annotations.*;

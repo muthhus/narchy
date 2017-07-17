@@ -3,7 +3,7 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.Narsese;
 import nars.concept.TaskConcept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.table.BeliefTable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

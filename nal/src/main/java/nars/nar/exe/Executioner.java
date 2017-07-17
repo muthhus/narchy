@@ -1,4 +1,4 @@
-package nars.util.exe;
+package nars.nar.exe;
 
 import jcog.Loop;
 import nars.NAR;
@@ -10,9 +10,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-/**
- * Created by me on 8/16/16.
- */
+
 abstract public class Executioner implements Executor {
     @Nullable
     protected NAR nar;

@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.nar.Terminal;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;

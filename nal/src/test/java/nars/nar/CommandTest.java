@@ -1,6 +1,7 @@
 package nars.nar;
 
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.Task;
 import org.junit.Ignore;

@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import nars.*;
 import nars.concept.Concept;
-import nars.nar.NARS;
+import nars.NARS;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;

@@ -1,6 +1,5 @@
 package nars;
 
-import nars.nar.NARS;
 import org.junit.Test;
 
 /**
