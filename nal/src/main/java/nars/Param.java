@@ -122,14 +122,12 @@ public abstract class Param  {
     public static final int UnificationConstraintsMax = 8;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 48;
+    public final static int BeliefMatchTTL = 64;
 
     /** 'time to live', unification steps until unification is stopped */
     public final static int UnificationTTLMax = BeliefMatchTTL * 4;
 
 
-
-    public static int DEFAULT_NAL_LEVEL = 8;
 
 
     /** additional pedantic warnings */

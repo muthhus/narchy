@@ -20,7 +20,7 @@ public class NALLevelTest {
         Param.DEBUG = true;
 
         NAR nDefault = new NARS().get();
-        assertEquals(Param.DEFAULT_NAL_LEVEL, nDefault.level());
+        assertEquals(8, nDefault.level());
 
         NAR n1 = new NARS().get();
         n1.nal(1);
