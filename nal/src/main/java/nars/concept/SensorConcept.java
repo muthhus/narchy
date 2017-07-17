@@ -34,7 +34,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     public SensorConcept(@NotNull Compound c, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
         super(c,
-                new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable(c)),
+                null, //new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable(c)),
                 null, n);
 
         this.sensor = new ScalarSignal(n, c, this, truth, resolution) {
@@ -51,67 +51,18 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
                 return SensorConcept.this.nextStamp(nar);
             }
         };
-        ((SensorBeliefTable)beliefs).sensor = sensor;
+        //((SensorBeliefTable)beliefs).sensor = sensor;
 
         this.signal = signal;
-//        this.beliefs = newBeliefTable(n, true);
-//        this.goals = newBeliefTable(n, false);
-    }
 
-//    @Override
-//    protected @NotNull BeliefTable newBeliefTable(NAR nar, boolean beliefOrGoal) {
-//        return new SensorBeliefTable();
-//    }
+    }
 
     /**
      * returns a new stamp for a sensor task
      */
     protected LongSupplier nextStamp(@NotNull NAR nar) {
-        //Truth g = goal(nar.time(), nar.dur());
-        //if (g!=null) {
-        //compare goal with belief state to determine if an adjustment task should be created
-        //System.out.println(this + "\tbelief=" + currentBelief + " desire=" + g);
-        //}
         return nar.time::nextStamp;
     }
-
-
-    //    /** originating from this sensor, or a future prediction */
-//    @Override
-//    public boolean validBelief(@NotNull Task t, @NotNull NAR nar) {
-//        //return onlyDerivationsIfFuture(t, nar);
-//        return true;
-//    }
-//    @Override
-//    public boolean validGoal(@NotNull Task goal, @NotNull NAR nar) {
-//        //return onlyDerivationsIfFuture(t, nar);
-//        return true;
-//    }
-
-
-//    public static boolean onlyDerivationsIfFuture(@NotNull Task belief, @NotNull NAR nar) {
-//        if (!(belief instanceof DerivedTask))
-//            return true;
-//
-//        long bocc = belief.occurrence();
-//        return (bocc!=ETERNAL && bocc > nar.time());
-//    }
-//
-
-
-//
-//    @Override
-//    final protected @NotNull BeliefTable newGoalTable() {
-//        return newGoalTable(1,goalCapacity);
-//    }
-
-
-//    /** async timing: only commits when value has changed significantly, and as often as necessary */
-//    @NotNull
-//    public SensorConcept async() {
-//        timing(0, 0);
-//        return this;
-//    }
 
 
     public void setSignal(FloatSupplier signal) {
@@ -141,23 +92,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return currentValue;
     }
 
-
-//    public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull MutableFloat min, @NotNull MutableFloat limit, @NotNull NAR nar) {
-//
-//        activeAttention(c,
-//                //(cp) -> Util.lerp( limit.floatValue(), min.floatValue(), cp) //direct pri -> pri mapping
-//                (cp) -> Util.lerp(limit.floatValue(), min.floatValue(),
-//                            UtilityFunctions.sawtoothCurved(cp))
-//                , nar);
-//    }
-
-
-//    /** adaptively sets the priority of a group of sensors via a function  */
-//    public static void activeAttention(@NotNull Iterable<? extends Prioritizable> c, @NotNull FloatToFloatFunction f, @NotNull NAR nar) {
-//        c.forEach( s -> s.pri(() -> {
-//            return f.valueOf(nar.pri((Termed)s, Float.NaN));
-//        } ) );
-//    }
 
     /**
      * should only be called if autoupdate() is false

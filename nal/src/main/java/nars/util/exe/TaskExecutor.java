@@ -337,24 +337,23 @@ public class TaskExecutor extends Executioner {
         actuallyFeedback(x, next);
     }
 
-    protected void actuallyFeedback(ITask x, ITask[] next) {
-        if (next != null && next.length > 0)
-            nar.input(next);
+    protected void actuallyFeedback(ITask parent, @Nullable ITask[] children) {
+        if (children != null && children.length > 0)
+            nar.input(children);
     }
 
 
     @Override
-    public boolean run(@NotNull ITask input) {
-        if (input.punc() == COMMAND) {
-            execute(input); //commands executed immediately
-            return true;
-        } else {
-            if (input instanceof NALTask) {
-                tasks.putAsync(input);
-            } else
-                concepts.putAsync(input);
+    public void run(@NotNull ITask input) {
 
-            return true;//!= null;
+        boolean nal = input instanceof NALTask;
+
+        if ((busy.get()==false && nal)|| input.punc() == COMMAND) {
+            //if not busy, input NAL tasks directly. this allows direct insertion of tasks while the reasoner is paused
+            //commands executed immediately
+            execute(input);
+        } else {
+            (nal ? tasks : concepts).putAsync(input);
         }
     }
 

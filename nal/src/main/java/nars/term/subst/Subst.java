@@ -104,7 +104,7 @@ public interface Subst  {
                     return null;
                 }
 
-                if (this instanceof Derivation && u instanceof VarPattern)
+                if (this instanceof Derivation && u.varPattern() > 0)
                     return null;
 
                 if (!next.add(u))

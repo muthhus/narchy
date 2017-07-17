@@ -80,7 +80,7 @@ abstract public class Executioner implements Executor {
     }
 
     /** returns whether the input was accepted */
-    abstract public boolean run(@NotNull ITask input);
+    abstract public void run(@NotNull ITask input);
 
     public Loop loop(float fps /* initial */, Runnable repeated) {
         return new Periodic(fps, repeated);

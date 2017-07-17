@@ -159,9 +159,10 @@ public class TermIOTest {
 
         //dump all tasks to a set of sorted strings and compare their equality:
         Set<String> ab = new HashSet();
+        a.forEachConceptTask( t-> ab.add(t.toStringWithoutBudget()) , true,true,true,true);
+
         Set<String> bb = new HashSet();
-        a.forEachConceptTask(t-> ab.add(t.toStringWithoutBudget()) , true,true,true,true);
-        b.forEachConceptTask(t->bb.add(t.toStringWithoutBudget()), true,true,true,true);
+        b.forEachConceptTask( t->bb.add(t.toStringWithoutBudget()), true,true,true,true);
 
         assertEquals("difference: " + Sets.symmetricDifference(ab, bb), ab, bb);
 

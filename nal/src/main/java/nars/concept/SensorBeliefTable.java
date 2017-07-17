@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * latches the last known task
  */
-class SensorBeliefTable extends DefaultBeliefTable {
+@Deprecated class SensorBeliefTable extends DefaultBeliefTable {
 
     static final int durationsTolerance = 1;
 

@@ -14,10 +14,8 @@ import nars.util.exe.Executioner;
 import nars.util.exe.TaskExecutor;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.TreeMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ForkJoinPool;
@@ -209,21 +207,21 @@ public class MultiNAR extends NAR {
 
     private static class RootExecutioner extends Executioner implements Runnable {
 
-
         public ForkJoinTask lastCycle;
         private ForkJoinPool passive;
-
-
-
-        public RootExecutioner() {
-
-        }
+        private SubExecutor[] workers;
+        private int num;
 
         @Override
         public void start(NAR nar) {
             this.passive = ((MultiNAR)nar).passive;
             super.start(nar);
 
+            List<SubExecutor> ww = ((MultiNAR) nar).sub;
+            num = ww.size();
+            assert(num > 0);
+
+            workers = ww.toArray(new SubExecutor[num]);
         }
 
         @Override
@@ -232,21 +230,13 @@ public class MultiNAR extends NAR {
         }
 
         @Override
-        public boolean run(@NotNull ITask x) {
+        public void run(@NotNull ITask x) {
+            int sub = worker(x);
+            workers[sub].run(x);
+        }
 
-            List<SubExecutor> workers = ((MultiNAR) nar).sub;
-            int num = workers.size();
-            if (num == 0) {
-                //HACK do nothing because the workers havent started yet?
-                return false;
-            }
-
-
-            int sub =
-                    //random.nextInt(num);
-                    Math.abs(Util.hashWangJenkins(x.hashCode())) % num;
-            //apply(x);
-            return workers.get(sub).run(x);
+        public int worker(@NotNull ITask x) {
+            return Math.abs(Util.hashWangJenkins(x.hashCode())) % num;
         }
 
 
@@ -258,8 +248,10 @@ public class MultiNAR extends NAR {
 
         @Override
         public void stop() {
-            lastCycle = null;
             super.stop();
+            lastCycle = null;
+            workers = null;
+            num = 0;
         }
 
         final AtomicBoolean busy = new AtomicBoolean(false);
@@ -276,7 +268,7 @@ public class MultiNAR extends NAR {
             if (!busy.compareAndSet(false, true))
                 return; //already in the cycle
 
-            ((MultiNAR) nar).nextCycle();
+
             try {
 
                 if (lastCycle != null) {
@@ -290,7 +282,6 @@ public class MultiNAR extends NAR {
                     lastCycle.reinitialize();
                     passive.execute(lastCycle);
 
-                    ((MultiNAR) nar).nextCycle();
 
                 } else {
                     lastCycle = passive.submit(this);
@@ -310,7 +301,7 @@ public class MultiNAR extends NAR {
 
         @Override
         public int concurrency() {
-            return 2; //TODO calculate based on # of sub-NAR's but definitely is concurrent so we add 1 here in case passive=1
+            return 1 + num; //TODO calculate based on # of sub-NAR's but definitely is concurrent so we add 1 here in case passive=1
         }
 
         @Override
@@ -323,16 +314,6 @@ public class MultiNAR extends NAR {
             ((MultiNAR) nar).sub.forEach(s -> s.forEach(each));
         }
 
-    }
-
-    protected void nextCycle() {
-//        if (!((HijackMemoize)truthCache).isEmpty()) {
-//            System.out.println("Truth Cache: " + truthCache.summary());
-//        } else {
-//            truthCache.summary(); //HACK to call stat reset
-//        }
-//
-//        truthCache.clear();
     }
 
 //    /** temporary 1-cycle old cache of truth calculations */
@@ -374,9 +355,9 @@ public class MultiNAR extends NAR {
 //        }
 
         @Override
-        protected void actuallyFeedback(ITask x, ITask[] next) {
-            if (next != null)
-                MultiNAR.this.input(next); //through post mix
+        protected void actuallyFeedback(ITask x, ITask[] children) {
+            if (children != null)
+                MultiNAR.this.input(children); //through post mix
         }
 
         @Override

@@ -277,7 +277,7 @@ abstract public class NAgentX extends NAgent {
                             new WindowButton("actionShort", () -> Vis.beliefCharts(a.nar.dur() * 4, a.actions, a.nar)),
                             new WindowButton("actionMed", () -> Vis.beliefCharts(a.nar.dur() * 32, a.actions, a.nar)),
                             new WindowButton("actionLong", () -> Vis.beliefCharts(a.nar.dur() * 128, a.actions, a.nar)),
-                            new WindowButton("predict", () -> Vis.beliefCharts(200, a.p, a.nar)),
+                            new WindowButton("predict", () -> Vis.beliefCharts(200, a.predictors, a.nar)),
                             //"agentActions",
                             //"agentPredict",
 

@@ -1505,6 +1505,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         MutableInteger total = new MutableInteger(0), wrote = new MutableInteger(0);
 
         forEachConceptTask(_x -> {
+
+            if (_x.isDeleted()) return; //HACK forEachConcept should not return deleted tasks
+
             total.increment();
             Task x = post(_x);
             if (x.truth() != null && x.conf() < confMin.floatValue())
