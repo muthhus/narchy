@@ -98,9 +98,17 @@ public final class Conclude extends AbstractPred<Derivation> {
         if (b1 == null)
             return true;
 
-        final Compound c1 = compoundOrNull(b1.eval(d));
+        Compound c1 = compoundOrNull(b1.eval(d));
         if (c1 == null)
             return true;
+
+        boolean polarity = true;
+        if (c1.op()==NEG) {
+            c1 = compoundOrNull( c1.unneg() );
+            if (c1==null)
+                return true;
+            polarity = false;
+        }
 
 
         nar.emotion.derivation2.increment();
@@ -117,25 +125,16 @@ public final class Conclude extends AbstractPred<Derivation> {
 
             //process time with the unnegated term
             Op o = c1.op();
-            Compound t1;
-            boolean negated = false;
-            if (o == NEG) {
-                t1 = compoundOrNull(c1.unneg());
-                assert(t1!=null);
-                negated = true;
-            } else {
-                negated = false;
-                t1 = c1;
-            }
+
 
             float[] confScale = {1f};
 
-            @Nullable Compound t2 = this.time.compute(t1,
+            @Nullable Compound t1 = this.time.compute(c1,
                     d, this, occ, confScale
             );
 
             //temporalization failure, could not determine temporal attributes. seems this can happen normally
-            if ((t2 == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
+            if ((t1 == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
                 //                 {
                 //                    //FOR DEBUGGING, re-run it
                 //                    Compound temporalized2 = this.time.compute(content,
@@ -164,8 +163,6 @@ public final class Conclude extends AbstractPred<Derivation> {
             //apply any non 1.0 the confidence scale
             if (truth != null) {
 
-                if (negated)
-                    truth = truth.negated();
 
                 float cf = confScale[0];
                 if (cf != 1) {
@@ -181,7 +178,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 
             if (occ[1] == ETERNAL) occ[1] = occ[0];
 
-            c2 = t2;
+            c2 = t1;
 
         } else {
             occ = Tense.ETERNAL_RANGE;
@@ -225,8 +222,15 @@ public final class Conclude extends AbstractPred<Derivation> {
                     return true; //wasted
                 }
 
-                if (negating && truth != null)
-                    truth = truth.negated();
+
+                if (truth!=null) {
+
+                    if (negating)
+                        polarity = !polarity;
+
+                    if (!polarity)
+                        truth = truth.negated();
+                }
 
                 DerivedTask t =
                         Param.DEBUG ?

@@ -56,13 +56,13 @@ public class NARS {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.5f);
+        n.goalConfidence(0.75f);
 
 
-        n.DEFAULT_BELIEF_PRIORITY = 0.2f;
-        n.DEFAULT_GOAL_PRIORITY = 0.2f;
-        n.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        n.DEFAULT_QUEST_PRIORITY = 0.1f;
+        n.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        n.DEFAULT_GOAL_PRIORITY = 0.5f;
+        n.DEFAULT_QUESTION_PRIORITY = 0.25f;
+        n.DEFAULT_QUEST_PRIORITY = 0.25f;
         n.termVolumeMax.setValue(40);
 
         NiNner nin = new NiNner(n);

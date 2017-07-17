@@ -59,7 +59,7 @@ public class BufferedImageBitmap2D implements Bitmap2D, Supplier<BufferedImage> 
                 float left = xx > 0 ? super.brightness(xx-1, yy) : c;
                 float down = yy < height()-1 ? super.brightness(xx, yy+1) : c;
                 float right = xx < width()-1 ? super.brightness(xx+1, yy) : c;
-                return (c*4 + up + left + down + right)/8;
+                return (c*8 + up + left + down + right)/12;
             }
         };
     }

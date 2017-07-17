@@ -50,9 +50,9 @@ public class Gradius extends NAgentX {
 
 
 
-        nar.truthResolution.setValue(0.05f);
+        //nar.truthResolution.setValue(0.05f);
 
-        BufferedImageBitmap2D camScaleLow = new Scale(() -> g.image, 16, 16);
+        BufferedImageBitmap2D camScaleLow = new Scale(() -> g.image, 24, 24);
         for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[]{
                 R,
                 BufferedImageBitmap2D.ColorMode.B,

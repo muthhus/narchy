@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.math.FloatNormalized;
 import nars.*;
 import nars.term.atom.Atomic;
+import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -43,8 +44,8 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", () -> fz.image, 32, 20)
-                .resolution(0.2f);
+        senseCamera("fz", new Scale(() -> fz.image, 24, 24).blur())
+                .resolution(0.05f);
 
 
         actionBipolar($.inh(Atomic.the("fwd"), id), (f) -> {

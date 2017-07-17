@@ -326,12 +326,14 @@ public abstract class TermBuilder {
         if (o.temporal)
             nextDT = XTERNAL;
 
-        if (o.temporal && s.length <= 2) {
+        if (o.temporal && s.length == 2) {
 
-            if (s[0].equals(s[1])) {
-                s = new Term[]{s[0], s[0] /* repeated */};
-                subsChanged = true;
-            } else if (o.commutative) {
+
+//            if (s.length s[0].equals(s[1])) {
+//                s = new Term[]{s[0], s[0] /* repeated */};
+//                subsChanged = true;
+//            } else
+            if (o.commutative) {
                 if (s[0].compareTo(s[1]) > 0) { //lexical sort
                     s = new Term[]{s[1], s[0]};
                     subsChanged = true;
