@@ -149,9 +149,9 @@ public class TermutatorTest {
 
         unifier.versioning.setTTL(TTL);
 
-        t.mutate(unifier, Lists.newArrayList( t, new Termutator() {
+        t.mutate(unifier, new Termutator[] { t,  new Termutator() {
 
-            @Override public void mutate(@NotNull Unify f, List<Termutator> chain, int current) {
+            @Override public void mutate(@NotNull Unify f, Termutator[] chain, int current) {
                 TreeMap t = new TreeMap(); //use treemap for sorted keys
                 f.xy.map.forEach(t::put);
 
@@ -167,7 +167,7 @@ public class TermutatorTest {
                 return 0;
             }
 
-        }), 0);
+         }}, 0);
 
 
         String res = s.toString();

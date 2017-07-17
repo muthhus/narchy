@@ -69,7 +69,7 @@ public class UnificationTest {
             nar.run(cycles);
 
 
-            Termed t2 = nar.concept(s2);
+            Termed t2 = nar.conceptualize(s2);
             assertNotNull(t2);
             Set<Term> t1u = ((Compound) t1).recurseTermsToSet(type);
             //assertTrue(t1u.size() > 0);

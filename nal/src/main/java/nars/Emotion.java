@@ -2,10 +2,13 @@ package nars;
 
 import com.netflix.servo.monitor.BasicCounter;
 import com.netflix.servo.monitor.Counter;
+import com.netflix.servo.monitor.Monitor;
 import com.netflix.servo.monitor.StepCounter;
+import jcog.Util;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.meter.event.BufferedFloatGuage;
 import nars.term.Compound;
+import nars.util.ConcurrentMonitorRegistry;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,7 +22,7 @@ import static nars.NiNner.id;
  * <p>
  * https://prometheus.io/docs/practices/instrumentation/
  */
-public final class Emotion /* extends ConcurrentMonitorRegistry */ {
+public final class Emotion extends ConcurrentMonitorRegistry {
 
 
     /**
@@ -27,12 +30,14 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
      */
     public final Counter busyPri = new StepCounter(id("busyPri"));
 
-    public final Counter conceptFires = new BasicCounter(id("concept fire runs"));
-    public final Counter conceptActivations = new BasicCounter(id("concept fire activates"));
+    public final Counter conceptFires = new BasicCounter(id("concept fire count"));
+    public final Counter conceptActivations = new BasicCounter(id("concept fire activations"));
     public final Counter conceptFirePremises = new BasicCounter(id("concept fire premises"));
     public final Counter taskDerivations = new BasicCounter(id("task derivations"));
-    public final Counter derivation1, derivation2, derivation3;
 
+    public final Counter derivation1 = new BasicCounter(id("derivation stage 1"));
+    public final Counter derivation2 = new BasicCounter(id("derivation stage 2"));
+    public final Counter derivation3 = new BasicCounter(id("derivation stage 3"));
 
     @NotNull
     public final BufferedFloatGuage busyVol;
@@ -83,6 +88,8 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
     public Emotion(NAR n) {
         super();
 
+        register(this);
+
         //logger = LoggerFactory.getLogger(class);
 
         this.busyVol = new BufferedFloatGuage("busyV");
@@ -98,9 +105,6 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 
         this.errrVol = new BufferedFloatGuage("error");
 
-        derivation1 = new BasicCounter(id("derivation stage 1"));
-        derivation2 = new BasicCounter(id("derivation stage 2"));
-        derivation3 = new BasicCounter(id("derivation stage 3"));
 
     }
 
@@ -275,12 +279,8 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
     }
 
     public void stat(SortedMap<String, Object> x) {
-        //TODO reflect
-        for (Counter c : new Counter[]{
-                conceptFires, conceptActivations, conceptFirePremises, taskDerivations,
-                derivation1, derivation2, derivation3
-        })
-            x.put(c.getConfig().getName(), c.getValue());
+
+        monitors.forEach(m -> x.put(m.getConfig().getName(), m.getValue()));
 
         x.put("emotion", summary());
     }

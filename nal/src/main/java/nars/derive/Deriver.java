@@ -1,6 +1,7 @@
 package nars.derive;
 
 import nars.control.premise.Derivation;
+import nars.derive.rule.PremiseRuleSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +24,18 @@ public interface Deriver extends Predicate<Derivation> {
 //    PremiseRuleSet defaultRules;
 
     Logger logger = LoggerFactory.getLogger(Deriver.class);
+
+    PremiseRuleSet DEFAULT_RULES = PremiseRuleSet.rules(true,
+                "nal1.nal",
+                //"nal4.nal",
+                "nal6.nal",
+                "misc.nal",
+                "induction.nal",
+                "nal2.nal",
+                "nal3.nal"
+        );;
+
+    TrieDeriver DEFAULT = new TrieDeriver(Deriver.DEFAULT_RULES);
 
 //    Cache<String, Deriver> derivers = Caffeine.newBuilder().build();
 //    Function<String,Deriver> loader = (s) -> new TrieDeriver(PremiseRuleSet.rules(s));

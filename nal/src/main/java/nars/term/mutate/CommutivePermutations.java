@@ -34,7 +34,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
     }
 
     @Override
-    public void mutate(@NotNull Unify f, List<Termutator> chain, int current) {
+    public void mutate(@NotNull Unify f, Termutator[] chain, int current) {
         int start = f.now();
 
         ShuffledSubterms p = new ShuffledSubterms(f.random, x);

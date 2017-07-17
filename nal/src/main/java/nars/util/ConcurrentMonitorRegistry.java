@@ -9,6 +9,7 @@ import com.netflix.servo.monitor.Monitor;
 import com.netflix.servo.monitor.MonitorConfig;
 import com.netflix.servo.monitor.NumericMonitor;
 import com.netflix.servo.util.UnmodifiableList;
+import jcog.Util;
 import org.jetbrains.annotations.NotNull;
 
 import javax.management.*;
@@ -28,8 +29,22 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class ConcurrentMonitorRegistry implements MonitorRegistry {
 
-    private final Set<Monitor<?>> monitors = Sets.newConcurrentHashSet();
+    public final Set<Monitor<?>> monitors = Sets.newConcurrentHashSet();
 
+    public void register(Object o) {
+        Util.getAllDeclaredFields(this, true).forEach(f -> {
+            if (Monitor.class.isAssignableFrom( f.getType() )) {
+                if (f.trySetAccessible()) {
+                    try {
+                        register((Monitor) f.get(this));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                        //logger.error("monitor registeration: {} {}", f, e);
+                    }
+                }
+            }
+        });
+    }
 
     public static class WithJMX extends ConcurrentMonitorRegistry {
         private final MBeanServer mBeanServer;

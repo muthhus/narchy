@@ -219,7 +219,7 @@ public class RevisionTest {
                 "(a). %0.1;0.5%"
                 );
         n.run(1);
-        Task t = n.concept("(a)").beliefs().match(ETERNAL, null, null, true, null);
+        Task t = n.conceptualize("(a)").beliefs().match(ETERNAL, null, null, true, null);
         assertEquals(0.37f, t.freq(), 0.02f);
         assertEquals(0.75f, t.conf(), 0.02f);
     }
@@ -229,7 +229,7 @@ public class RevisionTest {
             .input("(x ==> y). %1.0;0.9%",
                    "(x ==> y). %0.0;0.9%" )
                 .run(1);
-        CompoundConcept c = (CompoundConcept) n.concept("(x ==> y)");
+        CompoundConcept c = (CompoundConcept) n.conceptualize("(x ==> y)");
         c.print();
         Task t = n.match(c, BELIEF, ETERNAL);
         assertEquals(0.5f, t.freq(), 0.01f);

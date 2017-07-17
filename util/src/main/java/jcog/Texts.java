@@ -232,7 +232,7 @@ public enum Texts {
 //    }
 
 
-    static final ThreadLocal<Format> oneDecimal = ThreadLocal.withInitial( () -> new DecimalFormat("0.0") );
+    static final ThreadLocal<Format> oneDecimal = ThreadLocal.withInitial(() -> new DecimalFormat("0.0"));
 
     public static String n1(float x) {
         return oneDecimal.get().format(x);
@@ -243,7 +243,7 @@ public enum Texts {
 //    }
 
 
-    static final ThreadLocal<Format> threeDecimal = ThreadLocal.withInitial( () -> new DecimalFormat("0.000") );
+    static final ThreadLocal<Format> threeDecimal = ThreadLocal.withInitial(() -> new DecimalFormat("0.000"));
 
     public static String n3(float x) {
         return threeDecimal.get().format(x);
@@ -253,10 +253,10 @@ public enum Texts {
         return threeDecimal.get().format(x);
     }
 
-    static final ThreadLocal<Format> fourDecimal = ThreadLocal.withInitial( () -> new DecimalFormat("0.0000") );
+    static final ThreadLocal<Format> fourDecimal = ThreadLocal.withInitial(() -> new DecimalFormat("0.0000"));
 
     public static String n4(float x) {
-        if (x!=x)
+        if (x != x)
             return "NNaaNN";
         else
             return fourDecimal.get().format(x);
@@ -285,7 +285,7 @@ public enum Texts {
     }
 
     public static String n2(float x) {
-        if (x!=x)
+        if (x != x)
             return "NaN"; //NaN
 
         if ((x < 0) || (x > 1.0f))
@@ -381,7 +381,7 @@ public enum Texts {
             if (i != -1) return i;
         } else if (s.length() == 2) {
             int dig1 = i(s.charAt(1));
-            if (dig1!=-1) {
+            if (dig1 != -1) {
                 int dig10 = i(s.charAt(0));
                 if (dig10 != -1)
                     return dig10 * 10 + dig1;
@@ -391,23 +391,25 @@ public enum Texts {
     }
 
 
-
-
     /**
      * fast parse a non-negative int under certain conditions, avoiding Integer.parse if possible
      * TODO parse negative values with a leading '-'
      */
     public static int i(String s, int ifMissing) {
         switch (s.length()) {
-            case 0: return ifMissing;
-            case 1: return i1(s, ifMissing);
-            case 2: return i2(s, ifMissing);
-            case 3: return i3(s, ifMissing);
+            case 0:
+                return ifMissing;
+            case 1:
+                return i1(s, ifMissing);
+            case 2:
+                return i2(s, ifMissing);
+            case 3:
+                return i3(s, ifMissing);
             default:
 
                 //attempt to avoid throwing a stack trace
                 for (int i = 0; i < s.length(); i++)
-                    if (i(s.charAt(i))==-1) //non-digit found
+                    if (i(s.charAt(i)) == -1) //non-digit found
                         return ifMissing;
 
 
@@ -426,14 +428,16 @@ public enum Texts {
             return ifMissing;
 
         switch (sl) {
-            case 1: return i1(s, offset, ifMissing);
-            case 2: return i2(s, offset, ifMissing);
-            case 3: return i3(s, offset, ifMissing);
+            case 1:
+                return i1(s, offset, ifMissing);
+            case 2:
+                return i2(s, offset, ifMissing);
+            case 3:
+                return i3(s, offset, ifMissing);
             default:
                 try {
-                    return Integer.parseInt(offset!=0 ? s.substring(offset) : s);
-                }
-                catch (NumberFormatException e) {
+                    return Integer.parseInt(offset != 0 ? s.substring(offset) : s);
+                } catch (NumberFormatException e) {
                     return ifMissing;
                 }
         }
@@ -447,10 +451,10 @@ public enum Texts {
         int dig100 = i(s.charAt(offset));
         if (dig100 == -1) return ifMissing;
 
-        int dig10 = i(s.charAt(offset+1));
+        int dig10 = i(s.charAt(offset + 1));
         if (dig10 == -1) return ifMissing;
 
-        int dig1 = i(s.charAt(offset+2));
+        int dig1 = i(s.charAt(offset + 2));
         if (dig1 == -1) return ifMissing;
 
         return dig100 * 100 + dig10 * 10 + dig1;
@@ -464,7 +468,7 @@ public enum Texts {
         int dig10 = i(s.charAt(offset));
         if (dig10 == -1) return ifMissing;
 
-        int dig1 = i(s.charAt(offset+1));
+        int dig1 = i(s.charAt(offset + 1));
         if (dig1 == -1) return ifMissing;
 
         return dig10 * 10 + dig1;
@@ -553,7 +557,7 @@ public enum Texts {
         int s = v.length;
         for (int i = 0; i < s; i++) {
             sb.append(n2(v[i]));
-            if (i!= s -1) sb.append(' ');
+            if (i != s - 1) sb.append(' ');
         }
         return sb.toString();
     }
@@ -563,16 +567,17 @@ public enum Texts {
         int s = v.length;
         for (int i = 0; i < s; i++) {
             sb.append(n4(v[i]));
-            if (i!= s -1) sb.append(' ');
+            if (i != s - 1) sb.append(' ');
         }
         return sb.toString();
     }
+
     public static String n4(float[] v) {
         StringBuilder sb = new StringBuilder(v.length * 6 + 2 /* approx */);
         int s = v.length;
         for (int i = 0; i < s; i++) {
             sb.append(n4(v[i]));
-            if (i!= s -1) sb.append(' ');
+            if (i != s - 1) sb.append(' ');
         }
         return sb.toString();
     }
@@ -609,7 +614,8 @@ public enum Texts {
      *
      * @param timestamp seconds since start of Unix-time
      * @return String formatted as - yyyy.MM.dd HH:mm:ss
-       from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java */
+     * from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java
+     */
     public static String longToDateTime(long timestamp) {
         Date date = new Date(timestamp * 1000);
         DateFormat formatter = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
@@ -618,13 +624,14 @@ public enum Texts {
 
     /**
      * string repr of an amount of milliseconds
-     * from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java */
+     * from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java
+     */
     public static String stringifyMS(long msec) {
         if (msec < 1000) return msec + "ms";
         if (msec < 3000) return String.format("%.2f", msec / 1000d);
         if (msec < 60 * 1000) return (msec / 1000) + "s";
         long sec = msec / 1000;
-        if (sec < 5 * 60) return (sec / 60) +  "m" + (sec % 60) + 's';
+        if (sec < 5 * 60) return (sec / 60) + "m" + (sec % 60) + 's';
         long min = sec / 60;
         if (min < 60) return min + "m";
         long hour = min / 60;
@@ -633,21 +640,26 @@ public enum Texts {
         return day + "d" + (day % 24) + 'h';
     }
 
-    /** from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java */
+    /**
+     * from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java
+     */
     public static String stringifyByteCount(long size) {
         if (size < 2 * (1L << 10)) return size + "b";
         if (size < 2 * (1L << 20)) return String.format("%dKb", size / (1L << 10));
         if (size < 2 * (1L << 30)) return String.format("%dMb", size / (1L << 20));
         return String.format("%dGb", size / (1L << 30));
     }
-    /** from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java */
+
+    /**
+     * from: https://github.com/ethereum/ethereumj/blob/develop/ethereumj-core/src/main/java/org/ethereum/util/Utils.java
+     */
     public static String repeat(String s, int n) {
 
         if (s.length() == 1) {
             char c = s.charAt(0);
             if (c < 0xff) { //ASCII, 8bit
                 byte[] bb = new byte[n];
-                Arrays.fill(bb, (byte)c);
+                Arrays.fill(bb, (byte) c);
                 return new String(bb);
             }
         }
@@ -657,5 +669,14 @@ public enum Texts {
         return ret.toString();
     }
 
+    /** pad with leading zeros
+     * TODO can be made faster
+     */
+    public static String iPad(long v, int digits) {
+        String s = String.valueOf(v);
+        while (s.length() < digits)
+            s = "0" + s;
+        return s;
+    }
 }
 

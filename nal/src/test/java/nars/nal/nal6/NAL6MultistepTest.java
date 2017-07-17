@@ -15,9 +15,6 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL6MultistepTest {
 
-    static {
-        Param.DEBUG = true;
-    }
 
     /** https://dtai.cs.kuleuven.be/problog/tutorial/basic/02_bayes.html */
     @Test public void testBurglarEarthquake1() throws Narsese.NarseseException {
@@ -57,10 +54,12 @@ public class NAL6MultistepTest {
         for (int i = 0; i < 5; i++) {
             //long now = d.time();
             n.run(100);
-            burglary = n.concept("(burglary)");
-            earthquake = n.concept("(earthquake)");            // burglary.print();  earthquake.print();
+            burglary = n.conceptualize("(burglary)");
+            earthquake = n.conceptualize("(earthquake)");            // burglary.print();  earthquake.print();
             //System.out.println("burglary=" + burglary.belief(Tense.ETERNAL,0, nar) + "\tearthquake=" + earthquake.belief(Tense.ETERNAL,0, nar));
         }
+
+        n.stats(System.out);
 
         //result from Probcog:  earthquake=23%, burglary=99%
         assertEquals(0.99f, n.beliefTruth(burglary, Tense.ETERNAL).freq(), 0.4f /* approximate */);
@@ -99,8 +98,8 @@ public class NAL6MultistepTest {
             // burglary.print();  earthquake.print();
             //long now = d.time();
             n.run(100);
-            burglary = n.concept("(burglary)");
-            earthquake = n.concept("(earthquake)");            // burglary.print();  earthquake.print();
+            burglary = n.conceptualize("(burglary)");
+            earthquake = n.conceptualize("(earthquake)");            // burglary.print();  earthquake.print();
             System.out.println("burglary=" + n.beliefTruth(burglary,0) + "\tearthquake=" + earthquake.beliefs().truth(Tense.ETERNAL, n));
         }
 

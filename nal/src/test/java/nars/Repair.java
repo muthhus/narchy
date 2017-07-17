@@ -30,14 +30,14 @@ public class Repair {
 
         }, testClasses);
 
-        for (int v : new int[] { 8, 16, 32 }) {
+        for (int v : new int[] { 16 }) {
             o.run((x) -> {
 
                 //SETUP EXPERIMENT
                 x.test.trace = false;
 
                 return new OptiUnit.Tweaks<>(x)
-                        .set("cycles", 5)
+                        .set("cycles", 100)
                         .call("nar.termVolumeMax.setValue", v)
                         ;
 
@@ -51,7 +51,7 @@ public class Repair {
                 "nar.termVolumeMax.setValue(",
                 //"concept fire activates",
                 //"concept fire premises",
-                "task belief count",
+                "belief count",
                 "score");
         table.print(System.out);
 

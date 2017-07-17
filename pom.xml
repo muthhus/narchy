@@ -34,6 +34,7 @@
                         <trimStackTrace>true</trimStackTrace>
 
                         <reuseForks>true</reuseForks>
+                        <forkMode>always</forkMode>
                         <!--<useUnlimitedThreads>true</useUnlimitedThreads>-->
                         <!--<parallelOptimized>true</parallelOptimized>-->
                         <!--<argLine>-Xmx200m</argLine>-->

@@ -3,7 +3,6 @@ package nars.term;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.io.NarseseTest;
 import nars.nar.NARS;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
@@ -291,8 +290,8 @@ public class TemporalTest {
 
         n.run(2);
 
-        Concept a = n.concept("(((SELF,#1)-->at) && goto(#1)).");
-        Concept a0 = n.concept("(goto(#1) && ((SELF,#1)-->at)).");
+        Concept a = n.conceptualize("(((SELF,#1)-->at) && goto(#1)).");
+        Concept a0 = n.conceptualize("(goto(#1) && ((SELF,#1)-->at)).");
         assertNotNull(a);
         assertTrue(a == a0);
 
@@ -447,7 +446,7 @@ public class TemporalTest {
         n.terms.print(System.out);
         assertEquals(indexSize, n.terms.size()); //remains same amount
 
-        n.concept("(x==>y)").print();
+        n.conceptualize("(x==>y)").print();
     }
 
 
@@ -488,7 +487,7 @@ public class TemporalTest {
         //assertTrue(5 <= cb.size());
 
         String abpill = "((a==>b)-->[pill])";
-        Concept cc = n.concept(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
+        Concept cc = n.conceptualize(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
         assertNotNull(cc);
 

@@ -51,7 +51,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
     }
 
     @Override
-    public void mutate(Unify versioneds, List<Termutator> chain, int current) {
+    public void mutate(Unify versioneds, Termutator[] chain, int current) {
 
         @NotNull Combinations ccc = this.comb;
         ccc.reset();

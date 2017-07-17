@@ -63,7 +63,7 @@ public class TestNAR {
     public Object result;
     boolean finished;
     private boolean exitOnAllSuccess = true;
-    private boolean requireConditions = true;
+    public boolean requireConditions = true;
 
     /** 0 = hasnt been determined yet, -1 = failure, +1 = success */
     public int score = 0;
@@ -106,7 +106,7 @@ public class TestNAR {
     @NotNull
     public TestNAR run(long finalCycle, boolean testAndPrintReport /* for use with JUnit */) {
 
-        if (requireConditions())
+        if (requireConditions)
             assertTrue("no conditions tested", !requires.isEmpty() || !disqualifies.isEmpty());
 
 
@@ -614,9 +614,6 @@ public class TestNAR {
 //        }
 //    }
 
-    protected boolean requireConditions() {
-        return requireConditions;
-    }
 
     @NotNull
     public TestNAR run(boolean testAndPrintReport /* for use with JUnit */) {

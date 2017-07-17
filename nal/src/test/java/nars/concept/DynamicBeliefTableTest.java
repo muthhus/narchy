@@ -148,7 +148,7 @@ public class DynamicBeliefTableTest {
         String c = "(tetris-->(((0,(1,(1))),(0,(0,(1,(0)))))&((1,(0,(1))),(0,(0,(1,(0)))))))";
         n.believe(c);
         n.run(1);
-        @Nullable Task a = n.concept(c).beliefs().match((long) 0, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), null, false, n);
+        @Nullable Task a = n.conceptualize(c).beliefs().match((long) 0, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), null, false, n);
         //System.out.println(a);
         assertTrue(a.toString().endsWith(" (tetris-->(((0,(1,(1))),(0,(0,(1,(0)))))&((1,(0,(1))),(0,(0,(1,(0))))))). %1.0;.90%"));
 //        @Nullable Task b = n.concept(c).beliefs().match(10, 0, 1, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), false);

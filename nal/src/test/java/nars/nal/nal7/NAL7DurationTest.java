@@ -29,7 +29,7 @@ public class NAL7DurationTest {
         //with duration = 5, the evidence surrounding a point
         // belief/goal will decay in the +/- 2.5 radius of time surrounding it.
 
-        n.concept("(x)").print();
+        n.conceptualize("(x)").print();
 
         assertEquals(0.85f, n.beliefTruth("(x)",  7).conf(), 0.01f );
         assertEquals(0.86f, n.beliefTruth("(x)",  8).conf(), 0.01f );
@@ -86,7 +86,7 @@ public class NAL7DurationTest {
     }
 
     static void assertDuration(NAR n, String c, long start, long end) throws Narsese.NarseseException {
-        Concept cc = n.concept(c);
+        Concept cc = n.conceptualize(c);
         assertNotNull(c + " unconceptualized", cc);
 
         List<Task> tt = Lists.newArrayList(cc.beliefs());

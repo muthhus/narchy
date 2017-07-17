@@ -28,7 +28,7 @@ public class ConceptFireTest {
         NAR nar = new NARS().get();
         nar.input("$0.01 a:b."); //low priority so it doesnt affect links
         nar.run(1);
-        Concept c = nar.concept("a:b");
+        Concept c = nar.conceptualize("a:b");
         for (int n = 0; n < 5; n++) {
             c.termlinks().put(new PLink<Term>($(n + ":a"), 0.2f * n));
         }

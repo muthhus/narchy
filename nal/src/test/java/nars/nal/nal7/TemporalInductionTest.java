@@ -53,7 +53,7 @@ public class TemporalInductionTest {
 
         //n.forEachConcept(Concept::print);
 
-        TaskConcept c = (TaskConcept) n.concept("a:b");
+        TaskConcept c = (TaskConcept) n.conceptualize("a:b");
         assertNotNull(c);
         //assertEquals("(b-->a). 5+0 %.50;.95%", c.getBeliefs().top(n.time()).toStringWithoutBudget());
 

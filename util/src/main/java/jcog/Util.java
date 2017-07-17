@@ -63,6 +63,7 @@ import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
+import static jcog.Texts.iPad;
 
 /**
  *
@@ -1783,10 +1784,12 @@ public enum Util {
         });
     }
 
+
     public static void toMap(AbstractHistogram h, String header, int linearStep, BiConsumer<String, Object> x) {
+        int digits = (int) (1+Math.log10(h.getMaxValue())); //pad leading number for lexicographic / ordinal coherence
         h.linearBucketValues(linearStep).iterator().forEachRemaining((p)->{
-           x.accept(header + " [" +
-                   p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
+            x.accept(header + " [" +
+                    iPad(p.getValueIteratedFrom(), digits) + ".." + iPad(p.getValueIteratedTo(), digits) + ']',
                    p.getCountAddedInThisIterationStep());
         });
     }

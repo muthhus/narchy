@@ -3,6 +3,7 @@ package nars;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import jcog.Loop;
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -128,9 +129,10 @@ abstract public class NAgent implements NSense, NAct {
         this.happy = new SensorConcept(
                 id == null ? p("happy") : $.inh( Atomic.the("happy"), id),
                 nar,
-                new FloatPolarNormalized(() -> reward),
+                //new FloatPolarNormalized(() -> reward),
+                ()->reward /* -1..+1 */,
 
-                (x) -> t(x, alpha())
+                (x) -> t(0.5f*(Util.tanhFast(x*2)+1), alpha() )
 
 //                (x) -> {
 //                    if (x > 0.5f + Param.TRUTH_EPSILON) {

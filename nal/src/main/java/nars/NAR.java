@@ -20,12 +20,9 @@ import nars.concept.TaskConcept;
 import nars.conceptualize.state.ConceptState;
 import nars.control.Cause;
 import nars.control.ConceptFire;
-import nars.control.premise.DerivationBudgeting;
-import nars.control.premise.PreferSimpleAndPolarized;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
 import nars.derive.meta.op.RegisterCause;
-import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.op.Command;
@@ -199,8 +196,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         x.put("concept count", terms.size());
 
-        x.put("task belief count", ((double) beliefs.getSum()));
-        x.put("task goal count", ((double) goals.getSum()));
+        x.put("belief count", ((double) beliefs.getSum()));
+        x.put("goal count", ((double) goals.getSum()));
 
         Util.toMap(tasklinkCount, "tasklink count", 4, x::put);
         //x.put("tasklink usage", ((double) tasklinkCount.getTotalCount()) / tasklinksCap.getSum());
@@ -242,16 +239,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.level = 8;
 
         //this.deriver = new TrieDeriver(DefaultDeriver.rules);
-        PremiseRuleSet rules = PremiseRuleSet.rules(true,
-                "nal1.nal",
-                //"nal4.nal",
-                "nal6.nal",
-                "misc.nal",
-                "induction.nal",
-                "nal2.nal",
-                "nal3.nal"
-        );
-        this.deriver = new TrieDeriver(rules);
+
+        this.deriver = Deriver.DEFAULT;
         deriver.forEachCause((RegisterCause x) -> {
             if (x.cause != null) // a re-used copy from rule permutes? TODO why?
                 return;
@@ -382,8 +371,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * gets a concept if it exists, or returns null if it does not
      */
     @Nullable
-    public final Concept concept(@NotNull String conceptTerm) throws NarseseException {
-        return concept(term(conceptTerm));
+    public final Concept conceptualize(@NotNull String conceptTerm) throws NarseseException {
+        return conceptualize(term(conceptTerm));
     }
 
 //    /** parses a term, returning it, or throws an exception (but will not return null) */
@@ -923,12 +912,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @Nullable
     public Truth beliefTruth(String concept, long when) throws NarseseException {
-        return truth(concept(concept), BELIEF, when);
+        return truth(conceptualize(concept), BELIEF, when);
     }
 
     @Nullable
     public Truth goalTruth(String concept, long when) throws NarseseException {
-        return truth(concept(concept), GOAL, when);
+        return truth(conceptualize(concept), GOAL, when);
     }
 
     @Nullable

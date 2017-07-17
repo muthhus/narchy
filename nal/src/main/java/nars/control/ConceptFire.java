@@ -18,10 +18,13 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
+import nars.term.var.Variable;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -194,6 +197,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //        }
 
         Termed[] localTemplates = templates(id, nar, true);
+        //System.out.println("templates: " + id + " " + Arrays.toString(localTemplates));
 
         int penalty = Math.max(1, ttlPerPremise / (2));
 
@@ -245,7 +249,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             if (taskConcept == null)
                 continue; //hrm
 
-            Termed[] taskTemplates = templates(taskConcept, nar, false);
+            Termed[] taskTemplates = templates(taskConcept, nar, true);
 
             //if (templateConceptsCount > 0) {
 
@@ -349,38 +353,55 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //        }
     }
 
-    public static Termed[] templates(@NotNull Concept id, NAR nar, boolean includeNonConcepts) {
+    public Termed[] templates(@NotNull Concept id, NAR nar, boolean includeNonConcepts) {
         TermContainer ctpl = id.templates();
+
+        if (ctpl == null || ctpl.size()==0) {
+            Term sampledTermLink = id.termlinks().sample().get();
+            if (sampledTermLink!=null)
+                ctpl = TermVector.the(sampledTermLink);
+        }
+
         if (ctpl != null) {
             Set<Termed> tc = new UnifiedSet(id.volume() /* estimate */);
             templates(tc, ctpl, nar, layers(id), includeNonConcepts);
-            return tc.toArray(new Termed[tc.size()]);
-        } else {
+            if (!tc.isEmpty())
+                return tc.toArray(new Termed[tc.size()]);
+        }
 
             //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
 
 //                templateConcepts = Concept.EmptyArray;
 //                templateConceptsCount = 0;
-            return Termed.EmptyArray;
-        }
+        return Termed.EmptyArray;
+
     }
 
-    private static void templates(Set<Termed> tc, TermContainer ctpl, NAR nar, int layersRemain, boolean includeNonConcepts) {
+    private void templates(Set<Termed> tc, TermContainer ctpl, NAR nar, int layersRemain, boolean includeNonConcepts) {
 
         int cs = ctpl.size();
         for (int i = 0; i < cs; i++) {
-            Term x = ctpl.sub(i);
-            @Nullable Concept c = nar.conceptualize(x);
+            Term b = ctpl.sub(i);
+            @Nullable Concept c = (!(b instanceof Variable /* quick var prefilter */)) ? nar.conceptualize(b) : null;
+            TermContainer e = null;
             if (c != null) {
-                if (tc.add(c)) {
+                if (!c.equals(id) && tc.add(c.term() /* dont link to concept directly for long-term GC sanity */)) {
                     if (layersRemain > 0 && c instanceof Compound) {
-                        templates(tc, c.templates(), nar, layersRemain - 1, includeNonConcepts);
+                        e = c.templates();
                     }
                 }
-            } else {
-                if (includeNonConcepts)
-                    tc.add(x.unneg()); //variable or other non-concept term
+            } else if (includeNonConcepts && !b.equals(id)) {
+                Term d = b.unneg();
+                //variable or other non-concept term
+                if (tc.add(d)) {
+                    if (layersRemain > 0 && d instanceof Compound) {
+                        e = ((Compound)d).subterms();
+                    }
+                }
             }
+
+            if (e!=null)
+                templates(tc, e, nar, layersRemain - 1, includeNonConcepts);
         }
     }
 
@@ -440,8 +461,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //                    //return (vars > 0) ? 2 : 1; //prevent long conjunctions from creating excessive templates
 //                }
 
+
             default:
-                throw new UnsupportedOperationException("unhandled operator type: " + host.op());
+                return 1;
+                //throw new UnsupportedOperationException("unhandled operator type: " + host.op());
         }
     }
 

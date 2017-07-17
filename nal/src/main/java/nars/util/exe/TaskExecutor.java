@@ -31,7 +31,7 @@ import static nars.Op.COMMAND;
 public class TaskExecutor extends Executioner {
 
     int inputBatch = 32;
-    int fireBatch = 4;
+    int fireBatch = 16;
 
     //    private final DisruptorBlockingQueue<ITask> overflow;
     protected boolean trace;

@@ -16,7 +16,7 @@ public class TuffySmokesTest {
         for (String name : new String[]{"Edward", "Anna", "Bob", "Frank", "Gary", "Helen"}) {
             String t = "<" + name + " --> Cancer>";
             //n.input(t + "?");
-            Concept c = n.concept(t);
+            Concept c = n.conceptualize(t);
 
             System.err.print(System.identityHashCode(c) + " ");
 

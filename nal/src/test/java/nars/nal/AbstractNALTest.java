@@ -5,7 +5,6 @@ import nars.Param;
 import nars.nar.NARS;
 import nars.op.stm.STMTemporalLinkage;
 import nars.test.TestNAR;
-import org.jetbrains.annotations.NotNull;
 import org.junit.After;
 
 /**
@@ -24,13 +23,13 @@ public abstract class AbstractNALTest extends NARS {
     protected AbstractNALTest() {
 
 
-        this.nar = get();
-        this.nar.termVolumeMax.setValue(28);
+        nar = get();
+        nar.termVolumeMax.setValue(16);
         //n.nal(level);
-//                    n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-//                    n.DEFAULT_GOAL_PRIORITY = 0.5f;
-        this.nar.DEFAULT_QUEST_PRIORITY = 0.5f;
-        this.nar.DEFAULT_QUESTION_PRIORITY = 0.5f;
+        nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
+        nar.DEFAULT_GOAL_PRIORITY = 0.5f;
+        nar.DEFAULT_QUEST_PRIORITY = 0.25f;
+        nar.DEFAULT_QUESTION_PRIORITY = 0.25f;
         //if (level >= 7) {
         new STMTemporalLinkage(this.nar, 1, false);
 

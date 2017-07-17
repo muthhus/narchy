@@ -1,5 +1,6 @@
 package nars.term.subst;
 
+import jcog.Util;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
@@ -12,6 +13,7 @@ import nars.term.Term;
 import nars.term.mutate.Termutator;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -48,7 +50,9 @@ public abstract class Unify implements Subst {
     public final Op type;
 
     @NotNull
-    public final Set<Termutator> termutes = new LinkedHashSet();
+    public final Set<Termutator> termutes =
+            new HashSet();
+            //new LinkedHashSet();
 
     @NotNull
     public final Versioning versioning;
@@ -97,9 +101,9 @@ public abstract class Unify implements Subst {
      */
     public abstract boolean onMatch();
 
-    public final void mutate(List<Termutator> chain, int next) {
-        if (versioning.tick())
-            chain.get(++next).mutate(this, chain, next);
+    public final void mutate(Termutator[] chain, int next) {
+        if (versioning.tick() && ++next < chain.length)
+            chain[next].mutate(this, chain, next);
     }
 
     @Override
@@ -154,13 +158,13 @@ public abstract class Unify implements Subst {
                 break;
 
             //TODO use Termutator[] not List
-            List<Termutator> t = $.newArrayList(ts );
-            t.addAll(termutes);
+            Termutator[] t = termutes.toArray(new Termutator[ts]);
+
             termutes.clear();
 
             //shuffle the ordering of the termutes themselves
             if (ts > 1)
-                Collections.shuffle(t, random);
+                Util.shuffle(t, random);
 
             mutate(t, -1); //start combinatorial recurse
 
