@@ -174,12 +174,4 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return this;
     }
 
-
-    public float freq() {
-        SignalTask t = sensor.current;
-        if (t !=null)
-            return t.freq();
-        else
-            return Float.NaN;
-    }
 }

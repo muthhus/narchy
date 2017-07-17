@@ -31,9 +31,7 @@ import jcog.list.FasterList;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
 import jcog.pri.Priority;
-import org.HdrHistogram.AbstractHistogram;
-import org.HdrHistogram.Histogram;
-import org.HdrHistogram.ShortCountsHistogram;
+import org.HdrHistogram.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.block.function.primitive.DoubleToFloatFunction;
@@ -1790,6 +1788,14 @@ public enum Util {
         h.linearBucketValues(linearStep).iterator().forEachRemaining((p)->{
             x.accept(header + " [" +
                     iPad(p.getValueIteratedFrom(), digits) + ".." + iPad(p.getValueIteratedTo(), digits) + ']',
+                   p.getCountAddedInThisIterationStep());
+        });
+    }
+    public static void toMap(DoubleHistogram h, String header, int linearStep, BiConsumer<String, Object> x) {
+        final char[] order = {'a'};
+        h.linearBucketValues(linearStep).iterator().forEachRemaining((p)->{
+            x.accept(header + " " + (order[0]++) + "[" +
+                   p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
                    p.getCountAddedInThisIterationStep());
         });
     }

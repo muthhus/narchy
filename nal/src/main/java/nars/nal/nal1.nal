@@ -8,10 +8,6 @@
 
     (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong)
 
-//// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
-
-    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong)
-
 //// inheritance-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 // If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
 //       (A --> B) ------- (B --> C)
@@ -38,8 +34,17 @@
 
 //If M is a special case of P and S and M are similar, then S is also a special case of P (strong)
 
-    (M --> P), (S <-> M), neqRCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong, Permute:Swap)
-    (P --> M), (S <-> M), neqRCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong, Permute:Swap)
-        //(M --> P), (S <-> M), belief(negative), neqRCom(S,P) |- (--,(S --> P)), (Belief:AnalogyPN, Goal:StrongPN)
-        //(P --> M), (S <-> M), belief(negative), neqRCom(S,P) |- (--,(P --> S)), (Belief:AnalogyPN, Goal:StrongPN)
+    (M --> P), (S <-> M), neqRCom(S,P) |- (S --> P), (Belief:Analogy, Goal:Strong)
+        (M --> P), (S <-> (--,%M)), neqRCom(S,P) |- (--,(S --> P)), (Belief:Analogy, Goal:Strong)
+            //TODO write test case for this
+    (P --> M), (S <-> M), neqRCom(S,P) |- (P --> S), (Belief:Analogy, Goal:Strong)
+        (P --> M), (S <-> (--,%M)), neqRCom(S,P) |- (--,(P --> S)), (Belief:Analogy, Goal:Strong)
+            //TODO write test case for this
     (M <-> P), (S <-> M), neqRCom(S,P) |- (S <-> P), (Belief:Resemblance, Goal:Strong)
+        ((--,%M) <-> P), (M <-> S), neqRCom(S,P) |- (--,(S <-> P)), (Belief:Resemblance, Goal:Strong)
+            //TODO write test case for this
+
+//// inheritance from similarty <- todo check why this one was missing ////////////////////////////////////////////////////////////////////////////////////
+
+    (S <-> P), (P --> S) |- (S --> P), (Belief:ReduceConjunction, Goal:Strong)
+    (S <-> (--,%P)), (P --> S) |- (--,(S --> P)), (Belief:ReduceConjunction, Goal:Strong)

@@ -9,6 +9,7 @@ import nars.NAgentX;
 import nars.Task;
 import nars.gui.Vis;
 import nars.task.ITask;
+import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -365,7 +366,7 @@ public abstract class ConsoleAgent extends NAgentX {
             return cols();
         }
 
-        public Stream<Task> input() {
+        public Stream<SignalTask> input() {
             nextStamp = nar.time.nextStamp();
             return IntStream.range(0, rows() * cols()).mapToObj(i -> {
                 int x = i % cols();

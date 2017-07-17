@@ -213,7 +213,7 @@ public class Line1D {
                                                     new Vis.EmotionPlot(history, a),
                                                     new ReflectionSurface<>(a),
                                                     Vis.beliefCharts(history,
-                                                            Lists.newArrayList(a.sensors.get(0).freq(), a.out)
+                                                            Lists.newArrayList(a.sensors.get(0).sensor.freq(), a.out)
                                                             , a.nar)
                                             )
                                     )

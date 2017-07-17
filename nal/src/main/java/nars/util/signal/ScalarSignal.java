@@ -3,6 +3,7 @@ package nars.util.signal;
 import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Task;
+import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -54,8 +55,6 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
         this.truthFloatFunction = truthFloatFunction == null ? (v)->null : truthFloatFunction;
 
 
-
-        this.lastInputTime = n.time();
 
         this.currentValue = Float.NaN;
     }
@@ -117,12 +116,6 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
     }
 
 
-    @Nullable
-    public Task next() {
-        return current;
-    }
-
-
 
 
 
@@ -133,11 +126,18 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 //        return v;
 //    }
 
+    public float freq() {
+        SignalTask t = get();
+        if (t !=null)
+            return t.freq();
+        else
+            return Float.NaN;
+    }
 
 
     /** provides an immediate truth assessment with the last known signal value */
     @Nullable public final Truth truth() {
-        Task t = this.current;
+        Task t = get();
         return t!=null ? t.truth() : null;
     }
 

@@ -5,6 +5,7 @@ import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import jcog.Util;
+import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -110,7 +111,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
 
 
-
     @NotNull
     public final transient Emotion emotion;
     @NotNull
@@ -205,6 +205,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         Util.toMap(termlinkCount, "termlink count", 4, x::put);
         //x.put("termlink usage", ((double) termlinkCount.getTotalCount()) / termlinksCap.getSum());
         x.put("termlink count", ((double) termlinkCount.getTotalCount()));
+
+        DoubleSummaryStatistics values = new DoubleSummaryStatistics();
+        causeValue.forEach(c -> values.accept(c.floatValue()));
+        x.put("values mean", values.getAverage());
+        x.put("values min", values.getMin());
+        x.put("values max", values.getMax());
+        x.put("values count", values.getCount());
+
 
         //x.put("volume mean", volume.);
 //
@@ -1637,17 +1645,20 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     /**
      * returns the sum of the current values (applied after adding the increment)
+     *
      */
-    public float value(short[] causes, float inc) {
+    public float value(short[] causes, float value) {
 
         float boost = 0;
         int xl = causes.length;
 
-        float vPer = inc / xl;
-        if (Math.abs(vPer) < EPSILON)
-            vPer = 0;
+        //value *= activation; //weight the apparent value by its incoming activation
 
-        for (int i = xl - 1; i >= 0; i--) {
+        if (Math.abs(value) < EPSILON)
+            value = 0;
+
+
+        for (int i = 0; i < xl; i++) {
             short c = causes[i];
             Cause cc = this.causeValue.get(c);
             if (cc == null)
@@ -1655,6 +1666,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                     /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
 
             boost += cc.value();
+
+            float vPer = (((float)(i+1))/xl) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
             if (vPer != 0) {
                 cc.apply(vPer);
             }
@@ -1672,8 +1685,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
+
+    public final FloatParam valuePositiveDecay = new FloatParam(0.99f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.95f, 0, 1f);
+
     public void valueUpdate() {
-        causeValue.forEach(c -> c.commit(0.995f));
+        causeValue.forEach(c -> c.commit((c.value() > 0 ? valuePositiveDecay : valueNegativeDecay).floatValue()));
     }
 
 }

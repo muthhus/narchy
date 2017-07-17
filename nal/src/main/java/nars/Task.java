@@ -380,7 +380,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                         new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
                 answers.commit();
 
-                float confEffective = answer.conf(nearestStartOrEnd(nar.time()), nar.dur());
+                float confEffective = answer.conf(nearestTimeTo(nar.time()), nar.dur());
                 answers.put(new PLink<>(answer, confEffective * 1f));
             }
 
@@ -417,12 +417,27 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         }
     }
 
-    default long nearestStartOrEnd(long when) {
+    default long nearestTimeTo(long when) {
         long s = start();
         if (s == ETERNAL)
             return ETERNAL;
         return nearestStartOrEnd(s, end(), when);
     }
+
+// TODO
+//    default long nearestTimeTo(Task otherTask) {
+//        long s = start();
+//        if (s == ETERNAL)
+//            return ETERNAL;
+//        long os = otherTask.start();
+//        if (os == ETERNAL)
+//            return s;
+//
+//
+//        if (s == ETERNAL)
+//            return ETERNAL;
+//        return nearestStartOrEnd(s, end(), when);
+//    }
 
     static long nearestStartOrEnd(long s, long e, long when) {
         assert (s != ETERNAL);
@@ -1005,22 +1020,22 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     }
 
     default boolean isFutureOf(long when) {
-        long x = nearestStartOrEnd(when);
+        long x = nearestTimeTo(when);
         return x == ETERNAL || x > when;
     }
 
     default boolean isPastOf(long when) {
-        long x = nearestStartOrEnd(when);
+        long x = nearestTimeTo(when);
         return x == ETERNAL || x < when;
     }
 
     default boolean isPresentOf(long when) {
-        long x = nearestStartOrEnd(when);
+        long x = nearestTimeTo(when);
         return x == ETERNAL || x == when;
     }
 
     default boolean isPresentOf(long when, int dur) {
-        long x = nearestStartOrEnd(when);
+        long x = nearestTimeTo(when);
         return x == ETERNAL || Math.abs(x - when) <= dur;
     }
 

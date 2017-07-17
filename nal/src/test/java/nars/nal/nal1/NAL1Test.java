@@ -8,7 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 
 public class NAL1Test extends AbstractNALTest {
 
-    final int CYCLES = 1250;
+    final int CYCLES = 100;
 
 //
 //                new Supplier[]{

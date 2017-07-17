@@ -98,6 +98,8 @@ public final class Conclude extends AbstractPred<Derivation> {
         if (b1 == null)
             return true;
 
+        assert(b1.varPattern() == 0);
+
         Compound c1 = compoundOrNull(b1.eval(d));
         if (c1 == null)
             return true;

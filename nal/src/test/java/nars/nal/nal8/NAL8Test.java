@@ -1373,5 +1373,14 @@ public class NAL8Test extends AbstractNALTest {
                 //TODO needs a 'mustAsk' condition
                 .mustOutput(0, cycles, "((b) ==>-4 (a))?", QUESTION, 0f, 1f, 0f, 1f, 4);
     }
+  @Test public void testNegativeSimliarityGoal() {
 
+        test
+                .log()
+                .input("((me) <-> --(you))!") //i dont want to be like you
+                .input("((me) --> (you)).") //i am like you
+                    //TODO repeat this for <->
+                .mustDesire(cycles, "((you) --> (me))", 0f, 0.81f)
+        ;
+    }
 }

@@ -112,8 +112,21 @@ public class Premise {
 //                            }
                     long when = whenAnswer(task, now);
                     match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
-                    if (match != null)
-                        tryAnswer(taskLink, match, nar);
+                    if (match != null) {
+                        @Nullable Task answered = task.onAnswered(match, nar);
+                        if (answered != null) {
+
+                            float effectiveConf = answered.conf(answered.nearestTimeTo(task.mid()), dur);
+
+                            //transfer budget from question to answer
+                            //float qBefore = taskBudget.priSafe(0);
+                            //float aBefore = answered.priSafe(0);
+                            BudgetFunctions.fund(taskLink, answered,
+                                /*Util.sqr*/effectiveConf, false);
+
+                            nar.value(answered.cause(),effectiveConf);
+                        }
+                    }
                 } else {
                     long when = whenMatch(task, now);
                     match = table.match(when, task, (Compound) beliefTerm, true, nar);
@@ -164,7 +177,7 @@ public class Premise {
         if (task.isEternal()) {
             return ETERNAL;
         } else //if (task.isInput()) {
-            return task.nearestStartOrEnd(now);
+            return task.nearestTimeTo(now);
 //        } else {
 //            if (task.isBelief()) {
 //                return now +
@@ -180,55 +193,7 @@ public class Premise {
     }
 
     protected static long whenAnswer(Task task, long now) {
-        return task.nearestStartOrEnd(now);
-    }
-
-
-    static boolean tryAnswer(PriReference<Task> question /* or quest */, @NotNull Task answer, NAR nar) {
-
-        Task Q = question.get();
-
-
-        @Nullable Task answered = Q.onAnswered(answer, nar);
-
-        if (answered != null) {
-
-            //transfer budget from question to answer
-            //float qBefore = taskBudget.priSafe(0);
-            //float aBefore = answered.priSafe(0);
-            BudgetFunctions.fund(question, answered,
-                    /*Util.sqr*/(answered.conf()),
-                    false);
-
-            //(1f - taskBudget.qua())
-            //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
-
-            //      if (Q.isInput())
-            //        nar.eventTaskProcess.emit(answer);
-
-            return true;
-
-            //BudgetMerge.maxBlend.apply(theTaskLink, taskLinkCopy, 1f);
-
-            //task.budget().set(taskBudget); //update the task budget
-
-            //Crosslink.crossLink(task, answered, answered.conf(), nar);
-
-
-                /*
-                if (qBefore > 0) {
-                    float qFactor = taskBudget.priSafe(0) / qBefore;
-                    c.tasklinks().mul(task, qFactor); //adjust the tasklink's budget in the same proportion as the task was adjusted
-                }
-
-
-                if (aBefore > 0) {
-                    float aFactor = answered.priSafe(0) / aBefore;
-                    c.termlinks().mul(beliefTerm, aFactor);
-                }
-                */
-        }
-        return false;
+        return task.nearestTimeTo(now);
     }
 
 
