@@ -3,6 +3,7 @@ package nars.nal.nal2;
 
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
+import org.junit.Before;
 import org.junit.Test;
 
 //@RunWith(Parameterized.class)
@@ -18,6 +19,9 @@ public class NAL2Test extends AbstractNALTest {
 //    public static Iterable<Supplier<NAR>> configurations() {
 //        return AbstractNALTest.nars(2);
 //    }
+
+    @Before
+    public void nal() { test.nar.nal(2); }
 
     @Test
     public void revision() {

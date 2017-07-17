@@ -2,6 +2,7 @@ package nars.nal.nal5;
 
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -21,6 +22,9 @@ public class NAL5Test extends AbstractNALTest {
 //    }
 
     final int cycles = 750;
+
+    @Before
+    public void nal() { test.nar.nal(5); }
 
     @Test
     public void revision() {

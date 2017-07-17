@@ -3,11 +3,14 @@ package nars.nal.nal4;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class NAL4MultistepTest extends AbstractNALTest {
 
+    @Before
+    public void nal() { test.nar.nal(4); }
 
 
     @Test

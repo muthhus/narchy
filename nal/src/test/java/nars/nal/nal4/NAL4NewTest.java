@@ -1,6 +1,7 @@
 package nars.nal.nal4;
 
 import nars.nal.AbstractNALTest;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -11,6 +12,9 @@ public class NAL4NewTest extends AbstractNALTest {
 
 
     public static final int CYCLES = 450;
+
+    @Before
+    public void nal() { test.nar.nal(4); }
 
 
     @Test

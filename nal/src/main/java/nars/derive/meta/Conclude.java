@@ -86,29 +86,20 @@ public final class Conclude extends AbstractPred<Derivation> {
     public final boolean test(@NotNull Derivation d) {
         NAR nar = d.nar;
 
+        nar.emotion.derivation1.increment();
+
         if (rule.minNAL > nar.level())  //HACK
             return true;
-
-
-        nar.emotion.derivation1.increment();
 
         //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
         Term b0 = this.conclusionPattern;
+        Term b1 = compoundOrNull(d.transform(b0, d));
+        if (b1 == null)
+            return true;
 
-        for (int i = 0; i < 2; i++) { //repeat necessary for second-layer unification
-            Term bp = b0;
-            b0 = compoundOrNull(d.transform(b0, d));
-            if (b0 == null || b0 == conclusionPattern)
-                return true;
-            if (b0.equals(bp))// == bp)
-                break; //no change
-        }
-
-        Compound c0 = (Compound) b0;
-
-        final Compound c1 = compoundOrNull(c0.eval(d));
+        final Compound c1 = compoundOrNull(b1.eval(d));
         if (c1 != null) {
 
             nar.emotion.derivation2.increment();

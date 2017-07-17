@@ -2,7 +2,9 @@ package nars.nal.nal1;
 
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 
 public class NAL1Test extends AbstractNALTest {
 
@@ -37,13 +39,14 @@ public class NAL1Test extends AbstractNALTest {
 //    }
 
 
+    @Before public void nal() { test.nar.nal(1); }
+
     @Test
     public void revision()  {
 
         String belief = "<bird --> swimmer>";
 
         test
-
                 .mustBelieve(4, belief, 0.87f, 0.91f)
                 .believe(belief)                 //.en("bird is a type of swimmer.");
                 .believe(belief, 0.10f, 0.60f)                 //.en("bird is probably not a type of swimmer."); //.en("bird is very likely to be a type of swimmer.");*/

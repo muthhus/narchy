@@ -2,6 +2,7 @@ package nars.nal.nal6;
 
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -12,6 +13,10 @@ public class NAL6Test extends AbstractNALTest {
 
 
     final int cycles = 250;
+
+    @Before
+    public void nal() { test.nar.nal(6); }
+
 
     @Test
     public void variable_unification1()  {

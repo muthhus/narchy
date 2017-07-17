@@ -5,6 +5,7 @@ import nars.$;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
+import org.junit.Before;
 import org.junit.Test;
 
 import static nars.time.Tense.ETERNAL;
@@ -20,6 +21,8 @@ public class NAL3Test extends AbstractNALTest {
 //    public static Iterable configurations() {
 //        return AbstractNALTest.nars(3);
 //    }
+    @Before
+    public void nal() { test.nar.nal(3); }
 
 
     @Test

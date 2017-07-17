@@ -24,7 +24,7 @@ public abstract class AbstractNALTest extends NARS {
 
 
         nar = get();
-        nar.termVolumeMax.setValue(16);
+        nar.termVolumeMax.setValue(32);
         //n.nal(level);
         nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
         nar.DEFAULT_GOAL_PRIORITY = 0.5f;

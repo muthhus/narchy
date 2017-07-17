@@ -6,6 +6,7 @@ import nars.Param;
 import nars.concept.Concept;
 import nars.nar.NARS;
 import nars.time.Tense;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,6 +35,8 @@ public class NAL6MultistepTest {
 //                query(earthquake).
 
         NAR n = new NARS().get();
+        n.nal(6);
+
         //d.log();
         n.input(
                 "(burglary). %0.7;0.9%",
@@ -81,6 +84,8 @@ public class NAL6MultistepTest {
 //                query(earthquake).
 
         NAR n = new NARS().get();
+        n.nal(6);
+
         //d.log();
         n.input(
                 "(burglary).   %0.7;0.9%",
