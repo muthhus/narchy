@@ -26,7 +26,7 @@ public class GoalActionConcept extends ActionConcept {
 
     public static final float CURIOSITY_CONF_FACTOR = 0.5f;
     public final Signal feedback;
-    public final Signal feedbackGoal;
+    public final Signal action;
 
     private final FloatParam curiosity;
 
@@ -47,7 +47,10 @@ public class GoalActionConcept extends ActionConcept {
 
         this.curiosity = curiosity;
         this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priorityDefault(BELIEF));
-        this.feedbackGoal = new Signal(GOAL, resolution).pri(() -> n.priorityDefault(GOAL));
+        ((SensorBeliefTable) beliefs).sensor = feedback;
+
+        this.action = new Signal(GOAL, resolution).pri(() -> n.priorityDefault(GOAL));
+        ((SensorBeliefTable) goals).sensor = action;
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
@@ -129,12 +132,10 @@ public class GoalActionConcept extends ActionConcept {
         LongSupplier stamper = nar.time::nextStamp;
 
         Task fb = feedback.set(this, beliefFeedback, stamper, nar);
-        ((SensorBeliefTable) beliefs).commit(fb);
 
 
 //        //HACK insert shadow goal
-        Task fg = feedbackGoal.set(this, goal, stamper, nar);
-        ((SensorBeliefTable) goals).commit(fg);
+        Task fg = action.set(this, goal, stamper, nar);
 
         //Task fg = null;
 

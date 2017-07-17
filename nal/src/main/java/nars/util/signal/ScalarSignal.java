@@ -85,7 +85,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 
         return set(term,
                 truth,
-                update(truth, nar),
+                stamp(truth, nar),
                 nar);
 
 //        int maxT = this.maxTimeBetweenUpdates;
@@ -111,7 +111,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 //        return null;
     }
 
-    protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
+    protected LongSupplier stamp(Truth currentBelief, @NotNull NAR nar) {
         return nar.time::nextStamp;
     }
 

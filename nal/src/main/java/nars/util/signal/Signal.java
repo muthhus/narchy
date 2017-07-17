@@ -23,7 +23,7 @@ import static nars.time.Tense.ETERNAL;
 public class Signal extends AtomicReference<SignalTask> {
 
 
-    public FloatSupplier pri;
+    FloatSupplier pri;
 
 
     /**
@@ -38,7 +38,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
     final byte punc;
 
-    public long lastInputTime = ETERNAL;
+    long lastInputTime = ETERNAL;
 
 
     public Signal(byte punc, FloatSupplier resolution) {
@@ -62,30 +62,32 @@ public class Signal extends AtomicReference<SignalTask> {
 
             } else {
 
+                SignalTask next = current;
                 long now = nar.time(); //allow the current percept to extend 1/2 duration into the future
 
                 if (current == null ||
                         current.isDeleted() ||
-                        !current.truth.equals(nextTruth, resolution.asFloat())
-                        //(Param.SIGNAL_LATCH_TIME != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME)
-                    ) {
+                        (!current.truth.equals(nextTruth, resolution.asFloat()) ||
+                        (Param.SIGNAL_LATCH_TIME != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME)
+                    )) {
 
                     long last = this.lastInputTime;
-
-
-
-                    this.lastInputTime = now;
-
+                    if (lastInputTime==ETERNAL)
+                        last = now;
 
                     //TODO move the task construction out of this critical update section?
-                    return task(term, nextTruth.truth(),
+                    next = task(term, nextTruth.truth(),
                             last, now,
                             stamper.getAsLong());
-                    //current.priMax(pri.asFloat() * deltaFactor(current, current.truth()));
 
                 }
 
-                return current; //nothing, keep as-is
+                this.lastInputTime = now;
+
+                next.priMax(pri.asFloat()); // * deltaFactor(prev, current.truth()));
+
+
+                return next; //nothing, keep as-is
             }
 
         });

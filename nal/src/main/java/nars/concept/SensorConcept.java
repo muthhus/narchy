@@ -25,33 +25,33 @@ import java.util.function.LongSupplier;
  */
 public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, Function<NAR, Task> {
 
-
-    @NotNull
     public final ScalarSignal sensor;
     private FloatSupplier signal;
     protected float currentValue = Float.NaN;
 
-    public static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
+    static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
 
     public SensorConcept(@NotNull Compound c, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
-        super(c, new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable(c)),
+        super(c,
+                new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable(c)),
                 null, n);
 
         this.sensor = new ScalarSignal(n, c, this, truth, resolution) {
 
-            @Override
-            public Task set(@NotNull Compound term, @Nullable Truthed nextTruth, LongSupplier nextStamp, NAR nar) {
-                Task t = super.set(term, nextTruth, nextStamp, nar);
-                ((SensorBeliefTable) beliefs()).commit(t); //HACK
-                return t;
-            }
+//            @Override
+//            public Task set(@NotNull Compound term, @Nullable Truthed nextTruth, LongSupplier nextStamp, NAR nar) {
+//                Task t = super.set(term, nextTruth, nextStamp, nar);
+//                //((SensorBeliefTable) beliefs()).commit(t); //HACK
+//                return t;
+//            }
 
             @Override
-            protected LongSupplier update(Truth currentBelief, @NotNull NAR nar) {
+            protected LongSupplier stamp(Truth currentBelief, @NotNull NAR nar) {
                 return SensorConcept.this.nextStamp(nar);
             }
         };
+        ((SensorBeliefTable)beliefs).sensor = sensor;
 
         this.signal = signal;
 //        this.beliefs = newBeliefTable(n, true);

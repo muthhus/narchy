@@ -6,6 +6,8 @@ import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;
+import nars.util.signal.ScalarSignal;
+import nars.util.signal.Signal;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -13,25 +15,23 @@ import org.jetbrains.annotations.Nullable;
  */
 class SensorBeliefTable extends DefaultBeliefTable {
 
-    static final int durationsTolerance = 3;
+    static final int durationsTolerance = 1;
 
-    private Task current;
+
+    public Signal sensor;
 
     public SensorBeliefTable(TemporalBeliefTable t) {
         super(t);
     }
 
-    public void commit(Task next) {
-        this.current = next;
-    }
 
     @Override
     public Truth truth(long when, NAR nar) {
         Truth tabled = super.truth(when, nar);
 
-        Task current = this.current;
-        if (latches(when, nar, current)) {
-            return Truth.maxConf(tabled, current.truth());
+        Task current = this.sensor.get();
+        if (current!=null && latches(when, nar, current)) {
+            return Truth.maxConf(tabled, current.truth(when, nar.dur()));
         } else {
             return tabled;
         }
@@ -41,10 +41,11 @@ class SensorBeliefTable extends DefaultBeliefTable {
     public Task match(long when, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
         Task tabled = super.match(when, against, template, noOverlap, nar);
 
-        Task current = this.current;
-        if (latches(when, nar, current)) {
-            if (tabled!=null && tabled.conf() >= current.conf())
-                    return tabled;
+        Task current = this.sensor.get();
+        if (current!=null && latches(when, nar, current)) {
+            int dur = nar.dur();
+            if (tabled!=null && tabled.evi(when, dur) >= current.evi(when, dur))
+                return tabled;
             return current;
         } else {
             return tabled;
