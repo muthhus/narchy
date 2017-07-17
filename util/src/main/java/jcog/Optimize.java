@@ -15,6 +15,7 @@ import org.apache.commons.math3.util.MathArrays;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatObjectProcedure;
 import org.eclipse.collections.api.tuple.primitive.DoubleObjectPair;
+import org.intelligentjava.machinelearning.decisiontree.FloatTable;
 import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -253,10 +254,12 @@ public class Optimize<X> {
                 return null;
 
 
-            int cols = tweaks.size() + 1;
-            RealDecisionTree rt = new RealDecisionTree(discretization, maxDepth,
-                    ArrayUtils.add(
-                            tweaks.stream().map(Tweak::toString).toArray(String[]::new), "score"));
+            FloatTable<String> data = new FloatTable<>(
+                ArrayUtils.add(
+                        tweaks.stream().map(Tweak::toString).toArray(String[]::new), "score")
+            );
+
+            int cols = data.cols.length;
 
             for (DoubleObjectPair<double[]> exp : experiments) {
                 float[] r = new float[cols];
@@ -265,10 +268,10 @@ public class Optimize<X> {
                     r[i++] = (float)x;
                 }
                 r[i] = (float)exp.getOne();
-                rt.add(r);
+                data.add(r);
             }
 
-            rt.update(cols-1 /* score */);
+            RealDecisionTree rt = new RealDecisionTree(data, cols - 1 /* score */, maxDepth, discretization);
 
             return rt;
 

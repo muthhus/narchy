@@ -1,11 +1,12 @@
 package nars.util;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ListMultimap;
-import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.Iterators;
+import jcog.Texts;
 import jcog.Util;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.$;
+import org.intelligentjava.machinelearning.decisiontree.FloatTable;
 import org.jetbrains.annotations.Nullable;
 import org.junit.internal.runners.model.ReflectiveCallable;
 import org.junit.internal.runners.statements.Fail;
@@ -37,7 +38,7 @@ public class OptiUnit<T> extends RunListener {
 //    final ListMultimap<SortedMap<String, Object>, SortedMap<String, Object>> log =
 //            MultimapBuilder.hashKeys().arrayListValues().build();
 
-    final List<Experiment> log = Collections.synchronizedList($.newArrayList());
+    final List<Experiment> experiments = Collections.synchronizedList($.newArrayList());
 
     private final Class<? extends T>[] tests;
     private final Function<T, SortedMap<String, Object>> get;
@@ -46,21 +47,18 @@ public class OptiUnit<T> extends RunListener {
     private final RunNotifier rn;
 
 
-
-
     /**
      * records modifications to an object
      * for an immutable representation of experiment's preconditions, etc.
-     *
-     *      * invoke method with arguments
-     *      * set field value
-     *
+     * <p>
+     * * invoke method with arguments
+     * * set field value
+     * <p>
      * each action consists of a key and value pair.  the order they are applied
      * should not matter, and so the keys will be stored sorted lexicographically
-     *
+     * <p>
      * it uses nashorn javascript engine to evaluate the generated expressions
      * upon the given object.
-     *
      */
     public static class Tweaks<X> extends TreeMap<String, Object> {
 
@@ -87,18 +85,19 @@ public class OptiUnit<T> extends RunListener {
         public Tweaks<X> set(String fieldExpression, Object value) {
             try {
                 JS.eval("thiz." + fieldExpression + " = " + value, ctx);
-                put(fieldExpression, value);
+                assert (put(fieldExpression, value) == null);
             } catch (ScriptException e) {
                 e.printStackTrace();
             }
             return this;
         }
-//
+
+        //
         public Tweaks<X> call(String methodExpression, Object... param) {
             String paramStr = Joiner.on(",").join(param);
             try {
                 JS.eval("thiz." + methodExpression + "(" + paramStr + ")", ctx);
-                put(methodExpression + "(", paramStr);
+                assert (put(methodExpression + "(", paramStr) == null);
             } catch (ScriptException e) {
                 e.printStackTrace();
             }
@@ -125,14 +124,21 @@ public class OptiUnit<T> extends RunListener {
         rn.addListener(this);
     }
 
-    public OptiUnit<T> run(Function<T, SortedMap<String, Object>> setup) {
-        try {
-            new Suite(new BuildMyRunners(setup), tests).run(rn);
+    public OptiUnit<T> run(Function<T, SortedMap<String, Object>>... sets) {
+        return run(Iterators.forArray(sets));
+    }
 
-        } catch (Throwable t) {
-            t.printStackTrace();
-            logger.error(" {}", t);
-        }
+    public OptiUnit<T> run(Iterator<? extends Function<T, SortedMap<String, Object>>> sets) {
+
+        sets.forEachRemaining(s -> {
+            try {
+
+                new Suite(new BuildMyRunners(s), tests).run(rn);
+
+            } catch (Throwable t) {
+                logger.error(" {}", t);
+            }
+        });
 
         return this;
     }
@@ -195,14 +201,13 @@ public class OptiUnit<T> extends RunListener {
                 cause = setCause.apply(subject);
 
                 run.evaluate();
-            }
-            catch (Throwable t) {
+            } catch (Throwable t) {
                 error = t;
             }
 
             effect = getEffect.apply(subject);
 
-            log.add(this);
+            experiments.add(this);
 
 
             if (error != null && traceErrors)
@@ -211,7 +216,56 @@ public class OptiUnit<T> extends RunListener {
         }
 
 
+        /**
+         * extracts an array of float values (conversion attempted otherwise NaN)
+         */
+        public float[] floats(String... keys) {
+            float[] f = new float[keys.length];
+            for (int i = 0; i < keys.length; i++) {
+                f[i] = floatValue(get(keys[i]));
+            }
+            return f;
+        }
+
+
+        /**
+         * HACK gets the values, but must check both maps. TODO merge on construction
+         */
+        public Object get(String key) {
+            Object e = effect.get(key);
+            if (e != null) {
+                return e;
+            }
+
+            return cause.get(key);
+        }
+
+
     }
+
+    static float floatValue(Object value) {
+        if (value instanceof Number) {
+            return ((Number)value).floatValue();
+        } else {
+            //last resort try to parse as a string
+            try {
+                return Texts.f(value.toString());
+            } catch (NumberFormatException e) {
+                return Float.NaN;
+            }
+        }
+    }
+
+
+    /**
+     * extract a table of numeric values from each experiment, selected from the specified columns
+     */
+    public FloatTable<String> table(String... columns) {
+        FloatTable<String> t = new FloatTable<>(columns);
+        experiments.forEach(e ->  t.add(e.floats(columns)) );
+        return t;
+    }
+
 
     final static Logger logger = LoggerFactory.getLogger(OptiUnit.class);
 
@@ -263,12 +317,12 @@ public class OptiUnit<T> extends RunListener {
         }
     }
 
-   public void print(File out) throws FileNotFoundException {
+    public void print(File out) throws FileNotFoundException {
         print(new PrintStream(new FileOutputStream(out)));
     }
 
     public void print(PrintStream out) {
-        log.forEach(e -> e.print(out));
+        experiments.forEach(e -> e.print(out));
     }
 
 //    abstract public static interface Experiment<O,P> {

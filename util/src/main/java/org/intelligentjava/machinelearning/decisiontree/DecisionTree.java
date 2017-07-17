@@ -89,27 +89,27 @@ public class DecisionTree<K, V> {
 
     /**
      * Trains tree on training data for provided features.
-     *
-     * @param value        The value column being learned
+     *  @param value        The value column being learned
      * @param trainingData List of training data samples.
      * @param features     List of possible features.
      */
-    public void put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, IntToFloatFunction precision) {
+    public Node put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, IntToFloatFunction precision) {
         root = put(value, trainingData, features, 1, precision);
+        return root;
     }
 
     /**
      * constant precision
      */
-    public void put(K value, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features, float precision) {
-        put(value, data, features, (depth) -> precision);
+    public Node put(K value, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features, float precision) {
+        return put(value, data, features, (depth) -> precision);
     }
 
     /**
      * default constant precision
      */
-    public void put(K value, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features) {
-        put(value, data, features, DEFAULT_PRECISION);
+    public Node put(K value, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features) {
+        return put(value, data, features, DEFAULT_PRECISION);
     }
 
     /**

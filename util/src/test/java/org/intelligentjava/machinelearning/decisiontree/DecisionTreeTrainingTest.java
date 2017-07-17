@@ -19,7 +19,7 @@ import static org.junit.Assert.*;
 public class DecisionTreeTrainingTest {
 
 
-    static final com.google.common.base.Function<JsonNode, Function<String,Object>> jsonValue = (j) -> j::get;
+    static final com.google.common.base.Function<JsonNode, Function<String, Object>> jsonValue = (j) -> j::get;
     //static final com.google.common.base.Function<Map, Value> mapValue = (j) -> j::get;
 
     /**
@@ -45,10 +45,10 @@ public class DecisionTreeTrainingTest {
         SimpleValue data3 = data(header, Boolean.FALSE, Boolean.TRUE, BooleanLabel.FALSE_LABEL);
         SimpleValue data4 = data(header, Boolean.FALSE, Boolean.FALSE, BooleanLabel.FALSE_LABEL);
 
-        Predicate<Function<String,Object>> feature1 = feature("x1", Boolean.TRUE);
-        Predicate<Function<String,Object>> feature2 = feature("x1", Boolean.FALSE);
-        Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
-        Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
+        Predicate<Function<String, Object>> feature1 = feature("x1", Boolean.TRUE);
+        Predicate<Function<String, Object>> feature2 = feature("x1", Boolean.FALSE);
+        Predicate<Function<String, Object>> feature3 = feature("x2", Boolean.TRUE);
+        Predicate<Function<String, Object>> feature4 = feature("x2", Boolean.FALSE);
 
         tree.put("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
 
@@ -93,10 +93,10 @@ public class DecisionTreeTrainingTest {
         SimpleValue data3 = data(header, Boolean.FALSE, Boolean.TRUE, BooleanLabel.TRUE_LABEL);
         SimpleValue data4 = data(header, Boolean.FALSE, Boolean.FALSE, BooleanLabel.FALSE_LABEL);
 
-        Predicate<Function<String,Object>> feature1 = feature("x1", Boolean.TRUE);
-        Predicate<Function<String,Object>> feature2 = feature("x1", Boolean.FALSE);
-        Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
-        Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
+        Predicate<Function<String, Object>> feature1 = feature("x1", Boolean.TRUE);
+        Predicate<Function<String, Object>> feature2 = feature("x1", Boolean.FALSE);
+        Predicate<Function<String, Object>> feature3 = feature("x2", Boolean.TRUE);
+        Predicate<Function<String, Object>> feature4 = feature("x2", Boolean.FALSE);
 
         tree.put("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
 
@@ -140,10 +140,10 @@ public class DecisionTreeTrainingTest {
         SimpleValue data3 = data(header, Boolean.FALSE, Boolean.TRUE, BooleanLabel.TRUE_LABEL);
         SimpleValue data4 = data(header, Boolean.FALSE, Boolean.FALSE, BooleanLabel.FALSE_LABEL);
 
-        Predicate<Function<String,Object>> feature1 = feature("x1", Boolean.TRUE);
-        Predicate<Function<String,Object>> feature2 = feature("x1", Boolean.FALSE);
-        Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
-        Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
+        Predicate<Function<String, Object>> feature1 = feature("x1", Boolean.TRUE);
+        Predicate<Function<String, Object>> feature2 = feature("x1", Boolean.FALSE);
+        Predicate<Function<String, Object>> feature3 = feature("x2", Boolean.TRUE);
+        Predicate<Function<String, Object>> feature4 = feature("x2", Boolean.FALSE);
 
         tree.put("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
         tree.print();
@@ -205,10 +205,10 @@ public class DecisionTreeTrainingTest {
         SimpleValue data3 = data(header, Boolean.FALSE, Boolean.TRUE, BooleanLabel.FALSE_LABEL);
         SimpleValue data4 = data(header, Boolean.FALSE, Boolean.FALSE, BooleanLabel.FALSE_LABEL);
 
-        Predicate<Function<String,Object>> feature1 = feature("x1", Boolean.TRUE);
-        Predicate<Function<String,Object>> feature2 = feature("x1", Boolean.FALSE);
-        Predicate<Function<String,Object>> feature3 = feature("x2", Boolean.TRUE);
-        Predicate<Function<String,Object>> feature4 = feature("x2", Boolean.FALSE);
+        Predicate<Function<String, Object>> feature1 = feature("x1", Boolean.TRUE);
+        Predicate<Function<String, Object>> feature2 = feature("x1", Boolean.FALSE);
+        Predicate<Function<String, Object>> feature3 = feature("x2", Boolean.TRUE);
+        Predicate<Function<String, Object>> feature4 = feature("x2", Boolean.FALSE);
 
         tree.put("answer",
                 asList(data1, data2, data3, data4),
@@ -248,18 +248,25 @@ public class DecisionTreeTrainingTest {
 //    }
 //
 
-    @Test public void testRealDecisionTable() {
-        RealDecisionTree t = new RealDecisionTree(2, 5,"a", "b", "x").rangeLabels("LO", "HI");
-        t.add(1, 1, 0);
-        t.add(1, 0, 1);
-        t.add(2, 1, 1);
-        t.add(5, 1, 0);
-        t.add(5, 0, 1);
-        t.update(2);
-        t.print();
+    @Test
+    public void testRealDecisionTable() {
+
+
+        RealDecisionTree tr = new RealDecisionTree(
+            new FloatTable<>("a", "b", "x")
+                .add(1, 1, 0)
+                .add(1, 0, 1)
+                .add(2, 1, 1)
+                .add(5, 1, 0)
+                .add(5, 0, 1),
+                2,
+                5, new String[]{"LO", "HI"}
+        );
+
+        tr.print();
 
         assertEquals("[1.0, 0.0]",
-                t.leaves().collect(toList()).toString());
+                tr.leaves().collect(toList()).toString());
 
     }
 
