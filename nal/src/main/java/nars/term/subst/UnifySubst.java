@@ -88,7 +88,7 @@ public class UnifySubst extends Unify {
 
             return /*subs.isEmpty() ?
                     t : *//* no change necessary */
-                    new MapSubst(subs).transform(t, nar.terms);
+                    new MapSubst(subs).transform(t);
 //        } catch (InvalidTermException e) {
 //            return null;
 //        }

@@ -5,6 +5,8 @@ import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.Op.Null;
+
 /**
  * note: if the two terms are equal, it is automatically invalid ("neq")
  */
@@ -20,8 +22,8 @@ public abstract class CommonalityConstraint extends MatchConstraint {
     @Override
     public final boolean invalid(@NotNull Term y, @NotNull Unify f) {
 
-        Term x = f.resolve(other);
-        if (x == null)
+        Term x = f.xy(other);
+        if (x == null || x == Null)
             return false; //not invalid until both are present to be compared
 
         if (x.equals(y)) {

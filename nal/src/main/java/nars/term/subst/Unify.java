@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
-import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.derive.meta.constraint.MatchConstraint;
@@ -13,7 +12,6 @@ import nars.term.Term;
 import nars.term.mutate.Termutator;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -201,7 +199,7 @@ public abstract class Unify implements Subst {
 
     @Nullable
     public Term resolve(@NotNull Term x) {
-        return transform(x, terms);
+        return transform(x);
     }
 
 

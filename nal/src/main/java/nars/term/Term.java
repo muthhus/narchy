@@ -416,7 +416,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
     }
 
     /** if filterTrueFalse is false, only filters Null's */
-    static boolean filterAbsolute(@NotNull Term u, boolean filterTrueFalse) {
+    static boolean filterBool(@NotNull Term u, boolean filterTrueFalse) {
         return u instanceof Bool && (filterTrueFalse || (u == Null));
     }
 

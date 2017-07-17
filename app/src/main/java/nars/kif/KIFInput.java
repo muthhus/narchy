@@ -359,11 +359,11 @@ public class KIFInput implements Runnable {
                             "_" + t.toString().substring(1)));
         });
 
-        conditionTerm = new MapSubst(remap).transform(conditionTerm, nar.terms);
+        conditionTerm = new MapSubst(remap).transform(conditionTerm);
         if (conditionTerm == null)
             return null;
 
-        actionTerm = new MapSubst(remap).transform(actionTerm, nar.terms);
+        actionTerm = new MapSubst(remap).transform(actionTerm);
         if (actionTerm == null)
             return null;
 

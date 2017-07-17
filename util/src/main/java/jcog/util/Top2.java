@@ -45,10 +45,8 @@ public final class Top2<T> implements Consumer<T> {
     public List<T> toList() {
         if (a != null && b != null) {
             return Lists.newArrayList(a, b);
-        } else if (b == null) {
+        } else if (b == null && a!=null) {
             return Collections.singletonList(a);
-        } else if (a == null) {
-            return Collections.singletonList(b);
         } else {
             return Collections.emptyList();
         }

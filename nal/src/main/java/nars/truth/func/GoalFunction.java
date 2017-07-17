@@ -84,13 +84,23 @@ public enum GoalFunction implements TruthOperator {
             return decompose(T, B, true, false, false, minConf);
         }
     },
-
+    DecomposePositiveNegativePositive() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return TruthFunctions.decompose(T,B, true, false, true, minConf);
+        }
+    },
     DecomposeNegativeNegativeNegative() {
         @Nullable @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
             return decompose(T, B, false, false, false, minConf);
         }
     },
-
+    DecomposeNegativePositivePositive() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return TruthFunctions.decompose(T,B, false, true, true, minConf);
+        }
+    },
 
     @SinglePremise
     Identity() {

@@ -539,14 +539,18 @@ public class PremiseRule extends GenericCompound {
                     constraints.add(new OpInConstraint(X, Op.SETi, Op.SETe));
                     break;
 
-                case "setext":
-                    pres.add(new TaskBeliefHas(Op.SETe.bit, taskTermPattern.contains(X), beliefTermPattern.contains(X)));
-                    constraints.add(new OpConstraint(X, Op.SETe));
+                case "setext": //TODO rename: opSETe
+                    isOp(pres, taskTermPattern, beliefTermPattern, constraints, X, Op.SETe);
                     break;
 
-                case "setint":
-                    pres.add(new TaskBeliefHas(Op.SETi.bit, taskTermPattern.contains(X), beliefTermPattern.contains(X)));
-                    constraints.add(new OpConstraint(X, Op.SETi));
+                case "setint": //TODO rename: opSETi
+                    isOp(pres, taskTermPattern, beliefTermPattern, constraints, X, Op.SETi);
+                    break;
+                case "opSECTe":
+                    isOp(pres, taskTermPattern, beliefTermPattern, constraints, X, Op.SECTe);
+                    break;
+                case "opSECTi":
+                    isOp(pres, taskTermPattern, beliefTermPattern, constraints, X, Op.SECTi);
                     break;
 
 
@@ -770,6 +774,11 @@ public class PremiseRule extends GenericCompound {
 //            throw new RuntimeException("rule's conclusion belief pattern has no pattern variable");
 
         return this;
+    }
+
+    public static void isOp(Set<BoolPred> pres, Term taskTermPattern, Term beliefTermPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
+        pres.add(new TaskBeliefHas(v.bit, taskTermPattern.contains(x), beliefTermPattern.contains(x)));
+        constraints.add(new OpConstraint(x, v));
     }
 
     public TimeFunctions time(Set<BoolPred> pres, Term y, Term z, String XString) {

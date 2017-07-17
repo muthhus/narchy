@@ -40,6 +40,30 @@ public class BufferedImageBitmap2D implements Bitmap2D, Supplier<BufferedImage> 
         }.mode(c);
     }
 
+    //HACK TODO use better filter
+    public BufferedImageBitmap2D blur() {
+        return new BufferedImageBitmap2D(this){
+            @Override
+            public int width() {
+                return BufferedImageBitmap2D.this.width(); //HACK
+            }
+            @Override
+            public int height() {
+                return BufferedImageBitmap2D.this.height(); //HACK
+            }
+
+            @Override
+            public float brightness(int xx, int yy) {
+                float c = super.brightness(xx, yy);
+                float up = yy > 0 ? super.brightness(xx, yy-1) : c;
+                float left = xx > 0 ? super.brightness(xx-1, yy) : c;
+                float down = yy < height()-1 ? super.brightness(xx, yy+1) : c;
+                float right = xx < width()-1 ? super.brightness(xx+1, yy) : c;
+                return (c*4 + up + left + down + right)/8;
+            }
+        };
+    }
+
     public BufferedImageBitmap2D mode(ColorMode c) {
         this.mode = c;
         return this;

@@ -26,7 +26,6 @@ import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
 
 /**
  * Final conclusion step of the derivation process that produces a derived task
@@ -95,7 +94,7 @@ public final class Conclude extends AbstractPred<Derivation> {
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
         Term b0 = this.conclusionPattern;
-        Term b1 = compoundOrNull(d.transform(b0, d));
+        Term b1 = compoundOrNull(d.transform(b0));
         if (b1 == null)
             return true;
 

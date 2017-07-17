@@ -70,7 +70,7 @@ public class SubUnify extends Unify {
 //            }
 
 
-                result = transform(xterm, terms);
+                result = transform(xterm);
 //                if (result == null)
 //                    fail = true;
 

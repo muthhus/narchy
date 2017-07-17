@@ -45,7 +45,7 @@ public class Gradius4K extends GamePanel implements Runnable {
     public static final int VK_SHOOT = 0x42;
     public int score = 0;
     public int playerDead = 1;
-    public int SPEED = 2;
+    public int SPEED = 1;
     public float cameraX = 0;
     public float[] player = new float[256];
 

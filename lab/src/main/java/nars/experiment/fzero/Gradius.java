@@ -23,7 +23,7 @@ public class Gradius extends NAgentX {
 
         this.g = new Gradius4K();
 
-        g.updateMS = 20;
+        g.updateMS = 8;
 
         //Scale cc = new Scale(() -> g.image, 96, 96);
         //senseCamera("(G)", cc);
@@ -50,7 +50,9 @@ public class Gradius extends NAgentX {
 
 
 
-        Scale camScaleLow = new Scale(() -> g.image, 24, 24);
+        nar.truthResolution.setValue(0.05f);
+
+        BufferedImageBitmap2D camScaleLow = new Scale(() -> g.image, 16, 16);
         for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[]{
                 R,
                 BufferedImageBitmap2D.ColorMode.B,
@@ -58,8 +60,8 @@ public class Gradius extends NAgentX {
         }) {
             senseCamera("Gc" + cm.name(), /*"(G,c" + cm.name() + ")"*/
                     //(cm == R ? camScale : camScaleLow).filter(cm)
-                    camScaleLow.filter(cm)
-            ).resolution(0.2f);
+                    camScaleLow.filter(cm).blur()
+            ).resolution(0.1f);
         }
 
         actionToggle($.inh(Atomic.the("fire"), id),
@@ -118,7 +120,6 @@ public class Gradius extends NAgentX {
 
         NAgentX.runRT((n) -> {
 
-            n.termVolumeMax.setValue(24);
 
             Gradius a = null;
             try {
@@ -128,7 +129,7 @@ public class Gradius extends NAgentX {
             }
             return a;
 
-        }, 10f);
+        }, 30f);
 
     }
 

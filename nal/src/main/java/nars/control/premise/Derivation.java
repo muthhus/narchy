@@ -16,12 +16,15 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.subst.Unify;
 import nars.term.util.InvalidTermException;
+import nars.term.var.VarPattern;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.False;
+import static nars.Op.Null;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesDep;
@@ -135,6 +138,8 @@ public class Derivation extends Unify implements TermContext {
             return compared.isNegative() ? $.neg(subterm) : subterm;
         });
     }
+
+
 
 
     @Override

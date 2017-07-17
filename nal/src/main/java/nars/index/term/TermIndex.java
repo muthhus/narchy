@@ -306,7 +306,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
                 return null;
 
             if (y != x) {
-                if (Term.filterAbsolute(y, filterTrueFalse))
+                if (Term.filterBool(y, filterTrueFalse))
                     return null;
 
                 //            if (y != null)
@@ -341,7 +341,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
             case EQUI:
             case IMPL:
             case CONJ:
-                return false; //allow for these because reductions may apply
+                return false; //allow for these because reductions may apply if they are present
             default:
                 return true;
         }
@@ -432,12 +432,12 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
     @Nullable
     public final Term replace(@NotNull Term src, @NotNull Map<Term, Term> m) {
-        return new MapSubst(m).transform(src, this);
+        return new MapSubst(m).transform(src);
     }
 
     @Nullable
     public final Term replace(@NotNull Term src, @NotNull Term from, @NotNull Term to) {
-        return new MapSubst1(from, to).transform(src, this);
+        return new MapSubst1(from, to).transform(src);
     }
 
 

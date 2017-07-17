@@ -1,17 +1,16 @@
 package nars.term.subst;
 
 import nars.Op;
-import nars.control.premise.Derivation;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.PatternTermIndex;
-import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.VAR_PATTERN;
 import static nars.index.term.TermIndex.disallowTrueOrFalse;
 
 
@@ -21,7 +20,9 @@ public interface Subst  {
      * used as a quick test to prevent transform initializations */
     boolean isEmpty();
 
+    /** the assigned value for x */
     @Nullable Term xy(Term t);
+
 
 //    /** suggests to this to store a cached result, which can be ignored if the impl chooses */
 //    void cache(@NotNull Term x /* usually a Variable */, @NotNull Term y);
@@ -40,49 +41,51 @@ public interface Subst  {
      * */
     boolean put(@NotNull Unify copied);
 
-    @Nullable default Term transform(@NotNull Term src, TermContext index) {
-        Term y = xy(src);
+
+    @Nullable default Term transform(@NotNull Term x) {
+        Term y = xy(x);
         if (y != null) {
             return y; //an assigned substitution, whether a variable or other type of term
         }
 
-        Op op = src.op();
-        switch (op) {
-            case ATOM:
-            case INT:
-            case VAR_DEP:
-            case VAR_INDEP:
-            case VAR_QUERY:
-                return src; //unassigned literal atom or non-pattern var
-            case VAR_PATTERN:
-                return null; //unassigned pattern variable
-        }
+        if (!(x instanceof Compound))
+            return x;
+//        Op op = x.op();
+//        switch (op) {
+//            case ATOM:
+//            case INT:
+//            case VAR_DEP:
+//            case VAR_INDEP:
+//            case VAR_QUERY:
+//            case VAR_PATTERN:
+//                return x; //unassigned literal atom or non-pattern var
+//        }
 
-        //shortcut for premise evaluation matching:
-        //no variables that could be substituted, so return this constant
-        if (this instanceof Derivation && (src.vars() + src.varPattern() == 0))
-            return src;
+//        //shortcut for premise evaluation matching:
+//        //no variables that could be substituted, so return this constant
+//        if (this instanceof Derivation && (x.vars() + x.varPattern() == 0))
+//            return x;
 
 
-        boolean strict = !(index instanceof PatternTermIndex); //f instanceof Derivation;
 
-        Compound curr = (Compound) src;
+        Compound curr = (Compound) x;
         TermContainer subs = curr.subterms();
 
         int len = subs.size();
 
 
-        Op cop = curr.op();
+        Op op = x.op();
 
-        AppendProtoCompound next = new AppendProtoCompound(cop, len);
+        AppendProtoCompound next = new AppendProtoCompound(op, len);
 
         //early prefilter for True/False subterms
-        boolean filterTrueFalse = disallowTrueOrFalse(cop);
+        boolean filterTrueFalse = disallowTrueOrFalse(op);
+
 
 
         for (int i = 0; i < len; i++) {
             Term t = subs.sub(i);
-            Term u = transform(t, index);
+            Term u = transform(t);
 
             if (u instanceof EllipsisMatch) {
 
@@ -95,28 +98,28 @@ public interface Subst  {
 
             } else {
 
-                if (u == null) {
-
-                    if (strict) {
-                        return null;
-                    }
-
-                    u = t; //keep value
-
+                if (u == null || Term.filterBool(u, filterTrueFalse)) {
+                    return null;
                 }
 
-                if (Term.filterAbsolute(u, filterTrueFalse))
+                if (!next.add(u))
                     return null;
-
-                next.add(u);
-
 
             }
 
-
         }
 
-        return cop.the(curr.dt(), next.subterms());
+
+//        int ns = next.size();
+//        if (ns > op.maxSize)
+//            return null;
+//        if (op.statement && ns < op.minSize) {
+////
+////            if (ns != 1 || next.sub(0).op()!=VAR_PATTERN) //exclude special single-element pattern variables
+//                return null;
+//        }
+
+        return op.the(curr.dt(), next.subterms());
     }
 
 

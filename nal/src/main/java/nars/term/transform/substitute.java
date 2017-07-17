@@ -57,7 +57,7 @@ public class substitute extends Functor {
 //                (hasYX ?
 //                    new MapSubstWithOverride(parent.yx, x, y) :
                     new MapSubst1(x,y) //optimized case
-                        .transform(input, $.terms);
+                        .transform(input);
 
         return (output != null) ? output : Null;
     }
