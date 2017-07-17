@@ -61,7 +61,7 @@ public class SyntaxUtilities
      * @param match The character array to match
      */
     public static boolean regionMatches(boolean ignoreCase, Segment text,
-                        int offset, char[] match)
+                                        int offset, char... match)
     {
         int length = offset + match.length;
         char[] textArray = text.array;

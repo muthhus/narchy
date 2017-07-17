@@ -23,7 +23,7 @@ class PrologThread extends Thread {
 
 public class TestStop {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String... args) throws Exception {
 		
 		Prolog core = new Prolog();
 		

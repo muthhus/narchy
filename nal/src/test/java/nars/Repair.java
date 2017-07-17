@@ -1,23 +1,26 @@
 package nars;
 
+import nars.nal.AbstractNALTest;
 import nars.nal.nal1.NAL1Test;
 import nars.nal.nal2.NAL2Test;
 import nars.nal.nal6.NAL6Test;
-import nars.nal.nal7.NAL7Test;
 import nars.util.OptiUnit;
 import org.intelligentjava.machinelearning.decisiontree.FloatTable;
+import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 
-import java.io.FileNotFoundException;
 import java.util.SortedMap;
 
 public class Repair {
 
-    Class[] testClasses = {
-        NAL1Test.class, NAL2Test.class, NAL6Test.class
-    };
 
     public static void main(String[] args) {
-        OptiUnit o = new OptiUnit<>((x) -> {
+
+        Class[] testClasses = {
+                //NAL1Test.class, NAL2Test.class,
+                NAL6Test.class
+        };
+
+        OptiUnit<AbstractNALTest> o = new OptiUnit<AbstractNALTest>((x) -> {
 
             //OBSERVE AND COLLECT EXPERIMENT RESULTS
             SortedMap<String, Object> stat = x.nar.stats();
@@ -25,21 +28,36 @@ public class Repair {
 
             return stat;
 
-        }, NAL7Test.class).run((x) -> {
+        }, testClasses);
 
-            //SETUP EXPERIMENT
-            x.test.trace = false;
+        for (int v : new int[] { 8, 16, 32 }) {
+            o.run((x) -> {
 
-            return new OptiUnit.Tweaks<>(x)
-                    .set("cycles", 5)
-                    .call("nar.termVolumeMax.setValue", 28)
-                    ;
+                //SETUP EXPERIMENT
+                x.test.trace = false;
 
-        });
+                return new OptiUnit.Tweaks<>(x)
+                        .set("cycles", 5)
+                        .call("nar.termVolumeMax.setValue", v)
+                        ;
 
-        FloatTable<String> table = o.table("concept count", "concept fire activates", "score");
-        table.print(System.out);
+            });
+        }
 
         o.print(System.out);
+
+        FloatTable<String> table = o.table(
+                "concept count",
+                "nar.termVolumeMax.setValue(",
+                //"concept fire activates",
+                //"concept fire premises",
+                "task belief count",
+                "score");
+        table.print(System.out);
+
+        RealDecisionTree tree = new RealDecisionTree(table, 3, 8,
+                "LL", "MM", "HH");
+        tree.print(System.out);
+
     }
 }

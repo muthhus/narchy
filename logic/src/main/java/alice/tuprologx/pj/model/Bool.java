@@ -24,7 +24,7 @@ public class Bool extends Term<Bool> {
         
         @Override
         public alice.tuprolog.Term marshal() {
-            return _theBool.booleanValue() ? alice.tuprolog.Struct.TRUE : alice.tuprolog.Struct.FALSE;
+            return _theBool ? alice.tuprolog.Struct.TRUE : alice.tuprolog.Struct.FALSE;
         }
         
         static Bool unmarshal(alice.tuprolog.Struct b) {

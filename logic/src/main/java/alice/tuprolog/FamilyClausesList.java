@@ -416,7 +416,7 @@ public class FamilyClausesList extends
 
 		private static final FamilyClausesList clauseList = new FamilyClausesList();
 
-		public static void main(String[] args) {
+		public static void main(String... args) {
 			ClauseInfo first = new ClauseInfo(new Struct(new Struct("First"),new Struct("First")),"First Element");
 			ClauseInfo second = new ClauseInfo(new Struct(new Struct("Second"),new Struct("Second")),"Second Element");
 			ClauseInfo third = new ClauseInfo(new Struct(new Struct("Third"),new Struct("Third")),"Third Element");

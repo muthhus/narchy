@@ -136,12 +136,8 @@ public class Var extends Term {
     Term copy(AbstractMap<Var, Var> vMap, int idExecCtx) {
         Term tt = getTerm();
         if (tt == this) {
-            Var v = vMap.get(this);
-            if (v == null) {
-                //No occurence of v before
-                v = new Var(name, idExecCtx, 0, timestamp);
-                vMap.put(this, v);
-            }
+            Var v = vMap.computeIfAbsent(this, k -> new Var(name, idExecCtx, 0, timestamp));
+            //No occurence of v before
             return v;
         } else {
             return tt.copy(vMap, idExecCtx);

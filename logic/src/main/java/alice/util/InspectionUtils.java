@@ -18,7 +18,7 @@ public class InspectionUtils
 	 * @param methodName: name of method
 	 * @param parms: array of params
 	 */
-	public static Method searchForMethod(Class<?> type, String methodName, Class<?>[] parms) {
+	public static Method searchForMethod(Class<?> type, String methodName, Class<?>... parms) {
 	    Method[] methods = type.getMethods();
 	    for(int i = 0; i < methods.length; i++) {
 	        // Has to be named the same of course.
@@ -45,7 +45,7 @@ public class InspectionUtils
      *  Any null values in sources are considered wild-cards and will skip the
      *  isAssignableFrom check as if it passed.
      */
-    public static boolean areTypesCompatible(Class<?>[] targets, Class<?>[] sources)
+    public static boolean areTypesCompatible(Class<?>[] targets, Class<?>... sources)
     {
         if(targets.length != sources.length)
             return( false );

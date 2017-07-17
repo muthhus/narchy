@@ -21,7 +21,7 @@ public class ThreadLibrary extends Library {
 	}
 	
 	//Tenta di unificare a t l'identificativo del thread corrente
-	public boolean thread_id_1 (Term t) throws PrologError{
+	public boolean thread_id_1 (Term t) {
         int id = engineManager.runnerId();
         unify(t,new Int(id));
 		return true;

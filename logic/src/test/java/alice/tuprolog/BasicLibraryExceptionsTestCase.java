@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 /**
  * @author Matteo Iuliani
@@ -15,11 +16,11 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_theory(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("set_theory", new Var("X"))));
+		Assert.assertTrue(g.isEqual(new Struct("set_theory", new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che set_theory(1) lancia un errore di tipo
@@ -27,15 +28,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_theory(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("set_theory", new Int(1))));
+		Assert.assertTrue(g.isEqual(new Struct("set_theory", new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("atom")));
+		Assert.assertTrue(validType.isEqual(new Struct("atom")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che set_theory(a) lancia un errore di sintassi
@@ -43,15 +44,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(set_theory(a), error(syntax_error(Message), syntax_error(Goal, Line, Position, Message)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("set_theory", new Struct("a"))));
+		Assert.assertTrue(g.isEqual(new Struct("set_theory", new Struct("a"))));
 		Int line = (Int) info.getTerm("Line");
-		assertTrue(line.intValue() == 1);
+        assertEquals(1, line.intValue());
 		Int position = (Int) info.getTerm("Line");
-		assertTrue(position.intValue() == 1);
+        assertEquals(1, position.intValue());
 		Struct message = (Struct) info.getTerm("Message");
-		assertTrue(message.isEqual(new Struct("The term 'a' is not ended with a period.")));
+		Assert.assertTrue(message.isEqual(new Struct("The term 'a' is not ended with a period.")));
 	}
 
 	// verifico che add_theory(X) lancia un errore di instanziazione
@@ -59,11 +60,11 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(add_theory(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("add_theory", new Var("X"))));
+		Assert.assertTrue(g.isEqual(new Struct("add_theory", new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che add_theory(1) lancia un errore di tipo
@@ -71,15 +72,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(add_theory(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("add_theory", new Int(1))));
+		Assert.assertTrue(g.isEqual(new Struct("add_theory", new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("atom")));
+		Assert.assertTrue(validType.isEqual(new Struct("atom")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che add_theory(a) lancia un errore di sintassi
@@ -87,15 +88,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(add_theory(a), error(syntax_error(Message), syntax_error(Goal, Line, Position, Message)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("add_theory", new Struct("a"))));
+		Assert.assertTrue(g.isEqual(new Struct("add_theory", new Struct("a"))));
 		Int line = (Int) info.getTerm("Line");
-		assertTrue(line.intValue() == 1);
+        assertEquals(1, line.intValue());
 		Int position = (Int) info.getTerm("Line");
-		assertTrue(position.intValue() == 1);
+        assertEquals(1, position.intValue());
 		Struct message = (Struct) info.getTerm("Message");
-		assertTrue(message.isEqual(new Struct("The term 'a' is not ended with a period.")));
+		Assert.assertTrue(message.isEqual(new Struct("The term 'a' is not ended with a period.")));
 	}
 
 	// verifico che agent(X) lancia un errore di instanziazione
@@ -103,11 +104,11 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(agent(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("agent", new Var("X"))));
+		Assert.assertTrue(g.isEqual(new Struct("agent", new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che agent(1) lancia un errore di tipo
@@ -115,15 +116,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(agent(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("agent", new Int(1))));
+		Assert.assertTrue(g.isEqual(new Struct("agent", new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("atom")));
+		Assert.assertTrue(validType.isEqual(new Struct("atom")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che agent(X, a) lancia un errore di instanziazione
@@ -131,12 +132,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(agent(X, a), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g
+		Assert.assertTrue(g
 				.isEqual(new Struct("agent", new Var("X"), new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che agent(a, X) lancia un errore di instanziazione
@@ -144,12 +145,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(agent(a, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g
+		Assert.assertTrue(g
 				.isEqual(new Struct("agent", new Struct("a"), new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che agent(1, a) lancia un errore di tipo
@@ -157,15 +158,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(agent(1, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("agent", new Int(1), new Struct("a"))));
+		Assert.assertTrue(g.isEqual(new Struct("agent", new Int(1), new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("atom")));
+		Assert.assertTrue(validType.isEqual(new Struct("atom")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che agent(a, 1) lancia un errore di tipo
@@ -173,15 +174,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(agent(a, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("agent", new Struct("a"), new Int(1))));
+		Assert.assertTrue(g.isEqual(new Struct("agent", new Struct("a"), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("struct")));
+		Assert.assertTrue(validType.isEqual(new Struct("struct")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che '=:='(X, 1) lancia un errore di instanziazione
@@ -189,12 +190,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=:='(X, 1), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Var("X"),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Var("X"),
 				new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che '=:='(1, X) lancia un errore di instanziazione
@@ -202,12 +203,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=:='(1, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
 				new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che '=:='(a, 1) lancia un errore di tipo
@@ -215,16 +216,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=:='(a, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Struct("a"),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Struct("a"),
 				new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '=:='(1, a) lancia un errore di tipo
@@ -232,16 +233,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=:='(1, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
 				new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '=\='(X, 1) lancia un errore di instanziazione
@@ -249,12 +250,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=\\='(X, 1), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Var("X"),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Var("X"),
 				new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che '=\='(1, X) lancia un errore di instanziazione
@@ -262,12 +263,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=\\='(1, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
 				new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che '=\='(a, 1) lancia un errore di tipo
@@ -275,16 +276,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=\\='(a, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Struct("a"),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Struct("a"),
 				new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '=\='(1, a) lancia un errore di tipo
@@ -292,16 +293,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=\\='(1, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
 				new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '>'(X, 1) lancia un errore di instanziazione
@@ -309,12 +310,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>'(X, 1), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_than",
 				new Var("X"), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che '>'(1, X) lancia un errore di instanziazione
@@ -322,12 +323,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>'(1, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_than", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_than", new Int(1),
 				new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che '>'(a, 1) lancia un errore di tipo
@@ -335,16 +336,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>'(a, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_than", new Struct(
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_than", new Struct(
 				"a"), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '>'(1, a) lancia un errore di tipo
@@ -352,16 +353,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>'(1, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_than", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_than", new Int(1),
 				new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '<'(X, 1) lancia un errore di instanziazione
@@ -369,12 +370,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('<'(X, 1), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_than", new Var("X"),
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_than", new Var("X"),
 				new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che '<'(1, X) lancia un errore di instanziazione
@@ -382,12 +383,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('<'(1, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_than", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_than", new Int(1),
 				new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che '<'(a, 1) lancia un errore di tipo
@@ -395,16 +396,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('<'(a, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_than",
 				new Struct("a"), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '<'(1, a) lancia un errore di tipo
@@ -412,16 +413,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('<'(1, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_than", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_than", new Int(1),
 				new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '>='(X, 1) lancia un errore di instanziazione
@@ -429,12 +430,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>='(X, 1), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
 				new Var("X"), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che '>='(1, X) lancia un errore di instanziazione
@@ -442,12 +443,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>='(1, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
 				new Int(1), new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che '>='(a, 1) lancia un errore di tipo
@@ -455,16 +456,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>='(a, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
 				new Struct("a"), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '>='(1, a) lancia un errore di tipo
@@ -472,16 +473,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>='(1, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
 				new Int(1), new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '=<'(X, 1) lancia un errore di instanziazione
@@ -489,12 +490,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=<'(X, 1), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
 				new Var("X"), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che '=<'(1, X) lancia un errore di instanziazione
@@ -502,12 +503,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=<'(1, X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
 				new Int(1), new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che '=<'(a, 1) lancia un errore di tipo
@@ -515,16 +516,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=<'(a, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
 				new Struct("a"), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '=<'(1, a) lancia un errore di tipo
@@ -532,16 +533,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=<'(1, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
 				new Int(1), new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("evaluable")));
+		Assert.assertTrue(validType.isEqual(new Struct("evaluable")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che '=:='(1, 1/0) lancia l'errore di valutazione "zero_divisor"
@@ -549,14 +550,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=:='(1, 1/0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
 				new Struct("/", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '=\='(1, 1/0) lancia l'errore di valutazione "zero_divisor"
@@ -564,14 +565,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=\\='(1, 1/0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
 				new Struct("/", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '>'(1, 1/0) lancia l'errore di valutazione "zero_divisor"
@@ -579,14 +580,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>'(1, 1/0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_than", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_than", new Int(1),
 				new Struct("/", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '<'(1, 1/0) lancia l'errore di valutazione "zero_divisor"
@@ -594,14 +595,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('<'(1, 1/0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_than", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_than", new Int(1),
 				new Struct("/", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '>='(1, 1/0) lancia l'errore di valutazione "zero_divisor"
@@ -609,14 +610,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>='(1, 1/0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
 				new Int(1), new Struct("/", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '=<'(1, 1/0) lancia l'errore di valutazione "zero_divisor"
@@ -624,14 +625,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=<'(1, 1/0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
 				new Int(1), new Struct("/", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '=:='(1, 1//0) lancia l'errore di valutazione "zero_divisor"
@@ -639,14 +640,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=:='(1, 1//0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
 				new Struct("//", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '=\='(1, 1//0) lancia l'errore di valutazione "zero_divisor"
@@ -654,14 +655,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=\\='(1, 1//0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Int(1),
 				new Struct("//", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '>'(1, 1//0) lancia l'errore di valutazione "zero_divisor"
@@ -669,14 +670,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>'(1, 1//0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_than", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_than", new Int(1),
 				new Struct("//", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '<'(1, 1//0) lancia l'errore di valutazione "zero_divisor"
@@ -684,14 +685,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('<'(1, 1//0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_than", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_than", new Int(1),
 				new Struct("//", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '>='(1, 1//0) lancia l'errore di valutazione "zero_divisor"
@@ -699,14 +700,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>='(1, 1//0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
 				new Int(1), new Struct("//", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '=<'(1, 1//0) lancia l'errore di valutazione "zero_divisor"
@@ -714,14 +715,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=<'(1, 1//0), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
 				new Int(1), new Struct("//", new Int(1), new Int(0)))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '=:='(1 div 0, 1) lancia l'errore di valutazione
@@ -730,14 +731,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=:='(1 div 0, 1), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Struct(
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Struct(
 				"div", new Int(1), new Int(0)), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '=\='(1 div 0, 1) lancia l'errore di valutazione
@@ -746,14 +747,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=\\='(1 div 0, 1), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_equality", new Struct(
+		Assert.assertTrue(g.isEqual(new Struct("expression_equality", new Struct(
 				"div", new Int(1), new Int(0)), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '>'(1 div 0, 1) lancia l'errore di valutazione
@@ -762,14 +763,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>'(1 div 0, 1), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_than", new Struct(
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_than", new Struct(
 				"div", new Int(1), new Int(0)), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '<'(1 div 0, 1) lancia l'errore di valutazione
@@ -778,14 +779,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('<'(1 div 0, 1), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_than", new Struct(
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_than", new Struct(
 				"div", new Int(1), new Int(0)), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '>='(1 div 0, 1) lancia l'errore di valutazione
@@ -794,14 +795,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('>='(1 div 0, 1), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_greater_or_equal_than",
 				new Struct("div", new Int(1), new Int(0)), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che '=<'(1 div 0, 1) lancia l'errore di valutazione
@@ -810,14 +811,14 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch('=<'(1 div 0, 1), error(evaluation_error(Error), evaluation_error(Goal, ArgNo, Error)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
+		Assert.assertTrue(g.isEqual(new Struct("expression_less_or_equal_than",
 				new Struct("div", new Int(1), new Int(0)), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("Error");
-		assertTrue(validType.isEqual(new Struct("zero_divisor")));
+		Assert.assertTrue(validType.isEqual(new Struct("zero_divisor")));
 	}
 
 	// verifico che text_concat(X, a, b) lancia un errore di instanziazione
@@ -825,12 +826,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(text_concat(X, a, b), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("text_concat", new Var("X"),
+		Assert.assertTrue(g.isEqual(new Struct("text_concat", new Var("X"),
 				new Struct("a"), new Struct("b"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che text_concat(a, X, b) lancia un errore di instanziazione
@@ -838,12 +839,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(text_concat(a, X, b), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("text_concat", new Struct("a"),
+		Assert.assertTrue(g.isEqual(new Struct("text_concat", new Struct("a"),
 				new Var("X"), new Struct("b"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che text_concat(1, a, b) lancia un errore di tipo
@@ -851,16 +852,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(text_concat(1, a, b), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("text_concat", new Int(1), new Struct(
+		Assert.assertTrue(g.isEqual(new Struct("text_concat", new Int(1), new Struct(
 				"a"), new Struct("b"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("atom")));
+		Assert.assertTrue(validType.isEqual(new Struct("atom")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che text_concat(a, 1, b) lancia un errore di tipo
@@ -868,16 +869,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(text_concat(a, 1, b), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("text_concat", new Struct("a"),
+		Assert.assertTrue(g.isEqual(new Struct("text_concat", new Struct("a"),
 				new Int(1), new Struct("b"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("atom")));
+		Assert.assertTrue(validType.isEqual(new Struct("atom")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che num_atom(a, X) lancia un errore di tipo
@@ -885,16 +886,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(num_atom(a, X), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("num_atom", new Struct("a"), new Var(
+		Assert.assertTrue(g.isEqual(new Struct("num_atom", new Struct("a"), new Var(
 				"X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("number")));
+		Assert.assertTrue(validType.isEqual(new Struct("number")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che num_atom(1, 1) lancia un errore di tipo
@@ -902,15 +903,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(num_atom(1, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("num_atom", new Int(1), new Int(1))));
+		Assert.assertTrue(g.isEqual(new Struct("num_atom", new Int(1), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("atom")));
+		Assert.assertTrue(validType.isEqual(new Struct("atom")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che num_atom(1, a) lancia un errore di dominio
@@ -918,16 +919,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(num_atom(1, a), error(domain_error(ValidDomain, Culprit), domain_error(Goal, ArgNo, ValidDomain, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g
+		Assert.assertTrue(g
 				.isEqual(new Struct("num_atom", new Int(1), new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validDomain = (Struct) info.getTerm("ValidDomain");
-		assertTrue(validDomain.isEqual(new Struct("num_atom")));
+		Assert.assertTrue(validDomain.isEqual(new Struct("num_atom")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che arg(X, p(1), 1) lancia un errore di instanziazione
@@ -935,12 +936,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(arg(X, p(1), 1), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("arg_guard", new Var("X"), new Struct(
+		Assert.assertTrue(g.isEqual(new Struct("arg_guard", new Var("X"), new Struct(
 				"p", new Int(1)), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che arg(1, X, 1) lancia un errore di instanziazione
@@ -948,12 +949,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(arg(1, X, 1), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("arg_guard", new Int(1), new Var("X"),
+		Assert.assertTrue(g.isEqual(new Struct("arg_guard", new Int(1), new Var("X"),
 				new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che arg(a, p(1), 1) lancia un errore di tipo
@@ -961,16 +962,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(arg(a, p(1), 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("arg_guard", new Struct("a"),
+		Assert.assertTrue(g.isEqual(new Struct("arg_guard", new Struct("a"),
 				new Struct("p", new Int(1)), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("integer")));
+		Assert.assertTrue(validType.isEqual(new Struct("integer")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che arg(1, p, 1) lancia un errore di tipo
@@ -978,16 +979,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(arg(1, p, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("arg_guard", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("arg_guard", new Int(1),
 				new Struct("p"), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("compound")));
+		Assert.assertTrue(validType.isEqual(new Struct("compound")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("p")));
+		Assert.assertTrue(culprit.isEqual(new Struct("p")));
 	}
 
 	// verifico che arg(0, p(0), 1) lancia un errore di dominio
@@ -995,16 +996,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(arg(0, p(0), 1), error(domain_error(ValidDomain, Culprit), domain_error(Goal, ArgNo, ValidDomain, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("arg_guard", new Int(0), new Struct(
+		Assert.assertTrue(g.isEqual(new Struct("arg_guard", new Int(0), new Struct(
 				"p", new Int(0)), new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidDomain");
-		assertTrue(validType.isEqual(new Struct("greater_than_zero")));
+		Assert.assertTrue(validType.isEqual(new Struct("greater_than_zero")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 0);
+        assertEquals(0, culprit.intValue());
 	}
 
 	// verifico che clause(X, true) lancia un errore di instanziazione
@@ -1012,12 +1013,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(clause(X, true), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("clause_guard", new Var("X"),
+		Assert.assertTrue(g.isEqual(new Struct("clause_guard", new Var("X"),
 				new Struct("true"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che call(X) lancia un errore di instanziazione
@@ -1025,11 +1026,11 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(call(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("call_guard", new Var("X"))));
+		Assert.assertTrue(g.isEqual(new Struct("call_guard", new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che call(1) lancia un errore di tipo
@@ -1037,15 +1038,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(call(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("call_guard", new Int(1))));
+		Assert.assertTrue(g.isEqual(new Struct("call_guard", new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("callable")));
+		Assert.assertTrue(validType.isEqual(new Struct("callable")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che findall(a, X, L) lancia un errore di instanziazione
@@ -1053,12 +1054,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(findall(a, X, L), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
+		Assert.assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
 				new Struct("a"), new Var("X"), new Var("L"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che findall(a, 1, L) lancia un errore di tipo
@@ -1066,16 +1067,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(findall(a, 1, L), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
+		Assert.assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
 				new Struct("a"), new Int(1), new Var("L"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("callable")));
+		Assert.assertTrue(validType.isEqual(new Struct("callable")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che setof(a, X, L) lancia un errore di instanziazione
@@ -1083,12 +1084,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(setof(a, X, L), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
+		Assert.assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
 				new Struct("a"), new Var("X"), new Var("L"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che setof(a, 1, L) lancia un errore di tipo
@@ -1096,16 +1097,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(setof(a, 1, L), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
+		Assert.assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
 				new Struct("a"), new Int(1), new Var("L"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("callable")));
+		Assert.assertTrue(validType.isEqual(new Struct("callable")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che bagof(a, X, L) lancia un errore di instanziazione
@@ -1113,12 +1114,12 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(bagof(a, X, L), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
+		Assert.assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
 				new Struct("a"), new Var("X"), new Var("L"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 	}
 
 	// verifico che bagof(a, 1, L) lancia un errore di tipo
@@ -1126,16 +1127,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(bagof(a, 1, L), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
+		Assert.assertTrue(g.isEqual(new Struct("all_solutions_predicates_guard",
 				new Struct("a"), new Int(1), new Var("L"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("callable")));
+		Assert.assertTrue(validType.isEqual(new Struct("callable")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che assert(X) lancia un errore di instanziazione
@@ -1143,11 +1144,11 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(assert(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("assertz", new Var("X"))));
+		Assert.assertTrue(g.isEqual(new Struct("assertz", new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che assert(1) lancia un errore di tipo
@@ -1155,15 +1156,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(assert(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("assertz", new Int(1))));
+		Assert.assertTrue(g.isEqual(new Struct("assertz", new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("clause")));
+		Assert.assertTrue(validType.isEqual(new Struct("clause")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che retract(X) lancia un errore di instanziazione
@@ -1171,11 +1172,11 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(retract(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("retract_guard", new Var("X"))));
+		Assert.assertTrue(g.isEqual(new Struct("retract_guard", new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che retract(1) lancia un errore di tipo
@@ -1183,15 +1184,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(retract(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("retract_guard", new Int(1))));
+		Assert.assertTrue(g.isEqual(new Struct("retract_guard", new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("clause")));
+		Assert.assertTrue(validType.isEqual(new Struct("clause")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che retractall(X) lancia un errore di instanziazione
@@ -1199,11 +1200,11 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(retractall(X), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("retract_guard", new Var("X"))));
+		Assert.assertTrue(g.isEqual(new Struct("retract_guard", new Var("X"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che retractall(1) lancia un errore di tipo
@@ -1211,15 +1212,15 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(retractall(1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("retract_guard", new Int(1))));
+		Assert.assertTrue(g.isEqual(new Struct("retract_guard", new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("clause")));
+		Assert.assertTrue(validType.isEqual(new Struct("clause")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che member(a, 1) lancia un errore di tipo
@@ -1227,16 +1228,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(member(a, 1), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("member_guard", new Struct("a"),
+		Assert.assertTrue(g.isEqual(new Struct("member_guard", new Struct("a"),
 				new Int(1))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("list")));
+		Assert.assertTrue(validType.isEqual(new Struct("list")));
 		Int culprit = (Int) info.getTerm("Culprit");
-		assertTrue(culprit.intValue() == 1);
+        assertEquals(1, culprit.intValue());
 	}
 
 	// verifico che reverse(a, []) lancia un errore di tipo
@@ -1244,16 +1245,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(reverse(a, []), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("reverse_guard", new Struct("a"),
+		Assert.assertTrue(g.isEqual(new Struct("reverse_guard", new Struct("a"),
 				new Struct())));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("list")));
+		Assert.assertTrue(validType.isEqual(new Struct("list")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che delete(a, a, []) lancia un errore di tipo
@@ -1261,16 +1262,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(delete(a, a, []), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("delete_guard", new Struct("a"),
+		Assert.assertTrue(g.isEqual(new Struct("delete_guard", new Struct("a"),
 				new Struct("a"), new Struct())));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("list")));
+		Assert.assertTrue(validType.isEqual(new Struct("list")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 	// verifico che element(1, a, a) lancia un errore di tipo
@@ -1278,16 +1279,16 @@ public class BasicLibraryExceptionsTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "catch(element(1, a, a), error(type_error(ValidType, Culprit), type_error(Goal, ArgNo, ValidType, Culprit)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("element_guard", new Int(1),
+		Assert.assertTrue(g.isEqual(new Struct("element_guard", new Int(1),
 				new Struct("a"), new Struct("a"))));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 2);
+        assertEquals(2, argNo.intValue());
 		Struct validType = (Struct) info.getTerm("ValidType");
-		assertTrue(validType.isEqual(new Struct("list")));
+		Assert.assertTrue(validType.isEqual(new Struct("list")));
 		Struct culprit = (Struct) info.getTerm("Culprit");
-		assertTrue(culprit.isEqual(new Struct("a")));
+		Assert.assertTrue(culprit.isEqual(new Struct("a")));
 	}
 
 }

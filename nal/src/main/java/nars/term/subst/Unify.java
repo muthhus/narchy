@@ -37,7 +37,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class Unify implements Termutator, Subst {
+public abstract class Unify implements Subst {
 
     protected final static Logger logger = LoggerFactory.getLogger(Unify.class);
 
@@ -97,19 +97,14 @@ public abstract class Unify implements Termutator, Subst {
      */
     public abstract boolean onMatch();
 
-    public final boolean mutate(List<Termutator> chain, int next) {
-        versioning.tick();
-        return chain.get(++next).mutate(this, chain, next);
+    public final void mutate(List<Termutator> chain, int next) {
+        if (versioning.tick())
+            chain.get(++next).mutate(this, chain, next);
     }
 
     @Override
     public final void clear() {
         versioning.clear();
-    }
-
-    @Override
-    public int getEstimatedPermutations() {
-        throw new UnsupportedOperationException();
     }
 
     @Nullable
@@ -124,72 +119,63 @@ public abstract class Unify implements Termutator, Subst {
     }
 
 
-
-    public final boolean unifyAll(@NotNull Term x, @NotNull Term y) {
-        return unify(x, y, true);
+    public final void unifyAll(@NotNull Term x, @NotNull Term y) {
+        unify(x, y, true);
     }
+
     /**
      * unifies the next component, which can either be at the start (true, false), middle (false, false), or end (false, true)
      * of a matching context
      * <p>
      * setting finish=false allows matching in pieces before finishing
      */
-    public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public void unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
-        boolean result;
+
         try {
             if (unify(x, y)) {
 
-                if (!finish) {
-                    result = true; //return to callee to continue in subsequent operation
-                } else {
-                    result = tryMatch();
+                if (finish) {
+                    tryMatch();
                 }
 
-            } else {
-                result = false;
             }
         } catch (Throwable e) {
             if (Param.DEBUG)
                 logger.error("{}", e);
-            result = false;
-            finish = true;
         }
-
-        return result;
     }
 
-    private boolean tryMatch() {
-        int ts = termutes.size();
-        if (ts == 0)
-            return onMatch();
+    private void tryMatch() {
+        int ts;
+        while ((ts = termutes.size()) > 0) {
 
-        //TODO use Termutator[] not List
-        List<Termutator> t = $.newArrayList(ts + 1);
-        t.addAll(termutes);
-        termutes.clear();
+            if (!versioning.live())
+                break;
 
-        //shuffle the ordering of the termutes themselves
-        if (ts > 1)
-            Collections.shuffle(t, random);
+            //TODO use Termutator[] not List
+            List<Termutator> t = $.newArrayList(ts );
+            t.addAll(termutes);
+            termutes.clear();
 
-        t.add(this); //append call-back at the end
+            //shuffle the ordering of the termutes themselves
+            if (ts > 1)
+                Collections.shuffle(t, random);
 
-        return mutate(this, t, -2);
+            mutate(t, -1); //start combinatorial recurse
+
+        }
+
+
+        onMatch();
+
+
     }
 
 
     @Override
     public boolean put(@NotNull Unify m) {
         return m.xy.forEachVersioned(this::putXY);
-    }
-
-    @Override
-    public final boolean mutate(Unify f, List<Termutator> n, int seq) {
-        return (seq == -2) ?
-                f.mutate(n, -1) //start combinatorial recurse
-                :
-                f.tryMatch(); //continue combinatorial recurse
     }
 
 
@@ -245,17 +231,8 @@ public abstract class Unify implements Termutator, Subst {
     }
 
     public final boolean revert(int then) {
-        return versioning.revert(then);
-    }
-
-
-
-    /** weather the given term has any potential free variables that could be assigned in unification */
-    public boolean freeVars(Term x) {
-        return type == null ?
-                (x.volume() > x.complexity()) /* any variable, including pattern */
-                    :
-                (x.hasAny(type));
+        versioning.revert(then);
+        return versioning.live();
     }
 
 

@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 
-public final class SubGoalTree extends FasterList<AbstractSubGoalTree> implements AbstractSubGoalTree, Iterable<AbstractSubGoalTree> {
+public final class SubGoalTree extends FasterList<AbstractSubGoalTree> implements AbstractSubGoalTree {
 
     public SubGoalTree() {
         super();

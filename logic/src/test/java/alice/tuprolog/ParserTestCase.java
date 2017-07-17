@@ -1,18 +1,19 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 public class ParserTestCase extends TestCase {
 	
 	public void testReadingTerms() throws InvalidTermException {
 		Parser p = new Parser("hello.");
 		Struct result = new Struct("hello");
-		assertEquals(result, p.nextTerm(true));
+		Assert.assertEquals(result, p.nextTerm(true));
 	}
 	
 	public void testReadingEOF() throws InvalidTermException {
 		Parser p = new Parser("");
-		assertNull(p.nextTerm(false));
+		Assert.assertNull(p.nextTerm(false));
 	}
 	
 	public void testUnaryPlusOperator() {
@@ -21,8 +22,8 @@ public class ParserTestCase extends TestCase {
 		// GNU Prolog interprets "n(+100)" as "n(+(100))"
 		// The ISO Standard says + is not a unary operator
 		try {
-			assertNotNull(p.nextTerm(true));
-			fail();
+			Assert.assertNotNull(p.nextTerm(true));
+			Assert.fail();
 		} catch (InvalidTermException e) {}
 	}
 	
@@ -34,33 +35,33 @@ public class ParserTestCase extends TestCase {
 		// What does the ISO Standard say about that?
 		Struct result = new Struct("n", new Int(-100));
 		result.resolveTerm();
-		assertEquals(result, p.nextTerm(true));
+		Assert.assertEquals(result, p.nextTerm(true));
 	}
 	
 	public void testBinaryMinusOperator() throws InvalidTermException {
 		String s = "abs(3-11)";
 		Parser p = new Parser(s);
 		Struct result = new Struct("abs", new Struct("-", new Int(3), new Int(11)));
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 	}
 	
 	public void testListWithTail() throws InvalidTermException {
 		Parser p = new Parser("[p|Y]");
 		Struct result = new Struct(new Struct("p"), new Var("Y"));
 		result.resolveTerm();
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 	}
 	
 	public void testBraces() throws InvalidTermException {
 		String s = "{a,b,[3,{4,c},5],{a,b}}";
 		Parser parser = new Parser(s);
-		assertEquals(s, parser.nextTerm(false).toString());
+		Assert.assertEquals(s, parser.nextTerm(false).toString());
 	}
 	
 	public void testUnivOperator() throws InvalidTermException {
 		Parser p = new Parser("p =.. q.");
 		Struct result = new Struct("=..", new Struct("p"), new Struct("q"));
-		assertEquals(result, p.nextTerm(true));
+		Assert.assertEquals(result, p.nextTerm(true));
 	}
 	
 	public void testDotOperator() throws InvalidTermException {
@@ -70,7 +71,7 @@ public class ParserTestCase extends TestCase {
 		Parser p = new Parser(om, s);
 		Struct result = new Struct(".", new Struct("class", new Struct("java.lang.Integer")),
 				                        new Struct("MAX_VALUE"));
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 	}
 	
 	public void testBracketedOperatorAsTerm() throws InvalidTermException {
@@ -82,7 +83,7 @@ public class ParserTestCase extends TestCase {
 		om.opNew("b3", "yfx", 300);
 		Parser p = new Parser(om, s);
 		Struct result = new Struct("b2", new Struct("u", new Struct("b1")), new Struct("b3"));
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 	}
 	
 	public void testBracketedOperatorAsTerm2() throws InvalidTermException {
@@ -94,18 +95,18 @@ public class ParserTestCase extends TestCase {
 		om.opNew("b3", "yfx", 300);
 		Parser p = new Parser(om, s);
 		Struct result = new Struct("b1", new Struct("u"), new Struct("b3", new Struct("b2"), new Struct("a")));
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 	}
 	
 	public void testIntegerBinaryRepresentation() throws InvalidTermException {
 		String n = "0b101101";
 		Parser p = new Parser(n);
 		alice.tuprolog.Number result = new Int(45);
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 		String invalid = "0b101201";
 		try {
 			new Parser(invalid).nextTerm(false);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	
@@ -113,11 +114,11 @@ public class ParserTestCase extends TestCase {
 		String n = "0o77351";
 		Parser p = new Parser(n);
 		alice.tuprolog.Number result = new Int(32489);
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 		String invalid = "0o78351";
 		try {
 			new Parser(invalid).nextTerm(false);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	
@@ -125,11 +126,11 @@ public class ParserTestCase extends TestCase {
 		String n = "0xDECAF";
 		Parser p = new Parser(n);
 		alice.tuprolog.Number result = new Int(912559);
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 		String invalid = "0xG";
 		try {
 			new Parser(invalid).nextTerm(false);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	
@@ -137,14 +138,14 @@ public class ParserTestCase extends TestCase {
 		String s = "{}";
 		Parser p = new Parser(s);
 		Struct result = new Struct("{}");
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 	}
 	
 	public void testSingleDCGAction() throws InvalidTermException {
 		String s = "{hello}";
 		Parser p = new Parser(s);
 		Struct result = new Struct("{}", new Struct("hello"));
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 	}
 	
 	public void testMultipleDCGAction() throws InvalidTermException {
@@ -153,7 +154,7 @@ public class ParserTestCase extends TestCase {
 		Struct result = new Struct("{}",
                                    new Struct(",", new Struct("a"),
                                        new Struct(",", new Struct("b"), new Struct("c"))));
-		assertEquals(result, p.nextTerm(false));
+		Assert.assertEquals(result, p.nextTerm(false));
 	}
 	
 	 //This is an error both in 2.0.1 and in 2.1... don't know why, though.
@@ -164,7 +165,7 @@ public class ParserTestCase extends TestCase {
                                 new Struct(",", new Struct("hotel"), new Int(2))));
         result.resolveTerm();
         Parser p = new Parser(input);
-        assertEquals(result, p.nextTerm(false));
+        Assert.assertEquals(result, p.nextTerm(false));
 	}
 	
 	public void testMissingDCGActionElement() {
@@ -172,7 +173,7 @@ public class ParserTestCase extends TestCase {
 		Parser p = new Parser(s);
 		try {
 			p.nextTerm(false);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	
@@ -181,7 +182,7 @@ public class ParserTestCase extends TestCase {
 		Parser p = new Parser(s);
 		try {
 			p.nextTerm(false);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	
@@ -190,14 +191,14 @@ public class ParserTestCase extends TestCase {
 		Parser p = new Parser(s);
 		try {
 			p.nextTerm(false);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 		
 		s = "{1, 2";
 		p = new Parser(s);
 		try {
 			p.nextTerm(false);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 
@@ -208,8 +209,8 @@ public class ParserTestCase extends TestCase {
 		                "*/" + "\n" +
 		                "t3." + "\n";
 		Parser p = new Parser(theory);
-		assertEquals(new Struct("t1"), p.nextTerm(true));
-		assertEquals(new Struct("t3"), p.nextTerm(true));
+		Assert.assertEquals(new Struct("t1"), p.nextTerm(true));
+		Assert.assertEquals(new Struct("t3"), p.nextTerm(true));
 	}
 	
 	public void testSingleQuotedTermWithInvalidLineBreaks() {
@@ -220,7 +221,7 @@ public class ParserTestCase extends TestCase {
 		Parser p = new Parser(s);
 		try {
 			p.nextTerm(true);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	

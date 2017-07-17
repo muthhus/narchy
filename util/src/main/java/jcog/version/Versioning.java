@@ -30,7 +30,7 @@ public class Versioning extends
     /**
      * reverts/undo to previous state
      */
-    public final boolean revert(int when) {
+    public final void revert(int when) {
         //assert (size >= when);
 
         //pop(size - when );
@@ -61,7 +61,7 @@ public class Versioning extends
             //assert(removed!=null);
             //TODO removeLastFast where we dont need the returned value
         }
-        return live();
+
     }
 
 

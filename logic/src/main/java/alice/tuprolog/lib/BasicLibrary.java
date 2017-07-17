@@ -465,20 +465,20 @@ public class BasicLibrary extends Library {
         return num0.isInteger() && num1.isInteger() ? num0.longValue() < num1.longValue() : num0.doubleValue() < num1.doubleValue();
     }
 
-    public static boolean term_equality_2(Term arg0, Term arg1) throws PrologError {
+    public static boolean term_equality_2(Term arg0, Term arg1) {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         return arg0.isEqual(arg1);
     }
 
-    public static boolean term_greater_than_2(Term arg0, Term arg1) throws PrologError {
+    public static boolean term_greater_than_2(Term arg0, Term arg1) {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         //System.out.println("Confronto "+arg0+" con "+arg1);
         return arg0.isGreater(arg1);
     }
 
-    public static boolean term_less_than_2(Term arg0, Term arg1) throws PrologError {
+    public static boolean term_less_than_2(Term arg0, Term arg1) {
         arg0 = arg0.getTerm();
         arg1 = arg1.getTerm();
         return !(arg0.isGreater(arg1) || arg0.isEqual(arg1));
@@ -1205,8 +1205,8 @@ public class BasicLibrary extends Library {
                 //
                 + "assert(C) :- assertz(C). \n"
                 + "retract(Rule) :- retract_guard(Rule), Rule = ':-'(Head, Body), !, clause(Head, Body), '$retract'(Rule). \n"
-                + "retract(Fact) :- retract_guard(Fact), clause(Fact, true), '$retract'(Fact). \n"
-                + "retractall(Head) :- retract_guard(Head), findall(':-'(Head, Body), clause(Head, Body), L), '$retract_clause_list'(L), !. \n"
+                + "retract(Fact) :- retract_guard(Fact), clause(Fact, true), '$retract'(Fact).\n"
+                + "retractall(Head) :- retract_guard(Head), findall(':-'(Head, Body), clause(Head, Body), L), '$retract_clause_list'(L), !.\n"
                 + "'$retract_clause_list'([]). \n"
                 + "'$retract_clause_list'([E | T]) :- !, '$retract'(E), '$retract_clause_list'(T). \n"
                 +

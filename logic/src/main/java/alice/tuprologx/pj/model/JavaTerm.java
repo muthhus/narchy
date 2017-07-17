@@ -25,7 +25,7 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
 	static class TermifiableStruct<O> extends alice.tuprolog.Struct {
         JavaTerm<O> _term;
 
-        TermifiableStruct(String name, alice.tuprolog.Term[] arr) {
+        TermifiableStruct(String name, alice.tuprolog.Term... arr) {
             super(name, arr);
         }
 

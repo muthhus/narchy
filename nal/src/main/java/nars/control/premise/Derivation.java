@@ -3,9 +3,11 @@ package nars.control.premise;
 import nars.*;
 import nars.control.Cause;
 import nars.control.Premise;
+import nars.derive.Deriver;
 import nars.derive.meta.BoolPred;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
+import nars.task.DerivedTask;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Functor;
@@ -33,7 +35,7 @@ import static nars.time.Tense.ETERNAL;
 public class Derivation extends Unify implements TermContext {
 
     @NotNull public NAR nar;
-    @NotNull public DerivationBudgeting budgeting;
+
     public float truthResolution;
     public float confMin;
 
@@ -109,6 +111,7 @@ public class Derivation extends Unify implements TermContext {
     public float parentPri;
     private short[] parentCause;
     public Cause cause;
+    public Deriver deriver;
 
 
     /** if using this, must set: nar, index, random, DerivationBudgeting */
@@ -149,21 +152,20 @@ public class Derivation extends Unify implements TermContext {
 
     /** concept-scope
      * @param n*/
-    @NotNull public void restartA(NAR n, long when, int dur) {
+    @NotNull public void restart(NAR n) {
         this.nar = n;
         this.terms = n.terms;
-        this.budgeting = n.budgeting;
         this.random = n.random();
-        this.time = when;
-        this.dur = dur;
+        this.time = n.time();
+        this.dur = n.dur();
         this.truthResolution = nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
+        this.deriver = n.deriver();
     }
 
     /** tasklink/termlink scope */
-    @NotNull public Derivation restartB(@NotNull Premise p, Task task, Task belief, Term beliefTerm, float parentTaskPri, int ttl) {
+    @NotNull public void run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, float parentTaskPri, int ttl) {
 
-        assert(ttl >= 0);
 
         revert(0);
 
@@ -199,6 +201,7 @@ public class Derivation extends Unify implements TermContext {
         evidenceDouble = evidenceSingle = null;
         temporal = cyclic = overlap = false;
 
+        assert(ttl >= 0);
         this.versioning.setTTL(ttl);
 
         this.premise = p;
@@ -265,9 +268,8 @@ public class Derivation extends Unify implements TermContext {
             this.parentCause = new short[] { beliefCause[0] };
         }
 
+        deriver.test(this);
 
-
-        return this;
     }
 
 
@@ -285,21 +287,21 @@ public class Derivation extends Unify implements TermContext {
 
         boolean finish = (this.forEachMatch = eachMatch)!=null;
 
-        boolean result = unify(x, y, finish);
+        unify(x, y, finish);
 
         this.forEachMatch = null;
 
-        return !finish || result;
+        return versioning.live();
     }
 
     @Override public final boolean onMatch() {
-        try {
+        //try {
             forEachMatch.test(this);
-        } catch (InvalidTermException | InvalidTaskException t) {
-            if (Param.DEBUG_EXTRA) {
-                logger.error("Derivation onMatch {}", t);
-            }
-        }
+//        } catch (InvalidTermException | InvalidTaskException t) {
+//            if (Param.DEBUG_EXTRA) {
+//                logger.error("Derivation onMatch {}", t);
+//            }
+//        }
         //return  (--matchesRemain > 0) && ;
         return true;
     }
@@ -375,6 +377,11 @@ public class Derivation extends Unify implements TermContext {
         return ArrayUtils.add(this.parentCause, c);
     }
 
+    public boolean accept(DerivedTask t) {
+        nar.input(t);
+        nar.emotion.taskDerivations.increment();
+        return versioning.tick();
+    }
 }
 
 

@@ -53,7 +53,7 @@ public abstract class Automaton implements Runnable, java.io.Serializable {
         }
     }
 
-    protected void become(String s, Object[] args){
+    protected void become(String s, Object... args){
         if (!state.equals("end")){
             state=s;
             arguments=args;

@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 /**
  * @author Matteo Iuliani
@@ -16,19 +17,19 @@ public class JavaThrowCatchTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "atom_length(err, 3), java_catch(java_object('Counter', ['MyCounter'], c), [('java.lang.ClassNotFoundException'(Cause, Message, StackTrace), ((X is Cause+2, 5 is X+3)))], Y is 2+3), Z is X+5.";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Int cause = (Int) info.getTerm("Cause");
-		assertTrue(cause.intValue() == 0);
+		assertEquals(0, cause.intValue());
 		Struct message = (Struct) info.getTerm("Message");
-		assertTrue(message.isEqual(new Struct("Counter")));
+		Assert.assertTrue(message.isEqual(new Struct("Counter")));
 		Struct stackTrace = (Struct) info.getTerm("StackTrace");
-		assertTrue(stackTrace.isList());
+		Assert.assertTrue(stackTrace.isList());
 		Int x = (Int) info.getTerm("X");
-		assertTrue(x.intValue() == 2);
+		assertEquals(2, x.intValue());
 		Int y = (Int) info.getTerm("Y");
-		assertTrue(y.intValue() == 5);
+		assertEquals(5, y.intValue());
 		Int z = (Int) info.getTerm("Z");
-		assertTrue(z.intValue() == 7);
+		assertEquals(7, z.intValue());
 	}
 
 	// verifico che venga eseguito il piu' vicino antenato java_catch/3
@@ -38,15 +39,15 @@ public class JavaThrowCatchTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "java_catch(java_object('Counter', ['MyCounter'], c), [('java.lang.ClassNotFoundException'(Cause, Message, StackTrace), true)], true), java_catch(java_object('Counter', ['MyCounter2'], c2), [('java.lang.ClassNotFoundException'(C, M, ST), X is C+2)], true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Int cause = (Int) info.getTerm("Cause");
-		assertTrue(cause.intValue() == 0);
+		assertEquals(0, cause.intValue());
 		Struct message = (Struct) info.getTerm("Message");
-		assertTrue(message.isEqual(new Struct("Counter")));
+		Assert.assertTrue(message.isEqual(new Struct("Counter")));
 		Struct stackTrace = (Struct) info.getTerm("StackTrace");
-		assertTrue(stackTrace.isList());
+		Assert.assertTrue(stackTrace.isList());
 		Int x = (Int) info.getTerm("X");
-		assertTrue(x.intValue() == 2);
+		assertEquals(2, x.intValue());
 	}
 
 	// verifico che l'esecuzione fallisce se si verifica un errore durante
@@ -56,8 +57,8 @@ public class JavaThrowCatchTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "java_catch(java_object('Counter', ['MyCounter'], c), [('java.lang.Exception'(Cause, Message, StackTrace), true)], true).";
 		Solution info = engine.solve(goal);
-		assertFalse(info.isSuccess());
-		assertTrue(info.isHalted());
+		Assert.assertFalse(info.isSuccess());
+		Assert.assertTrue(info.isHalted());
 	}
 
 	// verifico che catch/3 fallisce se il gestore e' falso
@@ -65,7 +66,7 @@ public class JavaThrowCatchTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "java_catch(java_object('Counter', ['MyCounter'], c), [('java.lang.ClassNotFoundException'(Cause, Message, StackTrace), false)], true).";
 		Solution info = engine.solve(goal);
-		assertFalse(info.isSuccess());
+		Assert.assertFalse(info.isSuccess());
 	}
 
 	// verifico che il finally venga eseguito in caso di successo di JavaGoal
@@ -73,13 +74,13 @@ public class JavaThrowCatchTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "java_catch(java_object('java.util.ArrayList', [], l), [(E, true)], (X is 2+3, Y is 3+5)).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Term e = info.getTerm("E");
-		assertTrue(e instanceof Var);
+		Assert.assertTrue(e instanceof Var);
 		Int x = (Int) info.getTerm("X");
-		assertTrue(x.intValue() == 5);
+		assertEquals(5, x.intValue());
 		Int y = (Int) info.getTerm("Y");
-		assertTrue(y.intValue() == 8);
+		assertEquals(8, y.intValue());
 	}
 
 	// verifico che catch/3 fallisce se si verifica un'eccezione durante
@@ -88,8 +89,8 @@ public class JavaThrowCatchTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "java_catch(java_object('Counter', ['MyCounter'], c), [('java.lang.ClassNotFoundException'(Cause, Message, StackTrace), java_object('Counter', ['MyCounter2'], c2))], true).";
 		Solution info = engine.solve(goal);
-		assertFalse(info.isSuccess());
-		assertTrue(info.isHalted());
+		Assert.assertFalse(info.isSuccess());
+		Assert.assertTrue(info.isHalted());
 	}
 
 	// verifico la correttezza della ricerca del catcher all'interno della lista
@@ -97,12 +98,12 @@ public class JavaThrowCatchTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		String goal = "java_catch(java_object('Counter', ['MyCounter'], c), [('java.lang.Exception'(Cause, Message, StackTrace), X is 2+3), ('java.lang.ClassNotFoundException'(Cause, Message, StackTrace), Y is 3+5)], true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Term x = info.getTerm("X");
-		assertTrue(x instanceof Var);
+		Assert.assertTrue(x instanceof Var);
 		Term y = info.getTerm("Y");
-		assertTrue(y instanceof Int);
-		assertTrue(((Int) y).intValue() == 8);
+		Assert.assertTrue(y instanceof Int);
+		assertEquals(8, ((Int) y).intValue());
 	}
 
 }

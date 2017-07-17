@@ -1,52 +1,57 @@
 package nars;
 
-import com.netflix.servo.BasicMonitorRegistry;
 import com.netflix.servo.monitor.BasicCounter;
 import com.netflix.servo.monitor.Counter;
-import com.netflix.servo.monitor.MonitorConfig;
 import com.netflix.servo.monitor.StepCounter;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.meter.event.BufferedFloatGuage;
 import nars.term.Compound;
-import nars.util.ConcurrentMonitorRegistry;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.Serializable;
-import java.util.Map;
 import java.util.SortedMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static jcog.Texts.n4;
+import static nars.NiNner.id;
 
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values
- *
+ * <p>
  * https://prometheus.io/docs/practices/instrumentation/
  */
 public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 
 
-    /** priority rate of Task processing attempted */
-    public final Counter busyPri = new StepCounter(NiNner.id("busyPri"));
+    /**
+     * priority rate of Task processing attempted
+     */
+    public final Counter busyPri = new StepCounter(id("busyPri"));
 
-    public final Counter conceptFires = new BasicCounter(NiNner.id("concept fire runs"));
-    public final Counter conceptActivations = new BasicCounter(NiNner.id("concept fire activates"));
-    public final Counter conceptFirePremises  = new BasicCounter(NiNner.id("concept fire premises"));
+    public final Counter conceptFires = new BasicCounter(id("concept fire runs"));
+    public final Counter conceptActivations = new BasicCounter(id("concept fire activates"));
+    public final Counter conceptFirePremises = new BasicCounter(id("concept fire premises"));
+    public final Counter taskDerivations = new BasicCounter(id("task derivations"));
+    public final Counter derivation1, derivation2, derivation3;
+
 
     @NotNull
     public final BufferedFloatGuage busyVol;
 
-    /** priority rate of Task processing which affected concepts */
+    /**
+     * priority rate of Task processing which affected concepts
+     */
     @NotNull
     public final BufferedFloatGuage learnPri, learnVol;
 
-    /** task priority overflow rate */
+    /**
+     * task priority overflow rate
+     */
     @NotNull
     public final BufferedFloatGuage stress;
 
-    /** happiness rate */
+    /**
+     * happiness rate
+     */
     @NotNull
     public final AtomicSummaryStatistics happy = new AtomicSummaryStatistics();
 
@@ -57,7 +62,9 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
     public final BufferedFloatGuage confident;
 
 
-    /** count of errors */
+    /**
+     * count of errors
+     */
     @NotNull
     public final BufferedFloatGuage errrVol;
 
@@ -73,7 +80,7 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 
     //final ResourceMeter resourceMeter = new ResourceMeter();
 
-    public Emotion() {
+    public Emotion(NAR n) {
         super();
 
         //logger = LoggerFactory.getLogger(class);
@@ -91,10 +98,16 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 
         this.errrVol = new BufferedFloatGuage("error");
 
+        derivation1 = new BasicCounter(id("derivation stage 1"));
+        derivation2 = new BasicCounter(id("derivation stage 2"));
+        derivation3 = new BasicCounter(id("derivation stage 3"));
+
     }
 
 
-    /** new frame started */
+    /**
+     * new frame started
+     */
     public void cycle() {
 
         _happy = (float) happy.getSum();
@@ -117,7 +130,9 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 //        counts.values().forEach(x -> x.set(0));
 //    }
 
-    /** percentage of business which was not frustration, by aggregate volume */
+    /**
+     * percentage of business which was not frustration, by aggregate volume
+     */
     public float learningVol() {
         double v = busyVol.getSum();
         if (v > 0)
@@ -184,31 +199,34 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 
     //TODO use Meter subclass that will accept and transform these float parameters
 
-    @Deprecated public void happy(float increment) {
-        happy.accept( increment );
+    @Deprecated
+    public void happy(float increment) {
+        happy.accept(increment);
     }
 
-    @Deprecated public void busy(float pri, int vol) {
-        busyPri.increment( Math.round(pri * 1000) );
-        busyVol.accept( vol );
+    @Deprecated
+    public void busy(float pri, int vol) {
+        busyPri.increment(Math.round(pri * 1000));
+        busyVol.accept(vol);
     }
 
 
     public final void stress(@NotNull MutableFloat pri) {
         float v = pri.floatValue();
         if (v > 0)
-            stress.accept( v );
+            stress.accept(v);
     }
 
-    @Deprecated public void learn(float pri, int vol) {
+    @Deprecated
+    public void learn(float pri, int vol) {
 
-        learnPri.accept( pri );
+        learnPri.accept(pri);
         learnVol.accept(vol);
 
     }
 
     public void confident(float deltaConf, @NotNull Compound term) {
-        confident.accept( deltaConf );
+        confident.accept(deltaConf);
     }
 
 //    @Deprecated public void alert(float percentFocusChange) {
@@ -258,7 +276,10 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 
     public void stat(SortedMap<String, Object> x) {
         //TODO reflect
-        for (Counter c : new Counter[] { conceptFires, conceptActivations, conceptFirePremises } )
+        for (Counter c : new Counter[]{
+                conceptFires, conceptActivations, conceptFirePremises, taskDerivations,
+                derivation1, derivation2, derivation3
+        })
             x.put(c.getConfig().getName(), c.getValue());
 
         x.put("emotion", summary());
@@ -289,7 +310,6 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 //    private static float l2f(long l) {
 //        return l / 1000f; //0.001 precision
 //    }
-
 
 
 //    public void happy(float solution, @NotNull Task task) {
@@ -374,8 +394,6 @@ public final class Emotion /* extends ConcurrentMonitorRegistry */ {
 //
 //        return -1;
 //    }
-
-
 
 
 //    protected void commitBusy() {

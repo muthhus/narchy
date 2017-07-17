@@ -13,7 +13,7 @@ public class JavaDynamicClassLoader extends AbstractDynamicClassLoader
 		super();
 	}
 	
-	public JavaDynamicClassLoader(URL[] urls)
+	public JavaDynamicClassLoader(URL... urls)
 	{
 		super(urls);
 	}

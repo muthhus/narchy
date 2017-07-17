@@ -24,7 +24,7 @@ public class TermPanel extends JPanel implements ActionListener{
 	private static final long serialVersionUID = 1L;
 
 /**Transforms prolog terms into trees.*/
-  public static final ToTree<Term> term2tree= new ToTree<Term>() {
+  public static final ToTree<Term> term2tree= new ToTree<>() {
     @Override
     public Node makeTreeFrom(Term term) {
         Node node = new Node("" + term);

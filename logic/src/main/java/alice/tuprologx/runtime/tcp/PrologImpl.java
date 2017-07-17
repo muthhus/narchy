@@ -58,7 +58,7 @@ public class PrologImpl implements java.io.Serializable {
     }
 
     public void hasOpenAlternatives(ObjectInputStream in,ObjectOutputStream out)  throws Exception {
-        out.writeObject(Boolean.valueOf(core.hasOpenAlternatives()));
+        out.writeObject(core.hasOpenAlternatives());
     }
 
     public void solveTerm(ObjectInputStream in,ObjectOutputStream out)  throws Exception {

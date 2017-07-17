@@ -56,7 +56,7 @@ public class Theory extends List<Clause<?,?>> {
         //System.out.println(this);     
     }
     
-    public Theory(String[] s) {
+    public Theory(String... s) {
         this(parseTheoryArray(s));
     }
     
@@ -163,7 +163,7 @@ public class Theory extends List<Clause<?,?>> {
         return clauses;
     }
     
-    private static Collection<Clause<?,?>> parseTheoryArray(String[] arr) {
+    private static Collection<Clause<?,?>> parseTheoryArray(String... arr) {
         String temp="";
         for (String s : arr) {
             temp+=s+ '\n';

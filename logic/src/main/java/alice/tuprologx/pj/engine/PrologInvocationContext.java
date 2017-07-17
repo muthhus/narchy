@@ -34,7 +34,7 @@ public class PrologInvocationContext {
     private final boolean trace;
     
     /** Creates a new instance of InvocationObject */
-    public PrologInvocationContext(Method m, Object[] args) {        
+    public PrologInvocationContext(Method m, Object... args) {
         PrologMethod pann = m.getAnnotation(PrologMethod.class);
         assert (pann != null);         
         keepSubstitutions = pann.keepSubstitutions();// || pann.signature().equals("");
@@ -46,7 +46,7 @@ public class PrologInvocationContext {
         trace = m.isAnnotationPresent(TRACE.class);            
     }
     
-    public Term<?> buildGoal(Object[] args) throws Exception {        
+    public Term<?> buildGoal(Object... args) {
         Term<?>[] tlist = new Term<?>[variableNames.size()];
         int i = 0;
         int pos;
@@ -164,7 +164,7 @@ public class PrologInvocationContext {
     
     
     
-    public Object dispatch(alice.tuprologx.pj.engine.PJProlog _engine, Object[] args) throws NoSolutionException {
+    public Object dispatch(alice.tuprologx.pj.engine.PJProlog _engine, Object... args) {
 	try {                            
             Term<?> theGoal = buildGoal(args);  
             if (trace) {
@@ -313,7 +313,7 @@ public class PrologInvocationContext {
                         return _result.hasNext();
                     }
                 }
-                return (Iterable<Object>) () -> new SolutionIterator();
+                return (Iterable<Object>) SolutionIterator::new;
             }        
             else { //single solution
                 PrologSolution<?,? extends Cons<?,?>> si = _engine.solve(theGoal);                            

@@ -119,7 +119,7 @@ public class PrologAgent extends Prolog {
 
         try {
 
-            return new Iterator<Term>() {
+            return new Iterator<>() {
 
                 Solution s = run(goal);
 
@@ -128,7 +128,7 @@ public class PrologAgent extends Prolog {
                 @Override
                 public boolean hasNext() {
 
-                    return next!=null;
+                    return next != null;
                 }
 
                 @Override
@@ -141,7 +141,7 @@ public class PrologAgent extends Prolog {
                         } else {
                             this.next = null;
                         }
-                    } catch ( NoMoreSolutionException | NoSolutionException e) {
+                    } catch (NoMoreSolutionException | NoSolutionException e) {
                         this.next = null;
                     }
                     return next;

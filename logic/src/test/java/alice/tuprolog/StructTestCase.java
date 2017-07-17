@@ -1,49 +1,50 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 public class StructTestCase extends TestCase {
 	
 	public void testStructWithNullArgument() {
 		try {
 			new Struct("p", (Term) null);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 		try {
 			new Struct("p", new Int(1), null);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 		try {
 			new Struct("p", new Int(1), new Int(2), null);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 		try {
 			new Struct("p", new Int(1), new Int(2), new Int(3), null);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 		try {
 			new Struct("p", new Int(1), new Int(2), new Int(3), new Int(4), null);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 		try {
 			new Struct("p", new Int(1), new Int(2), new Int(3), new Int(4), new Int(5), null);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 		try {
 			new Struct("p", new Int(1), new Int(2), new Int(3), new Int(4), new Int(5), new Int(6), null);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 		try {
-			Term[] args = new Term[] {new Struct("a"), null, new Var("P")};
+			Term[] args = {new Struct("a"), null, new Var("P")};
 			new Struct("p", args);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	
 	public void testStructWithNullName() {
 		try {
 			new Struct(null, new Int(1), new Int(2));
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	
@@ -51,122 +52,122 @@ public class StructTestCase extends TestCase {
 	public void testStructWithEmptyName() {
 		try {
 			new Struct("", new Int(1), new Int(2));
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
-		assertEquals(0, new Struct("").name().length());
+		Assert.assertEquals(0, new Struct("").name().length());
 	}
 	
 	public void testEmptyList() {
 		Struct list = new Struct();
-		assertTrue(list.isList());
-		assertTrue(list.isEmptyList());
-		assertEquals(0, list.listSize());
-		assertEquals("[]", list.name());
-		assertEquals(0, list.getArity());
+		Assert.assertTrue(list.isList());
+		Assert.assertTrue(list.isEmptyList());
+		Assert.assertEquals(0, list.listSize());
+		Assert.assertEquals("[]", list.name());
+		Assert.assertEquals(0, list.getArity());
 	}
 
 	/** Another correct method of building an empty list */
 	public void testEmptyListAsSquaredStruct() {
 		Struct emptyList = new Struct("[]");
-		assertTrue(emptyList.isList());
-		assertTrue(emptyList.isEmptyList());
-		assertEquals("[]", emptyList.name());
-		assertEquals(0, emptyList.getArity());
-		assertEquals(0, emptyList.listSize());
+		Assert.assertTrue(emptyList.isList());
+		Assert.assertTrue(emptyList.isEmptyList());
+		Assert.assertEquals("[]", emptyList.name());
+		Assert.assertEquals(0, emptyList.getArity());
+		Assert.assertEquals(0, emptyList.listSize());
 	}
 	
 	/** A wrong method of building an empty list */
 	public void testEmptyListAsDottedStruct() {
 		Struct notAnEmptyList = new Struct(".");
-		assertFalse(notAnEmptyList.isList());
-		assertFalse(notAnEmptyList.isEmptyList());
-		assertEquals(".", notAnEmptyList.name());
-		assertEquals(0, notAnEmptyList.getArity());
+		Assert.assertFalse(notAnEmptyList.isList());
+		Assert.assertFalse(notAnEmptyList.isEmptyList());
+		Assert.assertEquals(".", notAnEmptyList.name());
+		Assert.assertEquals(0, notAnEmptyList.getArity());
 	}
 	
 	/** Use dotted structs to build lists with content */
 	public void testListAsDottedStruct() {
 		Struct notAnEmptyList = new Struct(".", new Struct("a"), new Struct(".", new Struct("b"), new Struct()));
-		assertTrue(notAnEmptyList.isList());
-		assertFalse(notAnEmptyList.isEmptyList());
-		assertEquals(".", notAnEmptyList.name());
-		assertEquals(2, notAnEmptyList.getArity());
+		Assert.assertTrue(notAnEmptyList.isList());
+		Assert.assertFalse(notAnEmptyList.isEmptyList());
+		Assert.assertEquals(".", notAnEmptyList.name());
+		Assert.assertEquals(2, notAnEmptyList.getArity());
 	}
 	
 	public void testListFromArgumentArray() {
-		assertEquals(new Struct(), new Struct(new Term[0]));
+		Assert.assertEquals(new Struct(), new Struct(new Term[0]));
 		
 		Term[] args = new Term[2];
 		args[0] = new Struct("a");
 		args[1] = new Struct("b");
 		Struct list = new Struct(args);
-		assertEquals(new Struct(), list.listTail().listTail());
+		Assert.assertEquals(new Struct(), list.listTail().listTail());
 	}
 	
 	public void testListSize() {
 		Struct list = new Struct(new Struct("a"),
 				       new Struct(new Struct("b"),
 				           new Struct(new Struct("c"), new Struct())));
-		assertTrue(list.isList());
-		assertFalse(list.isEmptyList());
-		assertEquals(3, list.listSize());
+		Assert.assertTrue(list.isList());
+		Assert.assertFalse(list.isEmptyList());
+		Assert.assertEquals(3, list.listSize());
 	}
 	
 	public void testNonListHead() throws InvalidTermException {
 		Struct s = new Struct("f", new Var("X"));
 		try {
-			assertNotNull(s.listHead()); // just to make an assertion...
-			fail();
+			Assert.assertNotNull(s.listHead()); // just to make an assertion...
+			Assert.fail();
 		} catch (UnsupportedOperationException e) {
-			assertEquals("The structure " + s + " is not a list.", e.getMessage());
+			Assert.assertEquals("The structure " + s + " is not a list.", e.getMessage());
 		}
 	}
 	
 	public void testNonListTail() {
 		Struct s = new Struct("h", new Int(1));
 		try {
-			assertNotNull(s.listTail()); // just to make an assertion...
-			fail();
+			Assert.assertNotNull(s.listTail()); // just to make an assertion...
+			Assert.fail();
 		} catch (UnsupportedOperationException e) {
-			assertEquals("The structure " + s + " is not a list.", e.getMessage());
+			Assert.assertEquals("The structure " + s + " is not a list.", e.getMessage());
 		}
 	}
 	
 	public void testNonListSize() throws InvalidTermException {
 		Struct s = new Struct("f", new Var("X"));
 		try {
-			assertEquals(0, s.listSize()); // just to make an assertion...
-			fail();
+			Assert.assertEquals(0, s.listSize()); // just to make an assertion...
+			Assert.fail();
 		} catch (UnsupportedOperationException e) {
-			assertEquals("The structure " + s + " is not a list.", e.getMessage());
+			Assert.assertEquals("The structure " + s + " is not a list.", e.getMessage());
 		}
 	}
 	
 	public void testNonListIterator() {
 		Struct s = new Struct("f", new Int(2));
 		try {
-			assertNotNull(s.listIterator()); // just to make an assertion...
-			fail();
+			Assert.assertNotNull(s.listIterator()); // just to make an assertion...
+			Assert.fail();
 		} catch (UnsupportedOperationException e) {
-			assertEquals("The structure " + s + " is not a list.", e.getMessage());
+			Assert.assertEquals("The structure " + s + " is not a list.", e.getMessage());
 		}
 	}
 	
 	public void testToList() {
 		Struct emptyList = new Struct();
 		Struct emptyListToList = new Struct(new Struct("[]"), new Struct());
-		assertEquals(emptyListToList, emptyList.toList());
+		Assert.assertEquals(emptyListToList, emptyList.toList());
 	}
 	
 	public void testToString() throws InvalidTermException {
 		Struct emptyList = new Struct();
-		assertEquals("[]", emptyList.toString());
+		Assert.assertEquals("[]", emptyList.toString());
 		Struct s = new Struct("f", new Var("X"));
-		assertEquals("f(X)", s.toString());
+		Assert.assertEquals("f(X)", s.toString());
 		Struct list = new Struct(new Struct("a"),
 		          new Struct(new Struct("b"),
 		        	  new Struct(new Struct("c"), new Struct())));
-		assertEquals("[a,b,c]", list.toString());
+		Assert.assertEquals("[a,b,c]", list.toString());
 	}
 	
 	public void testAppend() {
@@ -177,81 +178,81 @@ public class StructTestCase extends TestCase {
 		emptyList.append(new Struct("a"));
 		emptyList.append(new Struct("b"));
 		emptyList.append(new Struct("c"));
-		assertEquals(list, emptyList);
+		Assert.assertEquals(list, emptyList);
 		Struct tail = new Struct(new Struct("b"),
                           new Struct(new Struct("c"), new Struct()));
-		assertEquals(tail, emptyList.listTail());
+		Assert.assertEquals(tail, emptyList.listTail());
 		
 		emptyList = new Struct();
 		emptyList.append(new Struct());
-		assertEquals(new Struct(new Struct(), new Struct()), emptyList);
+		Assert.assertEquals(new Struct(new Struct(), new Struct()), emptyList);
 		
 		Struct anotherList = new Struct(new Struct("d"),
 				                 new Struct(new Struct("e"), new Struct()));
 		list.append(anotherList);
-		assertEquals(anotherList, list.listTail().listTail().listTail().listHead());
+		Assert.assertEquals(anotherList, list.listTail().listTail().listTail().listHead());
 	}
 	
 	public void testIteratedGoalTerm() throws Exception {
 		Var x = new Var("X");
 		Struct foo = new Struct("foo", x);
 		Struct term = new Struct("^", x, foo);
-		assertEquals(foo, term.iteratedGoalTerm());
+		Assert.assertEquals(foo, term.iteratedGoalTerm());
 	}
 	
 	public void testIsList() {
 		Struct notList = new Struct(".", new Struct("a"), new Struct("b"));
-		assertFalse(notList.isList());
+		Assert.assertFalse(notList.isList());
 	}
 	
 	public void testIsAtomic() {
 		Struct emptyList = new Struct();
-		assertTrue(emptyList.isAtomic());
+		Assert.assertTrue(emptyList.isAtomic());
 		Struct atom = new Struct("atom");
-		assertTrue(atom.isAtomic());
+		Assert.assertTrue(atom.isAtomic());
 		Struct list = new Struct(new Term[] {new Int(0), new Int(1)});
-		assertFalse(list.isAtomic());
+		Assert.assertFalse(list.isAtomic());
 		Struct compound = new Struct("f", new Struct("a"), new Struct("b"));
-		assertFalse(compound.isAtomic());
+		Assert.assertFalse(compound.isAtomic());
 		Struct singleQuoted = new Struct("'atom'");
-		assertTrue(singleQuoted.isAtomic());
+		Assert.assertTrue(singleQuoted.isAtomic());
 		Struct doubleQuoted = new Struct("\"atom\"");
-		assertTrue(doubleQuoted.isAtomic());
+		Assert.assertTrue(doubleQuoted.isAtomic());
 	}
 	
 	public void testIsAtom() {
 		Struct emptyList = new Struct();
-		assertTrue(emptyList.isAtom());
+		Assert.assertTrue(emptyList.isAtom());
 		Struct atom = new Struct("atom");
-		assertTrue(atom.isAtom());
+		Assert.assertTrue(atom.isAtom());
 		Struct list = new Struct(new Term[] {new Int(0), new Int(1)});
-		assertFalse(list.isAtom());
+		Assert.assertFalse(list.isAtom());
 		Struct compound = new Struct("f", new Struct("a"), new Struct("b"));
-		assertFalse(compound.isAtom());
+		Assert.assertFalse(compound.isAtom());
 		Struct singleQuoted = new Struct("'atom'");
-		assertTrue(singleQuoted.isAtom());
+		Assert.assertTrue(singleQuoted.isAtom());
 		Struct doubleQuoted = new Struct("\"atom\"");
-		assertTrue(doubleQuoted.isAtom());
+		Assert.assertTrue(doubleQuoted.isAtom());
 	}
 	
 	public void testIsCompound() {
 		Struct emptyList = new Struct();
-		assertFalse(emptyList.isCompound());
+		Assert.assertFalse(emptyList.isCompound());
 		Struct atom = new Struct("atom");
-		assertFalse(atom.isCompound());
+		Assert.assertFalse(atom.isCompound());
 		Struct list = new Struct(new Term[] {new Int(0), new Int(1)});
-		assertTrue(list.isCompound());
+		Assert.assertTrue(list.isCompound());
 		Struct compound = new Struct("f", new Struct("a"), new Struct("b"));
-		assertTrue(compound.isCompound());
+		Assert.assertTrue(compound.isCompound());
 		Struct singleQuoted = new Struct("'atom'");
-		assertFalse(singleQuoted.isCompound());
+		Assert.assertFalse(singleQuoted.isCompound());
 		Struct doubleQuoted = new Struct("\"atom\"");
-		assertFalse(doubleQuoted.isCompound());
+		Assert.assertFalse(doubleQuoted.isCompound());
 	}
 	
 	public void testEqualsToObject() {
 		Struct s = new Struct("id");
-		assertFalse(s.equals(new Object()));
+		Assert.assertFalse(s.equals(new Object()));
 	}
 
 }

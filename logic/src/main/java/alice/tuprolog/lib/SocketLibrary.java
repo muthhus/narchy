@@ -38,11 +38,6 @@ public class SocketLibrary extends Library implements ISocketLib {
 		clientSockets= new LinkedList<>();
 	}
 
-	@Override
-	public String getTheory() {
-		return "";
-	}
-
 	
 
 	/* SocketLib UDP extension by Adelina Benedetti */
@@ -312,10 +307,6 @@ public boolean tcp_socket_client_open_2(Struct Address, Term SocketTerm) throws 
 		s = new Socket(InetAddress.getByAddress(address), port);
 		SocketTerm.unify(this.getEngine(), new Client_Socket(s));
 		addClientSocket(s);
-	} catch (UnknownHostException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-		return false;
 	} catch (IOException e) {
 		e.printStackTrace();
 		return false;
@@ -427,10 +418,7 @@ public boolean read_from_socket_3(Term Socket, Term Msg, Struct Options) throws 
 			ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
 			Term m = (Term) in.readObject();
 			Msg.unify(this.getEngine(), m);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		} catch (ClassNotFoundException e) {
+		} catch (IOException | ClassNotFoundException e) {
 			e.printStackTrace();
 			return false;
 		}

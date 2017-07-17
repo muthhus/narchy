@@ -143,7 +143,7 @@ final class ClassUtilities {
      *            primitive.
      * @return true if compatible, false otherwise
      */
-    public static boolean compatibleClasses(final Class<?>[] lhs, final Class<?>[] rhs) {
+    public static boolean compatibleClasses(final Class<?>[] lhs, final Class<?>... rhs) {
         if (lhs.length != rhs.length) {
             return false;
         }
@@ -178,7 +178,7 @@ final class ClassUtilities {
      *         interfaces of aClass are searched, then their superclasses, etc.
      *         until a method is found. Returns null if there is no such method.
      */
-    public static Method getAccessibleMethodFrom(final Class<?> aClass, final String methodName, final Class<?>[] parameterTypes) {
+    public static Method getAccessibleMethodFrom(final Class<?> aClass, final String methodName, final Class<?>... parameterTypes) {
         // Look for overridden method in the superclass.
         Class<?> superclass = aClass.getSuperclass();
         Method overriddenMethod = null;

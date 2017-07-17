@@ -128,11 +128,8 @@ public class PJLibrary extends Library {
 		}
 		preregisterObjects();
 	}
-	
-	@Override
-	public void onSolveEnd() { }
-	
-	/**
+
+    /**
 	 * objects actually pre-registered in order to be
 	 * available since the beginning of demonstration
 	 */
@@ -592,57 +589,75 @@ public class PJLibrary extends Library {
 				return false;
 			}
 			String name = cl.toString();
-			if (name.equals("class [I")){
-				if (!(what instanceof Number)){
-					return false;
-				}
-				byte v = (byte)((Number)what).intValue();
-				Array.setInt(obj,index.intValue(),v);
-			}  else if (name.equals("class [D")){
-				if (!(what instanceof Number)){
-					return false;
-				}
-				double v = ((Number)what).doubleValue();
-				Array.setDouble(obj,index.intValue(),v);
-			}  else if (name.equals("class [F")){
-				if (!(what instanceof Number)){
-					return false;
-				}
-				float v = ((Number)what).floatValue();
-				Array.setFloat(obj,index.intValue(),v);
-			}  else if (name.equals("class [L")){
-				if (!(what instanceof Number)){
-					return false;
-				}
-				long v = ((Number)what).longValue();
-				Array.setFloat(obj,index.intValue(),v);
-			}  else if (name.equals("class [C")){
-				String s = what.toString();
-				Array.setChar(obj,index.intValue(),s.charAt(0));
-			}  else if (name.equals("class [Z")){
-				String s = what.toString();
-				if (s.equals("true")){
-					Array.setBoolean(obj,index.intValue(),true);
-				} else if (s.equals("false")){
-					Array.setBoolean(obj,index.intValue(),false);
-				} else {
-					return false;
-				}
-			}  else if (name.equals("class [B")){
-				if (!(what instanceof Number)){
-					return false;
-				}
-				int v = ((Number)what).intValue();
-				Array.setByte(obj,index.intValue(),(byte)v);
-			}  else if (name.equals("class [S")){
-				if (!(what instanceof Number)){
-					return false;
-				}
-				short v = (short)((Number)what).intValue();
-				Array.setShort(obj,index.intValue(),v);
-			}  else {
-				return false;
-			}
+            switch (name) {
+                case "class [I": {
+                    if (!(what instanceof Number)) {
+                        return false;
+                    }
+                    byte v = (byte) ((Number) what).intValue();
+                    Array.setInt(obj, index.intValue(), v);
+                    break;
+                }
+                case "class [D": {
+                    if (!(what instanceof Number)) {
+                        return false;
+                    }
+                    double v = ((Number) what).doubleValue();
+                    Array.setDouble(obj, index.intValue(), v);
+                    break;
+                }
+                case "class [F": {
+                    if (!(what instanceof Number)) {
+                        return false;
+                    }
+                    float v = ((Number) what).floatValue();
+                    Array.setFloat(obj, index.intValue(), v);
+                    break;
+                }
+                case "class [L": {
+                    if (!(what instanceof Number)) {
+                        return false;
+                    }
+                    long v = ((Number) what).longValue();
+                    Array.setFloat(obj, index.intValue(), v);
+                    break;
+                }
+                case "class [C": {
+                    String s = what.toString();
+                    Array.setChar(obj, index.intValue(), s.charAt(0));
+                    break;
+                }
+                case "class [Z":
+                    String s = what.toString();
+                    switch (s) {
+                        case "true":
+                            Array.setBoolean(obj, index.intValue(), true);
+                            break;
+                        case "false":
+                            Array.setBoolean(obj, index.intValue(), false);
+                            break;
+                        default:
+                            return false;
+                    }
+                    break;
+                case "class [B": {
+                    if (!(what instanceof Number)) {
+                        return false;
+                    }
+                    int v = ((Number) what).intValue();
+                    Array.setByte(obj, index.intValue(), (byte) v);
+                    break;
+                }
+                case "class [S":
+                    if (!(what instanceof Number)) {
+                        return false;
+                    }
+                    short v = (short) ((Number) what).intValue();
+                    Array.setShort(obj, index.intValue(), v);
+                    break;
+                default:
+                    return false;
+            }
 			return true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -673,37 +688,44 @@ public class PJLibrary extends Library {
 				return false;
 			}
 			String name = cl.toString();
-			if (name.equals("class [I")){
-				Term value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
-				return unify(what,value);
-			}  else if (name.equals("class [D")){
-				Term value = new alice.tuprolog.Double(Array.getDouble(obj,index.intValue()));
-				return unify(what,value);
-			}  else if (name.equals("class [F")){
-				Term value = new alice.tuprolog.Float(Array.getFloat(obj,index.intValue()));
-				return unify(what,value);
-			}  else if (name.equals("class [L")){
-				Term value = new alice.tuprolog.Long(Array.getLong(obj,index.intValue()));
-				return unify(what,value);
-			}  else if (name.equals("class [C")){
-				Term value = new alice.tuprolog.Struct(""+Array.getChar(obj,index.intValue()));
-				return unify(what,value);
-			}  else if (name.equals("class [Z")){
-				boolean b = Array.getBoolean(obj,index.intValue());
-				if (b) {
-					return unify(what,alice.tuprolog.Term.TRUE);
-				} else {
-					return unify(what,alice.tuprolog.Term.FALSE);
-				}
-			}  else if (name.equals("class [B")){
-				Term value = new alice.tuprolog.Int(Array.getByte(obj,index.intValue()));
-				return unify(what,value);
-			}  else if (name.equals("class [S")){
-				Term value = new alice.tuprolog.Int(Array.getInt(obj,index.intValue()));
-				return unify(what,value);
-			}  else {
-				return false;
-			}
+            switch (name) {
+                case "class [I": {
+                    Term value = new Int(Array.getInt(obj, index.intValue()));
+                    return unify(what, value);
+                }
+                case "class [D": {
+                    Term value = new alice.tuprolog.Double(Array.getDouble(obj, index.intValue()));
+                    return unify(what, value);
+                }
+                case "class [F": {
+                    Term value = new alice.tuprolog.Float(Array.getFloat(obj, index.intValue()));
+                    return unify(what, value);
+                }
+                case "class [L": {
+                    Term value = new alice.tuprolog.Long(Array.getLong(obj, index.intValue()));
+                    return unify(what, value);
+                }
+                case "class [C": {
+                    Term value = new Struct("" + Array.getChar(obj, index.intValue()));
+                    return unify(what, value);
+                }
+                case "class [Z":
+                    boolean b = Array.getBoolean(obj, index.intValue());
+                    if (b) {
+                        return unify(what, Term.TRUE);
+                    } else {
+                        return unify(what, Term.FALSE);
+                    }
+                case "class [B": {
+                    Term value = new Int(Array.getByte(obj, index.intValue()));
+                    return unify(what, value);
+                }
+                case "class [S":
+                    Term value = new Int(Array.getInt(obj, index.intValue()));
+                    return unify(what, value);
+                default:
+                    return false;
+            }
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			return false;
@@ -716,26 +738,36 @@ public class PJLibrary extends Library {
 		try {
 			Object array = null;
 			String obtype = type.substring(0, type.length() - 2);
-			if (obtype.equals("boolean")) {
-				array = new boolean[nargs];
-			} else if (obtype.equals("byte")) {
-				array = new byte[nargs];
-			} else if (obtype.equals("char")) {
-				array = new char[nargs];
-			} else if (obtype.equals("short")) {
-				array = new short[nargs];
-			} else if (obtype.equals("int")) {
-				array = new int[nargs];
-			} else if (obtype.equals("long")) {
-				array = new long[nargs];
-			} else if (obtype.equals("float")) {
-				array = new float[nargs];
-			} else if (obtype.equals("double")) {
-				array = new double[nargs];
-			} else {
-				Class<?> cl = Class.forName(obtype);
-				array = Array.newInstance(cl, nargs);
-			}
+            switch (obtype) {
+                case "boolean":
+                    array = new boolean[nargs];
+                    break;
+                case "byte":
+                    array = new byte[nargs];
+                    break;
+                case "char":
+                    array = new char[nargs];
+                    break;
+                case "short":
+                    array = new short[nargs];
+                    break;
+                case "int":
+                    array = new int[nargs];
+                    break;
+                case "long":
+                    array = new long[nargs];
+                    break;
+                case "float":
+                    array = new float[nargs];
+                    break;
+                case "double":
+                    array = new double[nargs];
+                    break;
+                default:
+                    Class<?> cl = Class.forName(obtype);
+                    array = Array.newInstance(cl, nargs);
+                    break;
+            }
 			return bindDynamicObject(id, array);
 		} catch (Exception ex) {
 			//ex.printStackTrace();
@@ -756,7 +788,7 @@ public class PJLibrary extends Library {
 		return new Signature(values, types);
 	}
 	
-	private Signature parseArg(Object[] objs) {
+	private Signature parseArg(Object... objs) {
 		Object[] values = new Object[objs.length];
 		Class<?>[] types = new Class[objs.length];
 		for (int i = 0; i < objs.length; i++) {
@@ -773,34 +805,38 @@ public class PJLibrary extends Library {
 				types[i] = null;
 			} else if (term.isAtom()) {
 				String name = alice.util.Tools.removeApices(term.toString());
-				if (name.equals("true")){
-					values[i]=Boolean.TRUE;
-					types[i] = Boolean.TYPE;
-				} else if (name.equals("false")){
-					values[i]=Boolean.FALSE;
-					types[i] = Boolean.TYPE;
-				} else {
-					Object obj = currentObjects.get(name);
-					if (obj == null) {
-						values[i] = name;
-					} else {
-						values[i] = obj;
-					}
-					types[i] = values[i].getClass();
-				}
+                switch (name) {
+                    case "true":
+                        values[i] = Boolean.TRUE;
+                        types[i] = Boolean.TYPE;
+                        break;
+                    case "false":
+                        values[i] = Boolean.FALSE;
+                        types[i] = Boolean.TYPE;
+                        break;
+                    default:
+                        Object obj = currentObjects.get(name);
+                        if (obj == null) {
+                            values[i] = name;
+                        } else {
+                            values[i] = obj;
+                        }
+                        types[i] = values[i].getClass();
+                        break;
+                }
 			} else if (term instanceof Number) {
 				Number t = (Number) term;
 				if (t instanceof Int) {
-					values[i] = new java.lang.Integer(t.intValue());
+					values[i] = t.intValue();
 					types[i] = java.lang.Integer.TYPE;
 				} else if (t instanceof alice.tuprolog.Double) {
-					values[i] = new java.lang.Double(t.doubleValue());
+					values[i] = t.doubleValue();
 					types[i] = java.lang.Double.TYPE;
 				} else if (t instanceof alice.tuprolog.Long) {
-					values[i] = new java.lang.Long(t.longValue());
+					values[i] = t.longValue();
 					types[i] = java.lang.Long.TYPE;
 				} else if (t instanceof alice.tuprolog.Float) {
-					values[i] = new java.lang.Float(t.floatValue());
+					values[i] = t.floatValue();
 					types[i] = java.lang.Float.TYPE;
 				}
 			} else if (term instanceof Struct) {
@@ -852,37 +888,50 @@ public class PJLibrary extends Library {
 					types[i]=String.class;	
 					return true;
 				} else if (castTo_name.endsWith("[]")) {
-					if (castTo_name.equals("boolean[]")) {
-						castTo_name = "[Z";
-					} else if (castTo_name.equals("byte[]")) {
-						castTo_name = "[B";
-					} else if (castTo_name.equals("short[]")) {
-						castTo_name = "[S";
-					} else if (castTo_name.equals("char[]")) {
-						castTo_name = "[C";
-					} else if (castTo_name.equals("int[]")) {
-						castTo_name = "[I";
-					} else if (castTo_name.equals("long[]")) {
-						castTo_name = "[L";
-					} else if (castTo_name.equals("float[]")) {
-						castTo_name = "[F";
-					} else if (castTo_name.equals("double[]")) {
-						castTo_name = "[D";
-					} else {
-						castTo_name = "[L" + castTo_name.substring(0, castTo_name.length() - 2) + ';';
-					}
+                    switch (castTo_name) {
+                        case "boolean[]":
+                            castTo_name = "[Z";
+                            break;
+                        case "byte[]":
+                            castTo_name = "[B";
+                            break;
+                        case "short[]":
+                            castTo_name = "[S";
+                            break;
+                        case "char[]":
+                            castTo_name = "[C";
+                            break;
+                        case "int[]":
+                            castTo_name = "[I";
+                            break;
+                        case "long[]":
+                            castTo_name = "[L";
+                            break;
+                        case "float[]":
+                            castTo_name = "[F";
+                            break;
+                        case "double[]":
+                            castTo_name = "[D";
+                            break;
+                        default:
+                            castTo_name = "[L" + castTo_name.substring(0, castTo_name.length() - 2) + ';';
+                            break;
+                    }
 				}
 				if (!castWhat_name.equals("null")) {
 					Object obj_to_cast = currentObjects.get(castWhat_name);
 					if (obj_to_cast == null) {
 						if (castTo_name.equals("boolean")) {
-							if (castWhat_name.equals("true")) {
-								values[i] = Boolean.TRUE;
-							} else if (castWhat_name.equals("false")) {
-								values[i] = Boolean.FALSE;
-							} else {
-								return false;
-							}
+                            switch (castWhat_name) {
+                                case "true":
+                                    values[i] = Boolean.TRUE;
+                                    break;
+                                case "false":
+                                    values[i] = Boolean.FALSE;
+                                    break;
+                                default:
+                                    return false;
+                            }
 							types[i] = Boolean.TYPE;
 						} else {
 							// conversion to array
@@ -899,55 +948,72 @@ public class PJLibrary extends Library {
 					}
 				} else {
 					values[i] = null;
-					if (castTo_name.equals("byte")) {
-						types[i] = Byte.TYPE;
-					} else if (castTo_name.equals("short")) {
-						types[i] = Short.TYPE;
-					} else if (castTo_name.equals("char")) {
-						types[i] = Character.TYPE;
-					} else if (castTo_name.equals("int")) {
-						types[i] = java.lang.Integer.TYPE;
-					} else if (castTo_name.equals("long")) {
-						types[i] = java.lang.Long.TYPE;
-					} else if (castTo_name.equals("float")) {
-						types[i] = java.lang.Float.TYPE;
-					} else if (castTo_name.equals("double")) {
-						types[i] = java.lang.Double.TYPE;
-					} else if (castTo_name.equals("boolean")) {
-						types[i] = java.lang.Boolean.TYPE;
-					} else {
-						try {
-							types[i] = (Class.forName(castTo_name));
-						} catch (ClassNotFoundException ex) {
-							Prolog.warn("Java class not found: " + castTo_name);
-							return false;
-						}
-					}
+                    switch (castTo_name) {
+                        case "byte":
+                            types[i] = Byte.TYPE;
+                            break;
+                        case "short":
+                            types[i] = Short.TYPE;
+                            break;
+                        case "char":
+                            types[i] = Character.TYPE;
+                            break;
+                        case "int":
+                            types[i] = Integer.TYPE;
+                            break;
+                        case "long":
+                            types[i] = java.lang.Long.TYPE;
+                            break;
+                        case "float":
+                            types[i] = java.lang.Float.TYPE;
+                            break;
+                        case "double":
+                            types[i] = java.lang.Double.TYPE;
+                            break;
+                        case "boolean":
+                            types[i] = Boolean.TYPE;
+                            break;
+                        default:
+                            try {
+                                types[i] = (Class.forName(castTo_name));
+                            } catch (ClassNotFoundException ex) {
+                                Prolog.warn("Java class not found: " + castTo_name);
+                                return false;
+                            }
+                            break;
+                    }
 				}
 			} else {
 				Number num = (Number) castWhat;
 				String castTo_name = ((Struct) castTo).name();
-				if (castTo_name.equals("byte")) {
-					values[i] = new Byte((byte) num.intValue());
-					types[i] = Byte.TYPE;
-				} else if (castTo_name.equals("short")) {
-					values[i] = new Short((short) num.intValue());
-					types[i] = Short.TYPE;
-				} else if (castTo_name.equals("int")) {
-					values[i] = new Integer(num.intValue());
-					types[i] = Integer.TYPE;
-				} else if (castTo_name.equals("long")) {
-					values[i] = new java.lang.Long(num.longValue());
-					types[i] = java.lang.Long.TYPE;
-				} else if (castTo_name.equals("float")) {
-					values[i] = new java.lang.Float(num.floatValue());
-					types[i] = java.lang.Float.TYPE;
-				} else if (castTo_name.equals("double")) {
-					values[i] = new java.lang.Double(num.doubleValue());
-					types[i] = java.lang.Double.TYPE;
-				} else {
-					return false;
-				}
+                switch (castTo_name) {
+                    case "byte":
+                        values[i] = (byte) num.intValue();
+                        types[i] = Byte.TYPE;
+                        break;
+                    case "short":
+                        values[i] = (short) num.intValue();
+                        types[i] = Short.TYPE;
+                        break;
+                    case "int":
+                        values[i] = num.intValue();
+                        types[i] = Integer.TYPE;
+                        break;
+                    case "long":
+                        values[i] = num.longValue();
+                        types[i] = java.lang.Long.TYPE;
+                        break;
+                    case "float":
+                        values[i] = num.floatValue();
+                        types[i] = java.lang.Float.TYPE;
+                        break;
+                    case "double":
+                        values[i] = num.doubleValue();
+                        types[i] = java.lang.Double.TYPE;
+                        break;
+                    default:
+                        return false;
+                }
 			}
 		} catch (Exception ex) {
 			Prolog.warn("Casting " + castWhat + " to " + castTo + " failed");
@@ -968,7 +1034,7 @@ public class PJLibrary extends Library {
 		}
 		try {
 			if (Boolean.class.isInstance(obj)) {
-				if (((Boolean) obj).booleanValue()) {
+				if ((Boolean) obj) {
 					return unify(id, Term.TRUE);
 				} else {
 					return unify(id, Term.FALSE);
@@ -978,13 +1044,13 @@ public class PJLibrary extends Library {
 			} else if (Short.class.isInstance(obj)) {
 				return unify(id, new Int(((Short) obj).intValue()));
 			} else if (Integer.class.isInstance(obj)) {
-				return unify(id, new Int(((Integer) obj).intValue()));
+				return unify(id, new Int((Integer) obj));
 			} else if (java.lang.Long.class.isInstance(obj)) {
-				return unify(id, new alice.tuprolog.Long(((java.lang.Long) obj).longValue()));
+				return unify(id, new alice.tuprolog.Long((java.lang.Long) obj));
 			} else if (java.lang.Float.class.isInstance(obj)) {
-				return unify(id, new alice.tuprolog.Float(((java.lang.Float) obj).floatValue()));
+				return unify(id, new alice.tuprolog.Float((java.lang.Float) obj));
 			} else if (java.lang.Double.class.isInstance(obj)) {
-				return unify(id, new alice.tuprolog.Double(((java.lang.Double) obj).doubleValue()));
+				return unify(id, new alice.tuprolog.Double((java.lang.Double) obj));
 			} else if (String.class.isInstance(obj)) {
 				return unify(id, new Struct((String) obj));
 			} else if (Character.class.isInstance(obj)) {
@@ -1283,7 +1349,7 @@ public class PJLibrary extends Library {
 	// --------------------------------------------------
 	
 	private static Method lookupMethod(Class<?> target, String name,
-			Class<?>[] argClasses, Object[] argValues) throws NoSuchMethodException {
+                                       Class<?>[] argClasses, Object... argValues) throws NoSuchMethodException {
 		// first try for exact match
 		try {
 			Method m = target.getMethod(name, argClasses);
@@ -1336,7 +1402,7 @@ public class PJLibrary extends Library {
 		}
 	}
 	
-	private static Constructor<?> lookupConstructor(Class<?> target, Class<?>[] argClasses, Object[] argValues) throws NoSuchMethodException {
+	private static Constructor<?> lookupConstructor(Class<?> target, Class<?>[] argClasses, Object... argValues) throws NoSuchMethodException {
 		// first try for exact match
 		try {
 			return target.getConstructor(argClasses);
@@ -1386,7 +1452,7 @@ public class PJLibrary extends Library {
 	}
 	
 	// 1st arg is from method, 2nd is actual parameters
-	private static boolean matchClasses(Class<?>[] mclasses, Class<?>[] pclasses) {
+	private static boolean matchClasses(Class<?>[] mclasses, Class<?>... pclasses) {
 		if (mclasses.length == pclasses.length) {
 			for (int i = 0; i != mclasses.length; i++) {
 				if (!matchClass(mclasses[i], pclasses[i])) {
@@ -1491,7 +1557,7 @@ public class PJLibrary extends Library {
 	//   required a int,    provided a   double => NOT CONSIDERED
 	//   required a long,   provided a   double => NOT CONSIDERED
 	//
-	private static Object[] matchClasses(Class<?>[] mclasses, Class<?>[] pclasses, Object[] values) {
+	private static Object[] matchClasses(Class<?>[] mclasses, Class<?>[] pclasses, Object... values) {
 		if (mclasses.length == pclasses.length) {
 			Object[] newvalues = new Object[mclasses.length];
 			
@@ -1504,17 +1570,17 @@ public class PJLibrary extends Library {
 						pclasses[i].equals(java.lang.Double.TYPE)) {
 					// arg required: a float, arg provided: a double
 					// so we need an explicit conversion...
-					newvalues[i] = new java.lang.Float(((java.lang.Double) values[i]).floatValue());
+					newvalues[i] = ((java.lang.Double) values[i]).floatValue();
 				} else if (mclasses[i].equals(java.lang.Float.TYPE) &&
 						pclasses[i].equals(java.lang.Integer.TYPE)) {
 					// arg required: a float, arg provided: an int
 					// so we need an explicit conversion...
-					newvalues[i] = new java.lang.Float(((java.lang.Integer) values[i]).intValue());
+					newvalues[i] = (float) ((Integer) values[i]).intValue();
 				} else if (mclasses[i].equals(java.lang.Double.TYPE) &&
 						pclasses[i].equals(java.lang.Integer.TYPE)) {
 					// arg required: a double, arg provided: an int
 					// so we need an explicit conversion...
-					newvalues[i] = new java.lang.Double(((java.lang.Integer) values[i]).doubleValue());
+					newvalues[i] = ((Integer) values[i]).doubleValue();
 				} else if (values[i] == null && !mclasses[i].isPrimitive()) {
 					newvalues[i] = null;
 				} else {
@@ -1540,7 +1606,7 @@ class Signature implements Serializable {
 	Class<?>[] types;
 	Object[] values;
 	
-	public Signature(Object[] v, Class<?>[] c) {
+	public Signature(Object[] v, Class<?>... c) {
 		values = v;
 		types = c;
 	}

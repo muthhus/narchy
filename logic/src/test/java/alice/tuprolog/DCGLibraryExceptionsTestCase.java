@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 /**
  * @author Matteo Iuliani
@@ -16,12 +17,12 @@ public class DCGLibraryExceptionsTestCase extends TestCase {
 		engine.addLibrary("alice.tuprolog.lib.DCGLibrary");
 		String goal = "catch(phrase(X, []), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("phrase_guard", new Var("X"),
+		Assert.assertTrue(g.isEqual(new Struct("phrase_guard", new Var("X"),
 				new Struct())));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 	// verifico che phrase(X, [], []) lancia un errore di instanziazione
@@ -30,12 +31,12 @@ public class DCGLibraryExceptionsTestCase extends TestCase {
 		engine.addLibrary("alice.tuprolog.lib.DCGLibrary");
 		String goal = "catch(phrase(X, [], []), error(instantiation_error, instantiation_error(Goal, ArgNo)), true).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct g = (Struct) info.getTerm("Goal");
-		assertTrue(g.isEqual(new Struct("phrase_guard", new Var("X"),
+		Assert.assertTrue(g.isEqual(new Struct("phrase_guard", new Var("X"),
 				new Struct(), new Struct())));
 		Int argNo = (Int) info.getTerm("ArgNo");
-		assertTrue(argNo.intValue() == 1);
+        assertEquals(1, argNo.intValue());
 	}
 
 }

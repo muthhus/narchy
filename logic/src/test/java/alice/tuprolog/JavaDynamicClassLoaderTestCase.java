@@ -55,7 +55,7 @@ public class JavaDynamicClassLoaderTestCase {
 		Method m1 = cl.getMethod("getValue");
 		m1.setAccessible(true);
 		Object res_obj = m1.invoke(obj);
-		int res = new Integer(res_obj.toString()).intValue();
+		int res = new Integer(res_obj.toString());
 		assertEquals(1, res);
 	}
 	
@@ -104,7 +104,7 @@ public class JavaDynamicClassLoaderTestCase {
 			+ File.separator + "test"
 			+ File.separator + "unit" 
 			+ File.separator + "TestURLClassLoaderNestedPackage.jar";
-		URL[] urls = getURLsFromStringArray(new String[]{tempPath});
+		URL[] urls = getURLsFromStringArray(tempPath);
 		loader = new JavaDynamicClassLoader(urls, this.getClass().getClassLoader());
 		Class<?> cl = loader.loadClass("acme.corp.Counter");
 		assertNotNull(cl);
@@ -128,7 +128,7 @@ public class JavaDynamicClassLoaderTestCase {
 		paths[1] = file.getCanonicalPath();
 	}
 	
-	private URL[] getURLsFromStringArray(String[] paths) throws MalformedURLException  
+	private URL[] getURLsFromStringArray(String... paths) throws MalformedURLException
     {
     	URL[] urls = new URL[paths.length];
 		

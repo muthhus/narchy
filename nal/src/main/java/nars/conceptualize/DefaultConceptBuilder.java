@@ -66,7 +66,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
-        if (v < 8) {
+        if (v < 16) {
             Map sharedMap = newBagMap(v);
             @NotNull Bag<Term, PriReference<Term>> termbag =
                     new CurveBag<>(0, Param.termlinkMerge, sharedMap);

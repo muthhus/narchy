@@ -27,7 +27,7 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
         _theName = name;        
     }
     
-    public static <Z extends Cons<?,?>> Z make(String f, Term<?>[] termList) {        
+    public static <Z extends Cons<?,?>> Z make(String f, Term<?>... termList) {
         if (termList.length == 1)
             //return (Z)new Compound1<Term<?>>(f,termList[0]);
         	return uncheckedCast(new Compound1<Term<?>>(f,termList[0]));
@@ -70,7 +70,7 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
     */
     @Override
     public Iterator<Term> iterator() {
-        return new Iterator<Term>() {
+        return new Iterator<>() {
             Cons<?, ?> theTuple = (Cons<?, ?>) Cons.this;
 
             @Override
@@ -106,7 +106,7 @@ public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Con
         throw new UnsupportedOperationException(); //cannot create a 0-sized compound
     }
 
-    public Cons(String name, Term<?>[] termArr) {
+    public Cons(String name, Term<?>... termArr) {
         this(name, new Vector<>(Arrays.asList(termArr)));
     }
 

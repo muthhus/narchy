@@ -152,14 +152,15 @@ public class PJ implements MethodHandler {
         return result;
     }
 
-    public static Object invokeInternal(Object receiver, Method method, Object[] args) {
-        if (method.getName().equals("getMetaPrologClass")) {
-            return getMetaClass(receiver);
-        } 
-        else if (method.getName().equals("getTheory"))
-            return getTheory(receiver);
-        else if (method.getName().equals("setTheory"))
-            return setTheory(receiver, (Theory)args[0]);
+    public static Object invokeInternal(Object receiver, Method method, Object... args) {
+        switch (method.getName()) {
+            case "getMetaPrologClass":
+                return getMetaClass(receiver);
+            case "getTheory":
+                return getTheory(receiver);
+            case "setTheory":
+                return setTheory(receiver, (Theory) args[0]);
+        }
         return null;                        
     }
 

@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.concept.Concept;
+import nars.control.premise.Derivation;
 import nars.nar.NARS;
 import nars.task.DerivedTask;
 import nars.term.Term;
@@ -35,12 +36,12 @@ public class ConceptFireTest {
         HashBag<String> s = new HashBag();
         ConceptFire cf = new ConceptFire(c, 1f) {
             @Override
-            protected int premise(NAR nar, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
+            protected int premise(Derivation d, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
                 if (termlink.get() instanceof Atom)
                     return 0 ; //ignore
                 s.addOccurrences(/*tasklink.get() + " " +*/ termlink.get().toString(), 1);
-                return super.premise(nar, tasklink, termlink, x, ttlPerPremise);
+                return super.premise(d, tasklink, termlink, x, ttlPerPremise);
             }
         };
 

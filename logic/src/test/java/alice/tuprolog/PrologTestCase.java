@@ -1,22 +1,23 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 public class PrologTestCase extends TestCase {
 	
 	public void testEngineInitialization() {
 		Prolog engine = new Prolog();
 		//assertEquals(4, engine.getCurrentLibraries().length);
-		assertNotNull(engine.library("alice.tuprolog.lib.BasicLibrary"));
-		assertNotNull(engine.library("alice.tuprolog.lib.ISOLibrary"));
-		assertNotNull(engine.library("alice.tuprolog.lib.IOLibrary"));
-		assertNotNull(engine.library("alice.tuprolog.lib.OOLibrary"));
+		Assert.assertNotNull(engine.library("alice.tuprolog.lib.BasicLibrary"));
+		Assert.assertNotNull(engine.library("alice.tuprolog.lib.ISOLibrary"));
+		Assert.assertNotNull(engine.library("alice.tuprolog.lib.IOLibrary"));
+		Assert.assertNotNull(engine.library("alice.tuprolog.lib.OOLibrary"));
 	}
 	
 	public void testLoadLibraryAsString() throws InvalidLibraryException {
 		Prolog engine = new Prolog();
 		engine.addLibrary("alice.tuprolog.StringLibrary");
-		assertNotNull(engine.library("alice.tuprolog.StringLibrary"));
+		Assert.assertNotNull(engine.library("alice.tuprolog.StringLibrary"));
 	}
 
 //	@Ignore
@@ -31,17 +32,17 @@ public class PrologTestCase extends TestCase {
 //	}
 	
 	public void testGetLibraryWithName() throws InvalidLibraryException {
-		Prolog engine = new Prolog(new String[] {"alice.tuprolog.TestLibrary"});
-		assertNotNull(engine.library("TestLibraryName"));
+		Prolog engine = new Prolog("alice.tuprolog.TestLibrary");
+		Assert.assertNotNull(engine.library("TestLibraryName"));
 	}
 	
 	public void testUnloadLibraryAfterLoadingTheory() throws Exception {
 		Prolog engine = new Prolog();
-		assertNotNull(engine.library("alice.tuprolog.lib.IOLibrary"));
+		Assert.assertNotNull(engine.library("alice.tuprolog.lib.IOLibrary"));
 		Theory t = new Theory("a(1).\na(2).\n");
 		engine.setTheory(t);
 		engine.removeLibrary("alice.tuprolog.lib.IOLibrary");
-		assertNull(engine.library("alice.tuprolog.lib.IOLibrary"));
+		Assert.assertNull(engine.library("alice.tuprolog.lib.IOLibrary"));
 	}
 	
 	public void testAddTheory() throws InvalidTheoryException {
@@ -49,9 +50,9 @@ public class PrologTestCase extends TestCase {
 		Theory t = new Theory("test :- notx existing(s).");
 		try {
 			engine.addTheory(t);
-			fail();
+			Assert.fail();
 		} catch (InvalidTheoryException expected) {
-			assertEquals("", engine.getTheory().toString());
+			Assert.assertEquals("", engine.getTheory().toString());
 		}
 	}
 	
@@ -75,9 +76,9 @@ public class PrologTestCase extends TestCase {
 		TestPrologEventAdapter a = new TestPrologEventAdapter();
 		engine.addLibraryListener(a);
 		engine.addLibrary("alice.tuprolog.lib.JavaLibrary");
-		assertEquals("alice.tuprolog.lib.JavaLibrary", a.firstMessage);
+		Assert.assertEquals("alice.tuprolog.lib.JavaLibrary", a.firstMessage);
 		engine.removeLibrary("alice.tuprolog.lib.JavaLibrary");
-		assertEquals("alice.tuprolog.lib.JavaLibrary", a.firstMessage);
+		Assert.assertEquals("alice.tuprolog.lib.JavaLibrary", a.firstMessage);
 	}
 	
 	public void testTheoryListener() throws InvalidTheoryException {
@@ -86,12 +87,12 @@ public class PrologTestCase extends TestCase {
 		engine.addTheoryListener(a);
 		Theory t = new Theory("a(1).\na(2).\n");
 		engine.setTheory(t);
-		assertEquals("", a.firstMessage);
-		assertEquals("a(1).\n\na(2).\n\n", a.secondMessage);
+		Assert.assertEquals("", a.firstMessage);
+		Assert.assertEquals("a(1).\n\na(2).\n\n", a.secondMessage);
 		t = new Theory("a(3).\na(4).\n");
 		engine.addTheory(t);
-		assertEquals("a(1).\n\na(2).\n\n", a.firstMessage);
-		assertEquals("a(1).\n\na(2).\n\na(3).\n\na(4).\n\n", a.secondMessage);
+		Assert.assertEquals("a(1).\n\na(2).\n\n", a.firstMessage);
+		Assert.assertEquals("a(1).\n\na(2).\n\na(3).\n\na(4).\n\n", a.secondMessage);
 	}
 	
 	public void testQueryListener() throws Exception {
@@ -100,11 +101,11 @@ public class PrologTestCase extends TestCase {
 		engine.addQueryListener(a);
 		engine.setTheory(new Theory("a(1).\na(2).\n"));
 		engine.solve("a(X).");
-		assertEquals("a(X)", a.firstMessage);
-		assertEquals("yes.\nX / 1", a.secondMessage);
+		Assert.assertEquals("a(X)", a.firstMessage);
+		Assert.assertEquals("yes.\nX / 1", a.secondMessage);
 		engine.solveNext();
-		assertEquals("a(X)", a.firstMessage);
-		assertEquals("yes.\nX / 2", a.secondMessage);
+		Assert.assertEquals("a(X)", a.firstMessage);
+		Assert.assertEquals("yes.\nX / 2", a.secondMessage);
 	}
 
 }

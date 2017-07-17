@@ -2,13 +2,12 @@ package alice.tuprologx.runtime.rmi;
 
 import alice.tuprolog.*;
 
-import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 @SuppressWarnings("serial")
 public class PrologImpl extends UnicastRemoteObject
-    implements alice.tuprologx.runtime.rmi.Prolog, Serializable {
+    implements alice.tuprologx.runtime.rmi.Prolog {
 
    private alice.tuprolog.Prolog imp;
 

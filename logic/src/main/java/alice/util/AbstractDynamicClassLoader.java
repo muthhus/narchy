@@ -1,6 +1,5 @@
 package alice.util;
 
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +25,7 @@ public abstract class AbstractDynamicClassLoader extends ClassLoader
 		listURLs = new ArrayList<>();
 	}
 	
-	public AbstractDynamicClassLoader(URL[] urls)
+	public AbstractDynamicClassLoader(URL... urls)
 	{
 		super(AbstractDynamicClassLoader.class.getClassLoader());
 		listURLs = new ArrayList<>(Arrays.asList(urls));
@@ -43,8 +42,7 @@ public abstract class AbstractDynamicClassLoader extends ClassLoader
         return findClass(className);  
 	}
 		
-	public void addURLs(URL[] urls) throws MalformedURLException
-	{
+	public void addURLs(URL... urls) {
 		if(urls == null)
 			throw new IllegalArgumentException("Array URLs must not be null.");
 		for (URL url : urls) {
@@ -60,7 +58,7 @@ public abstract class AbstractDynamicClassLoader extends ClassLoader
 		listURLs.remove(url);
 	}
 	
-	public void removeURLs(URL[] urls) throws IllegalArgumentException
+	public void removeURLs(URL... urls) throws IllegalArgumentException
 	{
 		if(urls == null)
 			throw new IllegalArgumentException("Array URLs must not be null.");

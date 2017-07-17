@@ -15,8 +15,8 @@ public class TestGolog {
         Prolog p = new Prolog();
 
         p.setSpy(true);
-        p.addExceptionListener(e -> System.out.println(e));
-        p.addOutputListener(e -> System.out.println(e));
+        p.addExceptionListener(System.out::println);
+        p.addOutputListener(System.out::println);
         //p.addQueryListener(e -> System.out.println(e));
 
 
@@ -25,10 +25,7 @@ public class TestGolog {
         p.addTheory(theory("golog.elevator.pl"));
 
 
-        p.solve(p.term("nextFloor(M,s0)."), (s) -> {
-            System.out.println(s);
-
-        }, 0);
+        p.solve(p.term("nextFloor(M,s0)."), System.out::println, 0);
 
 
 

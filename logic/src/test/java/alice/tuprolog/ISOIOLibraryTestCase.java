@@ -26,10 +26,9 @@ public class ISOIOLibraryTestCase {
 	{
 		try
 		{	
-			engine = new Prolog(new String[] {
-					"alice.tuprolog.lib.BasicLibrary",
+			engine = new Prolog("alice.tuprolog.lib.BasicLibrary",
 					//"alice.tuprolog.lib.IOLibrary",
-			"alice.tuprolog.lib.ISOIOLibrary"});
+					"alice.tuprolog.lib.ISOIOLibrary");
 
 			File file = new File(".");
 			writePath = file.getCanonicalPath() 
@@ -135,14 +134,7 @@ public class ISOIOLibraryTestCase {
 		final String dataToRead = "ciao";
 		// Per beccare l'output
 		//TODO Da rivedere
-		OutputListener listener = new OutputListener() {
-
-			@Override
-			public void onOutput(OutputEvent e) 
-			{
-				assertEquals("", dataToRead, e.getMsg());
-			}
-		};
+		OutputListener listener = e -> assertEquals("", dataToRead, e.getMsg());
 
 		engine.addOutputListener(listener);
 
@@ -199,14 +191,7 @@ public class ISOIOLibraryTestCase {
 		final String dataToRead = "c";
 		// Per beccare l'output
 		//TODO Da rivedere
-		OutputListener listener = new OutputListener() {
-
-			@Override
-			public void onOutput(OutputEvent e) 
-			{
-				assertEquals("", dataToRead, e.getMsg());
-			}
-		};
+		OutputListener listener = e -> assertEquals("", dataToRead, e.getMsg());
 
 		engine.addOutputListener(listener);
 
@@ -224,14 +209,7 @@ public class ISOIOLibraryTestCase {
 		final int dataToRead = 51;
 		// Per beccare l'output
 		//TODO Da rivedere
-		OutputListener listener = new OutputListener() {
-
-			@Override
-			public void onOutput(OutputEvent e) 
-			{
-				assertEquals("", dataToRead+"", e.getMsg());
-			}
-		};
+		OutputListener listener = e -> assertEquals("", dataToRead+"", e.getMsg());
 
 		engine.addOutputListener(listener);
 

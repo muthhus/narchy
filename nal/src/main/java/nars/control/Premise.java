@@ -13,17 +13,13 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.control.premise.Derivation;
 import nars.table.BeliefTable;
-import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
-
 import static nars.time.Tense.ETERNAL;
-import static nars.util.UtilityFunctions.aveAri;
 
 /**
  * NOTE: this currently isnt input to the NAR like ITask's are even though it inherits
@@ -41,15 +37,9 @@ public class Premise {
     final PriReference<Task> taskLink;
     final PriReference<Term> termLink;
 
-    static final ThreadLocal<Derivation> derivation =
-            ThreadLocal.withInitial(Derivation::new);
-
-    transient private final Consumer<DerivedTask> target;
-
-    public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> target) {
+    public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink) {
         this.taskLink = tasklink;
         this.termLink = termlink;
-        this.target = target;
     }
 
     /**
@@ -67,7 +57,7 @@ public class Premise {
      * <p>
      * returns ttl used, -1 if failed before starting
      */
-    public int run(NAR nar, int ttlMax) {
+    public int run(Derivation d, int ttlMax) {
 
         //nar.emotion.count("Premise_run");
 
@@ -75,8 +65,10 @@ public class Premise {
         Task task = taskLink.get();
         float taskPri = task.priElseZero();
 
-        int dur = nar.dur();
-        long now = nar.time();
+
+        NAR nar = d.nar;
+        int dur = d.dur;
+        long now = d.time;
 
 
         Term beliefTerm = termLink.get();
@@ -138,39 +130,26 @@ public class Premise {
             belief = null;
 
         float beliefPri;
-        if (belief != null)
-
-        {
+        if (belief != null) {
             beliefPri = belief.pri();
             if (beliefPri != beliefPri) {
                 belief = null; //belief was deleted
             } else {
                 beliefTerm = belief.term();
             }
-        } else
-
-        {
+        } else {
             beliefPri = Float.NaN;
         }
-
-        //TODO lerp by the two budget's qualities instead of aveAri,or etc ?
 
         float premisePri = beliefPri != beliefPri ? taskPri :
                 Param.tasktermLinkCombine.apply(taskPri, beliefPri);
 
-        Derivation d = derivation.get();
 
-        d.restartA(nar, now, dur);
-
-        d.restartB(this, task, belief, beliefTerm, premisePri,
+        d.run(this, task, belief, beliefTerm, premisePri,
                 //Util.lerp(parentTaskPri, Param.UnificationTTLMin, Param.UnificationTTLMax)
                 ttlMax
         );
 
-
-        nar.deriver().
-
-                test(d);
 
         int ttlAfter = d.ttl();
 
@@ -224,8 +203,8 @@ public class Premise {
             //(1f - taskBudget.qua())
             //(1f - Util.unitize(taskBudget.qua()/answered.qua())) //proportion of the taskBudget which the answer receives as a boost
 
-      //      if (Q.isInput())
-        //        nar.eventTaskProcess.emit(answer);
+            //      if (Q.isInput())
+            //        nar.eventTaskProcess.emit(answer);
 
             return true;
 
@@ -289,9 +268,4 @@ public class Premise {
 //            return null;
     }
 
-    public boolean accept(DerivedTask nt) {
-        target.accept(nt);
-        //return (priElseZero() > Pri.EPSILON);
-        return true;
-    }
 }

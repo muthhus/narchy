@@ -7,7 +7,7 @@ import java.rmi.registry.LocateRegistry;
 
 public class Daemon {
 
-    public static void main(String args[]){
+    public static void main(String... args){
         String engineName="prolog";
         int port=1099;
         String portString="1099";

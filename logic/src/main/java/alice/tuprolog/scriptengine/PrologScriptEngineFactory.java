@@ -8,7 +8,6 @@ import alice.util.VersionInfo;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -42,11 +41,11 @@ public class PrologScriptEngineFactory implements ScriptEngineFactory {
     	LANGUAGE_NAME = "Prolog";
     	LANGUAGE_VERSION = VersionInfo.getEngineVersion();
     	
-    	EXTENSIONS = Collections.unmodifiableList(Arrays.asList("pro", "pl", "2p"));
+    	EXTENSIONS = List.of("pro", "pl", "2p");
     	
     	MIME_TYPES  = Collections.unmodifiableList(Collections.singletonList("text/plain"));
     	
-    	NAMES = Collections.unmodifiableList(Arrays.asList("tuProlog", "Prolog", "prolog"));
+    	NAMES = List.of("tuProlog", "Prolog", "prolog");
     	
     	PARAMETERS = new HashMap<>();
     	

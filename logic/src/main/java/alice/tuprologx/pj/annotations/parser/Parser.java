@@ -86,7 +86,7 @@ public class Parser {
     }
     
     
-    public static void main(String args[]) {
+    public static void main(String... args) {
         Parser p = new Parser("(X,B)->{C}");        
         System.out.println(p.parseSignature());        
     } 

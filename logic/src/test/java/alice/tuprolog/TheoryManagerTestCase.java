@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 import java.util.List;
 
@@ -29,8 +30,8 @@ public class TheoryManagerTestCase extends TestCase {
 	public void testAssertNotBacktrackable() throws PrologException {
 		Prolog engine = new Prolog();
 		Solution firstSolution = engine.solve("assertz(a(z)).");
-		assertTrue(firstSolution.isSuccess());
-		assertFalse(firstSolution.hasOpenAlternatives());
+		Assert.assertTrue(firstSolution.isSuccess());
+		Assert.assertFalse(firstSolution.hasOpenAlternatives());
 	}
 
 	public void testAbolish() throws PrologException {
@@ -40,12 +41,12 @@ public class TheoryManagerTestCase extends TestCase {
 		TheoryManager manager = engine.getTheoryManager();
 		Struct testTerm = new Struct("test", new Struct("a"), new Struct("b"));
 		List<ClauseInfo> testClauses = manager.find(testTerm);
-		assertEquals(1, testClauses.size());
+		Assert.assertEquals(1, testClauses.size());
 		manager.abolish(new Struct("/", new Struct("test"), new Int(2)));
 		testClauses = manager.find(testTerm);
 		// The predicate should also disappear completely from the clause
 		// database, i.e. ClauseDatabase#get(f/a) should return null
-		assertEquals(0, testClauses.size());
+		Assert.assertEquals(0, testClauses.size());
 	}
 
 	public void testAbolish2() throws InvalidTheoryException, MalformedGoalException{
@@ -54,34 +55,32 @@ public class TheoryManagerTestCase extends TestCase {
 									"fact(other).\n"));
 
 		Solution info = engine.solve("abolish(fact/1).");
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		info = engine.solve("fact(V).");
-		assertFalse(info.isSuccess());
+		Assert.assertFalse(info.isSuccess());
 	}
 	
 	// Based on the bugs 65 and 66 on sourceforge
 	public void testRetractall() throws MalformedGoalException, NoSolutionException, NoMoreSolutionException {
 		Prolog engine = new Prolog();
 		Solution info = engine.solve("assert(takes(s1,c2)), assert(takes(s1,c3)).");
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		info = engine.solve("takes(s1, N).");
-		assertTrue(info.isSuccess());
-		assertTrue(info.hasOpenAlternatives());
-		assertEquals("c2", info.getVarValue("N").toString());
+		Assert.assertTrue(info.isSuccess());
+		Assert.assertTrue(info.hasOpenAlternatives());
+		Assert.assertEquals("c2", info.getVarValue("N").toString());
 		info = engine.solveNext();
-		assertTrue(info.isSuccess());
-		assertEquals("c3", info.getVarValue("N").toString());
+		Assert.assertTrue(info.isSuccess());
+		Assert.assertEquals("c3", info.getVarValue("N").toString());
 		
 		info = engine.solve("retractall(takes(s1,c2)).");
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		info = engine.solve("takes(s1, N).");
-
-		System.out.println(info);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		if (info.hasOpenAlternatives())
 			System.err.println(engine.solveNext());
-		assertFalse(info.hasOpenAlternatives());
-		assertEquals("c2", info.getVarValue("N").toString());
+		Assert.assertFalse(info.hasOpenAlternatives());
+		Assert.assertEquals("c2", info.getVarValue("N").toString());
 	}
 
 	// TODO test retractall: ClauseDatabase#get(f/a) should return an
@@ -93,8 +92,8 @@ public class TheoryManagerTestCase extends TestCase {
 		engine.addOutputListener(listener);
 		engine.setTheory(new Theory("insect(ant). insect(bee)."));
 		Solution info = engine.solve("retract(insect(I)), write(I), retract(insect(bee)), fail.");
-		assertFalse(info.isSuccess());
-		assertEquals("antbee", listener.output);
+		Assert.assertFalse(info.isSuccess());
+		Assert.assertEquals("antbee", listener.output);
 		
 	}
 

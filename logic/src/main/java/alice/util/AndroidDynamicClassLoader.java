@@ -12,7 +12,7 @@ public class AndroidDynamicClassLoader extends AbstractDynamicClassLoader
 		super();
 	}
 	
-	public AndroidDynamicClassLoader(URL[] urls)
+	public AndroidDynamicClassLoader(URL... urls)
 	{
 		super(urls);
 	}

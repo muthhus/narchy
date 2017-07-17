@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 public class TheoryTestCase extends TestCase {
 
@@ -8,7 +9,7 @@ public class TheoryTestCase extends TestCase {
 		String before = "a :- b, (d ; e).";
 		Theory theory = new Theory(before);
 		String after = theory.toString();
-		assertEquals(theory.toString(), new Theory(after).toString());
+		Assert.assertEquals(theory.toString(), new Theory(after).toString());
 	}
 	
 	public void testAppendClauseLists() throws InvalidTheoryException, MalformedGoalException {
@@ -18,8 +19,8 @@ public class TheoryTestCase extends TestCase {
 		theory.append(new Theory(new Struct(otherClauseList)));
 		Prolog engine = new Prolog();
 		engine.setTheory(theory);
-		assertTrue((engine.solve("p.")).isSuccess());
-		assertTrue((engine.solve("b.")).isSuccess());
+		Assert.assertTrue((engine.solve("p.")).isSuccess());
+		Assert.assertTrue((engine.solve("b.")).isSuccess());
 	}
 
 }

@@ -44,7 +44,7 @@ public class Choose1 extends Termutator.AbstractTermutator {
     }
 
     @Override
-    public boolean mutate(@NotNull Unify f, List<Termutator> chain, int current) {
+    public void mutate(@NotNull Unify f, List<Termutator> chain, int current) {
 
         @NotNull Term[] yy = this.yy;
 
@@ -67,10 +67,9 @@ public class Choose1 extends Termutator.AbstractTermutator {
             }
 
             if (!f.revert(start))
-                return false;
+                break;
         }
 
-        return true;
     }
 
 

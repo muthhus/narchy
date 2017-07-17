@@ -3,6 +3,7 @@ package alice.tuprolog;
 import alice.tuprolog.event.OutputEvent;
 import alice.tuprolog.event.OutputListener;
 import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.Ignore;
 
 
@@ -110,7 +111,7 @@ public class TestVarIsEqual extends TestCase {
     core.setTheory(new Theory(theory));
 
     Solution info = core.solve("test. ");
-    assertTrue("Test should complete normally: " + info,
+    Assert.assertTrue("Test should complete normally: " + info,
             info.isSuccess());
     String expected = ""
       + "\n" +    "body_for_head_literal input Head: d(X_e1,Y_e1)"
@@ -130,7 +131,7 @@ public class TestVarIsEqual extends TestCase {
       + "\n" +    ""
     ;
 
-  assertEquals("Var == should not succeed.", expected, sysoutListener.getAllOutput());
+  Assert.assertEquals("Var == should not succeed.", expected, sysoutListener.getAllOutput());
   }
 
 }

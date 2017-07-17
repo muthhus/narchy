@@ -26,5 +26,6 @@ import java.util.function.Consumer;
  * @since 1.3
  */
 public interface QueryListener extends EventListener, Consumer<QueryEvent> {
+    @Override
     void accept(QueryEvent e);
 }

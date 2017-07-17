@@ -10,6 +10,7 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
+import nars.control.premise.Derivation;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.UnaryTask;
@@ -28,6 +29,9 @@ import java.util.function.Consumer;
 import static nars.Param.UnificationTTLMax;
 
 public class ConceptFire extends UnaryTask<Concept> implements Termed {
+
+    static final ThreadLocal<Derivation> derivation = ThreadLocal.withInitial(Derivation::new);
+
 
     /**
      * rate at which ConceptFire forms premises and derives
@@ -193,6 +197,9 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 
         int penalty = Math.max(1, ttlPerPremise / (2));
 
+        Derivation d = derivation.get();
+        d.restart(nar);
+
         Random rng = nar.random();
         while (ttl > 0 /*samples++ < samplesMax*/) {
 
@@ -271,7 +278,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
             termlink = terml.get(termlSelected);
 
 
-            int ttlUsed = premise(nar, tasklink, termlink, nar::input, ttlPerPremise); //inline
+            int ttlUsed = premise(d, tasklink, termlink, nar::input, ttlPerPremise); //inline
 //            if (ttlUsed <= 0) {
 //                //failure penalty
 //                tasklinkPri[tasklSelected] *= 0.9f;
@@ -377,11 +384,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         }
     }
 
-    protected int premise(NAR nar, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
-        Premise p = new Premise(tasklink, termlink, x);
-        int ttl = p.run(nar, ttlPerPremise);
+    protected int premise(Derivation d, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
+        Premise p = new Premise(tasklink, termlink);
+        int ttl = p.run(d, ttlPerPremise);
         //TODO record ttl usage
-        nar.emotion.conceptFirePremises.increment();
+        d.nar.emotion.conceptFirePremises.increment();
         return ttl;
     }
 

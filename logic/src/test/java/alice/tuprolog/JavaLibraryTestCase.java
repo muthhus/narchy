@@ -3,6 +3,7 @@ package alice.tuprolog;
 import alice.tuprolog.lib.InvalidObjectIdException;
 import alice.tuprolog.lib.OOLibrary;
 import junit.framework.TestCase;
+import org.junit.Assert;
 import org.junit.Ignore;
 
 import java.io.File;
@@ -21,10 +22,10 @@ public class JavaLibraryTestCase extends TestCase {
 	public void testGetPrimitives() {
 		Library library = new OOLibrary();
 		Map<Integer, List<PrimitiveInfo>> primitives = library.getPrimitives();
-		assertEquals(3, primitives.size());
-		assertEquals(0, primitives.get(PrimitiveInfo.DIRECTIVE).size());
-		assertTrue(primitives.get(PrimitiveInfo.PREDICATE).size() > 0);
-		assertEquals(0, primitives.get(PrimitiveInfo.FUNCTOR).size());
+		Assert.assertEquals(3, primitives.size());
+		Assert.assertEquals(0, primitives.get(PrimitiveInfo.DIRECTIVE).size());
+		Assert.assertTrue(primitives.get(PrimitiveInfo.PREDICATE).size() > 0);
+		Assert.assertEquals(0, primitives.get(PrimitiveInfo.FUNCTOR).size());
 	}
 
 	public void testAnonymousObjectRegistration() throws InvalidTheoryException, InvalidObjectIdException {	
@@ -35,11 +36,11 @@ public class JavaLibraryTestCase extends TestCase {
 		// check registering behaviour
 		Struct t = lib.register(counter);
 		engine.solve(new Struct("demo", t));
-		assertEquals(1, counter.getValue());
+		Assert.assertEquals(1, counter.getValue());
 		// check unregistering behaviour
 		lib.unregister(t);
 		Solution goal = engine.solve(new Struct("demo", t));
-		assertFalse(goal.isSuccess());
+		Assert.assertFalse(goal.isSuccess());
 	}
 
 	public void testDynamicObjectsRetrival() throws PrologException {
@@ -53,7 +54,7 @@ public class JavaLibraryTestCase extends TestCase {
 		Solution info = engine.solve("demo(Obj).");
 		Struct id = (Struct) info.getVarValue("Obj");
 		TestCounter counter = (TestCounter) lib.getRegisteredDynamicObject(id);
-		assertEquals(2, counter.getValue());
+		Assert.assertEquals(2, counter.getValue());
 	}
 
 	
@@ -69,9 +70,9 @@ public class JavaLibraryTestCase extends TestCase {
 				"Obj <- getValue returns C.";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Value).");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		alice.tuprolog.Number result2 = (alice.tuprolog.Number) info.getVarValue("Value");
-		assertEquals(2, result2.intValue());
+		Assert.assertEquals(2, result2.intValue());
 
 		// Testing URLClassLoader with java.lang.String class
 		theory = 	"demo_string(S) :- \n" +
@@ -79,9 +80,9 @@ public class JavaLibraryTestCase extends TestCase {
 				"Obj_str <- toString returns S.";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo_string(StringValue).");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		result = info.getVarValue("StringValue").toString().replace("'", "");
-		assertEquals("MyString", result);
+		Assert.assertEquals("MyString", result);
 	}
 	
 
@@ -95,9 +96,9 @@ public class JavaLibraryTestCase extends TestCase {
 					+ "MyMountainBike <- getGear returns Gear.";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo_hierarchy(Res).");
-		assertEquals(false, info.isHalted());
+        assertFalse(info.isHalted());
 		alice.tuprolog.Number result2 = (alice.tuprolog.Number) info.getVarValue("Res");
-		assertEquals(8, result2.intValue());
+		Assert.assertEquals(8, result2.intValue());
 	}
 	
 	public void test_invalid_path_java_object() throws PrologException, IOException
@@ -112,7 +113,7 @@ public class JavaLibraryTestCase extends TestCase {
 				"Obj_inc <- getValue returns Res.";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Value).");
-		assertEquals(true, info.isHalted());
+        assertTrue(info.isHalted());
 	}
 
 	public void test_java_call_3() throws PrologException, IOException
@@ -122,24 +123,24 @@ public class JavaLibraryTestCase extends TestCase {
 		theory = "demo(Value) :- set_classpath([" + paths + "]), class('TestStaticClass') <- echo('Message') returns Value.";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(StringValue).");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		result = info.getVarValue("StringValue").toString().replace("'", "");
-		assertEquals("Message", result);
+		Assert.assertEquals("Message", result);
 
 		//Testing get/set static Field 
 		setPath(true);
 		theory = "demo_2(Value) :- set_classpath([" + paths + "]), class('TestStaticClass').'id' <- get(Value).";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo_2(Res).");
-		assertEquals(true, info.isSuccess());		
-		assertEquals(0, Integer.parseInt(info.getVarValue("Res").toString()));
+        assertTrue(info.isSuccess());
+		Assert.assertEquals(0, Integer.parseInt(info.getVarValue("Res").toString()));
 		
 		theory = "demo_2(Value, NewValue) :- set_classpath([" + paths + "]), class('TestStaticClass').'id' <- set(Value), \n" +
 				"class('TestStaticClass').'id' <- get(NewValue).";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo_2(5, Val).");
-		assertEquals(true, info.isSuccess());		
-		assertEquals(5, Integer.parseInt(info.getVarValue("Val").toString()));
+        assertTrue(info.isSuccess());
+		Assert.assertEquals(5, Integer.parseInt(info.getVarValue("Val").toString()));
 		
 	}
 
@@ -150,7 +151,7 @@ public class JavaLibraryTestCase extends TestCase {
 		theory = "demo(Value) :- set_classpath([" + paths + "]), class('TestStaticClass') <- echo('Message') returns Value.";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(StringValue).");
-		assertEquals(true, info.isHalted());
+        assertTrue(info.isHalted());
 	}
 
 	public void test_java_array() throws PrologException, IOException
@@ -163,9 +164,9 @@ public class JavaLibraryTestCase extends TestCase {
 
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Value).");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		alice.tuprolog.Number resultInt = (alice.tuprolog.Number) info.getVarValue("Value");
-		assertEquals(10, resultInt.intValue());
+		Assert.assertEquals(10, resultInt.intValue());
 
 		//Testing java_array_set and java_array_get
 		setPath(true);
@@ -178,9 +179,9 @@ public class JavaLibraryTestCase extends TestCase {
 
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Value).");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		alice.tuprolog.Number resultInt2 = (alice.tuprolog.Number) info.getVarValue("Value");
-		assertEquals(1, resultInt2.intValue());
+		Assert.assertEquals(1, resultInt2.intValue());
 	}
 
 	public void test_set_classpath() throws PrologException, IOException
@@ -195,9 +196,9 @@ public class JavaLibraryTestCase extends TestCase {
 
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Value).");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		alice.tuprolog.Number resultInt = (alice.tuprolog.Number) info.getVarValue("Value");
-		assertEquals(10, resultInt.intValue());
+		Assert.assertEquals(10, resultInt.intValue());
 	}
 	
 	public void test_get_classpath() throws PrologException, IOException
@@ -206,9 +207,9 @@ public class JavaLibraryTestCase extends TestCase {
 		theory =  "demo(P) :- get_classpath(P).";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Value).");
-		assertEquals(true, info.isSuccess());
-		assertEquals(true, info.getTerm("Value").isList());
-		assertEquals("[]", info.getTerm("Value").toString());
+        assertTrue(info.isSuccess());
+        assertTrue(info.getTerm("Value").isList());
+		Assert.assertEquals("[]", info.getTerm("Value").toString());
 
 		//Testing get_classpath using DynamicURLClassLoader with not URLs added
 		setPath(true);
@@ -217,9 +218,9 @@ public class JavaLibraryTestCase extends TestCase {
 
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Value).");
-		assertEquals(true, info.isSuccess());
-		assertEquals(true, info.getTerm("Value").isList());
-		assertEquals("[" + paths + "]", info.getTerm("Value").toString());
+        assertTrue(info.isSuccess());
+        assertTrue(info.getTerm("Value").isList());
+		Assert.assertEquals("[" + paths + "]", info.getTerm("Value").toString());
 		
 //		// Test if get_classpath(PathList) unifies with the DynamicURLClassLoader urls
 //		theory =  "demo(P) :- set_classpath([" + paths + "]), get_classpath([" + paths + "]).";
@@ -240,7 +241,7 @@ public class JavaLibraryTestCase extends TestCase {
 				"register(Obj).";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(R).");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		
 		theory = "demo2(Obj, Val) :- \n"
 				+ "Obj <- inc, \n"
@@ -248,14 +249,14 @@ public class JavaLibraryTestCase extends TestCase {
 		engine.addTheory(new Theory(theory));
 		String obj =  info.getTerm("R").toString();
 		Solution info2 = engine.solve("demo2(" + obj + ", V).");
-		assertEquals(true, info2.isSuccess());
-		assertEquals(3, Integer.parseInt(info2.getVarValue("V").toString()));
+        assertTrue(info2.isSuccess());
+		Assert.assertEquals(3, Integer.parseInt(info2.getVarValue("V").toString()));
 	
 		// Test invalid object_id registration
 		theory = "demo(Obj1) :- register(Obj1).";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Res).");
-		assertEquals(true, info.isHalted());		
+        assertTrue(info.isHalted());
 	}
 	
 	
@@ -265,7 +266,7 @@ public class JavaLibraryTestCase extends TestCase {
 		theory = "demo(Obj1) :- unregister(Obj1).";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Res).");
-		assertEquals(true, info.isHalted());	
+        assertTrue(info.isHalted());
 		
 		setPath(true);
 		theory = "demo(Obj) :- \n" +
@@ -276,11 +277,11 @@ public class JavaLibraryTestCase extends TestCase {
 				"register(Obj), unregister(Obj).";
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(Res).");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		OOLibrary lib = (OOLibrary) engine.library("alice.tuprolog.lib.OOLibrary");
 		Struct id = (Struct) info.getTerm("Res");
 		Object obj = lib.getRegisteredObject(id);
-		assertNull(obj);
+		Assert.assertNull(obj);
 	}
 	
 	public void test_java_catch() throws PrologException, IOException
@@ -293,7 +294,7 @@ public class JavaLibraryTestCase extends TestCase {
 				
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("demo(S).");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 	}
 	
 	public void test_interface() throws PrologException, IOException
@@ -304,20 +305,20 @@ public class JavaLibraryTestCase extends TestCase {
 				
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("goal1.");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		
 		theory = "goal2 :- set_classpath([" + paths + "])," +
 				"java_object('Pippo', [], Obj), class('Pluto') <- method2(Obj).";
 				
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("goal2.");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		
 		theory = "goal3 :- java_object('Pippo', [], Obj), set_classpath([" + paths + "]), class('Pluto') <- method(Obj).";
 				
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("goal3.");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		
 		theory = "goal4 :- set_classpath([" + paths + "]), " +
 					"java_object('IPippo[]', [5], Array), " +
@@ -328,7 +329,7 @@ public class JavaLibraryTestCase extends TestCase {
 		
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("goal4.");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		
 		theory = "goal5 :- set_classpath([" + paths + "])," +
 				"java_object('Pippo', [], Obj)," +
@@ -336,7 +337,7 @@ public class JavaLibraryTestCase extends TestCase {
 		
 		engine.setTheory(new Theory(theory));
 		info = engine.solve("goal5.");
-		assertEquals(true, info.isSuccess());
+        assertTrue(info.isSuccess());
 		
 	}
 	

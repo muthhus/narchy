@@ -179,8 +179,8 @@ public class J2PProxyFactory extends ProxyFactory {
                 return false;
         }
 
-        static String getKey(Class<?> superClass, Class<?>[] interfaces) {
-            StringBuffer sbuf = new StringBuffer();
+        static String getKey(Class<?> superClass, Class<?>... interfaces) {
+            StringBuilder sbuf = new StringBuilder();
             if (superClass != null)
                 sbuf.append(superClass.getName());
             sbuf.append(':');
@@ -553,7 +553,7 @@ public class J2PProxyFactory extends ProxyFactory {
         return cf;
     }
 
-    private static void setInterfaces(ClassFile cf, Class<?>[] interfaces) {
+    private static void setInterfaces(ClassFile cf, Class<?>... interfaces) {
         String setterIntf = ProxyObject.class.getName();
         String[] list;
         if (interfaces == null || interfaces.length == 0)
@@ -726,7 +726,7 @@ public class J2PProxyFactory extends ProxyFactory {
             return name.substring(0, i);
     }
 
-    private static HashMap<String,Method> getMethods(Class<?> superClass, Class<?>[] interfaceTypes) {
+    private static HashMap<String,Method> getMethods(Class<?> superClass, Class<?>... interfaceTypes) {
         HashMap<String,Method> hash = new HashMap<>();
         for (int i = 0; i < interfaceTypes.length; i++)
             getMethods(hash, interfaceTypes[i]);
@@ -875,7 +875,7 @@ public class J2PProxyFactory extends ProxyFactory {
     }
 
     private static void setThrows(MethodInfo minfo, ConstPool cp,
-                                  Class<?>[] exceptions) {
+                                  Class<?>... exceptions) {
         if (exceptions.length == 0)
             return;
 
@@ -944,7 +944,7 @@ public class J2PProxyFactory extends ProxyFactory {
         return 1;
     }
 
-    private static void makeParameterList(Bytecode code, Class<?>[] params) {
+    private static void makeParameterList(Bytecode code, Class<?>... params) {
         int regno = 1;
         int n = params.length;
         code.addIconst(n);

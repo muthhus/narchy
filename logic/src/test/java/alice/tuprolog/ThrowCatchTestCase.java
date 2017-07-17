@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 /**
  * @author Matteo Iuliani
@@ -17,15 +18,15 @@ public class ThrowCatchTestCase extends TestCase {
 		engine.setTheory(new Theory(theory));
 		String goal = "atom_length(err, 3), catch(p(0), E, (atom_length(E, Length), X is 2+3)), Y is X+5.";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct e = (Struct) info.getTerm("E");
-		assertTrue(e.isEqual(new Struct("error")));
+		Assert.assertTrue(e.isEqual(new Struct("error")));
 		Int length = (Int) info.getTerm("Length");
-		assertTrue(length.intValue() == 5);
+        assertEquals(5, length.intValue());
 		Int x = (Int) info.getTerm("X");
-		assertTrue(x.intValue() == 5);
+        assertEquals(5, x.intValue());
 		Int y = (Int) info.getTerm("Y");
-		assertTrue(y.intValue() == 10);
+        assertEquals(10, y.intValue());
 	}
 
 	// verifico che venga eseguito il piu' vicino antenato catch/3 nell'albero di
@@ -36,11 +37,11 @@ public class ThrowCatchTestCase extends TestCase {
 		engine.setTheory(new Theory(theory));
 		String goal = "catch(p(1), E, fail), catch(p(0), E, atom_length(E, Length)).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
+		Assert.assertTrue(info.isSuccess());
 		Struct e = (Struct) info.getTerm("E");
-		assertTrue(e.isEqual(new Struct("error")));
+		Assert.assertTrue(e.isEqual(new Struct("error")));
 		Int length = (Int) info.getTerm("Length");
-		assertTrue(length.intValue() == 5);
+        assertEquals(5, length.intValue());
 	}
 
 	// verifico che l'esecuzione fallisce se si verifica un errore durante
@@ -52,8 +53,8 @@ public class ThrowCatchTestCase extends TestCase {
 		engine.setTheory(new Theory(theory));
 		String goal = "catch(p(0), error(X), true).";
 		Solution info = engine.solve(goal);
-		assertFalse(info.isSuccess());
-		assertTrue(info.isHalted());
+		Assert.assertFalse(info.isSuccess());
+		Assert.assertTrue(info.isHalted());
 	}
 
 	// verifico che catch/3 fallisce se Handler e' falso
@@ -63,7 +64,7 @@ public class ThrowCatchTestCase extends TestCase {
 		engine.setTheory(new Theory(theory));
 		String goal = "catch(p(0), E, E == err).";
 		Solution info = engine.solve(goal);
-		assertFalse(info.isSuccess());
+		Assert.assertFalse(info.isSuccess());
 	}
 
 	// verifico che un Goal non deterministico venga rieseguito, e nel caso
@@ -76,11 +77,11 @@ public class ThrowCatchTestCase extends TestCase {
 		engine.setTheory(new Theory(theory));
 		String goal = "catch(p(X), E, E == error).";
 		Solution info = engine.solve(goal);
-		assertTrue(info.isSuccess());
-		assertTrue(info.hasOpenAlternatives());
+		Assert.assertTrue(info.isSuccess());
+		Assert.assertTrue(info.hasOpenAlternatives());
 		info = engine.solveNext();
-		assertTrue(info.isSuccess());
-		assertFalse(info.hasOpenAlternatives());
+		Assert.assertTrue(info.isSuccess());
+		Assert.assertFalse(info.hasOpenAlternatives());
 	}
 
 	// verifico che catch/3 fallisce se si verifica un'eccezione durante Handler
@@ -90,8 +91,8 @@ public class ThrowCatchTestCase extends TestCase {
 		engine.setTheory(new Theory(theory));
 		String goal = "catch(p(0), E, throw(err)).";
 		Solution info = engine.solve(goal);
-		assertFalse(info.isSuccess());
-		assertTrue(info.isHalted());
+		Assert.assertFalse(info.isSuccess());
+		Assert.assertTrue(info.isHalted());
 	}
 
 }

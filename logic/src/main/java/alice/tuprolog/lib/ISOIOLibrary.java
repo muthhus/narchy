@@ -575,7 +575,7 @@ public class ISOIOLibrary extends Library{
         return  "stream_property(S,P) :- find_property(L,P),member(S,L).\n"; 
     } 
     
-    public boolean at_end_of_stream_0()throws PrologError{
+    public boolean at_end_of_stream_0() {
         initLibrary();
         Hashtable<String,Term> entry = inputStreams.get(inputStream);
         Term value = entry.get("end_of_stream");
@@ -803,7 +803,7 @@ public class ISOIOLibrary extends Library{
                                     e.getMessage()));
                 }
 
-            return unify(char_code, new Int(value == -1 ? -1 : value));
+            return unify(char_code, new Int(value));
         }
         
         //se invece lo stream e' un normale file, devo controllare tutte le opzioni decise in apertura.

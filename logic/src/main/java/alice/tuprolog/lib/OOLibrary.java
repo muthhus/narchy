@@ -162,10 +162,6 @@ public class OOLibrary extends Library {
         preregisterObjects();
     }
 
-    @Override
-    public void onSolveEnd() {
-    }
-
     /**
      * objects actually pre-registered in order to be available since the
      * beginning of demonstration
@@ -271,7 +267,7 @@ public class OOLibrary extends Library {
      * @throws JavaException, Exception
      */
     @SuppressWarnings("unchecked")
-	public <T> boolean new_lambda_3(Term interfaceName, Term implementation, Term id)throws JavaException,Exception { 
+	public <T> boolean new_lambda_3(Term interfaceName, Term implementation, Term id)throws JavaException {
     	try {
     		counter++;
     		String target_class=(interfaceName.toString()).substring(1, interfaceName.toString().length()-1);
@@ -1041,7 +1037,7 @@ public class OOLibrary extends Library {
      *
      * @throws JavaException
      */
-    private static URL[] getURLsFromStringArray(String[] paths) throws MalformedURLException
+    private static URL[] getURLsFromStringArray(String... paths) throws MalformedURLException
     {
     	URL[] urls = null;
     	if(paths != null)
@@ -1094,7 +1090,7 @@ public class OOLibrary extends Library {
         return new Signature(values, types);
     }
 
-    private Signature parseArg(Object[] objs) {
+    private Signature parseArg(Object... objs) {
         Object[] values = new Object[objs.length];
         Class<?>[] types = new Class[objs.length];
         for (int i = 0; i < objs.length; i++) {
@@ -1296,27 +1292,27 @@ public class OOLibrary extends Library {
                 String castTo_name = ((Struct) castTo).name();
                 switch (castTo_name) {
                     case "byte":
-                        values[i] = new Byte((byte) num.intValue());
+                        values[i] = (byte) num.intValue();
                         types[i] = Byte.TYPE;
                         break;
                     case "short":
-                        values[i] = new Short((short) num.intValue());
+                        values[i] = (short) num.intValue();
                         types[i] = Short.TYPE;
                         break;
                     case "int":
-                        values[i] = new Integer(num.intValue());
+                        values[i] = num.intValue();
                         types[i] = Integer.TYPE;
                         break;
                     case "long":
-                        values[i] = new Long(num.longValue());
+                        values[i] = num.longValue();
                         types[i] = Long.TYPE;
                         break;
                     case "float":
-                        values[i] = new Float(num.floatValue());
+                        values[i] = num.floatValue();
                         types[i] = Float.TYPE;
                         break;
                     case "double":
-                        values[i] = new Double(num.doubleValue());
+                        values[i] = num.doubleValue();
                         types[i] = Double.TYPE;
                         break;
                     default:
@@ -1713,7 +1709,7 @@ public class OOLibrary extends Library {
     // --------------------------------------------------
 
     private static Method lookupMethod(Class<?> target, String name,
-            Class<?>[] argClasses, Object[] argValues)
+                                       Class<?>[] argClasses, Object... argValues)
             throws NoSuchMethodException {
         // first try for exact match
         try {
@@ -1769,7 +1765,7 @@ public class OOLibrary extends Library {
     }
 
     private static Constructor<?> lookupConstructor(Class<?> target,
-            Class<?>[] argClasses, Object[] argValues)
+                                                    Class<?>[] argClasses, Object... argValues)
             throws NoSuchMethodException {
         // first try for exact match
         try {
@@ -1821,7 +1817,7 @@ public class OOLibrary extends Library {
     }
 
     // 1st arg is from method, 2nd is actual parameters
-    private static boolean matchClasses(Class<?>[] mclasses, Class<?>[] pclasses) {
+    private static boolean matchClasses(Class<?>[] mclasses, Class<?>... pclasses) {
         if (mclasses.length == pclasses.length) {
             for (int i = 0; i != mclasses.length; i++) {
                 if (!matchClass(mclasses[i], pclasses[i])) {
@@ -1931,7 +1927,7 @@ public class OOLibrary extends Library {
     // required a long, provided a double => NOT CONSIDERED
     //
     private static Object[] matchClasses(Class<?>[] mclasses, Class<?>[] pclasses,
-            Object[] values) {
+                                         Object... values) {
         if (mclasses.length == pclasses.length) {
             Object[] newvalues = new Object[mclasses.length];
 
@@ -1950,7 +1946,7 @@ public class OOLibrary extends Library {
                         && pclasses[i].equals(java.lang.Integer.TYPE)) {
                     // arg required: a float, arg provided: an int
                     // so we need an explicit conversion...
-                    newvalues[i] = (float) ((Integer) values[i]).intValue();
+                    newvalues[i] = (float) (Integer) values[i];
                 } else if (mclasses[i].equals(java.lang.Double.TYPE)
                         && pclasses[i].equals(java.lang.Integer.TYPE)) {
                     // arg required: a double, arg provided: an int
@@ -1979,7 +1975,7 @@ class Signature implements Serializable {
    Class<?>[] types;
    Object[] values;
 
-    public Signature(Object[] v, Class<?>[] c) {
+    public Signature(Object[] v, Class<?>... c) {
         values = v;
         types = c;
     }

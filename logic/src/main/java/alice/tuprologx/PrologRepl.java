@@ -5,10 +5,13 @@ import alice.tuprolog.event.*;
 import alice.tuprolog.lib.IOLibrary;
 import alice.util.Automaton;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 @SuppressWarnings("serial")
-public class PrologRepl extends Automaton implements Serializable, OutputListener, SpyListener, WarningListener/*Castagna 06/2011*/, ExceptionListener/**/{
+public class PrologRepl extends Automaton implements OutputListener, SpyListener, WarningListener/*Castagna 06/2011*/, ExceptionListener/**/{
 
 	BufferedReader  stdin;
     Prolog          engine;
@@ -17,7 +20,7 @@ public class PrologRepl extends Automaton implements Serializable, OutputListene
     static final String incipit =
         "tuProlog system - release " + Prolog.getVersion() + '\n';
        
-    public PrologRepl(String[] args){
+    public PrologRepl(String... args){
 
         if (args.length>1){
             System.err.println("args: { theory file }");
@@ -179,7 +182,7 @@ public class PrologRepl extends Automaton implements Serializable, OutputListene
 	}
 	/**/
 	
-    public static void main(String[] args){
+    public static void main(String... args){
         new Thread(new PrologRepl(args)).start();
     }
 }

@@ -117,7 +117,7 @@ public final class MethodFinder {
      *                or if the reflective call is ambiguous based on the
      *                parameter types
      */
-    public Constructor<?> findConstructor(final Class<?>[] parameterTypes) throws NoSuchMethodException {
+    public Constructor<?> findConstructor(final Class<?>... parameterTypes) throws NoSuchMethodException {
         return (Constructor<?>) findMemberIn(ctorList, parameterTypes == null ? new Class[0] : parameterTypes);
     }
 
@@ -125,7 +125,7 @@ public final class MethodFinder {
      * Basis of findConstructor() and findMethod(). The member list fed to this
      * method will be either all Constructor objects or all Method objects.
      */
-    private Member findMemberIn(final List<Member> memberList, final Class<?>[] parameterTypes) throws NoSuchMethodException {
+    private Member findMemberIn(final List<Member> memberList, final Class<?>... parameterTypes) throws NoSuchMethodException {
         List<Member> matchingMembers = new ArrayList<>();
         for (Member member: memberList) {
             Class<?>[] methodParamTypes = paramMap.get(member);
@@ -162,7 +162,7 @@ public final class MethodFinder {
      *                the reflective call is ambiguous based on the parameter
      *                types, or if methodName is null
      */
-    public Method findMethod(final String methodName, final Class<?>[] parameterTypes) throws NoSuchMethodException {
+    public Method findMethod(final String methodName, final Class<?>... parameterTypes) throws NoSuchMethodException {
         List<Member> methodList = methodMap.get(methodName);
         if (methodList == null) {
             throw new NoSuchMethodException("no method named " + clazz.getName() + '.' + methodName);
@@ -234,7 +234,7 @@ public final class MethodFinder {
      *         array is returned. If an element in args is null, then Void.TYPE
      *         is the corresponding Class in the return array.
      */
-    public static Class<?>[] getParameterTypesFrom(final Object[] args) {
+    public static Class<?>[] getParameterTypesFrom(final Object... args) {
         if (args == null) {
             return new Class[0];
         }
@@ -262,7 +262,7 @@ public final class MethodFinder {
      * @throws ClassNotFoundException if any of the FQNs name an unknown
      *                class
      */
-    public static Class<?>[] getParameterTypesFrom(final String[] classNames) throws ClassNotFoundException {
+    public static Class<?>[] getParameterTypesFrom(final String... classNames) throws ClassNotFoundException {
         return getParameterTypesFrom(classNames, MethodFinder.class.getClassLoader());
     }
 
@@ -326,11 +326,7 @@ public final class MethodFinder {
             Method m = methods[i];
             String methodName = m.getName();
             Class<?>[] paramTypes = m.getParameterTypes();
-            List<Member> list = methodMap.get(methodName);
-            if (list == null) {
-                list = new ArrayList<>();
-                methodMap.put(methodName, list);
-            }
+            List<Member> list = methodMap.computeIfAbsent(methodName, k -> new ArrayList<>());
             if (!ClassUtilities.classIsAccessible(clazz)) {
                 m = ClassUtilities.getAccessibleMethodFrom(clazz, methodName, paramTypes);
             }

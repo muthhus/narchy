@@ -6,9 +6,6 @@
  */
 package alice.tuprolog;
 
-import alice.tuprolog.event.SpyEvent;
-import alice.tuprolog.event.SpyListener;
-
 /**
  * @author aricci
  *
@@ -18,7 +15,7 @@ import alice.tuprolog.event.SpyListener;
 public class TestBug {
 
     
-	public static void main(String[] args) throws Exception {
+	public static void main(String... args) throws Exception {
 
 	    
 	    String goal = "out('"+
@@ -36,12 +33,7 @@ public class TestBug {
 		
 		
 		Prolog engine = new Prolog();
-		engine.addSpyListener(new SpyListener(){ 
-			@Override
-			public void onSpy(SpyEvent e){
-				System.out.println(e);
-			}
-		});
+		engine.addSpyListener(e -> System.out.println(e));
 		//engine.setSpy(true);
 		engine.setTheory(new Theory(st));
 		Solution info = engine.solve("test(L1,L2).");

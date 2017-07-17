@@ -43,7 +43,7 @@ class MyListener extends PrologEventAdapter {
  */
 public class TestEvent {
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String... args) throws Exception {
     
         Prolog engine = new Prolog(new String[]{});
         

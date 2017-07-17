@@ -23,7 +23,7 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.*;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.Vector;
 
 /**
@@ -1155,7 +1155,7 @@ public class JEditTextArea extends JComponent
 				start = tmp;
 			}
 
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			Segment seg = new Segment();
 
 			for(int i = selectionStartLine; i <= selectionEndLine; i++)
@@ -1474,7 +1474,7 @@ public class JEditTextArea extends JComponent
 			String selection = getSelectedText();
 
 			int repeatCount = inputHandler.getRepeatCount();
-			StringBuffer buf = new StringBuffer();
+			StringBuilder buf = new StringBuilder();
 			for(int i = 0; i < repeatCount; i++)
 				buf.append(selection);
 
@@ -1500,7 +1500,7 @@ public class JEditTextArea extends JComponent
 								.replace('\r','\n');
 
 				int repeatCount = inputHandler.getRepeatCount();
-				StringBuffer buf = new StringBuffer();
+				StringBuilder buf = new StringBuilder();
 				for(int i = 0; i < repeatCount; i++)
 					buf.append(selection);
 				selection = buf.toString();
@@ -1764,10 +1764,10 @@ public class JEditTextArea extends JComponent
 					centerHeight);
 
 			// Lay out all status components, in order
-			Enumeration<Component> status = leftOfScrollBar.elements();
-			while(status.hasMoreElements())
+			Iterator<Component> iterator = leftOfScrollBar.iterator();
+			while(iterator.hasNext())
 			{
-				Component comp = status.nextElement();
+				Component comp = iterator.next();
 				Dimension dim = comp.getPreferredSize();
 				comp.setBounds(ileft,
 						itop + centerHeight,

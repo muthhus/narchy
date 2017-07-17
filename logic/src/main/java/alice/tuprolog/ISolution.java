@@ -2,9 +2,9 @@ package alice.tuprolog;
 
 public interface ISolution<Q,S,T> {
     
-    <Z extends T> Z agetVarValue(String varName) throws alice.tuprolog.NoSolutionException;
+    <Z extends T> Z agetVarValue(String varName);
 
-    <Z extends T> Z getTerm(String varName) throws alice.tuprolog.NoSolutionException, UnknownVarException ;
+    <Z extends T> Z getTerm(String varName);
 
     boolean isSuccess();
 
@@ -12,9 +12,9 @@ public interface ISolution<Q,S,T> {
 
     boolean hasOpenAlternatives();
 
-    S getSolution() throws NoSolutionException;
+    S getSolution();
 
     Q getQuery();
 
-    java.util.List<? extends T> getBindingVars() throws alice.tuprolog.NoSolutionException;
+    java.util.List<? extends T> getBindingVars();
 }

@@ -348,6 +348,13 @@ public interface Compound extends Term, IPair, TermContainer {
         return appendTo;
     }
 
+    /** weather the given term has any potential free variables that could be assigned in unification */
+    default boolean freeVars(@Nullable Op type) {
+        return type == null ?
+                (volume() > complexity()) /* any variable, including pattern */
+                    :
+                (hasAny(type));
+    }
 
     /**
      * unification matching entry point (default implementation)
@@ -364,7 +371,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if (equals(ty))
                 return true;
 
-            if (!subst.freeVars(this))
+            if (!freeVars(subst.type))
                 return false; //no free vars, the only way unification can proceed is if equal
 
             Op op = op();

@@ -103,7 +103,7 @@ import java.util.*;
      *
      * @author ivar.orstavik@hist.no
      */
-    private static class OperatorRegister extends LinkedHashSet<Operator> /*Castagna 06/2011*/implements Cloneable/**/
+    private static class OperatorRegister extends LinkedHashSet<Operator> /*Castagna 06/2011*//**/
     {
         //map of operators by name and type
         //key is the nameType of an operator (for example ":-xfx") - value is an Operator

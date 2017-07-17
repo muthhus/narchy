@@ -274,7 +274,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         }
     }
     
-    private void checkArgument(VariableElement pd, int pos, String[] types) {        
+    private void checkArgument(VariableElement pd, int pos, String... types) {
         String varName = signature.inputTree.variables.get(pos).name;
         java.util.List<Character> annotations = null;
         TypeMirror baseType = null;
@@ -299,7 +299,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         }
     }
     
-    private void checkTypeVariable(TypeParameterElement pd, int pos, String[] types) {        
+    private void checkTypeVariable(TypeParameterElement pd, int pos, String... types) {
         String varName = pd.getSimpleName().toString();
         java.util.List<Character> annotations = null;
         TypeMirror baseType = null;

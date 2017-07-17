@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
@@ -14,10 +15,10 @@ public class TermIteratorTestCase extends TestCase {
 	public void testEmptyIterator() {
 		String theory = "";
 		Iterator<Term> i = Term.getIterator(theory);
-		assertFalse(i.hasNext());
+		Assert.assertFalse(i.hasNext());
 		try {
 			i.next();
-			fail();
+			Assert.fail();
 		} catch (NoSuchElementException expected) {}
 	}
 	
@@ -31,17 +32,17 @@ public class TermIteratorTestCase extends TestCase {
 		int count = 0;
 		for (; i.hasNext(); count++)
 			i.next();
-		assertEquals(5, count);
-		assertFalse(i.hasNext());
+		Assert.assertEquals(5, count);
+		Assert.assertFalse(i.hasNext());
 	}
 	
 	public void testMultipleHasNext() {
 		String theory = "p. q. r.";
 		Iterator<Term> i = Term.getIterator(theory);
-		assertTrue(i.hasNext());
-		assertTrue(i.hasNext());
-		assertTrue(i.hasNext());
-		assertEquals(new Struct("p"), i.next());
+		Assert.assertTrue(i.hasNext());
+		Assert.assertTrue(i.hasNext());
+		Assert.assertTrue(i.hasNext());
+		Assert.assertEquals(new Struct("p"), i.next());
 	}
 	
 	public void testMultipleNext() {
@@ -52,18 +53,18 @@ public class TermIteratorTestCase extends TestCase {
 						"q(5)." + "\n" +
 						"q(7).";
 		Iterator<Term> i = Term.getIterator(theory);
-		assertTrue(i.hasNext());
+		Assert.assertTrue(i.hasNext());
 		i.next(); // skip the first term
-		assertEquals(new Struct("q", new Int(1)), i.next());
-		assertEquals(new Struct("q", new Int(2)), i.next());
-		assertEquals(new Struct("q", new Int(3)), i.next());
-		assertEquals(new Struct("q", new Int(5)), i.next());
-		assertEquals(new Struct("q", new Int(7)), i.next());
+		Assert.assertEquals(new Struct("q", new Int(1)), i.next());
+		Assert.assertEquals(new Struct("q", new Int(2)), i.next());
+		Assert.assertEquals(new Struct("q", new Int(3)), i.next());
+		Assert.assertEquals(new Struct("q", new Int(5)), i.next());
+		Assert.assertEquals(new Struct("q", new Int(7)), i.next());
 		// no more terms
-		assertFalse(i.hasNext());
+		Assert.assertFalse(i.hasNext());
 		try {
 			i.next();
-			fail();
+			Assert.fail();
 		} catch (NoSuchElementException expected) {}
 	}
 	
@@ -71,7 +72,7 @@ public class TermIteratorTestCase extends TestCase {
 		String t = "q(1)"; // missing the End-Of-Clause!
 		try {
 			Term.getIterator(t);
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	
@@ -84,30 +85,30 @@ public class TermIteratorTestCase extends TestCase {
 		Struct firstTerm = new Struct("q", new Int(1));
 		Struct secondTerm = new Struct("q", new Int(2));
 		Iterator<Term> i1 = Term.getIterator(theory);
-		assertTrue(i1.hasNext());
-		assertEquals(firstTerm, i1.next());
-		assertTrue(i1.hasNext());
-		assertEquals(secondTerm, i1.next());
+		Assert.assertTrue(i1.hasNext());
+		Assert.assertEquals(firstTerm, i1.next());
+		Assert.assertTrue(i1.hasNext());
+		Assert.assertEquals(secondTerm, i1.next());
 		try {
 			i1.hasNext();
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 		Iterator<Term> i2 = Term.getIterator(theory);
-		assertEquals(firstTerm, i2.next());
-		assertEquals(secondTerm, i2.next());
+		Assert.assertEquals(firstTerm, i2.next());
+		Assert.assertEquals(secondTerm, i2.next());
 		try {
 			i2.next();
-			fail();
+			Assert.fail();
 		} catch (InvalidTermException expected) {}
 	}
 	
 	public void testRemoveOperationNotSupported() {
 		String theory = "p(1).";
 		Iterator<Term> i = Term.getIterator(theory);
-		assertNotNull(i.next());
+		Assert.assertNotNull(i.next());
 		try {
 			i.remove();
-			fail();
+			Assert.fail();
 		} catch (UnsupportedOperationException expected) {}
 	}
 

@@ -4,7 +4,7 @@ import alice.tuprolog.Solution;
 
 public class Test
 {
-    public static void main(String args[])
+    public static void main(String... args)
     {
         if (args.length<2){
             System.err.println("args:  <host> <goal>");

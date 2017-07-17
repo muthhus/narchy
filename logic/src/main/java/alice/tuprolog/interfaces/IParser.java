@@ -10,7 +10,7 @@ public interface IParser {
      * (a period), <tt>false</tt> otherwise.
      * @throws InvalidTermException if a syntax error is found. 
      */
-    Term nextTerm(boolean endNeeded) throws Exception;
+    Term nextTerm(boolean endNeeded);
     
     /**
      * @return the current line number

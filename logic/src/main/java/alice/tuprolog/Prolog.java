@@ -127,11 +127,15 @@ public class Prolog  {
 	 *
 	 * @param libs the (class) name of the libraries to be loaded
 	 */
-	public Prolog(String[] libs) throws InvalidLibraryException {
+	public Prolog(String... libs)  {
 		this(false, new MutableClauseIndex());
 		if (libs != null) {
 			for (int i = 0; i < libs.length; i++) {
-				addLibrary(libs[i]);
+				try {
+					addLibrary(libs[i]);
+				} catch (InvalidLibraryException e) {
+					logger.error("loading {}: {}", libs[i], e);
+				}
 			}
 		}
 	}
@@ -353,7 +357,7 @@ public class Prolog  {
 	 * @return the reference to the Library just loaded
 	 * @throws InvalidLibraryException if name is not a valid library
 	 */
-	public Library addLibrary(String className, String[] paths) throws InvalidLibraryException {	//no syn
+	public Library addLibrary(String className, String... paths) throws InvalidLibraryException {	//no syn
 		return libraryManager.loadClass(className, paths);
 	}
 

@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 public class LibraryTestCase extends TestCase {
 	
@@ -8,8 +9,8 @@ public class LibraryTestCase extends TestCase {
 		Prolog engine = new Prolog();
 		engine.addLibrary(new TestLibrary());
 		Solution goal = engine.solve("N is sum(1, 3).");
-		assertTrue(goal.isSuccess());
-		assertEquals(new Int(4), goal.getVarValue("N"));
+		Assert.assertTrue(goal.isSuccess());
+		Assert.assertEquals(new Int(4), goal.getVarValue("N"));
 	}
 	
 	public void testLibraryPredicate() throws PrologException {
@@ -18,7 +19,7 @@ public class LibraryTestCase extends TestCase {
 		TestOutputListener l = new TestOutputListener();
 		engine.addOutputListener(l);
 		engine.solve("println(sum(5)).");
-		assertEquals("sum(5)", l.output);
+		Assert.assertEquals("sum(5)", l.output);
 	}
 
 }

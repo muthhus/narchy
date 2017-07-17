@@ -112,7 +112,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
 
-    public final DerivationBudgeting budgeting = new PreferSimpleAndPolarized();
+
 
     @NotNull
     public final transient Emotion emotion;
@@ -235,7 +235,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         this.self = Param.randomSelf();
 
-        this.emotion = new Emotion();
+        this.time = time;
+
+        this.emotion = new Emotion(this);
 
         this.level = 8;
 
@@ -257,7 +259,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             x.cause = newCause(x);
         });
 
-        this.time = time;
 
         this.terms = terms;
 

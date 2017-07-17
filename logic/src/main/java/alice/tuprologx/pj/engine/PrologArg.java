@@ -11,12 +11,12 @@ public class PrologArg<X extends Term<X>> {
     private final TermKind[] _annotations;
     
     /** Creates a new instance of PrologArg */
-    public PrologArg(Term<X> arg, TermKind[] annotations) {        
+    public PrologArg(Term<X> arg, TermKind... annotations) {
         this(annotations);
         _theArg = arg;      
     }
     
-    public PrologArg(TermKind[] annotations) {     
+    public PrologArg(TermKind... annotations) {
         _annotations = annotations;
     }
     

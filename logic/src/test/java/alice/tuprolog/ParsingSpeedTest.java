@@ -2,7 +2,7 @@ package alice.tuprolog;
 
 public class ParsingSpeedTest {
 	
-	public static void main(String[] args) throws InvalidTermException {
+	public static void main(String... args) throws InvalidTermException {
 		int repetitions = 1000;
 		long start = System.currentTimeMillis();
 		OperatorManager om = new Prolog().getOperatorManager();

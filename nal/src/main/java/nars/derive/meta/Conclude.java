@@ -90,6 +90,8 @@ public final class Conclude extends AbstractPred<Derivation> {
             return true;
 
 
+        nar.emotion.derivation1.increment();
+
         //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
@@ -109,6 +111,7 @@ public final class Conclude extends AbstractPred<Derivation> {
         final Compound c1 = compoundOrNull(c0.eval(d));
         if (c1 != null) {
 
+            nar.emotion.derivation2.increment();
 
             Truth truth = d.concTruth;
 
@@ -253,6 +256,8 @@ public final class Conclude extends AbstractPred<Derivation> {
             @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2, punc, d.terms, true);
             if (c3n != null) {
 
+                nar.emotion.derivation3.increment();
+
                 boolean negating = c3n.getTwo();
 
                 final Compound C = c3n.getOne();
@@ -290,7 +295,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                     if (Param.DEBUG)
                         t.log(rule);
 
-                    return d.premise.accept(t);
+                    return d.accept(t);
 
                 }
             }

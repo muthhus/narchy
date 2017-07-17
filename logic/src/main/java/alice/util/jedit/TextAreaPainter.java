@@ -90,7 +90,7 @@ public class TextAreaPainter extends JComponent implements TabExpander
 	 * @param styles  The syntax styles
 	 * @see  org.gjt.sp.jedit.syntax.Token
 	 */
-    public final void setStyles(SyntaxStyle[] styles)
+    public final void setStyles(SyntaxStyle... styles)
     {
         this.styles = styles;
         repaint();
@@ -366,9 +366,9 @@ public class TextAreaPainter extends JComponent implements TabExpander
     @Override
     public void paint(Graphics gfx)
     {
-        tabSize = fm.charWidth(' ') * ((Integer)textArea
-            .getDocument().getProperty(
-            PlainDocument.tabSizeAttribute)).intValue();
+        tabSize = fm.charWidth(' ') * (Integer) textArea
+                .getDocument().getProperty(
+                        PlainDocument.tabSizeAttribute);
 
         Rectangle clipRect = gfx.getClipBounds();
 

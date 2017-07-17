@@ -143,7 +143,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	 * @throws InvalidTermException if a syntax error is found. 
 	 */
 	@Override
-	public Term nextTerm(boolean endNeeded) throws InvalidTermException {
+	public Term nextTerm(boolean endNeeded) {
 		try {
 			Token t = tokenizer.readToken();
 			if (t.isEOF())

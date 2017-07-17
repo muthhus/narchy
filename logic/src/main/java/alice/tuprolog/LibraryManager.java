@@ -109,7 +109,7 @@ public class LibraryManager
 	 * @throws InvalidLibraryException
 	 *             if name is not a valid library
 	 */
-	public synchronized Library loadClass(String className, String[] paths) throws InvalidLibraryException
+	public synchronized Library loadClass(String className, String... paths) throws InvalidLibraryException
 	{
 		Library lib = null;
 		URL[] urls = null;

@@ -323,7 +323,7 @@ public class ISOLibrary extends Library {
         return null;
     }
 
-    public Term div_2(Term v0, Term v1) throws PrologError {
+    public Term div_2(Term v0, Term v1) {
         Term val0 = null;
         Term val1 = null;
         try {
@@ -338,7 +338,7 @@ public class ISOLibrary extends Library {
         return null;
     }
 
-    public Term mod_2(Term v0, Term v1) throws PrologError {
+    public Term mod_2(Term v0, Term v1) {
         Term val0 = null;
         Term val1 = null;
         try {

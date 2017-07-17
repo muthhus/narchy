@@ -1,39 +1,40 @@
 package alice.tuprolog;
 
 import junit.framework.TestCase;
+import org.junit.Assert;
 
 public class DoubleTestCase extends TestCase {
 	
 	public void testIsAtomic() {
-		assertTrue(new alice.tuprolog.Double(0).isAtomic());
+		Assert.assertTrue(new alice.tuprolog.Double(0).isAtomic());
 	}
 	
 	public void testIsAtom() {
-		assertFalse(new alice.tuprolog.Double(0).isAtom());
+		Assert.assertFalse(new alice.tuprolog.Double(0).isAtom());
 	}
 	
 	public void testIsCompound() {
-		assertFalse(new alice.tuprolog.Double(0).isCompound());
+		Assert.assertFalse(new alice.tuprolog.Double(0).isCompound());
 	}
 	
 	public void testEqualsToStruct() {
 		alice.tuprolog.Double zero = new alice.tuprolog.Double(0);
 		Struct s = new Struct();
-		assertFalse(zero.equals(s));
+		Assert.assertFalse(zero.equals(s));
 	}
 	
 	public void testEqualsToVar() throws InvalidTermException {
 		alice.tuprolog.Double one = new alice.tuprolog.Double(1);
 		Var x = new Var("X");
-		assertFalse(one.equals(x));
+		Assert.assertFalse(one.equals(x));
 	}
 	
 	public void testEqualsToDouble() {
 		alice.tuprolog.Double zero = new alice.tuprolog.Double(0);
 		alice.tuprolog.Double one = new alice.tuprolog.Double(1);
-		assertFalse(zero.equals(one));
+		Assert.assertFalse(zero.equals(one));
 		alice.tuprolog.Double anotherZero = new alice.tuprolog.Double(0.0);
-		assertTrue(anotherZero.equals(zero));
+        assertEquals(anotherZero, zero);
 	}
 	
 	public void testEqualsToFloat() {
@@ -43,7 +44,7 @@ public class DoubleTestCase extends TestCase {
 	public void testEqualsToInt() {
 		alice.tuprolog.Double doubleOne = new alice.tuprolog.Double(1.0);
 		Int integerOne = new Int(1);
-		assertFalse(doubleOne.equals(integerOne));
+		Assert.assertFalse(doubleOne.equals(integerOne));
 	}
 	
 	public void testEqualsToLong() {
