@@ -24,7 +24,7 @@ import nars.control.Cause;
 import nars.control.ConceptFire;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.op.RegisterCause;
+import nars.derive.meta.op.Caused;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.nar.exe.Executioner;
@@ -71,7 +71,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static jcog.pri.Priority.EPSILON;
 import static nars.$.$;
 import static nars.$.newArrayList;
 import static nars.Op.*;
@@ -257,7 +256,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.emotion = new Emotion(this);
 
         this.deriver = Deriver.DEFAULT;
-        deriver.forEachCause((RegisterCause x) -> {
+        deriver.forEachCause((Caused x) -> {
             if (x.cause != null) // a re-used copy from rule permutes? TODO why?
                 return;
             //assert(x.cause == null);
@@ -944,25 +943,24 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle();
 
+        valueUpdate();
+
         emotion.cycle();
+
+        exe.cycle(this);
 
         if (!scheduled.isEmpty()) {
             LongObjectPair<Runnable> next;
             long now = time();
             while ((next = scheduled.peek()) != null) {
                 if (next.getOne() <= now) {
-                    exe.runLater(next.getTwo());
                     scheduled.poll();
+                    exe.runLater(next.getTwo());
                 } else {
                     break; //wait till another time
                 }
             }
         }
-
-        valueUpdate();
-
-        exe.cycle(this);
-
 
     }
 
@@ -1178,12 +1176,28 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * TODO this needs refactoring to use a central scheduler
      */
     @NotNull
-    public NAR inputAt(long time, @NotNull String... tt) throws NarseseException {
-        List<Task> yy = newArrayList(tt.length);
-        for (String s : tt)
-            yy.addAll(tasks(s));
+    public NAR inputAt(long time, @NotNull String... tt)  {
 
-        inputAt(time, yy.toArray(new Task[yy.size()]));
+        assert(tt.length>0);
+
+        at(time, ()->{
+            List<Task> yy = newArrayList(tt.length);
+            for (String s : tt) {
+                try {
+                    yy.addAll(tasks(s));
+                } catch (NarseseException e) {
+                    logger.error("{} for: {}", e, s);
+                    e.printStackTrace();
+                }
+            }
+
+
+            int size = yy.size();
+            if (size > 0)
+                input(yy.toArray(new Task[size]));
+
+        });
+
         return this;
     }
 
@@ -1644,11 +1658,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         float boost = 0;
         int xl = causes.length;
 
-        //value *= activation; //weight the apparent value by its incoming activation
+        //value *= activation; //weight the apparent value by its incoming activation?
 
-        if (Math.abs(value) < EPSILON)
-            value = 0;
 
+        //normalize the sub-values to 1.0 using triangular number as a divisor
+        float sum = 0.5f * xl * (xl + 1);
 
         for (int i = 0; i < xl; i++) {
             short c = causes[i];
@@ -1659,7 +1673,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
             boost += cc.value();
 
-            float vPer = (((float)(i+1))/xl) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
+            float vPer = (((float)(i+1))/sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
             if (vPer != 0) {
                 cc.apply(vPer);
             }

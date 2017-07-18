@@ -45,8 +45,17 @@ public abstract class Param  {
                     //Integer.MAX_VALUE;
                     16;
 
+    /** cost of a termutate call */
+    public static final int TTL_MUTATE = 1;
 
+    /** cost of a term unification */
+    public static final int TTL_UNIFY = 1;
 
+    /** cost of a successful task derivation */
+    public static final int TTL_DERIVE_TASK = 1;
+
+    /** cost of a failed/aborted task derivation */
+    public static final int TTL_DERIVE_TASK_FAIL = 1;
 
     /**
      * use this for advanced error checking, at the expense of lower performance.

@@ -13,11 +13,9 @@ public class Versioning extends
         FasterList<Versioned> {
 
 
-    public int ttl;
 
-    public Versioning(int capacity, int ttl) {
+    public Versioning(int capacity) {
         super(0, new Versioned[capacity]);
-        this.ttl = ttl;
     }
 
     @NotNull
@@ -70,10 +68,6 @@ public class Versioning extends
         revert(0);
     }
 
-    @Override
-    public boolean add(@NotNull Versioned newItem) {
-        return tick() && super.add(newItem);
-    }
 
     @Override
     public void add(int index, Versioned element) {
@@ -110,15 +104,5 @@ public class Versioning extends
 //        }
 //    }
 
-    public final boolean tick() {
-        return (ttl-- > 0);
-    }
 
-    public final boolean live() {
-        return ttl > 0;
-    }
-
-    public final void setTTL(int ttl) {
-        this.ttl = ttl;
-    }
 }

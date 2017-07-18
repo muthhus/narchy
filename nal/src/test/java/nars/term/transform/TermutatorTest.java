@@ -146,7 +146,7 @@ public class TermutatorTest {
         //int blocked = 0;
         final int[] duplicates = {0};
 
-        unifier.versioning.setTTL(TTL);
+        unifier.setTTL(TTL);
 
         t.mutate(unifier, new Termutator[] { t,  new Termutator() {
 

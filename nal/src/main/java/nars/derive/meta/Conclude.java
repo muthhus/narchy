@@ -83,6 +83,7 @@ public final class Conclude extends AbstractPred<Derivation> {
      */
     @Override
     public final boolean test(@NotNull Derivation d) {
+
         NAR nar = d.nar;
 
         nar.emotion.derivation1.increment();
@@ -248,8 +249,8 @@ public final class Conclude extends AbstractPred<Derivation> {
                 if (Param.DEBUG)
                     t.log(rule);
 
-                return d.accept(t);
-
+                d.accept(t);
+                d.use(Param.TTL_DERIVE_TASK);
             }
         }
 
@@ -258,6 +259,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 //                logger.warn("{} {}", m, e.getMessage());
 //        }
 
+        d.use(Param.TTL_DERIVE_TASK_FAIL);
         return true;
     }
 

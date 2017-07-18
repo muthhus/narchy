@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import static nars.Param.TTL_UNIFY;
 import static nars.Param.UnificationConstraintsMax;
 
 
@@ -68,9 +69,27 @@ public abstract class Unify implements Subst {
      */
     public int dur = 0;
 
+    public int ttl;
+
 
     protected Unify(TermIndex terms, @Nullable Op type, Random random, int stackMax, int ttl) {
-        this(terms, type, random, new Versioning(stackMax, ttl));
+        this(terms, type, random, new Versioning(stackMax));
+        setTTL(ttl);
+    }
+
+    /** spend an amount of TTL; returns whether it is still live */
+    public final boolean use(int cost) {
+        return ((ttl -= cost) > 0);
+    }
+
+    /** whether the unifier should continue: if TTL is non-zero. */
+    public final boolean live() {
+        return ttl > 0;
+    }
+
+    /** set the TTL value */
+    public final void setTTL(int ttl) {
+        this.ttl = ttl;
     }
 
     /**
@@ -102,7 +121,7 @@ public abstract class Unify implements Subst {
     public abstract boolean onMatch();
 
     public final void mutate(Termutator[] chain, int next) {
-        if (versioning.tick() && ++next < chain.length)
+        if (++next < chain.length && use(Param.TTL_MUTATE))
             chain[next].mutate(this, chain, next);
     }
 
@@ -151,10 +170,12 @@ public abstract class Unify implements Subst {
     }
 
     private void tryMatch() {
+
         int ts;
+
         while ((ts = termutes.size()) > 0) {
 
-            if (!versioning.live())
+            if (!live())
                 break;
 
             //TODO use Termutator[] not List
@@ -184,7 +205,7 @@ public abstract class Unify implements Subst {
 
 
     public final boolean unify(@NotNull Term x, @NotNull Term y) {
-        return versioning.tick() && x.unify(y, this);
+        return use(TTL_UNIFY) && x.unify(y, this);
     }
 
     public final boolean matchType(@NotNull Term y) {
@@ -236,7 +257,7 @@ public abstract class Unify implements Subst {
 
     public final boolean revert(int then) {
         versioning.revert(then);
-        return versioning.live();
+        return live();
     }
 
 

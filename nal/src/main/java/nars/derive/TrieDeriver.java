@@ -9,7 +9,7 @@ import nars.derive.meta.*;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.derive.meta.op.MatchTerm;
 import nars.derive.meta.op.MatchTermPrototype;
-import nars.derive.meta.op.RegisterCause;
+import nars.derive.meta.op.Caused;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.term.Term;
@@ -93,10 +93,10 @@ public class TrieDeriver implements Deriver {
 
     }
 
-    public void forEachCause(Consumer<RegisterCause> p) {
+    public void forEachCause(Consumer<Caused> p) {
         forEach(pred, (c) -> {
-            if (c instanceof RegisterCause) {
-                p.accept((RegisterCause) c);
+            if (c instanceof Caused) {
+                p.accept((Caused) c);
             }
         });
     }

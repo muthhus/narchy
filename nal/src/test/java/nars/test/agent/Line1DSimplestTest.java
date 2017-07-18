@@ -310,12 +310,9 @@ public class Line1DSimplestTest {
         //this.activeTasks = activeTasks;
         NAR n = new NARS().get();
         n.on("say", (op, args, nar) -> {
-            if (!(args[0] instanceof Variable))
-                try {
-                    n.inputAt(Math.round(nar.time()+nar.dur()), "say(" +  args[0] + "). :|:");
-                } catch (Narsese.NarseseException e) {
-                    e.printStackTrace();
-                }
+            if (!(args[0] instanceof Variable)) {
+                n.inputAt(Math.round(nar.time()+nar.dur()), "say(" +  args[0] + "). :|:");
+            }
         });
 
         n.log();

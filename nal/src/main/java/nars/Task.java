@@ -868,11 +868,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     @Override
     default ITask[] run(@NotNull NAR n) {
 
-        float inputPri = this.pri();
-        if (inputPri != inputPri)
-            return DeleteMe; //deleted
-
-        n.emotion.busy(inputPri, this.volume());
+        n.emotion.busy(priElseZero(), this.volume());
 
         //elide if DerivedTask since it has already been evaluated
         boolean evaluate = !(this instanceof DerivedTask) || isCommand();

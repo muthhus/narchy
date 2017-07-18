@@ -99,7 +99,7 @@ abstract public class MatchTermPrototype extends AbstractPred<Derivation> {
 
     private BoolPred cause(Conclude c) {
         return AndCondition.the( Lists.newArrayList(
-            new RegisterCause(),
+            new Caused(),
             c
         ) );
     }

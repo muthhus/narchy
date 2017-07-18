@@ -48,11 +48,6 @@ public class BufferedExecutioner extends Executioner {
 //     */
 //    protected final FasterList<ITask> toRemove = new FasterList();
 
-    //    /**
-//     * amount of priority to subtract from each processed task (re-calculated each cycle according to bag pressure)
-//     */
-//    protected float forgetEachPri;
-    public final FloatParam masterGain = new FloatParam(1f, 0f, 1f);
 
 
     public final Bag<ITask, ITask> tasks =
@@ -217,7 +212,7 @@ public class BufferedExecutioner extends Executioner {
 
     @Override
     public void runLater(Runnable r) {
-        r.run(); //synchronous
+        r.run(); //default to synchronous execution
     }
 
 
@@ -331,10 +326,6 @@ public class BufferedExecutioner extends Executioner {
 
         if (next == ITask.DeleteMe) {
             x.delete();
-        } else {
-            float g = masterGain.floatValue();
-            if (g != 1)
-                x.priMult(g);
         }
 
         actuallyFeedback(x, next);

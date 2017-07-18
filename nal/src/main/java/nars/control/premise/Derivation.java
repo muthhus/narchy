@@ -105,7 +105,7 @@ public class Derivation extends Unify implements TermContext {
     //public final float overlapAmount;
 
     private final Functor substituteIfUnifiesAny, substituteIfUnifiesDep, polarize;
-    private int serial;
+
     public float parentPri;
     private short[] parentCause;
     public Cause cause;
@@ -202,7 +202,7 @@ public class Derivation extends Unify implements TermContext {
         temporal = cyclic = overlap = false;
 
         assert(ttl >= 0);
-        this.versioning.setTTL(ttl);
+        this.setTTL(ttl);
 
         this.premise = p;
 
@@ -291,7 +291,7 @@ public class Derivation extends Unify implements TermContext {
 
         this.forEachMatch = null;
 
-        return versioning.live();
+        return live();
     }
 
     @Override public final boolean onMatch() {
@@ -364,12 +364,8 @@ public class Derivation extends Unify implements TermContext {
     }
 
 
-    public int next() {
-        return serial++;
-    }
-
     public int ttl() {
-        return versioning.ttl;
+        return ttl;
     }
 
     /** forms a new cause by appending a cause ID to the derivation's cause */
@@ -377,10 +373,9 @@ public class Derivation extends Unify implements TermContext {
         return ArrayUtils.add(this.parentCause, c);
     }
 
-    public boolean accept(DerivedTask t) {
+    public void accept(DerivedTask t) {
         nar.input(t);
         nar.emotion.taskDerivations.increment();
-        return versioning.tick();
     }
 }
 

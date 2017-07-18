@@ -191,7 +191,6 @@ public class TestNAR {
 
 
             nar.stats(System.out);
-            
 
         }
 
@@ -252,11 +251,7 @@ public class TestNAR {
     @NotNull
     public TestNAR inputAt(long time, String s) {
         finished = false;
-        try {
-            nar.inputAt(time, s);
-        } catch (Narsese.NarseseException e) {
-            fail(e.toString());
-        }
+        nar.inputAt(time, s);
         return this;
     }
 
@@ -536,8 +531,6 @@ public class TestNAR {
     public TestNAR askAt(int i, String term) {
         try {
             nar.inputAt(i, term + '?');
-        } catch (Narsese.NarseseException e) {
-            e.printStackTrace();
         } catch (Throwable e) {
             throw new RuntimeException(e);
         }
