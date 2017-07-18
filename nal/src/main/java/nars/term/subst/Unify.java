@@ -65,9 +65,9 @@ public abstract class Unify implements Subst {
     public final VersionMap<Term, Term> xy;
 
     /**
-     * temporal tolerance
+     * temporal tolerance; if -1, then it is not tested
      */
-    public int dur = 0;
+    public int dur = -1;
 
     public int ttl;
 
@@ -197,6 +197,10 @@ public abstract class Unify implements Subst {
 
     }
 
+    @Override
+    public String toString() {
+        return "xy=" + xy + ", ttl=" + ttl;
+    }
 
     @Override
     public boolean put(@NotNull Unify m) {

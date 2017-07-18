@@ -383,8 +383,13 @@ public interface Compound extends Term, IPair, TermContainer {
                 return false;
 
             Compound y = (Compound) ty;
-            if (op.temporal && !matchTemporalDT(this, y, subst.dur))
-                return false;
+            if (op.temporal) {
+                int sdur = subst.dur;
+                if (sdur >= 0) {
+                    if (!matchTemporalDT(this, y, sdur))
+                        return false;
+                }
+            }
 
             TermContainer xsubs = subterms();
             TermContainer ysubs = y.subterms();

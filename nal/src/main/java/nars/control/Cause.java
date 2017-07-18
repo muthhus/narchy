@@ -12,14 +12,40 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class Cause extends AtomicDouble /* value */ {
+/**
+ * represents a causal influence and tracks its
+ * positive and negative gain (separately).  this is thread safe
+ * so multiple threads can safely affect the accumulators. it must be commited
+ * periodically (by a single thread, ostensibly) to apply the accumulated values
+ * and calculate the values
+ * as reported by the value() function which represents the effective
+ * positive/negative balance that has been accumulated. a decay function
+ * applies forgetting, and this is applied at commit time by separate
+ * positive and negative decay rates.  the value is clamped to a range
+ * (ex: 0..+3) so it doesnt explode.  the +3 here is compatible with the
+ * associated tanhFast function, which is used for converting a summation of
+ * (bipolar) gain values to a unipolar amplitude factor, since it
+ * clamps values beyond the x=-3..+3 interval.
+ */
+public class Cause {
+
+    /** pos,neg range limit */
+    final static float LIMIT = 3;
+    final static float EPSILON = 0.00000001f;
+
     public final short id;
     public final Object x;
 
-    float next = 0;
+    /** positive value */
+    final AtomicDouble posAcc = new AtomicDouble(); //accumulating
+    float pos = 0; //current value
+
+    /** negative value */
+    final AtomicDouble negAcc = new AtomicDouble(); //accumulating
+    float neg = 0; //current value
+    private float value;
 
     public Cause(short id, Object x) {
-        super(0);
         this.id = id;
         this.x = x;
     }
@@ -63,7 +89,7 @@ public class Cause extends AtomicDouble /* value */ {
             n++;
         } while (remain);
         if (ls == 0)
-            return ArrayUtils.EMPTY_SHORT_ARRAY; //shared
+            return ArrayUtils.EMPTY_SHORT_ARRAY;
 
         short[] ll = l.toArray();
         ArrayUtils.reverse(ll);
@@ -72,15 +98,35 @@ public class Cause extends AtomicDouble /* value */ {
     }
 
     public void apply(float v) {
-        addAndGet(v);
+        if (v >= EPSILON) {
+            posAcc.addAndGet(v);
+        } else if (v <= -EPSILON) {
+            negAcc.addAndGet(-v);
+        }
     }
 
-    public void commit(float decayRate) {
-        float n = (float) this.getAndSet(0);
-        this.next = (Util.clamp((next * decayRate + n), -1f, +2f));
+    public void commit(float posDecay, float negDecay) {
+        this.pos = decay(pos, posAcc, posDecay);
+        this.neg = decay(neg, negAcc, negDecay);
+        this.value = value(pos, neg);
+    }
+
+    /** calculate the value scalar  from the distinctly tracked positive and negative values;
+     * any function could be used here. for example:
+     *      simplest:  pos - neg
+     *      quadratic: pos*pos - neg*neg
+     *
+     * pos and neg will always be positive.
+     * */
+    public float value(float pos, float neg) {
+        return pos - neg;
+    }
+
+    static float decay(float cur, AtomicDouble acc, float rate) {
+        return Util.clamp( (float)((cur * rate) + acc.getAndSet(0)), 0, +LIMIT);
     }
 
     public float value() {
-        return next;
+        return value;
     }
 }

@@ -210,7 +210,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         x.put("termlink count", ((double) termlinkCount.getTotalCount()));
 
         DoubleSummaryStatistics values = new DoubleSummaryStatistics();
-        causeValue.forEach(c -> values.accept(c.floatValue()));
+        causeValue.forEach(c -> values.accept(c.value()));
         x.put("values mean", values.getAverage());
         x.put("values min", values.getMin());
         x.put("values max", values.getMax());
@@ -1692,11 +1692,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.99f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.95f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.995f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.97f, 0, 1f);
 
     public void valueUpdate() {
-        causeValue.forEach(c -> c.commit((c.value() > 0 ? valuePositiveDecay : valueNegativeDecay).floatValue()));
+        float p = valuePositiveDecay.floatValue();
+        float n = valueNegativeDecay.floatValue();
+        causeValue.forEach(c -> c.commit(p, n));
     }
 
 }
