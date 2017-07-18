@@ -1,5 +1,6 @@
 package nars.term.var;
 
+import com.google.common.io.ByteArrayDataOutput;
 import nars.$;
 import nars.Op;
 import nars.index.term.NonInternable;
@@ -8,6 +9,8 @@ import nars.term.Term;
 import nars.term.atom.AtomicToString;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.IO.SPECIAL_OP;
 
 /**
  * Unnormalized, labeled variable
@@ -108,4 +111,13 @@ public class UnnormalizedVariable extends AtomicToString implements Variable, No
     public Term eval(TermContext index) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public void append(ByteArrayDataOutput out) {
+        out.writeByte(SPECIAL_OP);
+        byte[] b = bytes();
+        out.writeShort(b.length);
+        out.write(b);
+    }
+
 }

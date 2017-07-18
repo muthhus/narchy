@@ -1,5 +1,6 @@
 package nars.term.atom;
 
+import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 
 /**
@@ -19,6 +20,14 @@ public abstract class AtomicToString implements Atomic {
                         toString().equals(u.toString()
                 );
 
+    }
+
+    @Override
+    public void append(ByteArrayDataOutput out) {
+        out.writeByte(op().id);
+        byte[] b = bytes();
+        out.writeShort(b.length);
+        out.write(b);
     }
 
     @Override

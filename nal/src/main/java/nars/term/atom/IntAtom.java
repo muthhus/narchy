@@ -1,5 +1,6 @@
 package nars.term.atom;
 
+import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.primitives.Ints;
 import nars.Op;
 import nars.term.Term;
@@ -32,6 +33,12 @@ public class IntAtom implements Atomic {
 
     IntAtom(int i) {
         this.id = i;
+    }
+
+    @Override
+    public void append(ByteArrayDataOutput out) {
+        out.writeByte(INT.id);
+        out.writeInt(id);
     }
 
     @Override

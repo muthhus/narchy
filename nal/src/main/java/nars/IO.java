@@ -1,6 +1,7 @@
 package nars;
 
 
+import com.google.common.io.ByteArrayDataOutput;
 import jcog.byt.DynByteSeq;
 import jcog.data.string.Utf8Writer;
 import jcog.pri.Prioritized;
@@ -13,7 +14,6 @@ import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
-import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
@@ -125,7 +125,13 @@ public class IO {
      */
     public static void writeTask(@NotNull DataOutput out, @NotNull Task t) throws IOException {
 
-        writeTerm(out, t.term());
+        Compound tt = t.term();
+
+        if (out instanceof ByteArrayDataOutput) {
+            writeTerm((ByteArrayDataOutput) out, tt);
+        } else {
+            out.write(IO.termToBytes(tt)); //buffer to bytes
+        }
 
         byte p = t.punc();
         out.writeByte(p);
@@ -262,48 +268,22 @@ public class IO {
         }
     }
 
-    public static void writeTerm(@NotNull DataOutput out, @NotNull Term term) throws IOException {
-
-//        if (isAbsolute(term))
-//            throw new IOException("absolute leak");
-
-//        if (term instanceof SerialCompound) {
-//            //it's already serialized in a SerialCompound
-//            ((SerialCompound) term).appendTo(out);
-//            return;
-//        }
-
-        if (term instanceof UnnormalizedVariable) {
-            out.writeByte(SPECIAL_OP);
-            out.write(((UnnormalizedVariable) term).bytes());
-            return;
-        }
-
-        Op o = term.op();
-        out.writeByte(o.id);
-
-        if (term instanceof AbstractVariable) {
-
-            out.writeInt(((AbstractVariable) term).id);
-
-        } else if (term instanceof Atomic) {
+    public static void writeTerm(@NotNull ByteArrayDataOutput out, @NotNull Term term) throws IOException {
 
 
-            byte[] b = ((Atomic) term).bytes();
-            out.writeShort(b.length);
-            out.write(b);
-
-
+        if (term instanceof Atomic) {
+            ((Atomic) term).append(out);
         } else {
+            Op o = term.op();
+            out.writeByte(o.id);
 
             Compound c = (Compound) term;
             writeTermContainer(out, c);
             writeCompoundSuffix(out, c, o);
-
         }
     }
 
-    static void writeTermContainer(@NotNull DataOutput out, @NotNull TermContainer c) throws IOException {
+    static void writeTermContainer(@NotNull ByteArrayDataOutput out, @NotNull TermContainer c) throws IOException {
         int siz = c.size();
 
         out.writeByte(siz);
@@ -312,12 +292,12 @@ public class IO {
             writeTerm(out, c.sub(i));
     }
 
-    public static void writeTermContainer(@NotNull DataOutput out, @NotNull Term... subterms) throws IOException {
-        out.writeByte(subterms.length);
-        for (Term x : subterms) {
-            writeTerm(out, x);
-        }
-    }
+//    public static void writeTermContainer(@NotNull DataOutput out, @NotNull Term... subterms) throws IOException {
+//        out.writeByte(subterms.length);
+//        for (Term x : subterms) {
+//            writeTerm(out, x);
+//        }
+//    }
 
     public static void writeCompoundSuffix(@NotNull DataOutput out, Compound c, Op o) throws IOException {
         if (o.temporal)

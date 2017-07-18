@@ -1,5 +1,6 @@
 package nars.term.atom;
 
+import com.google.common.io.ByteArrayDataOutput;
 import jcog.Texts;
 import nars.$;
 import nars.Narsese;
@@ -22,7 +23,9 @@ import static java.lang.Integer.MIN_VALUE;
 public interface Atomic extends Term {
 
     /** canonical byte representation of this atomic */
-    byte[] bytes();
+    @Deprecated byte[] bytes();
+
+    void append(ByteArrayDataOutput out);
 
     @Override
     default boolean OR(Predicate<Term> v) {

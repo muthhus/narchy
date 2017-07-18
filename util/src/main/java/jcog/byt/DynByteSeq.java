@@ -1,5 +1,6 @@
 package jcog.byt;
 
+import com.google.common.io.ByteArrayDataOutput;
 import org.apache.commons.lang3.ArrayUtils;
 import org.iq80.snappy.Snappy;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +12,7 @@ import java.util.Arrays;
 /**
  * copied from Infinispan SimpleDataOutput
  */
-public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
+public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
 
     private final static float minCompressionRatio = 0.9f;
     private final static int MIN_COMPRESSION_LEN = 64;
@@ -313,6 +314,12 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
     }
 
+
+    @Override
+    @Deprecated public byte[] toByteArray() {
+        return bytes;
+    }
+
     @Override
     public void writeChars(String s) {
 //        int len = s.length();
@@ -325,7 +332,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeUTF(@NotNull String s) throws IOException {
+    public void writeUTF(@NotNull String s) {
 
         throw new UnsupportedOperationException("yet");
 

@@ -21,6 +21,7 @@
 package nars.term.var;
 
 
+import com.google.common.io.ByteArrayDataOutput;
 import nars.Op;
 import nars.Param;
 import nars.term.Term;
@@ -47,6 +48,12 @@ public abstract class AbstractVariable implements Variable {
     @Override
     public byte[] bytes() {
         return new byte[] { (byte)(id) };
+    }
+
+    @Override
+    public void append(ByteArrayDataOutput out) {
+        out.writeByte(op().id);
+        out.writeInt(id);
     }
 
     @Override
