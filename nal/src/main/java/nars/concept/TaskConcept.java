@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import static nars.Op.*;
 import static nars.conceptualize.state.ConceptState.Deleted;
 import static nars.table.QuestionTable.Unstored;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * concept of a compound term which can name a task, and thus have associated beliefs, goals, questions, and quests
@@ -148,10 +149,31 @@ public class TaskConcept extends CompoundConcept {
 
     }
 
-    public float value(@NotNull Task t, float activation, NAR n) {
-        int vol = t.volume();
-        return -(vol)/n.termVolumeMax.floatValue() * (0.5f + 0.5f * (1f - (t.isBeliefOrGoal() ? t.conf(n.time(), n.dur()) : 0.5f))
-        )/1000f;
+    public float valueIfProcessed(@NotNull Task t, float activation, NAR n) {
+        //positive value based on the conf but also multiplied by the activation in case it already was known
+        return 0.001f * activation * (t.isBeliefOrGoal() ? t.conf(n.time(), n.dur()) : 0.5f);
+
+//            @Override
+//    public float value(@NotNull Task t, NAR n) {
+//        byte p = t.punc();
+//        if (p == BELIEF || p == GOAL) {// isGoal()) {
+//            //example value function
+//            long s = t.end();
+//
+//            if (s!=ETERNAL) {
+//                long now = n.time();
+//                long relevantTime = p == GOAL ?
+//                        now - n.dur() : //present or future goal
+//                        now; //future belief prediction
+//
+//                if (s > relevantTime) //present or future TODO irrelevance discount for far future
+//                    return (float) (0.1f + Math.pow(t.conf(), 0.25f));
+//            }
+//        }
+//
+//        //return super.value(t, activation, n);
+//        return 0;
+//    }
     }
 
 

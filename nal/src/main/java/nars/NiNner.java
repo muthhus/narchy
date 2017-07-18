@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
 //                new MonitorRegistryMetricPoller(this);
 
 
-        register(monitor("emotion", nar.emotion));
+        register(new BasicCompositeMonitor(id("emotion"), new ArrayList(nar.emotion.getRegisteredMonitors())));
 
         {
             //MetricObserver obs = new FileMetricObserver("stats", directory);

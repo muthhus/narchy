@@ -124,7 +124,7 @@ public class Premise {
                             BudgetFunctions.fund(taskLink, answered,
                                 /*Util.sqr*/effectiveConf, false);
 
-                            nar.value(answered.cause(),effectiveConf);
+                            nar.value(answered.cause(), effectiveConf);
                         }
                     }
                 } else {

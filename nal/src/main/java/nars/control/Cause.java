@@ -117,8 +117,9 @@ public class Cause {
      * pos and neg will always be positive.
      * */
     public float value(float pos, float neg) {
-        //return pos - neg;
-        return pos * 2 - neg;
+        return pos - neg;
+        //return pos * 2 - neg;
+        //return Util.tanhFast( pos ) - Util.tanhFast( neg );
     }
 
     static float decay(float cur, AtomicDouble acc, float decay) {

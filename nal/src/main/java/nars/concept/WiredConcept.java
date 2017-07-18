@@ -37,27 +37,7 @@ public class WiredConcept extends TaskConcept implements PermanentConcept {
         resolution.setValue(n.truthResolution);
     }
 
-    @Override
-    public float value(@NotNull Task t, float activation, NAR n) {
-        byte p = t.punc();
-        if (p == BELIEF || p == GOAL) {// isGoal()) {
-            //example value function
-            long s = t.end();
 
-            if (s!=ETERNAL) {
-                long now = n.time();
-                long relevantTime = p == GOAL ?
-                        now - n.dur() : //present or future goal
-                        now; //future belief prediction
-
-                if (s > relevantTime) //present or future TODO irrelevance discount for far future
-                    return (float) (0.1f + Math.pow(t.conf(), 0.25f));
-            }
-        }
-
-        //return super.value(t, activation, n);
-        return 0;
-    }
 
 //    @Override
 //    public void process(@NotNull Task t, @NotNull NAR n) {

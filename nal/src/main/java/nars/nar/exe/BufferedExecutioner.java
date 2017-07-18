@@ -36,9 +36,12 @@ import static nars.Op.COMMAND;
 public class BufferedExecutioner extends Executioner {
 
     /**
-     * number of tasks input after each firing; defines an input load processing ratio
+     * number of tasks input after each firing;
+     * defines an input load processing ratio
+     * TODO make this automatically controlled according to the
+     * input task load that occurred while it was firing
      */
-    int inputsPerFire = 4;
+    int inputsPerFire = 32;
 
 
     //    private final DisruptorBlockingQueue<ITask> overflow;
@@ -264,6 +267,9 @@ public class BufferedExecutioner extends Executioner {
 
     @Override
     public void run(@NotNull ITask input) {
+
+        if (input.isDeleted())
+            return; //TODO track these
 
         boolean nal = input instanceof NALTask;
 

@@ -18,7 +18,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.var.Variable;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +29,9 @@ import java.util.function.Consumer;
 
 import static nars.Param.UnificationTTLMax;
 
-/** concept firing, activation, etc */
+/**
+ * concept firing, activation, etc
+ */
 public class Activate extends UnaryTask<Concept> implements Termed {
 
     static final ThreadLocal<Derivation> derivation = ThreadLocal.withInitial(Derivation::new);
@@ -39,11 +40,11 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 1;
+    private static final int maxSamples = 2;
 
-    static final int TASKLINKS_SAMPLED = 4;
+    static final int TASKLINKS_SAMPLED = 3;
     static final int TERMLINKS_SAMPLED = 4;
-
+    private Termed[] localTemplates;
 
 
     public Activate(Concept c, float pri) {
@@ -61,22 +62,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             short[] x = t.cause();
             int xl = x.length;
             if (xl > 0) {
-                float taskValue = origin.value(t, activation, n);
-
-                float gain = n.value(x, taskValue);
-                if (gain != 0) {
-
-                    float b = Util.tanhFast(gain) + 1f;
-                    activation *= b;
-                    //t.priMult(b);
-                    if (/*t.priElseZero()*/ activation < EPSILON)
-                        return null;
-                }
-
-            } /*else {
-                if (t.stamp().length > 1)
-                    System.out.println(t + " has no cause");
-            }*/
+                float taskValue = origin.valueIfProcessed(t, activation, n);
+                n.value(x, taskValue);
+            }
 
             origin.tasklinks().putAsync(
                     //new PLinkUntilDeleted<>(t, activation)
@@ -97,6 +85,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 }*/
 //            }
         }
+
         return null;
     }
 
@@ -105,10 +94,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     }
 
     public static void activate(@NotNull Task t, float activation, @NotNull NAR n, boolean process) {
-       // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
+        // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
         if (activation >= EPSILON) {
             TaskConcept cc = t.concept(n, true);
-            if (cc!=null) {
+            if (cc != null) {
 
                 n.input(activate(t, activation, cc, n));
 //                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
@@ -211,7 +200,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //            this.templates = templates(id, nar);
 //        }
 
-        Termed[] localTemplates = templates(id, nar);
+        if (localTemplates==null) {
+            localTemplates = templates(id, nar);
+        }
         //System.out.println("templates: " + id + " " + Arrays.toString(localTemplates));
 
         int penalty = Math.max(1, ttlPerPremise / (2));
@@ -244,8 +235,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             //tasklink activates local subterms and their reverse termlinks to this
             float tfaEach = tfa / localTemplates.length;
             for (Termed localSub : localTemplates) {
-                Concept localSubConcept = nar.conceptualize(localSub);
-                if (localSubConcept instanceof Concept) {
+
+                if (localSub instanceof Concept) {
+                    Concept localSubConcept = (Concept)localSub;
                     localSubConcept.tasklinks().putAsync(
                             new PLink(task, tfaEach)
                     );
@@ -389,7 +381,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 return tc.toArray(new Termed[tc.size()]);
         }
 
-            //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
+        //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
 
 //                templateConcepts = Concept.EmptyArray;
 //                templateConceptsCount = 0;
@@ -416,12 +408,12 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 //variable or other non-concept term
                 if (tc.add(d)) {
                     if (layersRemain > 0 && d instanceof Compound) {
-                        e = ((Compound)d).subterms();
+                        e = ((Compound) d).subterms();
                     }
                 }
             }
 
-            if (e!=null)
+            if (e != null)
                 templates(tc, e, nar, layersRemain - 1);
         }
     }
@@ -485,7 +477,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
             default:
                 return 1;
-                //throw new UnsupportedOperationException("unhandled operator type: " + host.op());
+            //throw new UnsupportedOperationException("unhandled operator type: " + host.op());
         }
     }
 

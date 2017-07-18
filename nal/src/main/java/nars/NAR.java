@@ -11,6 +11,7 @@ import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import jcog.list.FasterList;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
@@ -20,8 +21,8 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.state.ConceptState;
-import nars.control.Cause;
 import nars.control.Activate;
+import nars.control.Cause;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
 import nars.derive.meta.op.Caused;
@@ -283,10 +284,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 if (x instanceof NALTask) {
                     //assert (((NALTask) x.ref).cause.length == 0);
                     NALTask t = (NALTask) x;
-                    if (t.cause == null)
-                        t.cause = cs;
-                    else
-                        t.cause = ArrayUtils.add(t.cause, 0 /* prepend */, ci);
+                    if (t.cause == null || t.cause.length == 0)
+                        t.cause = cs; //.clone();
+                    else {
+                        if (!ArrayUtils.contains(t.cause, ci)) //in case the same task is input repeatedly, dont add the same cause
+                            t.cause = ArrayUtils.add(t.cause, 0 /* prepend */, ci);
+                    }
                 }
                 return x;
             }
@@ -627,9 +630,23 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             if (x != null) input(x);
     }
 
-    public void input(ITask x) {
-        if (x != null)
-            exe.run(x);
+    public void input(@NotNull ITask x) {
+
+
+        if (x instanceof Task) {
+            Task t = (Task) x;
+            if (evaluate(t) < Pri.EPSILON)
+                return; //TODO track what might cause this
+
+            value(t.cause(), valueIfAccepted(t, this));
+        }
+
+        exe.run(x);
+    }
+
+    public float valueIfAccepted(@NotNull Task t, NAR n) {
+        int vol = t.volume();
+        return -(vol)/n.termVolumeMax.floatValue()/1000f;
     }
 
 
@@ -1176,11 +1193,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * TODO this needs refactoring to use a central scheduler
      */
     @NotNull
-    public NAR inputAt(long time, @NotNull String... tt)  {
+    public NAR inputAt(long time, @NotNull String... tt) {
 
-        assert(tt.length>0);
+        assert (tt.length > 0);
 
-        at(time, ()->{
+        at(time, () -> {
             List<Task> yy = newArrayList(tt.length);
             for (String s : tt) {
                 try {
@@ -1650,21 +1667,61 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final FasterList<Cause> causeValue = new FasterList(512);
 
     /**
-     * returns the sum of the current values (applied after adding the increment)
-     *
+     * set the value of a cause trace
      */
-    public float value(short[] causes, float value) {
+    public void value(short[] causes, float value) {
+        int numCauses = causes.length;
+
+        float sum = 0.5f * numCauses * (numCauses + 1);
+
+        for (int i = 0; i < numCauses; i++) {
+            short c = causes[i];
+            Cause cc = this.causeValue.get(c);
+            if (cc == null)
+                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
+                    /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
+
+            float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
+            if (vPer != 0) {
+                cc.apply(vPer);
+            }
+        }
+    }
+
+    /** returns a "value" adjusted priority
+     * which is also applied to the given task.
+     * a NaN (deleted) priority will be returned as zero
+     * */
+    public float evaluate(Task x) {
+        short[] causes = ((Task) x).cause();
+        float gain = evaluate(causes);
+        if (gain != 0) {
+
+            float amp = Util.tanhFast(gain) + 1f; //[0..+2]
+
+//            amp *= amp; //sharpen, psuedo-logarithmic x^4
+//            amp *= amp;
+
+            return x.priMult(amp);
+        } else {
+            return x.priElseZero();
+        }
+    }
+
+    /**
+     * estimate the value of a cause trace
+     */
+    public float evaluate(short[] causes) {
 
         float boost = 0;
-        int xl = causes.length;
 
         //value *= activation; //weight the apparent value by its incoming activation?
 
 
         //normalize the sub-values to 1.0 using triangular number as a divisor
-        float sum = 0.5f * xl * (xl + 1);
+        int numCauses = causes.length;
 
-        for (int i = 0; i < xl; i++) {
+        for (int i = 0; i < numCauses; i++) {
             short c = causes[i];
             Cause cc = this.causeValue.get(c);
             if (cc == null)
@@ -1672,15 +1729,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                     /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
 
             boost += cc.value();
-
-            float vPer = (((float)(i+1))/sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
-            if (vPer != 0) {
-                cc.apply(vPer);
-            }
-
         }
 
-        return boost/xl;
+        return boost / numCauses;
     }
 
     private Cause newCause(Object x) {
@@ -1693,8 +1744,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.995f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
 
     public void valueUpdate() {
         float p = valuePositiveDecay.floatValue();

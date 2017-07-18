@@ -31,7 +31,7 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
 
     public final Set<Monitor<?>> monitors = Sets.newConcurrentHashSet();
 
-    public void register(Object o) {
+    public void registerFields(Object o) {
         Util.getAllDeclaredFields(this, true).forEach(f -> {
             if (Monitor.class.isAssignableFrom( f.getType() )) {
                 if (f.trySetAccessible()) {

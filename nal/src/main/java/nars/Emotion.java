@@ -87,7 +87,7 @@ public final class Emotion extends ConcurrentMonitorRegistry {
     public Emotion(NAR n) {
         super();
 
-        register(this);
+        registerFields(this);
 
         //logger = LoggerFactory.getLogger(class);
 

@@ -99,7 +99,7 @@ abstract public class NAgentX extends NAgent {
         //fps * 2f; //nyquist
 
         RealTime clock =
-                durFPS >= 20 ?
+                durFPS >= 10 ?
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
 
@@ -108,10 +108,11 @@ abstract public class NAgentX extends NAgent {
         NAR n = new NARS()
                     .exe(
                         new MultiExecutioner((i) ->
-                            new MultiExecutioner.Worker(256, 64, 0.25f),
+                            new MultiExecutioner.Worker(
+                                    64, 32, 0.05f),
                                 3, 2))
                     .time(clock)
-                    .index(new CaffeineIndex(128 * 1024))
+                    .index(new CaffeineIndex(96 * 1024))
                     .get();
 
         n.confMin.setValue(0.01f);

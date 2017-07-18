@@ -200,11 +200,11 @@ public interface Priority extends Prioritized {
     }
 
     @NotNull
-    default Priority priMult(float factor) {
+    default float priMult(float factor) {
         float p = pri();
         if (p==p)
-            setPri(p * notNaNOrNeg(factor));
-        return this;
+            return setPri(p * notNaNOrNeg(factor));
+        return Float.NaN;
     }
 
 
