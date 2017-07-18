@@ -10,13 +10,14 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
- * Establishes conditions for the Term match
+ * Establishes conditions for the Term unification
  *
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
-abstract public class MatchTermPrototype extends AbstractPred<Derivation> {
+abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
     @Nullable
     private BoolPred eachMatch;
@@ -30,9 +31,9 @@ abstract public class MatchTermPrototype extends AbstractPred<Derivation> {
     public final Term pattern;
 
     /** derivation handlers; use the array form for fast iteration */
-    private final Set<Conclude> conclude = $.newHashSet(1);
+    public final TreeSet<Conclude> conclude = new TreeSet();
 
-    public MatchTermPrototype(@NotNull Compound id, Term pattern) {
+    public UnificationPrototype(@NotNull Compound id, Term pattern) {
         super(id);
         this.id = this.pid = id;
 
@@ -72,24 +73,25 @@ abstract public class MatchTermPrototype extends AbstractPred<Derivation> {
 
             BoolPred om;
 
-            switch (conclude.size()) {
+            int cs = conclude.size();
+            switch (cs) {
                 case 0:
                     om = null;
                     break;
                 case 1:
-                    om = cause(conclude.iterator().next());
+                    om = conclude.first();
                     break;
                 default:
                     om = Fork.compile(
-                        conclude.stream().map(this::cause).toArray(BoolPred[]::new)
-                        //conclude.toArray(new Conclude[conclude.size()])
+                        conclude.toArray(new Conclude[cs])
                     );
                     break;
             }
 
 
-            this.ref = this.id = om!=null ? $.func("MatchTerm", pid, om) :
-                                 $.func( "MatchTerm", pid);
+            this.ref = this.id = om!=null ?
+                    $.func("unify", pid, om) :
+                    $.func( "unify", pid);
 
             this.eachMatch = om;
         }
@@ -97,12 +99,6 @@ abstract public class MatchTermPrototype extends AbstractPred<Derivation> {
         return build(this.eachMatch);
     }
 
-    private BoolPred cause(Conclude c) {
-        return AndCondition.the( Lists.newArrayList(
-            new Caused(),
-            c
-        ) );
-    }
 
     @NotNull
     abstract protected BoolPred build(BoolPred eachMatch);

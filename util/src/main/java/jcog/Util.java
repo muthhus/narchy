@@ -58,6 +58,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
 import java.util.stream.Stream;
 
@@ -1819,5 +1821,11 @@ public enum Util {
         if (x >= 3f) return +1f;
         return x * ( 27 + x * x ) / ( 27 + 9 * x * x );
     }
+
+//    public static <T>  Collector<T, ?, List<T>> toListOrNullIfEmpty() {
+//        return new Collectors.CollectorImpl<>((Supplier<List<T>>) ArrayList::new, List::add,
+//                                   (left, right) -> { left.addAll(right); return left; },
+//                                   CH_ID);
+//    }
 
 }

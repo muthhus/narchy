@@ -7,7 +7,6 @@ import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.op.MatchOneSubtermPrototype;
 import nars.term.Term;
 import nars.term.compound.ProxyCompound;
-import nars.term.container.TermVector;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,29 +20,9 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
 
     private static final Term AND_ATOM = $.quote("&&");
 
-
-    /**
-     * simple 2-ary version
-     */
-    public static final class AndCondition2 extends ProxyCompound implements BoolPred<Derivation> {
-
-        private final BoolPred a, b;
-
-        public AndCondition2(BoolPred a, BoolPred b) {
-            super($.p(AND_ATOM, $.p(a, b)));
-            this.a = a;
-            this.b = b;
-        }
-
-        @Override
-        public boolean test(Derivation derivation) {
-            return a.test(derivation) && b.test(derivation);
-        }
-    }
-
     @Override
     public final boolean test(@NotNull Derivation m) {
-        for (BoolPred<Derivation> x : termCache) {
+        for (BoolPred<Derivation> x : cache) {
             boolean b = x.test(m);
 
 //            if (m.now() > 0)
@@ -60,27 +39,18 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
 
     public static @Nullable BoolPred the(@NotNull List<BoolPred> cond) {
 
-        //remove suffix 'TRUE'
         int s = cond.size();
-        if (s == 0) return null;
-
-
-//        if (cond.get(s - 1) == BoolCondition.TRUE) {
-//            cond = cond.subList(0, s - 1);
-//            s--;
-//            if (s == 0) return null;
-//        }
-
+        if (s == 0)
+            return null;
 
         if (s == 1) return cond.get(0);
-        if (s == 2) return new AndCondition2(cond.get(0), cond.get(1));
 
         return new AndCondition(cond);
     }
 
 
     @NotNull
-    public final BoolPred<Derivation>[] termCache;
+    public final BoolPred<Derivation>[] cache;
 
     /*public AndCondition(@NotNull BooleanCondition<C>[] p) {
         this(TermVector.the((Term[])p));
@@ -88,8 +58,8 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
     AndCondition(@NotNull Collection<BoolPred> p) {
         super($.p(AND_ATOM, $.p(p.toArray(new Term[p.size()]))));
 
-        this.termCache = p.toArray(new BoolPred[p.size()]);
-        if (termCache.length < 2)
+        this.cache = p.toArray(new BoolPred[p.size()]);
+        if (cache.length < 2)
             throw new RuntimeException("unnecessary use of AndCondition");
     }
 
@@ -146,8 +116,8 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
 
     public @Nullable BoolPred without(BoolPred condition) {
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
-        BoolPred[] x = ArrayUtils.removeElement(termCache, condition);
-        if (x.length == termCache.length)
+        BoolPred[] x = ArrayUtils.removeElement(cache, condition);
+        if (x.length == cache.length)
             throw new RuntimeException("element missing for removal");
 
         return AndCondition.the(Lists.newArrayList(x));

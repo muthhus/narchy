@@ -109,7 +109,7 @@ public class Derivation extends Unify implements TermContext {
 
     public float parentPri;
     private short[] parentCause;
-    public Cause cause;
+
     public Deriver deriver;
     public ByteShuffler shuffler = new ByteShuffler(64);
 
@@ -170,8 +170,6 @@ public class Derivation extends Unify implements TermContext {
 
 
         revert(0);
-
-        this.cause = null;
 
         //remove common variable entries because they will just consume memory if retained as empty
         //xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);

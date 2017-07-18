@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 5/21/16.
  */
-public final class MatchOneSubtermPrototype extends MatchTermPrototype {
+public final class MatchOneSubtermPrototype extends UnificationPrototype {
 
     /**
      * either 0 (task) or 1 (belief)

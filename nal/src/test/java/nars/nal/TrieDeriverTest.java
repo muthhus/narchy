@@ -16,7 +16,9 @@ public class TrieDeriverTest {
 
     @Test public void printCompiledRuleTree() {
 
-        new TrieDeriver(Deriver.DEFAULT_RULES).print(System.out);
+        TrieDeriver td = new TrieDeriver(Deriver.DEFAULT_RULES);
+
+        td.print(System.out);
 
 
     }

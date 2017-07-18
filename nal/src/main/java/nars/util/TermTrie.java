@@ -16,62 +16,33 @@ import java.io.PrintStream;
 import java.util.List;
 
 
-/** indexes sequences of (a perfectly-hashable fixed number
- * of unique) terms in a magnos trie */
-abstract public class TermTrie<K extends Term, V> {
+/**
+ * indexes sequences of (a perfectly-hashable fixed number
+ * of unique) terms in a magnos trie
+ */
+abstract public class TermTrie<K extends Term, V> extends Trie<List<K>, V> implements TrieSequencer<List<K>> {
 
-    @NotNull
-    public final Trie<List<K>, V> trie;
+    final ObjectIntHashMap<Term> conds = new ObjectIntHashMap<>();
 
-    public void printSummary() {
-        printSummary(System.out);
+    public void print() {
+        print(System.out);
     }
 
-    public void printSummary(@NotNull PrintStream out) {
-        printSummary(trie.root, out);
+    public void print(@NotNull PrintStream out) {
+        printSummary(((Trie<List<K>, V>) this).root, out);
     }
 
 
-    public TermTrie(@NotNull Iterable<V> R) {
-        super();
-
-        ObjectIntHashMap<Term> conds = new ObjectIntHashMap<>();
-
-        trie = new Trie(new TrieSequencer<List<K>>() {
-
-            @Override
-            public int matches(@NotNull List<K> sequenceA, int indexA, @NotNull List<K> sequenceB, int indexB, int count) {
-                for (int i = 0; i < count; i++) {
-                    K a = sequenceA.get(i + indexA);
-                    K b = sequenceB.get(i + indexB);
-                    if (!a.equals(b))
-                        return i;
-                }
-
-                return count;
-            }
-
-            @Override
-            public int lengthOf(@NotNull List<K> sequence) {
-                return sequence.size();
-            }
-
-            @Override
-            public int hashOf(@NotNull List<K> sequence, int index) {
-                //return sequence.get(index).hashCode();
-
-                Term pp = sequence.get(index);
-                return conds.getIfAbsentPutWithKey(pp, (p) -> 1 + conds.size());
-            }
-        });
-
-        R.forEach(this::index);
+    public TermTrie() {
+        super(null);
     }
 
-    /** called for each item on insert */
-    abstract public void index(V v);
+    /**
+     * called for each item on insert
+     */
+    abstract public void put(V v);
 
-    public static <A, B> void printSummary(@NotNull TrieNode<List<A>,B> node, @NotNull PrintStream out) {
+    public static <A, B> void printSummary(@NotNull TrieNode<List<A>, B> node, @NotNull PrintStream out) {
 
         node.forEach(n -> {
             List<A> seq = n.seq();
@@ -82,14 +53,13 @@ abstract public class TermTrie<K extends Term, V> {
 
             indent(from * 4);
 
-            out.println(Joiner.on(" , ").join( seq.subList(from, n.end())
+            out.println(Joiner.on(" , ").join(seq.subList(from, n.end())
                     //.stream().map(x ->
-                //'[' + x.getClass().getSimpleName() + ": " + x + "/]").collect(Collectors.toList())
-            ) );
+                    //'[' + x.getClass().getSimpleName() + ": " + x + "/]").collect(Collectors.toList())
+            ));
 
             printSummary(n, out);
         });
-
 
 
     }
@@ -97,7 +67,8 @@ abstract public class TermTrie<K extends Term, V> {
 
     //TODO use the compiled rule trie
     @NotNull
-    @Deprecated public SummaryStatistics costAnalyze(@NotNull FloatFunction<K> costFn, @Nullable PrintStream o) {
+    @Deprecated
+    public SummaryStatistics costAnalyze(@NotNull FloatFunction<K> costFn, @Nullable PrintStream o) {
 
         SummaryStatistics termCost = new SummaryStatistics();
         SummaryStatistics sequenceLength = new SummaryStatistics();
@@ -105,9 +76,9 @@ abstract public class TermTrie<K extends Term, V> {
         SummaryStatistics endDepth = new SummaryStatistics();
         int[] currentDepth = new int[1];
 
-        costAnalyze(costFn, termCost, sequenceLength, branchFanOut, endDepth, currentDepth, trie.root);
+        costAnalyze(costFn, termCost, sequenceLength, branchFanOut, endDepth, currentDepth, ((Trie<List<K>, V>) this).root);
 
-        if (o!=null) {
+        if (o != null) {
             o.println("termCost: " + s(termCost));
             o.println("sequenceLength: " + s(sequenceLength));
             o.println("branchFanOut: " + s(branchFanOut));
@@ -120,7 +91,7 @@ abstract public class TermTrie<K extends Term, V> {
         return s.getSummary().toString().replace('\n', ' ').replace("StatisticalSummaryValues: ", "");
     }
 
-    public static <K,V> void costAnalyze(@NotNull FloatFunction<K> costFn, @NotNull SummaryStatistics termCost, @NotNull SummaryStatistics sequenceLength, @NotNull SummaryStatistics branchFanOut, @NotNull SummaryStatistics endDepth, int[] currentDepth, @NotNull TrieNode<List<K>, V> root) {
+    public static <K, V> void costAnalyze(@NotNull FloatFunction<K> costFn, @NotNull SummaryStatistics termCost, @NotNull SummaryStatistics sequenceLength, @NotNull SummaryStatistics branchFanOut, @NotNull SummaryStatistics endDepth, int[] currentDepth, @NotNull TrieNode<List<K>, V> root) {
 
         int nc = root.childCount();
         if (nc > 0)
@@ -137,7 +108,7 @@ abstract public class TermTrie<K extends Term, V> {
             sequenceLength.addValue(sqn.size());
 
             for (K k : sqn) {
-                termCost.addValue( costFn.floatValueOf(k) );
+                termCost.addValue(costFn.floatValueOf(k));
             }
 
             //indent(from * 4);
@@ -159,7 +130,45 @@ abstract public class TermTrie<K extends Term, V> {
 
     public String getSummary() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        printSummary(new PrintStream(baos));
+        print(new PrintStream(baos));
         return baos.toString();
     }
+
+    /**
+     * override this to implement custom merging behavior; there can be only one
+     */
+    protected void onMatch(K existing, K incoming) {
+
+    }
+
+
+    @Override
+    public int matches(@NotNull List<K> sequenceA, int indexA, @NotNull List<K> sequenceB, int indexB, int count) {
+        for (int i = 0; i < count; i++) {
+            K a = sequenceA.get(i + indexA);
+            K b = sequenceB.get(i + indexB);
+            if (!a.equals(b))
+                return i;
+            else {
+                onMatch(a, b);
+            }
+        }
+
+        return count;
+    }
+
+
+    @Override
+    public int lengthOf(@NotNull List<K> sequence) {
+        return sequence.size();
+    }
+
+    @Override
+    public int hashOf(@NotNull List<K> sequence, int index) {
+        //return sequence.get(index).hashCode();
+
+        Term pp = sequence.get(index);
+        return conds.getIfAbsentPutWithKey(pp, (p) -> 1 + conds.size());
+    }
+
 }

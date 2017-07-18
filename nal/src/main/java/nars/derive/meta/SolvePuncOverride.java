@@ -12,8 +12,8 @@ public final class SolvePuncOverride extends Solve {
     private final byte puncOverride;
 
 
-    public SolvePuncOverride(Compound i, Conclude der, byte puncOverride, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
-        super(i, der, belief, desire, beliefProjected);
+    public SolvePuncOverride(Compound i, byte puncOverride, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
+        super(i, belief, desire, beliefProjected);
         this.puncOverride = puncOverride;
     }
 

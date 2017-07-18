@@ -8,8 +8,7 @@ import nars.control.premise.Derivation;
 import nars.derive.meta.*;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
 import nars.derive.meta.op.MatchTerm;
-import nars.derive.meta.op.MatchTermPrototype;
-import nars.derive.meta.op.Caused;
+import nars.derive.meta.op.UnificationPrototype;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.term.Term;
@@ -18,12 +17,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 
 /**
@@ -34,40 +34,20 @@ public class TrieDeriver implements Deriver {
     private BoolPred<Derivation> pred;
 
 
-    /**
-     * derivation term graph, gathered for analysis
-     */
-    //public final HashMultimap<MatchTerm,Derive> derivationLinks = HashMultimap.create();
+    public TrieDeriver(PremiseRuleSet r) {
 
-    static final class TermPremiseRuleTermTrie extends TermTrie<Term, PremiseRule> {
+        //return Collections.unmodifiableList(premiseRules);
+        final TermTrie<Term, PremiseRule> trie = new RuleTrie(r);
 
-        public TermPremiseRuleTermTrie(@NotNull PremiseRuleSet ruleset) {
-            super(ruleset.rules);
-        }
 
-        @Override
-        public void index(@Nullable PremiseRule rule) {
+        @NotNull List<BoolPred> bb = subtree(trie.root);
+        BoolPred[] roots = bb.toArray(new BoolPred[bb.size()]);
 
-            assert (rule != null && rule.POST != null) : "Null rule:" + rule;
+        for (int i = 0; i < roots.length; i++)
+            roots[i] = build(roots[i]);
 
-            for (PostCondition p : rule.POST) {
+        this.pred = Fork.compile(roots);
 
-                List<Term> c = rule.conditions(p);
-
-                PremiseRule existing = trie.put(c, rule);
-
-                if (existing != null) {
-                    throw new RuntimeException("Duplicate condition sequence:\n\t" + c + "\n\t" + existing);
-                }
-//                    if (existing != null && s != existing && existing.equals(s)) {
-//                        System.err.println("DUPL: " + existing);
-//                        System.err.println("      " + existing.getSource());
-//                        System.err.println("EXST: " + s.getSource());
-//                        System.err.println();
-//                    }
-//                }
-            }
-        }
     }
 
 
@@ -75,35 +55,170 @@ public class TrieDeriver implements Deriver {
 //        return get(new PremiseRuleSet(true, PremiseRule.rule(individualRule)));
 //    }
 
+    public static void print(Object p, @NotNull PrintStream out, int indent) {
 
-    public TrieDeriver(PremiseRuleSet r) {
+        /*if (p instanceof IfThen) {
 
-        //return Collections.unmodifiableList(premiseRules);
-        final TermTrie<Term, PremiseRule> trie = new TermPremiseRuleTermTrie(r);
+            IfThen it = (IfThen) p;
 
-        Compiler c = new Compiler();
+            TermTrie.indent(indent);
+            out.println(Util.className(p) + " (");
+            print(it.cond, out, indent + 2);
 
-        @NotNull List<BoolPred> bb = c.subtree(trie.trie.root);
-        BoolPred[] roots = bb.toArray(new BoolPred[bb.size()]);
+            TermTrie.indent(indent);
+            out.println(") ==> {");
 
-        for (int i = 0; i < roots.length; i++)
-            roots[i] = c.build(roots[i]);
+            print(it.conseq, out, indent + 2);
+            TermTrie.indent(indent);
+            out.println("}");
 
-        this.pred = Fork.compile(roots);
+        } *//*else if (p instanceof If) {
 
-    }
-
-    public void forEachCause(Consumer<Caused> p) {
-        forEach(pred, (c) -> {
-            if (c instanceof Caused) {
-                p.accept((Caused) c);
+            indent(indent); out.println(Util.className(p) + " {");
+            {
+                If it = (If) p;
+                print(it.cond, out, indent + 2);
             }
-        });
+            indent(indent); out.println("}");
+
+        }  else */
+        if (p instanceof AndCondition) {
+            TermTrie.indent(indent);
+            out.println("and {");
+            AndCondition ac = (AndCondition) p;
+            for (BoolPred b : ac.cache) {
+                print(b, out, indent + 2);
+            }
+            TermTrie.indent(indent);
+            out.println("}");
+        } else if (p instanceof Fork) {
+            TermTrie.indent(indent);
+            out.println(Util.className(p) + " {");
+            Fork ac = (Fork) p;
+            for (BoolPred b : ac.cached) {
+                print(b, out, indent + 2);
+            }
+            TermTrie.indent(indent);
+            out.println("}");
+
+        } else if (p instanceof PatternOpSwitch) {
+            PatternOpSwitch sw = (PatternOpSwitch) p;
+            TermTrie.indent(indent);
+            out.println("SubTermOp" + sw.subterm + " {");
+            int i = -1;
+            for (BoolPred b : sw.proc) {
+                i++;
+                if (b == null) continue;
+
+                TermTrie.indent(indent + 2);
+                out.println('"' + Op.values()[i].toString() + "\": {");
+                print(b, out, indent + 4);
+                TermTrie.indent(indent + 2);
+                out.println("}");
+
+            }
+            TermTrie.indent(indent);
+            out.println("}");
+        } else {
+
+            if (p instanceof UnificationPrototype)
+                ((UnificationPrototype) p).build();
+
+            TermTrie.indent(indent);
+            out.println( /*Util.className(p) + ": " +*/ p);
+
+        }
+
+
     }
 
-    @Override
-    public final boolean test(Derivation d) {
-        return pred.test(d);
+    static void forEach(Object p, @NotNull Consumer out) {
+        out.accept(p);
+
+        /*if (p instanceof IfThen) {
+
+            IfThen it = (IfThen) p;
+
+            TermTrie.indent(indent);
+            out.println(Util.className(p) + " (");
+            print(it.cond, out, indent + 2);
+
+            TermTrie.indent(indent);
+            out.println(") ==> {");
+
+            print(it.conseq, out, indent + 2);
+            TermTrie.indent(indent);
+            out.println("}");
+
+        } *//*else if (p instanceof If) {
+
+            indent(indent); out.println(Util.className(p) + " {");
+            {
+                If it = (If) p;
+                print(it.cond, out, indent + 2);
+            }
+            indent(indent); out.println("}");
+
+        }  else */
+        if (p instanceof AndCondition) {
+            //TermTrie.indent(indent);
+            //out.println("and {");
+            AndCondition ac = (AndCondition) p;
+            for (BoolPred b : ac.cache) {
+                forEach(b, out);
+            }
+        } else if (p instanceof Fork) {
+            //TermTrie.indent(indent);
+            //out.println(Util.className(p) + " {");
+            Fork ac = (Fork) p;
+            for (BoolPred b : ac.cached) {
+                forEach(b, out);
+            }
+//            TermTrie.indent(indent);
+//            out.println("}");
+
+        } else if (p instanceof PatternOpSwitch) {
+            PatternOpSwitch sw = (PatternOpSwitch) p;
+            //TermTrie.indent(indent);
+            //out.println("SubTermOp" + sw.subterm + " {");
+            int i = -1;
+            for (BoolPred b : sw.proc) {
+                i++;
+                if (b == null) continue;
+
+                //TermTrie.indent(indent + 2);
+                //out.println('"' + Op.values()[i].toString() + "\": {");
+                //print(b, out, indent + 4);
+                forEach(b, out);
+                //TermTrie.indent(indent + 2);
+                //out.println("}");
+
+            }
+//            TermTrie.indent(indent);
+//            out.println("}");
+        } else if (p instanceof MatchTerm) {
+            forEach(((MatchTerm) p).eachMatch, out);
+        } else {
+
+            if (p instanceof UnificationPrototype)
+                throw new UnsupportedOperationException();
+            //((MatchTermPrototype) p).build();
+
+//            TermTrie.indent(indent);
+//            out.println( /*Util.className(p) + ": " +*/ p);
+
+
+        }
+
+
+    }
+
+    protected static List<BoolPred> compileSwitch(List<BoolPred> bb) {
+
+        bb = factorSubOpToSwitch(bb, 0, 2);
+        bb = factorSubOpToSwitch(bb, 1, 2);
+
+        return bb;
     }
 
 
@@ -169,210 +284,9 @@ public class TrieDeriver implements Deriver {
 //        return true;
 //    }
 
-
-    public static void print(Object p, @NotNull PrintStream out, int indent) {
-
-        /*if (p instanceof IfThen) {
-
-            IfThen it = (IfThen) p;
-
-            TermTrie.indent(indent);
-            out.println(Util.className(p) + " (");
-            print(it.cond, out, indent + 2);
-
-            TermTrie.indent(indent);
-            out.println(") ==> {");
-
-            print(it.conseq, out, indent + 2);
-            TermTrie.indent(indent);
-            out.println("}");
-
-        } *//*else if (p instanceof If) {
-
-            indent(indent); out.println(Util.className(p) + " {");
-            {
-                If it = (If) p;
-                print(it.cond, out, indent + 2);
-            }
-            indent(indent); out.println("}");
-
-        }  else */
-        if (p instanceof AndCondition) {
-            TermTrie.indent(indent);
-            out.println("and {");
-            AndCondition ac = (AndCondition) p;
-            for (BoolPred b : ac.termCache) {
-                print(b, out, indent + 2);
-            }
-            TermTrie.indent(indent);
-            out.println("}");
-        } else if (p instanceof Fork) {
-            TermTrie.indent(indent);
-            out.println(Util.className(p) + " {");
-            Fork ac = (Fork) p;
-            for (BoolPred b : ac.cached) {
-                print(b, out, indent + 2);
-            }
-            TermTrie.indent(indent);
-            out.println("}");
-
-        } else if (p instanceof PatternOpSwitch) {
-            PatternOpSwitch sw = (PatternOpSwitch) p;
-            TermTrie.indent(indent);
-            out.println("SubTermOp" + sw.subterm + " {");
-            int i = -1;
-            for (BoolPred b : sw.proc) {
-                i++;
-                if (b == null) continue;
-
-                TermTrie.indent(indent + 2);
-                out.println('"' + Op.values()[i].toString() + "\": {");
-                print(b, out, indent + 4);
-                TermTrie.indent(indent + 2);
-                out.println("}");
-
-            }
-            TermTrie.indent(indent);
-            out.println("}");
-        } else {
-
-            if (p instanceof MatchTermPrototype)
-                ((MatchTermPrototype) p).build();
-
-            TermTrie.indent(indent);
-            out.println( /*Util.className(p) + ": " +*/ p);
-
-        }
-
-
-    }
-
-    static void forEach(Object p, @NotNull Consumer out) {
-        out.accept(p);
-
-        /*if (p instanceof IfThen) {
-
-            IfThen it = (IfThen) p;
-
-            TermTrie.indent(indent);
-            out.println(Util.className(p) + " (");
-            print(it.cond, out, indent + 2);
-
-            TermTrie.indent(indent);
-            out.println(") ==> {");
-
-            print(it.conseq, out, indent + 2);
-            TermTrie.indent(indent);
-            out.println("}");
-
-        } *//*else if (p instanceof If) {
-
-            indent(indent); out.println(Util.className(p) + " {");
-            {
-                If it = (If) p;
-                print(it.cond, out, indent + 2);
-            }
-            indent(indent); out.println("}");
-
-        }  else */
-        if (p instanceof AndCondition) {
-            //TermTrie.indent(indent);
-            //out.println("and {");
-            AndCondition ac = (AndCondition) p;
-            for (BoolPred b : ac.termCache) {
-                forEach(b, out);
-            }
-        } else if (p instanceof Fork) {
-            //TermTrie.indent(indent);
-            //out.println(Util.className(p) + " {");
-            Fork ac = (Fork) p;
-            for (BoolPred b : ac.cached) {
-                forEach(b, out);
-            }
-//            TermTrie.indent(indent);
-//            out.println("}");
-
-        } else if (p instanceof PatternOpSwitch) {
-            PatternOpSwitch sw = (PatternOpSwitch) p;
-            //TermTrie.indent(indent);
-            //out.println("SubTermOp" + sw.subterm + " {");
-            int i = -1;
-            for (BoolPred b : sw.proc) {
-                i++;
-                if (b == null) continue;
-
-                //TermTrie.indent(indent + 2);
-                //out.println('"' + Op.values()[i].toString() + "\": {");
-                //print(b, out, indent + 4);
-                forEach(b, out);
-                //TermTrie.indent(indent + 2);
-                //out.println("}");
-
-            }
-//            TermTrie.indent(indent);
-//            out.println("}");
-        } else if (p instanceof MatchTerm) {
-            forEach(((MatchTerm) p).eachMatch, out);
-        } else {
-
-            if (p instanceof MatchTermPrototype)
-                throw new UnsupportedOperationException();
-            //((MatchTermPrototype) p).build();
-
-//            TermTrie.indent(indent);
-//            out.println( /*Util.className(p) + ": " +*/ p);
-
-
-        }
-
-
-    }
-
-    public void print(@NotNull PrintStream out) {
-        print(pred, out, 0);
-
-//        out.println("Fork {");
-//
-//        for (BoolPred p : roots())
-//            print(p, out, 2);
-//
-//        out.println("}");
-    }
-
-    static class Compiler {
-
-        final AtomicReference<MatchTermPrototype> matchParent = new AtomicReference<>(null);
-
-        @NotNull
-        private List<BoolPred> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
-
-
-            List<BoolPred> bb = $.newArrayList(node.childCount());
-
-            node.forEach(n -> {
-
-                BoolPred branch = ifThen(
-                        conditions(n.seq().subList(n.start(), n.end())),
-                        Fork.compile(subtree(n))
-                );
-
-                if (branch != null)
-                    bb.add(branch);
-            });
-
-            return compileSwitch(bb);
-        }
-
-        protected static List<BoolPred> compileSwitch(List<BoolPred> bb) {
-
-            bb = factorSubOpToSwitch(bb, 0, 2);
-            bb = factorSubOpToSwitch(bb, 1, 2);
-
-            return bb;
-        }
-
-        @NotNull
-        private static List<BoolPred> factorSubOpToSwitch(@NotNull List<BoolPred> bb, int subterm, int minToCreateSwitch) {
+    @NotNull
+    private static List<BoolPred> factorSubOpToSwitch(@NotNull List<BoolPred> bb, int subterm, int minToCreateSwitch) {
+        if (!bb.isEmpty()) {
             Map<PatternOp, BoolPred> cases = $.newHashMap(8);
             List<BoolPred> removed = $.newArrayList(); //in order to undo
             bb.removeIf(p -> {
@@ -397,60 +311,116 @@ public class TrieDeriver implements Deriver {
             });
 
 
-            if (cases.size() > minToCreateSwitch) {
-                if (cases.size() != removed.size()) {
+            int numCases = cases.size();
+            if (numCases > minToCreateSwitch) {
+                if (numCases != removed.size()) {
                     throw new RuntimeException("switch fault");
                 }
                 bb.add(new PatternOpSwitch(subterm, cases));
             } else {
                 bb.addAll(removed); //undo
             }
-
-            return bb;
         }
 
+        return bb;
+    }
 
-        /**
-         * final processing step before finalized usable form
-         */
-        private static BoolPred build(BoolPred p) {
+    /**
+     * final processing step before finalized usable form
+     */
+    private static BoolPred build(BoolPred p) {
         /*if (p instanceof IfThen) {
             IfThen it = (IfThen) p;
             return new IfThen(build(it.cond), build(it.conseq) ); //HACK wasteful
         } else */
-            if (p instanceof AndCondition) {
-                AndCondition ac = (AndCondition) p;
-                BoolPred[] termCache = ac.termCache;
-                for (int i = 0; i < termCache.length; i++) {
-                    termCache[i] = build(termCache[i]);
-                }
-            } else if (p instanceof Fork) {
-                Fork ac = (Fork) p;
-                BoolPred[] termCache = ac.cached;
-                for (int i = 0; i < termCache.length; i++) {
-                    termCache[i] = build(termCache[i]);
-                }
-
-            } else if (p instanceof PatternOpSwitch) {
-                PatternOpSwitch sw = (PatternOpSwitch) p;
-                BoolPred[] proc = sw.proc;
-                for (int i = 0; i < proc.length; i++) {
-                    BoolPred b = proc[i];
-                    if (b != null)
-                        proc[i] = build(b);
-                    //else {
-                    //continue
-                    //}
-                }
-            } else {
-
-                if (p instanceof MatchTermPrototype)
-                    return ((MatchTermPrototype) p).build();
-
+        if (p instanceof AndCondition) {
+            AndCondition ac = (AndCondition) p;
+            BoolPred[] termCache = ac.cache;
+            for (int i = 0; i < termCache.length; i++) {
+                termCache[i] = build(termCache[i]);
+            }
+        } else if (p instanceof Fork) {
+            Fork ac = (Fork) p;
+            BoolPred[] termCache = ac.cached;
+            for (int i = 0; i < termCache.length; i++) {
+                termCache[i] = build(termCache[i]);
             }
 
-            return p;
+        } else if (p instanceof PatternOpSwitch) {
+            PatternOpSwitch sw = (PatternOpSwitch) p;
+            BoolPred[] proc = sw.proc;
+            for (int i = 0; i < proc.length; i++) {
+                BoolPred b = proc[i];
+                if (b != null)
+                    proc[i] = build(b);
+                //else {
+                //continue
+                //}
+            }
+        } else {
+
+            if (p instanceof UnificationPrototype)
+                return ((UnificationPrototype) p).build();
+
         }
+
+        return p;
+    }
+
+    @Nullable
+    public static BoolPred ifThen(@NotNull Stream<BoolPred> cond, @Nullable BoolPred conseq) {
+        return AndCondition.the(AndCondition.compile(
+                (conseq != null ? Stream.concat(cond, Stream.of(conseq)) : cond).collect(toList())
+        ));
+    }
+
+    public void forEachConclude(Consumer<Conclude> p) {
+        forEach(pred, (c) -> {
+            if (c instanceof Conclude) {
+                p.accept((Conclude) c);
+            }
+        });
+    }
+
+    @Override
+    public final boolean test(Derivation d) {
+        return pred.test(d);
+    }
+
+    public void print(@NotNull PrintStream out) {
+        print(pred, out, 0);
+
+//        out.println("Fork {");
+//
+//        for (BoolPred p : roots())
+//            print(p, out, 2);
+//
+//        out.println("}");
+    }
+
+    @NotNull
+    private List<BoolPred> subtree(@NotNull TrieNode<List<Term>, PremiseRule> node) {
+
+
+        List<BoolPred> bb = $.newArrayList(node.childCount());
+
+        node.forEach(n -> {
+
+            List<BoolPred> conseq = subtree(n);
+
+            int nStart = n.start();
+            int nEnd = n.end();
+            BoolPred branch = ifThen(
+                    conditions(n.seq().stream().skip(nStart).limit(nEnd - nStart)),
+                    !conseq.isEmpty() ? Fork.compile(conseq) : null
+            );
+
+            if (branch != null)
+                bb.add(branch);
+        });
+
+        return compileSwitch(bb);
+    }
 
 //    public void recurse(@NotNull CauseEffect each) {
 //        for (BoolCondition p : roots) {
@@ -505,191 +475,214 @@ public class TrieDeriver implements Deriver {
 //        return curr;
 //    }
 
-        @NotNull
-        private List<BoolPred> conditions(@NotNull Collection<Term> t) {
-
-            return t.stream().filter(x -> {
-                if (x instanceof Conclude) {
-                    //link this derivation action to the previous Match,
-                    //allowing multiple derivations to fold within a Match's actions
-                    MatchTermPrototype mt = matchParent.get();
-                    if (mt == null) {
-                        throw new RuntimeException("detached Derive action: " + x + " in branch: " + t);
-                        //System.err.println("detached Derive action: " + x + " in branch: " + t);
-                    } else {
-                        //HACK
-                        Conclude dx = (Conclude) x;
-                        mt.derive(dx);
-                        //derivationLinks.put(mt, dx);
-                    }
-                    return false;
-                } else if (x instanceof BoolPred) {
-                    if (x instanceof MatchTermPrototype) {
-                        matchParent.set((MatchTermPrototype) x);
-                    }
-                    //return true;
-                }
-                return true;
-            }).map(x -> (BoolPred) x).collect(Collectors.toList());
-        }
-
-
-        //    @NotNull
-        //    private static ProcTerm compileActions(@NotNull List<ProcTerm> t) {
-        //
-        //        switch (t.size()) {
-        //            case 0: return null;
-        //            case 1:
-        //                return t.get(0);
-        //            default:
-        //                //optimization: find expression prefix types common to all, and see if a switch can be formed
-        //
-        //        }
-        //
-        //    }
-
-
-        @Nullable
-        public static BoolPred ifThen(@NotNull List<BoolPred> cond, @Nullable BoolPred conseq) {
-            //
-            //        BoolCondition cc = AndCondition.the(cond);
-            //
-            //        if (cc != null) {
-
-
-            //return conseq == null ? cc : new IfThen(cc, conseq);
-            List<BoolPred> ccc = $.newArrayList(conseq != null ? conseq.size() : 0 + 1);
-            ccc.addAll(cond);
-            if (conseq != null)
-                ccc.add(conseq);
-            return AndCondition.the(AndCondition.compile(ccc));
-            //
-            //        } else {
-            //            /*if (conseq!=null)
-            //                throw new RuntimeException();*/
-            //            return conseq;
-            //        }
-        }
-
-        //    //TODO not complete
-        //    protected void compile(@NotNull ProcTerm p) throws IOException, CannotCompileException, NotFoundException {
-        //        StringBuilder s = new StringBuilder();
-        //
-        //        final String header = "public final static String wtf=" +
-        //                '"' + this + ' ' + new Date() + "\"+\n" +
-        //                "\"COPYRIGHT (C) OPENNARS. ALL RIGHTS RESERVED.\"+\n" +
-        //                "\"THIS SOURCE CODE AND ITS GENERATOR IS PROTECTED BY THE AFFERO GENERAL PUBLIC LICENSE: https://gnu.org/licenses/agpl.html\"+\n" +
-        //                "\"http://github.com/opennars/opennars\";\n";
-        //
-        //        //System.out.print(header);
-        //        p.appendJavaProcedure(s);
-        //
-        //
-        //        ClassPool pool = ClassPool.getDefault();
-        //        pool.importPackage("nars.truth");
-        //        pool.importPackage("nars.nal");
-        //
-        //        CtClass cc = pool.makeClass("nars.nal.CompiledDeriver");
-        //        CtClass parent = pool.get("nars.nal.Deriver");
-        //
-        //        cc.addField(CtField.make(header, cc));
-        //
-        //        cc.setSuperclass(parent);
-        //
-        //        //cc.addConstructor(parent.getConstructors()[0]);
-        //
-        //        String initCode = "nars.Premise p = m.premise;";
-        //
-        //        String m = "public void run(nars.nal.PremiseMatch m) {\n" +
-        //                '\t' + initCode + '\n' +
-        //                '\t' + s + '\n' +
-        //                '}';
-        //
-        //        System.out.println(m);
-        //
-        //
-        //        cc.addMethod(CtNewMethod.make(m, cc));
-        //        cc.writeFile("/tmp");
-        //
-        //        //System.out.println(cc.toBytecode());
-        //        System.out.println(cc);
-        //    }
-        //
-
-        //final static Logger logger = LoggerFactory.getLogger(TrieDeriver.class);
-
-
-        //    final static void run(RuleMatch m, List<TaskRule> rules, int level, Consumer<Task> t) {
-        //
-        //        final int nr = rules.size();
-        //        for (int i = 0; i < nr; i++) {
-        //
-        //            TaskRule r = rules.get(i);
-        //            if (r.minNAL > level) continue;
-        //
-        //            PostCondition[] pc = m.run(r);
-        //            if (pc != null) {
-        //                for (PostCondition p : pc) {
-        //                    if (p.minNAL > level) continue;
-        //                    ArrayList<Task> Lx = m.apply(p);
-        //                    if(Lx!=null) {
-        //                        for (Task x : Lx) {
-        //                            if (x != null)
-        //                                t.accept(x);
-        //                        }
-        //                    }
-        //                    /*else
-        //                        System.out.println("Post exit: " + r + " on " + m.premise);*/
-        //                }
-        //            }
-        //        }
-        //    }
-
-
-        //    static final class Return extends Atom implements ProcTerm {
-        //
-        //        public static final ProcTerm the = new Return();
-        //
-        //        private Return() {
-        //            super("return");
-        //        }
-        //
-        //
-        //        @Override
-        //        public void appendJavaProcedure(@NotNull StringBuilder s) {
-        //            s.append("return;");
-        //        }
-        //
-        //        @Override
-        //        public void accept(PremiseEval versioneds) {
-        //            System.out.println("why call this");
-        //            //throw new UnsupportedOperationException("should not be invoked");
-        //        }
-        //
-        //    }
-
-        //    /** just evaluates a boolean condition HACK */
-        //    static final class If extends GenericCompound implements ProcTerm {
-        //
-        //
-        //        public final transient @NotNull BoolCondition cond;
-        //
-        //
-        //        public If(@NotNull BoolCondition cond) {
-        //            super(Op.IMPLICATION,
-        //                    TermVector.the( cond, Return.the)
-        //            );
-        //
-        //            this.cond = cond;
-        //        }
-        //
-        //        @Override public void accept(@NotNull PremiseEval m) {
-        //            final int stack = m.now();
-        //            cond.booleanValueOf(m);
-        //            m.revert(stack);
-        //        }
-        //
-        //    }
+    @NotNull
+    private Stream<BoolPred> conditions(@NotNull Stream<Term> t) {
+//
+//            final AtomicReference<UnificationPrototype> unificationParent = new AtomicReference<>(null);
+//
+//            return t.filter(x -> {
+//                if (x instanceof Conclude) {
+//                    //link this derivation action to the previous Match,
+//                    //allowing multiple derivations to fold within a Match's actions
+//                    UnificationPrototype mt = unificationParent.getAndSet(null);
+//                    if (mt == null) {
+//                        throw new RuntimeException("detached Derive action: " + x + " in branch: " + t);
+//                        //System.err.println("detached Derive action: " + x + " in branch: " + t);
+//                    } else {
+//                        mt.derive((Conclude) x);
+//                    }
+//                    return false;
+//                } else if (x instanceof BoolPred) {
+//                    if (x instanceof UnificationPrototype) {
+//
+//                        unificationParent.set((UnificationPrototype) x);
+//                    }
+//                }
+//                return true;
+        return t./*filter(x -> !(x instanceof Conclude)).*/map(x -> (BoolPred) x);
     }
+
+
+    //    @NotNull
+    //    private static ProcTerm compileActions(@NotNull List<ProcTerm> t) {
+    //
+    //        switch (t.size()) {
+    //            case 0: return null;
+    //            case 1:
+    //                return t.get(0);
+    //            default:
+    //                //optimization: find expression prefix types common to all, and see if a switch can be formed
+    //
+    //        }
+    //
+    //    }
+
+    /**
+     * derivation term graph, gathered for analysis
+     */
+    //public final HashMultimap<MatchTerm,Derive> derivationLinks = HashMultimap.create();
+
+    static final class RuleTrie extends TermTrie<Term, PremiseRule> {
+
+        public RuleTrie(@NotNull PremiseRuleSet ruleset) {
+            super();
+            ruleset.rules.forEach(this::put);
+        }
+
+        @Override
+        protected void onMatch(Term existing, Term incoming) {
+            if (existing instanceof UnificationPrototype) {
+                //merge the set of conclusions where overlapping
+                TreeSet<Conclude> incomingConcs = ((UnificationPrototype) incoming).conclude;
+                ((UnificationPrototype) existing).conclude.addAll(incomingConcs);
+                incomingConcs.clear();
+            }
+        }
+
+        @Override
+        public void put(@Nullable PremiseRule rule) {
+
+            assert (rule != null && rule.POST != null) : "Null rule:" + rule;
+
+            for (PostCondition p : rule.POST) {
+
+                List<Term> c = rule.conditions(p);
+
+                PremiseRule existing = put(c, rule);
+
+//                if (existing != null) {
+//                    throw new RuntimeException("Duplicate condition sequence:\n\t" + c + "\n\t" + existing);
+//                }
+//                    if (existing != null && s != existing && existing.equals(s)) {
+//                        System.err.println("DUPL: " + existing);
+//                        System.err.println("      " + existing.getSource());
+//                        System.err.println("EXST: " + s.getSource());
+//                        System.err.println();
+//                    }
+//                }
+            }
+        }
+    }
+
+    //    //TODO not complete
+    //    protected void compile(@NotNull ProcTerm p) throws IOException, CannotCompileException, NotFoundException {
+    //        StringBuilder s = new StringBuilder();
+    //
+    //        final String header = "public final static String wtf=" +
+    //                '"' + this + ' ' + new Date() + "\"+\n" +
+    //                "\"COPYRIGHT (C) OPENNARS. ALL RIGHTS RESERVED.\"+\n" +
+    //                "\"THIS SOURCE CODE AND ITS GENERATOR IS PROTECTED BY THE AFFERO GENERAL PUBLIC LICENSE: https://gnu.org/licenses/agpl.html\"+\n" +
+    //                "\"http://github.com/opennars/opennars\";\n";
+    //
+    //        //System.out.print(header);
+    //        p.appendJavaProcedure(s);
+    //
+    //
+    //        ClassPool pool = ClassPool.getDefault();
+    //        pool.importPackage("nars.truth");
+    //        pool.importPackage("nars.nal");
+    //
+    //        CtClass cc = pool.makeClass("nars.nal.CompiledDeriver");
+    //        CtClass parent = pool.get("nars.nal.Deriver");
+    //
+    //        cc.addField(CtField.make(header, cc));
+    //
+    //        cc.setSuperclass(parent);
+    //
+    //        //cc.addConstructor(parent.getConstructors()[0]);
+    //
+    //        String initCode = "nars.Premise p = m.premise;";
+    //
+    //        String m = "public void run(nars.nal.PremiseMatch m) {\n" +
+    //                '\t' + initCode + '\n' +
+    //                '\t' + s + '\n' +
+    //                '}';
+    //
+    //        System.out.println(m);
+    //
+    //
+    //        cc.addMethod(CtNewMethod.make(m, cc));
+    //        cc.writeFile("/tmp");
+    //
+    //        //System.out.println(cc.toBytecode());
+    //        System.out.println(cc);
+    //    }
+    //
+
+    //final static Logger logger = LoggerFactory.getLogger(TrieDeriver.class);
+
+
+    //    final static void run(RuleMatch m, List<TaskRule> rules, int level, Consumer<Task> t) {
+    //
+    //        final int nr = rules.size();
+    //        for (int i = 0; i < nr; i++) {
+    //
+    //            TaskRule r = rules.get(i);
+    //            if (r.minNAL > level) continue;
+    //
+    //            PostCondition[] pc = m.run(r);
+    //            if (pc != null) {
+    //                for (PostCondition p : pc) {
+    //                    if (p.minNAL > level) continue;
+    //                    ArrayList<Task> Lx = m.apply(p);
+    //                    if(Lx!=null) {
+    //                        for (Task x : Lx) {
+    //                            if (x != null)
+    //                                t.accept(x);
+    //                        }
+    //                    }
+    //                    /*else
+    //                        System.out.println("Post exit: " + r + " on " + m.premise);*/
+    //                }
+    //            }
+    //        }
+    //    }
+
+
+    //    static final class Return extends Atom implements ProcTerm {
+    //
+    //        public static final ProcTerm the = new Return();
+    //
+    //        private Return() {
+    //            super("return");
+    //        }
+    //
+    //
+    //        @Override
+    //        public void appendJavaProcedure(@NotNull StringBuilder s) {
+    //            s.append("return;");
+    //        }
+    //
+    //        @Override
+    //        public void accept(PremiseEval versioneds) {
+    //            System.out.println("why call this");
+    //            //throw new UnsupportedOperationException("should not be invoked");
+    //        }
+    //
+    //    }
+
+    //    /** just evaluates a boolean condition HACK */
+    //    static final class If extends GenericCompound implements ProcTerm {
+    //
+    //
+    //        public final transient @NotNull BoolCondition cond;
+    //
+    //
+    //        public If(@NotNull BoolCondition cond) {
+    //            super(Op.IMPLICATION,
+    //                    TermVector.the( cond, Return.the)
+    //            );
+    //
+    //            this.cond = cond;
+    //        }
+    //
+    //        @Override public void accept(@NotNull PremiseEval m) {
+    //            final int stack = m.now();
+    //            cond.booleanValueOf(m);
+    //            m.revert(stack);
+    //        }
+    //
+    //    }
+
 
 }

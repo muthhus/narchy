@@ -16,6 +16,8 @@
 
 package jcog.trie;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 
 
@@ -41,7 +43,7 @@ public class Trie<S, T> implements Map<S, T> {
     private static final EmptyContainer<?> EMPTY_CONTAINER = new EmptyContainer<>();
 
     public final TrieNode<S, T> root;
-    private final TrieSequencer<S> sequencer;
+    public final TrieSequencer<S> sequencer;
     private TrieMatch defaultMatch = TrieMatch.STARTS_WITH;
 
     private final SequenceSet sequences;
@@ -62,17 +64,18 @@ public class Trie<S, T> implements Map<S, T> {
      * Instantiates a new Trie.
      *
      * @param sequencer    The TrieSequencer which handles the necessary sequence operations.
+     *                     if sequencer is null, the constructor will attempt to cast the class itself as the sequencer.
      * @param defaultValue The default value of the Trie is the value returned when
      *                     {@link #get(Object)} or {@link #get(Object, TrieMatch)} is called
      *                     and no match was found.
      */
-    public Trie(TrieSequencer<S> sequencer, T defaultValue) {
+    public Trie(@Nullable TrieSequencer<S> sequencer, T defaultValue) {
         root = new TrieNode<>(null, defaultValue, null, 0, 0, new PerfectHashMap<>());
         sequences = new SequenceSet(root);
         values = new ValueCollection(root);
         entries = new EntrySet(root);
         nodes = new NodeSet(root);
-        this.sequencer = sequencer;
+        this.sequencer = sequencer!=null ? sequencer : (TrieSequencer)this;
     }
 
     /**

@@ -58,424 +58,367 @@ import java.util.function.Consumer;
  * You can tell a valued branch or leaf apart by {@link #childCount()}, if it
  * returns 0 then it's a leaf, otherwise it's a branch.
  * </p>
- * 
- * 
+ *
  * @author Philip Diffenderfer
- * 
  */
-public class TrieNode<S, T> implements Entry<S, T>
-{
+public class TrieNode<S, T> implements Entry<S, T> {
 
-   protected TrieNode<S, T> parent;
-   protected T value;
-   protected S sequence;
-   protected final int start;
-   protected int end;
-   protected PerfectHashMap<TrieNode<S, T>> children;
-   protected int size;
+    protected TrieNode<S, T> parent;
+    protected T value;
+    protected S sequence;
+    protected final int start;
+    protected int end;
+    protected PerfectHashMap<TrieNode<S, T>> children;
+    protected int size;
 
-   /**
-    * Instantiates a new TrieNode.
-    * 
-    * @param parent
-    *        The parent to this node.
-    * @param value
-    *        The value of this node.
-    * @param sequence
-    *        The sequence of this node.
-    * @param start
-    *        The start of the sequence for this node, typically the end of the
-    *        parent.
-    * @param end
-    *        The end of the sequence for this node.
-    * @param children
-    *        The intial set of children.
-    */
-   protected TrieNode( TrieNode<S, T> parent, T value, S sequence, int start, int end, PerfectHashMap<TrieNode<S, T>> children )
-   {
-      this.parent = parent;
-      this.sequence = sequence;
-      this.start = start;
-      this.end = end;
-      this.children = children;
-      size = calculateSize( children );
-      setValue( value );
-   }
+    /**
+     * Instantiates a new TrieNode.
+     *
+     * @param parent   The parent to this node.
+     * @param value    The value of this node.
+     * @param sequence The sequence of this node.
+     * @param start    The start of the sequence for this node, typically the end of the
+     *                 parent.
+     * @param end      The end of the sequence for this node.
+     * @param children The intial set of children.
+     */
+    protected TrieNode(TrieNode<S, T> parent, T value, S sequence, int start, int end, PerfectHashMap<TrieNode<S, T>> children) {
+        this.parent = parent;
+        this.sequence = sequence;
+        this.start = start;
+        this.end = end;
+        this.children = children;
+        size = calculateSize(children);
+        setValue(value);
+    }
 
-   /**
-    * Splits this node at the given relative index and returns the TrieNode with
-    * the sequence starting at index. The returned TrieNode has this node's
-    * sequence, value, and children. The returned TrieNode is also the only
-    * child of this node when this method returns.
-    * 
-    * @param index
-    *        The relative index (starting at 0 and going to end - start - 1) in
-    *        the sequence.
-    * @param newValue
-    *        The new value of this node.
-    * @param sequencer
-    *        The sequencer used to add the returned node to this node.
-    * @return The reference to the child node created that's sequence starts at
-    *         index.
-    * 
-    */
-   protected TrieNode<S, T> split( int index, T newValue, TrieSequencer<S> sequencer )
-   {
-      TrieNode<S, T> c = new TrieNode<>(this, value, sequence, index + start, end, children);
-      c.registerAsParent();
+    /**
+     * Splits this node at the given relative index and returns the TrieNode with
+     * the sequence starting at index. The returned TrieNode has this node's
+     * sequence, value, and children. The returned TrieNode is also the only
+     * child of this node when this method returns.
+     *
+     * @param index     The relative index (starting at 0 and going to end - start - 1) in
+     *                  the sequence.
+     * @param newValue  The new value of this node.
+     * @param sequencer The sequencer used to add the returned node to this node.
+     * @return The reference to the child node created that's sequence starts at
+     * index.
+     */
+    protected TrieNode<S, T> split(int index, T newValue, TrieSequencer<S> sequencer) {
+        TrieNode<S, T> c = new TrieNode<>(this, value, sequence, index + start, end, children);
+        c.registerAsParent();
 
-      setValue( null );
-      setValue( newValue );
-      end = index + start;
-      children = null;
+        setValue(null);
+        setValue(newValue);
+        end = index + start;
+        children = null;
 
-      add( c, sequencer );
+        add(c, sequencer);
 
-      return c;
-   }
+        return c;
+    }
 
-   /**
-    * Adds the given child to this TrieNode. The child TrieNode is expected to
-    * have had this node's reference passed to it's constructor as the parent
-    * parameter. This needs to be done to keep the size calculations accurate.
-    * 
-    * @param child
-    *        The TrieNode to add as a child.
-    * @param sequencer
-    *        The sequencer to use to determine the place of the node in the
-    *        children PerfectHashMap.
-    */
-   protected void add( TrieNode<S, T> child, TrieSequencer<S> sequencer )
-   {
-      int hash = sequencer.hashOf( child.sequence, end );
+    /**
+     * Adds the given child to this TrieNode. The child TrieNode is expected to
+     * have had this node's reference passed to it's constructor as the parent
+     * parameter. This needs to be done to keep the size calculations accurate.
+     *
+     * @param child     The TrieNode to add as a child.
+     * @param sequencer The sequencer to use to determine the place of the node in the
+     *                  children PerfectHashMap.
+     */
+    protected void add(TrieNode<S, T> child, TrieSequencer<S> sequencer) {
+        int hash = sequencer.hashOf(child.sequence, end);
 
-      if (children == null)
-      {
-         children = new PerfectHashMap<>(hash, child);
-      }
-      else
-      {
-         children.put( hash, child );
-      }
-   }
+        if (children == null) {
+            children = new PerfectHashMap<>(hash, child);
+        } else {
+            children.put(hash, child);
+        }
+    }
 
-   public void forEach(Consumer<TrieNode<S,T>> childConsumer) {
-      if (children == null) return;
+    public void forEach(Consumer<TrieNode<S, T>> childConsumer) {
+        if (children == null) return;
 
-      Object[] vv = children.values;
-      if ((vv == null) || (vv.length == 0)) return;
+        Object[] vv = children.values;
+        if ((vv == null) || (vv.length == 0)) return;
 
-      for (Object x : vv) {
-         if (x == null) continue;
-         childConsumer.accept((TrieNode<S,T>)x);
-      }
-   }
+        for (Object x : vv) {
+            if (x == null) continue;
+            childConsumer.accept((TrieNode<S, T>) x);
+        }
+    }
 
-   public void forEach(BiConsumer<TrieNode<S,T>, TrieNode<S,T>> parentChildConsumer) {
-      if (children == null) return;
-      Object[] vv = children.values;
-      if ((vv == null) || (vv.length == 0)) return;
+    public void forEach(BiConsumer<TrieNode<S, T>, TrieNode<S, T>> parentChildConsumer) {
+        if (children == null) return;
+        Object[] vv = children.values;
+        if ((vv == null) || (vv.length == 0)) return;
 
-      for (Object x /*TrieNode<S,T> x*/ : vv) {
-         if (x == null) continue;
-         TrieNode<S,T> xx = (TrieNode<S,T>)x;
-         parentChildConsumer.accept(this, xx);
-         xx.forEach(parentChildConsumer);
-      }
-   }
+        for (Object x /*TrieNode<S,T> x*/ : vv) {
+            if (x == null) continue;
+            TrieNode<S, T> xx = (TrieNode<S, T>) x;
+            parentChildConsumer.accept(this, xx);
+            xx.forEach(parentChildConsumer);
+        }
+    }
 
-   /**
-    * Removes this node from the Trie and appropriately adjusts it's parent and
-    * children.
-    * 
-    * @param sequencer
-    *        The sequencer to use to determine the place of this node in this
-    *        nodes sibling PerfectHashMap.
-    */
-   protected void remove( TrieSequencer<S> sequencer )
-   {
-      // Decrement size if this node had a value
-      setValue( null );
+    /**
+     * Removes this node from the Trie and appropriately adjusts it's parent and
+     * children.
+     *
+     * @param sequencer The sequencer to use to determine the place of this node in this
+     *                  nodes sibling PerfectHashMap.
+     */
+    protected void remove(TrieSequencer<S> sequencer) {
+        // Decrement size if this node had a value
+        setValue(null);
 
-      int childCount = (children == null ? 0 : children.size());
+        int childCount = (children == null ? 0 : children.size());
 
-      // When there are no children, remove this node from it's parent.
-      if (childCount == 0)
-      {
-         parent.children.remove( sequencer.hashOf( sequence, start ) );
-      }
-      // With one child, become the child!
-      else if (childCount == 1)
-      {
-         TrieNode<S, T> child = children.valueAt( 0 );
+        // When there are no children, remove this node from it's parent.
+        if (childCount == 0) {
+            parent.children.remove(sequencer.hashOf(sequence, start));
+        }
+        // With one child, become the child!
+        else if (childCount == 1) {
+            TrieNode<S, T> child = children.valueAt(0);
 
-         children = child.children;
-         value = child.value;
-         sequence = child.sequence;
-         end = child.end;
+            children = child.children;
+            value = child.value;
+            sequence = child.sequence;
+            end = child.end;
 
-         child.children = null;
-         child.parent = null;
-         child.sequence = null;
-         child.value = null;
+            child.children = null;
+            child.parent = null;
+            child.sequence = null;
+            child.value = null;
 
-         registerAsParent();
-      }
-   }
+            registerAsParent();
+        }
+    }
 
-   /**
-    * Adds the given size to this TrieNode and it's parents.
-    * 
-    * @param amount
-    *        The amount of size to add.
-    */
-   private void addSize( int amount )
-   {
-      TrieNode<S, T> curr = this;
+    /**
+     * Adds the given size to this TrieNode and it's parents.
+     *
+     * @param amount The amount of size to add.
+     */
+    private void addSize(int amount) {
+        TrieNode<S, T> curr = this;
 
-      while (curr != null)
-      {
-         curr.size += amount;
-         curr = curr.parent;
-      }
-   }
+        while (curr != null) {
+            curr.size += amount;
+            curr = curr.parent;
+        }
+    }
 
-   /**
-    * Sums the sizes of all non-null TrieNodes in the given map.
-    * 
-    * @param nodes
-    *        The map to calculate the total size of.
-    * @return The total size of the given map.
-    */
-   private int calculateSize( PerfectHashMap<TrieNode<S, T>> nodes )
-   {
-      int size = 0;
+    /**
+     * Sums the sizes of all non-null TrieNodes in the given map.
+     *
+     * @param nodes The map to calculate the total size of.
+     * @return The total size of the given map.
+     */
+    private int calculateSize(PerfectHashMap<TrieNode<S, T>> nodes) {
+        int size = 0;
 
-      if (nodes != null)
-      {
-         for (int i = nodes.capacity() - 1; i >= 0; i--)
-         {
-            TrieNode<S, T> n = nodes.valueAt( i );
+        if (nodes != null) {
+            for (int i = nodes.capacity() - 1; i >= 0; i--) {
+                TrieNode<S, T> n = nodes.valueAt(i);
 
-            if (n != null)
-            {
-               size += n.size;
+                if (n != null) {
+                    size += n.size;
+                }
             }
-         }
-      }
+        }
 
-      return size;
-   }
+        return size;
+    }
 
-   /**
-    * Ensures all child TrieNodes to this node are pointing to the correct
-    * parent (this).
-    */
-   private void registerAsParent()
-   {
-      if (children != null)
-      {
-         for (int i = 0; i < children.capacity(); i++)
-         {
-            TrieNode<S, T> c = children.valueAt( i );
+    /**
+     * Ensures all child TrieNodes to this node are pointing to the correct
+     * parent (this).
+     */
+    private void registerAsParent() {
+        if (children != null) {
+            for (int i = 0; i < children.capacity(); i++) {
+                TrieNode<S, T> c = children.valueAt(i);
 
-            if (c != null)
-            {
-               c.parent = this;
+                if (c != null) {
+                    c.parent = this;
+                }
             }
-         }
-      }
-   }
+        }
+    }
 
-   /**
-    * Returns whether this TrieNode has children.
-    * 
-    * @return True if children exist, otherwise false.
-    */
-   public boolean hasChildren()
-   {
-      return children != null && !children.isEmpty();
-   }
+    /**
+     * Returns whether this TrieNode has children.
+     *
+     * @return True if children exist, otherwise false.
+     */
+    public boolean hasChildren() {
+        return children != null && !children.isEmpty();
+    }
 
-   /**
-    * Returns the parent of this TrieNode. If this TrieNode doesn't have a
-    * parent it signals that this TrieNode is the root of a Trie and null will
-    * be returned.
-    * 
-    * @return The reference to the parent of this node, or null if this is a
-    *         root node.
-    */
-   public TrieNode<S, T> getParent()
-   {
-      return parent;
-   }
+    /**
+     * Returns the parent of this TrieNode. If this TrieNode doesn't have a
+     * parent it signals that this TrieNode is the root of a Trie and null will
+     * be returned.
+     *
+     * @return The reference to the parent of this node, or null if this is a
+     * root node.
+     */
+    public TrieNode<S, T> getParent() {
+        return parent;
+    }
 
-   /**
-    * The value of this TrieNode.
-    * 
-    * @return The value of this TrieNode or null if this TrieNode is a branching
-    *         node only (has children but the sequence in this node was never
-    *         directly added).
-    */
-   @Override
-   public T getValue()
-   {
-      return value;
-   }
+    /**
+     * The value of this TrieNode.
+     *
+     * @return The value of this TrieNode or null if this TrieNode is a branching
+     * node only (has children but the sequence in this node was never
+     * directly added).
+     */
+    @Override
+    public T getValue() {
+        return value;
+    }
 
-   /**
-    * The complete sequence of this TrieNode. The actual sequence
-    * is a sub-sequence that starts at {@link #start()} (inclusive) and ends
-    * at {@link #end()} (exclusive).
-    * 
-    * @return The complete sequence of this TrieNode.
-    */
-   public S seq()
-   {
-      return sequence;
-   }
+    /**
+     * The complete sequence of this TrieNode. The actual sequence
+     * is a sub-sequence that starts at {@link #start()} (inclusive) and ends
+     * at {@link #end()} (exclusive).
+     *
+     * @return The complete sequence of this TrieNode.
+     */
+    public S seq() {
+        return sequence;
+    }
 
-   /**
-    * The start of the sequence in this TrieNode.
-    * 
-    * @return The start of the sequence in this TrieNode, greater than or equal
-    *         to 0 and less than {@link #end()}. In the case of
-    *         the root node: {@link #start()} == {@link #end()}.
-    */
-   public int start()
-   {
-      return start;
-   }
+    /**
+     * The start of the sequence in this TrieNode.
+     *
+     * @return The start of the sequence in this TrieNode, greater than or equal
+     * to 0 and less than {@link #end()}. In the case of
+     * the root node: {@link #start()} == {@link #end()}.
+     */
+    public int start() {
+        return start;
+    }
 
-   /**
-    * The end of the sequence in this TrieNode.
-    * 
-    * @return The end of the sequence in this TrieNode, greater than
-    *         {@link #start()}. In the case of the root node:
-    *         {@link #start()} == {@link #end()}.
-    */
-   public int end()
-   {
-      return end;
-   }
+    /**
+     * The end of the sequence in this TrieNode.
+     *
+     * @return The end of the sequence in this TrieNode, greater than
+     * {@link #start()}. In the case of the root node:
+     * {@link #start()} == {@link #end()}.
+     */
+    public int end() {
+        return end;
+    }
 
-   /**
-    * Returns the number of non-null values that exist in ALL child nodes
-    * (including this node's value).
-    * 
-    * @return The number of non-null values and valid sequences.
-    */
-   public int getSize()
-   {
-      return size;
-   }
+    /**
+     * Returns the number of non-null values that exist in ALL child nodes
+     * (including this node's value).
+     *
+     * @return The number of non-null values and valid sequences.
+     */
+    public int getSize() {
+        return size;
+    }
 
-   /**
-    * Returns the number of direct children.
-    * 
-    * @return The number of direct children in this node.
-    */
-   public int childCount()
-   {
-      return (children == null ? 0 : children.size());
-   }
+    /**
+     * Returns the number of direct children.
+     *
+     * @return The number of direct children in this node.
+     */
+    public int childCount() {
+        return (children == null ? 0 : children.size());
+    }
 
-   /**
-    * Calculates the root node by traversing through all parents until it found
-    * it.
-    * 
-    * @return The root of the {@link Trie} this TrieNode.
-    */
-   public TrieNode<S, T> getRoot()
-   {
-      TrieNode<S, T> n = parent;
+    /**
+     * Calculates the root node by traversing through all parents until it found
+     * it.
+     *
+     * @return The root of the {@link Trie} this TrieNode.
+     */
+    public TrieNode<S, T> getRoot() {
+        TrieNode<S, T> n = parent;
 
-      while (n.parent != null) {
-         n = n.parent;
-      }
+        while (n.parent != null) {
+            n = n.parent;
+        }
 
-      return n;
-   }
+        return n;
+    }
 
-   /**
-    * @return True if this node is a root, otherwise false.
-    */
-   public boolean isRoot()
-   {
-      return (parent == null);
-   }
+    /**
+     * @return True if this node is a root, otherwise false.
+     */
+    public boolean isRoot() {
+        return (parent == null);
+    }
 
-   /**
-    * @return True if this node is a root or a naked (branch only) node,
-    *         otherwise false.
-    */
-   public boolean isNaked()
-   {
-      return (value == null);
-   }
+    /**
+     * @return True if this node is a root or a naked (branch only) node,
+     * otherwise false.
+     */
+    public boolean isNaked() {
+        return (value == null);
+    }
 
-   /**
-    * @return True if this node has a non-null value (is not a root or naked
-    *         node).
-    */
-   public boolean hasValue()
-   {
-      return (value != null);
-   }
+    /**
+     * @return True if this node has a non-null value (is not a root or naked
+     * node).
+     */
+    public boolean hasValue() {
+        return (value != null);
+    }
 
-   @Override
-   public S getKey()
-   {
-      return sequence;
-   }
+    @Override
+    public S getKey() {
+        return sequence;
+    }
 
-   @Override
-   public T setValue( T newValue )
-   {
-      T previousValue = value;
+    @Override
+    public T setValue(T newValue) {
+        T previousValue = value;
 
-      boolean nulled = (value = newValue) == null;
+        boolean nulled = (value = newValue) == null;
 
-      if (previousValue == null && !nulled)
-      {
-         addSize( 1 );
-      }
-      else if (previousValue != null && nulled)
-      {
-         addSize( -1 );
-      }
+        if (previousValue == null && !nulled) {
+            addSize(1);
+        } else if (previousValue != null && nulled) {
+            addSize(-1);
+        }
 
-      return previousValue;
-   }
+        return previousValue;
+    }
 
-   @Override
-   public int hashCode()
-   {
-      return (sequence == null ? 0 : sequence.hashCode())
-         ^ (value == null ? 0 : value.hashCode());
-   }
+    @Override
+    public int hashCode() {
+        return (sequence == null ? 0 : sequence.hashCode())
+                ^ (value == null ? 0 : value.hashCode());
+    }
 
-   @Override
-   public String toString()
-   {
-      return sequence + "=" + value;
-   }
+    @Override
+    public String toString() {
+        return sequence + "=" + value;
+    }
 
-   @Override
-   public boolean equals( Object o )
-   {
-      if (/*o == null ||*/ !(o instanceof TrieNode)) {
-         return false;
-      }
+    @Override
+    public boolean equals(Object o) {
+        if (/*o == null ||*/ !(o instanceof TrieNode)) {
+            return false;
+        }
 
-      TrieNode node = (TrieNode)o;
+        TrieNode node = (TrieNode) o;
 
-      Object nv = node.value;
-      Object ns = node.sequence;
-      S ts = sequence;
-      T tv = value;
-      return (ts == ns || ts.equals(ns)) &&
-         (tv == nv || (tv != null && nv != null && tv.equals(nv)));
-   }
+        Object nv = node.value;
+        Object ns = node.sequence;
+        S ts = sequence;
+        T tv = value;
+        return (ts == ns || ts.equals(ns)) &&
+                (tv == nv || (tv != null && nv != null && tv.equals(nv)));
+    }
 
 }

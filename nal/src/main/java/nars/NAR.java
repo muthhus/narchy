@@ -5,7 +5,6 @@ import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
 import jcog.Util;
-import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
@@ -25,7 +24,7 @@ import nars.control.Activate;
 import nars.control.Cause;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.op.Caused;
+import nars.derive.meta.Conclude;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.nar.exe.Executioner;
@@ -257,12 +256,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.emotion = new Emotion(this);
 
         this.deriver = new TrieDeriver(Deriver.DEFAULT_RULES);
-        deriver.forEachCause((Caused x) -> {
-            if (x.cause != null) // a re-used copy from rule permutes? TODO why?
-                return;
-            //assert(x.cause == null);
-            x.cause = newCause(x);
-        });
+        deriver.forEachConclude(x -> x.setCause( newCause(x).id ) );
 
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);

@@ -10,8 +10,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public final class SolvePuncFromTask extends Solve {
 
-    public SolvePuncFromTask(Compound i, Conclude der, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
-        super(i, der, belief, desire, beliefProjected);
+    public SolvePuncFromTask(Compound i, TruthOperator belief, TruthOperator desire, boolean beliefProjected) {
+        super(i, belief, desire, beliefProjected);
     }
 
     @Override

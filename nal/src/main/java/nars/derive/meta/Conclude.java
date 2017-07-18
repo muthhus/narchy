@@ -21,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import static nars.Op.ATOM;
 import static nars.Op.NEG;
 import static nars.term.Terms.compoundOrNull;
@@ -49,12 +51,17 @@ public final class Conclude extends AbstractPred<Derivation> {
 
     public final TruthOperator belief, goal;
 
+    /** provided later */
+    private short cause = -1;
+
+    final static AtomicInteger serial = new AtomicInteger();
 
     public Conclude(@NotNull PremiseRule rule, @NotNull Term conclusionPattern,
                     @Nullable TruthOperator belief, @Nullable TruthOperator goal,
                     @NotNull TimeFunctions time) {
         super($.func((Atomic) $.the("conc"),
-                conclusionPattern, $.the(/*"time" + */time.toString())));
+                $.the(serial), conclusionPattern, $.the(/*"time" + */time.toString())));
+
 
         this.rule = rule;
         this.time = time;
@@ -240,8 +247,8 @@ public final class Conclude extends AbstractPred<Derivation> {
 
                 DerivedTask t =
                         Param.DEBUG ?
-                                new DebugDerivedTask(C, punc, truth, d, start, end, d.cause.id) :
-                                new DerivedTask(C, punc, truth, d, start, end, d.cause.id);
+                                new DebugDerivedTask(C, punc, truth, d, start, end, cause) :
+                                new DerivedTask(C, punc, truth, d, start, end, cause);
 
                 if (t.equals(d.task) || t.equals(d.belief)) {
                     return true; //created a duplicate of the task
@@ -271,6 +278,11 @@ public final class Conclude extends AbstractPred<Derivation> {
     @Override
     public Op op() {
         return ATOM; //product?
+    }
+
+    public void setCause(short id) {
+        assert(this.cause == -1): "cause was already set to: " + cause + ", why set now to: " + id;
+        this.cause = id;
     }
 
 

@@ -78,7 +78,7 @@ public class FasterList<X> extends FastList<X> {
 
     @Override
     public int size() {
-        assert (size >= 0);
+        //assert (size >= 0);
         return size;
     }
 

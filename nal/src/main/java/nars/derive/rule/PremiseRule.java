@@ -158,7 +158,39 @@ public class PremiseRule extends GenericCompound {
     public List<Term> conditions(@NotNull PostCondition post) {
 
         Set<Term> s = newHashSet(16); //for ensuring uniqueness / no duplicates
-        Solve truth = solve(post, this, timeFunction, beliefProjected);
+
+        byte puncOverride = post.puncOverride;
+
+        TruthOperator belief = BeliefFunction.get(post.beliefTruth);
+        if ((post.beliefTruth != null) && !post.beliefTruth.equals(TruthOperator.NONE) && (belief == null)) {
+            throw new RuntimeException("unknown BeliefFunction: " + post.beliefTruth);
+        }
+        TruthOperator goal = GoalFunction.get(post.goalTruth);
+        if ((post.goalTruth != null) && !post.goalTruth.equals(TruthOperator.NONE) && (goal == null)) {
+            throw new RuntimeException("unknown GoalFunction: " + post.goalTruth);
+        }
+
+        Conclude conc = new Conclude(this, post.pattern, belief, goal, timeFunction);
+
+        String beliefLabel = belief != null ? belief.toString() : "_";
+        String goalLabel = goal != null ? goal.toString() : "_";
+
+        List<Term> args = $.newArrayList(
+                $.the(beliefLabel),
+                $.the(goalLabel)
+        );
+        if (puncOverride != 0)
+            args.add($.quote(/*"conc" +*/ ((char) puncOverride)));
+
+        if (!beliefProjected)
+            args.add($.the("unproj"));
+
+        Compound ii = $.func("truth", args);
+
+
+        Solve truth = puncOverride == 0 ?
+                new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
+                new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
 
         //PREFIX
         {
@@ -176,9 +208,10 @@ public class PremiseRule extends GenericCompound {
 
         //SUFFIX (order already determined for matching)
         {
+
             l.addAll(match.post);
 
-            l.add(truth.conclude); //will be linked to and invoked by match callbacks
+            ((UnificationPrototype)match.post.get(match.post.size()-1)).conclude.add(conc);
         }
 
         return l;
@@ -307,46 +340,6 @@ public class PremiseRule extends GenericCompound {
         });
 
         return l;
-    }
-
-
-    @NotNull
-    public static Solve solve(@NotNull PostCondition p, @NotNull PremiseRule rule,
-                              @NotNull TimeFunctions temporalizer, boolean beliefProjected) {
-
-        byte puncOverride = p.puncOverride;
-
-        TruthOperator belief = BeliefFunction.get(p.beliefTruth);
-        if ((p.beliefTruth != null) && !p.beliefTruth.equals(TruthOperator.NONE) && (belief == null)) {
-            throw new RuntimeException("unknown BeliefFunction: " + p.beliefTruth);
-        }
-        TruthOperator goal = GoalFunction.get(p.goalTruth);
-        if ((p.goalTruth != null) && !p.goalTruth.equals(TruthOperator.NONE) && (goal == null)) {
-            throw new RuntimeException("unknown GoalFunction: " + p.goalTruth);
-        }
-
-        Conclude der = new Conclude(rule, p.pattern, belief, goal, temporalizer);
-
-        String beliefLabel = belief != null ? belief.toString() : "_";
-        String goalLabel = goal != null ? goal.toString() : "_";
-
-        List<Term> args = $.newArrayList(
-                $.the(beliefLabel),
-                $.the(goalLabel)
-        );
-        if (puncOverride != 0)
-            args.add($.quote(/*"conc" +*/ ((char) puncOverride)));
-
-        if (!beliefProjected)
-            args.add($.the("unproj"));
-
-        Compound ii = $.func("truth", args);
-
-        return puncOverride == 0 ?
-                new SolvePuncFromTask(ii, der, belief, goal, beliefProjected) :
-                new SolvePuncOverride(ii, der, puncOverride, belief, goal, beliefProjected);
-
-
     }
 
 
