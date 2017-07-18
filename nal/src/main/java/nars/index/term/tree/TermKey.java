@@ -1,8 +1,6 @@
 package nars.index.term.tree;
 
 import com.google.common.base.Charsets;
-import io.airlift.compress.lz4.Lz4Compressor;
-import io.airlift.compress.lz4.Lz4RawCompressor;
 import jcog.byt.HashCachedDynByteSeq;
 import nars.IO;
 import nars.Op;
@@ -25,11 +23,9 @@ import static nars.IO.writeEvidence;
  */
 public class TermKey extends HashCachedDynByteSeq {
 
-    public final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(Lz4Compressor::new);
+    //public final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(Lz4Compressor::new);
     //final static Lz4Decompressor decompressor = new Lz4Decompressor();
 
-    private final static float minCompressionRatio = 0.9f;
-    private final static int MIN_COMPRESSION_INPUT = 16;
     private static final boolean COMPRESS = false;
 
     /**
@@ -48,7 +44,7 @@ public class TermKey extends HashCachedDynByteSeq {
             writeTermSeq(y, x, false);
 
             //int before = length();
-            if (COMPRESS && c > 1 && y.compress(1)) {
+            if (COMPRESS && c > 1 && y.compress(1)!=-1) {
                 //int after = length();
                 //System.out.println(conceptualizable + "\t" + before + " -> " + after + "\t" + new String(array()));
             }
@@ -92,36 +88,6 @@ public class TermKey extends HashCachedDynByteSeq {
         }
     }
 
-    public boolean compress() {
-        return compress(0);
-    }
-
-    //TODO add parameter for from..to range compresion, currently this will only skip a prefix
-    public boolean compress(int from) {
-        int to = length();
-        if (to < MIN_COMPRESSION_INPUT) {
-            return false;
-        }
-        byte[] uncompressed = this.bytes;
-
-        int uncLength = to - from;
-
-        byte[] compressed = new byte[from + Lz4RawCompressor.maxCompressedLength(uncLength)];
-
-        int compressedLength = compressor.get()
-                .compress(uncompressed, from, uncLength, compressed, from, compressed.length);
-
-        if (compressedLength <= (int) (uncLength * minCompressionRatio)) {
-
-            System.arraycopy(bytes, 0, compressed, 0, from); //copy prefix
-            //TODO copy suffix
-
-            this.bytes = compressed;
-            this.len = compressedLength;
-            return true;
-        }
-        return false;
-    }
 
 
     @Override
@@ -146,7 +112,6 @@ public class TermKey extends HashCachedDynByteSeq {
 
             writeStringBytes(out, term);
 
-            //out.writeByte(term.op().ordinal()); //put operator last
         } else {
             writeCompoundSeq(out, (Compound) term, includeTemporal);
         }
@@ -174,7 +139,7 @@ public class TermKey extends HashCachedDynByteSeq {
         out.writeByte(')');
 
         @NotNull Op o = c.op();
-        out.writeByte(o.ordinal()); //put operator last
+        out.writeByte(o.id); //put operator last
         if (includeTemporal && o.temporal) {
             out.writeInt(c.dt());
         }

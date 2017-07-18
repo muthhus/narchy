@@ -49,7 +49,7 @@ public enum Terms { ;
      * into 32-bit or 64-bit fields/arrays
      */
     public static int hashVar(@NotNull Op type, int id) {
-        return (type.ordinal() << 16) | id;
+        return (type.id << 16) | id;
     }
 
     /**

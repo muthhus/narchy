@@ -36,7 +36,7 @@ public class SerialCompound extends DynByteSeq implements Compound {
     public SerialCompound(Op op, int dt, Term[] subterms) {
         super(subterms.length * 4 /* estimate */);
 
-        writeByte(op.ordinal());
+        writeByte(op.id);
         writeByte(subterms.length);
 
         int v = 1;

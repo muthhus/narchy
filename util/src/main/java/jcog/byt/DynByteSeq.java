@@ -1,6 +1,7 @@
 package jcog.byt;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.iq80.snappy.Snappy;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
@@ -11,6 +12,10 @@ import java.util.Arrays;
  * copied from Infinispan SimpleDataOutput
  */
 public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
+
+    private final static float minCompressionRatio = 0.9f;
+    private final static int MIN_COMPRESSION_LEN = 64;
+
 
     public static final int MIN_GROWTH_BYTES = 16;
     protected byte[] bytes;
@@ -33,6 +38,44 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
         this.len = len;
     }
 
+    public int compress() {
+        return compress(0);
+    }
+
+
+    /** return length of the compressed region (not including the from offset).
+     * or -1 if compression was not applied */
+    public int compress(int from) {
+
+        //TODO add parameter for from..to range compresion, currently this will only skip a prefix
+
+        int to = length();
+        int len = to - from;
+        if (len < MIN_COMPRESSION_LEN) {
+            return -1;
+        }
+
+
+        byte[] compressed = new byte[from + Snappy.maxCompressedLength(len)];
+        int compressedLength = Snappy.compress(
+                bytes, from, len,
+                compressed, from);
+
+
+        if (compressedLength < (int) (len * minCompressionRatio)) {
+
+            if (from > 0)
+                System.arraycopy(bytes, 0, compressed, 0, from); //copy prefix
+            //TODO copy suffix
+
+            this.bytes = compressed;
+            this.len = from + compressedLength;
+            return compressedLength;
+        }
+        return -1;
+    }
+
+
     @Override
     public int hashCode() {
         return hash(0, len);
@@ -41,6 +84,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     public int hash(int from, int to) {
         return ByteSeq.hash(bytes, from, to);
     }
+
     public long hash64(int from, int to) {
         return ByteSeq.hash64(bytes, from, to);
     }
@@ -67,7 +111,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
     @Override
     public ByteSeq subSequence(int start, int end) {
-        if (end-start == 1)
+        if (end - start == 1)
             return new OneByteSeq(at(start));
 
         if (start == 0 && end == length())
@@ -77,13 +121,13 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void write(int v)  {
+    public void write(int v) {
         writeByte(v);
     }
 
 
     @Override
-    public void writeByte(int v)  {
+    public void writeByte(int v) {
         ensureSized(1);
         this.bytes[this.len++] = (byte) v;
     }
@@ -97,12 +141,12 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
 
     @Override
-    public void write(@NotNull byte[] bytes)  {
+    public void write(@NotNull byte[] bytes) {
         this.write(bytes, 0, bytes.length);
     }
 
     @Override
-    public void write(@NotNull byte[] bytes, int off, int len)  {
+    public void write(@NotNull byte[] bytes, int off, int len) {
         int position = ensureSized(len);
         System.arraycopy(bytes, off, this.bytes, position, len);
         this.len = position + len;
@@ -110,13 +154,13 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
     private int ensureSized(int extra) {
         byte[] b = this.bytes;
-        int space = b!=null ? b.length : 0;
+        int space = b != null ? b.length : 0;
         int p = this.len;
         if (space - p <= extra) {
             this.bytes =
-                    b!=null ?
-                        Arrays.copyOf(this.bytes, space + Math.max(extra, MIN_GROWTH_BYTES)) :
-                        new byte[extra];
+                    b != null ?
+                            Arrays.copyOf(this.bytes, space + Math.max(extra, MIN_GROWTH_BYTES)) :
+                            new byte[extra];
         }
         return p;
     }
@@ -128,13 +172,18 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     public void compact() {
-        compact(null);
+        compact(false);
     }
-    public void compact(byte[] forceIfSameAs) {
+
+    public void compact(boolean force) {
+        compact(null, force);
+    }
+
+    public void compact(byte[] forceIfSameAs, boolean force) {
         int l = this.len;
         if (l > 0) {
             byte[] b = this.bytes;
-            if ( b.length != l || forceIfSameAs==bytes)
+            if (force || b.length != l || forceIfSameAs == bytes)
                 this.bytes = Arrays.copyOfRange(b, 0, l);
         }
     }
@@ -152,24 +201,24 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
 
 
     @Override
-    public void writeBoolean(boolean v)  {
+    public void writeBoolean(boolean v) {
         ensureSized(1);
         byte[] e = this.bytes;
         e[this.len++] = (byte) (v ? 1 : 0);
     }
 
     @Override
-    public void writeShort(int v)  {
+    public void writeShort(int v) {
 
         int s = ensureSized(2);
         byte[] e = this.bytes;
-        e[s] = (byte)(v >> 8);
+        e[s] = (byte) (v >> 8);
         e[s + 1] = (byte) v;
         this.len += 2;
     }
 
     @Override
-    public void writeChar(int v)  {
+    public void writeChar(int v) {
 
         int s = ensureSized(2);
         byte[] e = this.bytes;
@@ -180,7 +229,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeInt(int v)  {
+    public void writeInt(int v) {
 
         int s = ensureSized(4);
         byte[] e = this.bytes;
@@ -192,7 +241,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeLong(long v)  {
+    public void writeLong(long v) {
 
         int s = ensureSized(8);
         this.len += 8;
@@ -208,7 +257,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeFloat(float v)  {
+    public void writeFloat(float v) {
 
         int s = ensureSized(4);
         byte[] e = this.bytes;
@@ -221,7 +270,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeDouble(double v)  {
+    public void writeDouble(double v) {
         throw new UnsupportedOperationException("yet");
 //        long bits = Double.doubleToLongBits(v);
 //
@@ -254,7 +303,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeBytes(String s)  {
+    public void writeBytes(String s) {
 //        int len = s.length();
 //
 //        for (int i = 0; i < len; ++i) {
@@ -265,7 +314,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeChars(String s)  {
+    public void writeChars(String s) {
 //        int len = s.length();
 //
 //        for (int i = 0; i < len; ++i) {
@@ -296,12 +345,12 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public Appendable append(CharSequence csq)  {
+    public Appendable append(CharSequence csq) {
         return append(csq, 0, csq.length());
     }
 
     @Override
-    public Appendable append(CharSequence csq, int start, int end)  {
+    public Appendable append(CharSequence csq, int start, int end) {
         for (int i = start; i < end; i++) {
             writeChar(csq.charAt(i)); //TODO optimize
         }
@@ -309,7 +358,7 @@ public class DynByteSeq implements DataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public Appendable append(char c)  {
+    public Appendable append(char c) {
         writeChar(c);
         return this;
     }

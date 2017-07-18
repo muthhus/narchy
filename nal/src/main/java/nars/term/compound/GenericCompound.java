@@ -36,7 +36,7 @@ public class GenericCompound implements Compound {
 
         this.op = op;
 
-        this.hash = Util.hashCombine(subterms.hashCode(), op.ordinal());
+        this.hash = Util.hashCombine(subterms.hashCode(), op.id);
 
         this.normalized = !(subterms.vars() > 0 || subterms.varPattern() > 0);
 

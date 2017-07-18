@@ -1,6 +1,7 @@
 package nars.index.term;
 
 import jcog.byt.DynByteSeq;
+import jcog.util.ArrayPool;
 import nars.IO;
 import nars.Op;
 import nars.term.Term;
@@ -62,7 +63,7 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
 
     public AppendProtoCompound(Op op, TermContainer subterms) {
         this(op, subterms.size());
-        for (int i  = 0; i < (size = subs.length); i++) /* (has been set in superconstructor)*/
+        for (int i = 0; i < (size = subs.length); i++) /* (has been set in superconstructor)*/
             subs[i] = subterms.sub(i);
 
     }
@@ -107,7 +108,7 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
     @Override
     public AppendProtoCompound commit(int commuteForDT) {
         boolean commute = false;
-        if (commuteForDT!=DTERNAL && op!=null) {
+        if (commuteForDT != DTERNAL && op != null) {
             commute = subs.length > 1 && op.commutative;
             if (commute && op.temporal && !Op.concurrent(commuteForDT))
                 commute = false; //dont pre-commute
@@ -120,27 +121,42 @@ public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements Pro
      */
     public AppendProtoCompound commit(boolean commute) {
 
+        if (commute) {
+            subs = Terms.sorted(subs);
+            size = subs.length;
+        }
 
-            if (commute) {
-                subs = Terms.sorted(subs);
-                size = subs.length;
-            }
-
-
-        this.bytes = new byte[subs.length * 8 /* estimate */];
-        writeByte(op != null ? op.ordinal() : Byte.MAX_VALUE);
+        int volume = 0;
         for (Term x : subs)
-            appendKey(x);
+            volume += x.volume();
+
+        ArrayPool<byte[]> bytePool = ArrayPool.bytes();
+        byte[] bbTmp = bytePool.getMin(volume * 32 /* estimate */);
+        try {
+
+            this.bytes = bbTmp;
+            //this.bytes = new byte[subs.length * 8 /* estimate */];
+
+            writeByte(op != null ? op.id : Byte.MAX_VALUE);
+            for (Term x : subs)
+                appendKey(x);
+
+            compress();
+            compact(bbTmp, false);
+
+        } finally {
+            bytePool.release(bbTmp);
+        }
 
         this.hash = hash(0, len);
-        if (this.hash==0) this.hash = 1;
+        if (this.hash == 0) this.hash = 1;
         return this;
     }
 
     @Override
     public int hashCode() {
         int h = this.hash;
-        assert(h!=0);
+        //assert(h!=0);
         return h;
     }
 

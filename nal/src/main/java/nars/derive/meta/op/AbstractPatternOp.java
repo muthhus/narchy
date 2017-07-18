@@ -29,7 +29,7 @@ public enum AbstractPatternOp  {
         public PatternOp(int subterm, @NotNull Op op) {
 
             this.subterm = subterm;
-            this.opOrdinal = op.ordinal();
+            this.opOrdinal = op.id;
             this.id = name(getClass(), subterm, op.str).toString();
         }
 

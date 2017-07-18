@@ -340,7 +340,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @NotNull
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
-        appendTo.add((byte) op().ordinal());
+        appendTo.add((byte) op().id);
         appendTo.add((byte) size());
         forEach(x -> {
             x.structureKey(appendTo);

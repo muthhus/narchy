@@ -357,8 +357,7 @@ public class UDPeer extends UDP {
             }
         }
 
-
-        m.compact(inputArray);
+        m.compact(inputArray, false);
 
         boolean seen = seen(m, 1f);
         if (seen)

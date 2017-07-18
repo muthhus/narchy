@@ -656,7 +656,7 @@ public enum Op implements $ {
         //Setup NativeOperator String index hashtable
         for (Op r : Op.values()) {
             _stringToOperator.put(r.toString(), r);
-            int ordinal = r.ordinal();
+            int ordinal = r.id;
             if (ordinal < 15)
                 Op.byteSymbols[ordinal] = r;
         }
@@ -708,6 +708,7 @@ public enum Op implements $ {
      * whether this involves an additional numeric component: 'dt' (for temporals) or 'relation' (for images)
      */
     public final boolean hasNumeric;
+    public final int id;
 
     Op(char c, int minLevel, OpType type) {
         this(c, minLevel, type, Args.None);
@@ -745,6 +746,7 @@ public enum Op implements $ {
 
     Op(@NotNull String string, boolean commutative, int minLevel, OpType type, @NotNull IntIntPair size) {
 
+        this.id = ordinal();
         this.str = string;
 
         this.commutative = commutative;

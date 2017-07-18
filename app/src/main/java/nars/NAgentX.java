@@ -207,7 +207,7 @@ abstract public class NAgentX extends NAgent {
     private static Surface causePlot(NAR nar) {
         int s = nar.causeValue.size();
         return new MatrixView((i) ->
-                Util.tanhFast( nar.causeValue.get(i).value() ),
+                nar.causeValue.get(i).value(),
                 s, (int) Math.max(1, Math.sqrt(s)), bipolar1);
     }
 

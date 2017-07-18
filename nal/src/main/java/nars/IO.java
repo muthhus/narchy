@@ -280,7 +280,7 @@ public class IO {
         }
 
         Op o = term.op();
-        out.writeByte(o.ordinal());
+        out.writeByte(o.id);
 
         if (term instanceof AbstractVariable) {
 

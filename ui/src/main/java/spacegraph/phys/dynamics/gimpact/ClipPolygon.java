@@ -31,7 +31,7 @@ import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.math.VectorUtil;
-import spacegraph.phys.util.ArrayPool;
+import jcog.util.ArrayPool;
 import spacegraph.phys.util.OArrayList;
 
 /**
@@ -77,9 +77,9 @@ class ClipPolygon {
 	 * @return The count of the clipped counts
 	 */
 	public static int plane_clip_polygon(Vector4f plane, OArrayList<v3> polygon_points, int polygon_point_count, OArrayList<v3> clipped) {
-		ArrayPool<int[]> intArrays = ArrayPool.get(int.class);
+		ArrayPool<int[]> intArrays = ArrayPool.the(int.class);
 
-		int[] clipped_count = intArrays.getFixed(1);
+		int[] clipped_count = intArrays.getExact(1);
 		clipped_count[0] = 0;
 
 		// clip first point
@@ -133,9 +133,9 @@ class ClipPolygon {
 	 * @return the count of the clipped counts
 	 */
 	public static int plane_clip_triangle(Vector4f plane, v3 point0, v3 point1, v3 point2, OArrayList<v3> clipped) {
-		ArrayPool<int[]> intArrays = ArrayPool.get(int.class);
+		ArrayPool<int[]> intArrays = ArrayPool.the(int.class);
 
-		int[] clipped_count = intArrays.getFixed(1);
+		int[] clipped_count = intArrays.getExact(1);
 		clipped_count[0] = 0;
 
 		// clip first point0

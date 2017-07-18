@@ -279,7 +279,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
     @NotNull
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
-        appendTo.add((byte) op().ordinal());
+        appendTo.add((byte) op().id);
         return appendTo;
     }
 
@@ -407,7 +407,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
     /** opX function */
     private static int opX(Op o, byte subOp) {
-        return o.ordinal() << 8 | subOp;
+        return o.id << 8 | subOp;
     }
 
     /** for convenience, delegates to the byte function */

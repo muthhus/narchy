@@ -21,7 +21,7 @@ public abstract class TermVector implements TermContainer {
     /** normal high-entropy "content" hash */
     public  final int hash;
     /**
-     * bitvector of subterm types, indexed by NALOperator's .ordinal() and OR'd into by each subterm
+     * bitvector of subterm types, indexed by Op.id and OR'd into by each subterm
      * low-entropy, use 'hash' for normal hash operations.
      */
     public  final int structure;

@@ -635,7 +635,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         if (x instanceof Task) {
             Task t = (Task) x;
-            if (evaluate(t) < Pri.EPSILON)
+            float tp = evaluate(t);
+            if (tp!=tp || tp < Pri.EPSILON)
                 return; //TODO track what might cause this
 
             value(t.cause(), valueIfAccepted(t, this));
@@ -1690,7 +1691,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     /** returns a "value" adjusted priority
      * which is also applied to the given task.
-     * a NaN (deleted) priority will be returned as zero
+     * returns NaN possibly
      * */
     public float evaluate(Task x) {
         short[] causes = ((Task) x).cause();
@@ -1705,7 +1706,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
             return x.priMult(amp);
         } else {
-            return x.priElseZero();
+            return x.pri();
         }
     }
 

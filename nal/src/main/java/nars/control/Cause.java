@@ -33,13 +33,13 @@ public class Cause {
     public final short id;
     public final Object x;
 
-    /** positive value */
     final AtomicDouble posAcc = new AtomicDouble(); //accumulating
     float pos = 0; //current value
 
-    /** negative value */
     final AtomicDouble negAcc = new AtomicDouble(); //accumulating
     float neg = 0; //current value
+
+    /** summary */
     private float value;
 
     public Cause(short id, Object x) {
