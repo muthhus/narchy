@@ -7,6 +7,7 @@ import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.concept.TaskConcept;
 import nars.control.Cause;
+import nars.control.Activate;
 import nars.task.NALTask;
 import nars.task.Revision;
 import nars.term.Compound;
@@ -438,7 +439,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
 
         if (activated != null)
-            TaskTable.activate(activated, activation, nar);
+            Activate.activate(activated, activation, nar);
     }
 
 

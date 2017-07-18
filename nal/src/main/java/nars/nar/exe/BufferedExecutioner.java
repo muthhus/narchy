@@ -2,12 +2,15 @@ package nars.nar.exe;
 
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;
+import jcog.bag.impl.ArrayBag;
+import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
+import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -19,6 +22,8 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -30,8 +35,10 @@ import static nars.Op.COMMAND;
  */
 public class BufferedExecutioner extends Executioner {
 
-    @Deprecated int inputBatch = 32;
-    @Deprecated int fireBatch = 16;
+    /**
+     * number of tasks input after each firing; defines an input load processing ratio
+     */
+    int inputsPerFire = 32;
 
 
     //    private final DisruptorBlockingQueue<ITask> overflow;
@@ -47,7 +54,6 @@ public class BufferedExecutioner extends Executioner {
 //     * temporary collection of tasks to remove after sampling
 //     */
 //    protected final FasterList<ITask> toRemove = new FasterList();
-
 
 
     public final Bag<ITask, ITask> tasks =
@@ -67,92 +73,55 @@ public class BufferedExecutioner extends Executioner {
                 public ITask key(@NotNull ITask value) {
                     return value;
                 }
+
+                @Override
+                protected Random random() {
+                    return rng;
+                }
             };
-//            new ArrayBag<>(0, PriMerge.max, new ConcurrentHashMap<>()) {
-//
-//        @Override
-//        public float floatValueOf(ITask x) {
-//            return x.pri();
-//        }
-//
-//        @Nullable
-//        @Override
-//        public ITask key(@NotNull ITask l) {
-//            return l.ref;
-//        }
-//    };
 
 
     /**
      * active tasks
      */
     public final Bag<ITask, ITask> concepts =
-//            new ArrayBag<>(PriMerge.plus, new ConcurrentHashMap<>()) {
+            new CurveBag(0, Param.conceptMerge, new ConcurrentHashMap<>()) {
 
-
-            new PriorityHijackBag<>(4) {
-                @Override
-                protected final Consumer<ITask> forget(float rate) {
-                    return null;
-                }
-
-
-                @Override
-                protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
-                    Param.conceptMerge.merge(existing, incoming);
-                    return existing;
-                }
-
-                @Override
-                public Bag<ITask, ITask> commit() {
-                    return this; //do nothing
-                }
-
-                @NotNull
-                @Override
-                public HijackBag commit(Consumer c) {
-                    return this; //do nothing
-                }
-
+            //new PriorityHijackBag<>(4) {
+                //@Override protected final Consumer<ITask> forget(float rate) {
+                    //return null;
+                //}
+//                @Override protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
+//                    Param.conceptMerge.merge(existing, incoming);
+//                    return existing;
+//                }
+//                @NotNull
 //                @Override
-//                public ITask put(@NotNull ITask x) {
-//                    ITask y = super.put(x);
-////                    if (y == null) {
-////                        overflow.offer(x);
-////                    }
-//                    return y;
+//                public final ITask key(ITask value) {
+//                    return value;
 //                }
 
+
 //                @Override
-//                public void onRemoved(@NotNull ITask value) {
-//
-//                    //DO NOTHING, DONT DELETE
-//
-////                    if (value.priElseZero() >= Pri.EPSILON) {
-////                        if (overflow.remainingCapacity() < 1) {
-////                            overflow.poll(); //forget
-////                        }
-////                        overflow.offer(value); //save
-////                    } else {
-////                        ITask x = overflow.poll();
-////                        if (x != null && x.priElseZero() >= Pri.EPSILON)
-////                            put(x); //restore
-////                    }
+//                public Bag<ITask, ITask> commit() {
+//                    return this; //do nothing
 //                }
 //
+//                @NotNull
+//                @Override
+//                public HijackBag commit(Consumer c) {
+//                    return this; //do nothing
+//                }
 
-                @NotNull
+
                 @Override
-                public final ITask key(ITask value) {
-                    return value;
+                protected Random random() {
+                    return rng;
                 }
-
-
             };
+    private Random rng;
 
     //final DecideRoulette<ITask> activeBuffer = new DecideRoulette<>(CLink::priElseZero);
-
-    private float forgetEachActivePri;
 
 
     public BufferedExecutioner(int conceptCapacity, int taskCapacity) {
@@ -162,7 +131,7 @@ public class BufferedExecutioner extends Executioner {
     public BufferedExecutioner(int conceptCapacity, int taskCapacity, float executedPerCycle) {
         concepts.setCapacity(conceptCapacity);
         tasks.setCapacity(taskCapacity);
-        conceptsPerCycleMax.setValue(Math.ceil(conceptCapacity * executedPerCycle));
+        conceptsPerCycleMax.setValue(executedPerCycle);
     }
 
     @Override
@@ -181,17 +150,22 @@ public class BufferedExecutioner extends Executioner {
 
     @Override
     public void stop() {
+
         flush();
+
         super.stop();
+
     }
 
 
     @Override
     public void start(NAR nar) {
         super.start(nar);
+
+        this.rng = nar.random();
+
         flush(); //<- may not be necessary
     }
-
 
 
 //    @Override
@@ -217,90 +191,41 @@ public class BufferedExecutioner extends Executioner {
 
 
     protected void flush() {
+
         if (!busy.compareAndSet(false, true))
             return;
 
-        //System.out.println(getClass() + " flush " + nal.size() + " " + active.size());
-
         try {
-
-
-
 
             boolean t = this.trace;
             if (t)
                 concepts.print();
 
-            final int[] toFire = {conceptsPerCycleMax.intValue()};
+            final int toFire =
+                    (int) Math.ceil(conceptsPerCycleMax.floatValue() * concepts.capacity())
+            ;
 
-
-            //Random rng = nar.random();
-
-
-            //EXEC
-            float eFrac = ((float) toFire[0]) / concepts.capacity();
-            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((HijackBag) concepts).depressurize(eFrac) * (eFrac);
-            this.forgetEachActivePri =
+            float eFrac = ((float) toFire) / concepts.capacity();
+            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((CurveBag) concepts).depressurize(eFrac) * (eFrac);
+            float forgetEachActivePri =
                     pAvg >= Pri.EPSILON ? pAvg : 0;
 
 
-            concepts.commit();
+            tasks.pop(inputsPerFire, this::execute); //pre-fire inputs
 
-            do {
+            concepts.commit(null).sample(toFire, x -> {
 
+                execute(x);
 
-                concepts.sample(fireBatch, x -> {
+                if (forgetEachActivePri > 0) {
+                    x.priSub(forgetEachActivePri);
+                }
 
-                    execute(x);
+                tasks.pop(inputsPerFire, this::execute);
 
-
-                    if (forgetEachActivePri > 0) {
-                        x.priSub(forgetEachActivePri);
-                    }
-
-                    --toFire[0];
-
-                    //activeBuffer.add(x);
-                    //(Consumer<? super ITask>)(buffer::add)
-                });
-
-
-                //input a batch of tasks
-                tasks.pop(inputBatch, this::execute);
-
-
-            } while (--toFire[0] /* decrement to fire if nothing else than to prevent infinite stall */ > 0 /*|| toInput[0] > 0*/);
-
-
-//            for (int i = 0; i < toExe; i++) {
-//                @Nullable ITask x = activeBuffer.decide(rng);
-//                actuallyRun(x);
-//                if (forgetEachActivePri > 0) {
-//                    x.priSub(forgetEachActivePri);
-//                }
-//            }
-
-            //active.sample(toExe, this::actuallyRun);
-
-//            if (!toRemove.isEmpty()) {
-//                toRemove.clear(active::remove);
-//            }
-
-//            } else {
-//                //sort
-//                if (sorted == null || sorted.capacity() != (toExe + 1)) {
-//                    sorted = new SortedArray<ITask>(new ITask[toExe + 1]);
-//                }
-//                pending.sample(pending.capacity(), s -> {
-//                    sorted.add(s, Prioritized::oneMinusPri);
-//                    if (sorted.size() > toExe)
-//                        sorted.removeLast();
-//                });
-//                assert (sorted.size() == toExe);
-//                sorted.forEach(this::actuallyRun);
-//            }
-
-            //Runtime.getRuntime().runFinalization();
+                //activeBuffer.add(x);
+                //(Consumer<? super ITask>)(buffer::add)
+            });
 
         } finally {
             busy.set(false);
@@ -342,7 +267,7 @@ public class BufferedExecutioner extends Executioner {
 
         boolean nal = input instanceof NALTask;
 
-        if ((busy.get()==false && nal)|| input.punc() == COMMAND) {
+        if ((nal && !busy.get()) || input.punc() == COMMAND) {
             //if not busy, input NAL tasks directly. this allows direct insertion of tasks while the reasoner is paused
             //commands executed immediately
             execute(input);

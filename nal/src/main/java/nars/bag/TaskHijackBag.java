@@ -5,6 +5,7 @@ import jcog.pri.op.PriForget;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
+import nars.control.Activate;
 import nars.table.TaskTable;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -97,7 +98,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
             //x.delete();
         }
 
-        TaskTable.activate(y, activation, n);
+        Activate.activate(y, activation, n);
     }
 
 

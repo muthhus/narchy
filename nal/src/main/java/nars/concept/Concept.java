@@ -354,10 +354,4 @@ public interface Concept extends Termed, Termlike {
     }
 
 
-    default float value(@NotNull Task t, float activation, NAR n) {
-        int vol = t.volume();
-        return -(vol) * (0.5f + 0.5f * (1f - (t.isBeliefOrGoal() ? t.conf(n.time(), n.dur()) : 0.5f))
-                //* activation
-        )/2000f;
-    }
 }

@@ -9,7 +9,7 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Task;
 import nars.bag.leak.LeakOut;
-import nars.control.ConceptFire;
+import nars.control.Activate;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.nar.exe.BufferedExecutioner;
@@ -221,7 +221,7 @@ public class Vis {
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
                 () -> (((BufferedExecutioner) (n.exe)).concepts)
                         .stream()
-                        .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
+                        .map(x -> x instanceof Activate ? ((Activate) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
                 /* TODO */, 128, 256, 2, 7);

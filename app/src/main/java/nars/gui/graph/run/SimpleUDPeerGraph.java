@@ -7,7 +7,7 @@ import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.concept.Concept;
-import nars.control.ConceptFire;
+import nars.control.Activate;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
 import nars.nar.exe.BufferedExecutioner;
@@ -36,7 +36,7 @@ public class SimpleUDPeerGraph {
         SimpleConceptGraph1 s = new SimpleConceptGraph1(n,
                 () -> (((BufferedExecutioner) (n.exe)).concepts)
                         .stream()
-                        .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
+                        .map(x -> x instanceof Activate ? ((Activate) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
                 /* TODO */, population+1, population+1, 4, 8);
@@ -104,8 +104,8 @@ public class SimpleUDPeerGraph {
                 from.termlinks().put(new PLink(to, p));
 
 
-                n.input(new ConceptFire(from, 0.5f + p / 2f));
-                n.input(new ConceptFire(to, 0.5f + p / 2f));
+                n.input(new Activate(from, 0.5f + p / 2f));
+                n.input(new Activate(to, 0.5f + p / 2f));
 
                 //System.out.println(from + " " + to.me + " " + m.edgeValueOrDefault(from, to.me, null));
             }

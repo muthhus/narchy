@@ -30,7 +30,8 @@ import java.util.function.Consumer;
 
 import static nars.Param.UnificationTTLMax;
 
-public class ConceptFire extends UnaryTask<Concept> implements Termed {
+/** concept firing, activation, etc */
+public class Activate extends UnaryTask<Concept> implements Termed {
 
     static final ThreadLocal<Derivation> derivation = ThreadLocal.withInitial(Derivation::new);
 
@@ -38,10 +39,10 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 4;
+    private static final int maxSamples = 2;
 
-    static final int TASKLINKS_SAMPLED = 6;
-    static final int TERMLINKS_SAMPLED = 6;
+    static final int TASKLINKS_SAMPLED = 4;
+    static final int TERMLINKS_SAMPLED = 4;
 
     //private static final float priMinAbsolute = Pri.EPSILON * 1;
     //private static final float momentum = 0.75f;
@@ -50,14 +51,14 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //            ThreadLocal.withInitial(LinkedHashMap::new);
 
 
-    public ConceptFire(Concept c, float pri) {
+    public Activate(Concept c, float pri) {
         super(c, pri);
         assert (c.isNormalized()) :
                 c + " not normalized";
     }
 
 
-    public static ConceptFire activate(@NotNull Task t, float activation, Concept origin, NAR n) {
+    public static Activate activate(@NotNull Task t, float activation, TaskConcept origin, NAR n) {
 
 
         if (activation >= EPSILON) {
@@ -96,12 +97,32 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
 //                //atomic activation)
 
             n.emotion.conceptActivations.increment();
-            return new ConceptFire(origin, activation); /*, () -> {
+            return new Activate(origin, activation); /*, () -> {
 
                 }*/
 //            }
         }
         return null;
+    }
+
+    public static void activate(@NotNull Task t, float activation, @NotNull NAR n) {
+        activate(t, activation, n, true);
+    }
+
+    public static void activate(@NotNull Task t, float activation, @NotNull NAR n, boolean process) {
+       // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
+        if (activation >= EPSILON) {
+            TaskConcept cc = t.concept(n, true);
+            if (cc!=null) {
+
+                n.input(activate(t, activation, cc, n));
+//                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
+//                n.input(a);
+            }
+
+            if (process)
+                n.eventTaskProcess.emit(/*post*/t);
+        }
     }
 
     @Override
@@ -235,7 +256,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                     localSubConcept.termlinks().putAsync(
                             new PLink(thisTerm, tfaEach)
                     );
-                    nar.input(new ConceptFire(localSubConcept, tfaEach));
+                    nar.input(new Activate(localSubConcept, tfaEach));
                 }
 
                 id.termlinks().putAsync(
@@ -262,7 +283,7 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
                     cc.termlinks().putAsync(
                             new PLink(thisTerm, taskTemplateActivation)
                     );
-                    nar.input(new ConceptFire(cc, taskTemplateActivation));
+                    nar.input(new Activate(cc, taskTemplateActivation));
 
 //                        //reverse termlink from task template to this concept
 //                        //maybe this should be allowed for non-concept subterms
@@ -381,10 +402,11 @@ public class ConceptFire extends UnaryTask<Concept> implements Termed {
         int cs = ctpl.size();
         for (int i = 0; i < cs; i++) {
             Term b = ctpl.sub(i);
-            @Nullable Concept c = (!(b instanceof Variable /* quick var prefilter */)) ? nar.conceptualize(b) : null;
+            @Nullable Concept c = (!(b instanceof Variable /* quick var prefilter */)) ?
+                    nar.conceptualize(b) : null;
             TermContainer e = null;
             if (c != null) {
-                if (!c.equals(id) && tc.add(c.term() /* dont link to concept directly for long-term GC sanity */)) {
+                if (!c.equals(id) && tc.add(c)) {
                     if (layersRemain > 0 && c instanceof Compound) {
                         e = c.templates();
                     }

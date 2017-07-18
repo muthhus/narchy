@@ -143,8 +143,6 @@ abstract public class NAgentX extends NAgent {
         chart(a);
         chart(n, a);
 
-        int HISTORY = 24;
-        //MixContRL m = (MixContRL) n.in;
         window(row(
 
                 causePlot(a.nar),

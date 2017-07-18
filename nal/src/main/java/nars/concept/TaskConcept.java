@@ -148,6 +148,13 @@ public class TaskConcept extends CompoundConcept {
 
     }
 
+    public float value(@NotNull Task t, float activation, NAR n) {
+        int vol = t.volume();
+        return -(vol)/n.termVolumeMax.floatValue() * (0.5f + 0.5f * (1f - (t.isBeliefOrGoal() ? t.conf(n.time(), n.dur()) : 0.5f))
+        )/1000f;
+    }
+
+
     @Override
     public void delete(@NotNull NAR nar) {
         super.delete(nar);

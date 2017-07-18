@@ -483,16 +483,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         return IntStream.range(0, map.length()).mapToObj(map::get).filter(Objects::nonNull);
     }
 
-    public float depressurize(float frac) {
-        frac = Util.unitize(frac);
-        float p = depressurize();
-        float pF = frac * p;
-        if (pF >= Pri.EPSILON) {
-            pressurize(p - pF);
-            return pF;
-        }
-        return 0;
-    }
 
     /**
      * always >= 0

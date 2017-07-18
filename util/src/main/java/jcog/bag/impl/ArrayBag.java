@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -84,6 +85,17 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         //return false;
     }
 
+    /** WARNING this is a duplicate of code in hijackbag, they ought to share this through a common Pressure class extending AtomicDouble or something*/
+    @Override
+    public float depressurize() {
+        float pv = (float) pressure.getAndSet(0);
+        if (pv >= 0) {
+            return pv;
+        } else {
+            pressure.set(0);
+            return 0;
+        }
+    }
 
     @Override
     public void pressurize(float f) {
@@ -281,7 +293,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 //get some: choose random starting index, get the next consecutive values
                 max = Math.min(s, max);
                 for (int i =
-                     (this instanceof CurveBag ? rng(s) : 0), m = 0; m < max; m++) {
+                     (this instanceof CurveBag ? random(s) : 0), m = 0; m < max; m++) {
                     Y lll = (Y) ll[i++];
                     if (lll != null)
                         if (!kontinue.test(lll))
@@ -293,8 +305,12 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         return this;
     }
 
-    public int rng(int s) {
-        return ThreadLocalRandom.current().nextInt(s);
+    protected int random(int s) {
+        return random().nextInt(s);
+    }
+
+    protected Random random() {
+        return ThreadLocalRandom.current();
     }
 
     /**
@@ -307,7 +323,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             int s = size();
             if (s == 0) return;
             else if (s == 1) i = 0;
-            else i = rng(s);
+            else i = random(s);
             //i = 0;
         }
 
@@ -379,11 +395,13 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
             pressurize(p); //absorb pressure even if it's about to get removed
 
-            synchronized(items) {
-                //check if it can actually exist here
-                if ((size() >= capacity && p < priMinFast(-1)) || !updateItems(y)) {
-                    map.remove(key);
-                    return null;
+            if (size() >= capacity) {
+                synchronized (items) {
+                    //check if it can actually exist here
+                    if ((p < priMinFast(-1)) || !updateItems(y)) {
+                        map.remove(key);
+                        return null;
+                    }
                 }
             }
 

@@ -5,7 +5,7 @@ import jcog.pri.Priority;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.control.ConceptFire;
+import nars.control.Activate;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;
@@ -26,7 +26,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     @Override
     public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
         if (!input.isInput()) {
-            ConceptFire.activate(input,
+            Activate.activate(input,
                     input.priElseZero() * 0.5f /* since it isnt being stored, we simulate the effect of the task already being present which would otherwise reduce the activation fired */, concept, nar); //activate only; dont process
             return;
         }

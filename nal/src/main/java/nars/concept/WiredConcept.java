@@ -51,7 +51,7 @@ public class WiredConcept extends TaskConcept implements PermanentConcept {
                         now; //future belief prediction
 
                 if (s > relevantTime) //present or future TODO irrelevance discount for far future
-                    return (float) (0.25f + Math.pow(t.conf(), 0.25f));
+                    return (float) (0.1f + Math.pow(t.conf(), 0.25f));
             }
         }
 

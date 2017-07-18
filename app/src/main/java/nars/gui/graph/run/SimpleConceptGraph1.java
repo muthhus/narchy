@@ -7,7 +7,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import nars.control.ConceptFire;
+import nars.control.Activate;
 import nars.gui.NARChart;
 import nars.gui.NARSpace;
 import nars.gui.graph.DynamicConceptSpace;
@@ -31,7 +31,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
     final AtomicBoolean atomsEnabled = new AtomicBoolean(true);
 
-    public SimpleConceptGraph1(NAR nar, @NotNull Iterable<ConceptFire> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+    public SimpleConceptGraph1(NAR nar, @NotNull Iterable<Activate> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super(nar, concepts, maxNodes, bufferedNodes, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
     }
 
@@ -108,7 +108,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         NARSpace cs = new SimpleConceptGraph1(n,
                 () -> (((BufferedExecutioner) (n.exe)).concepts)
                         .stream()
-                        .map(x -> x instanceof ConceptFire ? ((ConceptFire) x) : null)
+                        .map(x -> x instanceof Activate ? ((Activate) x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
                 /* TODO */, 64, 64, 7, 15);
@@ -228,7 +228,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         MultiStatistics<ITask> exeTasks = new MultiStatistics<ITask>()
                 .classify("NALTask", x -> x instanceof NALTask)
-                .classify("ConceptFire", x -> x instanceof ConceptFire)
+                .classify("ConceptFire", x -> x instanceof Activate)
                 ;
         n.onCycle((nn)->{
             n.exe.forEach(exeTasks::accept);

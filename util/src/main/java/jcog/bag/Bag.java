@@ -2,6 +2,7 @@ package jcog.bag;
 
 import jcog.Util;
 import jcog.list.FasterList;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import jcog.pri.Priority;
 import jcog.table.Table;
@@ -27,6 +28,8 @@ import static jcog.bag.Bag.BagCursorAction.Next;
  * K=key, V = item/value of type Item
  */
 public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
+
+
 
 
 
@@ -505,6 +508,23 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         }
         return x;
     }
+
+
+    default float depressurize(float frac) {
+        frac = Util.unitize(frac);
+        float p = depressurize();
+        float pF = frac * p;
+        if (pF >= Pri.EPSILON) {
+            pressurize(p - pF);
+            return pF;
+        }
+        return 0;
+    }
+
+    default float depressurize() {
+        return 0f; //TODO
+    }
+
 
     @NotNull
     public static double[] priHistogram(Iterable<? extends PriReference> pp, @NotNull double[] x) {

@@ -22,16 +22,13 @@ import java.util.List;
  * positive/negative balance that has been accumulated. a decay function
  * applies forgetting, and this is applied at commit time by separate
  * positive and negative decay rates.  the value is clamped to a range
- * (ex: 0..+3) so it doesnt explode.  the +3 here is compatible with the
- * associated tanhFast function, which is used for converting a summation of
- * (bipolar) gain values to a unipolar amplitude factor, since it
- * clamps values beyond the x=-3..+3 interval.
+ * (ex: 0..+1) so it doesn't explode.
  */
 public class Cause {
 
     /** pos,neg range limit */
-    final static float LIMIT = 3;
-    final static float EPSILON = 0.00000001f;
+    final static float LIMIT = 1;
+    final static float EPSILON = 0.0000001f;
 
     public final short id;
     public final Object x;
@@ -113,17 +110,19 @@ public class Cause {
 
     /** calculate the value scalar  from the distinctly tracked positive and negative values;
      * any function could be used here. for example:
-     *      simplest:  pos - neg
-     *      quadratic: pos*pos - neg*neg
+     *      simplest:           pos - neg
+     *      linear combination: x * pos - y * neg
+     *      quadratic:          pos*pos - neg*neg
      *
      * pos and neg will always be positive.
      * */
     public float value(float pos, float neg) {
-        return pos - neg;
+        //return pos - neg;
+        return pos * 2 - neg;
     }
 
-    static float decay(float cur, AtomicDouble acc, float rate) {
-        return Util.clamp( (float)((cur * rate) + acc.getAndSet(0)), 0, +LIMIT);
+    static float decay(float cur, AtomicDouble acc, float decay) {
+        return Util.clamp( (float)((cur * decay) + acc.getAndSet(0)), 0, +LIMIT);
     }
 
     public float value() {

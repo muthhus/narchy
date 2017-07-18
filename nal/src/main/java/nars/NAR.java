@@ -21,7 +21,7 @@ import nars.concept.TaskConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.control.Cause;
-import nars.control.ConceptFire;
+import nars.control.Activate;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
 import nars.derive.meta.op.Caused;
@@ -1331,10 +1331,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return this;
     }
 
-    public NAR forEachConceptActive(@NotNull Consumer<ConceptFire> recip) {
+    public NAR forEachConceptActive(@NotNull Consumer<Activate> recip) {
         return forEachTaskActive(t -> {
-            if (t instanceof ConceptFire) {
-                recip.accept(((ConceptFire) t));
+            if (t instanceof Activate) {
+                recip.accept(((Activate) t));
             }
         });
     }
@@ -1677,9 +1677,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             if (vPer != 0) {
                 cc.apply(vPer);
             }
+
         }
 
-        return boost;
+        return boost/xl;
     }
 
     private Cause newCause(Object x) {
@@ -1693,7 +1694,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     public final FloatParam valuePositiveDecay = new FloatParam(0.995f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.97f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
 
     public void valueUpdate() {
         float p = valuePositiveDecay.floatValue();

@@ -9,7 +9,7 @@ import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.concept.Concept;
-import nars.control.ConceptFire;
+import nars.control.Activate;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
 import nars.gui.graph.EdgeDirected;
@@ -99,24 +99,24 @@ public class SimpleGraph1 extends ConceptSpace {
     }
 
     //TODO use AtomicReference
-    List<ConceptFire> nodes = $.newArrayList(), next = null;
+    List<Activate> nodes = $.newArrayList(), next = null;
 
     protected SimpleGraph1 commit(Graph g) {
-        List<ConceptFire> n2 = $.newArrayList(g.nodes().size());
+        List<Activate> n2 = $.newArrayList(g.nodes().size());
 
         g.nodes().forEach(x -> {
             //HACK todo use proxyterms in a cache
             Concept c = nar.conceptualize(nodeTerm(x));
             //c.termlinks().clear();
             g.successors(x).forEach( y -> c.termlinks().put(new PLink(nodeTerm(y),  1f) ));
-            n2.add(new ConceptFire(c, 1f));
+            n2.add(new Activate(c, 1f));
         });
 
         this.next = n2;
         return this;
     }
    protected <N,E> SimpleGraph1 commit(ValueGraph<N,E> g, FloatFunction<E> pri) {
-        List<ConceptFire> n2 = $.newArrayList(g.nodes().size());
+        List<Activate> n2 = $.newArrayList(g.nodes().size());
 
 
         g.nodes().forEach(x -> {
@@ -130,7 +130,7 @@ public class SimpleGraph1 extends ConceptSpace {
                 )));
             } );
             tl.commit();
-            n2.add(new ConceptFire(c, 1f));
+            n2.add(new Activate(c, 1f));
         });
 
         this.next = n2;

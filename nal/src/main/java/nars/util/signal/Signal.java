@@ -38,7 +38,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
     final byte punc;
 
-    long lastInputTime = ETERNAL;
+    long lastUpdated = ETERNAL;
 
 
     public Signal(byte punc, FloatSupplier resolution) {
@@ -58,6 +58,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
             if (nextTruth == null) {
 
+                lastUpdated = ETERNAL;
                 return null;             //no signal
 
             } else {
@@ -71,21 +72,24 @@ public class Signal extends AtomicReference<SignalTask> {
                         (Param.SIGNAL_LATCH_TIME != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME)
                     )) {
 
-                    long last = this.lastInputTime;
-                    if (lastInputTime==ETERNAL)
+                    long last = this.lastUpdated;
+                    if (last==ETERNAL) {
                         last = now;
+                    }
 
                     //TODO move the task construction out of this critical update section?
                     next = task(term, nextTruth.truth(),
                             last, now,
                             stamper.getAsLong());
 
+                } else {
+                    if (current!=null)
+                        current.setEnd(now); //stretch existing
                 }
 
-                this.lastInputTime = now;
+                this.lastUpdated = now;
 
                 next.priMax(pri.asFloat()); // * deltaFactor(prev, current.truth()));
-
 
                 return next; //nothing, keep as-is
             }

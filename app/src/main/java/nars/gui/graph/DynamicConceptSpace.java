@@ -4,7 +4,7 @@ import jcog.bag.util.Bagregate;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
-import nars.control.ConceptFire;
+import nars.control.Activate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -12,29 +12,29 @@ import java.util.List;
 
 public class DynamicConceptSpace extends ConceptSpace {
 
-    final Bagregate<ConceptFire> bag;
+    final Bagregate<Activate> bag;
     private final int maxNodes;
     private final List next;
     final float bagUpdateRate = 0.1f;
 
-    public DynamicConceptSpace(NAR nar, @NotNull Iterable<ConceptFire> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
+    public DynamicConceptSpace(NAR nar, @NotNull Iterable<Activate> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super(nar, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
 
         this.maxNodes = maxNodes;
 
         bag = new Bagregate<>(concepts, maxNodes + bufferedNodes, bagUpdateRate) {
             @Override
-            protected boolean include(ConceptFire x) {
+            protected boolean include(Activate x) {
                 return DynamicConceptSpace.this.include(x.term());
             }
 
             @Override
-            public void onAdded(PriReference<ConceptFire> conceptPLink) {
+            public void onAdded(PriReference<Activate> conceptPLink) {
 
             }
 
             @Override
-            public void onRemoved(@NotNull PriReference<ConceptFire> value) {
+            public void onRemoved(@NotNull PriReference<Activate> value) {
                 removeNode(value.get());
             }
         };
@@ -43,7 +43,7 @@ public class DynamicConceptSpace extends ConceptSpace {
         nar.onCycle(nn -> {
             bag.update();
             next.clear();
-            bag.forEach(maxNodes, (PriReference<ConceptFire> concept) ->
+            bag.forEach(maxNodes, (PriReference<Activate> concept) ->
                             next.add(nodeGetOrCreate(concept))
                     //space.getOrAdd(concept.term(), materializer).setConcept(concept, now)
             );

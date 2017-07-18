@@ -3,6 +3,7 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
+import nars.control.Activate;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -87,7 +88,7 @@ public interface QuestionTable extends TaskTable {
                 activation -= e.priElseZero();
             }
 
-            TaskTable.activate(t, activation, n);
+            Activate.activate(t, activation, n);
         }
 
         @Override

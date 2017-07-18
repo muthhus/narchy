@@ -10,7 +10,7 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.control.ConceptFire;
+import nars.control.Activate;
 import nars.task.Revision;
 import nars.task.SignalTask;
 import nars.task.Tasked;
@@ -175,7 +175,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 float after = found.task.priAdd(activation);
                 activation = (after - before);
 
-                TaskTable.activate(found.task, activation, nar);
+                Activate.activate(found.task, activation, nar);
             }
         };
 
@@ -192,7 +192,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                         if (super.add(tr)) {
                             //new insertion
-                            TaskTable.activate(tr.task, tr.task.priElseZero(), nar);
+                            Activate.activate(tr.task, tr.task.priElseZero(), nar);
                             return true;
                         }
                         return false;
@@ -403,7 +403,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 for (int i = 0, toActivateSize = toActivate.size(); i < toActivateSize; i++) {
                     Task ii = toActivate.get(i);
 
-                    n.input(ConceptFire.activate(ii, ii.priElseZero(), c, n));
+                    n.input(Activate.activate(ii, ii.priElseZero(), c, n));
                 }
             }
         }

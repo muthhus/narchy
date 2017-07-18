@@ -43,7 +43,7 @@ public abstract class Param  {
     public final static int SIGNAL_LATCH_TIME =
                     //0;
                     //Integer.MAX_VALUE;
-                    16;
+                    128;
 
     /** cost of a termutate call */
     public static final int TTL_MUTATE = 1;
@@ -132,7 +132,7 @@ public abstract class Param  {
     public final static int BeliefMatchTTL = 64;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTLMax = BeliefMatchTTL * 2;
+    public final static int UnificationTTLMax = BeliefMatchTTL * 4;
 
 
 

@@ -4,7 +4,7 @@ import jcog.memoize.HijackMemoize;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.concept.Concept;
-import nars.control.ConceptFire;
+import nars.control.Activate;
 import nars.gui.NARSpace;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.Pair;
@@ -59,7 +59,7 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
         return edgeBuilder.apply(to.getTwo());
     }, 4096, 2);
 
-    void removeNode(ConceptFire concept) {
+    void removeNode(Activate concept) {
         space.remove(concept.term());
 
 //        @Nullable ConceptWidget cw = widgets.getIfPresent(concept.get());
@@ -77,13 +77,13 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 //    }
 
 
-    protected ConceptWidget nodeGetOrCreate(PriReference<ConceptFire> clink) {
+    protected ConceptWidget nodeGetOrCreate(PriReference<Activate> clink) {
         ConceptWidget cw = nodeGetOrCreate(clink.get());
         cw.pri = clink.priSafe(0);
         return cw;
     }
 
-    protected ConceptWidget nodeGetOrCreate(ConceptFire concept) {
+    protected ConceptWidget nodeGetOrCreate(Activate concept) {
         ConceptWidget cw = space.getOrAdd(concept.term(), nodeBuilder);
         cw.concept = concept.get();
         cw.activate();

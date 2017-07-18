@@ -34,7 +34,7 @@ public class ConceptFireTest {
         }
 
         HashBag<String> s = new HashBag();
-        ConceptFire cf = new ConceptFire(c, 1f) {
+        Activate cf = new Activate(c, 1f) {
             @Override
             protected int premise(Derivation d, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);

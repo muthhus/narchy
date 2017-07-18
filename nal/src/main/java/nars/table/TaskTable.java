@@ -1,10 +1,8 @@
 package nars.table;
 
-import jcog.pri.Pri;
 import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
-import nars.control.ConceptFire;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -25,25 +23,6 @@ public interface TaskTable  {
      */
     void add(@NotNull Task t, TaskConcept c, NAR n);
 
-
-    static void activate(@NotNull Task t, float activation, @NotNull NAR n) {
-        activate(t, activation, n, true);
-    }
-    static void activate(@NotNull Task t, float activation, @NotNull NAR n, boolean process) {
-       // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
-        if (activation >= Pri.EPSILON) {
-            TaskConcept cc = t.concept(n, true);
-            if (cc!=null) {
-
-                n.input(ConceptFire.activate(t, activation, cc, n));
-//                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
-//                n.input(a);
-            }
-
-            if (process)
-                n.eventTaskProcess.emit(/*post*/t);
-        }
-    }
 
     int capacity();
 
