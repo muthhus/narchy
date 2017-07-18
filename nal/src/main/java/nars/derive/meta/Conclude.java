@@ -86,7 +86,7 @@ public final class Conclude extends AbstractPred<Derivation> {
 
         NAR nar = d.nar;
 
-        nar.emotion.derivation1.increment();
+        nar.emotion.derivationTry.increment();
 
         if (rule.minNAL > nar.level())  //HACK
             return true;
@@ -101,6 +101,12 @@ public final class Conclude extends AbstractPred<Derivation> {
 
         assert(b1.varPattern() == 0);
 
+        /// ----
+
+        d.use(Param.TTL_DERIVE_TASK_ATTEMPT);
+        nar.emotion.derivationEval.increment();
+
+
         Compound c1 = compoundOrNull(b1.eval(d));
         if (c1 == null)
             return true;
@@ -114,7 +120,6 @@ public final class Conclude extends AbstractPred<Derivation> {
         }
 
 
-        nar.emotion.derivation2.increment();
 
         Truth truth = d.concTruth;
 
@@ -203,8 +208,6 @@ public final class Conclude extends AbstractPred<Derivation> {
         @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2, punc, d.terms, true);
         if (c3n != null) {
 
-            nar.emotion.derivation3.increment();
-
             boolean negating = c3n.getTwo();
 
             final Compound C = c3n.getOne();
@@ -250,7 +253,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                     t.log(rule);
 
                 d.accept(t);
-                d.use(Param.TTL_DERIVE_TASK);
+                d.use(Param.TTL_DERIVE_TASK_SUCCESS);
             }
         }
 

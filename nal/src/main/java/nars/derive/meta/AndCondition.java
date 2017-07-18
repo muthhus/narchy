@@ -30,8 +30,7 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
         private final BoolPred a, b;
 
         public AndCondition2(BoolPred a, BoolPred b) {
-            //super($.p(AND_ATOM, $.p(a, b)));
-            super($.seq(a, 1, b));
+            super($.p(AND_ATOM, $.p(a, b)));
             this.a = a;
             this.b = b;
         }
@@ -87,7 +86,7 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
         this(TermVector.the((Term[])p));
     }*/
     AndCondition(@NotNull Collection<BoolPred> p) {
-        super($.p(AND_ATOM, $.p(TermVector.the(p))));
+        super($.p(AND_ATOM, $.p(p.toArray(new Term[p.size()]))));
 
         this.termCache = p.toArray(new BoolPred[p.size()]);
         if (termCache.length < 2)

@@ -51,8 +51,11 @@ public abstract class Param  {
     /** cost of a term unification */
     public static final int TTL_UNIFY = 1;
 
+    /** cost of attempting a derivation */
+    public static final int TTL_DERIVE_TASK_ATTEMPT = 1;
+
     /** cost of a successful task derivation */
-    public static final int TTL_DERIVE_TASK = 1;
+    public static final int TTL_DERIVE_TASK_SUCCESS = 1;
 
     /** cost of a failed/aborted task derivation */
     public static final int TTL_DERIVE_TASK_FAIL = 1;
@@ -136,7 +139,7 @@ public abstract class Param  {
     public static final int UnificationConstraintsMax = 8;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 24;
+    public final static int BeliefMatchTTL = 64;
 
     /** 'time to live', unification steps until unification is stopped */
     public final static int UnificationTTLMax = BeliefMatchTTL * 3;

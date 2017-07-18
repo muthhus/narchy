@@ -20,11 +20,12 @@ public class ByteShufflerTest {
 
     void testPermutes(ByteShuffler b, Random rng, int len) {
         int permutations = (int) org.apache.commons.math3.util.CombinatoricsUtils.factorial(len);
-        int iterates = permutations * 4 /* to be sure */;
+        int iterates = permutations * 6 /* to be sure */;
         TreeSet<String> combos = new TreeSet<>();
         for (int i = 0; i < iterates; i++) {
-            byte[] order = b.shuffle(rng, len);
-            combos.add( Arrays.toString(Arrays.copyOfRange(order, 0, len)) );
+            byte[] order = b.shuffle(rng, len, true);
+            assertEquals(len, order.length );
+            combos.add( Arrays.toString(order) );
         }
         //System.out.println(combos);
         assertEquals(permutations, combos.size());

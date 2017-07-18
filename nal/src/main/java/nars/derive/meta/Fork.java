@@ -1,9 +1,12 @@
 package nars.derive.meta;
 
+import jcog.math.ByteShuffler;
+import nars.$;
 import nars.control.premise.Derivation;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.compound.GenericCompound;
+import nars.term.compound.ProxyCompound;
 import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,13 +19,13 @@ import static nars.Op.CONJ;
 /**
  * parallel branching
  */
-public class Fork extends GenericCompound implements BoolPred<Derivation> {
+public class Fork extends ProxyCompound implements BoolPred<Derivation> {
 
     @NotNull
     public final BoolPred<Derivation>[] cached;
 
     public Fork(@NotNull BoolPred[] actions) {
-        super(CONJ, TermVector.the(Terms.sorted((Term[]) actions)));
+        super($.sete((Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
         this.cached = actions;
@@ -31,29 +34,15 @@ public class Fork extends GenericCompound implements BoolPred<Derivation> {
     @Override
     public boolean test(@NotNull Derivation m) {
 
-//        int now = m.now();
-//        for (int i = 0, termCacheLength = cached.length; i < termCacheLength; i++) {
-//            cached[i].test(m);
-//            m.revert(now);
-//        }
-
         int branches = cached.length;
-        int start = m.random.nextInt(branches);
-        int now = m.now();
+        ByteShuffler b = m.shuffler;
+        byte[] order = b.shuffle(m.random, branches, true); //must get a copy because recursion will re-use the shuffler's internal array
+
+        int before = m.now();
         for (int i = 0; i < branches; i++) {
-
-            //try {
-            cached[start].test(m);
-
-            /*} catch (Throwable t) {
-                m.logger.error("{}", t); //HACK
-            }*/
-
-            if (!m.revert(now))
+            cached[order[i]].test(m);
+            if (!m.revert(before))
                 return false;
-
-            if (++start == cached.length)
-                start = 0;
         }
 
         return true;

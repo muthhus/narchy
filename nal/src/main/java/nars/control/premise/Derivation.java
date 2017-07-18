@@ -1,5 +1,6 @@
 package nars.control.premise;
 
+import jcog.math.ByteShuffler;
 import nars.*;
 import nars.control.Cause;
 import nars.control.Premise;
@@ -110,6 +111,7 @@ public class Derivation extends Unify implements TermContext {
     private short[] parentCause;
     public Cause cause;
     public Deriver deriver;
+    public ByteShuffler shuffler = new ByteShuffler(64);
 
 
     /** if using this, must set: nar, index, random, DerivationBudgeting */
