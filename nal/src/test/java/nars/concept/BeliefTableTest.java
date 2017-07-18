@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
+import static junit.framework.TestCase.assertNotNull;
 import static nars.task.RevisionTest.AB;
 import static nars.task.RevisionTest.newNAR;
 import static nars.time.Tense.ETERNAL;
@@ -104,7 +105,9 @@ public class BeliefTableTest  {
         BeliefTable beliefs = b.concept().beliefs();
 
         assertEquals(0.5, beliefs.match(ETERNAL, null, null, true, null).conf(), 0.001);
-        assertEquals(0.5, n.beliefTruth(b, n.time()).conf(), 0.001);
+        Truth bt = n.beliefTruth(b, n.time());
+        assertNotNull(bt);
+        assertEquals(0.5, bt.conf(), 0.001);
         assertEquals(1, beliefs.size());
 
         b.believe(1.0f, 0.5f); n.cycle();

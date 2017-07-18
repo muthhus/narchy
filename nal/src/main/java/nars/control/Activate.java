@@ -44,6 +44,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     static final int TASKLINKS_SAMPLED = 3;
     static final int TERMLINKS_SAMPLED = 4;
+
     private Termed[] localTemplates;
 
 

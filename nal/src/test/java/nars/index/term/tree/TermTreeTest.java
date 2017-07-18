@@ -1,6 +1,8 @@
 package nars.index.term.tree;
 
 import com.google.common.collect.Sets;
+import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
@@ -60,9 +62,11 @@ public class TermTreeTest {
     @Test
     public void testCompoundInsertion() throws Narsese.NarseseException {
 
-        Terminal nar = new Terminal();
-        TreeTermIndex index = new TreeTermIndex(1000);
-        index.start(nar);
+        TreeTermIndex index;
+        NAR nar = new NARS().index(
+            index = new TreeTermIndex(1000)
+        ).get();
+
 
         String[] terms = {
                 "x",

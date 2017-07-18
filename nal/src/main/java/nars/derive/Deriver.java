@@ -35,7 +35,7 @@ public interface Deriver extends Predicate<Derivation> {
                 "nal3.nal"
         );;
 
-    TrieDeriver DEFAULT = new TrieDeriver(Deriver.DEFAULT_RULES);
+
 
 //    Cache<String, Deriver> derivers = Caffeine.newBuilder().build();
 //    Function<String,Deriver> loader = (s) -> new TrieDeriver(PremiseRuleSet.rules(s));

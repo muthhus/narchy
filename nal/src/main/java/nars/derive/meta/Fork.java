@@ -52,7 +52,7 @@ public class Fork extends GenericCompound implements BoolPred<Derivation> {
             if (!m.revert(now))
                 return false;
 
-            if (++start == branches)
+            if (++start == cached.length)
                 start = 0;
         }
 

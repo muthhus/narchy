@@ -256,7 +256,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         this.emotion = new Emotion(this);
 
-        this.deriver = Deriver.DEFAULT;
+        this.deriver = new TrieDeriver(Deriver.DEFAULT_RULES);
         deriver.forEachCause((Caused x) -> {
             if (x.cause != null) // a re-used copy from rule permutes? TODO why?
                 return;

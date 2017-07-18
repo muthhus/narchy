@@ -1,5 +1,7 @@
 package nars.nal;
 
+import nars.derive.Deriver;
+import nars.derive.TrieDeriver;
 import org.junit.Test;
 
 /**
@@ -14,7 +16,7 @@ public class TrieDeriverTest {
 
     @Test public void printCompiledRuleTree() {
 
-        //new TrieDeriver(DefaultDeriver.rules).print(System.out);
+        new TrieDeriver(Deriver.DEFAULT_RULES).print(System.out);
 
 
     }
