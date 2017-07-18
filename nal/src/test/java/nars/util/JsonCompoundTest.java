@@ -2,8 +2,8 @@ package nars.util;
 
 import nars.$;
 import nars.NAR;
-import nars.Narsese;
 import nars.NARS;
+import nars.Narsese;
 import nars.task.util.TaskRule;
 import nars.term.atom.Atomic;
 import nars.time.Tense;

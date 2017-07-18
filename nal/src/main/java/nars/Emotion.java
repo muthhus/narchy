@@ -2,9 +2,7 @@ package nars;
 
 import com.netflix.servo.monitor.BasicCounter;
 import com.netflix.servo.monitor.Counter;
-import com.netflix.servo.monitor.Monitor;
 import com.netflix.servo.monitor.StepCounter;
-import jcog.Util;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.meter.event.BufferedFloatGuage;
 import nars.term.Compound;

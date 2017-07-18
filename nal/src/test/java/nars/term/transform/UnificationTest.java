@@ -2,7 +2,6 @@ package nars.term.transform;
 
 import nars.*;
 import nars.index.term.PatternTermIndex;
-import nars.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

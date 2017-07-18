@@ -2,9 +2,9 @@ package nars.test.agent;
 
 import jcog.list.FasterList;
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import nars.NARS;
 import nars.term.var.Variable;
 import nars.time.Tense;
 import org.junit.Ignore;

@@ -1,9 +1,9 @@
 package nars.nal;
 
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.NARS;
 
 /**
  * Created by me on 1/28/16.

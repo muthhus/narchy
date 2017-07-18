@@ -40,7 +40,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
     private final float forget = 0.05f;
 
     public HijackTermIndex(ConceptBuilder cb, int capacity, int reprobes) {
-        super(cb);
+        super();
 
         updateBatchSize = 4096; //1 + (capacity / (reprobes * 2));
         updatePeriodMS = 100;

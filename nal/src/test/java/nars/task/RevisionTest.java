@@ -5,7 +5,6 @@ import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.conceptualize.state.DefaultConceptState;
-import nars.NARS;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -43,7 +42,7 @@ public class RevisionTest {
         */
 
         //}
-        ((DefaultConceptState)d.terms.conceptBuilder().awake()).beliefsMaxEte.set(maxBeliefs);
+        ((DefaultConceptState)d.conceptBuilder.awake()).beliefsMaxEte.set(maxBeliefs);
         return d;
     }
 

@@ -31,7 +31,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static jcog.pri.op.PriMerge.max;
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 

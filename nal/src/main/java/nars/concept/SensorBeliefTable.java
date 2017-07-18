@@ -6,7 +6,6 @@ import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;
-import nars.util.signal.ScalarSignal;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.Nullable;
 

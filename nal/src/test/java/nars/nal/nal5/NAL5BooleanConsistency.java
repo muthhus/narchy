@@ -2,7 +2,6 @@ package nars.nal.nal5;
 
 import nars.*;
 import nars.concept.Concept;
-import nars.NARS;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;

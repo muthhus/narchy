@@ -4,15 +4,12 @@ import nars.Op;
 import nars.control.premise.Derivation;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.index.term.AppendProtoCompound;
-import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import nars.term.var.VarPattern;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.VAR_PATTERN;
 import static nars.index.term.TermIndex.disallowTrueOrFalse;
 
 

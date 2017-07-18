@@ -2,10 +2,11 @@ package nars.nar;
 
 import jcog.random.XORShiftRandom;
 import nars.NAR;
+import nars.conceptualize.DefaultConceptBuilder;
 import nars.index.term.BasicTermIndex;
+import nars.nar.exe.BufferedExecutioner;
 import nars.time.CycleTime;
 import nars.time.Time;
-import nars.nar.exe.BufferedExecutioner;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
@@ -16,7 +17,7 @@ import java.util.Random;
  * stream which can be delegated to other
  * components like other NAR's
  */
-public class Terminal extends NAR {
+@Deprecated public class Terminal extends NAR {
 
     public Terminal() {
         this(1024);
@@ -27,7 +28,7 @@ public class Terminal extends NAR {
     }
 
     public Terminal(int capacity, @NotNull Random random, @NotNull Time time) {
-        super(new BasicTermIndex(capacity), new BufferedExecutioner(capacity, capacity), time, random);
+        super(new BasicTermIndex(capacity), new BufferedExecutioner(capacity, capacity), time, random, new DefaultConceptBuilder());
     }
 
 }

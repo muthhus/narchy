@@ -1,11 +1,7 @@
 package nars.task;
 
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Task;
+import nars.*;
 import nars.concept.TaskConcept;
-import nars.NARS;
 import nars.nar.Terminal;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;

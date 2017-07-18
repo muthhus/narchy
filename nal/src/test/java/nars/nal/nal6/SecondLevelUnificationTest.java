@@ -1,8 +1,8 @@
 package nars.nal.nal6;
 
 import nars.NAR;
-import nars.Narsese;
 import nars.NARS;
+import nars.Narsese;
 import org.junit.Test;
 
 /**

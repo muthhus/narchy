@@ -3,7 +3,6 @@ package nars.index.term.map;
 import com.github.benmanes.caffeine.cache.*;
 import nars.Param;
 import nars.concept.PermanentConcept;
-import nars.conceptualize.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -55,12 +54,13 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
                 //v.volume();
     };
 
-
+    public CaffeineIndex(long capacity) {
+        this(capacity, null);
+    }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(@NotNull ConceptBuilder conceptBuilder, long capacity, @Nullable Executor exe) {
-        super(conceptBuilder);
-
+    public CaffeineIndex(long capacity, @Nullable Executor exe) {
+        super();
 
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 

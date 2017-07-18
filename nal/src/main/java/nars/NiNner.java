@@ -4,9 +4,7 @@ import com.netflix.servo.Metric;
 import com.netflix.servo.monitor.*;
 import com.netflix.servo.publish.*;
 import com.netflix.servo.tag.BasicTagList;
-import com.netflix.servo.tag.SortedTagList;
 import com.netflix.servo.tag.Tag;
-import com.netflix.servo.tag.TagList;
 import com.netflix.servo.util.Clock;
 import com.netflix.servo.util.Reflection;
 import com.netflix.servo.util.Throwables;
@@ -20,7 +18,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static java.util.Collections.singleton;

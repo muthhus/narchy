@@ -2,11 +2,7 @@ package nars.op;
 
 import com.google.common.base.Joiner;
 import jcog.list.CircularArrayList;
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Task;
-import nars.NARS;
+import nars.*;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;

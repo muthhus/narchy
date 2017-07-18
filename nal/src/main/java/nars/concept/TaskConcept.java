@@ -30,7 +30,7 @@ public class TaskConcept extends CompoundConcept {
     protected final BeliefTable goals;
 
     public TaskConcept(@NotNull Compound term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, @NotNull NAR n) {
-        this(term, beliefs, goals, n.terms.conceptBuilder());
+        this(term, beliefs, goals, n.conceptBuilder);
     }
 
     public TaskConcept(@NotNull Compound term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder cb) {

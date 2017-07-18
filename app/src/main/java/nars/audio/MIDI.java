@@ -2,14 +2,10 @@ package nars.audio;
 
 import jcog.Loop;
 import jcog.data.FloatParam;
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Param;
+import nars.*;
 import nars.concept.Concept;
 import nars.concept.GoalActionConcept;
 import nars.gui.Vis;
-import nars.nar.MultiNAR;
 import nars.task.DerivedTask;
 import nars.task.NALTask;
 import nars.term.Compound;
@@ -38,7 +34,7 @@ public class MIDI {
     float volume[] = new float[128];
 
     public MIDI() throws LineUnavailableException {
-        MultiNAR nar = null;
+        NAR nar = NARS.threadSafe();
         nar.termVolumeMax.setValue(16);
 
         Param.DEBUG = true;

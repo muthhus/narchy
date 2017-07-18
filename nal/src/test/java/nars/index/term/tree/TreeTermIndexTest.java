@@ -2,7 +2,6 @@ package nars.index.term.tree;
 
 import jcog.tree.radix.MyConcurrentRadixTree;
 import nars.Narsese;
-import nars.conceptualize.DefaultConceptBuilder;
 import org.junit.Test;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class TreeTermIndexTest {
 
     @Test
     public void testVolumeSubTrees() throws Narsese.NarseseException {
-        TreeTermIndex t = new TreeTermIndex(new DefaultConceptBuilder(), 128);
+        TreeTermIndex t = new TreeTermIndex( 128);
         t.set($("a"));
         t.set($("(a)"));
         t.set($("(a-->b)"));

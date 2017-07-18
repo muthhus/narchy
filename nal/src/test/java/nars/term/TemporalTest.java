@@ -3,7 +3,6 @@ package nars.term;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
-import nars.NARS;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -16,9 +15,7 @@ import java.util.TreeSet;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.term.container.TermContainer.theTermArray;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
+import static nars.time.Tense.*;
 import static org.junit.Assert.*;
 
 

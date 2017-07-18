@@ -25,8 +25,7 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
+import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -38,6 +37,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
     private static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
     public NAR nar;
+    protected ConceptBuilder conceptBuilder;
 
 
     /**
@@ -86,23 +86,21 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     }
 
     public void start(NAR nar) {
+
         this.nar = nar;
+        this.conceptBuilder = nar.conceptBuilder;
 
         for (Concept t : Builtin.statik)
             set(t);
 
         Builtin.load(nar);
 
-        conceptBuilder().start(nar);
     }
 
     /**
      * # of contained terms
      */
     public abstract int size();
-
-    @NotNull
-    abstract public ConceptBuilder conceptBuilder();
 
 
     /**
@@ -423,7 +421,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         Concept cc = (Concept) c;
         if (cc.isDeleted()) {
-            cc.state(conceptBuilder().init());
+            cc.state(conceptBuilder.init());
         }
         commit(cc);
         return cc;

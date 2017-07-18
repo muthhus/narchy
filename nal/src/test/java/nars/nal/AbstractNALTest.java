@@ -1,8 +1,8 @@
 package nars.nal;
 
 import nars.NAR;
-import nars.Param;
 import nars.NARS;
+import nars.Param;
 import nars.op.stm.STMTemporalLinkage;
 import nars.test.TestNAR;
 import org.junit.After;

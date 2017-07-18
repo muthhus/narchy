@@ -2,9 +2,9 @@ package nars.nal.multistep;
 
 import nars.$;
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.nal.AbstractNALTest;
-import nars.NARS;
 import nars.test.TestNAR;
 import org.junit.Ignore;
 import org.junit.Test;

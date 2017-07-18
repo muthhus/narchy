@@ -136,7 +136,7 @@ public class CompoundConcept implements Concept, Compound, Termlike, NonInternab
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.terms.conceptBuilder());
+        this(term, (DefaultConceptBuilder) n.conceptBuilder);
     }
 
 

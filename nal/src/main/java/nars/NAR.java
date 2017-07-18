@@ -18,6 +18,7 @@ import jcog.pri.mix.PSink;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
+import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.control.Cause;
 import nars.control.ConceptFire;
@@ -26,6 +27,7 @@ import nars.derive.TrieDeriver;
 import nars.derive.meta.op.RegisterCause;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
+import nars.nar.exe.Executioner;
 import nars.op.Command;
 import nars.op.Operator;
 import nars.table.BeliefTable;
@@ -47,7 +49,6 @@ import nars.time.Time;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.util.Cycles;
-import nars.nar.exe.Executioner;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.lang3.ArrayUtils;
@@ -106,6 +107,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     public final Executioner exe;
     protected final @NotNull Random random;
+
+    public final ConceptBuilder conceptBuilder;
+
     public final transient Topic<NAR> eventReset = new ArrayTopic<>();
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
@@ -232,9 +236,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public NAR(@NotNull TermIndex terms, @NotNull Executioner exe, @NotNull Time time, @NotNull Random rng) {
+    public NAR(@NotNull TermIndex terms, @NotNull Executioner exe, @NotNull Time time, @NotNull Random rng, @NotNull ConceptBuilder conceptBuilder) {
 
         this.random = rng;
+
+        this.terms = terms;
 
         this.exe = exe;
 
@@ -242,11 +248,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         this.time = time;
 
-        this.emotion = new Emotion(this);
+        (this.conceptBuilder = conceptBuilder).start(this);
 
         this.level = 8;
 
-        //this.deriver = new TrieDeriver(DefaultDeriver.rules);
+        time.clear();
+
+        this.emotion = new Emotion(this);
 
         this.deriver = Deriver.DEFAULT;
         deriver.forEachCause((RegisterCause x) -> {
@@ -256,16 +264,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             x.cause = newCause(x);
         });
 
-
-        this.terms = terms;
-
-
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);
 
-        time.clear();
-
         exe.start(this);
+
     }
 
 
@@ -843,28 +846,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @Deprecated
     public final void on(@NotNull Atom a, @NotNull Operator o) {
-//        DefaultConceptBuilder builder = (DefaultConceptBuilder) terms.conceptBuilder();
-//        PermanentAtomConcept c = builder.withBags(a,
-//                (termlink, tasklink) -> new PermanentAtomConcept(a, termlink, tasklink)
-//        );
-//        c.put(Operator.class, o);
-//        terms.set(c);
+
         on(new Command(a) {
 
             @Override
             public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
                 Compound c = t.term();
-                //try {
                 o.run((Atomic) (c.sub(1)), ((Compound) (t.term(0))).toArray(), nar);
                 return t;
-//                } catch (Throwable error) {
-//                    if (Param.DEBUG)
-//                        throw error;
-//                    else
-//                        return error(error);
-//                }
-
-                //return o.run(t, nar);
             }
 
         });
@@ -1444,7 +1433,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         if ((existing != null) && (existing != c))
             throw new RuntimeException("concept already indexed for term: " + c.term());
 
-        c.state(terms.conceptBuilder().awake());
+        c.state(conceptBuilder.awake());
         terms.set(c);
 
         return c;

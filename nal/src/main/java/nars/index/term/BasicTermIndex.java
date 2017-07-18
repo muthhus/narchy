@@ -17,7 +17,6 @@ public class BasicTermIndex extends MapTermIndex {
 
     public BasicTermIndex(int capacity, ConceptBuilder cb) {
         super(
-                cb,
                 new HashMap<>(capacity/*, 0.9f*/)
                 //new UnifiedMap(capacity, 0.9f),
                 //new UnifiedMap(capacity, 0.9f)

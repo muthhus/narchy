@@ -1,8 +1,8 @@
 package nars.nal.nal6;
 
 import nars.NAR;
-import nars.Narsese;
 import nars.NARS;
+import nars.Narsese;
 import nars.term.Compound;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;

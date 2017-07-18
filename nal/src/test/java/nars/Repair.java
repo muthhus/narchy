@@ -1,8 +1,6 @@
 package nars;
 
 import nars.nal.AbstractNALTest;
-import nars.nal.nal1.NAL1Test;
-import nars.nal.nal2.NAL2Test;
 import nars.nal.nal6.NAL6Test;
 import nars.util.OptiUnit;
 import org.intelligentjava.machinelearning.decisiontree.FloatTable;

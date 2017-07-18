@@ -2,9 +2,9 @@ package nars.experiment;
 
 import jcog.Util;
 import nars.NAR;
+import nars.NARS;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.NARS;
 import nars.test.agent.Line1DSimplest;
 
 public class Line1DQ {

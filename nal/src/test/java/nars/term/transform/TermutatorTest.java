@@ -1,6 +1,5 @@
 package nars.term.transform;
 
-import com.google.common.collect.Lists;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Narsese;

@@ -3,11 +3,9 @@ package nars.concept;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
-import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.truth.Truthed;
 import nars.util.signal.ScalarSignal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -34,7 +32,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
     public SensorConcept(@NotNull Compound c, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
         super(c,
-                null, //new SensorBeliefTable(n.terms.conceptBuilder().newTemporalBeliefTable(c)),
+                null,
                 null, n);
 
         this.sensor = new ScalarSignal(n, c, this, truth, resolution) {

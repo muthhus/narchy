@@ -1,13 +1,9 @@
 package nars.nal.nal7;
 
 import com.google.common.collect.Lists;
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Task;
+import nars.*;
 import nars.concept.Concept;
 import nars.concept.dynamic.DynamicBeliefTable;
-import nars.NARS;
 import nars.nar.Terminal;
 import org.junit.Test;
 

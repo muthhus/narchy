@@ -1,6 +1,5 @@
 package nars.index.term.map;
 
-import nars.conceptualize.ConceptBuilder;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -15,8 +14,8 @@ public class MapTermIndex extends MaplikeTermIndex {
 
     protected final Map<Term,Termed> concepts;
 
-    public MapTermIndex(@NotNull ConceptBuilder conceptBuilder, Map<Term, Termed> map) {
-        super(conceptBuilder);
+    public MapTermIndex(Map<Term, Termed> map) {
+        super();
         this.concepts = map;
     }
 

@@ -1,8 +1,8 @@
 package nars.nal.nal8;
 
 import nars.NAR;
-import nars.Narsese;
 import nars.NARS;
+import nars.Narsese;
 import nars.time.Tense;
 import org.junit.Test;
 

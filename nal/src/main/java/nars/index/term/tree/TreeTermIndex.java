@@ -4,7 +4,6 @@ import jcog.tree.radix.MyConcurrentRadixTree;
 import nars.NAR;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.conceptualize.ConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
@@ -27,13 +26,10 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     @NotNull
     public final TermTree concepts;
 
-    private final ConceptBuilder conceptBuilder;
-
     int sizeLimit;
 
-    public TreeTermIndex(ConceptBuilder conceptBuilder, int sizeLimit) {
+    public TreeTermIndex(int sizeLimit) {
 
-        this.conceptBuilder = conceptBuilder;
         this.concepts = new TermTree() {
 
             @Override
@@ -66,6 +62,7 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     @Override
     public void start(@NotNull NAR nar) {
         super.start(nar);
+
         nar.onCycle(this);
     }
 
@@ -233,11 +230,6 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
     @Override
     public int size() {
         return concepts.size(); //WARNING may be slow
-    }
-
-    @Override
-    public @Nullable ConceptBuilder conceptBuilder() {
-        return conceptBuilder;
     }
 
 

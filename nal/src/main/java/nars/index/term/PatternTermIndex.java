@@ -1,7 +1,6 @@
 package nars.index.term;
 
 import nars.Op;
-import nars.conceptualize.ConceptBuilder;
 import nars.derive.meta.PatternCompound;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.rule.PremiseRule;
@@ -24,20 +23,21 @@ import static nars.Op.NEG;
 public class PatternTermIndex extends MapTermIndex {
 
     public PatternTermIndex() {
-        super(ConceptBuilder.Null, new HashMap<>(/*capacity*/) );
+        super(new HashMap<>(/*capacity*/) );
     }
 
     @Override
     public Termed get(@NotNull Term x, boolean createIfMissing) {
         if (x instanceof Compound) {
-            return compute((Compound)x);
+            x = compute((Compound)x);
         }
-        return super.get(x, createIfMissing);
+        Termed y = concepts.putIfAbsent(x, x);
+        return y!=null ? y : x;
     }
 
 
     @NotNull
-    protected Termed compute(@NotNull Compound x) {
+    protected Term compute(@NotNull Compound x) {
 
         //dont store the actual rules, they are guaranteed unique by other means
         if (x instanceof PremiseRule) {

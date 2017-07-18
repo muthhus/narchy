@@ -1,7 +1,6 @@
 package nars.nar.exe;
 
 import com.google.common.base.Joiner;
-import jcog.Loop;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;

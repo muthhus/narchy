@@ -6,8 +6,6 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 /**
  * Created by me on 12/22/15.
  */

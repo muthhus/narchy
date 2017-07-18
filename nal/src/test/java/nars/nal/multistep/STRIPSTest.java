@@ -1,8 +1,8 @@
 package nars.nal.multistep;
 
 import nars.NAR;
-import nars.Narsese;
 import nars.NARS;
+import nars.Narsese;
 import org.junit.Test;
 
 /**

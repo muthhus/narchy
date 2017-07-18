@@ -2,7 +2,6 @@ package nars.op.java;
 
 import jcog.tree.interval.IntervalTree;
 import nars.*;
-import nars.NARS;
 import nars.op.in.ChangedTextInput;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 

@@ -7,13 +7,9 @@ import nars.nal.AbstractNALTest;
 import nars.task.NALTask;
 import nars.test.TestNAR;
 import nars.time.Tense;
-import nars.util.OptiUnit;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.Map;
-import java.util.SortedMap;
 
 import static nars.$.$;
 import static nars.Op.*;

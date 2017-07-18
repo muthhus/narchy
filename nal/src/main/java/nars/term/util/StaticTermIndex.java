@@ -1,6 +1,5 @@
 package nars.term.util;
 
-import nars.conceptualize.ConceptBuilder;
 import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
@@ -24,11 +23,6 @@ public class StaticTermIndex extends TermIndex {
 //            return super.the(c);
 //        }
 
-
-    @Override
-    public @NotNull ConceptBuilder conceptBuilder() {
-        return ConceptBuilder.Null;
-    }
 
     @Override
     public

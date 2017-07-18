@@ -12,8 +12,6 @@ import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static jcog.pri.op.PriMerge.avg;
-import static jcog.pri.op.PriMerge.max;
 import static nars.Op.*;
 
 /**

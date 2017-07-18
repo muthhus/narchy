@@ -1,8 +1,8 @@
 package nars.budget;
 
 import nars.NAR;
-import nars.Narsese;
 import nars.NARS;
+import nars.Narsese;
 import org.junit.Ignore;
 import org.junit.Test;
 

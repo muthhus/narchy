@@ -1,9 +1,9 @@
 package nars.logic;
 
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import nars.NARS;
 import nars.nar.exe.BufferedExecutioner;
 import org.junit.Test;
 

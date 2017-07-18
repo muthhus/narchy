@@ -3,7 +3,7 @@ package nars;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.gui.Vis;
-import nars.nar.MultiNAR;
+import nars.index.term.map.CaffeineIndex;
 import nars.nar.exe.MultiExecutioner;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
@@ -104,11 +104,15 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        NAR n = new NARS().exe(
-                new MultiExecutioner((i) ->
-                        new MultiExecutioner.Worker(256, 32, 0.05f),
-                        3, 2))
-                .time(clock).get();
+        NAR n = new NARS()
+                    .exe(
+                        new MultiExecutioner((i) ->
+                            new MultiExecutioner.Worker(256, 32, 0.05f),
+                                3, 2))
+                    .time(clock)
+                    .index(new CaffeineIndex(128 * 1024))
+                    .get();
+
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 

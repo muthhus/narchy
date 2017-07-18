@@ -1,8 +1,8 @@
 package nars.nlp;
 
 import nars.NAR;
-import nars.Narsese;
 import nars.NARS;
+import nars.Narsese;
 
 /**
  * Created by me on 2/10/16.

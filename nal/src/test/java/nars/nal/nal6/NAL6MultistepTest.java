@@ -1,9 +1,9 @@
 package nars.nal.nal6;
 
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.concept.Concept;
-import nars.NARS;
 import nars.time.Tense;
 import org.junit.Test;
 

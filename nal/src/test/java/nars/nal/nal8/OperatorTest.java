@@ -1,9 +1,9 @@
 package nars.nal.nal8;
 
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import nars.NARS;
 import org.junit.Test;
 
 public class OperatorTest {

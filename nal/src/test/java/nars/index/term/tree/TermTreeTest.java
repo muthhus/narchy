@@ -61,14 +61,15 @@ public class TermTreeTest {
     public void testCompoundInsertion() throws Narsese.NarseseException {
 
         Terminal nar = new Terminal();
-        TreeTermIndex index = new TreeTermIndex(nar.terms.conceptBuilder(), 1000);
+        TreeTermIndex index = new TreeTermIndex(1000);
+        index.start(nar);
 
         String[] terms = {
                 "x",
                 "(x)", "(xx)", "(xxx)",
                 "(x,y)", "(x,z)",
                 "(x --> z)", "(x <-> z)",
-                "(x&&z)","(/,x,_)","(/,_,x)"
+                "(x&&z)"
         };
         HashSet<Term> input = new HashSet();
         for (String s : terms) {

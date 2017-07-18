@@ -2,9 +2,9 @@ package nars.term;
 
 
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import nars.NARS;
 import nars.test.analyze.EventCount;
 import org.junit.Test;
 

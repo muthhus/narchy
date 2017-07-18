@@ -6,8 +6,6 @@ import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 
-import java.util.List;
-
 /**
  * AIKR choicepoint used in deciding possible mutations to apply in deriving new compounds
  */

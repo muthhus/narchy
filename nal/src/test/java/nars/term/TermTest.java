@@ -18,7 +18,6 @@ package nars.term;
 
 import nars.*;
 import nars.concept.Concept;
-import nars.NARS;
 import nars.nar.Terminal;
 import nars.term.atom.Atomic;
 import nars.term.container.ArrayTermVector;

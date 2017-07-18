@@ -1,19 +1,10 @@
 package nars.io;
 
 import jcog.Util;
-import nars.InterNAR;
-import nars.NAR;
-import nars.Narsese;
-import nars.Param;
-import nars.conceptualize.DefaultConceptBuilder;
-import nars.index.term.map.MapTermIndex;
-import nars.NARS;
-import nars.time.RealTime;
+import nars.*;
 import nars.time.Tense;
-import nars.nar.exe.BufferedExecutioner;
 import org.junit.Test;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
@@ -34,10 +25,10 @@ public class InterNARTest {
         Param.ANSWER_REPORTING = false;
 
         try {
-            NAR a = newNAR();
+            NAR a = NARS.threadSafe();
             a.setSelf("a");
 
-            NAR b = newNAR();
+            NAR b = NARS.threadSafe();
             b.setSelf("b");
 
             beforeConnect.accept(a, b);
@@ -77,11 +68,6 @@ public class InterNARTest {
             e.printStackTrace();
             assertTrue(e.toString(), false);
         }
-    }
-
-    private static NAR newNAR() {
-        return new NARS().index(new MapTermIndex(new DefaultConceptBuilder(), new ConcurrentHashMap(1024))).time(new RealTime.DSHalf(true))
-                .exe(new BufferedExecutioner(256, 512)).get();
     }
 
     @Test
