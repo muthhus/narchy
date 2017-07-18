@@ -1695,6 +1695,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public float evaluate(Task x) {
         short[] causes = ((Task) x).cause();
         float gain = evaluate(causes);
+        assert(gain==gain);
         if (gain != 0) {
 
             float amp = Util.tanhFast(gain) + 1f; //[0..+2]
@@ -1720,6 +1721,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         //normalize the sub-values to 1.0 using triangular number as a divisor
         int numCauses = causes.length;
+        if (numCauses == 0)
+            return 0f;
 
         for (int i = 0; i < numCauses; i++) {
             short c = causes[i];
