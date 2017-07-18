@@ -1,6 +1,6 @@
 package nars.index.task;
 
-import jcog.byt.ByteSeq;
+import jcog.byt.AbstractBytes;
 import jcog.tree.radix.MyConcurrentRadixTree;
 import nars.Task;
 import nars.index.term.tree.TermKey;
@@ -45,7 +45,7 @@ public class TreeTaskIndex implements TaskIndex {
     }
 
     @NotNull
-    static ByteSeq key(@NotNull Task x) {
+    static AbstractBytes key(@NotNull Task x) {
         return new TermKey(x);
     }
 

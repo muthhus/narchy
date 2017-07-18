@@ -18,7 +18,7 @@
 package jcog.byt.collection;
 
 
-import jcog.byt.RawByteSeq;
+import jcog.byt.RawBytes;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -29,13 +29,13 @@ import java.util.Set;
  * Created by Anton Nashatyrev on 06.10.2016.
  */
 public class ByteArraySet implements Set<byte[]> {
-    Set<RawByteSeq> delegate;
+    Set<RawBytes> delegate;
 
     public ByteArraySet() {
-        this(new HashSet<RawByteSeq>());
+        this(new HashSet<RawBytes>());
     }
 
-    ByteArraySet(Set<RawByteSeq> delegate) {
+    ByteArraySet(Set<RawBytes> delegate) {
         this.delegate = delegate;
     }
 
@@ -51,14 +51,14 @@ public class ByteArraySet implements Set<byte[]> {
 
     @Override
     public boolean contains(Object o) {
-        return delegate.contains(new RawByteSeq((byte[]) o));
+        return delegate.contains(new RawBytes((byte[]) o));
     }
 
     @Override
     public Iterator<byte[]> iterator() {
         return new Iterator<>() {
 
-            Iterator<RawByteSeq> it = delegate.iterator();
+            Iterator<RawBytes> it = delegate.iterator();
 
             @Override
             public boolean hasNext() {
@@ -82,7 +82,7 @@ public class ByteArraySet implements Set<byte[]> {
         int s = size();
         byte[][] ret = new byte[s][];
 
-        RawByteSeq[] arr = delegate.toArray(new RawByteSeq[s]);
+        RawBytes[] arr = delegate.toArray(new RawBytes[s]);
         for (int i = 0; i < arr.length; i++) {
             ret[i] = arr[i].array();
         }
@@ -96,12 +96,12 @@ public class ByteArraySet implements Set<byte[]> {
 
     @Override
     public boolean add(byte[] bytes) {
-        return delegate.add(new RawByteSeq(bytes));
+        return delegate.add(new RawBytes(bytes));
     }
 
     @Override
     public boolean remove(Object o) {
-        return delegate.remove(new RawByteSeq((byte[]) o));
+        return delegate.remove(new RawBytes((byte[]) o));
     }
 
     @Override

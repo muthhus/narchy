@@ -8,11 +8,11 @@ import java.util.Arrays;
 /**
  * Created by me on 12/20/16.
  */
-public class ArrayByteSeq implements ByteSeq, Serializable /*implements CharSequence*/ {
+public class ArrayBytes implements AbstractBytes, Serializable /*implements CharSequence*/ {
 
     public final byte[] bytes;
 
-    public ArrayByteSeq(byte[] bytes) {
+    public ArrayBytes(byte[] bytes) {
         this.bytes = bytes;
     }
 
@@ -23,7 +23,7 @@ public class ArrayByteSeq implements ByteSeq, Serializable /*implements CharSequ
 
     @Override
     public boolean equals(Object obj) {
-        return Arrays.equals(bytes, ((ArrayByteSeq)obj).bytes);
+        return Arrays.equals(bytes, ((ArrayBytes)obj).bytes);
     }
 
     @Override
@@ -47,18 +47,18 @@ public class ArrayByteSeq implements ByteSeq, Serializable /*implements CharSequ
     }
 
     @Override
-    public ByteSeq subSequence(int start, int end) {
+    public AbstractBytes subSequence(int start, int end) {
         return subSeq(start, end);
     }
 
-    public ByteSeq subSeq(int start, int end) {
+    public AbstractBytes subSeq(int start, int end) {
         if (end - start == 1)
             return new OneByteSeq(at(start));
 
         if (start == 0 && end == length())
             return this; //no change
 
-        return new WindowByteSeq(bytes, start, end);
+        return new WindowBytes(bytes, start, end);
     }
 
     public String toString() {

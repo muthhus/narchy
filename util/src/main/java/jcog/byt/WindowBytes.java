@@ -5,11 +5,11 @@ import java.util.Arrays;
 /**
  * Created by me on 4/17/17.
  */
-public class WindowByteSeq extends ArrayByteSeq /*implements CharSequence*/ {
+public class WindowBytes extends ArrayBytes /*implements CharSequence*/ {
     final int start;
     final int end;
 
-    protected WindowByteSeq(byte[] bytes, int start, int end) {
+    protected WindowBytes(byte[] bytes, int start, int end) {
         super(bytes);
         if (start < 0) {
             throw new IllegalArgumentException("start " + start + " < 0");
@@ -47,7 +47,7 @@ public class WindowByteSeq extends ArrayByteSeq /*implements CharSequence*/ {
     }
 
     @Override
-    public ByteSeq subSequence(int start, int end) {
+    public AbstractBytes subSequence(int start, int end) {
         if (start < 0) {
             throw new IllegalArgumentException("start " + start + " < 0");
         } else if (end > this.length()) {
@@ -55,7 +55,7 @@ public class WindowByteSeq extends ArrayByteSeq /*implements CharSequence*/ {
         } else if (end < start) {
             throw new IllegalArgumentException("end " + end + " < start " + start);
         } else {
-            return new WindowByteSeq(this.bytes, this.start + start, this.start + end);
+            return new WindowBytes(this.bytes, this.start + start, this.start + end);
         }
     }
 

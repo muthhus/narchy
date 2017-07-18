@@ -53,31 +53,35 @@ public class GenericCompoundDT extends ProxyCompound {
             Compound ref = this.ref;
             Compound dref = d.ref;
 
-            if (ref == dref) {
-                //ok
-            } else if (ref.equals(dref)) {
-                //share equivalent instance, prefer to maintain a normalized term as it is likely used elsewhere (ie. in task content)
-                if (ref.isNormalized()) {
-                    d.ref.setNormalized(); //though we will overwrite this next, in case it's shared elsewhere it will now also be known normalized
-                    d.ref = ref;
-                } else if (d.ref.isNormalized()) {
-                    ref.setNormalized();  //though we will overwrite this next, in case it's shared elsewhere it will now also be known normalized
-                    this.ref = d.ref;
-                } else {
-                    d.ref = ref;
-                }
+            if (!Param.CompoundDT_TermSharing) {
 
-//                if (System.identityHashCode(ref) < System.identityHashCode(dref)) {
-//                    this.ref = dref;
-//                } else {
-//                    d.ref = this.ref;
-//                }
+                //compares hash and dt first, but doesnt share
+                return (hashDT == d.hashDT && dt == d.dt && ref.equals(d.ref));
 
             } else {
-                return false;
+
+                if (ref == dref) {
+                    //ok
+                } else if (ref.equals(dref)) {
+                    //share equivalent instance, prefer to maintain a normalized term as it is likely used elsewhere (ie. in task content)
+                    if (ref.isNormalized()) {
+                        d.ref.setNormalized(); //though we will overwrite this next, in case it's shared elsewhere it will now also be known normalized
+                        d.ref = ref;
+                    } else if (d.ref.isNormalized()) {
+                        ref.setNormalized();  //though we will overwrite this next, in case it's shared elsewhere it will now also be known normalized
+                        this.ref = d.ref;
+                    } else {
+                        d.ref = ref;
+                    }
+
+
+                } else {
+                    return false;
+                }
+
+                return (hashDT == d.hashDT && dt == d.dt);
             }
 
-            return (hashDT == d.hashDT && dt == d.dt);
         } else if (obj instanceof ProxyCompound) {
             return equals(((ProxyCompound) obj).ref);
         }

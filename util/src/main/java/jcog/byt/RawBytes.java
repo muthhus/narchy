@@ -3,11 +3,11 @@ package jcog.byt;
 /**
  * extends ArrayByteSeq with a cached hashCode
  */
-public class RawByteSeq extends ArrayByteSeq {
+public class RawBytes extends ArrayBytes {
 
     private final int hash;
 
-    public RawByteSeq(byte[] bytes) {
+    public RawBytes(byte[] bytes) {
         super(bytes);
         this.hash = super.hashCode();
     }

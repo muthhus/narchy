@@ -125,25 +125,25 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     }
 
 
-    static boolean equivalentTo(@NotNull Task a, @NotNull Task b, boolean punctuation, boolean term, boolean truth, boolean stamp, boolean occurrenceTime) {
+    static boolean equal(@NotNull Task a, @NotNull Task b) {
 
         @NotNull long[] evidence = a.stamp();
 
-        if (stamp && (!Arrays.equals(evidence, b.stamp())))
+        if ((!Arrays.equals(evidence, b.stamp())))
             return false;
 
         if (evidence.length > 1) {
-            if (occurrenceTime && (a.start() != b.start()) || (a.end() != b.end()))
+            if (!Objects.equals(a.truth(), b.truth()))
                 return false;
 
-            if (truth && !Objects.equals(a.truth(), b.truth()))
+            if ((a.start() != b.start()) || (a.end() != b.end()))
                 return false;
         }
 
-        if (term && !a.term().equals(b.term()))
+        if (a.punc() != b.punc())
             return false;
 
-        return !punctuation || a.punc() == b.punc();
+        return a.term().equals(b.term());
     }
 
 
@@ -1035,6 +1035,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         return x == ETERNAL || Math.abs(x - when) <= dur;
     }
 
+    /** TODO cause should be merged if possible when merging tasks in belief table or otherwise */
     short[] cause();
 
 }

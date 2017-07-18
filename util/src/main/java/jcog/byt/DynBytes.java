@@ -10,31 +10,33 @@ import java.io.IOException;
 import java.util.Arrays;
 
 /**
- * copied from Infinispan SimpleDataOutput
+ * dynamic byte array with mostly append-oriented functionality
  */
-public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
+public class DynBytes implements ByteArrayDataOutput, Appendable, AbstractBytes {
 
+    /** must remain final for global consistency */
     private final static float minCompressionRatio = 0.9f;
-    private final static int MIN_COMPRESSION_LEN = 64;
+    /** must remain final for global consistency */
+    private final static int MIN_COMPRESSION_BYTES = 64;
 
+    static final int MIN_GROWTH_BYTES = 64;
 
-    public static final int MIN_GROWTH_BYTES = 16;
     protected byte[] bytes;
     public int len;
 
-    protected DynByteSeq() {
+    protected DynBytes() {
         this.bytes = null;
     }
 
-    public DynByteSeq(int bufferSize) {
+    public DynBytes(int bufferSize) {
         this.bytes = new byte[bufferSize];
     }
 
-    public DynByteSeq(byte[] zeroCopy) {
+    public DynBytes(byte[] zeroCopy) {
         this(zeroCopy, zeroCopy.length);
     }
 
-    public DynByteSeq(byte[] zeroCopy, int len) {
+    public DynBytes(byte[] zeroCopy, int len) {
         this.bytes = zeroCopy;
         this.len = len;
     }
@@ -52,7 +54,7 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
 
         int to = length();
         int len = to - from;
-        if (len < MIN_COMPRESSION_LEN) {
+        if (len < MIN_COMPRESSION_BYTES) {
             return -1;
         }
 
@@ -83,11 +85,11 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
     }
 
     public int hash(int from, int to) {
-        return ByteSeq.hash(bytes, from, to);
+        return AbstractBytes.hash(bytes, from, to);
     }
 
     public long hash64(int from, int to) {
-        return ByteSeq.hash64(bytes, from, to);
+        return AbstractBytes.hash64(bytes, from, to);
     }
 
     @Override
@@ -95,7 +97,8 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
         if (this == obj)
             return true;
 
-        DynByteSeq d = (DynByteSeq) obj;
+        DynBytes d = (DynBytes) obj;
+        int len = this.len;
         return d.len == len && Arrays.equals(bytes, 0, len, d.bytes, 0, len);
     }
 
@@ -106,34 +109,46 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public byte at(int index) {
+    public final byte at(int index) {
         return bytes[index];
     }
 
     @Override
-    public ByteSeq subSequence(int start, int end) {
+    public final AbstractBytes subSequence(int start, int end) {
         if (end - start == 1)
             return new OneByteSeq(at(start));
 
         if (start == 0 && end == length())
             return this; //no change
 
-        return new WindowByteSeq(bytes, start, end);
+        return new WindowBytes(bytes, start, end);
     }
 
     @Override
-    public void write(int v) {
+    public final void write(int v) {
         writeByte(v);
     }
 
 
     @Override
-    public void writeByte(int v) {
+    public final void writeByte(int v) {
         ensureSized(1);
         this.bytes[this.len++] = (byte) v;
     }
 
-    public void fillBytes(byte b, int next) {
+    /** combo: (byte, int)  */
+    public final void write(byte b, int v) {
+        int s = ensureSized(1 + 4 );
+        byte[] e = this.bytes;
+        e[s++] = b;
+        e[s++] = (byte) (v >> 24);
+        e[s++] = (byte) (v >> 16);
+        e[s++] = (byte) (v >> 8);
+        e[s++] = (byte) v;
+        this.len = s;
+    }
+
+    public final void fillBytes(byte b, int next) {
         int start = this.len;
         this.len += next;
         int end = this.len;
@@ -142,12 +157,12 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
 
 
     @Override
-    public void write(@NotNull byte[] bytes) {
+    public final void write(@NotNull byte[] bytes) {
         this.write(bytes, 0, bytes.length);
     }
 
     @Override
-    public void write(@NotNull byte[] bytes, int off, int len) {
+    public final void write(@NotNull byte[] bytes, int off, int len) {
         int position = ensureSized(len);
         System.arraycopy(bytes, off, this.bytes, position, len);
         this.len = position + len;
@@ -167,7 +182,7 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public byte[] array() {
+    public final byte[] array() {
         compact();
         return bytes;
     }
@@ -176,11 +191,11 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
         compact(false);
     }
 
-    public void compact(boolean force) {
+    public final void compact(boolean force) {
         compact(null, force);
     }
 
-    public void compact(byte[] forceIfSameAs, boolean force) {
+    public final void compact(byte[] forceIfSameAs, boolean force) {
         int l = this.len;
         if (l > 0) {
             byte[] b = this.bytes;
@@ -191,7 +206,7 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
 
 
     @Override
-    public void toArray(byte[] c, int offset) {
+    public final void toArray(byte[] c, int offset) {
         System.arraycopy(bytes, 0, c, offset, length());
     }
 
@@ -202,14 +217,14 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
 
 
     @Override
-    public void writeBoolean(boolean v) {
+    public final void writeBoolean(boolean v) {
         ensureSized(1);
         byte[] e = this.bytes;
         e[this.len++] = (byte) (v ? 1 : 0);
     }
 
     @Override
-    public void writeShort(int v) {
+    public final void writeShort(int v) {
 
         int s = ensureSized(2);
         byte[] e = this.bytes;
@@ -219,7 +234,7 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeChar(int v) {
+    public final void writeChar(int v) {
 
         int s = ensureSized(2);
         byte[] e = this.bytes;
@@ -230,7 +245,7 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeInt(int v) {
+    public final void writeInt(int v) {
 
         int s = ensureSized(4);
         byte[] e = this.bytes;
@@ -242,7 +257,7 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeLong(long v) {
+    public final void writeLong(long v) {
 
         int s = ensureSized(8);
         this.len += 8;
@@ -258,7 +273,7 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeFloat(float v) {
+    public final void writeFloat(float v) {
 
         int s = ensureSized(4);
         byte[] e = this.bytes;
@@ -271,7 +286,7 @@ public class DynByteSeq implements ByteArrayDataOutput, Appendable, ByteSeq {
     }
 
     @Override
-    public void writeDouble(double v) {
+    public final void writeDouble(double v) {
         throw new UnsupportedOperationException("yet");
 //        long bits = Double.doubleToLongBits(v);
 //

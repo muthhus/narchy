@@ -3,11 +3,11 @@ package jcog.byt;
 /**
  * caches the hashcode when compact() is called
  */
-public class HashCachedDynByteSeq extends DynByteSeq {
+public class HashCachedBytes extends DynBytes {
 
     private int hash;
 
-    public HashCachedDynByteSeq(int bufferSize) {
+    public HashCachedBytes(int bufferSize) {
         super(bufferSize);
         compact(); //initialize
     }
@@ -20,7 +20,7 @@ public class HashCachedDynByteSeq extends DynByteSeq {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof DynByteSeq)) return false;
+        if (!(obj instanceof DynBytes)) return false;
         if (hash != obj.hashCode()) return false;
         return super.equals(obj);
     }

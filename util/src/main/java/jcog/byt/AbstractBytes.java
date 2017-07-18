@@ -3,9 +3,9 @@ package jcog.byt;
 import jcog.Util;
 
 
-public interface ByteSeq {
+public interface AbstractBytes {
 
-    ByteSeq EMPTY = new ByteSeq() {
+    AbstractBytes EMPTY = new AbstractBytes() {
 
         @Override
         public int length() {
@@ -18,7 +18,7 @@ public interface ByteSeq {
         }
 
         @Override
-        public ByteSeq subSequence(int start, int end) {
+        public AbstractBytes subSequence(int start, int end) {
             throw new UnsupportedOperationException();
         }
     };
@@ -37,7 +37,7 @@ public interface ByteSeq {
 
     byte at(int index);
 
-    ByteSeq subSequence(int start, int end);
+    AbstractBytes subSequence(int start, int end);
 
     default void toArray(byte[] c, int offset) {
         int l = length();
@@ -53,7 +53,7 @@ public interface ByteSeq {
         return b;
     }
 
-    class OneByteSeq implements ByteSeq /*implements CharSequence*/ {
+    class OneByteSeq implements AbstractBytes /*implements CharSequence*/ {
         public final byte b;
 
         public OneByteSeq(byte b) {
@@ -83,7 +83,7 @@ public interface ByteSeq {
         }
 
         @Override
-        public ByteSeq subSequence(int start, int end) {
+        public AbstractBytes subSequence(int start, int end) {
             if ((start == 0) && (end == 1))
                 return this;
 

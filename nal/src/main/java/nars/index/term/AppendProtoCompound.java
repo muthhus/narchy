@@ -1,6 +1,6 @@
 package nars.index.term;
 
-import jcog.byt.DynByteSeq;
+import jcog.byt.DynBytes;
 import jcog.util.ArrayPool;
 import nars.IO;
 import nars.Op;
@@ -30,7 +30,7 @@ import static nars.time.Tense.DTERNAL;
  * VolumeLimitedIncrementalProtoCompound extends AppendProtoCompound
  * etc...
  */
-public class AppendProtoCompound extends /*HashCached*/DynByteSeq implements ProtoCompound {
+public class AppendProtoCompound extends /*HashCached*/DynBytes implements ProtoCompound {
 
     public final Op op;
 

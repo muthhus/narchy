@@ -6,7 +6,7 @@ import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
-import jcog.byt.DynByteSeq;
+import jcog.byt.DynBytes;
 import jcog.data.FloatParam;
 import jcog.io.BinTxt;
 import jcog.math.RecycledSummaryStatistics;
@@ -560,7 +560,7 @@ public class UDPeer extends UDP {
     }
 
 
-    public static class Msg extends DynByteSeq implements Priority {
+    public static class Msg extends DynBytes implements Priority {
 
         final static int TTL_BYTE = 0;
         final static int CMD_BYTE = 1;

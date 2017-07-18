@@ -6,7 +6,7 @@ import io.undertow.websockets.core.BufferedTextMessage;
 import io.undertow.websockets.core.StreamSourceFrameChannel;
 import io.undertow.websockets.core.WebSocketChannel;
 import jcog.Util;
-import jcog.byt.DynByteSeq;
+import jcog.byt.DynBytes;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import org.jetbrains.annotations.Nullable;
@@ -107,7 +107,7 @@ public class NarseseIOService extends WebsocketService {
             @Override
             protected float send(Task task) {
 
-                DynByteSeq dos = new DynByteSeq(8 + task.volume() * 6 /* estimate */);
+                DynBytes dos = new DynBytes(8 + task.volume() * 6 /* estimate */);
 
                 try {
                     IO.writeTask2(dos, task);

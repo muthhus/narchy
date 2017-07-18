@@ -1,7 +1,7 @@
 package nars.term.compound;
 
 import com.google.common.primitives.Ints;
-import jcog.byt.DynByteSeq;
+import jcog.byt.DynBytes;
 import nars.$;
 import nars.IO;
 import nars.Op;
@@ -25,7 +25,7 @@ import static nars.time.Tense.DTERNAL;
  * <p>
  * see IO.writeTerm()
  */
-public class SerialCompound extends DynByteSeq implements Compound {
+public class SerialCompound extends DynBytes implements Compound {
 
     final byte volume;
 

@@ -2,7 +2,7 @@ package nars;
 
 
 import com.google.common.io.ByteArrayDataOutput;
-import jcog.byt.DynByteSeq;
+import jcog.byt.DynBytes;
 import jcog.data.string.Utf8Writer;
 import jcog.pri.Prioritized;
 import nars.index.term.TermIndex;
@@ -43,16 +43,16 @@ public class IO {
 
     public interface TermEncoder {
         default void write(Term x) {
-            write(x, new DynByteSeq(x.volume() * 4 /* ESTIMATE */));
+            write(x, new DynBytes(x.volume() * 4 /* ESTIMATE */));
         }
 
-        void write(Term x, DynByteSeq to);
+        void write(Term x, DynBytes to);
     }
 
     public static class DefaultTermEncoder implements TermEncoder {
 
         @Override
-        public void write(Term x, DynByteSeq to) {
+        public void write(Term x, DynBytes to) {
 
             try {
                 IO.writeTerm(to, x);
@@ -369,7 +369,7 @@ public class IO {
 
     public static byte[] termToBytes(@NotNull Term t) {
         try {
-            DynByteSeq d = new DynByteSeq(t.volume() * 2 /* estimate */);
+            DynBytes d = new DynBytes(t.volume() * 16 /* estimate */);
             //ByteArrayOutputStream bs = new ByteArrayOutputStream();
             IO.writeTerm(d, t);
             return d.array(); //bs.toByteArray();
@@ -421,7 +421,7 @@ public class IO {
 
     public static byte[] taskToBytes(@NotNull Task x, @NotNull TaskSerialization mode) {
         try {
-            DynByteSeq dos = new DynByteSeq(x.volume() * 16);
+            DynBytes dos = new DynBytes(x.volume() * 16);
             switch (mode) {
                 case TermFirst:
                     IO.writeTask(dos, x);
@@ -731,7 +731,7 @@ public class IO {
 //    }
 
     public static void writeUTF8WithPreLen(String s, DataOutput o) throws IOException {
-        DynByteSeq d = new DynByteSeq(s.length());
+        DynBytes d = new DynBytes(s.length());
 
         new Utf8Writer(d).write(s);
 

@@ -17,7 +17,7 @@
  */
 package jcog.byt.collection;
 
-import jcog.byt.RawByteSeq;
+import jcog.byt.RawBytes;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -26,13 +26,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * Created by Anton Nashatyrev on 06.10.2016.
  */
 public class ByteArrayMap<V> implements Map<byte[], V> {
-    private final Map<RawByteSeq, V> delegate;
+    private final Map<RawBytes, V> delegate;
 
     public ByteArrayMap() {
-        this(new ConcurrentHashMap<RawByteSeq, V>());
+        this(new ConcurrentHashMap<RawBytes, V>());
     }
 
-    public ByteArrayMap(Map<RawByteSeq, V> delegate) {
+    public ByteArrayMap(Map<RawBytes, V> delegate) {
         this.delegate = delegate;
     }
 
@@ -48,7 +48,7 @@ public class ByteArrayMap<V> implements Map<byte[], V> {
 
     @Override
     public boolean containsKey(Object key) {
-        return delegate.containsKey(new RawByteSeq((byte[]) key));
+        return delegate.containsKey(new RawBytes((byte[]) key));
     }
 
     @Override
@@ -58,23 +58,23 @@ public class ByteArrayMap<V> implements Map<byte[], V> {
 
     @Override
     public V get(Object key) {
-        return delegate.get(new RawByteSeq((byte[]) key));
+        return delegate.get(new RawBytes((byte[]) key));
     }
 
     @Override
     public V put(byte[] key, V value) {
-        return delegate.put(new RawByteSeq(key), value);
+        return delegate.put(new RawBytes(key), value);
     }
 
     @Override
     public V remove(Object key) {
-        return delegate.remove(new RawByteSeq((byte[]) key));
+        return delegate.remove(new RawBytes((byte[]) key));
     }
 
     @Override
     public void putAll(Map<? extends byte[], ? extends V> m) {
         for (Entry<? extends byte[], ? extends V> entry : m.entrySet()) {
-            delegate.put(new RawByteSeq(entry.getKey()), entry.getValue());
+            delegate.put(new RawBytes(entry.getKey()), entry.getValue());
         }
     }
 
@@ -115,9 +115,9 @@ public class ByteArrayMap<V> implements Map<byte[], V> {
     }
 
     private class MapEntrySet implements Set<Map.Entry<byte[], V>> {
-        private final Set<Map.Entry<RawByteSeq, V>> delegate;
+        private final Set<Map.Entry<RawBytes, V>> delegate;
 
-        private MapEntrySet(Set<Entry<RawByteSeq, V>> delegate) {
+        private MapEntrySet(Set<Entry<RawBytes, V>> delegate) {
             this.delegate = delegate;
         }
 
@@ -138,7 +138,7 @@ public class ByteArrayMap<V> implements Map<byte[], V> {
 
         @Override
         public Iterator<Entry<byte[], V>> iterator() {
-            final Iterator<Entry<RawByteSeq, V>> it = delegate.iterator();
+            final Iterator<Entry<RawBytes, V>> it = delegate.iterator();
             return new Iterator<Entry<byte[], V>>() {
 
                 @Override
@@ -148,7 +148,7 @@ public class ByteArrayMap<V> implements Map<byte[], V> {
 
                 @Override
                 public Entry<byte[], V> next() {
-                    Entry<RawByteSeq, V> next = it.next();
+                    Entry<RawBytes, V> next = it.next();
                     return new AbstractMap.SimpleImmutableEntry(next.getKey().array(), next.getValue());
                 }
 

@@ -1,7 +1,7 @@
 package nars.index.term.tree;
 
 import com.google.common.base.Charsets;
-import jcog.byt.HashCachedDynByteSeq;
+import jcog.byt.HashCachedBytes;
 import nars.IO;
 import nars.Op;
 import nars.Task;
@@ -21,7 +21,7 @@ import static nars.IO.writeEvidence;
 /**
  * TODO lazily compute
  */
-public class TermKey extends HashCachedDynByteSeq {
+public class TermKey extends HashCachedBytes {
 
     //public final static ThreadLocal<Lz4Compressor> compressor = ThreadLocal.withInitial(Lz4Compressor::new);
     //final static Lz4Decompressor decompressor = new Lz4Decompressor();

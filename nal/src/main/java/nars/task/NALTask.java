@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.pri.Pri;
 import nars.Param;
 import nars.Task;
+import nars.control.Cause;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.truth.DiscreteTruth;
@@ -134,7 +135,13 @@ public class NALTask extends Pri implements Task {
         return this == that ||
                 (that instanceof Task &&
                  hash == that.hashCode() &&
-                 Task.equivalentTo(this, (Task) that, true, true, true, true, true));
+                 Task.equal(this, (Task) that));
+    }
+
+
+    /** combine cause: should be called in all Task bags and belief tables on merge */
+    public void merge(NALTask incoming) {
+        this.cause = Cause.zip(this, incoming);
     }
 
     @Nullable

@@ -2,6 +2,7 @@ package nars.term.atom;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.primitives.Ints;
+import jcog.byt.DynBytes;
 import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -37,8 +38,12 @@ public class IntAtom implements Atomic {
 
     @Override
     public void append(ByteArrayDataOutput out) {
-        out.writeByte(INT.id);
-        out.writeInt(id);
+        if (out instanceof DynBytes) {
+            ((DynBytes)out).write((byte)INT.id, id); //faster combo
+        } else {
+            out.writeByte(id);
+            out.writeInt(id);
+        }
     }
 
     @Override

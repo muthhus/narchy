@@ -57,6 +57,9 @@ public abstract class Param  {
     /** cost of a failed/aborted task derivation */
     public static final int TTL_DERIVE_TASK_FAIL = 1;
 
+    /** no term sharing means faster comparison but potentially more memory usage. TODO determine effects */
+    public static boolean CompoundDT_TermSharing = false;
+
 
     public final FloatParam valuePositiveDecay = new FloatParam(0.98f, 0, 1f);
     public final FloatParam valueNegativeDecay = new FloatParam(0.98f, 0, 1f);

@@ -27,10 +27,6 @@ public interface ITask extends Priority {
         return false;
     }
 
-    default ITask merge(ITask incoming) {
-        priAdd(incoming.priSafe(0));
-        return this;
-    }
 
     /** fluent form of setPri which returns this class */
     default ITask pri(float p) {
