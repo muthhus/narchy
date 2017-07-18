@@ -179,8 +179,8 @@ public class BufferedExecutioner extends Executioner {
 
     @Override
     public void forEach(Consumer<ITask> each) {
-        tasks.forEachKey(each);
-        concepts.forEachKey(each);
+        tasks.forEach(each);
+        concepts.forEach(each);
     }
 
 

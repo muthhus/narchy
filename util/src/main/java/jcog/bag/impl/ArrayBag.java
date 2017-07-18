@@ -85,7 +85,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         //return false;
     }
 
-    /** WARNING this is a duplicate of code in hijackbag, they ought to share this through a common Pressure class extending AtomicDouble or something*/
+    /**
+     * WARNING this is a duplicate of code in hijackbag, they ought to share this through a common Pressure class extending AtomicDouble or something
+     */
     @Override
     public float depressurize() {
         float pv = (float) pressure.getAndSet(0);
@@ -380,9 +382,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             incomingPri[0] *= -1; //upright
 
             float oo = existing != incoming ?
-                            mergeFunction.merge((Priority) existing /* HACK */, incoming)
-                                :
-                            incomingPri[0] /* all of it if identical */;
+                    mergeFunction.merge((Priority) existing /* HACK */, incoming)
+                    :
+                    incomingPri[0] /* all of it if identical */;
 
             if (oo >= Pri.EPSILON) {
                 incomingPri[0] -= oo; //release any unabsorbed pressure
@@ -395,15 +397,15 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
             pressurize(p); //absorb pressure even if it's about to get removed
 
-            if (size() >= capacity) {
-                synchronized (items) {
-                    //check if it can actually exist here
-                    if ((p < priMinFast(-1)) || !updateItems(y)) {
-                        map.remove(key);
-                        return null;
-                    }
+
+            synchronized (items) {
+                //check if it can actually exist here
+                if (((size() >= capacity) && (p < priMinFast(-1)) || !updateItems(y))) {
+                    map.remove(key);
+                    return null;
                 }
             }
+
 
             onAdded(y);
             return y;

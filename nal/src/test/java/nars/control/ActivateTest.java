@@ -21,7 +21,7 @@ import java.util.function.Consumer;
 import static nars.$.$;
 import static org.junit.Assert.assertEquals;
 
-public class ConceptFireTest {
+public class ActivateTest {
 
     @Test
     public void testConceptFireLinkSelection() throws Narsese.NarseseException {

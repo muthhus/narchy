@@ -106,6 +106,7 @@ public class TestNAR {
     @NotNull
     public TestNAR run(long finalCycle, boolean testAndPrintReport /* for use with JUnit */) {
 
+
         if (requireConditions)
             assertTrue("no conditions tested", !requires.isEmpty() || !disqualifies.isEmpty());
 

@@ -216,7 +216,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //            this.templates = templates(id, nar);
 //        }
 
-        Termed[] localTemplates = templates(id, nar, true);
+        Termed[] localTemplates = templates(id, nar);
         //System.out.println("templates: " + id + " " + Arrays.toString(localTemplates));
 
         int penalty = Math.max(1, ttlPerPremise / (2));
@@ -244,17 +244,18 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 continue;
             }
 
+            Term taskTerm = task.term();
 
             //tasklink activates local subterms and their reverse termlinks to this
             float tfaEach = tfa / localTemplates.length;
             for (Termed localSub : localTemplates) {
-                if (localSub instanceof Concept) {
-                    Concept localSubConcept = (Concept) localSub;
+                Concept localSubConcept = nar.conceptualize(localSub);
+                if (localSubConcept instanceof Concept) {
                     localSubConcept.tasklinks().putAsync(
                             new PLink(task, tfaEach)
                     );
                     localSubConcept.termlinks().putAsync(
-                            new PLink(thisTerm, tfaEach)
+                            new PLink(taskTerm, tfaEach)
                     );
                     nar.input(new Activate(localSubConcept, tfaEach));
                 }
@@ -269,32 +270,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             if (taskConcept == null)
                 continue; //hrm
 
-            Termed[] taskTemplates = templates(taskConcept, nar, true);
-
-            //if (templateConceptsCount > 0) {
-
-            //float momentum = 0.5f;
-            float taskTemplateActivation = pri / taskTemplates.length;
-            for (Termed c : taskTemplates) {
-
-                //this concept activates task templates and termlinks to them
-                if (c instanceof Concept) {
-                    Concept cc = (Concept) c;
-                    cc.termlinks().putAsync(
-                            new PLink(thisTerm, taskTemplateActivation)
-                    );
-                    nar.input(new Activate(cc, taskTemplateActivation));
-
-//                        //reverse termlink from task template to this concept
-//                        //maybe this should be allowed for non-concept subterms
-//                        id.termlinks().putAsync(new PLink(c, taskTemplateActivation / 2)
-//                                //(concept ? (1f - momentum) : 1))
-//                        );
-
-                }
-
-
-            }
+            //activateTaskExperiment1(nar, pri, thisTerm, taskConcept);
 
             if (terml.isEmpty())
                 break;
@@ -373,18 +349,47 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //        }
     }
 
-    public Termed[] templates(@NotNull Concept id, NAR nar, boolean includeNonConcepts) {
+    public void activateTaskExperiment1(NAR nar, float pri, Term thisTerm, TaskConcept taskConcept) {
+        Termed[] taskTemplates = templates(taskConcept, nar);
+
+        //if (templateConceptsCount > 0) {
+
+        //float momentum = 0.5f;
+        float taskTemplateActivation = pri / taskTemplates.length;
+        for (Termed ct : taskTemplates) {
+
+            Concept c = nar.conceptualize(ct);
+            //this concept activates task templates and termlinks to them
+            if (c instanceof Concept) {
+                c.termlinks().putAsync(
+                        new PLink(thisTerm, taskTemplateActivation)
+                );
+                nar.input(new Activate(c, taskTemplateActivation));
+
+//                        //reverse termlink from task template to this concept
+//                        //maybe this should be allowed for non-concept subterms
+//                        id.termlinks().putAsync(new PLink(c, taskTemplateActivation / 2)
+//                                //(concept ? (1f - momentum) : 1))
+//                        );
+
+            }
+
+
+        }
+    }
+
+    public Termed[] templates(@NotNull Concept id, NAR nar) {
         TermContainer ctpl = id.templates();
 
-        if (ctpl == null || ctpl.size()==0) {
-            Term sampledTermLink = id.termlinks().sample().get();
-            if (sampledTermLink!=null)
-                ctpl = TermVector.the(sampledTermLink);
-        }
+//        if (ctpl == null || ctpl.size()==0) {
+//            Term sampledTermLink = id.termlinks().sample().get();
+//            if (sampledTermLink!=null)
+//                ctpl = TermVector.the(sampledTermLink);
+//        }
 
         if (ctpl != null) {
-            Set<Termed> tc = new UnifiedSet(id.volume() /* estimate */);
-            templates(tc, ctpl, nar, layers(id), includeNonConcepts);
+            Set<Termed> tc = new UnifiedSet<>(id.volume() /* estimate */);
+            templates(tc, ctpl, nar, layers(id));
             if (!tc.isEmpty())
                 return tc.toArray(new Termed[tc.size()]);
         }
@@ -397,7 +402,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     }
 
-    private void templates(Set<Termed> tc, TermContainer ctpl, NAR nar, int layersRemain, boolean includeNonConcepts) {
+    private void templates(Set<Termed> tc, TermContainer ctpl, NAR nar, int layersRemain) {
 
         int cs = ctpl.size();
         for (int i = 0; i < cs; i++) {
@@ -406,12 +411,12 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                     nar.conceptualize(b) : null;
             TermContainer e = null;
             if (c != null) {
-                if (!c.equals(id) && tc.add(c)) {
+                if (!c.equals(id) && tc.add(b)) {
                     if (layersRemain > 0 && c instanceof Compound) {
                         e = c.templates();
                     }
                 }
-            } else if (includeNonConcepts && !b.equals(id)) {
+            } else if (!b.equals(id)) {
                 Term d = b.unneg();
                 //variable or other non-concept term
                 if (tc.add(d)) {
@@ -422,7 +427,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             }
 
             if (e!=null)
-                templates(tc, e, nar, layersRemain - 1, includeNonConcepts);
+                templates(tc, e, nar, layersRemain - 1);
         }
     }
 

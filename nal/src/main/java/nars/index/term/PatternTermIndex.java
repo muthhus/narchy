@@ -31,6 +31,7 @@ public class PatternTermIndex extends MapTermIndex {
         if (x instanceof Compound) {
             x = compute((Compound)x);
         }
+//        return x;
         Termed y = concepts.putIfAbsent(x, x);
         return y!=null ? y : x;
     }
@@ -39,10 +40,6 @@ public class PatternTermIndex extends MapTermIndex {
     @NotNull
     protected Term compute(@NotNull Compound x) {
 
-        //dont store the actual rules, they are guaranteed unique by other means
-        if (x instanceof PremiseRule) {
-            return x;
-        }
 
         TermContainer s = x.subterms();
         int ss = s.size();
@@ -52,19 +49,20 @@ public class PatternTermIndex extends MapTermIndex {
             Term a = s.sub(i);
 
             Termed b;
-            if (a instanceof Compound) {
-
-                if (!canBuildConcept(a) || a.isTemporal()) {
-                    //temporal = true;//dont store subterm arrays containing temporal compounds
-                    b = a;
-                } else {
-                    /*if (b != a && a.isNormalized())
-                        ((GenericCompound) b).setNormalized();*/
-                    b = get(a, true);
-                }
-            } else {
+//            Termed b;
+//            if (a instanceof Compound) {
+//
+//                if (!canBuildConcept(a) || a.isTemporal()) {
+//                    //temporal = true;//dont store subterm arrays containing temporal compounds
+//                    b = a;
+//                } else {
+//                    /*if (b != a && a.isNormalized())
+//                        ((GenericCompound) b).setNormalized();*/
+//                    b = get(a, true);
+//                }
+//            } else {
                 b = get(a, true);
-            }
+//            }
             if (a != b) {
                 changed = true;
             }
