@@ -39,16 +39,11 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     /**
      * rate at which ConceptFire forms premises and derives
      */
-    private static final int maxSamples = 2;
+    private static final int maxSamples = 1;
 
     static final int TASKLINKS_SAMPLED = 4;
     static final int TERMLINKS_SAMPLED = 4;
 
-    //private static final float priMinAbsolute = Pri.EPSILON * 1;
-    //private static final float momentum = 0.75f;
-
-//    static final ThreadLocal<Map<DerivedTask, DerivedTask>> buffers =
-//            ThreadLocal.withInitial(LinkedHashMap::new);
 
 
     public Activate(Concept c, float pri) {

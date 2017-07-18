@@ -38,7 +38,7 @@ public class BufferedExecutioner extends Executioner {
     /**
      * number of tasks input after each firing; defines an input load processing ratio
      */
-    int inputsPerFire = 32;
+    int inputsPerFire = 4;
 
 
     //    private final DisruptorBlockingQueue<ITask> overflow;
@@ -85,21 +85,21 @@ public class BufferedExecutioner extends Executioner {
      * active tasks
      */
     public final Bag<ITask, ITask> concepts =
-            new CurveBag(0, Param.conceptMerge, new ConcurrentHashMap<>()) {
+//            new CurveBag(0, Param.conceptMerge, new ConcurrentHashMap<>()) {
 
-            //new PriorityHijackBag<>(4) {
-                //@Override protected final Consumer<ITask> forget(float rate) {
-                    //return null;
-                //}
-//                @Override protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
-//                    Param.conceptMerge.merge(existing, incoming);
-//                    return existing;
-//                }
-//                @NotNull
-//                @Override
-//                public final ITask key(ITask value) {
-//                    return value;
-//                }
+            new PriorityHijackBag<>(4) {
+                @Override protected final Consumer<ITask> forget(float rate) {
+                    return null;
+                }
+                @Override protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
+                    Param.conceptMerge.merge(existing, incoming);
+                    return existing;
+                }
+                @NotNull
+                @Override
+                public final ITask key(ITask value) {
+                    return value;
+                }
 
 
 //                @Override
@@ -206,7 +206,7 @@ public class BufferedExecutioner extends Executioner {
             ;
 
             float eFrac = ((float) toFire) / concepts.capacity();
-            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * ((CurveBag) concepts).depressurize(eFrac) * (eFrac);
+            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * concepts.depressurize(eFrac) * (eFrac);
             float forgetEachActivePri =
                     pAvg >= Pri.EPSILON ? pAvg : 0;
 

@@ -8,6 +8,7 @@ import com.netflix.servo.tag.Tag;
 import com.netflix.servo.util.Clock;
 import com.netflix.servo.util.Reflection;
 import com.netflix.servo.util.Throwables;
+import jcog.Loop;
 import jcog.event.On;
 import jcog.list.FasterList;
 import jcog.meter.event.BufferedFloatGuage;
@@ -44,24 +45,31 @@ public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
 //                new MonitorRegistryMetricPoller(this);
 
 
-        //register(monitor("emotion", nar.emotion));
-        register(Monitors.newObjectMonitor("emotion", nar.emotion));
-        register(new BasicGauge<>(id("concepts"), nar.terms::size));
+        register(monitor("emotion", nar.emotion));
 
         {
-            MetricObserver obs = new PrintStreamMetricObserver("x", nar.time, System.out);
             //MetricObserver obs = new FileMetricObserver("stats", directory);
 
-            PollScheduler scheduler = PollScheduler.getInstance();
-            scheduler.start();
+//            PollScheduler scheduler = PollScheduler.getInstance();
+//            scheduler.start();
 
 
 //            MetricObserver transform = new CounterToRateMetricTransform(
 //                    obs, 1, TimeUnit.SECONDS);
             PollRunnable task = new PollRunnable(
                     new MonitorRegistryMetricPoller(this),
-                    BasicMetricFilter.MATCH_ALL, obs);
-            scheduler.addPoller(task, 2, TimeUnit.SECONDS);
+                    BasicMetricFilter.MATCH_ALL,
+                    new PrintStreamMetricObserver("x", nar.time, System.out)
+            );
+            new Loop(2000) {
+
+                @Override
+                public boolean next() {
+                    task.run();
+                    return true;
+                }
+            };
+            //scheduler.addPoller(task, 2, TimeUnit.SECONDS);
         }
     }
 

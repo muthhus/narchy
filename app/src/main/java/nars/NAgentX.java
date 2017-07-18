@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.gui.Vis;
@@ -107,7 +108,7 @@ abstract public class NAgentX extends NAgent {
         NAR n = new NARS()
                     .exe(
                         new MultiExecutioner((i) ->
-                            new MultiExecutioner.Worker(256, 32, 0.05f),
+                            new MultiExecutioner.Worker(256, 64, 0.25f),
                                 3, 2))
                     .time(clock)
                     .index(new CaffeineIndex(128 * 1024))
@@ -126,8 +127,6 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_QUEST_PRIORITY = 0.25f;
         n.termVolumeMax.setValue(40);
 
-        NiNner nin = new NiNner(n);
-        nin.start();
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
         MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, true, 16f);
@@ -143,13 +142,16 @@ abstract public class NAgentX extends NAgent {
         chart(a);
         chart(n, a);
 
-        window(row(
+        NiNner nin = new NiNner(n);
+        nin.start();
 
-                causePlot(a.nar),
+        window(/*row*/(
+
+                causePlot(a.nar)
 
                 //mixPlot(a, m, HISTORY),
 
-                col(
+
 //                        row(
 ////                                new Plot2D(HISTORY, Plot2D.Line)
 ////                                        .on(a::onFrame),
@@ -190,21 +192,22 @@ abstract public class NAgentX extends NAgent {
 //                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
 //                            return 0;
 //                        })
-                )
-        ), 800, 800);
+        ), 600, 600);
 
         NARLoop narLoop = a.startRT(fps, endTime);
-        n.onCycle(nn -> {
-            float lag = narLoop.lagSumThenClear() + a.running().lagSumThenClear();
-            //n.emotion.happy(-lag);
-            //n.emotion.happy(n.emotion.busyPri.getSum()/50000f);
-        });
+//        n.onCycle(nn -> {
+//            float lag = narLoop.lagSumThenClear() + a.running().lagSumThenClear();
+//            //n.emotion.happy(-lag);
+//            //n.emotion.happy(n.emotion.busyPri.getSum()/50000f);
+//        });
         return n;
     }
 
     private static Surface causePlot(NAR nar) {
         int s = nar.causeValue.size();
-        return new MatrixView((i) -> nar.causeValue.get(i).value(), s, (int) Math.max(1, Math.sqrt(s)), bipolar1);
+        return new MatrixView((i) ->
+                Util.tanhFast( nar.causeValue.get(i).value() ),
+                s, (int) Math.max(1, Math.sqrt(s)), bipolar1);
     }
 
     private static void chart(NAR n, NAgent a) {

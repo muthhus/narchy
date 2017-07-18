@@ -21,7 +21,7 @@ public class NAL2Test extends AbstractNALTest {
 //    }
 
     @Before
-    public void nal() { test.nar.nal(3); }
+    public void nal() { test.nar.nal(2); }
 
     @Test
     public void revision() {

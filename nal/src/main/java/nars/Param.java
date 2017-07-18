@@ -43,7 +43,7 @@ public abstract class Param  {
     public final static int SIGNAL_LATCH_TIME =
                     //0;
                     //Integer.MAX_VALUE;
-                    128;
+                    4;
 
     /** cost of a termutate call */
     public static final int TTL_MUTATE = 1;
@@ -123,16 +123,16 @@ public abstract class Param  {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 16;
+    public static final int CAUSE_CAPACITY = 8;
 
-    public final static int UnificationStackMax = 32;
+    public final static int UnificationStackMax = 32; //how many assignments can be stored in the 'versioning' maps
     public static final int UnificationConstraintsMax = 8;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 64;
+    public final static int BeliefMatchTTL = 16;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTLMax = BeliefMatchTTL * 4;
+    public final static int UnificationTTLMax = BeliefMatchTTL * 8;
 
 
 

@@ -62,7 +62,7 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = () ->new BufferedExecutioner(128, 32, 0.2f);
+        exe = () ->new BufferedExecutioner(128, 32, 0.1f);
 
         rng = () -> new XorShift128PlusRandom(1);
 

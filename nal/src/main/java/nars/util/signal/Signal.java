@@ -53,18 +53,22 @@ public class Signal extends AtomicReference<SignalTask> {
 
         //int halfDur = Math.max(1, nar.dur() / 2);
         //long next = now + halfDur;
-
         return updateAndGet((current) -> {
+
+            long now = nar.time();
+            long last = this.lastUpdated;
+            if (last == ETERNAL) {
+                last = now;
+            }
 
             if (nextTruth == null) {
 
-                lastUpdated = ETERNAL;
+                this.lastUpdated = ETERNAL;
                 return null;             //no signal
 
             } else {
 
                 SignalTask next = current;
-                long now = nar.time(); //allow the current percept to extend 1/2 duration into the future
 
                 if (current == null ||
                         current.isDeleted() ||
@@ -72,10 +76,7 @@ public class Signal extends AtomicReference<SignalTask> {
                         (Param.SIGNAL_LATCH_TIME != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME)
                     )) {
 
-                    long last = this.lastUpdated;
-                    if (last==ETERNAL) {
-                        last = now;
-                    }
+
 
                     //TODO move the task construction out of this critical update section?
                     next = task(term, nextTruth.truth(),
@@ -83,8 +84,7 @@ public class Signal extends AtomicReference<SignalTask> {
                             stamper.getAsLong());
 
                 } else {
-                    if (current!=null)
-                        current.setEnd(now); //stretch existing
+                    current.setEnd(now); //stretch existing
                 }
 
                 this.lastUpdated = now;
@@ -93,6 +93,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
                 return next; //nothing, keep as-is
             }
+
 
         });
 
