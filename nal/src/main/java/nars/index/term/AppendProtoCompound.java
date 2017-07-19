@@ -6,7 +6,6 @@ import nars.IO;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,8 +15,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-
-import static nars.time.Tense.DTERNAL;
 
 /**
  * a lightweight, prototype compound, not fully constructed.
@@ -85,6 +82,15 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
     public Term[] subterms() {
         compact(); //compact the key
 
+        Term[] tt = this.theArray();
+
+        this.subs = null; //clear refernce to the array from this point
+
+        return tt;
+    }
+
+    @Override
+    public Term[] theArray() {
         Term[] tt;
         int s = this.size;
         @NotNull Term[] ss = this.subs;
@@ -94,15 +100,11 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
         } else {
             tt = Arrays.copyOfRange(ss, 0, s); //trim
         }
-
-        this.subs = null; //clear refernce to the array from this point
-
         return tt;
     }
 
-    @Override
     public Term[] toArray() {
-        return subs; //.clone();
+       return theArray().clone();
     }
 
 //    @Override

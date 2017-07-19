@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
  * this will be better than expecting each implementation's toString() method to remain
  * constant
  */
-@Deprecated public abstract class AtomicPred<X> extends AtomicToString implements BoolPred<X> {
+@Deprecated public abstract class AtomicPred<X> extends AtomicToString implements PrediTerm<X> {
 
     @NotNull
     public abstract String toString();

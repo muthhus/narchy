@@ -1,7 +1,9 @@
 package nars.term.subst;
 
+import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
+import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.index.term.AppendProtoCompound;
 import nars.term.Compound;
@@ -9,6 +11,9 @@ import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 import static nars.index.term.TermIndex.disallowTrueOrFalse;
 
@@ -75,12 +80,10 @@ public interface Subst  {
 
         Op op = x.op();
 
-        AppendProtoCompound next = new AppendProtoCompound(op, len);
+        List<Term> next = $.newArrayList(len);
 
         //early prefilter for True/False subterms
         boolean filterTrueFalse = disallowTrueOrFalse(op);
-
-
 
         for (int i = 0; i < len; i++) {
             Term t = subs.sub(i);
@@ -88,7 +91,7 @@ public interface Subst  {
 
             if (u instanceof EllipsisMatch) {
 
-                ((EllipsisMatch) u).expand(op, next);
+                Collections.addAll(next, ((EllipsisMatch)u).terms);
 
 //                for (; volAt < subAt; volAt++) {
 //                    Term st = next.sub(volAt);
@@ -121,7 +124,7 @@ public interface Subst  {
 //                return null;
 //        }
 
-        return op.the(curr.dt(), next.subterms());
+        return op.the(curr.dt(), next.toArray(new Term[next.size()]));
     }
 
 

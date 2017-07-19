@@ -411,9 +411,18 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
+    /** an array of the subterms, which an implementation may allow
+     * direct access to its internal array which if modified will
+     * lead to disaster. by default, it will call 'toArray' which
+     * guarantees a clone. override with caution
+     */
+    default public Term[] theArray() {
+        return toArray();
+    }
+
     /**
      * an array of the subterms
-     * for now, an instance should not allow callee to modify any internal immutable state by not returning a clone of an array field
+     * this is meant to be a clone always
      */
     default public Term[] toArray() {
         int s = size();

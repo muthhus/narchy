@@ -11,7 +11,7 @@ import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
-import nars.derive.meta.BoolPred;
+import nars.derive.meta.PrediTerm;
 import nars.derive.meta.LambdaPred;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
@@ -20,7 +20,6 @@ import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.IntAtom;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
@@ -976,17 +975,17 @@ public interface $ {
         return term != null ? term : Null;
     }
 
-    public static <X> BoolPred<X> IF(Compound t, Predicate<X> test) {
+    public static <X> PrediTerm<X> IF(Compound t, Predicate<X> test) {
         return new LambdaPred<X>(t, test);
     }
 
-    public static <X> BoolPred<X> AND(BoolPred<X> a, BoolPred<X> b) {
+    public static <X> PrediTerm<X> AND(PrediTerm<X> a, PrediTerm<X> b) {
         return new LambdaPred<X>((Compound) $.conj(a, b), (X x) -> {
             return a.test(x) && b.test(x);
         });
     }
 
-    public static <X> BoolPred<X> OR(BoolPred<X> a, BoolPred<X> b) {
+    public static <X> PrediTerm<X> OR(PrediTerm<X> a, PrediTerm<X> b) {
         return new LambdaPred<X>((Compound) $.disj(a, b), (X x) -> {
             return a.test(x) || b.test(x);
         });

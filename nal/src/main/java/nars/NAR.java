@@ -22,9 +22,11 @@ import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.control.Activate;
 import nars.control.Cause;
+import nars.control.premise.Derivation;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.Conclude;
+import nars.derive.meta.InstrumentedDerivationPredicate;
+import nars.derive.meta.PrediTerm;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.nar.exe.Executioner;
@@ -134,7 +136,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     protected final NARLoop loop = new NARLoop(this);
 
-    private TrieDeriver deriver;
+    private Predicate<Derivation> deriver;
 
     /**
      * creates a snapshot statistics object
@@ -255,7 +257,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         this.emotion = new Emotion(this);
 
-        this.deriver = new TrieDeriver(Deriver.DEFAULT_RULES, this);
+        this.deriver = TrieDeriver.the(Deriver.DEFAULT_RULES, this, (PrediTerm<Derivation> d) -> {
+            return new InstrumentedDerivationPredicate(d);
+        });
 
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);
@@ -1640,7 +1644,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return ((BeliefTable) concept.table(punc)).match(when, null, null, false, this);
     }
 
-    public Deriver deriver() {
+    public Predicate<Derivation> deriver() {
         return deriver;
     }
 

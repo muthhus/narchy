@@ -3,7 +3,7 @@ package nars.derive.meta.op;
 import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
-import nars.derive.meta.BoolPred;
+import nars.derive.meta.PrediTerm;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
@@ -17,13 +17,13 @@ import java.util.Set;
 import java.util.SortedSet;
 
 
-public class MatchTaskBelief extends ProxyCompound implements BoolPred<Derivation> {
+public class MatchTaskBelief extends ProxyCompound implements PrediTerm<Derivation> {
 
 
 
 
-    public final List<BoolPred> post;
-    public final List<BoolPred> pre;
+    public final List<PrediTerm> post;
+    public final List<PrediTerm> pre;
     public final Set<MatchConstraint> constraints;
 
 //    @NotNull
@@ -33,9 +33,9 @@ public class MatchTaskBelief extends ProxyCompound implements BoolPred<Derivatio
     public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull SortedSet<MatchConstraint> constraints) {
         super( $.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ) );
 
-        List<BoolPred> pre = $.newArrayList();
+        List<PrediTerm> pre = $.newArrayList();
 
-        List<BoolPred> post = $.newArrayList();
+        List<PrediTerm> post = $.newArrayList();
 
         compile(taskPattern, beliefPattern, pre, post, constraints);
 
@@ -74,7 +74,7 @@ public class MatchTaskBelief extends ProxyCompound implements BoolPred<Derivatio
 
 
     private static void compile(@NotNull Term task, @NotNull Term belief,
-                                @NotNull List<BoolPred> pre, @NotNull List<BoolPred> code,
+                                @NotNull List<PrediTerm> pre, @NotNull List<PrediTerm> code,
                                 @NotNull SortedSet<MatchConstraint> constraints) {
 
         //BoolPredicate preGuard = null;
@@ -123,8 +123,8 @@ public class MatchTaskBelief extends ProxyCompound implements BoolPred<Derivatio
 
     }
 
-    private static void compileTaskBelief(@NotNull List<BoolPred> pre,
-                                          @NotNull List<BoolPred> code, @Nullable Term task, @Nullable Term belief, @NotNull SortedSet<MatchConstraint> constraints) {
+    private static void compileTaskBelief(@NotNull List<PrediTerm> pre,
+                                          @NotNull List<PrediTerm> code, @Nullable Term task, @Nullable Term belief, @NotNull SortedSet<MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 

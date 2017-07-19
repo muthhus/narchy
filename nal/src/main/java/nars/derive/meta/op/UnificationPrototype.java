@@ -1,6 +1,5 @@
 package nars.derive.meta.op;
 
-import com.google.common.collect.Lists;
 import nars.$;
 import nars.control.premise.Derivation;
 import nars.derive.meta.*;
@@ -9,7 +8,6 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -20,7 +18,7 @@ import java.util.TreeSet;
 abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
     @Nullable
-    private BoolPred eachMatch;
+    private PrediTerm eachMatch;
 
     @NotNull
     protected Compound id;
@@ -67,11 +65,11 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
         conclude.add(x);
     }
 
-    public final @NotNull BoolPred build() {
+    public final @NotNull PrediTerm build() {
         if (this.eachMatch == null) {
 
 
-            BoolPred om;
+            PrediTerm om;
 
             int cs = conclude.size();
             switch (cs) {
@@ -82,7 +80,7 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
                     om = conclude.first();
                     break;
                 default:
-                    om = Fork.compile(
+                    om = Fork.fork(
                         conclude.toArray(new Conclude[cs])
                     );
                     break;
@@ -101,7 +99,7 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
 
     @NotNull
-    abstract protected BoolPred build(BoolPred eachMatch);
+    abstract protected PrediTerm build(PrediTerm eachMatch);
 
     @Override
     public boolean test(Derivation derivation) {

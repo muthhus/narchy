@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
+import nars.index.term.NonInternable;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -133,7 +134,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
 
-    public static final class LambdaFunctor extends Functor {
+    public static final class LambdaFunctor extends Functor implements NonInternable {
 
         @NotNull private final Function<TermContainer, Term> f;
 

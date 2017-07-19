@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Task;
 import nars.derive.meta.AtomicPred;
-import nars.derive.meta.BoolPred;
+import nars.derive.meta.PrediTerm;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.util.SoftException;
@@ -22,9 +22,9 @@ abstract public class TaskMatch extends AtomicPred<Task> implements Consumer<Tas
 
     @NotNull protected final NAR nar;
     private final On on;
-    private BoolPred<Term> term;
+    private PrediTerm<Term> term;
     //private final BoolPred<Truth> truth = null;
-    private BoolPred<Byte> punctuation;
+    private PrediTerm<Byte> punctuation;
     //private final BoolPred<LongLongPair> time = null;
     //private final BoolPred<Priority> budget = null;
 
@@ -57,11 +57,11 @@ abstract public class TaskMatch extends AtomicPred<Task> implements Consumer<Tas
         this.on = n.onTask(this);
     }
 
-    public void setTerm(BoolPred<Term> term) {
+    public void setTerm(PrediTerm<Term> term) {
         this.term = term;
     }
 
-    public void setPunctuation(BoolPred<Byte> punctuation) {
+    public void setPunctuation(PrediTerm<Byte> punctuation) {
         this.punctuation = punctuation;
     }
 

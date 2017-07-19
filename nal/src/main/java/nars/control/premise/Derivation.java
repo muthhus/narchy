@@ -2,10 +2,8 @@ package nars.control.premise;
 
 import jcog.math.ByteShuffler;
 import nars.*;
-import nars.control.Cause;
 import nars.control.Premise;
-import nars.derive.Deriver;
-import nars.derive.meta.BoolPred;
+import nars.derive.meta.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.task.DerivedTask;
@@ -20,6 +18,8 @@ import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Predicate;
 
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesAny;
@@ -57,7 +57,7 @@ public class Derivation extends Unify implements TermContext {
      * current MatchTerm to receive matches at the end of the Termute chain; set prior to a complete match by the matchee
      */
     @Nullable
-    private BoolPred forEachMatch;
+    private PrediTerm forEachMatch;
 
     /**
      * cached values ==========================================
@@ -110,7 +110,7 @@ public class Derivation extends Unify implements TermContext {
     public float parentPri;
     private short[] parentCause;
 
-    public Deriver deriver;
+    public Predicate<Derivation> deriver;
     public ByteShuffler shuffler = new ByteShuffler(64);
 
 
@@ -283,7 +283,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * only one thread should be in here at a time
      */
-    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable BoolPred eachMatch) {
+    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm eachMatch) {
 
         boolean finish = (this.forEachMatch = eachMatch)!=null;
 

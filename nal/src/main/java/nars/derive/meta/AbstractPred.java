@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Created by me on 4/21/17.
  */
-public abstract class AbstractPred<X> extends ProxyCompound implements BoolPred<X> {
+public abstract class AbstractPred<X> extends ProxyCompound implements PrediTerm<X> {
 
     public AbstractPred(@NotNull String x) {
         this($.$safe(x));

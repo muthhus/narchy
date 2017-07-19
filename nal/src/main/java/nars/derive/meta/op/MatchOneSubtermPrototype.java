@@ -1,7 +1,7 @@
 package nars.derive.meta.op;
 
 import nars.$;
-import nars.derive.meta.BoolPred;
+import nars.derive.meta.PrediTerm;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ public final class MatchOneSubtermPrototype extends UnificationPrototype {
 
     @NotNull
     @Override
-    protected BoolPred build(BoolPred eachMatch) {
+    protected PrediTerm build(PrediTerm eachMatch) {
         return new MatchOneSubterm(id, subterm, pattern, finish ? eachMatch : null);
     }
 

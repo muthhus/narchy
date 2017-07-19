@@ -16,13 +16,13 @@ import java.util.*;
 /**
  * Created by me on 12/31/15.
  */
-public final class AndCondition extends ProxyCompound implements BoolPred<Derivation> {
+public final class AndCondition extends ProxyCompound implements PrediTerm<Derivation> {
 
     private static final Term AND_ATOM = $.quote("&&");
 
     @Override
     public final boolean test(@NotNull Derivation m) {
-        for (BoolPred<Derivation> x : cache) {
+        for (PrediTerm<Derivation> x : cache) {
             boolean b = x.test(m);
 
 //            if (m.now() > 0)
@@ -37,7 +37,7 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
         return true;
     }
 
-    public static @Nullable BoolPred the(@NotNull List<BoolPred> cond) {
+    public static @Nullable PrediTerm the(@NotNull List<PrediTerm> cond) {
 
         int s = cond.size();
         if (s == 0)
@@ -50,15 +50,15 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
 
 
     @NotNull
-    public final BoolPred<Derivation>[] cache;
+    public final PrediTerm<Derivation>[] cache;
 
     /*public AndCondition(@NotNull BooleanCondition<C>[] p) {
         this(TermVector.the((Term[])p));
     }*/
-    AndCondition(@NotNull Collection<BoolPred> p) {
+    AndCondition(@NotNull Collection<PrediTerm> p) {
         super($.p(AND_ATOM, $.p(p.toArray(new Term[p.size()]))));
 
-        this.cache = p.toArray(new BoolPred[p.size()]);
+        this.cache = p.toArray(new PrediTerm[p.size()]);
         if (cache.length < 2)
             throw new RuntimeException("unnecessary use of AndCondition");
     }
@@ -67,14 +67,14 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
     /**
      * combine certain types of items in an AND expression
      */
-    public static List<BoolPred> compile(List<BoolPred> p) {
+    public static List<PrediTerm> compile(List<PrediTerm> p) {
         if (p.size() == 1)
             return p;
 
         SortedSet<MatchConstraint> constraints = new TreeSet<MatchConstraint>(MatchConstraint.costComparator);
-        Iterator<BoolPred> il = p.iterator();
+        Iterator<PrediTerm> il = p.iterator();
         while (il.hasNext()) {
-            BoolPred c = il.next();
+            PrediTerm c = il.next();
             if (c instanceof MatchConstraint) {
                 constraints.add((MatchConstraint) c);
                 il.remove();
@@ -87,7 +87,7 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
 
             int iMatchTerm = -1; //first index of a MatchTerm op, if any
             for (int j = 0, cccSize = p.size(); j < cccSize; j++) {
-                BoolPred c = p.get(j);
+                PrediTerm c = p.get(j);
                 if ((c instanceof MatchOneSubtermPrototype || c instanceof Fork) && iMatchTerm == -1) {
                     iMatchTerm = j;
                 }
@@ -114,9 +114,9 @@ public final class AndCondition extends ProxyCompound implements BoolPred<Deriva
 //    }
 
 
-    public @Nullable BoolPred without(BoolPred condition) {
+    public @Nullable PrediTerm without(PrediTerm condition) {
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
-        BoolPred[] x = ArrayUtils.removeElement(cache, condition);
+        PrediTerm[] x = ArrayUtils.removeElement(cache, condition);
         if (x.length == cache.length)
             throw new RuntimeException("element missing for removal");
 

@@ -3,7 +3,7 @@ package nars.derive.meta.op;
 import nars.Task;
 import nars.control.premise.Derivation;
 import nars.derive.meta.AtomicPred;
-import nars.derive.meta.BoolPred;
+import nars.derive.meta.PrediTerm;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,7 +93,7 @@ abstract public class events extends AtomicPred<Derivation> {
 //
 //    };
 
-    public static final BoolPred<Derivation> beliefDTSimultaneous = new events() {
+    public static final PrediTerm<Derivation> beliefDTSimultaneous = new events() {
 
         @Override
         public String toString() {

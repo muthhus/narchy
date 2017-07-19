@@ -11,13 +11,13 @@ import java.util.Map;
 /**
  * Created by me on 5/21/16.
  */
-public final class PatternOpSwitch extends ProxyCompound implements BoolPred<Derivation> {
+public final class PatternOpSwitch extends ProxyCompound implements PrediTerm<Derivation> {
 
-    public final BoolPred[] proc = new BoolPred[32]; //should be large enough
+    public final PrediTerm[] proc = new PrediTerm[32]; //should be large enough
     public final int subterm;
 
 
-    public PatternOpSwitch(int subterm, @NotNull Map<PatternOp, BoolPred> cases) {
+    public PatternOpSwitch(int subterm, @NotNull Map<PatternOp, PrediTerm> cases) {
         super($.func( $.the(subterm), $.quote( cases.toString() )));
 
         this.subterm = subterm;
@@ -27,7 +27,7 @@ public final class PatternOpSwitch extends ProxyCompound implements BoolPred<Der
 
     @Override
     public boolean test(@NotNull Derivation m) {
-        BoolPred p = proc[m.subOp(subterm)];
+        PrediTerm p = proc[m.subOp(subterm)];
         if (p!=null) {
             return p.test(m);
         }

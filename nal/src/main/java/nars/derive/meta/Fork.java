@@ -4,27 +4,22 @@ import jcog.math.ByteShuffler;
 import nars.$;
 import nars.control.premise.Derivation;
 import nars.term.Term;
-import nars.term.Terms;
-import nars.term.compound.GenericCompound;
 import nars.term.compound.ProxyCompound;
-import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static nars.Op.CONJ;
-
 
 /**
  * parallel branching
  */
-public class Fork extends ProxyCompound implements BoolPred<Derivation> {
+public class Fork extends ProxyCompound implements PrediTerm<Derivation> {
 
     @NotNull
-    public final BoolPred<Derivation>[] cached;
+    public final PrediTerm<Derivation>[] cached;
 
-    public Fork(@NotNull BoolPred[] actions) {
+    public Fork(@NotNull PrediTerm[] actions) {
         super($.sete((Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
@@ -48,12 +43,12 @@ public class Fork extends ProxyCompound implements BoolPred<Derivation> {
         return true;
     }
 
-    public static BoolPred<? extends Object> compile(List<BoolPred> t) {
-        return compile(t.toArray(new BoolPred[t.size()]));
+    public static PrediTerm<? extends Object> compile(List<PrediTerm> t) {
+        return fork(t.toArray(new PrediTerm[t.size()]));
     }
 
     @Nullable
-    public static BoolPred<Derivation> compile(@NotNull BoolPred<Derivation>[] n) {
+    public static PrediTerm<Derivation> fork(@NotNull PrediTerm<Derivation>[] n) {
         switch (n.length) {
             case 0:
                 return null;

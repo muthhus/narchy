@@ -63,7 +63,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * conditions which can be tested before unification
      */
-    public BoolPred[] PRE;
+    public PrediTerm[] PRE;
 
     /**
      * consequences applied after unification
@@ -446,7 +446,7 @@ public class PremiseRule extends GenericCompound {
         Term[] postcons = ((Compound) sub(1)).toArray();
 
 
-        Set<BoolPred> pres =
+        Set<PrediTerm> pres =
                 //Global.newArrayList(precon.length);
                 new TreeSet(); //for consistent ordering to maximize folding
 
@@ -722,7 +722,7 @@ public class PremiseRule extends GenericCompound {
         }
 
         //store to arrays
-        this.PRE = pres.toArray(new BoolPred[pres.size()]);
+        this.PRE = pres.toArray(new PrediTerm[pres.size()]);
 
 
         if (Sets.newHashSet(postConditions).size() != postConditions.size())
@@ -769,12 +769,12 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    public static void isOp(Set<BoolPred> pres, Term taskTermPattern, Term beliefTermPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
+    public static void isOp(Set<PrediTerm> pres, Term taskTermPattern, Term beliefTermPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
         pres.add(new TaskBeliefHas(v.bit, taskTermPattern.contains(x), beliefTermPattern.contains(x)));
         constraints.add(new OpConstraint(x, v));
     }
 
-    public TimeFunctions time(Set<BoolPred> pres, Term y, Term z, String XString) {
+    public TimeFunctions time(Set<PrediTerm> pres, Term y, Term z, String XString) {
         TimeFunctions timeFunction = TimeFunctions.Auto;
         switch (XString) {
             case "task":
@@ -1070,7 +1070,7 @@ public class PremiseRule extends GenericCompound {
         return derived;
     }
 
-    public static void opNot(Term task, Term belief, @NotNull Set<BoolPred> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
+    public static void opNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
 
 //        boolean prefiltered = false;
 //        if (t.equals(task)) {
@@ -1086,7 +1086,7 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-    public static void opNotContaining(Term task, Term belief, @NotNull Set<BoolPred> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
+    public static void opNotContaining(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
 
 
         boolean prefiltered = false;

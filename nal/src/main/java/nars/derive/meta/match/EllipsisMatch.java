@@ -137,9 +137,4 @@ public class EllipsisMatch extends ArrayTermVector implements Term, NonInternabl
         return (n >= min);
     }
 
-
-    /** returns whether anything has changed in the target */
-    public void expand(Op op, @NotNull AppendProtoCompound target) {
-        target.addAll(terms);
-    }
 }
