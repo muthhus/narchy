@@ -320,7 +320,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
      */
     @Override
     default int compareTo(@NotNull Termlike y) {
-        if (this == y /*|| this.equals(y)*/) return 0;
+        if (this.equals(y)) return 0;
 
 //        int diff2 = Integer.compare(hashCode(), y.hashCode());
 //        if (diff2 != 0)
@@ -333,7 +333,6 @@ public interface Term extends Termlike, Comparable<Termlike> {
 //        if (y instanceof ProxyTerm)
 //            y = ((ProxyTerm)y).ref; //de-ref
 
-        if (this.equals(y)) return 0;
 
         if (this instanceof Compound) {
 

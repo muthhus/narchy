@@ -352,6 +352,7 @@ public enum TrieDeriver  { ;
 
     /**
      * final processing step before finalized usable form
+     *
      */
     protected static PrediTerm build(PrediTerm p, Function<PrediTerm<Derivation>,PrediTerm<Derivation>> each) {
         /*if (p instanceof IfThen) {
@@ -361,26 +362,22 @@ public enum TrieDeriver  { ;
         if (p instanceof AndCondition) {
             AndCondition ac = (AndCondition) p;
             PrediTerm[] termCache = ac.cache;
-            for (int i = 0; i < termCache.length; i++) {
+            for (int i = 0; i < termCache.length; i++)
                 termCache[i] = build(termCache[i], each);
-            }
+
         } else if (p instanceof Fork) {
             Fork ac = (Fork) p;
             PrediTerm[] termCache = ac.cached;
-            for (int i = 0; i < termCache.length; i++) {
+            for (int i = 0; i < termCache.length; i++)
                 termCache[i] = build(termCache[i], each);
-            }
 
         } else if (p instanceof PatternOpSwitch) {
             PatternOpSwitch sw = (PatternOpSwitch) p;
             PrediTerm[] proc = sw.proc;
             for (int i = 0; i < proc.length; i++) {
                 PrediTerm b = proc[i];
-                if (b != null)
-                    proc[i] = build(b, each);
-                //else {
-                //continue
-                //}
+                //if (b != null)
+                proc[i] = build(b, each);
             }
         } else if (p instanceof UnificationPrototype) {
             p = ((UnificationPrototype) p).build(each);

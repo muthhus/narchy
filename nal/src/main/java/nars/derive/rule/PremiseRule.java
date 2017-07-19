@@ -335,7 +335,7 @@ public class PremiseRule extends GenericCompound {
             Object bc = classify(b);
 
             HashMap<Object, Integer> ps = PremiseRule.preconditionScore;
-            int c = Integer.compare(ps.getOrDefault(bc, -1), ps.getOrDefault(ac, -1));
+            int c = Integer.compare(ps.get(bc) /*getOrDefault(bc, -1)*/, ps.get(ac) /*ps.getOrDefault(ac, -1)*/);
             return (c != 0) ? c : b.toString().compareTo(a.toString());
         });
 

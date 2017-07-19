@@ -7,7 +7,6 @@ import nars.derive.meta.PrediTerm;
 import nars.term.Term;
 import nars.term.compound.ProxyCompound;
 import nars.term.subst.Unify;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Comparator;
@@ -18,7 +17,7 @@ public abstract class MatchConstraint extends ProxyCompound implements PrediTerm
     public final Term target;
 
     public MatchConstraint(String func, Term target, Term... args) {
-        super($.func(func, ArrayUtils.add(args, 0, target)));
+        super($.impl(target, $.func(func, args)));
         this.target = target;
     }
 
@@ -32,7 +31,7 @@ public abstract class MatchConstraint extends ProxyCompound implements PrediTerm
     @Override
     public boolean test(Derivation p) {
         //this will not be called when it is part of a CompoundConstraint group
-        return p.addConstraint(this);
+        return p.constrain(this);
     }
 
 
@@ -48,13 +47,13 @@ public abstract class MatchConstraint extends ProxyCompound implements PrediTerm
         private final MatchConstraint[] cache;
 
         public CompoundConstraint(MatchConstraint[] c) {
-            super($.func("MatchConstraint", c));
+            super(/*$.func("MatchConstraint",*/ $.sete(c)/*)*/);
             this.cache = c;
         }
 
         @Override
         public boolean test(Derivation derivation) {
-            return derivation.addConstraint(cache);
+            return derivation.constrain(cache);
         }
     }
 

@@ -337,7 +337,7 @@ public abstract class Unify implements Subst {
     }
 
 
-    public boolean addConstraint(MatchConstraint... cc) {
+    public boolean constrain(MatchConstraint... cc) {
         for (MatchConstraint m : cc) {
             Versioned<Term> v = xy.getOrCreateIfAbsent(m.target);
             if (((ConstrainedVersionedTerm) v).constraints.set(m) == null)

@@ -88,15 +88,16 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
             }
 
 
-            this.ref = this.id = om!=null ?
-                    $.func("unify", pid, om) :
-                    $.func( "unify", pid);
 
-            if (om!=null)
-                this.eachMatch = each.apply(om);
+            this.ref = this.id = om!=null ?
+
+                    $.func("unify", pid,
+                            this.eachMatch = each.apply(om)  ) : //final part of match
+
+                    $.func( "unify", pid); //first part of match
         }
 
-        return each.apply(build(this.eachMatch));
+        return build(this.eachMatch);
     }
 
 
