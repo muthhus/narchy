@@ -61,8 +61,8 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
 
   @Override
-    public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return f.apply( build( f.apply(buildEachMatch()) ) );
+    public final PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
+        return build( f.apply(buildEachMatch()) ).transform(f);
     }
 
     public final @Nullable PrediTerm<Derivation> buildEachMatch() {

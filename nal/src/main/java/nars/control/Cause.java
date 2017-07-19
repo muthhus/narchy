@@ -10,7 +10,14 @@ import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static nars.Param.CAUSE_CAPACITY;
 
 /**
  * represents a causal influence and tracks its
@@ -52,18 +59,35 @@ public class Cause {
         return x + "Cause[" + id + "]=" + super.toString();
     }
 
-    public static short[] zip(@Nullable FasterList<Task> e) {
-        return zip(e, Param.CAUSE_CAPACITY);
-    }
+
+
     public static short[] zip(@Nullable Task... e) {
-        return zip(new FasterList(e)); //HACK
+        switch (e.length) {
+            case 0: throw new NullPointerException();
+            case 1: return e[0].cause();
+            case 2: return zip(e[0].cause(), e[1].cause(), CAUSE_CAPACITY);
+            default:
+                return zip(Stream.of(e)
+                        .filter(Objects::nonNull).map(Task::cause).collect(toList()), CAUSE_CAPACITY); //HACK
+        }
+
     }
 
-    static short[] zip(@NotNull List<? extends Task> s, int maxLen) {
+    static short[] zip(short[] c0, short[] c1, int cap) {
+        if (Arrays.equals(c0, c1)) return c0; //no change
+
+        if (c0.length + c1.length < cap) {
+            return ArrayUtils.addAll(c0, c1);
+        } else {
+            return zip(List.of(c0, c1), cap);
+        }
+    }
+
+    static short[] zip(@NotNull List<short[]> s, int maxLen) {
 
         int ss = s.size();
         if (ss == 1) {
-            return s.get(0).cause();
+            return s.get(0);
         }
 
         ShortArrayList l = new ShortArrayList(maxLen);
@@ -73,8 +97,7 @@ public class Cause {
         main: do {
             remain = false;
             for (int i = 0, sSize = s.size(); i < sSize; i++) {
-                Task x = s.get(i);
-                short[] c = x.cause();
+                short[] c = s.get(i);
                 int cl = c.length;
                 if (cl >= n) {
                     l.add(c[cl - n]);

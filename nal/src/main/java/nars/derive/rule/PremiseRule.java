@@ -265,7 +265,7 @@ public class PremiseRule extends GenericCompound {
         put(TaskPunctuation.class, rank--);
 
 
-        put(events.class, rank--);
+        put(TaskBeliefOccurrence.class, rank--);
 
         put(TaskBeliefHas.class, rank--);
 
@@ -308,10 +308,10 @@ public class PremiseRule extends GenericCompound {
 
 //        if (b instanceof TermNotEquals) return TermNotEquals.class;
 
-        if (b == events.bothEvents) return events.class;
-        if (b == events.afterOrEternal) return events.class;
-        if (b == events.eventsOrEternals) return events.class;
-        if (b == events.beliefDTSimultaneous) return events.class;
+        if (b == TaskBeliefOccurrence.bothEvents) return TaskBeliefOccurrence.class;
+        if (b == TaskBeliefOccurrence.afterOrEternal) return TaskBeliefOccurrence.class;
+        if (b == TaskBeliefOccurrence.eventsOrEternals) return TaskBeliefOccurrence.class;
+        if (b == TaskBeliefOccurrence.beliefDTSimultaneous) return TaskBeliefOccurrence.class;
 
         if (b instanceof SubTermStructure) return SubTermStructure.class;
 
@@ -950,7 +950,7 @@ public class PremiseRule extends GenericCompound {
                 break;
 
             case "beliefDTSimultaneous":
-                pres.add(events.beliefDTSimultaneous);
+                pres.add(TaskBeliefOccurrence.beliefDTSimultaneous);
                 break;
 
 //                        case "decomposeTaskIfTermLinkBefore":
@@ -1007,7 +1007,7 @@ public class PremiseRule extends GenericCompound {
 
             case "dtCombine":
                 timeFunction = TimeFunctions.dtCombine;
-                pres.add(events.eventsOrEternals);
+                pres.add(TaskBeliefOccurrence.eventsOrEternals);
                 break;
             case "dtCombinePre":
                 timeFunction = TimeFunctions.dtCombinePre;
@@ -1018,20 +1018,20 @@ public class PremiseRule extends GenericCompound {
 
             case "dtEvents":
                 timeFunction = TimeFunctions.occForward;
-                pres.add(events.bothEvents);
+                pres.add(TaskBeliefOccurrence.bothEvents);
                 break;
             case "dtEventsReverse":
                 timeFunction = TimeFunctions.occReverse;
-                pres.add(events.bothEvents);
+                pres.add(TaskBeliefOccurrence.bothEvents);
                 break;
             //NOTE THIS SHOULD ACTUALLY BE CALLED dtBeforeAfterOrEternal or something
             case "dtEventsOrEternals":
                 timeFunction = TimeFunctions.occForward;
-                pres.add(events.eventsOrEternals);
+                pres.add(TaskBeliefOccurrence.eventsOrEternals);
                 break;
             case "dtEventsOrEternalsReverse":
                 timeFunction = TimeFunctions.occReverse;
-                pres.add(events.eventsOrEternals);
+                pres.add(TaskBeliefOccurrence.eventsOrEternals);
                 break;
 
             case "dtTminB":

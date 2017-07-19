@@ -41,7 +41,7 @@ public final class AndCondition extends ProxyCompound implements PrediTerm<Deriv
 
     @Override
     public PrediTerm transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return new AndCondition(Util.map(f, new PrediTerm[cache.length], cache));
+        return new AndCondition( Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache));
     }
 
 

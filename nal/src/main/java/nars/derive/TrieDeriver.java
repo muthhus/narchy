@@ -50,11 +50,17 @@ public enum TrieDeriver {
         if (nar != null) {
             each = (a) -> {
 
+                //System.out.println(System.identityHashCode(a) + " transform: " + a );
+
                 if (a instanceof Conclude) {
                     Conclude x = (Conclude) a;
-                    assert (x.cause[0] == -1);
-
-                    x.setCause(nar.newCause(x).id);
+//                    if (x.cause[0]!=-1) {
+//                        System.err.println(x.rule);
+//                        System.err.println("WTF");
+//                    }
+                    //assert (x.cause[0] == -1);
+                    if (x.cause[0]==-1)
+                        x.setCause(nar.newCause(x).id);
 
                 }
 
@@ -68,13 +74,10 @@ public enum TrieDeriver {
             each = each0;
         }
 
-        for (int i = 0; i < roots.length; i++)
-            roots[i] = roots[i].transform(each);
+//        for (int i = 0; i < roots.length; i++)
+//            roots[i] = roots[i].transform(each);
 
-        @Nullable PrediTerm deriver = each.apply(Fork.fork(roots) /* ROOT */);
-
-
-        return deriver;
+        return Fork.fork(roots).transform(each);
 
     }
 
@@ -110,6 +113,7 @@ public enum TrieDeriver {
             indent(indent); out.println("}");
 
         }  else */
+
         if (p instanceof AndCondition) {
             TermTrie.indent(indent);
             out.println("and {");
@@ -153,7 +157,14 @@ public enum TrieDeriver {
                 p = ((UnificationPrototype) p).transform((x) -> x);
 
             TermTrie.indent(indent);
-            out.println( /*Util.className(p) + ": " +*/ p);
+            out.print( /*Util.className(p) + ": " +*/ p);
+
+            if (p instanceof Conclude) {
+                Conclude c = (Conclude)p;
+                out.print(c.cause[0] + " " + c.rule );
+            }
+
+            out.println();
 
         }
 

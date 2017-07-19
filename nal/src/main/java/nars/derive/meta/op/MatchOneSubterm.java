@@ -1,5 +1,6 @@
 package nars.derive.meta.op;
 
+import nars.$;
 import nars.control.premise.Derivation;
 import nars.derive.meta.PrediTerm;
 import nars.term.Compound;
@@ -13,8 +14,10 @@ public final class MatchOneSubterm extends MatchTerm {
     /** which premise component, 0 (task) or 1 (belief) */
     private final int subterm;
 
-    public MatchOneSubterm(@NotNull Compound id, int subterm, @NotNull Term pattern, @Nullable PrediTerm eachMatch) {
-        super(id, pattern, eachMatch);
+    public MatchOneSubterm(int subterm, @NotNull Term pattern, @Nullable PrediTerm eachMatch) {
+        super(eachMatch!=null ?
+                $.func("unify", $.the(subterm), pattern, eachMatch) :
+                $.func("unify", $.the(subterm), pattern), pattern, eachMatch);
         this.subterm = subterm;
     }
 

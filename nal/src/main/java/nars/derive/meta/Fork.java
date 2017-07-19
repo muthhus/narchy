@@ -31,7 +31,7 @@ public class Fork extends ProxyCompound implements PrediTerm<Derivation> {
 
     @Override
     public PrediTerm transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return fork(Util.map(f, new PrediTerm[cache.length], cache));
+        return fork(Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache));
     }
 
     @Override

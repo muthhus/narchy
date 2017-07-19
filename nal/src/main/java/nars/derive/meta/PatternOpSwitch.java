@@ -37,7 +37,7 @@ public final class PatternOpSwitch extends ProxyCompound implements PrediTerm<De
 
     @Override
     public PrediTerm transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
-        return new PatternOpSwitch(ref, subterm, Util.map(f, new PrediTerm[cache.length], cache));
+        return new PatternOpSwitch(ref, subterm, Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache));
     }
 
 

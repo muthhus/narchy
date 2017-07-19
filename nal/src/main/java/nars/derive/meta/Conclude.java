@@ -38,20 +38,20 @@ public final class Conclude extends AbstractPred<Derivation> {
 
     public final static Logger logger = LoggerFactory.getLogger(Conclude.class);
 
-    @NotNull
-    public final PremiseRule rule;
+    @NotNull public final PremiseRule rule;
+
     private final @NotNull TimeFunctions time;
 
     private final boolean varIntro;
 
-
-    @NotNull
-    public final Term conclusionPattern;
+    @NotNull public final Term conclusionPattern;
 
     public final TruthOperator belief, goal;
 
     /** provided later */
     public short[] cause = new short[] { -1 };
+
+
 
     //final static AtomicInteger serial = new AtomicInteger();
 

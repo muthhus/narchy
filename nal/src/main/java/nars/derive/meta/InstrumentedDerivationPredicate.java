@@ -4,6 +4,7 @@ import nars.$;
 import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.term.ProxyCompound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 abstract public class InstrumentedDerivationPredicate extends ProxyCompound implements PrediTerm<Derivation> {
@@ -13,7 +14,21 @@ abstract public class InstrumentedDerivationPredicate extends ProxyCompound impl
     }
 
     @Override public boolean test(Derivation derivation) {
-        PrediTerm p = ref instanceof PrediTerm ? (PrediTerm)ref : ((PrediTerm)(ref.sub(0)));
+
+        PrediTerm p;
+        if (ref instanceof PrediTerm) {
+            p = (PrediTerm) ref;
+        } else {
+
+            Term s0 = sub(0);
+            if (s0 instanceof PrediTerm)
+                p = (PrediTerm) s0;
+            else {
+                throw new UnsupportedOperationException();
+                //((PrediTerm)(ref.sub(0)));
+            }
+        }
+
         onEnter(p, derivation);
         Throwable thrown = null;
         boolean result = false;
