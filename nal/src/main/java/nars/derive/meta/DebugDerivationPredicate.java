@@ -31,17 +31,17 @@ public class DebugDerivationPredicate extends InstrumentedDerivationPredicate {
             }
             Ansi ansi = Ansi.ansi();
             String pAnsi = ansi
+                    .a(Texts.iPad(nanos, 6) + "nS ")
+                    .a(' ')
                     .a(d.toString())
                     .a(' ')
-                    .a(Texts.iPad(nanos, 6) + "nS ")
-                    .a(p.getClass().getSimpleName())
-                    .a(' ')
+                    //.a(p.getClass().getSimpleName())                    .a(' ')
                     .fg(fg).a(p.toString()).fg(Ansi.Color.DEFAULT)
                     .a(' ')
                     .a((thrown != null ? (" "+thrown) : ' '))
                     .fg(returnValue ? Ansi.Color.GREEN : Ansi.Color.RED)
                     //.bg( thrown!=null ? Ansi.Color.YELLOW : Ansi.Color.BLACK )
-                    .a(Boolean.toString(returnValue)).fg(Ansi.Color.DEFAULT).newline().toString();
+                    .a(returnValue ? "TRUE" : "FALS").fg(Ansi.Color.DEFAULT).newline().toString();
 
             System.out.print(pAnsi);
         }

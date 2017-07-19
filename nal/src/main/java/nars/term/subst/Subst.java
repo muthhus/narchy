@@ -104,8 +104,10 @@ public interface Subst  {
                     return null;
                 }
 
-                if (this instanceof Derivation && u.varPattern() > 0)
+                if (this instanceof Derivation && u.varPattern() > 0) {
+                    assert(false): "varPattern should have been filtered?";
                     return null;
+                }
 
                 if (!next.add(u))
                     return null;

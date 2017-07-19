@@ -89,7 +89,7 @@ public class UnificationTest {
 
 
                 @Override
-                public boolean onMatch() {
+                public void onMatch() {
 
                     if (shouldSub) {
 
@@ -122,7 +122,7 @@ public class UnificationTest {
                         //assertFalse("match found but should not have", true);
                     }
 
-                    return false; //done
+                    setTTL(0);//die
                 }
             };
             sub.unifyAll(t1.term(), t2.term());

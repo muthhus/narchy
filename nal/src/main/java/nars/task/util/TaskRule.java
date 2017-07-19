@@ -72,9 +72,9 @@ public class TaskRule extends TaskMatch {
         }
 
         @Override
-        public boolean onMatch() {
+        public void onMatch() {
             accept(x, xy);
-            return false;
+            setTTL(0);
         }
 
     }

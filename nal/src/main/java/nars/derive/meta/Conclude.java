@@ -2,6 +2,7 @@ package nars.derive.meta;
 
 import jcog.pri.Priority;
 import nars.*;
+import nars.control.Cause;
 import nars.control.premise.Derivation;
 import nars.derive.rule.PremiseRule;
 import nars.op.DepIndepVarIntroduction;
@@ -14,6 +15,7 @@ import nars.time.Tense;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import nars.truth.func.TruthOperator;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
@@ -52,7 +54,7 @@ public final class Conclude extends AbstractPred<Derivation> {
     public final TruthOperator belief, goal;
 
     /** provided later */
-    public short cause = -1;
+    public short[] cause = new short[] { -1 };
 
     final static AtomicInteger serial = new AtomicInteger();
 
@@ -245,6 +247,10 @@ public final class Conclude extends AbstractPred<Derivation> {
                         truth = truth.negated();
                 }
 
+                assert(this.cause[0]!=-1): "unregistered cause: " + this;
+
+                short[] cause = ArrayUtils.addAll(d.parentCause, this.cause);
+
                 DerivedTask t =
                         Param.DEBUG ?
                                 new DebugDerivedTask(C, punc, truth, d, start, end, cause) :
@@ -255,6 +261,7 @@ public final class Conclude extends AbstractPred<Derivation> {
                 }
 
                 t.setPri(priority);
+
 
                 if (Param.DEBUG)
                     t.log(rule);
@@ -281,8 +288,8 @@ public final class Conclude extends AbstractPred<Derivation> {
     }
 
     public void setCause(short id) {
-        assert(this.cause == -1): "cause was already set to: " + cause + ", why set now to: " + id;
-        this.cause = id;
+        assert(this.cause[0] == -1): "cause was already set to: " + cause + ", why set now to: " + id;
+        this.cause[0] = id;
     }
 
 

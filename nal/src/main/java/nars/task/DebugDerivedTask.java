@@ -13,7 +13,7 @@ public class DebugDerivedTask extends DerivedTask {
     private final Task parentBelief;
     private final Task parentTask;
 
-    public DebugDerivedTask(@NotNull Compound tc, byte punct, @Nullable Truth truth, @NotNull Derivation d, long start, long end, @NotNull short rule) {
+    public DebugDerivedTask(@NotNull Compound tc, byte punct, @Nullable Truth truth, @NotNull Derivation d, long start, long end, @NotNull short[] rule) {
         super(tc, punct, truth, d, start, end, rule);
         this.parentTask = d.task;
         this.parentBelief = d.belief;

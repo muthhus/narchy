@@ -32,9 +32,9 @@ public class TermutatorTest {
     final Unify unifier = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1),
             Param.UnificationStackMax, TTL) {
         @Override
-        public boolean onMatch() {
+        public void onMatch() {
 
-            return false;
+            setTTL(0);
         }
     };
 

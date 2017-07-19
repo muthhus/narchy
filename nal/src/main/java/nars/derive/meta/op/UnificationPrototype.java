@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.TreeSet;
+import java.util.function.Function;
 
 /**
  * Establishes conditions for the Term unification
@@ -65,7 +66,7 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
         conclude.add(x);
     }
 
-    public final @NotNull PrediTerm build() {
+    public final @NotNull PrediTerm build(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
         if (this.eachMatch == null) {
 
 
@@ -91,10 +92,11 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
                     $.func("unify", pid, om) :
                     $.func( "unify", pid);
 
-            this.eachMatch = om;
+            if (om!=null)
+                this.eachMatch = each.apply(om);
         }
 
-        return build(this.eachMatch);
+        return each.apply(build(this.eachMatch));
     }
 
 

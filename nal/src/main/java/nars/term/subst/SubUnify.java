@@ -56,7 +56,7 @@ public class SubUnify extends Unify {
      * terminates after the first match
      */
     @Override
-    public boolean onMatch() {
+    public void onMatch() {
         //apply the match before the xy/yx mapping gets reverted after leaving the termutator
         //int start = target!=null ? target.now() : -1;
 
@@ -88,7 +88,7 @@ public class SubUnify extends Unify {
 //            return true; //HACK done after once, but TODO try multiple
 //        }
 
-        return false;
+        setTTL(0);
     }
 
     public void tryMatch(@NotNull Term x, @NotNull Term y) {

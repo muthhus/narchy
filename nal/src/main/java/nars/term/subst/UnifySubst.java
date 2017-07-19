@@ -45,7 +45,7 @@ public class UnifySubst extends Unify {
     }
 
 
-    @Override public boolean onMatch() {
+    @Override public void onMatch() {
 
         //TODO combine these two blocks to use the same sub-method
 
@@ -55,6 +55,7 @@ public class UnifySubst extends Unify {
             Term aa = resolve(a, xy);
             if (aa!=null && target.test(aa))
                 matches++;
+
 
 //        }
 //        catch (InvalidTermException e) {
@@ -79,7 +80,6 @@ public class UnifySubst extends Unify {
 
 
         //return matches < maxMatches; //determines how many
-        return false;
     }
 
 

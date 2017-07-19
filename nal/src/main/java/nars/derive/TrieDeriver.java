@@ -36,7 +36,7 @@ public enum TrieDeriver  { ;
         return the(r, nar, (x)->x);
     }
 
-    public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>,PrediTerm<Derivation>> each) {
+    public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>,PrediTerm<Derivation>> each0) {
 
         //return Collections.unmodifiableList(premiseRules);
         final TermTrie<Term, PremiseRule> trie = new RuleTrie();
@@ -45,6 +45,21 @@ public enum TrieDeriver  { ;
         @NotNull List<PrediTerm> bb = subtree(trie.root);
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
 
+        Function<PrediTerm<Derivation>,PrediTerm<Derivation>> each;
+        if (nar!=null) {
+            each  = (a) -> {
+                if (a instanceof Conclude) {
+                    Conclude x = (Conclude) a;
+                    if (x.cause[0] == -1)
+                        x.setCause(nar.newCause(x).id);
+                }
+
+                return each0.apply(a);
+            };
+        } else {
+            each = each0;
+        }
+
         for (int i = 0; i < roots.length; i++)
             roots[i] = build(roots[i], each);
 
@@ -52,8 +67,7 @@ public enum TrieDeriver  { ;
 
         if (nar!=null) {
             forEachConclude(deriver, x -> {
-                if (x.cause == -1)
-                    x.setCause(nar.newCause(x).id);
+
             });
         }
 
@@ -133,7 +147,7 @@ public enum TrieDeriver  { ;
         } else {
 
             if (p instanceof UnificationPrototype)
-                p = ((UnificationPrototype) p).build();
+                p = ((UnificationPrototype) p).build((x) -> x);
 
             TermTrie.indent(indent);
             out.println( /*Util.className(p) + ": " +*/ p);
@@ -369,7 +383,7 @@ public enum TrieDeriver  { ;
                 //}
             }
         } else if (p instanceof UnificationPrototype) {
-            p = ((UnificationPrototype) p).build();
+            p = ((UnificationPrototype) p).build(each);
         }
 
         return each.apply(p);

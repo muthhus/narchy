@@ -17,9 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static nars.Param.TTL_UNIFY;
 import static nars.Param.UnificationConstraintsMax;
@@ -118,7 +116,7 @@ public abstract class Unify implements Subst {
      *
      * @return whether to continue on any subsequent matches
      */
-    public abstract boolean onMatch();
+    public abstract void onMatch();
 
     public final void mutate(Termutator[] chain, int next) {
         if (++next < chain.length && use(Param.TTL_MUTATE))
@@ -192,6 +190,23 @@ public abstract class Unify implements Subst {
         }
 
 
+
+        if (now()==0) {
+            //quick test for no assignments
+            return;
+        }
+
+        //filter incomplete matches by detecting them here
+        //TODO use a counter to measure this instead of checking all the time
+        Iterator<Map.Entry<Term, Versioned<Term>>> ee = xy.map.entrySet().iterator();
+        while (ee.hasNext()) {
+            Map.Entry<Term, Versioned<Term>> e = ee.next();
+            Versioned<Term> v = e.getValue();
+            if ((v==null || v.get()==null) && matchType(e.getKey().op()))
+                return;
+        }
+
+
         onMatch();
 
 
@@ -199,7 +214,7 @@ public abstract class Unify implements Subst {
 
     @Override
     public String toString() {
-        return "xy=" + xy + ", ttl=" + ttl;
+        return xy + "@" + ttl;
     }
 
     @Override

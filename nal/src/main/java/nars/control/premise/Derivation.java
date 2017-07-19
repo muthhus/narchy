@@ -1,6 +1,7 @@
 package nars.control.premise;
 
 import jcog.math.ByteShuffler;
+import jcog.version.Versioned;
 import nars.*;
 import nars.control.Premise;
 import nars.derive.meta.PrediTerm;
@@ -19,6 +20,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import static nars.Op.VAR_PATTERN;
@@ -108,7 +111,7 @@ public class Derivation extends Unify implements TermContext {
     private final Functor substituteIfUnifiesAny, substituteIfUnifiesDep, polarize;
 
     public float parentPri;
-    private short[] parentCause;
+    public short[] parentCause;
 
     public Predicate<Derivation> deriver;
     public ByteShuffler shuffler = new ByteShuffler(64);
@@ -294,16 +297,17 @@ public class Derivation extends Unify implements TermContext {
         return live();
     }
 
-    @Override public final boolean onMatch() {
+    @Override public final void onMatch() {
         //try {
-            forEachMatch.test(this);
+
+
+        forEachMatch.test(this);
 //        } catch (InvalidTermException | InvalidTaskException t) {
 //            if (Param.DEBUG_EXTRA) {
 //                logger.error("Derivation onMatch {}", t);
 //            }
 //        }
         //return  (--matchesRemain > 0) && ;
-        return true;
     }
 
 

@@ -6,10 +6,11 @@ import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.compound.ProxyCompound;
 import org.fusesource.jansi.Ansi;
+import org.jetbrains.annotations.NotNull;
 
 abstract public class InstrumentedDerivationPredicate extends ProxyCompound implements PrediTerm<Derivation> {
 
-    public InstrumentedDerivationPredicate(PrediTerm<Derivation> inner) {
+    public InstrumentedDerivationPredicate(@NotNull PrediTerm<Derivation> inner) {
         super(inner instanceof Compound ? (Compound)inner : $.p(inner));
     }
 
