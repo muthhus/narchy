@@ -46,7 +46,7 @@ public class SerialCompound extends DynBytes implements Compound {
 
             for (int i = 0; i < subterms.length; i++) {
                 Term x = subterms[i];
-                IO.writeTerm(this, x);
+                IO.writeTerm(x, this);
                 v += x.volume();
             }
 

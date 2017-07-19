@@ -1,31 +1,68 @@
 package nars.derive;
 
-import nars.control.premise.Derivation;
+import jcog.util.FileCache;
+import nars.IO;
+import nars.NAR;
 import nars.derive.rule.PremiseRuleSet;
+import nars.index.term.PatternTermIndex;
+import nars.term.Compound;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.tuple.Tuples;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Predicate;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import static nars.IO.readTerm;
+import static nars.derive.rule.PremiseRuleSet.parsedRules;
 
 /**
  * Implements a strategy for managing submitted derivation processes
  * ( via the run() methods )
  * <p>
  * Created by patrick.hammer on 30.07.2015.
- *
+ * <p>
  * TODO remove Deriver and just consider any BoolPred<Derivation> a deriver
  */
-public interface Deriver extends Predicate<Derivation> {
+public interface Deriver {
 
-    //@Deprecated public static final TermIndex terms = TermIndex.memory(16384);
 
-//    TrieDeriver defaultDeriver;
-//
-//    PremiseRuleSet defaultRules;
+    /**
+     * for now it seems there is a leak so its better if each NAR gets its own copy. adds some overhead but we'll fix this later
+     * not working yet probably due to unsupported ellipsis IO codec. will fix soon
+     */
+    static PremiseRuleSet DEFAULT_RULES_cached() {
 
-    Logger logger = LoggerFactory.getLogger(Deriver.class);
 
-    PremiseRuleSet DEFAULT_RULES = PremiseRuleSet.rules(true,
+        return new PremiseRuleSet(
+                Stream.of(
+                        "nal1.nal",
+                        //"nal4.nal",
+                        "nal6.nal",
+                        "misc.nal",
+                        "induction.nal",
+                        "nal2.nal",
+                        "nal3.nal"
+                ).flatMap(x -> {
+                    try {
+                        return rulesParsed(x);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return Stream.empty();
+                }), new PatternTermIndex(), true);
+    }
+
+    static PremiseRuleSet DEFAULT_RULES() {
+        return PremiseRuleSet.rules(true,
                 "nal1.nal",
                 //"nal4.nal",
                 "nal6.nal",
@@ -33,8 +70,19 @@ public interface Deriver extends Predicate<Derivation> {
                 "induction.nal",
                 "nal2.nal",
                 "nal3.nal"
-        );;
+        );
+    }
 
+
+//    PremiseRuleSet DEFAULT_RULES = PremiseRuleSet.rules(true,
+//                "nal1.nal",
+//                //"nal4.nal",
+//                "nal6.nal",
+//                "misc.nal",
+//                "induction.nal",
+//                "nal2.nal",
+//                "nal3.nal"
+//        );
 
 
 //    Cache<String, Deriver> derivers = Caffeine.newBuilder().build();
@@ -47,87 +95,53 @@ public interface Deriver extends Predicate<Derivation> {
 //    }
 
 
+    Logger logger = LoggerFactory.getLogger(Deriver.class);
 
-    //    @NotNull
-//    static Deriver[] get(String... paths) {
-//        return Lists.newArrayList(paths).stream().map(path -> derivers.get(path,loader)).toArray(Deriver[]::new);
-//    }
-
-
-//    @NotNull public static TrieDeriver getDefaultDeriver() {
-//        synchronized (Deriver.class) {
-//            if (defaultRules == null) {
-//                //synchronized(logger) {
-//                if (defaultDeriver == null) { //double boiler
-//                    Util.time(logger, "Rule parse", () -> {
-//                        try {
-//                            defaultRules = PremiseRuleSet
-//                                    //.rulesCached("nal.nal");
-//                                    .rules("nal.nal");
-//                        } catch (Exception e) {
-//                            logger.error("rule parse: {}", e);
-//                            throw new RuntimeException(e);
-//                        }
-//                    });
-//                    Util.time(logger, "Rule compile", () -> {
-//                        defaultDeriver = new TrieDeriver(defaultRules);
-//                    });
-//                }
-//                //}
-//
-//            }
-//            return defaultDeriver;
-//        }
-//    }
+    BiConsumer<Stream<Compound>, DataOutput> encoder = (x, o) -> {
+        try {
+            IO.writeTerm(x, o);
+            //o.writeUTF(x.getTwo());
+        } catch (IOException e) {
+            throw new RuntimeException(e); //e.printStackTrace();
+        }
+    };
 
 
-//    /**
-//     * default set of rules, statically available
-//     */
-//    @Nullable
-//    public final PremiseRuleSet rules;
-//
-//
-//    public Deriver(@Nullable PremiseRuleSet rules) {
-//        this.rules = rules;
-//    }
+    @NotNull
+    static Stream<Pair<Compound, String>> rulesParsed(String ruleSet) throws IOException, URISyntaxException {
+
+        PatternTermIndex p = new PatternTermIndex();
+
+        Function<DataInput, Compound> decoder = (i) -> {
+            try {
+                return //Tuples.pair(
+                        (Compound) readTerm(i, p);
+                //,i.readUTF()
+                //);
+            } catch (IOException e) {
+                throw new RuntimeException(e); //e.printStackTrace();
+                //return null;
+            }
+        };
 
 
-//    //not ready yet
-//    static void loadCachedRules() {
-//        final String key = "derivation_rules:standard";
-//        Deriver.standard = TemporaryCache.computeIfAbsent(
-//                key, new GenericJBossMarshaller(),
-//                () -> {
-//                    try {
-////                        standard = new DerivationRules();
-//
-//                        return new DerivationRules();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                        System.exit(1);
-//                        return null;
-//                    }
-//                }
-////                //TODO compare hash/checksum of the input file
-////                //to what is stored in cached file
-////                (x) -> {
-////                    //this disables entirely and just creates a new one each time:
-////                    return  ...
-////                }
-//        );
-//    }
+        URL path = NAR.class.getResource("nal/" + ruleSet);
 
-//    /** run an initialized rule matcher */
-//    public abstract void run(@NotNull PremiseEval matcher);
+        Stream<Compound> parsed =
+                FileCache.fileCache(path, PremiseRuleSet.class.getSimpleName(),
+                        () -> load(ruleSet),
+                        encoder,
+                        decoder,
+                        logger
+                );
 
+        return parsed.map(x -> Tuples.pair(x, "."));
+    }
 
-//    public void load(Memory memory) {
-//        DerivationRules r = this.rules;
-//        int s = r.size();
-//        for (int i = 0; i < s; i++) {
-//            r.get(i).index(memory.index);
-//        }
-//    }
+    static Stream<Compound> load(String ruleFile) {
+
+        return parsedRules(new PatternTermIndex(), ruleFile).map(x -> x.getOne() /* HACK */);
+
+    }
 
 }

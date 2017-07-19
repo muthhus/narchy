@@ -40,7 +40,8 @@ public class ActivateTest {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
                 if (termlink.get() instanceof Atom)
                     return 0 ; //ignore
-                s.addOccurrences(/*tasklink.get() + " " +*/ termlink.get().toString(), 1);
+                String tls = termlink.get().toString();
+                s.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
                 return super.premise(d, tasklink, termlink, x, ttlPerPremise);
             }
         };

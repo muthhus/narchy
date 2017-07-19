@@ -40,7 +40,7 @@ public class IntAtom implements Atomic {
 //        if (out instanceof DynBytes) {
 //            ((DynBytes)out).write((byte)INT.id, id); //faster combo
 //        } else {
-            out.writeByte(id);
+            out.writeByte(INT.id);
             out.writeInt(id);
         //}
     }

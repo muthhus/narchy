@@ -50,15 +50,19 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
      * hash will be modified for each added subterm
      *
      * @param initial_capacity estimated size, but will grow if exceeded
+     * @param op if null, indicates construction of a subterms vector
      */
-    public AppendProtoCompound(Op op, int initial_capacity) {
+    public AppendProtoCompound(@Nullable Op op, int initial_capacity) {
         super();
         this.op = op;
         if (initial_capacity > 0)
             this.subs = new Term[initial_capacity];
     }
 
-    public AppendProtoCompound(Op op, TermContainer subterms) {
+    /**
+     * @param op if null, indicates construction of a subterms vector
+     */
+    public AppendProtoCompound(@Nullable Op op, @NotNull TermContainer subterms) {
         this(op, subterms.size());
         for (int i = 0; i < (size = subs.length); i++) /* (has been set in superconstructor)*/
             subs[i] = subterms.sub(i);
@@ -199,12 +203,8 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
     }
 
     private void appendKey(@NotNull Term x) {
-        try {
-            IO.writeTerm(this, x);
-            writeByte(0); //separator
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        IO.writeTerm(x, this);
+        writeByte(0); //separator
     }
 
     protected void ensureCapacity(int newCapacity) {

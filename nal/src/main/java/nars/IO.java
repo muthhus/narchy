@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.*;
@@ -54,11 +55,8 @@ public class IO {
         @Override
         public void write(Term x, DynBytes to) {
 
-            try {
-                IO.writeTerm(to, x);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            IO.writeTerm(x, to);
+
         }
     }
 
@@ -128,7 +126,7 @@ public class IO {
         Compound tt = t.term();
 
         if (out instanceof ByteArrayDataOutput) {
-            writeTerm((ByteArrayDataOutput) out, tt);
+            writeTerm(Stream.of(tt), (ByteArrayDataOutput) out);
         } else {
             out.write(IO.termToBytes(tt)); //buffer to bytes
         }
@@ -268,7 +266,13 @@ public class IO {
         }
     }
 
-    public static void writeTerm(@NotNull ByteArrayDataOutput out, @NotNull Term term) throws IOException {
+    public static void writeTerm(@NotNull Stream<? extends Term> term, @NotNull DataOutput out) throws IOException {
+        DynBytes d = new DynBytes(64 * 1024); //HACK make configurable size
+        term.forEach(x -> writeTerm(x, d));
+        d.appendTo(out);
+    }
+
+    public static void writeTerm(@NotNull Term term, @NotNull ByteArrayDataOutput out) {
 
 
         if (term instanceof Atomic) {
@@ -283,13 +287,13 @@ public class IO {
         }
     }
 
-    static void writeTermContainer(@NotNull ByteArrayDataOutput out, @NotNull TermContainer c) throws IOException {
+    static void writeTermContainer(@NotNull ByteArrayDataOutput out, @NotNull TermContainer c) {
         int siz = c.size();
 
         out.writeByte(siz);
 
         for (int i = 0; i < siz; i++)
-            writeTerm(out, c.sub(i));
+            writeTerm(c.sub(i), out);
     }
 
 //    public static void writeTermContainer(@NotNull DataOutput out, @NotNull Term... subterms) throws IOException {
@@ -299,7 +303,7 @@ public class IO {
 //        }
 //    }
 
-    public static void writeCompoundSuffix(@NotNull DataOutput out, Compound c, Op o) throws IOException {
+    public static void writeCompoundSuffix(@NotNull ByteArrayDataOutput out, Compound c, Op o) {
         if (o.temporal)
             out.writeInt(c.dt());
     }
@@ -368,14 +372,11 @@ public class IO {
     }
 
     public static byte[] termToBytes(@NotNull Term t) {
-        try {
-            DynBytes d = new DynBytes(t.volume() * 16 /* estimate */);
-            //ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            IO.writeTerm(d, t);
-            return d.array(); //bs.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        //bb = ArrayPool.bytes().
+        DynBytes d = new DynBytes(t.volume() * 16 /* estimate */);
+        //ByteArrayOutputStream bs = new ByteArrayOutputStream();
+        IO.writeTerm(t, d);
+        return d.array(); //bs.toByteArray();
     }
 
     public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException {

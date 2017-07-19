@@ -36,84 +36,12 @@ public class PremiseRuleSet {
     private final boolean permuteBackwards, permuteForwards;
 
 
-//    static final BiConsumer<Pair<Compound, String>, DataOutput> encoder = (x, o) ->{
-//        try {
-//            IO.writeTerm(o, x.getOne());
-//            o.writeUTF(x.getTwo());
-//        } catch (IOException e) {
-//            throw new RuntimeException(e); //e.printStackTrace();
-//        }
-//    };
-//
-//    @NotNull
-//    public static PremiseRuleSet rulesCached(String name) throws IOException, URISyntaxException {
-//
-//        PatternTermIndex p = new PatternTermIndex(1024);
-//
-//        Function<DataInput,Pair<Compound,String>> decoder = (i) -> {
-//            try {
-//                return Tuples.pair(
-//                        (Compound)readTerm(i, p),
-//                        i.readUTF()
-//                );
-//            } catch (IOException e) {
-//                throw new RuntimeException(e); //e.printStackTrace();
-//                //return null;
-//            }
-//        };
-//
-//        //Path path = Paths.get(Deriver.class.getClassLoader().getResource(name).toURI());
-//
-//        URL path = Deriver.class.getClassLoader().getResource(name);
-//
-//        Stream<Pair<Compound, String>> parsed =
-//                Util.fileCache(path, PremiseRuleSet.class.getSimpleName(),
-//                        () -> load(p, path),
-//                        encoder,
-//                        decoder,
-//                        logger
-//                );
-//
-//        return new PremiseRuleSet(parsed, p);
-//    }
-//static Stream<Pair<Compound, String>> load(@NotNull PatternTermIndex p, @NotNull URL path) {
-//    try {
-//
-//        return parse(load(readAllLines(Paths.get(path.toURI()))), p);
-//    } catch (Exception e) {
-//        throw new RuntimeException(e);
-//    }
-//}
-//public PremiseRuleSet(@NotNull List<String> ruleStrings) {
-//    this(ruleStrings, new PatternTermIndex());
-//}
-//
-//    public PremiseRuleSet(@NotNull List<String> ruleStrings, @NotNull PatternTermIndex patterns) {
-//        this(parse(load(ruleStrings), patterns), patterns);
-//    }
-
 
     @NotNull
     public static PremiseRuleSet rules(boolean permute, String... name) {
     final PatternTermIndex p = new PatternTermIndex();
 
-        PremiseRuleSet rs = new PremiseRuleSet(
-                Stream.of(name).flatMap(n -> {
-
-                            InputStream nn = NAR.class.getResourceAsStream("nal/" + n);
-                            byte[] bb;
-                            try {
-                                bb = nn.readAllBytes();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                bb = new byte[0];
-                            }
-                            return parse(load(bb), p);
-
-                        }
-                )
-                , p, permute
-        );
+        PremiseRuleSet rs = new PremiseRuleSet(parsedRules(p, name) , p, permute);
 
         //logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
         if (rs.errors[0] > 0) {
@@ -121,6 +49,23 @@ public class PremiseRuleSet {
         }
 
         return rs;
+    }
+
+    public static Stream<Pair<Compound, String>> parsedRules(PatternTermIndex p, String... name) {
+        return Stream.of(name).flatMap(n -> {
+
+                    InputStream nn = NAR.class.getResourceAsStream("nal/" + n);
+                    byte[] bb;
+                    try {
+                        bb = nn.readAllBytes();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        bb = new byte[0];
+                    }
+                    return parse(load(bb), p);
+
+                }
+        );
     }
 
 

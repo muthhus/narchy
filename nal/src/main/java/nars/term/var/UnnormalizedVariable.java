@@ -114,9 +114,12 @@ public class UnnormalizedVariable extends AtomicToString implements Variable, No
     @Override
     public void append(ByteArrayDataOutput out) {
         out.writeByte(SPECIAL_OP);
-        byte[] b = bytes();
-        out.writeShort(b.length);
-        out.write(b);
+        String s = toString();
+        out.writeShort(s.length());
+        out.write(s.getBytes()); //HACK
+        //byte[] b = bytes();
+        //out.writeShort(b.length);
+
     }
 
 }

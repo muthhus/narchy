@@ -257,18 +257,15 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public Truth truth(long when, EternalTable eternal, NAR nar) {
 
-        if (size()==0)
-            return null;
 
-        long now = nar.time();
 
-        updateSignalTasks(now);
-
-        Task ete = eternal != null ? eternal.strongest() : null;
-        @Nullable Task e = ete;
+        final Task ete = eternal != null ? eternal.strongest() : null;
 
         int ss = size();
         if (!tree.isEmpty()) {
+
+            long now = nar.time();
+            updateSignalTasks(now);
 
             int dur = nar.dur();
 
@@ -311,7 +308,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
 
 
-        return e != null ? e.truth() : null;
+        return ete != null ? ete.truth() : null;
 
     }
 
@@ -404,7 +401,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 for (int i = 0, toActivateSize = toActivate.size(); i < toActivateSize; i++) {
                     Task ii = toActivate.get(i);
 
-                    n.input(Activate.activate(ii, ii.priElseZero(), c, n));
+                    Activate aa = Activate.activate(ii, ii.priElseZero(), c, n);
+                    if (aa!=null)
+                        n.input(aa);
                 }
             }
         }
