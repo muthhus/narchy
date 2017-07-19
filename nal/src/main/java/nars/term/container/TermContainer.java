@@ -289,7 +289,22 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
         return false;
     }
-
+    default boolean containsRecursively(@NotNull Term y, Predicate<Compound> subTermOf) {
+        if (!impossibleSubTerm(y)) {
+            int s = size();
+            for (int i = 0; i < s; i++) {
+                Term x = sub(i);
+                if (x.equals(y))
+                    return true;
+                if (x instanceof Compound) {
+                    Compound cx = (Compound) x;
+                    if (subTermOf.test(cx) && cx.containsRecursively(y, subTermOf))
+                        return true;
+                }
+            }
+        }
+        return false;
+    }
 //    default boolean containsTermAtemporally(@NotNull Term b) {
 //        b = b.unneg();
 //        if (!impossibleSubTerm(b)) {

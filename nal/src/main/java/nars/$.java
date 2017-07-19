@@ -146,42 +146,34 @@ public interface $ {
     }
 
 
-    @Nullable
+    @NotNull
     public static <T extends Term> T sim(@NotNull Term subj, @NotNull Term pred) {
         return (T) the(SIM, subj, pred);
     }
 
 
-    public static Compound func(@NotNull String opTerm, @Nullable Term... arg) {
+    public static @NotNull Compound func(@NotNull String opTerm, @NotNull Term... arg) {
         return func(Atomic.the(opTerm), arg);
     }
 
-    public static Compound func(@NotNull String opTerm, @Nullable List<Term> arg) {
+    public static @NotNull Compound func(@NotNull String opTerm, @NotNull List<Term> arg) {
         return func(Atomic.the(opTerm), arg.toArray(new Term[arg.size()]));
     }
 
-    public static Compound func(@NotNull String opTerm, @Nullable String... arg) throws Narsese.NarseseException {
+    public static @NotNull Compound func(@NotNull String opTerm, @NotNull String... arg) throws Narsese.NarseseException {
         return func(Atomic.the(opTerm), $.array(arg));
     }
 
     /**
      * function ((a,b)==>c) aka: c(a,b)
      */
-    public static Compound func(@NotNull Atomic opTerm, @Nullable Term... arg) {
-        return compoundOrNull(the(
-                INH,
-                arg == null ? Terms.ZeroProduct : $.p(arg),
-                opTerm
-        ));
+    @NotNull public static Compound func(@NotNull Atomic opTerm, @NotNull Term... arg) {
+        return (Compound) INH.the( $.p(arg), opTerm );
     }
 
     @NotNull
-    public static Compound func(@NotNull Atomic opTerm, @Nullable Collection<Term> arg) {
-        return (Compound) the(
-                INH,
-                arg == null ? Terms.ZeroProduct : $.p(arg),
-                opTerm
-        );
+    public static Compound func(@NotNull Atomic opTerm, @NotNull Collection<Term> arg) {
+        return (Compound) INH.the( $.p(arg), opTerm );
     }
 
 
@@ -773,7 +765,7 @@ public interface $ {
      */
     @Nullable
     public static Compound seq(Term x, int dt, Term y) {
-        return compoundOrNull(the(CONJ, dt, x, y)); //must be a vector, not set
+        return compoundOrNull(CONJ.the(dt, x, y)); //must be a vector, not set
     }
 
 

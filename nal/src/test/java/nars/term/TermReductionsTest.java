@@ -129,6 +129,10 @@ public class TermReductionsTest {
         assertEquals("(--,(x-->y))", inh(neg($("x")), $("y")).toString());
         assertEquals("(x-->y)", inh(neg($("x")), neg($("y"))).toString());
     }
+    @Test public void testFunctionRecursion() throws Narsese.NarseseException {
+        //that this is valid, though self referential
+        assertTrue($("task((polarize(%1,task) <=>+- polarize(%2,belief)))") instanceof Compound);
+    }
 
     @Test
     public void testInvalidEquivalences() throws Narsese.NarseseException {

@@ -31,9 +31,9 @@ public class PatternTermIndex extends MapTermIndex {
         if (x instanceof Compound) {
             x = compute((Compound)x);
         }
-//        return x;
-        Termed y = concepts.putIfAbsent(x, x);
-        return y!=null ? y : x;
+        return x;
+        //Termed y = concepts.putIfAbsent(x, x);
+        //return y!=null ? y : x;
     }
 
 

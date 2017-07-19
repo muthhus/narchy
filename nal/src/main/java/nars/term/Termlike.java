@@ -44,6 +44,10 @@ public interface Termlike extends Termed {
         return contains(t);
     }
 
+    default boolean containsRecursively(Term t, Predicate<Compound> inSubtermsOf) {
+        return contains(t);
+    }
+
 
     /** whether any subterms (recursively) have
      *  non-DTernal temporal relation */

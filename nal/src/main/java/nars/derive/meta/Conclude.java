@@ -56,13 +56,13 @@ public final class Conclude extends AbstractPred<Derivation> {
     /** provided later */
     public short[] cause = new short[] { -1 };
 
-    final static AtomicInteger serial = new AtomicInteger();
+    //final static AtomicInteger serial = new AtomicInteger();
 
     public Conclude(@NotNull PremiseRule rule, @NotNull Term conclusionPattern,
                     @Nullable TruthOperator belief, @Nullable TruthOperator goal,
                     @NotNull TimeFunctions time) {
-        super($.p(//(Atomic) $.the("conc"),
-                $.quote(serial.getAndIncrement()), conclusionPattern, $.quote(/*"time" + */time.toString())));
+        super($.func("task",
+                /*$.quote(serial.getAndIncrement()),*/ conclusionPattern, $.quote(/*"time" + */time.toString())));
 
 
         this.rule = rule;
@@ -247,7 +247,8 @@ public final class Conclude extends AbstractPred<Derivation> {
                         truth = truth.negated();
                 }
 
-                assert(this.cause[0]!=-1): "unregistered cause: " + this;
+                assert(this.cause[0]!=-1):
+                        "unregistered cause: " + this;
 
                 short[] cause = ArrayUtils.addAll(d.parentCause, this.cause);
 

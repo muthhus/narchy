@@ -1149,8 +1149,8 @@ public enum Op implements $ {
             Term pu = predicate.unneg();
             Term su = subject.unneg();
             //first layer only, not recursively
-            if ((pu.varPattern() == 0 && (subject.equals(pu) || subject.containsRecursively(pu))) ||
-                    (su.varPattern() == 0 && (predicate.equals(su) || predicate.containsRecursively(su))))
+            if ((pu.varPattern() == 0 && (subject.equals(pu) || subject.containsRecursively(pu, (c -> c.op()!=PROD)))) ||
+                    (su.varPattern() == 0 && (predicate.equals(su) || predicate.containsRecursively(su, (c -> c.op()!=PROD)))))
                 //(!(su instanceof Variable) && predicate.contains(su)))
                 return False; //cyclic
 
