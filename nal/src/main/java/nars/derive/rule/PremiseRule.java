@@ -180,7 +180,7 @@ public class PremiseRule extends GenericCompound {
                 $.the(goalLabel)
         );
         if (puncOverride != 0)
-            args.add($.quote(/*"conc" +*/ ((char) puncOverride)));
+            args.add($.quote( ((char) puncOverride)));
 
         if (!beliefProjected)
             args.add($.the("unproj"));

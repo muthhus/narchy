@@ -59,8 +59,8 @@ public final class Conclude extends AbstractPred<Derivation> {
     public Conclude(@NotNull PremiseRule rule, @NotNull Term conclusionPattern,
                     @Nullable TruthOperator belief, @Nullable TruthOperator goal,
                     @NotNull TimeFunctions time) {
-        super($.func((Atomic) $.the("conc"),
-                $.the(serial), conclusionPattern, $.the(/*"time" + */time.toString())));
+        super($.p(//(Atomic) $.the("conc"),
+                $.quote(serial.getAndIncrement()), conclusionPattern, $.quote(/*"time" + */time.toString())));
 
 
         this.rule = rule;

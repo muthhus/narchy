@@ -122,7 +122,7 @@ public class TrieDeriver implements Deriver {
         } else {
 
             if (p instanceof UnificationPrototype)
-                ((UnificationPrototype) p).build();
+                p = ((UnificationPrototype) p).build();
 
             TermTrie.indent(indent);
             out.println( /*Util.className(p) + ": " +*/ p);
@@ -357,12 +357,10 @@ public class TrieDeriver implements Deriver {
                 //continue
                 //}
             }
-        } else {
-
-            if (p instanceof UnificationPrototype)
-                return ((UnificationPrototype) p).build();
-
+        } else if (p instanceof UnificationPrototype) {
+            return ((UnificationPrototype) p).build();
         }
+
 
         return p;
     }
@@ -527,15 +525,18 @@ public class TrieDeriver implements Deriver {
         public RuleTrie(@NotNull PremiseRuleSet ruleset) {
             super();
             ruleset.rules.forEach(this::put);
+
         }
 
         @Override
         protected void onMatch(Term existing, Term incoming) {
             if (existing instanceof UnificationPrototype) {
                 //merge the set of conclusions where overlapping
-                TreeSet<Conclude> incomingConcs = ((UnificationPrototype) incoming).conclude;
-                ((UnificationPrototype) existing).conclude.addAll(incomingConcs);
-                incomingConcs.clear();
+
+
+                ((UnificationPrototype) existing).conclude.addAll(((UnificationPrototype) incoming).conclude);
+                ((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
+                //incomingConcs.clear();
             }
         }
 

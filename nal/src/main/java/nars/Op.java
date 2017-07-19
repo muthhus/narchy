@@ -616,7 +616,7 @@ public enum Op implements $ {
 
             Op o = C.op();
             if (o != null) {
-                return compoundNew(o, C.subterms());
+                return compoundNew(o, C);
             } else
                 return subtermsNew(C.subterms());
 
@@ -880,7 +880,9 @@ public enum Op implements $ {
     }
 
 
-    public static Term compoundNew(Op o, Term... subterms) {
+    public static Term compoundNew(Op o, TermContainer subContainer) {
+
+        Term[] subterms = subContainer.toArray();
 
         int s = subterms.length;
         assert (o.maxSize >= s) : "subterm overflow: " + o + " " + Arrays.toString(subterms);
@@ -923,17 +925,27 @@ public enum Op implements $ {
     @NotNull
     public static Term compound(Op op, int dt, TermContainer subterms) {
         assert (!op.atomic);
+
+        if (subterms.OR(x -> x instanceof NonInternable))
+            return compoundNew(op, subterms).dt(dt);
+
         AppendProtoCompound apc = new AppendProtoCompound(op, subterms);
         return compound(apc, dt);
     }
 
     @NotNull
     public static Term compound(AppendProtoCompound apc, int dt) {
-        Term x = (Term) cache.apply(apc.commit());
-        if (dt != DTERNAL && x instanceof Compound)
-            return x.dt(dt);
-        else
-            return x;
+
+        if (apc.OR(x -> x instanceof NonInternable)) {
+            return compoundNew(apc.op, apc).dt(dt);
+        } else {
+            Term x = (Term) cache.apply(apc.commit());
+
+            if (dt != DTERNAL && x instanceof Compound)
+                return x.dt(dt);
+            else
+                return x;
+        }
     }
 
     static boolean in(int needle, int haystack) {

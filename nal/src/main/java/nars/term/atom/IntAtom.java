@@ -38,12 +38,12 @@ public class IntAtom implements Atomic {
 
     @Override
     public void append(ByteArrayDataOutput out) {
-        if (out instanceof DynBytes) {
-            ((DynBytes)out).write((byte)INT.id, id); //faster combo
-        } else {
+//        if (out instanceof DynBytes) {
+//            ((DynBytes)out).write((byte)INT.id, id); //faster combo
+//        } else {
             out.writeByte(id);
             out.writeInt(id);
-        }
+        //}
     }
 
     @Override
