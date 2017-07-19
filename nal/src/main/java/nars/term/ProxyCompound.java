@@ -40,6 +40,11 @@ public class ProxyCompound implements Compound, NonInternable {
     }
 
     @Override
+    public String toString() {
+        return IO.Printer.stringify(this).toString();
+    }
+
+    @Override
     public void append(@NotNull Appendable p) throws IOException {
         IO.Printer.append(this, p);
     }
@@ -47,6 +52,11 @@ public class ProxyCompound implements Compound, NonInternable {
     @Override
     public boolean isNormalized() {
         return ref.isNormalized();
+    }
+
+    @Override
+    public void setNormalized() {
+        ref.setNormalized();
     }
 
     @Override

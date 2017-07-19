@@ -30,13 +30,14 @@ import static java.util.stream.Collectors.toList;
 /**
  * separates rules according to task/belief term type but otherwise involves significant redundancy we'll eliminate in other Deriver implementations
  */
-public enum TrieDeriver  { ;
+public enum TrieDeriver {
+    ;
 
     public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar) {
-        return the(r, nar, (x)->x);
+        return the(r, nar, (x) -> x);
     }
 
-    public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>,PrediTerm<Derivation>> each0) {
+    public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each0) {
 
         //return Collections.unmodifiableList(premiseRules);
         final TermTrie<Term, PremiseRule> trie = new RuleTrie();
@@ -45,31 +46,33 @@ public enum TrieDeriver  { ;
         @NotNull List<PrediTerm> bb = subtree(trie.root);
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
 
-        Function<PrediTerm<Derivation>,PrediTerm<Derivation>> each;
-        if (nar!=null) {
-            each  = (a) -> {
+        Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each;
+        if (nar != null) {
+            each = (a) -> {
+
                 if (a instanceof Conclude) {
                     Conclude x = (Conclude) a;
-                    if (x.cause[0] == -1)
-                        x.setCause(nar.newCause(x).id);
+                    assert (x.cause[0] == -1);
+
+                    x.setCause(nar.newCause(x).id);
+
                 }
 
+                if (a == null)
+                    return null; //allow nulls
+
                 return each0.apply(a);
+
             };
         } else {
             each = each0;
         }
 
         for (int i = 0; i < roots.length; i++)
-            roots[i] = build(roots[i], each);
+            roots[i] = roots[i].transform(each);
 
-        @Nullable PrediTerm deriver = each.apply( Fork.fork(roots) /* ROOT */);
+        @Nullable PrediTerm deriver = each.apply(Fork.fork(roots) /* ROOT */);
 
-        if (nar!=null) {
-            forEachConclude(deriver, x -> {
-
-            });
-        }
 
         return deriver;
 
@@ -120,7 +123,7 @@ public enum TrieDeriver  { ;
             TermTrie.indent(indent);
             out.println(Util.className(p) + " {");
             Fork ac = (Fork) p;
-            for (PrediTerm b : ac.cached) {
+            for (PrediTerm b : ac.cache) {
                 print(b, out, indent + 2);
             }
             TermTrie.indent(indent);
@@ -131,7 +134,7 @@ public enum TrieDeriver  { ;
             TermTrie.indent(indent);
             out.println("SubTermOp" + sw.subterm + " {");
             int i = -1;
-            for (PrediTerm b : sw.proc) {
+            for (PrediTerm b : sw.cache) {
                 i++;
                 if (b == null) continue;
 
@@ -147,7 +150,7 @@ public enum TrieDeriver  { ;
         } else {
 
             if (p instanceof UnificationPrototype)
-                p = ((UnificationPrototype) p).build((x) -> x);
+                p = ((UnificationPrototype) p).transform((x) -> x);
 
             TermTrie.indent(indent);
             out.println( /*Util.className(p) + ": " +*/ p);
@@ -196,7 +199,7 @@ public enum TrieDeriver  { ;
             //TermTrie.indent(indent);
             //out.println(Util.className(p) + " {");
             Fork ac = (Fork) p;
-            for (PrediTerm b : ac.cached) {
+            for (PrediTerm b : ac.cache) {
                 forEach(b, out);
             }
 //            TermTrie.indent(indent);
@@ -207,7 +210,7 @@ public enum TrieDeriver  { ;
             //TermTrie.indent(indent);
             //out.println("SubTermOp" + sw.subterm + " {");
             int i = -1;
-            for (PrediTerm b : sw.proc) {
+            for (PrediTerm b : sw.cache) {
                 i++;
                 if (b == null) continue;
 
@@ -350,42 +353,6 @@ public enum TrieDeriver  { ;
         return bb;
     }
 
-    /**
-     * final processing step before finalized usable form
-     *
-     */
-    protected static PrediTerm build(PrediTerm p, Function<PrediTerm<Derivation>,PrediTerm<Derivation>> each) {
-        /*if (p instanceof IfThen) {
-            IfThen it = (IfThen) p;
-            return new IfThen(build(it.cond), build(it.conseq) ); //HACK wasteful
-        } else */
-        if (p instanceof AndCondition) {
-            AndCondition ac = (AndCondition) p;
-            PrediTerm[] termCache = ac.cache;
-            for (int i = 0; i < termCache.length; i++)
-                termCache[i] = build(termCache[i], each);
-
-        } else if (p instanceof Fork) {
-            Fork ac = (Fork) p;
-            PrediTerm[] termCache = ac.cached;
-            for (int i = 0; i < termCache.length; i++)
-                termCache[i] = build(termCache[i], each);
-
-        } else if (p instanceof PatternOpSwitch) {
-            PatternOpSwitch sw = (PatternOpSwitch) p;
-            PrediTerm[] proc = sw.proc;
-            for (int i = 0; i < proc.length; i++) {
-                PrediTerm b = proc[i];
-                //if (b != null)
-                proc[i] = build(b, each);
-            }
-        } else if (p instanceof UnificationPrototype) {
-            p = ((UnificationPrototype) p).build(each);
-        }
-
-        return each.apply(p);
-    }
-
     @Nullable
     public static PrediTerm ifThen(@NotNull Stream<PrediTerm> cond, @Nullable PrediTerm conseq) {
         return AndCondition.the(AndCondition.compile(
@@ -393,13 +360,7 @@ public enum TrieDeriver  { ;
         ));
     }
 
-    public static void forEachConclude(PrediTerm<Derivation> d, Consumer<Conclude> p) {
-        forEach(d, (c) -> {
-            if (c instanceof Conclude) {
-                p.accept((Conclude) c);
-            }
-        });
-    }
+
     public static void print(PrediTerm<Derivation> d, @NotNull PrintStream out) {
         print(d, out, 0);
 
@@ -410,7 +371,6 @@ public enum TrieDeriver  { ;
 //
 //        out.println("}");
     }
-
 
 
     @NotNull
@@ -427,7 +387,7 @@ public enum TrieDeriver  { ;
             int nEnd = n.end();
             PrediTerm branch = ifThen(
                     conditions(n.seq().stream().skip(nStart).limit(nEnd - nStart)),
-                    !conseq.isEmpty() ? Fork.compile(conseq) : null
+                    !conseq.isEmpty() ? (PrediTerm<?>) Fork.fork(conseq.toArray(new PrediTerm[conseq.size()])) : null
             );
 
             if (branch != null)

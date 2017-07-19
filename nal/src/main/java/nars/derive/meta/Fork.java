@@ -1,5 +1,6 @@
 package nars.derive.meta;
 
+import jcog.Util;
 import jcog.math.ByteShuffler;
 import nars.$;
 import nars.control.premise.Derivation;
@@ -8,43 +9,46 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.function.Function;
 
 
 /**
  * parallel branching
+ *
+ * TODO generify beyond only Derivation
  */
 public class Fork extends ProxyCompound implements PrediTerm<Derivation> {
 
     @NotNull
-    public final PrediTerm<Derivation>[] cached;
+    public final PrediTerm<Derivation>[] cache;
 
     public Fork(@NotNull PrediTerm[] actions) {
         super($.sete((Term[]) actions));
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
-        this.cached = actions;
+        this.cache = actions;
+    }
+
+    @Override
+    public PrediTerm transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
+        return fork(Util.map(f, new PrediTerm[cache.length], cache));
     }
 
     @Override
     public boolean test(@NotNull Derivation m) {
 
-        int branches = cached.length;
+        int branches = cache.length;
         ByteShuffler b = m.shuffler;
         byte[] order = b.shuffle(m.random, branches, true); //must get a copy because recursion will re-use the shuffler's internal array
 
         int before = m.now();
         for (int i = 0; i < branches; i++) {
-            cached[order[i]].test(m);
+            cache[order[i]].test(m);
             if (!m.revert(before))
                 return false;
         }
 
         return true;
-    }
-
-    public static PrediTerm<? extends Object> compile(List<PrediTerm> t) {
-        return fork(t.toArray(new PrediTerm[t.size()]));
     }
 
     @Nullable

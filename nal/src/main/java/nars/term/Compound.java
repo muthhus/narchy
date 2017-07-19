@@ -123,8 +123,7 @@ public interface Compound extends Term, IPair, TermContainer {
     /**
      * if the compound tracks normalization state, this will set the flag internally
      */
-    default void setNormalized() {
-    }
+    void setNormalized();
 
     /**
      * gets the set of unique recursively contained terms of a specific type

@@ -1,6 +1,7 @@
 package nars.derive.meta;
 
 import com.google.common.collect.Lists;
+import jcog.Util;
 import nars.$;
 import nars.control.premise.Derivation;
 import nars.derive.meta.constraint.MatchConstraint;
@@ -12,9 +13,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
- * Created by me on 12/31/15.
+ * TODO generify beyond only Derivation
  */
 public final class AndCondition extends ProxyCompound implements PrediTerm<Derivation> {
 
@@ -37,6 +39,12 @@ public final class AndCondition extends ProxyCompound implements PrediTerm<Deriv
         return true;
     }
 
+    @Override
+    public PrediTerm transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
+        return new AndCondition(Util.map(f, new PrediTerm[cache.length], cache));
+    }
+
+
     public static @Nullable PrediTerm the(@NotNull List<PrediTerm> cond) {
 
         int s = cond.size();
@@ -55,12 +63,15 @@ public final class AndCondition extends ProxyCompound implements PrediTerm<Deriv
     /*public AndCondition(@NotNull BooleanCondition<C>[] p) {
         this(TermVector.the((Term[])p));
     }*/
-    AndCondition(@NotNull Collection<PrediTerm> p) {
-        super($.p(AND_ATOM, $.p(p.toArray(new Term[p.size()]))));
 
-        this.cache = p.toArray(new PrediTerm[p.size()]);
-        if (cache.length < 2)
-            throw new RuntimeException("unnecessary use of AndCondition");
+    AndCondition(@NotNull PrediTerm[] p) {
+        super($.p(AND_ATOM, $.p(p)));
+        assert(p.length >= 2): "unnecessary use of AndCondition";
+        this.cache = p;
+    }
+
+    AndCondition(@NotNull Collection<PrediTerm> p) {
+        this(p.toArray(new PrediTerm[p.size()]));
     }
 
 

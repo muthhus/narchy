@@ -1,5 +1,6 @@
 package nars.term;
 
+import nars.IO;
 import nars.Op;
 import nars.index.term.NonInternable;
 import nars.index.term.TermContext;
@@ -26,6 +27,10 @@ public class ProxyTerm<T extends Term> implements Term, NonInternable {
         this.ref = t;
     }
 
+    @Override
+    public String toString() {
+        return ref.toString();
+    }
 
     @NotNull
     @Override

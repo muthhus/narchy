@@ -89,6 +89,12 @@ public class CompoundConcept implements Concept, Compound, Termlike, NonInternab
         return term.subterms();
     }
 
+    @Override
+    public void setNormalized() {
+        //ignore
+        assert(isNormalized()): "why wasnt this already normalized";
+    }
+
     @NotNull
     @Override
     public Compound term() {

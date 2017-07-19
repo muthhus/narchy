@@ -15,7 +15,7 @@ import java.util.function.Function;
 
 /**
  * Establishes conditions for the Term unification
- *
+ * <p>
  * < (|, match [, constraints]) ==> (&|, derivation1, ... derivationN)>
  */
 abstract public class UnificationPrototype extends AbstractPred<Derivation> {
@@ -31,7 +31,9 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
     public final Term pattern;
 
-    /** derivation handlers; use the array form for fast iteration */
+    /**
+     * derivation handlers; use the array form for fast iteration
+     */
     public final TreeSet<Conclude> conclude = new TreeSet();
 
     public UnificationPrototype(@NotNull Compound id, Term pattern) {
@@ -41,9 +43,7 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
         this.pattern = pattern;
     }
 
-
-
-
+    abstract protected PrediTerm build(@Nullable PrediTerm eachMatch);
 
 //    public static final class MatchTaskBeliefPair extends MatchTerm {
 //
@@ -60,34 +60,32 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
 
 
-    /** add a derivation handler to be applied after a rule match */
-    public void derive(Conclude x) {
-        conclude.add(x);
+  @Override
+    public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
+        return f.apply( build( f.apply(buildEachMatch()) ) );
     }
 
-    public final @NotNull PrediTerm build(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
+    public final @Nullable PrediTerm<Derivation> buildEachMatch() {
 
+        PrediTerm om;
 
-            PrediTerm om;
-
-            int cs = conclude.size();
-            switch (cs) {
-                case 0:
-                    om = null;
-                    break;
-                case 1:
-                    om = conclude.first();
-                    break;
-                default:
-                    om = Fork.fork(
+        int cs = conclude.size();
+        switch (cs) {
+            case 0:
+                om = null;
+                break;
+            case 1:
+                om = conclude.first();
+                break;
+            default:
+                om = Fork.fork(
                         conclude.toArray(new Conclude[cs])
-                    );
-                    break;
-            }
+                );
+                break;
+        }
 
 
-
-            return build( om!=null ? each.apply(om) : null );
+        return om;
 //
 //                    $.func("unify", pid,
 //                            this.eachMatch = each.apply(om)  ) : //final part of match
@@ -98,8 +96,6 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
     }
 
 
-    @NotNull
-    abstract protected PrediTerm build(PrediTerm eachMatch);
 
     @Override
     public boolean test(Derivation derivation) {

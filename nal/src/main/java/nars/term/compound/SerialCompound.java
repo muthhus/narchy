@@ -28,6 +28,7 @@ import static nars.time.Tense.DTERNAL;
 public class SerialCompound extends DynBytes implements Compound {
 
     final byte volume;
+    boolean normalized = false;
 
     public SerialCompound(Compound c) {
         this(c.op(), c.dt(), c.toArray());
@@ -101,6 +102,11 @@ public class SerialCompound extends DynBytes implements Compound {
     @Override
     public @NotNull TermContainer subterms() {
         return build().subterms(); //HACK just a temporary way of accessing them
+    }
+
+    @Override
+    public void setNormalized() {
+        normalized = true;
     }
 
 //    static class SerialTermVector implements TermContainer {
