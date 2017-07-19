@@ -61,7 +61,7 @@ public final class Conclude extends AbstractPred<Derivation> {
     public Conclude(@NotNull PremiseRule rule, @NotNull Term conclusionPattern,
                     @Nullable TruthOperator belief, @Nullable TruthOperator goal,
                     @NotNull TimeFunctions time) {
-        super($.func("task",
+        super($.func("derive",
                 /*$.quote(serial.getAndIncrement()),*/ conclusionPattern, $.quote(/*"time" + */time.toString())));
 
 

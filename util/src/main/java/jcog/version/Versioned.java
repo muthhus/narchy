@@ -95,6 +95,12 @@ public class Versioned<X>
 
     }
 
+    public final X getAndPop() {
+        X x = items[--size];
+        items[size+1] = null;
+        return x;
+    }
+
     public void pop() {
 
             //if (size > 0) { //HACK wtf would it be empty

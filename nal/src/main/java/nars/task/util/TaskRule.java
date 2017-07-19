@@ -33,14 +33,14 @@ public class TaskRule extends TaskMatch {
     /** mapping of input variables to normalized variables */
     private final Map<Variable, Variable> io;
 
-    private final Term input;
+    private final Compound input;
     private final Compound id;
 
     public TaskRule(String input, String output, NAR nar) throws Narsese.NarseseException {
         super(nar);
 
         this.input = $.$(input);
-        this.outputRaw = (Compound) nar.terms.termRaw(output);
+        this.outputRaw = nar.terms.termRaw(output);
 
         VariableNormalization varNorm = new VariableNormalization(outputRaw.size() /* est */);
 

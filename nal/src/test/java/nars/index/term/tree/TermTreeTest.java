@@ -68,6 +68,8 @@ public class TermTreeTest {
         ).get();
 
 
+        int preSize = index.size();
+
         String[] terms = {
                 "x",
                 "(x)", "(xx)", "(xxx)",
@@ -82,12 +84,15 @@ public class TermTreeTest {
             index.get(ts, true);
         }
 
-        assertEquals(terms.length, index.size());
+        assertEquals(terms.length + preSize, index.size());
+
+        for (Term x : input)
+            assertNotNull(index.get(x,false));
 
 
-        Set<Termed> stored = StreamSupport.stream(index.concepts.spliterator(), false).collect(Collectors.toSet());
+        //Set<Termed> stored = StreamSupport.stream(index.concepts.spliterator(), false).collect(Collectors.toSet());
 
-        assertEquals(Sets.symmetricDifference(input, stored) + " = difference", input, stored);
+        //assertEquals(Sets.symmetricDifference(input, stored) + " = difference", input, stored);
 
         index.concepts.prettyPrint();
         index.print(System.out);

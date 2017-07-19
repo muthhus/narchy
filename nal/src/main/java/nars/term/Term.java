@@ -45,6 +45,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static nars.Op.Null;
 import static nars.time.Tense.DTERNAL;
@@ -93,6 +94,9 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
     boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, @Nullable Compound parent);
 
+    default boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, Compound parent)  {
+        return whileTrue.test(this);
+    }
 
     /**
      * Commutivity in NARS means that a Compound term's

@@ -4,13 +4,14 @@ import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.function.Consumer;
 
 /**
  * versioning context that holds versioned instances
  */
-public class Versioning extends
+public class Versioning<X> extends
         //FastList<Versioned> {
-        FasterList<Versioned> {
+        FasterList<Versioned<X>> {
 
 
 
@@ -29,39 +30,30 @@ public class Versioning extends
      * reverts/undo to previous state
      */
     public final void revert(int when) {
-        //assert (size >= when);
-
-        //pop(size - when );
 
         int s = size();
         int c = s - when;
 
         while (c-- > 0) {
-
-            //Versioned versioned =
-                    //removeLast();
-
             Versioned versioned = items[--size];
             items[size] = null; //GC help
 
-
-
-//            if (versioned == null) {
-//                throw new NullPointerException();
-//                //continue;
-//            }
-
-            //if (!versioned.isEmpty()) { //HACK wtf would it be empty
-
             versioned.pop();
-
-            //}
-            //assert(removed!=null);
-            //TODO removeLastFast where we dont need the returned value
         }
-
     }
 
+    public final void revert(int when, Consumer<X> each) {
+
+        int s = size();
+        int c = s - when;
+
+        while (c-- > 0) {
+            Versioned<X> versioned = items[--size];
+            items[size] = null; //GC help
+
+            each.accept( versioned.getAndPop() );
+        }
+    }
 
     @Override
     public void clear() {
@@ -75,17 +67,17 @@ public class Versioning extends
     }
 
     @Override
-    public boolean addAll(Collection<? extends Versioned> source) {
+    public boolean addAll(Collection<? extends Versioned<X>> source) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends Versioned> source) {
+    public boolean addAll(int index, Collection<? extends Versioned<X>> source) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean addAllIterable(Iterable<? extends Versioned> iterable) {
+    public boolean addAllIterable(Iterable<? extends Versioned<X>> iterable) {
         throw new UnsupportedOperationException();
     }
 

@@ -27,7 +27,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
         );
     }
 
-    public VersionMap(Versioning context, Map<X, Versioned<Y>/*<Y>*/> map, int elementStackSizeDefault) {
+    public VersionMap(Versioning<Y> context, Map<X, Versioned<Y>/*<Y>*/> map, int elementStackSizeDefault) {
         this.context = context;
         this.map = map;
         this.elementStackSizeDefault = elementStackSizeDefault;
@@ -40,13 +40,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     @Override
     public Y remove(Object key) {
         Versioned<Y> x = map.remove(key);
-        if (x != null) {
-            Y value = x.get();
-            //x.clear();
-            return value;
-        } else {
-            return null;
-        }
+        return x != null ? x.get() : null;
     }
 
     @Override
@@ -120,7 +114,10 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     }
 
     public boolean tryPut(X key, Y value) {
-        return getOrCreateIfAbsent(key).set(value) != null;
+        Versioned<Y> slot = getOrCreateIfAbsent(key);
+        if (slot.get()!=null)
+            return false;
+        return slot.set(value) != null;
     }
 
     public final void putConstant(X key, Y value) {
@@ -132,7 +129,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     }
 
     @NotNull
-    public Versioned<Y> newEntry(Object ignored) {
+    public Versioned<Y> newEntry(X ignored) {
         return new Versioned<>(context, elementStackSizeDefault);
         //return cache(k) ? new Versioned(context) :
         //return new RemovingVersionedEntry(k);

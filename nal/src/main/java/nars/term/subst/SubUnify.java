@@ -3,6 +3,7 @@ package nars.term.subst;
 import nars.Op;
 import nars.Param;
 import nars.index.term.TermIndex;
+import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -91,14 +92,14 @@ public class SubUnify extends Unify {
         setTTL(0);
     }
 
-    public void tryMatch(@NotNull Term x, @NotNull Term y) {
+    public void tryMatch(@NotNull Compound x, @NotNull Compound y) {
         this.xterm = null;
         this.result = null;
         unify(x, y, true);
     }
 
     @Nullable
-    public Term tryMatch(@Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
+    public Term tryMatch(@Nullable Compound xterm, @NotNull Compound x, @NotNull Compound y) {
         this.xterm = xterm;
         this.result = null;
         unify(x, y, true);

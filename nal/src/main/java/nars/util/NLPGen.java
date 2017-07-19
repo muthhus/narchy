@@ -5,6 +5,7 @@ import nars.Param;
 import nars.Task;
 import nars.index.term.PatternTermIndex;
 import nars.nar.Terminal;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import nars.time.Tense;
@@ -68,7 +69,7 @@ public class NLPGen {
     }
 
     private void train(String natural, Task t) {
-        Term pattern = index.get(t.term(), true).term();
+        Compound pattern = (Compound)(index.get(t.term(), true).term());
 
         rules.add((tt, freq, conf, tense) -> {
             if (timeMatch(t, tense)) {
@@ -96,7 +97,7 @@ public class NLPGen {
                             }
                         };
 
-                        u.unifyAll(pattern, tt);
+                        u.unifyAll(pattern, (Compound)tt);
 
                         if (result[0]!=null)
                             return result[0];

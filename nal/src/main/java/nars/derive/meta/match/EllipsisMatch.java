@@ -5,13 +5,16 @@ import nars.index.term.AppendProtoCompound;
 import nars.index.term.NonInternable;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.container.ArrayTermVector;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.SortedSet;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Holds results of an ellipsis match and
@@ -72,21 +75,21 @@ public class EllipsisMatch extends ArrayTermVector implements Term, NonInternabl
 
     }
 
-    public static Term match(@NotNull Collection<Term> term) {
+    public static Term match(@NotNull SortedSet<Term> term) {
         switch (term.size()) {
             case 0: return empty;
-            case 1: return term.iterator().next();
+            case 1: return term.first();
             default: return new EllipsisMatch(term.toArray(new Term[term.size()]));
         }
     }
 
-    /** HACK */
-    @NotNull
-    static Term[] expand(Term raw) {
-        return raw instanceof EllipsisMatch ?
-                ((EllipsisMatch)raw).terms :
-                new Term[] { raw };
-    }
+//    /** HACK */
+//    @NotNull
+//    static Term[] expand(Term raw) {
+//        return raw instanceof EllipsisMatch ?
+//                ((EllipsisMatch)raw).terms :
+//                new Term[] { raw };
+//    }
 
 //    public EllipsisMatch(@NotNull Collection<Term> term, Term except) {
 //        this(term.stream().filter(t -> ((t!=except) )).collect(toList()));
@@ -137,4 +140,8 @@ public class EllipsisMatch extends ArrayTermVector implements Term, NonInternabl
         return (n >= min);
     }
 
+    @Override
+    public boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, Compound parent) {
+        return recurseTerms(parentsMust, whileTrue, Terms.ZeroProduct /* this isnt a term */);
+    }
 }

@@ -13,11 +13,11 @@ import org.jetbrains.annotations.Nullable;
  */
 abstract public class MatchTerm extends ProxyCompound implements PrediTerm<Derivation> {
 
-    @NotNull public final Term pattern;
+    @NotNull public final Compound pattern;
 
     public final @Nullable PrediTerm eachMatch;
 
-    public MatchTerm(@NotNull Compound id, @NotNull Term pattern, @Nullable PrediTerm eachMatch) {
+    public MatchTerm(@NotNull Compound id, @NotNull Compound pattern, @Nullable PrediTerm eachMatch) {
         super(id);
         this.pattern = pattern;
         this.eachMatch = eachMatch;

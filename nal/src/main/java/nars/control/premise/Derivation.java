@@ -172,7 +172,7 @@ public class Derivation extends Unify implements TermContext {
     @NotNull public void run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, float parentTaskPri, int ttl) {
 
 
-        revert(0);
+        versioning.revert(0); //revert directly
 
         //remove common variable entries because they will just consume memory if retained as empty
         //xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);
@@ -286,7 +286,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * only one thread should be in here at a time
      */
-    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm eachMatch) {
+    public final boolean matchAll(@NotNull Compound x, @NotNull Compound y, @Nullable PrediTerm eachMatch) {
 
         boolean finish = (this.forEachMatch = eachMatch)!=null;
 

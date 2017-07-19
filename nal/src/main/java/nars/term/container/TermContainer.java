@@ -305,6 +305,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
         return false;
     }
+
+
+
 //    default boolean containsTermAtemporally(@NotNull Term b) {
 //        b = b.unneg();
 //        if (!impossibleSubTerm(b)) {
@@ -1016,8 +1019,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
     @Override
     default void recurseTerms(@NotNull Consumer<Term> v) {
-
         forEach(s -> s.recurseTerms(v));
+    }
+
+    default boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, Compound parent) {
+        return AND(s -> s.recurseTerms(parentsMust, whileTrue, parent));
     }
 
 //    /**

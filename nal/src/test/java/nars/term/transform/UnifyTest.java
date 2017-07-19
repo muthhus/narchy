@@ -5,6 +5,7 @@ import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.Param;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Subst;
 import nars.term.subst.Unify;
@@ -28,7 +29,7 @@ public class UnifyTest {
 
 
     @NotNull
-    public Subst testFindSubst(@NotNull Term a, @NotNull Term b, boolean matches) {
+    public Subst testFindSubst(@NotNull Compound a, @NotNull Compound b, boolean matches) {
 
         AtomicBoolean matched = new AtomicBoolean(false);
 

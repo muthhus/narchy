@@ -208,4 +208,21 @@ public interface Termlike extends Termed {
         return subIs(i, sub);
     }
 
+    /** if type is null, returns total # of variables */
+    default int vars(@Nullable Op type) {
+        if (type == null)
+            return vars() + varPattern();
+
+        switch (type) {
+            case VAR_PATTERN: return varPattern();
+            case VAR_QUERY: return varQuery();
+            case VAR_DEP: return varDep();
+            case VAR_INDEP: return varIndep();
+        }
+
+        throw new UnsupportedOperationException();
+    }
+
+
+
 }

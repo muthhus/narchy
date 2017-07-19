@@ -1,5 +1,6 @@
 package nars.term.transform;
 
+import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
@@ -46,30 +47,29 @@ public class UnificationTest {
 
         //Param.DEBUG = true;
 
-        NAR nar = new NARS().get();
-
-
-        Termed t1;
-
+        //NAR nar = new NARS().get();
         try {
 
-            Compound ps1 = nar.terms.termRaw(s1);
+            Compound t2 = (Compound)Narsese.the().term(s2, $.terms, true);
+            assertNotNull(t2);
 
+            Compound t1;
             if (type == Op.VAR_PATTERN) {
-                t1 = new PatternTermIndex().pattern(ps1); //special handling
+                //special handling for ellipsis
+                t1 = new PatternTermIndex().pattern(
+                        (Compound)Narsese.the().term(s1, $.terms, false)
+                );
+                assertNotNull(t1);
             } else {
-                nar.question(s1);
-                t1 = nar.conceptualize(ps1);
+                t1 = (Compound)Narsese.the().term(s1, $.terms, true);;
             }
 
-            assertNotNull(t1);
 
-            nar.question(s2);
-            nar.run(cycles);
+//            nar.question(s2);
+//            nar.run(cycles);
 
 
-            Termed t2 = nar.conceptualize(s2);
-            assertNotNull(t2);
+
             Set<Term> t1u = ((Compound) t1).recurseTermsToSet(type);
             //assertTrue(t1u.size() > 0);
             Set<Term> t2u = ((Compound) t2).recurseTermsToSet(type);
@@ -84,8 +84,9 @@ public class UnificationTest {
 
             AtomicBoolean subbed = new AtomicBoolean(false);
 
-            Unify sub = new Unify($.terms, type,
-                    nar.random(), Param.UnificationStackMax, Param.UnificationTTLMax) {
+            Unify sub = new Unify(type,
+                    new XorShift128PlusRandom(1),
+                    Param.UnificationStackMax, Param.UnificationTTLMax) {
 
 
                 @Override
@@ -127,6 +128,7 @@ public class UnificationTest {
             };
             sub.unifyAll(t1.term(), t2.term());
 
+            sub.revert(0); //for testing
 
             assertEquals(shouldSub, subbed.get());
 
@@ -590,13 +592,14 @@ public class UnificationTest {
                 "(a,b,c,d,e,f,g,h,x)",
                 false);
     }
-   @Test
-    public void patternLongSeq_YES() {
-        test(Op.VAR_PATTERN,
-                "(a,b,c,d,e,f,g,h,j)",
-                "(a,b,c,d,e,f,g,h,j)",
-                true);
-    }
+
+//   @Test
+//    public void patternLongSeq_YES() {
+//        test(Op.VAR_PATTERN,
+//                "(a,b,c,d,e,f,g,h,j)",
+//                "(a,b,c,d,e,f,g,h,j)",
+//                true);
+//    }
 
     @Test
     public void ellipsisCommutive1a() {

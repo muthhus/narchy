@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -223,7 +224,6 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     @Override
     default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
-
         return recurseTerms(whileTrue, this);
     }
 
@@ -234,6 +234,20 @@ public interface Compound extends Term, IPair, TermContainer {
         }
         return false;
     }
+
+
+    default boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue) {
+        return recurseTerms(parentsMust, whileTrue, this);
+    }
+
+    @Override
+    default boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, @Nullable Compound parent) {
+        if (parentsMust.test(this )) {
+            return subterms().recurseTerms(parentsMust, whileTrue, this);
+        }
+        return false;
+    }
+
 
     @Override
     default void recurseTerms(@NotNull Consumer<Term> v) {
@@ -348,14 +362,33 @@ public interface Compound extends Term, IPair, TermContainer {
         return appendTo;
     }
 
-    /** weather the given term has any potential free variables that could be assigned in unification */
-    default boolean freeVars(@Nullable Op type) {
-        return type == null ?
-                (volume() > complexity()) /* any variable, including pattern */
-                    :
-                (hasAny(type));
-    }
+//    /** weather the given term has any potential free variables that could be assigned in unification */
+//    default boolean freeVars(@Nullable Op type) {
+//        return type == null ?
+//                (volume() > complexity()) /* any variable, including pattern */
+//                    :
+//                (hasAny(type));
+//    }
+  default int varsUnique(@NotNull Op type) {
+        int num = vars(type);
+        if (num <= 1)
+            return num;
+        else {
+            //must check all in case of repeats
+            Set<Term> u = new UnifiedSet(num);
+            final int[] remain = {num};
 
+            recurseTerms(parent -> vars(type)>0,
+                (sub) -> {
+                    if (sub.op() == type) {
+                        u.add(sub);
+                        remain[0]--;
+                    }
+                    return (remain[0] > 0);
+            });
+            return u.size();
+        }
+    }
     /**
      * unification matching entry point (default implementation)
      *
@@ -371,7 +404,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if (equals(ty))
                 return true;
 
-            if (!freeVars(subst.type))
+            if (vars(subst.type) == 0)
                 return false; //no free vars, the only way unification can proceed is if equal
 
             Op op = op();

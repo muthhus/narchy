@@ -3,6 +3,7 @@ package nars.term.subst;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
+import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +34,7 @@ public class UnifySubst extends Unify {
     }
 
     @Override
-    public void unify(@NotNull Term x, @NotNull Term y,  boolean finish) {
+    public void unify(@NotNull Compound x, @NotNull Compound y, boolean finish) {
         this.a = x;
         this.matches = 0;
         super.unify(x, y, finish);

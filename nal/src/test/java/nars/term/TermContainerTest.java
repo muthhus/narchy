@@ -1,4 +1,4 @@
-package nars.term.container;
+package nars.term;
 
 import nars.Narsese;
 import nars.Op;
@@ -6,6 +6,9 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import nars.term.container.ArrayTermVector;
+import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import org.junit.Test;
 
 import static nars.$.$;

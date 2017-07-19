@@ -3,6 +3,7 @@ package nars.term.transform;
 import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
+import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -112,7 +113,10 @@ abstract public class substituteIfUnifies extends Functor {
 //            return False; //no change
 //        }
 
-        Term z = new SubUnify(parent, op).tryMatch(input, x, y);
+        if (!(x instanceof Compound) && !(y instanceof Compound))
+            return Null;
+
+        Term z = new SubUnify(parent, op).tryMatch((Compound)input, (Compound)x, (Compound)y);
         return (z != null) ? z : Null;
     }
 
