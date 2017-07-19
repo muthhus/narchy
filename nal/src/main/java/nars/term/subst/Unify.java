@@ -173,7 +173,7 @@ public abstract class Unify implements Subst {
      * <p>
      * setting finish=false allows matching in pieces before finishing
      */
-    public void unify(@NotNull Term x, @NotNull Compound y, boolean finish) {
+    public void unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
 
 //        try {

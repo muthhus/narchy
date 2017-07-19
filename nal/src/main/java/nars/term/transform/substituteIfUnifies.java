@@ -113,10 +113,9 @@ abstract public class substituteIfUnifies extends Functor {
 //            return False; //no change
 //        }
 
-        if (!(x instanceof Compound) && !(y instanceof Compound))
-            return Null;
 
-        Term z = new SubUnify(parent, op).tryMatch((Compound)input, (Compound)x, (Compound)y);
+
+        Term z = new SubUnify(parent, op).tryMatch(input, x, (Compound)y);
         return (z != null) ? z : Null;
     }
 

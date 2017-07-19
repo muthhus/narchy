@@ -136,7 +136,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     protected final NARLoop loop = new NARLoop(this);
 
-    private Predicate<Derivation> deriver;
+    private PrediTerm<Derivation> deriver;
 
     /**
      * creates a snapshot statistics object
@@ -263,6 +263,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             else
                 return d;
         });
+        if (Param.TRACE) {
+            TrieDeriver.print((PrediTerm<Derivation>) deriver, System.out);
+        }
 
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);

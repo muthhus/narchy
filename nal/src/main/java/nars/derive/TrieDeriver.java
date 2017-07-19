@@ -159,10 +159,7 @@ public enum TrieDeriver {
             TermTrie.indent(indent);
             out.print( /*Util.className(p) + ": " +*/ p);
 
-            if (p instanceof Conclude) {
-                Conclude c = (Conclude)p;
-                out.print(c.cause[0] + " " + c.rule );
-            }
+
 
             out.println();
 

@@ -244,8 +244,9 @@ public final class Conclude extends AbstractPred<Derivation> {
                         truth = truth.negated();
                 }
 
-                assert(this.cause[0]!=-1):
-                        "unregistered cause: " + this;
+                if (this.cause[0]==-1) {
+                    throw new RuntimeException("unregistered cause: " + this + "\n" + this.rule + "\n" + d + "\n");
+                }
 
                 short[] cause = ArrayUtils.addAll(d.parentCause, this.cause);
 

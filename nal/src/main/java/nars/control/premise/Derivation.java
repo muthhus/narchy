@@ -283,7 +283,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * only one thread should be in here at a time
      */
-    public final boolean matchAll(@NotNull Term x, @NotNull Compound y, @Nullable PrediTerm eachMatch) {
+    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm eachMatch) {
 
         boolean finish = (this.forEachMatch = eachMatch)!=null;
 

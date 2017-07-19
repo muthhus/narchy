@@ -34,7 +34,7 @@ public class UnifySubst extends Unify {
     }
 
     @Override
-    public void unify(@NotNull Term x, @NotNull Compound y, boolean finish) {
+    public void unify(@NotNull Term x, @NotNull Term y, boolean finish) {
         this.a = x;
         this.matches = 0;
         super.unify(x, y, finish);
