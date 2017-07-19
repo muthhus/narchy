@@ -9,9 +9,9 @@ import org.junit.Test;
 public class NAL1Test extends AbstractNALTest {
 
     final int CYCLES = 10;
-    static {
-        Param.TRACE = true;
-    }
+//    static {
+//        Param.TRACE = true;
+//    }
 
     @Before public void nal() { test.nar.nal(1); }
 

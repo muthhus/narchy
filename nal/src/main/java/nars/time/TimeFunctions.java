@@ -946,12 +946,12 @@ public interface TimeFunctions {
             }
 
             int preDT;
-            if ((taskDT != DTERNAL) && (taskDT != XTERNAL) && (beliefDT != DTERNAL) && (beliefDT != XTERNAL)) {
+            if (preSub.size()==2 && ((taskDT != DTERNAL) && (taskDT != XTERNAL) && (beliefDT != DTERNAL) && (beliefDT != XTERNAL))) {
                 preDT = (taskDT - beliefDT);
                 if (!task.term(0).equals(preSub.sub(0)))
                     preDT = -preDT; //reverse the order
             } else {
-                preDT = DTERNAL;
+                preDT = 0; //DTERNAL; //??
             }
 
             Term newPresub = p.terms.the(preSub, preDT);

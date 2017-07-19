@@ -10,12 +10,13 @@ import nars.util.signal.Signal;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * latches the last known task
+ * latches the last known task for a short time period into the future (ex: 1 duration)
+ * this allows the sensor to override inference in that time, ie. getting a grip on reality
+ * whether or not the belief table has forgotten the latest signal task
  */
-@Deprecated class SensorBeliefTable extends DefaultBeliefTable {
+class SensorBeliefTable extends DefaultBeliefTable {
 
     static final int durationsTolerance = 1;
-
 
     public Signal sensor;
 
@@ -29,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
         Truth tabled = super.truth(when, nar);
 
         Task current = this.sensor.get();
-        if (current!=null && latches(when, nar, current)) {
+        if (current!=null && latch(when, nar, current)) {
             return Truth.maxConf(tabled, current.truth(when, nar.dur()));
         } else {
             return tabled;
@@ -41,7 +42,7 @@ import org.jetbrains.annotations.Nullable;
         Task tabled = super.match(when, against, template, noOverlap, nar);
 
         Task current = this.sensor.get();
-        if (current!=null && latches(when, nar, current)) {
+        if (current!=null && latch(when, nar, current)) {
             int dur = nar.dur();
             if (tabled!=null && tabled.evi(when, dur) >= current.evi(when, dur))
                 return tabled;
@@ -52,7 +53,7 @@ import org.jetbrains.annotations.Nullable;
 
     }
 
-    static boolean latches(long when, NAR nar, Task current) {
+    static boolean latch(long when, NAR nar, Task current) {
         return current != null &&
                 current.start() <= when
                 && when <= current.end() + durationsTolerance * nar.dur();

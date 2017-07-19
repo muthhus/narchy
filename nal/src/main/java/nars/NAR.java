@@ -1677,7 +1677,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public void value(short[] causes, float value) {
         int numCauses = causes.length;
 
-        float sum = 0.5f * numCauses * (numCauses + 1);
+        //float sum = 0.5f * numCauses * (numCauses + 1);
+        float vPer = value / numCauses; //flat
 
         for (int i = 0; i < numCauses; i++) {
             short c = causes[i];
@@ -1686,7 +1687,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
                     /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
 
-            float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
+            //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
             if (vPer != 0) {
                 cc.apply(vPer);
             }
