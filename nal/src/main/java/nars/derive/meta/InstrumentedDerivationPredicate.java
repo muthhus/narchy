@@ -5,8 +5,9 @@ import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.compound.ProxyCompound;
+import org.fusesource.jansi.Ansi;
 
-public class InstrumentedDerivationPredicate extends ProxyCompound implements PrediTerm<Derivation> {
+abstract public class InstrumentedDerivationPredicate extends ProxyCompound implements PrediTerm<Derivation> {
 
     public InstrumentedDerivationPredicate(PrediTerm<Derivation> inner) {
         super(inner instanceof Compound ? (Compound)inner : $.p(inner));
@@ -29,12 +30,8 @@ public class InstrumentedDerivationPredicate extends ProxyCompound implements Pr
     }
 
 
-    protected void onEnter(PrediTerm<Derivation> p, Derivation d) {
+    abstract protected void onEnter(PrediTerm<Derivation> p, Derivation d);
 
-    }
-
-    protected void onExit(PrediTerm<Derivation> p, Derivation d, boolean returnValue, Throwable thrown, long nanos) {
-        (thrown!=null ? System.err : System.out).println(p + " " + d + "\t" + returnValue + " " + (thrown!=null ? (thrown + " ") : "") + nanos + "nS" );
-    }
+    abstract protected void onExit(PrediTerm<Derivation> p, Derivation d, boolean returnValue, Throwable thrown, long nanos);
 
 }

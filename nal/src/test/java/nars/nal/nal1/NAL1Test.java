@@ -1,5 +1,6 @@
 package nars.nal.nal1;
 
+import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Before;
@@ -7,36 +8,10 @@ import org.junit.Test;
 
 public class NAL1Test extends AbstractNALTest {
 
-    final int CYCLES = 100;
-
-//
-//                new Supplier[]{
-//                //{new Default()},
-////                {new Default().setInternalExperience(null)},
-//
-//                //{new NewDefault()},
-//                { () -> new Default().nal(1)},
-//                { () -> new Default().nal(2)},
-//                { () -> new Default() },
-//
-////                {new Default().level(2)}, //why does this need level 2 for some tests?
-////                {new DefaultMicro().level(2) },
-////                {new Classic()},
-//
-//                { () -> new DefaultAlann(48)},
-//
-//                //{new Solid(1, 48, 1, 2, 1, 3).level(1)},
-//                //{new Solid(1, 64, 1, 2, 1, 3).level(2)},
-//        });
-//}
-
-//
-//    @Before
-//    public void setup() {
-//
-//        //tester.setTemporalTolerance(50 /* cycles */);
-//    }
-
+    final int CYCLES = 1;
+    static {
+        Param.TRACE = true;
+    }
 
     @Before public void nal() { test.nar.nal(1); }
 
@@ -65,11 +40,6 @@ public class NAL1Test extends AbstractNALTest {
                         //.en("robin is a type of bird.");
                 .mustBelieve(CYCLES, "<robin --> animal>", 0.81f);
     }
-
-//    static {
-//        Param.TRACE = true;
-//    }
-
 
     @Test
     public void abduction()  {

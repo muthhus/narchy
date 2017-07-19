@@ -42,6 +42,11 @@ public class Premise {
         this.termLink = termlink;
     }
 
+    @Override
+    public String toString() {
+        return taskLink + " " + termLink;
+    }
+
     /**
      * resolve the most relevant belief of a given term/concept
      * <p>

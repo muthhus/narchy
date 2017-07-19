@@ -25,7 +25,7 @@ import nars.control.Cause;
 import nars.control.premise.Derivation;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.InstrumentedDerivationPredicate;
+import nars.derive.meta.DebugDerivationPredicate;
 import nars.derive.meta.PrediTerm;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
@@ -258,7 +258,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.emotion = new Emotion(this);
 
         this.deriver = TrieDeriver.the(Deriver.DEFAULT_RULES, this, (PrediTerm<Derivation> d) -> {
-            return new InstrumentedDerivationPredicate(d);
+            if (Param.TRACE)
+                return new DebugDerivationPredicate(d);
+            else
+                return d;
         });
 
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing

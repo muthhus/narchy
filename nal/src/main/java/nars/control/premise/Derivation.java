@@ -363,6 +363,11 @@ public class Derivation extends Unify implements TermContext {
         return evidenceDouble;
     }
 
+    @Override
+    public String toString() {
+        return task + " " + (belief!=null ? belief : beliefTerm)
+                + " " + super.toString();
+    }
 
     public int ttl() {
         return ttl;

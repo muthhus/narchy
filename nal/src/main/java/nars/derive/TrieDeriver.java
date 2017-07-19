@@ -48,7 +48,7 @@ public enum TrieDeriver  { ;
         for (int i = 0; i < roots.length; i++)
             roots[i] = build(roots[i], each);
 
-        @Nullable PrediTerm deriver = Fork.fork(roots);
+        @Nullable PrediTerm deriver = each.apply( Fork.fork(roots) /* ROOT */);
 
         if (nar!=null) {
             forEachConclude(deriver, x -> {

@@ -119,7 +119,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         nar.emotion.conceptFires.increment();
 
-        Term thisTerm = id.term();
+
 
         //nar.emotion.count("ConceptFire_run_attempt");
 
@@ -399,7 +399,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                     nar.conceptualize(b) : null;
             TermContainer e = null;
             if (c != null) {
-                if (!c.equals(id) && tc.add(b)) {
+                if (!c.equals(id) && tc.add(c)) {
                     if (layersRemain > 0 && c instanceof Compound) {
                         e = c.templates();
                     }
