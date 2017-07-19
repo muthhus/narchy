@@ -99,7 +99,7 @@ public class SubUnify extends Unify {
     }
 
     @Nullable
-    public Term tryMatch(@Nullable Term xterm, @NotNull Term x, @NotNull Compound y) {
+    public Term tryMatch(@Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
         this.xterm = xterm;
         this.result = null;
         unify(x, y, true);

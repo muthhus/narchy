@@ -367,7 +367,7 @@ public interface Compound extends Term, IPair, TermContainer {
 //                    :
 //                (hasAny(type));
 //    }
-  default int varsUnique(@NotNull Op type) {
+  default int varsUnique(@Nullable Op type) {
         int num = vars(type);
         if (num <= 1)
             return num;

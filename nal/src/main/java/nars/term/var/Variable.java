@@ -1,7 +1,9 @@
 package nars.term.var;
 
+import nars.Op;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * similar to a plain atom, but applies altered operating semantics according to the specific
@@ -42,6 +44,11 @@ public interface Variable extends Atomic {
         return 0;
     }
 
+
+    @Override
+    default int varsUnique(@Nullable Op type) {
+        return (type == null) ? 1 : ((op() == type) ? 1 : 0);
+    }
 
     @Override
     default void init(@NotNull int[] meta) {

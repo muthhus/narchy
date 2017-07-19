@@ -102,7 +102,7 @@ public interface Subst  {
                 }
 
                 if (this instanceof Derivation && u.varPattern() > 0) {
-                    assert(false): "varPattern should have been filtered?";
+                    //assert(false): "varPattern should have been filtered? " + u;
                     return null;
                 }
 

@@ -335,11 +335,16 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
         arg[k/*++*/] = nar.terms.queryToDepVar($.negIf(s.term(), tr != null && tr.isNegative())); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
 
-        Compound ff = $.func(reify(s.punc()), arg);
-        if (ff!=null)
+        try {
+            Compound ff = $.func(reify(s.punc()), arg);
             return Terms.compoundOrNull($.negIf(ff, false));
-        else
-            return null;
+
+        } catch (Exception e) {
+            logger.error(" {}", e);
+
+        }
+
+        return null;
     }
 
 
