@@ -18,7 +18,7 @@ public final class MatchOneSubtermPrototype extends UnificationPrototype {
 
     private final boolean finish;
 
-    public MatchOneSubtermPrototype(@NotNull Compound x, int subterm, boolean finish) {
+    public MatchOneSubtermPrototype(@NotNull Term x, int subterm, boolean finish) {
         super( $.func(subterm==0 ? "task" : "belief", id(x)), x );
         this.subterm = subterm;
         this.finish = finish;

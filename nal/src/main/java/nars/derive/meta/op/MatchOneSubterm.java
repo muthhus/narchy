@@ -13,7 +13,7 @@ public final class MatchOneSubterm extends MatchTerm {
     /** which premise component, 0 (task) or 1 (belief) */
     private final int subterm;
 
-    public MatchOneSubterm(@NotNull Compound id, int subterm, @NotNull Compound pattern, @Nullable PrediTerm eachMatch) {
+    public MatchOneSubterm(@NotNull Compound id, int subterm, @NotNull Term pattern, @Nullable PrediTerm eachMatch) {
         super(id, pattern, eachMatch);
         this.subterm = subterm;
     }

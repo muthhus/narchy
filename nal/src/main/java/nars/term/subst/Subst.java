@@ -91,7 +91,7 @@ public interface Subst  {
 
             if (u instanceof EllipsisMatch) {
 
-                Collections.addAll(next, ((EllipsisMatch)u).terms);
+                ((EllipsisMatch)u).forEach(next::add);
 
 //                for (; volAt < subAt; volAt++) {
 //                    Term st = next.sub(volAt);

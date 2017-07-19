@@ -1,12 +1,15 @@
 package nars.derive.meta.match;
 
+import nars.$;
 import nars.Op;
 import nars.index.term.AppendProtoCompound;
 import nars.index.term.NonInternable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
+import nars.term.compound.ProxyCompound;
 import nars.term.container.ArrayTermVector;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -18,11 +21,8 @@ import java.util.function.Predicate;
 
 /**
  * Holds results of an ellipsis match and
- * implements a pre-filter before forming the
- * subterm collection, and post-filter before
- * forming a resulting substituted term.
- */
-public class EllipsisMatch extends ArrayTermVector implements Term, NonInternable {
+*/
+public class EllipsisMatch extends ProxyCompound implements NonInternable {
 
     //    public static ArrayEllipsisMatch matchedSubterms(Compound Y, IntObjectPredicate<Term> filter) {
 //        Function<IntObjectPredicate,Term[]> arrayGen =
@@ -38,7 +38,7 @@ public class EllipsisMatch extends ArrayTermVector implements Term, NonInternabl
 
 
     protected EllipsisMatch(Term[] t) {
-        super(t);
+        super($.pStack(t));
     }
 
     public static Term match(@NotNull Term[] matched) {
@@ -47,11 +47,6 @@ public class EllipsisMatch extends ArrayTermVector implements Term, NonInternabl
             case 1: return matched[0]; //if length==1 it should not be an ellipsismatch, just the raw term
             default: return new EllipsisMatch(matched);
         }
-    }
-
-    @Override
-    @NotNull public final Term term() {
-        return this;
     }
 
     @Override
@@ -103,26 +98,9 @@ public class EllipsisMatch extends ArrayTermVector implements Term, NonInternabl
 
     //abstract public boolean addContained(Compound Y, Set<Term> target);
 
-    @NotNull
-    @Override
-    public Op op() {
-        return Op.PROD;
-    }
-
-    @Override
-    public boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, Compound parent) {
-        return recurseSubTerms(whileTrue, parent);
-    }
-
-    @Override
-    public void recurseTerms(@NotNull Consumer<Term> v) {
-        forEach(x -> x.recurseTerms(v));
-    }
-
     @Override
     public boolean isCommutative() {
-        throw new UnsupportedOperationException();
-        //return false;
+        throw new UnsupportedOperationException("it depends");
     }
 
     @Override
@@ -132,7 +110,10 @@ public class EllipsisMatch extends ArrayTermVector implements Term, NonInternabl
 
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
         int n = 0;
-        for (Term e : terms) {
+        @NotNull TermContainer x = subterms();
+        int xs = x.size();
+        for (int i = 0; i < xs; i++) {
+            Term e = x.sub(i);
             if (!(y.contains(e) && target.add(e)))
                 return false;
             n++;
@@ -140,8 +121,5 @@ public class EllipsisMatch extends ArrayTermVector implements Term, NonInternabl
         return (n >= min);
     }
 
-    @Override
-    public boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, Compound parent) {
-        return recurseTerms(parentsMust, whileTrue, Terms.ZeroProduct /* this isnt a term */);
-    }
+
 }

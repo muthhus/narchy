@@ -359,16 +359,16 @@ public class PremiseRule extends GenericCompound {
      * the task-term pattern
      */
     @NotNull
-    public final Compound getTask() {
-        return (Compound) (getPremise().sub(0));
+    public final Term getTask() {
+        return (getPremise().sub(0));
     }
 
     /**
      * the belief-term pattern
      */
     @NotNull
-    public final Compound getBelief() {
-        return (Compound) (getPremise().sub(1));
+    public final Term getBelief() {
+        return (getPremise().sub(1));
     }
 
     @NotNull

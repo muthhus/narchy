@@ -11,7 +11,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * Created by me on 3/26/17.
+ * TODO check that every method of Term is covered by this.
+ * results could be catastrophic otherwise
  */
 public class ProxyTerm<T extends Term> implements Term, NonInternable {
 
@@ -83,6 +84,16 @@ public class ProxyTerm<T extends Term> implements Term, NonInternable {
     }
 
     @Override
+    public int vars() {
+        return ref.vars();
+    }
+
+    @Override
+    public int varsUnique(@NotNull Op type) {
+        return ref.varsUnique(type);
+    }
+
+    @Override
     public int varIndep() {
         return ref.varIndep();
     }
@@ -150,7 +161,6 @@ public class ProxyTerm<T extends Term> implements Term, NonInternable {
     public void append(@NotNull Appendable p) throws IOException {
         ref.append(p);
     }
-
 
 
     @Override

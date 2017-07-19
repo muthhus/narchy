@@ -31,7 +31,7 @@ public class MatchTaskBelief extends ProxyCompound implements PrediTerm<Derivati
 //    public final Term term;
 
 
-    public MatchTaskBelief(@NotNull Compound taskPattern, Compound beliefPattern, @NotNull SortedSet<MatchConstraint> constraints) {
+    public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull SortedSet<MatchConstraint> constraints) {
         super( $.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ) );
 
         List<PrediTerm> pre = $.newArrayList();
@@ -74,7 +74,7 @@ public class MatchTaskBelief extends ProxyCompound implements PrediTerm<Derivati
     }
 
 
-    private static void compile(@NotNull Compound task, @NotNull Compound belief,
+    private static void compile(@NotNull Term task, @NotNull Term belief,
                                 @NotNull List<PrediTerm> pre, @NotNull List<PrediTerm> code,
                                 @NotNull SortedSet<MatchConstraint> constraints) {
 
@@ -126,7 +126,7 @@ public class MatchTaskBelief extends ProxyCompound implements PrediTerm<Derivati
 
     private static void compileTaskBelief(@NotNull List<PrediTerm> pre,
                                           @NotNull List<PrediTerm> code,
-                                          @Nullable Compound task, @Nullable Compound belief,
+                                          @Nullable Term task, @Nullable Term belief,
                                           @NotNull SortedSet<MatchConstraint> constraints) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;

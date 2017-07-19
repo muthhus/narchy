@@ -140,7 +140,7 @@ public abstract class Unify implements Subst {
             if (use(Param.TTL_MUTATE))
                 chain[next].mutate(this, chain, next);
         } else {
-            tryMatch(); //end of chain
+            tryMatches(); //end of chain
         }
     }
 
@@ -171,7 +171,7 @@ public abstract class Unify implements Subst {
      * <p>
      * setting finish=false allows matching in pieces before finishing
      */
-    public void unify(@NotNull Compound x, @NotNull Compound y, boolean finish) {
+    public void unify(@NotNull Term x, @NotNull Compound y, boolean finish) {
 
 
 //        try {
@@ -182,24 +182,7 @@ public abstract class Unify implements Subst {
 
             if (finish) {
 
-
-                int ts = termutes.size();
-                if (ts > 0) {
-
-                    //TODO use Termutator[] not List
-                    Termutator[] t = termutes.toArray(new Termutator[ts]);
-
-                    termutes.clear();
-
-                    //shuffle the ordering of the termutes themselves
-                    if (ts > 1)
-                        Util.shuffle(t, random);
-
-                    mutate(t, -1); //start combinatorial recurse
-
-                } else {
-                    tryMatch();
-                }
+                tryMatches();
 
             }
 
@@ -210,6 +193,26 @@ public abstract class Unify implements Subst {
 //        }
     }
 
+    public void tryMatches() {
+        int ts = termutes.size();
+        if (ts > 0) {
+
+            //TODO use Termutator[] not List
+            Termutator[] t = termutes.toArray(new Termutator[ts]);
+
+            termutes.clear();
+
+            //shuffle the ordering of the termutes themselves
+            if (ts > 1)
+                Util.shuffle(t, random);
+
+            mutate(t, -1); //start combinatorial recurse
+
+        } else {
+            tryMatch();
+        }
+    }
+
     private void tryMatch() {
 
 
@@ -218,15 +221,15 @@ public abstract class Unify implements Subst {
             return;
         }
 
-        //filter incomplete matches by detecting them here
-        //TODO use a counter to measure this instead of checking all the time
-        Iterator<Map.Entry<Term, Versioned<Term>>> ee = xy.map.entrySet().iterator();
-        while (ee.hasNext()) {
-            Map.Entry<Term, Versioned<Term>> e = ee.next();
-            Versioned<Term> v = e.getValue();
-            if ((v == null || v.get() == null) && matchType(e.getKey()))
-                return;
-        }
+//        //filter incomplete matches by detecting them here
+//        //TODO use a counter to measure this instead of checking all the time
+//        Iterator<Map.Entry<Term, Versioned<Term>>> ee = xy.map.entrySet().iterator();
+//        while (ee.hasNext()) {
+//            Map.Entry<Term, Versioned<Term>> e = ee.next();
+//            Versioned<Term> v = e.getValue();
+//            if ((v == null || v.get() == null) && matchType(e.getKey()))
+//                return;
+//        }
 
 
         onMatch();

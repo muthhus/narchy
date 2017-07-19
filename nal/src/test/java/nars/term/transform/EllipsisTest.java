@@ -101,7 +101,7 @@ public class EllipsisTest {
                             Set<Term> varArgTerms = $.newHashSet(1);
                             if (u instanceof EllipsisMatch) {
                                 EllipsisMatch m = (EllipsisMatch)u;
-                                Collections.addAll(varArgTerms, m.terms);
+                                m.forEach(varArgTerms::add);
                             } else {
                                 varArgTerms.add(u);
                             }

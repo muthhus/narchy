@@ -429,5 +429,9 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return this;
     }
 
+    default int varsUnique(@NotNull Op type) {
+        return op()==type ?  1 : 0;
+    }
+
 }
 

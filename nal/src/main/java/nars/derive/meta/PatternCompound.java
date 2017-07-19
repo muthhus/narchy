@@ -173,22 +173,22 @@ abstract public class PatternCompound extends GenericCompound implements NonInte
     }
 
 
-    /**
-     * requies dt exact match, for example, when matching Images (but not temporal terms)
-     */
-    abstract public static class PatternCompoundWithEllipsisLinearDT extends PatternCompoundWithEllipsisLinear {
-
-        public PatternCompoundWithEllipsisLinearDT(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
-            super(seed, ellipsis, subterms);
-        }
-
-//        @Override
-//        protected boolean canMatch(@NotNull Compound y) {
-//            return (dt == y.dt() && super.canMatch(y));
+//    /**
+//     * requies dt exact match, for example, when matching Images (but not temporal terms)
+//     */
+//    abstract public static class PatternCompoundWithEllipsisLinearDT extends PatternCompoundWithEllipsisLinear {
+//
+//        public PatternCompoundWithEllipsisLinearDT(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+//            super(seed, ellipsis, subterms);
 //        }
-
-
-    }
+//
+////        @Override
+////        protected boolean canMatch(@NotNull Compound y) {
+////            return (dt == y.dt() && super.canMatch(y));
+////        }
+//
+//
+//    }
 
 //    public static final class PatternCompoundWithEllipsisLinearImage extends PatternCompoundWithEllipsisLinearDT {
 //

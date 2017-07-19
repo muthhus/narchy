@@ -27,12 +27,12 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
     @NotNull
     protected final Compound pid;
 
-    public final Compound pattern;
+    public final Term pattern;
 
     /** derivation handlers; use the array form for fast iteration */
     public final TreeSet<Conclude> conclude = new TreeSet();
 
-    public UnificationPrototype(@NotNull Compound id, Compound pattern) {
+    public UnificationPrototype(@NotNull Compound id, Term pattern) {
         super(id);
         this.id = this.pid = id;
 

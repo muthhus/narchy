@@ -1,6 +1,7 @@
 package nars.term.compound;
 
 import nars.IO;
+import nars.Op;
 import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.container.TermContainer;
@@ -47,4 +48,8 @@ public class ProxyCompound extends ProxyTerm<Compound> implements Compound {
         ref.setNormalized();
     }
 
+    @Override
+    public int vars() {
+        return super.vars();
+    }
 }
