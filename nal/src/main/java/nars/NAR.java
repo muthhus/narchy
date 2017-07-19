@@ -255,8 +255,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         this.emotion = new Emotion(this);
 
-        this.deriver = new TrieDeriver(Deriver.DEFAULT_RULES);
-        deriver.forEachConclude(x -> x.setCause( newCause(x).id ) );
+        this.deriver = new TrieDeriver(Deriver.DEFAULT_RULES, this);
 
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);
@@ -1732,7 +1731,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return boost / numCauses;
     }
 
-    private Cause newCause(Object x) {
+    public Cause newCause(Object x) {
         synchronized (causeValue) {
             short next = (short) (causeValue.size());
             Cause c = new Cause(next, x);

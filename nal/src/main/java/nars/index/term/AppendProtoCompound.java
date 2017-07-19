@@ -35,7 +35,7 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
     public final Op op;
 
     @Nullable
-    private Term[] subs;
+    protected Term[] subs;
 
     int size;
 
@@ -105,26 +105,26 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
         return subs; //.clone();
     }
 
-    @Override
-    public AppendProtoCompound commit(int commuteForDT) {
-        boolean commute = false;
-        if (commuteForDT != DTERNAL && op != null) {
-            commute = subs.length > 1 && op.commutative;
-            if (commute && op.temporal && !Op.concurrent(commuteForDT))
-                commute = false; //dont pre-commute
-        }
-        return commit(commute);
-    }
+//    @Override
+//    public AppendProtoCompound commit(int commuteForDT) {
+//        boolean commute = false;
+//        if (commuteForDT != DTERNAL && op != null) {
+//            commute = subs.length > 1 && op.commutative;
+//            if (commute && op.temporal && !Op.concurrent(commuteForDT))
+//                commute = false; //dont pre-commute
+//        }
+//        return commit(commute);
+//    }
 
     /**
      * hashes and prepares for use in hashmap
      */
-    public AppendProtoCompound commit(boolean commute) {
+    public AppendProtoCompound commit() {
 
-        if (commute) {
-            subs = Terms.sorted(subs);
-            size = subs.length;
-        }
+//        if (commute) {
+//            subs = Terms.sorted(subs);
+//            size = subs.length;
+//        }
 
         int volume = 0;
         for (Term x : subs)
@@ -258,4 +258,6 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
     public Iterator<Term> iterator() {
         throw new UnsupportedOperationException("TODO");
     }
+
+
 }

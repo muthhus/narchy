@@ -52,7 +52,7 @@ public final class Conclude extends AbstractPred<Derivation> {
     public final TruthOperator belief, goal;
 
     /** provided later */
-    private short cause = -1;
+    public short cause = -1;
 
     final static AtomicInteger serial = new AtomicInteger();
 

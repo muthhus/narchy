@@ -150,7 +150,7 @@ abstract public class TermTrie<K extends Term, V> extends Trie<List<K>, V> imple
             if (!a.equals(b))
                 return i;
             else {
-                onMatch(a, b);
+                onMatch(b, a);
             }
         }
 

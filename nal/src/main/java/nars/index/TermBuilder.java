@@ -258,11 +258,6 @@ public abstract class TermBuilder {
         return csrc.op().the(csrc.dt(), newSubs);
     }
 
-    @NotNull
-    public Term the(@NotNull Op op, int dt, @NotNull TermContainer newSubs) {
-        return op.the(dt, newSubs.toArray());
-    }
-
 
     @Nullable
     public Term the(@NotNull Object o) {

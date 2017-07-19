@@ -616,7 +616,7 @@ public enum Op implements $ {
 
             Op o = C.op();
             if (o != null) {
-                return compoundNew(o, C);
+                return compound(o, C, C.size() >= 2 /* intern if >= 2 subs */ );
             } else
                 return subtermsNew(C.subterms());
 
@@ -880,10 +880,16 @@ public enum Op implements $ {
     }
 
 
-    public static Term compoundNew(Op o, TermContainer subContainer) {
+    /** creates new instance */
+    public static Compound compound(Op o, TermContainer subContainer, boolean internSubs) {
 
         Term[] subterms = subContainer.toArray();
 
+        return compound(o, subterms, internSubs);
+    }
+
+    /** creates new instance */
+    public static Compound compound(Op o, Term[] subterms, boolean internSubs) {
         int s = subterms.length;
         assert (o.maxSize >= s) : "subterm overflow: " + o + " " + Arrays.toString(subterms);
         assert (o.minSize <= s) : "subterm underflow: " + o + " " + Arrays.toString(subterms);
@@ -893,7 +899,7 @@ public enum Op implements $ {
                 return new UnitCompound1(o, subterms[0]);
 
             default:
-                return new GenericCompound(o, subterms(subterms));
+                return new GenericCompound(o, internSubs ? subterms(subterms) : subtermsNew(subterms) );
         }
     }
 
@@ -906,13 +912,7 @@ public enum Op implements $ {
 //            return _subterms(s);
 //        } else {
 
-        boolean internable = true;
-        for (Term y : x) {
-            if (y instanceof NonInternable) { //"must not intern non-internable" + y + "(" +y.getClass() + ")";
-                internable = false;
-                break;
-            }
-        }
+        boolean internable = internable(x);
 
         if (internable) {
             return (TermContainer) cache.apply(new AppendProtoCompound(null, x).commit());
@@ -922,22 +922,34 @@ public enum Op implements $ {
 
     }
 
+    public static boolean internable(@NotNull Term[] x) {
+        boolean internable = true;
+        for (Term y : x) {
+            if (y instanceof NonInternable) { //"must not intern non-internable" + y + "(" +y.getClass() + ")";
+                internable = false;
+                break;
+            }
+        }
+        return internable;
+    }
+
     @NotNull
     public static Term compound(Op op, int dt, TermContainer subterms) {
         assert (!op.atomic);
 
-        if (subterms.OR(x -> x instanceof NonInternable))
-            return compoundNew(op, subterms).dt(dt);
-
-        AppendProtoCompound apc = new AppendProtoCompound(op, subterms);
-        return compound(apc, dt);
+        if (!subterms.internable())
+            return compound(op, subterms, false).dt(dt);
+        else
+            return compound(new AppendProtoCompound(op, subterms), dt);
     }
 
     @NotNull
     public static Term compound(AppendProtoCompound apc, int dt) {
 
+
+
         if (apc.OR(x -> x instanceof NonInternable)) {
-            return compoundNew(apc.op, apc).dt(dt);
+            return compound(apc.op, apc, false).dt(dt);
         } else {
             Term x = (Term) cache.apply(apc.commit());
 
@@ -1445,7 +1457,8 @@ public enum Op implements $ {
         if (statement) {
             return statement(this, dt, u[0], u[1]);
         } else {
-            return compound(this, dt, subterms(commute(dt, u) ? Terms.sorted(u) : u));
+            Term[] uu = commute(dt, u) ? Terms.sorted(u) : u;
+            return compound(this, dt, subterms(uu));
         }
     }
 

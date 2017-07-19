@@ -2,6 +2,7 @@ package nars.term.container;
 
 import nars.$;
 import nars.Op;
+import nars.index.term.NonInternable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -91,6 +92,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     @Override
     default Iterator<Term> iterator() {
         throw new UnsupportedOperationException();
+    }
+
+    default public boolean internable() {
+        return !OR(x -> x instanceof NonInternable);
     }
 
     /**

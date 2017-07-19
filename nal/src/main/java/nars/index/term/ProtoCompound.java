@@ -112,9 +112,9 @@ public interface ProtoCompound extends TermContainer {
         return false;
     }
 
-    default ProtoCompound commit() {
-        return commit(DTERNAL);
-    }
-
-    ProtoCompound commit(int dt);
+    ProtoCompound commit();
+//    {
+//        return commit(DTERNAL);
+//    }
+//    ProtoCompound commit(int dt);
 }

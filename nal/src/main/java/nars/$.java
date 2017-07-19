@@ -238,11 +238,11 @@ public interface $ {
      * quickly creates a product on the stack, bypassing any memoization
      */
     public static Compound pStack(@NotNull Term... subs) {
-        return new GenericCompound(PROD, Op.subtermsNew(subs));
+        return Op.compound(PROD, subs, false);
     }
 
     public static Compound pStack(@NotNull TermContainer subs) {
-        return new GenericCompound(PROD, subs);
+        return Op.compound(PROD, subs, false);
     }
 
     @NotNull

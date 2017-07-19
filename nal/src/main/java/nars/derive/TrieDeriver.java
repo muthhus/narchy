@@ -3,6 +3,7 @@ package nars.derive;
 import jcog.Util;
 import jcog.trie.TrieNode;
 import nars.$;
+import nars.NAR;
 import nars.Op;
 import nars.control.premise.Derivation;
 import nars.derive.meta.*;
@@ -34,7 +35,7 @@ public class TrieDeriver implements Deriver {
     private BoolPred<Derivation> pred;
 
 
-    public TrieDeriver(PremiseRuleSet r) {
+    public TrieDeriver(PremiseRuleSet r, NAR nar) {
 
         //return Collections.unmodifiableList(premiseRules);
         final TermTrie<Term, PremiseRule> trie = new RuleTrie(r);
@@ -47,6 +48,13 @@ public class TrieDeriver implements Deriver {
             roots[i] = build(roots[i]);
 
         this.pred = Fork.compile(roots);
+
+        if (nar!=null) {
+            forEachConclude(x -> {
+                if (x.cause == -1)
+                    x.setCause(nar.newCause(x).id);
+            });
+        }
 
     }
 
@@ -535,7 +543,7 @@ public class TrieDeriver implements Deriver {
 
 
                 ((UnificationPrototype) existing).conclude.addAll(((UnificationPrototype) incoming).conclude);
-                ((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
+                //((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
                 //incomingConcs.clear();
             }
         }
