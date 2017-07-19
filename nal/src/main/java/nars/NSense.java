@@ -28,6 +28,10 @@ import static nars.term.Terms.compoundOrNull;
  */
 public interface NSense {
 
+    @NotNull Atomic LOW = Atomic.the("low");
+    @NotNull Atomic MID = Atomic.the("mid");
+    @NotNull Atomic HIH = Atomic.the("hih");
+
     @NotNull Collection<SensorConcept> sensors();
 
     NAR nar();
@@ -192,23 +196,14 @@ public interface NSense {
     }
 
     @NotNull
-    default FuzzyScalarConcepts senseNumberBi(String id, FloatSupplier v) {
-        return senseNumberBi(Atomic.the(id), v);
-    }
-
-    @NotNull
     default FuzzyScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
-        return senseNumber(v, prop(id, Atomic.the("lo")), prop(id, Atomic.the("hi")));
+        return senseNumber(v, prop(id, LOW), prop(id, HIH));
     }
     @NotNull
-    default FuzzyScalarConcepts senseNumberTri(String id, FloatSupplier v) throws Narsese.NarseseException {
-        Atomic ID = $(id);
-        return senseNumber(v,  inh(ID, Atomic.the("lo")), inh(ID, Atomic.the("mid")), inh(ID, Atomic.the("hi")));
+    default FuzzyScalarConcepts senseNumberTri(Term id, FloatSupplier v)  {
+        return senseNumber(v,  inh(id, LOW), inh(id, MID), inh(id, HIH));
     }
 
-    default SensorConcept senseNumber(String id, DoubleSupplier v) throws Narsese.NarseseException {
-        return senseNumber(compoundOrNull($(id)), ()->(float)v.getAsDouble());
-    }
     default SensorConcept senseNumber(String id, FloatSupplier v) throws Narsese.NarseseException {
         return senseNumber(compoundOrNull($(id)), v);
     }

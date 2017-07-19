@@ -105,12 +105,13 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
+        int THREADS = 2;
         NAR n = new NARS()
                     .exe(
                         new MultiExecutioner((i) ->
                             new MultiExecutioner.Worker(
                                     64, 32, 0.05f),
-                                3, 2))
+                                THREADS, 2))
                     .time(clock)
                     .index(new CaffeineIndex(96 * 1024))
                     .get();

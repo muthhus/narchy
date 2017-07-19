@@ -25,19 +25,100 @@ import static spacegraph.layout.Grid.*;
  * Created by me on 3/15/17.
  */
 public class Line1D {
+    public static class Line1DVis {
 
+
+        public static void main(String[] args) {
+
+//        a.nar.onTask(t -> {
+//            if (!t.isInput() && t instanceof DerivedTask && t.isGoal()) {
+//                System.err.println(t.proof());
+//            }
+//        });
+//                InstrumentedExecutor exe =
+//                        new InstrumentedExecutor(
+//                        new TaskExecutor(256, 0.5f)
+//                );
+//
+            NAR n = new NARS().get();
+
+            //new STMTemporalLinkage(n, 2, false);
+            n.time.dur(1);
+            n.termVolumeMax.set(16);
+            n.beliefConfidence(0.9f);
+            n.goalConfidence(0.75f);
+            n.onCycle((nn) -> {
+                nn.stats(System.out);
+            });
+
+            new Line1DExperiment() {
+                @Override
+                protected void onStart(Line1DSimplest a) {
+                    new Thread(() -> {
+                        //NAgentX.chart(a);
+                        int history = 800;
+                        window(
+                                row(
+                                        conceptPlot(a.nar, Lists.newArrayList(
+                                                () -> (float) a.i.floatValue(),
+                                                a.o,
+                                                //a.out.feedback.current!=null ? a.out.feedback.current.freq() : 0f,
+                                                () -> a.reward
+                                                //() -> a.rewardSum
+                                                )
+                                                ,
+                                                history),
+                                        col(
+                                                new Vis.EmotionPlot(history, a),
+                                                new ReflectionSurface<>(a),
+                                                Vis.beliefCharts(history,
+                                                        Lists.newArrayList(a.sensors.get(0).sensor.freq(), a.out)
+                                                        , a.nar)
+                                        )
+                                )
+                                , 900, 900);
+
+                    }).start();
+
+                }
+            }.floatValueOf(n);
+
+
+        }
+
+        public static Grid conceptPlot(NAR nar, Iterable<FloatSupplier> concepts, int plotHistory) {
+
+            //TODO make a lambda Grid constructor
+            Grid grid = new Grid(VERTICAL);
+            List<Plot2D> plots = $.newArrayList();
+            for (FloatSupplier t : concepts) {
+                Plot2D p = new Plot2D(plotHistory, Plot2D.Line);
+                p.add(t.toString(), t::asFloat, 0f, 1f);
+                grid.children.add(p);
+                plots.add(p);
+            }
+            grid.layout();
+
+            nar.onCycle(f -> {
+                plots.forEach(Plot2D::update);
+            });
+
+            return grid;
+        }
+
+    }
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.003f; //in time units
-        float yResolution = 0.04f; //in 0..1.0
+        float tHz = 0.001f; //in time units
+        float yResolution = 0.05f; //in 0..1.0
         float periods = 532;
 
-        final int runtime = Math.round(periods /tHz);
+        final int runtime = Math.round(periods / tHz);
 
         @Override
         public float floatValueOf(NAR n) {
 
-            n.truthResolution.setValue(0.05f);
+            //n.truthResolution.setValue(0.05f);
 
             Line1DSimplest a = new Line1DSimplest(n) {
 
@@ -50,12 +131,11 @@ public class Line1D {
             onStart(a);
 
 
-
             a.speed.setValue(yResolution);
 
             a.happy.resolution.setValue(0.01f);
             a.out.resolution.setValue(yResolution);
-            a.in.resolution.setValue(yResolution);
+            a.in.resolution(yResolution);
             a.curiosity.setValue(
                     0.1f
                     //(2/yResolution)*tHz);
@@ -76,7 +156,7 @@ public class Line1D {
 
                 a.target(
                         //Math.signum(Math.sin(a.nar.time() * tHz * 2 * PI) ) > 0 ? 1f : -1f
-                        Util.round((float)   ( 0.5f + 0.5f * Math.sin(a.nar.time() * tHz * 2 * PI) ), yResolution)
+                        Util.round((float) (0.5f + 0.5f * Math.sin(a.nar.time() * tHz * 2 * PI)), yResolution)
                         //(float) ( Math.sin(a.nar.time() * tHz * 2 * PI) )
                         //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
                         //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
@@ -141,8 +221,7 @@ public class Line1D {
                 x.confMin.setValue(y);
             })*//*.tweak("truthResolution", 0.01f, 0.04f, 0.01f, (y, x) -> {
                 x.truthResolution.setValue(y);
-            })*/
-            ;
+            })*/;
 
             Optimize.Result r = o.run(64, maxIterations, repeats, new Line1DExperiment());
 
@@ -161,184 +240,103 @@ public class Line1D {
 
         }
 
-        public static class Line1DVis {
 
-
-            public static void main(String[] args) {
-
-//        a.nar.onTask(t -> {
-//            if (!t.isInput() && t instanceof DerivedTask && t.isGoal()) {
-//                System.err.println(t.proof());
-//            }
-//        });
-//                InstrumentedExecutor exe =
-//                        new InstrumentedExecutor(
-//                        new TaskExecutor(256, 0.5f)
-//                );
-//
-                NAR n = new NARS().get();
-
-                //new STMTemporalLinkage(n, 2, false);
-                n.time.dur(1);
-                n.termVolumeMax.set(22);
-                n.beliefConfidence(0.9f);
-                n.goalConfidence(0.5f);
-                n.onCycle((nn)->{
-                    System.out.println(nn.emotion.summary());
-                });
-
-                new Line1DExperiment() {
-                    @Override
-                    protected void onStart(Line1DSimplest a) {
-                        new Thread(() -> {
-                            //NAgentX.chart(a);
-                            int history = 800;
-                            window(
-                                    row(
-                                            conceptPlot(a.nar, Lists.newArrayList(
-                                                    () -> (float) a.in.sensor.getAsDouble(),
-                                                    a.o,
-                                                            //a.out.feedback.current!=null ? a.out.feedback.current.freq() : 0f,
-                                                    () -> a.reward
-                                                    //() -> a.rewardSum
-                                                    )
-                                                    ,
-                                                    history),
-                                            col(
-                                                    new Vis.EmotionPlot(history, a),
-                                                    new ReflectionSurface<>(a),
-                                                    Vis.beliefCharts(history,
-                                                            Lists.newArrayList(a.sensors.get(0).sensor.freq(), a.out)
-                                                            , a.nar)
-                                            )
-                                    )
-                                    , 900, 900);
-
-                        }).start();
-
-                    }
-                }.floatValueOf(n);
-
-
-            }
-
-            public static Grid conceptPlot(NAR nar, Iterable<FloatSupplier> concepts, int plotHistory) {
-
-                //TODO make a lambda Grid constructor
-                Grid grid = new Grid(VERTICAL);
-                List<Plot2D> plots = $.newArrayList();
-                for (FloatSupplier t : concepts) {
-                    Plot2D p = new Plot2D(plotHistory, Plot2D.Line);
-                    p.add(t.toString(), t::asFloat, 0f, 1f);
-                    grid.children.add(p);
-                    plots.add(p);
-                }
-                grid.layout();
-
-                nar.onCycle(f -> {
-                    plots.forEach(Plot2D::update);
-                });
-
-                return grid;
-            }
-        }
-
-        public static class Line1DTrainer {
-
-            public static final int trainingRounds = 20;
-            private float lastReward;
-            int consecutiveCorrect;
-            int lag;
-            //int perfect = 0;
-            int step;
-
-
-            final LinkedHashSet<Task>
-                    current = new LinkedHashSet();
-
-            private final Line1DSimplest a;
-
-            //how long the correct state must be held before it advances to next step
-            int completionThreshold;
-
-            float worsenThreshold;
-
-            public Line1DTrainer(Line1DSimplest a) {
-                this.a = a;
-                this.lastReward = a.reward;
-
-                NAR n = a.nar;
-                a.speed.setValue(0.02f);
-
-
-                float speed = a.speed.floatValue();
-                this.worsenThreshold = speed / 2f;
-                this.completionThreshold = n.dur() * 32;
-                float rewardThresh = 0.75f; //reward to be considered correct in this frame
-
-                n.onTask(x -> {
-                    if (step > trainingRounds && x.isGoal() && !x.isInput()
-
-                        //&& x.term().equals(a.out.term())
-                            ) {
-                        current.add(x);
-                    }
-                });
-
-                a.onFrame((z) -> {
-
-
-                    //System.out.println(a.reward);
-                    if (a.reward > rewardThresh)
-                        consecutiveCorrect++;
-                    else
-                        consecutiveCorrect = 0; //start over
-
-                    if (consecutiveCorrect > completionThreshold) {
-                        //int lagCorrected = lag - perfect;
-                        System.out.println(lag);
-
-                        float next = Util.round(n.random().nextFloat(), speed);
-                        //perfect = (int) Math.floor((next - a.target()) / speed);
-                        a.target(next);
-
-                        step++;
-                        consecutiveCorrect = 0;
-                        lag = 0;
-
-                        if (step < trainingRounds) {
-                            //completionThreshold += n.dur(); //increase completion threshold
-                        } else {
-                            if (a.curiosity.floatValue() > 0)
-                                System.err.println("TRAINING FINISHED - DISABLING CURIOSITY");
-                            a.curiosity.setValue(0f); //disable curiosity
-                        }
-                    } else {
-
-                        if (lag > 1) { //skip the step after a new target has been selected which can make it seem worse
-
-                            float worsening = lastReward - a.reward;
-                            if (step > trainingRounds && worsening > worsenThreshold) {
-                                //print tasks suspected of faulty logic
-                                current.forEach(x -> {
-                                    System.err.println(worsening + "\t" + x.proof());
-                                });
-                            }
-                        }
-
-                        lag++;
-
-                    }
-
-                    lastReward = a.reward;
-
-                    current.clear();
-                });
-            }
-
-        }
     }
 
+    public static class Line1DTrainer {
+
+        public static final int trainingRounds = 20;
+        private float lastReward;
+        int consecutiveCorrect;
+        int lag;
+        //int perfect = 0;
+        int step;
+
+
+        final LinkedHashSet<Task>
+                current = new LinkedHashSet();
+
+        private final Line1DSimplest a;
+
+        //how long the correct state must be held before it advances to next step
+        int completionThreshold;
+
+        float worsenThreshold;
+
+        public Line1DTrainer(Line1DSimplest a) {
+            this.a = a;
+            this.lastReward = a.reward;
+
+            NAR n = a.nar;
+            a.speed.setValue(0.02f);
+
+
+            float speed = a.speed.floatValue();
+            this.worsenThreshold = speed / 2f;
+            this.completionThreshold = n.dur() * 32;
+            float rewardThresh = 0.75f; //reward to be considered correct in this frame
+
+            n.onTask(x -> {
+                if (step > trainingRounds && x.isGoal() && !x.isInput()
+
+                    //&& x.term().equals(a.out.term())
+                        ) {
+                    current.add(x);
+                }
+            });
+
+            a.onFrame((z) -> {
+
+
+                //System.out.println(a.reward);
+                if (a.reward > rewardThresh)
+                    consecutiveCorrect++;
+                else
+                    consecutiveCorrect = 0; //start over
+
+                if (consecutiveCorrect > completionThreshold) {
+                    //int lagCorrected = lag - perfect;
+                    System.out.println(lag);
+
+                    float next = Util.round(n.random().nextFloat(), speed);
+                    //perfect = (int) Math.floor((next - a.target()) / speed);
+                    a.target(next);
+
+                    step++;
+                    consecutiveCorrect = 0;
+                    lag = 0;
+
+                    if (step < trainingRounds) {
+                        //completionThreshold += n.dur(); //increase completion threshold
+                    } else {
+                        if (a.curiosity.floatValue() > 0)
+                            System.err.println("TRAINING FINISHED - DISABLING CURIOSITY");
+                        a.curiosity.setValue(0f); //disable curiosity
+                    }
+                } else {
+
+                    if (lag > 1) { //skip the step after a new target has been selected which can make it seem worse
+
+                        float worsening = lastReward - a.reward;
+                        if (step > trainingRounds && worsening > worsenThreshold) {
+                            //print tasks suspected of faulty logic
+                            current.forEach(x -> {
+                                System.err.println(worsening + "\t" + x.proof());
+                            });
+                        }
+                    }
+
+                    lag++;
+
+                }
+
+                lastReward = a.reward;
+
+                current.clear();
+            });
+        }
+
+    }
 
 }
 

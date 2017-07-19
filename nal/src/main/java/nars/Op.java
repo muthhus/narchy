@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.term.Terms.flatten;
@@ -709,7 +710,7 @@ public enum Op implements $ {
      * whether this involves an additional numeric component: 'dt' (for temporals) or 'relation' (for images)
      */
     public final boolean hasNumeric;
-    public final int id;
+    public final byte id;
 
     Op(char c, int minLevel, OpType type) {
         this(c, minLevel, type, Args.None);
@@ -747,7 +748,7 @@ public enum Op implements $ {
 
     Op(@NotNull String string, boolean commutative, int minLevel, OpType type, @NotNull IntIntPair size) {
 
-        this.id = ordinal();
+        this.id =(byte)(ordinal());
         this.str = string;
 
         this.commutative = commutative;
@@ -807,7 +808,7 @@ public enum Op implements $ {
                         Null;
             case 2:
                 Term et0 = t[0], et1 = t[1];
-                if (et0.equals(et1) || et0.containsRecursively(et1) || et1.containsRecursively(et0))
+                if (et0.equals(et1) || et0.containsRecursively(et1, nonProduct) || et1.containsRecursively(et0, nonProduct))
                     return Null;
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, (Compound) et0, (Compound) et1);
@@ -982,6 +983,8 @@ public enum Op implements $ {
 //        }
     }
 
+    static final Predicate<Compound> nonProduct = c -> c.op() != PROD;
+
     @NotNull
     static Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
 
@@ -1150,8 +1153,8 @@ public enum Op implements $ {
             Term pu = predicate.unneg();
             Term su = subject.unneg();
             //first layer only, not recursively
-            if ((pu.varPattern() == 0 && (subject.equals(pu) || subject.containsRecursively(pu, (c -> c.op()!=PROD)))) ||
-                    (su.varPattern() == 0 && (predicate.equals(su) || predicate.containsRecursively(su, (c -> c.op()!=PROD)))))
+            if ((pu.varPattern() == 0 && (subject.equals(pu) || subject.containsRecursively(pu, nonProduct))) ||
+                    (su.varPattern() == 0 && (predicate.equals(su) || predicate.containsRecursively(su, nonProduct))))
                 //(!(su instanceof Variable) && predicate.contains(su)))
                 return False; //cyclic
 
@@ -1168,7 +1171,7 @@ public enum Op implements $ {
                 if (subjConj && !predConj) {
                     final Compound csub = (Compound) subject;
                     //TermContainer subjs = csub.subterms();
-                    if (csub.containsRecursively(predicate)) {
+                    if (csub.containsRecursively(predicate, nonProduct)) {
                         return False;
 //                        Term finalPredicate = predicate;
 //                        subject = the(CONJ, csub.dt(), subjs.asFiltered(z -> z.equals(finalPredicate)).toArray());
@@ -1178,7 +1181,7 @@ public enum Op implements $ {
                 } else if (predConj && !subjConj) {
                     final Compound cpred = (Compound) predicate;
                     //TermContainer preds = cpred.subterms();
-                    if (cpred.containsRecursively(subject)) {
+                    if (cpred.containsRecursively(subject, nonProduct)) {
                         return False;
 //                        Term finalSubject = subject;
 //                        predicate = the(CONJ, cpred.dt(), preds.asFiltered(z -> z.equals(finalSubject)).toArray());

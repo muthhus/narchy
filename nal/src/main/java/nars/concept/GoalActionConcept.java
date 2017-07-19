@@ -76,6 +76,7 @@ public class GoalActionConcept extends ActionConcept {
 
         //float curiPeriod = 2; //TODO vary this
         float cur = curiosity.floatValue();
+        boolean curious = false;
         if (nar.random().nextFloat() < cur) {
             // curiosity override
 
@@ -97,6 +98,7 @@ public class GoalActionConcept extends ActionConcept {
 //                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
 
             goal = $.t(f, curiConf);
+            curious = true;
 
 //                Truth ct = $.t(f, cc);
 //                goal = ct; //curiosity overrides goal
@@ -137,7 +139,11 @@ public class GoalActionConcept extends ActionConcept {
 
 
 //        //HACK insert shadow goal
-        Task fg = action.set(this, goal, stamper, nar);
+        Task fg;
+        if (goal!=null)
+            fg = action.set(this, goal, stamper, nar);
+        else
+            fg = action.get(); //latch previous goal
 
         //Task fg = null;
 
@@ -151,7 +157,7 @@ public class GoalActionConcept extends ActionConcept {
 //        beliefs().forEachTask(decay);
 //        goals().forEachTask(decay);
 
-        return Stream.of(fb, fg).filter(Objects::nonNull);
+        return Stream.of(fb, curious ? fg : null).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);
     }
 

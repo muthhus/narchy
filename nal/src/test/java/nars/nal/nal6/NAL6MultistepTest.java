@@ -5,9 +5,11 @@ import nars.NARS;
 import nars.Narsese;
 import nars.concept.Concept;
 import nars.time.Tense;
+import nars.truth.Truth;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by me on 10/29/16.
@@ -63,7 +65,9 @@ public class NAL6MultistepTest {
         n.stats(System.out);
 
         //result from Probcog:  earthquake=23%, burglary=99%
-        assertEquals(0.99f, n.beliefTruth(burglary, Tense.ETERNAL).freq(), 0.4f /* approximate */);
+        Truth burgTruth = n.beliefTruth(burglary, Tense.ETERNAL);
+        assertNotNull(burgTruth);
+        assertEquals(0.99f, burgTruth.freq(), 0.4f /* approximate */);
         assertEquals(0.31f, n.beliefTruth(earthquake,Tense.ETERNAL).freq(), 0.2f /* approximate */);
     }
 

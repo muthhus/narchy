@@ -40,7 +40,7 @@ public class ProxyCompound implements Compound, NonInternable {
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return IO.Printer.stringify(this).toString();
     }
 

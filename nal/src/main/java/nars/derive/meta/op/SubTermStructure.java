@@ -3,6 +3,7 @@ package nars.derive.meta.op;
 import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
+import nars.derive.meta.AbstractPred;
 import nars.derive.meta.AtomicPred;
 import org.jetbrains.annotations.NotNull;
 
@@ -12,15 +13,13 @@ import java.util.List;
 /**
  * requires a specific subterm to have minimum bit structure
  */
-public final class SubTermStructure extends AtomicPred<Derivation> {
+public final class SubTermStructure extends AbstractPred<Derivation> {
 
     /** higher number means a stucture with more enabled bits will be decomposed to its components */
-    public static final int SPLIT_THRESHOLD = 2;
+    public static final int SPLIT_THRESHOLD = 3;
 
     public final int subterm;
     public final int bits;
-    @NotNull
-    private final transient String id;
 
     public static List<SubTermStructure> get(int subterm, int bits) {
         int numBits = Integer.bitCount(bits);
@@ -45,6 +44,12 @@ public final class SubTermStructure extends AtomicPred<Derivation> {
     }
 
     private SubTermStructure(@NotNull Op matchingType, int subterm, int bits) {
+        super($.func("subTermStruct", $.the(subterm), $.the(bits)));
+//                ((Integer.bitCount(bits) == 1) ?
+//                        ("onBit_" + Integer.numberOfTrailingZeros(bits)) //shorthand for n'th bit
+//                            :
+//                        ("onAll_" + Integer.toBinaryString(bits))
+//                ) + ')');
         this.subterm = subterm;
 
 
@@ -52,21 +57,10 @@ public final class SubTermStructure extends AtomicPred<Derivation> {
         if (this.bits == 0) {
             throw new RuntimeException("no filter effected");
         }
-        id = "subTermStruct(" + subterm + ',' +
-                ((Integer.bitCount(bits) == 1) ?
-                        ("onBit_" + Integer.numberOfTrailingZeros(bits)) //shorthand for n'th bit
-                            :
-                        ("onAll_" + Integer.toBinaryString(bits))
-                ) + ')';
 
     }
 
 
-    @NotNull
-    @Override
-    public String toString() {
-        return id;
-    }
 
     @Override
     public boolean test(@NotNull Derivation ff) {

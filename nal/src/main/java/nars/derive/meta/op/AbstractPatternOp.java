@@ -3,6 +3,7 @@ package nars.derive.meta.op;
 import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
+import nars.derive.meta.AbstractPred;
 import nars.derive.meta.AtomicPred;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
@@ -19,25 +20,18 @@ public enum AbstractPatternOp  {
                 , $.quote(param));
     }
 
-    public static final class PatternOp extends AtomicPred<Derivation> {
+    public static final class PatternOp extends AbstractPred<Derivation> {
 
         public final int subterm;
         public final int opOrdinal;
 
-        @NotNull private final transient String id;
 
         public PatternOp(int subterm, @NotNull Op op) {
-
+            super(name(PatternOp.class, subterm, op.str));
             this.subterm = subterm;
             this.opOrdinal = op.id;
-            this.id = name(getClass(), subterm, op.str).toString();
         }
 
-        @NotNull
-        @Override
-        public String toString() {
-            return id;
-        }
 
         @Override
         public boolean test(@NotNull Derivation ff) {

@@ -4,6 +4,7 @@ import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
+import nars.concept.FuzzyScalarConcepts;
 import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
 import nars.term.Compound;
@@ -31,20 +32,19 @@ public class Line1DSimplest extends NAgent {
      * the current value
      */
     public final FloatParam o = new FloatParam(0.5f, 0, 1f);
-    public final SensorConcept in;
+    public final FuzzyScalarConcepts in;
 
 
     public Line1DSimplest(NAR n) {
         super("", n);
 
-        in = senseNumber( $.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
-                this.i
-                //()->Util.sigmoid(this.o.floatValue() - this.i.floatValue())
-        );
-//        FuzzyScalarConcepts in = senseNumberBi(
-//                //$.inh($.the("i"), id),
-//                $.p($.the("i"), id),
-//                this.i);
+//        in = senseNumber( $.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+//                this.i
+//        );
+        in = senseNumberBi(
+                //$.inh($.the("i"), id),
+                $.the("i"),
+                this.i);
 
 //        action( new GoalActionConcept($.p($.the("o"), id), nar, (b,d) -> {
 //            if (d!=null) {
@@ -110,7 +110,7 @@ public class Line1DSimplest extends NAgent {
     @Override
     protected float act() {
         float dist = Math.abs(
-            round(i.floatValue(), in.resolution.floatValue()) -
+            i.floatValue() -
             round(o.floatValue(), out.resolution.floatValue())
         );
 
@@ -129,7 +129,7 @@ public class Line1DSimplest extends NAgent {
 
 
     public float target() {
-        return in.asFloat();
+        return i.asFloat();
     }
 
     public void target(float v) {

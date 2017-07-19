@@ -23,6 +23,7 @@ abstract public class Bool extends AtomicToString {
     private final String id;
 
     protected Bool(@NotNull String id) {
+        super(ATOM, id);
         this.id = id;
     }
 

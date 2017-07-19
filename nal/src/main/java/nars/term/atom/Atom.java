@@ -16,19 +16,10 @@ public class Atom extends AtomicToString {
 
     @NotNull public final String id;
 
-    /** (cached for speed) */
-    transient final int hash;
-    transient final byte[] bytes;
 
     protected Atom(@NotNull String id) {
+        super(ATOM, id);
         this.id = validateAtomID(id);
-        this.bytes = id.getBytes();
-        this.hash = super.hashCode();
-    }
-
-    @Override
-    public byte[] bytes() {
-        return bytes;
     }
 
 
@@ -65,6 +56,7 @@ public class Atom extends AtomicToString {
     }
 
     public final static int AtomString = Term.opX(ATOM, 1);
+
     @Override public int opX() {
         return AtomString;
     }
@@ -115,7 +107,7 @@ public class Atom extends AtomicToString {
 
     @Override
     public final int hashCode() {
-        return hash;
+        return hashCached;
     }
 
     @Override

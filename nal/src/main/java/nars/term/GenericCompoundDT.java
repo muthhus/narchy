@@ -109,12 +109,6 @@ public class GenericCompoundDT extends ProxyCompound {
         return (op().temporal && (dt != DTERNAL)) || subterms().isTemporal();
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return IO.Printer.stringify(this).toString();
-    }
-
 
     @Override
     public int hashCode() {

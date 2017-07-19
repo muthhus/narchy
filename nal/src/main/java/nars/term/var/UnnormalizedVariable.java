@@ -19,15 +19,14 @@ public class UnnormalizedVariable extends AtomicToString implements Variable, No
 
     @NotNull
     public final Op type;
-
-    @NotNull
-    private final String str;
+    @Deprecated private final String str;
 
     @Override public int opX() { return Term.opX(op(), 10);    }
 
     public UnnormalizedVariable(@NotNull Op type, @NotNull String label) {
-        this.type = type;
+        super(type, label);
         this.str = label;
+        this.type = type;
     }
 
     @Override
@@ -46,7 +45,7 @@ public class UnnormalizedVariable extends AtomicToString implements Variable, No
 
         //prevent comparison with AbstractVariable
         if (u instanceof UnnormalizedVariable) {
-            return str.equals(((UnnormalizedVariable) u).str);
+            return toString().equals(((UnnormalizedVariable) u).toString());
         }
 
         return false;

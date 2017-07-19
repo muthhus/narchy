@@ -65,7 +65,7 @@ public abstract class Param  {
 
 
     public final FloatParam valuePositiveDecay = new FloatParam(0.995f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.92f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.97f, 0, 1f);
 
     /**
      * use this for advanced error checking, at the expense of lower performance.
