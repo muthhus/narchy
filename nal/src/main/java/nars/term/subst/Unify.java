@@ -19,7 +19,9 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 import static nars.Param.TTL_UNIFY;
 import static nars.Param.UnificationConstraintsInitialCapacity;

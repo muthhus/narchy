@@ -1,10 +1,9 @@
-package nars.term.compound;
+package nars.term;
 
 import jcog.Util;
 import nars.IO;
 import nars.Op;
 import nars.Param;
-import nars.term.Compound;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;

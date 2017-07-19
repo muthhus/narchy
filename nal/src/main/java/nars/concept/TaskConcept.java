@@ -14,7 +14,6 @@ import org.jetbrains.annotations.Nullable;
 import static nars.Op.*;
 import static nars.conceptualize.state.ConceptState.Deleted;
 import static nars.table.QuestionTable.Unstored;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * concept of a compound term which can name a task, and thus have associated beliefs, goals, questions, and quests

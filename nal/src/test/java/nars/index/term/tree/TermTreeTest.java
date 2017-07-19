@@ -1,23 +1,17 @@
 package nars.index.term.tree;
 
-import com.google.common.collect.Sets;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.concept.AtomConcept;
 import nars.concept.Concept;
-import nars.nar.Terminal;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import java.util.HashSet;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import static nars.$.$;
 import static org.junit.Assert.*;

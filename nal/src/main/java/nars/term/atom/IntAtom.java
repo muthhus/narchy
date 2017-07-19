@@ -2,7 +2,6 @@ package nars.term.atom;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.primitives.Ints;
-import jcog.byt.DynBytes;
 import nars.Op;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

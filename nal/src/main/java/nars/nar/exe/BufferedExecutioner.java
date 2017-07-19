@@ -2,15 +2,11 @@ package nars.nar.exe;
 
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;
-import jcog.bag.impl.ArrayBag;
-import jcog.bag.impl.CurveBag;
-import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
 import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
-import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -23,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 

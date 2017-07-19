@@ -3,14 +3,9 @@ package nars.concept;
 import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Param;
-import nars.Task;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
-
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * base class for concepts which are more or less programmatically "hard-wired" into

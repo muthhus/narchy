@@ -1,7 +1,6 @@
 package jcog.bag.impl;
 
 import com.google.common.util.concurrent.AtomicDouble;
-import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.util.Treadmill;
 import jcog.list.FasterList;

@@ -1,7 +1,6 @@
 package nars.nal;
 
 
-import com.google.common.graph.Graphs;
 import com.google.common.graph.MutableValueGraph;
 import jcog.pri.PriReference;
 import nars.$;

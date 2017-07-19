@@ -1,8 +1,10 @@
 package nars.derive.meta.op;
 
-import nars.$;
 import nars.control.premise.Derivation;
-import nars.derive.meta.*;
+import nars.derive.meta.AbstractPred;
+import nars.derive.meta.Conclude;
+import nars.derive.meta.Fork;
+import nars.derive.meta.PrediTerm;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -40,10 +42,7 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
     }
 
 
-    @Nullable
-    public static Term id(@NotNull Term pattern) {
-        return pattern;
-    }
+
 
 
 //    public static final class MatchTaskBeliefPair extends MatchTerm {
@@ -67,7 +66,6 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
     }
 
     public final @NotNull PrediTerm build(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
-        if (this.eachMatch == null) {
 
 
             PrediTerm om;
@@ -89,15 +87,14 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
 
 
-            this.ref = this.id = om!=null ?
+            return build( om!=null ? each.apply(om) : null );
+//
+//                    $.func("unify", pid,
+//                            this.eachMatch = each.apply(om)  ) : //final part of match
+//
+//                    $.func( "unify", pid)
+//            ); //first part of match
 
-                    $.func("unify", pid,
-                            this.eachMatch = each.apply(om)  ) : //final part of match
-
-                    $.func( "unify", pid); //first part of match
-        }
-
-        return build(this.eachMatch);
     }
 
 

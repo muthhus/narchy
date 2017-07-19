@@ -6,8 +6,6 @@ import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-
 
 public final class OpInConstraint extends MatchConstraint {
 

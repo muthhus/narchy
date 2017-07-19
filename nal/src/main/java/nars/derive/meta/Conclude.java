@@ -2,7 +2,6 @@ package nars.derive.meta;
 
 import jcog.pri.Priority;
 import nars.*;
-import nars.control.Cause;
 import nars.control.premise.Derivation;
 import nars.derive.rule.PremiseRule;
 import nars.op.DepIndepVarIntroduction;
@@ -22,8 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static nars.Op.ATOM;
 import static nars.Op.NEG;

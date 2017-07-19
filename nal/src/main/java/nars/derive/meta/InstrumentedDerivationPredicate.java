@@ -3,9 +3,7 @@ package nars.derive.meta;
 import nars.$;
 import nars.control.premise.Derivation;
 import nars.term.Compound;
-import nars.term.ProxyTerm;
-import nars.term.compound.ProxyCompound;
-import org.fusesource.jansi.Ansi;
+import nars.term.ProxyCompound;
 import org.jetbrains.annotations.NotNull;
 
 abstract public class InstrumentedDerivationPredicate extends ProxyCompound implements PrediTerm<Derivation> {

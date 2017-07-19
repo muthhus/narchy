@@ -7,9 +7,8 @@ import nars.derive.meta.PrediTerm;
 import nars.derive.meta.constraint.MatchConstraint;
 import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
-import nars.term.Compound;
+import nars.term.ProxyCompound;
 import nars.term.Term;
-import nars.term.compound.ProxyCompound;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

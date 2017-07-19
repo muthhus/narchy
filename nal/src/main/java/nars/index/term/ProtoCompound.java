@@ -7,8 +7,6 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.time.Tense.DTERNAL;
-
 /**
  * a lightweight Compound builder
  *      - fast-write

@@ -1,20 +1,35 @@
 package nars.term;
 
-import com.google.common.base.Joiner;
+import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.*;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.function.Function;
 
 public class ProxyTermTest {
 
+    @Ignore
     @Test
     public void testEveryTermMethodProxied() {
 
-        System.out.println(
-                Joiner.on("\n").join(List.of(Term.class.getMethods()))
-        );
+        Function<Method, String> methodSummarizer = x ->
+                x.getName() + "(" + Arrays.toString(x.getParameterTypes()) + ")";
+
+
+        for (Class proxy : new Class[] { ProxyTerm.class, ProxyCompound.class }) {
+            int unoverriden = 0;
+            for (Method m : proxy.getMethods()) {
+                Class<?> c = m.getDeclaringClass();
+                if (c == proxy || c == Object.class)
+                    continue;
+
+                System.out.println(proxy + " does not override: " + c + " " + m);
+
+                unoverriden++;
+            }
+            //assertEquals(0, unoverriden);
+        }
 
     }
 }

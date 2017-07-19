@@ -1,7 +1,6 @@
 package nars.control.premise;
 
 import jcog.math.ByteShuffler;
-import jcog.version.Versioned;
 import nars.*;
 import nars.control.Premise;
 import nars.derive.meta.PrediTerm;
@@ -20,8 +19,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.Map;
 import java.util.function.Predicate;
 
 import static nars.Op.VAR_PATTERN;

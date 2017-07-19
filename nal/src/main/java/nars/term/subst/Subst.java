@@ -3,16 +3,13 @@ package nars.term.subst;
 import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
-import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
-import nars.index.term.AppendProtoCompound;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 
 import static nars.index.term.TermIndex.disallowTrueOrFalse;

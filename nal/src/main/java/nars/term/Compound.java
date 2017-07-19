@@ -29,7 +29,6 @@ import nars.Op;
 import nars.index.term.TermContext;
 import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
-import nars.term.compound.GenericCompoundDT;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;

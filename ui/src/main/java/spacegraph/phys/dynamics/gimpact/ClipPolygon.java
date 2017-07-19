@@ -27,11 +27,11 @@
 
 package spacegraph.phys.dynamics.gimpact;
 
+import jcog.util.ArrayPool;
 import spacegraph.math.Vector4f;
 import spacegraph.math.v3;
 import spacegraph.phys.BulletGlobals;
 import spacegraph.phys.math.VectorUtil;
-import jcog.util.ArrayPool;
 import spacegraph.phys.util.OArrayList;
 
 /**

@@ -3,7 +3,7 @@ package nars.derive.meta;
 import nars.$;
 import nars.control.premise.Derivation;
 import nars.derive.meta.op.AbstractPatternOp.PatternOp;
-import nars.term.compound.ProxyCompound;
+import nars.term.ProxyCompound;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;

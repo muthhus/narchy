@@ -1,6 +1,5 @@
 package nars;
 
-import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.gui.Vis;
@@ -29,7 +28,8 @@ import java.util.function.Supplier;
 
 import static nars.Op.BELIEF;
 import static spacegraph.SpaceGraph.window;
-import static spacegraph.layout.Grid.*;
+import static spacegraph.layout.Grid.col;
+import static spacegraph.layout.Grid.grid;
 import static spacegraph.widget.meter.MatrixView.bipolar1;
 
 /**

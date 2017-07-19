@@ -1,10 +1,6 @@
 package jcog.math;
 
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.lang.reflect.Array;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Random;
 
 public class ByteShuffler {
