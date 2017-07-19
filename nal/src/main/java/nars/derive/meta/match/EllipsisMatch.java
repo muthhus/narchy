@@ -96,10 +96,6 @@ public class EllipsisMatch extends ProxyCompound implements NonInternable {
         throw new UnsupportedOperationException("it depends");
     }
 
-    @Override
-    public void append(@NotNull Appendable w) throws IOException {
-        w.append(toString());
-    }
 
     public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
         int n = 0;

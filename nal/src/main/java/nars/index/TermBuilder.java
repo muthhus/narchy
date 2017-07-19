@@ -1,5 +1,6 @@
 package nars.index;
 
+import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
@@ -344,6 +345,8 @@ public abstract class TermBuilder {
         Compound y = compoundOrNull(
                 subsChanged ? o.the(nextDT, s) : x.dt(nextDT)
         );
+        if (y == null)
+            return Null;
 
         return y;
     }

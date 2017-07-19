@@ -201,8 +201,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 //        }
 
         Term c = $.terms.atemporalize(t);
-        if (!(c instanceof Compound))
-            throw new InvalidTaskException(t, "no associated concept");
+        if (!(c instanceof Compound)) {
+            fail(t, "no associated concept", safe);
+        }
 
         return taskStatementValid(t, punc, safe);
     }

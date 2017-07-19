@@ -31,10 +31,8 @@ public class TermutatorTest {
 
     final Unify unifier = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1),
             Param.UnificationStackMax, TTL) {
-        @Override
-        public void onMatch() {
-
-            setTTL(0);
+        @Override public void onMatch() {
+            stop();
         }
     };
 

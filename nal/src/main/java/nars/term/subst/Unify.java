@@ -109,6 +109,10 @@ public abstract class Unify implements Subst {
         this.ttl = ttl;
     }
 
+    public final void stop() {
+        setTTL(0);
+    }
+
     /**
      * @param terms
      * @param type       if null, unifies any variable type.  if non-null, only unifies that type

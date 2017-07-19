@@ -146,6 +146,17 @@ public class FasterList<X> extends FastList<X> {
         return items;
     }
 
+    public final X[] array(Class<? extends X[]> safe) {
+        Object[] i = items;
+        int s = size;
+        if (i.getClass()!=safe) {
+            X[] j = (X[]) Array.newInstance(safe.getComponentType(), s);
+            System.arraycopy(i, 0, j, 0, s);
+            return j;
+        }
+        return items;
+    }
+
 
     public float maxValue(FloatFunction<? super X> function) {
         float max = Float.NEGATIVE_INFINITY;

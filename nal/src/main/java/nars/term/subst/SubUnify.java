@@ -15,7 +15,7 @@ import java.util.Random;
  */
 public class SubUnify extends Unify {
 
-    private @Nullable Term xterm;
+    private @Nullable Term transformed;
 
     @Nullable private Term result;
 
@@ -24,8 +24,9 @@ public class SubUnify extends Unify {
         super(index, type, r, Param.UnificationStackMax, ttl);
     }
 
-    public SubUnify(@NotNull Unify parent, @Nullable Op type) {
+    public SubUnify(@NotNull Unify parent, @Nullable Op type, int ttl) {
         super(parent.terms, type, parent.random, parent.versioning);
+        setTTL(ttl);
     }
 
 //    @Override
@@ -54,53 +55,29 @@ public class SubUnify extends Unify {
 //    }
 
     /**
-     * terminates after the first match
+     * terminate after the first match
      */
     @Override
     public void onMatch() {
-        //apply the match before the xy/yx mapping gets reverted after leaving the termutator
-        //int start = target!=null ? target.now() : -1;
 
-//        boolean fail = false;
-        if (xterm != null) {
-
-//            if (target != null) {
-//                if (!target.put(this)) {
-//                    fail = true;
-//                }
-//            }
-
-
-                result = transform(xterm);
-//                if (result == null)
-//                    fail = true;
-
-        } else {
-            //return false; //??
+        if (transformed != null) {
+            Term result = transform(transformed);
+            if (result instanceof Compound) {
+                this.result = result;
+                stop(); //done
+            }
         }
-
-
-//        if (fail) {
-//            //s.revert(start);
-//            //return s.live(); //try again if ttl > 0
-//        } else {
-//            //return false; //success, done
-//
-//            return true; //HACK done after once, but TODO try multiple
-//        }
-
-        setTTL(0);
     }
 
     public void tryMatch(@NotNull Term x, @NotNull Term y) {
-        this.xterm = null;
+        this.transformed = null;
         this.result = null;
         unify(x, y, true);
     }
 
     @Nullable
-    public Term tryMatch(@Nullable Term xterm, @NotNull Term x, @NotNull Term y) {
-        this.xterm = xterm;
+    public Term tryMatch(@Nullable Term transformed, @NotNull Term x, @NotNull Term y) {
+        this.transformed = transformed;
         this.result = null;
         unify(x, y, true);
         return result;

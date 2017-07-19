@@ -2,6 +2,7 @@ package nars.term.transform;
 
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.control.premise.Derivation;
 import nars.term.Compound;
 import nars.term.Functor;
@@ -115,7 +116,7 @@ abstract public class substituteIfUnifies extends Functor {
 
 
 
-        Term z = new SubUnify(parent, op).tryMatch(input, x, y);
+        Term z = new SubUnify(parent, op, Param.BeliefMatchTTL).tryMatch(input, x, y);
         return (z != null) ? z : Null;
     }
 

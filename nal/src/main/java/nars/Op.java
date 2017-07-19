@@ -223,6 +223,7 @@ public enum Op implements $ {
                 //assert (n == 2);
                 if (n != 2) {
                     throw new InvalidTermException(CONJ, tt, "invalid non-commutive conjunction");
+                    //return Null;
                 }
 
                 Term a = tt[0];

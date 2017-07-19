@@ -132,7 +132,7 @@ public class EllipsisTest {
                             assertEquals(s.toString() + " should be all subbed by " + this.xy.toString(), 0, s.varPattern());
                         }
 
-                        setTTL(0);
+                        stop();
                     }
                 };
 
