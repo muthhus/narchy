@@ -59,21 +59,22 @@ public class BufferedExecutioner extends Executioner {
 //    protected final FasterList<ITask> toRemove = new FasterList();
 
 
-    public final Bag<ITask, ITask> tasks =
-            new PriorityHijackBag<ITask, ITask>(4) {
+    public final Bag<Task, Task> tasks =
+            new PriorityHijackBag<Task, Task>(4) {
                 @Override
-                protected Consumer<ITask> forget(float rate) {
+                protected Consumer<Task> forget(float rate) {
                     return null;
                 }
 
                 @Override
-                protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
+                protected Task merge(@NotNull Task existing, @NotNull Task incoming, @Nullable MutableFloat overflowing) {
                     Param.taskMerge.merge(existing, incoming);
+                    ((NALTask)existing).merge(((NALTask)incoming));
                     return existing;
                 }
 
                 @Override
-                public ITask key(@NotNull ITask value) {
+                public Task key(@NotNull Task value) {
                     return value;
                 }
 
@@ -278,7 +279,8 @@ public class BufferedExecutioner extends Executioner {
             //commands executed immediately
             execute(input);
         } else {
-            (nal ? tasks : concepts).putAsync(input);
+            if (nal) tasks.putAsync((NALTask)input);
+            else concepts.putAsync(input);
         }
     }
 

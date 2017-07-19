@@ -11,10 +11,7 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.control.Activate;
-import nars.task.Revision;
-import nars.task.SignalTask;
-import nars.task.Tasked;
-import nars.task.TruthPolation;
+import nars.task.*;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -165,17 +162,21 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         Spatialization<TaskRegion> model = new Spatialization<TaskRegion>((t -> t), Spatialization.DefaultSplits.AXIAL, 3, 4) {
 
             @Override
-            public void merge(TaskRegion found, TaskRegion incoming) {
+            public void merge(TaskRegion existing, TaskRegion incoming) {
 
-                if (found.task == incoming.task)
+                Task i = incoming.task;
+                Task e = existing.task;
+                if (e == i)
                     return; //same instance
 
-                float activation = incoming.task.priElseZero();
-                float before = found.task.priElseZero();
-                float after = found.task.priAdd(activation);
+                float activation = i.priElseZero();
+                float before = e.priElseZero();
+                float after = e.priAdd(activation);
                 activation = (after - before);
 
-                Activate.activate(found.task, activation, nar);
+                ((NALTask) e).merge(((NALTask) i));
+
+                Activate.activate(e, activation, nar);
             }
         };
 

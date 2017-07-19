@@ -58,19 +58,21 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     public static Activate activate(@NotNull Task t, float activation, TaskConcept origin, NAR n) {
 
 
-        if (activation >= EPSILON) {
+        if (activation < EPSILON) {
+            return null;
+        }
 
-            short[] x = t.cause();
-            int xl = x.length;
-            if (xl > 0) {
-                float taskValue = origin.valueIfProcessed(t, activation, n);
-                n.value(x, taskValue);
-            }
+        short[] x = t.cause();
+        int xl = x.length;
+        if (xl > 0) {
+            float taskValue = origin.valueIfProcessed(t, activation, n);
+            n.value(x, taskValue);
+        }
 
-            origin.tasklinks().putAsync(
-                    //new PLinkUntilDeleted<>(t, activation)
-                    new PLink<>(t, activation)
-            );
+        origin.tasklinks().putAsync(
+                //new PLinkUntilDeleted<>(t, activation)
+                new PLink<>(t, activation)
+        );
 
 
 //            if (origin instanceof CompoundConcept) {
@@ -80,14 +82,12 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //            } else {
 //                //atomic activation)
 
-            n.emotion.conceptActivations.increment();
-            return new Activate(origin, activation); /*, () -> {
+        n.emotion.conceptActivations.increment();
+        return new Activate(origin, activation); /*, () -> {
 
-                }*/
+            }*/
 //            }
-        }
 
-        return null;
     }
 
     public static void activate(@NotNull Task t, float activation, @NotNull NAR n) {

@@ -389,7 +389,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 if (revised == input) {
                     //already present duplicate, so ignore
                     return;
-                } else if (revised.equals(input)) {
+                } else if (revised.equals(input)) { //HACK todo avoid this duplcate equals which is already known from tryRevision
+
 //                    float maxActivation = 1f - revised.priSafe(0);
 //                    activation = Math.min(maxActivation, input.priSafe(0)); //absorb up to 1.0 max
                     float before = revised.priElseZero();
@@ -399,6 +400,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                     activated = revised;
                     activation = after - before; //use previous value
                     input.delete();
+
+                    ((NALTask)revised).merge(((NALTask)input));
                 } else {
                     //a novel revision
                     if (insert(revised)) {

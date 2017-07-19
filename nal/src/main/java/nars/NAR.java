@@ -645,9 +645,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         exe.run(x);
     }
 
+    /** pessimism */
     public float valueIfAccepted(@NotNull Task t, NAR n) {
         int vol = t.volume();
-        return -(vol)/n.termVolumeMax.floatValue()/1000f;
+        return -(vol)/n.termVolumeMax.floatValue()/500f;
     }
 
 

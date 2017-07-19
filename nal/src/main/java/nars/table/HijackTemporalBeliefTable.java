@@ -7,6 +7,7 @@ import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
 import nars.concept.TaskConcept;
+import nars.task.NALTask;
 import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Stamp;
@@ -393,6 +394,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     protected Task merge(@NotNull Task existing, @NotNull Task incoming, @Nullable MutableFloat overflowing) {
         //return super.merge(existing, incoming, overflowing);
         existing.priMax(incoming.priElseZero());
+        ((NALTask)existing).merge(((NALTask)incoming));
         return existing;
     }
 

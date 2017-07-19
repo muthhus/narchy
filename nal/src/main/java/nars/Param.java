@@ -64,8 +64,8 @@ public abstract class Param  {
     public static boolean CompoundDT_TermSharing = false;
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.98f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.98f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.995f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.92f, 0, 1f);
 
     /**
      * use this for advanced error checking, at the expense of lower performance.
@@ -139,10 +139,10 @@ public abstract class Param  {
     public static final int UnificationConstraintsMax = 8;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 128;
+    public final static int BeliefMatchTTL = 64;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTLMax = BeliefMatchTTL * 2;
+    public final static int UnificationTTLMax = BeliefMatchTTL * 3;
 
 
 
