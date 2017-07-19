@@ -254,16 +254,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return b.termsToSetRecurse(commonStructure, scratch, false);
     }
 
-    @NotNull
-    public static boolean isSubtermOfTheOther(@NotNull Term a, @NotNull Term b, boolean recurse, boolean excludeVariables) {
-
-        if ((excludeVariables) && (a instanceof Variable || b instanceof Variable))
-            return false;
-
-        return recurse ?
-                a.containsRecursively(b) || b.containsRecursively(a) :
-                a.contains(b) || b.contains(a);
-    }
 
 
     /**

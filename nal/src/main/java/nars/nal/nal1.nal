@@ -20,10 +20,11 @@
 
     // the second neqRCom() is to handle the Backward cases until a proper variable transform is implemented for those auto-generated rules
 
-    (A --> B), (B --> C), neqRCom(A,C)   |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Swap)
-    (A --> B), (A --> C), neqRCom(B,C)   |- (C --> B), (Belief:Abduction, Goal:Weak, Permute:Swap)
-    (A --> C), (B --> C), neqRCom(A,B)   |- (A --> B), (Belief:Induction, Goal:Weak, Permute:Swap)
-    (A --> B), (B --> C), neqRCom(A,C)   |- (C --> A), (Belief:Exemplification, Goal:Weak, Permute:Swap)
+    (A --> B), (B --> C), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
+        (A --> C), (B --> C), neqRCom(A,C)  |- (A --> C), (Punctuation:Question)
+    (A --> B), (A --> C), neqRCom(B,C)      |- (C --> B), (Belief:Abduction, Goal:Weak)
+    (A --> C), (B --> C), neqRCom(A,B)      |- (A --> B), (Belief:Induction, Goal:Weak)
+    (A --> B), (B --> C), neqRCom(A,C)      |- (C --> A), (Belief:Exemplification, Goal:Weak)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),

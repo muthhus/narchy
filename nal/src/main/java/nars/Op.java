@@ -983,7 +983,7 @@ public enum Op implements $ {
 //        }
     }
 
-    static final Predicate<Compound> nonProduct = c -> c.op() != PROD;
+    public static final Predicate<Compound> nonProduct = c -> c.op() != PROD;
 
     @NotNull
     static Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
