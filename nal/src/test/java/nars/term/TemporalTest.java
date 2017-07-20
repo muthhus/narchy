@@ -599,7 +599,7 @@ public class TemporalTest {
         Param.DEBUG = true;
         NAR n = new NARS().get();
         n.input("((x) ==>+5 (y)).", "((y) ==>-5 (x)).");
-        n.run(155);
+        n.run(1);
 
         TreeSet d = new TreeSet((x, y) -> x.toString().compareTo(y.toString()));
         n.forEachConceptActive(x -> d.add(x.get()));
@@ -608,7 +608,7 @@ public class TemporalTest {
         assertEquals(
                 //"[(#1==>x), (#1==>y), ((--,(y==>#1))&&(--,(#1==>y))), ((x==>#1)&&(#1==>x)), (x<=>y), (x==>#1), (x==>y), (y==>#1), (y==>x), x, y]"
                 //"[((x)<=>(y)), ((x)==>(y)), ((y)<=>(x)), ((y)==>(x)), (x), (y), x, y]"
-                "[((x) <=>+- (y)), ((x) ==>+- (y)), ((y) ==>+- (x)), (x), (y), x, y]"
+                "[((x) ==>+- (y)), ((y) ==>+- (x)), (x), (y), x, y]"
                 , d.toString());
     }
 
@@ -738,7 +738,9 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertEquals(n.terms.atemporalize($("(x && (w ==> z))")),
+        assertEquals("((x &&+1 z) ==>+1 w)",
+                $("(x &&+1 (z ==>+1 w))").toString());
+        assertEquals(n.terms.atemporalize($("((x &&+- z) ==>+- w)")),
                 n.terms.atemporalize($("(x &&+1 (z ==>+1 w))")));
     }
 

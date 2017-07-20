@@ -46,10 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -391,6 +388,29 @@ public interface Compound extends Term, IPair, TermContainer {
                         }
                         return (remain[0] > 0);
                     });
+            return u;
+        }
+    }
+    default Set<Term> varsUnique(@Nullable Op type, Set<Term> unlessHere) {
+        int num = vars(type);
+        if (num == 0)
+            return null;
+        else {
+            //must check all in case of repeats
+            MutableSet<Term> u = new UnifiedSet(num);
+            final int[] remain = {num};
+
+            recurseTerms(parent -> vars(type) > 0,
+                    (sub) -> {
+                        if (sub.op() == type) {
+                            if (!unlessHere.contains(sub))
+                                u.add(sub);
+                            remain[0]--;
+                        }
+                        return (remain[0] > 0);
+                    });
+            if (u.isEmpty())
+                return null;
             return u;
         }
     }

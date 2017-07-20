@@ -439,8 +439,12 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return this;
     }
 
-    default Set<Term> varsUnique(@Nullable Op type) {
-        return Collections.emptySet();
+    /** return null if none, cheaper than using an empty iterator */
+    @Nullable default Set<Term> varsUnique(@Nullable Op type) {
+        return null;
+    }
+    @Nullable default Set<Term> varsUnique(@Nullable Op type, Set<Term> exceptIfHere) {
+        return null;
     }
 
 }

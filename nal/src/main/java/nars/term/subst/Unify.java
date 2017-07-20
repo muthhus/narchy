@@ -1,6 +1,7 @@
 package nars.term.subst;
 
 import jcog.Util;
+import jcog.data.UnenforcedConcatSet;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
@@ -20,13 +21,12 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static nars.Op.Null;
 import static nars.Param.TTL_UNIFY;
 import static nars.Param.UnificationConstraintsInitialCapacity;
+import static jcog.data.UnenforcedConcatSet.emptySet;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -74,7 +74,6 @@ public abstract class Unify extends Versioning implements Subst {
     public int dur = -1;
 
 
-
     /**
      * free variables remaining unassigned, for counting
      */
@@ -87,7 +86,6 @@ public abstract class Unify extends Versioning implements Subst {
     protected Unify(@Nullable Op type, Random random, int stackMax, int ttl) {
         this($.terms, type, random, stackMax, ttl);
     }
-
 
 
     /**
@@ -116,7 +114,6 @@ public abstract class Unify extends Versioning implements Subst {
     public final boolean use(int cost) {
         return ((ttl -= cost) > 0);
     }
-
 
 
     /**
@@ -159,34 +156,41 @@ public abstract class Unify extends Versioning implements Subst {
      */
     public void unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
+        free.set(freeVariables(x)); //plus and not equals because this may continue from another unification!!!!!
 
-
-        Set<Term> newFree = x.varsUnique(type);
-        Set<Term> oldFree = free.get();
-        if (oldFree != null) {
-            if (!newFree.isEmpty())
-                newFree.addAll(oldFree);
-            else
-                newFree = oldFree;
-        }
-        free.set(newFree); //plus and not equals because this may continue from another unification!!!!!
         //assert (unassigned.isEmpty() ) : "non-purposeful unification";
         //this.freeCount.add( newFree.size() );
 
         if (unify(x, y)) {
-
             if (finish) {
-
                 tryMatches();
-
             }
-
         }
 
-//        } catch (Throwable e) {
-//            if (Param.DEBUG)
-//                logger.error("{}", e);
-//        }
+    }
+
+    /**
+     * computes a lazy set with the new free variables added by the incoming term, to continue
+     * from a previous partial unification if necessary.
+     */
+    Set<Term> freeVariables(@NotNull Term x) {
+        Set<Term> oldFree = free.get();
+        Set<Term> newFree = oldFree != null ? x.varsUnique(type, oldFree) : x.varsUnique(type);
+        Set<Term> nextFree;
+        boolean oldIsNull = oldFree == null || oldFree == emptySet;
+        if (newFree == null && (oldIsNull)) {
+            nextFree = emptySet;
+        }
+        if (newFree == null) {
+            nextFree = oldFree;
+        } else {
+            if (oldIsNull) {
+                nextFree = newFree;
+            } else {
+                nextFree = new UnenforcedConcatSet<>(oldFree, newFree);
+            }
+        }
+        return nextFree;
     }
 
     public void tryMatches() {
@@ -234,7 +238,7 @@ public abstract class Unify extends Versioning implements Subst {
 //        }
 
         for (Term f : free.get())
-            if (xy(f)==null)
+            if (xy(f) == null)
                 return;
 
 //        if (!matched.add(((ConstrainedVersionMap)xy).snapshot()))

@@ -230,6 +230,11 @@ public class ProxyTerm<T extends Term> implements Term, NonInternable {
     }
 
     @Override
+    public @Nullable Set<Term> varsUnique(@Nullable Op type, Set<Term> exceptIfHere) {
+        return ref.varsUnique(type, exceptIfHere);
+    }
+
+    @Override
     public int size() {
         return ref.size();
     }
