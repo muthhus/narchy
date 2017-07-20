@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -224,7 +225,7 @@ public class ProxyTerm<T extends Term> implements Term, NonInternable {
     }
 
     @Override
-    public int varsUnique(@NotNull Op type) {
+    public Set<Term> varsUnique(@NotNull Op type) {
         return ref.varsUnique(type);
     }
 

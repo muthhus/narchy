@@ -43,7 +43,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -437,8 +439,8 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return this;
     }
 
-    default int varsUnique(@Nullable Op type) {
-        return 0;
+    default Set<Term> varsUnique(@Nullable Op type) {
+        return Collections.emptySet();
     }
 
 }

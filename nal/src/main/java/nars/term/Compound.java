@@ -55,6 +55,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static java.util.Collections.emptySet;
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
@@ -373,10 +374,10 @@ public interface Compound extends Term, IPair, TermContainer {
 //                    :
 //                (hasAny(type));
 //    }
-    default int varsUnique(@Nullable Op type) {
+    default Set<Term> varsUnique(@Nullable Op type) {
         int num = vars(type);
-        if (num <= 1)
-            return num;
+        if (num == 0)
+            return emptySet();
         else {
             //must check all in case of repeats
             Set<Term> u = new UnifiedSet(num);
@@ -390,7 +391,7 @@ public interface Compound extends Term, IPair, TermContainer {
                         }
                         return (remain[0] > 0);
                     });
-            return u.size();
+            return u;
         }
     }
 
@@ -437,7 +438,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if (isCommutative()) {
                 return xsubs.unifyCommute(ysubs, subst);
             } else {
-                return xsubs.equals(ysubs) || xsubs.unifyLinear(ysubs, subst);
+                return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
             }
 
         } /*else if (ty instanceof Abbreviation.AliasConcept) {

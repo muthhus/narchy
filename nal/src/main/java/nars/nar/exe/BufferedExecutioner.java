@@ -36,7 +36,7 @@ public class BufferedExecutioner extends Executioner {
      * TODO make this automatically controlled according to the
      * input task load that occurred while it was firing
      */
-    int inputsPerFire = 24;
+    int inputsPerFire = 32;
 
 
     //    private final DisruptorBlockingQueue<ITask> overflow;

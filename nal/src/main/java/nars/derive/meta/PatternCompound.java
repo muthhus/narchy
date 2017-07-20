@@ -40,6 +40,10 @@ abstract public class PatternCompound extends GenericCompoundDT   {
         commutativeCached = super.isCommutative();
     }
 
+    @Override
+    public final boolean equals(Object obj) {
+        return Compound.equals(this, obj);
+    }
 
     @Override
     public boolean isCommutative() {

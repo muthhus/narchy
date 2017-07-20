@@ -23,7 +23,7 @@ public class GenericCompoundDT extends ProxyCompound {
     public GenericCompoundDT(Compound base, int dt) {
         super(base);
 
-        assert dt != DTERNAL || this instanceof PatternCompound : "use GenericCompound if dt==DTERNAL";
+
 
         if (Param.DEBUG) {
 
@@ -38,7 +38,10 @@ public class GenericCompoundDT extends ProxyCompound {
         }
 
         this.dt = dt;
-        this.hashDT = Util.hashCombine(base.hashCode(), dt);
+
+        assert dt != DTERNAL || this instanceof PatternCompound : "use GenericCompound if dt==DTERNAL";
+        int baseHash = base.hashCode();
+        this.hashDT = dt!=DTERNAL ? Util.hashCombine(baseHash, dt) : baseHash;
     }
 
     @Override

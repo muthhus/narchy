@@ -135,9 +135,9 @@ public abstract class Param  {
     public static final int STAMP_CAPACITY = 10;
     public static final int CAUSE_CAPACITY = 16;
 
-    public final static int UnificationStackMax = 32; //how many assignments can be stored in the 'versioning' maps
+    public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
     public static final int UnificationConstraintsInitialCapacity = 1; //>=1
-    public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
+    public static final int UnificationVariableStackInitial = 32; //how many rewrites a variable is allowed
 
     public final static int BeliefMatchTTL = 64;
 

@@ -20,7 +20,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
 
     public VersionMap(Versioning context, int elementStackSizeDefault) {
         this(context,
-                new HashMap(elementStackSizeDefault)
+                new HashMap()
                 //new LinkedHashMap<>(elementStackSizeDefault)
                 //new UnifiedMap(elementStackSizeDefault)
                 , elementStackSizeDefault

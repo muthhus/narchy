@@ -36,11 +36,7 @@ public class TrieDeriverTest {
 
     }
 
-    @Test public void testPatternCompoundWithXTERNAL() throws Narsese.NarseseException {
-        Compound p = (Compound) new PatternTermIndex().get($("((x) ==>+- (y))"), true).term();
-        assertEquals(PatternCompound.PatternCompoundSimple.class, p.getClass());
-        assertEquals(XTERNAL, p.dt());
-    }
+
 
 //    @Test public void printRuleSet() {
 //

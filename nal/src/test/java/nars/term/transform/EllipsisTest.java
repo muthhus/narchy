@@ -381,6 +381,7 @@ public class EllipsisTest {
             }
         }
     }
+
     @Test public void testEllipsisMatchCommutive2_empty() throws Narsese.NarseseException {
         for (String e : new String[] { "%1..*" }) {
             for (String[] s : new String[][] { p("(", ")") }) {
@@ -391,7 +392,6 @@ public class EllipsisTest {
 
     static void testCombinations(Compound X, @NotNull Compound Y, int expect) {
         X = new PatternTermIndex().pattern(X);
-        //Y = (Compound) new PatternIndex().the(Y).term();
 
         for (int seed = 0; seed < 3 /*expect*5*/; seed++) {
 

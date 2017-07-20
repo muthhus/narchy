@@ -1,9 +1,15 @@
 package nars.term.var;
 
 import nars.Op;
+import nars.term.Term;
 import nars.term.atom.Atomic;
+import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
+
+import static java.util.Collections.emptySet;
 
 /**
  * similar to a plain atom, but applies altered operating semantics according to the specific
@@ -46,8 +52,8 @@ public interface Variable extends Atomic {
 
 
     @Override
-    default int varsUnique(@Nullable Op type) {
-        return (type == null) ? 1 : ((op() == type) ? 1 : 0);
+    default Set<Term> varsUnique(@Nullable Op type) {
+        return (type == null) ? Sets.mutable.of(this) : ((op() == type) ? Sets.mutable.of(this) : emptySet());
     }
 
     @Override

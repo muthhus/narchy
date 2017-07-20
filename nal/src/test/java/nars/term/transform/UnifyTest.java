@@ -130,6 +130,7 @@ public class UnifyTest {
                     setTTL(0);//die
                 }
             };
+
             sub.unifyAll(t1.term(), t2.term());
 
             sub.revert(0); //for testing

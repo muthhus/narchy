@@ -146,6 +146,8 @@ public class TermutatorTest {
 
         unifier.setTTL(TTL);
 
+        unifier.unassigned = Integer.MAX_VALUE; //MOCK
+
         t.mutate(unifier, new Termutator[] { t,  new Termutator() {
 
             @Override public void mutate(@NotNull Unify f, Termutator[] chain, int current) {

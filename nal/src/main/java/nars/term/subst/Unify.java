@@ -76,10 +76,10 @@ public abstract class Unify implements Subst {
     public int ttl;
 
     /**
-     * counter of how many free variables remain unassigned
+     * free variables remaining unassigned, for counting
      */
-
-    protected int unassigned;
+    protected Versioned<Set<Term>> free;
+    public int unassigned;
     //protected final Set<NewCompound> matched = new HashSet();
 
 
@@ -133,7 +133,8 @@ public abstract class Unify implements Subst {
 
         this.versioning = versioning;
 
-        xy = new ConstrainedVersionMap(versioning, Param.UnificationVariableStackMax);
+        xy = new ConstrainedVersionMap(versioning, Param.UnificationVariableStackInitial);
+        this.free = new Versioned<>(versioning, 8);
 
     }
 
@@ -184,25 +185,29 @@ public abstract class Unify implements Subst {
     public void unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
 
-        int unassignedBefore = unassigned;
 
-        unassigned += x.varsUnique(type); //plus and not equals because this may continue from another unification!!!!!
-        //assert (unassigned > 0) : "non-purposeful unification";
+        Set<Term> newFree = x.varsUnique(type);
+        Set<Term> oldFree = free.get();
+        if (oldFree != null) {
+            if (!newFree.isEmpty())
+                newFree.addAll(oldFree);
+            else
+                newFree = oldFree;
+        }
+        free.set(newFree); //plus and not equals because this may continue from another unification!!!!!
+        //assert (unassigned.isEmpty() ) : "non-purposeful unification";
+        this.unassigned = newFree.size();
 
-        try {
-            if (unify(x, y)) {
+        if (unify(x, y)) {
 
-                if (finish) {
+            if (finish) {
 
-                    tryMatches();
-
-                }
+                tryMatches();
 
             }
-        } finally {
-            if (finish)
-                this.unassigned = unassignedBefore;
+
         }
+
 //        } catch (Throwable e) {
 //            if (Param.DEBUG)
 //                logger.error("{}", e);
@@ -277,12 +282,16 @@ public abstract class Unify implements Subst {
         return use(TTL_UNIFY) && x.unify(y, this);
     }
 
-    /** whether the term is assignable */
+    /**
+     * whether the term is assignable
+     */
     public final boolean matchType(@NotNull Term y) {
         return matchType(y.op());
     }
 
-    /** whether the op is assignable */
+    /**
+     * whether the op is assignable
+     */
     public final boolean matchType(@NotNull Op oy) {
         Op t = this.type;
         return t == null ?
@@ -354,7 +363,7 @@ public abstract class Unify implements Subst {
             if (super.tryPut(key, value)) {
                 if (matchType(key)) {
                     unassigned--;
-                    assert(unassigned>=0);
+                    assert (unassigned >= 0);
                 }
                 return true;
             }
@@ -369,7 +378,7 @@ public abstract class Unify implements Subst {
 
         public NewCompound snapshot() {
             NewCompound s = new NewCompound(null, xy.map.size() * 2);
-            xy.forEach((x,y)->{
+            xy.forEach((x, y) -> {
                 s.add(x);
                 if (y == null)
                     y = Null; //HACK this should have been handled by the variable count
@@ -381,10 +390,14 @@ public abstract class Unify implements Subst {
 
     final class ConstrainedVersionedTerm extends Versioned<Term> {
 
-        /** whether this is a for a matched variable type, so when popped we can decrement the assigned count */
+        /**
+         * whether this is a for a matched variable type, so when popped we can decrement the assigned count
+         */
         private final boolean forMatchedType;
 
-        /** lazyily constructed */
+        /**
+         * lazyily constructed
+         */
         Versioned<MatchConstraint> constraints = null;
 
 //        /**
@@ -394,7 +407,7 @@ public abstract class Unify implements Subst {
 //        Versioned<MatchConstraint> fastConstraints = null;
 
         ConstrainedVersionedTerm(boolean forMatchedType) {
-            super(versioning, Param.UnificationVariableStackMax);
+            super(versioning, Param.UnificationVariableStackInitial);
             this.forMatchedType = forMatchedType;
         }
 
@@ -402,7 +415,7 @@ public abstract class Unify implements Subst {
         public void pop() {
             if (forMatchedType) {
                 if (get() != null) {
-                    unassigned++;
+                    unassigned++; //relase assigned variable
                 }
             }
 
@@ -438,7 +451,6 @@ public abstract class Unify implements Subst {
 
             return constraints.set(m) != null;
         }
-
 
 
 //
