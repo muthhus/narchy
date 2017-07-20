@@ -12,6 +12,7 @@
     //nature of such a rule."
 
     (M ==> P), (S ==> M), neqCom(P,S), time(dtSum), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
+        (S ==> P), (S ==> M), neqCom(P,S), time(dtSum), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Punctuation:Question)
 
     (P ==> M), (S ==> M), neqCom(P,S), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction)
 

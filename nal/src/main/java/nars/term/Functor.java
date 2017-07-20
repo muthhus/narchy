@@ -8,6 +8,7 @@ import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.index.term.NonInternable;
 import nars.term.atom.Atom;
+import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -92,7 +93,10 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
 
     public @NotNull
     static <X extends Term> Function<Term, Term> safeFunctor(@NotNull Function<X, Term> ff) {
-        return x -> (x==null || x instanceof Variable) ? null : ff.apply((X) x);
+        return x ->
+                (x==null || x instanceof Variable) ? null
+                :
+                ff.apply((X) x);
     }
 
     /** a functor involving a concept resolved by the 1st argument term */

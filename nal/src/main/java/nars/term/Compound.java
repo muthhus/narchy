@@ -240,7 +240,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, @Nullable Compound parent) {
-        if (parentsMust.test(this )) {
+        if (parentsMust.test(this)) {
             return subterms().recurseTerms(parentsMust, whileTrue, this);
         }
         return false;
@@ -360,14 +360,14 @@ public interface Compound extends Term, IPair, TermContainer {
         return appendTo;
     }
 
-//    /** weather the given term has any potential free variables that could be assigned in unification */
+    //    /** weather the given term has any potential free variables that could be assigned in unification */
 //    default boolean freeVars(@Nullable Op type) {
 //        return type == null ?
 //                (volume() > complexity()) /* any variable, including pattern */
 //                    :
 //                (hasAny(type));
 //    }
-  default int varsUnique(@Nullable Op type) {
+    default int varsUnique(@Nullable Op type) {
         int num = vars(type);
         if (num <= 1)
             return num;
@@ -376,17 +376,18 @@ public interface Compound extends Term, IPair, TermContainer {
             Set<Term> u = new UnifiedSet(num);
             final int[] remain = {num};
 
-            recurseTerms(parent -> vars(type)>0,
-                (sub) -> {
-                    if (sub.op() == type) {
-                        u.add(sub);
-                        remain[0]--;
-                    }
-                    return (remain[0] > 0);
-            });
+            recurseTerms(parent -> vars(type) > 0,
+                    (sub) -> {
+                        if (sub.op() == type) {
+                            u.add(sub);
+                            remain[0]--;
+                        }
+                        return (remain[0] > 0);
+                    });
             return u.size();
         }
     }
+
     /**
      * unification matching entry point (default implementation)
      *
@@ -701,7 +702,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if ((nextDT != XTERNAL && !concurrent(nextDT)) && size() > 2)
                 return Null; //tried to temporalize what can only be commutive
 
-            if (nextDT!=DTERNAL)
+            if (nextDT != DTERNAL)
                 return new GenericCompoundDT(b, nextDT);
             else {
                 return op.the(nextDT, toArray());
@@ -963,45 +964,46 @@ public interface Compound extends Term, IPair, TermContainer {
         }
 
 
-        //recursively compute contained subterm functors
-        if (o == INH) {
-            Term possibleArgs = xy[0];
-            if (possibleArgs instanceof Compound && possibleArgs.op() == PROD) {
-                Term possibleFunc = xy[1];
-                if (possibleFunc instanceof Atomic && possibleFunc.op() == ATOM) {
-                    Atomic ff = (Atomic) index.getIfPresentElse(possibleFunc);
-                    if (ff instanceof Functor) {
-                        Term t = ((Functor) ff).apply(((Compound) possibleArgs).subterms());
-                        if (t != null)
-                            return t;
-                    }
-                }
-            }
-        }
-
-        if (!subsModified)
-            return this;
-
-
         Term u;
         if (subsModified) {
             u = o.the(dt(), xy);
             if (!(u instanceof Compound))
                 return u; //atomic, including Bool short-circuits on invalid term
         } else {
-            return this;
+            u = this;
         }
 
+        //recursively compute contained subterm functors
+        if (u.op() == INH && u.size() == 2) {
+            Term possibleArgs = u.sub(0, null);
+            if (possibleArgs instanceof Compound && possibleArgs.op() == PROD) {
+                Term possibleFunc = u.sub(1, null);
+                if (possibleFunc instanceof Atomic && possibleFunc.op() == ATOM) {
+                    Atomic ff = (Atomic) index.getIfPresentElse(possibleFunc);
+                    if (ff instanceof Functor) {
+                        u = ((Functor) ff).apply(((Compound) possibleArgs).subterms());
+                        if (u == null)
+                            u = this; //null means to keep the same
+                    }
+                }
+            }
+        }
 
-        if (u.equals(this))
+        if (!(u instanceof Compound))
+            return u; //atomic, including Bool short-circuits on invalid term
+
+        if (u.equals(this)) {
             return this;
+        } else {
 
-        try {
-            return u.eval(index);
-        } catch (StackOverflowError e) {
-            logger.error("eval stack overflow: {} -> {}", this, u);
-            return Null;
-            //throw new RuntimeException("stack overflow on eval : " + t);
+            //it has been changed, so eval recursively until stable
+            try {
+                return u.eval(index);
+            } catch (StackOverflowError e) {
+                logger.error("eval stack overflow: {} -> {}", this, u);
+                return Null;
+                //throw new RuntimeException("stack overflow on eval : " + t);
+            }
         }
     }
 

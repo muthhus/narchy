@@ -65,7 +65,7 @@ abstract public class Bool extends AtomicToString {
 
     @Override
     public Term eval(TermContext index) {
-        throw never("eval");
+        return this;
     }
 
     @Override
