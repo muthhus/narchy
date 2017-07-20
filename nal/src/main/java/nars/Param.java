@@ -138,7 +138,7 @@ public abstract class Param  {
 
     public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
 
-    public final static int BeliefMatchTTL = 16;
+    public final static int BeliefMatchTTL = 64;
     public static final int UnificationVariableCapInitial = 8;
 
     /** 'time to live', unification steps until unification is stopped */

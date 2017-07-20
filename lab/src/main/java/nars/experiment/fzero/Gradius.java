@@ -7,6 +7,7 @@ import nars.NAgentX;
 import nars.Narsese;
 import nars.term.atom.Atomic;
 import nars.video.BufferedImageBitmap2D;
+import nars.video.PixelBag;
 import nars.video.Scale;
 
 import static nars.video.BufferedImageBitmap2D.ColorMode.R;
@@ -25,11 +26,11 @@ public class Gradius extends NAgentX {
 
         g.updateMS = 8;
 
-        //Scale cc = new Scale(() -> g.image, 96, 96);
-        //senseCamera("(G)", cc);
+        BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
+        senseCamera("(G)", cc);
 
-        //PixelBag cc = PixelBag.of(camScale, 64, 64);
-        //cc.setClarity(0.5f, 0.9f);
+//        PixelBag cc = PixelBag.of(() -> g.image, 64, 64);
+//        cc.setClarity(0.5f, 0.9f);
 
 
 //        //TODO fix the panning/zooming
@@ -52,17 +53,18 @@ public class Gradius extends NAgentX {
 
         //nar.truthResolution.setValue(0.05f);
 
-        BufferedImageBitmap2D camScaleLow = new Scale(() -> g.image, 24, 24);
-        for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[]{
-                R,
-                BufferedImageBitmap2D.ColorMode.B,
-                BufferedImageBitmap2D.ColorMode.G
-        }) {
-            senseCamera("Gc" + cm.name(), /*"(G,c" + cm.name() + ")"*/
-                    //(cm == R ? camScale : camScaleLow).filter(cm)
-                    camScaleLow.filter(cm).blur()
-            ).resolution(0.1f);
-        }
+//        BufferedImageBitmap2D camScaleLow = new Scale(() -> g.image, 16, 16);
+//        for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[]{
+//                R,
+//                BufferedImageBitmap2D.ColorMode.B,
+//                BufferedImageBitmap2D.ColorMode.G
+//        }) {
+//            senseCamera("Gc" + cm.name(), /*"(G,c" + cm.name() + ")"*/
+//                    //(cm == R ? camScale : camScaleLow).filter(cm)
+//                    camScaleLow.filter(cm).blur()
+//            ).resolution(0.05f);
+//        }
+
 
         actionToggle($.inh(Atomic.the("fire"), id),
                 (b) -> g.keys[Gradius4K.VK_SHOOT] = b);

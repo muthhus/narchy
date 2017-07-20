@@ -37,6 +37,8 @@ public class ArrayPool<T> extends FasterList {
 
     private static final ThreadLocal<ArrayPool<byte[]>> bytes =
             ThreadLocal.withInitial(() -> new ArrayPool(byte[].class));
+    private static final ThreadLocal<ArrayPool<short[]>> shorts =
+            ThreadLocal.withInitial(() -> new ArrayPool(short[].class));
 
     private static final ThreadLocal<Map<Class, ArrayPool>> typed = ThreadLocal.withInitial(HashMap::new);
 
@@ -59,6 +61,9 @@ public class ArrayPool<T> extends FasterList {
 
     public static ArrayPool<byte[]> bytes() {
         return bytes.get();
+    }
+    public static ArrayPool<short[]> shorts() {
+        return shorts.get();
     }
 
     @Deprecated
@@ -99,6 +104,8 @@ public class ArrayPool<T> extends FasterList {
         if (this.primitive) {
             if (componentType == byte.class) {
                 comparator = new ByteArrayLengthMatcher();
+            } else if (componentType == short.class) {
+                comparator = new ShortArrayLengthMatcher();
             } else {
                 throw new UnsupportedOperationException("TODO " + componentType);
             }
@@ -183,6 +190,11 @@ public class ArrayPool<T> extends FasterList {
     private static class ByteArrayLengthMatcher extends ArrayLengthMatcher {
         @Override final int len(Object o) {
             return ((byte[])o).length;
+        }
+    }
+    private static class ShortArrayLengthMatcher extends ArrayLengthMatcher {
+        @Override final int len(Object o) {
+            return ((short[])o).length;
         }
     }
 }

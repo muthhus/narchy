@@ -45,7 +45,7 @@ public class Gradius4K extends GamePanel implements Runnable {
     public static final int VK_SHOOT = 0x42;
     public int score = 0;
     public int playerDead = 1;
-    public int SPEED = 1;
+    public int SPEED = 4;
     public float cameraX = 0;
     public float[] player = new float[256];
 
@@ -114,7 +114,8 @@ public class Gradius4K extends GamePanel implements Runnable {
 
         int playerShootDelay = 0;
         int fireworks = 0;
-        int level = 0;
+        int level = 1;
+        int playerGun = 2;
         int i = 0;
         int j = 0;
         int k = 0;
@@ -124,7 +125,6 @@ public class Gradius4K extends GamePanel implements Runnable {
         int s = 0;
         int v = 0;
         int counter = 0;
-        int playerGun = 1;
 
         float dx = 0;
         float dy = 0;
@@ -132,7 +132,7 @@ public class Gradius4K extends GamePanel implements Runnable {
 
         float cameraVx = 0;
 
-        boolean bossMode = true;
+        boolean bossMode = false;
 
         Graphics2D g2 = null;
         int[][] levelMap = null;

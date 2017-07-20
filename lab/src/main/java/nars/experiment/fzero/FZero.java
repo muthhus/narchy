@@ -8,6 +8,8 @@ import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.term.atom.Atomic.the;
+
 /**
  * Created by me on 3/21/17.
  */
@@ -17,7 +19,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
 
-        float fps = 10f;
+        float fps = 15f;
 
 
         NAgentX.runRT((n)->{
@@ -44,18 +46,18 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", new Scale(() -> fz.image, 24, 24).blur())
-                .resolution(0.05f);
+        senseCamera("fz", new Scale(() -> fz.image, 32, 24).blur())
+                .resolution(0.1f);
 
 
-        actionBipolar($.inh(Atomic.the("fwd"), id), (f) -> {
+        actionBipolar($.inh(the("fwd"), id), (f) -> {
             fz.vehicleMetrics[0][6] += (f) * 1f;
             return f;
-        }).resolution.setValue(0.01f);
-        actionBipolar($.inh(Atomic.the("rot"), id), (r) -> {
+        }).resolution.setValue(0.02f);
+        actionBipolar($.inh(the("rot"), id), (r) -> {
             fz.playerAngle += (r*r*r) * 0.35f;
             return r;
-        }).resolution.setValue(0.01f);
+        }).resolution.setValue(0.02f);
 
         //keyboard-ish controls:
 //actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );
@@ -67,12 +69,12 @@ public class FZero extends NAgentX {
 //            }
 //        });
 
-        senseNumberDifference($.inh(Atomic.the("joy"), id), happy).resolution.setValue(0.2f);
-        senseNumberDifference($.inh(Atomic.the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.1f);
-        senseNumberDifference($.inh(Atomic.the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.1f);
-        senseNumber($.inh(Atomic.the("ang"), id), new FloatNormalized(() ->
+        senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
+        senseNumberDifference($.inh(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
+        senseNumberDifference($.inh(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
+        senseNumber($.inh(the("ang"), id), new FloatNormalized(() ->
                 (float) MathUtils.normalizeAngle(fz.playerAngle, Math.PI) / (Math.PI*2))
-        ).resolution(0.1f);
+        ).resolution(0.02f);
 
         //nar.mix.stream("Derive").setValue(1);
         //implAccelerator(nar, this);

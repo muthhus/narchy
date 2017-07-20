@@ -209,7 +209,7 @@ abstract public class NAgentX extends NAgent {
         int s = nar.causeValue.size();
         return new MatrixView((i) ->
                 nar.causeValue.get(i).value(),
-                s, (int) Math.max(1, Math.sqrt(s)), bipolar1);
+                s,  Math.max(1, (int)Math.round(Math.sqrt(s)) ), bipolar1);
     }
 
     private static void chart(NAR n, NAgent a) {

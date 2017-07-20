@@ -109,6 +109,13 @@ public class FasterList<X> extends FastList<X> {
         return items[index];
         //}
     }
+    @Nullable public final X getSafe(int index) {
+        if (index >= 0 && index < this.size) {
+            return items[index];
+        } else {
+            return null;
+        }
+    }
 
 
 //    public final boolean addIfCapacity(X newItem) {

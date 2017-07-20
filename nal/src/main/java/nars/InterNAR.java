@@ -5,6 +5,7 @@ import jcog.net.UDPeer;
 import jcog.pri.PriReference;
 import jcog.pri.mix.PSink;
 import nars.bag.leak.LeakOut;
+import nars.control.CauseChannel;
 import nars.task.ITask;
 import nars.task.LambdaQuestionTask;
 import org.jetbrains.annotations.NotNull;
@@ -30,7 +31,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 
     public final NAR nar;
     public final LeakOut out;
-    private final PSink<ITask, ITask> receive;
+    private final CauseChannel<ITask> receive;
 
 
     public InterNAR(NAR nar) throws IOException {

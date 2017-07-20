@@ -14,7 +14,6 @@ import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
-import jcog.pri.mix.PSink;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
@@ -22,6 +21,7 @@ import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.control.Activate;
 import nars.control.Cause;
+import nars.control.CauseChannel;
 import nars.control.premise.Derivation;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
@@ -67,10 +67,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static nars.$.$;
@@ -136,7 +133,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     protected final NARLoop loop = new NARLoop(this);
 
+
     private PrediTerm<Derivation> deriver;
+
 
     /**
      * creates a snapshot statistics object
@@ -214,12 +213,17 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         //x.put("termlink usage", ((double) termlinkCount.getTotalCount()) / termlinksCap.getSum());
         x.put("termlink count", ((double) termlinkCount.getTotalCount()));
 
-        DoubleSummaryStatistics values = new DoubleSummaryStatistics();
-        causeValue.forEach(c -> values.accept(c.value()));
-        x.put("values mean", values.getAverage());
-        x.put("values min", values.getMin());
-        x.put("values max", values.getMax());
-        x.put("values count", values.getCount());
+        DoubleSummaryStatistics pos = new DoubleSummaryStatistics();
+        DoubleSummaryStatistics neg = new DoubleSummaryStatistics();
+        causeValue.forEach(c -> pos.accept( c.pos() ));
+        causeValue.forEach(c -> neg.accept( c.neg() ));
+        x.put("value count", pos.getCount());
+        x.put("value pos mean", pos.getAverage());
+        x.put("value pos min", pos.getMin());
+        x.put("value pos max", pos.getMax());
+        x.put("value neg mean", neg.getAverage());
+        x.put("value neg min", neg.getMin());
+        x.put("value neg max", neg.getMax());
 
 
         //x.put("volume mean", volume.);
@@ -279,29 +283,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public PSink<ITask, ITask> newInputChannel(Object id) {
 
-        Cause c = newCause(id);
-        short ci = c.id;
-        short[] cs = new short[]{ci};
-
-        return new PSink<ITask, ITask>(id, this::input) {
-            @Override
-            public ITask apply(ITask x) {
-                if (x instanceof NALTask) {
-                    //assert (((NALTask) x.ref).cause.length == 0);
-                    NALTask t = (NALTask) x;
-                    if (t.cause == null || t.cause.length == 0)
-                        t.cause = cs; //.clone();
-                    else {
-                        if (!ArrayUtils.contains(t.cause, ci)) //in case the same task is input repeatedly, dont add the same cause
-                            t.cause = ArrayUtils.add(t.cause, 0 /* prepend */, ci);
-                    }
-                }
-                return x;
-            }
-        };
-    }
 
 
     /**
@@ -640,7 +622,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public void input(@NotNull ITask x) {
 
 
-        if (x instanceof Task) {
+        if (x instanceof Task && !((Task) x).isCommand()) {
             Task t = (Task) x;
             float tp = evaluate(t);
             if (tp!=tp || tp < Pri.EPSILON)
@@ -1713,8 +1695,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * returns NaN possibly
      * */
     public float evaluate(Task x) {
-        short[] causes = ((Task) x).cause();
-        float gain = evaluate(causes);
+
+        float gain = evaluate(x, x.cause(), taskCauses.get(x));
         assert(gain==gain);
         if (gain != 0) {
 
@@ -1729,29 +1711,114 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
+    /** bins a range of values into N equal levels */
+    public static class ChannelRange<X extends Priority> {
+        public final float min, max;
+        public final Cause[] levels;
+        transient private final float range ; //cache
+
+        public ChannelRange(String id, int levels, Function<Object,CauseChannel<X>> src, float min, float max) {
+            this.min = min; this.max = max; assert(max > min);
+            this.range = max - min; assert(range > Pri.EPSILON);
+            this.levels = Util.map(0, levels,  (l) -> src.apply(id + l), Cause[]::new);
+        }
+
+        public Cause get(float value) {
+            return levels[ Util.bin( Util.unitize((value - min)/range), levels.length ) ];
+        }
+    }
+
+    private final ImplicitTaskCauses taskCauses = new ImplicitTaskCauses(this);
+
+    static class ImplicitTaskCauses {
+
+        public final Cause causeBelief, causeGoal, causeQuestion, causeQuest;
+        public final Cause causePast, causePresent, causeFuture, causeEternal;
+        public final ChannelRange causeConf, causeFreq;
+        public final NAR nar;
+
+        ImplicitTaskCauses(NAR nar) {
+            this.nar = nar;
+            causeBelief = nar.newChannel(BELIEF);
+            causeGoal = nar.newChannel(GOAL);
+            causeQuestion = nar.newChannel(QUESTION);
+            causeQuest = nar.newChannel(QUESTION);
+            causePast = nar.newChannel("Past");
+            causeEternal = nar.newChannel("Eternal");
+            causePresent = nar.newChannel("Present");
+            causeFuture = nar.newChannel("Future");
+            causeConf = new ChannelRange("conf", 8, nar::newChannel, 0f, 1f);
+            causeFreq = new ChannelRange("freq", 8, nar::newChannel, 0f, 1f);
+        }
+
+        /**
+         * classifies the implicit / self-evident causes a task
+         */
+        public short[] get(Task x) {
+            //short[] ii = ArrayPool.shorts().getExact(8);
+
+            short time;
+            if (x.isEternal())
+                time = causeEternal.id;
+            else {
+                long now = nar.time();
+                long then = x.nearestTimeTo(now);
+                if (Math.abs(now - then) <= nar.dur())
+                    time = causePresent.id;
+                else if (then > now)
+                    time = causeFuture.id;
+                else
+                    time = causePast.id;
+            }
+
+            short punc;
+            switch (x.punc()) {
+                case BELIEF: punc = causeBelief.id; break;
+                case GOAL: punc = causeGoal.id; break;
+                case QUESTION: punc = causeQuestion.id; break;
+                case QUEST: punc = causeQuest.id; break;
+                default:
+                    throw new UnsupportedOperationException();
+            }
+            if (x.isBeliefOrGoal()) {
+                short freq = causeFreq.get(x.freq()).id;
+                short conf = causeConf.get(x.conf()).id;
+                return new short[] { time, punc, freq, conf };
+            } else {
+                return new short[] { time, punc };
+            }
+        }
+
+    }
+
+
     /**
      * estimate the value of a cause trace
      */
-    public float evaluate(short[] causes) {
+    protected float evaluate(Task x, short[]... causes) {
 
         float boost = 0;
 
         //value *= activation; //weight the apparent value by its incoming activation?
 
 
-        //normalize the sub-values to 1.0 using triangular number as a divisor
-        int numCauses = causes.length;
+        int numCauses = 0;
+        for (short[] cc : causes)
+            numCauses += cc.length;
+
         if (numCauses == 0)
             return 0f;
 
-        for (int i = 0; i < numCauses; i++) {
-            short c = causes[i];
-            Cause cc = this.causeValue.get(c);
-            if (cc == null)
-                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
-                    /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
+        for (short[] cc : causes) {
+            for (short c : cc) {
+                Cause cause = this.causeValue.getSafe(c);
+                if (cc == null) {
+                    logger.error("cause id={} missing", c);
+                    continue;
+                }
 
-            boost += cc.value();
+                boost += cause.value();
+            }
         }
 
         return boost / numCauses;
@@ -1766,6 +1833,43 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
+    public CauseChannel<Task> newChannel(Object x) {
+        return newChannel(x, this::input);
+    }
+
+    public CauseChannel newInputChannel(Object id) {
+
+        synchronized (causeValue) {
+
+            short ci = (short) (causeValue.size());
+            short[] cs = new short[]{ci};
+
+            CauseChannel c = new CauseChannel<ITask>(ci, id, (x) -> {
+                if (x instanceof NALTask) {
+                    //assert (((NALTask) x.ref).cause.length == 0);
+                    NALTask t = (NALTask) x;
+                    if (t.cause == null || t.cause.length == 0)
+                        t.cause = cs; //.clone();
+                    else {
+                        if (!ArrayUtils.contains(t.cause, ci)) //in case the same task is input repeatedly, dont add the same cause
+                            t.cause = ArrayUtils.add(t.cause, 0 /* prepend */, ci);
+                    }
+                }
+                input(x);
+            });
+            causeValue.add(c);
+            return c;
+        }
+    }
+
+    public CauseChannel<Task> newChannel(Object x, Consumer<ITask> target) {
+        synchronized (causeValue) {
+            short next = (short) (causeValue.size());
+            CauseChannel c = new CauseChannel(next, x, target);
+            causeValue.add(c);
+            return c;
+        }
+    }
 
 
     public void valueUpdate() {

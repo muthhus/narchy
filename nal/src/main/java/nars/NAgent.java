@@ -14,6 +14,7 @@ import jcog.pri.mix.PSink;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
+import nars.control.CauseChannel;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Compound;
@@ -77,9 +78,7 @@ abstract public class NAgent implements NSense, NAct {
 
 
     //public final FloatParam predictorProbability = new FloatParam(1f);
-    private final PSink sense;
-    private final PSink predict;
-    private final PSink motor;
+    private final CauseChannel<ITask> sense, predict, motor;
 
 
     private boolean initialized;
@@ -152,6 +151,7 @@ abstract public class NAgent implements NSense, NAct {
         curiosity = new FloatParam(0.10f);
 
 
+        if (id==null) id = $.the(getClass().getSimpleName());
         this.sense = nar.newInputChannel(id + " sensor");
         this.predict = nar.newInputChannel(id + " predict");
         this.motor = nar.newInputChannel(id + " motor");

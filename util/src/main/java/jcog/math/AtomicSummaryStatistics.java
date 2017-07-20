@@ -74,6 +74,7 @@ public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure,
     public final void clear() {
         update.accumulate(Double.NaN);
     }
+
 //    public final void clear(float percentToClear) {
 //          TODO impl
 //    }

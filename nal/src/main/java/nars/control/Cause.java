@@ -28,14 +28,14 @@ import static nars.Param.CAUSE_CAPACITY;
  * positive and negative decay rates.  the value is clamped to a range
  * (ex: 0..+1) so it doesn't explode.
  */
-public class Cause {
+public class Cause<X> {
 
     /** pos,neg range limit */
     final static float LIMIT = 1;
     final static float EPSILON = 0.0000001f;
 
     public final short id;
-    public final Object x;
+    public final Object name;
 
     final AtomicDouble posAcc = new AtomicDouble(); //accumulating
     float pos = 0; //current value
@@ -46,16 +46,21 @@ public class Cause {
     /** summary */
     private float value;
 
-    public Cause(short id, Object x) {
+    public Cause(short id, Object name) {
         this.id = id;
-        this.x = x;
+        this.name = name;
     }
 
     @Override
     public String toString() {
-        return x + "Cause[" + id + "]=" + super.toString();
+        return name + "Cause[" + id + "]=" + super.toString();
     }
 
+    /** current optimism level */
+    public float pos() { return pos; }
+
+    /** current pessimism level */
+    public float neg() { return neg; }
 
 
     public static short[] zip(@Nullable Task... e) {
@@ -149,4 +154,5 @@ public class Cause {
     public float value() {
         return value;
     }
+
 }

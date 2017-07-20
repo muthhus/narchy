@@ -9,7 +9,9 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.BudgetFunctions;
+import nars.control.CauseChannel;
 import nars.index.term.TermIndex;
+import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -43,7 +45,7 @@ public class MySTMClustered extends STMClustered {
     private final int maxGroupSize;
     private final int minGroupSize;
     private final int inputsPerDur;
-    private final PSink in;
+    private final CauseChannel<ITask> in;
 
     float freqCoherenceThresh = 0.9f;
     float confCoherenceThresh = 0.5f;

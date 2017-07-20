@@ -7,6 +7,8 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Op;
 import nars.concept.SensorConcept;
+import nars.control.CauseChannel;
+import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -32,7 +34,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     private final NAR nar;
 
     public final List<PixelConcept> pixels;
-    private final PSink in;
+    private final CauseChannel<ITask> in;
     private final Term id;
 
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
@@ -54,6 +56,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         numPixels = w * h;
 
         this.in = nar.newInputChannel(this);
+        this.in.set(0f, 1f/(w*h)); //shared amongst all pixels
 
         pixels = encode(RadixProduct(root, src.width(), src.height(), RADIX));
 
@@ -201,10 +204,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
         in.input(pixels.stream() /*filter(PixelConcept::update).*/
                         .map(c -> c.apply(nar)));
-    }
-
-    public void pri(float v) {
-        in.setValue(v);
     }
 
 
