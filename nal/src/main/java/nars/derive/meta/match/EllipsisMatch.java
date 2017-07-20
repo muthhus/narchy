@@ -8,7 +8,6 @@ import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.SortedSet;
 

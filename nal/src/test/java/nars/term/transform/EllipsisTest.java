@@ -432,7 +432,7 @@ public class EllipsisTest {
         testCombinations(
                 $("((|,%X,%Z,%A) --> (|,%Y,%Z,%A))"),
                 $("((|,bird,man, swimmer)-->(|,man, animal,swimmer))"),
-                2);
+                1);
     }
 
     @Test public void testRepeatEllipsisAWithoutEllipsis() throws Narsese.NarseseException {
@@ -478,11 +478,11 @@ public class EllipsisTest {
         testCombinations(
                 $("(%M --> (|,%S,%A..+))"),
                 $("(m-->(|,s,a))"),
-                2);
+                1);
         testCombinations(
                 $("(%M --> (&,%S,%A..+))"),
                 $("(m-->(&,s,a))"),
-                2);
+                1);
     }
 
 

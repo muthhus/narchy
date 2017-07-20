@@ -26,10 +26,7 @@ package jcog.util;
 import jcog.list.FasterList;
 
 import java.lang.reflect.Array;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Object pool for arrays.
@@ -141,7 +138,7 @@ public class ArrayPool<T> extends FasterList {
         comparator.value = length;
         int index = Collections.binarySearch(this, comparator, comparator);
         if (index < 0) {
-            return (T) create(length);
+            return create(length);
         }
         return (T) remove(index);
     }
@@ -159,7 +156,7 @@ public class ArrayPool<T> extends FasterList {
         int index = Collections.binarySearch(this, comparator, comparator);
         if (index < 0) {
             index = -index - 1;
-            return index < size() ? (T) remove(index) : (T) create(minLength);
+            return index < size ? (T) remove(index) : create(minLength);
         }
         return (T) remove(index);
     }
@@ -178,15 +175,13 @@ public class ArrayPool<T> extends FasterList {
         // remove references from object arrays:
         if (!primitive) {
             Object[] objArray = (Object[]) array;
-            for (int i = 0; i < objArray.length; i++) {
-                objArray[i] = null;
-            }
+            Arrays.fill(objArray, null);
         }
     }
 
 
     private static class ByteArrayLengthMatcher extends ArrayLengthMatcher {
-        @Override int len(Object o) {
+        @Override final int len(Object o) {
             return ((byte[])o).length;
         }
     }

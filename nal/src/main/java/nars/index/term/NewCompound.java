@@ -10,7 +10,6 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Consumer;
@@ -27,7 +26,7 @@ import java.util.function.Predicate;
  * VolumeLimitedIncrementalProtoCompound extends AppendProtoCompound
  * etc...
  */
-public class AppendProtoCompound extends /*HashCached*/DynBytes implements ProtoCompound {
+public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound {
 
     public final Op op;
 
@@ -39,7 +38,7 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
     int hash;
 
 
-    public AppendProtoCompound(Op op, @NotNull Term[] prepopulated) {
+    public NewCompound(Op op, @NotNull Term[] prepopulated) {
         super();
         this.op = op;
         this.subs = prepopulated; //zero-copy direct usage
@@ -52,7 +51,7 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
      * @param initial_capacity estimated size, but will grow if exceeded
      * @param op if null, indicates construction of a subterms vector
      */
-    public AppendProtoCompound(@Nullable Op op, int initial_capacity) {
+    public NewCompound(@Nullable Op op, int initial_capacity) {
         super();
         this.op = op;
         if (initial_capacity > 0)
@@ -62,7 +61,7 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
     /**
      * @param op if null, indicates construction of a subterms vector
      */
-    public AppendProtoCompound(@Nullable Op op, @NotNull TermContainer subterms) {
+    public NewCompound(@Nullable Op op, @NotNull TermContainer subterms) {
         this(op, subterms.size());
         for (int i = 0; i < (size = subs.length); i++) /* (has been set in superconstructor)*/
             subs[i] = subterms.sub(i);
@@ -125,7 +124,7 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
     /**
      * hashes and prepares for use in hashmap
      */
-    public AppendProtoCompound commit() {
+    public NewCompound commit() {
 
 //        if (commute) {
 //            subs = Terms.sorted(subs);
@@ -186,6 +185,8 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
         return false;
     }
 
+
+
     public boolean add(@NotNull Termed x) {
         int c = subs.length;
         int len = this.size;
@@ -243,10 +244,10 @@ public class AppendProtoCompound extends /*HashCached*/DynBytes implements Proto
 
     @Override
     public String toString() {
-        return "AppendProtoCompound{" +
-                "op=" + op +
-                ", subs=" + Arrays.toString(Arrays.copyOfRange(subs, 0, size)) + //HACK use more efficient string method
-                '}';
+        return getClass().getSimpleName() + "<" +
+                (op!=null ? (op + "|") : "") +
+                Arrays.toString(Arrays.copyOfRange(subs, 0, size)) + //HACK use more efficient string method
+                '>';
     }
 
     @Override

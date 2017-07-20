@@ -21,7 +21,7 @@
     // the second neqRCom() is to handle the Backward cases until a proper variable transform is implemented for those auto-generated rules
 
     (A --> B), (B --> C), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
-        (A --> C), (B --> C), neqRCom(A,C)  |- (A --> B), (Punctuation:Question)
+        (A --> C), (B --> C), task("."), neqRCom(A,C)  |- (A --> B), (Punctuation:Question)
     (A --> B), (A --> C), neqRCom(B,C)      |- (C --> B), (Belief:Abduction, Goal:Weak)
     (A --> C), (B --> C), neqRCom(A,B)      |- (A --> B), (Belief:Induction, Goal:Weak)
     (A --> B), (B --> C), neqRCom(A,C)      |- (C --> A), (Belief:Exemplification, Goal:Weak)

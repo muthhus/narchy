@@ -14,8 +14,6 @@ import nars.concept.AtomConcept;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.table.BeliefTable;
-import nars.table.QuestionTable;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;

@@ -7,7 +7,6 @@ import nars.Task;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
-import nars.table.TaskTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;

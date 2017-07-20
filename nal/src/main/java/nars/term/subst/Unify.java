@@ -8,6 +8,7 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.derive.meta.constraint.MatchConstraint;
+import nars.index.term.NewCompound;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
@@ -23,6 +24,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import static nars.Op.Null;
 import static nars.Param.TTL_UNIFY;
 import static nars.Param.UnificationConstraintsInitialCapacity;
 
@@ -76,7 +78,9 @@ public abstract class Unify implements Subst {
     /**
      * counter of how many free variables remain unassigned
      */
-    int assigned, unassigned;
+
+    protected int unassigned;
+    //protected final Set<NewCompound> matched = new HashSet();
 
 
     protected Unify(@Nullable Op type, Random random, int stackMax, int ttl) {
@@ -146,7 +150,7 @@ public abstract class Unify implements Subst {
             if (use(Param.TTL_MUTATE))
                 chain[next].mutate(this, chain, next);
         } else {
-            tryMatches(); //end of chain
+            tryMatch(); //end of chain
         }
     }
 
@@ -180,18 +184,24 @@ public abstract class Unify implements Subst {
     public void unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
 
-//        try {
-        unassigned = x.varsUnique(type);
+        int unassignedBefore = unassigned;
+
+        unassigned += x.varsUnique(type); //plus and not equals because this may continue from another unification!!!!!
         //assert (unassigned > 0) : "non-purposeful unification";
 
-        if (unify(x, y)) {
+        try {
+            if (unify(x, y)) {
 
-            if (finish) {
+                if (finish) {
 
-                tryMatches();
+                    tryMatches();
+
+                }
 
             }
-
+        } finally {
+            if (finish)
+                this.unassigned = unassignedBefore;
         }
 //        } catch (Throwable e) {
 //            if (Param.DEBUG)
@@ -217,12 +227,18 @@ public abstract class Unify implements Subst {
         } else {
             tryMatch();
         }
+
+//        if (matched.size()>1)
+//            System.out.println(matched);
+
+//        matched.clear();
+
     }
 
     private void tryMatch() {
 
 
-        if (assigned < unassigned) {
+        if (unassigned > 0) {
             //quick test for no assignments
             return;
         }
@@ -237,6 +253,9 @@ public abstract class Unify implements Subst {
 //                return;
 //        }
 
+
+//        if (!matched.add(((ConstrainedVersionMap)xy).snapshot()))
+//            return; //already seen
 
         onMatch();
 
@@ -333,8 +352,10 @@ public abstract class Unify implements Subst {
         @Override
         public boolean tryPut(Term key, @NotNull Term value) {
             if (super.tryPut(key, value)) {
-                if (matchType(key))
-                    assigned++;
+                if (matchType(key)) {
+                    unassigned--;
+                    assert(unassigned>=0);
+                }
                 return true;
             }
             return false;
@@ -344,6 +365,17 @@ public abstract class Unify implements Subst {
         @Override
         public Versioned newEntry(Term key) {
             return new ConstrainedVersionedTerm(matchType(key));
+        }
+
+        public NewCompound snapshot() {
+            NewCompound s = new NewCompound(null, xy.map.size() * 2);
+            xy.forEach((x,y)->{
+                s.add(x);
+                if (y == null)
+                    y = Null; //HACK this should have been handled by the variable count
+                s.add(y);
+            });
+            return s.commit();
         }
     }
 
@@ -368,11 +400,14 @@ public abstract class Unify implements Subst {
 
         @Override
         public void pop() {
-            super.pop();
             if (forMatchedType) {
-                assigned--;
-                assert(assigned >= 0);
+                if (get() != null) {
+                    unassigned++;
+                }
             }
+
+            super.pop();
+
         }
 
         @Nullable

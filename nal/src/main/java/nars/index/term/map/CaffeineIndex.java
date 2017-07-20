@@ -5,7 +5,6 @@ import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

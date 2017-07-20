@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
-import static nars.Op.Null;
 
 
 /**

@@ -3,7 +3,6 @@ package nars.derive.meta.op;
 import nars.$;
 import nars.control.premise.Derivation;
 import nars.derive.meta.PrediTerm;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

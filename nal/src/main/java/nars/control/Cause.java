@@ -2,8 +2,6 @@ package nars.control;
 
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
-import jcog.list.FasterList;
-import nars.Param;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
@@ -13,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;

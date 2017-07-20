@@ -49,6 +49,8 @@ public class Gradius4K extends GamePanel implements Runnable {
     public float cameraX = 0;
     public float[] player = new float[256];
 
+    public int DIE_TIME = 60; //how long player remains dead
+
     public static final int OBJ_X = 0;
     public static final int OBJ_Y = 1;
     public static final int OBJ_TYPE = 2;
@@ -130,7 +132,7 @@ public class Gradius4K extends GamePanel implements Runnable {
 
         float cameraVx = 0;
 
-        boolean bossMode = false;
+        boolean bossMode = true;
 
         Graphics2D g2 = null;
         int[][] levelMap = null;
@@ -862,7 +864,8 @@ public class Gradius4K extends GamePanel implements Runnable {
                     explosionSeed[OBJ_X] = player[OBJ_X];
                     explosionSeed[OBJ_Y] = player[OBJ_Y];
                     explosionSeed[OBJ_NONRENDERABLE] = 1;
-                    playerDead = 180;
+
+                    this.playerDead = DIE_TIME;
                 }
 
                 // -- update ends ------------------------------------------------------

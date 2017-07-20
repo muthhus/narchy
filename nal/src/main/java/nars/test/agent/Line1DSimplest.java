@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.NAgent;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.GoalActionConcept;
-import nars.concept.SensorConcept;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
 

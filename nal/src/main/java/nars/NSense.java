@@ -17,7 +17,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.*;
+import java.util.function.BooleanSupplier;
+import java.util.function.IntFunction;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 import static nars.$.$;
 import static nars.$.*;

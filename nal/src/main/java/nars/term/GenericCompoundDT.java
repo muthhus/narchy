@@ -1,7 +1,6 @@
 package nars.term;
 
 import jcog.Util;
-import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.derive.meta.PatternCompound;

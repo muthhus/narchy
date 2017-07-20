@@ -4,7 +4,6 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.control.premise.Derivation;
-import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;

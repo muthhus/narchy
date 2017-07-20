@@ -1,13 +1,10 @@
 package nars.derive.meta.op;
 
 import nars.$;
-import nars.control.premise.Derivation;
 import nars.derive.meta.PrediTerm;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Function;
 
 /**
  * Created by me on 5/21/16.

@@ -11,7 +11,6 @@ import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -32,7 +31,7 @@ public class TrieDeriverTest {
 
     @Test public void printCompiledRuleTree() {
 
-        TrieDeriver.print(TrieDeriver.the(Deriver.DEFAULT_RULES(), null), System.out);
+        TrieDeriver.print(TrieDeriver.the(Deriver.RULES, null), System.out);
 
 
     }

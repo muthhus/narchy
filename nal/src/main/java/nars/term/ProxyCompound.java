@@ -20,7 +20,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class ProxyCompound implements Compound, NonInternable {
+public class ProxyCompound implements Compound/*, NonInternable*/ {
 
     /** only modify this if you are sure it wont change hash/equality */
     protected Compound ref;

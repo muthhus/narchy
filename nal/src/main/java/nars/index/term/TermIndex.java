@@ -288,7 +288,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         @NotNull TermContainer srcSubs = src.subterms(); //for faster access, generally
         int s = srcSubs.size(), subtermMods = 0;
-        AppendProtoCompound target = new AppendProtoCompound(op, s);
+        NewCompound target = new NewCompound(op, s);
         for (int i = 0; i < s; i++) {
 
             Term x = srcSubs.sub(i), y;

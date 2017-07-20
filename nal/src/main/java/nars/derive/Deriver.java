@@ -35,6 +35,7 @@ import static nars.derive.rule.PremiseRuleSet.parsedRules;
 public interface Deriver {
 
 
+    /** default rule set, NAL1..NAL8 */
     @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true,
             "nal1.nal",
             //"nal4.nal",
@@ -71,9 +72,7 @@ public interface Deriver {
                 }), new PatternTermIndex(), true);
     }
 
-    static PremiseRuleSet DEFAULT_RULES() {
-        return RULES;
-    }
+
 
 
 //    PremiseRuleSet DEFAULT_RULES = PremiseRuleSet.rules(true,

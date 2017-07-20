@@ -129,7 +129,7 @@ public class Gradius extends NAgentX {
             }
             return a;
 
-        }, 30f);
+        }, 20f);
 
     }
 

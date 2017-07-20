@@ -3,7 +3,6 @@ package nars.term.subst;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-abstract public class PatternCompound extends GenericCompoundDT implements NonInternable  {
+abstract public class PatternCompound extends GenericCompoundDT   {
 
     public final int sizeCached;
     public final int structureNecessary;

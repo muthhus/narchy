@@ -8,8 +8,6 @@ import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.NonInternable;
-import nars.table.BeliefTable;
-import nars.table.QuestionTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -23,7 +21,7 @@ import java.util.function.Predicate;
 import static nars.conceptualize.state.ConceptState.Deleted;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
-public class CompoundConcept implements Concept, Compound, Termlike, NonInternable {
+public class CompoundConcept implements Concept, Compound, Termlike {
 
     @NotNull
     private final Bag<Task,PriReference<Task>> taskLinks;

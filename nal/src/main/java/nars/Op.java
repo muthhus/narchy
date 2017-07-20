@@ -1,11 +1,10 @@
 package nars;
 
 
-import jcog.memoize.CaffeineMemoize;
 import jcog.memoize.HijackMemoize;
 import jcog.memoize.Memoize;
 import nars.derive.meta.match.Ellipsislike;
-import nars.index.term.AppendProtoCompound;
+import nars.index.term.NewCompound;
 import nars.index.term.NonInternable;
 import nars.index.term.ProtoCompound;
 import nars.index.term.TermContext;
@@ -918,7 +917,7 @@ public enum Op implements $ {
         boolean internable = internable(x);
 
         if (internable) {
-            return (TermContainer) cache.apply(new AppendProtoCompound(null, x).commit());
+            return (TermContainer) cache.apply(new NewCompound(null, x).commit());
         } else {
             return subtermsNew(x);
         }
@@ -943,11 +942,11 @@ public enum Op implements $ {
         if (!subterms.internable())
             return compound(op, subterms, false).dt(dt);
         else
-            return compound(new AppendProtoCompound(op, subterms), dt);
+            return compound(new NewCompound(op, subterms), dt);
     }
 
     @NotNull
-    public static Term compound(AppendProtoCompound apc, int dt) {
+    public static Term compound(NewCompound apc, int dt) {
 
 
 

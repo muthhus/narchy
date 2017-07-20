@@ -5,8 +5,6 @@ import jcog.pri.PriReference;
 import nars.Task;
 import nars.conceptualize.state.ConceptState;
 import nars.index.term.TermContext;
-import nars.table.BeliefTable;
-import nars.table.QuestionTable;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;

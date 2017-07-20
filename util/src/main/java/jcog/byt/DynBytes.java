@@ -1,6 +1,7 @@
 package jcog.byt;
 
 import com.google.common.io.ByteArrayDataOutput;
+import jcog.util.ArrayPool;
 import org.apache.commons.lang3.ArrayUtils;
 import org.iq80.snappy.Snappy;
 import org.jetbrains.annotations.NotNull;
@@ -14,9 +15,13 @@ import java.util.Arrays;
  */
 public class DynBytes implements ByteArrayDataOutput, Appendable, AbstractBytes {
 
-    /** must remain final for global consistency */
+    /**
+     * must remain final for global consistency
+     */
     private final static float minCompressionRatio = 0.9f;
-    /** must remain final for global consistency */
+    /**
+     * must remain final for global consistency
+     */
     private final static int MIN_COMPRESSION_BYTES = 64;
 
     static final int MIN_GROWTH_BYTES = 64;
@@ -46,8 +51,10 @@ public class DynBytes implements ByteArrayDataOutput, Appendable, AbstractBytes 
     }
 
 
-    /** return length of the compressed region (not including the from offset).
-     * or -1 if compression was not applied */
+    /**
+     * return length of the compressed region (not including the from offset).
+     * or -1 if compression was not applied
+     */
     public int compress(int from) {
 
         //TODO add parameter for from..to range compresion, currently this will only skip a prefix
@@ -59,22 +66,29 @@ public class DynBytes implements ByteArrayDataOutput, Appendable, AbstractBytes 
         }
 
 
-        byte[] compressed = new byte[from + Snappy.maxCompressedLength(len)];
+        int bufferLen = from + Snappy.maxCompressedLength(len);
+        //byte[] compressed = new byte[bufferLen];
+        ArrayPool<byte[]> bb = ArrayPool.bytes();
+        byte[] compressed = bb.getMin(bufferLen);
+
         int compressedLength = Snappy.compress(
-                bytes, from, len,
+                this.bytes, from, len,
                 compressed, from);
 
 
         if (compressedLength < (int) (len * minCompressionRatio)) {
 
             if (from > 0)
-                System.arraycopy(bytes, 0, compressed, 0, from); //copy prefix
+                System.arraycopy(this.bytes, 0, compressed, 0, from); //copy prefix
             //TODO copy suffix
 
             this.bytes = compressed;
             this.len = from + compressedLength;
             return compressedLength;
+        } else {
+            bb.release(compressed);
         }
+
         return -1;
     }
 
@@ -136,9 +150,11 @@ public class DynBytes implements ByteArrayDataOutput, Appendable, AbstractBytes 
         this.bytes[this.len++] = (byte) v;
     }
 
-    /** combo: (byte, int)  */
+    /**
+     * combo: (byte, int)
+     */
     public final void write(byte b, int v) {
-        int s = ensureSized(1 + 4 );
+        int s = ensureSized(1 + 4);
         byte[] e = this.bytes;
         e[s++] = b;
         e[s++] = (byte) (v >> 24);
@@ -331,7 +347,8 @@ public class DynBytes implements ByteArrayDataOutput, Appendable, AbstractBytes 
 
 
     @Override
-    @Deprecated public byte[] toByteArray() {
+    @Deprecated
+    public byte[] toByteArray() {
         return bytes;
     }
 

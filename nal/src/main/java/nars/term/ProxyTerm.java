@@ -1,6 +1,5 @@
 package nars.term;
 
-import nars.IO;
 import nars.Op;
 import nars.index.term.NonInternable;
 import nars.index.term.TermContext;

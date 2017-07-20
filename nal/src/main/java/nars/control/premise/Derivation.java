@@ -287,7 +287,17 @@ public class Derivation extends Unify implements TermContext {
 
         boolean finish = (this.forEachMatch = eachMatch)!=null;
 
+        if (!finish) {
+            //before the start
+            //this.matched.clear();
+            this.unassigned = 0; //reset
+        }
+
         unify(x, y, finish);
+
+        if (finish) {
+            //after the end
+        }
 
         this.forEachMatch = null;
 

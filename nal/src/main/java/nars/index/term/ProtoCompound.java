@@ -18,43 +18,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface ProtoCompound extends TermContainer {
 
-//    public static class TermContainerProtoCompound implements ProtoCompound {
-//
-//        final Op op;
-//
-//        public TermContainerProtoCompound(Op op) {
-//            this.op = op;
-//        }
-//
-//        @Override
-//        public @Nullable Op op() {
-//            return op;
-//        }
-//
-//        @NotNull
-//        @Override
-//        public Term[] subterms() {
-//            return new Term[0];
-//        }
-//
-//        @Override
-//        public int size() {
-//            return 0;
-//        }
-//
-//        @Override
-//        public Term sub(int i) {
-//            return null;
-//        }
-//
-//        @Override
-//        public ProtoCompound commit(int dt) {
-//            return null;
-//        }
-//
-//
-//    }
-
     @Nullable
     @Override
     Op op();
@@ -111,8 +74,5 @@ public interface ProtoCompound extends TermContainer {
     }
 
     ProtoCompound commit();
-//    {
-//        return commit(DTERNAL);
-//    }
-//    ProtoCompound commit(int dt);
+
 }
