@@ -4,19 +4,15 @@ import nars.NARS;
 import nars.Narsese;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.PatternCompound;
 import nars.derive.meta.PrediTerm;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
-import static nars.$.$;
-import static nars.time.Tense.XTERNAL;
 import static org.junit.Assert.*;
 
 /**

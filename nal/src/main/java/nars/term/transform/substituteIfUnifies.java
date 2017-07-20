@@ -2,7 +2,6 @@ package nars.term.transform;
 
 import nars.$;
 import nars.Op;
-import nars.Param;
 import nars.control.premise.Derivation;
 import nars.term.Functor;
 import nars.term.Term;

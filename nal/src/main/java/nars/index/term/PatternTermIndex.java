@@ -15,8 +15,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
-import static nars.Op.NEG;
-
 /**
  * Index which specifically holds the term components of a deriver ruleset.
  */

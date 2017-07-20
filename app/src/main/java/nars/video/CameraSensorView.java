@@ -4,7 +4,6 @@ import com.jogamp.opengl.GL2;
 import jcog.event.On;
 import nars.NAR;
 import nars.NAgent;
-import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.truth.Truth;
 import spacegraph.Surface;

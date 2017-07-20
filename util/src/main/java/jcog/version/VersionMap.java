@@ -18,12 +18,26 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     public final int elementStackSizeDefault; //stackSizePerElement
 
 
-    public VersionMap(Versioning context, int elementStackSizeDefault) {
+    public VersionMap(Versioning context) {
+        this(context, 0);
+    }
+
+    public VersionMap(Versioning context, int mapCap) {
+        this(context, mapCap, 0);
+    }
+
+    /**
+     *
+     * @param context
+     * @param mapCap initial capacity of map (but can grow
+     * @param eleCap initial capacity of map elements (but can grow
+     */
+    public VersionMap(Versioning context, int mapCap, int eleCap) {
         this(context,
-                new HashMap()
+                new HashMap(mapCap)
                 //new LinkedHashMap<>(elementStackSizeDefault)
                 //new UnifiedMap(elementStackSizeDefault)
-                , elementStackSizeDefault
+                , eleCap
         );
     }
 
@@ -174,7 +188,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
         //return map.keySet();
     }
 
-    public static final VersionMap Empty = new VersionMap(new Versioning<>(0, 0), 0) {
+    public static final VersionMap Empty = new VersionMap(new Versioning<>(0, 0), 0, 0) {
 
         @Override
         public boolean tryPut(Object key, Object value) {

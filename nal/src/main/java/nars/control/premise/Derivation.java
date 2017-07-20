@@ -165,6 +165,11 @@ public class Derivation extends Unify implements TermContext {
         this.deriver = n.deriver();
     }
 
+    @Override
+    public void onDeath() {
+        nar.emotion.derivationDeath.increment();
+    }
+
     /** tasklink/termlink scope */
     @NotNull public void run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, float parentTaskPri, int ttl) {
 

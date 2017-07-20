@@ -43,7 +43,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
@@ -443,7 +442,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
     @Nullable default Set<Term> varsUnique(@Nullable Op type) {
         return null;
     }
-    @Nullable default Set<Term> varsUnique(@Nullable Op type, Set<Term> exceptIfHere) {
+    @Nullable default Set<Term> varsUnique(@Nullable Op type, @Nullable Set<Term> exceptIfHere) {
         return null;
     }
 

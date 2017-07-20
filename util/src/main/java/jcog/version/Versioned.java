@@ -1,7 +1,6 @@
 package jcog.version;
 
 import jcog.list.FasterList;
-import jcog.list.LimitedFasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

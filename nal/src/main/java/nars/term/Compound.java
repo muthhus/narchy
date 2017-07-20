@@ -46,7 +46,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -391,7 +394,7 @@ public interface Compound extends Term, IPair, TermContainer {
             return u;
         }
     }
-    default Set<Term> varsUnique(@Nullable Op type, Set<Term> unlessHere) {
+    @Nullable default Set<Term> varsUnique(@Nullable Op type, @NotNull Set<Term> unlessHere) {
         int num = vars(type);
         if (num == 0)
             return null;

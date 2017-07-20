@@ -2,7 +2,6 @@ package nars.term;
 
 import nars.IO;
 import nars.Op;
-import nars.index.term.NonInternable;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;

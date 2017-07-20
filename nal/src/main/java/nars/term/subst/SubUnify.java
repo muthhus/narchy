@@ -2,13 +2,10 @@ package nars.term.subst;
 
 import nars.Op;
 import nars.Param;
-import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 /**
  * Less powerful one-match only unification
@@ -24,6 +21,11 @@ public class SubUnify extends Unify {
     public SubUnify(@NotNull Unify parent, @Nullable Op type) {
         super(parent.terms, type, parent.random, Param.UnificationStackMax, 0);
         this.parent = parent;
+    }
+
+    @Override
+    public void onDeath() {
+        parent.onDeath();
     }
 
     @Override

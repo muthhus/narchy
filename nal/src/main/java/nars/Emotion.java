@@ -39,6 +39,10 @@ public final class Emotion extends ConcurrentMonitorRegistry {
     /** a successful conclusion term gets evaluated and temporalized and formed into a Task */
     public final Counter derivationEval = new BasicCounter(id("derivation eval"));
 
+    /** count of times that deriver reached ttl=0. if this is high it means more TTL should
+     * be budgeted for each derivation */
+    public final Counter derivationDeath = new BasicCounter(id("derivation death"));
+
 
 
     @NotNull

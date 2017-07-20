@@ -64,6 +64,7 @@ public abstract class Param  {
     public static boolean CompoundDT_TermSharing = false;
 
 
+
     public final FloatParam valuePositiveDecay = new FloatParam(0.995f, 0, 1f);
     public final FloatParam valueNegativeDecay = new FloatParam(0.97f, 0, 1f);
 
@@ -136,10 +137,9 @@ public abstract class Param  {
     public static final int CAUSE_CAPACITY = 16;
 
     public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
-    public static final int UnificationConstraintsInitialCapacity = 1; //>=1
-    public static final int UnificationVariableStackInitial = 32; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 64;
+    public final static int BeliefMatchTTL = 16;
+    public static final int UnificationVariableCapInitial = 8;
 
     /** 'time to live', unification steps until unification is stopped */
     public final static int UnificationTTLMax = BeliefMatchTTL * 4;

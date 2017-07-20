@@ -95,8 +95,18 @@ public class Versioning<X> extends
     public final void stop() {
         setTTL(0);
     }
+
     public final boolean tick() {
-        return (ttl-- > 0);
+        //return (ttl-- > 0);
+        if (ttl-- == 0) {
+            onDeath(); //transition from live to death occurred
+        }
+        return ttl > 0;
+    }
+
+    /** empty for subclass impl */
+    public void onDeath() {
+
     }
 
     /**

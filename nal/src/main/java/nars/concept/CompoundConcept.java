@@ -7,7 +7,6 @@ import nars.Op;
 import nars.Task;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
-import nars.index.term.NonInternable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;

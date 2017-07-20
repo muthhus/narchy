@@ -21,12 +21,12 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 import static nars.Op.Null;
 import static nars.Param.TTL_UNIFY;
-import static nars.Param.UnificationConstraintsInitialCapacity;
-import static jcog.data.UnenforcedConcatSet.emptySet;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -102,8 +102,8 @@ public abstract class Unify extends Versioning implements Subst {
         this.random = random;
         this.type = type;
 
-        xy = new ConstrainedVersionMap(versioning, Param.UnificationVariableStackInitial);
-        this.free = new Versioned<>(versioning, 8);
+        xy = new ConstrainedVersionMap(versioning, Param.UnificationVariableCapInitial);
+        this.free = new Versioned<>(versioning, 1);
         //this.freeCount = new Versioned<>(versioning, 8);
 
     }
@@ -174,24 +174,11 @@ public abstract class Unify extends Versioning implements Subst {
      * from a previous partial unification if necessary.
      */
     Set<Term> freeVariables(@NotNull Term x) {
-        Set<Term> oldFree = free.get();
-        Set<Term> newFree = oldFree != null ? x.varsUnique(type, oldFree) : x.varsUnique(type);
-        Set<Term> nextFree;
-        boolean oldIsNull = oldFree == null || oldFree == emptySet;
-        if (newFree == null && (oldIsNull)) {
-            nextFree = emptySet;
-        }
-        if (newFree == null) {
-            nextFree = oldFree;
-        } else {
-            if (oldIsNull) {
-                nextFree = newFree;
-            } else {
-                nextFree = new UnenforcedConcatSet<>(oldFree, newFree);
-            }
-        }
-        return nextFree;
+        Set<Term> prevFree = free.get();
+        Set<Term> nextFree = prevFree != null ? x.varsUnique(type, prevFree) : x.varsUnique(type);
+        return UnenforcedConcatSet.the(prevFree, nextFree);
     }
+
 
     public void tryMatches() {
         int ts = termutes.size();
@@ -323,8 +310,8 @@ public abstract class Unify extends Versioning implements Subst {
 //    }
 
     private class ConstrainedVersionMap extends VersionMap<Term, Term> {
-        public ConstrainedVersionMap(@NotNull Versioning versioning, int maxVars) {
-            super(versioning, maxVars);
+        public ConstrainedVersionMap(@NotNull Versioning versioning, int mapCap) {
+            super(versioning, mapCap, 1);
         }
 
 //        @Nullable
@@ -395,7 +382,7 @@ public abstract class Unify extends Versioning implements Subst {
 //        Versioned<MatchConstraint> fastConstraints = null;
 
         ConstrainedVersionedTerm(boolean forMatchedType) {
-            super(versioning, Param.UnificationVariableStackInitial);
+            super(versioning, 1);
             this.forMatchedType = forMatchedType;
         }
 
@@ -434,7 +421,7 @@ public abstract class Unify extends Versioning implements Subst {
         public boolean constrain(MatchConstraint m) {
 
             if (constraints == null)
-                constraints = new Versioned(versioning, UnificationConstraintsInitialCapacity);
+                constraints = new Versioned(versioning, 0);
 
             return constraints.set(m) != null;
         }
