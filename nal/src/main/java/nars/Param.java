@@ -133,16 +133,16 @@ public abstract class Param  {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 12;
+    public static final int CAUSE_CAPACITY = 16;
 
     public final static int UnificationStackMax = 32; //how many assignments can be stored in the 'versioning' maps
     public static final int UnificationConstraintsInitialCapacity = 0;
     public static final int UnificationVariableStackMax = 2; //how many rewrites a variable is allowed
 
-    public final static int BeliefMatchTTL = 64;
+    public final static int BeliefMatchTTL = 32;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTLMax = BeliefMatchTTL * 3;
+    public final static int UnificationTTLMax = BeliefMatchTTL * 2;
 
 
 

@@ -59,6 +59,19 @@ public class GoalActionConcept extends ActionConcept {
 
     }
 
+    public float valueIfProcessed(@NotNull Task t, float activation, NAR n) {
+        float v = super.valueIfProcessed(t, activation, n);
+        if (t.isGoal() && !t.isInput()) {
+
+            //allow the boost to apply to 1 duration ahead, to promote goal prediction
+            v = Math.max(v,
+                    TaskConcept.valueIfProcessedAt(t, activation, n.time() + n.dur(), n ));
+
+            assert(v >= 0);
+            v *= 2; //boost goal derivations in general
+        }
+        return v;
+    }
 
     public GoalActionConcept resolution(float r) {
         resolution.setValue(r);

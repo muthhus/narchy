@@ -113,6 +113,8 @@ public class PatrickTests extends AbstractNALTest {
 
         TestNAR tt = test;
         tt.nar.time.dur(2);
+        tt.nar.truthResolution.setValue(0.1f);
+        tt.nar.termVolumeMax.setValue(18);
 
 //        tt.nar.onCycle(()->{
 //            System.err.println(tt.nar.time());

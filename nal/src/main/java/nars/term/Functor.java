@@ -138,7 +138,7 @@ abstract public class Functor extends AtomConcept implements PermanentConcept, F
     }
 
 
-    public static final class LambdaFunctor extends Functor implements NonInternable {
+    public static final class LambdaFunctor extends Functor  {
 
         @NotNull private final Function<TermContainer, Term> f;
 

@@ -35,6 +35,16 @@ import static nars.derive.rule.PremiseRuleSet.parsedRules;
 public interface Deriver {
 
 
+    @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true,
+            "nal1.nal",
+            //"nal4.nal",
+            "nal6.nal",
+            "misc.nal",
+            "induction.nal",
+            "nal2.nal",
+            "nal3.nal"
+    );
+
     /**
      * for now it seems there is a leak so its better if each NAR gets its own copy. adds some overhead but we'll fix this later
      * not working yet probably due to unsupported ellipsis IO codec. will fix soon
@@ -62,15 +72,7 @@ public interface Deriver {
     }
 
     static PremiseRuleSet DEFAULT_RULES() {
-        return PremiseRuleSet.rules(true,
-                "nal1.nal",
-                //"nal4.nal",
-                "nal6.nal",
-                "misc.nal",
-                "induction.nal",
-                "nal2.nal",
-                "nal3.nal"
-        );
+        return RULES;
     }
 
 

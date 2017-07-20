@@ -390,13 +390,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     }
 
-    @Override
-    protected Task merge(@NotNull Task existing, @NotNull Task incoming, @Nullable MutableFloat overflowing) {
-        //return super.merge(existing, incoming, overflowing);
-        existing.priMax(incoming.priElseZero());
-        ((NALTask)existing).merge(((NALTask)incoming));
-        return existing;
-    }
+
 
     //    static private FloatFunction<Task> temporalConfidenceF(long when, long now, int dur) {
 //        return x -> rankTemporalByConfidence(x, when, now, dur);

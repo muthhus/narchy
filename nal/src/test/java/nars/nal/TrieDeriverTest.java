@@ -86,6 +86,7 @@ public class TrieDeriverTest {
         assertTrue(d.toString().contains("&&\",(truth(_,_),unify(1,%1),unify(0,%1,{(((?2 &&+0 %1),") );
         assertTrue(d.toString().contains("(?2 &&+- %1)") );
 
+        assertTrue("something at least got stored in the index", idx.size() > 16);
 
         //test that A..+ survives as an ellipsis
         //assertTrue(d.trie.getSummary().contains("..+"));

@@ -131,7 +131,7 @@ public class TaskConcept extends CompoundConcept {
 
     public float valueIfProcessed(@NotNull Task t, float activation, NAR n) {
         //positive value based on the conf but also multiplied by the activation in case it already was known
-        return 0.001f * activation * (t.isBeliefOrGoal() ? t.conf(n.time(), n.dur()) : 0.5f);
+        return valueIfProcessedAt(t, activation, n.time(), n);
 
 //            @Override
 //    public float value(@NotNull Task t, NAR n) {
@@ -154,6 +154,10 @@ public class TaskConcept extends CompoundConcept {
 //        //return super.value(t, activation, n);
 //        return 0;
 //    }
+    }
+
+    public static float valueIfProcessedAt(@NotNull Task t, float activation, long when, NAR n) {
+        return 0.001f * activation * (t.isBeliefOrGoal() ? t.conf(when, n.dur()) : 0.5f);
     }
 
 

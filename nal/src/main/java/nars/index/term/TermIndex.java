@@ -474,7 +474,9 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
             return null;
         } else {
             Compound yy = (Compound)y;
-//            int ydt = yy.dt();
+
+
+            //            int ydt = yy.dt();
 //            if (ydt ==XTERNAL|| ydt ==DTERNAL) {
 //                int zdt = r.dt(x);
 //                if (ydt!=zdt)
