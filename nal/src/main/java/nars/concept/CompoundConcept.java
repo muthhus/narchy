@@ -64,25 +64,6 @@ public class CompoundConcept implements Concept, Compound, Termlike, NonInternab
         this.state = Deleted;
     }
 
-    @Override
-    public @NotNull QuestionTable questions() {
-        return QuestionTable.Null;
-    }
-
-    @Override
-    public @Nullable QuestionTable quests() {
-        return QuestionTable.Null;
-    }
-
-    @Override
-    public @NotNull BeliefTable beliefs() {
-        return BeliefTable.EMPTY;
-    }
-
-    @Override
-    public @NotNull BeliefTable goals() {
-        return BeliefTable.EMPTY;
-    }
 
     @Override
     public @NotNull TermContainer subterms() {
@@ -159,10 +140,9 @@ public class CompoundConcept implements Concept, Compound, Termlike, NonInternab
     public ConceptState state(@NotNull ConceptState p) {
         ConceptState current = this.state;
         if (current != p) {
-            if ((this.state = p)!=Deleted) { //dont bother shrinking to zero capacity on delete. potentially supports fast immediate recovery
-                termlinks().setCapacity(p.linkCap(this, true));
-                tasklinks().setCapacity(p.linkCap(this, false));
-            }
+            this.state = p;
+            termlinks().setCapacity(p.linkCap(this, true));
+            tasklinks().setCapacity(p.linkCap(this, false));
         }
         return p;
     }

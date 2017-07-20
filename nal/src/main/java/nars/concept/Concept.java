@@ -25,9 +25,6 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import nars.conceptualize.state.ConceptState;
-import nars.table.BeliefTable;
-import nars.table.QuestionTable;
-import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
@@ -42,8 +39,6 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
-import static nars.Op.*;
 
 public interface Concept extends Termed, Termlike {
 
@@ -100,13 +95,13 @@ public interface Concept extends Termed, Termlike {
     }
 
 
-    @NotNull BeliefTable beliefs();
-
-    @NotNull BeliefTable goals();
-
-    @NotNull QuestionTable questions();
-
-    @Nullable QuestionTable quests();
+//    @NotNull BeliefTable beliefs();
+//
+//    @NotNull BeliefTable goals();
+//
+//    @NotNull QuestionTable questions();
+//
+//    @Nullable QuestionTable quests();
 
 
     @Nullable
@@ -141,18 +136,9 @@ public interface Concept extends Termed, Termlike {
 
 
     default void delete(@NotNull NAR nar) {
-
-//        termlinks().clear();
-//        tasklinks().clear();
-//
-//        beliefs().clear();
-//        goals().clear();
-//        questions().clear();
-//        quests().clear();
-
-
+        termlinks().clear();
+        tasklinks().clear();
         state(ConceptState.Deleted);
-
     }
 
 
@@ -176,36 +162,8 @@ public interface Concept extends Termed, Termlike {
         return state() == ConceptState.Deleted;
     }
 
-    @Nullable
-    default TaskTable table(byte punc) {
-        switch (punc) {
-            case BELIEF:
-                return beliefs();
-            case GOAL:
-                return goals();
-            case QUESTION:
-                return questions();
-            case QUEST:
-                return quests();
-            default:
-                throw new UnsupportedOperationException();
-        }
-    }
 
 
-    default void forEachTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests, @NotNull Consumer<Task> each) {
-        if (includeConceptBeliefs) beliefs().forEachTask(each);
-        if (includeConceptQuestions) questions().forEachTask(each);
-        if (includeConceptGoals) goals().forEachTask(each);
-        if (includeConceptQuests) quests().forEachTask(each);
-    }
-
-    default void forEachTask(@NotNull Consumer<Task> each) {
-        beliefs().forEachTask(each);
-        questions().forEachTask(each);
-        goals().forEachTask(each);
-        quests().forEachTask(each);
-    }
 
 //    @NotNull
 //    default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {
@@ -233,6 +191,8 @@ public interface Concept extends Termed, Termlike {
     }
 
 
+    String printIndent = "  \t";
+
     /**
      * prints a summary of all termlink, tasklink, etc..
      */
@@ -240,61 +200,16 @@ public interface Concept extends Termed, Termlike {
 
         try {
             out.append("concept: ").append(toString()).append('\n');
-            String indent = "  \t";
-
-            Consumer<Task> printTask = s -> {
-                try {
-                    out.append(indent);
-                    out.append(s.toString());
-                    out.append(" ");
-                    Object ll = s.lastLogged();
-                    if (ll != null)
-                        out.append(ll.toString());
-                    out.append('\n');
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            };
 
             Consumer<PriReference> printBagItem = b -> {
                 try {
-                    out.append(indent);
+                    out.append(printIndent);
                     out.append(String.valueOf(b.get())).append(' ').append(b.toBudgetString());
                     out.append(" ");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             };
-
-            if (showbeliefs) {
-                out.append(" Beliefs:");
-                if (beliefs().isEmpty()) out.append(" none").append('\n');
-                else {
-                    out.append('\n');
-                    beliefs().forEachTask(printTask);
-                }
-                out.append(" Questions:");
-                if (questions().isEmpty()) out.append(" none").append('\n');
-                else {
-                    out.append('\n');
-                    questions().forEachTask(printTask);
-                }
-            }
-
-            if (showgoals) {
-                out.append(" Goals:");
-                if (goals().isEmpty()) out.append(" none").append('\n');
-                else {
-                    out.append('\n');
-                    goals().forEachTask(printTask);
-                }
-                out.append(" Quests:");
-                if (questions().isEmpty()) out.append(" none").append('\n');
-                else {
-                    out.append('\n');
-                    quests().forEachTask(printTask);
-                }
-            }
 
             if (showtermlinks) {
                 //out.append("TermLinkTemplates: ");

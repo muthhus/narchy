@@ -166,14 +166,15 @@
         //this one needs reviewed, it might need to be subIfUnified, and other problems
 
 //goal search
-    X, X, task("!") |-          (?1 ==> X), (Punctuation:Question)
-    X, X, task("!") |-          (X ==> ?1), (Punctuation:Question)
-    X, X, task("!") |-     ((--,X) ==> ?1), (Punctuation:Question)
+    X, X, task("!") |-          (?1 ==>+- X), (Punctuation:Question)
+    X, X, task("!") |-          (X ==>+- ?1), (Punctuation:Question)
+    X, X, task("!") |-     ((--,X) ==>+- ?1), (Punctuation:Question)
 
-    X, X, task("!") |-           (?1 && X), (Punctuation:Question)
-    X, X, task("!") |-           (?1 && X), (Punctuation:Quest)
-    X, X, task("!") |-      (?1 && (--,X)), (Punctuation:Question)
-    X, X, task("!") |-      (?1 && (--,X)), (Punctuation:Quest)
+//    X, X, task("!") |-           (?1 && X), (Punctuation:Question)
+    X, X, task("!") |-           (?1 &&+- X), (Punctuation:Question)
+    X, X, task("!") |-           (?1 &&+- X), (Punctuation:Quest)
+    X, X, task("!") |-      (?1 &&+- (--,X)), (Punctuation:Question)
+    X, X, task("!") |-      (?1 &&+- (--,X)), (Punctuation:Quest)
 
     //X, X, task("!") |-           (#1 && X), (Goal:StructuralDeduction)
     //X, X, task("!") |- (--,(#1 && (--,X))), (Goal:StructuralDeduction)

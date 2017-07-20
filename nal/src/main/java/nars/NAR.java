@@ -183,10 +183,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             //tasklinksCap.accept(c.tasklinks().capacity());
             tasklinkCount.recordValue(c.tasklinks().size());
 
-            beliefs.accept(c.beliefs().size());
-            goals.accept(c.goals().size());
-            questions.accept(c.questions().size());
-            quests.accept(c.quests().size());
+            if (c instanceof TaskConcept) {
+                TaskConcept tc = (TaskConcept)c;
+                beliefs.accept(tc.beliefs().size());
+                goals.accept(tc.goals().size());
+                questions.accept(tc.questions().size());
+                quests.accept(tc.quests().size());
+            }
 
         });
 
@@ -913,13 +916,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         if (concept != null) {
             @Nullable Concept c = concept(concept);
             if (c instanceof TaskConcept) {
+                TaskConcept tc = (TaskConcept)c;
                 BeliefTable table;
                 switch (punc) {
                     case BELIEF:
-                        table = c.beliefs();
+                        table = tc.beliefs();
                         break;
                     case GOAL:
-                        table = c.goals();
+                        table = tc.goals();
                         break;
                     default:
                         throw new UnsupportedOperationException();
@@ -1256,12 +1260,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public NAR forEachConceptTask(@NotNull Consumer<Task> each) {
-        return forEachConcept(c -> c.forEachTask(each));
+        return forEachTaskConcept(c -> c.forEachTask(each));
     }
 
     @NotNull
     public NAR forEachConceptTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
-        return forEachConcept(c -> {
+        return forEachTaskConcept(c -> {
             c.forEachTask(includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests, each);
         });
     }
@@ -1271,7 +1275,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                                   boolean includeTaskLinks, int maxPerConcept,
                                   @NotNull Consumer<Task> recip) {
         Consumer<? super PriReference<Task>> action = t -> recip.accept(t.get());
-        forEachConcept(c -> {
+        forEachTaskConcept(c -> {
+
             if (includeConceptBeliefs) c.beliefs().forEach(maxPerConcept, recip);
             if (includeConceptQuestions) c.questions().forEach(maxPerConcept, recip);
             if (includeConceptGoals) c.goals().forEach(maxPerConcept, recip);
@@ -1368,6 +1373,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         terms.forEach(x -> {
             if (x instanceof Concept)
                 recip.accept((Concept) x);
+        });
+        return this;
+    }
+    @NotNull
+    public NAR forEachTaskConcept(@NotNull Consumer<TaskConcept> recip) {
+        forEachConcept(c -> {
+            if (c instanceof TaskConcept)
+                recip.accept((TaskConcept)c);
         });
         return this;
     }
@@ -1647,10 +1660,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     public Task match(Compound c, byte punc, long when) {
         Concept concept = concept(c);
-        if (concept == null)
+        if (!(concept instanceof TaskConcept))
             return null;
 
-        return ((BeliefTable) concept.table(punc)).match(when, null, null, false, this);
+        return ((BeliefTable) ((TaskConcept)concept).table(punc)).match(when, null, null, false, this);
     }
 
     public Predicate<Derivation> deriver() {

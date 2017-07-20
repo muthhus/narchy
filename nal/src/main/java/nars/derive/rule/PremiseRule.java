@@ -106,7 +106,7 @@ public class PremiseRule extends GenericCompound {
 
     @NotNull
     public static PremiseRule rule(PremiseRule onlyRule) {
-        return new PremiseRuleSet(onlyRule).rules.get(0);
+        return new PremiseRuleSet(new PatternTermIndex(), onlyRule).rules.get(0);
     }
 
     @NotNull

@@ -6,6 +6,7 @@ import jcog.event.On;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.term.Term;
 import nars.term.Termed;
@@ -38,7 +39,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
     private final On on;
 
 
-    Concept cc = null; //cached concept
+    TaskConcept cc = null; //cached concept
     float cp = 0; //cached priority
     private int dur; //cached dur
     private long now; //cached time
@@ -114,7 +115,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         long now = this.now = nar.time();
         int dur = this.dur = nar.dur();
 
-        cc = nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
+        cc = (TaskConcept)nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
 
         if (cc != null) {
             cp = 1f; /*nar.pri(cc);*/ if (cp!=cp) cp = 0;

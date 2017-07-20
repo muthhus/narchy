@@ -4,6 +4,7 @@ import jcog.Util;
 import nars.IO;
 import nars.Op;
 import nars.Param;
+import nars.derive.meta.PatternCompound;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +24,7 @@ public class GenericCompoundDT extends ProxyCompound {
     public GenericCompoundDT(Compound base, int dt) {
         super(base);
 
-        assert dt != DTERNAL : "use GenericCompound if dt==DTERNAL";
+        assert dt != DTERNAL || this instanceof PatternCompound : "use GenericCompound if dt==DTERNAL";
 
         if (Param.DEBUG) {
 

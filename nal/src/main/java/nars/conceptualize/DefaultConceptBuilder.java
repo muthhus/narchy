@@ -293,6 +293,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
 
+    @Override
+    public QuestionTable newQuestionTable() {
+        return new HijackQuestionTable(0, 2);
+    }
+
     private static boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {
         return !subterms.OR(x -> x instanceof Variable);
     }
@@ -377,7 +382,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         //int defaultInitialCap = 0;
         float loadFactor = 0.75f;
 
-        if (nar.exe.concurrent()) {
+        if (concurrent()) {
 //            //return new ConcurrentHashMap(defaultInitialCap, 1f);
 //            //return new NonBlockingHashMap(cap);
 //            return new org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe<>();
@@ -398,6 +403,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return new HashMap(0, loadFactor);
         }
 
+    }
+
+    public boolean concurrent() {
+        return nar.exe.concurrent();
     }
 
 }

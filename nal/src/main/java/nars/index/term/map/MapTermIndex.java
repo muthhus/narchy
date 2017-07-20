@@ -2,6 +2,7 @@ package nars.index.term.map;
 
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,7 +41,13 @@ public class MapTermIndex extends MaplikeTermIndex {
     @Nullable
     @Override
     public Termed get(@NotNull Term x, boolean createIfMissing) {
+
+        //assert(!(x instanceof Variable)): "variables should not be stored in index";
+        if (x instanceof Variable)
+            return x;
+
         if (createIfMissing) {
+
             return concepts.computeIfAbsent(x, conceptBuilder);
         } else {
             return concepts.get(x);

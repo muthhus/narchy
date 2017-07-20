@@ -27,7 +27,6 @@ import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.index.term.TermContext;
-import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
@@ -168,16 +167,23 @@ public interface Compound extends Term, IPair, TermContainer {
     @NotNull
     default boolean termsToSetRecurse(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
         final boolean[] r = {false};
-        recurseTerms((s) -> {
+        Predicate<Term> selector = (Predicate<Term>) (s) -> {
 
             if (!addOrRemoved && r[0]) { //on removal we can exit early
-                return; //HACK todo make a visitor with a predicate termination condition rather than have to continue traversing
+                return false;
             }
 
             if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
                 r[0] |= (addOrRemoved) ? t.add(s) : t.remove(s);
             }
-        });
+
+            return true;
+        };
+
+        if (inStructure!=-1)
+            recurseTerms((p) -> p.hasAny(inStructure), selector);
+        else
+            recurseTerms(any -> true, selector);
 
         return r[0];
     }
@@ -434,10 +440,10 @@ public interface Compound extends Term, IPair, TermContainer {
                 return xsubs.equals(ysubs) || xsubs.unifyLinear(ysubs, subst);
             }
 
-        } else if (ty instanceof Abbreviation.AliasConcept) {
+        } /*else if (ty instanceof Abbreviation.AliasConcept) {
             Compound abbreviated = ((Abbreviation.AliasConcept) ty).abbr.term();
             return abbreviated.equals(this) || unify(abbreviated, subst);
-        }
+        }*/
 
         return false;
 

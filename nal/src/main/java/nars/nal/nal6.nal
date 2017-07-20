@@ -12,9 +12,13 @@
     //nature of such a rule."
 
     (M ==> P), (S ==> M), neqCom(P,S), time(dtSum), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
-        (S ==> P), (S ==> M), neqCom(P,S), time(dtSum), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Punctuation:Question)
+        //cousin of: (A --> C), (B --> C), neqRCom(A,C)  |- (A --> B), (Punctuation:Question)
+        //TODO unit test:
+        (S ==> P), (S ==> M), neqCom(P,S), time(dtBminT), notImplEqui(S), notEqui(P) |- (M ==>+- P), (Punctuation:Question)
 
     (P ==> M), (S ==> M), neqCom(P,S), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction)
+        //TODO unit test:
+        (S ==> P), (S ==> M), neqCom(P,S), time(dtTminB), notImplEqui(S), notEqui(P) |- (P ==>+- M), (Punctuation:Question)
 
     (M ==> P), (M ==> S), neqCom(P,S), time(dtTminB), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction)
 

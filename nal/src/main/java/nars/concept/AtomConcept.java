@@ -92,30 +92,6 @@ public class AtomConcept extends Atom implements Concept {
     }
 
 
-    @NotNull
-    @Override
-    public BeliefTable beliefs() {
-        return BeliefTable.EMPTY;
-    }
-
-    @NotNull
-    @Override
-    public BeliefTable goals() {
-        return BeliefTable.EMPTY;
-    }
-
-    @Override
-    @NotNull
-    public QuestionTable questions() {
-        return QuestionTable.Unstored;
-    }
-
-    @NotNull
-    @Override
-    public QuestionTable quests() {
-        return QuestionTable.Unstored;
-    }
-
 
 //    @Override
 //    public void delete(@NotNull NAR nar) {

@@ -6,6 +6,7 @@ import nars.derive.meta.match.Ellipsis;
 import nars.derive.meta.match.EllipsisMatch;
 import nars.index.term.NonInternable;
 import nars.term.Compound;
+import nars.term.GenericCompoundDT;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -20,22 +21,17 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-abstract public class PatternCompound extends GenericCompound implements NonInternable  {
+abstract public class PatternCompound extends GenericCompoundDT implements NonInternable  {
 
     public final int sizeCached;
     public final int structureNecessary;
     public final boolean commutativeCached;
-    private final int dt;
-    private final int hashDT;
 
     PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
-        super(seed.op(), subterms);
+        super(new GenericCompound(seed.op(), subterms), seed.dt());
 
         if (seed.isNormalized())
             this.setNormalized();
-
-        this.dt = seed.dt();
-        this.hashDT = seed.hashCode();
 
         sizeCached = seed.size();
         structureNecessary =
@@ -44,16 +40,6 @@ abstract public class PatternCompound extends GenericCompound implements NonInte
         commutativeCached = super.isCommutative();
     }
 
-
-    @Override
-    public int dt() {
-        return dt;
-    }
-
-    @Override
-    public int hashCode() {
-        return hashDT;
-    }
 
     @Override
     public boolean isCommutative() {
@@ -83,7 +69,7 @@ abstract public class PatternCompound extends GenericCompound implements NonInte
 
         @Override
         public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
-            return op == y.op() && y.hasAll(structureNecessary) && matchEllipsis((Compound) y, subst);
+            return op() == y.op() && y.hasAll(structureNecessary) && matchEllipsis((Compound) y, subst);
         }
 
 

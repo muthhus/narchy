@@ -1,8 +1,24 @@
 package nars.nal;
 
+import nars.NARS;
+import nars.Narsese;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
+import nars.derive.meta.PatternCompound;
+import nars.derive.meta.PrediTerm;
+import nars.derive.rule.PremiseRuleSet;
+import nars.index.term.PatternTermIndex;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.Termed;
+import nars.term.Terms;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
+
+import static nars.$.$;
+import static nars.time.Tense.XTERNAL;
+import static org.junit.Assert.*;
 
 /**
  * Created by me on 12/12/15.
@@ -21,6 +37,12 @@ public class TrieDeriverTest {
 
     }
 
+    @Test public void testPatternCompoundWithXTERNAL() throws Narsese.NarseseException {
+        Compound p = (Compound) new PatternTermIndex().get($("((x) ==>+- (y))"), true).term();
+        assertEquals(PatternCompound.PatternCompoundSimple.class, p.getClass());
+        assertEquals(XTERNAL, p.dt());
+    }
+
 //    @Test public void printRuleSet() {
 //
 ////        List<PremiseRule> rr = d.rules.rules;
@@ -32,6 +54,42 @@ public class TrieDeriverTest {
 //        d.trie.costAnalyze((t) -> 1, System.out);
 //    }
 
+    @Test public void testConclusionWithXTERNAL() throws Narsese.NarseseException {
+        PatternTermIndex idx = new PatternTermIndex() {
+            @Override
+            public @Nullable Termed get(@NotNull Term t, boolean create) {
+                Termed u = super.get(t, create);
+                assertNotNull(u);
+                if (u!=t) {
+                    System.out.println(t + " (" + t.getClass() + ")" + " -> " + u + " (" + u.getClass() + ")");
+                    if (u.equals(t) && u.getClass().equals(t)) {
+                        fail("\t ^ same class, wasteful duplicate");
+                    }
+                }
+                return u;
+            }
+        };
+
+        System.out.println();
+
+        PrediTerm d = TrieDeriver.the(new PremiseRuleSet(idx,
+        "Y, Y |- (?1 &&+0 Y), ()",
+              "X, X |- (?1 &&+- X), ()"
+        ), NARS.single());
+
+        System.out.println();
+
+        d.printRecursive();
+
+        System.out.println(d);
+
+        assertTrue(d.toString().contains("&&\",(truth(_,_),unify(1,%1),unify(0,%1,{(((?2 &&+0 %1),") );
+        assertTrue(d.toString().contains("(?2 &&+- %1)") );
+
+
+        //test that A..+ survives as an ellipsis
+        //assertTrue(d.trie.getSummary().contains("..+"));
+    }
 
 
     static final String r0 = "(S --> P), (S <-> P), task(\"?\") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief)";
@@ -99,6 +157,7 @@ public class TrieDeriverTest {
 //        };
 //        return d;
 //    }
+
 
 //    @Test public void testEllipsisRule() {
 //        TrieDeriver d = testRule(

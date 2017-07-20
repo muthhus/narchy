@@ -1,6 +1,7 @@
 package nars.derive.rule;
 
 import com.google.common.collect.Lists;
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static nars.Op.Null;
 
 
 /**
@@ -76,16 +78,20 @@ public class PremiseRuleSet {
     private static final Logger logger = LoggerFactory.getLogger(PremiseRuleSet.class);
 
 
-    public PremiseRuleSet(@NotNull PremiseRule... rules) {
-        this(false, rules);
+    public PremiseRuleSet(PatternTermIndex index, @NotNull PremiseRule... rules) {
+        this(false, index, rules);
     }
 
-    public PremiseRuleSet(boolean permute, @NotNull PremiseRule... rules) {
-        this.patterns = new PatternTermIndex();
+    public PremiseRuleSet(PatternTermIndex index, @NotNull String... rules) {
+        this(index, (PremiseRule[])parse(index, rules));
+    }
+
+    public PremiseRuleSet(boolean permute, PatternTermIndex index, @NotNull PremiseRule... rules) {
+        this.patterns = index;
         this.rules = $.newArrayList(rules.length);
         for (PremiseRule p : rules) {
             try {
-                this.rules.add(normalize(p, patterns));
+                this.rules.add(normalize(p, this.patterns));
             } catch (RuntimeException e) {
                 logger.error(" {}", e);
             }
@@ -209,6 +215,18 @@ public class PremiseRuleSet {
     @NotNull
     public static PremiseRule parse(@NotNull String src) throws Narsese.NarseseException {
         return parse(src, new PatternTermIndex());
+    }
+
+
+    public static PremiseRule[] parse(@NotNull PatternTermIndex index, @NotNull String... src)  {
+        return Util.map((s -> {
+            try {
+                return parse(s, index);
+            } catch (Narsese.NarseseException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }), new PremiseRule[src.length], src);
     }
 
     @NotNull

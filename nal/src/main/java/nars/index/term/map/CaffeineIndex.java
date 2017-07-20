@@ -5,6 +5,8 @@ import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.var.AbstractVariable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -164,12 +166,14 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
 
     @Override
-    public Termed get(Term key, boolean createIfMissing) {
+    public Termed get(Term x, boolean createIfMissing) {
+
+        assert(!(x instanceof Variable)): "variables should not be stored in index";
 
         if (createIfMissing) {
-            return concepts.get(key, conceptBuilder);
+            return concepts.get(x, conceptBuilder);
         } else {
-            return concepts.getIfPresent(key);
+            return concepts.getIfPresent(x);
         }
     }
 

@@ -11,6 +11,7 @@ import nars.index.TermBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.MapSubst1;
 import nars.term.transform.CompoundTransform;
@@ -259,10 +260,10 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
     @Nullable
     public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
-        if (!t.testSuperTerm(src)) {
-            return src;
-        } else {
+        if (t.testSuperTerm(src)) {
             return transform(src.op(), src.dt(), src, t);
+        } else {
+            return src;
         }
     }
 
@@ -285,11 +286,12 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 
         boolean filterTrueFalse = disallowTrueOrFalse(op);
 
-        int s = src.size(), subtermMods = 0;
+        @NotNull TermContainer srcSubs = src.subterms(); //for faster access, generally
+        int s = srcSubs.size(), subtermMods = 0;
         AppendProtoCompound target = new AppendProtoCompound(op, s);
         for (int i = 0; i < s; i++) {
 
-            Term x = src.sub(i), y;
+            Term x = srcSubs.sub(i), y;
 
             y = t.apply(src, x);
 
@@ -330,7 +332,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
             if (target.internable())
                 return op.the(dt, target.subs);
             else
-                return Op.compound(op, target, false); //HACK
+                return Op.compound(op, target, false).dt(dt); //HACK
 
         } else if (dt != src.dt())
             return src.dt(dt);

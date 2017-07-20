@@ -4,6 +4,7 @@ import jcog.Util;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import org.apache.commons.math3.stat.Frequency;
 
 import java.io.PrintStream;
@@ -30,7 +31,7 @@ public class TaskStatistics {
         return this;
     }
 
-    public TaskStatistics add(Concept c) {
+    public TaskStatistics add(TaskConcept c) {
         c.forEachTask(this::add);
         return this;
     }

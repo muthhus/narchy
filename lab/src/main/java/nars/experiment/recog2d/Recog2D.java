@@ -159,10 +159,7 @@ public class Recog2D extends NAgentX {
 
                         float freq, conf;
 
-                        long now = nar.time();
-                        int dur = nar.dur();
-
-                        Truth t = c.beliefs().truth(now, nar);
+                        Truth t = nar.beliefTruth(c, nar.time());
                         if (t != null) {
                             conf = t.conf();
                             freq = t.freq();
@@ -259,7 +256,7 @@ public class Recog2D extends NAgentX {
 
 
             long when = nar.time();
-            Truth g = nar.concept(outs.outVector[i]).beliefs().truth(when, nar);
+            Truth g = nar.beliefTruth(outs.outVector[i], when);
 
             if (g == null) {
                 error += 0.5;

@@ -3,6 +3,7 @@ package nars.term;
 import nars.*;
 import nars.concept.CompoundConcept;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -287,7 +288,7 @@ public class TemporalTest {
 
         n.run(2);
 
-        Concept a = n.conceptualize("(((SELF,#1)-->at) && goto(#1)).");
+        TaskConcept a = (TaskConcept) n.conceptualize("(((SELF,#1)-->at) && goto(#1)).");
         Concept a0 = n.conceptualize("(goto(#1) && ((SELF,#1)-->at)).");
         assertNotNull(a);
         assertTrue(a == a0);
@@ -427,7 +428,7 @@ public class TemporalTest {
 
 
 
-        Concept xImplY = n.conceptualize($("(x==>y)"));
+        TaskConcept xImplY = (TaskConcept) n.conceptualize($("(x==>y)"));
         assertEquals(3, xImplY.beliefs().size());
 
         int indexSize = n.terms.size();
@@ -470,7 +471,7 @@ public class TemporalTest {
 
 
         //INTERMPOLATION APPLIED DURING REVISION:
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(ETERNAL, null, null, true, null).term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", ((TaskConcept)cc).beliefs().match(ETERNAL, null, null, true, null).term().toString());
     }
 
     @Test
@@ -484,7 +485,7 @@ public class TemporalTest {
         //assertTrue(5 <= cb.size());
 
         String abpill = "((a==>b)-->[pill])";
-        Concept cc = n.conceptualize(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
+        TaskConcept cc = (TaskConcept) n.conceptualize(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
         assertNotNull(cc);
 

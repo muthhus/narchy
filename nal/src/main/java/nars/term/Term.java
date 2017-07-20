@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -397,6 +398,13 @@ public interface Term extends Termlike, Comparable<Termlike> {
         events.add(PrimitiveTuples.pair(this, dt));
     }
 
+    default void printRecursive() {
+        printRecursive(System.out);
+    }
+
+    default void printRecursive(@NotNull PrintStream out) {
+        Terms.printRecursive(out, this);
+    }
 
     @NotNull
     static Term nullIfNull(@Nullable Term maybeNull) {

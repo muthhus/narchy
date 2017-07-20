@@ -5,7 +5,9 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.concept.Concept;
+import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
+import nars.table.TaskTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -57,7 +59,9 @@ abstract public class DynamicTruthModel {
 
             Concept subConcept = n.concept(subterm);
             if (subConcept == null)
-                return null;
+                return null; //ok just missing
+            else if (!(subConcept instanceof TaskConcept))
+                throw new RuntimeException("dynamically evaluated term should have only believable subterms");
 
             int dt = superterm.subtermTime(subterm);
             if (dt == DTERNAL)
@@ -69,7 +73,7 @@ abstract public class DynamicTruthModel {
             Task bt = null;
             if (evi) {
                 //task
-                bt = ((BeliefTable)subConcept.table(beliefOrGoal ? BELIEF : GOAL)).match( when + dt, null, (Compound)subterm, false, n);
+                bt = ((BeliefTable)((TaskConcept)subConcept).table(beliefOrGoal ? BELIEF : GOAL)).match( when + dt, null, (Compound)subterm, false, n);
                 if (bt == null) {
                     return null;
                 }

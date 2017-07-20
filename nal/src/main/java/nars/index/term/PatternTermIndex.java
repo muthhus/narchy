@@ -23,17 +23,26 @@ import static nars.Op.NEG;
 public class PatternTermIndex extends MapTermIndex {
 
     public PatternTermIndex() {
-        super(new HashMap<>(/*capacity*/) );
+        super(new HashMap<>(/*capacity*/));
     }
+
 
     @Override
     public Termed get(@NotNull Term x, boolean createIfMissing) {
-        if (x instanceof Compound) {
-            x = compute((Compound)x);
+        if (x instanceof Variable)
+            return x;
+
+        if (createIfMissing) {
+            if (x instanceof Compound) {
+                x = compute((Compound) x);
+            }
+            if (x instanceof NonInternable)
+                return x;
+            Termed y = concepts.putIfAbsent(x, x);
+            return y != null ? y : x;
+        } else {
+            return concepts.get(x);
         }
-        return x;
-        //Termed y = concepts.putIfAbsent(x, x);
-        //return y!=null ? y : x;
     }
 
 
@@ -61,7 +70,7 @@ public class PatternTermIndex extends MapTermIndex {
 //                    b = get(a, true);
 //                }
 //            } else {
-                b = get(a, true);
+            b = get(a, true);
 //            }
             if (a != b) {
                 changed = true;
@@ -120,13 +129,15 @@ public class PatternTermIndex extends MapTermIndex {
 //                return new PatternCompound.PatternCompoundWithEllipsisLinearImageTransform(
 //                        seed, (EllipsisTransform)e, v);
 //            } else {
-                return new PatternCompound.PatternCompoundWithEllipsisLinear(seed, e, v);
+            return new PatternCompound.PatternCompoundWithEllipsisLinear(seed, e, v);
 //            }
         }
 
     }
 
-    /** returns an normalized, optimized pattern term for the given compound */
+    /**
+     * returns an normalized, optimized pattern term for the given compound
+     */
     public @NotNull Compound pattern(@NotNull Compound ss) {
         return (Compound) get(transform(ss, new PremiseRule.PremiseRuleVariableNormalization()), true).term();
     }

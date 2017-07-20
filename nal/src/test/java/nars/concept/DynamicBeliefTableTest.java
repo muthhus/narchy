@@ -44,7 +44,7 @@ public class DynamicBeliefTableTest {
         n.believe("z:b", 0f, 0.9f);
         n.run(2);
         for (long now : new long[] { 0, n.time() /* 2 */, ETERNAL }) {
-            assertTrue(n.conceptualize($("((x|y)-->a)")).beliefs() instanceof DynamicBeliefTable);
+            assertTrue(((TaskConcept)n.conceptualize($("((x|y)-->a)"))).beliefs() instanceof DynamicBeliefTable);
             assertEquals($.t(1f, 0.81f), n.beliefTruth("((x|y)-->a)", now));
             assertEquals($.t(0f, 0.81f), n.beliefTruth(n.conceptualize($("((x|z)-->a)")), now));
             assertEquals($.t(1f, 0.81f), n.beliefTruth(n.conceptualize($("((x&z)-->a)")), now));
@@ -67,7 +67,7 @@ public class DynamicBeliefTableTest {
         n.believe("a:z", 1f, 0.9f);
         n.run(1);
 
-        Concept cc = n.conceptualize($("(&&, a:x, a:y, a:z)"));
+        TaskConcept cc = ((TaskConcept)n.conceptualize($("(&&, a:x, a:y, a:z)")));
         Truth now = n.beliefTruth(cc, n.time());
         assertTrue($.t(1f, 0.73f).equals(now, 0.01f));
         //the truth values were provided despite the belief tables being empty:
@@ -111,7 +111,7 @@ public class DynamicBeliefTableTest {
 //            System.out.println( i + ": " + cc.belief(i) );
 //        }
 
-        DynamicBeliefTable xtable = (DynamicBeliefTable) ((cc).beliefs());
+        DynamicBeliefTable xtable = (DynamicBeliefTable) (((TaskConcept)cc).beliefs());
         Compound template = $("((x) &&+4 (y))");
 
         DynTruth xt = xtable.truth(0, template, true, n);
@@ -144,7 +144,7 @@ public class DynamicBeliefTableTest {
         String c = "(tetris-->(((0,(1,(1))),(0,(0,(1,(0)))))&((1,(0,(1))),(0,(0,(1,(0)))))))";
         n.believe(c);
         n.run(1);
-        @Nullable Task a = n.conceptualize(c).beliefs().match((long) 0, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), null, false, n);
+        @Nullable Task a = ((TaskConcept)n.conceptualize(c)).beliefs().match((long) 0, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), null, false, n);
         //System.out.println(a);
         assertTrue(a.toString().endsWith(" (tetris-->(((0,(1,(1))),(0,(0,(1,(0)))))&((1,(0,(1))),(0,(0,(1,(0))))))). %1.0;.90%"));
 //        @Nullable Task b = n.concept(c).beliefs().match(10, 0, 1, $.task($("(tetris-->#1)"), QUESTION, null).apply(n), false);

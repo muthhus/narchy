@@ -3,6 +3,7 @@ package nars.conceptualize;
 import nars.NAR;
 import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;
+import nars.table.QuestionTable;
 import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
@@ -66,7 +67,15 @@ public interface ConceptBuilder extends Function<Term, Termed> {
             return null;
         }
 
+        @Override
+        public QuestionTable newQuestionTable() {
+            return null;
+        }
+
     };
 
     BeliefTable newBeliefTable(Compound t, boolean beliefOrGoal);
+
+    QuestionTable newQuestionTable();
+
 }

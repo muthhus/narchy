@@ -58,7 +58,7 @@ public class NARS {
 
         index = () ->
             //new CaffeineIndex(new DefaultConceptBuilder(), 8*1024, 16*1024, null)
-            new BasicTermIndex(2 * 1024 );
+            new BasicTermIndex(1 * 1024 );
 
         time = new CycleTime();
 
@@ -74,7 +74,12 @@ public class NARS {
         return new NARS().get();
     }
 
+    /** single thread but for multithread usage */
     public static NAR threadSafe() {
-        return new NARS().index(new CaffeineIndex(-1)).get();
+        return new NARS().concepts(new DefaultConceptBuilder() {
+            @Override public boolean concurrent() {
+                return true;
+            }
+        }).index(new CaffeineIndex(-1)).get();
     }
 }

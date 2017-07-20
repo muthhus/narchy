@@ -22,7 +22,7 @@ public interface QuestionTable extends TaskTable {
     /** allows question to pass through it to the link activation phase, but
      * otherwise does not store it
      */
-    @NotNull QuestionTable Unstored = new EmptyQuestionTable();
+    //@NotNull QuestionTable Unstored = new EmptyQuestionTable();
 
     @NotNull QuestionTable Null = new NullQuestionTable();
 
@@ -71,6 +71,7 @@ public interface QuestionTable extends TaskTable {
 
     }
 
+    /** untested */
     class EmptyQuestionTable extends QuestionTable.NullQuestionTable {
 
         final static HijackQuestionTable common = new HijackQuestionTable(1024, 3);
@@ -96,6 +97,9 @@ public interface QuestionTable extends TaskTable {
             return Integer.MAX_VALUE;
         }
 
-
+        @Override
+        public void capacity(int newCapacity) {
+            super.capacity(newCapacity);
+        }
     }
 }

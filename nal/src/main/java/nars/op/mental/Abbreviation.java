@@ -392,29 +392,29 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
             return abbr.meta();
         }
 
-        @NotNull
-        @Override
-        public BeliefTable beliefs() {
-            return abbr.beliefs();
-        }
-
-        @NotNull
-        @Override
-        public BeliefTable goals() {
-            return abbr.goals();
-        }
-
-        @NotNull
-        @Override
-        public QuestionTable questions() {
-            return abbr.questions();
-        }
-
-        @NotNull
-        @Override
-        public QuestionTable quests() {
-            return abbr.quests();
-        }
+//        @NotNull
+//        @Override
+//        public BeliefTable beliefs() {
+//            return abbr.beliefs();
+//        }
+//
+//        @NotNull
+//        @Override
+//        public BeliefTable goals() {
+//            return abbr.goals();
+//        }
+//
+//        @NotNull
+//        @Override
+//        public QuestionTable questions() {
+//            return abbr.questions();
+//        }
+//
+//        @NotNull
+//        @Override
+//        public QuestionTable quests() {
+//            return abbr.quests();
+//        }
     }
 
 

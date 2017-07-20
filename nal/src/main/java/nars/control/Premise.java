@@ -95,10 +95,12 @@ public class Premise {
                 }
             }
 
-            Concept beliefConcept = nar.concept(beliefTerm);
+            Concept _beliefConcept = nar.concept(beliefTerm);
 
             //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
-            if (beliefConcept instanceof TaskConcept) { //beliefs/goals will only be in TaskConcepts
+            if (_beliefConcept instanceof TaskConcept) { //beliefs/goals will only be in TaskConcepts
+
+                TaskConcept beliefConcept = (TaskConcept)_beliefConcept;
 
                 BeliefTable table =
                         ((task.isQuestion() && task.isGoal()) || task.isQuest()) ?
