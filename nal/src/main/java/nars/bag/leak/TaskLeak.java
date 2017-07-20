@@ -26,7 +26,7 @@ public abstract class TaskLeak</* TODO: A, */X, V extends PriReference<X>> exten
     TaskLeak(@NotNull Bag<X, V> bag, @NotNull FloatParam rate, @NotNull NAR n) {
         super(bag, rate);
         onTask = n.onTask(this);
-        onReset = n.eventReset.on((nn) -> clear());
+        onReset = n.eventClear.on((nn) -> clear());
         onCycle = n.onCycle((nn) -> commit(nn.time(), nn.dur()));
     }
     public void stop() {

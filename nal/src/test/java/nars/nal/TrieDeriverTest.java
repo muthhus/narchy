@@ -1,5 +1,6 @@
 package nars.nal;
 
+import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.derive.Deriver;
@@ -9,9 +10,13 @@ import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
 import nars.term.Term;
 import nars.term.Termed;
+import net.byteseek.utils.collections.IdentityHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
+
+import java.util.HashSet;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -27,33 +32,21 @@ public class TrieDeriverTest {
 
     @Test public void printCompiledRuleTree() {
 
-        TrieDeriver.print(TrieDeriver.the(Deriver.RULES, null), System.out);
-
+        TrieDeriver.print(TrieDeriver.the(Deriver.RULES, NARS.single()), System.out);
 
     }
 
 
 
-//    @Test public void printRuleSet() {
-//
-////        List<PremiseRule> rr = d.rules.rules;
-////        System.out.println(rr.size() + " rules");
-////        rr.forEach(r -> {
-////            System.out.println(r);
-////        });
-//
-//        d.trie.costAnalyze((t) -> 1, System.out);
-//    }
-
     @Test public void testConclusionWithXTERNAL() throws Narsese.NarseseException {
         PatternTermIndex idx = new PatternTermIndex() {
             @Override
-            public @Nullable Termed get(@NotNull Term t, boolean create) {
-                Termed u = super.get(t, create);
+            public @Nullable Termed get(@NotNull Term x, boolean create) {
+                Termed u = super.get(x, create);
                 assertNotNull(u);
-                if (u!=t) {
-                    System.out.println(t + " (" + t.getClass() + ")" + " -> " + u + " (" + u.getClass() + ")");
-                    if (u.equals(t) && u.getClass().equals(t)) {
+                if (u!= x) {
+                    System.out.println(x + " (" + x.getClass() + ")" + " -> " + u + " (" + u.getClass() + ")");
+                    if (u.equals(x) && u.getClass().equals(x)) {
                         fail("\t ^ same class, wasteful duplicate");
                     }
                 }
@@ -74,7 +67,7 @@ public class TrieDeriverTest {
 
         System.out.println(d);
 
-        assertTrue(d.toString().contains("&&\",(truth(_,_),unify(1,%1),unify(0,%1,{(((?2 &&+0 %1),") );
+        assertTrue(d.toString().contains(",((?2 &&+0 %1),") );
         assertTrue(d.toString().contains("(?2 &&+- %1)") );
 
         //assertTrue("something at least got stored in the index", idx.size() > 16);
@@ -84,12 +77,44 @@ public class TrieDeriverTest {
     }
 
 
-    static final String r0 = "(S --> P), (S <-> P), task(\"?\") |- (S --> P), (Belief:StructuralIntersection, Punctuation:Belief)";
+    @Test public void testCompile() {
+        PremiseRuleSet src = new PremiseRuleSet(
+            "(A --> B), (B --> C), neqRCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)"
+        );
+        NAR n = NARS.single();
+        PrediTerm d = src.compile(n);
 
-    static final String r1 = "((|,X,A..+) --> M), M, task(\".\") |- (X --> M), (Belief:StructuralDeduction)";
-    static final String r1Case = "<(|, puppy, kitten) --> animal>.";
+        d.printRecursive();
 
-    static final String rN = "(C --> {A..+}), (C --> {B..+}) |- (C --> {A..+,B..+}), (Belief:Union), (C --> intersect({A..+},{B..+})), (Belief:Intersection)";
+        Set<Term> byEquality = new HashSet();
+        Set<Term> byIdentity = new IdentityHashSet();
+        d.recurseTerms(a -> {
+            byEquality.add(a);
+            byIdentity.add(a);
+        });
+        System.out.println(d);
+        System.out.println("           volume: " + d.volume());
+        System.out.println("       complexity: " + d.complexity());
+        System.out.println("terms by equality: " + byEquality.size());
+        System.out.println("terms by identity: " + byIdentity.size());
+
+        System.out.println("  values: " + n.values.size());
+        n.values.forEach(System.out::println);
+
+        //PrediTerm e = src.compile(NARS.single());
+
+    }
+
+//    @Test public void printRuleSet() {
+//
+////        List<PremiseRule> rr = d.rules.rules;
+////        System.out.println(rr.size() + " rules");
+////        rr.forEach(r -> {
+////            System.out.println(r);
+////        });
+//
+//        d.trie.costAnalyze((t) -> 1, System.out);
+//    }
 
 
 //    @Test

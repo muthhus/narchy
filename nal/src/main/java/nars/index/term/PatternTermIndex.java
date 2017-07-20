@@ -30,17 +30,11 @@ public class PatternTermIndex extends MapTermIndex {
         if (x instanceof Variable)
             return x;
 
-        if (createIfMissing) {
-            if (x instanceof Compound) {
-                x = compute((Compound) x);
-            }
-            if (x instanceof NonInternable)
-                return x;
-            Termed y = concepts.putIfAbsent(x, x);
-            return y != null ? y : x;
-        } else {
-            return concepts.get(x);
+        Termed y = concepts.get(x);
+        if (y == null) {
+            concepts.put(x, y = x instanceof Compound ? compute((Compound) x) : x);
         }
+        return y;
     }
 
 
@@ -136,8 +130,14 @@ public class PatternTermIndex extends MapTermIndex {
     /**
      * returns an normalized, optimized pattern term for the given compound
      */
-    public @NotNull Compound pattern(@NotNull Compound ss) {
-        return (Compound) get(transform(ss, new PremiseRule.PremiseRuleVariableNormalization()), true).term();
+    public @NotNull Compound pattern(@NotNull Compound x) {
+
+        Term y = transform(x, new PremiseRule.PremiseRuleVariableNormalization());
+
+        assert(y!=null);
+
+        return (Compound) get(y, true).term();
+
     }
 
 }

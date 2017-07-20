@@ -27,7 +27,7 @@ public abstract class ConceptMap {
 	protected ConceptMap(@NotNull NAR nar) {
 
         regs = new Ons(
-        nar.eventReset.on(n -> {
+        nar.eventClear.on(n -> {
             frame = 0;
             reset();
         }),

@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 
-public class ProxyTerm<T extends Term> implements Term, NonInternable {
+public class ProxyTerm<T extends Term> implements Term {
 
     public /*HACK make unpublic */ T ref;
 

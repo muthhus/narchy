@@ -67,7 +67,7 @@ import static nars.time.Tense.XTERNAL;
  */
 public interface Compound extends Term, IPair, TermContainer {
 
-    static boolean equals(Compound a, @Nullable Object b) {
+    static boolean equals(@NotNull Compound a, @NotNull Object b) {
         if (a == b)
             return true;
         if (a.hashCode() != b.hashCode())

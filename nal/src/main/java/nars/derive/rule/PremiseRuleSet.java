@@ -2,10 +2,15 @@ package nars.derive.rule;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
+import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
+import nars.derive.TrieDeriver;
+import nars.derive.meta.PrediTerm;
 import nars.index.term.PatternTermIndex;
+import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.Pair;
@@ -20,6 +25,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,12 +37,9 @@ import static java.util.stream.Collectors.toList;
 /**
  * Holds an set of derivation rules and a pattern index of their components
  */
-public class PremiseRuleSet {
+public class PremiseRuleSet extends TreeSet<PremiseRule> {
 
-    public final List<PremiseRule> rules;
     private final boolean permuteBackwards, permuteForwards;
-
-
 
     @NotNull
     public static PremiseRuleSet rules(boolean permute, String... name) {
@@ -81,16 +84,20 @@ public class PremiseRuleSet {
         this(false, index, rules);
     }
 
+    public PremiseRuleSet(@NotNull String... rules) {
+        this(new PatternTermIndex(), rules);
+    }
+
     public PremiseRuleSet(PatternTermIndex index, @NotNull String... rules) {
-        this(index, (PremiseRule[])parse(index, rules));
+        this(index, (PremiseRule[])parse($.terms, rules));
     }
 
     public PremiseRuleSet(boolean permute, PatternTermIndex index, @NotNull PremiseRule... rules) {
+        super();
         this.patterns = index;
-        this.rules = $.newArrayList(rules.length);
         for (PremiseRule p : rules) {
             try {
-                this.rules.add(normalize(p, this.patterns));
+                this.add(normalize(p, this.patterns));
             } catch (RuntimeException e) {
                 logger.error(" {}", e);
             }
@@ -104,7 +111,7 @@ public class PremiseRuleSet {
     public PremiseRuleSet(@NotNull Stream<Pair<Compound, String>> parsed, @NotNull PatternTermIndex patterns, boolean permute) {
         this.patterns = patterns;
         this.permuteBackwards = this.permuteForwards = permute;
-        this.rules = permute(parsed, patterns).distinct().collect(toList());
+        permute(parsed, patterns).forEach(this::add);
     }
 
 
@@ -197,15 +204,11 @@ public class PremiseRuleSet {
 
     @NotNull
     static Stream<Pair<Compound, String>> parse(@NotNull Collection<String> rawRules, @NotNull PatternTermIndex index) {
-        return rawRules.stream()
-                //.distinct()
-                //.parallel()
-                //.sequential()
-                .map(src -> {
+        return rawRules.stream().map(src -> {
                     try {
                         return Tuples.pair(parse(src, index), src);
                     } catch (Narsese.NarseseException e) {
-                        logger.error(" {}", e);
+                        logger.error("{}:\t{}", e, src);
                         return null;
                     }
                 });
@@ -213,11 +216,11 @@ public class PremiseRuleSet {
 
     @NotNull
     public static PremiseRule parse(@NotNull String src) throws Narsese.NarseseException {
-        return parse(src, new PatternTermIndex());
+        return parse(src, $.terms);
     }
 
 
-    public static PremiseRule[] parse(@NotNull PatternTermIndex index, @NotNull String... src)  {
+    public static PremiseRule[] parse(@NotNull TermIndex index, @NotNull String... src)  {
         return Util.map((s -> {
             try {
                 return parse(s, index);
@@ -229,7 +232,7 @@ public class PremiseRuleSet {
     }
 
     @NotNull
-    public static PremiseRule parse(@NotNull String src, @NotNull PatternTermIndex index) throws Narsese.NarseseException {
+    public static PremiseRule parse(@NotNull String src, @NotNull TermIndex index) throws Narsese.NarseseException {
 
         //(Compound) index.parseRaw(src)
         String[] ab = src.split("\\|\\-");
@@ -355,5 +358,8 @@ public class PremiseRuleSet {
     private static final Pattern spacePattern = Pattern.compile(" ", Pattern.LITERAL);
 
 
+    public PrediTerm compile(NAR n) {
+        return TrieDeriver.the(this, n);
+    }
 }
 

@@ -20,12 +20,13 @@ import static org.junit.Assert.*;
 public class PremiseRuleTest {
 
 
-    static final Narsese p = Narsese.the();
+
 
 
     @Test
     public void testParser() throws Narsese.NarseseException {
 
+        final Narsese p = Narsese.the();
 
         //NAR p = new NAR(new Default());
 
@@ -52,20 +53,20 @@ public class PremiseRuleTest {
         int vv = 19;
         {
             PremiseRule x = PremiseRule.rule("<A --> B>, <B --> A> |- <A <-> B>, (Belief:Revision, Goal:Weak)");
-            x = PremiseRule.rule(x);
+            //x = PremiseRule.rule(x);
             assertEquals(vv, x.volume());
             //assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Revision-->Belief),(Weak-->Desire))))", x.toString());
 
         }
         {
             PremiseRule x = PremiseRule.rule("<A --> B>, <B --> A> |- <A <-> nonvar>, (Belief:Revision, Goal:Weak)");
-            x = PremiseRule.rule(x);
+            //x = PremiseRule.rule(x);
             assertEquals(vv, x.volume()); //same volume as previous block
             //assertEquals("(((%1-->%2),(%2-->%1)),((nonvar<->%1),((Revision-->Belief),(Weak-->Desire))))", x.toString());
         }
         {
             PremiseRule x = PremiseRule.rule(" <A --> B>, <B --> A> |- <A <-> B>,  (Belief:Conversion, Punctuation:Belief)");
-            x = PremiseRule.rule(x);
+            //x = PremiseRule.rule(x);
             assertEquals(vv, x.volume());
             //assertEquals("(((%1-->%2),(%2-->%1)),((%1<->%2),((Conversion-->Belief),(Judgment-->Punctuation))))", x.toString());
         }
@@ -79,7 +80,7 @@ public class PremiseRuleTest {
 
         //and the first complete rule:
         PremiseRule x = PremiseRule.rule("(S --> M), (P --> M) |- (P <-> S), (Belief:Comparison,Goal:Strong)");
-        x = PremiseRule.rule(x);
+        //x = PremiseRule.rule(x);
         //assertEquals("(((%1-->%2),(%3-->%2)),((%1<->%3),((Comparison-->Belief),(Strong-->Desire))))", x.toString());
         assertEquals(vv, x.volume());
 
@@ -153,7 +154,7 @@ public class PremiseRuleTest {
 //
 //    }
 
-    static final PremiseRuleSet permuter = new PremiseRuleSet(true, new PatternTermIndex());
+    final PremiseRuleSet permuter = new PremiseRuleSet(true, new PatternTermIndex());
 
     @Test
     public void testBackwardPermutations() throws Narsese.NarseseException {

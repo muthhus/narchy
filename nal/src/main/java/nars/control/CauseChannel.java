@@ -4,6 +4,7 @@ import jcog.math.AtomicSummaryStatistics;
 import jcog.pri.Priority;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -23,6 +24,13 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
         this.target = target;
     }
 
+    @Override
+    public String toString() {
+        return name.toString();
+    }
+
+    public final void input(Iterator<? extends X> xx) { xx.forEachRemaining( this ); }
+
     public final void input(Iterable<? extends X> xx) {
         xx.forEach( this );
     }
@@ -33,7 +41,11 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
 
     public final void input(X... x) {
         for (X p : x)
-            accept(p);
+            input(p);
+    }
+
+    public final void input(X x) {
+        accept(x);
     }
 
     @Override

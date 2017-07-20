@@ -65,6 +65,11 @@ public class MultiExecutioner extends Executioner {
     }
 
     @Override
+    public void runLaterAndWait(Runnable cmd) {
+        passive.submit(cmd).join();
+    }
+
+    @Override
     public void run(@NotNull ITask x) {
         int sub = worker(x);
         workers[sub].run(x);

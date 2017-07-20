@@ -3,6 +3,7 @@ package nars.derive.rule;
 import com.google.common.collect.Sets;
 import jcog.list.FasterList;
 import nars.$;
+import nars.NAR;
 import nars.Narsese;
 import nars.Op;
 import nars.control.premise.Derivation;
@@ -104,10 +105,6 @@ public class PremiseRule extends GenericCompound {
         Terms.printRecursive(System.out, x);
     }
 
-    @NotNull
-    public static PremiseRule rule(PremiseRule onlyRule) {
-        return new PremiseRuleSet(new PatternTermIndex(), onlyRule).rules.get(0);
-    }
 
     @NotNull
     public static PremiseRule rule(@NotNull String onlyRule) throws Narsese.NarseseException {
@@ -155,7 +152,7 @@ public class PremiseRule extends GenericCompound {
      * compiles the conditions which are necessary to activate this rule
      */
     @NotNull
-    public List<Term> conditions(@NotNull PostCondition post) {
+    public List<Term> conditions(@NotNull PostCondition post, NAR nar) {
 
         Set<Term> s = newHashSet(16); //for ensuring uniqueness / no duplicates
 
@@ -170,7 +167,7 @@ public class PremiseRule extends GenericCompound {
             throw new RuntimeException("unknown GoalFunction: " + post.goalTruth);
         }
 
-        Conclude conc = new Conclude(this, post.pattern, belief, goal, timeFunction);
+        Conclude conc = new Conclude(this, post.pattern, timeFunction);
 
         String beliefLabel = belief != null ? belief.toString() : "_";
         String goalLabel = goal != null ? goal.toString() : "_";
@@ -211,7 +208,7 @@ public class PremiseRule extends GenericCompound {
 
             l.addAll(match.post);
 
-            ((UnificationPrototype)match.post.get(match.post.size()-1)).conclude.add(conc);
+            ((UnificationPrototype)match.post.get(match.post.size()-1)).conclude.add(conc.apply(nar));
         }
 
         return l;
@@ -778,7 +775,7 @@ public class PremiseRule extends GenericCompound {
         TimeFunctions timeFunction = TimeFunctions.Auto;
         switch (XString) {
             case "task":
-                timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
+                timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
                     long occ = p.task.start();
                     occReturn[0] = occ;
                     boolean temporal = false;
@@ -845,7 +842,7 @@ public class PremiseRule extends GenericCompound {
                 };
                 break;
             case "belief":
-                timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull Conclude d, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
+                timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
                     long occ;
                     boolean temporal = false;
                     if (!p.task.isEternal()) {

@@ -81,7 +81,7 @@ public class Hear extends Loop {
         super( );
         this.nar = nar;
 
-        onReset = nar.eventReset.onWeak(this::onReset);
+        onReset = nar.eventClear.onWeak(this::onReset);
         tokens = msg;
         context = null; //TODO //who.isEmpty() ? null : $.the(who);
         //contextAnonymous = new Term[]{$.the("hear"), $.varDep(1), Op.Imdex};

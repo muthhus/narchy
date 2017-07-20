@@ -26,7 +26,7 @@ abstract public class STM /*extends BagBuffer<Task>*/ implements Consumer<Task> 
             if (stmLinkable(t, allowNonInput))
                 accept(t);
         });
-        nar.eventReset.on(n -> clear());
+        nar.eventClear.on(n -> clear());
     }
 
     static boolean stmLinkable(@NotNull Task newEvent, boolean allowNonInput) {

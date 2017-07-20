@@ -151,7 +151,7 @@ abstract public class NAgent implements NSense, NAct {
         curiosity = new FloatParam(0.10f);
 
 
-        if (id==null) id = $.the(getClass().getSimpleName());
+        if (id==null) id = $.quote(getClass().toString());
         this.sense = nar.newInputChannel(id + " sensor");
         this.predict = nar.newInputChannel(id + " predict");
         this.motor = nar.newInputChannel(id + " motor");

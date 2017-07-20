@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 public class TemporalTest {
 
     @NotNull
-    static final NAR n = new NARS().get();
+    final NAR n = NARS.single();
 
 
     @Test

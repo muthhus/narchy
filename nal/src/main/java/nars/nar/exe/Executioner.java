@@ -54,7 +54,9 @@ abstract public class Executioner implements Executor {
 //        }
 
 
-    abstract public void runLater(Runnable cmd);
+    public abstract void runLater(Runnable cmd);
+
+    public abstract void runLaterAndWait(Runnable cmd);
 
 
     /** a positive or negative value indicating the percentage difference from the
@@ -76,6 +78,8 @@ abstract public class Executioner implements Executor {
     public final void execute(Runnable whenIGetAroundToIt) {
         runLater(whenIGetAroundToIt);
     }
+
+
 
     /** returns whether the input was accepted */
     abstract public void run(@NotNull ITask input);

@@ -1,10 +1,7 @@
 package nars.derive.meta.op;
 
 import nars.control.premise.Derivation;
-import nars.derive.meta.AbstractPred;
-import nars.derive.meta.Conclude;
-import nars.derive.meta.Fork;
-import nars.derive.meta.PrediTerm;
+import nars.derive.meta.*;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -20,8 +17,6 @@ import java.util.function.Function;
  */
 abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
-    @Nullable
-    private PrediTerm eachMatch;
 
     @NotNull
     protected Compound id;
@@ -34,7 +29,7 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
     /**
      * derivation handlers; use the array form for fast iteration
      */
-    public final TreeSet<Conclude> conclude = new TreeSet();
+    public final TreeSet<Conclusion> conclude = new TreeSet();
 
     public UnificationPrototype(@NotNull Compound id, Term pattern) {
         super(id);
@@ -80,7 +75,7 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
                 break;
             default:
                 om = Fork.fork(
-                        conclude.toArray(new Conclude[cs])
+                    conclude.toArray(new Conclusion[cs])
                 );
                 break;
         }

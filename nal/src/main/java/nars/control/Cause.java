@@ -53,7 +53,7 @@ public class Cause<X> {
 
     @Override
     public String toString() {
-        return name + "Cause[" + id + "]=" + super.toString();
+        return name + "[" + id + "]=" + super.toString();
     }
 
     /** current optimism level */

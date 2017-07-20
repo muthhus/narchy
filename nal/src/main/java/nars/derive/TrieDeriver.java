@@ -37,48 +37,16 @@ public enum TrieDeriver {
         return the(r, nar, (x) -> x);
     }
 
-    public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each0) {
+    public static PrediTerm<Derivation> the(PremiseRuleSet r, NAR nar, Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each) {
 
         //return Collections.unmodifiableList(premiseRules);
-        final TermTrie<Term, PremiseRule> trie = new RuleTrie();
-        r.rules.forEach(trie::put);
+        final TermTrie<Term, PremiseRule> trie = new RuleTrie(nar);
+        r.forEach(trie::put);
 
-        @NotNull List<PrediTerm> bb = subtree(trie.root);
+        List<PrediTerm> bb = subtree(trie.root);
         PrediTerm[] roots = bb.toArray(new PrediTerm[bb.size()]);
 
-        Function<PrediTerm<Derivation>, PrediTerm<Derivation>> each;
-        if (nar != null) {
-            each = (a) -> {
-
-                //System.out.println(System.identityHashCode(a) + " transform: " + a );
-
-                if (a instanceof Conclude) {
-                    Conclude x = (Conclude) a;
-//                    if (x.cause[0]!=-1) {
-//                        System.err.println(x.rule);
-//                        System.err.println("WTF");
-//                    }
-                    //assert (x.cause[0] == -1);
-                    if (x.cause[0]==-1)
-                        x.setCause(nar.newCause(x).id);
-
-                }
-
-                if (a == null)
-                    return null; //allow nulls
-
-                return each0.apply(a);
-
-            };
-        } else {
-            each = each0;
-        }
-
-//        for (int i = 0; i < roots.length; i++)
-//            roots[i] = roots[i].transform(each);
-
         return Fork.fork(roots).transform(each);
-
     }
 
 
@@ -507,8 +475,11 @@ public enum TrieDeriver {
 
     static final class RuleTrie extends TermTrie<Term, PremiseRule> {
 
-        public RuleTrie() {
+        private final NAR nar;
+
+        public RuleTrie(NAR nar) {
             super();
+            this.nar = nar;
         }
 
         @Override
@@ -530,7 +501,7 @@ public enum TrieDeriver {
 
             for (PostCondition p : rule.POST) {
 
-                List<Term> c = rule.conditions(p);
+                List<Term> c = rule.conditions(p, nar);
 
                 PremiseRule existing = put(c, rule);
 

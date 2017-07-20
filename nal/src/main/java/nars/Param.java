@@ -33,8 +33,8 @@ public abstract class Param  {
 
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
-            //Util::or;
-            UtilityFunctions::aveAri;
+            Util::or;
+            //UtilityFunctions::aveAri;
             //Util::and;
             //Math::min;
             //Math::max;
@@ -43,7 +43,7 @@ public abstract class Param  {
     public final static int SIGNAL_LATCH_TIME =
                     //0;
                     //Integer.MAX_VALUE;
-                    32;
+                    16;
 
     /** cost of a termutate call */
     public static final int TTL_MUTATE = 1;
@@ -60,13 +60,18 @@ public abstract class Param  {
     /** cost of a failed/aborted task derivation */
     public static final int TTL_DERIVE_TASK_FAIL = 1;
 
-    /** no term sharing means faster comparison but potentially more memory usage. TODO determine effects */
-    public static boolean CompoundDT_TermSharing = false;
 
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.995f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.985f, 0, 1f);
     public final FloatParam valueNegativeDecay = new FloatParam(0.97f, 0, 1f);
+    /** pessimistic negative value applied to each accepted task. this may
+     * be balanced by a future positive value (ie. on concept processing) */
+    public static float valueAtInput(Task accepted, NAR nar) {
+        int vol = accepted.volume();
+        return -(vol)/nar.termVolumeMax.floatValue()/1000f;
+    }
+
 
     /**
      * use this for advanced error checking, at the expense of lower performance.
@@ -224,6 +229,8 @@ public abstract class Param  {
     }
 
 
+    /** no term sharing means faster comparison but potentially more memory usage. TODO determine effects */
+    public static boolean CompoundDT_TermSharing = false;
 
 
     /**

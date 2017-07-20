@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.FloatParam;
+import jcog.event.On;
 import jcog.math.MultiStatistics;
 import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Pri;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -119,6 +121,7 @@ public class BufferedExecutioner extends Executioner {
                 }
             };
     private Random rng;
+    private On onClear;
 
     //final DecideRoulette<ITask> activeBuffer = new DecideRoulette<>(CLink::priElseZero);
 
@@ -152,6 +155,9 @@ public class BufferedExecutioner extends Executioner {
 
         flush();
 
+        onClear.off();
+        onClear = null;
+
         super.stop();
 
     }
@@ -162,9 +168,14 @@ public class BufferedExecutioner extends Executioner {
         super.start(nar);
 
         this.rng = nar.random();
+        this.onClear = nar.eventClear.on((n)->{
+            tasks.clear();
+            concepts.clear();
+        });
 
         flush(); //<- may not be necessary
     }
+
 
 
 //    @Override
@@ -183,11 +194,18 @@ public class BufferedExecutioner extends Executioner {
     }
 
 
+    //final ConcurrentLinkedQueue  pendingRuns = new ConcurrentLinkedQueue();
+
     @Override
     public void runLater(Runnable r) {
-        r.run(); //default to synchronous execution
+        //pendingRuns.add(r);
+        r.run(); //default: inline
     }
 
+    @Override
+    public void runLaterAndWait(Runnable r) {
+        r.run(); //default: inline
+    }
 
     protected void flush() {
 
