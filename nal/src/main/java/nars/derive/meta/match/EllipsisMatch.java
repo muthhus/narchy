@@ -102,8 +102,9 @@ public class EllipsisMatch extends ProxyCompound implements NonInternable {
         int xs = x.size();
         for (int i = 0; i < xs; i++) {
             Term e = x.sub(i);
-            if (!(y.contains(e) && target.add(e)))
+            if (!(y.contains(e) && target.add(e))) {
                 return false;
+            }
             n++;
         }
         return (n >= min);

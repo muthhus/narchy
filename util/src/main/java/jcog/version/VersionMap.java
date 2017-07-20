@@ -113,15 +113,8 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
         throw new UnsupportedOperationException("use tryPut(k,v)");
     }
 
-    public boolean tryPut(X key, Y value) {
-        Versioned<Y> slot = getOrCreateIfAbsent(key);
-        if (slot.get()!=null)
-            return false;
-        return slot.set(value) != null;
-    }
-
-    public final void putConstant(X key, Y value) {
-        map.put(key, new Versioned(value));
+     public boolean tryPut(X key, Y value) {
+        return getOrCreateIfAbsent(key).set(value) != null;
     }
 
     public final Versioned<Y> getOrCreateIfAbsent(X key) {
@@ -181,7 +174,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
         //return map.keySet();
     }
 
-    public static final VersionMap Empty = new VersionMap(new Versioning(0), 0) {
+    public static final VersionMap Empty = new VersionMap(new Versioning<>(0, 0), 0) {
 
         @Override
         public boolean tryPut(Object key, Object value) {

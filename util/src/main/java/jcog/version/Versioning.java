@@ -4,7 +4,6 @@ import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.function.Consumer;
 
 /**
  * versioning context that holds versioned instances
@@ -14,9 +13,11 @@ public class Versioning<X> extends
         FasterList<Versioned<X>> {
 
 
+    public int ttl;
 
-    public Versioning(int capacity) {
+    public Versioning(int capacity, int ttl) {
         super(0, new Versioned[capacity]);
+        this.ttl = ttl;
     }
 
     @NotNull
@@ -26,43 +27,53 @@ public class Versioning<X> extends
     }
 
 
+    public final boolean revertAndContinue(int to) {
+        revert(to);
+        return live();
+    }
+
     /**
      * reverts/undo to previous state
      */
     public final void revert(int when) {
+        //assert (size >= when);
 
-        int s = size();
+        //pop(size - when );
+
+        int s = size;
         int c = s - when;
 
         while (c-- > 0) {
-            Versioned versioned = items[--size];
-            items[size] = null; //GC help
+
+            //Versioned versioned =
+                    //removeLast();
+
+            Versioned versioned = items[--size]; //pop()
+            items[size] = null;
+
 
             versioned.pop();
+
+            //}
+            //assert(removed!=null);
+            //TODO removeLastFast where we dont need the returned value
         }
+
     }
 
-    public final void revert(int when, Consumer<X> each) {
-
-        int s = size();
-        int c = s - when;
-
-        while (c-- > 0) {
-            Versioned<X> versioned = items[--size];
-            items[size] = null; //GC help
-
-            each.accept( versioned.getAndPop() );
-        }
-    }
 
     @Override
     public void clear() {
         revert(0);
     }
 
+    @Override
+    public boolean add(@NotNull Versioned<X> newItem) {
+        return tick() && super.add(newItem);
+    }
 
     @Override
-    public void add(int index, Versioned element) {
+    public void add(int index, Versioned<X> element) {
         throw new UnsupportedOperationException();
     }
 
@@ -81,20 +92,21 @@ public class Versioning<X> extends
         throw new UnsupportedOperationException();
     }
 
-    //    @Override
-//    public final boolean add(@NotNull Versioned newItem) {
-//        Versioned[] ii = this.items;
-//        if (ii.length == this.size) {
-//            return false;
-//        } else {
-//            if (!tick())
-//                return false;
-//
-//            assert(this.size <= ii.length);
-//            ii[this.size++] = newItem;
-//            return true;
-//        }
-//    }
+    public final void stop() {
+        setTTL(0);
+    }
+    public final boolean tick() {
+        return (ttl-- > 0);
+    }
 
+    /**
+     * whether the unifier should continue: if TTL is non-zero.
+     */
+    public final boolean live() {
+        return ttl > 0;
+    }
 
+    public final void setTTL(int ttl) {
+        this.ttl = ttl;
+    }
 }

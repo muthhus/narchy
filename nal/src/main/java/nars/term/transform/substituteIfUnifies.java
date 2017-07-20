@@ -115,7 +115,7 @@ abstract public class substituteIfUnifies extends Functor {
 
 
 
-        Term z = new SubUnify(parent, op, Param.BeliefMatchTTL).tryMatch(input, x, y);
+        Term z = new SubUnify(parent, op).tryMatch(input, x, y);
         return (z != null) ? z : Null;
     }
 

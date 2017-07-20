@@ -6,6 +6,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.MapSubst;
 import nars.term.subst.SubUnify;
+import nars.term.subst.Unify;
 import nars.term.transform.VariableNormalization;
 import nars.term.util.InvalidTermException;
 import nars.term.var.Variable;
@@ -62,12 +63,13 @@ public class TaskRule extends TaskMatch {
 
     }
 
-    private class MySubUnify extends SubUnify {
+    private class MySubUnify extends Unify {
 
         private final Task x;
+        static final int TTL = Param.BeliefMatchTTL;
 
         public MySubUnify(Task x) {
-            super(TaskRule.this.nar.terms, Op.VAR_PATTERN, TaskRule.this.nar.random(), Param.UnificationTTLMax);
+            super(TaskRule.this.nar.terms, Op.VAR_PATTERN, TaskRule.this.nar.random(), Param.UnificationTTLMax, TTL);
             this.x = x;
         }
 
@@ -83,10 +85,10 @@ public class TaskRule extends TaskMatch {
     public boolean test(Task x) {
         if (super.test(x)) {
 
-            final SubUnify match = new MySubUnify(x);
+            final MySubUnify match = new MySubUnify(x);
 
             try {
-                match.tryMatch(input, x.term());
+                match.unify(input, x.term(), true);
             } catch (InvalidTermException | InvalidTaskException e) {
                 onError(e);
             }

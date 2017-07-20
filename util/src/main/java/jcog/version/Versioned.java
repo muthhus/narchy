@@ -1,6 +1,7 @@
 package jcog.version;
 
 import jcog.list.FasterList;
+import jcog.list.LimitedFasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,28 +9,24 @@ import org.jetbrains.annotations.Nullable;
  * Maintains a versioned snapshot history (stack) of a changing value.
  * Managed by a Versioning context
  */
-public class Versioned<X>
-        //extends FastList<X>
-        extends FasterList<X>
+public class Versioned<X> extends
+        //FastList<X>
+        FasterList<X>
+        //LimitedFasterList<X> //not supported yet
 {
 
 
     @NotNull
     protected final Versioning context;
 
-    public Versioned(@NotNull Versioned<X> copy) {
-        super(copy);
-        this.context = copy.context;
-    }
+//    public Versioned(@NotNull Versioned<X> copy) {
+//        super(copy);
+//        this.context = copy.context;
+//    }
 
-    public Versioned(@NotNull Versioning sharedContext, int initialCapacity) {
-        super(initialCapacity);
+    public Versioned(@NotNull Versioning sharedContext, int cap) {
+        super(cap);
         this.context = sharedContext;
-    }
-
-    protected Versioned(X... constValue) {
-        super(constValue.length, constValue);
-        this.context = null;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package nars.term.subst;
 
+import jcog.list.FasterList;
 import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
@@ -77,7 +78,7 @@ public interface Subst  {
 
         Op op = x.op();
 
-        List<Term> next = $.newArrayList(len);
+        FasterList<Term> next = new FasterList();
 
         //early prefilter for True/False subterms
         boolean filterTrueFalse = disallowTrueOrFalse(op);
@@ -123,7 +124,7 @@ public interface Subst  {
 //                return null;
 //        }
 
-        return op.the(curr.dt(), next.toArray(new Term[next.size()]));
+        return op.the(curr.dt(), next.array(Term[].class));
     }
 
 

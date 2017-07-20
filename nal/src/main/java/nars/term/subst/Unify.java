@@ -44,7 +44,7 @@ So it can be useful for a more easy to understand rewrite of this class TODO
 
 
 */
-public abstract class Unify implements Subst {
+public abstract class Unify extends Versioning implements Subst {
 
     protected final static Logger logger = LoggerFactory.getLogger(Unify.class);
 
@@ -60,7 +60,7 @@ public abstract class Unify implements Subst {
     //new LinkedHashSet();
 
     @NotNull
-    public final Versioning<Term> versioning;
+    public final Versioning<Term> versioning = this;
 
     @NotNull
     public TermIndex terms;
@@ -73,13 +73,14 @@ public abstract class Unify implements Subst {
      */
     public int dur = -1;
 
-    public int ttl;
+
 
     /**
      * free variables remaining unassigned, for counting
      */
     protected Versioned<Set<Term>> free;
-    public int unassigned;
+    //public Versioned<Integer> freeCount;
+
     //protected final Set<NewCompound> matched = new HashSet();
 
 
@@ -87,9 +88,26 @@ public abstract class Unify implements Subst {
         this($.terms, type, random, stackMax, ttl);
     }
 
-    protected Unify(TermIndex terms, @Nullable Op type, Random random, int stackMax, int ttl) {
-        this(terms, type, random, new Versioning(stackMax));
-        setTTL(ttl);
+
+
+    /**
+     * @param terms
+     * @param type       if null, unifies any variable type.  if non-null, only unifies that type
+     * @param random
+     * @param versioning
+     */
+    protected Unify(TermIndex terms, @Nullable Op type, Random random, int initialCap, int ttl) {
+        super(initialCap, ttl);
+
+        this.terms = terms;
+
+        this.random = random;
+        this.type = type;
+
+        xy = new ConstrainedVersionMap(versioning, Param.UnificationVariableStackInitial);
+        this.free = new Versioned<>(versioning, 8);
+        //this.freeCount = new Versioned<>(versioning, 8);
+
     }
 
     /**
@@ -99,44 +117,6 @@ public abstract class Unify implements Subst {
         return ((ttl -= cost) > 0);
     }
 
-    /**
-     * whether the unifier should continue: if TTL is non-zero.
-     */
-    public final boolean live() {
-        return ttl > 0;
-    }
-
-    /**
-     * set the TTL value
-     */
-    public final void setTTL(int ttl) {
-        this.ttl = ttl;
-    }
-
-    public final void stop() {
-        setTTL(0);
-    }
-
-    /**
-     * @param terms
-     * @param type       if null, unifies any variable type.  if non-null, only unifies that type
-     * @param random
-     * @param versioning
-     */
-    protected Unify(TermIndex terms, @Nullable Op type, Random random, @NotNull Versioning versioning) {
-        super();
-
-        this.terms = terms;
-
-        this.random = random;
-        this.type = type;
-
-        this.versioning = versioning;
-
-        xy = new ConstrainedVersionMap(versioning, Param.UnificationVariableStackInitial);
-        this.free = new Versioned<>(versioning, 8);
-
-    }
 
 
     /**
@@ -167,11 +147,6 @@ public abstract class Unify implements Subst {
     }
 
 
-    protected final void set(@NotNull Term t) {
-        xy.putConstant(t, t);
-    }
-
-
     public final void unifyAll(@NotNull Compound x, @NotNull Compound y) {
         unify(x, y, true);
     }
@@ -196,7 +171,7 @@ public abstract class Unify implements Subst {
         }
         free.set(newFree); //plus and not equals because this may continue from another unification!!!!!
         //assert (unassigned.isEmpty() ) : "non-purposeful unification";
-        this.unassigned = newFree.size();
+        //this.freeCount.add( newFree.size() );
 
         if (unify(x, y)) {
 
@@ -243,13 +218,13 @@ public abstract class Unify implements Subst {
     private void tryMatch() {
 
 
-        if (unassigned > 0) {
-            //quick test for no assignments
-            return;
-        }
+//        if (freeCount.get() > 0) {
+//            //quick test for no assignments
+//            return;
+//        }
 
-//        //filter incomplete matches by detecting them here
-//        //TODO use a counter to measure this instead of checking all the time
+        //filter incomplete matches by detecting them here
+        //TODO use a counter to measure this instead of checking all the time
 //        Iterator<Map.Entry<Term, Versioned<Term>>> ee = xy.map.entrySet().iterator();
 //        while (ee.hasNext()) {
 //            Map.Entry<Term, Versioned<Term>> e = ee.next();
@@ -258,6 +233,9 @@ public abstract class Unify implements Subst {
 //                return;
 //        }
 
+        for (Term f : free.get())
+            if (xy(f)==null)
+                return;
 
 //        if (!matched.add(((ConstrainedVersionMap)xy).snapshot()))
 //            return; //already seen
@@ -269,7 +247,7 @@ public abstract class Unify implements Subst {
 
     @Override
     public String toString() {
-        return xy + "@" + ttl;
+        return xy + "@" + versioning.ttl;
     }
 
     @Override
@@ -335,10 +313,10 @@ public abstract class Unify implements Subst {
         return versioning.size();
     }
 
-    public final boolean revert(int then) {
-        versioning.revert(then);
-        return live();
-    }
+//    public final boolean revert(int then) {
+//        versioning.revert(then);
+//        return live();
+//    }
 
     private class ConstrainedVersionMap extends VersionMap<Term, Term> {
         public ConstrainedVersionMap(@NotNull Versioning versioning, int maxVars) {
@@ -358,17 +336,23 @@ public abstract class Unify implements Subst {
 //            return x.get();
 //        }
 
-        @Override
-        public boolean tryPut(Term key, @NotNull Term value) {
-            if (super.tryPut(key, value)) {
-                if (matchType(key)) {
-                    unassigned--;
-                    assert (unassigned >= 0);
-                }
-                return true;
-            }
-            return false;
-        }
+//        @Override
+//        public boolean tryPut(Term key, @NotNull Term value) {
+//            int beforePut = matchType(key) ? now() : Integer.MAX_VALUE;
+//            if (super.tryPut(key, value)) {
+//                if (now() > beforePut) { //detects change and not just an equals() match
+////                    int nextUnassigned = freeCount.get() - 1;
+////
+////                    if (nextUnassigned < 0)
+////                        return false;
+////                    //assert(nextUnassigned >= 0): "underflow";
+////
+////                    freeCount.add(nextUnassigned);
+//                }
+//                return true;
+//            }
+//            return false;
+//        }
 
         @NotNull
         @Override
@@ -411,17 +395,16 @@ public abstract class Unify implements Subst {
             this.forMatchedType = forMatchedType;
         }
 
-        @Override
-        public void pop() {
-            if (forMatchedType) {
-                if (get() != null) {
-                    unassigned++; //relase assigned variable
-                }
-            }
-
-            super.pop();
-
-        }
+//        @Override
+//        public void pop() {
+//            if (forMatchedType) {
+//                if (get() != null) {
+//                    freeCount.add(freeCount.get()+1); //relase assigned variable
+//                }
+//            }
+//
+//            super.pop();
+//        }
 
         @Nullable
         @Override

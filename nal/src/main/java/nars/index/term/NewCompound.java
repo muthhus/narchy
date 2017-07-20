@@ -56,6 +56,8 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
         this.op = op;
         if (initial_capacity > 0)
             this.subs = new Term[initial_capacity];
+        else
+            this.subs = Term.EmptyArray;
     }
 
     /**

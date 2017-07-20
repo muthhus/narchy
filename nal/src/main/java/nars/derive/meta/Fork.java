@@ -44,7 +44,7 @@ public class Fork extends ProxyCompound implements PrediTerm<Derivation> {
         int before = m.now();
         for (int i = 0; i < branches; i++) {
             cache[order[i]].test(m);
-            if (!m.revert(before))
+            if (!m.revertAndContinue(before))
                 return false;
         }
 

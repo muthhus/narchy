@@ -819,9 +819,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     /**
      * a must be in input, and output must be of size input.length-1
+     * equality is compared by instance for speed
      */
-    @NotNull
-    static Term[] except(@NotNull Term[] input, Term a, @NotNull Term[] output) {
+    @NotNull static Term[] exceptByInstance(@NotNull Term[] input, Term a, @NotNull Term[] output) {
 //        int targetLen = input.size() - 1;
 //        if (output.length!= targetLen) {
 //            throw new RuntimeException("wrong size");

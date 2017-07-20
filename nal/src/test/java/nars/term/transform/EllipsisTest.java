@@ -55,7 +55,7 @@ public class EllipsisTest {
             assertNotNull(y);
             assertTrue(y.isNormalized());
             //no variables in Y
-            y.forEach(yy -> { assertFalse(yy instanceof Variable); });
+            y.forEach(yy -> assertFalse(yy instanceof Variable));
 
             Compound r = getResult();
             assertTrue(r.isNormalized());
@@ -67,6 +67,7 @@ public class EllipsisTest {
             ///x.forEach(xx -> { assertFalse(xx.toString() + " is var", xx instanceof Variable ); });
 
             Term ellipsisTerm = firstEllipsis(x);
+                        assertNotNull(ellipsisTerm);
 
 
 
@@ -82,7 +83,6 @@ public class EllipsisTest {
                     public void onMatch() {
                         //System.out.println(x + "\t" + y + "\t" + this);
 
-                        assertNotNull(ellipsisTerm);
 
                         Term a = xy(ellipsisTerm);
                         if (a instanceof EllipsisMatch) {
@@ -123,7 +123,7 @@ public class EllipsisTest {
 
 
                         //2. test substitution
-                        Term s = Termed.termOrNull(transform(r));
+                        Term s = Termed.termOrNull(transform(x));
                         if (s!=null) {
                             //System.out.println(s);
                             if (s.varPattern()==0)
@@ -268,7 +268,7 @@ public class EllipsisTest {
             Set<Term> s = super.test(arity, repeats);
             Term the = s.isEmpty() ? null : s.iterator().next();
             assertNotNull(the);
-            assertTrue(the.toString().substring(1).length() > 0 && the.toString().substring(1).charAt(0) == 'Z');
+            assertTrue(!the.toString().substring(1).isEmpty() && the.toString().substring(1).charAt(0) == 'Z');
             return s;
         }
 
@@ -402,7 +402,6 @@ public class EllipsisTest {
                 @Override
                 public void onMatch() {
                     results.add(xy.toString());
-                    setTTL(0);
                 }
             };
 
@@ -418,7 +417,7 @@ public class EllipsisTest {
         //rule: ((&&,M,A..+) ==> C), ((&&,A,..) ==> C) |- M, (Truth:Abduction, Order:ForAllSame)
         testCombinations(
                 $("(&&, %1..+, %2)"),
-                $("(&&, <r --> [c]>, <r --> [w]>, <r --> [f]>)"),
+                $("(&&, x, y, z)"),
                 3);
     }
 
@@ -432,7 +431,7 @@ public class EllipsisTest {
         testCombinations(
                 $("((|,%X,%Z,%A) --> (|,%Y,%Z,%A))"),
                 $("((|,bird,man, swimmer)-->(|,man, animal,swimmer))"),
-                1);
+                2);
     }
 
     @Test public void testRepeatEllipsisAWithoutEllipsis() throws Narsese.NarseseException {
@@ -478,11 +477,11 @@ public class EllipsisTest {
         testCombinations(
                 $("(%M --> (|,%S,%A..+))"),
                 $("(m-->(|,s,a))"),
-                1);
+                2);
         testCombinations(
                 $("(%M --> (&,%S,%A..+))"),
                 $("(m-->(&,s,a))"),
-                1);
+                2);
     }
 
 
@@ -493,7 +492,8 @@ public class EllipsisTest {
 
         for (Op o : Op.values()) {
             if (o.minSize <= 1) continue;
-            if (o == DISJ) continue;
+            if (o.virtual)
+                continue;
 
             if (o.statement) continue;
 

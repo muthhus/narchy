@@ -738,7 +738,7 @@ public class TemporalTest {
 //        } else {
 //            return as.equals(bs);
 //        }
-        assertEquals(n.terms.atemporalize($("(x && (y ==> z))")),
+        assertEquals(n.terms.atemporalize($("(x && (w ==> z))")),
                 n.terms.atemporalize($("(x &&+1 (z ==>+1 w))")));
     }
 

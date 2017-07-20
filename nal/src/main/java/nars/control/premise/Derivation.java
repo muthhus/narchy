@@ -169,7 +169,7 @@ public class Derivation extends Unify implements TermContext {
     @NotNull public void run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, float parentTaskPri, int ttl) {
 
 
-        versioning.revert(0); //revert directly
+        revert(0); //revert directly
 
         //remove common variable entries because they will just consume memory if retained as empty
         //xy.map.entrySet().removeIf(e -> e.getKey() instanceof CommonVariable);

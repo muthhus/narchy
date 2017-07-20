@@ -15,21 +15,25 @@ import java.util.Random;
  */
 public class SubUnify extends Unify {
 
+    private final Unify parent;
     private @Nullable Term transformed;
 
     @Nullable private Term result;
 
 
-    public SubUnify(TermIndex index, Op type, Random r, int ttl) {
-        super(index, type, r, Param.UnificationStackMax, ttl);
+    public SubUnify(@NotNull Unify parent, @Nullable Op type) {
+        super(parent.terms, type, parent.random, Param.UnificationStackMax, 0);
+        this.parent = parent;
     }
 
-    public SubUnify(@NotNull Unify parent, @Nullable Op type, int ttl) {
-        super(parent.terms, type, parent.random, parent.versioning);
-        setTTL(ttl);
+    @Override
+    public void unify(@NotNull Term x, @NotNull Term y, boolean finish) {
+        this.ttl = parent.ttl; //load
+        super.unify(x, y, finish);
+        parent.ttl = ttl; //restore
     }
 
-//    @Override
+    //    @Override
 //    public @Nullable Term resolve(@NotNull Term x) {
 //
 //        assert(target!=null);
@@ -69,17 +73,13 @@ public class SubUnify extends Unify {
         }
     }
 
-    public void tryMatch(@NotNull Term x, @NotNull Term y) {
-        this.transformed = null;
-        this.result = null;
-        unify(x, y, true);
-    }
 
     @Nullable
     public Term tryMatch(@Nullable Term transformed, @NotNull Term x, @NotNull Term y) {
         this.transformed = transformed;
         this.result = null;
         unify(x, y, true);
+
         return result;
     }
 

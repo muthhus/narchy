@@ -4,7 +4,7 @@ package jcog.list;
 /**
  * capacity limited list, doesnt allow additions beyond a certain size
  */
-public final class LimitedFasterList<X> extends FasterList<X> {
+public class LimitedFasterList<X> extends FasterList<X> {
 
     final int max;
 

@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
 public class VersioningTest {
 
     @NotNull
-    Versioning v = new Versioning(10);
+    Versioning v = new Versioning(10, 10);
     @NotNull
     Versioned a = new Versioned(v, 8);
     @NotNull
@@ -21,7 +21,7 @@ public class VersioningTest {
 
     @Test
     public void test1() {
-        Versioning w = new Versioning(10);
+        Versioning w = new Versioning(10, 10);
         VersionMap<Object,Object> m = new VersionMap(w,10);
         m.tryPut("x", "a");
         assertEquals("{x=a}", m.toString());

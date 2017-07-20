@@ -712,6 +712,9 @@ public enum Op implements $ {
     public final boolean hasNumeric;
     public final byte id;
 
+    /** whether these are not actual terms, being immediately constructed from other non-virtual types */
+    public final boolean virtual;
+
     Op(char c, int minLevel, OpType type) {
         this(c, minLevel, type, Args.None);
     }
@@ -773,6 +776,7 @@ public enum Op implements $ {
 
         this.atomic = var || str.equals(".") /* atom */ || str.equals("`i") || str.equals("^") || str.equals("`");
 
+        this.virtual = (Set.of("||","{-]","-]-","-{-").contains(str));
     }
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
