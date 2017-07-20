@@ -332,7 +332,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
             if (target.internable())
                 return op.the(dt, target.subs);
             else
-                return Op.compound(op, target, false).dt(dt); //HACK
+                return Op.compound(op, target.theArray(), false).dt(dt); //HACK
 
         } else if (dt != src.dt())
             return src.dt(dt);

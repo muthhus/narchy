@@ -2,6 +2,7 @@ package nars.derive.meta.match;
 
 import nars.$;
 import nars.Op;
+import nars.index.term.NonInternable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
@@ -11,7 +12,7 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public abstract class Ellipsis extends AbstractVariable implements Ellipsislike {
+public abstract class Ellipsis extends AbstractVariable implements Ellipsislike, NonInternable {
 
     private final int minArity;
 

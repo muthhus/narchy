@@ -37,6 +37,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
+import static nars.derive.meta.match.Ellipsis.firstEllipsis;
 import static nars.term.Terms.flatten;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -898,7 +899,7 @@ public enum Op implements $ {
     public static Compound compound(Op o, Term[] subterms, boolean internSubs) {
         int s = subterms.length;
         assert (o.maxSize >= s) : "subterm overflow: " + o + " " + Arrays.toString(subterms);
-        assert (o.minSize <= s) : "subterm underflow: " + o + " " + Arrays.toString(subterms);
+        assert (o.minSize <= s || (firstEllipsis(subterms)!=null)) : "subterm underflow: " + o + " " + Arrays.toString(subterms);
 
         switch (s) {
             case 1:

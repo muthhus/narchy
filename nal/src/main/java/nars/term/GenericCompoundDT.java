@@ -4,6 +4,7 @@ import jcog.Util;
 import nars.Op;
 import nars.Param;
 import nars.derive.meta.PatternCompound;
+import nars.index.term.NonInternable;
 import nars.term.container.TermContainer;
 import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +13,7 @@ import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
-public class GenericCompoundDT extends ProxyCompound {
+public class GenericCompoundDT extends ProxyCompound implements NonInternable {
 
     /**
      * numeric (term or "dt" temporal relation)
