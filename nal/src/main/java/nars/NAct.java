@@ -3,6 +3,7 @@ package nars;
 import jcog.data.FloatParam;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
+import nars.control.CauseChannel;
 import nars.term.Compound;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
@@ -11,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 
@@ -21,7 +23,7 @@ import static nars.Op.BELIEF;
  */
 public interface NAct {
 
-    @NotNull Collection<ActionConcept> actions();
+    @NotNull Map<ActionConcept, CauseChannel<Task>> actions();
 
     NAR nar();
 

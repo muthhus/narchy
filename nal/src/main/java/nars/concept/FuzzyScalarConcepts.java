@@ -7,6 +7,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
+import nars.term.ProxyCompound;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -20,12 +21,13 @@ import java.util.function.Consumer;
  * manages a set of concepts whose beliefs represent components of an
  * N-ary (N>=1) discretization of a varying scalar (32-bit floating point) signal.
  * expects values which have been normalized to 0..1.0 range (ex: use NormalizedFloat) */
-public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
-
+public class FuzzyScalarConcepts extends ProxyCompound {
 
     private final FloatSupplier input;
+
     @NotNull
-    public final List<SensorConcept> sensors;
+    @Deprecated public final List<SensorConcept> sensors;
+
     @NotNull
     public final NAR nar;
 
@@ -100,7 +102,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
     }
 
     public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, FuzzyModel truther, @NotNull Compound... states) {
-
+        super($.func("FuzzyScalarConcepts", states));
 
         this.conf = nar.confDefault(Op.BELIEF);
         this.input = input;
@@ -161,10 +163,10 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
 //    }
 
 
-    @Override
-    public void forEach(Consumer<? super SensorConcept> action) {
-        sensors.forEach(action);
-    }
+//    @Override
+//    public void forEach(Consumer<? super SensorConcept> action) {
+//        sensors.forEach(action);
+//    }
 
     @NotNull
     public FuzzyScalarConcepts resolution() {
@@ -182,8 +184,7 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
 
 
     @NotNull
-    @Override
-    public String toString() {
+    public String summary() {
         return Joiner.on("\t").join(Iterators.transform(
                 sensors.iterator(), s -> {
                     if (s == null)
@@ -201,12 +202,6 @@ public class FuzzyScalarConcepts implements Iterable<SensorConcept> {
 //        sensors.forEach(s -> s.beliefs().clear());
 //    }
 
-
-    @NotNull
-    @Override
-    public Iterator<SensorConcept> iterator() {
-        return sensors.iterator();
-    }
 }
 ///**
 // * SensorConcept which wraps a MutableFloat value

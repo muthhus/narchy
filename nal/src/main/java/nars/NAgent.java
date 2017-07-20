@@ -10,7 +10,6 @@ import jcog.event.On;
 import jcog.event.Topic;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
-import jcog.pri.mix.PSink;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
@@ -27,8 +26,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -60,9 +61,9 @@ abstract public class NAgent implements NSense, NAct {
     public final NAR nar;
 
 
-    public final List<SensorConcept> sensors = newArrayList();
+    public final Map<SensorConcept,CauseChannel<Task>> sensors = new LinkedHashMap();
 
-    public final List<ActionConcept> actions = newArrayList();
+    public final Map<ActionConcept,CauseChannel<Task>> actions = new LinkedHashMap();
 
     /**
      * the general reward signal for this agent
@@ -78,7 +79,7 @@ abstract public class NAgent implements NSense, NAct {
 
 
     //public final FloatParam predictorProbability = new FloatParam(1f);
-    private final CauseChannel<ITask> sense, predict, motor;
+    private final CauseChannel<ITask> predict;
 
 
     private boolean initialized;
@@ -152,9 +153,7 @@ abstract public class NAgent implements NSense, NAct {
 
 
         if (id==null) id = $.quote(getClass().toString());
-        this.sense = nar.newInputChannel(id + " sensor");
         this.predict = nar.newInputChannel(id + " predict");
-        this.motor = nar.newInputChannel(id + " motor");
     }
 
     @Override
@@ -164,13 +163,12 @@ abstract public class NAgent implements NSense, NAct {
 
     @NotNull
     @Override
-    public final Collection<SensorConcept> sensors() {
+    public final Map<SensorConcept,CauseChannel<Task>> sensors() {
         return sensors;
     }
 
-    @NotNull
-    @Override
-    public final Collection<ActionConcept> actions() {
+    @NotNull @Override
+    public final Map<ActionConcept, CauseChannel<Task>> actions() {
         return actions;
     }
 
@@ -182,34 +180,6 @@ abstract public class NAgent implements NSense, NAct {
     public void stop() {
         nar.stop();
         loop = null;
-    }
-
-    /**
-     * should only be invoked before agent has started TODO check for this
-     */
-    protected void sense(SensorConcept... s) {
-        sense(Lists.newArrayList(s));
-    }
-
-    /**
-     * should only be invoked before agent has started TODO check for this
-     */
-    protected void sense(@NotNull Iterable<? extends SensorConcept> s) {
-        Iterables.addAll(sensors, s);
-    }
-
-    /**
-     * should only be invoked before agent has started TODO check for this
-     */
-    protected void action(ActionConcept... s) {
-        action(Lists.newArrayList(s));
-    }
-
-    /**
-     * should only be invoked before agent has started TODO check for this
-     */
-    protected void action(@NotNull Iterable<? extends ActionConcept> s) {
-        Iterables.addAll(actions, s);
     }
 
 
@@ -257,10 +227,13 @@ abstract public class NAgent implements NSense, NAct {
 //                            (float) Math.sqrt( Math.abs(dxm - lastDexterity) ));
 //            this.lastDexterity = dxm;
 
-        motor.input(actions.stream().flatMap(a -> a.apply(nar)));
-        //motor.input(curious(next), nar::input);
+        sensors.forEach((s,c)->{
+            c.input(s.apply(nar));
+        });
 
-        sense.input(sense(nar, next));
+        actions.forEach((a,c)->{
+            c.input(a.apply(nar));
+        });
 
         eventFrame.emitAsync(this, nar.exe);
 
@@ -284,12 +257,12 @@ abstract public class NAgent implements NSense, NAct {
 //        }
     }
 
-    /**
-     * provides the stream of the environment's next sensory percept tasks
-     */
-    public Stream<ITask> sense(NAR nar, long when) {
-        return sensors.stream().map(s -> s.apply(nar));
-    }
+//    /**
+//     * provides the stream of the environment's next sensory percept tasks
+//     */
+//    public Stream<ITask> sense(NAR nar, long when) {
+//        return sensors.stream().map(s -> s.apply(nar));
+//    }
 
 
 //    protected Stream<Task> curious(long next) {
@@ -367,7 +340,7 @@ abstract public class NAgent implements NSense, NAct {
 //        predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
 //        predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
 
-        for (Concept a : actions) {
+        for (Concept a : actions.keySet()) {
             Term action = a.term();
 
             ((FasterList) predictors).addAll(
@@ -488,10 +461,10 @@ abstract public class NAgent implements NSense, NAct {
         //System.out.println(Joiner.on('\n').join(predictors));
     }
 
-    public SensorConcept randomSensor() {
-        //quest(parallel((Compound) (action.term()), randomSensor()), now+dur),
-        return sensors.get(nar.random().nextInt(sensors.size()));
-    }
+//    public SensorConcept randomSensor() {
+//        //quest(parallel((Compound) (action.term()), randomSensor()), now+dur),
+//        return sensors.get(nar.random().nextInt(sensors.size()));
+//    }
 
 
     public NAgent runCycles(final int totalCycles) {
@@ -580,20 +553,20 @@ abstract public class NAgent implements NSense, NAct {
         if (n == 0)
             return 0;
 
-        float m = 0;
+        final float[] m = {0};
         int dur = nar.dur();
         long now = nar.time();
-        for (int i = 0; i < n; i++) {
-            Truth g = nar.goalTruth(actions.get(i), now);
+        actions.keySet().forEach(a -> {
+            Truth g = nar.goalTruth(a, now);
             float c;
             if (g != null) {
                 c = g.evi();
             } else {
                 c = 0;
             }
-            m += c;
-        }
-        return w2c(m / n /* avg */);
+            m[0] += c;
+        });
+        return w2c(m[0] / n /* avg */);
     }
 
 

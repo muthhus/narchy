@@ -6,6 +6,7 @@ import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
 import nars.concept.FuzzyScalarConcepts;
 import nars.concept.SensorConcept;
+import nars.control.CauseChannel;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -17,6 +18,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.IntFunction;
 import java.util.function.IntSupplier;
@@ -35,7 +37,7 @@ public interface NSense {
     @NotNull Atomic MID = Atomic.the("mid");
     @NotNull Atomic HIH = Atomic.the("hih");
 
-    @NotNull Collection<SensorConcept> sensors();
+    @NotNull Map<SensorConcept,CauseChannel<Task>> sensors();
 
     NAR nar();
 
@@ -59,7 +61,8 @@ public interface NSense {
     }
 
     default void addSensor(SensorConcept c) {
-        sensors().add(c);
+        CauseChannel existing = sensors().put(c, nar().newInputChannel(c));
+        assert(existing == null);
         nar().on(c);
     }
 
@@ -188,13 +191,22 @@ public interface NSense {
 
     @NotNull
     default FuzzyScalarConcepts senseNumber(FloatSupplier v, Compound... states) {
+
+        assert(states.length > 1);
+
         FuzzyScalarConcepts fs = new FuzzyScalarConcepts(
                v, nar(),
                 //FuzzyScalarConcepts.FuzzyTriangle,
                 FuzzyScalarConcepts.Hard,
                 states
         );
-        sensors().addAll(fs.sensors);
+        List<SensorConcept> x = fs.sensors;
+
+        CauseChannel ch = nar().newInputChannel(fs);
+        int xs = x.size();
+        for (int i = 0, xSize = xs; i < xSize; i++)
+            sensors().put(x.get(i), ch);
+        ch.set(0f, 1f/ xs);
         return fs;
     }
 
