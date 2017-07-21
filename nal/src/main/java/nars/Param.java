@@ -147,7 +147,7 @@ public abstract class Param  {
 
     /** 'time to live', unification steps until unification is stopped */
     public final MutableInteger matchTTL = new MutableInteger(128);
-    public final static int UnificationTTLMax = 128 * 2;
+    @Deprecated public final static int UnificationTTLMax = 128 * 2;
 
 
 

@@ -1319,14 +1319,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             term = compoundOrNull(term.unneg());
             if (term == null) return null;
 
-            term = compoundOrNull(terms.atemporalize((Compound) term));
+            term = compoundOrNull(((Compound) term).root());
             if (term == null) return null;
 
             //atemporalizing can reset normalization state of the result instance
             //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
             //if (wasNormalized) {
-            term = compoundOrNull(terms.normalize((Compound) term));
+            term = compoundOrNull(((Compound) term).normalize());
             if (term == null) return null;
             //}
 

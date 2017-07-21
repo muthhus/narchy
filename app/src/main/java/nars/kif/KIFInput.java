@@ -183,7 +183,7 @@ public class KIFInput implements Runnable {
                         System.err.println("instance expects 2 arguments");
                     } else {
                         try {
-                            y = compoundOrNull(Narsese.term("(" + args.get(0) + " --> [" + args.get(1) + "])", nar.terms, false));
+                            y = compoundOrNull(Narsese.term("(" + args.get(0) + " --> [" + args.get(1) + "])", false));
                         } catch (Narsese.NarseseException e) {
                             e.printStackTrace();
                         }

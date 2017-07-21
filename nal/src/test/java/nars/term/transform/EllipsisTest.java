@@ -251,7 +251,7 @@ public class EllipsisTest {
         @Override
         public Compound getResult() throws Narsese.NarseseException {
             final PatternTermIndex pi = new PatternTermIndex();
-            return pi.normalize(pi.term("<%1 --> (" + ellipsisTerm +  ")>")).term();
+            return pi.<Compound>term("<%1 --> (" + ellipsisTerm + ")>").normalize().term();
         }
 
     }

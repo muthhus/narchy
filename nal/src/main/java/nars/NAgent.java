@@ -627,7 +627,7 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     public Supplier<Task> prediction(@NotNull Compound _term, byte punct, DiscreteTruth truth) {
-        Compound term = $.terms.normalize(_term);
+        Compound term = _term.normalize();
         return () -> {
 
 //        if (truth == null && !(punct == QUESTION || punct == QUEST))

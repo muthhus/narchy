@@ -44,7 +44,7 @@ public class TaskRule extends TaskMatch {
 
         VariableNormalization varNorm = new VariableNormalization(outputRaw.size() /* est */);
 
-        this.output = compoundOrNull(nar.terms.transform(outputRaw, varNorm));
+        this.output = compoundOrNull(outputRaw.transform(varNorm));
         if (this.output == null)
             throw new RuntimeException("output pattern is not compound");
 
@@ -149,7 +149,7 @@ public class TaskRule extends TaskMatch {
         y = compoundOrNull(y);
         if (y==null) return;
 
-        y = nar.terms.normalize(y);
+        y = y.normalize();
         if (y==null) return;
 
         if (!Task.taskContentValid(y, X.punc(), nar, true))

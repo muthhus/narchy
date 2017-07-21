@@ -7,16 +7,12 @@ import nars.Op;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
-import nars.index.TermBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import nars.term.subst.MapSubst;
 import nars.term.subst.MapSubst1;
 import nars.term.transform.CompoundTransform;
-import nars.term.transform.VariableNormalization;
-import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -33,7 +29,7 @@ import static nars.time.Tense.XTERNAL;
 /**
  *
  */
-public abstract class TermIndex extends TermBuilder implements TermContext {
+public abstract class TermIndex implements TermContext {
 
 
     private static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
@@ -202,143 +198,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     }
 
 
-//    private boolean cacheNormalization(@NotNull Compound src) {
-//        return false;
-//    }
 
-
-//    @Nullable
-//    public Term the(@NotNull Compound src, @NotNull List<Term> newSubs) {
-//        if (src.size() == newSubs.size() && src.equalTerms(newSubs) )
-//            return src;
-//        else
-//            return the(src.op(), src.dt(), newSubs.toArray(new Term[newSubs.size()]));
-//    }
-
-    @Nullable
-    public Compound normalize(@NotNull Compound x) {
-
-        if (x.isNormalized())
-            return x; //TODO try not to let this happen
-
-        Term y;
-
-        int vars = x.vars();
-        int pVars = x.varPattern();
-        int totalVars = vars + pVars;
-
-        Compound result;
-        if (totalVars > 0) {
-            y = transform(x,
-                    ((vars == 1) && (pVars == 0)) ?
-                            VariableNormalization.singleVariableNormalization //special case for efficiency
-                            :
-                            new VariableNormalization(totalVars /* estimate */)
-            );
-
-            if (y instanceof Compound) {
-                if (y != x) {
-                    Compound cy = (Compound) y;
-                    result = cy;
-                } else {
-                    result = x;
-                }
-            } else {
-                result = null;
-            }
-
-        } else {
-            result = x;
-        }
-
-        if (result != null)
-            result.setNormalized();
-
-        return result;
-    }
-
-
-    @Nullable
-    public Term transform(@NotNull Compound src, @NotNull CompoundTransform t) {
-        if (t.testSuperTerm(src)) {
-            return transform(src.op(), src.dt(), src, t);
-        } else {
-            return src;
-        }
-    }
-
-    @Nullable
-    public Term transform(@NotNull Compound src, int newDT, @NotNull CompoundTransform t) {
-        if (src.dt() == newDT)
-            return transform(src, t); //no dt change, use non-DT changing method that has early fail
-        else {
-            return transform(src.op(), newDT, src, t);
-        }
-    }
-
-    @Nullable
-    private Term transform(Op op, int dt, @NotNull Compound src, @NotNull CompoundTransform t) {
-
-        //int modifications = 0;
-
-        if (!t.testSuperTerm(src))
-            return src;
-
-        boolean filterTrueFalse = disallowTrueOrFalse(op);
-
-        @NotNull TermContainer srcSubs = src.subterms(); //for faster access, generally
-        int s = srcSubs.size(), subtermMods = 0;
-        NewCompound target = new NewCompound(op, s);
-        for (int i = 0; i < s; i++) {
-
-            Term x = srcSubs.sub(i), y;
-
-            y = t.apply(src, x);
-
-            if (y == null)
-                return null;
-
-            if (y instanceof Compound) {
-                y = transform((Compound) y, t); //recurse
-            }
-
-            if (y == null)
-                return null;
-
-            if (y != x) {
-                if (Term.filterBool(y, filterTrueFalse))
-                    return null;
-
-                //            if (y != null)
-                //                y = y.eval(this);
-
-                //if (x != y) { //must be refernce equality test for some variable normalization cases
-                //if (!x.equals(y)) { //must be refernce equality test for some variable normalization cases
-                subtermMods++;
-
-            }
-
-            target.add(y);
-        }
-
-        //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
-
-        //        if (subtermMods == 0 && !opMod && dtMod && (op.image || (op.temporal && concurrent(dt)==concurrent(src.dt()))) ) {
-//            //same concurrency, just change dt, keep subterms
-//            return src.dt(dt);
-//        }
-        if (subtermMods > 0 || op != src.op()/* || dt != src.dt()*/) {
-
-            //if (target.internable())
-                return op.the(dt, target.subs);
-            //else
-                //return Op.compound(op, target.theArray(), false).dt(dt); //HACK
-
-        } else if (dt != src.dt())
-            return src.dt(dt);
-        else
-            return src;
-    }
 
     public static boolean disallowTrueOrFalse(Op superOp) {
 
@@ -353,59 +213,59 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     }
 
 
-    @Nullable
-    public Term transform(@NotNull Compound src, @NotNull ByteList path, @NotNull Term replacement) {
-        return transform(src, path, 0, replacement);
-    }
-
-    @Nullable
-    private Term transform(@NotNull Term src, @NotNull ByteList path, int depth, @NotNull Term replacement) {
-        int ps = path.size();
-        if (ps == depth)
-            return replacement;
-        if (ps < depth)
-            throw new RuntimeException("path overflow");
-
-        if (!(src instanceof Compound))
-            return src; //path wont continue inside an atom
-
-        int n = src.size();
-        Compound csrc = (Compound) src;
-
-        Term[] target = new Term[n];
-
-
-        boolean changed = false;
-        for (int i = 0; i < n; ) {
-            Term x = csrc.sub(i);
-            Term y;
-            if (path.get(depth) != i) {
-                //unchanged subtree
-                y = x;
-            } else {
-                //replacement is in this subtree
-                y = transform(x, path, depth + 1, replacement);
-                changed = true;
-            }
-
-            target[i++] = y;
-        }
-
-        if (!changed)
-            return csrc;
-
-        return csrc.op().the(csrc.dt(), target);
-    }
+//    @Nullable
+//    public Term transform(@NotNull Compound src, @NotNull ByteList path, @NotNull Term replacement) {
+//        return transform(src, path, 0, replacement);
+//    }
+//
+//    @Nullable
+//    private Term transform(@NotNull Term src, @NotNull ByteList path, int depth, @NotNull Term replacement) {
+//        int ps = path.size();
+//        if (ps == depth)
+//            return replacement;
+//        if (ps < depth)
+//            throw new RuntimeException("path overflow");
+//
+//        if (!(src instanceof Compound))
+//            return src; //path wont continue inside an atom
+//
+//        int n = src.size();
+//        Compound csrc = (Compound) src;
+//
+//        Term[] target = new Term[n];
+//
+//
+//        boolean changed = false;
+//        for (int i = 0; i < n; ) {
+//            Term x = csrc.sub(i);
+//            Term y;
+//            if (path.get(depth) != i) {
+//                //unchanged subtree
+//                y = x;
+//            } else {
+//                //replacement is in this subtree
+//                y = transform(x, path, depth + 1, replacement);
+//                changed = true;
+//            }
+//
+//            target[i++] = y;
+//        }
+//
+//        if (!changed)
+//            return csrc;
+//
+//        return csrc.op().the(csrc.dt(), target);
+//    }
 
 
     /** un-normalized */
     @NotNull public <T extends Term> T termRaw(@NotNull String termToParse) throws Narsese.NarseseException {
-        return (T) Narsese.term(termToParse, this, false);
+        return (T) Narsese.term(termToParse, false);
     }
 
     /** normalized */
     @NotNull public <T extends Term> T term(@NotNull String termToParse) throws Narsese.NarseseException {
-        return (T) (Narsese.term(termToParse, this, true));
+        return (T) (Narsese.term(termToParse, true));
     }
 
 
@@ -469,7 +329,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
     @Nullable
     public Compound retemporalize(@NotNull Compound x, Retemporalization r) {
 
-        Term y = transform(x, r.dt(x), r);
+        Term y = x.transform(r.dt(x), r);
         if (!(y instanceof Compound)) {
             return null;
         } else {
@@ -485,14 +345,14 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
 //            }
 //            if (yy == null)
 //                return null;
-            return normalize(yy);
+            return yy.normalize();
         }
 
     }
 
     @Nullable
     public Term queryToDepVar(@NotNull Compound term) {
-        return transform(term, CompoundTransform.queryToDepVar);
+        return term.transform(CompoundTransform.queryToDepVar);
     }
 
 
@@ -518,7 +378,7 @@ public abstract class TermIndex extends TermBuilder implements TermContext {
         public Term apply(@Nullable Compound parent, @NotNull Term term) {
             if (term instanceof Compound && term.hasAny(Op.TemporalBits)) {
                 Compound x = (Compound) term;
-                return transform(x, dt(x), this);
+                return x.transform(dt(x), this);
             }
             return term;
         }

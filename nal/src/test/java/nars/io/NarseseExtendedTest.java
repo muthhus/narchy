@@ -267,7 +267,7 @@ public class NarseseExtendedTest extends NarseseTest {
         //Terms.printRecursive(System.out, x);
         assertEquals("(x<->(_,_))", x.toString());
 
-        Term y = $.terms.normalize(x);
+        Term y = x.normalize();
         //Terms.printRecursive(System.out, y);
         assertEquals("(x<->(#1,#2))", y.toString());
 

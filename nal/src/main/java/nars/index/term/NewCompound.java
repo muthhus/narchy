@@ -31,7 +31,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
     public final Op op;
 
     @Nullable
-    protected Term[] subs;
+    public Term[] subs;
 
     int size;
 

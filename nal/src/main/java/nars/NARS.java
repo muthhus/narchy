@@ -122,10 +122,12 @@ public class NARS {
         return new Default(8, true).time(new RealTime.CS()).get();
     }
 
-//    /** TODO: provides only low level functionality */
-//    public static NAR terminal() {
-//        return null;
-//    }
+    /** provides only low level functionality */
+    public static NAR shell() {
+        //TODO disable deriver completely
+        return tmp();
+    }
+
 
     /** generic defaults */
     public static class Default extends NARS {

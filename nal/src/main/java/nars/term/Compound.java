@@ -26,10 +26,14 @@ import jcog.data.sexpression.Pair;
 import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.index.term.NewCompound;
 import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
+import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.term.transform.CompoundTransform;
+import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -57,6 +61,7 @@ import java.util.function.Predicate;
 
 import static java.util.Collections.emptySet;
 import static nars.Op.*;
+import static nars.index.term.TermIndex.disallowTrueOrFalse;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -1082,6 +1087,193 @@ public interface Compound extends Term, IPair, TermContainer {
             return sub(i, subpaths.get(0));
         }
 
+    }
+
+    @Nullable default Compound normalize() {
+        if (this.isNormalized())
+            return this; //TODO try not to let this happen
+
+        Term y;
+
+        int vars = this.vars();
+        int pVars = this.varPattern();
+        int totalVars = vars + pVars;
+
+        Compound result;
+        if (totalVars > 0) {
+            y = transform(
+                    ((vars == 1) && (pVars == 0)) ?
+                            VariableNormalization.singleVariableNormalization //special case for efficiency
+                            :
+                            new VariableNormalization(totalVars /* estimate */)
+            );
+
+            if (y instanceof Compound) {
+                if (y != this) {
+                    Compound cy = (Compound) y;
+                    result = cy;
+                } else {
+                    result = this;
+                }
+            } else {
+                result = null;
+            }
+
+        } else {
+            result = this;
+        }
+
+        if (result != null)
+            result.setNormalized();
+
+        return result;
+    }
+
+    @Nullable default Term transform(@NotNull CompoundTransform t) {
+        Compound src = this;
+        if (t.testSuperTerm(src)) {
+            return transform(src.op(), src.dt(), t);
+        } else {
+            return src;
+        }
+
+    }
+
+    @Nullable default Term transform(int newDT, @NotNull CompoundTransform t) {
+        if (this.dt() == newDT)
+            return transform( t); //no dt change, use non-DT changing method that has early fail
+        else {
+            return transform(op(), newDT, t);
+        }
+    }
+
+    @Nullable
+    default Term transform(Op op, int dt, @NotNull CompoundTransform t) {
+
+        if (!t.testSuperTerm(this))
+            return this;
+
+        boolean filterTrueFalse = disallowTrueOrFalse(op);
+
+        @NotNull TermContainer srcSubs = this.subterms(); //for faster access, generally
+        int s = srcSubs.size(), subtermMods = 0;
+        NewCompound target = new NewCompound(op, s);
+        for (int i = 0; i < s; i++) {
+
+            Term x = srcSubs.sub(i), y;
+
+            y = t.apply(this, x);
+
+            if (y == null)
+                return null;
+
+            if (y instanceof Compound) {
+                y = ((Compound)y).transform(t); //recurse
+            }
+
+            if (y == null)
+                return null;
+
+            if (y != x) {
+                if (Term.filterBool(y, filterTrueFalse))
+                    return null;
+
+                //            if (y != null)
+                //                y = y.eval(this);
+
+                //if (x != y) { //must be refernce equality test for some variable normalization cases
+                //if (!x.equals(y)) { //must be refernce equality test for some variable normalization cases
+                subtermMods++;
+
+            }
+
+            target.add(y);
+        }
+
+        //TODO does it need to recreate the container if the dt has changed because it may need to be commuted ... && (superterm.dt()==dt) but more specific for the case: (XTERNAL -> 0 or DTERNAL)
+
+        //        if (subtermMods == 0 && !opMod && dtMod && (op.image || (op.temporal && concurrent(dt)==concurrent(src.dt()))) ) {
+//            //same concurrency, just change dt, keep subterms
+//            return src.dt(dt);
+//        }
+        if (subtermMods > 0 || op != this.op()/* || dt != src.dt()*/) {
+
+            //if (target.internable())
+                return op.the(dt, target.theArray());
+            //else
+                //return Op.compound(op, target.theArray(), false).dt(dt); //HACK
+
+        } else if (dt != this.dt())
+            return this.dt(dt);
+        else
+            return this;
+    }
+
+    @Override @NotNull default Term root() {
+        if (!this.hasAny(Op.TemporalBits))// isTemporal())
+            return this;
+
+        Term[] s = this.toArray();
+
+        //1. determine if any subterms (excluding the term itself) get rewritten
+        boolean subsChanged = false;
+        if (this.subterms().hasAny(Op.TemporalBits)) {
+
+            //atemporalize subterms first
+
+            int cs = s.length;
+            for (int i = 0; i < cs; i++) {
+
+                Term xi = s[i];
+                if (xi instanceof Compound) {
+                    Term yi = xi.root();
+                    if (yi instanceof Bool)
+                        return Null;
+                    if (!xi.equals(yi)) {
+                        s[i] = yi;
+                        subsChanged = true;
+                    }
+                }
+            }
+        }
+
+
+        //2. anonymize the term itself if anything has changed.
+        Op o = this.op();
+        int dt = this.dt();
+        int nextDT = !o.temporal ? dt : DTERNAL;
+
+        if (o.temporal)
+            nextDT = XTERNAL;
+
+        if (o.temporal && s.length == 2) {
+
+
+//            if (s.length s[0].equals(s[1])) {
+//                s = new Term[]{s[0], s[0] /* repeated */};
+//                subsChanged = true;
+//            } else
+            if (o.commutative) {
+                if (s[0].compareTo(s[1]) > 0) { //lexical sort
+                    s = new Term[]{s[1], s[0]};
+                    subsChanged = true;
+                }
+            }
+        }
+
+        boolean dtChanging = (nextDT != dt);
+
+        if (!subsChanged && !dtChanging) {
+            return this; //no change is necessary
+        }
+
+        Compound y = compoundOrNull(
+                subsChanged ? o.the(nextDT, s) : this.dt(nextDT)
+        );
+        if (y == null)
+            return Null;
+
+        return y;
     }
 
 

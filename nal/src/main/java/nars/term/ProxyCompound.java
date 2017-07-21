@@ -138,10 +138,6 @@ public class ProxyCompound implements Compound/*, NonInternable*/ {
         return ref.compound(i);
     }
 
-    @Override
-    public boolean internable() {
-        return ref.internable();
-    }
 
     @Override
     @Nullable

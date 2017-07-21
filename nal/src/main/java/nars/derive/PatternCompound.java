@@ -4,7 +4,6 @@ import nars.$;
 import nars.Op;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
-import nars.index.term.NonInternable;
 import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
@@ -105,7 +104,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 
     }
 
-    abstract protected static class PatternCompoundWithEllipsis extends PatternCompound implements NonInternable {
+    abstract protected static class PatternCompoundWithEllipsis extends PatternCompound  {
 
         @NotNull
         protected final Ellipsis ellipsis;
@@ -129,7 +128,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
     }
 
 
-    public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis implements NonInternable {
+    public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis  {
 
         public PatternCompoundWithEllipsisLinear(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
@@ -318,7 +317,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 //
 //    }
 
-    public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis implements NonInternable {
+    public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis  {
 
         public PatternCompoundWithEllipsisCommutive(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);

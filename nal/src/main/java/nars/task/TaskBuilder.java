@@ -136,7 +136,7 @@ import static nars.time.Tense.*;
         if (punc == 0)
             throw new InvalidTaskException(this, "Unspecified punctuation");
 
-        Compound cntt = n.terms.normalize(t);
+        Compound cntt = t.normalize();
         if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 

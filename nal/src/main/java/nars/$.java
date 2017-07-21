@@ -319,17 +319,17 @@ public interface $ {
      */
     @Nullable
     public static <T extends Term> T inst(@NotNull Term subj, Term pred) {
-        return (T) terms.the(INH, terms.the(SETe, subj), pred);
+        return (T) INH.the(SETe.the(subj), pred);
     }
 
     @Nullable
     public static <T extends Term> T instprop(@NotNull Term subject, @NotNull Term predicate) {
-        return (T) terms.the(INH, terms.the(SETe, subject), terms.the(SETi, predicate));
+        return (T) INH.the(SETe.the(subject), SETi.the(predicate));
     }
 
     @Nullable
     public static <T extends Term> T prop(Term subject, Term predicate) {
-        return (T) terms.the(INH, subject, terms.the(SETi, predicate));
+        return (T) INH.the(subject, SETi.the(predicate));
     }
 
 //    public static Term term(final Op op, final Term... args) {
@@ -680,9 +680,6 @@ public interface $ {
         //  }
     }
 
-    public static Atomic the(Number o) {
-        return terms.the(o);
-    }
 
     @NotNull
     public static Atomic the(int v) {
@@ -769,7 +766,15 @@ public interface $ {
     }
 
     public static Term the(Object o) {
-        return terms.the(o);
+        if (o instanceof Term)
+            return ((Term) o);
+
+        if (o instanceof Number) {
+            if (o instanceof Integer)
+                return IntAtom.the(((Integer)o).intValue());
+        }
+
+        return Atomic.the(o.toString());
     }
 
     /**

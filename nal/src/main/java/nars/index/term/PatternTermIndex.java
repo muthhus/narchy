@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import nars.Narsese;
 import nars.Op;
 import nars.derive.PatternCompound;
 import nars.derive.match.Ellipsis;
@@ -21,7 +22,7 @@ import java.util.HashMap;
 public class PatternTermIndex extends MapTermIndex {
 
     public PatternTermIndex() {
-        super(new HashMap<>(/*capacity*/));
+        super(new HashMap<>(512));
     }
 
 
@@ -132,12 +133,16 @@ public class PatternTermIndex extends MapTermIndex {
      */
     public @NotNull Compound pattern(@NotNull Compound x) {
 
-        Term y = transform(x, new PremiseRule.PremiseRuleVariableNormalization());
+        Term y = x.transform(new PremiseRule.PremiseRuleVariableNormalization());
 
         assert(y!=null);
 
         return (Compound) get(y, true).term();
 
+    }
+
+    public @NotNull Compound pattern(@NotNull String s) throws Narsese.NarseseException {
+        return pattern( (Compound) Narsese.the().term(s, false) );
     }
 
 }

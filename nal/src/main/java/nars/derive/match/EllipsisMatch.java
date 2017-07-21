@@ -1,7 +1,6 @@
 package nars.derive.match;
 
 import nars.$;
-import nars.index.term.NonInternable;
 import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;
@@ -14,7 +13,7 @@ import java.util.SortedSet;
 /**
  * Holds results of an ellipsis match and
 */
-public class EllipsisMatch extends ProxyCompound implements NonInternable {
+public class EllipsisMatch extends ProxyCompound  {
 
     //    public static ArrayEllipsisMatch matchedSubterms(Compound Y, IntObjectPredicate<Term> filter) {
 //        Function<IntObjectPredicate,Term[]> arrayGen =

@@ -3,7 +3,6 @@ package nars.term.var;
 import com.google.common.io.ByteArrayDataOutput;
 import nars.$;
 import nars.Op;
-import nars.index.term.NonInternable;
 import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.atom.AtomicToString;
@@ -15,7 +14,7 @@ import static nars.IO.SPECIAL_OP;
 /**
  * Unnormalized, labeled variable
  */
-public class UnnormalizedVariable extends AtomicToString implements Variable, NonInternable {
+public class UnnormalizedVariable extends AtomicToString implements Variable {
 
     @NotNull
     public final Op type;

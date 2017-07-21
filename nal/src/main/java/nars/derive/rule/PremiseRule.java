@@ -427,7 +427,7 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     public final PremiseRule normalizeRule(@NotNull PatternTermIndex index) {
         return new PremiseRule((Compound) index.pattern(
-                (Compound) index.transform(this, UppercaseAtomsToPatternVariables)
+                (Compound) transform(UppercaseAtomsToPatternVariables)
         ));
     }
 

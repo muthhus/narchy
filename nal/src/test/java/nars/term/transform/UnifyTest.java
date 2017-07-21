@@ -53,18 +53,15 @@ public class UnifyTest {
         //NAR nar = new NARS().get();
         try {
 
-            Compound t2 = (Compound)Narsese.the().term(s2, $.terms, true);
+            Compound t2 = (Compound)Narsese.the().term(s2, true);
             assertNotNull(t2);
 
             Compound t1;
             if (type == Op.VAR_PATTERN) {
-                //special handling for ellipsis
-                t1 = new PatternTermIndex().pattern(
-                        (Compound)Narsese.the().term(s1, $.terms, false)
-                );
+                t1 = new PatternTermIndex().pattern( s1 ); //special handling for ellipsis
                 assertNotNull(t1);
             } else {
-                t1 = (Compound)Narsese.the().term(s1, $.terms, true);
+                t1 = (Compound)Narsese.the().term(s1, true);
             }
 
 
@@ -105,17 +102,13 @@ public class UnifyTest {
                             return true;
                         });
 
-                        if ((t2 instanceof Compound) && (t1 instanceof Compound)) {
-                            if (/*((n2) <= (yx.size())*/
-                                    (n1) <= (xy.size())) {
-                                subbed.set(true);
-
-                            } /*else {
-                                System.out.println("incomplete:\n\t" + xy);
-                            }*/
-                        } else {
+                        if (/*((n2) <= (yx.size())*/
+                                (n1) <= (xy.size())) {
                             subbed.set(true);
-                        }
+
+                        } /*else {
+                            System.out.println("incomplete:\n\t" + xy);
+                        }*/
 
 //                        assertFalse("incomplete: " + toString(), this.isEmpty());
 

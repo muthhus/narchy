@@ -417,7 +417,7 @@ public enum Terms { ;
             // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
             return i.retemporalize(c, r); //retemporalize does normalize at the end
         } else  {
-            return i.normalize(c);
+            return c.normalize();
         }
     }
 

@@ -446,5 +446,12 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return null;
     }
 
+    /** returns the term which identifies the concept that this term would be categorized by.
+     *  ex: any temporality is atemporalized.
+     * */
+    default @NotNull Term root() {
+        return this;
+    }
+
 }
 
