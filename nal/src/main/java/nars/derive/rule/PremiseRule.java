@@ -9,7 +9,6 @@ import nars.Op;
 import nars.control.premise.Derivation;
 import nars.derive.*;
 import nars.derive.constraint.*;
-import nars.derive.*;
 import nars.derive.match.Ellipsis;
 import nars.derive.op.*;
 import nars.index.term.PatternTermIndex;
@@ -36,6 +35,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
 
+import static java.lang.Math.max;
 import static java.util.Collections.addAll;
 import static nars.$.newArrayList;
 import static nars.$.newHashSet;
@@ -178,7 +178,7 @@ public class PremiseRule extends GenericCompound {
                 $.the(goalLabel)
         );
         if (puncOverride != 0)
-            args.add($.quote( ((char) puncOverride)));
+            args.add($.quote(((char) puncOverride)));
 
         if (!beliefProjected)
             args.add($.the("unproj"));
@@ -209,7 +209,7 @@ public class PremiseRule extends GenericCompound {
 
             l.addAll(match.post);
 
-            ((UnificationPrototype)match.post.get(match.post.size()-1)).conclude.add(conc.apply(nar));
+            ((UnificationPrototype) match.post.get(match.post.size() - 1)).conclude.add(conc.apply(nar));
         }
 
         return l;
@@ -734,11 +734,11 @@ public class PremiseRule extends GenericCompound {
 
         //TODO add modifiers to affect minNAL (ex: anything temporal set to 7)
         //this will be raised by conclusion postconditions of higher NAL level
-        minNAL = Math.max(minNAL,
-                Math.max(
-                        maxLevel(getTask()),
-                        maxLevel(getBelief())
-                ));
+        minNAL = max( minNAL,
+                    max( maxLevel(getConclusionTermPattern()),
+                        max( maxLevel(getTask()),
+                                maxLevel(getBelief())
+                )));
 
 
         //        if (getConclusionTermPattern().containsTemporal()) {
@@ -1017,10 +1017,12 @@ public class PremiseRule extends GenericCompound {
             case "dtEvents":
                 timeFunction = TimeFunctions.occForward;
                 pres.add(TaskBeliefOccurrence.bothEvents);
+                minNAL = 7;
                 break;
             case "dtEventsReverse":
                 timeFunction = TimeFunctions.occReverse;
                 pres.add(TaskBeliefOccurrence.bothEvents);
+                minNAL = 7;
                 break;
             //NOTE THIS SHOULD ACTUALLY BE CALLED dtBeforeAfterOrEternal or something
             case "dtEventsOrEternals":

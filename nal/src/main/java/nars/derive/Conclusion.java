@@ -59,6 +59,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         this.varIntro = varIntro;
         this.rule = rule.toString(); //only store toString of the rule to avoid remaining attached to the RuleSet
         this.minNAL = rule.minNAL;
+        //assert(this.minNAL!=0): "unknown min NAL level for rule: " + rule;
     }
 
      /**
