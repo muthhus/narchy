@@ -3,6 +3,11 @@ package nars;
 import jcog.random.XorShift128PlusRandom;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.control.premise.Derivation;
+import nars.derive.DebugDerivationPredicate;
+import nars.derive.Deriver;
+import nars.derive.PrediTerm;
+import nars.derive.TrieDeriver;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
@@ -15,6 +20,7 @@ import nars.time.Time;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -23,7 +29,7 @@ import java.util.function.Supplier;
 public class NARS {
 
     public NAR get() {
-        NAR n = new NAR(index.get(), exe.get(), time, rng.get(), concepts.get());
+        NAR n = new NAR(index.get(), exe.get(), time, rng.get(), concepts.get(), deriver);
         init(n);
         return n;
     }
@@ -44,6 +50,8 @@ public class NARS {
     protected Supplier<Random> rng;
 
     protected Supplier<ConceptBuilder> concepts;
+
+    protected Function<NAR,PrediTerm<Derivation>> deriver;
 
 
     public NARS index(@NotNull TermIndex concepts) {
@@ -83,6 +91,22 @@ public class NARS {
 
         concepts = () -> new DefaultConceptBuilder();
 
+        deriver = newDeriver(8);
+    }
+
+    public static Function<NAR, PrediTerm<Derivation>> newDeriver(int nal) {
+        return (nar) -> {
+            PrediTerm<Derivation> x = TrieDeriver.the(Deriver.DEFAULT(nal), nar, (PrediTerm<Derivation> d) -> {
+                if (Param.TRACE)
+                    return new DebugDerivationPredicate(d);
+                else
+                    return d;
+            });
+            if (Param.TRACE) {
+                TrieDeriver.print(x, System.out);
+            }
+            return x;
+        };
     }
 
     /**
@@ -135,7 +159,11 @@ public class NARS {
         final int nal;
 
         public Default(int nal, boolean threadSafe) {
+
             this.nal = nal;
+            this.deriver = newDeriver(nal);
+
+
             if (threadSafe)
                 index = ()->new CaffeineIndex(-1);
         }

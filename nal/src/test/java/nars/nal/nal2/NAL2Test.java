@@ -1,6 +1,8 @@
 package nars.nal.nal2;
 
 
+import nars.NAR;
+import nars.NARS;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Before;
@@ -20,8 +22,7 @@ public class NAL2Test extends AbstractNALTest {
 //        return AbstractNALTest.nars(2);
 //    }
 
-    @Before
-    public void nal() { test.nar.nal(2); }
+    @Override protected NAR nar() { return NARS.tmp(3); }
 
     @Test
     public void revision() {

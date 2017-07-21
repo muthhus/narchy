@@ -2,7 +2,6 @@ package nars.test;
 
 import jcog.event.Topic;
 import nars.*;
-import nars.nar.exe.BufferedExecutioner;
 import nars.task.ITask;
 import nars.task.Tasked;
 import nars.test.condition.EternalTaskCondition;

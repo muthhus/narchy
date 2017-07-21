@@ -17,6 +17,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -35,17 +37,31 @@ import static nars.derive.rule.PremiseRuleSet.parsedRules;
 public interface Deriver {
 
 
-    static PremiseRuleSet DEFAULT() {
-        /** default rule set, NAL1..NAL8 */
-        @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true,
-                "nal1.nal",
-                //"nal4.nal",
-                "nal6.nal",
-                "misc.nal",
-                "induction.nal",
-                "nal2.nal",
-                "nal3.nal"
-        );
+    static PremiseRuleSet DEFAULT(int level) {
+        Set<String> files = new TreeSet();
+        switch (level) {
+            case 8:
+            case 7:
+                files.add("induction.nal");
+                //fallthru
+            case 5:
+                files.add("nal6.nal");
+                //fallthru
+            case 4:
+            case 3:
+            case 2:
+                files.add("nal3.nal");
+                files.add("nal2.nal");
+                //fallthru
+            case 1:
+                files.add("misc.nal"); //TODO split this up
+                files.add("nal1.nal");
+                break;
+            default:
+                throw new UnsupportedOperationException();
+        }
+
+        @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true, files.toArray(new String[files.size()])       );
         return RULES;
     }
 

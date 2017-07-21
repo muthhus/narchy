@@ -20,12 +20,12 @@ public class NALLevelTest {
         Param.DEBUG = true;
 
         NAR nDefault = new NARS().get();
-        assertEquals(8, nDefault.level());
+        assertEquals(8, nDefault.nal());
 
         NAR n1 = new NARS().get();
         n1.nal(1);
         EventCount n1Count = new EventCount(n1);
-        assertEquals(1, n1.level());
+        assertEquals(1, n1.nal());
 
         NAR n8 = new NARS().get();
         n8.nal(8);

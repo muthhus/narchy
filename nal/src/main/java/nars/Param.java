@@ -146,14 +146,12 @@ public abstract class Param  {
     public static final int UnificationVariableCapInitial = 8;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(128);
+    public final MutableInteger matchTTL = new MutableInteger(96);
     @Deprecated public final static int UnificationTTLMax = 128 * 2;
 
 
 
 
-    /** additional pedantic warnings */
-    public static final boolean DEBUG_EXTRA = false;
 
     //public static final boolean DEBUG_BAG_MASS = false;
     //public static boolean DEBUG_TRACE_EVENTS = false; //shows all emitted events
@@ -319,7 +317,7 @@ public abstract class Param  {
     }
 
 
-    abstract public int level();
+    abstract public int nal();
 
 
 

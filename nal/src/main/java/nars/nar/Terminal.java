@@ -2,7 +2,9 @@ package nars.nar;
 
 import jcog.random.XORShiftRandom;
 import nars.NAR;
+import nars.NARS;
 import nars.conceptualize.DefaultConceptBuilder;
+import nars.control.premise.Derivation;
 import nars.index.term.BasicTermIndex;
 import nars.nar.exe.BufferedExecutioner;
 import nars.time.CycleTime;
@@ -28,7 +30,8 @@ import java.util.Random;
     }
 
     public Terminal(int capacity, @NotNull Random random, @NotNull Time time) {
-        super(new BasicTermIndex(capacity), new BufferedExecutioner(capacity, capacity), time, random, new DefaultConceptBuilder());
+        super(new BasicTermIndex(capacity), new BufferedExecutioner(capacity, capacity), time, random, new DefaultConceptBuilder(),
+                NARS.newDeriver(1));
     }
 
 }

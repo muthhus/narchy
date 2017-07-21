@@ -1,8 +1,9 @@
 package nars.nal.nal1;
 
+import nars.NAR;
+import nars.NARS;
 import nars.Param;
 import nars.nal.AbstractNALTest;
-import nars.nar.exe.BufferedExecutioner;
 import nars.test.TestNAR;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,7 +16,7 @@ public class NAL1Test extends AbstractNALTest {
         //Param.TRACE = true;
     }
 
-    @Before public void nal() { test.nar.nal(1); }
+    @Override protected NAR nar() { return NARS.tmp(1); }
 
     @Test
     public void revision()  {

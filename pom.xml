@@ -33,7 +33,11 @@
 
                         <trimStackTrace>true</trimStackTrace>
 
-                        <reuseForks>true</reuseForks>
+                        <parallel>both</parallel>
+                        <parallelMavenExecution>true</parallelMavenExecution>
+
+                        <!--<reuseForks>true</reuseForks>-->
+
                         <forkMode>always</forkMode>
                         <!--<useUnlimitedThreads>true</useUnlimitedThreads>-->
                         <!--<parallelOptimized>true</parallelOptimized>-->

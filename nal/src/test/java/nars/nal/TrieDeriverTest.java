@@ -4,8 +4,8 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.derive.Deriver;
-import nars.derive.TrieDeriver;
 import nars.derive.PrediTerm;
+import nars.derive.TrieDeriver;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
 import nars.term.Term;
@@ -32,7 +32,7 @@ public class TrieDeriverTest {
 
     @Test public void printCompiledRuleTree() {
 
-        TrieDeriver.print(TrieDeriver.the(Deriver.DEFAULT(), NARS.tmp()), System.out);
+        TrieDeriver.print(TrieDeriver.the(Deriver.DEFAULT(8), NARS.tmp()), System.out);
 
     }
 

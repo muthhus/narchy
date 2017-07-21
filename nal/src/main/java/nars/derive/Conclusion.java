@@ -2,7 +2,6 @@ package nars.derive;
 
 import jcog.pri.Priority;
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.control.CauseChannel;
@@ -73,7 +72,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         nar.emotion.derivationTry.increment();
 
-        if (minNAL > nar.level())  //HACK
+        if (minNAL > nar.nal())  //HACK
             return true;
 
         //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold

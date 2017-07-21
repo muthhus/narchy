@@ -23,10 +23,10 @@ import nars.control.Activate;
 import nars.control.Cause;
 import nars.control.CauseChannel;
 import nars.control.premise.Derivation;
-import nars.derive.Deriver;
-import nars.derive.TrieDeriver;
 import nars.derive.DebugDerivationPredicate;
+import nars.derive.Deriver;
 import nars.derive.PrediTerm;
+import nars.derive.TrieDeriver;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.nar.exe.Executioner;
@@ -188,7 +188,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             tasklinkCount.recordValue(c.tasklinks().size());
 
             if (c instanceof TaskConcept) {
-                TaskConcept tc = (TaskConcept)c;
+                TaskConcept tc = (TaskConcept) c;
                 beliefs.accept(tc.beliefs().size());
                 goals.accept(tc.goals().size());
                 questions.accept(tc.questions().size());
@@ -221,8 +221,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         DoubleSummaryStatistics pos = new DoubleSummaryStatistics();
         DoubleSummaryStatistics neg = new DoubleSummaryStatistics();
-        values.forEach(c -> pos.accept( c.pos() ));
-        values.forEach(c -> neg.accept( c.neg() ));
+        values.forEach(c -> pos.accept(c.pos()));
+        values.forEach(c -> neg.accept(c.neg()));
         x.put("value count", pos.getCount());
         x.put("value pos mean", pos.getAverage());
         x.put("value pos min", pos.getMin());
@@ -250,7 +250,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public NAR(@NotNull TermIndex terms, @NotNull Executioner exe, @NotNull Time time, @NotNull Random rng, @NotNull ConceptBuilder conceptBuilder) {
+    public NAR(@NotNull TermIndex terms, @NotNull Executioner exe, @NotNull Time time, @NotNull Random rng, @NotNull ConceptBuilder conceptBuilder, Function<NAR, PrediTerm<Derivation>> deriver) {
 
         this.random = rng;
 
@@ -271,25 +271,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.emotion = new Emotion(this);
 
 
-        this.deriver = TrieDeriver.the(Deriver.DEFAULT(), this, (PrediTerm<Derivation> d) -> {
-            if (Param.TRACE)
-                return new DebugDerivationPredicate(d);
-            else
-                return d;
-        });
-        if (Param.TRACE) {
-            TrieDeriver.print((PrediTerm<Derivation>) deriver, System.out);
-        }
-
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);
 
+        this.deriver = deriver.apply(this);
+
         exe.start(this);
-
     }
-
-
-
 
 
     /**
@@ -312,13 +300,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     }
 
-    /** the clear event is a signal indicating that any active memory or processes
+    /**
+     * the clear event is a signal indicating that any active memory or processes
      * which would interfere with attention should be stopped and emptied.
-     *
+     * <p>
      * this does not indicate the NAR has stopped or reset itself.
      */
     public void clear() {
-        exe.runLaterAndWait(()->{
+        exe.runLaterAndWait(() -> {
             eventClear.emit(this);
         });
     }
@@ -327,6 +316,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * initialization and post-reset procedure
      */
     protected void restart() {
+
+
 
         time.clear();
 
@@ -636,7 +627,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         if (x instanceof Task && !((Task) x).isCommand()) {
             Task t = (Task) x;
             float tp = evaluate(t);
-            if (tp!=tp || tp < Pri.EPSILON)
+            if (tp != tp || tp < Pri.EPSILON)
                 return; //TODO track what might cause this
 
             value(t.cause(), Param.valueAtInput(t, this));
@@ -644,7 +635,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         exe.run(x);
     }
-
 
 
 //    private boolean executable(Task input) {
@@ -903,7 +893,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         if (concept != null) {
             @Nullable Concept c = concept(concept);
             if (c instanceof TaskConcept) {
-                TaskConcept tc = (TaskConcept)c;
+                TaskConcept tc = (TaskConcept) c;
                 BeliefTable table;
                 switch (punc) {
                     case BELIEF:
@@ -1363,11 +1353,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         });
         return this;
     }
+
     @NotNull
     public NAR forEachTaskConcept(@NotNull Consumer<TaskConcept> recip) {
         forEachConcept(c -> {
             if (c instanceof TaskConcept)
-                recip.accept((TaskConcept)c);
+                recip.accept((TaskConcept) c);
         });
         return this;
     }
@@ -1487,7 +1478,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     @Override
-    public final int level() {
+    public final int nal() {
         return nal;
     }
 
@@ -1650,7 +1641,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         if (!(concept instanceof TaskConcept))
             return null;
 
-        return ((BeliefTable) ((TaskConcept)concept).table(punc)).match(when, null, null, false, this);
+        return ((BeliefTable) ((TaskConcept) concept).table(punc)).match(when, null, null, false, this);
     }
 
     public Predicate<Derivation> deriver() {
@@ -1696,14 +1687,15 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
-    /** returns a "value" adjusted priority
+    /**
+     * returns a "value" adjusted priority
      * which is also applied to the given task.
      * returns NaN possibly
-     * */
+     */
     public float evaluate(Task x) {
 
         float gain = evaluate(x, x.cause(), taskCauses.get(x));
-        assert(gain==gain);
+        assert (gain == gain);
         if (gain != 0) {
 
             float amp = Util.tanhFast(gain) + 1f; //[0..+2]
@@ -1717,20 +1709,25 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
-    /** bins a range of values into N equal levels */
+    /**
+     * bins a range of values into N equal levels
+     */
     public static class ChannelRange<X extends Priority> {
         public final float min, max;
         public final Cause[] levels;
-        transient private final float range ; //cache
+        transient private final float range; //cache
 
-        public ChannelRange(String id, int levels, Function<Object,CauseChannel<X>> src, float min, float max) {
-            this.min = min; this.max = max; assert(max > min);
-            this.range = max - min; assert(range > Pri.EPSILON);
-            this.levels = Util.map(0, levels,  (l) -> src.apply(id + l), Cause[]::new);
+        public ChannelRange(String id, int levels, Function<Object, CauseChannel<X>> src, float min, float max) {
+            this.min = min;
+            this.max = max;
+            assert (max > min);
+            this.range = max - min;
+            assert (range > Pri.EPSILON);
+            this.levels = Util.map(0, levels, (l) -> src.apply(id + l), Cause[]::new);
         }
 
         public Cause get(float value) {
-            return levels[ Util.bin( Util.unitize((value - min)/range), levels.length ) ];
+            return levels[Util.bin(Util.unitize((value - min) / range), levels.length)];
         }
     }
 
@@ -1745,10 +1742,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         ImplicitTaskCauses(NAR nar) {
             this.nar = nar;
-            causeBelief = nar.newChannel(String.valueOf((char)BELIEF));
-            causeGoal = nar.newChannel(String.valueOf((char)GOAL));
-            causeQuestion = nar.newChannel(String.valueOf((char)QUESTION));
-            causeQuest = nar.newChannel(String.valueOf((char)QUEST));
+            causeBelief = nar.newChannel(String.valueOf((char) BELIEF));
+            causeGoal = nar.newChannel(String.valueOf((char) GOAL));
+            causeQuestion = nar.newChannel(String.valueOf((char) QUESTION));
+            causeQuest = nar.newChannel(String.valueOf((char) QUEST));
             causePast = nar.newChannel("Past");
             causeEternal = nar.newChannel("Eternal");
             causePresent = nar.newChannel("Present");
@@ -1779,19 +1776,27 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
             short punc;
             switch (x.punc()) {
-                case BELIEF: punc = causeBelief.id; break;
-                case GOAL: punc = causeGoal.id; break;
-                case QUESTION: punc = causeQuestion.id; break;
-                case QUEST: punc = causeQuest.id; break;
+                case BELIEF:
+                    punc = causeBelief.id;
+                    break;
+                case GOAL:
+                    punc = causeGoal.id;
+                    break;
+                case QUESTION:
+                    punc = causeQuestion.id;
+                    break;
+                case QUEST:
+                    punc = causeQuest.id;
+                    break;
                 default:
                     throw new UnsupportedOperationException();
             }
             if (x.isBeliefOrGoal()) {
                 short freq = causeFreq.get(x.freq()).id;
                 short conf = causeConf.get(x.conf()).id;
-                return new short[] { time, punc, freq, conf };
+                return new short[]{time, punc, freq, conf};
             } else {
-                return new short[] { time, punc };
+                return new short[]{time, punc};
             }
         }
 
@@ -1837,7 +1842,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return newChannel(x, this::input);
     }
 
-    /** automatically adds the cause id to each input */
+    /**
+     * automatically adds the cause id to each input
+     */
     public CauseChannel<Task> newInputChannel(Object id) {
 
         synchronized (values) {

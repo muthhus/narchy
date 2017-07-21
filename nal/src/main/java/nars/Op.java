@@ -2,7 +2,6 @@ package nars;
 
 
 import nars.derive.match.Ellipsislike;
-import nars.index.term.NewCompound;
 import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Functor;

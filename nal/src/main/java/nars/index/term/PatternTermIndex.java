@@ -33,14 +33,14 @@ public class PatternTermIndex extends MapTermIndex {
 
         Termed y = concepts.get(x);
         if (y == null) {
-            concepts.put(x, y = x instanceof Compound ? compute((Compound) x) : x);
+            concepts.put(x, y = x instanceof Compound ? patternify((Compound) x) : x);
         }
         return y;
     }
 
 
     @NotNull
-    protected Term compute(@NotNull Compound x) {
+    protected Term patternify(@NotNull Compound x) {
 
 
         TermContainer s = x.subterms();
@@ -76,7 +76,7 @@ public class PatternTermIndex extends MapTermIndex {
 
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
-                makeEllipsis(x, v, e) :
+                ellipsis(x, v, e) :
                 new PatternCompound.PatternCompoundSimple(x, v);
     }
 
@@ -91,7 +91,7 @@ public class PatternTermIndex extends MapTermIndex {
 
 
     @NotNull
-    private static PatternCompound makeEllipsis(@NotNull Compound seed, @NotNull TermContainer v, @NotNull Ellipsis e) {
+    private static PatternCompound ellipsis(@NotNull Compound seed, @NotNull TermContainer v, @NotNull Ellipsis e) {
 
 
         //this.ellipsisTransform = hasEllipsisTransform(this);

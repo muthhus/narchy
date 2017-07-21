@@ -18,7 +18,11 @@ public abstract class AbstractNALTest  {
 
     protected AbstractNALTest() {
         Param.DEBUG = true;
-        test = new TestNAR(nar = NARS.tmp());
+        test = new TestNAR(nar = nar());
+    }
+
+    protected NAR nar() {
+        return NARS.tmp();
     }
 
     @After

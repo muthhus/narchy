@@ -191,7 +191,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
             if (t.volume() > maxVol)
                 return fail(t, "Term exceeds maximum volume", safe);
 
-            int nalLevel = nar.level();
+            int nalLevel = nar.nal();
             if (!t.levelValid(nalLevel))
                 return fail(t, "Term exceeds maximum NAL level", safe);
         }

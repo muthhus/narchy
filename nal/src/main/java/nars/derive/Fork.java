@@ -5,7 +5,6 @@ import jcog.math.ByteShuffler;
 import nars.$;
 import nars.control.premise.Derivation;
 import nars.term.ProxyCompound;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
