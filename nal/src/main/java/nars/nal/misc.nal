@@ -1,69 +1,5 @@
 
 
-//// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
-
-     //structural decompose any component of a conjunction.
-     //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
-
-     C, X, task("&&"), time(decomposeTaskSubset) |- dropAnyConj(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-
-     (&&,X,A..+), Y, task("."), time(task,A..+,X) |- subIfUnifiesAny((&&,A..+),X,Y,strict), (Belief:AnonymousAnalogy)
-     (&&,(--,%X),A..+), Y, task("."), time(task,A..+,X) |- (--,subIfUnifiesAny((&&,A..+),X,Y,strict)), (Belief:AnonymousAnalogy)
-
-        //TODO add a conj() guard to fast fail
-        //(&&,(--,%X),A..+), X, time(task, esubterm((A..+)), X) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-
-
-     ((&&,X,A..+) &&+- Z), Z, time(decomposeTaskComponents) |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-     (Z &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- (Z &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-        ((&&,X,A..+) &&+- (--,%Z)), Z, time(decomposeTaskComponents) |- (X &&+- (--,%Z)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-        ((--,%Z) &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- ((--,%Z) &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-
-     (&&,X,A..+), B, task("!"), time(task, esubterm((A..+), 0), X) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:Strong)
-        (&&,(--,%X),A..+), B,  task("!"), time(task, esubterm((A..+), 0), X) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:StrongPN)
-
-     //X, (&&,X,A..+),            task("?@"), time(decomposeBelief) |- (&&,A..+), ()
-     //   X, (&&,(--,%X),A..+),   task("?@"), time(decomposeBelief) |- (&&,A..+), ()
-     //B, (A==>B),                task("?@"), time(decomposeBelief) |- A, ()
-     //A, (A==>B),                task("?@"), time(decomposeBelief) |- B, ()
-     //A, ((--,%A)==>B),          task("?@"), time(decomposeBelief) |- B, ()
-
-     //quest to 'how' question
-     //B, X, neqRCom(B,X), task("@"), time(dtEventsOrEternals), notImplEqui(B), notEqui(X) |- (B ==>+- X), (Punctuation:Question)
-     //B, X, neqRCom(B,X), task("@"), time(dtEventsOrEternals), notImplEqui(B), notEqui(X) |- ((--,%B) ==>+- X), (Punctuation:Question)
-
-     //(&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
-     //   (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
-
-
-     //B, C, belief("&&"), time(decomposeBelief) |- subIfUnifiesDep(dropAnyConj(C),X,B), (Belief:AnonymousAnalogy)
-                //,Goal:Deduction
-                //Goal:Goduction)
-
-///// conjunction decompose
-//
-//    (&&,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
-//    (&/,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
-//    (&|,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
-//    (&/,B,A_1..n), B, task("!") |- (&/,A_1..n), (Truth:Deduction, Desire:Strong, SequenceIntervals:FromPremises)
-//
-////// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
-////If S is the case, and (&&,S,A_1..n) is not the case, it can't be that (&&,A_1..n) is the case
-//
-//    S, (&/,S,A_1..n) |- (&/,A_1..n), (Truth:DecomposePositiveNegativeNegative, SequenceIntervals:FromPremises)
-//    S, (&|,S,A_1..n) |- (&|,A_1..n), (Truth:DecomposePositiveNegativeNegative)
-//    S, (&&,S,A_1..n) |- (&&,A_1..n), (Truth:DecomposePositiveNegativeNegative)
-//    S, (||,S,A_1..n) |- (||,A_1..n), (Truth:DecomposeNegativePositivePositive)
-//
-////Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
-//
-//    S, (&/,(--,S),A_1..n) |- (&/,A_1..n), (Truth:DecomposeNegativeNegativeNegative, SequenceIntervals:FromPremises)
-//    S, (&|,(--,S),A_1..n) |- (&|,A_1..n), (Truth:DecomposeNegativeNegativeNegative)
-//    S, (&&,(--,S),A_1..n) |- (&&,A_1..n), (Truth:DecomposeNegativeNegativeNegative)
-//    S, (||,(--,S),A_1..n) |- (||,A_1..n), (Truth:DecomposePositivePositivePositive)
-
-
-
 //substitutionViaSimilarity
      (&&,X,A..+), (X<->Y), time(dtTaskExact)  |- (&&,Y,A..+), (Belief:Intersection, Goal:Strong)
         (&&,(--,%X),A..+), (X<->Y), time(dtTaskExact)  |- (&&,(--,%Y),A..+), (Belief:Intersection, Goal:Strong)
@@ -118,13 +54,6 @@
     (S --> P), (S <-> P),                   task("@") |- (S --> P),   (Goal:StructuralIntersection, Punctuation:Goal)
     (S ==> P), (S <=> P), time(dtCombine),  task("?") |- (S ==>+- P), (Belief:StructuralIntersection, Punctuation:Belief)
 
-//NAL2:
-
-    ([A] <-> [B]), (A <-> B), task("?") |- ([A] <-> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
-    ({A} <-> {B}), (A <-> B), task("?") |- ({A} <-> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
-
-    ([A] --> [B]), (A <-> B), task("?") |- ([A] --> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
-    ({A} --> {B}), (A <-> B), task("?") |- ({A} --> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
 
 //experimental:
 //    ([A] <-> {B}), (A <-> B), task("?") |- ([A] <-> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
@@ -137,21 +66,6 @@
 
 //TODO these may produce invalid beliefs if the input contains a query variable, this can be filtered before the rule is processed:
 
-////composition on both sides of a statement:
-
-    ((&,B,A..+) --> (&,X,A..+)), (B --> X), task("?") |- ((&,B,A..+) --> (&,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((|,B,A..+) --> (|,X,A..+)), (B --> X), task("?") |- ((|,B,A..+) --> (|,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-    ((-,S,A) --> (-,S,B)), (B --> A), task("?") |- ((-,S,A) --> (-,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((~,S,A) --> (~,S,B)), (B --> A), task("?") |- ((~,S,A) --> (~,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-////composition on one side of a statement:
-
-    (W --> (|,B,A..+)), (W --> B), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    ((&,B,A..+) --> W), (B --> W), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-
-    (W --> (-,S,B)), (W --> B), task("?"), neqRCom(S,B) |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief)
-    ((~,S,B) --> W), (B --> W), task("?"), neqRCom(S,B) |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief)
 
 
 //disjunction
@@ -186,5 +100,3 @@
     //<patham9> and I wouldnt apply StructuralDeduction as truth
 
 
-//set un-recurser
-    ({ (V-->K), A..* }-->M), M |- ({V} --> (M,K)), (Belief:StructuralDeduction)

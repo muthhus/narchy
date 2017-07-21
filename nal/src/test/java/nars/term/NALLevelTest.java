@@ -19,15 +19,15 @@ public class NALLevelTest {
     public void testLevel1vs8() throws Narsese.NarseseException {
         Param.DEBUG = true;
 
-        NAR nDefault = new NARS().get();
+        NAR nDefault = NARS.shell();
         assertEquals(8, nDefault.nal());
 
-        NAR n1 = new NARS().get();
+        NAR n1 = NARS.shell();
         n1.nal(1);
         EventCount n1Count = new EventCount(n1);
         assertEquals(1, n1.nal());
 
-        NAR n8 = new NARS().get();
+        NAR n8 = NARS.shell();
         n8.nal(8);
         EventCount n8Count = new EventCount(n8);
 

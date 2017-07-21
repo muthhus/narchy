@@ -29,7 +29,7 @@ public class EllipsisMatch extends ProxyCompound  {
 
 
     protected EllipsisMatch(Term[] t) {
-        super($.pFast(t));
+        super($.p(t));
     }
 
     public static Term match(@NotNull Term[] matched) {

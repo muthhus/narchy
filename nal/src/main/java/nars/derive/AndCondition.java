@@ -6,6 +6,7 @@ import nars.$;
 import nars.control.premise.Derivation;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.op.MatchOneSubtermPrototype;
+import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.apache.commons.lang3.ArrayUtils;
@@ -65,7 +66,7 @@ public final class AndCondition extends ProxyCompound implements PrediTerm<Deriv
     }*/
 
     AndCondition(@NotNull PrediTerm[] p) {
-        super($.pFast(p));
+        super($.p((Term[]) p));
         assert(p.length >= 2): "unnecessary use of AndCondition";
         this.cache = p;
     }

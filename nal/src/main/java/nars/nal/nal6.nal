@@ -207,3 +207,67 @@
     //(X ==> Y), (X ==> Y), task("?"), time(dtTaskExact) |- (?1 ==>+- Y), (Punctuation:Question)
     //(X ==> Y), (X ==> Y), task("?"), time(dtTaskExact) |- (X ==>+- ?1), (Punctuation:Question)
 
+
+
+//// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
+
+     //structural decompose any component of a conjunction.
+     //     NOTE: the multi-term decomposition allows the superset of subterms without overlap. if they are chosen only one at a time, then overlap will prevent their recombination to the aforementioned superset result so it is incomplete. thus only the ellipsis form is necessary
+
+     C, X, task("&&"), time(decomposeTaskSubset) |- dropAnyConj(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+
+     (&&,X,A..+), Y, task("."), time(task,A..+,X) |- subIfUnifiesAny((&&,A..+),X,Y,strict), (Belief:AnonymousAnalogy)
+     (&&,(--,%X),A..+), Y, task("."), time(task,A..+,X) |- (--,subIfUnifiesAny((&&,A..+),X,Y,strict)), (Belief:AnonymousAnalogy)
+
+        //TODO add a conj() guard to fast fail
+        //(&&,(--,%X),A..+), X, time(task, esubterm((A..+)), X) |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+
+
+     ((&&,X,A..+) &&+- Z), Z, time(decomposeTaskComponents) |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+     (Z &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- (Z &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+        ((&&,X,A..+) &&+- (--,%Z)), Z, time(decomposeTaskComponents) |- (X &&+- (--,%Z)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+        ((--,%Z) &&+- (&&,X,A..+)), Z, time(decomposeTaskComponents) |- ((--,%Z) &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+
+     (&&,X,A..+), B, task("!"), time(task, esubterm((A..+), 0), X) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:Strong)
+        (&&,(--,%X),A..+), B,  task("!"), time(task, esubterm((A..+), 0), X) |- subIfUnifiesAny((&&,A..+),X,B), (Goal:StrongPN)
+
+     //X, (&&,X,A..+),            task("?@"), time(decomposeBelief) |- (&&,A..+), ()
+     //   X, (&&,(--,%X),A..+),   task("?@"), time(decomposeBelief) |- (&&,A..+), ()
+     //B, (A==>B),                task("?@"), time(decomposeBelief) |- A, ()
+     //A, (A==>B),                task("?@"), time(decomposeBelief) |- B, ()
+     //A, ((--,%A)==>B),          task("?@"), time(decomposeBelief) |- B, ()
+
+     //quest to 'how' question
+     //B, X, neqRCom(B,X), task("@"), time(dtEventsOrEternals), notImplEqui(B), notEqui(X) |- (B ==>+- X), (Punctuation:Question)
+     //B, X, neqRCom(B,X), task("@"), time(dtEventsOrEternals), notImplEqui(B), notEqui(X) |- ((--,%B) ==>+- X), (Punctuation:Question)
+
+     //(&&,X,A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
+     //   (&&,(--,%X),A..+), X, time(decomposeTaskSubset), task("?@") |- (&&,A..+), ()
+
+
+     //B, C, belief("&&"), time(decomposeBelief) |- subIfUnifiesDep(dropAnyConj(C),X,B), (Belief:AnonymousAnalogy)
+                //,Goal:Deduction
+                //Goal:Goduction)
+
+///// conjunction decompose
+//
+//    (&&,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
+//    (&/,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
+//    (&|,A_1..n), A_1 |- A_1, (Truth:StructuralDeduction, Desire:StructuralStrong)
+//    (&/,B,A_1..n), B, task("!") |- (&/,A_1..n), (Truth:Deduction, Desire:Strong, SequenceIntervals:FromPremises)
+//
+////// propositional decomposition ////////////////////////////////////////////////////////////////////////////////////
+////If S is the case, and (&&,S,A_1..n) is not the case, it can't be that (&&,A_1..n) is the case
+//
+//    S, (&/,S,A_1..n) |- (&/,A_1..n), (Truth:DecomposePositiveNegativeNegative, SequenceIntervals:FromPremises)
+//    S, (&|,S,A_1..n) |- (&|,A_1..n), (Truth:DecomposePositiveNegativeNegative)
+//    S, (&&,S,A_1..n) |- (&&,A_1..n), (Truth:DecomposePositiveNegativeNegative)
+//    S, (||,S,A_1..n) |- (||,A_1..n), (Truth:DecomposeNegativePositivePositive)
+//
+////Additional for negation: https://groups.google.com/forum/#!topic/open-nars/g-7r0jjq2Vc
+//
+//    S, (&/,(--,S),A_1..n) |- (&/,A_1..n), (Truth:DecomposeNegativeNegativeNegative, SequenceIntervals:FromPremises)
+//    S, (&|,(--,S),A_1..n) |- (&|,A_1..n), (Truth:DecomposeNegativeNegativeNegative)
+//    S, (&&,(--,S),A_1..n) |- (&&,A_1..n), (Truth:DecomposeNegativeNegativeNegative)
+//    S, (||,(--,S),A_1..n) |- (||,A_1..n), (Truth:DecomposePositivePositivePositive)
+

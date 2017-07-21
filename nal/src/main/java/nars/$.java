@@ -227,27 +227,6 @@ public interface $ {
         return $.p(x);
     }
 
-    /**
-     * quickly creates a product on the stack, bypassing any memoization
-     */
-    public static Compound pFast(@NotNull Term... subs) {
-        return pFast(TermVector.the(subs));
-    }
-
-    /**
-     * quickly creates a product on the stack, bypassing any memoization
-     */
-    public static Compound pFast(@NotNull TermContainer subs) {
-        return new GenericCompound(PROD, subs);
-    }
-
-    /**
-     * quickly creates an extensional set (on the stack), bypassing any memoization
-     */
-    public static Compound sFast(@NotNull Term[] subs) {
-        return new GenericCompound(SETe, TermVector.the(Terms.sorted(subs)));
-    }
-
     @NotNull
     public static Compound p(@NotNull String... t) {
         return $.p((Term[]) $.the(t));

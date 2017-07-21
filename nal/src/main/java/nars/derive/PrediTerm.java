@@ -1,5 +1,7 @@
 package nars.derive;
 
+import nars.$;
+import nars.control.premise.Derivation;
 import nars.term.Term;
 
 import java.util.function.Function;

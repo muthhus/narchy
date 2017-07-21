@@ -43,6 +43,23 @@
     ((B ~ G) --> S), G, neqRCom(B,S) |- (B --> S), (Belief:StructuralDeduction, Goal:StructuralDeduction)
     (S --> (B - G)), G, neqRCom(B,S) |- (S --> B), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
+////composition on both sides of a statement:
+
+    ((&,B,A..+) --> (&,X,A..+)), (B --> X), task("?") |- ((&,B,A..+) --> (&,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((|,B,A..+) --> (|,X,A..+)), (B --> X), task("?") |- ((|,B,A..+) --> (|,X,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
+    ((-,S,A) --> (-,S,B)), (B --> A), task("?") |- ((-,S,A) --> (-,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((~,S,A) --> (~,S,B)), (B --> A), task("?") |- ((~,S,A) --> (~,S,B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
+////composition on one side of a statement:
+
+    (W --> (|,B,A..+)), (W --> B), task("?") |- (W --> (|,B,A..+)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    ((&,B,A..+) --> W), (B --> W), task("?") |- ((&,B,A..+) --> W), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+
+    (W --> (-,S,B)), (W --> B), task("?"), neqRCom(S,B) |- (W --> (-,S,B)), (Belief:BeliefStructuralDifference, Punctuation:Belief)
+    ((~,S,B) --> W), (B --> W), task("?"), neqRCom(S,B) |- ((~,S,B) --> W), (Belief:BeliefStructuralDifference, Punctuation:Belief)
+
+
 
 //experiment
 //     (M --> (S - P)), (M --> S), task("!") |- (M --> P), (Goal:DecomposePositiveNegativeNegative)

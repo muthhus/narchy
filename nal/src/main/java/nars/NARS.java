@@ -4,10 +4,7 @@ import jcog.random.XorShift128PlusRandom;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.control.premise.Derivation;
-import nars.derive.DebugDerivationPredicate;
-import nars.derive.Deriver;
-import nars.derive.PrediTerm;
-import nars.derive.TrieDeriver;
+import nars.derive.*;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
@@ -95,6 +92,10 @@ public class NARS {
     }
 
     public static Function<NAR, PrediTerm<Derivation>> newDeriver(int nal) {
+        if (nal == 0) {
+            return (n) -> Derivation.Null;
+        }
+
         return (nar) -> {
             PrediTerm<Derivation> x = TrieDeriver.the(Deriver.DEFAULT(nal), nar, (PrediTerm<Derivation> d) -> {
                 if (Param.TRACE)
@@ -146,10 +147,11 @@ public class NARS {
         return new Default(8, true).time(new RealTime.CS()).get();
     }
 
-    /** provides only low level functionality */
+    /** provides only low level functionality.
+     *  an empty deriver
+     * */
     public static NAR shell() {
-        //TODO disable deriver completely
-        return tmp();
+        return tmp(0);
     }
 
 

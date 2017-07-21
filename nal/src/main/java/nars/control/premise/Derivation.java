@@ -3,6 +3,7 @@ package nars.control.premise;
 import jcog.math.ByteShuffler;
 import nars.*;
 import nars.control.Premise;
+import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 
+import static nars.Op.True;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesDep;
@@ -33,6 +35,12 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Derivation extends Unify implements TermContext {
 
+    public static final PrediTerm<Derivation> Null = new AbstractPred<Derivation>($.p(True)) {
+        @Override
+        public boolean test(Derivation o) {
+            return true;
+        }
+    };
     @NotNull public NAR nar;
 
     public float truthResolution;

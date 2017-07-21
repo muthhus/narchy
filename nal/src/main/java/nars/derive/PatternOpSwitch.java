@@ -3,6 +3,7 @@ package nars.derive;
 import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
+import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -20,8 +21,9 @@ public final class PatternOpSwitch extends ProxyCompound implements PrediTerm<De
     public final int subterm;
 
     PatternOpSwitch(int subterm, @NotNull EnumMap<Op,PrediTerm<Derivation>> cases) {
-        super(/*$.impl*/ $.pFast( $.the("op" + subterm), $.pFast(cases.entrySet().stream().map(e->
-                $.pFast($.quote(e.getKey().toString()), e.getValue())).toArray(Term[]::new))));
+        super(/*$.impl*/ $.p($.the("op" + subterm), $.p(cases.entrySet().stream().map(e -> {
+            return $.p($.quote(e.getKey().toString()), e.getValue());
+        }).toArray(Term[]::new))));
 
         swtch = new PrediTerm[24]; //check this range
         cases.forEach((k,v) -> swtch[k.ordinal()] = v);

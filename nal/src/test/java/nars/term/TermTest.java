@@ -372,7 +372,7 @@ public class TermTest {
 
         Term a = n.term(s).term();
 
-        NAR n2 = new NARS().get();
+        NAR n2 = NARS.shell();
         Term b = n.term(s).term();
 
         //assertTrue(a != b);
@@ -447,7 +447,7 @@ public class TermTest {
         String s = "(&&, <<$1 --> key> ==> <#2 --> ( open, $1 )>>, <#2 --> lock>)";
         Termed a = n.term(s);
 
-        NAR n2 = new NARS().get();
+        NAR n2 = NARS.shell();
         Termed b = n2.term(s);
 
         //assertTrue(a != b);

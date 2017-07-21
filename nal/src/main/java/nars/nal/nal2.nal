@@ -38,3 +38,13 @@
     (X --> C), X, set(X) |- (dropAnyConj(X) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 
+//NAL2:
+
+    ([A] <-> [B]), (A <-> B), task("?") |- ([A] <-> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
+    ({A} <-> {B}), (A <-> B), task("?") |- ({A} <-> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
+
+    ([A] --> [B]), (A <-> B), task("?") |- ([A] --> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
+    ({A} --> {B}), (A <-> B), task("?") |- ({A} --> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
+
+//set un-recurser
+    ({ (V-->K), A..* }-->M), M |- ({V} --> (M,K)), (Belief:StructuralDeduction)

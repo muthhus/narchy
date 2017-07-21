@@ -23,7 +23,7 @@ import static org.junit.Assert.*;
 public class TemporalTest {
 
     @NotNull
-    final NAR n = NARS.tmp();
+    final NAR n = NARS.shell();
 
     @Test
     public void parsedCorrectOccurrenceTime() throws Narsese.NarseseException {
@@ -270,7 +270,7 @@ public class TemporalTest {
 
     @Test
     public void testCommutiveTemporalityConcepts() throws Narsese.NarseseException {
-        NAR n = new NARS().get();
+        NAR n = NARS.shell();
 
         n.log();
 
@@ -304,7 +304,7 @@ public class TemporalTest {
 
     @Test
     public void testCommutiveTemporalityConcepts2() throws Narsese.NarseseException {
-        NAR n = new NARS().get();
+        NAR n = NARS.shell();
 
         for (String op : new String[]{"&&", "<=>"}) {
             Concept a = n.conceptualize($("(x " + op + "   y)"));
@@ -454,7 +454,7 @@ public class TemporalTest {
     @Test
     public void testConceptualizationIntermpolationEternal() throws Narsese.NarseseException {
 
-        NAR d = new NARS().get();
+        NAR d = NARS.shell();
         d.believe("((a ==>+2 b)-->[pill])");
         d.believe("((a ==>+6 b)-->[pill])"); //same concept
         d.run(1);
@@ -600,7 +600,7 @@ public class TemporalTest {
     @Test
     public void testNonCommutivityImplConcept() throws Narsese.NarseseException {
         Param.DEBUG = true;
-        NAR n = new NARS().get();
+        NAR n = NARS.shell();
         n.input("((x) ==>+5 (y)).", "((y) ==>-5 (x)).");
         n.run(1);
 

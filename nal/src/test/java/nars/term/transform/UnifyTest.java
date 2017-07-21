@@ -50,7 +50,7 @@ public class UnifyTest {
 
         //Param.DEBUG = true;
 
-        //NAR nar = new NARS().get();
+        //NAR nar = NARS.shell();
         try {
 
             Compound t2 = (Compound)Narsese.the().term(s2, true);
@@ -546,7 +546,7 @@ public class UnifyTest {
     public void posNegQuestion() {
         //((p1, (--,p1), task("?")), (p1, (<BeliefNegation --> Truth>, <Judgment --> Punctuation>)))
         //  ((a:b, (--,a:b), task("?")), (a:b, (<BeliefNegation --> Truth>, <Judgment --> Punctuation>)))
-        RuleTest.get(new TestNAR(new NARS().get()),
+        RuleTest.get(new TestNAR(NARS.shell()),
                 "a:b?", "(--,a:b).",
                 "a:b.",
                 0, 0, 0.9f, 0.9f);
@@ -877,7 +877,7 @@ public class UnifyTest {
 
     void testIntroduction(String subj, Op relation, String pred, String belief, @NotNull String concl) {
 
-        NAR n = new NARS().get();
+        NAR n = NARS.shell();
         n.nal(6);
 
         new TestNAR(n)

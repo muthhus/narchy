@@ -4,7 +4,9 @@ import jcog.Util;
 import jcog.math.ByteShuffler;
 import nars.$;
 import nars.control.premise.Derivation;
+import nars.term.Compound;
 import nars.term.ProxyCompound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +24,7 @@ public class Fork extends ProxyCompound implements PrediTerm<Derivation> {
     public final PrediTerm<Derivation>[] cache;
 
     Fork(@NotNull PrediTerm[] actions) {
-        super($.pFast(actions) /* maybe should be a set but prod is faster */);
+        super($.p((Term[]) actions) /* maybe should be a set but prod is faster */);
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
         this.cache = actions;

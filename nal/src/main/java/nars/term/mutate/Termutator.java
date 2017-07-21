@@ -1,10 +1,12 @@
 package nars.term.mutate;
 
 import nars.$;
+import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * AIKR choicepoint used in deciding possible mutations to apply in deriving new compounds
@@ -32,7 +34,7 @@ public interface Termutator {
 
 
         AbstractTermutator(Term... keyComponents) {
-            super(keyComponents.length == 1 ? keyComponents[0] : $.pFast(keyComponents));
+            super(keyComponents.length == 1 ? keyComponents[0] : $.p(keyComponents));
         }
 
     }

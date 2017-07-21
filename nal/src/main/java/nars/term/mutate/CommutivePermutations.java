@@ -20,7 +20,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
      * x and y must have same size
      */
     public CommutivePermutations(@NotNull TermContainer x, @NotNull TermContainer y) {
-        super($.pFast(x), $.pFast(y)); //assert(x.size()==y.size());
+        super($.p(x), $.p(y)); //assert(x.size()==y.size());
         this.y = y;
         this.x = x;
     }

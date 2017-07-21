@@ -140,7 +140,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     protected final NARLoop loop = new NARLoop(this);
 
 
-    private PrediTerm<Derivation> deriver;
+    private final PrediTerm<Derivation> deriver;
 
 
     /**

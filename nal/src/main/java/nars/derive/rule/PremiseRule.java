@@ -1285,7 +1285,7 @@ public class PremiseRule extends GenericCompound {
 
         if (question) {
 
-            newPremise = $.pFast(concat(pp, TaskAny));
+            newPremise = $.p(concat(pp, TaskAny));
             //newPremise = pc; //same
 
 
@@ -1300,7 +1300,7 @@ public class PremiseRule extends GenericCompound {
 //                                        || cx.sub(1).equals(GOAL)));
 //                    }).append(QUESTION_PUNCTUATION))
 //            );
-            newConclusion = $.pFast(newConclusion.sub(0), p(QUESTION_PUNCTUATION));
+            newConclusion = $.p(newConclusion.sub(0), p(QUESTION_PUNCTUATION));
 
         } else {
 //            if (swapTruth) {
