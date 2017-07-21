@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -87,18 +88,19 @@ public class TrieDeriverTest {
 
 
     public static PrediTerm<Derivation> testCompile(String... rules) {
-        return testCompile(NARS.tmp(0), rules);
+        return testCompile(NARS.tmp(0), false, rules);
     }
 
     public static PrediTerm<Derivation> testCompile(NAR n, String... rules) {
+        return testCompile(n, false, rules);
+    }
 
-
+    public static PrediTerm<Derivation> testCompile(NAR n, boolean debug, String... rules) {
 
         PremiseRuleSet src = new PremiseRuleSet( rules );
         PrediTerm d = src.compile(n);
 
-        System.out.println(d);
-        d.printRecursive();
+        if (debug) d.printRecursive();
 
         Set<Term> byEquality = new HashSet();
         Set<Term> byIdentity = new IdentityHashSet();
@@ -107,18 +109,21 @@ public class TrieDeriverTest {
             byIdentity.add(a);
         });
 
-        System.out.println("           volume: " + d.volume());
-        System.out.println("       complexity: " + d.complexity());
-        System.out.println("terms by equality: " + byEquality.size());
-        System.out.println("terms by identity: " + byIdentity.size());
+        if (debug) {
+            System.out.println("           volume: " + d.volume());
+            System.out.println("       complexity: " + d.complexity());
+            System.out.println("terms by equality: " + byEquality.size());
+            System.out.println("terms by identity: " + byIdentity.size());
 
-        System.out.println("  values: " + n.values.size());
-        n.values.forEach(System.out::println);
+            System.out.println("  values: " + n.values.size());
+            n.values.forEach(System.out::println);
+        }
         assertTrue(n.values.size() > 0);
 
-        System.out.println();
-
-        TrieDeriver.print(d, System.out);
+        if (debug) {
+            System.out.println();
+            TrieDeriver.print(d, System.out);
+        }
 
         return d;
 
@@ -145,14 +150,14 @@ public class TrieDeriverTest {
                 "(A --> B), C |- (A ==> C), (Punctuation:Question)"
         };
 
-        Set<Task> t1 = testDerivation(rules, "(a-->b).", "b", 8);
+        Set<Task> t1 = testDerivation(rules, "(a-->b).", "b", 64);
         assertEquals(2, t1.size());
-        Set<Task> t2 = testDerivation(rules, "(a<->b).", "b", 8);
-        assertEquals(0, t1.size());
+        Set<Task> t2 = testDerivation(rules, "(a<->b).", "b", 64);
+        assertEquals(0, t2.size());
 
     }
 
-    public Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
+    public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
         NAR n = NARS.tmp(8);
 
         PrediTerm<Derivation> d = testCompile(n, rules )
@@ -161,14 +166,14 @@ public class TrieDeriverTest {
         Derivation der = new Derivation(n);
         der.cycle(d);
 
+        Set<Task> tasks = new LinkedHashSet();
+        n.onTask(tasks::add);
 
         new Premise(
                 new PLink(n.task(task), 0.5f),
                 new PLink(n.term(belief), 0.5f)
         ).run(der, ttlMax);
 
-        Set<Task> tasks = new TreeSet();
-        n.onTask(tasks::add);
         return tasks;
     }
 

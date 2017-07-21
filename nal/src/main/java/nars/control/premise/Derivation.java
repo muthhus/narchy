@@ -427,33 +427,33 @@ public class Derivation extends Unify implements TermContext {
         nar.emotion.taskDerivations.increment();
     }
 
-//    /** experimental memoization of transform results */
-//    @Nullable public Term transform(@NotNull Term pattern) {
-//        if (!(pattern instanceof Compound) || pattern.vars(type)==0 || pattern.size()==0) {
-//            //return super.transform(pattern);
-//            return xy.get(pattern); //fast variable resolution
-//        }
-//        if (pattern.OR(x -> x == Null))
-//            return Null;
-//
-//        Transformation key = snapshot((Compound)pattern);
-//
-//        //avoid recursive update problem on the single thread by splitting the get/put
-//        Term value = transformsCache.get(key);
-//        if (value!=null)
-//            return value;
-//
-//        value = super.transform(key.pattern);
-//        if (value == null)
-//            value = Null;
-//
-//        transformsCache.put(key, value);
-//
-//        if (value == Null)
-//            value = null;
-//
-//        return value;
-//    }
+    /** experimental memoization of transform results */
+    @Nullable public Term transform(@NotNull Term pattern) {
+        if (!(pattern instanceof Compound) || pattern.vars(type)==0 || pattern.size()==0) {
+            //return super.transform(pattern);
+            return super.transform(pattern); //xy.get(pattern); //fast variable resolution
+        }
+        if (pattern.OR(x -> x == Null))
+            return Null;
+
+        Transformation key = snapshot((Compound)pattern);
+
+        //avoid recursive update problem on the single thread by splitting the get/put
+        Term value = transformsCache.get(key);
+        if (value!=null)
+            return value;
+
+        value = super.transform(key.pattern);
+        if (value == null)
+            value = Null;
+
+        transformsCache.put(key, value);
+
+        if (value == Null)
+            value = null;
+
+        return value;
+    }
 
     final static class Transformation {
         public final Compound pattern;
@@ -487,11 +487,14 @@ public class Derivation extends Unify implements TermContext {
         //FasterList<Term> key = new FasterList<>(currentMatch.length * 2 + 1);
         DynBytes key = new DynBytes((2 * currentMatch.length + 1 ) * 8 /* estimate */ );
         pattern.append((ByteArrayDataOutput)key); //in 0th
+        key.writeByte(0);
         for (Term[] m : currentMatch) {
             Term var = m[0];
             if (pattern.containsRecursively(var)) {
                 var.append((ByteArrayDataOutput)key);
+                key.writeByte(0);
                 m[1].append((ByteArrayDataOutput)key);
+                key.writeByte(0);
             }
         }
         return new Transformation(pattern,key);
