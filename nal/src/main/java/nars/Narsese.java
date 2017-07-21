@@ -1,7 +1,5 @@
 package nars;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.github.fge.grappa.annotations.Cached;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
@@ -910,7 +908,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * list of terms prefixed by a particular compound term operate
      */
-    //@Cached
+    @Cached
     Rule MultiArgTerm(@Nullable Op defaultOp, char close, boolean initialOp, boolean allowInternalOp) {
 
         return sequence(
@@ -1281,33 +1279,46 @@ public class Narsese extends BaseParser<Object> {
     public static Term term(String s) throws NarseseException {
         Exception ee = null;
         try {
-            Term x = singleTerms.get(s);
-            if (x != null && x != Null)
-                return x;
+            //Term x = singleTerms.get(s);
+
+            ParsingResult r = singleTermParsers.get().run(s);
+
+            ValueStack stack = r.getValueStack();
+
+            if (stack.size() == 1) {
+                Object x = stack.pop();
+
+                if (x instanceof String)
+                    return Atomic.the((String) x);
+                else if (x instanceof Term)
+                    return (Term) x;
+            }
+
+            return Null;
+
         } catch (Exception e) {
             ee = e;
         }
         throw new NarseseException(s.toString(), null, ee);
     }
 
-    static LoadingCache<String, Term> singleTerms = Caffeine.newBuilder().maximumSize(32 * 1024)
-            .build((s) -> {
-                ParsingResult r = //parsers.get().singleTermParser.run(s);
-                        singleTermParsers.get().run(s);
-
-                ValueStack stack = r.getValueStack();
-
-                if (stack.size() == 1) {
-                    Object x = stack.pop();
-
-                    if (x instanceof String)
-                        return Atomic.the((String) x);
-                    else if (x instanceof Term)
-                        return (Term) x;
-                }
-
-                return Null;
-            });
+//    static LoadingCache<String, Term> singleTerms = Caffeine.newBuilder().maximumSize(32 * 1024)
+//            .build((s) -> {
+//                ParsingResult r = singleTermParsers.get().run(s);
+//
+//                ValueStack stack = r.getValueStack();
+//
+//                if (stack.size() == 1) {
+//                    Object x = stack.pop();
+//
+//                    if (x instanceof String)
+//                        return Atomic.the((String) x);
+//                    else if (x instanceof Term)
+//                        return (Term) x;
+//                }
+//
+//                return Null;
+//            });
 
 
     @NotNull
