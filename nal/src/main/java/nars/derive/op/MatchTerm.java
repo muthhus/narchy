@@ -17,7 +17,7 @@ abstract public class MatchTerm extends ProxyCompound implements PrediTerm<Deriv
 
     public final @Nullable PrediTerm eachMatch;
 
-    public MatchTerm(@NotNull Compound id, @NotNull Term pattern, @Nullable PrediTerm eachMatch) {
+    MatchTerm(@NotNull Compound id, @NotNull Term pattern, @Nullable PrediTerm eachMatch) {
         super(id);
         this.pattern = pattern;
         this.eachMatch = eachMatch;

@@ -1,8 +1,14 @@
 package nars.nal;
 
+import jcog.pri.PLink;
+import jcog.pri.PriReference;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
+import nars.Task;
+import nars.control.Premise;
+import nars.control.premise.Derivation;
+import nars.derive.DebugDerivationPredicate;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.derive.TrieDeriver;
@@ -17,6 +23,7 @@ import org.junit.Test;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static org.junit.Assert.*;
 
@@ -67,7 +74,7 @@ public class TrieDeriverTest {
 
         System.out.println(d);
 
-        assertTrue(d.toString().contains(",((?2 &&+0 %1),") );
+        assertTrue(d.toString().contains("((?2 &&+0 %1),") );
         assertTrue(d.toString().contains("(?2 &&+- %1)") );
 
 
@@ -78,9 +85,14 @@ public class TrieDeriverTest {
     }
 
 
-    void testCompile(String... rules) {
 
-        NAR n = NARS.tmp();
+    public static PrediTerm<Derivation> testCompile(String... rules) {
+        return testCompile(NARS.tmp(0), rules);
+    }
+
+    public static PrediTerm<Derivation> testCompile(NAR n, String... rules) {
+
+
 
         PremiseRuleSet src = new PremiseRuleSet( rules );
         PrediTerm d = src.compile(n);
@@ -108,6 +120,7 @@ public class TrieDeriverTest {
 
         TrieDeriver.print(d, System.out);
 
+        return d;
 
         //PrediTerm e = src.compile(NARS.single());
     }
@@ -125,6 +138,40 @@ public class TrieDeriverTest {
         );
 
     }
+    @Test public void testConclusionFold() throws Narsese.NarseseException {
+
+        String[] rules = {
+                "(A --> B), C |- (A --> C), (Punctuation:Question)",
+                "(A --> B), C |- (A ==> C), (Punctuation:Question)"
+        };
+
+        Set<Task> t1 = testDerivation(rules, "(a-->b).", "b", 8);
+        assertEquals(2, t1.size());
+        Set<Task> t2 = testDerivation(rules, "(a<->b).", "b", 8);
+        assertEquals(0, t1.size());
+
+    }
+
+    public Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
+        NAR n = NARS.tmp(8);
+
+        PrediTerm<Derivation> d = testCompile(n, rules )
+                .transform(DebugDerivationPredicate::new);
+
+        Derivation der = new Derivation(n);
+        der.cycle(d);
+
+
+        new Premise(
+                new PLink(n.task(task), 0.5f),
+                new PLink(n.term(belief), 0.5f)
+        ).run(der, ttlMax);
+
+        Set<Task> tasks = new TreeSet();
+        n.onTask(tasks::add);
+        return tasks;
+    }
+
 //    @Test public void printRuleSet() {
 //
 ////        List<PremiseRule> rr = d.rules.rules;

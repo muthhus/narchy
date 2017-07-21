@@ -62,7 +62,7 @@ public final class Conclude extends ProxyCompound implements Function<NAR,Conclu
     public Conclusion apply(@NotNull NAR nar) {
         int cid = serial.getAndIncrement();
         CauseChannel<Task> input = nar.newChannel(term());
-        return new Conclusion($.func("derive", $.the(cid), sub(0) /* prod args */ ), pattern, time, varIntro, rule, input);
+        return new Conclusion($.func("derive", /*$.the(cid), */sub(0) /* prod args */ ), pattern, time, varIntro, rule, input);
     }
 
 

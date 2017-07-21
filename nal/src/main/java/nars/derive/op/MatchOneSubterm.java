@@ -16,7 +16,8 @@ public final class MatchOneSubterm extends MatchTerm {
     public MatchOneSubterm(int subterm, @NotNull Term pattern, @Nullable PrediTerm eachMatch) {
         super(eachMatch!=null ?
                 $.func("unify", $.the(subterm), pattern, eachMatch) :
-                $.func("unify", $.the(subterm), pattern), pattern, eachMatch);
+                $.func("unify", $.the(subterm), pattern),
+                pattern, eachMatch);
         this.subterm = subterm;
     }
 

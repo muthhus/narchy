@@ -136,11 +136,9 @@ public class Derivation extends Unify implements TermContext {
 
     /** if using this, must set: nar, index, random, DerivationBudgeting */
     public Derivation(NAR nar) {
-        super(null, VAR_PATTERN, null, Param.UnificationStackMax, 0);
+        super(nar.terms, VAR_PATTERN, nar.random(), Param.UnificationStackMax, 0);
 
         this.nar = nar;
-        this.terms = nar.terms;
-        this.random = nar.random();
 
         substituteIfUnifiesAny = new substituteIfUnifiesAny(this) {
             @Override public boolean equals(Object u) { return this == u; }
@@ -176,13 +174,14 @@ public class Derivation extends Unify implements TermContext {
     }
 
     /** concept-scope  */
-    @NotNull public void restart(PrediTerm<Derivation> deriver) {
+    @NotNull public Derivation cycle(PrediTerm<Derivation> deriver) {
         this.time = this.nar.time();
         this.dur = this.nar.dur();
         this.truthResolution = this.nar.truthResolution.floatValue();
         this.confMin = Math.max(truthResolution, this.nar.confMin.floatValue());
         this.deriver = deriver;
         //transformsCached.cleanUp();
+        return this;
     }
 
 
@@ -314,18 +313,18 @@ public class Derivation extends Unify implements TermContext {
     public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm eachMatch) {
 
         boolean finish = (this.forEachMatch = eachMatch)!=null;
-
 //        if (!finish) {
 //            //before the start
 //        }
 
-        unify(x, y, finish);
-
+        try {
+            unify(x, y, finish);
+        } finally {
+            this.forEachMatch = null;
+        }
 //        if (finish) {
 //            //after the end
 //        }
-
-        this.forEachMatch = null;
 
         return live();
     }
@@ -447,7 +446,12 @@ public class Derivation extends Unify implements TermContext {
 //        value = super.transform(key.pattern);
 //        if (value == null)
 //            value = Null;
+//
 //        transformsCache.put(key, value);
+//
+//        if (value == Null)
+//            value = null;
+//
 //        return value;
 //    }
 

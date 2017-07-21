@@ -23,8 +23,8 @@ public class Fork extends ProxyCompound implements PrediTerm<Derivation> {
     @NotNull
     public final PrediTerm<Derivation>[] cache;
 
-    Fork(@NotNull PrediTerm[] actions) {
-        super($.p((Term[]) actions) /* maybe should be a set but prod is faster */);
+    protected Fork(@NotNull PrediTerm[] actions) {
+        super($.sete((Term[]) actions) /* maybe should be a set but prod is faster */);
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
         this.cache = actions;

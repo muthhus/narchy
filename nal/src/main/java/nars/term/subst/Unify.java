@@ -48,7 +48,7 @@ public abstract class Unify extends Versioning implements Subst {
     protected final static Logger logger = LoggerFactory.getLogger(Unify.class);
 
     @NotNull
-    public Random random;
+    public final Random random;
 
     @NotNull
     public final Op type;
@@ -62,7 +62,7 @@ public abstract class Unify extends Versioning implements Subst {
     public final Versioning<Term> versioning = this;
 
     @NotNull
-    public TermIndex terms;
+    public final TermIndex terms;
 
     @NotNull
     public final VersionMap<Term, Term> xy;

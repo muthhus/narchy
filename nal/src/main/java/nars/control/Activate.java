@@ -205,7 +205,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         int penalty = Math.max(1, ttlPerPremise / (2));
 
         Derivation d = nar.derivation();
-        d.restart(nar.deriver());
+        d.cycle(nar.deriver()); //TODO dont do this until the first premise is ready
+
 
         Random rng = nar.random();
         while (ttl > 0 /*samples++ < samplesMax*/) {

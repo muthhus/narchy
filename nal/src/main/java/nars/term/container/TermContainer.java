@@ -39,11 +39,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[]{});
 
-    @NotNull
-    @Deprecated
-    default public TermContainer append(@NotNull Term x) {
-        return Op.subterms(ArrayUtils.add(toArray(), x));
-    }
+
 
     //TODO optionally allow atomic structure positions to differ
     default boolean equivalentStructures() {

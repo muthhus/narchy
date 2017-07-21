@@ -123,13 +123,6 @@ public class ProxyCompound implements Compound/*, NonInternable*/ {
 
 
     @Override
-    @NotNull
-    @Deprecated
-    public TermContainer append(@NotNull Term x) {
-        return ref.append(x);
-    }
-
-    @Override
     public boolean equivalentStructures() {
         return ref.equivalentStructures();
     }
@@ -231,10 +224,7 @@ public class ProxyCompound implements Compound/*, NonInternable*/ {
         return ref.isSorted();
     }
 
-    @Override
-    public void append(ByteArrayDataOutput out) {
-        ref.append(out);
-    }
+
 
     @Override
     @NotNull
@@ -247,15 +237,6 @@ public class ProxyCompound implements Compound/*, NonInternable*/ {
         return ref.subStream();
     }
 
-    @Override
-    public boolean unifyLinear(TermContainer Y, @NotNull Unify u) {
-        return ref.unifyLinear(Y, u);
-    }
-
-    @Override
-    public boolean unifyCommute(TermContainer y, @NotNull Unify subst) {
-        return ref.unifyCommute(y, subst);
-    }
 
     @Override
     public @NotNull Term[] toArraySubRange(int from, int to) {

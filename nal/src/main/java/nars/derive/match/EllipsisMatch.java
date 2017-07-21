@@ -1,10 +1,13 @@
 package nars.derive.match;
 
 import nars.$;
+import nars.Op;
 import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -13,7 +16,7 @@ import java.util.SortedSet;
 /**
  * Holds results of an ellipsis match and
 */
-public class EllipsisMatch extends ProxyCompound  {
+public class EllipsisMatch extends GenericCompound {
 
     //    public static ArrayEllipsisMatch matchedSubterms(Compound Y, IntObjectPredicate<Term> filter) {
 //        Function<IntObjectPredicate,Term[]> arrayGen =
@@ -29,7 +32,7 @@ public class EllipsisMatch extends ProxyCompound  {
 
 
     protected EllipsisMatch(Term[] t) {
-        super($.p(t));
+        super(Op.PROD, TermVector.the(t));
     }
 
     public static Term match(@NotNull Term[] matched) {

@@ -149,8 +149,6 @@ public class Premise {
 
         }
 
-        if (belief != null && belief.equals(task)) //do not repeat the same task for belief
-            belief = null;
 
         float beliefPri;
         if (belief != null) {
@@ -163,6 +161,9 @@ public class Premise {
         } else {
             beliefPri = Float.NaN;
         }
+
+        if (belief != null && belief.equals(task)) //do not repeat the same task for belief
+            belief = null;
 
         float premisePri = beliefPri != beliefPri ? taskPri :
                 Param.tasktermLinkCombine.apply(taskPri, beliefPri);

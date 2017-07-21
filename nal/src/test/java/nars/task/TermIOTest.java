@@ -27,7 +27,11 @@ import static org.junit.Assert.*;
  */
 public class TermIOTest {
 
-    final static NAR nar = new Terminal();
+    final NAR nar = NARS.shell();
+
+    void assertEqualSerialize(@NotNull String orig) throws Narsese.NarseseException {
+        assertEqualSerialize(nar.term(orig).term());
+    }
 
     void assertEqualSerialize(@NotNull Object orig) {
         //final IO.DefaultCodec codec = new IO.DefaultCodec(nar.index);
@@ -81,13 +85,26 @@ public class TermIOTest {
     @Test
     public void testTermSerialization() throws Narsese.NarseseException {
 
-        assertEqualSerialize(nar.term("<a-->b>").term() /* term, not the concept */);
-        assertEqualSerialize(nar.term("<aa-->b>").term() /* term, not the concept */);
-        assertEqualSerialize(nar.term("<aa--><b<->c>>").term() /* term, not the concept */);
-        assertEqualSerialize(nar.term("(a &&+1 b)").term() /* term, not the concept */);
-        assertEqualSerialize(nar.term("(/, x, _, y)").term() /* term, not the concept */);
-        assertEqualSerialize(nar.term("exe(a,b)").term() /* term, not the concept */);
+        assertEqualSerialize("<a-->b>" /* term, not the concept */);
+        assertEqualSerialize("<aa-->b>" /* term, not the concept */);
+        assertEqualSerialize("<aa--><b<->c>>" /* term, not the concept */);
+        //assertEqualSerialize(("(/, x, _, y)") /* term, not the concept */);
+        assertEqualSerialize(("exe(a,b)") /* term, not the concept */);
     }
+
+    @Test
+    public void testTemporalSerialization() throws Narsese.NarseseException {
+
+        assertEqualSerialize(("(a &&+1 b)") /* term, not the concept */);
+        assertEqualSerialize("(a &&+1 (a &&+1 a))" /* term, not the concept */);
+        assertEqualSerialize("(a ==>+1 b)" /* term, not the concept */);
+        assertEqualSerialize("(a <=>+1 b)" /* term, not the concept */);
+        assertEqualSerialize("(a <=>+1 a)" /* term, not the concept */);
+        assertEqualSerialize(("(b ==>+1 b)") /* term, not the concept */);
+
+
+    }
+
 
     @Test
     public void testTermSerialization2() throws Narsese.NarseseException {
