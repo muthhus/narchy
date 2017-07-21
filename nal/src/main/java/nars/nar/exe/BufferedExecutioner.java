@@ -11,6 +11,7 @@ import jcog.pri.Pri;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.control.Activate;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.truth.Truthed;
@@ -19,6 +20,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.ObjectFloatHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -65,7 +67,7 @@ public class BufferedExecutioner extends Executioner {
                 @Override
                 protected Task merge(@NotNull Task existing, @NotNull Task incoming, @Nullable MutableFloat overflowing) {
                     Param.taskMerge.merge(existing, incoming);
-                    ((NALTask)existing).merge(((NALTask)incoming));
+                    ((NALTask) existing).merge(((NALTask) incoming));
                     return existing;
                 }
 
@@ -88,13 +90,17 @@ public class BufferedExecutioner extends Executioner {
 //            new CurveBag(0, Param.conceptMerge, new ConcurrentHashMap<>()) {
 
             new PriorityHijackBag<>(4) {
-                @Override protected final Consumer<ITask> forget(float rate) {
+                @Override
+                protected final Consumer<ITask> forget(float rate) {
                     return null;
                 }
-                @Override protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
+
+                @Override
+                protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, @Nullable MutableFloat overflowing) {
                     Param.conceptMerge.merge(existing, incoming);
                     return existing;
                 }
+
                 @NotNull
                 @Override
                 public final ITask key(ITask value) {
@@ -167,7 +173,7 @@ public class BufferedExecutioner extends Executioner {
         super.start(nar);
 
         this.rng = nar.random();
-        this.onClear = nar.eventClear.on((n)->{
+        this.onClear = nar.eventClear.on((n) -> {
             tasks.clear();
             concepts.clear();
         });
@@ -175,9 +181,16 @@ public class BufferedExecutioner extends Executioner {
         flush(); //<- may not be necessary
     }
 
+    @Override
+    public void print(PrintStream out) {
+        System.out.println("Concepts");
+        concepts.print();
+        concepts.forEach(x -> ((Activate)x).get().print());
+        System.out.println("\nTasks");
+        tasks.print();
+    }
 
-
-//    @Override
+    //    @Override
 //    public void stop() {
 //        flush();
 //        super.stop();
@@ -218,8 +231,7 @@ public class BufferedExecutioner extends Executioner {
                 concepts.print();
 
             final int toFire =
-                    (int) Math.ceil(conceptsPerCycleMax.floatValue() * concepts.capacity())
-            ;
+                    (int) Math.ceil(conceptsPerCycleMax.floatValue() * concepts.capacity());
 
             float eFrac = ((float) toFire) / concepts.capacity();
             float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * concepts.depressurize(eFrac) * (eFrac);
@@ -291,7 +303,7 @@ public class BufferedExecutioner extends Executioner {
             //commands executed immediately
             execute(input);
         } else {
-            if (nal) tasks.putAsync((NALTask)input);
+            if (nal) tasks.putAsync((NALTask) input);
             else concepts.putAsync(input);
         }
     }

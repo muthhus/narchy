@@ -4,6 +4,7 @@ import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.Task;
+import nars.io.NarseseTest;
 import nars.nar.Terminal;
 import nars.task.util.InvalidTaskException;
 import nars.term.atom.Atomic;
@@ -32,8 +33,6 @@ import static nars.$.t;
 import static nars.$.task;
 import static nars.$.varDep;
 import static nars.Op.*;
-import static nars.io.NarseseTest.assertInvalidTasks;
-import static nars.io.NarseseTest.assertInvalidTerms;
 import static nars.term.TermTest.*;
 import static nars.term.TermTest.t;
 import static org.junit.Assert.*;
@@ -41,7 +40,7 @@ import static org.junit.Assert.*;
 /**
  * Created by me on 12/10/15.
  */
-public class TermReductionsTest {
+public class TermReductionsTest extends NarseseTest {
 
     @Nullable
     final Term p = Atomic.the("P"), q = Atomic.the("Q"), r = Atomic.the("R"), s = Atomic.the("S");
@@ -129,7 +128,9 @@ public class TermReductionsTest {
         assertEquals("(--,(x-->y))", inh(neg($("x")), $("y")).toString());
         assertEquals("(x-->y)", inh(neg($("x")), neg($("y"))).toString());
     }
-    @Test public void testFunctionRecursion() throws Narsese.NarseseException {
+
+    @Test
+    public void testFunctionRecursion() throws Narsese.NarseseException {
         //that this is valid, though self referential
         assertTrue($("task((polarize(%1,task) <=>+- polarize(%2,belief)))") instanceof Compound);
     }
@@ -142,7 +143,6 @@ public class TermReductionsTest {
         assertInvalid(() -> equi(equi(p, q), r));
         assertInvalidTerms("<<a <=> b> <=> c>");
     }
-
 
 
     @Test
@@ -700,7 +700,7 @@ public class TermReductionsTest {
             /*"((a) &&+1 (a))",*/ //<-- conjunction case is special, see repeating conjunction simplification test
         }) {
             Term t = $(x);
-            assertTrue(x + " :: "  + t , t instanceof Compound);
+            assertTrue(x + " :: " + t, t instanceof Compound);
 
             Task y = task((Compound) t, Op.BELIEF, t(1f, 0.9f)).apply(n);
 
@@ -795,6 +795,7 @@ public class TermReductionsTest {
         assertInvalidTerms("(~,(x),(--,(x))");
         assertInvalidTerms("(-,(x),(x))");
     }
+
 
     @Test
     public void testGroupNonDTemporalParallelComponents() throws Narsese.NarseseException {
@@ -949,7 +950,7 @@ public class TermReductionsTest {
         assertEquals(
                 //"((j ==>-1 k) &&+1 b)",
                 "((j &&+1 b) ==>-1 k)",
-                $( "(b &&-1 (j ==>-1 k))").toString()
+                $("(b &&-1 (j ==>-1 k))").toString()
         );
     }
 

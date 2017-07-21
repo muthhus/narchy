@@ -15,7 +15,7 @@ public class Repair {
 
         Class[] testClasses = {
                 //NAL1Test.class, NAL2Test.class,
-                NAL6Test.class
+                AllNAL.class
         };
 
         OptiUnit<AbstractNALTest> o = new OptiUnit<AbstractNALTest>((x) -> {

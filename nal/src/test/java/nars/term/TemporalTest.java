@@ -23,8 +23,7 @@ import static org.junit.Assert.*;
 public class TemporalTest {
 
     @NotNull
-    final NAR n = NARS.single();
-
+    final NAR n = NARS.tmp();
 
     @Test
     public void parsedCorrectOccurrenceTime() throws Narsese.NarseseException {
@@ -209,7 +208,7 @@ public class TemporalTest {
     }
 
     @NotNull
-    static TermContainer the(@NotNull Op op, int dt, @NotNull Term... tt) {
+    TermContainer the(@NotNull Op op, int dt, @NotNull Term... tt) {
         return Op.subterms(theTermArray(op, dt, tt));
     }
 
@@ -347,9 +346,9 @@ public class TemporalTest {
     }
 
     @Nullable
-    static final Term A = $.the("a");
+    final Term A = $.the("a");
     @Nullable
-    static final Term B = $.the("b");
+    final Term B = $.the("b");
 
     @Test
     public void parseTemporalRelation() throws Narsese.NarseseException {

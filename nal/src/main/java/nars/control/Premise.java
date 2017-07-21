@@ -82,8 +82,12 @@ public class Premise {
 
             Compound taskTerm = task.term();
 
-            boolean beliefIsTask =
-                    beliefTerm.equals(taskTerm);
+            Concept taskConcept = nar.conceptualize(taskTerm);
+            Concept _beliefConcept = nar.conceptualize(beliefTerm);
+
+            boolean beliefIsTask = taskConcept.equals(_beliefConcept);
+
+
             //Terms.equalAtemporally(task.term(), (beliefTerm));
 
             boolean reUnified = false;
@@ -95,7 +99,6 @@ public class Premise {
                 }
             }
 
-            Concept _beliefConcept = nar.concept(beliefTerm);
 
             //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
             if (_beliefConcept instanceof TaskConcept) { //beliefs/goals will only be in TaskConcepts
@@ -110,7 +113,7 @@ public class Premise {
 
                 Task match;
 
-                if (task.isQuestOrQuestion() && (reUnified || beliefConcept.term().equals(nar.conceptTerm(taskTerm)))) {
+                if (task.isQuestOrQuestion() && (reUnified || beliefIsTask)) {
 //                            //see if belief unifies with task (in reverse of previous unify)
 //                            if (questionTerm.varQuery() == 0 || (unify((Compound)beliefConcept.term(), questionTerm, nar) == null)) {
 //

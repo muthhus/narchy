@@ -117,9 +117,6 @@ public class Conclusion extends AbstractPred<Derivation> {
             occ = Tense.ETERNAL_RANGE.clone();
 
             //process time with the unnegated term
-            Op o = c1.op();
-
-
             float[] confScale = {1f};
 
             @Nullable Compound t1 = this.time.compute(c1,
@@ -242,6 +239,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
                 d.accept(t);
                 d.use(Param.TTL_DERIVE_TASK_SUCCESS);
+                return true;
             }
         }
 

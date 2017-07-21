@@ -1,4 +1,4 @@
-package nars.derive.meta;
+package nars.derive;
 
 import nars.NAR;
 import nars.Narsese;

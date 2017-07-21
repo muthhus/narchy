@@ -6,6 +6,7 @@ import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintStream;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -86,6 +87,10 @@ abstract public class Executioner implements Executor {
 
     public Loop loop(float fps /* initial */, Runnable repeated) {
         return new Periodic(fps, repeated);
+    }
+
+    public void print(PrintStream out) {
+        out.println(this);
     }
 
 

@@ -17,6 +17,13 @@ import static nars.Op.*;
  * NAR Parameters
  */
 public abstract class Param  {
+    /**
+     * use this for advanced error checking, at the expense of lower performance.
+     * it is enabled for unit tests automatically regardless of the value here.
+     */
+    public static boolean DEBUG;
+    public static boolean TRACE;
+
 
 //
 //    /** belief projection lookahead time in premise formation, in multiples of duration */
@@ -47,8 +54,8 @@ public abstract class Param  {
     /** cost of a termutate call */
     public static final int TTL_MUTATE = 1;
 
-    /** cost of a term unification */
-    public static final int TTL_UNIFY = 1;
+    /** cost of a term unification: should be very small or zero */
+    public static final int TTL_UNIFY = 0;
 
     /** cost of attempting a derivation */
     public static final int TTL_DERIVE_TASK_ATTEMPT = 1;
@@ -72,12 +79,6 @@ public abstract class Param  {
     }
 
 
-    /**
-     * use this for advanced error checking, at the expense of lower performance.
-     * it is enabled for unit tests automatically regardless of the value here.
-     */
-    public static boolean DEBUG;
-    public static boolean TRACE;
 
 
     /** absolute limit for constructing terms in any context in which a NAR is not known, which could provide a limit.
@@ -142,11 +143,11 @@ public abstract class Param  {
 
     public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
 
-    public final static int BeliefMatchTTL = 64;
+    public final static int BeliefMatchTTL = 128;
     public static final int UnificationVariableCapInitial = 8;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final static int UnificationTTLMax = BeliefMatchTTL * 4;
+    public final static int UnificationTTLMax = BeliefMatchTTL * 2;
 
 
 

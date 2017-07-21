@@ -195,7 +195,7 @@ public class Derivation extends Unify implements TermContext {
         this.taskTerm = tt;
         this.termSub0Struct = tt.structure();
         Op tOp = tt.op();
-        this.termSub0op = (byte) tOp.id;
+        this.termSub0op = tOp.id;
         this.termSub0opBit = tOp.bit;
 
         this.concTruth = null;
@@ -248,7 +248,7 @@ public class Derivation extends Unify implements TermContext {
         this.termSub1Struct = beliefTerm.structure();
 
         Op bOp = beliefTerm.op();
-        this.termSub1op = (byte) bOp.id;
+        this.termSub1op = bOp.id;
         this.termSub1opBit = bOp.bit;
 
         this.temporal = temporal(task, belief);

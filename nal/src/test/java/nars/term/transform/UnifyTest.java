@@ -19,7 +19,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.*;
 
 
-@Deprecated
 public class UnifyTest {
 
     @Test
@@ -28,9 +27,9 @@ public class UnifyTest {
         testUnify($.$("(--,(a))"), $.$("<?C-->(b)>"), false);
     }
 
-        static {
-        Param.DEBUG = true;
-    }
+//        static {
+//        Param.DEBUG = true;
+//    }
 
 //
 //    @Before

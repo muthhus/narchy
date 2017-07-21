@@ -11,15 +11,13 @@ import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static nars.io.NarseseTest.task;
-import static nars.io.NarseseTest.term;
 import static nars.time.Tense.*;
 import static org.junit.Assert.*;
 
 /**
  * Proposed syntax extensions, not implemented yet
  */
-public class NarseseExtendedTest {
+public class NarseseExtendedTest extends NarseseTest {
 
 
     @Test public void testRuleComonent0() throws Narsese.NarseseException {

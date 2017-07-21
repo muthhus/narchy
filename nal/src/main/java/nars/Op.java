@@ -136,8 +136,12 @@ public enum Op implements $ {
 
     /**
      * PRODUCT
+     *   classically this is considered NAL4 but due to the use of functors
+     *   it is much more convenient to classify it in NAL1 so that it
+     *   along with inheritance (INH), which comprise the functor,
+     *   can be used to compose the foundation of the system.
      */
-    PROD("*", 4, Args.GTEZero),
+    PROD("*", 1, Args.GTEZero),
 
 
     /**

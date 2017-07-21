@@ -5,10 +5,10 @@ import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.Param;
-import nars.derive.meta.match.Ellipsis;
-import nars.derive.meta.match.EllipsisMatch;
-import nars.derive.meta.match.EllipsisOneOrMore;
-import nars.derive.meta.match.EllipsisZeroOrMore;
+import nars.derive.match.Ellipsis;
+import nars.derive.match.EllipsisMatch;
+import nars.derive.match.EllipsisOneOrMore;
+import nars.derive.match.EllipsisZeroOrMore;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.PatternTermIndex;
@@ -29,7 +29,7 @@ import java.util.Set;
 
 import static nars.$.$;
 import static nars.Op.*;
-import static nars.derive.meta.match.Ellipsis.firstEllipsis;
+import static nars.derive.match.Ellipsis.firstEllipsis;
 import static org.junit.Assert.*;
 
 /**

@@ -468,13 +468,13 @@ public interface TimeFunctions {
 
                 if (derivedInTask != DTERNAL) {
 
-                    if (task.isGoal() && derivedInTask != 0) {
-                        //if this is the result of the structural decompose: only decompose the earliest component of a conjunction goal
-                        //TODO this could be tested sooner in the derivation, here it has already been nearly constructed just to fail
-                        //otherwise it is the conditional decompose
-                        //                    if (d.goal.single())
-                        //                        return null;
-                    }
+//                    if (task.isGoal() && derivedInTask != 0) {
+//                        //if this is the result of the structural decompose: only decompose the earliest component of a conjunction goal
+//                        //TODO this could be tested sooner in the derivation, here it has already been nearly constructed just to fail
+//                        //otherwise it is the conditional decompose
+//                        //                    if (d.goal.single())
+//                        //                        return null;
+//                    }
 
                     if (!task.isEternal()) {
                         occReturn[0] = task.start() + derivedInTask;

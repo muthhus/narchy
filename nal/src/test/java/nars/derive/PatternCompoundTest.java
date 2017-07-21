@@ -1,4 +1,4 @@
-package nars.derive.meta;
+package nars.derive;
 
 import nars.Narsese;
 import nars.index.term.PatternTermIndex;

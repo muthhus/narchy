@@ -1,6 +1,8 @@
 package nars.nal.nal1;
 
+import nars.Param;
 import nars.nal.AbstractNALTest;
+import nars.nar.exe.BufferedExecutioner;
 import nars.test.TestNAR;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,9 +10,10 @@ import org.junit.Test;
 public class NAL1Test extends AbstractNALTest {
 
     final int CYCLES = 10;
-//    static {
-//        Param.TRACE = true;
-//    }
+    static {
+        Param.DEBUG = true;
+        //Param.TRACE = true;
+    }
 
     @Before public void nal() { test.nar.nal(1); }
 
@@ -82,6 +85,11 @@ public class NAL1Test extends AbstractNALTest {
 
     @Test public void induction() {
         //(A --> C), (B --> C), neq(A,B) |- (B --> A), (Belief:Induction, Desire:Weak, Derive:AllowBackward)
+
+//        test.nar.onCycle(()->{
+//            nar.exe.print(System.out);
+//        });
+        test.nar.log();
 
         test
                 .believe("<parakeet --> bird>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");

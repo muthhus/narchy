@@ -121,7 +121,7 @@ public class Recog2D extends NAgentX {
         train = new Training(
                 //sensors,
                 Lists.newArrayList(
-                        sp.src instanceof PixelBag ? Iterables.concat(sensors, ((PixelBag) sp.src).actions) : sensors
+                        sp.src instanceof PixelBag ? Iterables.concat(sensors.keySet(), ((PixelBag) sp.src).actions ) : sensors.keySet()
                 ),
                 outs, nar);
 

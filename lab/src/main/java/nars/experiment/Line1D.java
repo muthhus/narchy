@@ -1,5 +1,6 @@
 package nars.experiment;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import jcog.Optimize;
 import jcog.Util;
@@ -14,6 +15,7 @@ import spacegraph.layout.Grid;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meter.Plot2D;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -72,8 +74,7 @@ public class Line1D {
                                                 new Vis.EmotionPlot(history, a),
                                                 new ReflectionSurface<>(a),
                                                 Vis.beliefCharts(history,
-                                                        Lists.newArrayList(a.sensors.get(0).sensor.freq(), a.out)
-                                                        , a.nar)
+                                                        Iterables.concat(a.sensors.keySet(), a.actions.keySet()), a.nar)
                                         )
                                 )
                                 , 900, 900);

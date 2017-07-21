@@ -5,7 +5,7 @@ import nars.NARS;
 import nars.Narsese;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.PrediTerm;
+import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
 import nars.term.Term;
@@ -32,7 +32,7 @@ public class TrieDeriverTest {
 
     @Test public void printCompiledRuleTree() {
 
-        TrieDeriver.print(TrieDeriver.the(Deriver.RULES, NARS.single()), System.out);
+        TrieDeriver.print(TrieDeriver.the(Deriver.DEFAULT(), NARS.tmp()), System.out);
 
     }
 
@@ -59,7 +59,7 @@ public class TrieDeriverTest {
         PrediTerm d = TrieDeriver.the(new PremiseRuleSet(idx,
         "Y, Y |- (?1 &&+0 Y), ()",
               "X, X |- (?1 &&+- X), ()"
-        ), NARS.single());
+        ), NARS.tmp());
 
         System.out.println();
 
@@ -70,6 +70,7 @@ public class TrieDeriverTest {
         assertTrue(d.toString().contains(",((?2 &&+0 %1),") );
         assertTrue(d.toString().contains("(?2 &&+- %1)") );
 
+
         //assertTrue("something at least got stored in the index", idx.size() > 16);
 
         //test that A..+ survives as an ellipsis
@@ -77,13 +78,14 @@ public class TrieDeriverTest {
     }
 
 
-    @Test public void testCompile() {
-        PremiseRuleSet src = new PremiseRuleSet(
-            "(A --> B), (B --> C), neqRCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)"
-        );
-        NAR n = NARS.single();
+    void testCompile(String... rules) {
+
+        NAR n = NARS.tmp();
+
+        PremiseRuleSet src = new PremiseRuleSet( rules );
         PrediTerm d = src.compile(n);
 
+        System.out.println(d);
         d.printRecursive();
 
         Set<Term> byEquality = new HashSet();
@@ -92,7 +94,7 @@ public class TrieDeriverTest {
             byEquality.add(a);
             byIdentity.add(a);
         });
-        System.out.println(d);
+
         System.out.println("           volume: " + d.volume());
         System.out.println("       complexity: " + d.complexity());
         System.out.println("terms by equality: " + byEquality.size());
@@ -100,11 +102,29 @@ public class TrieDeriverTest {
 
         System.out.println("  values: " + n.values.size());
         n.values.forEach(System.out::println);
+        assertTrue(n.values.size() > 0);
+
+        System.out.println();
+
+        TrieDeriver.print(d, System.out);
+
 
         //PrediTerm e = src.compile(NARS.single());
-
     }
 
+    @Test public void testCompile() {
+        testCompile(
+    "(A --> B), (B --> C), neqRCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)"
+        );
+
+    }
+    @Test public void testCompilePatternOpSwitch() {
+        testCompile(
+    "(A --> B), C |- (A --> C), (Punctuation:Question)",
+          "(A ==> B), C |- (A ==> C), (Punctuation:Question)"
+        );
+
+    }
 //    @Test public void printRuleSet() {
 //
 ////        List<PremiseRule> rr = d.rules.rules;

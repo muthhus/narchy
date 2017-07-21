@@ -2,6 +2,7 @@ package nars.test;
 
 import jcog.event.Topic;
 import nars.*;
+import nars.nar.exe.BufferedExecutioner;
 import nars.task.ITask;
 import nars.task.Tasked;
 import nars.test.condition.EternalTaskCondition;
@@ -130,7 +131,7 @@ public class TestNAR {
             trace = null;
 
         if (exitOnAllSuccess) {
-            new EarlyExit(3);
+            new EarlyExit(1);
         }
 
         runUntil(finalCycle);
@@ -210,7 +211,7 @@ public class TestNAR {
 
 
         //try {
-        int frames = (int) (finalCycle - time());
+        int frames = Math.max(0,(int) (finalCycle - time()));
         while (frames-- > 0 && !finished)
             nar.cycle();
 
@@ -635,6 +636,7 @@ public class TestNAR {
             if (++cycle % checkResolution == 0 && !requires.isEmpty()) {
 
                 boolean finished = true;
+
 
                 for (int i = 0, requiresSize = requires.size(); i < requiresSize; i++) {
                     if (!requires.get(i).isTrue()) {

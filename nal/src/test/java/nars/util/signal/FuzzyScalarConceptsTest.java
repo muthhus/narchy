@@ -88,7 +88,7 @@ public class FuzzyScalarConceptsTest {
             n.cycle();
 
 
-            double freqSum = StreamSupport.stream(f.spliterator(), false)
+            double freqSum = StreamSupport.stream(f.sensors.spliterator(), false)
                     .peek(x -> n.input(x.apply(n)))
                     .map(x -> n.beliefTruth(x, n.time()))
                     .mapToDouble(x -> x!=null ? x.freq() : 0f).sum();

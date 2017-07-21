@@ -5,7 +5,7 @@ import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.Param;
-import nars.derive.meta.match.Ellipsis;
+import nars.derive.match.Ellipsis;
 import nars.term.Term;
 import nars.term.mutate.Choose1;
 import nars.term.mutate.Choose2;
@@ -79,7 +79,7 @@ public class TermutatorTest {
 
 
     static final Variable p2= v(Op.VAR_PATTERN, 2);
-    static final SortedSet<Term> p2p3 = $.pStack( p2, v(Op.VAR_PATTERN, 3) ).toSortedSet();
+    static final SortedSet<Term> p2p3 = $.pFast( p2, v(Op.VAR_PATTERN, 3) ).toSortedSet();
 
     @Test public void testChoose2_2() {
 

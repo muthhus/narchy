@@ -1,4 +1,4 @@
-package nars.derive.meta.constraint;
+package nars.derive.constraint;
 
 import nars.NARS;
 import nars.test.TestNAR;

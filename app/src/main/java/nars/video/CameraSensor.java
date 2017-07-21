@@ -2,10 +2,7 @@ package nars.video;
 
 import jcog.Util;
 import jcog.pri.mix.PSink;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
-import nars.Op;
+import nars.*;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
 import nars.task.ITask;
@@ -34,7 +31,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     private final NAR nar;
 
     public final List<PixelConcept> pixels;
-    private final CauseChannel<ITask> in;
+    private final CauseChannel<Task> in;
     private final Term id;
 
     float resolution = 0.01f;//Param.TRUTH_EPSILON;

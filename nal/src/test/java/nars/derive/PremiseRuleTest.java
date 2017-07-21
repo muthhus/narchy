@@ -1,4 +1,4 @@
-package nars.derive.meta;
+package nars.derive;
 
 import com.google.common.base.Joiner;
 import nars.Narsese;

@@ -754,43 +754,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        });
     }
 
-    public MatrixView.ViewFunction2D sensorMatrixView(NAR nar, long whenRelative) {
-        int dur = nar.dur();
-        return (x, y, g) -> {
-//            int rgb = cam.out.getRGB(x,y);
-//            float r = decodeRed(rgb);
-//            if (r > 0)
-//                System.out.println(x + " "+ y + " " + r);
-//            g.glColor3f(r,0,0);
-
-            SensorConcept s = sensors.get(y * tetris_width + x);
-
-            Truth b = s.beliefs().truth(now + whenRelative, nar);
-            float bf = b != null ? b.freq() : 0.5f;
-            Truth dt = s.goals().truth(now + whenRelative, nar);
-            float dr, dg;
-            if (dt == null) {
-                dr = dg = 0;
-            } else {
-                float f = dt.freq();
-                float c = dt.conf();
-                if (f > 0.5f) {
-                    dr = 0;
-                    dg = (f - 0.5f) * 2f;// * c;
-                } else {
-                    dg = 0;
-                    dr = (0.5f - f) * 2f;// * c;
-                }
-            }
-
-            float p = 1f;//nar.pri(s);
-            g.glColor4f(dr, dg, bf, 0.5f + 0.5f * p);
-
-            return b != null ? b.conf() : 0;
-        };
-    }
-
-
     public static class MyTetris extends Tetris {
 
         public MyTetris(NAR nar) throws Narsese.NarseseException {

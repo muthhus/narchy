@@ -3,7 +3,6 @@ package nars.nal;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
-import nars.op.stm.STMTemporalLinkage;
 import nars.test.TestNAR;
 import org.junit.After;
 
@@ -19,7 +18,7 @@ public abstract class AbstractNALTest  {
 
     protected AbstractNALTest() {
         Param.DEBUG = true;
-        test = new TestNAR(nar = NARS.single());
+        test = new TestNAR(nar = NARS.tmp());
     }
 
     @After

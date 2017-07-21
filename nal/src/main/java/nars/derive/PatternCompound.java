@@ -4,6 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
+import nars.index.term.NonInternable;
 import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
@@ -20,11 +21,17 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-abstract public class PatternCompound extends GenericCompoundDT   {
+/**
+ *
+ */
+abstract public class PatternCompound extends GenericCompoundDT  {
 
     public final int sizeCached;
     public final int structureNecessary;
-    public final boolean commutativeCached;
+    public final boolean commutative; //cached
+    transient final private Op op; //cached
+    private final int minVolumeNecessary;
+    private final int size;
 
     PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
         super(new GenericCompound(seed.op(), subterms), seed.dt());
@@ -35,8 +42,12 @@ abstract public class PatternCompound extends GenericCompoundDT   {
         sizeCached = seed.size();
         structureNecessary =
                 //seed.structure() & ~(Op.VariableBits);
-                seed.structure() & ~(Op.VAR_PATTERN.bit);
-        commutativeCached = super.isCommutative();
+                seed.structure() &
+                        ~(Op.VAR_PATTERN.bit | Op.INH.bit | Op.PROD.bit); //exclude: pattern var, inh and prod (for any functors)
+        commutative = super.isCommutative();
+        op = op();
+        minVolumeNecessary = volume();
+        size = size();
     }
 
     @Override
@@ -46,16 +57,55 @@ abstract public class PatternCompound extends GenericCompoundDT   {
 
     @Override
     public boolean isCommutative() {
-        return commutativeCached;
+        return commutative;
     }
 
+//    @Override
+//    public final int structure() {
+//        return structureNecessary;
+//    }
+
+    /** slightly modified from general compound unification */
     @Override
-    public final int structure() {
-        return structureNecessary;
+    public boolean unify(@NotNull Term ty, @NotNull Unify subst) {
+
+        if ((ty instanceof Compound) &&
+                op == ty.op() &&
+                ty.hasAll(structureNecessary) &&
+                size == ty.size()
+                //ty.volume() >= minVolumeNecessary
+            ) {
+
+            Compound y = (Compound) ty;
+            if (op.temporal) {
+                int sdur = subst.dur;
+                if (sdur >= 0) {
+                    if (!Compound.matchTemporalDT(this, y, sdur))
+                        return false;
+                }
+            }
+
+            TermContainer xsubs = subterms();
+            TermContainer ysubs = y.subterms();
+
+
+            //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
+            if (isCommutative()) {
+                return xsubs.unifyCommute(ysubs, subst);
+            } else {
+                return xsubs.unifyLinear(ysubs, subst);
+            }
+
+        } /*else if (ty instanceof Abbreviation.AliasConcept) {
+            Compound abbreviated = ((Abbreviation.AliasConcept) ty).abbr.term();
+            return abbreviated.equals(this) || unify(abbreviated, subst);
+        }*/
+
+        return false;
+
     }
 
-
-    abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {
+    abstract protected static class PatternCompoundWithEllipsis extends PatternCompound implements NonInternable {
 
         @NotNull
         protected final Ellipsis ellipsis;
@@ -79,7 +129,7 @@ abstract public class PatternCompound extends GenericCompoundDT   {
     }
 
 
-    public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis {
+    public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis implements NonInternable {
 
         public PatternCompoundWithEllipsisLinear(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);
@@ -268,7 +318,7 @@ abstract public class PatternCompound extends GenericCompoundDT   {
 //
 //    }
 
-    public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
+    public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis implements NonInternable {
 
         public PatternCompoundWithEllipsisCommutive(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, ellipsis, subterms);

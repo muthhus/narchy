@@ -7,6 +7,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Task;
+import nars.control.CauseChannel;
 import nars.gui.Vis;
 import nars.task.ITask;
 import nars.task.SignalTask;
@@ -51,20 +52,6 @@ public abstract class ConsoleAgent extends NAgentX {
         queue.add(t);
     }
 
-    @Override
-    public Stream<ITask> sense(NAR nar, long when) {
-        List<Task> q = $.newArrayList(queue.size());
-        Iterator<Task> qq = queue.iterator();
-        while (qq.hasNext()) {
-            q.add(qq.next());
-            qq.remove();
-        }
-
-        return Stream.concat(
-                super.sense(nar, when),
-                q.stream()
-        );
-    }
 
     public ConsoleAgent(NAR nar) {
         super("term", nar);
@@ -103,10 +90,22 @@ public abstract class ConsoleAgent extends NAgentX {
 
         senseNumberDifference($.func((Atomic) id, Atomic.the("joy")), happy);
 
+        CauseChannel<Task> s = nar.newInputChannel(this + "_HumanKeys");
+        onFrame(() -> {
+            //batch collected keyboard inputs since last frame
+            List<Task> q = $.newArrayList(queue.size());
+            Iterator<Task> qq = queue.iterator();
+            while (qq.hasNext()) {
+                q.add(qq.next());
+                qq.remove();
+            }
+
+            s.input(q);
+        });
     }
 
     @Override
-    protected Stream<ITask> predictions(long next) {
+    protected Stream<Task> predictions(long next) {
         return Stream.concat(
                 Stream.concat(
                         W.input(),
@@ -126,7 +125,7 @@ public abstract class ConsoleAgent extends NAgentX {
                 @Override
                 protected float act() {
                     //copy
-                    float s =  similarity(R.chars, W.chars);
+                    float s = similarity(R.chars, W.chars);
                     if (s == 1f)
                         return +1f;
                     else {
