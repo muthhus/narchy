@@ -218,11 +218,16 @@ public class OptiUnit<T> extends RunListener {
 
         /**
          * extracts an array of float values (conversion attempted otherwise NaN)
+         * returns null if the array contained NaN or other invalidity
          */
-        public float[] floats(String... keys) {
-            float[] f = new float[keys.length];
-            for (int i = 0; i < keys.length; i++) {
-                f[i] = floatValue(get(keys[i]));
+        @Nullable public float[] floats(String... keys) {
+            int l = keys.length;
+            float[] f = new float[l];
+            for (int i = 0; i < l; i++) {
+                float v = floatValue(get(keys[i]));
+                if (v!=v)
+                    return null;
+                f[i] = v;
             }
             return f;
         }
@@ -246,14 +251,15 @@ public class OptiUnit<T> extends RunListener {
     static float floatValue(Object value) {
         if (value instanceof Number) {
             return ((Number)value).floatValue();
-        } else {
+        } else if (value!=null) {
             //last resort try to parse as a string
             try {
                 return Texts.f(value.toString());
             } catch (NumberFormatException e) {
-                return Float.NaN;
+
             }
         }
+        return Float.NaN;
     }
 
 
@@ -262,7 +268,11 @@ public class OptiUnit<T> extends RunListener {
      */
     public FloatTable<String> table(String... columns) {
         FloatTable<String> t = new FloatTable<>(columns);
-        experiments.forEach(e ->  t.add(e.floats(columns)) );
+        experiments.forEach(e ->  {
+            @Nullable float[] a = e.floats(columns);
+            if (a!=null)
+                t.add(a);
+        } );
         return t;
     }
 

@@ -65,10 +65,9 @@ public class TaskRule extends TaskMatch {
     private class MySubUnify extends Unify {
 
         private final Task x;
-        static final int TTL = Param.BeliefMatchTTL;
 
         public MySubUnify(Task x) {
-            super(TaskRule.this.nar.terms, Op.VAR_PATTERN, TaskRule.this.nar.random(), Param.UnificationTTLMax, TTL);
+            super(TaskRule.this.nar.terms, Op.VAR_PATTERN, TaskRule.this.nar.random(), Param.UnificationTTLMax, nar.matchTTL.intValue());
             this.x = x;
         }
 

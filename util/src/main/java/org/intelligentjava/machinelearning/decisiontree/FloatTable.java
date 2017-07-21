@@ -1,5 +1,6 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
+import com.google.common.base.Joiner;
 import jcog.Texts;
 import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;
@@ -26,8 +27,12 @@ public class FloatTable<H> {
     }
 
     public FloatTable<H> print(PrintStream out) {
+        System.out.println(Joiner.on("\t").join(cols));
         rows.stream().map(x -> Texts.n4(x)).forEach(out::println);
         return this;
     }
 
+    public int size() {
+        return rows.size();
+    }
 }

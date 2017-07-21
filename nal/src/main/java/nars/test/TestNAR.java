@@ -66,8 +66,11 @@ public class TestNAR {
     private boolean exitOnAllSuccess = true;
     public boolean requireConditions = true;
 
-    /** 0 = hasnt been determined yet, -1 = failure, +1 = success */
-    public int score = 0;
+    /** -1 = failure,
+     * 0 = hasnt been determined yet by the end of the test,
+     * (0..1) = success in > 1 cycles,
+     * +1 = success in <= 1 cycles */
+    public float score = 0;
 
     public TestNAR(@NotNull NAR nar) {
         this.outputEvents = new Topic[]{
@@ -134,6 +137,9 @@ public class TestNAR {
             new EarlyExit(1);
         }
 
+        long startTime = nar.time();
+
+
         runUntil(finalCycle);
 
         boolean success = true;
@@ -155,7 +161,10 @@ public class TestNAR {
             }
         }
 
-        this.score = success ? +1 : -1;
+
+        long time = nar.time();
+        int duration = (int)(time - startTime);
+        this.score = success ? (+1/(+1f+duration)) : 0;
 
         if (testAndPrintReport) {
 
@@ -163,12 +172,9 @@ public class TestNAR {
             //return this;
 
 
-            System.out.println(nar.emotion.summary());
-
-
             //assertTrue("No cycles elapsed", tester.nar.memory().time/*SinceLastCycle*/() > 0);
 
-            long time = time();
+
 
             //Task[] inputs = n.inputs.toArray(new Task[n.inputs.size()]);
 //            Collection<HitMeter> var = eventMeters.values();

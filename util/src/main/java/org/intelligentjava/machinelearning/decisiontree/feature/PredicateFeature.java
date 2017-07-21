@@ -4,7 +4,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * Feature type that splits data into 2 sublists - one that
+ * Feature type that splits data into 2 sublists: true, false (in that order)
+ *
  *
  * @param <L> Feature data type (string, number)
  * @author Ignas

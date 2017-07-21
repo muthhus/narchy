@@ -233,7 +233,7 @@ public class Premise {
 
             return true; //keep trying
 
-        }, Param.BeliefMatchTTL).unifyAll(q, a);
+        }, nar.matchTTL.intValue()).unifyAll(q, a);
 
         return result[0];
 

@@ -52,7 +52,7 @@ public class DecisionTreeTrainingTest {
 
         tree.put("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
 
-        DecisionTree.Node root = tree.root();
+        DecisionTree.Node<?> root = tree.root();
 
         assertEquals("x1 = true", root.toString()); // root node x1 = true split
         assertEquals(null, root.label); // not leaf node
@@ -100,7 +100,7 @@ public class DecisionTreeTrainingTest {
 
         tree.put("answer", asList(data1, data2, data3, data4), asList(feature1, feature2, feature3, feature4));
 
-        DecisionTree.Node root = tree.root();
+        DecisionTree.Node<?> root = tree.root();
         assertEquals("x1 = true", root.toString()); // root node x1 = true split
         assertEquals(null, root.label); // not leaf node
 
@@ -176,7 +176,7 @@ public class DecisionTreeTrainingTest {
 
         tree.print();
 
-        DecisionTree.Node root = tree.root();
+        DecisionTree.Node<?> root = tree.root();
         assertEquals("x1 > 2", root.toString()); // root node x1 = true split
         assertEquals(null, root.label); // not leaf node
 

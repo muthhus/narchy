@@ -562,22 +562,24 @@ public enum Texts {
         return sb.toString();
     }
 
-    public static String n4(double[] v) {
+    /** prints an array of numbers separated by tab, suitable for a TSV line */
+    public static String n4(double... v) {
         StringBuilder sb = new StringBuilder(v.length * 6 + 2 /* approx */);
         int s = v.length;
         for (int i = 0; i < s; i++) {
             sb.append(n4(v[i]));
-            if (i != s - 1) sb.append(' ');
+            if (i != s - 1) sb.append('\t');
         }
         return sb.toString();
     }
 
-    public static String n4(float[] v) {
+    /** prints an array of numbers separated by tab, suitable for a TSV line */
+    public static String n4(float... v) {
         StringBuilder sb = new StringBuilder(v.length * 6 + 2 /* approx */);
         int s = v.length;
         for (int i = 0; i < s; i++) {
             sb.append(n4(v[i]));
-            if (i != s - 1) sb.append(' ');
+            if (i != s - 1) sb.append('\t'); //TSV
         }
         return sb.toString();
     }

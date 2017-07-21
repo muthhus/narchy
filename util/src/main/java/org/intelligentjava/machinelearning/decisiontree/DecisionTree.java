@@ -1,6 +1,7 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
 import com.google.common.collect.Streams;
+import com.google.common.graph.*;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.intelligentjava.machinelearning.decisiontree.impurity.GiniIndexImpurityCalculation;
@@ -50,7 +51,7 @@ public class DecisionTree<K, V> {
     /**
      * Root node.
      */
-    private Node root;
+    private Node<V> root;
 
     //    protected static <K,V> V label(K value, Collection<Function<K, V>> data) {
 //        return DecisionTree.label(value, data, DEFAULT_PRECISION);
@@ -79,21 +80,22 @@ public class DecisionTree<K, V> {
     /**
      * Get root.
      */
-    public Node root() {
+    public Node<V> root() {
         return root;
     }
 
-    public Stream<Node> leaves() {
-        return root != null ? root.recurse().filter(Node::isLeaf).distinct() : Stream.empty();
+    public Stream<Node.LeafNode<V>> leaves() {
+        return root != null ? root.recurse().filter(Node::isLeaf).map(n -> (Node.LeafNode<V>) n).distinct() : Stream.empty();
     }
 
     /**
      * Trains tree on training data for provided features.
-     *  @param value        The value column being learned
+     *
+     * @param value        The value column being learned
      * @param trainingData List of training data samples.
      * @param features     List of possible features.
      */
-    public Node put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, IntToFloatFunction precision) {
+    public Node<V> put(K value, Collection<Function<K, V>> trainingData, List<Predicate<Function<K, V>>> features, IntToFloatFunction precision) {
         root = put(value, trainingData, features, 1, precision);
         return root;
     }
@@ -130,11 +132,11 @@ public class DecisionTree<K, V> {
     /**
      * Grow tree during training by splitting data recusively on best feature.
      *
-     * @param data List of training data samples.
-     * @param features     List of possible features.
+     * @param data     List of training data samples.
+     * @param features List of possible features.
      * @return Node after split. For a first invocation it returns tree root node.
      */
-    protected Node put(K key, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features, int currentDepth, IntToFloatFunction depthToPrecision) {
+    protected Node<V> put(K key, Collection<Function<K, V>> data, List<Predicate<Function<K, V>>> features, int currentDepth, IntToFloatFunction depthToPrecision) {
 
         // if dataset already homogeneous enough (has label assigned) make this node a leaf
         V currentNodeLabel;
@@ -156,7 +158,7 @@ public class DecisionTree<K, V> {
         // else grow tree further recursively
 
         //log.debug("Data is split into sublists of sizes: {}", splitData.stream().map(List::size).collect(Collectors.toList()));
-        Node branch = split(split, data).map(
+        Node<V> branch = split(split, data).map(
 
                 subsetTrainingData -> subsetTrainingData.isEmpty() ?
 
@@ -184,7 +186,7 @@ public class DecisionTree<K, V> {
      * @return Return label of class.
      */
     public V get(Function<K, V> value) {
-        Node node = root;
+        Node<V> node = root;
         while (!node.isLeaf()) { // go through tree until leaf is reached
             // only binary splits for now - has feature first child node(left branch), does not have feature second child node(right branch).
             node = node.get(node.feature.test(value) ? 0 : 1);
@@ -225,6 +227,17 @@ public class DecisionTree<K, V> {
 
     // -------------------------------- TREE PRINTING ------------------------------------
 
+    public ValueGraph<Node<V>,Boolean> graph() {
+
+        MutableValueGraph<Node<V>,Boolean> graph = ValueGraphBuilder
+                .directed()
+                .nodeOrder(ElementOrder.unordered())
+                .allowsSelfLoops(false)
+                .build();
+
+        return root.graph(graph);
+    }
+
     public void print() {
         print(System.out);
     }
@@ -233,7 +246,7 @@ public class DecisionTree<K, V> {
         printSubtree(root, o);
     }
 
-    private void printSubtree(Node node, PrintStream o) {
+    private void printSubtree(Node<?> node, PrintStream o) {
         if (!node.isEmpty() && node.get(0) != null) {
             print(node.get(0), true, "", o);
         }
@@ -243,12 +256,12 @@ public class DecisionTree<K, V> {
         }
     }
 
-    private static <V> void print(Node node, PrintStream o) {
+    private static void print(Node node, PrintStream o) {
         o.print(node);
         o.println();
     }
 
-    private static <K, V> void print(Node node, boolean isRight, K indent, PrintStream o) {
+    private static <K> void print(Node<?> node, boolean isRight, K indent, PrintStream o) {
         if (!node.isEmpty() && node.get(0) != null) {
             print(node.get(0), true, indent + (isRight ? "        " : " |      "), o);
         }
@@ -265,7 +278,7 @@ public class DecisionTree<K, V> {
         }
     }
 
-    public static class Node extends FasterList<Node> implements Comparable {
+    public static class Node<V> extends FasterList<Node<V>> implements Comparable<V> {
 
 
         /**
@@ -273,22 +286,23 @@ public class DecisionTree<K, V> {
          */
         public final Predicate feature;
 
-        public final Object label;
+        public final V label;
         private final int hash;
 
         Node(Predicate feature) {
             this(feature, null);
         }
 
-        private Node(Predicate feature, Object label) {
-            super();
+        private Node(Predicate feature, V label) {
+            super(0);
             this.label = label;
             this.feature = feature;
             this.hash = Objects.hash(label, feature);
         }
 
+
         @Override
-        public boolean add(Node newItem) {
+        public boolean add(Node<V> newItem) {
             if (contains(newItem))
                 return false; //err
             return super.add(newItem);
@@ -299,17 +313,21 @@ public class DecisionTree<K, V> {
             super.add(index, element);
         }
 
-        public Stream<Node> recurse() {
-            return Stream.concat(Stream.of(this), isEmpty() ? Stream.empty() :
-                    Streams.concat(stream().map(Node::recurse).toArray(Stream[]::new)));
+        public Stream<Node<V>> recurse() {
+            return Stream.concat(
+                    Stream.of(this),
+                    !isEmpty() ?
+                            Streams.concat(stream().map(Node::recurse).toArray(Stream[]::new))
+                            :
+                            Stream.empty());
         }
 
-        public static Node feature(Predicate feature) {
-            return new Node(feature);
+        public static <V> Node<V> feature(Predicate feature) {
+            return new Node<V>(feature);
         }
 
-        public static Node leaf(Object label) {
-            return new LeafNode(label);
+        public static <V> Node<V> leaf(V label) {
+            return new LeafNode<>(label);
         }
 
         public boolean isLeaf() {
@@ -330,9 +348,9 @@ public class DecisionTree<K, V> {
             if (this == that) return true;
             else {
                 if (feature != null)
-                    if (!feature.equals(((Node) that).feature))
+                    if (!feature.equals(((Node) that).feature)) //branch
                         return false;
-                return Objects.equals(label, (((Node) that).label));
+                return Objects.equals(label, (((Node) that).label)); //leaf
             }
         }
 
@@ -341,16 +359,43 @@ public class DecisionTree<K, V> {
             if (o == this) return 0;
             Node n = (Node) o;
             if (feature != null) {
-                int f = Integer.compare(feature.hashCode(), n.feature.hashCode());
+                int f = Integer.compare(feature.hashCode(), n.feature.hashCode()); //branch
                 if (f != 0)
                     return f;
             }
-            return ((Comparable) label).compareTo(n.label);
+            return ((Comparable) label).compareTo(n.label); //leaf
         }
 
-        private static class LeafNode extends Node {
-            public LeafNode(Object label) {
+        public MutableValueGraph<Node<V>,Boolean> graph(MutableValueGraph<Node<V>,Boolean> graph) {
+            graph.addNode(this);
+
+            int s = size();
+            if (s ==2) {
+                Node<V> ifTrue = get(0);
+                ifTrue.graph(graph);
+                graph.putEdgeValue(this, ifTrue, true);
+
+                Node<V> ifFalse = get(1);
+                ifFalse.graph(graph);
+                graph.putEdgeValue(this, ifFalse, false);
+            } else if (s == 0) {
+                //nothing
+            } else {
+                throw new UnsupportedOperationException("predicate?");
+            }
+
+            return graph;
+        }
+
+        private static class LeafNode<V> extends Node<V> {
+            public LeafNode(V label) {
                 super(null, label);
+            }
+
+
+            @Override
+            public String toString() {
+                return label.toString();
             }
 
             //override other modifying methods

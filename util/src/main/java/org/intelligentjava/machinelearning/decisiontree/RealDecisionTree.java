@@ -1,11 +1,11 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
-import jcog.learn.gng.Gasolinear;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.intelligentjava.machinelearning.decisiontree.feature.DiscretizedScalarFeature;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -21,7 +21,7 @@ import static java.util.stream.Collectors.toList;
 public class RealDecisionTree extends DecisionTree<Integer, Float> {
 
     public final FloatTable<String> table;
-    public final NumFeature[] cols;
+    public final DiscretizedScalarFeature[] cols;
     @Nullable
     private String[] rangeLabels = null;
 
@@ -43,59 +43,6 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
      */
     final IntToFloatFunction depthToPrecision;
 
-    static class NumFeature {
-
-        final String name;
-        final Gasolinear discretizer;
-        final int num;
-
-        NumFeature(int x, String name, int discretization) {
-            this.num = x;
-            this.name = name;
-            this.discretizer = new Gasolinear(discretization);
-        }
-
-        public void learn(float x) {
-            discretizer.put(x);
-        }
-
-        public Stream<Predicate<Function<Integer, Float>>> classifiers(@Nullable String... labels) {
-            assert (labels == null || labels.length == 0 || labels.length == levels());
-            return IntStream.range(0, levels()).mapToObj(
-                    labels != null && labels.length == levels() ?
-                            i -> new CentroidMatch(i, labels[i]) :
-                            i -> new CentroidMatch(i, null)
-            );
-        }
-
-
-        protected int levels() {
-            return discretizer.node.length;
-        }
-
-        public class CentroidMatch implements Predicate<Function<Integer, Float>> {
-
-            private final int v;
-            private final String label;
-
-            CentroidMatch(int v, String label) {
-                this.v = v;
-                this.label = label;
-            }
-
-            @Override
-            public String toString() {
-                return name + "~" + (label != null ? label : discretizer.node[v].getEntry(0));
-            }
-
-            @Override
-            public boolean test(Function<Integer, Float> rr) {
-                return discretizer.which(rr.apply(num)) == v;
-            }
-        }
-
-    }
-
 
     public RealDecisionTree(FloatTable<String> table, int predictCol, int maxDepth, int discretization) {
         this(table, predictCol, maxDepth, IntStream.range(0, discretization).mapToObj(String::valueOf).toArray(String[]::new));
@@ -105,6 +52,7 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
         super();
 
         this.table = table;
+        assert(table.size() > 0);
 
         int discretization = rangeLabels.length;
         assert (discretization > 1);
@@ -116,8 +64,8 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
             return p;
         };
 
-        this.cols = IntStream.range(0, table.cols.length).mapToObj(x -> new NumFeature(x, table.cols[x], discretization))
-                .toArray(NumFeature[]::new);
+        this.cols = IntStream.range(0, table.cols.length).mapToObj(x -> new DiscretizedScalarFeature(x, table.cols[x], discretization))
+                .toArray(DiscretizedScalarFeature[]::new);
 
         switch (discretization) {
             case 2:
@@ -143,11 +91,6 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
 
     }
 
-    public RealDecisionTree rangeLabels(String... labels) {
-        this.rangeLabels = labels;
-        return this;
-    }
-
 
     void update(Stream<float[]> rows, int column) {
 
@@ -165,5 +108,16 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
         );
     }
 
+    public Node<Float> min() {
+        return leaves().min(centroidComparator).get();
+    }
+
+    public Node<Float> max() {
+        return leaves().max(centroidComparator).get();
+    }
+
+
+
+    static final Comparator<Node<Float>> centroidComparator = (a, b) -> Float.compare(a.label, b.label);
 
 }

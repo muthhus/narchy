@@ -27,8 +27,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import static nars.Param.UnificationTTLMax;
-
 /**
  * concept firing, activation, etc
  */
@@ -193,7 +191,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         //float pLimitFactor = priElseZero() * (1f - momentum) / samplesMax;
 
-        int ttlPerPremise = UnificationTTLMax;
+        int ttlPerPremise = nar.matchTTL.intValue(); // * UnificationTTLMax;
         int ttl = ttlPerPremise * Util.lerp(priElseZero(), 1, maxSamples);
 
 
