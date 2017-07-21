@@ -35,16 +35,19 @@ import static nars.derive.rule.PremiseRuleSet.parsedRules;
 public interface Deriver {
 
 
-    /** default rule set, NAL1..NAL8 */
-    @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true,
-            "nal1.nal",
-            //"nal4.nal",
-            "nal6.nal",
-            "misc.nal",
-            "induction.nal",
-            "nal2.nal",
-            "nal3.nal"
-    );
+    static PremiseRuleSet DEFAULT() {
+        /** default rule set, NAL1..NAL8 */
+        @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true,
+                "nal1.nal",
+                //"nal4.nal",
+                "nal6.nal",
+                "misc.nal",
+                "induction.nal",
+                "nal2.nal",
+                "nal3.nal"
+        );
+        return RULES;
+    }
 
     /**
      * for now it seems there is a leak so its better if each NAR gets its own copy. adds some overhead but we'll fix this later

@@ -182,18 +182,6 @@ public class CompoundConcept implements Concept, Compound, Termlike {
 
     @Deprecated
     @Override
-    public boolean AND(@NotNull Predicate<Term> v) {
-        return term.AND(v);
-    }
-
-    @Deprecated
-    @Override
-    public boolean OR(@NotNull Predicate<Term> v) {
-        return term.OR(v);
-    }
-
-    @Deprecated
-    @Override
     public int vars() {
         return term.vars();
     }

@@ -1,8 +1,8 @@
 package nars.term.mutate;
 
 import nars.$;
-import nars.derive.meta.match.Ellipsis;
-import nars.derive.meta.match.EllipsisMatch;
+import nars.derive.match.Ellipsis;
+import nars.derive.match.EllipsisMatch;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;

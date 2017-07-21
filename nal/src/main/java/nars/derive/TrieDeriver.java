@@ -6,10 +6,9 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.control.premise.Derivation;
-import nars.derive.meta.*;
-import nars.derive.meta.op.AbstractPatternOp.PatternOp;
-import nars.derive.meta.op.MatchTerm;
-import nars.derive.meta.op.UnificationPrototype;
+import nars.derive.op.AbstractPatternOp.PatternOp;
+import nars.derive.op.MatchTerm;
+import nars.derive.op.UnificationPrototype;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.term.Term;
@@ -18,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -106,7 +106,7 @@ public enum TrieDeriver {
             TermTrie.indent(indent);
             out.println("SubTermOp" + sw.subterm + " {");
             int i = -1;
-            for (PrediTerm b : sw.cache) {
+            for (PrediTerm b : sw.cases.values()) {
                 i++;
                 if (b == null) continue;
 
@@ -186,7 +186,7 @@ public enum TrieDeriver {
             //TermTrie.indent(indent);
             //out.println("SubTermOp" + sw.subterm + " {");
             int i = -1;
-            for (PrediTerm b : sw.cache) {
+            for (PrediTerm b : sw.cases.values()) {
                 i++;
                 if (b == null) continue;
 
@@ -316,11 +316,14 @@ public enum TrieDeriver {
 
 
             int numCases = cases.size();
-            if (numCases > minToCreateSwitch) {
+            if (numCases >= minToCreateSwitch) {
                 if (numCases != removed.size()) {
                     throw new RuntimeException("switch fault");
                 }
-                bb.add(new PatternOpSwitch(subterm, cases));
+
+                EnumMap<Op,PrediTerm<Derivation>> caseMap = new EnumMap(Op.class);
+                cases.forEach((c,p) -> caseMap.put(Op.values()[c.opOrdinal], p));
+                bb.add(new PatternOpSwitch(subterm, caseMap));
             } else {
                 bb.addAll(removed); //undo
             }

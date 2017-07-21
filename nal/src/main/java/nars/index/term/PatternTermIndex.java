@@ -1,8 +1,8 @@
 package nars.index.term;
 
 import nars.Op;
-import nars.derive.meta.PatternCompound;
-import nars.derive.meta.match.Ellipsis;
+import nars.derive.PatternCompound;
+import nars.derive.match.Ellipsis;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.map.MapTermIndex;
 import nars.term.Compound;

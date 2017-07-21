@@ -3,7 +3,7 @@ package nars.control.premise;
 import jcog.math.ByteShuffler;
 import nars.*;
 import nars.control.Premise;
-import nars.derive.meta.PrediTerm;
+import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.task.DerivedTask;

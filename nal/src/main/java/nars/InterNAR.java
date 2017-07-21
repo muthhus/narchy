@@ -3,10 +3,8 @@ package nars;
 import jcog.Util;
 import jcog.net.UDPeer;
 import jcog.pri.PriReference;
-import jcog.pri.mix.PSink;
 import nars.bag.leak.LeakOut;
 import nars.control.CauseChannel;
-import nars.task.ITask;
 import nars.task.LambdaQuestionTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +29,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 
     public final NAR nar;
     public final LeakOut out;
-    private final CauseChannel<ITask> receive;
+    private final CauseChannel<Task> receive;
 
 
     public InterNAR(NAR nar) throws IOException {

@@ -13,9 +13,7 @@ import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * manages a set of concepts whose beliefs represent components of an

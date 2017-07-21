@@ -4,14 +4,12 @@ import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.list.ArrayIterator;
 import jcog.list.FasterList;
-import jcog.pri.mix.PSink;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.budget.BudgetFunctions;
 import nars.control.CauseChannel;
 import nars.index.term.TermIndex;
-import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -20,8 +18,6 @@ import nars.truth.TruthFunctions;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -40,12 +36,12 @@ import static nars.term.Terms.normalizedOrNull;
  */
 public class MySTMClustered extends STMClustered {
 
-    private static final Logger logger = LoggerFactory.getLogger(MySTMClustered.class);
+    //private static final Logger logger = LoggerFactory.getLogger(MySTMClustered.class);
 
     private final int maxGroupSize;
     private final int minGroupSize;
     private final int inputsPerDur;
-    private final CauseChannel<ITask> in;
+    private final CauseChannel<Task> in;
 
     float freqCoherenceThresh = 0.9f;
     float confCoherenceThresh = 0.5f;

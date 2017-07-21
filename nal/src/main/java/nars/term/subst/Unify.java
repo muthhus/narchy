@@ -8,7 +8,7 @@ import jcog.version.Versioning;
 import nars.$;
 import nars.Op;
 import nars.Param;
-import nars.derive.meta.constraint.MatchConstraint;
+import nars.derive.constraint.MatchConstraint;
 import nars.index.term.NewCompound;
 import nars.index.term.TermIndex;
 import nars.term.Compound;

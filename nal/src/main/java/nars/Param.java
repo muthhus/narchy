@@ -8,7 +8,6 @@ import jcog.util.FloatFloatToFloatFunction;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -63,13 +62,13 @@ public abstract class Param  {
 
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.985f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.97f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.995f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.98f, 0, 1f);
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */
     public static float valueAtInput(Task accepted, NAR nar) {
         int vol = accepted.volume();
-        return -(vol)/nar.termVolumeMax.floatValue()/1000f;
+        return -(vol)/nar.termVolumeMax.floatValue()/750f;
     }
 
 

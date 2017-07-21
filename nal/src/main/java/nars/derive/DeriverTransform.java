@@ -3,9 +3,9 @@
 //import jcog.meter.event.PeriodMeter;
 //import jcog.version.VersionMap;
 //import nars.$;
-//import nars.derive.meta.AndCondition;
+//import AndCondition;
 //import nars.derive.meta.BoolPred;
-//import nars.derive.meta.Fork;
+//import Fork;
 //import nars.premise.Derivation;
 //import nars.term.Term;
 //import nars.term.var.Variable;

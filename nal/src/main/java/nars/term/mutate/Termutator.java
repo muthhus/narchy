@@ -32,7 +32,7 @@ public interface Termutator {
 
 
         AbstractTermutator(Term... keyComponents) {
-            super(keyComponents.length == 1 ? keyComponents[0] : $.pStack(keyComponents));
+            super(keyComponents.length == 1 ? keyComponents[0] : $.pFast(keyComponents));
         }
 
     }

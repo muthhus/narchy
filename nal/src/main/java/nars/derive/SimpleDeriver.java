@@ -2,7 +2,7 @@
 //
 //import nars.$;
 //import nars.derive.meta.BoolPredicate;
-//import nars.derive.meta.PostCondition;
+//import PostCondition;
 //import nars.derive.rule.PremiseRule;
 //import nars.derive.rule.PremiseRuleSet;
 //import nars.premise.Derivation;

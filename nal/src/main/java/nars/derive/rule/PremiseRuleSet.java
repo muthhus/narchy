@@ -2,13 +2,11 @@ package nars.derive.rule;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
-import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
-import nars.NARS;
 import nars.Narsese;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.PrediTerm;
+import nars.derive.PrediTerm;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
@@ -22,22 +20,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
-
 
 /**
  * Holds an set of derivation rules and a pattern index of their components
  */
-public class PremiseRuleSet extends TreeSet<PremiseRule> {
+public class PremiseRuleSet extends HashSet<PremiseRule> {
 
     private final boolean permuteBackwards, permuteForwards;
 

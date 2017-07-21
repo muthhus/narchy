@@ -11,8 +11,8 @@ import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.Priority;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
-import nars.derive.meta.LambdaPred;
-import nars.derive.meta.PrediTerm;
+import nars.derive.LambdaPred;
+import nars.derive.PrediTerm;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -228,12 +228,22 @@ public interface $ {
     /**
      * quickly creates a product on the stack, bypassing any memoization
      */
-    public static Compound pStack(@NotNull Term... subs) {
+    public static Compound pFast(@NotNull Term... subs) {
         return Op.compound(PROD, subs, false);
     }
 
-    public static Compound pStack(@NotNull TermContainer subs) {
+    /**
+     * quickly creates a product on the stack, bypassing any memoization
+     */
+    public static Compound pFast(@NotNull TermContainer subs) {
         return Op.compound(PROD, subs, false);
+    }
+
+    /**
+     * quickly creates an extensional set (on the stack), bypassing any memoization
+     */
+    public static Compound sFast(@NotNull Term[] subs) {
+        return Op.compound(SETe, Terms.sorted(subs), false);
     }
 
     @NotNull

@@ -7,10 +7,11 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Op;
 import nars.control.premise.Derivation;
-import nars.derive.meta.*;
-import nars.derive.meta.constraint.*;
-import nars.derive.meta.match.Ellipsis;
-import nars.derive.meta.op.*;
+import nars.derive.*;
+import nars.derive.constraint.*;
+import nars.derive.*;
+import nars.derive.match.Ellipsis;
+import nars.derive.op.*;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
@@ -1282,7 +1283,7 @@ public class PremiseRule extends GenericCompound {
 
         if (question) {
 
-            newPremise = p(concat(pp, TaskAny));
+            newPremise = $.pFast(concat(pp, TaskAny));
             //newPremise = pc; //same
 
 
@@ -1297,7 +1298,7 @@ public class PremiseRule extends GenericCompound {
 //                                        || cx.sub(1).equals(GOAL)));
 //                    }).append(QUESTION_PUNCTUATION))
 //            );
-            newConclusion = p(newConclusion.sub(0), p(QUESTION_PUNCTUATION));
+            newConclusion = $.pFast(newConclusion.sub(0), p(QUESTION_PUNCTUATION));
 
         } else {
 //            if (swapTruth) {

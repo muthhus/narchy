@@ -18,7 +18,7 @@ import com.github.fge.grappa.transform.ParserTransformer;
 import com.google.common.collect.Lists;
 import jcog.Texts;
 import jcog.list.FasterList;
-import nars.derive.meta.match.Ellipsis;
+import nars.derive.match.Ellipsis;
 import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;

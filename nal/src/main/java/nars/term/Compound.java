@@ -618,6 +618,16 @@ public interface Compound extends Term, IPair, TermContainer {
         return subterms().sub(i);
     }
 
+    @Override
+    default boolean OR(@NotNull Predicate<Term> p) {
+        return subterms().OR(p);
+    }
+
+    @Override
+    default boolean AND(@NotNull Predicate<Term> p) {
+        return subterms().AND(p);
+    }
+
     @NotNull
     @Override
     default Term[] toArray() {

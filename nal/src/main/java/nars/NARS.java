@@ -86,22 +86,26 @@ public class NARS {
     }
 
     /**
-     * safe for single-thread access only. full NAL8 with STM Linkage
+     * temporary, disposable NAR. safe for single-thread access only.
+     * full NAL8 with STM Linkage
      */
-    public static NAR single() {
-        return single(8);
+    public static NAR tmp() {
+        return tmp(8);
     }
 
 
     /**
-     * safe for single-thread access only. useful for unit tests or embedded components
+     * temporary, disposable NAR. useful for unit tests or embedded components
+     * safe for single-thread access only.
+     * @param nal adjustable NAL level. level >= 7 include STM (short-term-memory) Linkage plugin
      */
-    public static NAR single(int nal) {
+    public static NAR tmp(int nal) {
         return new Default(nal, false).get();
     }
 
-    /** single-thread, limited to NAL6. suitable for embedded situations */
-    public static NAR singleEternal() {
+    /** single-thread, limited to NAL6 so it should be more compact than .tmp()
+     */
+    public static NAR tmpEternal() {
         return new Default(6, false).get();
     }
 
@@ -140,7 +144,7 @@ public class NARS {
             nar.nal(nal);
 
             nar.termVolumeMax.setValue(32);
-            nar.confMin.setValue(0.05f);
+            //nar.confMin.setValue(0.05f);
 
             nar.DEFAULT_BELIEF_PRIORITY = 0.5f;
             nar.DEFAULT_GOAL_PRIORITY = 0.7f;

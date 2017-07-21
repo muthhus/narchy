@@ -25,8 +25,8 @@ import nars.control.CauseChannel;
 import nars.control.premise.Derivation;
 import nars.derive.Deriver;
 import nars.derive.TrieDeriver;
-import nars.derive.meta.DebugDerivationPredicate;
-import nars.derive.meta.PrediTerm;
+import nars.derive.DebugDerivationPredicate;
+import nars.derive.PrediTerm;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.nar.exe.Executioner;
@@ -67,7 +67,10 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.$.$;
@@ -268,7 +271,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         this.emotion = new Emotion(this);
 
 
-        this.deriver = TrieDeriver.the(Deriver.RULES, this, (PrediTerm<Derivation> d) -> {
+        this.deriver = TrieDeriver.the(Deriver.DEFAULT(), this, (PrediTerm<Derivation> d) -> {
             if (Param.TRACE)
                 return new DebugDerivationPredicate(d);
             else
@@ -1835,7 +1838,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     /** automatically adds the cause id to each input */
-    public CauseChannel newInputChannel(Object id) {
+    public CauseChannel<Task> newInputChannel(Object id) {
 
         synchronized (values) {
 

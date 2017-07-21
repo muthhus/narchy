@@ -3,7 +3,7 @@ package nars;
 
 import jcog.memoize.HijackMemoize;
 import jcog.memoize.Memoize;
-import nars.derive.meta.match.Ellipsislike;
+import nars.derive.match.Ellipsislike;
 import nars.index.term.NewCompound;
 import nars.index.term.NonInternable;
 import nars.index.term.ProtoCompound;
@@ -37,7 +37,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
-import static nars.derive.meta.match.Ellipsis.firstEllipsis;
+import static nars.derive.match.Ellipsis.firstEllipsis;
 import static nars.term.Terms.flatten;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;

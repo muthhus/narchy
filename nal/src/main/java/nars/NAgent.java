@@ -1,7 +1,5 @@
 package nars;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import jcog.Loop;
 import jcog.Util;
 import jcog.data.FloatParam;
@@ -14,7 +12,6 @@ import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
-import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -26,7 +23,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,7 +75,7 @@ abstract public class NAgent implements NSense, NAct {
 
 
     //public final FloatParam predictorProbability = new FloatParam(1f);
-    private final CauseChannel<ITask> predict;
+    private final CauseChannel<Task> predict;
 
 
     private boolean initialized;
@@ -538,7 +534,7 @@ abstract public class NAgent implements NSense, NAct {
         return loop;
     }
 
-    protected Stream<ITask> predictions(long now) {
+    protected Stream<Task> predictions(long now) {
         return predictors.stream().map(x -> {
             return x.get().budget(nar);
         });

@@ -4,7 +4,6 @@ import jcog.bag.impl.CurveBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
-import jcog.pri.mix.PSink;
 import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
@@ -12,7 +11,6 @@ import nars.Op;
 import nars.Task;
 import nars.bag.leak.TaskLeak;
 import nars.control.CauseChannel;
-import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -77,7 +75,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
      */
     @NotNull
     public final FloatParam freqMax = new FloatParam(0.1f);
-    final CauseChannel<ITask> in;
+    final CauseChannel<Task> in;
 
 //    float beliefFactor = 1f;
 //    float questionFactor = 0.5f;
@@ -277,7 +275,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
                 end = task.end();
             }
 
-            in.input(
+            in.input( (Task)
                 new NALTask(r, BELIEF,
                     new DiscreteTruth(1, nar.confDefault(Op.BELIEF)),
                     now, start, end, task.stamp()

@@ -1,7 +1,6 @@
 package nars.term;
 
 import nars.Op;
-import nars.index.term.NonInternable;
 import nars.index.term.TermContext;
 import nars.term.subst.Unify;
 import org.eclipse.collections.api.list.primitive.ByteList;

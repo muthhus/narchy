@@ -11,7 +11,6 @@ import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
@@ -44,11 +43,7 @@ public interface NAct {
             boolean next = d != null && d.freq() > 0.5f;
             return toggle(on, off, next);
         });
-        actions().add(m);
-
-        //m.resolution.setValue(1f);
-
-        return m;
+        return addAction(m);
     }
 
 //    /** softmax-like signal corruption that emulates PWM (pulse-width modulation) modulated by desire frequency */
@@ -150,14 +145,14 @@ public interface NAct {
             return null;
         });
         //m.resolution.setValue(0.5f);
-        addAction(m);
-
-        return m;
+        return addAction(m);
     }
 
-    default void addAction(ActionConcept c) {
-        actions().add(c);
+    default <A extends ActionConcept> A addAction(A c) {
+        CauseChannel existing = actions().put(c, nar().newInputChannel(c));
+        assert(existing == null);
         nar().on(c);
+        return c;
     }
 
     @Nullable
@@ -208,15 +203,11 @@ public interface NAct {
         });
         //m.resolution.setValue(0.5f);
 
-        addAction(m);
-
-        return m;
+        return addAction(m);
     }
 
     @Nullable
     default ActionConcept actionTriStatePWM(@NotNull Compound s, @NotNull IntConsumer i) {
-
-
         ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
 
 
@@ -263,9 +254,7 @@ public interface NAct {
                     //: null
                     ;
         });
-
-        actions().add(m);
-        return m;
+        return addAction(m);
     }
 
     @Nullable
@@ -350,9 +339,7 @@ public interface NAct {
 
     @NotNull
     default GoalActionConcept action(@NotNull Compound s, @NotNull GoalActionConcept.MotorFunction update) {
-        GoalActionConcept m = new GoalActionConcept(s, this, update);
-        addAction(m);
-        return m;
+        return addAction( new GoalActionConcept(s, this, update) );
     }
 
     /**
