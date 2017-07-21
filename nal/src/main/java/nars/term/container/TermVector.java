@@ -80,7 +80,7 @@ public abstract class TermVector implements TermContainer {
     public static TermContainer the(@NotNull Term... t) {
         switch (t.length) {
             case 0:
-                return Terms.NoSubterms;
+                return TermContainer.NoSubterms;
             case 1:
                 return the(t[0]);
             case 2:

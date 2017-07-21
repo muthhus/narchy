@@ -1,6 +1,7 @@
 package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
+import com.google.common.util.concurrent.MoreExecutors;
 import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.term.Term;
@@ -57,7 +58,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     };
 
     public CaffeineIndex(long capacity) {
-        this(capacity, null);
+        this(capacity, MoreExecutors.directExecutor());
     }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */

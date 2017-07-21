@@ -1,5 +1,6 @@
 package nars.term.compound;
 
+import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.primitives.Ints;
 import jcog.byt.DynBytes;
 import nars.$;
@@ -46,7 +47,9 @@ public class SerialCompound extends DynBytes implements Compound {
 
             for (int i = 0; i < subterms.length; i++) {
                 Term x = subterms[i];
-                IO.writeTerm(x, this);
+
+                x.append((ByteArrayDataOutput) this);
+
                 v += x.volume();
             }
 

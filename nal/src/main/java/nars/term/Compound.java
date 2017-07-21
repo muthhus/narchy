@@ -20,6 +20,7 @@
  */
 package nars.term;
 
+import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 import jcog.data.sexpression.IPair;
 import jcog.data.sexpression.Pair;
@@ -1180,7 +1181,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 return null;
 
             if (y != x) {
-                if (Term.filterBool(y, filterTrueFalse))
+                if (Term.invalidBoolSubterms(y, filterTrueFalse))
                     return null;
 
                 //            if (y != null)
@@ -1307,6 +1308,15 @@ public interface Compound extends Term, IPair, TermContainer {
         if (term == null) return Null;
 
         return term;
+    }
+
+    @Override
+    default void append(ByteArrayDataOutput out) {
+        Op o = op();
+        out.writeByte(o.id);
+        IO.writeTermContainer(out, subterms());
+        if (o.temporal)
+            out.writeInt(dt());
     }
 
     //    default MutableSet<Term> toSetAtemporal() {

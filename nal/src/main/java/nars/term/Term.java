@@ -21,6 +21,7 @@
 package nars.term;
 
 
+import com.google.common.io.ByteArrayDataOutput;
 import nars.$;
 import nars.Op;
 import nars.index.term.TermContext;
@@ -68,6 +69,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return this;
     }
 
+
     @NotNull
     @Override
     Op op();
@@ -80,6 +82,8 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
     @Override
     int structure();
+
+    void append(ByteArrayDataOutput out);
 
 //    @Override
 //    int size();
@@ -430,7 +434,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
     }
 
     /** if filterTrueFalse is false, only filters Null's */
-    static boolean filterBool(@NotNull Term u, boolean filterTrueFalse) {
+    static boolean invalidBoolSubterms(@NotNull Term u, boolean filterTrueFalse) {
         return u instanceof Bool && (filterTrueFalse || (u == Null));
     }
 

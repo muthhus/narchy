@@ -20,7 +20,6 @@ import nars.derive.match.Ellipsis;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
@@ -442,7 +441,7 @@ public class Narsese extends BaseParser<Object> {
         return o != null ? o : new MiniNullPointerException();
     }
 
-    @Cached
+    //@Cached
     Rule Term(boolean oper, boolean meta) {
         /*
                  <term> ::= <word>                             // an atomic constant term
@@ -493,7 +492,7 @@ public class Narsese extends BaseParser<Object> {
                                 //push((pop())),
 
                                 firstOf(
-                                        seq(COMPOUND_TERM_CLOSER, push(Terms.ZeroProduct)),// nonNull($.exec((Term)pop())) )),
+                                        seq(COMPOUND_TERM_CLOSER, push(ZeroProduct)),// nonNull($.exec((Term)pop())) )),
                                         MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false)
                                 ),
 
@@ -506,7 +505,7 @@ public class Narsese extends BaseParser<Object> {
                                 firstOf(
 
                                         sequence(
-                                                COMPOUND_TERM_CLOSER, push(Terms.ZeroProduct)
+                                                COMPOUND_TERM_CLOSER, push(ZeroProduct)
                                         ),
 
 
@@ -907,7 +906,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * list of terms prefixed by a particular compound term operate
      */
-    @Cached
+    //@Cached
     Rule MultiArgTerm(@Nullable Op defaultOp, char close, boolean initialOp, boolean allowInternalOp) {
 
         return sequence(

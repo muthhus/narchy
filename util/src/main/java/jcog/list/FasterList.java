@@ -153,17 +153,26 @@ public class FasterList<X> extends FastList<X> {
         return items;
     }
 
-    public final X[] array(Class<? extends X[]> safe) {
+    public void compact() {
         Object[] i = items;
         int s = size;
-        if (i.getClass()!=safe) {
-            X[] j = (X[]) Array.newInstance(safe.getComponentType(), s);
-            System.arraycopy(i, 0, j, 0, s);
-            return j;
+        if (i.length!=s) {
+            items = Arrays.copyOf(items, size);
+        }
+    }
+
+    /** returns the array directly, or reconstructs it for the target type for the exact size required */
+    public final X[] array(IntFunction<X[]> arrayBuilder) {
+        Object[] i = items;
+        int s = size;
+        if (i.length!=s || i.getClass()==Object[].class) {
+            X[] x = arrayBuilder.apply(s);
+            if (s > 0)
+                System.arraycopy(items, 0, x, 0, s);
+            return x;
         }
         return items;
     }
-
 
     public float maxValue(FloatFunction<? super X> function) {
         float max = Float.NEGATIVE_INFINITY;

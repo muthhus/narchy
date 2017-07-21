@@ -29,7 +29,7 @@ public class NAL5BooleanConsistency {
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++) {
                 NAR d = new NARS().get();
-                d.nal(7);
+                d.nal(6);
                 d.termVolumeMax.setValue(24);
 
                 String[] outcomes = {

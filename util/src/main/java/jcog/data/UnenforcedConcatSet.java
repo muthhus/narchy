@@ -17,10 +17,12 @@ import java.util.Set;
 public class UnenforcedConcatSet<X> extends AbstractSet<X> {
 
     final Set<X> a, b;
+    final int size;
 
     UnenforcedConcatSet(@NotNull Set<X> a, @NotNull Set<X> b) {
         this.a = a;
         this.b = b;
+        this.size = a.size() + b.size();
     }
 
     @Override
@@ -40,7 +42,7 @@ public class UnenforcedConcatSet<X> extends AbstractSet<X> {
 
     @Override
     public boolean isEmpty() {
-        throw new UnsupportedOperationException();
+        return size==0;
     }
 
     @Override
@@ -50,7 +52,7 @@ public class UnenforcedConcatSet<X> extends AbstractSet<X> {
 
     @Override
     public int size() {
-        throw new UnsupportedOperationException();
+        return size;
     }
 
     @Override

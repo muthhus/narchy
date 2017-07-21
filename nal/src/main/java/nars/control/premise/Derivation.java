@@ -1,5 +1,11 @@
 package nars.control.premise;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.util.concurrent.MoreExecutors;
+import jcog.Util;
+import jcog.byt.DynBytes;
+import jcog.map.MRUCache;
 import jcog.math.ByteShuffler;
 import nars.*;
 import nars.control.Premise;
@@ -8,21 +14,19 @@ import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.task.DerivedTask;
-import nars.term.Compound;
-import nars.term.Functor;
-import nars.term.Term;
-import nars.term.Termed;
+import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.subst.Unify;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Predicate;
+import java.util.Arrays;
 
-import static nars.Op.True;
+import static nars.Op.Null;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesDep;
@@ -35,13 +39,13 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Derivation extends Unify implements TermContext {
 
-    public static final PrediTerm<Derivation> Null = new AbstractPred<Derivation>($.p(True)) {
+    public static final PrediTerm<Derivation> NullDeriver = new AbstractPred<Derivation>(Op.ZeroProduct) {
         @Override
         public boolean test(Derivation o) {
             return true;
         }
     };
-    @NotNull public NAR nar;
+    @NotNull public final NAR nar;
 
     public float truthResolution;
     public float confMin;
@@ -118,14 +122,25 @@ public class Derivation extends Unify implements TermContext {
     public float parentPri;
     public short[] parentCause;
 
-    public Predicate<Derivation> deriver;
-    public ByteShuffler shuffler = new ByteShuffler(64);
+    public PrediTerm<Derivation> deriver;
+    public final ByteShuffler shuffler = new ByteShuffler(64);
 
+    private transient Term[][] currentMatch = null;
+
+//    public final com.github.benmanes.caffeine.cache.Cache< Transformation, Term> transformsCached = Caffeine.newBuilder()
+//            .maximumSize(Param.DERIVATION_THREAD_TRANSFORM_CACHE_SIZE)
+//            //.recordStats()
+//            .executor(MoreExecutors.directExecutor())
+//            .build();
+    final MRUCache<Transformation,Term> transformsCache = new MRUCache<>(Param.DERIVATION_THREAD_TRANSFORM_CACHE_SIZE);
 
     /** if using this, must set: nar, index, random, DerivationBudgeting */
-    public Derivation() {
+    public Derivation(NAR nar) {
         super(null, VAR_PATTERN, null, Param.UnificationStackMax, 0);
 
+        this.nar = nar;
+        this.terms = nar.terms;
+        this.random = nar.random();
 
         substituteIfUnifiesAny = new substituteIfUnifiesAny(this) {
             @Override public boolean equals(Object u) { return this == u; }
@@ -160,18 +175,17 @@ public class Derivation extends Unify implements TermContext {
         return x;
     }
 
-    /** concept-scope
-     * @param n*/
-    @NotNull public void restart(NAR n) {
-        this.nar = n;
-        this.terms = n.terms;
-        this.random = n.random();
-        this.time = n.time();
-        this.dur = n.dur();
-        this.truthResolution = nar.truthResolution.floatValue();
-        this.confMin = Math.max(truthResolution, nar.confMin.floatValue());
-        this.deriver = n.deriver();
+    /** concept-scope  */
+    @NotNull public void restart(PrediTerm<Derivation> deriver) {
+        this.time = this.nar.time();
+        this.dur = this.nar.dur();
+        this.truthResolution = this.nar.truthResolution.floatValue();
+        this.confMin = Math.max(truthResolution, this.nar.confMin.floatValue());
+        this.deriver = deriver;
+        //transformsCached.cleanUp();
     }
+
+
 
     @Override
     public void onDeath() {
@@ -283,6 +297,7 @@ public class Derivation extends Unify implements TermContext {
 
         deriver.test(this);
 
+
     }
 
 
@@ -315,11 +330,19 @@ public class Derivation extends Unify implements TermContext {
         return live();
     }
 
-    @Override public final void onMatch() {
+    @Override public final void onMatch(Term[][] match) {
         //try {
 
+        this.currentMatch = match;
 
-        forEachMatch.test(this);
+        try {
+
+            forEachMatch.test(this);
+
+        } finally {
+            this.currentMatch = null;
+        }
+
 //        } catch (InvalidTermException | InvalidTaskException t) {
 //            if (Param.DEBUG_EXTRA) {
 //                logger.error("Derivation onMatch {}", t);
@@ -404,6 +427,72 @@ public class Derivation extends Unify implements TermContext {
         nar.input(t);
         nar.emotion.taskDerivations.increment();
     }
+
+//    /** experimental memoization of transform results */
+//    @Nullable public Term transform(@NotNull Term pattern) {
+//        if (!(pattern instanceof Compound) || pattern.vars(type)==0 || pattern.size()==0) {
+//            //return super.transform(pattern);
+//            return xy.get(pattern); //fast variable resolution
+//        }
+//        if (pattern.OR(x -> x == Null))
+//            return Null;
+//
+//        Transformation key = snapshot((Compound)pattern);
+//
+//        //avoid recursive update problem on the single thread by splitting the get/put
+//        Term value = transformsCache.get(key);
+//        if (value!=null)
+//            return value;
+//
+//        value = super.transform(key.pattern);
+//        if (value == null)
+//            value = Null;
+//        transformsCache.put(key, value);
+//        return value;
+//    }
+
+    final static class Transformation {
+        public final Compound pattern;
+        final byte[] assignments;
+        final int hash;
+
+        Transformation(Compound pattern, DynBytes assignments) {
+            this.pattern = pattern;
+            this.assignments = assignments.array();
+            this.hash = Util.hashCombine(assignments.hashCode(), pattern.hashCode());
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            //if (this == o) return true;
+            Transformation tthat = (Transformation)o;
+            if (hash != tthat.hash) return false;
+            return pattern.equals(tthat.pattern) && Arrays.equals(assignments, tthat.assignments);
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+    }
+
+    Transformation snapshot(@NotNull Compound pattern) {
+
+        //TODO only include in the key the free variables in the pattern because there can be extra and this will cause multiple results that could have done the same thing
+        //FasterList<Term> key = new FasterList<>(currentMatch.length * 2 + 1);
+        DynBytes key = new DynBytes((2 * currentMatch.length + 1 ) * 8 /* estimate */ );
+        pattern.append((ByteArrayDataOutput)key); //in 0th
+        for (Term[] m : currentMatch) {
+            Term var = m[0];
+            if (pattern.containsRecursively(var)) {
+                var.append((ByteArrayDataOutput)key);
+                m[1].append((ByteArrayDataOutput)key);
+            }
+        }
+        return new Transformation(pattern,key);
+    }
+
 }
 
 

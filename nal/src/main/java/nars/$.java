@@ -16,13 +16,10 @@ import nars.derive.PrediTerm;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.IntAtom;
-import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
@@ -206,7 +203,7 @@ public interface $ {
 
     @NotNull
     public static Compound p(@NotNull Term... t) {
-        return (t.length == 0) ? Terms.ZeroProduct : (Compound) the(PROD, t);
+        return (t.length == 0) ? ZeroProduct : (Compound) the(PROD, t);
     }
 
     @NotNull

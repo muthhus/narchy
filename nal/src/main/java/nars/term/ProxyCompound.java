@@ -1,10 +1,12 @@
 package nars.term;
 
+import com.google.common.io.ByteArrayDataOutput;
 import nars.IO;
 import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.term.transform.CompoundTransform;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.jetbrains.annotations.NotNull;
@@ -229,6 +231,10 @@ public class ProxyCompound implements Compound/*, NonInternable*/ {
         return ref.isSorted();
     }
 
+    @Override
+    public void append(ByteArrayDataOutput out) {
+        ref.append(out);
+    }
 
     @Override
     @NotNull
@@ -261,4 +267,38 @@ public class ProxyCompound implements Compound/*, NonInternable*/ {
         return ref.recurseSubTerms(whileTrue, parent);
     }
 
+//    @Override
+//    public @Nullable Compound normalize() {
+//        return null;
+//    }
+//
+//    @Override
+//    public @Nullable Term transform(@NotNull CompoundTransform t) {
+//        return null;
+//    }
+//
+//    @Override
+//    public @Nullable Term transform(int newDT, @NotNull CompoundTransform t) {
+//        return null;
+//    }
+//
+//    @Override
+//    public @Nullable Term transform(Op op, int dt, @NotNull CompoundTransform t) {
+//        return null;
+//    }
+//
+//    @Override
+//    public @NotNull Term eternal() {
+//        return null;
+//    }
+//
+//    @Override
+//    public @NotNull Term root() {
+//        return null;
+//    }
+//
+//    @Override
+//    public @NotNull Term conceptual() {
+//        return null;
+//    }
 }

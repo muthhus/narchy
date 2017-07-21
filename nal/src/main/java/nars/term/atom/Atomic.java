@@ -25,7 +25,6 @@ public interface Atomic extends Term {
     /** canonical byte representation of this atomic */
     @Deprecated byte[] bytes();
 
-    void append(ByteArrayDataOutput out);
 
     @Override
     default boolean OR(Predicate<Term> v) {

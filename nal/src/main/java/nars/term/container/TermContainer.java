@@ -37,6 +37,8 @@ import static nars.Op.*;
  */
 public interface TermContainer extends Termlike, Iterable<Term> {
 
+    @NotNull TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[]{});
+
     @NotNull
     @Deprecated
     default public TermContainer append(@NotNull Term x) {
@@ -867,7 +869,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         if (OR(x -> p.test(x) && c.add(x)))
             return TermVector.the(c);
         else
-            return Terms.ZeroProduct;
+            return ZeroProduct;
     }
 
     /**

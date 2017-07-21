@@ -80,7 +80,7 @@ public class EllipsisTest {
                 Unify f = new Unify(index, VAR_PATTERN, new XorShift128PlusRandom(1+seed), Param.UnificationStackMax, Param.UnificationTTLMax) {
 
                     @Override
-                    public void onMatch() {
+                    public void onMatch(Term[][] match) {
                         //System.out.println(x + "\t" + y + "\t" + this);
 
 
@@ -399,7 +399,7 @@ public class EllipsisTest {
             Random rng = new XorShift128PlusRandom(seed);
             Unify f = new Unify($.terms, VAR_PATTERN, rng, Param.UnificationStackMax, Param.UnificationTTLMax) {
                 @Override
-                public void onMatch() {
+                public void onMatch(Term[][] match) {
                     results.add(xy.toString());
                 }
             };

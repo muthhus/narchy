@@ -32,8 +32,6 @@ import java.util.function.Consumer;
  */
 public class Activate extends UnaryTask<Concept> implements Termed {
 
-    static final ThreadLocal<Derivation> derivation = ThreadLocal.withInitial(Derivation::new);
-
 
     /**
      * rate at which ConceptFire forms premises and derives
@@ -206,8 +204,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         int penalty = Math.max(1, ttlPerPremise / (2));
 
-        Derivation d = derivation.get();
-        d.restart(nar);
+        Derivation d = nar.derivation();
+        d.restart(nar.deriver());
 
         Random rng = nar.random();
         while (ttl > 0 /*samples++ < samplesMax*/) {

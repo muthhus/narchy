@@ -71,7 +71,7 @@ public final class DynTruth implements Truthed {
     }
     @Nullable
     public short[] cause() {
-        return e != null ? Cause.zip(e.array(Task[].class) /* HACK */ ) : ArrayUtils.EMPTY_SHORT_ARRAY;
+        return e != null ? Cause.zip(e.array(Task[]::new) /* HACK */ ) : ArrayUtils.EMPTY_SHORT_ARRAY;
     }
 
     @Override

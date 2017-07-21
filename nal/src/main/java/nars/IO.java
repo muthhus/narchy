@@ -55,7 +55,7 @@ public class IO {
         @Override
         public void write(Term x, DynBytes to) {
 
-            IO.writeTerm(x, to);
+            x.append((ByteArrayDataOutput) to);
 
         }
     }
@@ -126,7 +126,7 @@ public class IO {
         Compound tt = t.term();
 
         if (out instanceof ByteArrayDataOutput) {
-            writeTerm(Stream.of(tt), (ByteArrayDataOutput) out);
+            tt.append((ByteArrayDataOutput)out);
         } else {
             out.write(IO.termToBytes(tt)); //buffer to bytes
         }
@@ -268,32 +268,17 @@ public class IO {
 
     public static void writeTerm(@NotNull Stream<? extends Term> term, @NotNull DataOutput out) throws IOException {
         DynBytes d = new DynBytes(64 * 1024); //HACK make configurable size
-        term.forEach(x -> writeTerm(x, d));
+        term.forEach(x -> x.append((ByteArrayDataOutput) d));
         d.appendTo(out);
     }
 
-    public static void writeTerm(@NotNull Term term, @NotNull ByteArrayDataOutput out) {
-
-
-        if (term instanceof Atomic) {
-            ((Atomic) term).append(out);
-        } else {
-            Op o = term.op();
-            out.writeByte(o.id);
-
-            Compound c = (Compound) term;
-            writeTermContainer(out, c);
-            writeCompoundSuffix(out, c, o);
-        }
-    }
-
-    static void writeTermContainer(@NotNull ByteArrayDataOutput out, @NotNull TermContainer c) {
+    public static void writeTermContainer(@NotNull ByteArrayDataOutput out, @NotNull TermContainer c) {
         int siz = c.size();
 
         out.writeByte(siz);
 
         for (int i = 0; i < siz; i++)
-            writeTerm(c.sub(i), out);
+            c.sub(i).append(out);
     }
 
 //    public static void writeTermContainer(@NotNull DataOutput out, @NotNull Term... subterms) throws IOException {
@@ -303,10 +288,6 @@ public class IO {
 //        }
 //    }
 
-    public static void writeCompoundSuffix(@NotNull ByteArrayDataOutput out, Compound c, Op o) {
-        if (o.temporal)
-            out.writeInt(c.dt());
-    }
 
     public static void writeCompoundSuffix(@NotNull DataOutput out, int dt, Op o) throws IOException {
         if (o.temporal)
@@ -375,7 +356,9 @@ public class IO {
         //bb = ArrayPool.bytes().
         DynBytes d = new DynBytes(t.volume() * 16 /* estimate */);
         //ByteArrayOutputStream bs = new ByteArrayOutputStream();
-        IO.writeTerm(t, d);
+
+        t.append((ByteArrayDataOutput) d);
+
         return d.array(); //bs.toByteArray();
     }
 

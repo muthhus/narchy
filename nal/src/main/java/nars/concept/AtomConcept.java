@@ -8,6 +8,7 @@ import nars.index.term.TermContext;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,6 +67,7 @@ public class AtomConcept extends Atom implements Concept {
         }
         return p;
     }
+
 
 
     @Override

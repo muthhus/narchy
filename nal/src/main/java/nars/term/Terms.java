@@ -39,11 +39,6 @@ import static nars.time.Tense.DTERNAL;
  */
 public enum Terms { ;
 
-    @NotNull
-    public static final TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[]{});
-    @NotNull
-    public static final Compound ZeroProduct = new GenericCompound(Op.PROD, NoSubterms);
-
     /**
      * TODO decide on some reasonable coding scheme for bundling these numeric values
      * into 32-bit or 64-bit fields/arrays

@@ -72,7 +72,7 @@ public class TaskRule extends TaskMatch {
         }
 
         @Override
-        public void onMatch() {
+        public void onMatch(Term[][] match) {
             accept(x, xy);
             setTTL(0);
         }

@@ -1,8 +1,8 @@
 package nars.index.term;
 
+import com.google.common.io.ByteArrayDataOutput;
 import jcog.byt.DynBytes;
 import jcog.util.ArrayPool;
-import nars.IO;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Termed;
@@ -206,7 +206,9 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
     }
 
     private void appendKey(@NotNull Term x) {
-        IO.writeTerm(x, this);
+
+        x.append((ByteArrayDataOutput) this);
+
         writeByte(0); //separator
     }
 

@@ -15,6 +15,7 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Index which specifically holds the term components of a deriver ruleset.
@@ -22,7 +23,7 @@ import java.util.HashMap;
 public class PatternTermIndex extends MapTermIndex {
 
     public PatternTermIndex() {
-        super(new HashMap<>(512));
+        super(new ConcurrentHashMap<>(512));
     }
 
 

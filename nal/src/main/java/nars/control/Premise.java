@@ -173,6 +173,9 @@ public class Premise {
                 ttlMax
         );
 
+//        long ds = d.transformsCached.estimatedSize();
+//        if (ds >0)
+//            System.out.println(ds + " " + d.transformsCached.stats());
 
         int ttlAfter = d.ttl();
 

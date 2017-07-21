@@ -1,5 +1,6 @@
 package nars.term;
 
+import com.google.common.io.ByteArrayDataOutput;
 import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.subst.Unify;
@@ -86,6 +87,11 @@ public class ProxyTerm<T extends Term> implements Term {
     @Override
     public boolean isCommutative() {
         return ref.isCommutative();
+    }
+
+    @Override
+    public void append(ByteArrayDataOutput out) {
+        ref.append(out);
     }
 
     @Override

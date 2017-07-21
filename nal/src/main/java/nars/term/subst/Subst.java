@@ -10,8 +10,6 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.index.term.TermIndex.disallowTrueOrFalse;
-
 
 public interface Subst  {
 
@@ -75,10 +73,10 @@ public interface Subst  {
 
         Op op = x.op();
 
-        FasterList<Term> next = new FasterList();
+        FasterList<Term> next = new FasterList(len);
 
         //early prefilter for True/False subterms
-        boolean filterTrueFalse = disallowTrueOrFalse(op);
+        boolean filterTrueFalse = !op.allowsBool;
 
         for (int i = 0; i < len; i++) {
             Term t = subs.sub(i);
@@ -95,7 +93,7 @@ public interface Subst  {
 
             } else {
 
-                if (u == null || Term.filterBool(u, filterTrueFalse)) {
+                if (u == null || Term.invalidBoolSubterms(u, filterTrueFalse)) {
                     return null;
                 }
 
@@ -121,7 +119,7 @@ public interface Subst  {
 //                return null;
 //        }
 
-        return op.the(curr.dt(), next.array(Term[].class));
+        return op.the(curr.dt(), next.array(Term[]::new));
     }
 
 

@@ -212,7 +212,7 @@ public enum Op implements $ {
 
             if (dt == XTERNAL) {
                 //leave un-sorted, un-de-duplicated
-                return /*conjImplReduction*/(compound(CONJ, XTERNAL, subterms(tt)));
+                return /*conjImplReduction*/compound(CONJ, XTERNAL, tt);
             }
 
             boolean commutive = concurrent(dt);
@@ -248,7 +248,7 @@ public enum Op implements $ {
                 }
 
                 return implInConjReduction(
-                        compound(CONJ, dt, subterms(tt))
+                        compound(CONJ, dt, tt)
                 );
 
             }
@@ -308,7 +308,7 @@ public enum Op implements $ {
                     if (!Arrays.equals(scs, u))
                         return CONJ.the(dt, scs);
                     else
-                        return compound(CONJ, dt, subterms(scs));
+                        return compound(CONJ, dt, scs);
                 }
             }
 
@@ -510,6 +510,8 @@ public enum Op implements $ {
      */
     //SUBTERMS("...", 1, OpType.Other)
     ;
+    @NotNull
+    public static final Compound ZeroProduct = new GenericCompound(Op.PROD, TermContainer.NoSubterms);
 
     public static final int StatementBits = Op.or(Op.INH, Op.SIM, Op.IMPL, Op.EQUI);
 
@@ -551,6 +553,7 @@ public enum Op implements $ {
     public static final char STAMP_SEPARATOR = ';';
     public static final char STAMP_STARTER = ':';
 
+    public final boolean allowsBool;
 
     /**
      * Image index ("imdex") symbol for products, and anonymous variable in products
@@ -706,7 +709,16 @@ public enum Op implements $ {
      * creates new instance
      */
     @NotNull
-    public static Compound compound(Op o, Term[] subterms) {
+    public static Term compound(Op o, Term... subterms) {
+
+        assert (!o.atomic);
+
+        if (!o.allowsBool) {
+            for (Term x : subterms)
+                if (x instanceof Bool)
+                    return Null;
+        }
+
         int s = subterms.length;
         assert (o.maxSize >= s) : "subterm overflow: " + o + " " + Arrays.toString(subterms);
         assert (o.minSize <= s || (firstEllipsis(subterms) != null)) : "subterm underflow: " + o + " " + Arrays.toString(subterms);
@@ -856,7 +868,25 @@ public enum Op implements $ {
 
         this.atomic = var || str.equals(".") /* atom */ || str.equals("`i") || str.equals("^") || str.equals("`");
 
-        this.virtual = (Set.of("||", "{-]", "-]-", "-{-").contains(str));
+        switch (str) {
+            case "||": case "{-]": case "-]-": case "-{-":
+                this.virtual = true;
+                break;
+            default:
+                this.virtual = false;
+                break;
+        }
+
+        switch (str) {
+            case "==>":
+            case "<=>":
+            case "&&":
+                allowsBool = true;
+                break;
+            default:
+                allowsBool = false;
+                break;
+        }
     }
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
@@ -897,7 +927,7 @@ public enum Op implements $ {
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, (Compound) et0, (Compound) et1);
                 else
-                    return compound(op, DTERNAL, subterms(t));
+                    return compound(op, DTERNAL, t);
 
 
         }
@@ -966,23 +996,11 @@ public enum Op implements $ {
     }
 
 
-    /**
-     * creates new instance
-     */
-    public static Compound compound(Op o, TermContainer subContainer) {
-
-        Term[] subterms = subContainer.toArray();
-
-        return compound(o, subterms);
-    }
-
-
     @NotNull
-    public static Term compound(Op op, int dt, TermContainer subterms) {
-        assert (!op.atomic);
+    public static Term compound(Op op, int dt, Term... subterms) {
 
         //if (!subterms.internable())
-            return compound(op, subterms).dt(dt);
+        return compound(op, subterms).dt(dt);
 //        else
 //            return compound(new NewCompound(op, subterms), dt);
     }
@@ -1107,7 +1125,7 @@ public enum Op implements $ {
 //                }
                 if (dt == XTERNAL) {
                     return compound(op, XTERNAL, //op != EQUI || subject.compareTo(predicate) <= 0 ?
-                            subterms(subject, predicate));
+                            subject, predicate);
                     //subterms(predicate,subject));
                 }
 
@@ -1303,7 +1321,7 @@ public enum Op implements $ {
         }
 
 
-        Term x = compound(op, dt, subterms(subject, predicate)); //use the calculated ordering, not the TermContainer default for commutives
+        Term x = compound(op, dt, subject, predicate); //use the calculated ordering, not the TermContainer default for commutives
         if (polarity)
             return x;
         else
@@ -1415,7 +1433,7 @@ public enum Op implements $ {
             args.add(term2);
         }
 
-        return compound(intersection, DTERNAL, subterms(Terms.sorted(args)));
+        return compound(intersection, DTERNAL, Terms.sorted(args));
     }
 
     @NotNull
@@ -1493,7 +1511,7 @@ public enum Op implements $ {
             return statement(this, dt, u[0], u[1]);
         } else {
             Term[] uu = commute(dt, u) ? Terms.sorted(u) : u;
-            return compound(this, dt, subterms(uu));
+            return compound(this, dt, uu);
         }
     }
 

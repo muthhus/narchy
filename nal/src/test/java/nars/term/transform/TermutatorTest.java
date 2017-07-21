@@ -7,7 +7,6 @@ import nars.Op;
 import nars.Param;
 import nars.derive.match.Ellipsis;
 import nars.term.Term;
-import nars.term.container.TermContainer;
 import nars.term.mutate.Choose1;
 import nars.term.mutate.Choose2;
 import nars.term.mutate.CommutivePermutations;
@@ -32,7 +31,7 @@ public class TermutatorTest {
 
     final Unify unifier = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1),
             Param.UnificationStackMax, TTL) {
-        @Override public void onMatch() {
+        @Override public void onMatch(Term[][] match) {
             stop();
         }
     };

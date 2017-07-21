@@ -1,6 +1,8 @@
 package jcog.version;
 
 import jcog.list.ArrayUnenforcedSet;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.api.tuple.Twin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

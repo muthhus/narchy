@@ -81,7 +81,7 @@ public class NLPGen {
                         Unify u = new Unify(terminal.terms, VAR_PATTERN, terminal.random(), Param.UnificationStackMax, Param.UnificationTTLMax) {
 
                             @Override
-                            public void onMatch() {
+                            public void onMatch(Term[][] match) {
 
 
                                 final String[] r = {natural};

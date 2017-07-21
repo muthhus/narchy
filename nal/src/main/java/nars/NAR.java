@@ -13,6 +13,7 @@ import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
+import jcog.util.IterableThreadLocal;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
@@ -113,6 +114,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
 
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
+
+    /** scoped to this NAR so it can be reset by it */
+    final ThreadLocal<Derivation> derivation =
+            //new IterableThreadLocal<Derivation>(()->new Derivation(this));
+            ThreadLocal.withInitial(()->new Derivation(this));
 
 
     @NotNull
@@ -287,8 +293,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         synchronized (exe) {
 
             stop();
-
-            clear();
 
             restart();
 
@@ -932,8 +936,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * Exits an iteration loop if running
      */
     public void stop() {
+
         loop.stop();
+
+        clear();
+
         exe.stop();
+
     }
 
     /**
@@ -1596,7 +1605,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return ((BeliefTable) ((TaskConcept) concept).table(punc)).match(when, null, null, false, this);
     }
 
-    public Predicate<Derivation> deriver() {
+    public PrediTerm<Derivation> deriver() {
         return deriver;
     }
 
@@ -1659,6 +1668,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         } else {
             return x.pri();
         }
+    }
+
+
+    public Derivation derivation() {
+        return derivation.get();
     }
 
     /**
@@ -1801,18 +1815,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         synchronized (values) {
 
-            short ci = (short) (values.size());
-            short[] cs = new short[]{ci};
-
+            final short ci = (short) (values.size());
             CauseChannel c = new CauseChannel<ITask>(ci, id, (x) -> {
                 if (x instanceof NALTask) {
-                    //assert (((NALTask) x.ref).cause.length == 0);
                     NALTask t = (NALTask) x;
-                    if (t.cause == null || t.cause.length == 0)
-                        t.cause = cs; //.clone();
-                    else {
-                        if (!ArrayUtils.contains(t.cause, ci)) //in case the same task is input repeatedly, dont add the same cause
-                            t.cause = ArrayUtils.add(t.cause, 0 /* prepend */, ci);
+                    if (t.cause == null || t.cause.length == 0) {
+                        t.cause = new short[]{ci};
+                    } else {
+                        t.cause = ArrayUtils.add(t.cause, 0 /* prepend */, ci);
                     }
                 }
                 input(x);

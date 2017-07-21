@@ -1,5 +1,6 @@
 package nars.derive.rule;
 
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.collect.Lists;
 import jcog.Util;
 import nars.$;
@@ -39,9 +40,9 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
     @NotNull
     public static PremiseRuleSet rules(boolean permute, String... name) {
-    final PatternTermIndex p = new PatternTermIndex();
 
-        PremiseRuleSet rs = new PremiseRuleSet(parsedRules(p, name) , p, permute);
+        final PatternTermIndex p = new PatternTermIndex();
+        PremiseRuleSet rs = new PremiseRuleSet(parsedRules(p, name), p, permute);
 
         //logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
         if (rs.errors[0] > 0) {
@@ -85,7 +86,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
     public PremiseRuleSet(PatternTermIndex index, @NotNull String... rules) {
-        this(index, (PremiseRule[])parse($.terms, rules));
+        this(index, (PremiseRule[]) parse($.terms, rules));
     }
 
     public PremiseRuleSet(boolean permute, PatternTermIndex index, @NotNull PremiseRule... rules) {
@@ -198,16 +199,25 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
 
+    final static com.github.benmanes.caffeine.cache.Cache<String, Pair<Compound, String>> lines = Caffeine.newBuilder()
+            .maximumSize(4 * 1024)
+            .build();
+
     @NotNull
     static Stream<Pair<Compound, String>> parse(@NotNull Collection<String> rawRules, @NotNull PatternTermIndex index) {
         return rawRules.stream().map(src -> {
+
+                return lines.get(src, (String s) -> {
                     try {
-                        return Tuples.pair(parse(src, index), src);
+                        PremiseRule parse = PremiseRuleSet.parse( s, index);
+                        return Tuples.pair(parse, s);
                     } catch (Narsese.NarseseException e) {
                         logger.error("{}:\t{}", e, src);
                         return null;
                     }
                 });
+
+        });
     }
 
     @NotNull
@@ -216,7 +226,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
 
-    public static PremiseRule[] parse(@NotNull TermIndex index, @NotNull String... src)  {
+    public static PremiseRule[] parse(@NotNull TermIndex index, @NotNull String... src) {
         return Util.map((s -> {
             try {
                 return parse(s, index);

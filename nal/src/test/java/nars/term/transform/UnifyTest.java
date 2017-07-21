@@ -91,7 +91,7 @@ public class UnifyTest {
 
 
                 @Override
-                public void onMatch() {
+                public void onMatch(Term[][] match) {
 
                     if (shouldSub) {
 
@@ -959,7 +959,7 @@ public class UnifyTest {
         Unify f = new Unify($.terms, Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax, Param.UnificationTTLMax) {
 
             @Override
-            public void onMatch() {
+            public void onMatch(Term[][] match) {
 
                 assertTrue(matches);
 

@@ -2,6 +2,7 @@ package nars.term.subst;
 
 import jcog.Util;
 import jcog.data.UnenforcedConcatSet;
+import jcog.list.FasterList;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
@@ -21,9 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 import static nars.Op.Null;
 import static nars.Param.TTL_UNIFY;
@@ -120,8 +119,9 @@ public abstract class Unify extends Versioning implements Subst {
      * called each time all variables are satisfied in a unique way
      *
      * @return whether to continue on any subsequent matches
+     * @param match [variables][2] where index 0 = key, index 1 = value
      */
-    public abstract void onMatch();
+    public abstract void onMatch(Term[][] match);
 
     public final void mutate(Termutator[] chain, int next) {
         if (++next < chain.length) {
@@ -133,7 +133,7 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
     @Override
-    public final void clear() {
+    public void clear() {
         versioning.clear();
     }
 
@@ -224,17 +224,28 @@ public abstract class Unify extends Versioning implements Subst {
 //                return;
 //        }
 
-        for (Term f : free.get())
-            if (xy(f) == null)
+
+        Set<Term> free = this.free.get();
+        Term[][] match = new Term[free.size()][];
+        int m = 0;
+        for (Term x : free) {
+            Term y = xy(x);
+            if (y == null)
                 return;
+            match[m++] = new Term[] { x, y };
+        }
+        Arrays.sort(match, matchElementComparator); //sort by key
 
 //        if (!matched.add(((ConstrainedVersionMap)xy).snapshot()))
 //            return; //already seen
 
-        onMatch();
+        onMatch(match);
 
 
     }
+
+    final static Comparator<Term[]> matchElementComparator = Comparator.comparing(v -> v[0]);
+
 
     @Override
     public String toString() {
