@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 
 public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
@@ -74,6 +75,11 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         @Override
         public Iterator<Task> taskIterator() {
             return Collections.emptyIterator();
+        }
+
+        @Override
+        public Stream<Task> stream() {
+            return Stream.empty();
         }
 
         @Override

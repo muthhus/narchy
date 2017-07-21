@@ -200,7 +200,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 //            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
 //        }
 
-        Term c = t.root();
+        Term c = t.eternal();
         if (!(c instanceof Compound)) {
             fail(t, "no associated concept", safe);
         }

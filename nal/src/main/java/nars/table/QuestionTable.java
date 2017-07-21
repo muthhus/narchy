@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /** task table used for storing Questions and Quests.
  *  simpler than Belief/Goal tables
@@ -27,6 +28,11 @@ public interface QuestionTable extends TaskTable {
     @NotNull QuestionTable Null = new NullQuestionTable();
 
     class NullQuestionTable implements QuestionTable {
+
+        @Override
+        public Stream<Task> stream() {
+            return Stream.empty();
+        }
 
         @Override
         public void add(@NotNull Task t, TaskConcept c, NAR n) {

@@ -148,10 +148,10 @@ public class NARS {
     }
 
     /** provides only low level functionality.
-     *  an empty deriver
+     *  an empty deriver, but allows any kind of term
      * */
     public static NAR shell() {
-        return tmp(0);
+        return tmp(0).nal(8);
     }
 
 

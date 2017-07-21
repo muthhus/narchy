@@ -57,7 +57,7 @@ public class QueryVariableTest {
 
         AtomicBoolean valid = new AtomicBoolean();
 
-        NAR nar = new NARS().get();
+        NAR nar = NARS.tmpEternal();
 
         Compound beliefTerm = compoundOrNull(nar.term(beliefString));
         assertNotNull(beliefTerm);

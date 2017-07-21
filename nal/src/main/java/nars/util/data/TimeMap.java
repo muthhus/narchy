@@ -17,7 +17,7 @@ public class TimeMap extends RTree<Task> implements Consumer<Task> {
 
     public TimeMap(@NotNull NAR n) {
         this();
-        n.forEachConceptTask(this, true, true, false, false);
+        n.tasks(true, true, false, false).forEach(this);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package nars.index.term.tree;
 
+import com.google.common.collect.Streams;
 import jcog.tree.radix.MyConcurrentRadixTree;
 import nars.NAR;
 import nars.concept.Concept;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * concurrent radix tree index
@@ -57,6 +59,11 @@ public class TreeTermIndex extends TermIndex implements Consumer<NAR> {
 //        });
 //        t.start();
 
+    }
+
+    @Override
+    public Stream<Termed> stream() {
+        return Streams.stream( concepts.iterator() );
     }
 
     @Override

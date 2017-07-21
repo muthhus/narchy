@@ -1,5 +1,6 @@
 package nars.concept;
 
+import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.conceptualize.ConceptBuilder;
@@ -13,7 +14,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static nars.Op.*;
 
@@ -256,4 +260,12 @@ public class TaskConcept extends CompoundConcept {
         //questions = quests = null;
     }
 
+    public Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests) {
+        List<Stream<Task>> s = new LinkedList<>();
+        if (includeBeliefs) s.add(beliefs.stream());
+        if (includeGoals) s.add(goals.stream());
+        if (includeQuestions) s.add(questions.stream());
+        if (includeQuests) s.add(quests.stream());
+        return s.stream().flatMap(x -> x);
+    }
 }

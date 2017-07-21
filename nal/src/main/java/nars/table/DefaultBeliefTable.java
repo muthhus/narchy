@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static nars.time.Tense.ETERNAL;
 
@@ -30,6 +31,10 @@ public class DefaultBeliefTable implements BeliefTable {
         temporal = t;
     }
 
+    @Override
+    public Stream<Task> stream() {
+        return Stream.concat(eternal.stream(), temporal.stream()).filter(x -> !x.isDeleted());
+    }
 
     /**
      * TODO this value can be cached per cycle (when,now) etc

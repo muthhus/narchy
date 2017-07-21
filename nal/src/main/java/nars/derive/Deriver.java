@@ -44,6 +44,7 @@ public interface Deriver {
             case 7:
                 files.add("induction.nal");
                 //fallthru
+            case 6:
             case 5:
                 files.add("nal6.nal");
                 //fallthru

@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * holds a set of ranked question/quests tasks
@@ -77,6 +78,8 @@ public interface TaskTable  {
     boolean removeTask(Task x);
 
     void clear();
+
+    Stream<Task> stream();
 
 
     //boolean contains(Task t);

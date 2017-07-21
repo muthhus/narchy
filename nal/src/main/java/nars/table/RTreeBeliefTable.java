@@ -2,6 +2,7 @@ package nars.table;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
+import com.google.common.collect.Streams;
 import jcog.Util;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
@@ -22,6 +23,7 @@ import java.io.PrintStream;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
@@ -211,6 +213,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     }
                 });
     }
+
+
 
     public void updateSignalTasks(long now) {
 
@@ -663,6 +667,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public Iterator<Task> taskIterator() {
         return Iterators.transform(tree.iterator(), x -> x.task);
+    }
+
+    @Override
+    public Stream<Task> stream() {
+        return Streams.stream(taskIterator());
     }
 
     @Override

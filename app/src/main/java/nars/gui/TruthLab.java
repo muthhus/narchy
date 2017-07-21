@@ -149,7 +149,7 @@ public class TruthLab extends Grid {
 
             this.label = task.toString();
 
-            Draw.colorHash(task.term().root(), labelColor);
+            Draw.colorHash(task.term().eternal(), labelColor);
         }
     }
 

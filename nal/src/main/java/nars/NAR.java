@@ -11,7 +11,6 @@ import jcog.event.On;
 import jcog.event.Topic;
 import jcog.list.FasterList;
 import jcog.pri.Pri;
-import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import nars.Narsese.NarseseException;
@@ -23,10 +22,7 @@ import nars.control.Activate;
 import nars.control.Cause;
 import nars.control.CauseChannel;
 import nars.control.premise.Derivation;
-import nars.derive.DebugDerivationPredicate;
-import nars.derive.Deriver;
 import nars.derive.PrediTerm;
-import nars.derive.TrieDeriver;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.nar.exe.Executioner;
@@ -1235,35 +1231,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         scheduled.add(PrimitiveTuples.pair(when, then));
     }
 
-    @NotNull
-    public NAR forEachConceptTask(@NotNull Consumer<Task> each) {
-        return forEachTaskConcept(c -> c.forEachTask(each));
+    /** tasks in concepts */
+    @NotNull public Stream<Task> tasks(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
+        return taskConcepts().flatMap(c -> c.tasks(includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests));
     }
-
-    @NotNull
-    public NAR forEachConceptTask(@NotNull Consumer<Task> each, boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
-        return forEachTaskConcept(c -> {
-            c.forEachTask(includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests, each);
-        });
-    }
-
-    @NotNull
-    public NAR forEachConceptTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests,
-                                  boolean includeTaskLinks, int maxPerConcept,
-                                  @NotNull Consumer<Task> recip) {
-        Consumer<? super PriReference<Task>> action = t -> recip.accept(t.get());
-        forEachTaskConcept(c -> {
-
-            if (includeConceptBeliefs) c.beliefs().forEach(maxPerConcept, recip);
-            if (includeConceptQuestions) c.questions().forEach(maxPerConcept, recip);
-            if (includeConceptGoals) c.goals().forEach(maxPerConcept, recip);
-            if (includeConceptQuests) c.quests().forEach(maxPerConcept, recip);
-            if (includeTaskLinks) {
-                c.tasklinks().sample(maxPerConcept, action);
-            }
-        });
-
-        return this;
+    @NotNull public Stream<Task> tasks() {
+        return tasks(true,true,true,true);
     }
 
 
@@ -1293,56 +1266,36 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
 
         Term y = conceptTerm(x.term());
-        return (y == null) ? null : terms.concept(y, createIfMissing);
+        return (y instanceof Bool) ? null : terms.concept(y, createIfMissing);
     }
 
     /**
      * returns the canonical Concept term for any given Term, or null if it is unconceptualizable
      */
-    @Nullable
+    @NotNull
     public Term conceptTerm(@NotNull Term term) {
-
-        if (term instanceof Compound) {
-
-            //boolean wasNormalized = term.isNormalized();
-
-            term = compoundOrNull(term.unneg());
-            if (term == null) return null;
-
-            term = compoundOrNull(((Compound) term).root());
-            if (term == null) return null;
-
-            //atemporalizing can reset normalization state of the result instance
-            //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
-
-            //if (wasNormalized) {
-            term = compoundOrNull(((Compound) term).normalize());
-            if (term == null) return null;
-            //}
-
-            term = compoundOrNull(term.unneg() /* once again to be sure */);
-            if (term == null) return null;
-
-        }
-
-        if (term instanceof Variable || term instanceof IntAtom || term instanceof Bool)
-            return null;
-
-        return term;
+        return term.conceptual();
     }
 
 
-    public NAR forEachTaskActive(@NotNull Consumer<ITask> recip) {
+    @Deprecated public NAR forEachTaskActive(@NotNull Consumer<ITask> recip) {
         exe.forEach(recip);
         return this;
     }
 
-    public NAR forEachConceptActive(@NotNull Consumer<Activate> recip) {
+    @Deprecated public NAR forEachConceptActive(@NotNull Consumer<Activate> recip) {
         return forEachTaskActive(t -> {
             if (t instanceof Activate) {
                 recip.accept(((Activate) t));
             }
         });
+    }
+
+    public Stream<Concept> concepts() {
+        return terms.stream().filter(t -> t instanceof Concept).map(t -> (Concept)t);
+    }
+    public Stream<TaskConcept> taskConcepts() {
+        return terms.stream().filter(t -> t instanceof TaskConcept).map(t -> (TaskConcept)t);
     }
 
     @NotNull
@@ -1485,8 +1438,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * sets current maximum allowed NAL level (1..8)
      */
-    public final void nal(int newLevel) {
+    public final NAR nal(int newLevel) {
         nal = newLevel;
+        return this;
     }
 
 
@@ -1522,9 +1476,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         MutableInteger total = new MutableInteger(0), wrote = new MutableInteger(0);
 
-        forEachConceptTask(_x -> {
-
-            if (_x.isDeleted()) return; //HACK forEachConcept should not return deleted tasks
+        tasks().forEach(_x -> {
 
             total.increment();
             Task x = post(_x);

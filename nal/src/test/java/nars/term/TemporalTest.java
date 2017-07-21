@@ -78,20 +78,20 @@ public class TemporalTest {
 
     @Test public void testAtemporalization2() throws Narsese.NarseseException {
 
-        assertEquals("(y &&+- (--,y))", $.<Compound>$("(y &&+3 (--,y))").root().toString());
+        assertEquals("(y &&+- (--,y))", $.<Compound>$("(y &&+3 (--,y))").eternal().toString());
     }
 
     @Test public void testAtemporalization3() throws Narsese.NarseseException {
 
         assertEquals("(--,((x &&+- $1) ==>+- ($1 &&+- (--,y))))",
-                $.<Compound>$("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))").root().toString());
+                $.<Compound>$("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))").eternal().toString());
     }
 
     @Test public void testAtemporalization4() throws Narsese.NarseseException {
         //maintain temporal information that would otherwise be factored out if non-temporal
 
         assertEquals("((x &&+- $1) ==>+- (y &&+- $1))",
-                $.<Compound>$("(($1 && x) ==>+1 ($1 &&+1 y))").root().toString());
+                $.<Compound>$("(($1 && x) ==>+1 ($1 &&+1 y))").eternal().toString());
     }
 
 
@@ -101,14 +101,14 @@ public class TemporalTest {
             assertTrue(c instanceof Compound);
 
             assertEquals("(y &&+- (x ==>+- y))",
-                    c.root().toString());
+                    c.eternal().toString());
         }
     }
 
     @Test public void testAtemporalization6() throws Narsese.NarseseException {
         Compound x = $("((--,(($1&&x) ==>+1 ((--,y) &&+2 $1))) &&+3 (--,y))");
 
-        Term y = x.root();
+        Term y = x.eternal();
         assertEquals("((--,y) &&+- (--,((x &&+- $1) ==>+- ($1 &&+- (--,y)))))", y.toString());
     }
 
@@ -328,7 +328,7 @@ public class TemporalTest {
 
             Term f0 = $("(y " + op + "+- x)");
             assertEquals("(y " + op + "+- x)", f0.toString());
-            assertEquals("(x " + op + "+- y)", f0.root().toString());
+            assertEquals("(x " + op + "+- y)", f0.eternal().toString());
 
             Concept f = n.conceptualize(f0);
             assertTrue(e + "==" + f, e == f);
@@ -671,10 +671,10 @@ public class TemporalTest {
         @NotNull Term a = $("(x && y)");
 
         Term b = $.$("(x &&+1 y)");
-        assertEquals("(x &&+- y)", b.root().toString());
+        assertEquals("(x &&+- y)", b.eternal().toString());
 
         Term c = $.$("(x &&+1 x)");
-        assertEquals("(x &&+- x)", c.root().toString());
+        assertEquals("(x &&+- x)", c.eternal().toString());
 
         //assertTrue(Terms.equalAtemporally(a, b));
         //        if (as == bs) {
@@ -711,8 +711,8 @@ public class TemporalTest {
 //        }
         Term f = $("(x ==> y)");
         Term g = $("(y ==>+1 x)");
-        assertEquals("(x ==>+- y)", f.root().toString());
-        assertEquals("(y ==>+- x)", g.root().toString());
+        assertEquals("(x ==>+- y)", f.eternal().toString());
+        assertEquals("(y ==>+- x)", g.eternal().toString());
     }
 
     @Test
@@ -733,8 +733,8 @@ public class TemporalTest {
 //            return as.equals(bs);
 //        }
 
-        assertEquals($.<Compound>$("(x && (y ==> z))").root(),
-                $.<Compound>$("(x &&+1 (y ==>+1 z))").root());
+        assertEquals($.<Compound>$("(x && (y ==> z))").eternal(),
+                $.<Compound>$("(x &&+1 (y ==>+1 z))").eternal());
         //        if (as == bs) {
 //            return true;
 //        } else if (as instanceof Compound && bs instanceof Compound) {
@@ -745,14 +745,14 @@ public class TemporalTest {
         assertEquals("((x &&+1 z) ==>+1 w)",
                 $("(x &&+1 (z ==>+1 w))").toString());
 
-        assertEquals($.<Compound>$("((x &&+- z) ==>+- w)").root(),
-                $.<Compound>$("(x &&+1 (z ==>+1 w))").root());
+        assertEquals($.<Compound>$("((x &&+- z) ==>+- w)").eternal(),
+                $.<Compound>$("(x &&+1 (z ==>+1 w))").eternal());
     }
 
     @Test
     public void testAtemporalization1() throws Narsese.NarseseException {
         Term x = $("(((--,(tetris-->(_n,#2))) &&+1 $1) <=>+1 ($1 &&+0 (--,(tetris-->(_n,#2)))))");
-        Term y = x.root();
+        Term y = x.eternal();
         assertEquals("(($1 &&+- (--,(tetris-->(_n,#2)))) <=>+- ($1 &&+- (--,(tetris-->(_n,#2)))))", y.toString());
     }
 

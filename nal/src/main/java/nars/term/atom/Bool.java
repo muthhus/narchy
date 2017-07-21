@@ -8,6 +8,7 @@ import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.ATOM;
+import static nars.Op.Null;
 
 
 /** special/reserved/keyword representing fundamental absolute boolean truth states:
@@ -47,6 +48,12 @@ abstract public class Bool extends AtomicToString {
     @Override
     public final boolean equals(Object u) {
         return u == this;
+    }
+
+    @Override
+    @NotNull
+    public final Term conceptual() {
+        return Null;
     }
 
     @Override

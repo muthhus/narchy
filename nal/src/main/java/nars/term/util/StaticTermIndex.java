@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 
 public class StaticTermIndex extends TermIndex {
@@ -23,6 +24,11 @@ public class StaticTermIndex extends TermIndex {
 //            return super.the(c);
 //        }
 
+
+    @Override
+    public Stream<Termed> stream() {
+        return Stream.empty();
+    }
 
     @Override
     public

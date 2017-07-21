@@ -384,7 +384,7 @@ public class IO {
         System.out.println("saving tasks: " + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
         PrintStream ps = new PrintStream(os);
-        nar.forEachConceptTask(t -> {
+        nar.tasks().forEach(t -> {
             Task tt = nar.post(t);
             try {
                 tt.appendTSV(ps);
@@ -399,7 +399,7 @@ public class IO {
         System.out.println("saving tasks: file://" + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
         PrintStream ps = new PrintStream(os);
-        nar.forEachConceptTask(t -> {
+        nar.tasks().forEach(t -> {
             Task tt = nar.post(t);
             try {
                 tt.appendTo(ps);

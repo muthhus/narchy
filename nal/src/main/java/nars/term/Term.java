@@ -26,6 +26,7 @@ import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
+import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
@@ -50,6 +51,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static nars.Op.Null;
+import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -450,6 +452,16 @@ public interface Term extends Termlike, Comparable<Termlike> {
      *  ex: any temporality is atemporalized.
      * */
     default @NotNull Term root() {
+        return this;
+    }
+
+    /** returns this term in a form which can identify a concept, or Null if it can't */
+    default @NotNull Term conceptual() {
+        return root();
+    }
+
+    /** erases temporal information, for use in computing root() */
+    default @NotNull Term eternal() {
         return this;
     }
 

@@ -7,6 +7,7 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.INT;
+import static nars.Op.Null;
 
 /** 32-bit signed integer */
 public class IntAtom implements Atomic {
@@ -33,6 +34,11 @@ public class IntAtom implements Atomic {
 
     IntAtom(int i) {
         this.id = i;
+    }
+
+    @Override
+    public @NotNull Term conceptual() {
+        return Null;
     }
 
     @Override

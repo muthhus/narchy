@@ -1,5 +1,6 @@
 package nars.table;
 
+import com.google.common.collect.Streams;
 import jcog.data.sorted.SortedArray;
 import nars.NAR;
 import nars.Param;
@@ -20,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -78,8 +80,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         }
 
+        @NotNull
         @Override
-        public Iterator<Task> taskIterator() {
+        public Iterator<Task> iterator() {
             return Collections.emptyIterator();
         }
 
@@ -96,6 +99,11 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     public EternalTable(int initialCapacity) {
         super();
         this.capacity = initialCapacity;
+    }
+
+    @Override
+    public Stream<Task> stream() {
+        return Streams.stream(iterator());
     }
 
     @Override
@@ -163,7 +171,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     @Override
-    public Iterator<Task> taskIterator() {
+    public final Iterator<Task> taskIterator() {
         return iterator();
     }
 

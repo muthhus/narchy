@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /** additionally caches subterm vectors */
 public class MapTermIndex extends MaplikeTermIndex {
@@ -18,6 +19,10 @@ public class MapTermIndex extends MaplikeTermIndex {
     public MapTermIndex(Map<Term, Termed> map) {
         super();
         this.concepts = map;
+    }
+
+    @Override public Stream<Termed> stream() {
+        return concepts.values().stream();
     }
 
     @NotNull

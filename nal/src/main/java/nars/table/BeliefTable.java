@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static java.util.stream.StreamSupport.stream;
 import static nars.term.Terms.normalizedOrNull;
@@ -33,6 +34,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
     @NotNull
     BeliefTable EMPTY = new BeliefTable() {
+
+        @Override
+        public Stream<Task> stream() {
+            return Stream.empty();
+        }
 
         @Override
         public Iterator<Task> iterator() {
@@ -169,8 +175,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     }
 
     default float priSum() {
-        return (float) stream(spliterator(), false)
-                .mapToDouble(Prioritized::pri).sum();
+        return (float) stream().mapToDouble(Prioritized::pri).sum();
     }
 
     /**

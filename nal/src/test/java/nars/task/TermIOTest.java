@@ -39,9 +39,8 @@ public class TermIOTest {
             if (torig.isDeleted())
                 throw new RuntimeException("task is deleted already");
             barray = IO.asBytes(torig);
-        }
-        else if (orig instanceof Term)
-            barray = IO.termToBytes((Term)orig);
+        } else if (orig instanceof Term)
+            barray = IO.termToBytes((Term) orig);
         else
             throw new RuntimeException("");
 
@@ -57,10 +56,10 @@ public class TermIOTest {
             throw new RuntimeException("");
 
         //if (copy instanceof Task) {
-            //((MutableTask)copy).invalidate();
-            //((Task)copy).normalize(nar);
-            //out.println("\t\t" +((Task)orig).explanation());
-            //out.println("\t\t" +((Task)copy).explanation());
+        //((MutableTask)copy).invalidate();
+        //((Task)copy).normalize(nar);
+        //out.println("\t\t" +((Task)orig).explanation());
+        //out.println("\t\t" +((Task)copy).explanation());
         //}
 
         //Terms.printRecursive(System.out, (Task)orig, 10);
@@ -89,10 +88,12 @@ public class TermIOTest {
         assertEqualSerialize(nar.term("(/, x, _, y)").term() /* term, not the concept */);
         assertEqualSerialize(nar.term("exe(a,b)").term() /* term, not the concept */);
     }
+
     @Test
     public void testTermSerialization2() throws Narsese.NarseseException {
         assertTermEqualSerialize("<a-->(be)>");
     }
+
     @Test
     public void testTermSerialization3() throws Narsese.NarseseException {
         assertTermEqualSerialize("(#1 --> b)");
@@ -103,10 +104,10 @@ public class TermIOTest {
         //multiple variables
 
         Variable q = $.varQuery(1);
-        Compound twoB = $.inh( $.varDep(2), Atomic.the("b"));
+        Compound twoB = $.inh($.varDep(2), Atomic.the("b"));
         assertNotEquals(
                 q.compareTo(twoB),
-                twoB.compareTo(q) );
+                twoB.compareTo(q));
 
         assertTermEqualSerialize("((#a --> b) <-> ?c)");
 
@@ -133,35 +134,37 @@ public class TermIOTest {
         assertEqualSerialize(nar.inputAndGet("$0.1 (b-->c)! %1.0;0.8%"));
     }
 
-    @Test public void testTaskSerialization2() throws Narsese.NarseseException {
+    @Test
+    public void testTaskSerialization2() throws Narsese.NarseseException {
         assertEqualSerialize(nar.inputAndGet("$0.3 (a-->(bd))! %1.0;0.8%"));
     }
 
-    @Test public void testNARTaskDump() throws Exception {
+    @Test
+    public void testNARTaskDump() throws Exception {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(16384);
 
         NAR a = new NARS().get()
-                        .input("a:b.", "b:c.", "c:d!")
-                        .run(32)
-                        .output(baos);
+                .input("a:b.", "b:c.", "c:d!")
+                .run(32)
+                .output(baos);
 
         byte[] x = baos.toByteArray();
         out.println("NAR tasks serialized: " + x.length + " bytes");
 
         NAR b = new NARS().get()
-                        .inputBinary(new ByteArrayInputStream(x)).run(1)
-                        //.next()
-                        //.forEachConceptTask(true,true,true,true, out::println)
-                        //.forEachConcept(System.out::println)
-                        ;
+                .inputBinary(new ByteArrayInputStream(x)).run(1)
+                //.next()
+                //.forEachConceptTask(true,true,true,true, out::println)
+                //.forEachConcept(System.out::println)
+                ;
 
         //dump all tasks to a set of sorted strings and compare their equality:
         Set<String> ab = new HashSet();
-        a.forEachConceptTask( t-> ab.add(t.toStringWithoutBudget()) , true,true,true,true);
+        a.tasks().forEach(t -> ab.add(t.toStringWithoutBudget()));
 
         Set<String> bb = new HashSet();
-        b.forEachConceptTask( t->bb.add(t.toStringWithoutBudget()), true,true,true,true);
+        b.tasks().forEach(t -> bb.add(t.toStringWithoutBudget()));
 
         assertEquals("difference: " + Sets.symmetricDifference(ab, bb), ab, bb);
 
@@ -174,26 +177,31 @@ public class TermIOTest {
 //        assertTrue("diff: " + diff.toString() + "\n\t" + abB + "\n\t" + bbB, 2 >= diff.size());
     }
 
-    @Test public void testByteMappingAtom() throws IOException, Narsese.NarseseException {
+    @Test
+    public void testByteMappingAtom() throws IOException, Narsese.NarseseException {
         assertEquals("(0,0)=. ", map("x"));
     }
 
 
-    @Test public void testByteMappingInh() throws IOException, Narsese.NarseseException {
+    @Test
+    public void testByteMappingInh() throws IOException, Narsese.NarseseException {
         assertEquals("(0,0)=--> (1,2)=. (1,6)=. ", map("a:b"));
     }
 
-    @Test public void testByteMappingCompoundDT() throws IOException, Narsese.NarseseException {
+    @Test
+    public void testByteMappingCompoundDT() throws IOException, Narsese.NarseseException {
         assertEquals("(0,0)===> (1,2)=. (1,6)=. ",
                 map("(a ==>+1 b)"));
     }
 
-    @Test public void testByteMappingCompoundDTExt() throws IOException, Narsese.NarseseException {
+    @Test
+    public void testByteMappingCompoundDTExt() throws IOException, Narsese.NarseseException {
         assertEquals("(0,0)=--> (1,2)===> (2,4)=. (2,8)=. (1,16)=. ",
                 map("((a ==>+1 b) --> c)"));
     }
 
-    @Test public void testByteMappingCompound() throws IOException, Narsese.NarseseException {
+    @Test
+    public void testByteMappingCompound() throws IOException, Narsese.NarseseException {
         assertEquals("(0,0)===> (1,2)=--> (2,4)=* (3,6)=. (3,10)=. (2,16)=. (1,20)=. ",
                 map("(a(b,\"c\") ==>+1 d)"));
     }

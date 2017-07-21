@@ -11,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 
 public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<Term,Termed> {
@@ -90,7 +91,12 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     }
 
-//    @Override
+    @Override
+    public Stream<Termed> stream() {
+        return concepts.asMap().values().stream();
+    }
+
+    //    @Override
 //    public void start(NAR nar) {
 //        super.start(nar);
 //        //nar.onCycle(this::cleanUp);

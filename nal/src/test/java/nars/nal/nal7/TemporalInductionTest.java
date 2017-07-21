@@ -137,7 +137,7 @@ public class TemporalInductionTest {
 
     private static int getBeliefCount(@NotNull NAR n) {
         AtomicInteger a = new AtomicInteger(0);
-        n.forEachConceptTask(true,false,false,false,false,1000, t->{
+        n.tasks(true,false,false,false).forEach(t->{
            a.addAndGet(1);
         });
         return a.intValue();

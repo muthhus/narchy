@@ -186,7 +186,7 @@ public interface Compound extends Term, IPair, TermContainer {
             return true;
         };
 
-        if (inStructure!=-1)
+        if (inStructure != -1)
             recurseTerms((p) -> p.hasAny(inStructure), selector);
         else
             recurseTerms(any -> true, selector);
@@ -399,7 +399,9 @@ public interface Compound extends Term, IPair, TermContainer {
             return u;
         }
     }
-    @Nullable default Set<Term> varsUnique(@Nullable Op type, @NotNull Set<Term> unlessHere) {
+
+    @Nullable
+    default Set<Term> varsUnique(@Nullable Op type, @NotNull Set<Term> unlessHere) {
         int num = vars(type);
         if (num == 0)
             return null;
@@ -1089,7 +1091,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
     }
 
-    @Nullable default Compound normalize() {
+    @Nullable
+    default Compound normalize() {
         if (this.isNormalized())
             return this; //TODO try not to let this happen
 
@@ -1129,7 +1132,8 @@ public interface Compound extends Term, IPair, TermContainer {
         return result;
     }
 
-    @Nullable default Term transform(@NotNull CompoundTransform t) {
+    @Nullable
+    default Term transform(@NotNull CompoundTransform t) {
         Compound src = this;
         if (t.testSuperTerm(src)) {
             return transform(src.op(), src.dt(), t);
@@ -1139,9 +1143,10 @@ public interface Compound extends Term, IPair, TermContainer {
 
     }
 
-    @Nullable default Term transform(int newDT, @NotNull CompoundTransform t) {
+    @Nullable
+    default Term transform(int newDT, @NotNull CompoundTransform t) {
         if (this.dt() == newDT)
-            return transform( t); //no dt change, use non-DT changing method that has early fail
+            return transform(t); //no dt change, use non-DT changing method that has early fail
         else {
             return transform(op(), newDT, t);
         }
@@ -1168,7 +1173,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 return null;
 
             if (y instanceof Compound) {
-                y = ((Compound)y).transform(t); //recurse
+                y = ((Compound) y).transform(t); //recurse
             }
 
             if (y == null)
@@ -1199,9 +1204,9 @@ public interface Compound extends Term, IPair, TermContainer {
         if (subtermMods > 0 || op != this.op()/* || dt != src.dt()*/) {
 
             //if (target.internable())
-                return op.the(dt, target.theArray());
+            return op.the(dt, target.theArray());
             //else
-                //return Op.compound(op, target.theArray(), false).dt(dt); //HACK
+            //return Op.compound(op, target.theArray(), false).dt(dt); //HACK
 
         } else if (dt != this.dt())
             return this.dt(dt);
@@ -1209,7 +1214,10 @@ public interface Compound extends Term, IPair, TermContainer {
             return this;
     }
 
-    @Override @NotNull default Term root() {
+
+    @Override
+    @NotNull
+    default Term eternal() {
         if (!this.hasAny(Op.TemporalBits))// isTemporal())
             return this;
 
@@ -1226,7 +1234,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
                 Term xi = s[i];
                 if (xi instanceof Compound) {
-                    Term yi = xi.root();
+                    Term yi = xi.eternal();
                     if (yi instanceof Bool)
                         return Null;
                     if (!xi.equals(yi)) {
@@ -1276,6 +1284,30 @@ public interface Compound extends Term, IPair, TermContainer {
         return y;
     }
 
+    @Override
+    @NotNull
+    default Term root() {
+
+        Compound term = compoundOrNull(unneg());
+
+        if (term == null) return Null;
+
+        term = compoundOrNull(((Compound) term).eternal());
+        if (term == null) return Null;
+
+        //atemporalizing can reset normalization state of the result instance
+        //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
+
+        //if (isNormalized()) {
+        term = compoundOrNull(((Compound) term).normalize());
+        if (term == null) return Null;
+        //}
+
+        term = compoundOrNull(term.unneg() /* once again to be sure */);
+        if (term == null) return Null;
+
+        return term;
+    }
 
     //    default MutableSet<Term> toSetAtemporal() {
 //        int ss = size();

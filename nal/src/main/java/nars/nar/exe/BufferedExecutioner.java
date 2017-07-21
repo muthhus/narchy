@@ -160,8 +160,11 @@ public class BufferedExecutioner extends Executioner {
 
         flush();
 
-        onClear.off();
-        onClear = null;
+        On c = this.onClear;
+        if (c !=null) {
+            this.onClear = null;
+            c.off();
+        }
 
         super.stop();
 

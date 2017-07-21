@@ -1,9 +1,6 @@
 package nars.index.term;
 
-import nars.Builtin;
-import nars.NAR;
-import nars.Narsese;
-import nars.Op;
+import nars.*;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.conceptualize.ConceptBuilder;
@@ -21,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintStream;
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
@@ -358,6 +356,8 @@ public abstract class TermIndex implements TermContext {
 
     public final Retemporalization retemporalizationDTERNAL = new Retemporalization(DTERNAL);
     public final Retemporalization retemporalizationZero = new Retemporalization(0);
+
+    abstract public Stream<Termed> stream();
 
 
     public class Retemporalization implements CompoundTransform {
