@@ -289,7 +289,7 @@ abstract public class NAgent implements NSense, NAct {
 
         return id + " rwrd=" + n2(reward) +
                 " dex=" + /*n4*/(dexterity()) +
-                "\t" + Op.cache.summary() +
+                //"\t" + Op.cache.summary() +
                 /*" var=" + n4(varPct(nar)) + */ "\t" + nar.terms.summary() + " " +
                 nar.emotion.summary();
     }

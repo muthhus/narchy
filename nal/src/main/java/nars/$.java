@@ -20,7 +20,9 @@ import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.IntAtom;
+import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
@@ -229,21 +231,21 @@ public interface $ {
      * quickly creates a product on the stack, bypassing any memoization
      */
     public static Compound pFast(@NotNull Term... subs) {
-        return Op.compound(PROD, subs, false);
+        return pFast(TermVector.the(subs));
     }
 
     /**
      * quickly creates a product on the stack, bypassing any memoization
      */
     public static Compound pFast(@NotNull TermContainer subs) {
-        return Op.compound(PROD, subs, false);
+        return new GenericCompound(PROD, subs);
     }
 
     /**
      * quickly creates an extensional set (on the stack), bypassing any memoization
      */
     public static Compound sFast(@NotNull Term[] subs) {
-        return Op.compound(SETe, Terms.sorted(subs), false);
+        return new GenericCompound(SETe, TermVector.the(Terms.sorted(subs)));
     }
 
     @NotNull

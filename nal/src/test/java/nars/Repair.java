@@ -105,12 +105,10 @@ public class Repair {
         System.out.println();
 
 
-//
-//        //g.edgesConnecting(tree.root(), tree.min()).forEach(System.out::println);
-//
-//        System.out.println("MAX=" + tree.max());
-//        //g.edgesConnecting(tree.root(), tree.max()).forEach(System.out::println);
-
+        /* TODO
+            traverse the tree collecting each node as an AND condition until a leaf node is reached. this becomes
+            the predicting predicate of the value at the leaf node. so a stack is necessary
+         */
 
     }
 }

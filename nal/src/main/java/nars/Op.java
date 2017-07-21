@@ -1,14 +1,13 @@
 package nars;
 
 
-import jcog.memoize.HijackMemoize;
-import jcog.memoize.Memoize;
 import nars.derive.match.Ellipsislike;
 import nars.index.term.NewCompound;
-import nars.index.term.NonInternable;
-import nars.index.term.ProtoCompound;
 import nars.index.term.TermContext;
-import nars.term.*;
+import nars.term.Compound;
+import nars.term.Functor;
+import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
@@ -33,7 +32,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
@@ -136,10 +134,10 @@ public enum Op implements $ {
 
     /**
      * PRODUCT
-     *   classically this is considered NAL4 but due to the use of functors
-     *   it is much more convenient to classify it in NAL1 so that it
-     *   along with inheritance (INH), which comprise the functor,
-     *   can be used to compose the foundation of the system.
+     * classically this is considered NAL4 but due to the use of functors
+     * it is much more convenient to classify it in NAL1 so that it
+     * along with inheritance (INH), which comprise the functor,
+     * can be used to compose the foundation of the system.
      */
     PROD("*", 1, Args.GTEZero),
 
@@ -618,36 +616,120 @@ public enum Op implements $ {
     public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);
     public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
     final static Logger logger = LoggerFactory.getLogger(Op.class);
-    static final Function<ProtoCompound, Termlike> buildTerm = (C) -> {
-        try {
 
-            Op o = C.op();
-            if (o != null) {
-                return compound(o, C, C.size() >= 2 /* intern if >= 2 subs */ );
-            } else
-                return subtermsNew(C.subterms());
+//    public interface TermInstancer {
+//
+//
+//        default @NotNull Term compound(@NotNull NewCompound apc, int dt) {
+//            return compound(apc.op(), apc.theArray()).dt(dt);
+//        }
+//
+//        @NotNull Compound compound(Op o, Term[] subterms);
+//
+//        @NotNull TermContainer subterms(@NotNull Term... x);
+//
+//    }
+//
+//    /**
+//     * memoization
+//     */
+//    public static class MemoizedTermInstancer implements TermInstancer {
+//
+//        final Function<ProtoCompound, Termlike> buildTerm = (C) -> {
+//            try {
+//
+//                Op o = C.op();
+//                if (o != null) {
+//                    return compound(C);
+//                } else
+//                    return subterms(C.subterms());
+//
+//            } catch (InvalidTermException e) {
+//                if (Param.DEBUG_EXTRA)
+//                    logger.error("Term Build: {}, {}", C, e);
+//                return Null;
+//            } catch (Throwable t) {
+//                logger.error("{}", t);
+//                return Null;
+//            }
+//        };
+//
+//
+//    public static boolean internable(@NotNull Term[] x) {
+//        boolean internable = true;
+//        for (Term y : x) {
+//            if (y instanceof NonInternable) { //"must not intern non-internable" + y + "(" +y.getClass() + ")";
+//                internable = false;
+//                break;
+//            }
+//        }
+//        return internable;
+//    }
+//        public static final Memoize<ProtoCompound, Termlike> cache =
+//                new HijackMemoize<>(buildTerm, 128 * 1024 + 1, 3);
+//        //CaffeineMemoize.build(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
+//
+//
+//        @NotNull
+//        @Override
+//        public Term compound(NewCompound apc, int dt) {
+//
+//            if (apc.OR(x -> x instanceof NonInternable)) {
+//                return compound(apc.op, apc, false).dt(dt);
+//            } else {
+//                Term x = (Term) cache.apply(apc.commit());
+//
+//                if (dt != DTERNAL && x instanceof Compound)
+//                    return x.dt(dt);
+//                else
+//                    return x;
+//            }
+//        }
+//
+//        @Override
+//        public @NotNull TermContainer subterms(@NotNull Term... x) {
+////        if (s.length < 2) {
+////            return _subterms(s);
+////        } else {
+//
+//            boolean internable = internable(x);
+//
+//            if (internable) {
+//                return (TermContainer) cache.apply(new NewCompound(null, x).commit());
+//            } else {
+//                return TermVector.the(x);
+//            }
+//
+//        }
+//    }
 
-        } catch (InvalidTermException e) {
-            if (Param.DEBUG_EXTRA)
-                logger.error("Term Build: {}, {}", C, e);
-            return Null;
-        } catch (Throwable t) {
-            logger.error("{}", t);
-            return Null;
-        }
-    };
-    public static final Memoize<ProtoCompound, Termlike> cache =
-            new HijackMemoize<>(buildTerm, 128 * 1024 + 1, 3);
-            //CaffeineMemoize.build(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
     /**
-     * index of operators which are encoded by 1 byte: must be less than 31 because this is the range for control characters
+     * creates new instance
      */
-    static final int numByteSymbols = 15;
-    static final Op[] byteSymbols = new Op[numByteSymbols];
+    @NotNull
+    public static Compound compound(Op o, Term[] subterms) {
+        int s = subterms.length;
+        assert (o.maxSize >= s) : "subterm overflow: " + o + " " + Arrays.toString(subterms);
+        assert (o.minSize <= s || (firstEllipsis(subterms) != null)) : "subterm underflow: " + o + " " + Arrays.toString(subterms);
+
+        switch (s) {
+            case 1:
+                return new UnitCompound1(o, subterms[0]);
+
+            default:
+                return new GenericCompound(o, subterms(subterms));
+        }
+    }
+
+    @NotNull
+    public static TermContainer subterms(@NotNull Term... s) {
+        return TermVector.the(s);
+    }
+
+
+
+
     static final ImmutableMap<String, Op> stringToOperator;
-    private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
-    private static final int InvalidImplicationSubj = or(EQUI, IMPL);
-    private static final int InvalidImplicationPred = or(EQUI);
 
     static {
         for (Op o : Op.values()) {
@@ -663,21 +745,13 @@ public enum Op implements $ {
         //Setup NativeOperator String index hashtable
         for (Op r : Op.values()) {
             _stringToOperator.put(r.toString(), r);
-            int ordinal = r.id;
-            if (ordinal < 15)
-                Op.byteSymbols[ordinal] = r;
+
         }
         stringToOperator = Maps.immutable.ofMap(_stringToOperator);
 
         //System.out.println(Arrays.toString(byteSymbols));
 
-        //VERIFICATION: Look for any empty holes in the byteSymbols table, indicating that the representation is not contigous
-        //index 0 is always 0 to maintain \0's semantics
-        //if # of operators are reduced in the future, then this will report that the table size should be reduced (avoiding unnecessary array lookups)
-        for (int i = 1; i < Op.byteSymbols.length; i++) {
-            if (null == Op.byteSymbols[i])
-                throw new RuntimeException("Invalid byteSymbols encoding: index " + i + " is null");
-        }
+
 
 //        //Setup NativeOperator Character index hashtable
 //        for (Op r : Op.values()) {
@@ -717,7 +791,9 @@ public enum Op implements $ {
     public final boolean hasNumeric;
     public final byte id;
 
-    /** whether these are not actual terms, being immediately constructed from other non-virtual types */
+    /**
+     * whether these are not actual terms, being immediately constructed from other non-virtual types
+     */
     public final boolean virtual;
 
     Op(char c, int minLevel, OpType type) {
@@ -756,7 +832,7 @@ public enum Op implements $ {
 
     Op(@NotNull String string, boolean commutative, int minLevel, OpType type, @NotNull IntIntPair size) {
 
-        this.id =(byte)(ordinal());
+        this.id = (byte) (ordinal());
         this.str = string;
 
         this.commutative = commutative;
@@ -781,7 +857,7 @@ public enum Op implements $ {
 
         this.atomic = var || str.equals(".") /* atom */ || str.equals("`i") || str.equals("^") || str.equals("`");
 
-        this.virtual = (Set.of("||","{-]","-]-","-{-").contains(str));
+        this.virtual = (Set.of("||", "{-]", "-]-", "-{-").contains(str));
     }
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
@@ -891,85 +967,27 @@ public enum Op implements $ {
     }
 
 
-    /** creates new instance */
-    public static Compound compound(Op o, TermContainer subContainer, boolean internSubs) {
+    /**
+     * creates new instance
+     */
+    public static Compound compound(Op o, TermContainer subContainer) {
 
         Term[] subterms = subContainer.toArray();
 
-        return compound(o, subterms, internSubs);
+        return compound(o, subterms);
     }
 
-    /** creates new instance */
-    public static Compound compound(Op o, Term[] subterms, boolean internSubs) {
-        int s = subterms.length;
-        assert (o.maxSize >= s) : "subterm overflow: " + o + " " + Arrays.toString(subterms);
-        assert (o.minSize <= s || (firstEllipsis(subterms)!=null)) : "subterm underflow: " + o + " " + Arrays.toString(subterms);
-
-        switch (s) {
-            case 1:
-                return new UnitCompound1(o, subterms[0]);
-
-            default:
-                return new GenericCompound(o, internSubs ? subterms(subterms) : subtermsNew(subterms) );
-        }
-    }
-
-    static TermContainer subtermsNew(@NotNull Term[] s) {
-        return TermVector.the(s);
-    }
-
-    static public @NotNull TermContainer subterms(@NotNull Term... x) {
-//        if (s.length < 2) {
-//            return _subterms(s);
-//        } else {
-
-        boolean internable = internable(x);
-
-        if (internable) {
-            return (TermContainer) cache.apply(new NewCompound(null, x).commit());
-        } else {
-            return subtermsNew(x);
-        }
-
-    }
-
-    public static boolean internable(@NotNull Term[] x) {
-        boolean internable = true;
-        for (Term y : x) {
-            if (y instanceof NonInternable) { //"must not intern non-internable" + y + "(" +y.getClass() + ")";
-                internable = false;
-                break;
-            }
-        }
-        return internable;
-    }
 
     @NotNull
     public static Term compound(Op op, int dt, TermContainer subterms) {
         assert (!op.atomic);
 
-        if (!subterms.internable())
-            return compound(op, subterms, false).dt(dt);
-        else
-            return compound(new NewCompound(op, subterms), dt);
+        //if (!subterms.internable())
+            return compound(op, subterms).dt(dt);
+//        else
+//            return compound(new NewCompound(op, subterms), dt);
     }
 
-    @NotNull
-    public static Term compound(NewCompound apc, int dt) {
-
-
-
-        if (apc.OR(x -> x instanceof NonInternable)) {
-            return compound(apc.op, apc, false).dt(dt);
-        } else {
-            Term x = (Term) cache.apply(apc.commit());
-
-            if (dt != DTERNAL && x instanceof Compound)
-                return x.dt(dt);
-            else
-                return x;
-        }
-    }
 
     static boolean in(int needle, int haystack) {
         return (needle & haystack) == needle;
@@ -982,17 +1000,10 @@ public enum Op implements $ {
         return bits;
     }
 
-    static boolean validEquivalenceTerm(@NotNull Term t) {
-        //return !t.opUnneg().in(InvalidEquivalenceTerm);
-        return !t.hasAny(InvalidEquivalenceTerm);
-//        if ( instanceof Implication) || (subject instanceof Equivalence)
-//                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
-//                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
-//            return null;
-//        }
-    }
-
     public static final Predicate<Compound> nonProduct = c -> c.op() != PROD;
+    private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
+    private static final int InvalidImplicationSubj = or(EQUI, IMPL);
+    private static final int InvalidImplicationPred = or(EQUI);
 
     @NotNull
     static Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
@@ -1066,9 +1077,21 @@ public enum Op implements $ {
                 //else not concurrent and equivalent, allow
 
 
-                if (!validEquivalenceTerm(subject))
+                //return !t.opUnneg().in(InvalidEquivalenceTerm);
+                //        if ( instanceof Implication) || (subject instanceof Equivalence)
+//                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
+//                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
+//            return null;
+//        }
+                if (!!subject.hasAny(InvalidEquivalenceTerm))
                     throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
-                if (!validEquivalenceTerm(predicate))
+                //return !t.opUnneg().in(InvalidEquivalenceTerm);
+                //        if ( instanceof Implication) || (subject instanceof Equivalence)
+//                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
+//                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
+//            return null;
+//        }
+                if (!!predicate.hasAny(InvalidEquivalenceTerm))
                     throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
 
 //                boolean subjNeg = subject.op() == NEG;
