@@ -27,7 +27,7 @@ public class Gradius extends NAgentX {
         g.updateMS = 8;
 
         BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
-        senseCamera("(G)", cc);
+        senseCamera("(G)", cc).resolution(0.12f);
 
 //        PixelBag cc = PixelBag.of(() -> g.image, 64, 64);
 //        cc.setClarity(0.5f, 0.9f);

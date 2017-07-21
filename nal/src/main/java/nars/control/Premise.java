@@ -174,9 +174,9 @@ public class Premise {
                 ttlMax
         );
 
-//        long ds = d.transformsCached.estimatedSize();
+//        long ds = d.transformsCache.estimatedSize();
 //        if (ds >0)
-//            System.out.println(ds + " " + d.transformsCached.stats());
+//            System.out.println(ds + " " + d.transformsCache.stats());
 
         int ttlAfter = d.ttl();
 

@@ -104,7 +104,7 @@ public abstract class Param  {
     public static boolean ANSWER_REPORTING = true;
 
 
-    public static final int DERIVATION_THREAD_TRANSFORM_CACHE_SIZE = 64 * 1024;
+    public static final int DERIVATION_THREAD_TRANSFORM_CACHE_SIZE = 128 * 1024;
 
     /**
      * hard upper-bound limit on Compound term complexity;
