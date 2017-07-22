@@ -1,15 +1,25 @@
 package nars.derive.op;
 
 import nars.control.premise.Derivation;
+import nars.derive.AbstractPred;
 import nars.derive.AtomicPred;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
 /** belief truth is postiive */
-public class BeliefPositive extends AtomicPred<Derivation> {
+public class BeliefPositive extends AbstractPred<Derivation> {
 
-    public static final BeliefPositive thePos = new BeliefPositive();
-    public static final BeliefNegative theNeg = new BeliefNegative();
+    public static final BeliefPositive beliefPos = new BeliefPositive();
+    public static final BeliefNegative beliefNeg = new BeliefNegative();
+    public static final BeliefExists beliefExists = new BeliefExists();
+
+    public BeliefPositive() {
+        this("belief(positive)");
+    }
+
+    BeliefPositive(String id) {
+        super(id);
+    }
 
     @Override
     public boolean test(@NotNull Derivation m) {
@@ -20,18 +30,28 @@ public class BeliefPositive extends AtomicPred<Derivation> {
         return false;
     }
 
-    @NotNull
-    @Override
-    public String toString() {
-        return getClass().getSimpleName();
-    }
 
     public static final class BeliefNegative extends BeliefPositive {
 
+        public BeliefNegative() {
+            super("belief(negative)");
+        }
 
         @Override
         public boolean test(@NotNull Derivation m) {
             return !super.test(m);
+        }
+    }
+
+    public static final class BeliefExists extends BeliefPositive {
+
+        public BeliefExists() {
+            super("belief(exists)");
+        }
+
+        @Override
+        public boolean test(@NotNull Derivation m) {
+            return m.belief!=null;
         }
     }
 

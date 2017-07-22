@@ -100,7 +100,7 @@ public class MultiExecutioner extends Executioner {
     final AtomicBoolean busy = new AtomicBoolean(false);
 
     @Override
-    public void cycle(@NotNull NAR nar) {
+    public void cycle() {
 
 
 //            int waitCycles = 0;
@@ -159,20 +159,24 @@ public class MultiExecutioner extends Executioner {
     }
 
 
-    public static class Worker extends BufferedExecutioner {
+    public static class Worker extends Executioner {
 
+        private final Executioner model;
         private Executor passive;
         private Loop loop;
 
-        public Worker(int conceptCapacity, int inputTaskCapacity, float exePct) {
-            super(conceptCapacity, inputTaskCapacity, exePct);
+        public Worker(Executioner delegate) {
+            super();
+            this.model = delegate;
         }
 
         Loop start(int periodMS) {
+            model.start(nar);
+
             return this.loop = new Loop(periodMS) {
                 @Override
                 public boolean next() {
-                    flush();
+                    model.cycle();
                     return true;
                 }
             };
@@ -191,7 +195,23 @@ public class MultiExecutioner extends Executioner {
         @Override
         public void stop() {
             loop.stop();
+            model.stop();
             loop = null;
+        }
+
+        @Override
+        public void cycle() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int concurrency() {
+            return model.concurrency();
+        }
+
+        @Override
+        public void forEach(Consumer<ITask> each) {
+            model.forEach(each);
         }
 
         @Override
@@ -199,6 +219,15 @@ public class MultiExecutioner extends Executioner {
             passive.execute(r); //use the common threadpool
         }
 
+        @Override
+        public void runLaterAndWait(Runnable cmd) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void run(@NotNull ITask input) {
+            model.run(input);
+        }
     }
 
 }

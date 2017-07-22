@@ -51,6 +51,7 @@ public class Premise extends Pri implements ITask {
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
+        if (!(obj instanceof Premise)) return false;
         Premise x = (Premise)obj;
         if (hash!=x.hash) return false;
         return taskLink.equals(((Premise) obj).taskLink) && termLink.equals(((Premise) obj).termLink);
@@ -63,7 +64,7 @@ public class Premise extends Pri implements ITask {
 
     @Override
     public String toString() {
-        return taskLink + " " + termLink;
+        return taskLink + "+" + termLink;
     }
 
     /**
@@ -88,7 +89,7 @@ public class Premise extends Pri implements ITask {
 
         PriReference<Task> taskLink = this.taskLink;
         Task task = taskLink.get();
-        float taskPri = task.priElseZero();
+        //float taskPri = task.priElseZero();
 
 
         NAR nar = d.nar;
@@ -121,7 +122,8 @@ public class Premise extends Pri implements ITask {
                     reUnified = true;
                 }
 
-                ttlMax = matchTTL[0]; //changed if consumed in match
+                assert(matchTTL[0] <= 0);
+                ttlMax += matchTTL[0]; //changed if consumed in match (this value will be negative
             }
 
 
@@ -175,21 +177,12 @@ public class Premise extends Pri implements ITask {
         }
 
 
-        float beliefPri;
         if (belief != null) {
-            beliefPri = belief.pri();
-            if (beliefPri != beliefPri) {
-                belief = null; //belief was deleted
-            } else {
-                beliefTerm = belief.term(); //use the belief's actual temporalized term
-            }
-        } else {
-            beliefPri = Float.NaN;
+            beliefTerm = belief.term(); //use the belief's actual possibly-temporalized term
         }
 
-//        if (belief != null && belief.equals(task)) //do not repeat the same task for belief
-//            belief = null; //force structural transform; this is also applied in Derivation
-
+        if (belief != null && belief.equals(task)) //do not repeat the same task for belief
+            belief = null; //force structural transform; also prevents potential inductive feedback loop
 
         //System.out.println(task + "\t" + beliefTerm + " ::: \t" + belief);
 
@@ -236,14 +229,18 @@ public class Premise extends Pri implements ITask {
      * unify any (and only) query variables which may be present in
      * the 'a' term with any non-query terms in the 'q' term
      * returns non-null if unification succeeded and resulted in a transformed 'a' term
+     *  sets a negative number in the ttl array, which is to be added to the callee's
+     *  ttl.  if zero, then no TTL was consumed
      */
     @Nullable
     private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar, int[] ttl) {
 
+        final int startTTL = ttl[0];
+        ttl[0] = 0;
+
         if (q.op() != a.op() /*|| q.size() != a.size()*/)
             return null; //fast-fail: no chance
 
-        final int startTTL = ttl[0];
 
         final Compound[] result = {null};
         UnifySubst u = new UnifySubst(null /* match anything */, nar, (aa) -> {
@@ -263,7 +260,7 @@ public class Premise extends Pri implements ITask {
         }, startTTL);
         u.unifyAll(q, a);
 
-        ttl[0] -= (startTTL - u.ttl); //how much consumed
+        ttl[0] = -(startTTL - u.ttl); //how much consumed
 
         return result[0];
 

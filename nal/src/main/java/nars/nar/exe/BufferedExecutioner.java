@@ -41,6 +41,8 @@ public class BufferedExecutioner extends Executioner {
      */
     int inputsPerFire = 8;
 
+    final AtomicBoolean busy = new AtomicBoolean(false);
+
 
     //    private final DisruptorBlockingQueue<ITask> overflow;
     protected boolean trace;
@@ -142,7 +144,7 @@ public class BufferedExecutioner extends Executioner {
     }
 
     @Override
-    public void cycle(@NotNull NAR nar) {
+    public void cycle() {
 
         if (!busy.compareAndSet(false, true))
             return;
@@ -191,8 +193,6 @@ public class BufferedExecutioner extends Executioner {
     @Override
     public void stop() {
 
-        flush();
-
         On c = this.onClear;
         if (c !=null) {
             this.onClear = null;
@@ -214,7 +214,6 @@ public class BufferedExecutioner extends Executioner {
             concepts.clear();
         });
 
-        flush(); //<- may not be necessary
     }
 
     @Override
@@ -226,13 +225,7 @@ public class BufferedExecutioner extends Executioner {
         tasks.print();
     }
 
-    //    @Override
-//    public void stop() {
-//        flush();
-//        super.stop();
-//    }
 
-    final AtomicBoolean busy = new AtomicBoolean(false);
 
 
     @Override
@@ -242,7 +235,6 @@ public class BufferedExecutioner extends Executioner {
     }
 
 
-    //final ConcurrentLinkedQueue  pendingRuns = new ConcurrentLinkedQueue();
 
     @Override
     public void runLater(Runnable r) {
@@ -255,46 +247,6 @@ public class BufferedExecutioner extends Executioner {
         r.run(); //default: inline
     }
 
-    protected void flush() {
-
-        if (!busy.compareAndSet(false, true))
-            return;
-
-        try {
-
-            boolean t = this.trace;
-            if (t)
-                concepts.print();
-
-            final int toFire =
-                    (int) Math.ceil(conceptsPerCycleMax.floatValue() * concepts.capacity());
-
-            float eFrac = ((float) toFire) / concepts.capacity();
-            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * concepts.depressurize(eFrac) * (eFrac);
-            float forgetEachActivePri =
-                    pAvg >= Pri.EPSILON ? pAvg : 0;
-
-
-            tasks.pop(inputsPerFire, this::execute); //pre-fire inputs
-
-            concepts.commit(null).sample(toFire, x -> {
-
-                execute(x);
-
-                if (forgetEachActivePri > 0) {
-                    x.priSub(forgetEachActivePri);
-                }
-
-                tasks.pop(inputsPerFire, this::execute);
-
-                //activeBuffer.add(x);
-                //(Consumer<? super ITask>)(buffer::add)
-            });
-
-        } finally {
-            busy.set(false);
-        }
-    }
 
     protected void execute(ITask x) {
         ITask[] next;

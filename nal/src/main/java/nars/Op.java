@@ -572,42 +572,24 @@ public enum Op implements $ {
 
 
     public static final char TrueSym = '†';
-    public static final char FalseSym = 'Ø';
-    public static final char NullSym = (char) 133 /* horizontal ellipsis */;
+    public static final char FalseSym = 'Ⅎ';
+    public static final char NullSym = '☢';
 
     /**
-     * absolutely invalid
+     * absolutely nonsense
      */
-    public static final Bool Null = new Bool(String.valueOf(NullSym)) {
-
-        @Override
-        public @NotNull Term unneg() {
-            return this;
-        }
-    };
+    public static final Bool Null = new BoolNull();
 
     /**
      * absolutely false
      */
-    public static final Bool False = new Bool(String.valueOf(FalseSym)) {
-        @NotNull
-        @Override
-        public Term unneg() {
-            return True;
-        }
-    };
+    public static final Bool False = new BoolFalse();
+
     /**
      * absolutely true
      */
-    public static final Bool True = new Bool(String.valueOf(TrueSym)) {
-        @NotNull
-        @Override
-        public Term unneg() {
-            return False;
-        }
-    };
-    public static final Term[] TrueArray = {True};
-    public static final Term[] FalseArray = {False};
+    public static final Bool True = new BoolTrue();
+
     /**
      * specifier for any NAL level
      */
@@ -1554,4 +1536,37 @@ public enum Op implements $ {
         }
     }
 
+    private static class BoolNull extends Bool {
+        public BoolNull() {
+            super(String.valueOf(Op.NullSym));
+        }
+
+        @Override public @NotNull Term unneg() {
+            return this;
+        }
+    }
+
+    private static class BoolFalse extends Bool {
+        public BoolFalse() {
+            super(String.valueOf(Op.FalseSym));
+        }
+
+        @NotNull
+        @Override
+        public Term unneg() {
+            return True;
+        }
+    }
+
+    private static class BoolTrue extends Bool {
+        public BoolTrue() {
+            super(String.valueOf(Op.TrueSym));
+        }
+
+        @NotNull
+        @Override
+        public Term unneg() {
+            return False;
+        }
+    }
 }

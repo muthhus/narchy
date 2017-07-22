@@ -261,7 +261,7 @@ public class Derivation extends Unify implements TermContext {
         evidenceDouble = evidenceSingle = null;
         temporal = cyclic = overlap = false;
 
-        assert (ttl >= 0);
+        assert (ttl > 0);
         this.setTTL(ttl);
 
         this.premise = p;

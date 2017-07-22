@@ -4,6 +4,8 @@ import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
+import nars.nar.exe.BufferedExecutioner;
+import nars.nar.exe.FocusedExecutioner;
 import nars.nar.exe.MultiExecutioner;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
@@ -110,8 +112,9 @@ abstract public class NAgentX extends NAgent {
                     .exe(
                         new MultiExecutioner((i) ->
                             new MultiExecutioner.Worker(
-                                    96, 32, 0.05f),
-                                THREADS, 2))
+                                    //new BufferedExecutioner(96, 32, 0.05f)
+                                    new FocusedExecutioner()
+                            ),THREADS, 2))
                     .time(clock)
                     .index(new CaffeineIndex(128 * 1024 ))
                     .get();

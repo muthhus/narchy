@@ -4,7 +4,6 @@ package nars;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
-import com.google.common.primitives.Shorts;
 import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
@@ -14,7 +13,6 @@ import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
-import jcog.util.IterableThreadLocal;
 import nars.Narsese.NarseseException;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
@@ -41,9 +39,7 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
-import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.DiscreteTruth;
@@ -51,7 +47,6 @@ import nars.truth.Truth;
 import nars.util.Cycles;
 import org.HdrHistogram.Histogram;
 import org.HdrHistogram.ShortCountsHistogram;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
@@ -954,14 +949,19 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle();
 
+        eventCycleStart.emit(this);
+
+        exe.cycle();
+
+        exeScheduled();
+
         valueUpdate();
 
         emotion.cycle();
 
-        eventCycleStart.emit(this);
+    }
 
-        exe.cycle(this);
-
+    void exeScheduled() {
         if (!scheduled.isEmpty()) {
             LongObjectPair<Runnable> next;
             long now = time();
@@ -974,7 +974,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 }
             }
         }
-
     }
 
 

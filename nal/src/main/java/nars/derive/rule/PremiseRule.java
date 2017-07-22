@@ -189,6 +189,8 @@ public class PremiseRule extends GenericCompound {
         Solve truth = puncOverride == 0 ?
                 new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
                 new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
+        if (belief!=null && goal!=null && !belief.single() && !goal.single())
+            s.add(BeliefPositive.beliefExists); //quick filter
 
         //PREFIX
         {
@@ -262,6 +264,7 @@ public class PremiseRule extends GenericCompound {
 
         put(TaskPunctuation.class, rank--);
 
+        put(BeliefPositive.BeliefExists.class, rank--);
 
         put(TaskBeliefOccurrence.class, rank--);
 
@@ -292,7 +295,8 @@ public class PremiseRule extends GenericCompound {
             return "PatternOp" + (((AbstractPatternOp.PatternOp) b).subterm == 0 ? "0" : "1"); //split
 
         if ((b == TaskPositive.the) || (b == TaskNegative.the)) return TaskPositive.class;
-        if ((b == BeliefPositive.thePos) || (b == BeliefPositive.theNeg)) return BeliefPositive.class;
+        if (b == BeliefPositive.beliefExists) return BeliefPositive.BeliefExists.class;
+        if ((b == BeliefPositive.beliefPos) || (b == BeliefPositive.beliefNeg)) return BeliefPositive.class;
 
         if (b.getClass() == TaskBeliefHas.class) return TaskBeliefHas.class;
 
@@ -626,10 +630,10 @@ public class PremiseRule extends GenericCompound {
                 case "belief":
                     switch (XString) {
                         case "negative":
-                            pres.add(BeliefPositive.theNeg);
+                            pres.add(BeliefPositive.beliefNeg);
                             break;
                         case "positive":
-                            pres.add(BeliefPositive.thePos);
+                            pres.add(BeliefPositive.beliefPos);
                             break;
 
                         //HACK do somethign other than duplciate this with the "task" select below, and also generalize to all ops

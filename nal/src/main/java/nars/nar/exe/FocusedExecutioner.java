@@ -6,7 +6,6 @@ import jcog.bag.impl.PriArrayBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.$;
-import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.control.Activate;
@@ -41,35 +40,46 @@ public class FocusedExecutioner extends Executioner {
     final PriArrayBag<ITask> concepts = new CurveBag<>(MAX_CONCEPTS, Param.conceptMerge, new ConcurrentHashMap<>());
 
     int subcycles = 1;
+    int subCycleTasks = 8;
+    int subCycleConcepts = 2;
+    int subCyclePremises = 4;
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
 
-    @Override
-    public void cycle(@NotNull NAR nar) {
+    /** temporary buffer for tasks about to be executed */
+    private final List<ITask> next = $.newArrayList(1024);
 
-        System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());
+    @Override
+    public void cycle() {
 
         tasks.commit();
         premises.commit();
         concepts.commit();
 
-        if (tasks.isEmpty())
-            logger.warn("no tasks");
-        if (concepts.isEmpty())
-            logger.warn("no concepts");
+        if (Param.TRACE) {
+            System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());
+            if (!concepts.isEmpty())
+                concepts.print();
+            if (tasks.isEmpty())
+                logger.warn("no tasks");
+            if (concepts.isEmpty())
+                logger.warn("no concepts");
+        }
 
-        List<ITask> next = $.newArrayList();
+
+
 
         Consumer<? super PriReference<ITask>> queueTask = x -> next.add(x.get());
 
         for (int i = 0; i < subcycles; i++) {
 
             //if (tasks.capacity() <= tasks.size())
-            final int[] maxTasks = {1};
+
+            final int[] maxTasks = {subCycleTasks};
             tasks.sample((x) -> {
                 NALTask tt = (NALTask) x.get();
                 next.add(tt);
-                boolean save = tt.isInput();
+                boolean save = false; // tt.isInput();
                 return --maxTasks[0] > 0 ?
                         (save ? Bag.BagSample.Next : Bag.BagSample.Remove)
                         :
@@ -78,11 +88,11 @@ public class FocusedExecutioner extends Executioner {
 
             execute(next);
 
-            concepts.sample(1, (Consumer) queueTask);
+            concepts.sample(subCycleConcepts, (Consumer) queueTask);
 
             execute(next);
 
-            premises.pop(1, queueTask);
+            premises.pop(subCyclePremises, queueTask);
 
             execute(next);
         }

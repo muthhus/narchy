@@ -14,7 +14,7 @@ import static nars.Op.Null;
 /** special/reserved/keyword representing fundamental absolute boolean truth states:
  *      True - absolutely true
  *      False - absolutely false
- *      Null - nonsense
+ *      Null - absolutely nonsense
  *
  *  these represent an intrinsic level of truth that exist within the context of
  *  an individual term.  not to be confused with Task-level Truth
@@ -38,7 +38,7 @@ abstract public class Bool extends AtomicToString {
         return id;
     }
 
-    public final static int AtomBool = Term.opX(ATOM, 0);
+    final static int AtomBool = Term.opX(ATOM, 0);
     @Override public final int opX() {
         return AtomBool;
     }
@@ -71,23 +71,24 @@ abstract public class Bool extends AtomicToString {
 
 
     @Override
-    public Term eval(TermContext index) {
+    public final Term eval(TermContext index) {
         return this;
     }
 
     @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+    public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
         throw never("unify");
     }
 
     @Override
-    public Term dt(int dt) {
-        throw never("dt");
+    public final Term dt(int dt) {
+        return this; //allow
+        //throw never("dt");
     }
 
 
-    static UnsupportedOperationException never(String eval) {
-        return new UnsupportedOperationException("Bool leak attemping: " + eval);
+    UnsupportedOperationException never(String eval) {
+        return new UnsupportedOperationException(this + " Bool leak attemping: " + eval);
     }
 
 }

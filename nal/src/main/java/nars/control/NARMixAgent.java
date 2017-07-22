@@ -50,7 +50,7 @@ public class NARMixAgent<X extends Priority> extends NAgent implements MixAgent 
         nar.time.dur(1);
 
         for (int i = 0; i < cyclesPerFrame; i++)
-            nar.exe.cycle(nar);
+            nar.exe.cycle();
         next();
         nar.time.cycle();
 
