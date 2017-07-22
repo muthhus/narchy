@@ -121,9 +121,6 @@ abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements
 //    @NotNull
 //    protected abstract Object commit();
 
-    /** if v is non-null it will be added after making capacity for it */
-    protected abstract boolean updateItems(@Nullable V v);
-
 
 //    @Override
 //    public final void forEach(@NotNull Consumer<? super L> action) {

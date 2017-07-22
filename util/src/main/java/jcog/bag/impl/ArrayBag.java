@@ -14,14 +14,12 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 
 /**
@@ -40,6 +38,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     public float mass;
 
     private final AtomicBoolean unsorted = new AtomicBoolean(false);
+    protected float min = 0, max = 0;
 
     public ArrayBag(PriMerge mergeFunction, @NotNull Map<X, Y> map) {
         this(0, mergeFunction, map);
@@ -48,7 +47,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     static final class SortedPLinks extends SortedArray {
         @Override
         protected Object[] newArray(int oldSize) {
-            return new Object[oldSize == 0 ? 2 : oldSize + (Math.max(1, oldSize/2))];
+            return new Object[oldSize == 0 ? 2 : oldSize + (Math.max(1, oldSize / 2))];
         }
     }
 
@@ -102,22 +101,20 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         pressure.addAndGet(f);
     }
 
-    @NotNull
-    @Override
-    public Iterator<Y> iterator() {
-        ensureSorted();
-        return super.iterator();
-    }
 
     /**
      * returns true unless failed to add during 'add' operation or becomes empty
      * call within synchronized
+     *
+     * @return List of trash items
+     * trash must be removed from the map, outside of critical section
+     * may include the item being added
      */
-    @Override
-    protected boolean updateItems(@Nullable Y toAdd) {
+    @Nullable
+    private List<Y> updateItems(@Nullable Y toAdd) {
 
         int c = capacity();
-        List<Y> pendingRemoval;
+
         int additional = (toAdd != null) ? 1 : 0;
 
         int s = size();
@@ -125,64 +122,88 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         int nextSize = s + additional;
 
         int needsRemoved = nextSize - c;
+        float min;
+        List<Y> trash = null;
         if (needsRemoved > 0) {
 
-            pendingRemoval = new FasterList(needsRemoved);
-            clean(toAdd, s, nextSize - c, pendingRemoval);
-
-
-            pendingRemoval.forEach(this::onRemoved); //execute outside of synchronization
+            trash = new FasterList(needsRemoved);
+            min = clean(toAdd, s, nextSize - c, trash);
 
             s = size();
-
+        } else {
+            min = Float.NEGATIVE_INFINITY;
         }
 
 
         if (toAdd != null) {
             if (s < c) {
+                //room to add an item
                 items.add(toAdd, this);
 
-                return true;
             } else {
-                //throw new RuntimeException("list became full during insert");
-                return false;
+                //at capacity
+                Y removed;
+                if (toAdd.priElseZero() > min) {
+                    //remove lowest
+                    removed = items.removeLast();
+                    //add this
+                    items.add(toAdd, this);
+                } else {
+                    removed = toAdd;
+                }
+
+                if (trash == null)
+                    trash = List.of(removed);
+                else
+                    trash.add(removed);
+
             }
-        } else {
-            return s > 0;
         }
+        return trash;
     }
-
-    private void clean(@Nullable Y toAdd, int s, int minRemoved, List<Y> trash) {
-
-        if (cleanDeletedEntries()) {
-            //first step: remove any nulls and deleted values
-            s -= removeDeleted(trash, minRemoved);
-        }
-
-        //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
-        int s1 = s;
-        SortedArray<Y> items1 = this.items;
-        final int c = capacity;
-        while (s1 > 0 && ((s1 - c) + (toAdd != null ? 1 : 0)) > 0) {
-            Y w1 = items1.remove(s1 - 1);
-            if (w1 != null) //skip over nulls
-                trash.add(w1);
-            s1--;
-        }
-
-        int trashed = trash.size();
-        for (int i = 0; i < trashed; i++) {
-            Y w = trash.get(i);
-            map.remove(key(w));
-        }
-    }
-
 
     /**
-     * return whether to clean deleted entries prior to removing any lowest ranked items
+     * returns the minimum pri value encountered
      */
-    protected boolean cleanDeletedEntries() {
-        return true;
+    private float clean(@Nullable Y toAdd, int s, int minRemoved, List<Y> trash) {
+
+        float min = Float.POSITIVE_INFINITY;
+
+
+        //first step: remove any nulls and deleted values
+
+        SortedArray items2 = this.items;
+        final Object[] l = items2.array();
+        int removedFromMap = 0;
+
+        //iterate in reverse since null entries should be more likely to gather at the end
+        for (int s2 = size() - 1; removedFromMap < minRemoved && s2 >= 0; s2--) {
+            Y x = (Y) l[s2];
+            if (x == null || (x.isDeleted() && trash.add(x))) {
+                items2.removeFast(s2);
+                removedFromMap++;
+            } else {
+                min = Math.min(min, x.priElseZero());
+            }
+        }
+
+        s -= removedFromMap;
+
+        final int c = capacity;
+        if (s > c) {
+
+            //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
+            int s1 = s;
+            SortedArray<Y> items1 = this.items;
+            while (s1 > 0 && ((s1 - c) + (toAdd != null ? 1 : 0)) > 0) {
+                Y w1 = items1.remove(s1 - 1);
+                if (w1 != null) //skip over nulls
+                    trash.add(w1);
+                s1--;
+            }
+        }
+
+        return min; //NOTE the min value will not be accurate in a capacity change situation but thats ok we wont need the value anyway
     }
 
 
@@ -251,8 +272,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     }
 
 
-
-
 //    @Override
 //    public Bag<X, Y> sample(int max, Consumer<? super Y> each) {
 //        return sample(max, ((x) -> {
@@ -306,7 +325,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     }
 
 
-    /** size > 0 */
+    /**
+     * size > 0
+     */
     protected int sampleStart(int size) {
         if (size == 1) return 0;
         else
@@ -347,7 +368,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 if (next.remove) {
 
                     //if removed and the bag's array has been changed to a new array while processing:
-                    if (remove(key(x))!= null && items.array() !=ii) {
+                    if (remove(key(x)) != null && items.array() != ii) {
                         //set it in this array to not encounter it again
                         ii[i] = null;
                         nulls++;
@@ -375,74 +396,117 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 //    }
 
     @Override
-    public final Y put(@NotNull final Y x, @Nullable final MutableFloat overflow) {
+    public final Y put(@NotNull final Y incoming, @Nullable final MutableFloat overflow) {
 
-        final float p = priElseZero(x);
-        boolean atCap = size() == capacity;
-        if (p < Pri.EPSILON) {
-            if (atCap)
-                return null; //automatically refuse sub-ther
-        }
+        final float p = incoming.pri();
+        if (p != p)
+            return null; //already deleted
 
-        float[] incomingPri = {-p};
+//        if (p < Pri.EPSILON) {
+//            if (atCap)
+//                return null; //automatically refuse sub-ther
+//        }
+
+        X key = key(incoming);
+
+        final @Nullable List[] trash = {null};
+        Y inserted = map.compute(key, (kk, existing) -> {
+            if (existing != null) {
+                if (existing == incoming)
+                    return existing; //no change
 
 
-        X key = key(x);
+                boolean atCap = size() == capacity;
+                float priBefore = (atCap ? existing.priElseZero() : -1 /* dont care */);
+                float oo = mergeFunction.merge((Priority) existing /* HACK */, incoming);
+                overflow.add(oo);
+                if (atCap) {
+                    float delta = existing.priElseZero() - priBefore;
+                    if (delta >= Pri.EPSILON)
+                        pressurize(delta);
+                }
+                return existing;
 
-        Y y = map.merge(key, x, (existing, incoming) -> {
+            } else {
 
-            incomingPri[0] *= -1; //upright
+                boolean atCap = size() == capacity;
+                if (atCap) {
+                    pressurize(p);
+                    @Nullable List<Y> trsh = updateItems(incoming);
+                    trash[0] = trsh;
+                    if (trsh!=null) {
+                        if (trsh.get(0)==incoming)
+                            return null;
+                    }
+                }
 
-            float oo = existing != incoming ?
-                    mergeFunction.merge((Priority) existing /* HACK */, incoming)
-                    :
-                    incomingPri[0] /* all of it if identical */;
-
-            if (oo >= Pri.EPSILON) {
-                incomingPri[0] -= oo; //release any unabsorbed pressure
+                return incoming; //success
             }
-
-            return existing;
+            return null;
         });
 
-        if (incomingPri[0] < 0) {
-
-            if (atCap)
-                pressurize(p); //absorb pressure even if it's about to get removed
-
-
-            synchronized (items) {
-                //check if it can actually exist here
-                if (((size() >= capacity) && (p < priMinFast(-1)) || !updateItems(y))) {
-                    map.remove(key);
-                    return null;
-                }
-            }
-
-
-            onAdded(y);
-            return y;
-
-        } else {
-
-            float activated = incomingPri[0];
-
-            if (activated >= Pri.EPSILON) {
-
-                unsorted.set(true); //merging may have shifted ordering, so sort later
-
-                if (atCap)
-                    pressurize(activated);
-
-                if (overflow != null) {
-                    float oo = p - activated;
-                    if (oo >= Pri.EPSILON)
-                        overflow.add(oo);
-                }
-            }
+        @Nullable List<Y> trsh = trash[0];
+        if (trsh!=null) {
+            //clear the entries from the map right away
+            //technically this should be done in a synchronized block along with what happens above
+            trsh.forEach(map::remove);
+            trsh.forEach(this::onRemoved);
         }
 
-        return y;
+
+        return inserted;
+
+//        Y y = map.merge(key, incoming, (existing, incoming) -> {
+//
+//            incomingPri[0] *= -1; //upright
+//
+//            float oo = existing != incoming ?
+//                    mergeFunction.merge((Priority) existing /* HACK */, incoming)
+//                    :
+//                    incomingPri[0] /* all of it if identical */;
+//
+//            if (oo >= Pri.EPSILON) {
+//                incomingPri[0] -= oo; //release any unabsorbed pressure
+//            }
+//
+//            return existing;
+//        });
+//        if (incomingPri[0] < 0) {
+//
+//            if (atCap)
+//                pressurize(p); //absorb pressure even if it's about to get removed
+//
+//
+//            synchronized (items) {
+//                //check if it can actually exist here
+//                if (((size() >= capacity) && (p < min) || !updateItems(y))) {
+//                    map.remove(key);
+//                    return null;
+//                }
+//            }
+//
+//
+//            onAdded(y);
+//            return y;
+//
+//        } else {
+//
+//            float activated = incomingPri[0];
+//
+//            if (activated >= Pri.EPSILON) {
+//
+//                unsorted.set(true); //merging may have shifted ordering, so sort later
+//
+//                if (atCap)
+//                    pressurize(activated);
+//
+//                if (overflow != null) {
+//                    float oo = p - activated;
+//                    if (oo >= Pri.EPSILON)
+//                        overflow.add(oo);
+//                }
+//            }
+//        }
 
     }
 
@@ -537,8 +601,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             return 8;
         if (s < 2048)
             return 16;
-
-        return 32;
+        else
+            return 32;
     }
 
     /**
@@ -588,24 +652,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         return null;
     }
 
-    private int removeDeleted(@NotNull List<Y> trash, int minRemoved) {
-
-        SortedArray items = this.items;
-        final Object[] l = items.array();
-        int removedFromMap = 0;
-
-        //iterate in reverse since null entries should be more likely to gather at the end
-        for (int s = size() - 1; removedFromMap < minRemoved && s >= 0; s--) {
-            Y x = (Y) l[s];
-            if (x == null || (x.isDeleted() && trash.add(x))) {
-                items.removeFast(s);
-                removedFromMap++;
-            }
-        }
-
-        return removedFromMap;
-    }
-
     @Override
     public void clear() {
         synchronized (items) {
@@ -639,8 +685,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     @Override
     public void forEach(int max, @NotNull Consumer<? super Y> action) {
-        ensureSorted();
-
         Object[] x = items.array();
         for (Object a : (x)) {
             if (a != null) {
@@ -804,42 +848,34 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         return super.toString() + '{' + items.getClass().getSimpleName() + '}';
     }
 
-    void ensureSorted() {
+    /**
+     * atomic sort procedure, updates min/max bounds
+     */
+    void sort() {
         if (unsorted.compareAndSet(true, false)) {
 
-            Object[] il = items.list;
-            if (il.length > 1) {
-                synchronized (items) {
-                    final int s = size();
-                    if (s > 1) { //test again
-                        int[] stack = new int[sortSize(s) /* estimate */];
-                        qsort(stack, il, 0 /*dirtyStart - 1*/, (s - 1));
-                    }
-                }
+            final int s = size();
+            if (s > 1) { //test again
+                Object[] il = items.list;
+                int[] stack = new int[sortSize(s) /* estimate */];
+                qsort(stack, il, 0 /*dirtyStart - 1*/, (s - 1));
+                min = ((Y) (il[0])).priSafe(0);
+                max = ((Y) (il[s - 1])).priSafe(0);
+            } else {
+                min = max = ((Y) (items.list[0])).priSafe(0);
             }
         }
     }
 
+
     @Override
     public float priMax() {
-        ensureSorted();
-        Y y = items.first();
-        return y != null ? y.priSafe(0) : 0f;
+        return max;
     }
 
     @Override
     public float priMin() {
-        ensureSorted();
-        return priMinFast(0);
-    }
-
-    /**
-     * doesnt ensure sorting to avoid synchronization
-     */
-    float priMinFast(float ifDeleted) {
-        Y y;
-        y = items.last();
-        return y != null ? y.priSafe(ifDeleted) : ifDeleted;
+        return min;
     }
 
 

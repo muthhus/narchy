@@ -1,6 +1,8 @@
 package jcog.bag.impl;
 
+import jcog.Util;
 import jcog.bag.Bag;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
@@ -27,13 +29,20 @@ public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
         this.random = rng;
     }
 
+
     @Override
     protected int sampleStart(int size) {
         if (size == 1)
             return 0;
         else {
             float i = random.nextFloat(); //uniform
-            i *= i; //curve: i^2
+            float min = this.min;
+            float max = this.max;
+            float diff = max - min;
+            if (diff > Pri.EPSILON) {
+                //normalize to the lack of dynamic range
+                i = Util.lerp(diff, i /* flat */, (i*i) /* curved */);
+            }
             return Math.round(i * (size - 1));
         }
     }
