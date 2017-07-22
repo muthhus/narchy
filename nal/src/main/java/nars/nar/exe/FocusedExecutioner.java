@@ -5,6 +5,7 @@ import jcog.bag.impl.CurveBag;
 import jcog.list.FasterList;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
+import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Param;
 import nars.Task;
@@ -17,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -34,11 +36,16 @@ public class FocusedExecutioner extends Executioner {
     final int MAX_TASKS = 64;
     final int MAX_CONCEPTS = 64;
 
-    final CurveBag<ITask> premises = new CurveBag<ITask>(Param.taskMerge /* TODO make separate premise merge param */, new ConcurrentHashMap<>(), MAX_PREMISES);
+    final Random random = new XorShift128PlusRandom(1);
 
-    final CurveBag<ITask> tasks = new CurveBag<ITask>(Param.taskMerge, new ConcurrentHashMap<>(), MAX_TASKS);
+    final CurveBag<ITask> premises = new CurveBag<ITask>(Param.taskMerge /* TODO make separate premise merge param */,
+            new ConcurrentHashMap<>(), random, MAX_PREMISES);
 
-    public final CurveBag<ITask> concepts = new CurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(), MAX_CONCEPTS);
+    final CurveBag<ITask> tasks = new CurveBag<ITask>(Param.taskMerge, new ConcurrentHashMap<>(),
+            random, MAX_TASKS);
+
+    public final CurveBag<ITask> concepts = new CurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(),
+            random, MAX_CONCEPTS);
 
     int subcycles = 16;
     int subCycleTasks = 16;

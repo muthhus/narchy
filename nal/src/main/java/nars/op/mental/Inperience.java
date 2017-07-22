@@ -135,7 +135,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
 
     public Inperience(@NotNull NAR n, float rate, int capacity) {
         super(
-            new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), capacity), rate, n
+            new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), n.random(), capacity), rate, n
         );
         this.nar = n;
 

@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.*;
@@ -67,10 +68,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         int v = t.volume();
         if (v < 16) {
             Map sharedMap = newBagMap(v);
+            Random rng = nar.random();
             @NotNull Bag<Term, PriReference<Term>> termbag =
-                    new CurveBag<>(Param.termlinkMerge, sharedMap, 0);
+                    new CurveBag<>(Param.termlinkMerge, sharedMap, rng, 0);
             @NotNull Bag<Task, PriReference<Task>> taskbag =
-                    new CurveBag<>(Param.tasklinkMerge, sharedMap, 0);
+                    new CurveBag<>(Param.tasklinkMerge, sharedMap, rng, 0);
             return new Bag[]{termbag, taskbag};
         } else {
             return new Bag[]{

@@ -63,6 +63,7 @@ import java.util.stream.DoubleStream;
 
 import static java.util.Arrays.stream;
 import static jcog.Texts.iPad;
+import static jcog.Texts.n4;
 
 /**
  *
@@ -1729,7 +1730,7 @@ public enum Util {
         final char[] order = {'a'};
         h.linearBucketValues(linearStep).iterator().forEachRemaining((p)->{
             x.accept(header + " " + (order[0]++) +
-                   "[" + p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
+                   "[" + n4(p.getValueIteratedFrom()) + ".." + n4(p.getValueIteratedTo()) + ']',
                    p.getCountAddedInThisIterationStep());
         });
     }

@@ -1,12 +1,21 @@
 package jcog.tensor;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.AbstractIterator;
+import jcog.Texts;
 import jcog.util.FloatFloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
+import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
 
+import java.util.Iterator;
 import java.util.function.Supplier;
 
 public interface Tensor extends Supplier<float[]> {
+
+    default float[] get() {
+        return snapshot();
+    }
 
     float get(int... cell);
 
@@ -36,7 +45,7 @@ public interface Tensor extends Supplier<float[]> {
 //    ..etc
 
     /**
-     * total # cells
+     * hypervolume, ie total # cells
      */
     default int volume() {
         int[] s = shape();
@@ -91,15 +100,15 @@ public interface Tensor extends Supplier<float[]> {
         });
     }
 
-    default Tensor apply(FloatToFloatFunction f) {
+    default FuncTensor apply(FloatToFloatFunction f) {
         return new FuncTensor(this, f);
     }
 
-    default Tensor add(float v) {
+    default FuncTensor add(float v) {
         return apply((x) -> x + v);
     }
 
-    default Tensor scale(float v) {
+    default FuncTensor scale(float v) {
         return apply((x) -> x * v);
     }
 
@@ -135,6 +144,32 @@ public interface Tensor extends Supplier<float[]> {
         for (int i = 0; i < v; i++) {
             this.set( get(i) + pc.get(i), i );
         }
+    }
+
+    /** produces a string which is separated by tab characters (for .TSV) and each
+     * value is rounded to 4 digits of decimal precision
+     */
+    default String tsv4() {
+        return Joiner.on('\t').join(iterator(Texts::n4));
+    }
+
+    /** produces a string which is separated by tab characters (for .TSV) and each
+     * value is rounded to 2 digits of decimal precision
+     */
+    default String tsv2() {
+        return Joiner.on('\t').join(iterator(Texts::n2));
+    }
+
+    default <X> Iterator<X> iterator(FloatToObjectFunction<X> map) {
+        return new AbstractIterator<X>() {
+            int j = 0;
+            final int limit = volume();
+            @Override
+            protected X computeNext() {
+                if (j == limit) return endOfData();
+                return map.valueOf(get(j++));
+            }
+        };
     }
 
 

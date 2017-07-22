@@ -6,15 +6,17 @@ import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
-import jcog.pri.*;
+import jcog.pri.PLink;
+import jcog.pri.Pri;
+import jcog.pri.PriReference;
+import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import jcog.random.XorShift128PlusRandom;
-import org.HdrHistogram.DoubleHistogram;
+import jcog.tensor.ArrayTensor;
+import jcog.tensor.Tensor;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.*;
@@ -38,8 +40,7 @@ public class BagTest {
     }
 
 
-
-    static void testBasicInsertionRemoval(Bag<String,PriReference<String>> c) {
+    static void testBasicInsertionRemoval(Bag<String, PriReference<String>> c) {
 
 
         assertEquals(1, c.capacity());
@@ -50,7 +51,8 @@ public class BagTest {
 
         //insert an item with (nearly) zero budget
         PLink x0 = new PLink("x", 2 * Pri.EPSILON);
-        PriReference added = c.put(x0); assertSame(added, x0);
+        PriReference added = c.put(x0);
+        assertSame(added, x0);
         c.commit();
 
         assertEquals(1, c.size());
@@ -87,8 +89,8 @@ public class BagTest {
     public void testSort() {
         PLinkArrayBag a = new PLinkArrayBag(4, plus, new HashMap<>(4));
 
-        a.put(new PLink("x",0.1f));
-        a.put(new PLink("y",0.2f));
+        a.put(new PLink("x", 0.1f));
+        a.put(new PLink("y", 0.2f));
 
         a.commit(null);
 
@@ -102,7 +104,7 @@ public class BagTest {
         a.put(new PLink("x", 0.2f));
 
         a.print();
-        System.out.println( a.listCopy() );
+        System.out.println(a.listCopy());
 
         a.commit();
 
@@ -122,13 +124,17 @@ public class BagTest {
 
         a.put(new PLink("x", 0.1f));
         a.put(new PLink("y", 0.2f));
-        a.commit(null);        a.print(); System.out.println();
+        a.commit(null);
+        a.print();
+        System.out.println();
         assertEquals(2, a.size());
 
-        assertEquals( 0.1f , a.priMin(), 0.01f);
+        assertEquals(0.1f, a.priMin(), 0.01f);
 
         a.put(new PLink("z", 0.05f));
-        a.commit();        a.print(); System.out.println();
+        a.commit();
+        a.print();
+        System.out.println();
         assertEquals(2, a.size());
         assertTrue(a.contains("x") && a.contains("y"));
         assertFalse(a.contains("z"));
@@ -140,7 +146,7 @@ public class BagTest {
         testRemoveByKey(new PLinkArrayBag(2, plus, new HashMap<>(2)));
     }
 
-    public static void testRemoveByKey(Bag<String,PriReference<String>> a) {
+    public static void testRemoveByKey(Bag<String, PriReference<String>> a) {
 
         a.put(new PLink("x", 0.1f));
         a.commit();
@@ -151,12 +157,11 @@ public class BagTest {
         assertEquals(0, a.size());
         assertTrue(a.isEmpty());
         if (a instanceof ArrayBag) {
-            assertTrue(((ArrayBag)a).listCopy().isEmpty());
-            assertTrue(((ArrayBag)a).keySet().isEmpty());
+            assertTrue(((ArrayBag) a).listCopy().isEmpty());
+            assertTrue(((ArrayBag) a).keySet().isEmpty());
         }
 
     }
-
 
 
     public static Random rng() {
@@ -205,13 +210,19 @@ public class BagTest {
     }
 
 
+    public static Tensor samplingPriDist(@NotNull Bag b, int batches, int batchSize, int bins) {
 
-    @NotNull public static DoubleHistogram samplingPriDistribution(@NotNull Bag b, int n) {
-        DoubleHistogram d = new DoubleHistogram(3);
+        assert(bins > 1);
+
+        ArrayTensor f = new ArrayTensor(bins);
+        //DoubleHistogram d = new DoubleHistogram(5);
         assertFalse(b.isEmpty());
-        b.sample(n, (Consumer) x ->  d.recordValue(b.pri(x)) );
-        assertEquals(n, d.getTotalCount() );
-        return d;
+        for (int i = 0; i < batches; i++) {
+            b.sample(batchSize, (Consumer) x -> f.data[Util.bin(b.pri(x), bins)]++ /*d.recordValue(b.pri(x)*/);
+        }
+        int total = batches * batchSize;
+        assertEquals(total, Util.sum(f.data), 0.001f);
+        return f.scale(1f / total);
     }
 
 
@@ -265,9 +276,9 @@ public class BagTest {
 
     }
 
-    public static void testPutMinMaxAndUniqueness(Bag<Integer,PriReference<Integer>> a) {
+    public static void testPutMinMaxAndUniqueness(Bag<Integer, PriReference<Integer>> a) {
         float pri = 0.5f;
-        int n = a.capacity()*16; //insert enough to fully cover all slots. strings have bad hashcode when input iteratively so this may need to be a high multiple
+        int n = a.capacity() * 16; //insert enough to fully cover all slots. strings have bad hashcode when input iteratively so this may need to be a high multiple
 
 
         for (int i = 0; i < n; i++) {
@@ -293,14 +304,14 @@ public class BagTest {
 
     @NotNull
     public CurveBag<PLink<String>> curveBag(int n, PriMerge mergeFunction) {
-        return new CurveBag(mergeFunction, new HashMap<>(n), n);
+        return new CurveBag(mergeFunction, new HashMap<>(n), new XorShift128PlusRandom(1), n);
     }
 
-    public static void populate(Bag<String,PriReference<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float qua) {
+    public static void populate(Bag<String, PriReference<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float qua) {
         populate(b, rng, count, dimensionality, minPri, maxPri, qua, qua);
     }
 
-    public static void populate(Bag<String,PriReference<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float minQua, float maxQua) {
+    public static void populate(Bag<String, PriReference<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float minQua, float maxQua) {
         float dPri = maxPri - minPri;
         for (int i = 0; i < count; i++) {
             b.put(new PLink(
@@ -313,10 +324,10 @@ public class BagTest {
     }
 
 
+    @Test
+    public void testCurveBagDistribution() {
 
-    @Test public void testDistribution() {
-
-        int cap = 32;
+        int cap = 64;
 
         CurveBag<PLink<String>> bag = curveBag(cap, PriMerge.plus);
 
@@ -324,23 +335,36 @@ public class BagTest {
 
         //bag.forEach(System.out::println);
 
+        Tensor f3 = samplingPriDist(bag, cap / 2, 4, 5);
 
-        sample(cap, bag, cap / 2);
-        sample(cap, bag, cap * 2);
-        sample(cap, bag, cap * 100);
+        Tensor f2 = samplingPriDist(bag, cap * 2, 4, 5);
 
-//        @NotNull DoubleHistogram h2 = samplingPriDistribution(bag, cap * 2);
-//        System.out.println(h1);
-//
-//        @NotNull DoubleHistogram h3 = samplingPriDistribution(bag, cap * 4);
-//        System.out.println(h1);
+
+        {
+            int batches = cap * 100;
+            int batchSize = 4;
+            Tensor f1 = samplingPriDist(bag, batches, batchSize, 10);
+            String h = "cap=" + cap + " samples=" + (batches * batchSize);
+            System.out.println(h + ":\n\t" + f1.tsv2());
+            System.out.println();
+
+            float[] ff = f1.get();
+
+            //monotonically increasing
+            for (int j = 0; j < ff.length; j++) {
+                for (int i = 0; i < j - 1; i++) {
+                    assertTrue(ff[j] > ff[i]);
+                }
+            }
+
+        }
+
 
         //TODO verify the histogram resulting from the above execution is relatively flat:
         //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
         //the tests below assume that it begins with a relatively flat distribution
 //        System.out.println(Arrays.toString(bag.priHistogram(4)));
 //        System.out.println(Arrays.toString(bag.priHistogram(8)));
-
 
 
 //        System.out.print("Sampling: " );
@@ -354,23 +378,21 @@ public class BagTest {
 
     }
 
-    static void sample(int cap, CurveBag<PLink<String>> bag, int s) {
-        @NotNull DoubleHistogram h1 = samplingPriDistribution(bag, s);
-        Util.decode(h1, "cap=" + cap + " samples=" + s,
-                0.1, (k, v) -> System.out.println(k + " " + v));
-    }
-
-    /** fill it exactly to capacity */
-    private void fillLinear(Bag<PLink<String>,PLink<String>> bag) {
+    /**
+     * fill it exactly to capacity
+     */
+    static void fillLinear(Bag<PLink<String>, PLink<String>> bag) {
         assertTrue(bag.isEmpty());
         int c = bag.capacity();
         for (int i = 0; i < c; i++) {
-            bag.put(new PLink("x" + i, ((float)(i+1)/c) ));
+            float a = (float) (i) / c;
+            float b = (float) (i + 1) / c;
+            bag.put(new PLink("x" + i, (a+b)/2f)); //midpoint
         }
         bag.commit();
         assertEquals(c, bag.size());
-        assertEquals(1f/c, bag.priMin(), 0.001f);
-        assertEquals(1, bag.priMax(), 0.001f); //no pressure should have been applied because capacity was only reached after the last put
+        assertEquals(0.5f / c, bag.priMin(), 0.001f);
+        assertEquals(1 - 1f/(c*2f), bag.priMax(), 0.001f); //no pressure should have been applied because capacity was only reached after the last put
     }
 
 

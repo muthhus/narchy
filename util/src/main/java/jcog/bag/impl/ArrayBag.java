@@ -251,15 +251,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     }
 
 
-    /**
-     * iterates in sorted order, descending
-     */
-    @NotNull
-    @Override
-    public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each) {
-        sample(each, 0);
-        return this;
-    }
+
 
 //    @Override
 //    public Bag<X, Y> sample(int max, Consumer<? super Y> each) {
@@ -313,18 +305,31 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         return ThreadLocalRandom.current();
     }
 
+
+    /** size > 0 */
+    protected int sampleStart(int size) {
+        if (size == 1) return 0;
+        else
+            return random().nextInt(size);
+    }
+
     /**
-     * @param each
-     * @param startingIndex if negative, a random starting location is used
+     * chooses a starting index randomly then iterates descending the list
+     * of items. if the sampling is not finished it restarts
+     * at the top of the list. so for large amounts of samples
+     * it will be helpful to call this in batches << the size of the bag.
      */
-    protected void sample(@NotNull Bag.BagCursor<? super Y> each, int startingIndex) {
-        int i = startingIndex;
-        if (i < 0) {
-            int s = size();
-            if (s == 0) return;
-            else if (s == 1) i = 0;
-            else i = random(s);
-        }
+    @NotNull
+    @Override
+    public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each) {
+
+        int s = size();
+        if (s == 0) return this;
+
+        final Object[] ii = items.array();
+        if (ii.length == 0) return this; //to be safe
+
+        int i = sampleStart(s);
 
         BagSample next = BagSample.Next;
 
@@ -332,7 +337,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         sampled items will be limited to the current array.  if the array has resized by
         an insertion from another thread, it will not be available in this sampling
          */
-        final Object[] ii = items.array();
 
         int nulls = 0; //# of nulls encountered. when this reaches the array length we know it is empty
         while (!next.stop && nulls < ii.length) {
@@ -362,6 +366,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 //        if (modified) {
 //            commit(null);
 //        }
+        return this;
     }
 
 //    @Override
@@ -551,13 +556,17 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         for (int i = s - 1; i >= 0; ) {
             Y b = (Y) l[i];
 
-            float p = (b != null) ? b.priSafe(-2) : -2; //sort nulls to the end of the end
-
-            if (p >= 0) { //Bag.active(p) semantics
-                each.accept(b);
+            float p;
+            if (b == null) {
+                p = -2; //sort nulls to the end of the end
+            } else {
+                p = b.priSafe(-2);
+                if (p >= 0) {
+                    each.accept(b);
+                }
             }
 
-            if (pBelow - b.priSafe(-2) >= Priority.EPSILON) {
+            if (pBelow - p >= Priority.EPSILON) {
                 sorted = false;
             }
 

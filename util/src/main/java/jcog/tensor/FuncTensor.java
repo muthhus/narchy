@@ -1,23 +1,52 @@
 package jcog.tensor;
 
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
+import org.eclipse.collections.api.block.procedure.primitive.IntFloatProcedure;
 
-public class FuncTensor extends BatchArrayTensor {
+/** view applying a specified function to each element */
+public class FuncTensor implements Tensor {
 
-    private final FloatToFloatFunction func;
+    public final FloatToFloatFunction func;
     private final Tensor from;
 
     public FuncTensor(Tensor from, FloatToFloatFunction func) {
-        super(from.shape());
         this.from = from;
         this.func = func;
     }
 
+    @Override
+    public float get(int... cell) {
+        return func.valueOf(from.get(cell));
+    }
 
     @Override
-    public void update() {
-        from.get();
-        from.writeTo(func, data);//trigger any updates but using the iterator HACK, not:
+    public float get(int linearCell) {
+        return func.valueOf(from.get(linearCell));
+    }
+
+    @Override
+    public int index(int... cell) {
+        return from.index(cell);
+    }
+
+    @Override
+    public float[] snapshot() {
+        float[] x = from.snapshot();
+        for (int i = 0; i < x.length; i++)
+            x[i] = func.valueOf(x[i]);
+        return x;
+    }
+
+    @Override
+    public int[] shape() {
+        return from.shape();
+    }
+
+    @Override
+    public void forEach(IntFloatProcedure sequential, int start, int end) {
+        from.forEach((i,v) -> {
+            sequential.value(i, func.valueOf(v));
+        }, start, end);
     }
 
 }

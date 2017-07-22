@@ -7,19 +7,44 @@ import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
+import java.util.Random;
 
 /**
  * ArrayBag with a randomized sampling range
  */
 public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
 
-    public CurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, int initialCapacity) {
-        super(mergeFunction, map, initialCapacity);
+    private final Random random;
+
+    public CurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, Random rng, int cap) {
+        this(mergeFunction, map, rng);
+        setCapacity(cap);
     }
 
 
+    public CurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, Random rng) {
+        super(mergeFunction, map);
+        this.random = rng;
+    }
 
-//    /** optimized point sample impl */
+    @Override
+    protected int sampleStart(int size) {
+        if (size == 1)
+            return 0;
+        else {
+            float i = random.nextFloat(); //uniform
+            i *= i; //curve: i^2
+            return Math.round(i * (size - 1));
+        }
+    }
+
+    @Override
+    protected Random random() {
+        return random;
+    }
+
+
+    //    /** optimized point sample impl */
 //    @Nullable
 //    @Override public PriReference<X> sample() {
 //        Object[] ii = items.array();
@@ -41,11 +66,5 @@ public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
 //        return null;
 //    }
 
-    @NotNull
-    @Override
-    public Bag<X, X> sample(@NotNull Bag.BagCursor<? super X> each) {
-        sample(each, -1);
-        return this;
-    }
 
 }
