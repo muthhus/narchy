@@ -54,7 +54,7 @@ public class NAL7DurationTest {
     public void testTemporalIntersection() throws Narsese.NarseseException {
 
         //this.activeTasks = activeTasks;
-        NAR n = new NARS().get();
+        NAR n = NARS.tmp();
 
         //n.log();
         n.inputAt( 0,"a:x. :|:");

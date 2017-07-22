@@ -115,9 +115,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
         int additional = (toAdd != null) ? 1 : 0;
 
+
+
         int s = size();
-
-
         int nextSize = s + additional;
 
         int needsRemoved = nextSize - c;
@@ -158,10 +158,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
                 if (trash == null) {
                     trash = new FasterList<>();
-                    trash.add(removed);
-                } else
-                    trash.add(removed);
+                }
 
+                trash.add(removed);
             }
         }
 
@@ -197,7 +196,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             int[] stack = new int[sortSize(s) /* estimate */];
             qsort(stack, il, 0 /*dirtyStart - 1*/, (s - 1));
             max = ((Y) (il[0])).priSafe(0);
-            min = ((Y) (il[s - 1])).priSafe(0);
+            Y lowest = (Y) (il[s - 1]);
+            if (lowest == null)
+                throw new NullPointerException();
+            min = lowest.priSafe(0);
         } else {
             this.min = this.max = ((Y) (il[0])).priSafe(0);
         }
@@ -431,7 +433,13 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         return this;
     }
 
-//    @Override
+    @Nullable @Override public Y remove(@NotNull X x) {
+        synchronized (items) {
+            return super.remove(x);
+        }
+    }
+
+    //    @Override
 //    public final void putAsync(@NotNull Y b) {
 //        toPut.accept(b);
 //    }

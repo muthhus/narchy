@@ -189,7 +189,7 @@ public class Premise extends Pri implements ITask {
 
         //System.out.println(task + "\t" + beliefTerm + " ::: \t" + belief);
 
-        d.run(this, task, belief, beliefTerm, priElseZero(), ttlMax );
+        d.run(this, task, belief, beliefTerm, ttlMax );
 
 //        long ds = d.transformsCache.estimatedSize();
 //        if (ds >0)

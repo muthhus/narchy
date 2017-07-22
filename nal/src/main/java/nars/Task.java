@@ -333,10 +333,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     @Nullable
     default TaskConcept concept(@NotNull NAR n, boolean conceptualize) {
         Concept c = conceptualize ? n.conceptualize(term()) : n.concept(term());
-        if (c instanceof TaskConcept)
+        if (c!=null)
             return ((TaskConcept) c);
-        else
-            return null;
+
+        return null;
 //        if (!(c instanceof TaskConcept)) {
 //            throw new InvalidTaskException
 //                    //System.err.println

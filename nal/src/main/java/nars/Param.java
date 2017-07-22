@@ -34,8 +34,8 @@ public abstract class Param  {
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 2;
 
-    public static final PriMerge termlinkMerge = PriMerge.or;
-    public static final PriMerge tasklinkMerge = PriMerge.or; //not safe to plus without enough headroom
+    public static final PriMerge termlinkMerge = PriMerge.max;
+    public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptMerge = PriMerge.plus;
 
@@ -68,6 +68,11 @@ public abstract class Param  {
     /** cost of a failed/aborted task derivation */
     public static final int TTL_DERIVE_TASK_FAIL = 1;
 
+    /** number between 0 and 1 controlling the proportion of activation going
+     * forward (compound to subterms) vs. reverse (subterms to parent compound).
+     * when calculated, the total activation will sum to 1.0.
+     * so 0.5 is equal amounts for both. */
+    public static final float TERMLINK_BALANCE = 0.5f;
 
 
 

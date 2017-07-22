@@ -588,6 +588,7 @@ public enum Op implements $ {
     public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
 
     final static Logger logger = LoggerFactory.getLogger(Op.class);
+    public final boolean conceptualizable;
 
 //    public interface TermInstancer {
 //
@@ -859,6 +860,7 @@ public enum Op implements $ {
                 allowsBool = false;
                 break;
         }
+        conceptualizable= !(var || virtual || str.equals("+") /* INT */);
     }
 
     public static boolean hasAll(int existing, int possiblyIncluded) {

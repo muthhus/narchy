@@ -196,11 +196,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             long start = occ[0];
             long end = occ[1];
-            if (start != ETERNAL && end < start) { //why?
-                long s = start;
-                start = end;
-                end = s; //swap
-            }
+            assert(end >= start);
 
             float priority = d.premisePri; //d.budgeting.budget(d, C, truth, punc, start, end);
             assert(priority == priority);

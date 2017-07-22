@@ -43,10 +43,11 @@ public interface Deriver {
         switch (level) {
             case 8:
             case 7:
-                files.add("induction.nal");
+                //TODO move temporal induction to a separate file
                 //fallthru
             case 6:
             case 5:
+                files.add("induction.nal");  //TODO nal6 only needs general induction, not the temporal parts
                 files.add("nal6.nal");
                 //fallthru
             case 4:

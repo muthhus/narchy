@@ -99,7 +99,7 @@ public class ActivateTest {
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {
         NAR n = NARS.tmp(1);
         n.believe(term + ".");
-        Activate a = new Activate(n.concept($(term)), 0.5f);
+        Activate a = new Activate(n.conceptualize($(term)), 0.5f);
         Termed[] t = a.templates(a.id, n);
         assertEquals(expect, Arrays.toString(t));
     }

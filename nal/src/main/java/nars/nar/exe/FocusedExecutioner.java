@@ -3,10 +3,7 @@ package nars.nar.exe;
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.list.FasterList;
-import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import jcog.random.XorShift128PlusRandom;
-import nars.$;
 import nars.Param;
 import nars.Task;
 import nars.control.Activate;
@@ -33,7 +30,7 @@ import java.util.function.Predicate;
 public class FocusedExecutioner extends Executioner {
 
     final int MAX_PREMISES = 64;
-    final int MAX_TASKS = 64;
+    final int MAX_TASKS = 256;
     final int MAX_CONCEPTS = 64;
 
     final Random random = new XorShift128PlusRandom(1);
@@ -47,10 +44,10 @@ public class FocusedExecutioner extends Executioner {
     public final CurveBag<ITask> concepts = new CurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(),
             random, MAX_CONCEPTS);
 
-    int subcycles = 16;
-    int subCycleTasks = 16;
+    int subCycles = 2;
+    int subCycleTasks = 4;
     int subCycleConcepts = 1;
-    int subCyclePremises = 8;
+    int subCyclePremises = 4;
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
 
@@ -79,7 +76,7 @@ public class FocusedExecutioner extends Executioner {
 
 
 
-        for (int i = 0; i < subcycles; i++) {
+        for (int i = 0; i < subCycles; i++) {
 
             //if (tasks.capacity() <= tasks.size())
 
@@ -117,9 +114,12 @@ public class FocusedExecutioner extends Executioner {
         try {
             x.run(nar);
         } catch (Throwable e) {
-            logger.error("exe {} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
-            x.delete();
-            return;
+            if (Param.DEBUG) {
+                throw e;
+            } else {
+                logger.error("exe {} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
+                x.delete();
+            }
         }
     }
 

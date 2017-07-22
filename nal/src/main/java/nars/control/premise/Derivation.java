@@ -207,13 +207,16 @@ public class Derivation extends Unify implements TermContext {
      * concept-scope
      */
     @NotNull
-    public Derivation cycle(PrediTerm<Derivation> deriver) {
-        this.time = this.nar.time();
-        this.dur = this.nar.dur();
-        this.truthResolution = this.nar.truthResolution.floatValue();
-        this.confMin = Math.max(truthResolution, this.nar.confMin.floatValue());
-        this.deriver = deriver;
-        //transformsCached.cleanUp();
+    public Derivation cycle() {
+        long now = this.nar.time();
+        if (now!=this.time) {
+            this.time =now;
+            this.dur = this.nar.dur();
+            this.truthResolution = this.nar.truthResolution.floatValue();
+            this.confMin = Math.max(truthResolution, this.nar.confMin.floatValue());
+            this.deriver = nar.deriver();
+            //transformsCached.cleanUp();
+        }
         return this;
     }
 
@@ -227,7 +230,7 @@ public class Derivation extends Unify implements TermContext {
      * tasklink/termlink scope
      */
     @NotNull
-    public void run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, float premisePri, int ttl) {
+    public void run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, int ttl) {
 
 
         revert(0); //revert directly
@@ -313,7 +316,7 @@ public class Derivation extends Unify implements TermContext {
             premiseEvidence = (premiseEvidence + beliefTruth.evi());
         this.premiseEvi = premiseEvidence;
 
-        this.premisePri = premisePri;
+        this.premisePri = p.priElseZero();
 
         short[] taskCause = task.cause();
         short[] beliefCause = belief != null ? belief.cause() : ArrayUtils.EMPTY_SHORT_ARRAY;

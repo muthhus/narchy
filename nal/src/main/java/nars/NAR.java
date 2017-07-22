@@ -39,7 +39,9 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
+import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
+import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.DiscreteTruth;
@@ -1269,23 +1271,27 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @Nullable
     private Concept concept(@NotNull Termed x, boolean createIfMissing) {
+        assert(!(x instanceof Bool));
+
+        Term xt;
         if (x instanceof Concept) {
             Concept ct = (Concept) x;
             if (!ct.isDeleted())
                 return ct; //assumes an existing Concept index isnt a different copy than what is being passed as an argument
             //otherwise if it is deleted, continue
+            xt = ct.term();
+        } else {
+
+            if (!(xt = x.unneg()).op().conceptualizable)
+                return null;
         }
 
-        Term y = conceptTerm(x.term());
-        return (y instanceof Bool) ? null : terms.concept(y, createIfMissing);
-    }
+        Term y = x.term().conceptual();
 
-    /**
-     * returns the canonical Concept term for any given Term, or null if it is unconceptualizable
-     */
-    @NotNull
-    public Term conceptTerm(@NotNull Term term) {
-        return term.conceptual();
+        if (y instanceof Bool)
+            throw new RuntimeException("failed to find conceptual root of " + y);
+
+        return terms.concept(y, createIfMissing);
     }
 
 
@@ -1305,6 +1311,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public Stream<Concept> concepts() {
         return terms.stream().filter(t -> t instanceof Concept).map(t -> (Concept)t);
     }
+
     public Stream<TaskConcept> taskConcepts() {
         return terms.stream().filter(t -> t instanceof TaskConcept).map(t -> (TaskConcept)t);
     }
@@ -1674,7 +1681,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     public Derivation derivation() {
-        return derivation.get();
+        return derivation.get().cycle();
     }
 
     /**

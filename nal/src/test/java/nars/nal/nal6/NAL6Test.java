@@ -343,11 +343,12 @@ public class NAL6Test extends AbstractNALTest {
     @Test
     public void variables_introduction()  {
 
-        TestNAR tester = test;
-        tester.believe("<{key1} --> (/,open,_,{lock1})>"); //en("Key-1 opens Lock-1.");
-        tester.believe("<{key1} --> key>"); //en("Key-1 is a key.");
-        tester.mustBelieve(cycles, "<<$1 --> key> ==> <$1 --> (/,open,_,{lock1})>>", 1.00f, 0.45f); //en("I guess every key can open Lock-1.");
-        tester.mustBelieve(cycles, "(&&,<#1 --> (/,open,_,{lock1})>,<#1 --> key>)", 1.00f, 0.81f); //en("Some key can open Lock-1.");
+        test
+            .log()
+            .believe("open({key1},{lock1})") //en("Key-1 opens Lock-1.");
+            .believe("key:{key1}") //en("Key-1 is a key.");
+            .mustBelieve(cycles, "(key:$1 ==> open($1,{lock1}))", 1.00f, 0.45f) //en("I guess every key can open Lock-1.");
+            .mustBelieve(cycles, "(&&,open(#1,{lock1}),key:#1)", 1.00f, 0.81f); //en("Some key can open Lock-1.");
 
     }
 

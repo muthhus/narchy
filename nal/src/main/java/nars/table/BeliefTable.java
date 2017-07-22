@@ -251,7 +251,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         if (novel && relevantTime && question.isQuestOrQuestion() &&
-                nar.conceptTerm(question.term()).equals(beliefConcept)
+                question.term().conceptual().equals(beliefConcept)
             ) {
             nar.input(answer);
         }
