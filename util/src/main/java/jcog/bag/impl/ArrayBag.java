@@ -334,27 +334,29 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
          */
         final Object[] ii = items.array();
 
-        final int nullLimit = ii.length; //hard safety limit: when reached, it means every item available in this sampling has been removed
-        int nulls = 0;
-        while (!next.stop && nulls < nullLimit) {
-            if (i == ii.length) i = 0; //wrap-around
+        int nulls = 0; //# of nulls encountered. when this reaches the array length we know it is empty
+        while (!next.stop && nulls < ii.length) {
             Y x = (Y) ii[i];
 
-            if (x != null/*.remove*/) {
+            if (x != null) {
                 next = each.next(x);
                 if (next.remove) {
-                    remove(key(x));
-                    if (ii[i]!=null)
-                        ii[i] = null; //set it in this array because the remove operation has instead set it in another copy of the array, caused by growth or capacity change (ie. from another thread)
-                    nulls++;
+
+                    //if removed and the bag's array has been changed to a new array while processing:
+                    if (remove(key(x))!= null && items.array() !=ii) {
+                        //set it in this array to not encounter it again
+                        ii[i] = null;
+                        nulls++;
+                    }
                     //modified = true;
+                } else {
+                    nulls = 0; //reset null count
                 }
-                /*if (remove(key(x))!=null)
-                    modified = true;*/
             } else {
                 nulls++;
             }
-            i++;
+
+            if (++i == ii.length) i = 0; //increment with wrap-around
         }
 
 //        if (modified) {

@@ -210,10 +210,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         x.put("belief count", ((double) beliefs.getSum()));
         x.put("goal count", ((double) goals.getSum()));
 
-        Util.toMap(tasklinkCount, "tasklink count", 4, x::put);
+        Util.decode(tasklinkCount, "tasklink count", 4, x::put);
         //x.put("tasklink usage", ((double) tasklinkCount.getTotalCount()) / tasklinksCap.getSum());
         x.put("tasklink count", ((double) tasklinkCount.getTotalCount()));
-        Util.toMap(termlinkCount, "termlink count", 4, x::put);
+        Util.decode(termlinkCount, "termlink count", 4, x::put);
         //x.put("termlink usage", ((double) termlinkCount.getTotalCount()) / termlinksCap.getSum());
         x.put("termlink count", ((double) termlinkCount.getTotalCount()));
 
@@ -240,7 +240,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         //Util.toMap(rootOp, "concept op", x::put);
 
-        Util.toMap(volume, "concept volume", 4, x::put);
+        Util.decode(volume, "concept volume", 4, x::put);
 
         //Util.toMap( clazz, "concept class", x::put);
 

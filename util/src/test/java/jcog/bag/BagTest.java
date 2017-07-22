@@ -1,5 +1,6 @@
 package jcog.bag;
 
+import jcog.Util;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.PLinkArrayBag;
@@ -315,22 +316,24 @@ public class BagTest {
 
     @Test public void testDistribution() {
 
-        int n = 32;
+        int cap = 32;
 
-        CurveBag<PLink<String>> bag = curveBag(n, PriMerge.plus);
+        CurveBag<PLink<String>> bag = curveBag(cap, PriMerge.plus);
 
         fillLinear(bag);
 
         //bag.forEach(System.out::println);
 
-        @NotNull DoubleHistogram h1 = samplingPriDistribution(bag, n / 2);
-        System.out.println(h1);
 
-        @NotNull DoubleHistogram h2 = samplingPriDistribution(bag, n * 2);
-        System.out.println(h1);
+        sample(cap, bag, cap / 2);
+        sample(cap, bag, cap * 2);
+        sample(cap, bag, cap * 100);
 
-        @NotNull DoubleHistogram h3 = samplingPriDistribution(bag, n * 4);
-        System.out.println(h1);
+//        @NotNull DoubleHistogram h2 = samplingPriDistribution(bag, cap * 2);
+//        System.out.println(h1);
+//
+//        @NotNull DoubleHistogram h3 = samplingPriDistribution(bag, cap * 4);
+//        System.out.println(h1);
 
         //TODO verify the histogram resulting from the above execution is relatively flat:
         //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
@@ -349,6 +352,12 @@ public class BagTest {
 //        List<SummaryStatistics> l = pri.getBinStats();
 //        assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());
 
+    }
+
+    static void sample(int cap, CurveBag<PLink<String>> bag, int s) {
+        @NotNull DoubleHistogram h1 = samplingPriDistribution(bag, s);
+        Util.decode(h1, "cap=" + cap + " samples=" + s,
+                0.1, (k, v) -> System.out.println(k + " " + v));
     }
 
     /** fill it exactly to capacity */

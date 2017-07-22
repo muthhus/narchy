@@ -1717,7 +1717,7 @@ public enum Util {
     }
 
 
-    public static void toMap(AbstractHistogram h, String header, int linearStep, BiConsumer<String, Object> x) {
+    public static void decode(AbstractHistogram h, String header, int linearStep, BiConsumer<String, Object> x) {
         int digits = (int) (1+Math.log10(h.getMaxValue())); //pad leading number for lexicographic / ordinal coherence
         h.linearBucketValues(linearStep).iterator().forEachRemaining((p)->{
             x.accept(header + " [" +
@@ -1725,16 +1725,16 @@ public enum Util {
                    p.getCountAddedInThisIterationStep());
         });
     }
-    public static void toMap(DoubleHistogram h, String header, int linearStep, BiConsumer<String, Object> x) {
+    public static void decode(DoubleHistogram h, String header, double linearStep, BiConsumer<String, Object> x) {
         final char[] order = {'a'};
         h.linearBucketValues(linearStep).iterator().forEachRemaining((p)->{
-            x.accept(header + " " + (order[0]++) + "[" +
-                   p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
+            x.accept(header + " " + (order[0]++) +
+                   "[" + p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
                    p.getCountAddedInThisIterationStep());
         });
     }
 
-    public static void toMapPercentile(AbstractHistogram h, String header, BiConsumer<String, Object> x) {
+    public static void decodePercentile(AbstractHistogram h, String header, BiConsumer<String, Object> x) {
         h.percentiles(1).iterator().forEachRemaining(p -> {
            x.accept(header + " [" +
                    p.getValueIteratedFrom() + ".." + p.getValueIteratedTo() + ']',
