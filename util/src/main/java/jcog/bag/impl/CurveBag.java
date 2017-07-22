@@ -43,7 +43,7 @@ public class CurveBag<X> extends PriArrayBag<X> {
     @NotNull
     @Override
     public Bag<X, PriReference<X>> sample(@NotNull Bag.BagCursor<? super PriReference<X>> each) {
-        sample(each, -1, false);
+        sample(each, -1);
         return this;
     }
 

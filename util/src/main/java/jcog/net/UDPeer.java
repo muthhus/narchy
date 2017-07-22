@@ -252,7 +252,7 @@ public class UDPeer extends UDP {
                 if (o.id() != to.id /*&& (pri >= 1 || rng.nextFloat() <= pri)*/ ) {
                     outBytes(bytes, to.addr);
                 }
-                return ((remain[0]--) > 0) ? Bag.BagCursorAction.Next : Bag.BagCursorAction.Stop;
+                return ((remain[0]--) > 0) ? Bag.BagSample.Next : Bag.BagSample.Stop;
             });
             return remain[0];
 

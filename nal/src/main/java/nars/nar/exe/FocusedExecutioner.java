@@ -1,11 +1,9 @@
 package nars.nar.exe;
 
-import com.google.common.collect.MinMaxPriorityQueue;
-import jcog.bag.impl.ArrayBag;
+import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.PriArrayBag;
 import jcog.pri.PLink;
-import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
@@ -14,18 +12,21 @@ import nars.Task;
 import nars.control.Activate;
 import nars.control.Premise;
 import nars.task.ITask;
+import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-/** uses 3 bags/priority queues for a controlled, deterministic
- *  selection policy
- *       pending inputs
- *       pending premises
- *       activations
- *
+/**
+ * uses 3 bags/priority queues for a controlled, deterministic
+ * selection policy
+ * pending inputs
+ * pending premises
+ * activations
  */
 public class FocusedExecutioner extends Executioner {
 
@@ -41,41 +42,66 @@ public class FocusedExecutioner extends Executioner {
 
     int subcycles = 1;
 
+    final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
+
     @Override
     public void cycle(@NotNull NAR nar) {
 
-        //System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());
+        System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());
 
         tasks.commit();
         premises.commit();
         concepts.commit();
 
+        if (tasks.isEmpty())
+            logger.warn("no tasks");
+        if (concepts.isEmpty())
+            logger.warn("no concepts");
+
         List<ITask> next = $.newArrayList();
+
+        Consumer<? super PriReference<ITask>> queueTask = x -> next.add(x.get());
+
         for (int i = 0; i < subcycles; i++) {
-            Consumer<? super PriReference<ITask>> queueTask = x -> next.add(x.get());
 
             //if (tasks.capacity() <= tasks.size())
-                tasks.pop(1, queueTask);
-            //else
-                //tasks.sample(1, queueTask);
+            final int[] maxTasks = {1};
+            tasks.sample((x) -> {
+                NALTask tt = (NALTask) x.get();
+                next.add(tt);
+                boolean save = tt.isInput();
+                return --maxTasks[0] > 0 ?
+                        (save ? Bag.BagSample.Next : Bag.BagSample.Remove)
+                        :
+                        (save ? Bag.BagSample.Stop : Bag.BagSample.RemoveAndStop);
+            });
+
+            execute(next);
 
             concepts.sample(1, (Consumer) queueTask);
 
+            execute(next);
+
             premises.pop(1, queueTask);
 
-            Consumer<Premise> runPremise = x -> x.run(nar.derivation(), nar.matchTTL.intValue());
+            execute(next);
+        }
+    }
 
-            if (!next.isEmpty()) {
-                next.forEach(t -> {
-                    if (t instanceof Premise) {
-                        runPremise.accept((Premise) t);
-                    } else {
-                        t.run(nar);
-                    }
-                });
-                next.clear();
-            }
+    public void execute(List<ITask> next) {
+        if (!next.isEmpty()) {
+            next.forEach(this::execute);
+            next.clear();
+        }
+    }
 
+    protected void execute(ITask x) {
+        try {
+            x.run(nar);
+        } catch (Throwable e) {
+            logger.error("exe {} {}", x, e /*(Param.DEBUG) ? e : e.getMessage()*/);
+            x.delete();
+            return;
         }
     }
 

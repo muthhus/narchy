@@ -258,8 +258,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      */
     @NotNull
     @Override
-    public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each, boolean pop) {
-        sample(each, 0, pop);
+    public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each) {
+        sample(each, 0);
         return this;
     }
 
@@ -319,7 +319,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      * @param each
      * @param startingIndex if negative, a random starting location is used
      */
-    protected void sample(@NotNull Bag.BagCursor<? super Y> each, int startingIndex, boolean pop) {
+    protected void sample(@NotNull Bag.BagCursor<? super Y> each, int startingIndex) {
         int i = startingIndex;
         if (i < 0) {
             int s = size();
@@ -330,7 +330,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         }
 
         //boolean modified = false;
-        BagCursorAction next = BagCursorAction.Next;
+        BagSample next = BagSample.Next;
 
         int count = 0;
         int c = capacity();
@@ -341,14 +341,14 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             Y x = get(i++);
 
             if (x != null/*.remove*/) {
-                if (pop) {
+                next = each.next(x);
+                if (next.remove) {
                     x = remove(key(x));
                     if (x == null)
                         continue;
                     //modified = true;
                 }
 
-                next = each.next(x);
                 ss++;
                 /*if (remove(key(x))!=null)
                     modified = true;*/

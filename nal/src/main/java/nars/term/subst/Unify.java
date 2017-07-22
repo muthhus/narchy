@@ -92,8 +92,8 @@ public abstract class Unify extends Versioning implements Subst {
      * @param random
      * @param versioning
      */
-    protected Unify(TermIndex terms, @Nullable Op type, Random random, int initialCap, int ttl) {
-        super(initialCap, ttl);
+    protected Unify(TermIndex terms, @Nullable Op type, Random random, int stackMax, int initialTTL) {
+        super(stackMax, initialTTL);
 
         this.terms = terms;
 

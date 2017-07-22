@@ -21,7 +21,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static jcog.bag.Bag.BagCursorAction.Next;
+import static jcog.bag.Bag.BagSample.*;
 
 
 /**
@@ -30,21 +30,20 @@ import static jcog.bag.Bag.BagCursorAction.Next;
 public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
 
-
-
-
-    enum BagCursorAction {
-        Next(/*false, */false),
-        //Remove(true, false),
-        Stop(/*false, */true)
-        //RemoveAndStop(true, true)
+    /** action returned from bag sampling visitor indicating what to do with the current
+     * item  */
+    enum BagSample {
+        Next(false, false),
+        Remove(true, false),
+        Stop(false, true),
+        RemoveAndStop(true, true)
         ;
 
-        //public boolean remove;
+        public boolean remove;
         public boolean stop;
 
-        BagCursorAction(/*boolean remove, */boolean stop) {
-            //this.remove = remove;
+        BagSample(boolean remove, boolean stop) {
+            this.remove = remove;
             this.stop = stop;
         }
     }
@@ -54,7 +53,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      */
     @FunctionalInterface
     interface BagCursor<V> {
-        @NotNull BagCursorAction next(@NotNull V x);
+        /*@NotNull */BagSample next(/*@NotNull*/ V x); //@NotNull's removed for max speed, but kept here as reference
     }
 
     /**
@@ -72,7 +71,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         Object[] result = new Object[1];
         sample((x) -> {
             result[0] = x;
-            return BagCursorAction.Stop;
+            return Stop;
         });
         return (V) result[0];
     }
@@ -120,9 +119,9 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
 
     /* sample the bag, optionally removing each visited element as decided by the visitor's
-     * return value */
-    @NotNull Bag<K, V> sample(@NotNull Bag.BagCursor<? super V> each, boolean pop);
-    default @NotNull Bag<K, V> sample(@NotNull Bag.BagCursor<? super V> each) { return sample(each, false); }
+     * returned value */
+    @NotNull Bag<K, V> sample(/*@NotNull */Bag.BagCursor<? super V> each);
+
 
     default List<V> copyToList(int n) {
         if (n == 0)
@@ -168,7 +167,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         final int[] count = {max};
         return sample((x) -> {
             return (kontinue.test(x) && ((count[0]--) > 0)) ?
-                    Next : Bag.BagCursorAction.Stop;
+                    Next : Stop;
         });
     }
 
@@ -188,8 +187,8 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         final int[] count = {max};
         return sample(x -> {
             each.accept(x);
-            return ((count[0]--) > 0) ? Next : Bag.BagCursorAction.Stop;
-        }, pop);
+            return ((count[0]--) > 0) ? (pop ? Remove : Next) : (pop ? RemoveAndStop : Stop);
+        });
     }
     @Nullable
     default V maxBy(FloatFunction<V> rank) {
@@ -591,7 +590,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
         @NotNull
         @Override
-        public Bag sample(@NotNull Bag.BagCursor each, boolean pop) {
+        public Bag sample(@NotNull Bag.BagCursor each) {
             return this;
         }
 

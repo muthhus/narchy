@@ -7,6 +7,7 @@ import java.util.Collection;
 
 /**
  * versioning context that holds versioned instances
+ * a maximum stack size is provided at construction and will not be exceeded
  */
 public class Versioning<X> extends
         //FastList<Versioned<X>> {
@@ -14,9 +15,10 @@ public class Versioning<X> extends
 
     public int ttl;
 
-    public Versioning(int capacity, int ttl) {
-        super(0, new Versioned[capacity]);
-        this.ttl = ttl;
+    public Versioning(int stackMax, int initialTTL) {
+        super(0, new Versioned[stackMax]);
+        assert(stackMax > 0);
+        setTTL(initialTTL);
     }
 
     @NotNull
@@ -69,7 +71,7 @@ public class Versioning<X> extends
     @Override
     public final boolean add(@NotNull Versioned<X> newItem) {
         Versioned<X>[] ii = this.items;
-        if (tick() && ii.length < this.size) {
+        if (tick() && ii.length > this.size) {
             ii[this.size++] = newItem; //cap
             return true;
         }

@@ -15,7 +15,7 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static jcog.bag.Bag.BagCursorAction.Next;
+import static jcog.bag.Bag.BagSample.Next;
 
 /** experimental implementation backed by a TinyCountingTable and a circular array of items */
 public class BloomBag<X> implements Bag<X,PriReference<X>> {
@@ -123,15 +123,15 @@ public class BloomBag<X> implements Bag<X,PriReference<X>> {
 
     @NotNull
     @Override
-    public Bag<X, PriReference<X>> sample(@NotNull Bag.BagCursor<? super PriReference<X>> each, boolean pop) {
+    public Bag<X, PriReference<X>> sample(@NotNull Bag.BagCursor<? super PriReference<X>> each) {
         Iterator<X> ii = list.iterator();
-        BagCursorAction next = Next;
+        BagSample next = Next;
         while (next==Next && ii.hasNext()) {
             X x = ii.next();
             if (x!=null) {
                 next = each.next(get(x));
             }
-            if (pop || x == null) ii.remove();
+            if (next.remove || x == null) ii.remove();
         }
         return this;
     }

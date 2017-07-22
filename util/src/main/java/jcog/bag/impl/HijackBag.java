@@ -409,13 +409,6 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     @Override
     @NotNull
     public HijackBag<K, V> sample(@NotNull Bag.BagCursor<? super V> each) {
-        return sample(each, false);
-    }
-
-    @Override
-    @NotNull
-    public HijackBag<K, V> sample(@NotNull Bag.BagCursor<? super V> each, boolean pop) {
-
         final int s = size();
         if (s <= 0)
             return this;
@@ -428,18 +421,22 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         final Random random = random();
         int i = random.nextInt(c);
 
-        BagCursorAction next = BagCursorAction.Next;
+        BagSample next = BagSample.Next;
         boolean modified = false;
         int seen = 0;
         while (seen++ < c) {
-            V v = pop ? map.getAndSet(i, null) : map.get(i);
+            V v = map.get(i);
             float p;
             if (v != null && ((p= pri(v))==p /* not deleted*/)) {
                 next = each.next(v);
-                if (pop) {
-                    modified = true;
-                    if (_onRemoved(v) <= 0)
-                        break;
+                if (next.remove) {
+                    if (map.compareAndSet(i, v,null)) {
+                        modified = true;
+                        //else: already removed
+
+                        if (_onRemoved(v) <= 0)
+                            break;
+                    }
                 }
             }
             if (next.stop)
