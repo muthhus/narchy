@@ -128,7 +128,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         if (needsRemoved > 0) {
 
             trash = new FasterList(needsRemoved);
-            min = clean(toAdd!=null, s, nextSize - c, trash);
+            min = clean(toAdd != null, s, nextSize - c, trash);
 
             s = size();
         } else {
@@ -176,7 +176,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     }
 
     private void massAndSort(int s) {
-        assert(s>0);
+        assert (s > 0);
 
         float mass = 0;
         //synchronized (items) {
@@ -191,7 +191,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     }
 
     private void sort(int s) {
-        assert(s>0);
+        assert (s > 0);
         Object[] il = items.list;
         if (s > 1) { //test again
             int[] stack = new int[sortSize(s) /* estimate */];
@@ -461,30 +461,35 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                         return existing; //no change
 
 
-                    boolean atCap = size() == capacity;
+                    int s = size();
+                    boolean atCap = s == capacity;
                     float priBefore = (atCap ? existing.priElseZero() : -1 /* dont care */);
                     float oo = mergeFunction.merge((Priority) existing /* HACK */, incoming);
 
-                    if (overflow!=null)
+                    if (overflow != null)
                         overflow.add(oo);
 
-                    if (atCap) {
-                        float delta = existing.priElseZero() - priBefore;
-                        if (delta >= Pri.EPSILON)
+                    float delta = existing.priElseZero() - priBefore;
+                    if (delta >= Pri.EPSILON) {
+                        if (atCap) {
                             pressurize(delta);
+                        }
+                        massAndSort(s);
                     }
                     return existing;
 
                 } else {
 
 
+                    if (size() == capacity)
                         pressurize(p);
-                        @Nullable FasterList<Y> trsh = update(incoming);
-                        if (trsh != null) {
-                            trash[0] = trsh;
-                            if (trsh.getLast() == incoming)
-                                return null;
-                        }
+
+                    @Nullable FasterList<Y> trsh = update(incoming);
+                    if (trsh != null) {
+                        trash[0] = trsh;
+                        if (trsh.getLast() == incoming)
+                            return null;
+                    }
 
                     return incoming; //success
                 }
@@ -604,7 +609,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                     trash = update(null);
                 }
 
-                boolean needsSort = trash!=null;
+                boolean needsSort = trash != null;
                 if (update != null) {
                     needsSort |= !updateBudget(update);
                 }
