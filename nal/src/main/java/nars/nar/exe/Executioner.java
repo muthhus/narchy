@@ -11,7 +11,18 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
-
+/** controls the relative amount of effort spent in 3 main ways:
+ *
+ *      perception
+ *         processing input and activating its concepts
+ *
+ *      hypothesizing
+ *         forming premises
+ *
+ *      proving
+ *         exploring the conclusions derived from premises, which arrive as new input
+ *
+ */
 abstract public class Executioner implements Executor {
     @Nullable
     protected NAR nar;

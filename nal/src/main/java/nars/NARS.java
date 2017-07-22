@@ -10,6 +10,7 @@ import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.nar.exe.BufferedExecutioner;
 import nars.nar.exe.Executioner;
+import nars.nar.exe.FocusedExecutioner;
 import nars.op.stm.STMTemporalLinkage;
 import nars.time.CycleTime;
 import nars.time.RealTime;
@@ -82,7 +83,9 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = () -> new BufferedExecutioner(64, 32, 0.2f);
+        exe = () ->
+                new FocusedExecutioner();
+                //new BufferedExecutioner(64, 32, 0.2f);
 
         rng = () -> new XorShift128PlusRandom(1);
 
@@ -184,7 +187,7 @@ public class NARS {
             nar.DEFAULT_QUEST_PRIORITY = 0.35f;
 
             if (nal >= 7)
-                new STMTemporalLinkage(nar, 2, false);
+                new STMTemporalLinkage(nar, 1, false);
 
         }
     }

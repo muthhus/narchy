@@ -41,7 +41,7 @@ public final class CommutivePermutations extends Termutator.AbstractTermutator {
         while (p.hasNextThenNext()) {
 
             if (p.unifyLinear(y, f)) {
-                f.mutate(chain, current);
+                f.tryMutate(chain, current);
             }
 
             if (!f.revertAndContinue(start))

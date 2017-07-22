@@ -4,6 +4,7 @@ package nars;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Sets;
 import com.google.common.primitives.Longs;
+import com.google.common.primitives.Shorts;
 import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
@@ -957,6 +958,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         emotion.cycle();
 
+        eventCycleStart.emit(this);
+
         exe.cycle(this);
 
         if (!scheduled.isEmpty()) {
@@ -1819,10 +1822,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             CauseChannel c = new CauseChannel<ITask>(ci, id, (x) -> {
                 if (x instanceof NALTask) {
                     NALTask t = (NALTask) x;
-                    if (t.cause == null || t.cause.length == 0) {
+                    int tcl = t.cause.length;
+                    if (t.cause == null || tcl == 0) {
                         t.cause = new short[]{ci};
                     } else {
-                        t.cause = ArrayUtils.add(t.cause, 0 /* prepend */, ci);
+                        //concat
+                        t.cause = Arrays.copyOf(t.cause, tcl+1);
+                        t.cause[tcl] = ci;
                     }
                 }
                 input(x);

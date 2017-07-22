@@ -3,6 +3,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
+import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.term.Term;
 import nars.test.TestNAR;
@@ -1318,11 +1319,16 @@ public class NAL8Test extends AbstractNALTest {
     @Test
     public void testPredictiveEquivalenceTemporalEternal() {
 
+        //Param.TRACE = true;
+//        test.nar.onCycle(()->{
+//            nar.exe.print(System.out);
+//        });
         test
+                //.log()
                 .inputAt(0, "((out) <=>-3 (happy)). :|:")
-                .inputAt(13, "(happy)!")
+                .inputAt(5, "(happy)!")
                 //.mustDesire(cycles, "(out)", 1f, 0.04f, 17)
-                .mustDesire(cycles, "(out)", 1f, 0.81f, 3)
+                .mustDesire(16, "(out)", 1f, 0.81f, 3)
         //.mustNotOutput(cycles, "(out)", GOAL, 13, 0)
         ;
     }

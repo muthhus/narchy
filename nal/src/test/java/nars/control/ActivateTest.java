@@ -10,12 +10,14 @@ import nars.concept.Concept;
 import nars.control.premise.Derivation;
 import nars.task.DerivedTask;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 import static nars.$.$;
@@ -30,19 +32,19 @@ public class ActivateTest {
         nar.run(1);
         Concept c = nar.conceptualize("a:b");
         for (int n = 0; n < 5; n++) {
-            c.termlinks().put(new PLink<Term>($(n + ":a"), 0.2f * n));
+            c.termlinks().put(new PLink<>($(n + ":a"), 0.2f * n));
         }
 
         HashBag<String> s = new HashBag();
         Activate cf = new Activate(c, 1f) {
             @Override
-            protected int premise(Derivation d, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
+            protected int premise(Derivation d, Premise p, Consumer<DerivedTask> x, int ttlPerPremise) {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
-                if (termlink.get() instanceof Atom)
+                if (p.termLink.get() instanceof Atom)
                     return 0 ; //ignore
-                String tls = termlink.get().toString();
+                String tls = p.termLink.get().toString();
                 s.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
-                return super.premise(d, tasklink, termlink, x, ttlPerPremise);
+                return super.premise(d, p, x, ttlPerPremise);
             }
         };
 
@@ -66,4 +68,47 @@ public class ActivateTest {
 
     }
 
+        @Test
+    public void testDerivedBudgets() throws Narsese.NarseseException {
+
+        NAR n= new NARS().get();
+
+        //TODO System.err.println("TextOutput.out impl in progress");
+        //n.stdout();
+
+
+        n.input("$0.1$ <a --> b>.");
+        n.input("$0.1$ <b --> a>.");
+        n.run(15);
+
+
+        n.forEachConceptActive(System.out::println);
+    }
+
+    @Test public void testTemplates() throws Narsese.NarseseException {
+
+        //layer 1:
+        testTemplates("open:door",
+                "[door, open]");
+
+        //layer 2:
+        testTemplates("open(John,door)",
+                "[(John,door), open, door, John]");
+
+        //layer 3:
+        testTemplates("(open(John,door) ==> #x)",
+                "[(John,door), open, #1, open(John,door), door, John]");
+
+        //dont descend past layer 3:
+        testTemplates("(open(John,portal:interdimensional) ==> #x)",
+                "[open(John,(interdimensional-->portal)), #1, (John,(interdimensional-->portal)), (interdimensional-->portal), open, John]");
+    }
+
+    static void testTemplates(String term, String expect) throws Narsese.NarseseException {
+        NAR n = NARS.tmp(1);
+        n.believe(term + ".");
+        Activate a = new Activate(n.concept($(term)), 0.5f);
+        Termed[] t = a.templates(a.id, n);
+        assertEquals(expect, Arrays.toString(t));
+    }
 }

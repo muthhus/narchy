@@ -218,7 +218,7 @@ public class EllipsisTest {
             Set<Term> selectedFixed = super.test(arity, repeats);
 
             /** should have iterated all */
-            assertEquals(selectedFixed.toString(), arity, selectedFixed.size());
+            assertEquals(selectedFixed.toString(), p.isCommutative() ? 1 : arity, selectedFixed.size());
             return selectedFixed;
         }
 

@@ -369,8 +369,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     public final Y put(@NotNull final Y x, @Nullable final MutableFloat overflow) {
 
         final float p = priElseZero(x);
-        if (p < Pri.EPSILON)
-            return null;
+        if (p < Pri.EPSILON) {
+            if (size() == capacity)
+                return null; //automatically refuse sub-ther
+        }
 
         float[] incomingPri = {-p};
 

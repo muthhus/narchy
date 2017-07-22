@@ -2,7 +2,6 @@ package nars.term.subst;
 
 import jcog.Util;
 import jcog.data.UnenforcedConcatSet;
-import jcog.list.FasterList;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
@@ -123,7 +122,7 @@ public abstract class Unify extends Versioning implements Subst {
      */
     public abstract void onMatch(Term[][] match);
 
-    public final void mutate(Termutator[] chain, int next) {
+    public final void tryMutate(Termutator[] chain, int next) {
         if (++next < chain.length) {
             if (use(Param.TTL_MUTATE))
                 chain[next].mutate(this, chain, next);
@@ -144,8 +143,8 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
 
-    public final void unifyAll(@NotNull Compound x, @NotNull Compound y) {
-        unify(x, y, true);
+    public final Unify unifyAll(@NotNull Compound x, @NotNull Compound y) {
+        return unify(x, y, true);
     }
 
     /**
@@ -154,8 +153,9 @@ public abstract class Unify extends Versioning implements Subst {
      * <p>
      * setting finish=false allows matching in pieces before finishing
      */
-    public void unify(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public Unify unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
+        //accumulate any new free variables in this next matched term
         free.set(freeVariables(x)); //plus and not equals because this may continue from another unification!!!!!
 
         //assert (unassigned.isEmpty() ) : "non-purposeful unification";
@@ -167,6 +167,7 @@ public abstract class Unify extends Versioning implements Subst {
             }
         }
 
+        return this;
     }
 
     /**
@@ -193,10 +194,10 @@ public abstract class Unify extends Versioning implements Subst {
             if (ts > 1)
                 Util.shuffle(t, random);
 
-            mutate(t, -1); //start combinatorial recurse
+            tryMutate(t, -1); //start combinatorial recurse
 
         } else {
-            tryMatch();
+            tryMatch(); //go directly to conclusion
         }
 
 //        if (matched.size()>1)

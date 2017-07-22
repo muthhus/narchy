@@ -4,6 +4,8 @@
  */
 package nars.control;
 
+import jcog.Util;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Param;
@@ -13,6 +15,7 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.control.premise.Derivation;
 import nars.table.BeliefTable;
+import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
@@ -32,14 +35,30 @@ import static nars.time.Tense.ETERNAL;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise {
+public class Premise extends Pri implements ITask {
 
-    final PriReference<Task> taskLink;
-    final PriReference<Term> termLink;
+    public final PriReference<Task> taskLink;
+    public final PriReference<Term> termLink;
+    private final int hash;
 
     public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink) {
+        super(Param.tasktermLinkCombine.apply(tasklink.priElseZero(), termlink.priElseZero()));
         this.taskLink = tasklink;
         this.termLink = termlink;
+        this.hash = Util.hashCombine(tasklink.hashCode(), termlink.hashCode());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        Premise x = (Premise)obj;
+        if (hash!=x.hash) return false;
+        return taskLink.equals(((Premise) obj).taskLink) && termLink.equals(((Premise) obj).termLink);
+    }
+
+    @Override
+    public int hashCode() {
+        return hash;
     }
 
     @Override
@@ -63,6 +82,7 @@ public class Premise {
      * returns ttl used, -1 if failed before starting
      */
     public int run(Derivation d, int ttlMax) {
+        d.nar.emotion.conceptFirePremises.increment();
 
         //nar.emotion.count("Premise_run");
 
@@ -92,11 +112,16 @@ public class Premise {
 
             boolean reUnified = false;
             if (beliefTerm.varQuery() > 0 && !beliefIsTask) {
-                Term unified = unify(taskTerm, (Compound) beliefTerm, nar);
+
+                int[] matchTTL = new int[] { Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION) };
+
+                Term unified = unify(taskTerm, (Compound) beliefTerm, nar, matchTTL);
                 if (unified != null) {
                     beliefTerm = unified;
                     reUnified = true;
                 }
+
+                ttlMax = matchTTL[0]; //changed if consumed in match
             }
 
 
@@ -106,7 +131,7 @@ public class Premise {
                 TaskConcept beliefConcept = (TaskConcept)_beliefConcept;
 
                 BeliefTable table =
-                        ((task.isQuestion() && task.isGoal()) || task.isQuest()) ?
+                        (task.isGoal() || task.isQuest()) ?
                                 beliefConcept.goals() :
                                 beliefConcept.beliefs();
 
@@ -156,23 +181,19 @@ public class Premise {
             if (beliefPri != beliefPri) {
                 belief = null; //belief was deleted
             } else {
-                beliefTerm = belief.term();
+                beliefTerm = belief.term(); //use the belief's actual temporalized term
             }
         } else {
             beliefPri = Float.NaN;
         }
 
-        if (belief != null && belief.equals(task)) //do not repeat the same task for belief
-            belief = null;
-
-        float premisePri = beliefPri != beliefPri ? taskPri :
-                Param.tasktermLinkCombine.apply(taskPri, beliefPri);
+//        if (belief != null && belief.equals(task)) //do not repeat the same task for belief
+//            belief = null; //force structural transform; this is also applied in Derivation
 
 
-        d.run(this, task, belief, beliefTerm, premisePri,
-                //Util.lerp(parentTaskPri, Param.UnificationTTLMin, Param.UnificationTTLMax)
-                ttlMax
-        );
+        //System.out.println(task + "\t" + beliefTerm + " ::: \t" + belief);
+
+        d.run(this, task, belief, beliefTerm, priElseZero(), ttlMax );
 
 //        long ds = d.transformsCache.estimatedSize();
 //        if (ds >0)
@@ -217,13 +238,15 @@ public class Premise {
      * returns non-null if unification succeeded and resulted in a transformed 'a' term
      */
     @Nullable
-    private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar) {
+    private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar, int[] ttl) {
 
         if (q.op() != a.op() /*|| q.size() != a.size()*/)
             return null; //fast-fail: no chance
 
+        final int startTTL = ttl[0];
+
         final Compound[] result = {null};
-        new UnifySubst(null /* match anything */, nar, (aa) -> {
+        UnifySubst u = new UnifySubst(null /* match anything */, nar, (aa) -> {
             if (aa instanceof Compound) {
 
                 if (!aa.equals(a)) {
@@ -237,7 +260,10 @@ public class Premise {
 
             return true; //keep trying
 
-        }, nar.matchTTL.intValue()).unifyAll(q, a);
+        }, startTTL);
+        u.unifyAll(q, a);
+
+        ttl[0] -= (startTTL - u.ttl); //how much consumed
 
         return result[0];
 
@@ -247,4 +273,10 @@ public class Premise {
 //            return null;
     }
 
+    @Nullable
+    @Override
+    public ITask[] run(@NotNull NAR n) {
+        run(n.derivation(), Math.round(n.matchTTL.intValue() * (1f + priElseZero())));
+        return null;
+    }
 }

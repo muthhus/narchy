@@ -58,7 +58,7 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     };
 
     public CaffeineIndex(long capacity) {
-        this(capacity, MoreExecutors.directExecutor());
+        this(capacity, null /*MoreExecutors.directExecutor()*/);
     }
 
     /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */

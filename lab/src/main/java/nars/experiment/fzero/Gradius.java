@@ -19,15 +19,15 @@ public class Gradius extends NAgentX {
 
     private final Gradius4K g;
 
-    public Gradius(NAR nar) throws Narsese.NarseseException {
+    public Gradius(NAR nar) {
         super("G", nar);
 
         this.g = new Gradius4K();
 
-        g.updateMS = 8;
+        g.updateMS = 16;
 
         BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
-        senseCamera("(G)", cc).resolution(0.12f);
+        senseCamera(id, cc).resolution(0.2f);
 
 //        PixelBag cc = PixelBag.of(() -> g.image, 64, 64);
 //        cc.setClarity(0.5f, 0.9f);
@@ -124,14 +124,11 @@ public class Gradius extends NAgentX {
 
 
             Gradius a = null;
-            try {
                 a = new Gradius(n);
-            } catch (Narsese.NarseseException e) {
-                e.printStackTrace();
-            }
+
             return a;
 
-        }, 20f);
+        }, 15f);
 
     }
 

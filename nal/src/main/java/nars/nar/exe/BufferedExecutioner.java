@@ -39,7 +39,7 @@ public class BufferedExecutioner extends Executioner {
      * TODO make this automatically controlled according to the
      * input task load that occurred while it was firing
      */
-    int inputsPerFire = 32;
+    int inputsPerFire = 8;
 
 
     //    private final DisruptorBlockingQueue<ITask> overflow;
@@ -143,11 +143,44 @@ public class BufferedExecutioner extends Executioner {
 
     @Override
     public void cycle(@NotNull NAR nar) {
-        //flush();
 
-        nar.eventCycleStart.emit(nar);
+        if (!busy.compareAndSet(false, true))
+            return;
 
-        flush();
+        try {
+
+            boolean t = this.trace;
+            if (t)
+                concepts.print();
+
+            final int toFire =
+                    (int) Math.ceil(conceptsPerCycleMax.floatValue() * concepts.capacity());
+
+            float eFrac = ((float) toFire) / concepts.capacity();
+            float pAvg = (1f /*PForget.DEFAULT_TEMP*/) * concepts.depressurize(eFrac) * (eFrac);
+            float forgetEachActivePri =
+                    pAvg >= Pri.EPSILON ? pAvg : 0;
+
+
+            tasks.pop(inputsPerFire, this::execute); //pre-fire inputs
+
+            concepts.commit(null).sample(toFire, x -> {
+
+                execute(x);
+
+                if (forgetEachActivePri > 0) {
+                    x.priSub(forgetEachActivePri);
+                }
+
+                tasks.pop(inputsPerFire, this::execute);
+
+                //activeBuffer.add(x);
+                //(Consumer<? super ITask>)(buffer::add)
+            });
+
+        } finally {
+            busy.set(false);
+        }
     }
 
     @Override

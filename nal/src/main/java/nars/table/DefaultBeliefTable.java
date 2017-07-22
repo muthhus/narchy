@@ -122,7 +122,7 @@ public class DefaultBeliefTable implements BeliefTable {
             return ete;
         }
 
-        Task tmp = temporal().match(when, against, nar);
+        Task tmp = temporal.match(when, against, nar);
 
         if (tmp == null) {
             return ete;

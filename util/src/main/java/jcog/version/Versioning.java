@@ -9,9 +9,8 @@ import java.util.Collection;
  * versioning context that holds versioned instances
  */
 public class Versioning<X> extends
-        //FastList<Versioned> {
+        //FastList<Versioned<X>> {
         FasterList<Versioned<X>> {
-
 
     public int ttl;
 
@@ -46,7 +45,7 @@ public class Versioning<X> extends
         while (c-- > 0) {
 
             //Versioned versioned =
-                    //removeLast();
+            //removeLast();
 
             Versioned versioned = items[--size]; //pop()
             items[size] = null;
@@ -68,8 +67,13 @@ public class Versioning<X> extends
     }
 
     @Override
-    public boolean add(@NotNull Versioned<X> newItem) {
-        return tick() && super.add(newItem);
+    public final boolean add(@NotNull Versioned<X> newItem) {
+        Versioned<X>[] ii = this.items;
+        if (tick() && ii.length < this.size) {
+            ii[this.size++] = newItem; //cap
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -97,17 +101,20 @@ public class Versioning<X> extends
     }
 
     public final boolean tick() {
-        //return (ttl-- > 0);
-        if (ttl-- == 0) {
-            onDeath(); //transition from live to death occurred
-        }
-        return ttl > 0;
-    }
+//        if (ttl-- == 0) {
+//            onDeath(); //transition from live to death occurred
+//        }
 
-    /** empty for subclass impl */
-    public void onDeath() {
+        return ttl-- > 0;
 
     }
+
+//    /**
+//     * empty for subclass impl
+//     */
+//    public void onDeath() {
+//
+//    }
 
     /**
      * whether the unifier should continue: if TTL is non-zero.

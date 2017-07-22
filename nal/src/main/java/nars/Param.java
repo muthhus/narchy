@@ -17,6 +17,8 @@ import static nars.Op.*;
  * NAR Parameters
  */
 public abstract class Param  {
+
+
     /**
      * use this for advanced error checking, at the expense of lower performance.
      * it is enabled for unit tests automatically regardless of the value here.
@@ -33,7 +35,7 @@ public abstract class Param  {
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 2;
 
     public static final PriMerge termlinkMerge = PriMerge.plus;
-    public static final PriMerge tasklinkMerge = PriMerge.plus; //not safe to plus without enough headroom
+    public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptMerge = PriMerge.plus;
 
@@ -69,13 +71,13 @@ public abstract class Param  {
 
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.995f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.98f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.98f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.96f, 0, 1f);
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */
     public static float valueAtInput(Task accepted, NAR nar) {
         int vol = accepted.volume();
-        return -(vol)/nar.termVolumeMax.floatValue()/750f;
+        return -(vol)/nar.termVolumeMax.floatValue()/1000f;
     }
 
 
@@ -104,7 +106,10 @@ public abstract class Param  {
     public static boolean ANSWER_REPORTING = true;
 
 
-    public static final int DERIVATION_THREAD_TRANSFORM_CACHE_SIZE = 128 * 1024;
+    /** -1 for softref */
+    public static final int DERIVATION_THREAD_TRANSFORM_CACHE_SIZE =
+            //-1; //softref
+            32 * 1024;
 
     /**
      * hard upper-bound limit on Compound term complexity;
@@ -139,7 +144,7 @@ public abstract class Param  {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 10;
+    public static final int STAMP_CAPACITY = 12;
     public static final int CAUSE_CAPACITY = 16;
 
     public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
@@ -147,10 +152,11 @@ public abstract class Param  {
     public static final int UnificationVariableCapInitial = 8;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(96);
+    public final MutableInteger matchTTL = new MutableInteger(128);
     @Deprecated public final static int UnificationTTLMax = 128 * 2;
 
-
+    /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.33f;
 
 
 

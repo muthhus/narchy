@@ -5,8 +5,7 @@ import jcog.Util;
 import nars.$;
 import nars.control.premise.Derivation;
 import nars.derive.constraint.MatchConstraint;
-import nars.derive.op.MatchOneSubtermPrototype;
-import nars.term.Compound;
+import nars.derive.op.MatchOneSubterm;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.apache.commons.lang3.ArrayUtils;
@@ -21,7 +20,7 @@ import java.util.function.Function;
  */
 public final class AndCondition extends ProxyCompound implements PrediTerm<Derivation> {
 
-    private static final Term AND_ATOM = $.quote("&&");
+    //private static final Term AND_ATOM = $.quote("&&");
 
     @Override
     public final boolean test(@NotNull Derivation m) {
@@ -100,7 +99,7 @@ public final class AndCondition extends ProxyCompound implements PrediTerm<Deriv
             int iMatchTerm = -1; //first index of a MatchTerm op, if any
             for (int j = 0, cccSize = p.size(); j < cccSize; j++) {
                 PrediTerm c = p.get(j);
-                if ((c instanceof MatchOneSubtermPrototype || c instanceof Fork) && iMatchTerm == -1) {
+                if ((c instanceof MatchOneSubterm || c instanceof Fork) && iMatchTerm == -1) {
                     iMatchTerm = j;
                 }
             }

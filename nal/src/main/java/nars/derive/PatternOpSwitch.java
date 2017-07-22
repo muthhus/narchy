@@ -3,7 +3,6 @@ package nars.derive;
 import nars.$;
 import nars.Op;
 import nars.control.premise.Derivation;
-import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -41,7 +40,7 @@ public final class PatternOpSwitch extends ProxyCompound implements PrediTerm<De
 
     @Override
     public boolean test(@NotNull Derivation m) {
-        int i = m.subOp(subterm);
+        int i = (subterm == 0) ? m.termSub0op : m.termSub1op;
 
         PrediTerm p =
                 swtch[i];

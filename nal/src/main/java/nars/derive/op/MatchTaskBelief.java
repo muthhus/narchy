@@ -168,20 +168,20 @@ public class MatchTaskBelief extends ProxyCompound implements PrediTerm<Derivati
 
             if (taskFirst(task, belief)) {
                 //task first
-                code.add(new MatchOneSubtermPrototype(task, 0, false));
-                code.add(new MatchOneSubtermPrototype(belief, 1, true));
+                code.add(new MatchOneSubterm(task, 0, false));
+                code.add(new MatchOneSubterm(belief, 1, true));
             } else {
                 //belief first
-                code.add(new MatchOneSubtermPrototype(belief, 1, false));
-                code.add(new MatchOneSubtermPrototype(task, 0, true));
+                code.add(new MatchOneSubterm(belief, 1, false));
+                code.add(new MatchOneSubterm(task, 0, true));
             }
 
         } else if (belief!=null) {
             //match belief only
-            code.add(new MatchOneSubtermPrototype(belief, 1, true));
+            code.add(new MatchOneSubterm(belief, 1, true));
         } else if (task!=null) {
             //match task only
-            code.add(new MatchOneSubtermPrototype(task, 0, true));
+            code.add(new MatchOneSubterm(task, 0, true));
         } else {
             throw new RuntimeException("invalid");
         }

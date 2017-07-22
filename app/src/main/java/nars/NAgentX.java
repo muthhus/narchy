@@ -110,28 +110,28 @@ abstract public class NAgentX extends NAgent {
                     .exe(
                         new MultiExecutioner((i) ->
                             new MultiExecutioner.Worker(
-                                    64, 32, 0.05f),
+                                    96, 32, 0.05f),
                                 THREADS, 2))
                     .time(clock)
-                    .index(new CaffeineIndex(96 * 1024))
+                    .index(new CaffeineIndex(128 * 1024 ))
                     .get();
 
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.75f);
+        n.goalConfidence(0.9f);
 
 
         n.DEFAULT_BELIEF_PRIORITY = 0.5f;
-        n.DEFAULT_GOAL_PRIORITY = 0.5f;
+        n.DEFAULT_GOAL_PRIORITY = 0.6f;
         n.DEFAULT_QUESTION_PRIORITY = 0.25f;
-        n.DEFAULT_QUEST_PRIORITY = 0.25f;
-        n.termVolumeMax.setValue(40);
+        n.DEFAULT_QUEST_PRIORITY = 0.3f;
+        n.termVolumeMax.setValue(26);
 
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
-        MySTMClustered stm = new MySTMClustered(n, 128, BELIEF, 3, true, 16f);
+        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, false);
+        MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 8f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 8);
 

@@ -1,8 +1,8 @@
 package nars.control.premise;
 
+import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.google.common.io.ByteArrayDataOutput;
-import com.google.common.util.concurrent.MoreExecutors;
 import jcog.Util;
 import jcog.byt.DynBytes;
 import jcog.math.ByteShuffler;
@@ -130,7 +130,7 @@ public class Derivation extends Unify implements TermContext {
 
     private final Functor substituteIfUnifiesAny, substituteIfUnifiesDep, polarize;
 
-    public float parentPri;
+    public float premisePri;
     public short[] parentCause;
 
     public PrediTerm<Derivation> deriver;
@@ -138,11 +138,10 @@ public class Derivation extends Unify implements TermContext {
 
     private transient Term[][] currentMatch = null;
 
-    public static final com.github.benmanes.caffeine.cache.Cache<Transformation, Term> transformsCache = Caffeine.newBuilder()
-            .maximumSize(Param.DERIVATION_THREAD_TRANSFORM_CACHE_SIZE)
-            //.recordStats()
-            .executor(MoreExecutors.directExecutor())
-            .build();
+    public /*static*/ final Cache<Transformation, Term> transformsCache; //works in static mode too
+    /*static*/ {
+    }
+
 //    final MRUCache<Transformation, Term> transformsCache = new MRUCache<>(Param.DERIVATION_THREAD_TRANSFORM_CACHE_SIZE);
 
     /**
@@ -152,6 +151,17 @@ public class Derivation extends Unify implements TermContext {
         super(nar.terms, VAR_PATTERN, nar.random(), Param.UnificationStackMax, 0);
 
         this.nar = nar;
+
+        Caffeine cb = Caffeine.newBuilder().executor(nar.exe);
+            //.executor(MoreExecutors.directExecutor());
+        int cs = Param.DERIVATION_THREAD_TRANSFORM_CACHE_SIZE;
+        if (cs == -1)
+            cb.softValues();
+        else
+            cb.maximumSize(cs);
+                    //.recordStats()
+        transformsCache = cb.build();
+
 
         substituteIfUnifiesAny = new substituteIfUnifiesAny(this) {
             @Override
@@ -208,16 +218,16 @@ public class Derivation extends Unify implements TermContext {
     }
 
 
-    @Override
-    public void onDeath() {
-        nar.emotion.derivationDeath.increment();
-    }
+//    @Override
+//    public void onDeath() {
+//        nar.emotion.derivationDeath.increment();
+//    }
 
     /**
      * tasklink/termlink scope
      */
     @NotNull
-    public void run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, float parentTaskPri, int ttl) {
+    public void run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, float premisePri, int ttl) {
 
 
         revert(0); //revert directly
@@ -303,7 +313,7 @@ public class Derivation extends Unify implements TermContext {
             premiseEvidence = (premiseEvidence + beliefTruth.evi());
         this.premiseEvi = premiseEvidence;
 
-        this.parentPri = parentTaskPri;
+        this.premisePri = premisePri;
 
         short[] taskCause = task.cause();
         short[] beliefCause = belief != null ? belief.cause() : ArrayUtils.EMPTY_SHORT_ARRAY;
@@ -336,7 +346,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * only one thread should be in here at a time
      */
-    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm eachMatch) {
+    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm<Derivation> eachMatch) {
 
         boolean finish = (this.forEachMatch = eachMatch) != null;
 //        if (!finish) {
@@ -357,24 +367,15 @@ public class Derivation extends Unify implements TermContext {
 
     @Override
     public final void onMatch(Term[][] match) {
-        //try {
 
         this.currentMatch = match;
 
         try {
-
             forEachMatch.test(this);
-
         } finally {
             this.currentMatch = null;
         }
 
-//        } catch (InvalidTermException | InvalidTaskException t) {
-//            if (Param.DEBUG_EXTRA) {
-//                logger.error("Derivation onMatch {}", t);
-//            }
-//        }
-        //return  (--matchesRemain > 0) && ;
     }
 
 
@@ -385,20 +386,7 @@ public class Derivation extends Unify implements TermContext {
         return (belief != null) &&
                 (!belief.isEternal()
                         ||
-                        (belief.op().temporal && (belief.dt() != DTERNAL)));
-    }
-
-
-    /**
-     * gets the op of the (top-level) pattern being compared
-     *
-     * @param subterm 0 or 1, indicating task or belief
-     */
-    /*public final boolean subTermIs(int subterm, int op) {
-        return (subterm==0 ? termSub0op : termSub1op) == op;
-    }*/
-    public final int subOp(int i /* 0 or 1 */) {
-        return (i == 0 ? termSub0op : termSub1op);
+                (belief.op().temporal && (belief.dt() != DTERNAL)));
     }
 
 
@@ -435,13 +423,6 @@ public class Derivation extends Unify implements TermContext {
 
     public int ttl() {
         return ttl;
-    }
-
-    /**
-     * forms a new cause by appending a cause ID to the derivation's cause
-     */
-    public short[] cause(short c) {
-        return ArrayUtils.add(this.parentCause, c);
     }
 
     public void accept(DerivedTask t) {

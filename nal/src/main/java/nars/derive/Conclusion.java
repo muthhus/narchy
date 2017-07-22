@@ -202,44 +202,43 @@ public class Conclusion extends AbstractPred<Derivation> {
                 end = s; //swap
             }
 
-            float priority = d.parentPri; //d.budgeting.budget(d, C, truth, punc, start, end);
-            if (priority == priority) {
+            float priority = d.premisePri; //d.budgeting.budget(d, C, truth, punc, start, end);
+            assert(priority == priority);
 
-                if (priority < Priority.EPSILON) {
-                    return true; //wasted
-                }
-
-
-                if (truth!=null) {
-
-                    if (negating)
-                        polarity = !polarity;
-
-                    if (!polarity)
-                        truth = truth.negated();
-                }
-
-                short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
-
-                DerivedTask t =
-                        Param.DEBUG ?
-                                new DebugDerivedTask(C, punc, truth, d, start, end, cause) :
-                                new DerivedTask(C, punc, truth, d, start, end, cause);
-
-                if (t.equals(d.task) || t.equals(d.belief)) {
-                    return true; //created a duplicate of the task
-                }
-
-                t.setPri(priority);
-
-
-                if (Param.DEBUG)
-                    t.log(rule);
-
-                d.accept(t);
-                d.use(Param.TTL_DERIVE_TASK_SUCCESS);
-                return true;
+            if (priority < Priority.EPSILON) {
+                return true; //wasted
             }
+
+
+            if (truth!=null) {
+
+                if (negating)
+                    polarity = !polarity;
+
+                if (!polarity)
+                    truth = truth.negated();
+            }
+
+            short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
+
+            DerivedTask t =
+                    Param.DEBUG ?
+                            new DebugDerivedTask(C, punc, truth, d, start, end, cause) :
+                            new DerivedTask(C, punc, truth, d, start, end, cause);
+
+            if (t.equals(d.task) || t.equals(d.belief)) {
+                return true; //created a duplicate of the task
+            }
+
+            t.setPri(priority);
+
+
+            if (Param.DEBUG)
+                t.log(rule);
+
+            d.accept(t);
+            d.use(Param.TTL_DERIVE_TASK_SUCCESS);
+            return true;
         }
 
         //        } catch (InvalidTermException | InvalidTaskException e) {

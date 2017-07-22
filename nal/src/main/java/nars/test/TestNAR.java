@@ -139,6 +139,7 @@ public class TestNAR {
         long startTime = nar.time();
 
 
+
         runUntil(finalCycle);
 
         boolean success = true;

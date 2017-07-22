@@ -13,12 +13,12 @@
         A, B, time(raw), belief(negative), task("."), time(dtEventsOrEternalsReverse), neqAndCom(A,B),   notImplEqui(A), notImplEqui(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
 
 //<=>
-    A, B, task("."), time(raw), time(dtEvents), neqCom(A,B), notImplEqui(A), notImplEqui(B) |- (polarize(A,task) <=>+- polarize(B,belief)), (Belief:ComparisonDepolarized)
-    A, B, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B)        notImplEqui(A), notImplEqui(B) |- varIntro((polarize(A,task) <=>+- polarize(B,belief))), (Belief:ComparisonDepolarized)
+    A, B, task("."), time(raw), time(dtEvents), notImplEqui(A), notImplEqui(B) |- (polarize(A,task) <=>+- polarize(B,belief)), (Belief:ComparisonDepolarized)
+    A, B, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B),        notImplEqui(A), notImplEqui(B) |- varIntro((polarize(A,task) <=>+- polarize(B,belief))), (Belief:ComparisonDepolarized)
 
 
 //&&
-    A, B, task("."), time(raw), time(dtEvents), neq(A,B), notEqui(A), notEqui(B)                      |- (polarize(A,task) &&+- polarize(B,belief)), (Belief:IntersectionDepolarized)
+    A, B, task("."), time(raw), time(dtEvents),  notEqui(A), notEqui(B)                      |- (polarize(A,task) &&+- polarize(B,belief)), (Belief:IntersectionDepolarized)
     A, B, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B), notEqui(A), notEqui(B)      |- varIntro((polarize(A,task) &&+- polarize(B,belief))), (Belief:IntersectionDepolarized)
 
 

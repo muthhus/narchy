@@ -23,6 +23,8 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -38,7 +40,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
      */
     private static final int maxSamples = 2;
 
-    static final int TASKLINKS_SAMPLED = 3;
+    static final int TASKLINKS_SAMPLED = 4;
     static final int TERMLINKS_SAMPLED = 4;
 
     private Termed[] localTemplates;
@@ -54,9 +56,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     public static Activate activate(@NotNull Task t, float activation, TaskConcept origin, NAR n) {
 
 
-        if (activation < EPSILON) {
-            return null;
-        }
+//        if (activation < EPSILON) {
+//            return null;
+//        }
 
         short[] x = t.cause();
         int xl = x.length;
@@ -92,7 +94,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     public static void activate(@NotNull Task t, float activation, @NotNull NAR n, boolean process) {
         // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
-        if (activation >= EPSILON) {
+        //if (activation >= EPSILON) {
             TaskConcept cc = t.concept(n, true);
             if (cc != null) {
 
@@ -101,17 +103,19 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //                n.input(a);
             }
 
-            if (process)
-                n.eventTaskProcess.emit(/*post*/t);
-        }
+            if (process) {
+                if (n.exe.concurrent())
+                    n.eventTaskProcess.emitAsync(/*post*/t, n.exe);
+                else
+                    n.eventTaskProcess.emit(t);
+            }
+        //}
     }
 
     @Override
     public ITask[] run(NAR nar) {
 
-        final float pri = priElseZero();
-        if (pri < Pri.EPSILON)
-            return null;
+
 
         nar.emotion.conceptFires.increment();
 
@@ -145,15 +149,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             return null;
         }
 
-        final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
-        DecideRoulette<PriReference<Term>> terml = new DecideRoulette(DecideRoulette.linearPri);
-        termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
-        if (terml.isEmpty()) {
-            //nar.emotion.count("ConceptFire_run_but_zero_termlinks_selected");
-            //return null;
 
-            //continue below, where termlinks may be added via a tasklink fire
-        }
 
         //nar.emotion.count("ConceptFire_run");
 
@@ -202,11 +198,13 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
         //System.out.println("templates: " + id + " " + Arrays.toString(localTemplates));
 
-        int penalty = Math.max(1, ttlPerPremise / (2));
+        int misfirePenalty = Math.max(1, ttlPerPremise / (2));
 
         Derivation d = nar.derivation();
         d.cycle(nar.deriver()); //TODO dont do this until the first premise is ready
 
+        DecideRoulette<PriReference<Term>> terml = null;
+        //Set<Premise> novel = new HashSet(); //ensures novel premise formation in this fire
 
         Random rng = nar.random();
         while (ttl > 0 /*samples++ < samplesMax*/) {
@@ -217,16 +215,16 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             @Nullable PriReference<Task> tll = tasklink;
             Task task = tll.get();
             if (task == null) {
-                ttl -= penalty;
+                ttl -= misfirePenalty;
                 continue;
             }
 
 
             float tfa = task.priElseZero();
-            if (tfa < Pri.EPSILON) {
-                ttl -= penalty;
-                continue;
-            }
+//            if (tfa < Pri.EPSILON) {
+//                ttl -= penalty;
+//                continue;
+//            }
 
             Term taskTerm = task.term();
 
@@ -252,27 +250,45 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             }
 
             TaskConcept taskConcept = task.concept(nar, true);
-            if (taskConcept == null)
+            if (taskConcept == null) {
+                ttl -= misfirePenalty;
                 continue; //hrm
+            }
 
             //activateTaskExperiment1(nar, pri, thisTerm, taskConcept);
 
-            if (terml.isEmpty())
-                break;
+            if (terml == null) {
+                final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
+                terml = new DecideRoulette(DecideRoulette.linearPri);
+                termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
+                if (terml.isEmpty()) {
+                    break;
+                }
+            }
+
             int termlSelected = terml.decideWhich(rng);
             termlink = terml.get(termlSelected);
 
 
-            int ttlUsed = premise(d, tasklink, termlink, nar::input, ttlPerPremise); //inline
-//            if (ttlUsed <= 0) {
-//                //failure penalty
-//                tasklinkPri[tasklSelected] *= 0.9f;
-//                termlinkPri[termlSelected] *= 0.9f;
-//            }
-
-            //ttl -= max(ttlUsed, penalty); //stingy
+            Premise p = new Premise(tasklink, termlink);
+            nar.input(p);
             ttl -= ttlPerPremise; //fair disbursement
-            premises++;
+
+
+//            if (novel.add(p)) {
+//                int ttlUsed = premise(d, p, nar::input, ttlPerPremise); //inline
+//                //            if (ttlUsed <= 0) {
+//                //                //failure penalty
+//                //                tasklinkPri[tasklSelected] *= 0.9f;
+//                //                termlinkPri[termlSelected] *= 0.9f;
+//                //            }
+//
+//                //ttl -= max(ttlUsed, penalty); //stingy
+//                ttl -= ttlPerPremise; //fair disbursement
+//                premises++;
+//            } else {
+//                ttl -= misfirePenalty;
+//            }
 
         }
 
@@ -373,8 +389,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //        }
 
         if (ctpl != null) {
-            Set<Termed> tc = new UnifiedSet<>(id.volume() /* estimate */);
-            templates(tc, ctpl, nar, layers(id));
+            Set<Termed> tc =
+                    //new UnifiedSet<>(id.volume() /* estimate */);
+                    new HashSet(id.volume());
+            templates(tc, ctpl, nar, layers(id)-1);
             if (!tc.isEmpty())
                 return tc.toArray(new Termed[tc.size()]);
         }
@@ -387,7 +405,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     }
 
-    private void templates(Set<Termed> tc, TermContainer ctpl, NAR nar, int layersRemain) {
+    public void templates(Set<Termed> tc, TermContainer ctpl, NAR nar, int layersRemain) {
 
         int cs = ctpl.size();
         for (int i = 0; i < cs; i++) {
@@ -396,12 +414,12 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                     nar.conceptualize(b) : null;
             TermContainer e = null;
             if (c != null) {
-                if (!c.equals(id) && tc.add(c)) {
+                if (/*!c.equals(id) && */tc.add(c)) {
                     if (layersRemain > 0 && c instanceof Compound) {
                         e = c.templates();
                     }
                 }
-            } else if (!b.equals(id)) {
+            } else /*if (!b.equals(id))*/ {
                 Term d = b.unneg();
                 //variable or other non-concept term
                 if (tc.add(d)) {
@@ -416,11 +434,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
     }
 
-    protected int premise(Derivation d, @Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink, Consumer<DerivedTask> x, int ttlPerPremise) {
-        Premise p = new Premise(tasklink, termlink);
+    protected int premise(Derivation d, Premise p, Consumer<DerivedTask> x, int ttlPerPremise) {
         int ttl = p.run(d, ttlPerPremise);
         //TODO record ttl usage
-        d.nar.emotion.conceptFirePremises.increment();
         return ttl;
     }
 
@@ -455,13 +471,13 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 return 3;
 
             case EQUI:
-                return 3;
+                return 2;
 
             case IMPL:
-                return 3;
+                return 2;
 
             case CONJ:
-                return 3;
+                return 2;
 
 //                int s = host.size();
 //                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {

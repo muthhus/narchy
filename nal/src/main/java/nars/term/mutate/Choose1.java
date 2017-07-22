@@ -60,7 +60,7 @@ public class Choose1 extends Termutator.AbstractTermutator {
             Term y = this.yy[(shuffle + l) % this.yy.length];
             if (f.unify(x, y)) {
                 if (f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.exceptByInstance(yy, y, m)))) {
-                    f.mutate(chain, current);
+                    f.tryMutate(chain, current);
                 }
 
             }

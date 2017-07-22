@@ -23,16 +23,17 @@ public class SubUnify extends Unify {
         this.parent = parent;
     }
 
-    @Override
-    public void onDeath() {
-        parent.onDeath();
-    }
+//    @Override
+//    public void onDeath() {
+//        parent.onDeath();
+//    }
 
     @Override
-    public void unify(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public Unify unify(@NotNull Term x, @NotNull Term y, boolean finish) {
         this.ttl = parent.ttl; //load
         super.unify(x, y, finish);
         parent.ttl = ttl; //restore
+        return null;
     }
 
     //    @Override
