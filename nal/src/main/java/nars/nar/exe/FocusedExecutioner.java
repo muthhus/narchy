@@ -30,7 +30,7 @@ import java.util.function.Predicate;
 public class FocusedExecutioner extends Executioner {
 
     final int MAX_PREMISES = 64;
-    final int MAX_TASKS = 256;
+    final int MAX_TASKS = 64;
     final int MAX_CONCEPTS = 64;
 
     final Random random = new XorShift128PlusRandom(1);
@@ -45,9 +45,9 @@ public class FocusedExecutioner extends Executioner {
             random, MAX_CONCEPTS);
 
     int subCycles = 2;
-    int subCycleTasks = 4;
-    int subCycleConcepts = 1;
-    int subCyclePremises = 4;
+    int subCycleTasks = 16;
+    int subCycleConcepts = 4;
+    int subCyclePremises = 8;
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
 

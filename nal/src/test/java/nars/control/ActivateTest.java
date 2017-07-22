@@ -31,7 +31,7 @@ public class ActivateTest {
         HashBag<String> s = new HashBag();
         Activate cf = new Activate(c, 1f) {
             @Override
-            protected void onPremise(Premise p, NAR nar) {
+            protected void premise(Premise p, NAR nar) {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
                 if (p.termLink.get() instanceof Atom)
                     return ; //ignore
