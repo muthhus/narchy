@@ -271,7 +271,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
             Premise p = new Premise(tasklink, termlink);
-            nar.input(p);
+            onPremise(p, nar);
+
             ttl -= ttlPerPremise; //fair disbursement
 
 
@@ -434,11 +435,11 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
     }
 
-    protected int premise(Derivation d, Premise p, Consumer<DerivedTask> x, int ttlPerPremise) {
-        int ttl = p.run(d, ttlPerPremise);
-        //TODO record ttl usage
-        return ttl;
-    }
+//    protected int premise(Derivation d, Premise p, Consumer<DerivedTask> x, int ttlPerPremise) {
+//        int ttl = p.run(d, ttlPerPremise);
+//        //TODO record ttl usage
+//        return ttl;
+//    }
 
     @NotNull
     @Override
@@ -495,4 +496,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
     }
 
+    protected void onPremise(Premise p, NAR nar) {
+        nar.input(p);
+    }
 }

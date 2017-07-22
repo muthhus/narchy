@@ -1,22 +1,25 @@
 package jcog.bag.impl;
 
-import jcog.pri.PriReference;
+import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-public class PriArrayBag<X> extends ArrayBag<X, PriReference<X>> {
+public class PriArrayBag<X extends Prioritized> extends ArrayBag<X,X> {
 
-    public PriArrayBag(int cap, PriMerge mergeFunction, @NotNull Map<X, PriReference<X>> map) {
-        super(cap, mergeFunction, map);
+    public PriArrayBag(PriMerge mergeFunction, @NotNull Map<X, X> map) {
+        super(mergeFunction, map);
     }
 
-    @Override
-    @NotNull
-    public final X key(@NotNull PriReference<X> l) {
-        return l.get();
+    public PriArrayBag(PriMerge mergeFunction, @NotNull Map<X, X> map, int cap) {
+        this(mergeFunction, map);
+        setCapacity(cap);
     }
 
-
+    @Nullable
+    @Override public X key(@NotNull X k) {
+        return k;
+    }
 }

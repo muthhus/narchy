@@ -187,9 +187,10 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         final int[] count = {max};
         return sample(x -> {
             each.accept(x);
-            return ((count[0]--) > 0) ? (pop ? Remove : Next) : (pop ? RemoveAndStop : Stop);
+            return ((--count[0]) > 0) ? (pop ? Remove : Next) : (pop ? RemoveAndStop : Stop);
         });
     }
+
     @Nullable
     default V maxBy(FloatFunction<V> rank) {
         final float[] best = {Float.NEGATIVE_INFINITY};

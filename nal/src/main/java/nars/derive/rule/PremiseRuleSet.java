@@ -1,8 +1,9 @@
 package nars.derive.rule;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.google.common.collect.Lists;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Streams;
 import jcog.Util;
+import jcog.map.FileHashMap;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
@@ -12,6 +13,9 @@ import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
@@ -21,14 +25,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 
 /**
@@ -52,8 +54,8 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         return rs;
     }
 
-    public static Stream<Pair<Compound, String>> parsedRules(PatternTermIndex p, String... name) {
-        return Stream.of(name).flatMap(n -> {
+    public static Stream<Pair<PremiseRule, String>> parsedRules(PatternTermIndex p, String... name) {
+        return Stream.of(name)./*parallel().*/flatMap(n -> {
 
                     InputStream nn = NAR.class.getResourceAsStream("nal/" + n);
                     byte[] bb;
@@ -61,7 +63,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
                         bb = nn.readAllBytes();
                     } catch (IOException e) {
                         e.printStackTrace();
-                        bb = new byte[0];
+                        bb = ArrayUtils.EMPTY_BYTE_ARRAY;
                     }
                     return parse(load(bb), p);
 
@@ -105,7 +107,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     final int[] errors = {0};
 
 
-    public PremiseRuleSet(@NotNull Stream<Pair<Compound, String>> parsed, @NotNull PatternTermIndex patterns, boolean permute) {
+    public PremiseRuleSet(@NotNull Stream<Pair<PremiseRule, String>> parsed, @NotNull PatternTermIndex patterns, boolean permute) {
         this.patterns = patterns;
         this.permuteBackwards = this.permuteForwards = permute;
         permute(parsed, patterns).forEach(this::add);
@@ -113,25 +115,19 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
 
     @NotNull
-    static Collection<String> load(@NotNull byte[] data) {
-        return load(Lists.newArrayList(new String(data).split("\n")));
+    static Stream<String> load(@NotNull byte[] data) {
+        return preprocess( Streams.stream(Splitter.on('\n').split(new String(data)) ) );
     }
 
     @NotNull
-    static Collection<String> load(@NotNull List<String> lines) {
+    static Stream<String> preprocess(@NotNull Stream<String> lines) {
 
-
-        StringBuilder current_rule = new StringBuilder(256);
-        boolean filtering = false;
-
-        List<String> lines2 = $.newArrayList(1024);
-
-        for (String s : lines) {
+        return lines.map(s -> {
 
             s = s.trim(); //HACK write a better file loader
 
             if (s.isEmpty() || s.startsWith("//")) {
-                continue;
+                return null;
             }
 
             if (s.contains("..")) {
@@ -141,83 +137,94 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
                 s = s.replace("%A.._=B", "%A.._=%B"); //add var pattern manually to ellipsis
             }
 
-            if (s.startsWith("try:")) {
-                filtering = true;
-            }
+//            if (s.startsWith("try:")) {
+//                filtering = true;
+//            }
 
-            lines2.add(s);
+            return s;
+            //lines2.add(s);
 
-        }
+        }).filter(Objects::nonNull);
 
-        lines = lines2;
 
-        if (filtering) {
-            List<String> unparsed_rules = $.newArrayList(1024);
-            for (String s : lines) {
-
-                s = s.trim(); //HACK write a better file loader
-
-                boolean currentRuleEmpty = current_rule.length() == 0;
-                if (s.startsWith("//") || spacePattern.matcher(s).replaceAll(Matcher.quoteReplacement("")).isEmpty()) {
-
-                    if (!currentRuleEmpty) {
-
-                        if (!filtering || filtering && current_rule.toString().contains("try:")) {
-                            unparsed_rules.add(current_rule.toString().trim().replace("try:", "")); //rule is finished, add it
-                        }
-                        current_rule.setLength(0); //start identifying a new rule
-                    }
-
-                } else {
-                    //note, it can also be that the current_rule is not empty and this line contains |- which means
-                    //its already a new rule, in which case the old rule has to be added before we go on
-                    if (!currentRuleEmpty && s.contains("|-")) {
-
-                        if (!filtering || filtering && current_rule.toString().contains("try:")) {
-                            unparsed_rules.add(current_rule.toString().trim().replace("try:", "")); //rule is finished, add it
-                        }
-                        current_rule.setLength(0); //start identifying a new rule
-
-                    }
-                    current_rule.append(s).append('\n');
-                }
-            }
-
-            if (current_rule.length() > 0) {
-                if (!filtering || filtering && current_rule.toString().contains("try:")) {
-                    unparsed_rules.add(current_rule.toString());
-                }
-            }
-
-            return unparsed_rules;
-            //.parallelStream();
-            //.stream();
-        } else {
-            return lines;//.stream();
-        }
+//        if (filtering) {
+//            StringBuilder current_rule = new StringBuilder(256);
+//            List<String> unparsed_rules = $.newArrayList(1024);
+//            for (String s : lines) {
+//
+//                s = s.trim(); //HACK write a better file loader
+//
+//                boolean currentRuleEmpty = current_rule.length() == 0;
+//                if (s.startsWith("//") || spacePattern.matcher(s).replaceAll(Matcher.quoteReplacement("")).isEmpty()) {
+//
+//                    if (!currentRuleEmpty) {
+//
+//                        if (!filtering || filtering && current_rule.toString().contains("try:")) {
+//                            unparsed_rules.add(current_rule.toString().trim().replace("try:", "")); //rule is finished, add it
+//                        }
+//                        current_rule.setLength(0); //start identifying a new rule
+//                    }
+//
+//                } else {
+//                    //note, it can also be that the current_rule is not empty and this line contains |- which means
+//                    //its already a new rule, in which case the old rule has to be added before we go on
+//                    if (!currentRuleEmpty && s.contains("|-")) {
+//
+//                        if (!filtering || filtering && current_rule.toString().contains("try:")) {
+//                            unparsed_rules.add(current_rule.toString().trim().replace("try:", "")); //rule is finished, add it
+//                        }
+//                        current_rule.setLength(0); //start identifying a new rule
+//
+//                    }
+//                    current_rule.append(s).append('\n');
+//                }
+//            }
+//
+//            if (current_rule.length() > 0) {
+//                if (!filtering || filtering && current_rule.toString().contains("try:")) {
+//                    unparsed_rules.add(current_rule.toString());
+//                }
+//            }
+//
+//            return unparsed_rules;
+//            //.parallelStream();
+//            //.stream();
+//        } else {
+//            return lines;//.stream();
+//        }
 
     }
 
 
-    final static com.github.benmanes.caffeine.cache.Cache<String, Pair<Compound, String>> lines = Caffeine.newBuilder()
-            .maximumSize(4 * 1024)
-            .build();
+    final static Map<String,PremiseRule> lines = new ConcurrentHashMap<>();
+//    static {
+//        Map<String, Compound> m;
+//        try {
+//            m = new FileHashMap<>();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            m = new ConcurrentHashMap();
+//        }
+//        lines = m;
+//    }
+
+
+//    final static com.github.benmanes.caffeine.cache.Cache<String, Pair<Compound, String>> lines = Caffeine.newBuilder()
+//            .maximumSize(4 * 1024)
+//            .build();
 
     @NotNull
-    static Stream<Pair<Compound, String>> parse(@NotNull Collection<String> rawRules, @NotNull PatternTermIndex index) {
-        return rawRules.stream().map(src -> {
+    static Stream<Pair<PremiseRule, String>> parse(@NotNull Stream<String> rawRules, @NotNull PatternTermIndex index) {
 
-                return lines.get(src, (String s) -> {
-                    try {
-                        PremiseRule parse = PremiseRuleSet.parse( s, index);
-                        return Tuples.pair(parse, s);
-                    } catch (Narsese.NarseseException e) {
-                        logger.error("{}:\t{}", e, src);
-                        return null;
-                    }
-                });
+        return rawRules.map(src -> Tuples.pair(lines.computeIfAbsent(src, s -> {
+            try {
+                return PremiseRuleSet.parse( s, index);
+            } catch (Narsese.NarseseException e) {
+                logger.error("rule parse: {}:\t{}", e, src);
+                return null;
+            }
+        }), src)).filter(x -> x.getOne()!=null);
 
-        });
     }
 
     @NotNull
@@ -239,6 +246,11 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
     @NotNull
     public static PremiseRule parse(@NotNull String src, @NotNull TermIndex index) throws Narsese.NarseseException {
+        return new PremiseRule(parseRuleComponents(src, index));
+    }
+
+    @NotNull
+    public static TermContainer parseRuleComponents(@NotNull String src, @NotNull TermIndex index) throws Narsese.NarseseException {
 
         //(Compound) index.parseRaw(src)
         String[] ab = src.split("\\|\\-");
@@ -258,11 +270,11 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
             throw new Narsese.NarseseException("Right rule component must be compound: " + src);
         }
 
-        return new PremiseRule((Compound) a, (Compound) b);
+        return TermVector.the((Compound) a, (Compound) b);
     }
 
     @NotNull
-    Stream<PremiseRule> permute(@NotNull Stream<Pair<Compound, String>> rawRules, @NotNull PatternTermIndex index) {
+    Stream<PremiseRule> permute(@NotNull Stream<Pair<PremiseRule, String>> rawRules, @NotNull PatternTermIndex index) {
         return rawRules.map(rawAndSrc -> {
 
             String src = rawAndSrc.getTwo();
@@ -361,11 +373,5 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         return q.normalizeRule(index).setup(index);
     }
 
-    private static final Pattern spacePattern = Pattern.compile(" ", Pattern.LITERAL);
-
-
-    public PrediTerm compile(NAR n) {
-        return TrieDeriver.the(this, n);
-    }
 }
 

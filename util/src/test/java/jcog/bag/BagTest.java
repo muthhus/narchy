@@ -2,28 +2,28 @@ package jcog.bag;
 
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.CurveBag;
-import jcog.bag.impl.PriArrayBag;
+import jcog.bag.impl.PLinkArrayBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
-import jcog.pri.PLink;
-import jcog.pri.Pri;
-import jcog.pri.PriReference;
-import jcog.pri.Priority;
+import jcog.pri.*;
 import jcog.pri.op.PriMerge;
 import jcog.random.XorShift128PlusRandom;
+import org.HdrHistogram.DoubleHistogram;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.DoubleSupplier;
 
 import static jcog.Texts.n4;
 import static jcog.pri.op.PriMerge.plus;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author me
@@ -33,12 +33,7 @@ public class BagTest {
 
     @Test
     public void testBasicInsertionRemovalArray() {
-        testBasicInsertionRemoval(new PriArrayBag<>(1, plus, new HashMap<>(1)));
-    }
-
-    @Test
-    public void testBasicInsertionRemovalCurve() {
-        testBasicInsertionRemoval(new CurveBag<>(1, plus, new HashMap(1)));
+        testBasicInsertionRemoval(new PLinkArrayBag<>(1, plus, new HashMap<>(1)));
     }
 
 
@@ -53,7 +48,8 @@ public class BagTest {
         }
 
         //insert an item with (nearly) zero budget
-        c.put(new PLink("x", 2 * Pri.EPSILON));
+        PLink x0 = new PLink("x", 2 * Pri.EPSILON);
+        PriReference added = c.put(x0); assertSame(added, x0);
         c.commit();
 
         assertEquals(1, c.size());
@@ -61,13 +57,16 @@ public class BagTest {
 
         assertEquals(0, c.priMin(), 0.001f);
 
-        assertTrue(Priority.Zero.equalsBudget(c.get("x"), 0.01f));
+        PriReference<String> x = c.get("x");
+        assertNotNull(x);
+        assertSame(x, x0);
+        assertTrue(Priority.Zero.equalsBudget(x, 0.01f));
 
     }
 
     @Test
     public void testBudgetMerge() {
-        PriArrayBag<String> a = new PriArrayBag<String>(4, plus, new HashMap<>(4));
+        PLinkArrayBag<String> a = new PLinkArrayBag<String>(4, plus, new HashMap<>(4));
         assertEquals(0, a.size());
 
         a.put(new PLink("x", 0.1f));
@@ -85,7 +84,7 @@ public class BagTest {
 
     @Test
     public void testSort() {
-        PriArrayBag a = new PriArrayBag(4, plus, new HashMap<>(4));
+        PLinkArrayBag a = new PLinkArrayBag(4, plus, new HashMap<>(4));
 
         a.put(new PLink("x",0.1f));
         a.put(new PLink("y",0.2f));
@@ -118,7 +117,7 @@ public class BagTest {
 
     @Test
     public void testCapacity() {
-        PriArrayBag a = new PriArrayBag(2, plus, new HashMap<>(2));
+        PLinkArrayBag a = new PLinkArrayBag(2, plus, new HashMap<>(2));
 
         a.put(new PLink("x", 0.1f));
         a.put(new PLink("y", 0.2f));
@@ -131,13 +130,13 @@ public class BagTest {
         a.commit();        a.print(); System.out.println();
         assertEquals(2, a.size());
         assertTrue(a.contains("x") && a.contains("y"));
-        Assert.assertFalse(a.contains("z"));
+        assertFalse(a.contains("z"));
 
     }
 
     @Test
     public void testRemoveByKey() {
-        testRemoveByKey(new PriArrayBag(2, plus, new HashMap<>(2)));
+        testRemoveByKey(new PLinkArrayBag(2, plus, new HashMap<>(2)));
     }
 
     public static void testRemoveByKey(Bag<String,PriReference<String>> a) {
@@ -205,19 +204,14 @@ public class BagTest {
     }
 
 
-//    @NotNull
-//    public static EmpiricalDistribution getSamplingPriorityDistribution(@NotNull Bag<?,? extends Prioritized> b, int n, int bins) {
-//        DoubleArrayList f = new DoubleArrayList(n);
-//        if (!b.isEmpty()) {
-//            b.sample(n, x -> {
-//                f.add(x.pri());
-//            });
-//
-//        }
-//        EmpiricalDistribution e = new EmpiricalDistribution(bins);
-//        e.load(f.toArray());
-//        return e;
-//    }
+
+    @NotNull public static DoubleHistogram samplingPriDistribution(@NotNull Bag b, int n) {
+        DoubleHistogram d = new DoubleHistogram(3);
+        assertFalse(b.isEmpty());
+        b.sample(n, (Consumer) x ->  d.recordValue(b.pri(x)) );
+        assertEquals(n, d.getTotalCount() );
+        return d;
+    }
 
 
 //    @Test
@@ -252,10 +246,10 @@ public class BagTest {
     }
 
     @NotNull
-    private CurveBag<String> populated(int n, @NotNull DoubleSupplier random) {
+    private CurveBag<PLink<String>> populated(int n, @NotNull DoubleSupplier random) {
 
 
-        CurveBag<String> a = curveBag(n, plus);
+        CurveBag<PLink<String>> a = curveBag(n, plus);
 
 
         //fill with uniform randomness
@@ -297,8 +291,8 @@ public class BagTest {
     }
 
     @NotNull
-    public CurveBag<String> curveBag(int n, PriMerge mergeFunction) {
-        return new CurveBag(n, mergeFunction, new HashMap<>(n));
+    public CurveBag<PLink<String>> curveBag(int n, PriMerge mergeFunction) {
+        return new CurveBag(mergeFunction, new HashMap<>(n), n);
     }
 
     public static void populate(Bag<String,PriReference<String>> b, Random rng, int count, int dimensionality, float minPri, float maxPri, float qua) {
@@ -319,38 +313,56 @@ public class BagTest {
 
 
 
+    @Test public void testDistribution() {
 
-    //AutoBag does not apply to this test
-//    @Test public void testDistribution() {
-//        Default n = new Default(48, 4, 2, 4);
-//        n.perfection.setValue(1f);
-//        n.input("$1$ a:b.");
-//        n.input("$1$ b:c.");
-//        n.input("$1$ c:d.");
-//        n.run(4);
-//        Bag<Concept> bag = n.core.concepts;
-//
-//        bag.forEach(System.out::println);
-//        System.out.println(bag.size() + " " + bag.priMax() + ' ' + bag.priMin());
-//
-//        //TODO verify the histogram resulting from the above execution is relatively flat:
-//        //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
-//        //the tests below assume that it begins with a relatively flat distribution
+        int n = 32;
+
+        CurveBag<PLink<String>> bag = curveBag(n, PriMerge.plus);
+
+        fillLinear(bag);
+
+        //bag.forEach(System.out::println);
+
+        @NotNull DoubleHistogram h1 = samplingPriDistribution(bag, n / 2);
+        System.out.println(h1);
+
+        @NotNull DoubleHistogram h2 = samplingPriDistribution(bag, n * 2);
+        System.out.println(h1);
+
+        @NotNull DoubleHistogram h3 = samplingPriDistribution(bag, n * 4);
+        System.out.println(h1);
+
+        //TODO verify the histogram resulting from the above execution is relatively flat:
+        //ex: [0.21649484536082475, 0.2268041237113402, 0.28865979381443296, 0.26804123711340205]
+        //the tests below assume that it begins with a relatively flat distribution
 //        System.out.println(Arrays.toString(bag.priHistogram(4)));
 //        System.out.println(Arrays.toString(bag.priHistogram(8)));
-//
-//
-//
+
+
+
 //        System.out.print("Sampling: " );
-//        printDist(getSamplingDistribution((CurveBag) n.core.concepts, 1000));
+//        printDist(samplingPriDistribution((CurveBag) n.core.concepts, 1000));
 //        System.out.print("Priority: " );
 //        EmpiricalDistribution pri;
 //        printDist(pri = getSamplingPriorityDistribution(n.core.concepts, 1000));
 //
 //        List<SummaryStatistics> l = pri.getBinStats();
 //        assertTrue(l.get(0).getN() < l.get(l.size() - 1).getN());
-//
-//    }
+
+    }
+
+    /** fill it exactly to capacity */
+    private void fillLinear(Bag<PLink<String>,PLink<String>> bag) {
+        assertTrue(bag.isEmpty());
+        int c = bag.capacity();
+        for (int i = 0; i < c; i++) {
+            bag.put(new PLink("x" + i, ((float)(i+1)/c) ));
+        }
+        bag.commit();
+        assertEquals(c, bag.size());
+        assertEquals(1f/c, bag.priMin(), 0.001f);
+        assertEquals(1, bag.priMax(), 0.001f); //no pressure should have been applied because capacity was only reached after the last put
+    }
 
 
 //    /** maybe should be in ArrayBagTest */

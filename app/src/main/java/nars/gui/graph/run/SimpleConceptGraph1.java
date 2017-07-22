@@ -13,6 +13,7 @@ import nars.gui.NARSpace;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
 import nars.nar.exe.BufferedExecutioner;
+import nars.nar.exe.FocusedExecutioner;
 import nars.task.ITask;
 import nars.task.NALTask;
 import nars.term.Term;
@@ -106,9 +107,9 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         NARSpace cs = new SimpleConceptGraph1(n,
-                () -> (((BufferedExecutioner) (n.exe)).concepts)
+                () -> (((FocusedExecutioner) (n.exe)).concepts)
                         .stream()
-                        .map(x -> x instanceof Activate ? ((Activate) x) : null)
+                        .map(x -> x instanceof Activate ? ((Activate)x) : null)
                         .filter(Objects::nonNull)
                         .iterator()
                 /* TODO */, 64, 64, 7, 15);

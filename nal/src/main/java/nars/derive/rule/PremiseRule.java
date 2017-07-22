@@ -19,6 +19,7 @@ import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.compound.GenericCompound;
+import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
@@ -53,7 +54,8 @@ import static nars.time.Tense.ETERNAL;
  */
 public class PremiseRule extends GenericCompound {
 
-    public static final Atomic Task = Atomic.the("task"), Belief = Atomic.the("belief");
+    public static final Atomic Task = Atomic.the("task");
+    static final Atomic Belief = Atomic.the("belief");
     static final Term TaskAny = $.func("task", Atomic.the("any"));
     static final Term QUESTION_PUNCTUATION = $.inh(Atomic.the("Question"), Atomic.the("Punctuation"));
 
@@ -106,23 +108,6 @@ public class PremiseRule extends GenericCompound {
         Terms.printRecursive(System.out, x);
     }
 
-
-    @NotNull
-    public static PremiseRule rule(@NotNull String onlyRule) throws Narsese.NarseseException {
-        return parse(onlyRule);
-//        PremiseRule r = (PremiseRule) p.term(onlyRule);
-//        return rule(
-//                r
-//        );
-    }
-//    @Nullable
-//    private static final CompoundTransform<Compound, Term> truthNegate = new PremiseTruthTransform(true, true) {
-//        @Override
-//        public Term apply(@NotNull Term func) {
-//            return $.the(func.toString() + 'N');
-//        }
-//    };
-
     @NotNull
     public final Compound getPremise() {
         return (Compound) sub(0);
@@ -133,12 +118,8 @@ public class PremiseRule extends GenericCompound {
         return (Compound) sub(1);
     }
 
-    PremiseRule(@NotNull Compound premisesResultProduct) {
-        this((Compound) premisesResultProduct.sub(0), (Compound) premisesResultProduct.sub(1));
-    }
-
-    public PremiseRule(@NotNull Compound premises, @NotNull Compound result) {
-        super(PROD, TermVector.the(premises, result));
+    public PremiseRule(TermContainer premiseAndResult) {
+        super(PROD, premiseAndResult);
     }
 
 
@@ -1315,7 +1296,7 @@ public class PremiseRule extends GenericCompound {
             newPremise = pc; //same
         }
 
-        return PremiseRuleSet.normalize(new PremiseRule(newPremise, newConclusion), index);
+        return PremiseRuleSet.normalize(new PremiseRule(TermVector.the(newPremise, newConclusion)), index);
 
     }
 

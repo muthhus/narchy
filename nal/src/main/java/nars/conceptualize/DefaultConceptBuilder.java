@@ -68,9 +68,9 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         if (v < 16) {
             Map sharedMap = newBagMap(v);
             @NotNull Bag<Term, PriReference<Term>> termbag =
-                    new CurveBag<>(0, Param.termlinkMerge, sharedMap);
+                    new CurveBag<>(Param.termlinkMerge, sharedMap, 0);
             @NotNull Bag<Task, PriReference<Task>> taskbag =
-                    new CurveBag<>(0, Param.tasklinkMerge, sharedMap);
+                    new CurveBag<>(Param.tasklinkMerge, sharedMap, 0);
             return new Bag[]{termbag, taskbag};
         } else {
             return new Bag[]{

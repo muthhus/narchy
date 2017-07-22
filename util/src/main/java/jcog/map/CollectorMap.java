@@ -117,31 +117,14 @@ public abstract class CollectorMap<K, V> {
 //        return removed;
 //    }
 
-    @Nullable
-    public V remove(@NotNull K x) {
-
-        V e = map.remove(x);
-
-        if (e != null) {
-
-            synchronized (_items()) {
-
-                V removed;
-                removed = removeItem(e);
-                //            if (removed == null) {
-                //                /*if (Global.DEBUG)
-                //                    throw new RuntimeException(key + " removed from index but not from items list");*/
-                //                //return null;
-                //            }
-
-                /*if (removed != e) {
-                    throw new RuntimeException(x + " removed " + e + " but item removed was something else: " + removed);
-                }*/
-                return removed;
-            }
-        }
-
-        return null;
+    @Nullable public V remove(@NotNull K x) {
+        final Object[] removed = new Object[]{null};
+        map.computeIfPresent(x, (k,v) -> {
+            removeItem(v);
+            removed[0] = v;
+            return null;
+        });
+        return (V) removed[0];
     }
 
 

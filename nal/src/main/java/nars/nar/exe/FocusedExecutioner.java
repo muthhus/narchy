@@ -2,7 +2,7 @@ package nars.nar.exe;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
-import jcog.bag.impl.PriArrayBag;
+import jcog.list.FasterList;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.$;
@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * uses 3 bags/priority queues for a controlled, deterministic
@@ -33,21 +34,21 @@ public class FocusedExecutioner extends Executioner {
     final int MAX_TASKS = 64;
     final int MAX_CONCEPTS = 64;
 
-    final PriArrayBag<ITask> premises = new PriArrayBag<>(MAX_PREMISES, Param.taskMerge /* TODO make separate premise merge param */, new ConcurrentHashMap<>());
+    final CurveBag<ITask> premises = new CurveBag<ITask>(Param.taskMerge /* TODO make separate premise merge param */, new ConcurrentHashMap<>(), MAX_PREMISES);
 
-    final PriArrayBag<ITask> tasks = new CurveBag<>(MAX_TASKS, Param.taskMerge, new ConcurrentHashMap<>());
+    final CurveBag<ITask> tasks = new CurveBag<ITask>(Param.taskMerge, new ConcurrentHashMap<>(), MAX_TASKS);
 
-    final PriArrayBag<ITask> concepts = new CurveBag<>(MAX_CONCEPTS, Param.conceptMerge, new ConcurrentHashMap<>());
+    public final CurveBag<ITask> concepts = new CurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(), MAX_CONCEPTS);
 
-    int subcycles = 1;
-    int subCycleTasks = 8;
-    int subCycleConcepts = 2;
-    int subCyclePremises = 4;
+    int subcycles = 16;
+    int subCycleTasks = 16;
+    int subCycleConcepts = 1;
+    int subCyclePremises = 8;
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
 
     /** temporary buffer for tasks about to be executed */
-    private final List<ITask> next = $.newArrayList(1024);
+    private final FasterList<ITask> next = new FasterList(1024);
 
     @Override
     public void cycle() {
@@ -69,7 +70,7 @@ public class FocusedExecutioner extends Executioner {
 
 
 
-        Consumer<? super PriReference<ITask>> queueTask = x -> next.add(x.get());
+
 
         for (int i = 0; i < subcycles; i++) {
 
@@ -77,7 +78,7 @@ public class FocusedExecutioner extends Executioner {
 
             final int[] maxTasks = {subCycleTasks};
             tasks.sample((x) -> {
-                NALTask tt = (NALTask) x.get();
+                NALTask tt = (NALTask) x;
                 next.add(tt);
                 boolean save = false; // tt.isInput();
                 return --maxTasks[0] > 0 ?
@@ -88,11 +89,11 @@ public class FocusedExecutioner extends Executioner {
 
             execute(next);
 
-            concepts.sample(subCycleConcepts, (Consumer) queueTask);
+            concepts.sample(subCycleConcepts, (Predicate<ITask>)(next::add));
 
             execute(next);
 
-            premises.pop(subCyclePremises, queueTask);
+            premises.pop(subCyclePremises, next::add);
 
             execute(next);
         }
@@ -138,16 +139,15 @@ public class FocusedExecutioner extends Executioner {
     }
 
     @Override
-    public void run(@NotNull ITask input) {
-        PLink p = new PLink(input, input.priElseZero());
-        if (input instanceof Task) {
-            tasks.putAsync(p);
-        } else if (input instanceof Premise) {
-            premises.putAsync(p);
-        } else if (input instanceof Activate) {
-            concepts.putAsync(p);
+    public void run(@NotNull ITask x) {
+        if (x instanceof Task) {
+            tasks.putAsync(x);
+        } else if (x instanceof Premise) {
+            premises.putAsync(x);
+        } else if (x instanceof Activate) {
+            concepts.putAsync(x);
         } else
-            throw new UnsupportedOperationException("what is " + input);
+            throw new UnsupportedOperationException("what is " + x);
     }
 
 }

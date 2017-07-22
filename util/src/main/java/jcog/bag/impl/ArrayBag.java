@@ -32,8 +32,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     public final PriMerge mergeFunction;
 
-    //final Consumer<Y> toPut;
-
     /**
      * inbound pressure sum since last commit
      */
@@ -50,7 +48,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     static final class SortedPLinks extends SortedArray {
         @Override
         protected Object[] newArray(int oldSize) {
-            return new Object[oldSize == 0 ? 4 : oldSize * 2];
+            return new Object[oldSize == 0 ? 2 : oldSize + (Math.max(1, oldSize/2))];
         }
     }
 
@@ -64,8 +62,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     }
 
     @Override
-    public final float floatValueOf(Prioritized x) {
-        return -pCmp(x);
+    public final float floatValueOf(Y y) {
+        return -pCmp(y);
     }
 
 
@@ -263,49 +261,49 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         return this;
     }
 
-    @Override
-    public Bag<X, Y> sample(int max, Consumer<? super Y> each) {
-        return sample(max, ((x) -> {
-            each.accept(x);
-            return true;
-        }));
-    }
-
-    @Override
-    public Bag<X, Y> sample(int max, Predicate<? super Y> kontinue) {
-        synchronized (items) {
-            assert (max > 0);
-            int s = size();
-
-            Object[] oo = items.list;
-            if (oo.length == 0)
-                return this;
-
-            Object[] ll = oo;
-            if (s == 1) {
-                //get the only
-                kontinue.test((Y) ll[0]);
-            } else if (s == max) {
-                //get all
-                for (int i = 0; i < s; i++) {
-                    if (!kontinue.test((Y) ll[i]))
-                        break;
-                }
-            } else if (s > 1) {
-                //get some: choose random starting index, get the next consecutive values
-                max = Math.min(s, max);
-                for (int i =
-                     (this instanceof CurveBag ? random(s) : 0), m = 0; m < max; m++) {
-                    Y lll = (Y) ll[i++];
-                    if (lll != null)
-                        if (!kontinue.test(lll))
-                            break;
-                    if (i == s) i = 0; //modulo
-                }
-            }
-        }
-        return this;
-    }
+//    @Override
+//    public Bag<X, Y> sample(int max, Consumer<? super Y> each) {
+//        return sample(max, ((x) -> {
+//            each.accept(x);
+//            return true;
+//        }));
+//    }
+//
+//    @Override
+//    public Bag<X, Y> sample(int max, Predicate<? super Y> kontinue) {
+//        synchronized (items) {
+//            assert (max > 0);
+//            int s = size();
+//
+//            Object[] oo = items.list;
+//            if (oo.length == 0)
+//                return this;
+//
+//            Object[] ll = oo;
+//            if (s == 1) {
+//                //get the only
+//                kontinue.test((Y) ll[0]);
+//            } else if (s == max) {
+//                //get all
+//                for (int i = 0; i < s; i++) {
+//                    if (!kontinue.test((Y) ll[i]))
+//                        break;
+//                }
+//            } else if (s > 1) {
+//                //get some: choose random starting index, get the next consecutive values
+//                max = Math.min(s, max);
+//                for (int i =
+//                     (this instanceof CurveBag ? random(s) : 0), m = 0; m < max; m++) {
+//                    Y lll = (Y) ll[i++];
+//                    if (lll != null)
+//                        if (!kontinue.test(lll))
+//                            break;
+//                    if (i == s) i = 0; //modulo
+//                }
+//            }
+//        }
+//        return this;
+//    }
 
     protected int random(int s) {
         return random().nextInt(s);
@@ -326,33 +324,37 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             if (s == 0) return;
             else if (s == 1) i = 0;
             else i = random(s);
-            //i = 0;
         }
 
-        //boolean modified = false;
         BagSample next = BagSample.Next;
 
-        int count = 0;
-        int c = capacity();
-        int ss = 0;
-        int ms = size();
-        while (!next.stop && (ss < ms) && (count++ < c)) {
-            if (i >= ms) i = 0;
-            Y x = get(i++);
+        /*
+        sampled items will be limited to the current array.  if the array has resized by
+        an insertion from another thread, it will not be available in this sampling
+         */
+        final Object[] ii = items.array();
+
+        final int nullLimit = ii.length; //hard safety limit: when reached, it means every item available in this sampling has been removed
+        int nulls = 0;
+        while (!next.stop && nulls < nullLimit) {
+            if (i == ii.length) i = 0; //wrap-around
+            Y x = (Y) ii[i];
 
             if (x != null/*.remove*/) {
                 next = each.next(x);
                 if (next.remove) {
-                    x = remove(key(x));
-                    if (x == null)
-                        continue;
+                    remove(key(x));
+                    if (ii[i]!=null)
+                        ii[i] = null; //set it in this array because the remove operation has instead set it in another copy of the array, caused by growth or capacity change (ie. from another thread)
+                    nulls++;
                     //modified = true;
                 }
-
-                ss++;
                 /*if (remove(key(x))!=null)
                     modified = true;*/
+            } else {
+                nulls++;
             }
+            i++;
         }
 
 //        if (modified) {
@@ -369,8 +371,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     public final Y put(@NotNull final Y x, @Nullable final MutableFloat overflow) {
 
         final float p = priElseZero(x);
+        boolean atCap = size() == capacity;
         if (p < Pri.EPSILON) {
-            if (size() == capacity)
+            if (atCap)
                 return null; //automatically refuse sub-ther
         }
 
@@ -397,7 +400,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
         if (incomingPri[0] < 0) {
 
-            pressurize(p); //absorb pressure even if it's about to get removed
+            if (atCap)
+                pressurize(p); //absorb pressure even if it's about to get removed
 
 
             synchronized (items) {
@@ -420,7 +424,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
                 unsorted.set(true); //merging may have shifted ordering, so sort later
 
-                pressurize(activated);
+                if (atCap)
+                    pressurize(activated);
 
                 if (overflow != null) {
                     float oo = p - activated;

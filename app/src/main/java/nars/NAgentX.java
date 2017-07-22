@@ -3,8 +3,7 @@ package nars;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.gui.Vis;
-import nars.index.term.map.CaffeineIndex;
-import nars.nar.exe.BufferedExecutioner;
+import nars.index.term.HijackTermIndex;
 import nars.nar.exe.FocusedExecutioner;
 import nars.nar.exe.MultiExecutioner;
 import nars.op.mental.Inperience;
@@ -116,7 +115,10 @@ abstract public class NAgentX extends NAgent {
                                     new FocusedExecutioner()
                             ),THREADS, 2))
                     .time(clock)
-                    .index(new CaffeineIndex(128 * 1024 ))
+                    .index(
+                        //new CaffeineIndex(128 * 1024 )
+                            new HijackTermIndex(128 * 1024,  4)
+                    )
                     .get();
 
         n.confMin.setValue(0.01f);

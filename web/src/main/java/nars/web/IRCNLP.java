@@ -2,7 +2,7 @@
 package nars.web;
 
 import jcog.bag.impl.ArrayBag;
-import jcog.bag.impl.PriArrayBag;
+import jcog.bag.impl.PLinkArrayBag;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.*;
@@ -56,8 +56,8 @@ public class IRCNLP extends IRC {
 
     boolean trace;
 
-    final ArrayBag<String, PriReference<String>> out = new PriArrayBag<>(16, PriMerge.max, new ConcurrentHashMap());
-    final ArrayBag<String, PriReference<String>> prevOut = new PriArrayBag<>(512, PriMerge.max, new ConcurrentHashMap());
+    final ArrayBag<String, PriReference<String>> out = new PLinkArrayBag<>(16, PriMerge.max, new ConcurrentHashMap());
+    final ArrayBag<String, PriReference<String>> prevOut = new PLinkArrayBag<>(512, PriMerge.max, new ConcurrentHashMap());
 
     public IRCNLP(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);

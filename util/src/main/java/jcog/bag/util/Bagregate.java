@@ -1,6 +1,6 @@
 package jcog.bag.util;
 
-import jcog.bag.impl.PriArrayBag;
+import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.Prioritized;
@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * resulting in containing effectively the integrated / moving average values of the input bag
  * TODO make a PLink version of ArrayBag since quality is not used here
  */
-public class Bagregate<X extends Prioritized> extends PriArrayBag<X> {
+public class Bagregate<X extends Prioritized> extends PLinkArrayBag<X> {
 
     private final Iterable<X> src;
     private final MutableFloat scale;

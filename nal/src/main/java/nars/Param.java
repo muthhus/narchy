@@ -34,14 +34,14 @@ public abstract class Param  {
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 2;
 
-    public static final PriMerge termlinkMerge = PriMerge.plus;
-    public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
+    public static final PriMerge termlinkMerge = PriMerge.or;
+    public static final PriMerge tasklinkMerge = PriMerge.or; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptMerge = PriMerge.plus;
 
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
-            Util::or;
+            Util::and;
             //UtilityFunctions::aveAri;
             //Util::and;
             //Math::min;
@@ -71,13 +71,13 @@ public abstract class Param  {
 
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.98f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.99f, 0, 1f);
     public final FloatParam valueNegativeDecay = new FloatParam(0.96f, 0, 1f);
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */
     public static float valueAtInput(Task accepted, NAR nar) {
         int vol = accepted.volume();
-        return -(vol)/nar.termVolumeMax.floatValue()/1000f;
+        return -(vol)/nar.termVolumeMax.floatValue()/2000f;
     }
 
 

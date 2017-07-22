@@ -2,6 +2,7 @@ package jcog.bag.impl;
 
 import jcog.bag.Bag;
 import jcog.pri.PriReference;
+import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,10 +11,10 @@ import java.util.Map;
 /**
  * ArrayBag with a randomized sampling range
  */
-public class CurveBag<X> extends PriArrayBag<X> {
+public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
 
-    public CurveBag(int initialCapacity, @NotNull PriMerge mergeFunction, @NotNull Map<X, PriReference<X>> map) {
-        super(initialCapacity, mergeFunction, map);
+    public CurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, int initialCapacity) {
+        super(mergeFunction, map, initialCapacity);
     }
 
 
@@ -42,7 +43,7 @@ public class CurveBag<X> extends PriArrayBag<X> {
 
     @NotNull
     @Override
-    public Bag<X, PriReference<X>> sample(@NotNull Bag.BagCursor<? super PriReference<X>> each) {
+    public Bag<X, X> sample(@NotNull Bag.BagCursor<? super X> each) {
         sample(each, -1);
         return this;
     }

@@ -88,7 +88,10 @@ public class Premise extends Pri implements ITask {
         //nar.emotion.count("Premise_run");
 
         PriReference<Task> taskLink = this.taskLink;
-        Task task = taskLink.get();
+        final Task task = taskLink.get();
+        if (task == null)
+            return 0;
+
         //float taskPri = task.priElseZero();
 
 
@@ -101,12 +104,12 @@ public class Premise extends Pri implements ITask {
         Task belief = null;
         if (beliefTerm instanceof Compound) {
 
-            Compound taskTerm = task.term();
 
-            Concept taskConcept = nar.conceptualize(taskTerm);
+            Concept taskConcept = task.concept(nar, true);
+            assert(taskConcept != null): task + " could not be conceptualized";
+
             Concept _beliefConcept = nar.conceptualize(beliefTerm);
-
-            boolean beliefIsTask = taskConcept.equals(_beliefConcept);
+            boolean beliefIsTask = _beliefConcept!=null && taskConcept.equals(_beliefConcept);
 
 
             //Terms.equalAtemporally(task.term(), (beliefTerm));
@@ -114,9 +117,9 @@ public class Premise extends Pri implements ITask {
             boolean reUnified = false;
             if (beliefTerm.varQuery() > 0 && !beliefIsTask) {
 
-                int[] matchTTL = new int[] { Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION) };
+                int[] matchTTL = { Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION) };
 
-                Term unified = unify(taskTerm, (Compound) beliefTerm, nar, matchTTL);
+                Term unified = unify(task.term(), (Compound) beliefTerm, nar, matchTTL);
                 if (unified != null) {
                     beliefTerm = unified;
                     reUnified = true;

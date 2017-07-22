@@ -3,6 +3,7 @@ package nars.derive;
 import jcog.util.FileCache;
 import nars.IO;
 import nars.NAR;
+import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
@@ -66,31 +67,31 @@ public interface Deriver {
         return RULES;
     }
 
-    /**
-     * for now it seems there is a leak so its better if each NAR gets its own copy. adds some overhead but we'll fix this later
-     * not working yet probably due to unsupported ellipsis IO codec. will fix soon
-     */
-    static PremiseRuleSet DEFAULT_RULES_cached() {
-
-
-        return new PremiseRuleSet(
-                Stream.of(
-                        "nal1.nal",
-                        //"nal4.nal",
-                        "nal6.nal",
-                        "misc.nal",
-                        "induction.nal",
-                        "nal2.nal",
-                        "nal3.nal"
-                ).flatMap(x -> {
-                    try {
-                        return rulesParsed(x);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    return Stream.empty();
-                }), new PatternTermIndex(), true);
-    }
+//    /**
+//     * for now it seems there is a leak so its better if each NAR gets its own copy. adds some overhead but we'll fix this later
+//     * not working yet probably due to unsupported ellipsis IO codec. will fix soon
+//     */
+//    static PremiseRuleSet DEFAULT_RULES_cached() {
+//
+//
+//        return new PremiseRuleSet(
+//                Stream.of(
+//                        "nal1.nal",
+//                        //"nal4.nal",
+//                        "nal6.nal",
+//                        "misc.nal",
+//                        "induction.nal",
+//                        "nal2.nal",
+//                        "nal3.nal"
+//                ).flatMap(x -> {
+//                    try {
+//                        return rulesParsed(x);
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                    return Stream.empty();
+//                }), new PatternTermIndex(), true);
+//    }
 
 
 
@@ -116,53 +117,51 @@ public interface Deriver {
 //    }
 
 
-    Logger logger = LoggerFactory.getLogger(Deriver.class);
-
-    BiConsumer<Stream<Compound>, DataOutput> encoder = (x, o) -> {
-        try {
-            IO.writeTerm(x, o);
-            //o.writeUTF(x.getTwo());
-        } catch (IOException e) {
-            throw new RuntimeException(e); //e.printStackTrace();
-        }
-    };
-
-
-    @NotNull
-    static Stream<Pair<Compound, String>> rulesParsed(String ruleSet) throws IOException, URISyntaxException {
-
-        PatternTermIndex p = new PatternTermIndex();
-
-        Function<DataInput, Compound> decoder = (i) -> {
-            try {
-                return //Tuples.pair(
-                        (Compound) readTerm(i, p);
-                //,i.readUTF()
-                //);
-            } catch (IOException e) {
-                throw new RuntimeException(e); //e.printStackTrace();
-                //return null;
-            }
-        };
-
-
-        URL path = NAR.class.getResource("nal/" + ruleSet);
-
-        Stream<Compound> parsed =
-                FileCache.fileCache(path, PremiseRuleSet.class.getSimpleName(),
-                        () -> load(ruleSet),
-                        encoder,
-                        decoder,
-                        logger
-                );
-
-        return parsed.map(x -> Tuples.pair(x, "."));
-    }
-
-    static Stream<Compound> load(String ruleFile) {
-
-        return parsedRules(new PatternTermIndex(), ruleFile).map(x -> x.getOne() /* HACK */);
-
-    }
+//    Logger logger = LoggerFactory.getLogger(Deriver.class);
+//
+//    BiConsumer<Stream<Compound>, DataOutput> encoder = (x, o) -> {
+//        try {
+//            IO.writeTerm(x, o);
+//            //o.writeUTF(x.getTwo());
+//        } catch (IOException e) {
+//            throw new RuntimeException(e); //e.printStackTrace();
+//        }
+//    };
+//
+//
+//    @NotNull
+//    static Stream<Pair<PremiseRule, String>> rulesParsed(String ruleSet) throws IOException, URISyntaxException {
+//
+//        PatternTermIndex p = new PatternTermIndex();
+//
+//        Function<DataInput, PremiseRule> decoder = (i) -> {
+//            try {
+//                return //Tuples.pair(
+//                        (PremiseRule) readTerm(i, p);
+//                //,i.readUTF()
+//                //);
+//            } catch (IOException e) {
+//                throw new RuntimeException(e); //e.printStackTrace();
+//                //return null;
+//            }
+//        };
+//
+//
+//        URL path = NAR.class.getResource("nal/" + ruleSet);
+//
+//        Stream<PremiseRule> parsed =
+//                FileCache.fileCache(path, PremiseRuleSet.class.getSimpleName(),
+//                        () -> load(ruleSet),
+//                        encoder,
+//                        decoder,
+//                        logger
+//                );
+//
+//        return parsed.map(x -> Tuples.pair(x, "."));
+//    }
+//
+//    static Stream<PremiseRule> load(String ruleFile) {
+//        return parsedRules(new PatternTermIndex(), ruleFile).map(Pair::getOne /* HACK */);
+//    }
 
 }

@@ -70,8 +70,8 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
-        super(new CurveBag(capacity,
-                PriMerge.max, new ConcurrentHashMap<>(capacity)), selectionRate, n);
+        super(new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), capacity
+        ), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;

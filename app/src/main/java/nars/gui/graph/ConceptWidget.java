@@ -3,7 +3,7 @@ package nars.gui.graph;
 import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.impl.PriArrayBag;
+import jcog.bag.impl.PLinkArrayBag;
 import jcog.pri.Deleteable;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
@@ -69,7 +69,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 //        edges = //new HijackBag<>(maxEdges * maxNodes, 4, BudgetMerge.plusBlend, nar.random);
         this.edges =
                 //new PLinkHijackBag(0, 2);
-                new PriArrayBag<>(0, PriMerge.avg, new HashMap());
+                new PLinkArrayBag<>(0, PriMerge.avg, new HashMap());
 
 
 //        for (int i = 0; i < edges; i++)

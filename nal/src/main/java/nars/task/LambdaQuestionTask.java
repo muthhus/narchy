@@ -1,7 +1,7 @@
 package nars.task;
 
 import jcog.bag.impl.ArrayBag;
-import jcog.bag.impl.PriArrayBag;
+import jcog.bag.impl.PLinkArrayBag;
 import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
@@ -42,7 +42,7 @@ public class LambdaQuestionTask extends NALTask {
     }
 
     protected ArrayBag<Task, PriReference<Task>> newBag(int history) {
-        return new PriArrayBag<>(history, PriMerge.max, new ConcurrentHashMap<>(history)) {
+        return new PLinkArrayBag<>(history, PriMerge.max, new ConcurrentHashMap<>(history)) {
             @Override
             public void onAdded(@NotNull PriReference<Task> t) {
                 eachAnswer.accept(LambdaQuestionTask.this, t.get());

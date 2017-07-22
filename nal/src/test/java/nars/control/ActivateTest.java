@@ -1,24 +1,17 @@
 package nars.control;
 
 import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import nars.Task;
 import nars.concept.Concept;
-import nars.control.premise.Derivation;
-import nars.task.DerivedTask;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
-import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 import static nars.$.$;
 import static org.junit.Assert.assertEquals;
@@ -38,13 +31,12 @@ public class ActivateTest {
         HashBag<String> s = new HashBag();
         Activate cf = new Activate(c, 1f) {
             @Override
-            protected int premise(Derivation d, Premise p, Consumer<DerivedTask> x, int ttlPerPremise) {
+            protected void onPremise(Premise p, NAR nar) {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
                 if (p.termLink.get() instanceof Atom)
-                    return 0 ; //ignore
+                    return ; //ignore
                 String tls = p.termLink.get().toString();
                 s.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
-                return super.premise(d, p, x, ttlPerPremise);
             }
         };
 

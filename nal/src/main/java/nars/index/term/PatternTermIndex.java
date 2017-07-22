@@ -26,7 +26,6 @@ public class PatternTermIndex extends MapTermIndex {
         super(new ConcurrentHashMap<>(512));
     }
 
-
     @Override
     public Termed get(@NotNull Term x, boolean createIfMissing) {
         if (x instanceof Variable)

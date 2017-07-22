@@ -1,7 +1,6 @@
 package nars.nal;
 
 import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -24,7 +23,6 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 import static org.junit.Assert.*;
 
@@ -98,7 +96,7 @@ public class TrieDeriverTest {
     public static PrediTerm<Derivation> testCompile(NAR n, boolean debug, String... rules) {
 
         PremiseRuleSet src = new PremiseRuleSet( rules );
-        PrediTerm d = src.compile(n);
+        PrediTerm d = TrieDeriver.the(src, n);
 
         if (debug) d.printRecursive();
 
