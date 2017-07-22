@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 
@@ -37,7 +36,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     public float mass;
 
-    private final AtomicBoolean unsorted = new AtomicBoolean(false);
     protected float min = 0, max = 0;
 
     public ArrayBag(PriMerge mergeFunction, @NotNull Map<X, Y> map) {
@@ -111,7 +109,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      * may include the item being added
      */
     @Nullable
-    private List<Y> updateItems(@Nullable Y toAdd) {
+    private FasterList<Y> update(@Nullable Y toAdd) {
 
         int c = capacity();
 
@@ -119,15 +117,18 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
         int s = size();
 
+
         int nextSize = s + additional;
 
         int needsRemoved = nextSize - c;
         float min;
-        List<Y> trash = null;
+
+        FasterList<Y> trash = null;
+
         if (needsRemoved > 0) {
 
             trash = new FasterList(needsRemoved);
-            min = clean(toAdd, s, nextSize - c, trash);
+            min = clean(toAdd!=null, s, nextSize - c, trash);
 
             s = size();
         } else {
@@ -135,13 +136,15 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         }
 
 
+        boolean rejection = false;
         if (toAdd != null) {
             if (s < c) {
                 //room to add an item
                 items.add(toAdd, this);
+                s++;
 
             } else {
-                //at capacity
+                //at capacity, size will remain the same
                 Y removed;
                 if (toAdd.priElseZero() > min) {
                     //remove lowest
@@ -150,22 +153,60 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                     items.add(toAdd, this);
                 } else {
                     removed = toAdd;
+                    rejection = true;
                 }
 
-                if (trash == null)
-                    trash = List.of(removed);
-                else
+                if (trash == null) {
+                    trash = new FasterList<>();
+                    trash.add(removed);
+                } else
                     trash.add(removed);
 
             }
         }
+
+        if (s > 0 && toAdd != null || (trash != null && !trash.isEmpty() && !rejection)) {
+            //bag has changed, update:
+            massAndSort(s);
+        } else {
+            this.min = this.max = this.mass = 0;
+        }
+
         return trash;
+    }
+
+    private void massAndSort(int s) {
+        assert(s>0);
+
+        float mass = 0;
+        //synchronized (items) {
+        for (int i = 0; i < s; i++) {
+            Y x = get(i);
+            if (x != null)
+                mass += x.priSafe(0);
+        }
+
+        sort(s);
+        this.mass = mass;
+    }
+
+    private void sort(int s) {
+        assert(s>0);
+        Object[] il = items.list;
+        if (s > 1) { //test again
+            int[] stack = new int[sortSize(s) /* estimate */];
+            qsort(stack, il, 0 /*dirtyStart - 1*/, (s - 1));
+            max = ((Y) (il[0])).priSafe(0);
+            min = ((Y) (il[s - 1])).priSafe(0);
+        } else {
+            this.min = this.max = ((Y) (il[0])).priSafe(0);
+        }
     }
 
     /**
      * returns the minimum pri value encountered
      */
-    private float clean(@Nullable Y toAdd, int s, int minRemoved, List<Y> trash) {
+    private float clean(@Deprecated boolean toAdd, int s, int minRemoved, List<Y> trash) {
 
         float min = Float.POSITIVE_INFINITY;
 
@@ -195,7 +236,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
             int s1 = s;
             SortedArray<Y> items1 = this.items;
-            while (s1 > 0 && ((s1 - c) + (toAdd != null ? 1 : 0)) > 0) {
+            while (s1 > 0 && ((s1 - c) + (toAdd ? 1 : 0)) > 0) {
                 Y w1 = items1.remove(s1 - 1);
                 if (w1 != null) //skip over nulls
                     trash.add(w1);
@@ -410,47 +451,62 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         X key = key(incoming);
 
         final @Nullable List[] trash = {null};
-        Y inserted = map.compute(key, (kk, existing) -> {
-            if (existing != null) {
-                if (existing == incoming)
-                    return existing; //no change
+        Y inserted;
+
+        synchronized (items) {
+
+            inserted = map.compute(key, (kk, existing) -> {
+                if (existing != null) {
+                    if (existing == incoming)
+                        return existing; //no change
 
 
-                boolean atCap = size() == capacity;
-                float priBefore = (atCap ? existing.priElseZero() : -1 /* dont care */);
-                float oo = mergeFunction.merge((Priority) existing /* HACK */, incoming);
-                overflow.add(oo);
-                if (atCap) {
-                    float delta = existing.priElseZero() - priBefore;
-                    if (delta >= Pri.EPSILON)
-                        pressurize(delta);
-                }
-                return existing;
+                    boolean atCap = size() == capacity;
+                    float priBefore = (atCap ? existing.priElseZero() : -1 /* dont care */);
+                    float oo = mergeFunction.merge((Priority) existing /* HACK */, incoming);
 
-            } else {
+                    if (overflow!=null)
+                        overflow.add(oo);
 
-                boolean atCap = size() == capacity;
-                if (atCap) {
-                    pressurize(p);
-                    @Nullable List<Y> trsh = updateItems(incoming);
-                    trash[0] = trsh;
-                    if (trsh!=null) {
-                        if (trsh.get(0)==incoming)
-                            return null;
+                    if (atCap) {
+                        float delta = existing.priElseZero() - priBefore;
+                        if (delta >= Pri.EPSILON)
+                            pressurize(delta);
                     }
+                    return existing;
+
+                } else {
+
+
+                        pressurize(p);
+                        @Nullable FasterList<Y> trsh = update(incoming);
+                        if (trsh != null) {
+                            trash[0] = trsh;
+                            if (trsh.getLast() == incoming)
+                                return null;
+                        }
+
+                    return incoming; //success
                 }
+            });
 
-                return incoming; //success
+
+            if (trash[0] != null) {
+                //clear the entries from the map right away
+                //this should be done in a synchronized block along with what happens above
+                trash[0].forEach(x -> {
+                    if (x != incoming)
+                        map.remove(x);
+                });
             }
-            return null;
-        });
+        }
 
-        @Nullable List<Y> trsh = trash[0];
-        if (trsh!=null) {
-            //clear the entries from the map right away
-            //technically this should be done in a synchronized block along with what happens above
-            trsh.forEach(map::remove);
-            trsh.forEach(this::onRemoved);
+        //this can be done outside critical section
+        if (trash[0] != null) {
+            ((List<Y>) (trash[0])).forEach(x -> {
+                if (x != incoming)
+                    onRemoved(x);
+            });
         }
 
 
@@ -538,58 +594,29 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     private void commit(@Nullable Consumer<Y> update, boolean checkCapacity) {
 
-        if (update != null || checkCapacity)
-            update(update, checkCapacity);
+        if (update == null && !checkCapacity)
+            return;
 
-
-        float mass = 0;
-        //synchronized (items) {
-        int iii = size();
-        for (int i = 0; i < iii; i++) {
-            Y x = get(i);
-            if (x != null)
-                mass += x.priSafe(0);
-        }
-        //}
-        this.mass = mass;
-
-
-    }
-
-
-    /**
-     * applies the 'each' consumer and commit simultaneously, noting the range of items that will need sorted
-     */
-    @NotNull
-    protected ArrayBag<X, Y> update(@Nullable Consumer<Y> each, boolean checkCapacity) {
-        boolean needsSort = false;
-
+        @Nullable FasterList<Y> trash = null;
         synchronized (items) {
             if (size() > 0) {
-                if (checkCapacity)
-                    if (!updateItems(null))
-                        return this;
+                if (checkCapacity) {
+                    trash = update(null);
+                }
 
-                if (each != null) {
-                    needsSort = !updateBudget(each);
-                } else {
-                    needsSort = false;
+                boolean needsSort = trash!=null;
+                if (update != null) {
+                    needsSort |= !updateBudget(update);
+                }
+
+                if (needsSort) {
+                    massAndSort(size());
                 }
             }
         }
 
-        if (needsSort) {
-            unsorted.set(true);
-        }
-
-        return this;
     }
 
-
-//    protected void sortAfterUpdate() {
-//        unsorted.set(true);
-//        sort();
-//    }
 
     static int sortSize(int s) {
         //TODO get a better calculation; this is an estimate, probably some ~log2(size) relationship
@@ -846,25 +873,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     @Override
     public String toString() {
         return super.toString() + '{' + items.getClass().getSimpleName() + '}';
-    }
-
-    /**
-     * atomic sort procedure, updates min/max bounds
-     */
-    void sort() {
-        if (unsorted.compareAndSet(true, false)) {
-
-            final int s = size();
-            if (s > 1) { //test again
-                Object[] il = items.list;
-                int[] stack = new int[sortSize(s) /* estimate */];
-                qsort(stack, il, 0 /*dirtyStart - 1*/, (s - 1));
-                min = ((Y) (il[0])).priSafe(0);
-                max = ((Y) (il[s - 1])).priSafe(0);
-            } else {
-                min = max = ((Y) (items.list[0])).priSafe(0);
-            }
-        }
     }
 
 
