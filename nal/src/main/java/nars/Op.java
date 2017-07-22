@@ -150,11 +150,8 @@ public enum Op implements $ {
             //Term[] u = uu.length > 1 ? conjTrueFalseFilter(uu) : uu /* avoid true false filter if fall-through only-term anyway */;
 
 
-            final int n = tt.length;
+            final int n = tt.length;             assert(n>0);
             switch (n) {
-
-                case 0:
-                    return Null; //shouldnt happen
 
                 case 1:
                     Term only = tt[0];
@@ -223,11 +220,7 @@ public enum Op implements $ {
             } else {
                 //NON-COMMUTIVE
 
-                //assert (n == 2);
-                if (n != 2) {
-                    throw new InvalidTermException(CONJ, tt, "invalid non-commutive conjunction");
-                    //return Null;
-                }
+                assert (n == 2): "invalid non-commutive conjunction arity!=2";
 
                 Term a = tt[0];
                 Term b = tt[1];
@@ -418,12 +411,6 @@ public enum Op implements $ {
             @NotNull Term ib = implication.sub(1); /* impl postcondition */
             Term ia =
                     CONJ.the(conjDT, others, implication.sub(0) /* impl precond */);
-            if (ia instanceof Bool) {
-                if (ia == True) //TODO maybe only applies to concurrent dt's
-                    return ib; //reduce to consequence
-                else
-                    return Null; //false or null
-            }
 
             return IMPL.the(implDT, ia, ib);
         }
@@ -599,6 +586,7 @@ public enum Op implements $ {
     public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
     public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);
     public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
+
     final static Logger logger = LoggerFactory.getLogger(Op.class);
 
 //    public interface TermInstancer {
@@ -695,10 +683,12 @@ public enum Op implements $ {
 
         assert (!o.atomic);
 
-        if (!o.allowsBool) {
-            for (Term x : subterms)
-                if (x instanceof Bool)
-                    return Null;
+        if (Param.DEBUG) {
+            if (!o.allowsBool) {
+                for (Term x : subterms)
+                    if (x instanceof Bool)
+                        return Null;
+            }
         }
 
         int s = subterms.length;
@@ -1462,7 +1452,7 @@ public enum Op implements $ {
         }
     }
 
-    public boolean commute(int dt, Term[] u) {
+    public boolean commute(int dt) {
         if (commutative) {
             if (temporal) {
                 /*if (dt == XTERNAL) {
@@ -1492,7 +1482,7 @@ public enum Op implements $ {
         if (statement) {
             return statement(this, dt, u[0], u[1]);
         } else {
-            Term[] uu = commute(dt, u) ? Terms.sorted(u) : u;
+            Term[] uu = commute(dt) ? Terms.sorted(u) : u;
             return compound(this, dt, uu);
         }
     }

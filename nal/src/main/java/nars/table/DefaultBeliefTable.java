@@ -46,12 +46,12 @@ public class DefaultBeliefTable implements BeliefTable {
 
     @Override
     public boolean removeTask(Task x) {
-        return (x.isEternal()) ? eternal.removeTask(x) : temporal().removeTask(x);
+        return (x.isEternal()) ? eternal.removeTask(x) : temporal.removeTask(x);
     }
 
     @Override
     public void clear() {
-        temporal().clear();
+        temporal.clear();
         eternal.clear();
     }
 
@@ -61,7 +61,7 @@ public class DefaultBeliefTable implements BeliefTable {
     public final Iterator<Task> iterator() {
         return Iterators.concat(
                 eternal.iterator(),
-                temporal().taskIterator()
+                temporal.taskIterator()
         );
     }
 
@@ -73,7 +73,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public final void forEachTask(Consumer<? super Task> action) {
         eternal.forEachTask(action);
-        temporal().forEachTask(action);
+        temporal.forEachTask(action);
     }
 
     @Override
@@ -81,34 +81,26 @@ public class DefaultBeliefTable implements BeliefTable {
         final float[] total = {0};
         Consumer<Task> totaler = t -> total[0] += t.priSafe(0);
         eternal.forEachTask(totaler);
-        temporal().forEachTask(totaler);
+        temporal.forEachTask(totaler);
         return total[0];
     }
 
     @Override
     public int size() {
-        return eternal.size() /* eternal */ + temporal().size();
+        return eternal.size() /* eternal */ + temporal.size();
     }
 
     @Override
     @Deprecated
     public int capacity() {
         //throw new UnsupportedOperationException("doesnt make sense to call this");
-        return eternal.capacity() /* eternal */ + temporal().capacity();
+        return eternal.capacity() /* eternal */ + temporal.capacity();
     }
 
     @Override
     public final void setCapacity(int eternals, int temporals) {
         temporal.setCapacity(temporals);
         eternal.setCapacity(eternals);
-    }
-
-    public EternalTable eternal() {
-        return eternal;
-    }
-
-    public TemporalBeliefTable temporal() {
-        return temporal;
     }
 
     /**

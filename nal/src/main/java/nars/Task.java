@@ -90,10 +90,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
                 //nearest endpoint of the interval
                 assert (dur > 0);
                 long dist = a != z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a - when);
-                if (dist > 0) {
-                    cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
-                    //cw = 0; //immediate cut-off
-                }
+                assert(dist > 0);
+
+                cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
+                //cw = 0; //immediate cut-off
+
 
                 if (eternalizable()) {
                     float et = t.eviEternalized();
