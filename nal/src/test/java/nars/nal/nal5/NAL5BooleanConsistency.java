@@ -21,7 +21,7 @@ public class NAL5BooleanConsistency {
 
         Param.DEBUG = true;
 
-        float confthresh = 0.05f;
+        float confthresh = 0.67f;
 
 //        final Deriver e = Deriver.get(
 //                "induction.nal", "nal6.nal"

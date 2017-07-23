@@ -18,6 +18,7 @@ import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -205,7 +206,7 @@ public class Derivation extends Unify implements TermContext {
             this.truthResolution = this.nar.truthResolution.floatValue();
             this.confMin = Math.max(truthResolution, this.nar.confMin.floatValue());
             this.deriver = nar.deriver();
-            //transformsCached.cleanUp();
+            transformsCache.cleanUp();
         }
         return this;
     }
@@ -428,16 +429,25 @@ public class Derivation extends Unify implements TermContext {
      */
     @Override
     @Nullable
-    public Term transform(@NotNull Term pattern) {
-
-        if (!Param.DERIVATION_TRANSFORM_CACHE || !(pattern instanceof Compound) || pattern.vars(type) == 0 || pattern.size() == 0) {
-            //return super.transform(pattern);
-            return super.transform(pattern); //xy.get(pattern); //fast variable resolution
+    public Term transform(@NotNull Term x) {
+        if (!Param.DERIVATION_TRANSFORM_CACHE) {
+            return super.transform(x); //xy.get(pattern); //fast variable resolution
         }
-        if (pattern.OR(x -> x == Null))
-            return Null;
 
-        Transformation key = Transformation.the((Compound) pattern, currentMatch);
+        Term y = xy(x);
+        if (y!=null) {
+            if (y instanceof Atomic || (y instanceof Compound && y.vars(null) == 0))
+                return y;
+            x = y;
+        }
+        if (x instanceof Atomic)
+            return x;
+
+
+//        if (pattern.OR(x -> x == Null))
+//            return Null;
+
+        Transformation key = Transformation.the((Compound) x, currentMatch);
 
         //avoid recursive update problem on the single thread by splitting the get/put
         Term value = transformsCache.getIfPresent(key);
@@ -480,7 +490,7 @@ public class Derivation extends Unify implements TermContext {
             return hash;
         }
 
-        static Transformation the(@NotNull Compound pattern, Term[][] match) {
+        static Transformation the(@NotNull Compound pattern, @NotNull Term[][] match) {
 
             //TODO only include in the key the free variables in the pattern because there can be extra and this will cause multiple results that could have done the same thing
             //FasterList<Term> key = new FasterList<>(currentMatch.length * 2 + 1);

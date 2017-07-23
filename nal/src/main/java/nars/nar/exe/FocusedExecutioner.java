@@ -44,9 +44,9 @@ public class FocusedExecutioner extends Executioner {
     public final CurveBag<ITask> concepts = new CurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(),
             random, MAX_CONCEPTS);
 
-    int subCycles = 8;
+    int subCycles = 1;
     int subCycleConcepts = 1;
-    int subCycleTasks = 32;
+    int subCycleTasks = 8;
     int subCyclePremises = 1;
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);

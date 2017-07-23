@@ -777,7 +777,7 @@ public interface TimeFunctions {
     static Term resolve(@NotNull Term x, @NotNull Derivation p) {
         Term y;
         try {
-            y = p.resolve(x);
+            y = p.transform(x);
         } catch (InvalidTermException e) {
             //failed, just return the input
             y = x;

@@ -276,12 +276,6 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
 
-    @Nullable
-    public Term resolve(@NotNull Term x) {
-        return transform(x);
-    }
-
-
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
 
         if (x instanceof CommonVariable) {
@@ -329,7 +323,7 @@ public abstract class Unify extends Versioning implements Subst {
             }*/
 
 
-            if (xy.tryPut(x, y)) {
+            if (xy.tryPut(x, (y))) {
                 if (!matchType(x)) {
                     //add to free variables to be included in transformation
                     Set<Term> knownFree = free.get();

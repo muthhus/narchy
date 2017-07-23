@@ -765,7 +765,7 @@ public class PremiseRule extends GenericCompound {
                     boolean temporal = false;
                     if (occ != ETERNAL) {
                         temporal = true;
-                        @Nullable Term yr = p.resolve(y).eval(p.terms);
+                        @Nullable Term yr = p.transform(y).eval(p.terms);
                         if (yr == null)
                             return null;
                         int occShift = p.taskTerm.subtermTime(yr);
@@ -776,14 +776,14 @@ public class PremiseRule extends GenericCompound {
                         occReturn[0] = p.belief.start();
                         if (z != null) {
                             //if Z occurrs in belief, then there is an additional shift
-                            @Nullable Term zr = p.resolve(z).eval(p.terms);
+                            @Nullable Term zr = p.transform(z).eval(p.terms);
                             if (zr == null)
                                 return null;
                             int relOccShift = p.taskTerm.subtermTime(zr);
                             if (relOccShift != DTERNAL)
                                 occReturn[0] -= (relOccShift - p.taskTerm.dtRange());
 
-                            @Nullable Term yr = p.resolve(y).eval(p.terms);
+                            @Nullable Term yr = p.transform(y).eval(p.terms);
                             if (yr == null)
                                 return null;
                             int occShift = p.taskTerm.subtermTime(yr);
@@ -835,7 +835,7 @@ public class PremiseRule extends GenericCompound {
                         occ = p.task.start();
                         if (z != null) {
                             //if Z occurrs in task, then there is an additional shift
-                            @Nullable Term zr = p.resolve(z).eval(p.terms);
+                            @Nullable Term zr = p.transform(z).eval(p.terms);
                             if (zr == null)
                                 return null;
                             int relOccShift = p.beliefTerm.subtermTime(zr);
@@ -853,7 +853,7 @@ public class PremiseRule extends GenericCompound {
 
                     if (occ != ETERNAL) {
                         occReturn[0] = occ;
-                        @Nullable Term yr = p.resolve(y).eval(p.terms);
+                        @Nullable Term yr = p.transform(y).eval(p.terms);
                         if (yr == null)
                             return null;
                         int occShift = p.beliefTerm.subtermTime(yr);
