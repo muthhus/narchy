@@ -188,7 +188,11 @@ public enum Op implements $ {
 
                     //filter out all boolean terms
 
-                    Term[] y = new Term[tt.length - trues];
+                    int size = tt.length - trues;
+                    if (size == 0)
+                        return True;
+
+                    Term[] y = new Term[size];
                     int j = 0;
                     for (int i = 0; j < y.length; i++) {
                         Term uu = tt[i];

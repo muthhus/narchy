@@ -11,6 +11,8 @@ import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Bool;
+import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,6 +34,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
 
     public NALTask generate( @NotNull Term template, long when, NAR nar) {
+        if (template instanceof Variable || template instanceof Bool)
+            return null;
         return generate(template, when, null, nar);
     }
 
@@ -100,7 +104,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         template = nar.terms.retemporalize(template,
                 target==null || target.isEternal() ?
                 nar.terms.retemporalizationDTERNAL : nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
-        if (template == null)
+        if (!(template instanceof Compound))
             return null; //??
 
         Task y = generate(template, when, nar);

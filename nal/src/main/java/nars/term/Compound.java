@@ -1294,7 +1294,6 @@ public interface Compound extends Term, IPair, TermContainer {
     default Term root() {
 
         Compound term = compoundOrNull(unneg());
-
         if (term == null) return Null;
 
         term = compoundOrNull(((Compound) term).eternal());

@@ -202,7 +202,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //        }
 
         Term c = t.conceptual();
-        if (c == null || c instanceof Bool) {
+        if (c instanceof Variable || c instanceof Bool) {
             fail(t, "no associated concept", safe);
         }
 
@@ -987,7 +987,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     @Nullable
     static ObjectBooleanPair<Term> tryContent(@NotNull Term t, byte punc, TermIndex index, boolean safe) {
 
-        if (t instanceof Bool)
+        if (t instanceof Variable || t instanceof Bool)
             return null;
 
         boolean negated = false;

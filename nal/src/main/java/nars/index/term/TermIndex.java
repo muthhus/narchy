@@ -335,7 +335,7 @@ public abstract class TermIndex implements TermContext {
 
         Term y = x.transform(r.dt(x), r);
         if (!(y instanceof Compound)) {
-            return null;
+            return y;
         } else {
             Compound yy = (Compound)y;
 

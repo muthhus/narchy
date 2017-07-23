@@ -32,15 +32,16 @@ public class GenericCompoundDT extends ProxyCompound {
             @NotNull TermContainer subterms = base.subterms();
             int size = subterms.size();
 
-
             if (op.temporal && (op != CONJ && size != 2))
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator", subterms.toArray());
+
+            if (dt!=XTERNAL && op().commutative && size()==2) {
+                if (sub(0).compareTo(sub(1)) > 0)
+                    throw new RuntimeException("invalid ordering");
+            }
+
         }
 
-        if (dt!=XTERNAL && op().commutative && size()==2) {
-            if (sub(0).compareTo(sub(1)) > 0)
-                throw new RuntimeException("invalid ordering");
-        }
 
         this.dt = dt;
 

@@ -133,7 +133,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             );
 
             //temporalization failure, could not determine temporal attributes. seems this can happen normally
-            if ((t1 == null) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
+            if ((t1 == null || t1 instanceof Variable || t1 instanceof Bool) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
                 //                 {
                 //                    //FOR DEBUGGING, re-run it
                 //                    Compound temporalized2 = this.time.compute(content,
@@ -205,7 +205,8 @@ public class Conclusion extends AbstractPred<Derivation> {
             boolean negating = c3n.getTwo();
 
             final Term C = c3n.getOne();
-
+            if (C instanceof Variable || C instanceof Bool)
+                return true;
 
             long start = occ[0];
             long end = occ[1];

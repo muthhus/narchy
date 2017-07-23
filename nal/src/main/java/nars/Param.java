@@ -78,8 +78,8 @@ public abstract class Param  {
 
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.97f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.99f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.95f, 0, 1f);
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */
     public static float valueAtInput(Task accepted, NAR nar) {
