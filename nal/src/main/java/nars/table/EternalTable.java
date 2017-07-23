@@ -12,6 +12,7 @@ import nars.control.Cause;
 import nars.task.NALTask;
 import nars.task.Revision;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -275,7 +276,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         //TODO use Task.tryContent in building the task:
 
         float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
-        Compound t = normalizedOrNull(Revision.intermpolate(
+        Term t = normalizedOrNull(Revision.intermpolate(
                 newBelief.term(), oldBelief.term(),
                 aProp,
                 nar.random(),

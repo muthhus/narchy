@@ -8,8 +8,7 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.concept.AtomConcept;
-import nars.concept.CompoundConcept;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
@@ -121,11 +120,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
      * for fragmentary concepts which by themselves or due to being un-normalizable,
      * can not be the content of Tasks yet may still exist as concepts
      */
-    private CompoundConcept newCompound(@NotNull Compound t,
-                                        Bag... bags
-                                        //Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag
+    private BaseConcept newCompound(@NotNull Compound t,
+                                    Bag... bags
+                                    //Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag
     ) {
-        return new CompoundConcept(t, bags);
+        return new BaseConcept(t, bags);
     }
 
     private TaskConcept newTask(@NotNull Compound t) {
@@ -277,7 +276,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
     @Override
-    public BeliefTable newBeliefTable(Compound c, boolean beliefOrGoal) {
+    public BeliefTable newBeliefTable(Term c, boolean beliefOrGoal) {
         //TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
         //return new HijackTemporalBeliefTable(tCap);
         //return new RTreeBeliefTable(tCap);
@@ -286,7 +285,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
     @Override
-    public TemporalBeliefTable newTemporalBeliefTable(Compound c) {
+    public TemporalBeliefTable newTemporalBeliefTable(Term c) {
         if (c.complexity() < 16) {
             return new RTreeBeliefTable();
         } else {
@@ -337,7 +336,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             } else if (term instanceof Atom) {
 
                 return
-                        new AtomConcept((Atom) term, newLinkBags(term));
+                        new BaseConcept(term, newLinkBags(term));
 
 //                result = new AtomConcept((Atomic)term,
 //                        new HijackBag<>(32, 2, BudgetMerge.maxBlend, nar.random),

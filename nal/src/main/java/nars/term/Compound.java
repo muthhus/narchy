@@ -29,6 +29,7 @@ import nars.IO;
 import nars.Op;
 import nars.index.term.NewCompound;
 import nars.index.term.TermContext;
+import nars.op.mental.AliasConcept;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
@@ -472,10 +473,10 @@ public interface Compound extends Term, IPair, TermContainer {
                 return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
             }
 
-        } /*else if (ty instanceof Abbreviation.AliasConcept) {
-            Compound abbreviated = ((Abbreviation.AliasConcept) ty).abbr.term();
+        } else if (ty instanceof AliasConcept.AliasAtom) {
+            Term abbreviated = ((AliasConcept.AliasAtom) ty).target;
             return abbreviated.equals(this) || unify(abbreviated, subst);
-        }*/
+        }
 
         return false;
 
@@ -492,8 +493,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    @NotNull
-    default Compound term() {
+    default Term term() {
         return this;
     }
 

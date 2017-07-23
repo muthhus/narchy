@@ -76,8 +76,8 @@ public abstract class Param  {
 
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.99f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.96f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.97f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */
     public static float valueAtInput(Task accepted, NAR nar) {
@@ -157,7 +157,7 @@ public abstract class Param  {
     public static final int UnificationVariableCapInitial = 8;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(128);
+    public final MutableInteger matchTTL = new MutableInteger(256);
     @Deprecated public final static int UnificationTTLMax = 128 * 2;
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */

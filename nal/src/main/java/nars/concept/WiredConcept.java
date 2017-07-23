@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Param;
 import nars.table.BeliefTable;
 import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -27,7 +28,7 @@ public class WiredConcept extends TaskConcept implements PermanentConcept {
 
     public final FloatParam resolution = new FloatParam(Param.TRUTH_EPSILON);
 
-    protected WiredConcept(@NotNull Compound term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
+    protected WiredConcept(@NotNull Term term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
         super(term, beliefs, goals, n);
         resolution.setValue(n.truthResolution);
     }
@@ -65,12 +66,6 @@ public class WiredConcept extends TaskConcept implements PermanentConcept {
 //        super.process(t, n);
 //    }
 
-
-    @NotNull
-    @Override
-    public final Compound term() {
-        return this;
-    }
 
 //    @Override
 //    public TemporalBeliefTable newTemporalTable(int tCap, NAR nar) {

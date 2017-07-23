@@ -309,7 +309,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //        return ttl;
 //    }
 
-    @NotNull
     @Override
     public final Term term() {
         return id.term();

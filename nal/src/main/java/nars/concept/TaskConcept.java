@@ -1,6 +1,5 @@
 package nars.concept;
 
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.conceptualize.ConceptBuilder;
@@ -9,7 +8,7 @@ import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TaskTable;
-import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +23,7 @@ import static nars.Op.*;
 /**
  * concept of a compound term which can name a task, and thus have associated beliefs, goals, questions, and quests
  */
-public class TaskConcept extends CompoundConcept {
+public class TaskConcept extends BaseConcept {
 
     //    @Nullable
 //    private QuestionTable questions;
@@ -36,14 +35,18 @@ public class TaskConcept extends CompoundConcept {
     protected final BeliefTable goals;
     private QuestionTable quests,questions;
 
-    public TaskConcept(@NotNull Compound term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, @NotNull NAR n) {
+    public TaskConcept(Term term, @NotNull NAR n) {
+        this(term, null, null, n);
+    }
+
+    public TaskConcept(Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, @NotNull NAR n) {
         this(term, beliefs, goals, n.conceptBuilder);
     }
 
-    public TaskConcept(@NotNull Compound term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder cb) {
+    public TaskConcept(Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder cb) {
         super(term, ((DefaultConceptBuilder) cb).newLinkBags(term));
-        this.beliefs = beliefs != null ? beliefs : cb.newBeliefTable(this, true);
-        this.goals = goals != null ? goals : cb.newBeliefTable(this, false);
+        this.beliefs = beliefs != null ? beliefs : cb.newBeliefTable(term, true);
+        this.goals = goals != null ? goals : cb.newBeliefTable(term, false);
         this.questions = cb.newQuestionTable();
         this.quests = cb.newQuestionTable();
     }

@@ -2,7 +2,7 @@ package nars.conceptualize.state;
 
 import jcog.Util;
 import jcog.data.MutableInteger;
-import nars.concept.CompoundConcept;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +58,7 @@ public final class DefaultConceptState extends ConceptState {
 
 
     @Override
-    public int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
+    public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
         int max, min;
         if (beliefOrGoal) {
             max = eternalOrTemporal ? beliefsMaxEte.intValue() : beliefsMaxTemp;

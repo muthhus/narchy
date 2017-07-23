@@ -7,6 +7,7 @@ import nars.NAR;
 import nars.NAct;
 import nars.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
@@ -36,11 +37,11 @@ public class GoalActionConcept extends ActionConcept {
     @NotNull
     private MotorFunction motor;
 
-    public GoalActionConcept(@NotNull Compound c, @NotNull NAct act, @NotNull MotorFunction motor) {
+    public GoalActionConcept(@NotNull Term c, @NotNull NAct act, @NotNull MotorFunction motor) {
         this(c, act.nar(), act.curiosity(), motor);
     }
 
-    public GoalActionConcept(@NotNull Compound c, @NotNull NAR n, FloatParam curiosity, @NotNull MotorFunction motor) {
+    public GoalActionConcept(@NotNull Term c, @NotNull NAR n, FloatParam curiosity, @NotNull MotorFunction motor) {
         super(c,
                 //new SensorBeliefTable(n.conceptBuilder.newTemporalBeliefTable(c)),
                 //new SensorBeliefTable(n.conceptBuilder.newTemporalBeliefTable(c)),
@@ -148,13 +149,13 @@ public class GoalActionConcept extends ActionConcept {
 
         LongSupplier stamper = nar.time::nextStamp;
 
-        Task fb = feedback.set(this, beliefFeedback, stamper, nar);
+        Task fb = feedback.set(term, beliefFeedback, stamper, nar);
 
 
 //        //HACK insert shadow goal
         Task fg;
         if (goal!=null)
-            fg = action.set(this, goal, stamper, nar);
+            fg = action.set(term, goal, stamper, nar);
         else
             fg = action.get(); //latch previous goal
 

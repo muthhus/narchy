@@ -107,7 +107,7 @@ public class Derivation extends Unify implements TermContext {
     public Truth beliefTruth, beliefTruthRaw;
 
     @NotNull
-    public Compound taskTerm;
+    public Term taskTerm;
     @NotNull
     public Term beliefTerm;
 
@@ -163,18 +163,8 @@ public class Derivation extends Unify implements TermContext {
         transformsCache = cb.build();
 
 
-        substituteIfUnifiesAny = new substituteIfUnifiesAny(this) {
-            @Override
-            public boolean equals(Object u) {
-                return this == u;
-            }
-        };
-        substituteIfUnifiesDep = new substituteIfUnifiesDep(this) {
-            @Override
-            public boolean equals(Object u) {
-                return this == u;
-            }
-        };
+        substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
+        substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
         polarize = Functor.f2("polarize", (subterm, whichTask) -> {
             Truth compared;
             if (whichTask.equals(PremiseRule.Task)) {
@@ -249,7 +239,7 @@ public class Derivation extends Unify implements TermContext {
         this.taskTruth = task.truth();
         this.taskPunct = task.punc();
 
-        Compound tt = task.term();
+        Term tt = task.term();
         this.taskTerm = tt;
         this.termSub0Struct = tt.structure();
         Op tOp = tt.op();

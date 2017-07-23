@@ -10,7 +10,6 @@ import nars.term.atom.Atomic;
 import nars.term.mutate.CommutivePermutations;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -68,7 +67,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * a termcontainer is not necessarily a term of its own
      */
-    @NotNull
     @Override
     default Term term() {
         throw new UnsupportedOperationException();

@@ -262,7 +262,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
 //        }
 //        //its a normal negated compound, which will be unnegated in task constructor
 //        return (Compound) s;
-        Compound r = normalizedOrNull(compoundOrNull(reify(task, nar.self())), nar.terms);
+        Term r = normalizedOrNull(compoundOrNull(reify(task, nar.self())), nar.terms);
         if (r != null) {
 
             long now = nar.time();

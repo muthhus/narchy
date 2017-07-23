@@ -1,6 +1,8 @@
 package nars.index.term.tree;
 
 import com.google.common.base.Charsets;
+import com.google.common.io.ByteArrayDataOutput;
+import jcog.byt.DynBytes;
 import jcog.byt.HashCachedBytes;
 import nars.IO;
 import nars.Op;
@@ -65,7 +67,7 @@ public class TermKey extends HashCachedBytes {
         super(task.volume() * 4 + 64 /* ESTIMATE */);
         try {
 
-            writeCompoundSeq(this, task.term(), true);
+            task.term().append((ByteArrayDataOutput)this);
 
             byte punc = task.punc();
             this.writeByte(punc);

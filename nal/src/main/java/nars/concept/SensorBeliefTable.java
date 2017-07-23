@@ -5,6 +5,7 @@ import nars.Task;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +39,7 @@ class SensorBeliefTable extends DefaultBeliefTable {
     }
 
     @Override
-    public Task match(long when, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
+    public Task match(long when, @Nullable Task against, Term template, boolean noOverlap, NAR nar) {
         Task tabled = super.match(when, against, template, noOverlap, nar);
 
         Task current = this.sensor.get();

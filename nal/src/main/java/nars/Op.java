@@ -3,10 +3,7 @@ package nars;
 
 import nars.derive.match.Ellipsislike;
 import nars.index.term.TermContext;
-import nars.term.Compound;
-import nars.term.Functor;
-import nars.term.Term;
-import nars.term.Terms;
+import nars.term.*;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
@@ -946,7 +943,7 @@ public enum Op implements $ {
      * decode a term which may be a functor, return null if it isnt
      */
     @Nullable
-    public static Pair<Atomic, Compound> functor(@NotNull Term maybeOperation, TermContext index, boolean mustFunctor) {
+    public static Pair<Functor, Compound> functor(@NotNull Term maybeOperation, TermContext index, boolean mustFunctor) {
         if (maybeOperation instanceof Compound && maybeOperation.hasAll(Op.OpBits)) {
             Compound c = (Compound) maybeOperation;
             if (c.op() == INH) {
@@ -954,10 +951,10 @@ public enum Op implements $ {
                 if (s0 instanceof Compound && s0.op() == PROD) {
                     Term s1 = c.sub(1);
                     if (s1 instanceof Atom /*&& s1.op() == ATOM*/) {
-                        Atom ff = (Atom) index.getIfPresentElse(s1);
+                        Termed ff = index.getIfPresentElse(s1);
                         if (!mustFunctor || ff instanceof Functor) {
                             return Tuples.pair(
-                                    ff,
+                                    ((Functor)ff),
                                     ((Compound) s0)
                             );
                         }

@@ -231,11 +231,11 @@ public class MySTMClustered extends STMClustered {
                             return null;
 
 
-                        @Nullable Compound conj = group(negated, uu);
+                        @Nullable Term conj = group(negated, uu);
                         if (conj == null)
                             return null;
 
-                        @Nullable ObjectBooleanPair<Compound> cp = Task.tryContent(conj, punc, nar.terms, true);
+                        @Nullable ObjectBooleanPair<Term> cp = Task.tryContent(conj, punc, nar.terms, true);
                         if (cp != null) {
                             int uuLen = uu.length;
                             long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
@@ -288,7 +288,7 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Nullable
-    private Compound group(boolean negated, @NotNull Task[] uu) {
+    private Term group(boolean negated, @NotNull Task[] uu) {
 
 
         TermIndex index = nar.terms;

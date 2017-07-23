@@ -114,10 +114,10 @@ public class Revision {
         float aProp = aw / (aw + bw);
 
         boolean negated = false;
-        Compound cc = null;
+        Term cc = null;
 
         for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
-            ObjectBooleanPair<Compound> ccp = Task.tryContent(
+            ObjectBooleanPair<Term> ccp = Task.tryContent(
                     intermpolate(a.term(), b.term(), aProp, new MutableFloat(0), 1f, rng, mergeOrChoose),
                     a.punc(), $.terms, true);
 

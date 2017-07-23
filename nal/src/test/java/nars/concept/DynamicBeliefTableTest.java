@@ -102,7 +102,7 @@ public class DynamicBeliefTableTest {
         n.believe($("(y)"), (long)4, 1f, 0.9f);
         n.run(2);
         n.time.dur(8);
-        CompoundConcept cc = (CompoundConcept) n.conceptualize($("((x) && (y))"));
+        BaseConcept cc = (BaseConcept) n.conceptualize($("((x) && (y))"));
 //        cc.print();
 //
 //

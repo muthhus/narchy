@@ -325,7 +325,10 @@ public abstract class TermIndex implements TermContext {
 
 
     @Nullable
-    public Compound retemporalize(@NotNull Compound x, Retemporalization r) {
+    public Term retemporalize(@NotNull Term tx, Retemporalization r) {
+        if (!(tx instanceof Compound)) return tx;
+
+        Compound x = (Compound)tx;
 
         Term y = x.transform(r.dt(x), r);
         if (!(y instanceof Compound)) {

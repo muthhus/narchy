@@ -32,7 +32,6 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.toString();
     }
 
-    @NotNull
     @Override
     public Term term() {
         return ref.term();

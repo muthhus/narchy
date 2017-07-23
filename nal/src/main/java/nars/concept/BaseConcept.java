@@ -15,11 +15,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static nars.conceptualize.state.ConceptState.Deleted;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
-public class CompoundConcept implements Concept, Compound, Termlike {
+public class BaseConcept<T extends Term> implements Concept, Termlike {
 
     @NotNull
     private final Bag<Task,PriReference<Task>> taskLinks;
@@ -28,7 +30,7 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     private final Bag<Term,PriReference<Term>> termLinks;
 
     @NotNull
-    private final Compound term;
+    protected final T term;
 
 
     private @Nullable Map meta;
@@ -43,13 +45,13 @@ public class CompoundConcept implements Concept, Compound, Termlike {
      * @param termLinks
      * @param taskLinks
      */
-    public CompoundConcept(@NotNull Compound term,
-                           Bag... bags) {
+    public BaseConcept(@NotNull T term,
+                       Bag... bags) {
         this(term,  bags[0], bags[1]);
     }
 
-    public CompoundConcept(@NotNull Compound term,
-                           @NotNull Bag<Term, PriReference<Term>> termLinks, @NotNull Bag<Task, PriReference<Task>> taskLinks
+    public BaseConcept(@NotNull T term,
+                       @NotNull Bag<Term, PriReference<Term>> termLinks, @NotNull Bag<Task, PriReference<Task>> taskLinks
     ) {
 
         this.term = term;
@@ -61,20 +63,19 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     }
 
 
-    @Override
-    public @NotNull TermContainer subterms() {
-        return term.subterms();
-    }
+//    @Override
+//    public @NotNull TermContainer subterms() {
+//        return term.subterms();
+//    }
+//
+//    @Override
+//    public void setNormalized() {
+//        //ignore
+//        assert(isNormalized()): "why wasnt this already normalized";
+//    }
 
     @Override
-    public void setNormalized() {
-        //ignore
-        assert(isNormalized()): "why wasnt this already normalized";
-    }
-
-    @NotNull
-    @Override
-    public Compound term() {
+    public Term term() {
         //return this;
         return term;
     }
@@ -112,18 +113,18 @@ public class CompoundConcept implements Concept, Compound, Termlike {
 
     @Override
     public TermContainer templates() {
-        return subterms();
+        return term instanceof Compound ? ((Compound)term).subterms() : TermContainer.NoSubterms;
     }
 
     /**
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
-    public CompoundConcept(@NotNull Compound term, @NotNull NAR n) {
+    public BaseConcept(@NotNull T term, @NotNull NAR n) {
         this(term, (DefaultConceptBuilder) n.conceptBuilder);
     }
 
 
-    CompoundConcept(@NotNull Compound term, @NotNull DefaultConceptBuilder b) {
+    BaseConcept(@NotNull T term, @NotNull DefaultConceptBuilder b) {
         this(term, b.newLinkBags(term));
     }
 
@@ -158,11 +159,6 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         return term.toString();
     }
 
-    @NotNull
-    public Term term(int i) {
-        return term.sub(i);
-    }
-
     @Override
     public int size() {
         return term.size();
@@ -177,6 +173,36 @@ public class CompoundConcept implements Concept, Compound, Termlike {
     @Override
     public boolean isTemporal() {
         return false; //term.isTemporal();
+    }
+
+    @Override
+    public <T extends Term> @Nullable T sub(int i, @Nullable T ifOutOfBounds) {
+        return term.sub(i, ifOutOfBounds);
+    }
+
+    @Override
+    public boolean AND(Predicate<Term> v) {
+        return term.AND(v);
+    }
+
+    @Override
+    public boolean ANDrecurse(@NotNull Predicate<Term> v) {
+        return term.ANDrecurse(v);
+    }
+
+    @Override
+    public void recurseTerms(@NotNull Consumer<Term> v) {
+        term.recurseTerms(v);
+    }
+
+    @Override
+    public boolean OR(Predicate<Term> v) {
+        return term.OR(v);
+    }
+
+    @Override
+    public boolean ORrecurse(@NotNull Predicate<Term> v) {
+        return term.ORrecurse(v);
     }
 
     @Deprecated
@@ -236,10 +262,6 @@ public class CompoundConcept implements Concept, Compound, Termlike {
         return false; //concepts themselves are always non-dynamic
     }
 
-    @Override
-    public int dt() {
-        return term.dt();
-    }
 
 
 }

@@ -9,7 +9,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Param;
-import nars.concept.CompoundConcept;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
 import nars.term.Termed;
@@ -133,7 +133,7 @@ public class Recog2D extends NAgentX {
 
     public Surface conceptTraining(Outputs tv, NAR nar) {
 
-        LinkedHashMap<CompoundConcept, Outputs.Neuron> out = tv.out;
+        LinkedHashMap<BaseConcept, Outputs.Neuron> out = tv.out;
 
         Plot2D p;
 

@@ -315,10 +315,7 @@ abstract public class NAgent implements NSense, NAct {
         int numSensors = sensors.size();
         int numActions = actions.size();
 
-        @NotNull Compound happiness = happy.term();
-
-
-
+        @NotNull Term happiness = happy.term();
         predictors.add(
                 goal(happiness,
                         t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
@@ -614,20 +611,20 @@ abstract public class NAgent implements NSense, NAct {
     }
 
 
-    public Supplier<Task> goal(@NotNull Compound term, Truth truth) {
+    public Supplier<Task> goal(@NotNull Term term, Truth truth) {
         return prediction(term, GOAL, new DiscreteTruth(truth.freq(), truth.conf()));
     }
 
-    public Supplier<Task> question(@NotNull Compound term) {
+    public Supplier<Task> question(@NotNull Term term) {
         return prediction(term, QUESTION, null);
     }
 
-    public Supplier<Task> quest(@NotNull Compound term) {
+    public Supplier<Task> quest(@NotNull Term term) {
         return prediction(term, QUEST, null);
     }
 
-    public Supplier<Task> prediction(@NotNull Compound _term, byte punct, DiscreteTruth truth) {
-        Compound term = _term.normalize();
+    public Supplier<Task> prediction(@NotNull Term _term, byte punct, DiscreteTruth truth) {
+        Term term = _term.normalize();
         return () -> {
 
 //        if (truth == null && !(punct == QUESTION || punct == QUEST))

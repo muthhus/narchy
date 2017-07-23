@@ -52,8 +52,8 @@ public class Premise extends Pri implements ITask {
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (!(obj instanceof Premise)) return false;
-        Premise x = (Premise)obj;
-        if (hash!=x.hash) return false;
+        Premise x = (Premise) obj;
+        if (hash != x.hash) return false;
         return taskLink.equals(((Premise) obj).taskLink) && termLink.equals(((Premise) obj).termLink);
     }
 
@@ -102,81 +102,78 @@ public class Premise extends Pri implements ITask {
 
         Term beliefTerm = termLink.get();
         Task belief = null;
-        if (beliefTerm instanceof Compound) {
 
 
-            Concept taskConcept = task.concept(nar, true);
-            assert(taskConcept != null): task + " could not be conceptualized";
+        Concept taskConcept = task.concept(nar, true);
+        assert (taskConcept != null) : task + " could not be conceptualized";
 
-            Concept _beliefConcept = nar.conceptualize(beliefTerm);
-            boolean beliefIsTask = _beliefConcept!=null && taskConcept.equals(_beliefConcept);
+        Concept _beliefConcept = nar.conceptualize(beliefTerm);
+        boolean beliefIsTask = _beliefConcept != null && taskConcept.equals(_beliefConcept);
 
 
-            //Terms.equalAtemporally(task.term(), (beliefTerm));
+        //Terms.equalAtemporally(task.term(), (beliefTerm));
 
-            boolean reUnified = false;
-            if (beliefTerm.varQuery() > 0 && !beliefIsTask) {
+        boolean reUnified = false;
+        if (beliefTerm.varQuery() > 0 && !beliefIsTask) {
 
-                int[] matchTTL = { Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION) };
+            int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
 
-                Term unified = unify(task.term(), (Compound) beliefTerm, nar, matchTTL);
-                if (unified != null) {
-                    beliefTerm = unified;
-                    reUnified = true;
-                }
-
-                assert(matchTTL[0] <= 0);
-                ttlMax += matchTTL[0]; //changed if consumed in match (this value will be negative
+            Term unified = unify(task.term(), (Compound) beliefTerm, nar, matchTTL);
+            if (unified != null) {
+                beliefTerm = unified;
+                reUnified = true;
             }
 
-
-            //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
-            if (_beliefConcept instanceof TaskConcept) { //beliefs/goals will only be in TaskConcepts
-
-                TaskConcept beliefConcept = (TaskConcept)_beliefConcept;
-
-                BeliefTable table =
-                        (task.isGoal() || task.isQuest()) ?
-                                beliefConcept.goals() :
-                                beliefConcept.beliefs();
+            assert (matchTTL[0] <= 0);
+            ttlMax += matchTTL[0]; //changed if consumed in match (this value will be negative
+        }
 
 
-                Task match;
+        //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
+        if (_beliefConcept instanceof TaskConcept) { //beliefs/goals will only be in TaskConcepts
 
-                if (task.isQuestOrQuestion() && (reUnified || beliefIsTask)) {
+            TaskConcept beliefConcept = (TaskConcept) _beliefConcept;
+
+            BeliefTable table =
+                    (task.isGoal() || task.isQuest()) ?
+                            beliefConcept.goals() :
+                            beliefConcept.beliefs();
+
+
+            Task match;
+
+            if (task.isQuestOrQuestion() && (reUnified || beliefIsTask)) {
 //                            //see if belief unifies with task (in reverse of previous unify)
 //                            if (questionTerm.varQuery() == 0 || (unify((Compound)beliefConcept.term(), questionTerm, nar) == null)) {
 //
 //                            } else {
 //
 //                            }
-                    long when = whenAnswer(task, now);
-                    match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
-                    if (match != null) {
-                        @Nullable Task answered = task.onAnswered(match, nar);
-                        if (answered != null) {
+                long when = whenAnswer(task, now);
+                match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
+                if (match != null) {
+                    @Nullable Task answered = task.onAnswered(match, nar);
+                    if (answered != null) {
 
-                            float effectiveConf = answered.conf(answered.nearestTimeTo(task.mid()), dur);
+                        float effectiveConf = answered.conf(answered.nearestTimeTo(task.mid()), dur);
 
-                            //transfer budget from question to answer
-                            //float qBefore = taskBudget.priSafe(0);
-                            //float aBefore = answered.priSafe(0);
-                            BudgetFunctions.fund(taskLink, answered,
+                        //transfer budget from question to answer
+                        //float qBefore = taskBudget.priSafe(0);
+                        //float aBefore = answered.priSafe(0);
+                        BudgetFunctions.fund(taskLink, answered,
                                 /*Util.sqr*/effectiveConf, false);
 
-                            nar.value(answered.cause(), effectiveConf);
-                        }
+                        nar.value(answered.cause(), effectiveConf);
                     }
-                } else {
-                    long when = whenMatch(task, now);
-                    match = table.match(when, task, (Compound) beliefTerm, true, nar);
                 }
-
-                if (match != null && match.isBelief()) {
-                    belief = match;
-                }
+            } else {
+                long when = whenMatch(task, now);
+                match = table.match(when, task, beliefTerm, true, nar);
             }
 
+            if (match != null && match.isBelief()) {
+                belief = match;
+            }
         }
 
 
@@ -189,7 +186,7 @@ public class Premise extends Pri implements ITask {
 
         //System.out.println(task + "\t" + beliefTerm + " ::: \t" + belief);
 
-        d.run(this, task, belief, beliefTerm, ttlMax );
+        d.run(this, task, belief, beliefTerm, ttlMax);
 
 //        long ds = d.transformsCache.estimatedSize();
 //        if (ds >0)
@@ -232,11 +229,11 @@ public class Premise extends Pri implements ITask {
      * unify any (and only) query variables which may be present in
      * the 'a' term with any non-query terms in the 'q' term
      * returns non-null if unification succeeded and resulted in a transformed 'a' term
-     *  sets a negative number in the ttl array, which is to be added to the callee's
-     *  ttl.  if zero, then no TTL was consumed
+     * sets a negative number in the ttl array, which is to be added to the callee's
+     * ttl.  if zero, then no TTL was consumed
      */
     @Nullable
-    private static Compound unify(@NotNull Compound q, @NotNull Compound a, NAR nar, int[] ttl) {
+    private static Compound unify(@NotNull Term q, @NotNull Term a, NAR nar, int[] ttl) {
 
         final int startTTL = ttl[0];
         ttl[0] = 0;
@@ -247,16 +244,16 @@ public class Premise extends Pri implements ITask {
 
         final Compound[] result = {null};
         UnifySubst u = new UnifySubst(null /* match anything */, nar, (aa) -> {
-            if (aa instanceof Compound) {
 
-                if (!aa.equals(a)) {
 
-                    aa = aa.eval(nar.terms);
+            if (!aa.equals(a)) {
 
-                    result[0] = ((Compound) aa);
-                    return false; //only this match
-                }
+                aa = aa.eval(nar.terms);
+
+                result[0] = ((Compound) aa);
+                return false; //only this match
             }
+
 
             return true; //keep trying
 

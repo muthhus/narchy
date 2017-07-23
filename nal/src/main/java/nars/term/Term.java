@@ -27,7 +27,6 @@ import nars.Op;
 import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
-import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
@@ -63,7 +62,6 @@ public interface Term extends Termlike, Comparable<Termlike> {
     @NotNull Term[] EmptyArray = new Term[0];
     ImmutableByteList EmptyByteList = ByteLists.immutable.empty();
 
-    @NotNull
     @Override
     default Term term() {
         return this;
@@ -469,5 +467,10 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return this;
     }
 
+    default int dt() { return DTERNAL; }
+
+    default Term normalize() {
+        return this; //no change
+    }
 }
 

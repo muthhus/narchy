@@ -290,7 +290,6 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
             }
         }
 
-        @NotNull
         @Override
         public Term term() {
             return target.key;

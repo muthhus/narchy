@@ -3,7 +3,7 @@ package nars.task;
 import jcog.bag.Bag;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
-import nars.concept.CompoundConcept;
+import nars.concept.BaseConcept;
 import nars.concept.TaskConcept;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.term.Compound;
@@ -229,7 +229,7 @@ public class RevisionTest {
             .input("(x ==> y). %1.0;0.9%",
                    "(x ==> y). %0.0;0.9%" )
                 .run(1);
-        CompoundConcept c = (CompoundConcept) n.conceptualize("(x ==> y)");
+        BaseConcept c = (BaseConcept) n.conceptualize("(x ==> y)");
         c.print();
         Task t = n.match(c, BELIEF, ETERNAL);
         assertEquals(0.5f, t.freq(), 0.01f);

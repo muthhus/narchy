@@ -398,21 +398,18 @@ public enum Terms { ;
         return compoundOr(t, null);
     }
     @Nullable
-    public static Compound normalizedOrNull(@Nullable Term t, @NotNull TermIndex i) {
-        return normalizedOrNull(t, i, i.retemporalizationDTERNAL);
+    public static <T extends Term> T normalizedOrNull(@Nullable Term t, @NotNull TermIndex i) {
+        return (T)normalizedOrNull(t, i, i.retemporalizationDTERNAL);
     }
     @Nullable
-    public static Compound normalizedOrNull(@Nullable Term t, @NotNull TermIndex i, TermIndex.Retemporalization r) {
-        Compound c = compoundOrNull(t);
-        if (c == null)
-            return null;
+    public static Term normalizedOrNull(@Nullable Term t, @NotNull TermIndex i, TermIndex.Retemporalization r) {
 
-        if (c.isTemporal()) {
+        if (t.isTemporal()) {
             //the compound indicated a potential dt, but the premise was actually atemporal;
             // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
-            return i.retemporalize(c, r); //retemporalize does normalize at the end
+            return i.retemporalize(t, r); //retemporalize does normalize at the end
         } else  {
-            return c.normalize();
+            return t.normalize();
         }
     }
 

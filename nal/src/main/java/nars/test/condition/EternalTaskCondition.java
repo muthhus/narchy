@@ -297,7 +297,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             float worstDiff = similar.size() >= maxSimilars ? similar.lastKey() : Float.POSITIVE_INFINITY;
 
             float difference = 0;
-            Compound tterm = task.term();
+            Term tterm = task.term();
             difference +=
                     tterm.equals(term) ? 0 : (term.volume());
             if (difference >= worstDiff)

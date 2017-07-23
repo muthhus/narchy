@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.TaskConcept;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -107,7 +108,7 @@ public class DefaultBeliefTable implements BeliefTable {
      * get the most relevant belief/goal with respect to a specific time.
      */
     @Override
-    public Task match(long when, @Nullable Task against, Compound template, boolean noOverlap, NAR nar) {
+    public Task match(long when, @Nullable Task against, Term template, boolean noOverlap, NAR nar) {
 
         final Task ete = eternal.strongest();
         if (ete != null && when == ETERNAL) {

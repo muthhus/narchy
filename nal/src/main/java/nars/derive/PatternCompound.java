@@ -4,6 +4,7 @@ import nars.$;
 import nars.Op;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
+import nars.op.mental.AliasConcept;
 import nars.term.Compound;
 import nars.term.GenericCompoundDT;
 import nars.term.Term;
@@ -95,10 +96,10 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                 return xsubs.unifyLinear(ysubs, subst);
             }
 
-        } /*else if (ty instanceof Abbreviation.AliasConcept) {
-            Compound abbreviated = ((Abbreviation.AliasConcept) ty).abbr.term();
+        } else if (ty instanceof AliasConcept.AliasAtom) {
+            Term abbreviated = ((AliasConcept.AliasAtom) ty).target;
             return abbreviated.equals(this) || unify(abbreviated, subst);
-        }*/
+        }
 
         return false;
 

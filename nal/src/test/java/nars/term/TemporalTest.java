@@ -1,7 +1,7 @@
 package nars.term;
 
 import nars.*;
-import nars.concept.CompoundConcept;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.term.container.TermContainer;
@@ -131,7 +131,7 @@ public class TemporalTest {
 
         assertTrue(na == nc);
 
-        assertTrue(((CompoundConcept) na).term(0) == ((CompoundConcept) nc).term(0));
+        assertTrue(((BaseConcept) na).term(0) == ((BaseConcept) nc).term(0));
 
 //        System.out.println(b.concept(n));
 //        System.out.println(c.concept(n));

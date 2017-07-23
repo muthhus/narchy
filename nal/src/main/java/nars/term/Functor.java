@@ -3,7 +3,7 @@ package nars.term;
 import jcog.bag.Bag;
 import nars.$;
 import nars.NAR;
-import nars.concept.AtomConcept;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.term.atom.Atom;
@@ -23,7 +23,7 @@ import static nars.term.atom.Atomic.the;
  *  a result Term from the TermContainer arguments of
  *  a function term, for example: f(x) or f(x, y).
  */
-abstract public class Functor extends AtomConcept implements PermanentConcept, Function<TermContainer,Term> {
+abstract public class Functor extends BaseConcept implements PermanentConcept, Function<TermContainer,Term> {
 
     public Functor(@NotNull String atom) {
         this(fName(atom));

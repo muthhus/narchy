@@ -8,6 +8,7 @@ import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
 import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,11 +29,11 @@ public class LambdaQuestionTask extends NALTask {
         this(q.term(), q.punc(), q.mid() /*, q.end()*/, history, nar, eachAnswer );
     }
 
-    public LambdaQuestionTask(@NotNull Compound term, byte punc, long occ, int history, NAR nar, @NotNull Consumer<Task> eachAnswer) {
+    public LambdaQuestionTask(@NotNull Term term, byte punc, long occ, int history, NAR nar, @NotNull Consumer<Task> eachAnswer) {
         this(term, punc, occ, history, nar, (q, a) -> eachAnswer.accept(a));
     }
 
-    public LambdaQuestionTask(@NotNull Compound term, byte punc, long occ, int history, NAR nar, @NotNull BiConsumer<? super LambdaQuestionTask, Task> eachAnswer) {
+    public LambdaQuestionTask(@NotNull Term term, byte punc, long occ, int history, NAR nar, @NotNull BiConsumer<? super LambdaQuestionTask, Task> eachAnswer) {
         super(term, punc, null, nar.time(), occ, occ, new long[] { nar.time.nextStamp() } );
 
         budget(nar);

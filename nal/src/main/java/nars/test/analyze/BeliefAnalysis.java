@@ -26,7 +26,6 @@ public class BeliefAnalysis extends EnergyAnalysis implements Termed {
 		this.term = term;
 	}
 
-	@NotNull
 	@Override
 	public Term term() {
 		return term;

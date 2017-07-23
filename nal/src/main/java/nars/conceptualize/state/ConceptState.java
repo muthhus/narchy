@@ -1,6 +1,6 @@
 package nars.conceptualize.state;
 
-import nars.concept.CompoundConcept;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ public abstract class ConceptState extends Atom {
 
     public abstract int linkCap(Concept compoundConcept, boolean termOrTask);
 
-    public abstract int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal);
+    public abstract int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal);
 
     public abstract int questionCap(boolean questionOrQuest);
 
@@ -31,7 +31,7 @@ public abstract class ConceptState extends Atom {
         }
 
         @Override
-        public int beliefCap(CompoundConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
+        public int beliefCap(BaseConcept compoundConcept, boolean beliefOrGoal, boolean eternalOrTemporal) {
             return 0;
         }
 

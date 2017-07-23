@@ -10,6 +10,7 @@ import nars.Task;
 import nars.control.Cause;
 import nars.task.NALTask;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -86,7 +87,7 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    public NALTask task(@NotNull Compound c, boolean beliefOrGoal, long cre, long start, long end, @Nullable Priority b, NAR nar) {
+    public NALTask task(@NotNull Term c, boolean beliefOrGoal, long cre, long start, long end, @Nullable Priority b, NAR nar) {
 
         Truth tr = truth();
         if (tr == null)

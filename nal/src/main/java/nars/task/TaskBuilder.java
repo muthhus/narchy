@@ -40,7 +40,7 @@ import static nars.time.Tense.*;
 @Deprecated public class TaskBuilder extends Pri implements Termed, Truthed, Function<NAR, Task> {
 
     @NotNull
-    private Compound term;
+    private Term term;
 
     protected byte punc;
 
@@ -81,7 +81,7 @@ import static nars.time.Tense.*;
     //    public MutableTask(@NotNull String compoundTermString, byte punct, float freq, float conf) throws Narsese.NarseseException {
 //        this($.$(compoundTermString), punct, t(freq, conf));
 //    }
-    public TaskBuilder(@NotNull Compound t, byte punct, float freq, float conf) {
+    public TaskBuilder(@NotNull Term t, byte punct, float freq, float conf) {
         this(t, punct, t(freq, conf));
     }
 
@@ -90,29 +90,29 @@ import static nars.time.Tense.*;
     }
 
 
-    public TaskBuilder(@NotNull Compound term, byte punct, @Nullable Truth truth) throws InvalidTaskException {
+    public TaskBuilder(@NotNull Term term, byte punct, @Nullable Truth truth) throws InvalidTaskException {
         this(term, punct, truth,
             /* budget: */ 0, Float.NaN);
     }
 
-    public TaskBuilder(@NotNull Compound term, byte punctuation /* TODO byte */, @Nullable Truth truth, float p, float q) throws InvalidTaskException {
+    public TaskBuilder(@NotNull Term term, byte punctuation /* TODO byte */, @Nullable Truth truth, float p, float q) throws InvalidTaskException {
         super();
         pri = p; //direct set
 
         this.punc = (byte) punctuation;
 
         //unwrap top-level negation
-        Compound tt = term.term();
+        Term tt = term.term();
         if (tt.op() == Op.NEG) {
-            Term nt = tt.sub(0);
-            if (nt instanceof Compound) {
-                tt = (Compound) nt;
-
-                if (punctuation == Op.BELIEF || punctuation == Op.GOAL)
-                    truth = truth.negated();
-            } else {
-                throw new InvalidTaskException(this, "Top-level negation not wrapping a Compound");
-            }
+//            Term nt = tt.sub(0);
+//            if (nt instanceof Compound) {
+//                tt = (Compound) nt;
+//
+//                if (punctuation == Op.BELIEF || punctuation == Op.GOAL)
+//                    truth = truth.negated();
+//            } else {
+                throw new InvalidTaskException(this, "Top-level negation");
+            //}
         }
 
 
@@ -130,13 +130,13 @@ import static nars.time.Tense.*;
         if (isDeleted())
             throw new InvalidTaskException(this, "Deleted");
 
-        Compound t = term;
+        Term t = term;
 
         byte punc = punc();
         if (punc == 0)
             throw new InvalidTaskException(this, "Unspecified punctuation");
 
-        Compound cntt = t.normalize();
+        Term cntt = t.normalize();
         if (cntt == null)
             throw new InvalidTaskException(t, "Failed normalization");
 
@@ -259,9 +259,8 @@ import static nars.time.Tense.*;
 
 
 
-    @NotNull
     @Override
-    public final Compound term() {
+    public final Term term() {
         return term;
     }
 

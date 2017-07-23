@@ -10,6 +10,7 @@ import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,13 +46,13 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
 
-    public NALTask generate( @NotNull Compound template, long when, NAR nar) {
+    public NALTask generate( @NotNull Term template, long when, NAR nar) {
         return generate(template, when, null, nar);
     }
 
 
     @Nullable
-    public NALTask generate(@NotNull Compound template, long when, @Nullable Priority b, NAR nar) {
+    public NALTask generate(@NotNull Term template, long when, @Nullable Priority b, NAR nar) {
 
         DynTruth yy = truth(when,  template, true, nar);
         if (yy == null)
@@ -86,12 +87,12 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
 
     @Nullable
-    public DynTruth truth(long when, @NotNull Compound template, boolean evidence, NAR nar) {
+    public DynTruth truth(long when, @NotNull Term template, boolean evidence, NAR nar) {
         return model.eval(template, beliefOrGoal, when, evidence, nar); //newDyn(evidence);
     }
 
     @Override
-    public Task match(long when, @Nullable Task target, Compound template, boolean noOverlap, NAR nar) {
+    public Task match(long when, @Nullable Task target, Term template, boolean noOverlap, NAR nar) {
         if (isEmpty())
             return null;
 

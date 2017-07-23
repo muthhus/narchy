@@ -110,7 +110,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         @NotNull final long[] occ;
 
-        Compound c2;
+        Term c2;
         if (d.temporal) {
 
             occ = Tense.ETERNAL_RANGE.clone();
@@ -175,7 +175,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         }
 
         if (varIntro) {
-            Compound Cv = normalizedOrNull(DepIndepVarIntroduction.varIntro(c2, nar), d.terms,
+            Term Cv = normalizedOrNull(DepIndepVarIntroduction.varIntro(c2, nar), d.terms,
                     d.temporal ? d.terms.retemporalizationZero : d.terms.retemporalizationDTERNAL //select between eternal and parallel depending on the premises's temporality
             );
 
@@ -186,12 +186,12 @@ public class Conclusion extends AbstractPred<Derivation> {
         }
 
         byte punc = d.concPunc;
-        @Nullable ObjectBooleanPair<Compound> c3n = Task.tryContent(c2, punc, d.terms, true);
+        @Nullable ObjectBooleanPair<Term> c3n = Task.tryContent(c2, punc, d.terms, true);
         if (c3n != null) {
 
             boolean negating = c3n.getTwo();
 
-            final Compound C = c3n.getOne();
+            final Term C = c3n.getOne();
 
 
             long start = occ[0];

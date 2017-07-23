@@ -123,7 +123,7 @@ public class IO {
      */
     public static void writeTask(@NotNull DataOutput out, @NotNull Task t) throws IOException {
 
-        Compound tt = t.term();
+        Term tt = t.term();
 
         if (out instanceof ByteArrayDataOutput) {
             tt.append((ByteArrayDataOutput)out);

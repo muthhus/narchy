@@ -548,10 +548,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @Nullable
-    public Task input(float pri, @NotNull Compound term, byte punc, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
+    public Task input(float pri, @NotNull Term term, byte punc, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
 
 
-        ObjectBooleanPair<Compound> b = Task.tryContent(term, punc, terms, false);
+        ObjectBooleanPair<Term> b = Task.tryContent(term, punc, terms, false);
         term = b.getOne();
         if (b.getTwo())
             freq = 1f - freq;
@@ -852,8 +852,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
             @Override
             public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
-                Compound c = t.term();
-                o.run((Atomic) (c.sub(1)), ((Compound) (t.term(0))).toArray(), nar);
+                Term c = t.term();
+                o.run((Atomic) (c.sub(1, null)), ((Compound) (t.term().sub(0, null))).toArray(), nar);
                 return t;
             }
 
@@ -1270,7 +1270,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @Nullable
-    private Concept concept(@NotNull Termed x, boolean createIfMissing) {
+    public Concept concept(@NotNull Termed x, boolean createIfMissing) {
         assert(!(x instanceof Bool));
 
         Term xt;

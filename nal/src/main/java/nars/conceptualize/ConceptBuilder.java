@@ -24,7 +24,7 @@ public interface ConceptBuilder extends Function<Term, Termed> {
     @NotNull ConceptState awake();
     @NotNull ConceptState sleep();
 
-    TemporalBeliefTable newTemporalBeliefTable(Compound c);
+    TemporalBeliefTable newTemporalBeliefTable(Term c);
 
     void start(NAR nar);
 
@@ -53,7 +53,7 @@ public interface ConceptBuilder extends Function<Term, Termed> {
         }
 
         @Override
-        public TemporalBeliefTable newTemporalBeliefTable(Compound c) {
+        public TemporalBeliefTable newTemporalBeliefTable(Term c) {
             return null;
         }
 
@@ -63,7 +63,7 @@ public interface ConceptBuilder extends Function<Term, Termed> {
         }
 
         @Override
-        public BeliefTable newBeliefTable(Compound t, boolean beliefOrGoal) {
+        public BeliefTable newBeliefTable(Term t, boolean beliefOrGoal) {
             return null;
         }
 
@@ -74,7 +74,7 @@ public interface ConceptBuilder extends Function<Term, Termed> {
 
     };
 
-    BeliefTable newBeliefTable(Compound t, boolean beliefOrGoal);
+    BeliefTable newBeliefTable(Term t, boolean beliefOrGoal);
 
     QuestionTable newQuestionTable();
 

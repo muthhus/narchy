@@ -3,6 +3,7 @@ package nars.task;
 import nars.Task;
 import nars.control.premise.Derivation;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,7 @@ public class DerivedTask extends NALTask {
 
     //TODO should this also affect the Belief task?
 
-    public DerivedTask(@NotNull Compound tc, byte punct, @Nullable Truth truth, @NotNull Derivation p, long start, long end, short[] cause) {
+    public DerivedTask(@NotNull Term tc, byte punct, @Nullable Truth truth, @NotNull Derivation p, long start, long end, short[] cause) {
         super(tc, punct, truth, p.time, start, end, p.concEvidence);
 
         this.cause = cause;

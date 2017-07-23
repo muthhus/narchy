@@ -6,6 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.task.SignalTask;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -48,7 +49,7 @@ public class Signal extends AtomicReference<SignalTask> {
         this.resolution = resolution;
     }
 
-    public Task set(@NotNull Compound term, @Nullable Truthed nextTruth, LongSupplier stamper, NAR nar) {
+    public Task set(@NotNull Term term, @Nullable Truthed nextTruth, LongSupplier stamper, NAR nar) {
 
 
         //int halfDur = Math.max(1, nar.dur() / 2);
@@ -100,7 +101,7 @@ public class Signal extends AtomicReference<SignalTask> {
     }
 
     @Nullable
-    protected SignalTask task(Compound term, Truth t, long start, long end, long stamp) {
+    protected SignalTask task(Term term, Truth t, long start, long end, long stamp) {
 
 
         SignalTask s = new SignalTask(term, punc, t, start, end, stamp);

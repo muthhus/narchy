@@ -420,7 +420,7 @@ public interface TimeFunctions {
 
         if (derived.size() == 2) {
 
-            Compound from = p.task.term();
+            Term from = p.task.term();
             int occA = from.subtermTime(derived.sub(0));
 
             if (occA != DTERNAL) {
@@ -444,7 +444,7 @@ public interface TimeFunctions {
      *   has special case for decomposing goal conjunctions (earliest component only */
     @Nullable TimeFunctions decomposeTaskSubset = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> {
         Task task = p.task;
-        Compound taskTerm = task.term();
+        Term taskTerm = task.term();
 
         int taskSize = taskTerm.size();
 
@@ -890,7 +890,7 @@ public interface TimeFunctions {
                 Term da = derived.sub(0);
                 Term db = derived.sub(1);
 
-                Compound tt = task.term();
+                Term tt = task.term();
                 int ta = tt.subtermTime(da);
                 int tb = tt.subtermTime(db);
 

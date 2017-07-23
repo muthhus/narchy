@@ -143,7 +143,7 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
 
-    public final Unify unifyAll(@NotNull Compound x, @NotNull Compound y) {
+    public final Unify unifyAll(@NotNull Term x, @NotNull Term y) {
         return unify(x, y, true);
     }
 

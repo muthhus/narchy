@@ -10,8 +10,6 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.bag.leak.TaskLeak;
-import nars.concept.AtomConcept;
-import nars.concept.CompoundConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.task.NALTask;
@@ -19,15 +17,12 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
-import nars.term.container.TermContainer;
-import nars.term.subst.Unify;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -70,7 +65,8 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
-        super(new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), n.random(), capacity
+        super(
+                new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), n.random(), capacity
         ), selectionRate, n);
 
         this.nar = n;
@@ -87,12 +83,12 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
     @Override
     protected void in(@NotNull Task task, @NotNull Consumer<PriReference<Compound>> each) {
 
-        if (task.meta(Abbreviation.class)==null)
+        if (task.meta(Abbreviation.class)!=null)
             return;
 
         Priority b = task.priority().clonePri();
         if (b != null)
-            input(b, each, task.term(), 1f);
+            input(b, each, (Compound)task.term(), 1f);
     }
 
     private void input(@NotNull Priority b, @NotNull Consumer<PriReference<Compound>> each, @NotNull Compound t, float scale) {
@@ -101,7 +97,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
             return;
 
         if (vol <= volume.hi()) {
-            if (t.vars() == 0 && !t.isTemporal()) {
+            if (t.vars() == 0 && t.conceptual().equals(t) /* identical to its conceptualize */ ) {
                 Concept abbreviable = (Concept) nar.concept(t);
                 if ((abbreviable == null) ||
                         !(abbreviable instanceof PermanentConcept) &&
@@ -193,14 +189,18 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 
                 if (a.putIfAbsent(Abbreviation.class, id) == null) {
 
-                    Concept alias = aliasConcept ? nar.on(AliasConcept.get(id, abbreviated, nar, abbreviation)) : null;
+                    AliasConcept ac = AliasConcept.get(id, abbreviated, nar, abbreviation);
+                    Concept alias = aliasConcept ?
+                            nar.on(ac) : null;
+
+                    nar.terms.set(abbreviated, ac); //set the abbreviated term to resolve to the abbreviation
 
                     Termed aliasTerm = alias != null ? alias : Atomic.the(id);
 
                     //if (abbreviation != null) {
 
                     //logger.info("{} <=== {}", alias, abbreviatedTerm);
-                    Compound abbreviatedTerm = abbreviated.term();
+                    Term abbreviatedTerm = abbreviated.term();
 
                     Task abbreviationTask = new NALTask(
                             abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
@@ -225,7 +225,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 //        return this;
 
                     nar.input(abbreviationTask);
-                    logger.info("{}", abbreviationTask);
+                    logger.info("+ {}", abbreviationTask);
                     return true;
                 }
             }
@@ -277,143 +277,6 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 //        }
 //    }
 //
-
-    /**
-     * the proxy concepts present a bidirectional facade between a referenced and an alias term (alias term can be just a serial # atom wrapped in a product).
-     * <p>
-     * it replaces the index entry for the referenced with itself and also adds itself so from its start it intercepts all references to itself or the aliased (abbreviated) term whether this occurrs at the top level or as a subterm in another term (or as a subterm in another abbreviation, etc..)
-     * <p>
-     * the index is usually a weakmap or equivalent in which abbreviations can be forgotten as well as any other concept.
-     * <p>
-     * seen from a superterm containing one, it appears as a simple volume=2 concept meanwhile it could be aliasing a concept much larger than it. common "phrase" concepts with a volume >> 2 are good candidates for abbreviation. but when printed, the default toString() method is proxied so it will automatically decompress on output (or other serialization).
-     */
-    public static final class AliasConcept extends AtomConcept {
-
-        @NotNull
-        public final CompoundConcept abbr;
-        private TermContainer templates;
-
-        static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar, @NotNull Term... additionalTerms) {
-            Concept c = nar.concept(decompressed);
-            if (c != null) {
-                AliasConcept a = new AliasConcept(compressed, (CompoundConcept) c, nar, additionalTerms);
-                return a;
-            }
-            return null;
-        }
-
-        AliasConcept(@NotNull String abbreviation, CompoundConcept abbr, @NotNull NAR nar, @NotNull Term... additionalTerms) {
-            super(abbreviation, abbr.termlinks(), abbr.tasklinks());
-
-            this.abbr = abbr;
-
-//            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
-//            if (additionalTerms.length > 0)
-//                tl = ArrayUtils.addAll(tl, additionalTerms);
-//            this.templates = TermVector.the(tl);
-
-            //rewriteLinks(nar);
-        }
-
-//
-//        /**
-//         * rewrite termlinks and tasklinks which contain the abbreviated term...
-//         * (but are not equal to since tasks can not have atom content)
-//         * ...replacing it with this alias
-//         */
-//        private void rewriteLinks(@NotNull NAR nar) {
-//            Term that = abbr.term();
-//            termlinks().compute(existingLink -> {
-//                Term x = existingLink.get();
-//                Term y = nar.concepts.replace(x, that, this);
-//                return (y != null && y != x && y != Term.False) ?
-//                        termlinks().newLink(y, existingLink) :
-//                        existingLink;
-//            });
-//            tasklinks().compute(existingLink -> {
-//                Task xt = existingLink.get();
-//                Term x = xt.term();
-//
-//                if (!x.equals(that) && !x.hasTemporal()) {
-//                    Term y = $.terms.replace(x, that, this);
-//                    if (y != x && y instanceof Compound) {
-//                        Task yt = MutableTask.clone(xt, (Compound) y, nar);
-//                        if (yt != null)
-//                            return termlinks().newLink(yt, existingLink);
-//                    }
-//                }
-//
-//                return existingLink;
-//
-//            });
-//        }
-
-
-        @Override
-        public void delete(NAR nar) {
-            abbr.delete(nar);
-            super.delete(nar);
-        }
-
-
-        @Override
-        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-
-            Term tt = abbr.term();
-            if (y instanceof AliasConcept) {
-                //try to unify with y's abbreviated
-//                if (tt.unify( ((AliasConcept)y).abbr.term(), subst ))
-//                    return true;
-
-                //if this is constant (no variables) then all it needs is equality test
-                if (tt.equals(((AliasConcept) y).abbr.term()))
-                    return true;
-            }
-
-            //try to unify with 'y'
-            return tt.equals(y) || tt.unify(y, subst);
-        }
-
-//        @Override
-//        public boolean equals(Object u) {
-//            return super.equals(u);
-//        }
-
-
-//        @Override
-//        public final Activation process(@NotNull Task input, NAR nar) {
-//            return abbr.process(input, nar);
-//        }
-
-        @Override
-        public @Nullable Map<Object, Object> meta() {
-            return abbr.meta();
-        }
-
-//        @NotNull
-//        @Override
-//        public BeliefTable beliefs() {
-//            return abbr.beliefs();
-//        }
-//
-//        @NotNull
-//        @Override
-//        public BeliefTable goals() {
-//            return abbr.goals();
-//        }
-//
-//        @NotNull
-//        @Override
-//        public QuestionTable questions() {
-//            return abbr.questions();
-//        }
-//
-//        @NotNull
-//        @Override
-//        public QuestionTable quests() {
-//            return abbr.quests();
-//        }
-    }
 
 
 //    public static class AbbreviationTask extends NALTask {

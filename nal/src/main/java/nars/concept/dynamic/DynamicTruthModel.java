@@ -29,13 +29,13 @@ abstract public class DynamicTruthModel {
     public static final DynamicTruthModel Intersection = new Intersection() {
         @NotNull
         @Override
-        public Term[] components(Compound superterm) {
-            return superterm.toArray();
+        public Term[] components(Term superterm) {
+            return ((Compound)superterm).toArray();
         }
     };
 
     @Nullable
-    public DynTruth eval(Compound superterm, boolean beliefOrGoal, long when, boolean stamp, NAR n) {
+    public DynTruth eval(Term superterm, boolean beliefOrGoal, long when, boolean stamp, NAR n) {
 
         Term[] inputs = components(superterm);
 
@@ -107,7 +107,7 @@ abstract public class DynamicTruthModel {
         return d;
     }
 
-    abstract public @NotNull Term[] components(Compound superterm);
+    abstract public @NotNull Term[] components(Term superterm);
 
     //protected abstract DynTruth eval(Compound template, long when, boolean stamp, NAR n);
 
@@ -238,7 +238,7 @@ abstract public class DynamicTruthModel {
 
         @NotNull
         @Override
-        public Term[] components(Compound superterm) {
+        public Term[] components(Term superterm) {
             return comp;
         }
 
@@ -255,7 +255,7 @@ abstract public class DynamicTruthModel {
 
         @NotNull
         @Override
-        public Term[] components(Compound superterm) {
+        public Term[] components(Term superterm) {
             return components;
         }
 
@@ -292,7 +292,7 @@ abstract public class DynamicTruthModel {
 
         @NotNull
         @Override
-        public Term[] components(Compound superterm) {
+        public Term[] components(Term superterm) {
             return components;
         }
 

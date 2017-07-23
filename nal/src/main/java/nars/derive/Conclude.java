@@ -7,6 +7,7 @@ import nars.Task;
 import nars.control.CauseChannel;
 import nars.derive.rule.PremiseRule;
 import nars.term.Compound;
+import nars.term.Functor;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -46,7 +47,7 @@ public final class Conclude extends ProxyCompound implements Function<NAR,Conclu
         Term pp = pattern;
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
-        Pair<Atomic, Compound> outerFunctor = Op.functor(pp, $.terms, false);
+        Pair<Functor, Compound> outerFunctor = Op.functor(pp, $.terms, false);
         if (outerFunctor != null && outerFunctor.getOne().toString().equals("varIntro")) {
             varIntro = true;
             pp = outerFunctor.getTwo().sub(0);

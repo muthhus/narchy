@@ -8,12 +8,14 @@ import nars.concept.Concept;
 import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
 import nars.op.Command;
+import nars.op.mental.AliasConcept;
 import nars.task.*;
 import nars.task.util.AnswerBag;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Bool;
 import nars.time.Tense;
 import nars.truth.*;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
@@ -40,15 +42,14 @@ import static nars.truth.TruthFunctions.w2c;
 /**
  * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.
  */
-public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
+public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
 
     @Override
     long creation();
 
-    @NotNull
     @Override
-    Compound term();
+    Term term();
 
     /**
      * occurrence starting time
@@ -173,7 +174,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     }
 
     @Nullable
-    static boolean taskContentValid(@NotNull Compound t, byte punc, @Nullable NAR nar, boolean safe) {
+    static boolean taskContentValid(@NotNull Term t, byte punc, @Nullable NAR nar, boolean safe) {
 
         if (t.op() == NEG) {
             //must be applied before instantiating Task
@@ -201,12 +202,12 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 //            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
 //        }
 
-        Term c = t.eternal();
-        if (!(c instanceof Compound)) {
+        Term c = t.conceptual();
+        if (c == null || c instanceof Bool) {
             fail(t, "no associated concept", safe);
         }
 
-        return taskStatementValid(t, punc, safe);
+        return t instanceof Compound ? validTaskCompound((Compound)t, punc, safe) : true;
     }
 
 //    @Nullable
@@ -219,7 +220,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
      * these can all be tested prenormalization, because normalization will not affect the result
      */
     @Nullable
-    static boolean taskStatementValid(@NotNull Compound t, byte punc, boolean safe) {
+    static boolean validTaskCompound(@NotNull Compound t, byte punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
@@ -333,8 +334,15 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     @Nullable
     default TaskConcept concept(@NotNull NAR n, boolean conceptualize) {
         Concept c = conceptualize ? n.conceptualize(term()) : n.concept(term());
-        if (c!=null)
+        if (c!=null) {
+            if (c instanceof AliasConcept) {
+                //dereference alias when being used for a task
+                //TODO warning abbr might deleted, check and if so, re-create and re-link the alias to it
+                return (TaskConcept) ((AliasConcept) c).abbr;
+            }
+
             return ((TaskConcept) c);
+        }
 
         return null;
 //        if (!(c instanceof TaskConcept)) {
@@ -667,8 +675,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
 
     @Nullable
-    default Term term(int i) {
-        return term().sub(i);
+    @Deprecated default Term term(int i) {
+        return term().sub(i, null);
     }
 
 
@@ -753,7 +761,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
 
     @Deprecated
     @Nullable
-    static NALTask clone(@NotNull Task x, @NotNull Compound newContent) {
+    static NALTask clone(@NotNull Task x, @NotNull Term newContent) {
 
         boolean negated = (newContent.op() == NEG);
         if (negated) {
@@ -876,13 +884,13 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
         boolean evaluate = !(this instanceof DerivedTask) || isCommand();
 
         if (evaluate) {
-            Compound x = term();
-            Compound y = compoundOrNull(
+            Term x = term();
+            Term y = compoundOrNull(
                     x.eval(n.terms)
             );
 
             if (!x.equals(y)) {
-                @Nullable ObjectBooleanPair<Compound> yy = tryContent(y, punc(), n.terms, true);
+                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), n.terms, true);
                 if (yy != null) {
                     NALTask inputY = clone(this, $.negIf(yy.getOne(), yy.getTwo() /* HACK */));
                     assert (inputY != null);
@@ -916,11 +924,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
     static @Nullable Task execute(Task cmd, NAR nar) {
 
 
-        Compound inputTerm = cmd.term();
+        Term inputTerm = cmd.term();
         if (inputTerm.hasAll(Op.EvalBits) && inputTerm.op() == INH) {
-            Term func = inputTerm.sub(1);
+            Term func = inputTerm.sub(1, null);
             if (func.op() == ATOM) {
-                Term args = inputTerm.sub(0);
+                Term args = inputTerm.sub(0, null);
                 if (args.op() == PROD) {
                     Concept funcConcept = nar.concept(func);
                     if (funcConcept instanceof Command) {
@@ -984,26 +992,26 @@ public interface Task extends Tasked, Truthed, Stamp, Termed<Compound>, ITask {
      * necessitating an inversion of truth when constructing a Task with the input term
      */
     @Nullable
-    static ObjectBooleanPair<Compound> tryContent(@NotNull Term t, byte punc, TermIndex index, boolean safe) {
-        @Nullable Compound cc = compoundOrNull(t);
-        if (cc == null)
+    static ObjectBooleanPair<Term> tryContent(@NotNull Term t, byte punc, TermIndex index, boolean safe) {
+
+        if (t instanceof Bool)
             return null;
 
         boolean negated = false;
 
-        if ((cc = normalizedOrNull(cc, index)) == null)
+        if ((t = normalizedOrNull(t, index)) == null)
             return null;
 
-        if (cc.op() == NEG) {
-            cc = compoundOrNull(cc.unneg());
-            if (cc == null)
+        if (t.op() == NEG) {
+            t = compoundOrNull(t.unneg());
+            if (t == null)
                 return null;
 
             negated = !negated;
         }
 
-        if (Task.taskContentValid(cc, punc, null, safe))
-            return PrimitiveTuples.pair(cc, negated);
+        if (Task.taskContentValid(t, punc, null, safe))
+            return PrimitiveTuples.pair(t, negated);
         else
             return null;
 

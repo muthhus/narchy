@@ -4,8 +4,10 @@ import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.gui.Vis;
 import nars.index.term.HijackTermIndex;
+import nars.index.term.map.CaffeineIndex;
 import nars.nar.exe.FocusedExecutioner;
 import nars.nar.exe.MultiExecutioner;
+import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
@@ -106,7 +108,7 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        int THREADS = 2;
+        int THREADS = 3;
         NAR n = new NARS()
                     .exe(
                         new MultiExecutioner((i) ->
@@ -116,8 +118,8 @@ abstract public class NAgentX extends NAgent {
                             ),THREADS, 2))
                     .time(clock)
                     .index(
-                        //new CaffeineIndex(128 * 1024 )
-                            new HijackTermIndex(128 * 1024,  4)
+                        new CaffeineIndex(128 * 1024 )
+                        //    new HijackTermIndex(128 * 1024,  4)
                     )
                     .get();
 
@@ -132,13 +134,14 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 0.6f;
         n.DEFAULT_QUESTION_PRIORITY = 0.25f;
         n.DEFAULT_QUEST_PRIORITY = 0.3f;
-        n.termVolumeMax.setValue(26);
+        n.termVolumeMax.setValue(32);
 
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 2, false);
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 8f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
-        Inperience inp = new Inperience(n, 0.01f, 8);
+        //Inperience inp = new Inperience(n, 0.01f, 8);
+        Abbreviation abb = new Abbreviation(n, "z", 3, 16, 1f, 16);
 
 
 

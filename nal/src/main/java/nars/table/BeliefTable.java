@@ -7,6 +7,7 @@ import nars.concept.TaskConcept;
 import nars.control.Cause;
 import nars.task.NALTask;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -66,7 +67,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long when, Task question, Compound template, boolean noOverlap, NAR nar) {
+        public Task match(long when, Task question, Term template, boolean noOverlap, NAR nar) {
             return null;
         }
 
@@ -155,7 +156,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      */
     void add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
 
-    Task match(long when, Task question, @Nullable Compound template, boolean noOverlap, NAR nar);
+    Task match(long when, Task question, @Nullable Term template, boolean noOverlap, NAR nar);
 
 
     default void print(@NotNull PrintStream out) {
@@ -231,7 +232,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             Truth aProj = answer.truth(when, dur, nar.confMin.floatValue());
             if (aProj != null) {
 
-                Compound at = normalizedOrNull(answer.term(), nar.terms, nar.terms.retemporalizationZero);
+                Term at = normalizedOrNull(answer.term(), nar.terms, nar.terms.retemporalizationZero);
                 if (at==null)
                     return null;
 

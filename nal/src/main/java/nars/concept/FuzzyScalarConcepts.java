@@ -86,7 +86,7 @@ public class FuzzyScalarConcepts extends ProxyCompound {
     }
 
     public Term get(int i) {
-        return sensors.get(i);
+        return sensors.get(i).term();
     }
 
     public FuzzyScalarConcepts resolution(float r) {

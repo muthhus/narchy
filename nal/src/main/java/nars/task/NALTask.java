@@ -7,6 +7,7 @@ import nars.Task;
 import nars.control.Cause;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
@@ -26,7 +27,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public class NALTask extends Pri implements Task {
 
-    public final Compound term;
+    public final Term term;
     public final DiscreteTruth truth;
     public final byte punc;
     private final long creation, start, end;
@@ -41,7 +42,7 @@ public class NALTask extends Pri implements Task {
     public Map meta;
 
 
-    public NALTask(Compound term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
+    public NALTask(Term term, byte punc, @Nullable Truth truth, long creation, long start, long end, long[] stamp) throws InvalidTaskException {
 
         if ((punc == BELIEF) || (punc == GOAL)) {
             if (truth == null)
@@ -162,7 +163,7 @@ public class NALTask extends Pri implements Task {
 
 
     @Override
-    public @NotNull Compound term() {
+    public Term term() {
         return term;
     }
 
