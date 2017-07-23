@@ -160,7 +160,9 @@ public class Derivation extends Unify implements TermContext {
             cb.softValues();
         else
             cb.maximumSize(cs);
-                    //.recordStats()
+
+        //cb.recordStats();
+
         transformsCache = cb.build();
 
 
@@ -436,15 +438,20 @@ public class Derivation extends Unify implements TermContext {
 
         Term y = xy(x);
         if (y!=null) {
-            if (y instanceof Atomic || (y instanceof Compound && y.vars(null) == 0))
+            if (y.vars(null) == 0) {
+//                if (xy.get(y)!=null)
+//                    System.out.println(y + " -> " + xy.get(y));
                 return y;
+            }
             x = y;
         }
-        if (x instanceof Atomic)
+        if (x instanceof Atomic) {
+//            if (xy.get(x)!=null)
+//                System.out.println(x + " -> " + xy.get(x));
             return x;
+        }
 
-
-//        if (pattern.OR(x -> x == Null))
+//        if (x.OR(xx -> xx == Null))
 //            return Null;
 
         Transformation key = Transformation.the((Compound) x, currentMatch);

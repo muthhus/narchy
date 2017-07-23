@@ -34,7 +34,6 @@ public class NAL1Test extends AbstractNALTest {
     public void deduction()  {
 
         test
-                //.log()
                 .believe("<bird --> animal>")
                 /*.en("bird is a type of animal.")
                 .es("bird es un tipo de animal.")
@@ -90,7 +89,7 @@ public class NAL1Test extends AbstractNALTest {
 //        test.nar.onCycle(()->{
 //            nar.exe.print(System.out);
 //        });
-        test.nar.log();
+
 
         test
                 .believe("<parakeet --> bird>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");

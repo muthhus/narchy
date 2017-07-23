@@ -29,7 +29,7 @@ import java.util.function.Predicate;
  */
 public class FocusedExecutioner extends Executioner {
 
-    int subCycles = 2;
+    public int subCycles = 2;
     int subCycleConcepts = 6;
     int subCycleTasks = 16;
     int subCyclePremises = 2;
@@ -159,7 +159,11 @@ public class FocusedExecutioner extends Executioner {
     @Override
     public void run(@NotNull ITask x) {
         if (x instanceof Task) {
-            tasks.putAsync(x);
+            if (x.isInput())
+                execute(x); //execute immediately
+            else
+                tasks.putAsync(x); //buffer
+
         } else if (x instanceof Premise) {
             premises.putAsync(x);
         } else if (x instanceof Activate) {

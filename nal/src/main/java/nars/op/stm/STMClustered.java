@@ -364,6 +364,7 @@ public abstract class STMClustered extends STM {
             }
 
             input.setCapacity(capacity.intValue());
+            input.commit();
 
             net.compact();
 

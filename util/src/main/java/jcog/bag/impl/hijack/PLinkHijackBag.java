@@ -71,7 +71,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PriReference<X>> {
     protected PriReference<X> merge(@NotNull PriReference<X> existing, @NotNull PriReference<X> incoming, MutableFloat overflowing) {
         float overflow = existing.priAddOverflow(incoming.priSafe(0) );
         if (overflow > 0) {
-            pressurize(-overflow);
+            //pressurize(-overflow);
             if (overflowing!=null) overflowing.add(overflow);
         }
         return existing;

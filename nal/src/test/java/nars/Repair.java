@@ -2,13 +2,20 @@ package nars;
 
 import com.google.common.graph.ValueGraph;
 import nars.nal.AbstractNALTest;
+import nars.nal.nal1.NAL1Test;
 import nars.nal.nal2.NAL2Test;
+import nars.nal.nal3.NAL3Test;
+import nars.nal.nal4.NAL4MultistepTest;
+import nars.nar.exe.FocusedExecutioner;
 import nars.util.OptiUnit;
 import org.intelligentjava.machinelearning.decisiontree.DecisionTree;
 import org.intelligentjava.machinelearning.decisiontree.FloatTable;
 import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 
+import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class Repair {
 
@@ -16,8 +23,10 @@ public class Repair {
     public static void main(String[] args) {
 
         Class[] testClasses = {
-                //NAL1Test.class, NAL2Test.class,
-                NAL2Test.class
+                NAL1Test.class,
+                NAL2Test.class,
+                NAL3Test.class,
+                NAL4MultistepTest.class
                 //AllNAL.class
         };
 
@@ -31,84 +40,65 @@ public class Repair {
 
         }, testClasses);
 
-        for (int ttl : new int[]{32, 64, 96, 128, 192}) {
+
+        for (int subCycles : new int[]{ 0, 1, 2, 4, 6, 8 }) {
+            for (int ttl : new int[]{ 16, 32, 64, 128 }) {
             /*for (int termVol : new int[]{16})*/
-            o.run((x) -> {
+                o.add((x) -> {
 
-                //SETUP EXPERIMENT
-                x.test.trace = false;
+                    //SETUP EXPERIMENT
+                    x.test.trace = false;
 
-                return new OptiUnit.Tweaks<>(x)
 
-                        //.set("cycles", 100)
-                        .call("nar.matchTTL.setValue", ttl)
-                        //.call("nar.termVolumeMax.setValue", termVol)
-                        ;
+                    return new OptiUnit.Tweaks<>(x)
 
-            });
+                            //.set("cycles", 100)
+                            .call("subCycles", (n, v) -> {
+                                ((FocusedExecutioner)(n.nar.exe)).subCycles = v;
+                            }, subCycles)
+                            .call("nar.matchTTL.setValue", ttl)
+                            //.call("nar.termVolumeMax.setValue", termVol)
+                            ;
+
+                });
+            }
         }
+
+        o.run();
 
         o.print(System.out);
 
         FloatTable<String> table = o.table(
-                "nar.matchTTL.setValue(",
+                "score",
+                "subCycles",
+                "nar.matchTTL.setValue",
                 //"nar.termVolumeMax.setValue(",
-                //"concept fire activates",
-                //"concept fire premises",
-                "concept fire premises",
                 "concept fire activations",
-                "concept count",
-                "belief count",
-                "score");
+                "concept fire premises",
+                //"concept fire premises",
+                //"concept fire activations",
+                "concept count"
+                //"belief count",
+                );
 
 
         table.print(System.out);
 
-        RealDecisionTree tree = new RealDecisionTree(table, 5, 8,
-                "LL", "HH");
+        RealDecisionTree tree = new RealDecisionTree(table, 0, 4,
+                "LL", "MM", "HH");
         tree.print(System.out);
 
-        ValueGraph<DecisionTree.Node<Float>, Boolean> g = tree.graph();
-        System.out.println(g);
-
-        //Network<DecisionTree.Node<Float>, String> h = Graphs.transpose(g);
-        //Graph<DecisionTree.Node<Float>> gg = Graphs.transitiveClosure(g);
-
         DecisionTree.Node<Float> MAX = tree.max();
-        System.out.println("MAX=" + MAX);
         DecisionTree.Node<Float> MIN = tree.min();
+        System.out.println("MAX=" + MAX);
         System.out.println("MIN=" + MIN);
 
 
-
-        g.edges().forEach(k -> {
-
-            DecisionTree.Node<Float> s = k.source();
-            DecisionTree.Node<Float> t = k.target();
-            //g.edgeValue(
-            System.out.println(s + " "  + k+ " " + t);
-
-        });
-
-        System.out.println();
-
-        //ValueGraph<DecisionTree.Node<Float>,Boolean> sg = Graphs.inducedSubgraph(Graphs.transpose(g), List.of(MAX));
-
-        for (DecisionTree.Node<Float> tgt : new DecisionTree.Node[] { MAX,MIN } ){
-            g.predecessors(tgt).forEach(k -> {
-                boolean b = g.edgeValue(k, tgt);
-                String ks = "\"" + k + "\"";
-                System.out.println("(" + (b ? ks : ("--" + k)) + " ==> score(" + tgt + "))");
-            });
-        }
-
-        System.out.println();
+        tree.explanations().forEach((k,v) -> System.out.println(v + " " + k));
 
 
-        /* TODO
-            traverse the tree collecting each node as an AND condition until a leaf node is reached. this becomes
-            the predicting predicate of the value at the leaf node. so a stack is necessary
-         */
+
+
 
     }
 }

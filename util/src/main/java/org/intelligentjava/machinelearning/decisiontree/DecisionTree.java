@@ -1,18 +1,19 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
 import com.google.common.graph.*;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.intelligentjava.machinelearning.decisiontree.impurity.GiniIndexImpurityCalculation;
 import org.intelligentjava.machinelearning.decisiontree.impurity.ImpurityCalculator;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -227,15 +228,19 @@ public class DecisionTree<K, V> {
 
     // -------------------------------- TREE PRINTING ------------------------------------
 
-    public ValueGraph<Node<V>,Boolean> graph() {
+//    public ValueGraph<Iterable<Node<V>>,Boolean> graph() {
+//
+//        MutableValueGraph<Node<V>,Boolean> graph = ValueGraphBuilder
+//                .directed()
+//                .nodeOrder(ElementOrder.unordered())
+//                .allowsSelfLoops(false)
+//                .build();
+//
+//        return root.graph(graph);
+//    }
 
-        MutableValueGraph<Node<V>,Boolean> graph = ValueGraphBuilder
-                .directed()
-                .nodeOrder(ElementOrder.unordered())
-                .allowsSelfLoops(false)
-                .build();
-
-        return root.graph(graph);
+    public void explain(BiConsumer<List<ObjectBooleanPair<Node<V>>>, Node.LeafNode<V>> c) {
+        root.explain(c, new FasterList());
     }
 
     public void print() {
@@ -276,6 +281,15 @@ public class DecisionTree<K, V> {
         if (node.size() > 1 && node.get(1) != null) {
             print(node.get(1), false, indent + (isRight ? " |      " : "        "), o);
         }
+    }
+
+    /** requires V to be Comparable */
+    public SortedMap<V, List<ObjectBooleanPair<Node<V>>>> explanations() {
+        SortedMap<V, List<ObjectBooleanPair<Node<V>>>> explanations = new TreeMap();
+        explain((path, result) -> {
+            explanations.put(result.label, path);
+        });
+        return explanations;
     }
 
     public static class Node<V> extends FasterList<Node<V>> implements Comparable<V> {
@@ -366,32 +380,62 @@ public class DecisionTree<K, V> {
             return ((Comparable) label).compareTo(n.label); //leaf
         }
 
-        public MutableValueGraph<Node<V>,Boolean> graph(MutableValueGraph<Node<V>,Boolean> graph) {
-            graph.addNode(this);
+        public void explain(BiConsumer<List<ObjectBooleanPair<Node<V>>>, LeafNode<V>> c, FasterList<ObjectBooleanPair<Node<V>>> path) {
+
+
 
             int s = size();
             if (s ==2) {
-                Node<V> ifTrue = get(0);
-                ifTrue.graph(graph);
-                graph.putEdgeValue(this, ifTrue, true);
 
-                Node<V> ifFalse = get(1);
-                ifFalse.graph(graph);
-                graph.putEdgeValue(this, ifFalse, false);
+                explain(c, path, 0);
+                explain(c, path, 1);
+
             } else if (s == 0) {
                 //nothing
             } else {
                 throw new UnsupportedOperationException("predicate?");
             }
 
-            return graph;
         }
 
-        private static class LeafNode<V> extends Node<V> {
+        public void explain(BiConsumer<List<ObjectBooleanPair<Node<V>>>, LeafNode<V>> c, FasterList<ObjectBooleanPair<Node<V>>> path, int child) {
+            assert(child == 0 || child == 1);
+            path.add(PrimitiveTuples.pair(this, child == 0 ? true : false));
+            get(child).explain(c, path);
+            path.removeLast();
+        }
+
+//        public MutableValueGraph<Iterable<Node<V>>,Boolean> graph(MutableValueGraph<Node<V>,Boolean> graph, Iterable<Node<V>> path) {
+//
+//            graph.addNode(Iterables.concat(Collections.singleton(this), path));
+//
+//            int s = size();
+//            if (s ==2) {
+//                Node<V> ifTrue = get(0);
+//                ifTrue.graph(graph);
+//                graph.putEdgeValue(this, ifTrue, true);
+//
+//                Node<V> ifFalse = get(1);
+//                ifFalse.graph(graph);
+//                graph.putEdgeValue(this, ifFalse, false);
+//            } else if (s == 0) {
+//                //nothing
+//            } else {
+//                throw new UnsupportedOperationException("predicate?");
+//            }
+//
+//            return graph;
+//        }
+
+        public static class LeafNode<V> extends Node<V> {
             public LeafNode(V label) {
                 super(null, label);
             }
 
+            @Override
+            public void explain(BiConsumer<List<ObjectBooleanPair<Node<V>>>, LeafNode<V>> c, FasterList<ObjectBooleanPair<Node<V>>> path) {
+                c.accept(path, this);
+            }
 
             @Override
             public String toString() {

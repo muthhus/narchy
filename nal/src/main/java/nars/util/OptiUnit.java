@@ -30,7 +30,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class OptiUnit<T> extends RunListener {
@@ -62,7 +64,7 @@ public class OptiUnit<T> extends RunListener {
      */
     public static class Tweaks<X> extends TreeMap<String, Object> {
 
-        private Object obj;
+        private X obj;
 
         static final ScriptEngineManager engineManager = new ScriptEngineManager();
         static final NashornScriptEngine JS = (NashornScriptEngine) engineManager.getEngineByName("nashorn");
@@ -97,10 +99,15 @@ public class OptiUnit<T> extends RunListener {
             String paramStr = Joiner.on(",").join(param);
             try {
                 JS.eval("thiz." + methodExpression + "(" + paramStr + ")", ctx);
-                assert (put(methodExpression + "(", paramStr) == null);
+                assert (put(methodExpression, paramStr) == null);
             } catch (ScriptException e) {
                 e.printStackTrace();
             }
+            return this;
+        }
+        public <Y> Tweaks<X> call(String id, BiConsumer<X, Y> apply, Y param) {
+            apply.accept(obj, param);
+            put(id, param.toString());
             return this;
         }
 
@@ -124,23 +131,31 @@ public class OptiUnit<T> extends RunListener {
         rn.addListener(this);
     }
 
-    public OptiUnit<T> run(Function<T, SortedMap<String, Object>>... sets) {
-        return run(Iterators.forArray(sets));
+    final Queue<Runnable> pending = new ConcurrentLinkedQueue<>();
+
+    public OptiUnit<T> add(Function<T, SortedMap<String, Object>>... setups) {
+        return add(Iterators.forArray(setups));
     }
 
-    public OptiUnit<T> run(Iterator<? extends Function<T, SortedMap<String, Object>>> sets) {
+    public OptiUnit<T> add(Iterator<? extends Function<T, SortedMap<String, Object>>> sets) {
 
         sets.forEachRemaining(s -> {
-            try {
-
-                new Suite(new BuildMyRunners(s), tests).run(rn);
-
-            } catch (Throwable t) {
-                logger.error(" {}", t);
-            }
+            pending.add(() -> {
+                try {
+                    Suite ss = new Suite(new BuildMyRunners(s), tests);
+                    logger.info("run: {}", s);
+                    ss.run(rn);
+                } catch (Throwable t) {
+                    logger.error(" {}", t);
+                }
+            });
         });
 
         return this;
+    }
+
+    public void run() {
+        pending.parallelStream().forEach(Runnable::run);
     }
 
 
@@ -220,12 +235,13 @@ public class OptiUnit<T> extends RunListener {
          * extracts an array of float values (conversion attempted otherwise NaN)
          * returns null if the array contained NaN or other invalidity
          */
-        @Nullable public float[] floats(String... keys) {
+        @Nullable
+        public float[] floats(String... keys) {
             int l = keys.length;
             float[] f = new float[l];
             for (int i = 0; i < l; i++) {
                 float v = floatValue(get(keys[i]));
-                if (v!=v)
+                if (v != v)
                     return null;
                 f[i] = v;
             }
@@ -250,8 +266,8 @@ public class OptiUnit<T> extends RunListener {
 
     static float floatValue(Object value) {
         if (value instanceof Number) {
-            return ((Number)value).floatValue();
-        } else if (value!=null) {
+            return ((Number) value).floatValue();
+        } else if (value != null) {
             //last resort try to parse as a string
             try {
                 return Texts.f(value.toString());
@@ -268,11 +284,11 @@ public class OptiUnit<T> extends RunListener {
      */
     public FloatTable<String> table(String... columns) {
         FloatTable<String> t = new FloatTable<>(columns);
-        experiments.forEach(e ->  {
+        experiments.forEach(e -> {
             @Nullable float[] a = e.floats(columns);
-            if (a!=null)
+            if (a != null)
                 t.add(a);
-        } );
+        });
         return t;
     }
 
