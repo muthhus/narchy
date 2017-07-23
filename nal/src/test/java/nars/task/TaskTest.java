@@ -1,7 +1,8 @@
 package nars.task;
 
 import nars.*;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
+import nars.concept.Concept;
 import nars.nar.Terminal;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;
@@ -180,7 +181,7 @@ public class TaskTest {
         Terminal tt = new Terminal();
         Task t = $.task("((&&,#1,(#1 &&+0 #3),(#2 &&+0 #3),(#2 &&+0 (toothbrush-->here))) ==>+0 lighter(I,toothbrush))", BELIEF, 1f, 0.9f).apply(tt);
         assertNotNull(t);
-        TaskConcept c = t.concept(tt,true);
+        Concept c = t.concept(tt,true);
         assertNotNull(c);
     }
 

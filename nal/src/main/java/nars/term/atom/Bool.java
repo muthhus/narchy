@@ -43,6 +43,7 @@ abstract public class Bool extends AtomicToString {
         return AtomBool;
     }
 
+    @Override
     abstract public Term unneg();
 
     @Override

@@ -7,8 +7,8 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.Compound;
@@ -40,7 +40,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     }
 
 
-    public static Activate activate(@NotNull Task t, float activation, TaskConcept origin, NAR n) {
+    public static Activate activate(@NotNull Task t, float activation, Concept origin, NAR n) {
 
 
 //        if (activation < EPSILON) {
@@ -82,7 +82,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     public static void activate(@NotNull Task t, float activation, @NotNull NAR n, boolean process) {
         // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
         //if (activation >= EPSILON) {
-        TaskConcept cc = t.concept(n, true);
+        Concept cc = t.concept(n, true);
         if (cc != null) {
 
             n.input(activate(t, activation, cc, n));
@@ -218,8 +218,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
     }
 
-    public void activateTaskExperiment1(NAR nar, float pri, Term thisTerm, TaskConcept taskConcept) {
-        Termed[] taskTemplates = templates(taskConcept, nar);
+    public void activateTaskExperiment1(NAR nar, float pri, Term thisTerm, BaseConcept cc) {
+        Termed[] taskTemplates = templates(cc, nar);
 
         //if (templateConceptsCount > 0) {
 

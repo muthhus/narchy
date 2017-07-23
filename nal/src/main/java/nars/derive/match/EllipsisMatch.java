@@ -1,9 +1,7 @@
 package nars.derive.match;
 
-import nars.$;
 import nars.Op;
 import nars.term.Compound;
-import nars.term.ProxyCompound;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;

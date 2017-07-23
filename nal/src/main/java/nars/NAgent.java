@@ -13,7 +13,6 @@ import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
 import nars.task.NALTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.truth.DiscreteTruth;

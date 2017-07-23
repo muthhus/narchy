@@ -8,7 +8,6 @@ import nars.Op;
 import nars.control.premise.Derivation;
 import nars.derive.op.AbstractPatternOp.PatternOp;
 import nars.derive.op.MatchOneSubterm;
-import nars.derive.op.MatchTerm;
 import nars.derive.op.UnificationPrototype;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;

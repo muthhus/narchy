@@ -4,7 +4,6 @@ import jcog.bag.Bag;
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
 import nars.concept.BaseConcept;
-import nars.concept.TaskConcept;
 import nars.conceptualize.state.DefaultConceptState;
 import nars.term.Compound;
 import nars.term.Term;
@@ -219,7 +218,7 @@ public class RevisionTest {
                 "(a). %0.1;0.5%"
                 );
         n.run(1);
-        Task t = ((TaskConcept)n.conceptualize("(a)")).beliefs().match(ETERNAL, null, null, true, null);
+        Task t = ((BaseConcept)n.conceptualize("(a)")).beliefs().match(ETERNAL, null, null, true, null);
         assertEquals(0.37f, t.freq(), 0.02f);
         assertEquals(0.75f, t.conf(), 0.02f);
     }

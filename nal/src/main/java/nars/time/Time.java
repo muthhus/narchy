@@ -19,6 +19,7 @@ public interface Time extends Clock, Serializable {
     /**
      * returns the current time, as measured in units determined by this clock
      */
+    @Override
     long now();
 
     /**

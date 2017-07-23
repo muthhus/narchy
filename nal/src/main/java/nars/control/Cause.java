@@ -38,10 +38,10 @@ public class Cause<X> {
     public final Object name;
 
     final AtomicDouble posAcc = new AtomicDouble(); //accumulating
-    float pos = 0; //current value
+    float pos; //current value
 
     final AtomicDouble negAcc = new AtomicDouble(); //accumulating
-    float neg = 0; //current value
+    float neg; //current value
 
     /** summary */
     private float value;

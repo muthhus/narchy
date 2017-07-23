@@ -66,6 +66,7 @@ public enum Op implements $ {
 
         }
 
+        @Override
         public Term the(Term... u) {
             assert (u.length == 1);
             return neg(u[0]);
@@ -943,7 +944,7 @@ public enum Op implements $ {
      * decode a term which may be a functor, return null if it isnt
      */
     @Nullable
-    public static Pair<Functor, Compound> functor(@NotNull Term maybeOperation, TermContext index, boolean mustFunctor) {
+    public static Pair<Atom, Compound> functor(@NotNull Term maybeOperation, TermContext index, boolean mustFunctor) {
         if (maybeOperation instanceof Compound && maybeOperation.hasAll(Op.OpBits)) {
             Compound c = (Compound) maybeOperation;
             if (c.op() == INH) {
@@ -954,7 +955,7 @@ public enum Op implements $ {
                         Termed ff = index.getIfPresentElse(s1);
                         if (!mustFunctor || ff instanceof Functor) {
                             return Tuples.pair(
-                                    ((Functor)ff),
+                                    ((Atom)ff),
                                     ((Compound) s0)
                             );
                         }
@@ -1186,8 +1187,8 @@ public enum Op implements $ {
             if ((op == IMPL || op == EQUI)) { //TODO verify this works as it should
 
 
-                boolean subjConj = subject.op() == CONJ && concurrent(((Compound) subject).dt());
-                boolean predConj = predicate.op() == CONJ && concurrent(((Compound) predicate).dt());
+                boolean subjConj = subject.op() == CONJ && concurrent(subject.dt());
+                boolean predConj = predicate.op() == CONJ && concurrent(predicate.dt());
                 if (subjConj && !predConj) {
                     final Compound csub = (Compound) subject;
                     //TermContainer subjs = csub.subterms();

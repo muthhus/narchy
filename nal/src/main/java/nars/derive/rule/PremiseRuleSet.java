@@ -3,12 +3,9 @@ package nars.derive.rule;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Streams;
 import jcog.Util;
-import jcog.map.FileHashMap;
 import nars.$;
 import nars.NAR;
 import nars.Narsese;
-import nars.derive.PrediTerm;
-import nars.derive.TrieDeriver;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
 import nars.term.Compound;
@@ -28,9 +25,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 
 /**
@@ -270,7 +265,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
             throw new Narsese.NarseseException("Right rule component must be compound: " + src);
         }
 
-        return TermVector.the((Compound) a, (Compound) b);
+        return TermVector.the(a, b);
     }
 
     @NotNull

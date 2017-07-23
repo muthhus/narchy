@@ -1,12 +1,9 @@
 package nars.term;
 
-import com.google.common.io.ByteArrayDataOutput;
 import nars.IO;
 import nars.Op;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
-import nars.term.subst.Unify;
-import nars.term.transform.CompoundTransform;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.jetbrains.annotations.NotNull;

@@ -6,7 +6,6 @@ import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by me on 5/26/16.

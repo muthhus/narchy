@@ -2,7 +2,6 @@ package nars.index.term.tree;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.ByteArrayDataOutput;
-import jcog.byt.DynBytes;
 import jcog.byt.HashCachedBytes;
 import nars.IO;
 import nars.Op;

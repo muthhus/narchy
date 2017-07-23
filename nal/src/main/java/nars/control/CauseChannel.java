@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 public class CauseChannel<X extends Priority> extends Cause<X> implements Consumer<X> {
 
     /** linear gain control */
-    public float bias = 0, amplitude = 1;
+    public float bias, amplitude = 1;
 
     /** in-bound traffic statistics */
     public final AtomicSummaryStatistics traffic = new AtomicSummaryStatistics();

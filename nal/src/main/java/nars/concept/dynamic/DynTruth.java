@@ -9,7 +9,6 @@ import nars.Param;
 import nars.Task;
 import nars.control.Cause;
 import nars.task.NALTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;

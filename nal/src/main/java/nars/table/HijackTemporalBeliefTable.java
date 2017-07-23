@@ -6,7 +6,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.task.Revision;
 import nars.task.TruthPolation;
 import nars.truth.Stamp;
@@ -56,7 +56,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //    }
 
     @Override
-    public void add(@NotNull Task x, TaskConcept c, NAR n) {
+    public void add(@NotNull Task x, BaseConcept c, NAR n) {
         now = n.time();
         super.add(x, c, n);
     }

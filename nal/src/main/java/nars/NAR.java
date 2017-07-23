@@ -14,8 +14,8 @@ import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import nars.Narsese.NarseseException;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.control.Activate;
@@ -39,9 +39,7 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
-import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.time.Time;
 import nars.truth.DiscreteTruth;
@@ -187,8 +185,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             //tasklinksCap.accept(c.tasklinks().capacity());
             tasklinkCount.recordValue(c.tasklinks().size());
 
-            if (c instanceof TaskConcept) {
-                TaskConcept tc = (TaskConcept) c;
+            if (c instanceof BaseConcept) {
+                BaseConcept tc = (BaseConcept) c;
                 beliefs.accept(tc.beliefs().size());
                 goals.accept(tc.goals().size());
                 questions.accept(tc.questions().size());
@@ -848,7 +846,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @Deprecated
     public final void on(@NotNull Atom a, @NotNull Operator o) {
 
-        on(new Command(a) {
+        on(new Command(a, this) {
 
             @Override
             public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
@@ -890,8 +888,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public Truth truth(@Nullable Termed concept, byte punc, long when) {
         if (concept != null) {
             @Nullable Concept c = concept(concept);
-            if (c instanceof TaskConcept) {
-                TaskConcept tc = (TaskConcept) c;
+            if (c instanceof BaseConcept) {
+                BaseConcept tc = (BaseConcept) c;
                 BeliefTable table;
                 switch (punc) {
                     case BELIEF:
@@ -1312,8 +1310,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return terms.stream().filter(t -> t instanceof Concept).map(t -> (Concept)t);
     }
 
-    public Stream<TaskConcept> taskConcepts() {
-        return terms.stream().filter(t -> t instanceof TaskConcept).map(t -> (TaskConcept)t);
+    public Stream<BaseConcept> taskConcepts() {
+        return terms.stream().filter(t -> t instanceof BaseConcept).map(t -> (BaseConcept)t);
     }
 
     @NotNull
@@ -1326,10 +1324,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR forEachTaskConcept(@NotNull Consumer<TaskConcept> recip) {
+    public NAR forEachTaskConcept(@NotNull Consumer<BaseConcept> recip) {
         forEachConcept(c -> {
-            if (c instanceof TaskConcept)
-                recip.accept((TaskConcept) c);
+            if (c instanceof BaseConcept)
+                recip.accept((BaseConcept) c);
         });
         return this;
     }
@@ -1608,10 +1606,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     public Task match(Term  c, byte punc, long when) {
         Concept concept = concept(c);
-        if (!(concept instanceof TaskConcept))
+        if (!(concept instanceof BaseConcept))
             return null;
 
-        return ((BeliefTable) ((TaskConcept) concept).table(punc)).match(when, null, null, false, this);
+        return ((BeliefTable) ((BaseConcept) concept).table(punc)).match(when, null, null, false, this);
     }
 
     public PrediTerm<Derivation> deriver() {

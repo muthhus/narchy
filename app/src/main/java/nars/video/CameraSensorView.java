@@ -4,7 +4,7 @@ import com.jogamp.opengl.GL2;
 import jcog.event.On;
 import nars.NAR;
 import nars.NAgent;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.truth.Truth;
 import spacegraph.Surface;
 import spacegraph.widget.meter.MatrixView;
@@ -51,7 +51,7 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
     @Override
     public float update(int x, int y, GL2 g) {
 
-        TaskConcept s = cam.matrix[x][y];
+        BaseConcept s = cam.matrix[x][y];
         Truth b = s.beliefs().truth(now, nar);
         float bf = b != null ? b.freq() : 0.5f;
         Truth d = s.goals().truth(now, nar);

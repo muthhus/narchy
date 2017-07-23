@@ -240,7 +240,7 @@ public abstract class Param  {
 
 
     /** no term sharing means faster comparison but potentially more memory usage. TODO determine effects */
-    public static boolean CompoundDT_TermSharing = false;
+    public static boolean CompoundDT_TermSharing;
 
 
     /**

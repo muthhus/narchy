@@ -2,7 +2,7 @@ package nars.nal.nal7;
 
 import com.google.common.collect.Lists;
 import nars.*;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.nar.Terminal;
 import org.junit.Test;
@@ -82,7 +82,7 @@ public class NAL7DurationTest {
     }
 
     static void assertDuration(NAR n, String c, long start, long end) throws Narsese.NarseseException {
-        TaskConcept cc = (TaskConcept) n.conceptualize(c);
+        BaseConcept cc = (BaseConcept) n.conceptualize(c);
         assertNotNull(c + " unconceptualized", cc);
 
         List<Task> tt = Lists.newArrayList(cc.beliefs());

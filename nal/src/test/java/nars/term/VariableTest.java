@@ -19,22 +19,22 @@ public class VariableTest {
     @Test
     public void testPatternVarVolume() throws Narsese.NarseseException {
 
-        assertEquals(0, p.term("$x").complexity());
-        assertEquals(1, p.term("$x").volume());
+        assertEquals(0, Narsese.term("$x").complexity());
+        assertEquals(1, Narsese.term("$x").volume());
 
-        assertEquals(0, p.term("%x").complexity());
-        assertEquals(1, p.term("%x").volume());
+        assertEquals(0, Narsese.term("%x").complexity());
+        assertEquals(1, Narsese.term("%x").volume());
 
-        assertEquals(p.term("<x --> y>").volume(),
-                p.term("<%x --> %y>").volume());
+        assertEquals(Narsese.term("<x --> y>").volume(),
+                Narsese.term("<%x --> %y>").volume());
 
     }
 
     @Test public void testNumVars() throws Narsese.NarseseException {
-        assertEquals(1, p.term("$x").vars());
-        assertEquals(1, p.term("#x").vars());
-        assertEquals(1, p.term("?x").vars());
-        assertEquals(0, p.term("%x").vars());
+        assertEquals(1, Narsese.term("$x").vars());
+        assertEquals(1, Narsese.term("#x").vars());
+        assertEquals(1, Narsese.term("?x").vars());
+        assertEquals(0, Narsese.term("%x").vars());
 
         //the pattern variable is not counted toward # vars
         assertEquals(1, $("<$x <-> %y>").vars());

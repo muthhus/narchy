@@ -1,5 +1,6 @@
 package nars.index.term;
 
+import nars.op.mental.AliasConcept;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
@@ -19,11 +20,16 @@ public interface TermContext {
      */
     @Nullable
     default Termed get(@NotNull Term t) {
-        return get(t, false);
+        Termed u = get(t, false);
+        if (u instanceof AliasConcept.AliasAtom || u instanceof AliasConcept) {
+            System.out.println("alias: " + u);
+        }
+        return u;
+        //return get(t, false);
     }
 
     default Termed getIfPresentElse(@NotNull Term _else) {
-        Termed y = get(_else, false);
+        Termed y = get(_else);
         if (y != null)
             return y;
         else

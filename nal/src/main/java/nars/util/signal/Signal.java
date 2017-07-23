@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.task.SignalTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.Truthed;

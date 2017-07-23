@@ -6,12 +6,11 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.control.Activate;
 import nars.control.Cause;
 import nars.task.NALTask;
 import nars.task.Revision;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -56,7 +55,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
         @Override
-        public @Nullable void add(@NotNull Task input, TaskConcept c, @NotNull NAR nar) {
+        public @Nullable void add(@NotNull Task input, BaseConcept c, @NotNull NAR nar) {
             //nothing
         }
 
@@ -213,7 +212,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      * non-null: revised task
      */
     @Nullable
-    private /*Revision*/Task tryRevision(@NotNull Task newBelief /* input */, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    private /*Revision*/Task tryRevision(@NotNull Task newBelief /* input */, @NotNull BaseConcept concept, @NotNull NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -371,7 +370,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     @Nullable
-    public void add(@NotNull Task input, TaskConcept c, @NotNull NAR nar) {
+    public void add(@NotNull Task input, BaseConcept c, @NotNull NAR nar) {
 
         int cap = capacity();
         if (cap == 0) {

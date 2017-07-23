@@ -20,8 +20,8 @@ public class TaskBeliefPairTest {
         String a = "<x --> #1>";
         String b = "<y --> #1>";
         Compound p = $.p(
-            parse.term(a),
-            parse.term(b)
+            Narsese.term(a),
+            Narsese.term(b)
         );
         String expect = "((x-->#1),(y-->#1))";
         assertEquals(expect, p.toString());

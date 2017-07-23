@@ -9,7 +9,6 @@ import nars.index.term.TermIndex;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
@@ -170,7 +169,7 @@ public class IO {
 
         //out.writeLong(t.creation()); //put this last because it is the least useful really
 
-        IO.writeUTF8WithPreLen(((Termed) t).term().toString(), out);
+        IO.writeUTF8WithPreLen(t.term().toString(), out);
     }
 
     //    public static void writeStringUTF(@NotNull DataOutput out, String s) throws IOException {

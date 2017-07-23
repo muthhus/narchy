@@ -4,8 +4,8 @@ import jcog.list.FasterList;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
@@ -59,7 +59,7 @@ abstract public class DynamicTruthModel {
             Concept subConcept = n.concept(subterm);
             if (subConcept == null)
                 return null; //ok just missing
-            else if (!(subConcept instanceof TaskConcept))
+            else if (!(subConcept instanceof BaseConcept))
                 throw new RuntimeException("dynamically evaluated term should have only believable subterms");
 
             int dt = superterm.subtermTime(subterm);
@@ -72,7 +72,7 @@ abstract public class DynamicTruthModel {
             Task bt = null;
             if (evi) {
                 //task
-                bt = ((BeliefTable)((TaskConcept)subConcept).table(beliefOrGoal ? BELIEF : GOAL)).match( when + dt, null, (Compound)subterm, false, n);
+                bt = ((BeliefTable)((BaseConcept)subConcept).table(beliefOrGoal ? BELIEF : GOAL)).match( when + dt, null, subterm, false, n);
                 if (bt == null) {
                     return null;
                 }

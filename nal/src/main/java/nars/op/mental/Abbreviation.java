@@ -189,7 +189,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 
                 if (a.putIfAbsent(Abbreviation.class, id) == null) {
 
-                    AliasConcept ac = AliasConcept.get(id, abbreviated, nar, abbreviation);
+                    AliasConcept ac = AliasConcept.get(id, abbreviated, nar);
                     Concept alias = aliasConcept ?
                             nar.on(ac) : null;
 

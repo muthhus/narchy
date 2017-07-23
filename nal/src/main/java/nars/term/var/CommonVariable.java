@@ -67,7 +67,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
             //so default to a String-based generic variable
             return $.v(A.op(),
                     A.toString().substring(1) /* remove leading variable char */ +
-                            B.toString()
+                            B
             );
             //throw new RuntimeException("variable oob");
         }
@@ -98,10 +98,8 @@ public final class CommonVariable extends GenericNormalizedVariable {
             return true;
 
         int v2 = ((hash >> 8) & 0xff) - 1; //unhash
-        if (v2 == h)
-            return true;
+        return v2 == h;
 
-        return false;
     }
 
 

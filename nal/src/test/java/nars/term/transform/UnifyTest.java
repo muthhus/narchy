@@ -116,7 +116,7 @@ public class UnifyTest {
 
                     } else {
                         //HACK there should be incomplete assignments even though this says it matched
-                        assertTrue("why matched?: " + xy.toString(), (n1) > (xy.size())); //|| (n2) <= (yx.size()));
+                        assertTrue("why matched?: " + xy, (n1) > (xy.size())); //|| (n2) <= (yx.size()));
                         //assertFalse("match found but should not have", true);
                     }
 

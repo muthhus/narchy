@@ -3,7 +3,6 @@ package nars.concept;
 import nars.NAR;
 import nars.Task;
 import nars.table.BeliefTable;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

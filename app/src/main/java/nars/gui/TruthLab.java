@@ -3,7 +3,7 @@ package nars.gui;
 import com.google.common.collect.Lists;
 import com.jogamp.opengl.GL2;
 import nars.*;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.truth.Truth;
@@ -187,7 +187,7 @@ public class TruthLab extends Grid {
 
             List<Surface> cc = $.newArrayList();
 
-            TaskConcept c = (TaskConcept) n.concept(term);
+            BaseConcept c = (BaseConcept) n.concept(term);
             if (c == null) {
 
             } else {

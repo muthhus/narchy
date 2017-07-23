@@ -3,7 +3,6 @@ package nars.term;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -131,7 +130,7 @@ public class TemporalTest {
 
         assertTrue(na == nc);
 
-        assertTrue(((BaseConcept) na).sub(0) == ((BaseConcept) nc).sub(0));
+        assertTrue(na.sub(0) == nc.sub(0));
 
 //        System.out.println(b.concept(n));
 //        System.out.println(c.concept(n));
@@ -291,7 +290,7 @@ public class TemporalTest {
 
         n.run(2);
 
-        TaskConcept a = (TaskConcept) n.conceptualize("(((SELF,#1)-->at) && goto(#1)).");
+        BaseConcept a = (BaseConcept) n.conceptualize("(((SELF,#1)-->at) && goto(#1)).");
         Concept a0 = n.conceptualize("(goto(#1) && ((SELF,#1)-->at)).");
         assertNotNull(a);
         assertTrue(a == a0);
@@ -431,7 +430,7 @@ public class TemporalTest {
 
 
 
-        TaskConcept xImplY = (TaskConcept) n.conceptualize($("(x==>y)"));
+        BaseConcept xImplY = (BaseConcept) n.conceptualize($("(x==>y)"));
         assertEquals(3, xImplY.beliefs().size());
 
         int indexSize = n.terms.size();
@@ -474,7 +473,7 @@ public class TemporalTest {
 
 
         //INTERMPOLATION APPLIED DURING REVISION:
-        assertEquals("((a ==>+4 b)-->[pill])", ((TaskConcept)cc).beliefs().match(ETERNAL, null, null, true, null).term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", ((BaseConcept)cc).beliefs().match(ETERNAL, null, null, true, null).term().toString());
     }
 
     @Test
@@ -488,7 +487,7 @@ public class TemporalTest {
         //assertTrue(5 <= cb.size());
 
         String abpill = "((a==>b)-->[pill])";
-        TaskConcept cc = (TaskConcept) n.conceptualize(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
+        BaseConcept cc = (BaseConcept) n.conceptualize(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
         assertNotNull(cc);
 

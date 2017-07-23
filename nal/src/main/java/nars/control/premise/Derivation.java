@@ -136,7 +136,7 @@ public class Derivation extends Unify implements TermContext {
     public PrediTerm<Derivation> deriver;
     public final ByteShuffler shuffler = new ByteShuffler(64);
 
-    private transient Term[][] currentMatch = null;
+    private transient Term[][] currentMatch;
 
     public /*static*/ final Cache<Transformation, Term> transformsCache; //works in static mode too
     /*static*/ {
@@ -426,6 +426,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * experimental memoization of transform results
      */
+    @Override
     @Nullable
     public Term transform(@NotNull Term pattern) {
         if (!(pattern instanceof Compound) || pattern.vars(type) == 0 || pattern.size() == 0) {

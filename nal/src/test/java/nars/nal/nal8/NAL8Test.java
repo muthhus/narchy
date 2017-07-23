@@ -3,7 +3,6 @@ package nars.nal.nal8;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
-import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.term.Term;
 import nars.test.TestNAR;

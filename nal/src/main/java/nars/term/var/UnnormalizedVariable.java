@@ -44,7 +44,7 @@ public class UnnormalizedVariable extends AtomicToString implements Variable {
 
         //prevent comparison with AbstractVariable
         if (u instanceof UnnormalizedVariable) {
-            return toString().equals(((UnnormalizedVariable) u).toString());
+            return toString().equals(u.toString());
         }
 
         return false;

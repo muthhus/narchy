@@ -108,6 +108,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
         return tt;
     }
 
+    @Override
     public Term[] toArray() {
        return theArray().clone();
     }
@@ -126,6 +127,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
     /**
      * hashes and prepares for use in hashmap
      */
+    @Override
     public NewCompound commit() {
 
 //        if (commute) {

@@ -129,7 +129,7 @@ public class EllipsisTest {
                             if (s.varPattern()==0)
                                 selectedFixed.add(s);
 
-                            assertEquals(s.toString() + " should be all subbed by " + this.xy.toString(), 0, s.varPattern());
+                            assertEquals(s + " should be all subbed by " + this.xy, 0, s.varPattern());
                         }
 
                     }

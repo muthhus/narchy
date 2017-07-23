@@ -5,7 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.nar.Terminal;
 import nars.task.DerivedTask;
 import nars.term.Compound;
@@ -24,7 +24,7 @@ public class RTreeBeliefTableTest {
     @Test
     public void testBasicOperations() throws Narsese.NarseseException {
         NAR n = new Terminal();
-        TaskConcept X = (TaskConcept) n.conceptualize($.$("a:b"));
+        BaseConcept X = (BaseConcept) n.conceptualize($.$("a:b"));
         RTreeBeliefTable t = new RTreeBeliefTable(4);
 
         assertEquals(0, t.size());
@@ -70,7 +70,7 @@ public class RTreeBeliefTableTest {
 
         n.log();
 
-        TaskConcept c = (TaskConcept) n.conceptualize(term);
+        BaseConcept c = (BaseConcept) n.conceptualize(term);
         @NotNull BeliefTable cb = true ? c.beliefs() : c.goals();
         //int numTasks = 0;
         long time=0;

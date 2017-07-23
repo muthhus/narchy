@@ -1,31 +1,10 @@
 package nars.derive;
 
-import jcog.util.FileCache;
-import nars.IO;
-import nars.NAR;
-import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
-import nars.index.term.PatternTermIndex;
-import nars.term.Compound;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.DataInput;
-import java.io.DataOutput;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
-
-import static nars.IO.readTerm;
-import static nars.derive.rule.PremiseRuleSet.parsedRules;
 
 /**
  * Implements a strategy for managing submitted derivation processes

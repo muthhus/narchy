@@ -4,7 +4,6 @@ import nars.NAR;
 import nars.Task;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;

@@ -4,7 +4,6 @@ import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Param;
 import nars.table.BeliefTable;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,12 +23,12 @@ import org.jetbrains.annotations.NotNull;
  * to make them directly reflect the sensor concept as the authority.
  *
  * */
-public class WiredConcept extends TaskConcept implements PermanentConcept {
+public class WiredConcept extends BaseConcept implements PermanentConcept {
 
     public final FloatParam resolution = new FloatParam(Param.TRUTH_EPSILON);
 
     protected WiredConcept(@NotNull Term term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
-        super(term, beliefs, goals, n);
+        super(term, beliefs, goals, n.conceptBuilder);
         resolution.setValue(n.truthResolution);
     }
 

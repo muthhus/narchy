@@ -5,7 +5,6 @@ import nars.NARS;
 import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
-import org.junit.Before;
 import org.junit.Test;
 
 public class NAL1Test extends AbstractNALTest {

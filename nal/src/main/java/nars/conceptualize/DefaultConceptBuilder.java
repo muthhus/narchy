@@ -10,7 +10,6 @@ import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.concept.dynamic.DynamicConcept;
 import nars.concept.dynamic.DynamicTruthModel;
@@ -110,7 +109,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         @NotNull Compound tt = t;
         boolean validForTask = Task.taskContentValid(t, (byte) 0, null /*nar -- checked above */, true);
         if (!validForTask) {
-            return newCompound(tt, newLinkBags(tt));
+            return newCompound(tt);
         } else {
             return newTask(tt);
         }
@@ -120,14 +119,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
      * for fragmentary concepts which by themselves or due to being un-normalizable,
      * can not be the content of Tasks yet may still exist as concepts
      */
-    private BaseConcept newCompound(@NotNull Compound t,
-                                    Bag... bags
+    private BaseConcept newCompound(@NotNull Compound t
                                     //Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag
     ) {
-        return new BaseConcept(t, bags);
+        return new BaseConcept(t, null, null, this, newLinkBags(t));
     }
 
-    private TaskConcept newTask(@NotNull Compound t) {
+    private BaseConcept newTask(@NotNull Compound t) {
         DynamicTruthModel dmt = null;
 
         switch (t.op()) {
@@ -271,7 +269,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
             return new DynamicConcept(t, beliefs, goals, nar);
         } else {
-            return new TaskConcept(t, newBeliefTable(t, true), newBeliefTable(t, false), nar);
+            return new BaseConcept(t, newBeliefTable(t, true), newBeliefTable(t, false), nar.conceptBuilder);
         }
     }
 
@@ -336,7 +334,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             } else if (term instanceof Atom) {
 
                 return
-                        new BaseConcept(term, newLinkBags(term));
+                        new BaseConcept(term, null, null, this);
 
 //                result = new AtomConcept((Atomic)term,
 //                        new HijackBag<>(32, 2, BudgetMerge.maxBlend, nar.random),

@@ -39,8 +39,9 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
-public interface Concept extends Termed, Termlike {
+public interface Concept extends Termlike {
 
 
 
@@ -243,6 +244,12 @@ public interface Concept extends Termed, Termlike {
     /** can return null if no templates */
     @Nullable TermContainer templates();
 
+
+    void process(Task task, @NotNull NAR n);
+
+    float valueIfProcessed(@NotNull Task t, float activation, NAR n);
+
+    Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests);
 
 
     /**

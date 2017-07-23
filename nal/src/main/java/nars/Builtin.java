@@ -195,7 +195,7 @@ public class Builtin {
             n.runLater(() -> Command.log(n, "Ready. (" + n.terms.size() + " subconcepts)"));
         });
         nar.on("top", (op, args, n) -> {
-            Command.log(n, n.emotion.summary() + " " + n.exe.toString());
+            Command.log(n, n.emotion.summary() + " " + n.exe);
         });
 
 

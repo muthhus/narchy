@@ -7,7 +7,6 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

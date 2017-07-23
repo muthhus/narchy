@@ -38,10 +38,10 @@ public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
 
     private final NAR nar;
     //private final MetricPoller poller;
-    private On onCycle = null;
+    private On onCycle;
 
     public NiNner(NAR n) {
-        super("NAR." + n.self().toString());
+        super("NAR." + n.self());
         this.nar = n;
 
 //        this.poller =
@@ -50,8 +50,7 @@ public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
 
         register(new BasicCompositeMonitor(id("emotion"), new ArrayList(nar.emotion.getRegisteredMonitors())));
 
-        {
-            //MetricObserver obs = new FileMetricObserver("stats", directory);
+        //MetricObserver obs = new FileMetricObserver("stats", directory);
 
 //            PollScheduler scheduler = PollScheduler.getInstance();
 //            scheduler.start();
@@ -59,21 +58,20 @@ public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
 
 //            MetricObserver transform = new CounterToRateMetricTransform(
 //                    obs, 1, TimeUnit.SECONDS);
-            PollRunnable task = new PollRunnable(
-                    new MonitorRegistryMetricPoller(this),
-                    BasicMetricFilter.MATCH_ALL,
-                    new PrintStreamMetricObserver("x", nar.time, System.out)
-            );
-            new Loop(2000) {
+        PollRunnable task = new PollRunnable(
+                new MonitorRegistryMetricPoller(this),
+                BasicMetricFilter.MATCH_ALL,
+                new PrintStreamMetricObserver("x", nar.time, System.out)
+        );
+        new Loop(2000) {
 
-                @Override
-                public boolean next() {
-                    task.run();
-                    return true;
-                }
-            };
-            //scheduler.addPoller(task, 2, TimeUnit.SECONDS);
-        }
+            @Override
+            public boolean next() {
+                task.run();
+                return true;
+            }
+        };
+        //scheduler.addPoller(task, 2, TimeUnit.SECONDS);
     }
 
 //    public List<Metric> meter() {
@@ -129,6 +127,7 @@ public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
         /**
          * {@inheritDoc}
          */
+        @Override
         public void updateImpl(List<Metric> metrics) {
             out.println(clock.now());
             for (Metric m : metrics) {

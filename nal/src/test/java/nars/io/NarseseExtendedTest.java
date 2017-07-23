@@ -112,7 +112,7 @@ public class NarseseExtendedTest extends NarseseTest {
 
 
         try {
-            Term a = p.term(shorter);
+            Term a = Narsese.term(shorter);
             assertNotNull(a);
             assertEquals(expected, a.toString());
 
@@ -158,9 +158,9 @@ public class NarseseExtendedTest extends NarseseTest {
     @Test
     public void testNamespaceLikeJSON() throws Narsese.NarseseException {
         Narsese p = Narsese.the();
-        Term a = p.term("{ a:x, b:{x,y} }");
+        Term a = Narsese.term("{ a:x, b:{x,y} }");
         assertNotNull(a);
-        assertEquals(p.term("{<{x,y}-->b>, <x-->a>}"), a);
+        assertEquals(Narsese.term("{<{x,y}-->b>, <x-->a>}"), a);
 
     }
 

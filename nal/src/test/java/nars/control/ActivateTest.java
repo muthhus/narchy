@@ -100,7 +100,7 @@ public class ActivateTest {
         NAR n = NARS.tmp(1);
         n.believe(term + ".");
         Activate a = new Activate(n.conceptualize($(term)), 0.5f);
-        Termed[] t = a.templates(a.id, n);
+        Termed[] t = Activate.templates(a.id, n);
         assertEquals(expect, Arrays.toString(t));
     }
 }

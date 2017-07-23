@@ -51,7 +51,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static nars.Op.Null;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -289,7 +288,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
     @NotNull
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
-        appendTo.add((byte) op().id);
+        appendTo.add(op().id);
         return appendTo;
     }
 

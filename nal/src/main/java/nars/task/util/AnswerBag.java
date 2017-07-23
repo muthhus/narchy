@@ -26,6 +26,6 @@ public final class AnswerBag extends PLinkArrayBag<Task> {
     @Override
     public void onAdded(@NotNull PriReference<Task> x) {
         if (Param.ANSWER_REPORTING)
-            Command.log(nar, question + "  " + x.get().toString());
+            Command.log(nar, question + "  " + x.get());
     }
 }

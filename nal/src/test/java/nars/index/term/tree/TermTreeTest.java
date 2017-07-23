@@ -6,7 +6,6 @@ import nars.Narsese;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.term.Term;
-import nars.term.atom.Atom;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -26,7 +25,7 @@ public class TermTreeTest {
 
         TermTree tree = new TermTree();
 
-        Function<Term, Concept> cb = (t)->new BaseConcept(t);
+        Function<Term, Term> cb = (t)->t;
 
         tree.computeIfAbsent(TermKey.term($("concept")), cb);
         tree.computeIfAbsent(TermKey.term($("term")), cb);

@@ -69,7 +69,7 @@ public class BufferedExecutioner extends Executioner {
                 @Override
                 protected Task merge(@NotNull Task existing, @NotNull Task incoming, @Nullable MutableFloat overflowing) {
                     Param.taskMerge.merge(existing, incoming);
-                    ((NALTask) existing).merge(((NALTask) incoming));
+                    ((NALTask) existing).merge(incoming);
                     return existing;
                 }
 

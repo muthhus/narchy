@@ -5,7 +5,6 @@ import nars.NAR;
 import nars.NARS;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
-import org.junit.Before;
 import org.junit.Test;
 
 //@RunWith(Parameterized.class)

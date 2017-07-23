@@ -56,6 +56,7 @@ public class ParallelTestRunner extends Suite {
             //Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() );
 
 
+            @Override
             public void schedule(Runnable childStatement) {
                 service.execute(()->{
                     try {
@@ -67,6 +68,7 @@ public class ParallelTestRunner extends Suite {
                 //service.submit(childStatement);
             }
 
+            @Override
             public void finished() {
                 try {
                     service.shutdown();

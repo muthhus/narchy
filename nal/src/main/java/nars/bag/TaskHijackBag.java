@@ -4,7 +4,7 @@ import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.pri.op.PriForget;
 import nars.NAR;
 import nars.Task;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.control.Activate;
 import nars.table.TaskTable;
 import nars.task.NALTask;
@@ -71,7 +71,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
     }
 
     @Override
-    public void add(@NotNull Task x, TaskConcept c, NAR n) {
+    public void add(@NotNull Task x, BaseConcept c, NAR n) {
 
         float activation = x.priSafe(0);
 

@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
+import nars.conceptualize.ConceptBuilder;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -30,7 +31,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
     }
 
     public Functor(@NotNull Atom atom) {
-        super(atom, Bag.EMPTY, Bag.EMPTY);
+        super(atom, null, null, ConceptBuilder.Null);
     }
 
     public static Atom fName(@NotNull String termAtom) {

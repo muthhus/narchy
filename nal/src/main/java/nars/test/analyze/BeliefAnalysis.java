@@ -5,8 +5,8 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
@@ -59,23 +59,23 @@ public class BeliefAnalysis extends EnergyAnalysis implements Termed {
 	}
 
 	@Nullable
-	public TaskConcept concept() {
-		return (TaskConcept) nar.concept(term);
+	public BaseConcept concept() {
+		return (BaseConcept) nar.concept(term);
 	}
 
 	@Nullable
 	public BeliefTable beliefs() {
 		Concept c = concept();
-		if (!(c instanceof TaskConcept))
+		if (!(c instanceof BaseConcept))
 			return BeliefTable.EMPTY;
-		return ((TaskConcept)c).beliefs();
+		return ((BaseConcept)c).beliefs();
 	}
 	@Nullable
 	public BeliefTable goals() {
 		Concept c = concept();
-		if (!(c instanceof TaskConcept))
+		if (!(c instanceof BaseConcept))
 			return BeliefTable.EMPTY;
-		return ((TaskConcept)c).goals();
+		return ((BaseConcept)c).goals();
 	}
 
 	@NotNull

@@ -97,7 +97,7 @@ public class NLPGen {
                             }
                         };
 
-                        u.unifyAll(pattern, (Compound)tt);
+                        u.unifyAll(pattern, tt);
 
                         if (result[0]!=null)
                             return result[0];

@@ -40,7 +40,7 @@ public class TestNAR {
      */
     static final boolean collectTrace = false;
 
-    public int temporalTolerance = 0;
+    public int temporalTolerance;
 
     @NotNull
     public final NAR nar;
@@ -69,7 +69,7 @@ public class TestNAR {
      * 0 = hasnt been determined yet by the end of the test,
      * (0..1) = success in > 1 cycles,
      * +1 = success in <= 1 cycles */
-    public float score = 0;
+    public float score;
 
     public TestNAR(@NotNull NAR nar) {
         this.outputEvents = new Topic[]{
@@ -309,7 +309,7 @@ public class TestNAR {
         requireConditions = false; //this is the condition
         nar.onTask(c -> {
             if (!c.isInput())
-                fail(c.toString() + " output, but must not output anything");
+                fail(c + " output, but must not output anything");
         });
         return this;
     }

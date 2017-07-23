@@ -11,7 +11,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.TreeSet;
-import java.util.function.Function;
 
 /**
  * Establishes conditions for the Term unification

@@ -5,7 +5,6 @@ import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.op.mental.AliasConcept;
@@ -207,7 +206,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             fail(t, "no associated concept", safe);
         }
 
-        return t instanceof Compound ? validTaskCompound((Compound)t, punc, safe) : true;
+        return !(t instanceof Compound) || validTaskCompound((Compound) t, punc, safe);
     }
 
 //    @Nullable
@@ -332,16 +331,16 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
 
     @Nullable
-    default TaskConcept concept(@NotNull NAR n, boolean conceptualize) {
+    default Concept concept(@NotNull NAR n, boolean conceptualize) {
         Concept c = conceptualize ? n.conceptualize(term()) : n.concept(term());
         if (c!=null) {
             if (c instanceof AliasConcept) {
                 //dereference alias when being used for a task
                 //TODO warning abbr might deleted, check and if so, re-create and re-link the alias to it
-                return (TaskConcept) ((AliasConcept) c).abbr;
+                return n.concept(((AliasConcept) c).abbr);
             }
 
-            return ((TaskConcept) c);
+            return c;
         }
 
         return null;
@@ -384,7 +383,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     @Nullable
     default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
         if (isInput()) {
-            TaskConcept concept = concept(nar, true);
+            Concept concept = concept(nar, true);
             if (concept != null) {
                 ArrayBag<Task, PriReference<Task>> answers = concept.computeIfAbsent(Op.QUESTION, () ->
                         new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
@@ -912,7 +911,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //            ((FrameTime) n.time).validate(this.stamp());
 //        }
 
-        TaskConcept c = concept(n, true);
+        Concept c = concept(n, true);
         if (c != null) {
             c.process(this, n);
         }

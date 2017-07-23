@@ -5,8 +5,12 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
+import nars.conceptualize.ConceptBuilder;
 import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
+import nars.table.BeliefTable;
+import nars.table.QuestionTable;
+import nars.table.TaskTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -14,15 +18,30 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
+import static nars.Op.*;
 import static nars.conceptualize.state.ConceptState.Deleted;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
 public class BaseConcept<T extends Term> implements Concept, Termlike {
 
+    //    @Nullable
+//    private QuestionTable questions;
+//    @Nullable
+//    private QuestionTable quests;
+    @NotNull
+    protected final BeliefTable beliefs;
+    @NotNull
+    protected final BeliefTable goals;
+    protected final QuestionTable quests;
+    protected final QuestionTable questions;
     @NotNull
     private final Bag<Task,PriReference<Task>> taskLinks;
 
@@ -46,20 +65,22 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
      * @param taskLinks
      */
     public BaseConcept(@NotNull T term,
-                       Bag... bags) {
-        this(term,  bags[0], bags[1]);
+                       @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder cb,
+                       @NotNull Bag... bags) {
+        this.term = term;
+        this.termLinks = bags[0];
+        this.taskLinks = bags[1];
+        this.beliefs = beliefs != null ? beliefs : cb.newBeliefTable(term, true);
+        this.goals = goals != null ? goals : cb.newBeliefTable(term, false);
+        this.quests = cb.newQuestionTable();
+        this.questions = cb.newQuestionTable();
+        this.state = Deleted;
     }
 
-    public BaseConcept(@NotNull T term,
-                       @NotNull Bag<Term, PriReference<Term>> termLinks, @NotNull Bag<Task, PriReference<Task>> taskLinks
-    ) {
-
-        this.term = term;
-        this.termLinks = termLinks;
-        this.taskLinks = taskLinks;
 
 
-        this.state = Deleted;
+    public static float valueIfProcessedAt(@NotNull Task t, float activation, long when, NAR n) {
+        return 0.001f * activation * (t.isBeliefOrGoal() ? t.conf(when, n.dur()) : 0.5f);
     }
 
 
@@ -120,12 +141,12 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public BaseConcept(@NotNull T term, @NotNull NAR n) {
-        this(term, (DefaultConceptBuilder) n.conceptBuilder);
+        this(term, null, null, (DefaultConceptBuilder) n.conceptBuilder);
     }
 
 
     BaseConcept(@NotNull T term, @NotNull DefaultConceptBuilder b) {
-        this(term, b.newLinkBags(term));
+        this(term, null, null, b);
     }
 
     @Override
@@ -133,16 +154,40 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
         return state;
     }
 
-    @Override
-    public ConceptState state(@NotNull ConceptState p) {
-        ConceptState current = this.state;
-        if (current != p) {
-            this.state = p;
-            termlinks().setCapacity(p.linkCap(this, true));
-            tasklinks().setCapacity(p.linkCap(this, false));
-        }
-        return p;
+    @NotNull
+    public QuestionTable quests() {
+        return quests;
     }
+
+    @NotNull
+    public QuestionTable questions() {
+        return questions;
+    }
+
+    /**
+     * Judgments directly made about the term Use ArrayList because of access
+     * and insertion in the middle
+     */
+    @NotNull
+    public final BeliefTable beliefs() {
+        return beliefs;
+    }
+
+    /**
+     * Desire values on the term, similar to the above one
+     */
+    @NotNull
+    public final BeliefTable goals() {
+        return goals;
+    }
+
+    protected final void beliefCapacity(int be, int bt, int ge, int gt) {
+
+        beliefs().setCapacity(be, bt);
+        goals().setCapacity(ge, gt);
+
+    }
+
 
     @Override
     public final boolean equals(Object obj) {
@@ -263,7 +308,165 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
     }
 
 
+    @Override
+    public ConceptState state(@NotNull ConceptState p) {
+        ConceptState current = this.state;
+        if (current != p) {
+            this.state = p;
+            termlinks().setCapacity(p.linkCap(this, true));
+            tasklinks().setCapacity(p.linkCap(this, false));
 
+            int be = p.beliefCap(this, true, true);
+            int bt = p.beliefCap(this, true, false);
+
+            int ge = p.beliefCap(this, false, true);
+            int gt = p.beliefCap(this, false, false);
+
+            beliefCapacity(be, bt, ge, gt);
+            questions().capacity(p.questionCap(true));
+            quests().capacity(p.questionCap(false));
+
+        }
+        return p;
+    }
+
+    /**
+     * Directly process a new task, if belief tables agree to store it.
+     * Called exactly once on each task.
+     */
+    public void process(@NotNull Task t, @NotNull NAR n) {
+        table(t.punc()).add(t, this, n);
+    }
+
+    public float valueIfProcessed(@NotNull Task t, float activation, NAR n) {
+        //positive value based on the conf but also multiplied by the activation in case it already was known
+        return valueIfProcessedAt(t, activation, n.time(), n);
+
+//            @Override
+//    public float value(@NotNull Task t, NAR n) {
+//        byte p = t.punc();
+//        if (p == BELIEF || p == GOAL) {// isGoal()) {
+//            //example value function
+//            long s = t.end();
+//
+//            if (s!=ETERNAL) {
+//                long now = n.time();
+//                long relevantTime = p == GOAL ?
+//                        now - n.dur() : //present or future goal
+//                        now; //future belief prediction
+//
+//                if (s > relevantTime) //present or future TODO irrelevance discount for far future
+//                    return (float) (0.1f + Math.pow(t.conf(), 0.25f));
+//            }
+//        }
+//
+//        //return super.value(t, activation, n);
+//        return 0;
+//    }
+    }
+
+    @Override
+    public void print(@NotNull Appendable out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
+        print(out, showbeliefs, showgoals, showtermlinks, showtasklinks);
+
+        Consumer<Task> printTask = s -> {
+            try {
+                out.append(printIndent);
+                out.append(s.toString());
+                out.append(" ");
+                Object ll = s.lastLogged();
+                if (ll != null)
+                    out.append(ll.toString());
+                out.append('\n');
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+
+        try {
+            if (showbeliefs) {
+                out.append(" Beliefs:");
+                if (beliefs().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    beliefs().forEachTask(printTask);
+                }
+                out.append(" Questions:");
+                if (questions().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    questions().forEachTask(printTask);
+                }
+            }
+
+            if (showgoals) {
+                out.append(" Goals:");
+                if (goals().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    goals().forEachTask(printTask);
+                }
+                out.append(" Quests:");
+                if (questions().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    quests().forEachTask(printTask);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Nullable
+    public TaskTable table(byte punc) {
+        switch (punc) {
+            case BELIEF:
+                return beliefs;
+            case GOAL:
+                return goals;
+            case QUESTION:
+                return questions;
+            case QUEST:
+                return quests;
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+    public void forEachTask(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests, @NotNull Consumer<Task> each) {
+        if (includeConceptBeliefs) beliefs.forEachTask(each);
+        if (includeConceptQuestions) questions.forEachTask(each);
+        if (includeConceptGoals) goals.forEachTask(each);
+        if (includeConceptQuests) quests.forEachTask(each);
+    }
+
+    public void forEachTask(@NotNull Consumer<Task> each) {
+        beliefs.forEachTask(each);
+        questions.forEachTask(each);
+        goals.forEachTask(each);
+        quests.forEachTask(each);
+    }
+
+    @Override
+    public void delete(@NotNull NAR nar) {
+        delete(nar);
+        beliefs.clear();
+        goals.clear();
+        questions.clear();
+        quests.clear();
+        //questions = quests = null;
+    }
+
+    @Override public Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests) {
+        List<Stream<Task>> s = new LinkedList<>();
+        if (includeBeliefs) s.add(beliefs.stream());
+        if (includeGoals) s.add(goals.stream());
+        if (includeQuestions) s.add(questions.stream());
+        if (includeQuests) s.add(quests.stream());
+        return s.stream().flatMap(x -> x);
+    }
 }
 
 //    /**

@@ -95,7 +95,7 @@ public class FuzzyScalarConceptsTest {
 
             System.out.println(
                     Texts.n4(m.floatValue()) + "\t" +
-                            f.toString() + " " +
+                            f + " " +
                             freqSum
 
                     //confWeightSum(beliefs)

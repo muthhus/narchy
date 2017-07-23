@@ -29,7 +29,7 @@ import static nars.time.Tense.DTERNAL;
 public class SerialCompound extends DynBytes implements Compound {
 
     final byte volume;
-    boolean normalized = false;
+    boolean normalized;
 
     public SerialCompound(Compound c) {
         this(c.op(), c.dt(), c.toArray());

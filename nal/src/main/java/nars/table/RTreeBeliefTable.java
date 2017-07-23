@@ -10,7 +10,7 @@ import jcog.util.Top2;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.control.Activate;
 import nars.task.*;
 import nars.truth.PreciseTruth;
@@ -157,7 +157,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     final Set<TaskRegion> ongoing = Sets.newConcurrentHashSet();
 
     private long lastUpdate = Long.MIN_VALUE;
-    private transient NAR nar = null;
+    private transient NAR nar;
     //private final AtomicBoolean compressing = new AtomicBoolean(false);
 
     public RTreeBeliefTable() {
@@ -176,7 +176,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 float after = e.priAdd(activation);
                 activation = (after - before);
 
-                ((NALTask) e).merge(((NALTask) i));
+                ((NALTask) e).merge(i);
 
                 Activate.activate(e, activation, nar);
             }
@@ -388,7 +388,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     @Override
-    public void add(@NotNull Task x, TaskConcept c, NAR n) {
+    public void add(@NotNull Task x, BaseConcept c, NAR n) {
 
         updateSignalTasks(n.time());
 

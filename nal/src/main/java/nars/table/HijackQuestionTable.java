@@ -4,7 +4,7 @@ import jcog.pri.Pri;
 import nars.NAR;
 import nars.Task;
 import nars.bag.TaskHijackBag;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -26,7 +26,7 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
 
 
     @Override
-    public void add(@NotNull Task x, TaskConcept c, NAR n) {
+    public void add(@NotNull Task x, BaseConcept c, NAR n) {
         super.add(x, c, n);
 
         if (pressure.floatValue() >= Pri.EPSILON)

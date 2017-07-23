@@ -1,7 +1,6 @@
 package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
-import com.google.common.util.concurrent.MoreExecutors;
 import nars.Param;
 import nars.concept.PermanentConcept;
 import nars.term.Term;

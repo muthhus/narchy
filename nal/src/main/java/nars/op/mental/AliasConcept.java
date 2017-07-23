@@ -4,16 +4,13 @@ import com.google.common.io.ByteArrayDataOutput;
 import nars.NAR;
 import nars.Op;
 import nars.concept.BaseConcept;
-import nars.concept.Concept;
-import nars.concept.TaskConcept;
+import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Map;
 
 /**
  * the proxy concepts present a bidirectional facade between a referenced and an alias term (alias term can be just a serial # atom wrapped in a product).
@@ -24,7 +21,7 @@ import java.util.Map;
  * <p>
  * seen from a superterm containing one, it appears as a simple volume=2 concept meanwhile it could be aliasing a concept much larger than it. common "phrase" concepts with a volume >> 2 are good candidates for abbreviation. but when printed, the default toString() method is proxied so it will automatically decompress on output (or other serialization).
  */
-public final class AliasConcept extends TaskConcept {
+public final class AliasConcept extends BaseConcept {
 
     public static class AliasAtom extends Atom {
 
@@ -35,12 +32,25 @@ public final class AliasConcept extends TaskConcept {
             this.target = target;
         }
 
+        @Override
+        public int structure() {
+            return target.structure() | Op.ATOM.bit;
+        }
+
+        @Override
+        public Term eval(TermContext index) {
+            return target;
+        }
 
         @Override
         public void append(ByteArrayDataOutput out) {
             target.append(out); //serialize the expanded version
         }
 
+        @Override
+        public boolean equals(Object u) {
+            return super.equals(u) || super.equals(target);
+        }
 
         @Override
         public boolean unify(@NotNull Term y, @NotNull Unify subst) {
@@ -63,19 +73,15 @@ public final class AliasConcept extends TaskConcept {
 
 
     @NotNull
-    public final BaseConcept abbr;
+    public final Compound abbr;
 
-    static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar, @NotNull Term... additionalTerms) {
-        Concept c = nar.concept(decompressed);
-        if (c != null) {
-            AliasConcept a = new AliasConcept(compressed, (BaseConcept) c, nar, additionalTerms);
-            return a;
-        }
-        return null;
+    static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar) {
+        AliasConcept a = new AliasConcept(compressed, decompressed, nar);
+        return a;
     }
 
-    AliasConcept(@NotNull String abbreviation, BaseConcept abbr, @NotNull NAR nar, @NotNull Term... additionalTerms) {
-        super(new AliasAtom(abbreviation, abbr.term()), nar);
+    AliasConcept(@NotNull String abbreviation, Compound abbr, @NotNull NAR nar) {
+        super(new AliasAtom(abbreviation, abbr), null, null, nar.conceptBuilder);
 
         this.abbr = abbr;
 
@@ -87,6 +93,10 @@ public final class AliasConcept extends TaskConcept {
         //rewriteLinks(nar);
     }
 
+    @Override
+    public TermContainer templates() {
+        return abbr.subterms();
+    }
 
     //
 //        /**
@@ -122,16 +132,8 @@ public final class AliasConcept extends TaskConcept {
 //        }
 
 
-    @Override
-    public int structure() {
-        return abbr.structure() | Op.ATOM.bit;
-    }
 
-    @Override
-    public void delete(NAR nar) {
-        abbr.delete(nar);
-        super.delete(nar);
-    }
+
 
 
 //        @Override
@@ -145,10 +147,7 @@ public final class AliasConcept extends TaskConcept {
 //            return abbr.process(input, nar);
 //        }
 
-    @Override
-    public @Nullable Map<Object, Object> meta() {
-        return abbr.meta();
-    }
+
 
 //        @NotNull
 //        @Override

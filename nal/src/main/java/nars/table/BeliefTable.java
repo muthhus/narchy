@@ -3,7 +3,7 @@ package nars.table;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.control.Cause;
 import nars.task.NALTask;
 import nars.term.Compound;
@@ -18,7 +18,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static java.util.stream.StreamSupport.stream;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 
@@ -82,7 +81,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long when, long now, int dur, @NotNull Task question, Compound template, TaskConcept beliefConcept, NAR nar) {
+        public Task answer(long when, long now, int dur, @NotNull Task question, Compound template, BaseConcept beliefConcept, NAR nar) {
             return null;
         }
 
@@ -93,7 +92,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public void add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar) {
+        public void add(@NotNull Task input, BaseConcept concept, @NotNull NAR nar) {
 
         }
 
@@ -154,7 +153,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     /**
      * attempt to insert a task; returns what was input or null if nothing changed (rejected)
      */
-    void add(@NotNull Task input, TaskConcept concept, @NotNull NAR nar);
+    void add(@NotNull Task input, BaseConcept concept, @NotNull NAR nar);
 
     Task match(long when, Task question, @Nullable Term template, boolean noOverlap, NAR nar);
 
@@ -208,7 +207,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
     /** projects a match */
-    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, TaskConcept beliefConcept, NAR nar) {
+    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, BaseConcept beliefConcept, NAR nar) {
 
 
         Task answer = match(when, question, question.term(), false, nar);

@@ -29,7 +29,7 @@ abstract public class TermTrie<K extends Term, V> extends Trie<List<K>, V> imple
     }
 
     public void print(@NotNull PrintStream out) {
-        printSummary(((Trie<List<K>, V>) this).root, out);
+        printSummary(this.root, out);
     }
 
 
@@ -76,7 +76,7 @@ abstract public class TermTrie<K extends Term, V> extends Trie<List<K>, V> imple
         SummaryStatistics endDepth = new SummaryStatistics();
         int[] currentDepth = new int[1];
 
-        costAnalyze(costFn, termCost, sequenceLength, branchFanOut, endDepth, currentDepth, ((Trie<List<K>, V>) this).root);
+        costAnalyze(costFn, termCost, sequenceLength, branchFanOut, endDepth, currentDepth, this.root);
 
         if (o != null) {
             o.println("termCost: " + s(termCost));

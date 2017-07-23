@@ -42,7 +42,7 @@ public class SeqTest {
         float expThresh = 0.66f;
 
         public Seq on(NAR n) {
-            n.on( new seqAdd());
+            n.on( new seqAdd(n));
             n.on(Functor.f2("seq", (key, index) -> {
                 if (key.vars()==0 && index.vars()==0) {
                     int i = $.intValue(index, Integer.MIN_VALUE);
@@ -68,8 +68,8 @@ public class SeqTest {
         private class seqAdd extends Command {
 
 
-            public seqAdd() {
-                super((Atom)$.the("seqAdd"));
+            public seqAdd(NAR n) {
+                super((Atom)$.the("seqAdd"), n);
             }
 
             @Override
@@ -88,7 +88,7 @@ public class SeqTest {
                             }
 
                             if (belief instanceof Compound) {
-                                Task u = Task.clone(t, (Compound) belief);
+                                Task u = Task.clone(t, belief);
                                 if (u != null)
                                     return u.log("seqAdd(" + key + ")");
                             } else {

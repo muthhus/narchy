@@ -11,7 +11,6 @@ import nars.budget.BudgetFunctions;
 import nars.control.CauseChannel;
 import nars.index.term.TermIndex;
 import nars.task.NALTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.TruthFunctions;

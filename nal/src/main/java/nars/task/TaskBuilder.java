@@ -104,15 +104,15 @@ import static nars.time.Tense.*;
         //unwrap top-level negation
         Term tt = term.term();
         if (tt.op() == Op.NEG) {
-//            Term nt = tt.sub(0);
-//            if (nt instanceof Compound) {
-//                tt = (Compound) nt;
-//
-//                if (punctuation == Op.BELIEF || punctuation == Op.GOAL)
-//                    truth = truth.negated();
-//            } else {
+            Term nt = tt.sub(0);
+            if (nt instanceof Compound) {
+                tt = (Compound) nt;
+
+                if (punctuation == Op.BELIEF || punctuation == Op.GOAL)
+                    truth = truth.negated();
+            } else {
                 throw new InvalidTaskException(this, "Top-level negation");
-            //}
+            }
         }
 
 

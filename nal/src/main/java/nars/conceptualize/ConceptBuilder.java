@@ -5,7 +5,6 @@ import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TemporalBeliefTable;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;

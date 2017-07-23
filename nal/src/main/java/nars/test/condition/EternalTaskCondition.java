@@ -122,7 +122,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             if (dist >= ifLessThan) return dist;
         } else {
             if (a instanceof Compound) { //b also a compound
-                if (((Compound) a).dt() != ((Compound) b).dt()) {
+                if (a.dt() != b.dt()) {
                     dist += 0.2f;
                     if (dist >= ifLessThan) return dist;
                 }
@@ -231,10 +231,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (!task.term().equals(term))
             return false;
 
-        if (!timeMatches(task))
-            return false;
-
-        return true;
+        return timeMatches(task);
     }
 
     private boolean truthMatches(@NotNull Truthed task) {

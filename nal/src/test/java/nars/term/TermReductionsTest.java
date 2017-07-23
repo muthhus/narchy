@@ -702,7 +702,7 @@ public class TermReductionsTest extends NarseseTest {
             Term t = $(x);
             assertTrue(x + " :: " + t, t instanceof Compound);
 
-            Task y = task((Compound) t, Op.BELIEF, t(1f, 0.9f)).apply(n);
+            Task y = task(t, Op.BELIEF, t(1f, 0.9f)).apply(n);
 
             assertEquals(x, y.term().toString());
 

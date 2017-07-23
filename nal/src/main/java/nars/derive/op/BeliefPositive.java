@@ -2,7 +2,6 @@ package nars.derive.op;
 
 import nars.control.premise.Derivation;
 import nars.derive.AbstractPred;
-import nars.derive.AtomicPred;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 

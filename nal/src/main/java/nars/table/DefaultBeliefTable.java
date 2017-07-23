@@ -3,8 +3,7 @@ package nars.table;
 import com.google.common.collect.Iterators;
 import nars.NAR;
 import nars.Task;
-import nars.concept.TaskConcept;
-import nars.term.Compound;
+import nars.concept.BaseConcept;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -135,7 +134,7 @@ public class DefaultBeliefTable implements BeliefTable {
 
 
     @Override
-    public void add(@NotNull Task input, @NotNull TaskConcept concept, @NotNull NAR nar) {
+    public void add(@NotNull Task input, @NotNull BaseConcept concept, @NotNull NAR nar) {
         if (input.isEternal()) {
 
             eternal.add(input, concept, nar);

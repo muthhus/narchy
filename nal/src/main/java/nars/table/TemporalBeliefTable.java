@@ -2,7 +2,7 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -47,7 +47,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
     TemporalBeliefTable EMPTY = new TemporalBeliefTable() {
 
         @Override
-        public void add(@NotNull Task t, TaskConcept c, NAR n) {
+        public void add(@NotNull Task t, BaseConcept c, NAR n) {
 
         }
 

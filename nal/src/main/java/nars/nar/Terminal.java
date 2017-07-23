@@ -4,7 +4,6 @@ import jcog.random.XORShiftRandom;
 import nars.NAR;
 import nars.NARS;
 import nars.conceptualize.DefaultConceptBuilder;
-import nars.control.premise.Derivation;
 import nars.index.term.BasicTermIndex;
 import nars.nar.exe.BufferedExecutioner;
 import nars.time.CycleTime;

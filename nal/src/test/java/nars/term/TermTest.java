@@ -71,7 +71,7 @@ public class TermTest {
         assertEquals(term1, term2);
         assertEquals(term2, term1);
         assertEquals(term1.hashCode(), term2.hashCode());
-        assertEquals(((Compound) term1).dt(), ((Compound) term2).dt());
+        assertEquals(term1.dt(), term2.dt());
         assertEquals(0, term1.compareTo(term2));
         assertEquals(0, term2.compareTo(term1));
         assertEquals(0, term1.compareTo(term1));
@@ -612,7 +612,7 @@ public class TermTest {
             assertNotNull(x);
 
             Terminal t = new Terminal(8);
-            t.believe((Compound)x);
+            t.believe(x);
 
             assertTrue(x + " should not have been allowed as a task content", false);
 
@@ -837,7 +837,7 @@ public class TermTest {
         try {
             Term recv = o.get();
             if (recv!=Null) //False also signals invalid reduction
-                assertTrue(recv.toString() + " was not null", false);
+                assertTrue(recv + " was not null", false);
         } catch (InvalidTermException e) {
             //correct if happens here
         }

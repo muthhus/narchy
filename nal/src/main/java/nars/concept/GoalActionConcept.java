@@ -6,7 +6,6 @@ import nars.$;
 import nars.NAR;
 import nars.NAct;
 import nars.Task;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
@@ -60,13 +59,14 @@ public class GoalActionConcept extends ActionConcept {
 
     }
 
+    @Override
     public float valueIfProcessed(@NotNull Task t, float activation, NAR n) {
         float v = super.valueIfProcessed(t, activation, n);
         if (t.isGoal() && !t.isInput()) {
 
             //allow the boost to apply to 1 duration ahead, to promote goal prediction
             v = Math.max(v,
-                    TaskConcept.valueIfProcessedAt(t, activation, n.time() + n.dur(), n ));
+                    BaseConcept.valueIfProcessedAt(t, activation, n.time() + n.dur(), n ));
 
             assert(v >= 0);
             v *= 2; //boost goal derivations in general

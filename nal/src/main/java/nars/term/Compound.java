@@ -1027,7 +1027,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if (possibleArgs instanceof Compound && possibleArgs.op() == PROD) {
                 Term possibleFunc = u.sub(1);
                 if (possibleFunc instanceof Atomic && possibleFunc.op() == ATOM) {
-                    Atomic ff = (Atomic) index.getIfPresentElse(possibleFunc);
+                    Termed ff = index.getIfPresentElse(possibleFunc);
                     if (ff instanceof Functor) {
                         u = ((Functor) ff).apply(((Compound) possibleArgs).subterms());
                         if (u == null)

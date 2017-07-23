@@ -2,7 +2,7 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -22,7 +22,7 @@ public interface TaskTable  {
      * @return: the input task itself, it it was added to the table
      * an existing equivalent task if this was a duplicate
      */
-    void add(@NotNull Task t, TaskConcept c, NAR n);
+    void add(@NotNull Task t, BaseConcept c, NAR n);
 
 
     int capacity();

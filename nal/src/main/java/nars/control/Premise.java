@@ -11,8 +11,8 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.concept.TaskConcept;
 import nars.control.premise.Derivation;
 import nars.table.BeliefTable;
 import nars.task.ITask;
@@ -118,7 +118,7 @@ public class Premise extends Pri implements ITask {
 
             int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
 
-            Term unified = unify(task.term(), (Compound) beliefTerm, nar, matchTTL);
+            Term unified = unify(task.term(), beliefTerm, nar, matchTTL);
             if (unified != null) {
                 beliefTerm = unified;
                 reUnified = true;
@@ -130,9 +130,9 @@ public class Premise extends Pri implements ITask {
 
 
         //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
-        if (_beliefConcept instanceof TaskConcept) { //beliefs/goals will only be in TaskConcepts
+        if (_beliefConcept instanceof BaseConcept) { //beliefs/goals will only be in TaskConcepts
 
-            TaskConcept beliefConcept = (TaskConcept) _beliefConcept;
+            BaseConcept beliefConcept = (BaseConcept) _beliefConcept;
 
             BeliefTable table =
                     (task.isGoal() || task.isQuest()) ?
@@ -150,7 +150,7 @@ public class Premise extends Pri implements ITask {
 //
 //                            }
                 long when = whenAnswer(task, now);
-                match = table.answer(when, now, dur, task, (Compound) beliefTerm, (TaskConcept) beliefConcept, nar);
+                match = table.answer(when, now, dur, task, (Compound) beliefTerm, beliefConcept, nar);
                 if (match != null) {
                     @Nullable Task answered = task.onAnswered(match, nar);
                     if (answered != null) {

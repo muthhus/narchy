@@ -2,7 +2,7 @@ package nars.table;
 
 import nars.NAR;
 import nars.Task;
-import nars.concept.TaskConcept;
+import nars.concept.BaseConcept;
 import nars.control.Activate;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,7 +35,7 @@ public interface QuestionTable extends TaskTable {
         }
 
         @Override
-        public void add(@NotNull Task t, TaskConcept c, NAR n) {
+        public void add(@NotNull Task t, BaseConcept c, NAR n) {
 
         }
 
@@ -83,7 +83,7 @@ public interface QuestionTable extends TaskTable {
         final static HijackQuestionTable common = new HijackQuestionTable(1024, 3);
 
         @Override
-        public void add(@NotNull Task t, TaskConcept c, NAR n) {
+        public void add(@NotNull Task t, BaseConcept c, NAR n) {
             Task e = common.get(t);
             float activation = t.priElseZero();
             if (e ==null) {

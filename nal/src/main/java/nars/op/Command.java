@@ -26,8 +26,8 @@ abstract public class Command extends BaseConcept implements PermanentConcept {
 
     public static String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
 
-    public Command(@NotNull Atom atom) {
-        super(atom, Bag.EMPTY, Bag.EMPTY);
+    public Command(@NotNull Atom atom, NAR n) {
+        super(atom, n);
     }
 
     @Deprecated protected void run(@NotNull Atomic op, @NotNull Term[] args, @NotNull NAR nar) {
@@ -37,7 +37,7 @@ abstract public class Command extends BaseConcept implements PermanentConcept {
     public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
         Term c = t.term();
         try {
-            run((Atomic) (c.sub(1, null)), ((Compound) (t.term(0))).toArray(), nar);
+            run(c.sub(1, null), ((Compound) (t.term(0))).toArray(), nar);
             return t;
         } catch (Throwable error) {
             if (Param.DEBUG)

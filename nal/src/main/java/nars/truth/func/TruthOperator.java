@@ -19,10 +19,10 @@ public interface TruthOperator {
             table.put(Atomic.the(tm.toString()), tm);
             table.put(Atomic.the(tm.toString() + 'X'), new SwappedTruth(tm));
             table.put(Atomic.the(tm.toString() + 'N'), new NegatedTaskTruth(tm)); //ie. NP
-            table.put(Atomic.the(tm.toString() + "PN"), new NegatedBeliefTruth(tm));
-            table.put(Atomic.the(tm.toString() + "NN"), new NegatedTruths(tm));
-            table.put(Atomic.the(tm.toString() + "NX"), new NegatedTaskTruth(new SwappedTruth(tm)));
-            table.put(Atomic.the(tm.toString() + "Depolarized"), new DepolarizedTruth(tm));
+            table.put(Atomic.the(tm + "PN"), new NegatedBeliefTruth(tm));
+            table.put(Atomic.the(tm + "NN"), new NegatedTruths(tm));
+            table.put(Atomic.the(tm + "NX"), new NegatedTaskTruth(new SwappedTruth(tm)));
+            table.put(Atomic.the(tm + "Depolarized"), new DepolarizedTruth(tm));
         }
     }
 

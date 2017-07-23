@@ -153,14 +153,14 @@ public class OptiUnit<T> extends RunListener {
         private final Function<S, SortedMap<String, Object>> setCause;
         private final Function<S, SortedMap<String, Object>> getEffect;
 
-        public SortedMap<String, Object> cause = null;
-        public SortedMap<String, Object> effect = null;
+        public SortedMap<String, Object> cause;
+        public SortedMap<String, Object> effect;
 
         //JUnit specific:
         private final Statement run;
         private final FrameworkMethod experiment;
 
-        private boolean traceErrors = false;
+        private final boolean traceErrors = false;
 
 
         /**
@@ -172,7 +172,7 @@ public class OptiUnit<T> extends RunListener {
          */
         public Experiment(S instance, FrameworkMethod experiment, Statement s, Function<S, SortedMap<String, Object>> setCause, Function<S, SortedMap<String, Object>> getEffect) {
             super();
-            this.id = experiment.toString() + " " + Util.UUIDbase64();
+            this.id = experiment + " " + Util.UUIDbase64();
             this.run = s;
             this.experiment = experiment;
             this.subject = instance;
