@@ -1,16 +1,21 @@
 package nars.op.mental;
 
 import com.google.common.io.ByteArrayDataOutput;
+import jcog.bag.Bag;
 import nars.NAR;
 import nars.Op;
 import nars.concept.BaseConcept;
+import nars.concept.Concept;
 import nars.index.term.TermContext;
+import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
 
 /**
  * the proxy concepts present a bidirectional facade between a referenced and an alias term (alias term can be just a serial # atom wrapped in a product).
@@ -22,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
  * seen from a superterm containing one, it appears as a simple volume=2 concept meanwhile it could be aliasing a concept much larger than it. common "phrase" concepts with a volume >> 2 are good candidates for abbreviation. but when printed, the default toString() method is proxied so it will automatically decompress on output (or other serialization).
  */
 public final class AliasConcept extends BaseConcept {
+
 
     public static class AliasAtom extends Atom {
 
@@ -39,13 +45,18 @@ public final class AliasConcept extends BaseConcept {
 
         @Override
         public Term eval(TermContext index) {
-            return target;
+            return target.eval(index);
         }
 
         @Override
-        public void append(ByteArrayDataOutput out) {
-            target.append(out); //serialize the expanded version
+        public void append(@NotNull Appendable w) throws IOException {
+            super.append(w);
         }
+
+        //        @Override
+//        public void append(ByteArrayDataOutput out) {
+//            target.append(out); //serialize the expanded version
+//        }
 
         @Override
         public boolean equals(Object u) {
@@ -74,16 +85,21 @@ public final class AliasConcept extends BaseConcept {
 
     @NotNull
     public final Compound abbr;
+    private final TermContainer templates;
 
-    @NotNull static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar) {
+    @NotNull static public AliasConcept get(@NotNull String compressed, @NotNull Concept decompressed, @NotNull NAR nar) {
         AliasConcept a = new AliasConcept(compressed, decompressed, nar);
         return a;
     }
 
-    AliasConcept(@NotNull String abbreviation, Compound abbr, @NotNull NAR nar) {
-        super(new AliasAtom(abbreviation, abbr), null, null, nar.conceptBuilder);
+    AliasConcept(@NotNull String abbreviation, Concept decompressed, @NotNull NAR nar) {
+        super(new AliasAtom(abbreviation, decompressed.term()),
+                decompressed.beliefs(), decompressed.goals(), decompressed.questions(), decompressed.quests(),
+                new Bag[] { decompressed.termlinks(), decompressed.tasklinks() } );
 
-        this.abbr = abbr;
+        this.abbr = (Compound) decompressed.term();
+        this.templates = decompressed.templates();
+        put(Abbreviation.class, abbr);
 
 //            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
 //            if (additionalTerms.length > 0)
@@ -95,7 +111,7 @@ public final class AliasConcept extends BaseConcept {
 
     @Override
     public TermContainer templates() {
-        return abbr.subterms();
+        return templates;
     }
 
     //

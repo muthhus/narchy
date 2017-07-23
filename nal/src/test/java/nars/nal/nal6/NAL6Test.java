@@ -247,8 +247,8 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("(&&,<#x --> lock>,(<$y --> key> ==> open($y,#x)))"); //en("There is a lock that can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
         tester.mustBelieve(cycles, "<<$1 --> key> ==> open($1,{lock1})>", 1.00f,
-                0.81f);
-                //0.43f); //en("I guess Lock-1 can be opened by every key.");
+                //0.81f);
+                0.43f); //en("I guess Lock-1 can be opened by every key.");
 
     }
 
@@ -257,9 +257,9 @@ public class NAL6Test extends AbstractNALTest {
     public void multiple_variable_elimination4()  {
 
         TestNAR tester = test;
-        tester.believe("(&&,<#x --> (/,open,#y,_)>,<#x --> lock>,<#y --> key>)"); //en("There is a key that can open some lock.");
+        tester.believe("(&&,open(#y,#x),<#x --> lock>,<#y --> key>)"); //en("There is a key that can open some lock.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
-        tester.mustBelieve(cycles, "(&&,<#1 --> key>,<{lock1} --> (/,open,#1,_)>)",
+        tester.mustBelieve(cycles, "(&&,<#1 --> key>,open(#1,{lock1}))",
                 1.00f,
                 0.43f
         ); //en("I guess there is a key that can open Lock-1.");
@@ -360,8 +360,8 @@ public class NAL6Test extends AbstractNALTest {
         //
         tester.believe("<<$x --> key> ==> open($x,{lock1})>"); //en("Lock-1 can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
-        //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> open($2,#1)>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
-        tester.mustBelieve(cycles, "(&&,<$1 --> lock>,<<$2 --> key> ==> open($2,$1)>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
+        tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> open($2,#1)>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
+        //tester.mustBelieve(cycles, "(&&,<$1 --> lock>,<<$2 --> key> ==> open($2,$1)>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
         //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
         //tester.mustBelieve(cycles, "<(&&,<$1 --> key>,<$2 --> lock>) ==> <$2 --> (/,open,$1,_)>>", 1.00f, 0.45f); //en("I guess every lock can be opened by every key.");
         //tester.mustBelieve(cycles, "<(&&,<$1 --> key>,<$2 --> lock>) ==> open($1,$2)>", 1.00f, 0.45f); //en("I guess every lock can be opened by every key.");

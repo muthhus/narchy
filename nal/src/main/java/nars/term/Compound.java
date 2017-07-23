@@ -1037,11 +1037,9 @@ public interface Compound extends Term, IPair, TermContainer {
             }
         }
 
-        if (!(u instanceof Compound))
-            return u; //atomic, including Bool short-circuits on invalid term
-
-        if (u.equals(this)) {
-            return this;
+        //atomic, including Bool short-circuits on invalid term
+        if (u instanceof Bool || u instanceof Variable || u.equals(this)) {
+            return u; //return u and not this
         } else {
 
             //it has been changed, so eval recursively until stable

@@ -25,6 +25,8 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import nars.conceptualize.state.ConceptState;
+import nars.table.BeliefTable;
+import nars.table.QuestionTable;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
@@ -96,13 +98,13 @@ public interface Concept extends Termlike {
     }
 
 
-//    @NotNull BeliefTable beliefs();
-//
-//    @NotNull BeliefTable goals();
-//
-//    @NotNull QuestionTable questions();
-//
-//    @Nullable QuestionTable quests();
+    @NotNull BeliefTable beliefs();
+
+    @NotNull BeliefTable goals();
+
+    @NotNull QuestionTable questions();
+
+    @Nullable QuestionTable quests();
 
 
     @Nullable

@@ -36,7 +36,7 @@ public abstract class Param  {
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 1;
 
     public static final PriMerge termlinkMerge = PriMerge.or;
-    public static final PriMerge tasklinkMerge = PriMerge.or; //not safe to plus without enough headroom
+    public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptMerge = PriMerge.plus;
     public static final PriMerge premiseMerge = PriMerge.max;

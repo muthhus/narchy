@@ -29,6 +29,7 @@ import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.term.util.StaticTermIndex;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
@@ -395,6 +396,11 @@ public interface Term extends Termlike, Comparable<Termlike> {
     }
 
     default Term eval(TermContext index) {
+        if (!(index instanceof StaticTermIndex)) {
+            Termed t = index.get(this, false); //resolve
+            if (t != null)
+                return t.term();
+        }
         return this;
     }
 

@@ -67,13 +67,6 @@ public class Atom extends AtomicToString {
         return Op.ATOM;
     }
 
-    @Override
-    public Term eval(TermContext index) {
-        Termed existing = index.get(this); //resolve atoms to their concepts for efficiency
-        //assumes the AtomConcept returned is the Term itself, as .term() would return
-        return existing != null ? existing.term() : this;
-    }
-
     @NotNull
     @Override public final String toString() {
         return id;

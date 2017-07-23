@@ -20,12 +20,7 @@ public interface TermContext {
      */
     @Nullable
     default Termed get(@NotNull Term t) {
-        Termed u = get(t, false);
-        if (u instanceof AliasConcept.AliasAtom || u instanceof AliasConcept) {
-            System.out.println("alias: " + u);
-        }
-        return u;
-        //return get(t, false);
+        return get(t, false);
     }
 
     default Termed getIfPresentElse(@NotNull Term _else) {

@@ -29,6 +29,11 @@ import java.util.function.Predicate;
  */
 public class FocusedExecutioner extends Executioner {
 
+    int subCycles = 2;
+    int subCycleConcepts = 6;
+    int subCycleTasks = 16;
+    int subCyclePremises = 2;
+
     final int MAX_PREMISES = 64;
     final int MAX_TASKS = 64;
     final int MAX_CONCEPTS = 64;
@@ -44,10 +49,6 @@ public class FocusedExecutioner extends Executioner {
     public final CurveBag<ITask> concepts = new CurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(),
             random, MAX_CONCEPTS);
 
-    int subCycles = 1;
-    int subCycleConcepts = 1;
-    int subCycleTasks = 8;
-    int subCyclePremises = 1;
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
 
@@ -89,7 +90,9 @@ public class FocusedExecutioner extends Executioner {
             tasks.sample((x) -> {
                 NALTask tt = (NALTask) x;
                 next.add(tt);
-                boolean save = false; // tt.isInput();
+                boolean save =
+                        tt.isInput();
+                        //false;
                 return --maxTasks[0] > 0 ?
                         (save ? Bag.BagSample.Next : Bag.BagSample.Remove)
                         :

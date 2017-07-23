@@ -881,6 +881,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                     x.eval(n.terms)
             );
 
+
             if (!x.equals(y)) {
                 @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), n.terms, true);
                 if (yy != null) {
@@ -890,6 +891,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                     delete(); //transfer control to transformation result
 
                     return inputY.run(n);
+                } else {
+                    return null; //eval to invalid
                 }
             }
         }

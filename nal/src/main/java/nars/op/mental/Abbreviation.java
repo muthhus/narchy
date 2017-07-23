@@ -185,13 +185,15 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
         if (abbreviation != null) {
 
             @Nullable Concept a = nar.concept(abbreviated);
-            if (a != null) {
+            if (a != null && a.term() instanceof Compound) {
 
                 if (a.putIfAbsent(Abbreviation.class, id) == null) {
 
-                    AliasConcept ac = AliasConcept.get(id, abbreviated, nar);
+                    AliasConcept ac = AliasConcept.get(id, a, nar);
                     Concept alias = aliasConcept ?
                             nar.on(ac) : null;
+
+
 
 
                     nar.terms.set(abbreviated, ac); //set the abbreviated term to resolve to the abbreviation
