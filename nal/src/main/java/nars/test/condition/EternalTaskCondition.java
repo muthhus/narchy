@@ -228,8 +228,13 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         if (!truthMatches(task))
             return false;
 
-        if (!task.term().equals(term))
+        if (!task.term().equals(term)) {
+            if (term.toString().equals(task.term().toString())) {
+                throw new RuntimeException("term construction problem: " + term + " .toString() is equal to " + task.term() + " but inequal otherwise");
+            }
             return false;
+        }
+
 
         return timeMatches(task);
     }

@@ -1,9 +1,6 @@
 package nars.nal.multistep;
 
-import nars.$;
-import nars.NAR;
-import nars.NARS;
-import nars.Narsese;
+import nars.*;
 import nars.nal.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Ignore;
@@ -112,7 +109,8 @@ public class PatrickTests extends AbstractNALTest {
 
 
         TestNAR tt = test;
-        //tt.log();
+        //Param.TRACE = true;
+        tt.log();
         tt.nar.time.dur(2);
         //tt.nar.truthResolution.setValue(0.1f);
         //tt.nar.termVolumeMax.setValue(18);
@@ -129,12 +127,16 @@ public class PatrickTests extends AbstractNALTest {
                 "(( <$1 --> [pliable]> &&+0 reshape(I,$1)) ==>+10 <$1 --> [hardened]>).",
                 "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrews]>).",
 
+//                "<toothbrush --> [unscrews]>! :|:", //make something that is here a screwdriver
+//                "<toothbrush --> [unscrews]>! :|:", //make something that is here a screwdriver
+//                "<toothbrush --> [unscrews]>! :|:", //make something that is here a screwdriver
+//                "<toothbrush --> [unscrews]>! :|:", //make something that is here a screwdriver
                 "<toothbrush --> [unscrews]>! :|:" //make something that is here a screwdriver
                 //"<toothbrush --> here>. :|:" //there is a toothbrush here NOW
         );
         //tt.log();
 
-        tt.mustDesire(1500, "lighter(I, toothbrush)", 1f,
+        tt.mustDesire(500, "lighter(I, toothbrush)", 1f,
                 0.18f,
 /*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 

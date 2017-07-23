@@ -34,6 +34,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class OptiUnit<T> extends RunListener {
 
@@ -282,14 +283,17 @@ public class OptiUnit<T> extends RunListener {
     /**
      * extract a table of numeric values from each experiment, selected from the specified columns
      */
-    public FloatTable<String> table(String... columns) {
+    public FloatTable<String> table(Predicate<float[]> include, String... columns) {
         FloatTable<String> t = new FloatTable<>(columns);
         experiments.forEach(e -> {
             @Nullable float[] a = e.floats(columns);
-            if (a != null)
+            if (a != null && include.test(a))
                 t.add(a);
         });
         return t;
+    }
+    public FloatTable<String> table(String... columns) {
+        return table((x)->true, columns);
     }
 
 

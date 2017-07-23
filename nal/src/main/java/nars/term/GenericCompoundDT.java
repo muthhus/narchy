@@ -37,6 +37,11 @@ public class GenericCompoundDT extends ProxyCompound {
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator", subterms.toArray());
         }
 
+        if (dt!=XTERNAL && op().commutative && size()==2) {
+            if (sub(0).compareTo(sub(1)) > 0)
+                throw new RuntimeException("invalid ordering");
+        }
+
         this.dt = dt;
 
         assert dt != DTERNAL || this instanceof PatternCompound : "use GenericCompound if dt==DTERNAL";

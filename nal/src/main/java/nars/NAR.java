@@ -725,15 +725,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return t;
     }
 
-    @NotNull
-    public Compound pre(@NotNull Compound c) {
-        Compound d = compoundOrNull(pre((Term) c));
-        if (d == null)
-            return c; //unchanged because post-processing resulted in invalid or non-compound
-        else
-            return d;
-    }
-
     /**
      * override to apply any post-processing of a task before it is made available for external use (ex: decompression)
      */

@@ -170,7 +170,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
             } else {
                 //duplicate was found in sub-tree but we checked for duplicates above
-                assert(false);
+                assert(false): "what to do with: " + t + " in " + parent;
                 //return null;
             }
 

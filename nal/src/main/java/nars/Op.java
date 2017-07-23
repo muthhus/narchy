@@ -219,24 +219,20 @@ public enum Op implements $ {
             } else {
                 //NON-COMMUTIVE
 
-                assert (n == 2): "invalid non-commutive conjunction arity!=2";
+                assert (n == 2) : "invalid non-commutive conjunction arity!=2";
 
                 Term a = tt[0];
                 Term b = tt[1];
-                if (a.equals(b)) {
-                    if (dt < 0) {
-                        //make dt positive to avoid creating both (x &&+1 x) and (x &&-1 x)
-                        dt = -dt;
-                    }
-                } else {
-                    if (a.compareTo(b) > 0) {
-                        //ensure lexicographic ordering
 
-                        Term x = tt[0];
-                        tt[0] = tt[1];
-                        tt[1] = x; //swap
-                        dt = -dt; //and invert time
-                    }
+                int order = a.compareTo(b);
+                if (order == 0) {
+                    dt = Math.abs(dt);
+                } else if (order > 0) {
+                    //ensure lexicographic ordering
+                    Term x = tt[0];
+                    tt[0] = tt[1];
+                    tt[1] = x; //swap
+                    dt = -dt;
                 }
 
                 return implInConjReduction(
@@ -976,7 +972,11 @@ public enum Op implements $ {
     public static Term compound(Op op, int dt, Term... subterms) {
 
         //if (!subterms.internable())
-        return compound(op, subterms).dt(dt);
+        Term c = compound(op, subterms);
+        if (dt!=DTERNAL)
+            return new GenericCompoundDT((Compound) c, dt);
+        return c;
+
 //        else
 //            return compound(new NewCompound(op, subterms), dt);
     }

@@ -373,11 +373,6 @@ public enum Terms { ;
 
 
     @Nullable
-    public static Compound compoundOr(@Nullable Term possiblyCompound, Compound other) {
-        return (possiblyCompound instanceof Compound) ? (Compound) possiblyCompound : other;
-    }
-
-    @Nullable
     public static Atom atomOr(@Nullable Term possiblyCompound, Atom other) {
         return (possiblyCompound instanceof Atom) ? (Atom) possiblyCompound : other;
     }
@@ -392,7 +387,9 @@ public enum Terms { ;
      */
     @Nullable
     public static Compound compoundOrNull(@Nullable Term t) {
-        return compoundOr(t, null);
+        if (t instanceof Compound) return (Compound) t;
+        else
+            return null;
     }
     @Nullable
     public static <T extends Term> T normalizedOrNull(@Nullable Term t, @NotNull TermIndex i) {
@@ -410,13 +407,7 @@ public enum Terms { ;
         }
     }
 
-    /**
-     * dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent
-     */
-    @Nullable
-    public static Compound compoundOrNull(@Nullable Termed t) {
-        return compoundOrNull(t.term());
-    }
+
 
     /**
      * detects a negated conjunction of negated subterms:

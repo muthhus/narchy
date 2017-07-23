@@ -742,17 +742,23 @@ public interface Compound extends Term, IPair, TermContainer {
     default Term dt(int nextDT) {
 
         int dt;
-        if (op().temporal && nextDT != (dt = this.dt())) {
-            Op op = op();
+        Op o = op();
+        if (o.temporal && nextDT != (dt = this.dt())) {
+            Op op = o;
             Compound b = this instanceof GenericCompoundDT ?
                     ((GenericCompoundDT) this).ref : this;
 
             if ((nextDT != XTERNAL && !concurrent(nextDT)) && size() > 2)
                 return Null; //tried to temporalize what can only be commutive
 
-            if (nextDT != DTERNAL)
+            if (nextDT == XTERNAL) {
                 return new GenericCompoundDT(b, nextDT);
-            else {
+            }
+
+            if (o.commutative && sub(0).compareTo(sub(1)) > 0) {
+                //must re-arrange the order to lexicographic, and invert dt
+                return o.the(nextDT != DTERNAL ? -nextDT : DTERNAL, sub(1), sub(0));
+            } else {
                 return op.the(nextDT, toArray());
             }
 

@@ -13,6 +13,7 @@ import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Bool;
+import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
@@ -32,14 +33,15 @@ import static nars.time.Tense.ETERNAL;
  * Final conclusion step of the derivation process that produces a derived task
  * <p>
  * Each rule corresponds to a unique instance of this
- *
+ * <p>
  * runtime instance. each leaf of each NAR's derivation tree should have
  * a unique instance, assigned the appropriate cause id by the NAR
  * at initialization.
  */
 public class Conclusion extends AbstractPred<Derivation> {
 
-    /** destination of any derived tasks; also may be used to communicate backpressure
+    /**
+     * destination of any derived tasks; also may be used to communicate backpressure
      * from the recipient.
      */
     private final CauseChannel<Task> channel;
@@ -62,7 +64,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         //assert(this.minNAL!=0): "unknown min NAL level for rule: " + rule;
     }
 
-     /**
+    /**
      * @return true to allow the matcher to continue matching,
      * false to stop it
      */
@@ -79,18 +81,22 @@ public class Conclusion extends AbstractPred<Derivation> {
         //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
-        Term b0 = this.pattern;
-        Term b1 = d.transform(b0);
+        Term b0 = this.pattern, b1 = null;
+
+        b1 = d.transform(b0);
         if (b1 == null)
             return true;
-        if (b1.vars(null)>0) {
+        if (b1.vars(null) > 0) {
             Term b2 = d.transform(b1);
-//            if (!b1.equals(b2))
-//                System.out.println("second transform");
+            if (b2 == null)
+                return true;
+            //            if (!b1.equals(b2))
+            //                System.out.println("second transform");
             b1 = b2;
         }
 
-        assert(b1.varPattern() == 0);
+
+        assert (b1.varPattern() == 0);
 
         /// ----
 
@@ -98,18 +104,15 @@ public class Conclusion extends AbstractPred<Derivation> {
         nar.emotion.derivationEval.increment();
 
 
-        Compound c1 = compoundOrNull(b1.eval(d));
-        if (c1 == null)
-            return true;
+        Term c1 = b1.eval(d);
+        if (c1 instanceof Variable || c1 instanceof Bool) return true;
 
         boolean polarity = true;
-        if (c1.op()==NEG) {
-            c1 = compoundOrNull( c1.unneg() );
-            if (c1==null)
-                return true;
+        if (c1.op() == NEG) {
+            c1 = c1.unneg();
+            if (c1 instanceof Variable || c1 instanceof Bool) return true;
             polarity = false;
         }
-
 
 
         Truth truth = d.concTruth;
@@ -125,7 +128,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             //process time with the unnegated term
             float[] confScale = {1f};
 
-            @Nullable Compound t1 = this.time.compute(c1,
+            @Nullable Term t1 = this.time.compute(c1,
                     d, occ, confScale
             );
 
@@ -206,17 +209,12 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             long start = occ[0];
             long end = occ[1];
-            assert(end >= start);
+            assert (end >= start);
 
             float priority = d.premisePri; //d.budgeting.budget(d, C, truth, punc, start, end);
-            assert(priority == priority);
+            assert (priority == priority);
 
-            if (priority < Priority.EPSILON) {
-                return true; //wasted
-            }
-
-
-            if (truth!=null) {
+            if (truth != null) {
 
                 if (negating)
                     polarity = !polarity;

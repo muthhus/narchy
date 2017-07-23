@@ -759,7 +759,7 @@ public class PremiseRule extends GenericCompound {
         TimeFunctions timeFunction = TimeFunctions.Auto;
         switch (XString) {
             case "task":
-                timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
+                timeFunction = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
                     long occ = p.task.start();
                     occReturn[0] = occ;
                     boolean temporal = false;
@@ -796,7 +796,7 @@ public class PremiseRule extends GenericCompound {
                         return null; //uncomputable temporal basis
                     }
 
-                    TimeFunctions.shiftIfImmediate(p, occReturn, derived);
+                    TimeFunctions.shiftIfImmediate(p, occReturn, (Compound)derived);
 
                     //HACK retemporalize a non-temporal conjunction result
                     if (p.taskTerm.op() == CONJ && p.taskTerm.dt() != DTERNAL &&
@@ -817,7 +817,7 @@ public class PremiseRule extends GenericCompound {
                                 break;
                             default:
                                 assert (derived.dt() == DTERNAL);
-                                derived = compoundOrNull(p.terms.the(derived, 0));
+                                derived = compoundOrNull(p.terms.the((Compound)derived, 0));
                                 break;
                         }
                     }
@@ -826,7 +826,7 @@ public class PremiseRule extends GenericCompound {
                 };
                 break;
             case "belief":
-                timeFunction = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
+                timeFunction = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
                     long occ;
                     boolean temporal = false;
                     if (!p.task.isEternal()) {
@@ -867,7 +867,7 @@ public class PremiseRule extends GenericCompound {
                         }
                     }
 
-                    TimeFunctions.shiftIfImmediate(p, occReturn, derived);
+                    TimeFunctions.shiftIfImmediate(p, occReturn, (Compound)derived);
 
                     return filterEternalBasis(derived, p, occReturn);
                 };
@@ -1043,7 +1043,7 @@ public class PremiseRule extends GenericCompound {
         return timeFunction;
     }
 
-    public @Nullable Compound filterEternalBasis(Compound derived, @NotNull Derivation p, @NotNull long[] occReturn) {
+    public @Nullable Term filterEternalBasis(Term derived, @NotNull Derivation p, @NotNull long[] occReturn) {
         if (derived == null)
             return null;
 

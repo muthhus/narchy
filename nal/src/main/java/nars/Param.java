@@ -35,7 +35,7 @@ public abstract class Param  {
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 1;
 
-    public static final PriMerge termlinkMerge = PriMerge.or;
+    public static PriMerge termlinkMerge = PriMerge.plus;
     public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptMerge = PriMerge.plus;
@@ -43,7 +43,7 @@ public abstract class Param  {
 
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
-            Util::and;
+            Util::or;
             //UtilityFunctions::aveAri;
             //Util::and;
             //Math::min;
@@ -113,7 +113,7 @@ public abstract class Param  {
     public static boolean ANSWER_REPORTING = true;
 
 
-    public static final boolean DERIVATION_TRANSFORM_CACHE = true;
+    public static final boolean DERIVATION_TRANSFORM_CACHE = false;
 
     /** -1 for softref */
     public static final int DERIVATION_TRANSFORM_CACHE_SIZE_PER_THREAD =
@@ -162,7 +162,7 @@ public abstract class Param  {
 
     /** 'time to live', unification steps until unification is stopped */
     public final MutableInteger matchTTL = new MutableInteger(256);
-    @Deprecated public final static int UnificationTTLMax = 128 * 2;
+    @Deprecated public final int UnificationTTLMax = matchTTL.intValue();
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
     public static final float BELIEF_MATCH_TTL_FRACTION = 0.33f;

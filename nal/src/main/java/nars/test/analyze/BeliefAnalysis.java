@@ -68,14 +68,14 @@ public class BeliefAnalysis extends EnergyAnalysis implements Termed {
 		Concept c = concept();
 		if (!(c instanceof BaseConcept))
 			return BeliefTable.Empty;
-		return ((BaseConcept)c).beliefs();
+		return c.beliefs();
 	}
 	@Nullable
 	public BeliefTable goals() {
 		Concept c = concept();
 		if (!(c instanceof BaseConcept))
 			return BeliefTable.Empty;
-		return ((BaseConcept)c).goals();
+		return c.goals();
 	}
 
 	@NotNull

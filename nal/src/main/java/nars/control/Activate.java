@@ -3,10 +3,7 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.task.ITask;
@@ -30,7 +27,7 @@ import java.util.function.Consumer;
 public class Activate extends UnaryTask<Concept> implements Termed {
 
     static final int TASKLINKS_SAMPLED = 2;
-    static final int TERMLINKS_SAMPLED = 4;
+    static final int TERMLINKS_SAMPLED = 2;
 
 
     public Activate(@NotNull Concept c, float pri) {
@@ -110,7 +107,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             return null;
         }
 
-        int talSampled = Math.min(tasklinks.size(), TERMLINKS_SAMPLED);
+        int talSampled = Math.min(tasklinks.size(), TASKLINKS_SAMPLED);
         List<PriReference<Task>> taskl = $.newArrayList(talSampled);
         tasklinks.sample(talSampled, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) {
@@ -129,6 +126,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         //concept priority transfers into:
         //      its termlinks to subterms
         //      and their reverse links back to this
+        float pri = this.priElseZero();
         if (localTemplates.length > 0) {
             float decayRate = 0.5f;
             float decayed = priElseZero() * (1f - decayRate);
@@ -144,7 +142,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
                     Concept localSubConcept = (Concept) localSub;
 
-                    nar.input(new Activate(localSubConcept, subDecay));
+                    nar.input(new Activate(localSubConcept, pri * subDecay));
 
                     localSubConcept.termlinks().putAsync(
                             new PLink(thisTerm, subDecayReverse)
@@ -280,6 +278,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         int cs = ctpl.size();
         for (int i = 0; i < cs; i++) {
             Term b = ctpl.sub(i);
+
+            if (b.varQuery() > 0) continue;
+
             @Nullable Concept c =
                     b instanceof Concept ? ((Concept) b) :
                             (b = b.unneg()).op().conceptualizable ?
@@ -293,11 +294,13 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                     }
                 }
             } else /*if (!b.equals(id))*/ {
-                if (tc.add(b)) { //variable or other non-conceptualizable term
-                    if (layersRemain > 0 && b instanceof Compound) {
-                        e = ((Compound) b).subterms();
+
+                    if (tc.add(b)) { //variable or other non-conceptualizable term
+                        if (layersRemain > 0 && b instanceof Compound) {
+                            e = ((Compound) b).subterms();
+                        }
                     }
-                }
+
             }
 
             if (e != null)

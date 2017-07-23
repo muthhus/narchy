@@ -115,9 +115,7 @@ public final class DynTruth implements Truthed {
         //long dur = (start!=ETERNAL && c.op() == CONJ) ? c.dtRange() : 0;
 
         if (c.op() == NEG) {
-            c = compoundOrNull(c.unneg());
-            if (c == null)
-                return null;
+            c = c.unneg();
             tr = tr.negated();
         }
 

@@ -250,7 +250,6 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
         return compoundOrNull(
                 $.sim(abbreviated, Atomic.the(id))
                 //$.equi
-
         );
         //(Compound) $.equi(abbreviated.term(), id);
         //(Compound) $.secte(abbreviated.term(), id);

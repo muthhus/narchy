@@ -757,8 +757,8 @@ public interface $ {
      * conjunction sequence (2-ary)
      */
     @Nullable
-    public static Compound seq(Term x, int dt, Term y) {
-        return compoundOrNull(CONJ.the(dt, x, y)); //must be a vector, not set
+    public static Term seq(Term x, int dt, Term y) {
+        return CONJ.the(dt, x, y); //must be a vector, not set
     }
 
 

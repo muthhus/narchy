@@ -2,6 +2,7 @@ package nars.table;
 
 import com.google.common.collect.Streams;
 import jcog.data.sorted.SortedArray;
+import jcog.pri.Pri;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -401,7 +402,11 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                     activation = after - before; //use previous value
                     input.delete();
 
-                    ((NALTask)revised).merge(((NALTask)input));
+                    if (activation >= Pri.EPSILON) {
+                        ((NALTask) revised).merge(((NALTask) input));
+                    } else {
+                        activated = null; //dont bother activating
+                    }
                 } else {
                     //a novel revision
                     if (insert(revised)) {

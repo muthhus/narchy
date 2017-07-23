@@ -62,6 +62,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     private final ConceptState sleep;
     private NAR nar;
 
+    @Override
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
         if (v < 16) {

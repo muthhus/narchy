@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -62,12 +63,14 @@ public class QueryVariableTest {
         Compound beliefTerm = compoundOrNull(nar.term(beliefString));
         assertNotNull(beliefTerm);
         nar.believe(beliefTerm, 1f, 0.9f);
+        assertEquals(1, nar.tasks().count());
         nar.question(question, Tense.ETERNAL, (q, a)-> {
             //if (a.term().equals(beliefTerm)) {
                 valid.set(true);
                 q.delete();
             //}
         });
+        assertEquals(2, nar.tasks().count());
         nar.run(time);
         assertTrue(valid.get());
 

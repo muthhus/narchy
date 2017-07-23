@@ -376,7 +376,7 @@ public class TestNAR {
                         sentenceTerm, punc, freqMin - h, freqMax + h, confMin - h, confMax + h) :
                 new TemporalTaskCondition(nar,
                         cycleStart, cycleEnd,
-                        start, start, end, end,
+                        start, end,
                         sentenceTerm, punc, freqMin - h, freqMax + h, confMin - h, confMax + h);
 
         for (Topic<Tasked> cc : c) {

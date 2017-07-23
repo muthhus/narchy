@@ -32,11 +32,11 @@ public class FocusedExecutioner extends Executioner {
     public int subCycles = 2;
     int subCycleConcepts = 6;
     int subCycleTasks = 16;
-    int subCyclePremises = 2;
+    int subCyclePremises = 6;
 
-    final int MAX_PREMISES = 64;
+    final int MAX_PREMISES = 16;
     final int MAX_TASKS = 64;
-    final int MAX_CONCEPTS = 64;
+    final int MAX_CONCEPTS = 16;
 
     final Random random = new XorShift128PlusRandom(1);
 
@@ -91,8 +91,8 @@ public class FocusedExecutioner extends Executioner {
                 NALTask tt = (NALTask) x;
                 next.add(tt);
                 boolean save =
-                        tt.isInput();
-                        //false;
+                        //tt.isInput();
+                        false;
                 return --maxTasks[0] > 0 ?
                         (save ? Bag.BagSample.Next : Bag.BagSample.Remove)
                         :

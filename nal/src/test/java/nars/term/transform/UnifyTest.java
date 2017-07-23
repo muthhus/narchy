@@ -86,7 +86,7 @@ public class UnifyTest {
 
             Unify sub = new Unify(type,
                     new XorShift128PlusRandom(1),
-                    Param.UnificationStackMax, Param.UnificationTTLMax) {
+                    Param.UnificationStackMax, 128) {
 
 
 
@@ -956,7 +956,7 @@ public class UnifyTest {
 
         AtomicBoolean matched = new AtomicBoolean(false);
 
-        Unify f = new Unify($.terms, Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax, Param.UnificationTTLMax) {
+        Unify f = new Unify($.terms, Op.VAR_QUERY, new XorShift128PlusRandom(1), Param.UnificationStackMax, 128) {
 
             @Override
             public void onMatch(Term[][] match) {

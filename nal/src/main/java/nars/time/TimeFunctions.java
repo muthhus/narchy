@@ -36,7 +36,7 @@ public interface TimeFunctions {
      * @param confScale
      * @return
      */
-    @Nullable Compound compute(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale);
+    Term compute(Term derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale);
 
 
     /**
@@ -98,23 +98,23 @@ public interface TimeFunctions {
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtTminB = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, +1);
+    TimeFunctions dtTminB = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, +1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtBminT = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, -1);
+    TimeFunctions dtBminT = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, -1);
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtIntersect = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, 0);
+    TimeFunctions dtIntersect = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> dtDiff(derived, p, occReturn, 0);
 
     /**
      * early-aligned, difference in dt
      */
-    TimeFunctions dtSum = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> {
+    TimeFunctions dtSum = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> {
         return dtDiff(derived, p, occReturn, 2);
     };
-    TimeFunctions dtSumReverse = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> {
+    TimeFunctions dtSumReverse = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> {
         return dtDiff(derived, p, occReturn, -2);
     };
 
@@ -125,9 +125,9 @@ public interface TimeFunctions {
     @Nullable TimeFunctions dternal = (derived, p, occReturn, confScale) -> dt(derived, DTERNAL, occReturn, p);
 
     @Nullable
-    static Compound dtDiff(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity) {
+    static Term dtDiff(@NotNull Term derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity) {
 
-        Compound taskTerm = (Compound) p.taskTerm;
+        Term taskTerm = p.taskTerm;
         Term beliefTerm = p.beliefTerm;
 
         int dt;
@@ -200,7 +200,7 @@ public interface TimeFunctions {
 
 
     @Nullable
-    static Compound occBeliefMinTask(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity, boolean merge) {
+    static Term occBeliefMinTask(@NotNull Term derived, @NotNull Derivation p, @NotNull long[] occReturn, int polarity, boolean merge) {
 
         long taskStart = p.task.start();
         long beliefStart = p.belief.start();
@@ -258,7 +258,7 @@ public interface TimeFunctions {
     }
 
     @Nullable
-    static Compound merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
+    static Term merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
 
         List<ObjectLongPair<Term>> events = $.newArrayList();
 
@@ -297,7 +297,7 @@ public interface TimeFunctions {
                             return null; //failure
                         if (events.isEmpty()) {
                             //got them all here
-                            return compoundOrNull(replacement);
+                            return replacement;
                         }
                         events.add(i, PrimitiveTuples.pair(replacement, when));
                         i++;
@@ -330,7 +330,7 @@ public interface TimeFunctions {
 
                 headAt = nextAt;
             }
-            return compoundOrNull(head);
+            return head;
         }
 
     }
@@ -355,32 +355,32 @@ public interface TimeFunctions {
     /**
      * copiesthe 'dt' and the occurence of the task term directly
      */
-    TimeFunctions dtTaskExact = (@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtTaskExact = (Term derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
             dtExact(derived, occReturn, p, true, +1);
-    TimeFunctions dtBeliefExact = (@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtBeliefExact = (Term derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
             dtExact(derived, occReturn, p, false, +1);
-    TimeFunctions dtBeliefReverse = (@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
+    TimeFunctions dtBeliefReverse = (Term derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
             dtExact(derived, occReturn, p, false, -1);
 
 
     /**
      * special handling for dealing with detaching, esp. conjunctions which involve a potential mix of eternal and non-eternal premise components
      */
-    @Nullable TimeFunctions decomposeTask = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) ->
+    @Nullable TimeFunctions decomposeTask = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) ->
             decompose(derived, p, occReturn, true);
-    @Nullable TimeFunctions decomposeBelief = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) ->
+    @Nullable TimeFunctions decomposeBelief = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) ->
             decompose(derived, p, occReturn, false);
 
-    @Nullable TimeFunctions decomposeBeliefLate = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) ->
+    @Nullable TimeFunctions decomposeBeliefLate = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) ->
             decomposeLate(derived, p, occReturn, false);
 
-    static Compound decomposeLate(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, boolean b) {
+    static Term decomposeLate(@NotNull Term derived, @NotNull Derivation p, @NotNull long[] occReturn, boolean b) {
         return lateIfGoal(p, occReturn, decompose(derived, p, occReturn, b));
     }
 
     ;
 
-    static Compound lateIfGoal(@NotNull Derivation p, @NotNull long[] occReturn, @Nullable Compound x) {
+    static Term lateIfGoal(@NotNull Derivation p, @NotNull long[] occReturn, @Nullable Term x) {
         if ((x != null) && p.task.isGoal() && p.concPunc == GOAL && (occReturn[0] != ETERNAL)) {
             long taskStart = p.task.start();
 
@@ -416,7 +416,7 @@ public interface TimeFunctions {
     /**
      * the 2-ary result will have its 'dt' assigned by the occurrence of its subterms in the task's compound
      */
-    @Nullable TimeFunctions decomposeTaskComponents = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> {
+    @Nullable TimeFunctions decomposeTaskComponents = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> {
 
         if (derived.size() == 2) {
 
@@ -442,7 +442,7 @@ public interface TimeFunctions {
 
     /*** special case for decomposing conjunctions in the task slot.
      *   has special case for decomposing goal conjunctions (earliest component only */
-    @Nullable TimeFunctions decomposeTaskSubset = (@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> {
+    @Nullable TimeFunctions decomposeTaskSubset = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, float[] confScale) -> {
         Task task = p.task;
         Term taskTerm = task.term();
 
@@ -451,7 +451,7 @@ public interface TimeFunctions {
         if (derived.op() == CONJ && (task.volume() == derived.volume() && taskSize == derived.size() && task.term().vars() == derived.vars())) {
             //something wrong happened with the ellipsis selection.
             //being a decomposition it should produce a smaller result
-            throw new InvalidTermException(derived.op(), derived.toArray(), "ellipsis commutive match fault: same as parent");
+            throw new RuntimeException(derived + " " + "ellipsis commutive match fault: same as parent");
         }
 
         Task belief = p.belief;
@@ -526,7 +526,7 @@ public interface TimeFunctions {
     };
 
     @Nullable
-    static Compound decompose(@NotNull Compound derived, @NotNull Derivation p, @NotNull long[] occReturn, boolean decomposeTask) {
+    static Term decompose(@NotNull Term derived, @NotNull Derivation p, @NotNull long[] occReturn, boolean decomposeTask) {
 
 
         Task task = p.task;
@@ -534,7 +534,7 @@ public interface TimeFunctions {
 
         Task otherTask = (decomposeTask) ? belief : task;
 
-        Compound decomposedTerm = (Compound) (decomposeTask ? p.taskTerm : p.beliefTerm);
+        Term decomposedTerm = (decomposeTask ? p.taskTerm : p.beliefTerm);
 
         //occOther: the non-decomposed counterpart of the premise
 
@@ -587,13 +587,13 @@ public interface TimeFunctions {
             Term rDerived = resolve(derived, p);
             if (rDerived != null) {
 
-                final Compound rDecomposed = compoundOrNull(resolve(decomposedTerm, p));
-                if (rDecomposed != null) {
+                final Term rDecomposed = resolve(decomposedTerm, p);
+                if (rDecomposed instanceof Compound) {
 
                     if (occOther != ETERNAL) {
-                        Compound rOtherTerm = compoundOrNull(resolve(otherTerm, p));
+                        Term rOtherTerm = resolve(otherTerm, p);
 
-                        long derivedInTask = solveDecompose(occOther, rDerived, rDecomposed);
+                        long derivedInTask = solveDecompose(occOther, rDerived, (Compound)rDecomposed);
 
                         if (derivedInTask != ETERNAL) {
 
@@ -617,7 +617,7 @@ public interface TimeFunctions {
 
                     if (occ == ETERNAL && occDecomposed != ETERNAL) {
                         //task could not resolve temporally; try to resolve using only the belief
-                        occ = solveDecompose(occDecomposed, rDerived, rDecomposed);
+                        occ = solveDecompose(occDecomposed, rDerived, (Compound)rDecomposed);
                     }
 
 
@@ -798,7 +798,7 @@ public interface TimeFunctions {
 
 
     @Nullable
-    static Compound dtExact(@NotNull Compound derived, @NotNull long[] occReturn, @NotNull Derivation p, boolean taskOrBelief, int polarity) {
+    static Term dtExact(@NotNull Term derived, @NotNull long[] occReturn, @NotNull Derivation p, boolean taskOrBelief, int polarity) {
 
         Term dtTerm = taskOrBelief ? p.taskTerm.unneg() : p.beliefTerm;
 
@@ -818,7 +818,7 @@ public interface TimeFunctions {
             int derivedInT = dtTermResolved.subtermTime(derivedResolved);
             if (derivedInT == DTERNAL && derivedResolved.op() == Op.IMPL) {
                 //try to find the subtermTime of the implication's subject
-                derivedInT = dtTermResolved.subtermTime(((Compound) derivedResolved).sub(0));
+                derivedInT = dtTermResolved.subtermTime((derivedResolved).sub(0));
             }
 
             if (derivedInT == DTERNAL) {
@@ -837,13 +837,13 @@ public interface TimeFunctions {
         }
 
 
-        int dtdt = ((Compound) dtTerm).dt();
+        int dtdt =  dtTerm.dt();
         return deriveDT(derived, polarity, dtdt, occReturn, p);
 
     }
 
     @Nullable
-    static Compound deriveDT(@NotNull Compound derived, int polarity, int eventDelta, @NotNull long[] occReturn, Derivation p) {
+    static Term deriveDT(@NotNull Term derived, int polarity, int eventDelta, @NotNull long[] occReturn, Derivation p) {
 
         int dt = eventDelta == DTERNAL ? DTERNAL : eventDelta * polarity;
 
@@ -851,13 +851,13 @@ public interface TimeFunctions {
     }
 
 
-    @NotNull TimeFunctions dtCombine = (@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
+    @NotNull TimeFunctions dtCombine = (Term derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
             dtCombiner(derived, p, occReturn, false, false);
 
-    @NotNull TimeFunctions dtCombinePre = (@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
+    @NotNull TimeFunctions dtCombinePre = (Term derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
             dtCombiner(derived, p, occReturn, true, false);
 
-    @NotNull TimeFunctions dtCombinePost = (@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
+    @NotNull TimeFunctions dtCombinePost = (Term derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
             dtCombiner(derived, p, occReturn, false, true);
 
 
@@ -865,13 +865,13 @@ public interface TimeFunctions {
      * combine any existant DT's in the premise (assumes both task and belief are present)
      */
     @Nullable
-    static Compound dtCombiner(@NotNull Compound derived, @NotNull Derivation p, long[] occReturn, boolean pre, boolean post) {
+    static Term dtCombiner(@NotNull Term derived, @NotNull Derivation p, long[] occReturn, boolean pre, boolean post) {
 
         Task task = p.task;
-        int taskDT = ((Compound) p.taskTerm.unneg()).dt();
+        int taskDT = ( p.taskTerm.unneg()).dt();
 
         Term bt = p.beliefTerm;
-        int beliefDT = (bt instanceof Compound) ? ((Compound) bt.unneg()).dt() : DTERNAL;
+        int beliefDT = (bt instanceof Compound) ? ( bt.unneg()).dt() : DTERNAL;
         int eventDelta = DTERNAL;
 
         if (derived.size() > 1) {
@@ -884,7 +884,7 @@ public interface TimeFunctions {
             } else if (taskDT != DTERNAL && beliefDT != DTERNAL) {
 
                 if (derived.size() != 2)
-                    throw new InvalidTermException(derived.op(), derived.toArray(), "expectd arity=2");
+                    throw new RuntimeException(derived +  " expectd arity=2");
 
                 //assume derived has 2 terms exactly
                 Term da = derived.sub(0);
@@ -894,7 +894,7 @@ public interface TimeFunctions {
                 int ta = tt.subtermTime(da);
                 int tb = tt.subtermTime(db);
 
-                Compound btc = (Compound) bt;
+                Term btc = bt;
                 int ba = btc.subtermTime(da);
                 int bb = btc.subtermTime(db);
 
@@ -936,10 +936,10 @@ public interface TimeFunctions {
             //set subterm 0's DT
 
 
-            Compound preSub = (Compound) derived.sub(0);
+            Term preSub =  derived.sub(0);
             boolean neg = preSub.op() == NEG;
             if (neg) {
-                preSub = (Compound) preSub.unneg(); //unwrap
+                preSub = preSub.unneg(); //unwrap
             }
 
             int preDT;
@@ -951,21 +951,19 @@ public interface TimeFunctions {
                 preDT = 0; //DTERNAL; //??
             }
 
-            Term newPresub = p.terms.the(preSub, preDT);
+            Term newPresub = p.terms.the((Compound)preSub, preDT);
 
-            if (!(newPresub instanceof Compound))
-                return null;
 
-            derived = compoundOrNull((p.terms.the(derived,
+            derived = (p.terms.the((Compound)derived,
                     new Term[]{$.negIf(newPresub, neg), derived.sub(1)})
-            ));
+            );
         }
         if (post && derived.sub(1) instanceof Compound && derived.sub(1).size() == 2) {
 
-            Compound postSub = (Compound) derived.sub(1);
+            Term postSub =  derived.sub(1);
             boolean neg = postSub.op() == NEG;
             if (neg) {
-                postSub = (Compound) postSub.unneg(); //unwrap
+                postSub = postSub.unneg(); //unwrap
             }
 
             int postDT;
@@ -984,9 +982,8 @@ public interface TimeFunctions {
             if (bool(newSubterm1))
                 return null;
 
-            derived = compoundOrNull(
-                    p.terms.the(derived, new Term[]{derived.sub(0), $.negIf(newSubterm1, neg)})
-            );
+            derived =
+                    p.terms.the((Compound)derived, new Term[]{derived.sub(0), $.negIf(newSubterm1, neg)});
 
         }
 
@@ -1359,7 +1356,7 @@ public interface TimeFunctions {
     }
 
 
-    static Compound dt(@NotNull Compound derived, int dt, long[] occReturn, Derivation p) {
+    static Term dt(@NotNull Term derived, int dt, long[] occReturn, Derivation p) {
         Op o = derived.op();
         if (!o.temporal) {
             dt = DTERNAL;
@@ -1371,7 +1368,7 @@ public interface TimeFunctions {
 //        }
         if (derived.dt() != dt) {
 
-            @NotNull Compound n = compoundOrNull(derived.dt(dt)); //compoundOrNull(p.terms.the(o, dt, ds));
+            @NotNull Term n = derived.dt(dt); //compoundOrNull(p.terms.the(o, dt, ds));
             if (n == null)
                 return null; //throw new InvalidTermException(o, dt, ds, "Untemporalizable to new DT");
 
@@ -1382,7 +1379,7 @@ public interface TimeFunctions {
                             && occReturn[0] != ETERNAL && occReturn[1] == ETERNAL)
                 occReturn[1] = occReturn[0] + n.dtRange();
 
-            return (Compound) n;
+            return n;
         } else {
             return derived;
         }

@@ -3,7 +3,6 @@ package nars.table;
 import nars.NAR;
 import nars.Narsese;
 import nars.Param;
-import nars.table.BeliefTable;
 import nars.test.analyze.BeliefAnalysis;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;

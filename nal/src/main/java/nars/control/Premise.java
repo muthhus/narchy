@@ -8,6 +8,7 @@ import jcog.Util;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.budget.BudgetFunctions;
@@ -118,7 +119,7 @@ public class Premise extends Pri implements ITask {
 
             int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
 
-            Term unified = unify(task.term(), beliefTerm, nar, matchTTL);
+            Term unified = unify( beliefTerm, task.term(), nar, matchTTL);
             if (unified != null) {
                 beliefTerm = unified;
                 reUnified = true;
@@ -241,9 +242,8 @@ public class Premise extends Pri implements ITask {
         if (q.op() != a.op() /*|| q.size() != a.size()*/)
             return null; //fast-fail: no chance
 
-
         final Compound[] result = {null};
-        UnifySubst u = new UnifySubst(null /* match anything */, nar, (aa) -> {
+        UnifySubst u = new UnifySubst(Op.VAR_QUERY, nar, (aa) -> {
 
 
             if (!aa.equals(a)) {

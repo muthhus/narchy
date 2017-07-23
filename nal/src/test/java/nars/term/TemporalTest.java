@@ -195,6 +195,36 @@ public class TemporalTest {
     }
 
 
+    @Test public void testCommutiveConjTemporal() throws Narsese.NarseseException {
+        Term x = $("(a &&+1 b)");
+        assertEquals("a", x.sub(0).toString());
+        assertEquals("b", x.sub(1).toString());
+        assertEquals(+1, x.dt());
+        assertEquals("(a &&+1 b)", x.toString());
+
+        Term y = $("(a &&-1 b)");
+        assertEquals("a", y.sub(0).toString());
+        assertEquals("b", y.sub(1).toString());
+        assertEquals(-1, y.dt());
+        assertEquals("(b &&+1 a)", y.toString());
+
+        Term z = $("(b &&+1 a)");
+        assertEquals("a", z.sub(0).toString());
+        assertEquals("b", z.sub(1).toString());
+        assertEquals(-1, z.dt());
+        assertEquals("(b &&+1 a)", z.toString());
+
+        Term w = $("(b &&-1 a)");
+        assertEquals("a", w.sub(0).toString());
+        assertEquals("b", w.sub(1).toString());
+        assertEquals(+1, w.dt());
+        assertEquals("(a &&+1 b)", w.toString());
+
+        assertEquals(y, z);
+        assertEquals(x, w);
+
+    }
+
     @Test
     public void testCommutiveTemporality1() {
         testParse("(at(SELF,b) &&+5 goto(a))", "(at(SELF,b) &&+5 goto(a))");
@@ -473,7 +503,7 @@ public class TemporalTest {
 
 
         //INTERMPOLATION APPLIED DURING REVISION:
-        assertEquals("((a ==>+4 b)-->[pill])", ((BaseConcept)cc).beliefs().match(ETERNAL, null, null, true, null).term().toString());
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(ETERNAL, null, null, true, null).term().toString());
     }
 
     @Test

@@ -15,26 +15,22 @@ public class TemporalTaskCondition extends EternalTaskCondition {
     /**
      * occurrence time (absolute) valid range
      */
-    public final long occStartStart, occStartEnd;
-    private final long occEndStart;
-    private final long occEndEnd;
+    public final long occStart, occEnd;
 
 
     public TemporalTaskCondition(@NotNull NAR n, long cycleStart, long cycleEnd,
-                                 long occStartStart, long occStartEnd,
-                                 long occEndStart, long occEndEnd,
+                                 long occStart,
+                                 long occEnd,
                                  @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax) throws Narsese.NarseseException {
         super(n, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax);
-        this.occStartStart = occStartStart;
-        this.occStartEnd = occStartEnd;
-        this.occEndStart = occEndStart;
-        this.occEndEnd = occEndEnd;
+        this.occStart = occStart;
+        this.occEnd = occEnd;
     }
 
     @NotNull
     @Override
     public String toString() {
-        return super.toString() + " occurrs: (" + occStartStart + ',' + occStartEnd +
+        return super.toString() + " occurrs: (" + occStart + ',' + occEnd +
                 ')';
     }
 
@@ -44,11 +40,11 @@ public class TemporalTaskCondition extends EternalTaskCondition {
 
         if (s == ETERNAL) return false;
 
-        if ((s < occStartStart) || (s > occStartEnd))
+        if (s < occStart)
             return false;
 
         long e = task.end();
-        return ((e >= occEndStart) && (e <= occEndEnd));
+        return (e <= occEnd);
 
 //
 ////                    long at = relativeToCondition ? getCreationTime() : task.getCreationTime();

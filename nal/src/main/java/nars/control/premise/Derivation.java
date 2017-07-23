@@ -20,6 +20,7 @@ import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
+import nars.term.var.Variable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
@@ -431,30 +432,32 @@ public class Derivation extends Unify implements TermContext {
      */
     @Override
     @Nullable
-    public Term transform(@NotNull Term x) {
+    public Term transform(@NotNull Term pattern) {
+
         if (!Param.DERIVATION_TRANSFORM_CACHE) {
-            return super.transform(x); //xy.get(pattern); //fast variable resolution
+            return super.transform(pattern); //xy.get(pattern); //fast variable resolution
         }
 
-        Term y = xy(x);
+        Term y = xy(pattern);
         if (y!=null) {
-            if (y.vars(null) == 0) {
+            if (pattern instanceof Variable || y.vars(null) == 0) {
 //                if (xy.get(y)!=null)
 //                    System.out.println(y + " -> " + xy.get(y));
+
                 return y;
             }
-            x = y;
+            pattern = y;
         }
-        if (x instanceof Atomic) {
+        if (pattern instanceof Atomic) {
 //            if (xy.get(x)!=null)
 //                System.out.println(x + " -> " + xy.get(x));
-            return x;
+            return pattern;
         }
 
 //        if (x.OR(xx -> xx == Null))
 //            return Null;
 
-        Transformation key = Transformation.the((Compound) x, currentMatch);
+        Transformation key = Transformation.the((Compound) pattern, currentMatch);
 
         //avoid recursive update problem on the single thread by splitting the get/put
         Term value = transformsCache.getIfPresent(key);

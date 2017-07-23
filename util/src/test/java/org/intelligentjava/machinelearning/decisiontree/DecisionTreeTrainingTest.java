@@ -6,6 +6,7 @@ import org.intelligentjava.machinelearning.decisiontree.feature.P;
 import org.intelligentjava.machinelearning.decisiontree.label.BooleanLabel;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -265,8 +266,10 @@ public class DecisionTreeTrainingTest {
 
         tr.print();
 
-        assertEquals("[1.0, 0.0]",
-                tr.leaves().collect(toList()).toString());
+        List<DecisionTree.Node.LeafNode<Float>> leavesList = tr.leaves().collect(toList());
+        assertEquals(4, leavesList.size());
+        assertEquals("[1.0, 0.0, 0.0, 1.0]",
+                leavesList.toString());
 
     }
 

@@ -14,6 +14,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Bool;
+import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.*;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
@@ -757,9 +758,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
         boolean negated = (newContent.op() == NEG);
         if (negated) {
-            newContent = compoundOrNull(newContent.unneg());
-            if (newContent == null)
-                return null;
+            newContent = newContent.unneg();
+            if (newContent instanceof Variable || newContent instanceof Bool) return null;
         }
 
         NALTask y = new NALTask(newContent, x.punc(),
@@ -877,9 +877,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
         if (evaluate) {
             Term x = term();
-            Term y = compoundOrNull(
-                    x.eval(n.terms)
-            );
+            Term y = x.eval(n.terms);
 
 
             if (!x.equals(y)) {
@@ -998,9 +996,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             return null;
 
         if (t.op() == NEG) {
-            t = compoundOrNull(t.unneg());
-            if (t == null)
-                return null;
+            t = t.unneg();
+            if (t instanceof Variable || t instanceof Bool) return null;
 
             negated = !negated;
         }
