@@ -44,7 +44,7 @@ public class NarseseBaseTest extends NarseseTest {
         Task t = task("<a --> b>.");
         assertNotNull(t);
         assertEquals(Op.INH, t.op());
-        Compound i = t.term();
+        Term i = t.term();
         assertEquals("a", i.sub(0).toString());
         assertEquals("b", i.sub(1).toString());
         assertEquals('.', t.punc());

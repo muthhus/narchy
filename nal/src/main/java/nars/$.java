@@ -313,17 +313,17 @@ public interface $ {
 //    }
 
     @NotNull
-    public static TaskBuilder belief(@NotNull Compound term, @NotNull Truth copyFrom) {
+    public static TaskBuilder belief(@NotNull Term term, @NotNull Truth copyFrom) {
         return belief(term, copyFrom.freq(), copyFrom.conf());
     }
 
     @NotNull
-    public static TaskBuilder belief(@NotNull Compound term, float freq, float conf) {
+    public static TaskBuilder belief(@NotNull Term term, float freq, float conf) {
         return task(term, BELIEF, freq, conf);
     }
 
     @NotNull
-    public static TaskBuilder goal(@NotNull Compound term, float freq, float conf) {
+    public static TaskBuilder goal(@NotNull Term  term, float freq, float conf) {
         return task(term, GOAL, freq, conf);
     }
 
@@ -333,12 +333,12 @@ public interface $ {
     }
 
     @NotNull
-    public static TaskBuilder task(@NotNull Compound term, byte punct, float freq, float conf) {
+    public static TaskBuilder task(@NotNull Term term, byte punct, float freq, float conf) {
         return task(term, punct, t(freq, conf));
     }
 
     @NotNull
-    public static TaskBuilder task(@NotNull Compound term, byte punct, Truth truth) {
+    public static TaskBuilder task(@NotNull Term term, byte punct, Truth truth) {
         return new TaskBuilder(term, punct, truth);
     }
 

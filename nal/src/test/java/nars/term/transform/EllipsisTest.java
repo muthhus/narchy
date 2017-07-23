@@ -41,8 +41,8 @@ public class EllipsisTest {
     public interface EllipsisTestCase {
         @NotNull
         Compound getPattern();
-        @Nullable
-        Compound getResult() throws Narsese.NarseseException;
+        @NotNull
+        Term getResult() throws Narsese.NarseseException;
         @Nullable
         Compound getMatchable(int arity) throws Narsese.NarseseException;
 
@@ -57,7 +57,7 @@ public class EllipsisTest {
             //no variables in Y
             y.forEach(yy -> assertFalse(yy instanceof Variable));
 
-            Compound r = getResult();
+            Term r = getResult();
             assertTrue(r.isNormalized());
 
             Compound x = getPattern();
@@ -246,11 +246,10 @@ public class EllipsisTest {
 
 
 
-        @NotNull
         @Override
-        public Compound getResult() throws Narsese.NarseseException {
+        public @NotNull Term getResult() throws Narsese.NarseseException {
             final PatternTermIndex pi = new PatternTermIndex();
-            return pi.<Compound>term("<%1 --> (" + ellipsisTerm + ")>").normalize().term();
+            return pi.term("<%1 --> (" + ellipsisTerm + ")>").normalize().term();
         }
 
     }
@@ -279,9 +278,8 @@ public class EllipsisTest {
 
 
 
-        @Nullable
         @Override
-        public Compound getResult() throws Narsese.NarseseException {
+        public @NotNull Term getResult() throws Narsese.NarseseException {
             String s = prefix + "Z, " + ellipsisTerm + suffix;
             Compound c = $(s);
             assertNotNull(s + " produced null compound", c);

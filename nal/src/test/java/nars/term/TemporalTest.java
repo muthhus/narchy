@@ -120,7 +120,7 @@ public class TemporalTest {
         Task b = n.inputAndGet("((x) <-> (y)).");
         n.cycle();
 
-        @NotNull Compound aa = a.term();
+        @NotNull Term aa = a.term();
         assertNotNull(aa);
 
         @Nullable Concept na = a.concept(n, true);
@@ -131,12 +131,12 @@ public class TemporalTest {
 
         assertTrue(na == nc);
 
-        assertTrue(((BaseConcept) na).term(0) == ((BaseConcept) nc).term(0));
+        assertTrue(((BaseConcept) na).sub(0) == ((BaseConcept) nc).sub(0));
 
 //        System.out.println(b.concept(n));
 //        System.out.println(c.concept(n));
 
-        assertTrue(b.concept(n, true).term(0).equals(c.concept(n, true).term(0)));
+        assertTrue(b.concept(n, true).sub(0).equals(c.concept(n, true).sub(0)));
 
     }
 

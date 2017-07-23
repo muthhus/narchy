@@ -90,6 +90,8 @@ public interface Termlike extends Termed {
      *  returns the provided ifOutOfBounds */
     @Nullable <T extends Term> T sub(int i, @Nullable T ifOutOfBounds);
 
+    default <T extends Term> T sub(int i) { return (T)sub(i, Op.Null); }
+
     default boolean impossibleSubTermVolume(int otherTermVolume) {
 //        return otherTermVolume >
 //                volume()

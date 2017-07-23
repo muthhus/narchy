@@ -397,11 +397,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * ask question
      */
-    public Task question(@NotNull Compound c) {
+    public Task question(@NotNull Term c) {
         return que(c, QUESTION);
     }
 
-    public Task quest(@NotNull Compound c) {
+    public Task quest(@NotNull Term c) {
         return que(c, QUEST);
     }
 
@@ -414,52 +414,52 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * desire goal
      */
     @Nullable
-    public Task goal(@NotNull Compound goalTerm, @NotNull Tense tense, float freq, float conf) {
+    public Task goal(@NotNull Term goalTerm, @NotNull Tense tense, float freq, float conf) {
         return goal(
                 priorityDefault(GOAL),
                 goalTerm, time(tense), freq, conf);
     }
 
     @NotNull
-    public NAR believe(@NotNull Compound term, @NotNull Tense tense, float freq, float conf) {
+    public NAR believe(@NotNull Term term, @NotNull Tense tense, float freq, float conf) {
         return believe(term, time(tense), freq, conf);
     }
 
     @NotNull
-    public NAR believe(@NotNull Compound term, @NotNull long when, float freq, float conf) {
+    public NAR believe(@NotNull Term term, @NotNull long when, float freq, float conf) {
         believe(priorityDefault(BELIEF), term, when, freq, conf);
         return this;
     }
 
     @NotNull
-    public NAR believe(@NotNull Compound term, @NotNull Tense tense, float freq) {
+    public NAR believe(@NotNull Term term, @NotNull Tense tense, float freq) {
         return believe(term, tense, freq, confDefault(BELIEF));
     }
 
     @NotNull
-    public NAR believe(@NotNull Compound term, long when, float freq) {
+    public NAR believe(@NotNull Term term, long when, float freq) {
         return believe(term, when, freq, confDefault(BELIEF));
     }
 
     @NotNull
-    public Task goal(@NotNull Compound term, @NotNull Tense tense, float freq) {
+    public Task goal(@NotNull Term term, @NotNull Tense tense, float freq) {
         return goal(term, tense, freq, confDefault(GOAL));
     }
 
 
     @Nullable
-    public Task believe(float priority, @NotNull Compound term, @NotNull Tense tense, float freq, float conf) {
+    public Task believe(float priority, @NotNull Term term, @NotNull Tense tense, float freq, float conf) {
         return believe(priority, term, time(tense), freq, conf);
     }
 
 
     @NotNull
-    public NAR believe(@NotNull Compound term, float freq, float conf) {
+    public NAR believe(@NotNull Term term, float freq, float conf) {
         return believe(term, Tense.Eternal, freq, conf);
     }
 
     @NotNull
-    public Task goal(@NotNull Compound term, float freq, float conf) {
+    public Task goal(@NotNull Term term, float freq, float conf) {
         return goal(term, Tense.Eternal, freq, conf);
     }
 
@@ -507,12 +507,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR believe(@NotNull Compound term) {
+    public NAR believe(@NotNull Term term) {
         return believe(term, true);
     }
 
     @NotNull
-    public NAR believe(@NotNull Compound term, boolean trueOrFalse) {
+    public NAR believe(@NotNull Term term, boolean trueOrFalse) {
         return believe(term, trueOrFalse, confDefault(BELIEF));
     }
 
@@ -527,7 +527,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR believe(@NotNull Compound term, boolean trueOrFalse, float conf) {
+    public NAR believe(@NotNull Term term, boolean trueOrFalse, float conf) {
         return believe(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
@@ -537,13 +537,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @Nullable
-    public Task believe(float pri, @NotNull Compound term, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
+    public Task believe(float pri, @NotNull Term term, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
         return input(pri, term, BELIEF, occurrenceTime, freq, conf);
     }
 
 
     @Nullable
-    public Task goal(float pri, @NotNull Compound goal, long when, float freq, float conf) throws InvalidTaskException {
+    public Task goal(float pri, @NotNull Term goal, long when, float freq, float conf) throws InvalidTaskException {
         return input(pri, goal, GOAL, when, freq, conf);
     }
 
@@ -572,14 +572,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * ¿qué?  que-stion or que-st
      */
-    public Task que(@NotNull Compound term, byte questionOrQuest) {
+    public Task que(@NotNull Term term, byte questionOrQuest) {
         return que(term, questionOrQuest, ETERNAL);
     }
 
     /**
      * ¿qué?  que-stion or que-st
      */
-    public Task que(@NotNull Compound term, byte punc, long when) {
+    public Task que(@NotNull Term term, byte punc, long when) {
 
 
         //TODO use input method like believe uses which avoids creation of redundant Budget instance
@@ -1592,21 +1592,21 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * strongest matching belief for the target time
      */
-    public Task belief(Compound c, long when) {
+    public Task belief(Term c, long when) {
         return match(c, BELIEF, when);
     }
 
     /**
      * strongest matching goal for the target time
      */
-    public final Task goal(Compound c, long when) {
+    public final Task goal(Term  c, long when) {
         return match(c, GOAL, when);
     }
 
     /**
      * punc must be either BELIEF or GOAL
      */
-    public Task match(Compound c, byte punc, long when) {
+    public Task match(Term  c, byte punc, long when) {
         Concept concept = concept(c);
         if (!(concept instanceof TaskConcept))
             return null;

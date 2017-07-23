@@ -3,7 +3,7 @@ package nars.index.term.tree;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import nars.concept.AtomConcept;
+import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -26,7 +26,7 @@ public class TermTreeTest {
 
         TermTree tree = new TermTree();
 
-        Function<Term, Concept> cb = (t)->new AtomConcept((Atom)t, null, null);
+        Function<Term, Concept> cb = (t)->new BaseConcept(t);
 
         tree.computeIfAbsent(TermKey.term($("concept")), cb);
         tree.computeIfAbsent(TermKey.term($("term")), cb);

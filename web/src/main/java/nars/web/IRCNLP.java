@@ -324,7 +324,7 @@ public class IRCNLP extends IRC {
         n.onTask(t -> {
             //if (t.isGoal()) {
             //feedback
-            Compound tt = t.term();
+            Term tt = t.term();
             long start = t.start();
             if (start != ETERNAL) {
                 if (t.isBelief() && t.expectation() > 0.75f) {

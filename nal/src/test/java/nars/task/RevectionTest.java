@@ -171,7 +171,7 @@ public class RevectionTest {
 
             long now = b.nar.time();
 
-            Task tt = n.belief(b.concept(), now);
+            Task tt = n.belief(b.concept().term(), now);
             tops.add(tt);
 
             System.out.println(now + " " +  tt);

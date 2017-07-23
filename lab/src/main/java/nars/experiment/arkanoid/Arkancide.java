@@ -130,7 +130,7 @@ public class Arkancide extends NAgentX {
 //            );
 
             SpaceGraph.window(Vis.beliefCharts(100,
-                    Lists.newArrayList(new Term[]{ab, a, b, c}),
+                    Lists.newArrayList(new Term[]{ab.term(), a.term(), b.term(), c.term()}),
                     nar), 600, 600);
 //            nar.onTask(t -> {
 //                if (t instanceof DerivedTask && t.isGoal()) {

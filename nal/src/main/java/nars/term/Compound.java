@@ -1023,9 +1023,9 @@ public interface Compound extends Term, IPair, TermContainer {
 
         //recursively compute contained subterm functors
         if (u.op() == INH && u.size() == 2) {
-            Term possibleArgs = u.sub(0, null);
+            Term possibleArgs = u.sub(0);
             if (possibleArgs instanceof Compound && possibleArgs.op() == PROD) {
-                Term possibleFunc = u.sub(1, null);
+                Term possibleFunc = u.sub(1);
                 if (possibleFunc instanceof Atomic && possibleFunc.op() == ATOM) {
                     Atomic ff = (Atomic) index.getIfPresentElse(possibleFunc);
                     if (ff instanceof Functor) {

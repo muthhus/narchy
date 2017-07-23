@@ -9,6 +9,7 @@ import nars.concept.TaskConcept;
 import nars.nar.Terminal;
 import nars.task.DerivedTask;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.LongToFloatFunction;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ public class RTreeBeliefTableTest {
 
         assertEquals(0, t.size());
 
-        Compound x = X.term();
+        Term x = X.term();
         Task a = $.belief(x, 1f, 0.9f).time(1).apply(n); a.pri(0.5f);
         t.add(a, X, n);
         assertEquals(1, t.size());

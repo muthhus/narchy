@@ -287,7 +287,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 return concept(
                         x + (rng.nextBoolean() ? -1 : +1),
                         y + (rng.nextBoolean() ? -1 : +1)
-                );
+                ).term();
             }
 
 
