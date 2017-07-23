@@ -286,7 +286,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             TermContainer e = null;
             if (c != null) {
                 if (/*!c.equals(id) && */tc.add(c)) {
-                    if (layersRemain > 0 && c instanceof Compound) {
+                    if (layersRemain > 0) {
                         e = c.templates();
                     }
                 }

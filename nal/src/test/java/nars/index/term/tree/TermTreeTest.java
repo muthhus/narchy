@@ -3,8 +3,6 @@ package nars.index.term.tree;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import nars.concept.BaseConcept;
-import nars.concept.Concept;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

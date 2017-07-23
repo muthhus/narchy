@@ -1,4 +1,4 @@
-package nars.task;
+package nars.io;
 
 import com.google.common.collect.Sets;
 import nars.*;

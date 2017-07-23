@@ -31,7 +31,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
     }
 
     public Functor(@NotNull Atom atom) {
-        super(atom, null, null, ConceptBuilder.Null);
+        super(atom, ConceptBuilder.Null);
     }
 
     public static Atom fName(@NotNull String termAtom) {

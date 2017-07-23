@@ -25,7 +25,7 @@ public interface QuestionTable extends TaskTable {
      */
     //@NotNull QuestionTable Unstored = new EmptyQuestionTable();
 
-    @NotNull QuestionTable Null = new NullQuestionTable();
+    @NotNull QuestionTable Empty = new NullQuestionTable();
 
     class NullQuestionTable implements QuestionTable {
 

@@ -32,31 +32,16 @@ import static nars.conceptualize.state.ConceptState.Deleted;
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
 public class BaseConcept<T extends Term> implements Concept, Termlike {
 
-    //    @Nullable
-//    private QuestionTable questions;
-//    @Nullable
-//    private QuestionTable quests;
-    @NotNull
-    protected final BeliefTable beliefs;
-    @NotNull
-    protected final BeliefTable goals;
-    protected final QuestionTable quests;
-    protected final QuestionTable questions;
-    @NotNull
-    private final Bag<Task,PriReference<Task>> taskLinks;
+    @NotNull public final T term;
+    @NotNull public final BeliefTable beliefs;
+    @NotNull public final BeliefTable goals;
+    @NotNull public final QuestionTable quests;
+    @NotNull public final QuestionTable questions;
+    @NotNull public final Bag<Task,PriReference<Task>> taskLinks;
+    @NotNull public final Bag<Term,PriReference<Term>> termLinks;
+    @NotNull public transient ConceptState state = Deleted;
 
-    @NotNull
-    private final Bag<Term,PriReference<Term>> termLinks;
-
-    @NotNull
-    protected final T term;
-
-
-    private @Nullable Map meta;
-
-    @NotNull
-    protected transient ConceptState state = Deleted;
-
+    @Nullable private Map meta;
 
     /**
      * Constructor, called in Memory.getConcept only
@@ -65,18 +50,22 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
      * @param taskLinks
      */
     public BaseConcept(@NotNull T term,
-                       @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder cb,
-                       @NotNull Bag... bags) {
+                       @NotNull BeliefTable beliefs, @NotNull BeliefTable goals,
+                       @NotNull QuestionTable questions, @NotNull QuestionTable quests,
+                       @NotNull Bag[] bags) {
         this.term = term;
         this.termLinks = bags[0];
         this.taskLinks = bags[1];
-        this.beliefs = beliefs != null ? beliefs : cb.newBeliefTable(term, true);
-        this.goals = goals != null ? goals : cb.newBeliefTable(term, false);
-        this.quests = cb.newQuestionTable();
-        this.questions = cb.newQuestionTable();
+        this.beliefs = beliefs;
+        this.goals = goals;
+        this.questions = questions;
+        this.quests = quests;
         this.state = Deleted;
     }
 
+    public BaseConcept(@NotNull T term, BeliefTable beliefs, BeliefTable goals, ConceptBuilder conceptBuilder) {
+        this(term, beliefs, goals, conceptBuilder.newQuestionTable(), conceptBuilder.newQuestionTable(), conceptBuilder.newLinkBags(term));
+    }
 
 
     public static float valueIfProcessedAt(@NotNull Task t, float activation, long when, NAR n) {
@@ -96,13 +85,13 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
 //    }
 
     @Override
-    public Term term() {
+    public final Term term() {
         //return this;
         return term;
     }
 
     @Override
-    public @NotNull Op op() {
+    public final @NotNull Op op() {
 //        Op t = term.op();
 //        assert(t!=NEG); //HACK
 //        return t;
@@ -141,12 +130,14 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public BaseConcept(@NotNull T term, @NotNull NAR n) {
-        this(term, null, null, (DefaultConceptBuilder) n.conceptBuilder);
+        this(term,  n.conceptBuilder);
     }
 
 
-    BaseConcept(@NotNull T term, @NotNull DefaultConceptBuilder b) {
-        this(term, null, null, b);
+    public BaseConcept(@NotNull T term, @NotNull ConceptBuilder b) {
+        this(term, b.newBeliefTable(term, true), b.newBeliefTable(term, false),
+                b.newQuestionTable(), b.newQuestionTable(),
+                b.newLinkBags(term));
     }
 
     @Override
@@ -183,8 +174,8 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
 
     protected final void beliefCapacity(int be, int bt, int ge, int gt) {
 
-        beliefs().setCapacity(be, bt);
-        goals().setCapacity(ge, gt);
+        beliefs.setCapacity(be, bt);
+        goals.setCapacity(ge, gt);
 
     }
 
@@ -313,8 +304,8 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
         ConceptState current = this.state;
         if (current != p) {
             this.state = p;
-            termlinks().setCapacity(p.linkCap(this, true));
-            tasklinks().setCapacity(p.linkCap(this, false));
+            termLinks.setCapacity(p.linkCap(this, true));
+            taskLinks.setCapacity(p.linkCap(this, false));
 
             int be = p.beliefCap(this, true, true);
             int bt = p.beliefCap(this, true, false);
@@ -323,8 +314,8 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
             int gt = p.beliefCap(this, false, false);
 
             beliefCapacity(be, bt, ge, gt);
-            questions().capacity(p.questionCap(true));
-            quests().capacity(p.questionCap(false));
+            questions.capacity(p.questionCap(true));
+            quests.capacity(p.questionCap(false));
 
         }
         return p;
@@ -367,7 +358,6 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
 
     @Override
     public void print(@NotNull Appendable out, boolean showbeliefs, boolean showgoals, boolean showtermlinks, boolean showtasklinks) {
-        print(out, showbeliefs, showgoals, showtermlinks, showtasklinks);
 
         Consumer<Task> printTask = s -> {
             try {
@@ -451,12 +441,13 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
 
     @Override
     public void delete(@NotNull NAR nar) {
-        delete(nar);
+        termLinks.delete();
+        taskLinks.delete();
         beliefs.clear();
         goals.clear();
         questions.clear();
         quests.clear();
-        //questions = quests = null;
+        meta.clear();
     }
 
     @Override public Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests) {

@@ -64,11 +64,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         }
 
-        @Override
-        public final int capacity() {
-            //throw new UnsupportedOperationException();
-            return 0;
-        }
 
         @Override
         public void setCapacity(int c) {
@@ -92,13 +87,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
     };
 
-    int capacity;
     @Nullable
     private Truth truth;
 
     public EternalTable(int initialCapacity) {
         super();
-        this.capacity = initialCapacity;
+        setCapacity(initialCapacity);
     }
 
     @Override
@@ -112,14 +106,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     }
 
     public void setCapacity(int c) {
-        int wasCapacity = this.capacity;
+        int wasCapacity = this.capacity();
         if (wasCapacity != c) {
 
             synchronized (this) {
-                if (capacity == c)
+                if (capacity() == c)
                     return; //already set
-
-                this.capacity = c;
 
                 int s = size;
 
@@ -127,6 +119,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 while (c < s--) {
                     removeLast().delete();
                 }
+
+                resize(c);
             }
 
         }
@@ -328,10 +322,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         return s != null ? s.truth() : null;
     }
 
-    @Override
-    public int capacity() {
-        return capacity;
-    }
+
 
 //    @Override
 //    public void remove(@NotNull Task belief, List<Task> displ) {

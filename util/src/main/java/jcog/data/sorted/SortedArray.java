@@ -211,11 +211,17 @@ public class SortedArray<E> implements Iterable<E> {
         int s = this.size;
         Object[] l = this.list;
         if (l.length == s) {
-            Object[] newList = newArray(Math.max(l.length, s));
-            System.arraycopy(l, 0, newList, 0, s);
-            this.list = (E[]) (l = newList);
+            int newLen = Math.max(l.length, s);
+            l = resize(newLen);
         }
         l[this.size++] = e;
+    }
+
+    protected Object[] resize(int newLen) {
+        Object[] newList = newArray(newLen);
+        System.arraycopy(list, 0, newList, 0, size);
+        this.list = (E[]) (newList);
+        return list;
     }
 
     public void addInternal(int index, E e) {

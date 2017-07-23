@@ -125,9 +125,9 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
             goals.current = nar.goalTruth(cc, now);
         } else {
             cp = 0;
-            beliefs.set(BeliefTable.EMPTY, now, dur, nar);
+            beliefs.set(BeliefTable.Empty, now, dur, nar);
             beliefs.current = null;
-            goals.set(BeliefTable.EMPTY, now, dur, nar);
+            goals.set(BeliefTable.Empty, now, dur, nar);
             goals.current = null;
         }
 

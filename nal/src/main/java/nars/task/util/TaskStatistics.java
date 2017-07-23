@@ -3,7 +3,6 @@ package nars.task.util;
 import jcog.Util;
 import nars.NAR;
 import nars.Task;
-import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import org.apache.commons.math3.stat.Frequency;
 

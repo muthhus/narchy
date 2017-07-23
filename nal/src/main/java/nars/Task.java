@@ -7,7 +7,6 @@ import jcog.pri.PriReference;
 import nars.concept.Concept;
 import nars.index.term.TermIndex;
 import nars.op.Command;
-import nars.op.mental.AliasConcept;
 import nars.task.*;
 import nars.task.util.AnswerBag;
 import nars.task.util.InvalidTaskException;
@@ -334,12 +333,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     default Concept concept(@NotNull NAR n, boolean conceptualize) {
         Concept c = conceptualize ? n.conceptualize(term()) : n.concept(term());
         if (c!=null) {
-            if (c instanceof AliasConcept) {
-                //dereference alias when being used for a task
-                //TODO warning abbr might deleted, check and if so, re-create and re-link the alias to it
-                return n.concept(((AliasConcept) c).abbr);
-            }
-
             return c;
         }
 

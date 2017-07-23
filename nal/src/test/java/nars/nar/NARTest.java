@@ -156,7 +156,7 @@ public class NARTest {
         Termed a2 = n.term("a");
         assertNotNull(a2);
 
-        Concept ca = n.concept(a2);
+        Concept ca = n.concept(a2, true);
         assertTrue(ca != null);
 
 

@@ -1,4 +1,4 @@
-package nars.concept;
+package nars.table;
 
 import nars.NAR;
 import nars.Narsese;

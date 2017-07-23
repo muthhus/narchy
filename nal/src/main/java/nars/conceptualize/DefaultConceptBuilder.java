@@ -119,10 +119,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
      * for fragmentary concepts which by themselves or due to being un-normalizable,
      * can not be the content of Tasks yet may still exist as concepts
      */
-    private BaseConcept newCompound(@NotNull Compound t
-                                    //Bag<Term, PriReference<Term>> termbag, Bag<Task, PriReference<Task>> taskbag
-    ) {
-        return new BaseConcept(t, null, null, this, newLinkBags(t));
+    private BaseConcept newCompound(@NotNull Compound t) {
+        return new BaseConcept(t, this);
     }
 
     private BaseConcept newTask(@NotNull Compound t) {
@@ -269,7 +267,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
             return new DynamicConcept(t, beliefs, goals, nar);
         } else {
-            return new BaseConcept(t, newBeliefTable(t, true), newBeliefTable(t, false), nar.conceptBuilder);
+            return new BaseConcept(t, this);
         }
     }
 
@@ -334,7 +332,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             } else if (term instanceof Atom) {
 
                 return
-                        new BaseConcept(term, null, null, this);
+                        new BaseConcept(term, this);
 
 //                result = new AtomConcept((Atomic)term,
 //                        new HijackBag<>(32, 2, BudgetMerge.maxBlend, nar.random),

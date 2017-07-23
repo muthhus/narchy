@@ -44,7 +44,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         return taskIterator();
     }
 
-    TemporalBeliefTable EMPTY = new TemporalBeliefTable() {
+    TemporalBeliefTable Empty = new TemporalBeliefTable() {
 
         @Override
         public void add(@NotNull Task t, BaseConcept c, NAR n) {

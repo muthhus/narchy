@@ -1,6 +1,8 @@
-package nars.concept;
+package nars.table;
 
 import nars.*;
+import nars.concept.BaseConcept;
+import nars.concept.Concept;
 import nars.concept.dynamic.DynTruth;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.concept.dynamic.DynamicConcept;

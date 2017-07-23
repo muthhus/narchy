@@ -1,7 +1,6 @@
 package nars.task;
 
 import nars.*;
-import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.nar.Terminal;
 import nars.time.Tense;

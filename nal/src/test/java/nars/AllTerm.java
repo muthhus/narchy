@@ -3,7 +3,7 @@ package nars;
 import junit.ParallelTestRunner;
 import nars.io.NarseseBaseTest;
 import nars.io.NarseseExtendedTest;
-import nars.task.TermIOTest;
+import nars.io.TermIOTest;
 import nars.term.*;
 import nars.term.transform.EllipsisTest;
 import nars.term.transform.TermutatorTest;

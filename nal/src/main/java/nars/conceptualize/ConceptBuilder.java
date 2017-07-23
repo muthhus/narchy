@@ -1,5 +1,6 @@
 package nars.conceptualize;
 
+import jcog.bag.Bag;
 import nars.NAR;
 import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;
@@ -16,13 +17,12 @@ import java.util.function.Function;
  */
 public interface ConceptBuilder extends Function<Term, Termed> {
 
-
-
-
     @NotNull ConceptState init();
     @NotNull ConceptState awake();
     @NotNull ConceptState sleep();
 
+    QuestionTable newQuestionTable();
+    BeliefTable newBeliefTable(Term t, boolean beliefOrGoal);
     TemporalBeliefTable newTemporalBeliefTable(Term c);
 
     void start(NAR nar);
@@ -38,22 +38,17 @@ public interface ConceptBuilder extends Function<Term, Termed> {
 
         @Override
         public @NotNull ConceptState init() {
-            return ConceptState.Deleted;
+            return ConceptState.Abstract;
         }
 
         @Override
         public @NotNull ConceptState awake() {
-            return null;
+            return ConceptState.Abstract;
         }
 
         @Override
         public @NotNull ConceptState sleep() {
-            return null;
-        }
-
-        @Override
-        public TemporalBeliefTable newTemporalBeliefTable(Term c) {
-            return null;
+            return ConceptState.Abstract;
         }
 
         @Override
@@ -62,19 +57,26 @@ public interface ConceptBuilder extends Function<Term, Termed> {
         }
 
         @Override
+        public TemporalBeliefTable newTemporalBeliefTable(Term c) {
+            return TemporalBeliefTable.Empty;
+        }
+
+        @Override
         public BeliefTable newBeliefTable(Term t, boolean beliefOrGoal) {
-            return null;
+            return BeliefTable.Empty;
         }
 
         @Override
         public QuestionTable newQuestionTable() {
-            return null;
+            return QuestionTable.Empty;
         }
 
+        @Override
+        public Bag[] newLinkBags(@NotNull Term term) {
+            return new Bag[] { Bag.EMPTY, Bag.EMPTY };
+        }
     };
 
-    BeliefTable newBeliefTable(Term t, boolean beliefOrGoal);
 
-    QuestionTable newQuestionTable();
-
+    Bag[] newLinkBags(@NotNull Term term);
 }

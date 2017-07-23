@@ -33,8 +33,9 @@ public class NAL1Test extends AbstractNALTest {
     @Test
     public void deduction()  {
 
-        test.
-                believe("<bird --> animal>")
+        test
+                //.log()
+                .believe("<bird --> animal>")
                 /*.en("bird is a type of animal.")
                 .es("bird es un tipo de animal.")
                 .de("bird ist eine art des animal.");*/

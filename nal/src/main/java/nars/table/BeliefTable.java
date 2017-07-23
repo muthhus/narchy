@@ -33,7 +33,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     }
 
     @NotNull
-    BeliefTable EMPTY = new BeliefTable() {
+    BeliefTable Empty = new BeliefTable() {
 
         @Override
         public Stream<Task> stream() {
@@ -62,7 +62,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
         @Override
         public void setCapacity(int eternals, int temporals) {
-            throw new RuntimeException("tried to set capacity on null table impl");
         }
 
         @Override

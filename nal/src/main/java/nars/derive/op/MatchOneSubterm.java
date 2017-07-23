@@ -36,7 +36,7 @@ public final class MatchOneSubterm extends UnificationPrototype {
 
     @Override @NotNull
     protected PrediTerm build(@Nullable PrediTerm eachMatch) {
-        assert(!(finish ? eachMatch == null : eachMatch != null)): "conclusion wrong";
+        assert(finish ? eachMatch != null : eachMatch == null): "conclusion wrong";
         if (!finish) {
             assert(eachMatch == null);
             return new UnifySubterm(subterm, pattern);
