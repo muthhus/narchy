@@ -284,10 +284,10 @@ public class DecisionTree<K, V> {
     }
 
     /** requires V to be Comparable */
-    public SortedMap<V, List<ObjectBooleanPair<Node<V>>>> explanations() {
-        SortedMap<V, List<ObjectBooleanPair<Node<V>>>> explanations = new TreeMap();
+    public SortedMap<Node.LeafNode<V>, List<ObjectBooleanPair<Node<V>>>> explanations() {
+        SortedMap<Node.LeafNode<V>, List<ObjectBooleanPair<Node<V>>>> explanations = new TreeMap();
         explain((path, result) -> {
-            explanations.put(result.label, path);
+            explanations.put(result, new FasterList(path) /* clone it */);
         });
         return explanations;
     }
@@ -435,6 +435,20 @@ public class DecisionTree<K, V> {
             @Override
             public void explain(BiConsumer<List<ObjectBooleanPair<Node<V>>>, LeafNode<V>> c, FasterList<ObjectBooleanPair<Node<V>>> path) {
                 c.accept(path, this);
+            }
+
+            @Override
+            public boolean equals(Object that) {
+                return this==that;
+            }
+
+            @Override
+            public int compareTo(@NotNull Object o) {
+                if (this == o) return 0;
+                if (!(o instanceof LeafNode)) return -1;
+                int x = ((Comparable)label).compareTo( ((LeafNode<V>)o).label );
+                if (x!=0) return x;
+                return Integer.compare(System.identityHashCode(this), System.identityHashCode(o));
             }
 
             @Override

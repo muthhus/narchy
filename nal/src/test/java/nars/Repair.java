@@ -26,7 +26,7 @@ public class Repair {
                 NAL1Test.class,
                 NAL2Test.class,
                 NAL3Test.class,
-                NAL4MultistepTest.class
+                //NAL4MultistepTest.class
                 //AllNAL.class
         };
 
@@ -41,8 +41,8 @@ public class Repair {
         }, testClasses);
 
 
-        for (int subCycles : new int[]{ 0, 1, 2, 4, 6, 8 }) {
-            for (int ttl : new int[]{ 16, 32, 64, 128 }) {
+        for (int subCycles : new int[]{ 2 }) {
+            for (int ttl : new int[]{ 4, 16, 32, 64, 128 }) {
             /*for (int termVol : new int[]{16})*/
                 o.add((x) -> {
 
@@ -70,14 +70,14 @@ public class Repair {
 
         FloatTable<String> table = o.table(
                 "score",
-                "subCycles",
-                "nar.matchTTL.setValue",
+                //"subCycles",
+                "nar.matchTTL.setValue"
                 //"nar.termVolumeMax.setValue(",
-                "concept fire activations",
-                "concept fire premises",
+                //"concept fire activations",
+                //"concept fire premises",
                 //"concept fire premises",
                 //"concept fire activations",
-                "concept count"
+                //"concept count"
                 //"belief count",
                 );
 
@@ -94,7 +94,9 @@ public class Repair {
         System.out.println("MIN=" + MIN);
 
 
-        tree.explanations().forEach((k,v) -> System.out.println(v + " " + k));
+        tree.explanations().forEach((k,v) -> System.out.println(k + " " +
+                v.toString()
+        ));
 
 
 

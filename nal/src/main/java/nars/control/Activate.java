@@ -110,8 +110,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             return null;
         }
 
-        List<PriReference<Task>> taskl = $.newArrayList(TASKLINKS_SAMPLED);
-        tasklinks.sample(TASKLINKS_SAMPLED, ((Consumer<PriReference<Task>>) taskl::add));
+        int talSampled = Math.min(tasklinks.size(), TERMLINKS_SAMPLED);
+        List<PriReference<Task>> taskl = $.newArrayList(talSampled);
+        tasklinks.sample(talSampled, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
             return null;
@@ -167,8 +168,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         if (termlinks.isEmpty()) {
             terml = Collections.emptyList();
         } else {
-            terml = $.newArrayList(TERMLINKS_SAMPLED);
-            termlinks.sample(TERMLINKS_SAMPLED, ((Consumer<PriReference<Term>>) terml::add));
+            int tlSampled = Math.min(termlinks.size(), TERMLINKS_SAMPLED);
+            terml = $.newArrayList(tlSampled);
+            termlinks.sample(tlSampled, ((Consumer<PriReference<Term>>) terml::add));
         }
 
         for (int i = 0, tasklSize = taskl.size(); i < tasklSize; i++) {

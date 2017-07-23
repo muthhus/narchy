@@ -13,6 +13,7 @@ import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
+import jcog.util.IterableThreadLocal;
 import nars.Narsese.NarseseException;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
@@ -112,9 +113,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
 
     /** scoped to this NAR so it can be reset by it */
-    final ThreadLocal<Derivation> derivation =
-            //new IterableThreadLocal<Derivation>(()->new Derivation(this));
-            ThreadLocal.withInitial(()->new Derivation(this));
+    final IterableThreadLocal<Derivation> derivation =
+            new IterableThreadLocal<Derivation>(()->new Derivation(this));
+            //ThreadLocal.withInitial(()->new Derivation(this));
 
 
     @NotNull
@@ -938,6 +939,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         clear();
 
         exe.stop();
+
+        derivation.forEach(c -> c.transformsCache.invalidateAll());
 
     }
 
