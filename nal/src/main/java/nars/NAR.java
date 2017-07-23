@@ -363,7 +363,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public <T extends Term> T term(@NotNull byte[] code) throws NarseseException {
-        return (T) IO.termFromBytes(code, terms);
+        return (T) IO.termFromBytes(code);
     }
 
 
@@ -1244,7 +1244,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     /** tasks in concepts */
     @NotNull public Stream<Task> tasks(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
-        return taskConcepts().flatMap(c -> c.tasks(includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests));
+        return concepts().flatMap(c -> c.tasks(includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests));
     }
     @NotNull public Stream<Task> tasks() {
         return tasks(true,true,true,true);
@@ -1310,9 +1310,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return terms.stream().filter(t -> t instanceof Concept).map(t -> (Concept)t);
     }
 
-    public Stream<BaseConcept> taskConcepts() {
-        return terms.stream().filter(t -> t instanceof BaseConcept).map(t -> (BaseConcept)t);
-    }
 
     @NotNull
     public NAR forEachConcept(@NotNull Consumer<Concept> recip) {
@@ -1506,7 +1503,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                     try {
 
                         //HACK temporary until this is debugged
-                        Task xx = IO.taskFromBytes(b, terms);
+                        Task xx = IO.taskFromBytes(b);
                         if (xx == null || !xx.equals(x)) {
                             //this can happen if a subterm is decompressed only to discover that it contradicts another part of the compound it belongs within
                             //logger.error("task serialization problem: {} != {}", _x, xx);
@@ -1562,7 +1559,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         int count = 0;
 
         while ((i.available() > 0) || (i.available() > 0) || (ii.available() > 0)) {
-            Task t = IO.readTask(ii, terms);
+            Task t = IO.readTask(ii);
             input(t);
             count++;
         }

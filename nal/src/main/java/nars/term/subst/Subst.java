@@ -36,7 +36,7 @@ public interface Subst  {
     /** copy in
      * @return whether all puts were successful
      * */
-    boolean put(@NotNull Unify copied);
+    //boolean put(@NotNull Unify copied);
 
 
     @Nullable default Term transform(@NotNull Term x) {

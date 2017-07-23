@@ -404,7 +404,7 @@ public class NAL6Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("(&&,<#1 --> lock>,<<$2 --> key> ==> open($2, #1)>)", 1.00f, 0.90f); //en("there is a lock which is opened by all keys");
         tester.believe("<{key1} --> key>", 1.00f, 0.90f); //en("key1 is a key");
-        tester.mustBelieve(cycles*2, "(&&,<#1 --> lock>,open({key1}, #1))", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
+        tester.mustBelieve(cycles, "(&&,<#1 --> lock>,open({key1}, #1))", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
     }
     @Test
     public void second_level_variable_unification_neg()  {

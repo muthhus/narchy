@@ -365,8 +365,9 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         int cap = capacity();
         if (cap == 0) {
-            if (input.isInput())
-                throw new RuntimeException("input task rejected (0 capacity): " + input);
+            //may be deleted already
+            /*if (input.isInput())
+                throw new RuntimeException("input task rejected (0 capacity): " + input + " "+ this + " " + this.capacity());*/
             return;
         }
 

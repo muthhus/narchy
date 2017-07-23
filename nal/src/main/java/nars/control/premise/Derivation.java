@@ -154,7 +154,7 @@ public class Derivation extends Unify implements TermContext {
 
         Caffeine cb = Caffeine.newBuilder().executor(nar.exe);
             //.executor(MoreExecutors.directExecutor());
-        int cs = Param.DERIVATION_THREAD_TRANSFORM_CACHE_SIZE;
+        int cs = Param.DERIVATION_TRANSFORM_CACHE_SIZE_PER_THREAD;
         if (cs == -1)
             cb.softValues();
         else
@@ -429,7 +429,8 @@ public class Derivation extends Unify implements TermContext {
     @Override
     @Nullable
     public Term transform(@NotNull Term pattern) {
-        if (!(pattern instanceof Compound) || pattern.vars(type) == 0 || pattern.size() == 0) {
+
+        if (!Param.DERIVATION_TRANSFORM_CACHE || !(pattern instanceof Compound) || pattern.vars(type) == 0 || pattern.size() == 0) {
             //return super.transform(pattern);
             return super.transform(pattern); //xy.get(pattern); //fast variable resolution
         }

@@ -46,7 +46,7 @@ public final class Conclude extends ProxyCompound implements Function<NAR,Conclu
         Term pp = pattern;
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
-        Pair<Atom, Compound> outerFunctor = Op.functor(pp, $.terms, true);
+        Pair<Atom, Compound> outerFunctor = Op.functor(pp, $.terms, false);
         if (outerFunctor != null && outerFunctor.getOne().toString().equals("varIntro")) {
             varIntro = true;
             pp = outerFunctor.getTwo().sub(0);

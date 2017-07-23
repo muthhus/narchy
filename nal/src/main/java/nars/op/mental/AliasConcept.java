@@ -75,7 +75,7 @@ public final class AliasConcept extends BaseConcept {
     @NotNull
     public final Compound abbr;
 
-    static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar) {
+    @NotNull static public AliasConcept get(@NotNull String compressed, @NotNull Compound decompressed, @NotNull NAR nar) {
         AliasConcept a = new AliasConcept(compressed, decompressed, nar);
         return a;
     }

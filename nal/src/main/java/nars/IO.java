@@ -72,10 +72,10 @@ public class IO {
 
 
     @NotNull
-    public static NALTask readTask(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    public static NALTask readTask(@NotNull DataInput in) throws IOException {
 
 
-        Compound preterm = compoundOrNull(readTerm(in, t));
+        Compound preterm = compoundOrNull(readTerm(in));
         if (preterm == null)
             throw new IOException("invalid task term");
 
@@ -202,12 +202,12 @@ public class IO {
 
 
     @NotNull
-    public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    public static Atomic readVariable(@NotNull DataInput in, @NotNull Op o) throws IOException {
         return $.v(o, in.readInt());
     }
 
     @NotNull
-    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o) throws IOException {
 
         switch (o) {
 
@@ -215,11 +215,7 @@ public class IO {
 
                 String s = in.readUTF();
                 Atomic a = Atomic.the(s);
-                Atomic aa = (Atomic) t.get(a);
-                if (aa != null)
-                    return aa; //the concept, if exists
-                else
-                    return a; //just the term
+                return a;
             }
 
             default:
@@ -240,26 +236,26 @@ public class IO {
      * called by readTerm after determining the op type
      */
     @NotNull
-    public static Term readTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    public static Term readTerm(@NotNull DataInput in) throws IOException {
 
         byte ob = in.readByte();
         if (ob == SPECIAL_OP)
-            return readSpecialTerm(in, t);
+            return readSpecialTerm(in);
 
         Op o = Op.values()[ob];
         if (o.var)
-            return readVariable(in, o, t);
+            return readVariable(in, o);
         else if (o.atomic)
-            return readAtomic(in, o, t);
+            return readAtomic(in, o);
         else
-            return readCompound(in, o, t);
+            return readCompound(in, o);
     }
 
     public
     @Nullable
-    static Term readSpecialTerm(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    static Term readSpecialTerm(@NotNull DataInput in) throws IOException {
         try {
-            return t.termRaw(in.readUTF());
+            return $.terms.termRaw(in.readUTF());
         } catch (Narsese.NarseseException e) {
             throw new IOException(e);
         }
@@ -299,14 +295,14 @@ public class IO {
 
 
     @NotNull
-    public static Term[] readTermContainer(@NotNull DataInput in, @NotNull TermIndex t) throws IOException {
+    public static Term[] readTermContainer(@NotNull DataInput in) throws IOException {
         int siz = in.readByte();
 
         assert (siz < Param.COMPOUND_SUBTERMS_MAX);
 
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
-            Term read = (s[i] = readTerm(in, t));
+            Term read = (s[i] = readTerm(in));
             if (read == null || bool(read))
                 throw new InvalidTermException(Op.PROD /* consider the termvector as a product */, s, "invalid");
         }
@@ -319,9 +315,9 @@ public class IO {
      * TODO make a version which reads directlyinto TermIndex
      */
     @NotNull
-    static Term readCompound(@NotNull DataInput in, @NotNull Op o, @NotNull TermIndex t) throws IOException {
+    static Term readCompound(@NotNull DataInput in, @NotNull Op o) throws IOException {
 
-        Term[] v = readTermContainer(in, t);
+        Term[] v = readTermContainer(in);
 
         int dt;
 
@@ -424,9 +420,9 @@ public class IO {
      * WARNING
      */
     @Nullable
-    public static Task taskFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
+    public static Task taskFromBytes(@NotNull byte[] b) {
         try {
-            return IO.readTask(input(b), index);
+            return IO.readTask(input(b));
         } catch (IOException e) {
             e.printStackTrace();
             return null;
@@ -439,9 +435,9 @@ public class IO {
      * WARNING
      */
     @Nullable
-    public static Term termFromBytes(@NotNull byte[] b, @NotNull TermIndex index) {
+    public static Term termFromBytes(@NotNull byte[] b) {
         try {
-            return IO.readTerm(input(b), index);
+            return IO.readTerm(input(b));
         } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (InvalidTermException f) {

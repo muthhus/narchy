@@ -90,15 +90,15 @@ public final class CommonVariable extends GenericNormalizedVariable {
 
     }
 
-    public boolean common(@NotNull Term y) {
-        int h = y.hashCode();
+    public boolean common(@NotNull AbstractVariable y) {
+        int yid = y.id;
 
         int v1 = (hash & 0xff) - 1; //unhash
-        if (v1 == h)
+        if (v1 == yid)
             return true;
 
         int v2 = ((hash >> 8) & 0xff) - 1; //unhash
-        return v2 == h;
+        return v2 == yid;
 
     }
 

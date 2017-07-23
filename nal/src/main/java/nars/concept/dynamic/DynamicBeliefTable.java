@@ -22,21 +22,6 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     private final boolean beliefOrGoal;
     private final Compound term;
 
-    //static final boolean rejectDerivations = false;
-
-    @Override
-    public void add(@NotNull Task input, @NotNull BaseConcept concept, @NotNull NAR nar) {
-        if (!input.isInput()) {
-            Activate.activate(input,
-                    input.priElseZero() * 0.5f /* since it isnt being stored, we simulate the effect of the task already being present which would otherwise reduce the activation fired */, concept, nar); //activate only; dont process
-            return;
-        }
-//        if (input instanceof AnswerTask) {
-//            return; //dont insert its own dynamic belief task, causing a feedback loop
-//        }
-
-        super.add(input, concept, nar);
-    }
 
     public DynamicBeliefTable(Compound c, TemporalBeliefTable t, DynamicTruthModel model, boolean beliefOrGoal) {
         super(t);

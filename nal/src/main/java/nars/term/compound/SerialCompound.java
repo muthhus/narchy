@@ -3,11 +3,9 @@ package nars.term.compound;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.primitives.Ints;
 import jcog.byt.DynBytes;
-import nars.$;
 import nars.IO;
 import nars.Op;
 import nars.Param;
-import nars.index.term.TermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
@@ -64,12 +62,9 @@ public class SerialCompound extends DynBytes implements Compound {
 
     }
 
-    public Compound build() {
-        return build($.terms);
-    }
 
-    public Compound build(TermIndex index) {
-        return (Compound) IO.termFromBytes(bytes, index);
+    public Compound build() {
+        return (Compound) IO.termFromBytes(bytes);
     }
 
     @Override

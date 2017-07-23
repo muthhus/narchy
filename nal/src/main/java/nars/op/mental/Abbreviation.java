@@ -66,7 +66,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(
-                new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), n.random(), capacity
+                new CurveBag(PriMerge.plus, new ConcurrentHashMap<>(capacity), n.random(), capacity
         ), selectionRate, n);
 
         this.nar = n;
@@ -86,7 +86,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
         if (task.meta(Abbreviation.class)!=null)
             return;
 
-        Priority b = task.priority().clonePri();
+        Priority b = task;
         if (b != null)
             input(b, each, (Compound)task.term(), 1f);
     }
@@ -193,6 +193,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
                     Concept alias = aliasConcept ?
                             nar.on(ac) : null;
 
+
                     nar.terms.set(abbreviated, ac); //set the abbreviated term to resolve to the abbreviation
 
                     Termed aliasTerm = alias != null ? alias : Atomic.the(id);
@@ -210,7 +211,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
                     abbreviationTask.meta(Abbreviation.class, new Term[] { abbreviatedTerm, aliasTerm.term() });
                     abbreviationTask.log("Abbreviate"); //, abbreviatedTerm, aliasTerm
                     abbreviationTask.priority().setPri(b);
-                    abbreviationTask.priority();
+                    //abbreviationTask.priority();
 //        if (srcCopy == null) {
 //            delete();
 //        } else {

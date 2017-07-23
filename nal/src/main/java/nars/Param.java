@@ -19,6 +19,7 @@ import static nars.Op.*;
 public abstract class Param  {
 
 
+
     /**
      * use this for advanced error checking, at the expense of lower performance.
      * it is enabled for unit tests automatically regardless of the value here.
@@ -32,12 +33,13 @@ public abstract class Param  {
 //    public static final int PREDICTION_HORIZON = 4;
 
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
-    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 2;
+    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 1;
 
-    public static final PriMerge termlinkMerge = PriMerge.max;
-    public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
+    public static final PriMerge termlinkMerge = PriMerge.or;
+    public static final PriMerge tasklinkMerge = PriMerge.or; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptMerge = PriMerge.plus;
+    public static final PriMerge premiseMerge = PriMerge.max;
 
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
@@ -111,8 +113,10 @@ public abstract class Param  {
     public static boolean ANSWER_REPORTING = true;
 
 
+    public static final boolean DERIVATION_TRANSFORM_CACHE = true;
+
     /** -1 for softref */
-    public static final int DERIVATION_THREAD_TRANSFORM_CACHE_SIZE =
+    public static final int DERIVATION_TRANSFORM_CACHE_SIZE_PER_THREAD =
             //-1; //softref
             32 * 1024;
 

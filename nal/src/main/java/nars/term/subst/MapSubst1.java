@@ -39,8 +39,8 @@ public class MapSubst1 implements Subst {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean put(@NotNull Unify copied) {
-        throw new UnsupportedOperationException();
-    }
+//    @Override
+//    public boolean put(@NotNull Unify copied) {
+//        throw new UnsupportedOperationException();
+//    }
 }

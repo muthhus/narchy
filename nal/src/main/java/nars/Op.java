@@ -34,6 +34,7 @@ import static java.util.Arrays.copyOfRange;
 import static nars.derive.match.Ellipsis.firstEllipsis;
 import static nars.term.Terms.flatten;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
@@ -369,6 +370,9 @@ public enum Op implements $ {
             Op xo = x.op();
             if (xo != CONJ || !x.hasAny(IMPL))
                 return x; //fall-through
+            int dt = x.dt();
+            if (dt==DTERNAL || dt==XTERNAL)
+                return x; //dont apply to eternal or xternal, only temporal
 
 
             //if there is only one implication subterm (first layer only), then fold into that.

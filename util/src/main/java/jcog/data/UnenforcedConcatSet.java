@@ -37,7 +37,7 @@ public class UnenforcedConcatSet<X> extends AbstractSet<X> {
 
     @Override
     public boolean contains(Object o) {
-        throw new UnsupportedOperationException();
+        return a.contains(o) || b.contains(o);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class UnenforcedConcatSet<X> extends AbstractSet<X> {
 
 
     /** if a or b are null, they are considered empty sets */
-    @NotNull public static <X> Set<X> the(@Nullable Set<X> a, @Nullable Set<X> b) {
+    @NotNull public static <X> Set<X> concat(@Nullable Set<X> a, @Nullable Set<X> b) {
         Set<X> nextFree;
         boolean aEmpty = a == null || a.isEmpty();
         boolean bEmpty = b == null || b.isEmpty();

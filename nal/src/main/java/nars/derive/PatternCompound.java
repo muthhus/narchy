@@ -451,7 +451,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                 case 1:
                     Term theFreeX = xFree.first();
                     if (yFree.size() == 1)
-                        return subst.putXY(theFreeX, yFree.first());
+                        return subst.putXY(ellipsis, yFree.first());
                     else {
                         @Nullable Term theFreeXassigned = subst.xy(theFreeX);
                         if (theFreeXassigned!=null) {

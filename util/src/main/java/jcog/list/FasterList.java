@@ -331,10 +331,12 @@ public class FasterList<X> extends FastList<X> {
 
     @Override
     public final void forEach(Consumer c) {
-        for (Object j : items) {
-            if (j == null)
-                break; //end of list
-            c.accept(j);
+        int s = size;
+        X[] ii = items;
+        for (int i = 0; i < s; i++) {
+            X j = ii[i];
+            if (j != null)
+                c.accept(j);
         }
     }
 

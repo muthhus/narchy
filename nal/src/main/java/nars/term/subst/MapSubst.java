@@ -45,11 +45,11 @@ public class MapSubst implements Subst {
 //        if (xy.isEmpty()) return;
 //        xy.forEach(each);
 //    }
-
-    @Override
-    public boolean put(@NotNull Unify copied) {
-        throw new UnsupportedOperationException("TODO");
-    }
+//
+//    @Override
+//    public boolean put(@NotNull Unify copied) {
+//        throw new UnsupportedOperationException("TODO");
+//    }
 
     @NotNull
     @Override

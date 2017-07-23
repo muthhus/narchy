@@ -63,8 +63,11 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
         this.state = Deleted;
     }
 
-    public BaseConcept(@NotNull T term, BeliefTable beliefs, BeliefTable goals, ConceptBuilder conceptBuilder) {
-        this(term, beliefs, goals, conceptBuilder.newQuestionTable(), conceptBuilder.newQuestionTable(), conceptBuilder.newLinkBags(term));
+    public BaseConcept(@NotNull T term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
+        this(term,
+                beliefs!=null ? beliefs : conceptBuilder.newBeliefTable(term, true),
+                goals!=null ? goals : conceptBuilder.newBeliefTable(term, false),
+                conceptBuilder.newQuestionTable(), conceptBuilder.newQuestionTable(), conceptBuilder.newLinkBags(term));
     }
 
 
@@ -447,7 +450,8 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
         goals.clear();
         questions.clear();
         quests.clear();
-        meta.clear();
+        if(meta!=null)
+            meta.clear();
     }
 
     @Override public Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests) {

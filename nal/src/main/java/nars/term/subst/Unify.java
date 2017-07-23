@@ -1,7 +1,6 @@
 package nars.term.subst;
 
 import jcog.Util;
-import jcog.data.UnenforcedConcatSet;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
@@ -13,6 +12,7 @@ import nars.index.term.NewCompound;
 import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.mutate.Termutator;
+import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+import static jcog.data.UnenforcedConcatSet.concat;
 import static nars.Op.Null;
 import static nars.Param.TTL_UNIFY;
 
@@ -116,8 +117,8 @@ public abstract class Unify extends Versioning implements Subst {
     /**
      * called each time all variables are satisfied in a unique way
      *
-     * @return whether to continue on any subsequent matches
      * @param match [variables][2] where index 0 = key, index 1 = value
+     * @return whether to continue on any subsequent matches
      */
     public abstract void onMatch(Term[][] match);
 
@@ -176,7 +177,7 @@ public abstract class Unify extends Versioning implements Subst {
     Set<Term> freeVariables(@NotNull Term x) {
         Set<Term> prevFree = free.get();
         Set<Term> nextFree = prevFree != null ? x.varsUnique(type, prevFree) : x.varsUnique(type);
-        return UnenforcedConcatSet.the(prevFree, nextFree);
+        return concat(prevFree, nextFree);
     }
 
 
@@ -232,7 +233,7 @@ public abstract class Unify extends Versioning implements Subst {
             Term y = xy(x);
             if (y == null)
                 return;
-            match[m++] = new Term[] { x, y };
+            match[m++] = new Term[]{x, y};
         }
         Arrays.sort(match, matchElementComparator); //sort by key
 
@@ -250,11 +251,6 @@ public abstract class Unify extends Versioning implements Subst {
     @Override
     public String toString() {
         return xy + "@" + versioning.ttl;
-    }
-
-    @Override
-    public boolean put(@NotNull Unify m) {
-        return m.xy.forEachVersioned(this::putXY);
     }
 
 
@@ -287,6 +283,21 @@ public abstract class Unify extends Versioning implements Subst {
 
 
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
+
+        if (x instanceof CommonVariable) {
+            if (y instanceof CommonVariable)
+                return false; //TODO support merging common variables
+
+            if (((CommonVariable) x).common((AbstractVariable)y))
+                return true;
+        }
+
+        if (y instanceof CommonVariable) {
+            if (((CommonVariable) y).common((AbstractVariable)x))
+                return true;
+        }
+
+
         @NotNull Term common = CommonVariable.common((Variable) x, (Variable) y);
         return (putXY(x, common) && putXY(y, common)
                 //&& putYX(y, common) //&& putYX(x,common)
@@ -302,12 +313,33 @@ public abstract class Unify extends Versioning implements Subst {
     /**
      * returns true if the assignment was allowed, false otherwise
      */
-    public final boolean putXY(@NotNull Term x /* usually a Variable */, @NotNull Term y /* value */) {
-        Term x2 = xy(x);
-        if (x2 != null) {
-            return unify(x2, y);
+    public final boolean putXY(@NotNull Term x0, @NotNull Term y) {
+        Term x = xy(x0);
+        if (x != null) {
+            return unify(x, y);
         } else {
-            return xy.tryPut(x, y);
+            x = x0;
+
+            if (x instanceof Variable && x.op() == y.op()) {
+
+                //TODO check if this is already a common variable containing y
+                return putCommon((Variable) x, (Variable) y);
+            } /*else {
+                //TODO to prevent certain variables from being assigned to other ones?
+            }*/
+
+
+            if (xy.tryPut(x, y)) {
+                if (!matchType(x)) {
+                    //add to free variables to be included in transformation
+                    Set<Term> knownFree = free.get();
+                    if (!knownFree.contains(x))
+                        free.set(concat(knownFree, Set.of(x)));
+                }
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 

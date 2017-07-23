@@ -917,6 +917,13 @@ public class TermReductionsTest extends NarseseTest {
         );
     }
 
+    /** should not apply this reduction to eternal */
+    @Test public void testConjImplReduction0() throws Narsese.NarseseException {
+        assertEquals(
+                "(inside(bob,office)&&(inside(john,playground)==>inside(bob,kitchen)))",
+                $("(inside(bob,office) && (inside(john,playground)==>inside(bob,kitchen)))").toString()
+        );
+    }
 
     @Test
     public void testConjImplReduction1() throws Narsese.NarseseException {

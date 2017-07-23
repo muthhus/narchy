@@ -7,7 +7,7 @@ import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * (recursive)
+ * true if the terms have any non-variable in common
  */
 public final class CommonSubtermConstraint extends CommonalityConstraint {
 

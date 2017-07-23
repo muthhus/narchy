@@ -35,7 +35,7 @@ public class FocusedExecutioner extends Executioner {
 
     final Random random = new XorShift128PlusRandom(1);
 
-    final CurveBag<ITask> premises = new CurveBag<ITask>(Param.taskMerge /* TODO make separate premise merge param */,
+    final CurveBag<ITask> premises = new CurveBag<ITask>(Param.premiseMerge /* TODO make separate premise merge param */,
             new ConcurrentHashMap<>(), random, MAX_PREMISES);
 
     final CurveBag<ITask> tasks = new CurveBag<ITask>(Param.taskMerge, new ConcurrentHashMap<>(),
@@ -44,10 +44,10 @@ public class FocusedExecutioner extends Executioner {
     public final CurveBag<ITask> concepts = new CurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(),
             random, MAX_CONCEPTS);
 
-    int subCycles = 2;
-    int subCycleTasks = 16;
-    int subCycleConcepts = 4;
-    int subCyclePremises = 8;
+    int subCycles = 8;
+    int subCycleConcepts = 1;
+    int subCycleTasks = 32;
+    int subCyclePremises = 1;
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
 
@@ -81,6 +81,11 @@ public class FocusedExecutioner extends Executioner {
             //if (tasks.capacity() <= tasks.size())
 
             final int[] maxTasks = {subCycleTasks};
+
+//            System.out.println(nar.time());
+//            tasks.print();
+//            System.out.println();
+
             tasks.sample((x) -> {
                 NALTask tt = (NALTask) x;
                 next.add(tt);
@@ -92,6 +97,7 @@ public class FocusedExecutioner extends Executioner {
             });
 
             execute(next);
+
 
             concepts.sample(subCycleConcepts, (Predicate<ITask>)(next::add));
 
@@ -112,6 +118,8 @@ public class FocusedExecutioner extends Executioner {
 
     protected void execute(ITask x) {
         try {
+            if (x.isDeleted())
+                return;
             x.run(nar);
         } catch (Throwable e) {
             if (Param.DEBUG) {

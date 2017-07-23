@@ -52,9 +52,9 @@ public class TermIOTest {
 
         Object copy;
         if (orig instanceof Task)
-            copy = IO.taskFromBytes(barray, nar.terms);
+            copy = IO.taskFromBytes(barray);
         else if (orig instanceof Term)
-            copy = IO.termFromBytes(barray, nar.terms);
+            copy = IO.termFromBytes(barray);
         else
             throw new RuntimeException("");
 

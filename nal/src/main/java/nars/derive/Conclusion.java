@@ -12,6 +12,7 @@ import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Bool;
 import nars.time.Tense;
 import nars.time.TimeFunctions;
 import nars.truth.Truth;
@@ -175,11 +176,14 @@ public class Conclusion extends AbstractPred<Derivation> {
         }
 
         if (varIntro) {
-            Term Cv = normalizedOrNull(DepIndepVarIntroduction.varIntro(c2, nar), d.terms,
+            Term cu = DepIndepVarIntroduction.varIntro(c2, nar);
+            if (cu instanceof Bool || (cu.equals(c2) /* keep only if it differs */))
+                return true;
+
+            Term Cv = normalizedOrNull(cu, d.terms,
                     d.temporal ? d.terms.retemporalizationZero : d.terms.retemporalizationDTERNAL //select between eternal and parallel depending on the premises's temporality
             );
-
-            if (Cv == null || Cv.equals(c2) /* keep only if it differs */)
+            if (Cv == null)
                 return true;
 
             c2 = Cv;

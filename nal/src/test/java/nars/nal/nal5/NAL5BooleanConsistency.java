@@ -3,6 +3,7 @@ package nars.nal.nal5;
 import nars.*;
 import nars.concept.Concept;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -62,7 +63,7 @@ public class NAL5BooleanConsistency {
                     String s = outcomes[k];
                     Concept dc = d.conceptualize(s);
                     assertNotNull(dc);
-                    @Nullable Task t = d.belief((Compound)dc, d.time());
+                    @Nullable Task t = d.belief(dc.term(), d.time());
                     Truth b = t!=null ? t.truth() : null;
 
                     System.out.println("\t" + s + "\t" + b);
