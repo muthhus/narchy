@@ -84,7 +84,7 @@ public abstract class Param  {
      * be balanced by a future positive value (ie. on concept processing) */
     public static float valueAtInput(Task accepted, NAR nar) {
         int vol = accepted.volume();
-        return -(vol)/nar.termVolumeMax.floatValue()/1000f;
+        return -(vol)/nar.termVolumeMax.floatValue()/500f;
     }
 
 

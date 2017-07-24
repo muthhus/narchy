@@ -1,6 +1,7 @@
 package nars.nar.exe;
 
 import jcog.bag.Bag;
+import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
 import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
@@ -35,18 +36,18 @@ public class FocusedExecutioner extends Executioner {
     int subCyclePremises = 6;
 
     final int MAX_PREMISES = 16;
-    final int MAX_TASKS = 64;
-    final int MAX_CONCEPTS = 16;
+    final int MAX_TASKS = 32;
+    final int MAX_CONCEPTS = 32;
 
     final Random random = new XorShift128PlusRandom(1);
 
     final CurveBag<ITask> premises = new CurveBag<ITask>(Param.premiseMerge /* TODO make separate premise merge param */,
             new ConcurrentHashMap<>(), random, MAX_PREMISES);
 
-    final CurveBag<ITask> tasks = new CurveBag<ITask>(Param.taskMerge, new ConcurrentHashMap<>(),
+    final CurveBag<ITask> tasks = new ConcurrentCurveBag<ITask>(Param.taskMerge, new ConcurrentHashMap<>(),
             random, MAX_TASKS);
 
-    public final CurveBag<ITask> concepts = new CurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(),
+    public final CurveBag<ITask> concepts = new ConcurrentCurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(),
             random, MAX_CONCEPTS);
 
 

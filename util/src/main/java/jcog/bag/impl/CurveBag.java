@@ -1,11 +1,14 @@
 package jcog.bag.impl;
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import jcog.pri.Prioritized;
+import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
+import jcog.util.QueueLock;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -28,7 +31,6 @@ public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
         super(mergeFunction, map);
         this.random = rng;
     }
-
 
     @Override
     protected int sampleStart(int size) {

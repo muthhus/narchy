@@ -143,7 +143,7 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 8f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 8);
         Inperience inp = new Inperience(n, 0.01f, 8);
-        Abbreviation abb = new Abbreviation(n, "z", 4, 12, 2f, 32);
+        Abbreviation abb = new Abbreviation(n, "z", 4, 12, 1f, 32);
 
 
 

@@ -2,6 +2,7 @@ package jcog.util;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -15,20 +16,23 @@ public class QueueLock<X> implements Consumer<X> {
 
     //public final Lock lock;
     public final AtomicBoolean busy;
-    public final BlockingQueue<X> queue;
+    public final Queue<X> queue;
     private final Consumer<X> proc;
 
     final static int concurrency = Runtime.getRuntime().availableProcessors();
 
     public QueueLock(Consumer<X> procedure) {
-        this(concurrency*2, procedure);
+        this(new LinkedBlockingQueue(), procedure);
     }
 
-    public QueueLock(int capacity, Consumer<X> procedure) {
-        queue = //new EvictingQueue<>(capacity);
-                //new DisruptorBlockingQueue<>(capacity);
-                new LinkedBlockingQueue();
-                //new ArrayBlockingQueue<X>(capacity);
+    /*
+    //new EvictingQueue<>(capacity);
+    //new DisruptorBlockingQueue<>(capacity);
+    //new ArrayBlockingQueue<X>(capacity);
+    //new LinkedBlockingQueue
+     */
+    public QueueLock(Queue<X> queue, Consumer<X> procedure) {
+        this.queue = queue;
 
         //this.lock = lock;
         this.busy = new AtomicBoolean(false);
