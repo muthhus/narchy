@@ -1593,11 +1593,11 @@ public enum Util {
     /**
      * msgpack deserialization
      */
-    public static <X> X fromBytes(byte[] msgPacked, Class<? extends X> type) throws IOException, com.fasterxml.jackson.core.JsonParseException, com.fasterxml.jackson.databind.JsonMappingException {
+    public static <X> X fromBytes(byte[] msgPacked, Class<? extends X> type) throws IOException {
         return msgPackMapper/*.reader(type)*/.readValue(msgPacked, type);
     }
 
-    public static <X> X fromBytes(byte[] msgPacked, int len, Class<? extends X> type) throws IOException, com.fasterxml.jackson.core.JsonParseException, com.fasterxml.jackson.databind.JsonMappingException {
+    public static <X> X fromBytes(byte[] msgPacked, int len, Class<? extends X> type) throws IOException {
         return msgPackMapper/*.reader(type)*/.readValue(msgPacked, 0, len, type);
     }
 

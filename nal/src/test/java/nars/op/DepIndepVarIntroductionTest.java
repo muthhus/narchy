@@ -1,8 +1,9 @@
 package nars.op;
 
 import nars.$;
+import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
-import nars.nar.Terminal;
 import nars.term.Term;
 import org.junit.Test;
 
@@ -13,7 +14,7 @@ public class DepIndepVarIntroductionTest {
 
     @Test
     public void testIntroducedVariablesNormalized() throws Narsese.NarseseException {
-        Terminal n = new Terminal();
+        NAR n = NARS.shell();
 
         Term t = $.$("(&&,(a-->c),(b-->c))");
         Term u = $.$("varIntro(" + t + ")").eval(n);

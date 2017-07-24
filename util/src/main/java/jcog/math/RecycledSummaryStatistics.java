@@ -3,8 +3,6 @@ package jcog.math;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
-import java.io.Serializable;
-
 /**
  * floatSummaryStatistics in java.util can't be cleared
  * wtf
@@ -13,7 +11,7 @@ import java.io.Serializable;
  * Commons Math SummaryStatistics which also is undesirable
  *
  */
-public class RecycledSummaryStatistics implements FloatProcedure, Serializable, StatisticalSummary {
+public class RecycledSummaryStatistics implements FloatProcedure, StatisticalSummary {
 
     protected long count;
 

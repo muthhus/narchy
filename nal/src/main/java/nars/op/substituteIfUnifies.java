@@ -1,8 +1,8 @@
-package nars.term.transform;
+package nars.op;
 
 import nars.$;
 import nars.Op;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;

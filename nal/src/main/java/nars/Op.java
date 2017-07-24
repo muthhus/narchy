@@ -11,7 +11,6 @@ import nars.term.compound.GenericCompound;
 import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
-import nars.term.util.InvalidTermException;
 import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;

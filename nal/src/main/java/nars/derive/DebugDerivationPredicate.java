@@ -1,7 +1,7 @@
 package nars.derive;
 
 import jcog.Texts;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.op.MatchTerm;
 import org.fusesource.jansi.Ansi;
 

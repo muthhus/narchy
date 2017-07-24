@@ -2,7 +2,7 @@ package nars.term.subst;
 
 import jcog.list.FasterList;
 import nars.Op;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Compound;
 import nars.term.Term;

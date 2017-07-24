@@ -1,4 +1,4 @@
-package nars.term.mutate;
+package nars.derive.mutate;
 
 import jcog.math.Combinations;
 import nars.$;

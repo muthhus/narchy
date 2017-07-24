@@ -1,4 +1,4 @@
-package nars.nar.exe;
+package nars.exe;
 
 import com.google.common.base.Joiner;
 import jcog.bag.Bag;

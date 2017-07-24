@@ -1,4 +1,4 @@
-package nars.conceptualize.state;
+package nars.concept.state;
 
 import nars.concept.BaseConcept;
 import nars.concept.Concept;

@@ -154,7 +154,7 @@ public class MultiStatistics<X> implements Consumer<X> {
 
         @Override
         public String toString() {
-            return id + ' ' + stats.snapshot().toString();
+            return id + ' ' + stats.snapshot();
         }
 
         @Override

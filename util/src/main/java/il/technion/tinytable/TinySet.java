@@ -13,7 +13,7 @@ public class TinySet extends BitwiseArray2 {
 	private final short[] A;
 	// first level index.
 	protected int nrItems;
-	boolean bloomFilter = false;
+	boolean bloomFilter;
 	long L[];
 	HashMakerWithIndexBit hashFunc;
 	BucketSizeExpert bucketMaster;
@@ -189,14 +189,16 @@ public class TinySet extends BitwiseArray2 {
 
 
 
-	public void Put(int bucketId,int idx, final long value) {
+	@Override
+    public void Put(int bucketId, int idx, final long value) {
 		int size = this.getBucketItemSize(bucketId,bucketBitSize-A[bucketId]*this.itemSize);
 		int mod = this.getBucketMod(bucketId,size);
 		this.Put(bucketId,idx, value,size,mod);
 		return;
 	}
 
-	public long Get(int bucketID, int idx) {
+	@Override
+    public long Get(int bucketID, int idx) {
 		int size = this.getBucketItemSize(bucketID,bucketBitSize-A[bucketID]*this.itemSize);
 		int mod =getBucketMod(bucketID,bucketBitSize-A[bucketID]*this.itemSize);
 		return this.Get(bucketID,idx, size,mod);

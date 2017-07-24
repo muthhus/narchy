@@ -9,7 +9,6 @@ import nars.NAgentX;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.gui.Vis;
-import nars.task.ITask;
 import nars.task.SignalTask;
 import nars.term.Compound;
 import nars.term.Term;

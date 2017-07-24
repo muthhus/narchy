@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.Param;
-import nars.nar.exe.BufferedExecutioner;
+import nars.exe.BufferedExecutioner;
 import org.junit.Test;
 
 import java.io.IOException;

@@ -2,16 +2,16 @@ package com.insightfullogic.slab;
 
 public interface GameEvent extends Cursor {
 
-    public int getId();
+    int getId();
 
-    public void setId(int value);
+    void setId(int value);
 
-    public long getStrength();
+    long getStrength();
 
-    public void setStrength(long value);
+    void setStrength(long value);
 
-    public int getTarget();
+    int getTarget();
     
-    public void setTarget(int value);
+    void setTarget(int value);
 
 }

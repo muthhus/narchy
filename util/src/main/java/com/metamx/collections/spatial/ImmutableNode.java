@@ -123,7 +123,7 @@ public class ImmutableNode {
 
     public Iterable<ImmutableNode> children() {
         return () -> new Iterator<ImmutableNode>() {
-            private volatile int count = 0;
+            private volatile int count;
 
             @Override
             public boolean hasNext() {

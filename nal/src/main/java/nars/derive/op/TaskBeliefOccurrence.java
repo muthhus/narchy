@@ -1,7 +1,7 @@
 package nars.derive.op;
 
 import nars.Task;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import org.jetbrains.annotations.NotNull;

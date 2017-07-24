@@ -51,7 +51,7 @@ public class TensorChain extends BatchArrayTensor {
 
     @Override
     protected void update() {
-        int[] p = new int[] { 0 };
+        int[] p = { 0 };
 
         for (Tensor x : sub) {
             x.forEach((i,v) -> {

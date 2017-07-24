@@ -219,7 +219,7 @@ public class FPGrow {
      * @return
      * @throws IOException
      */
-    private static List<List<String>> load(String filename) throws IOException, java.io.FileNotFoundException {
+    private static List<List<String>> load(String filename) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(new File(filename)));
         List<List<String>> transactions = new ArrayList<>();
 

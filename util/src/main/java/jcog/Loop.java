@@ -19,7 +19,7 @@ abstract public class Loop implements Runnable {
 
     protected final int windowLength = 4;
 
-    private float lag = 0, lagSum = 0;
+    private float lag, lagSum;
 
     protected long prevTime;
 

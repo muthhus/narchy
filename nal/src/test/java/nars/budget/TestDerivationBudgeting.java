@@ -1,6 +1,6 @@
 package nars.budget;
 
-import nars.nar.exe.BufferedExecutioner;
+import nars.exe.BufferedExecutioner;
 
 
 

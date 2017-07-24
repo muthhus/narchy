@@ -2,7 +2,7 @@ package nars.derive.op;
 
 import nars.$;
 import nars.Op;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.PrediTerm;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.match.Ellipsis;

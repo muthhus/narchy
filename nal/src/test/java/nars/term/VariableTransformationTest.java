@@ -1,9 +1,9 @@
 package nars.term;
 
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
 import nars.Task;
-import nars.nar.Terminal;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -25,7 +25,7 @@ public class VariableTransformationTest {
     public void testDestructiveNormalization() throws Narsese.NarseseException {
         String t = "<$x --> y>";
         String n = "($1-->y)";
-        NAR nar = new Terminal(32);
+        NAR nar = NARS.shell();
         Termed x = nar.term(t);
         assertEquals(n, x.toString());
         //assertTrue("immediate construction of a term from a string should automatically be normalized", x.isNormalized());
@@ -51,7 +51,7 @@ public class VariableTransformationTest {
     @Test public void varNormTestIndVar() throws Narsese.NarseseException {
         //<<($1, $2) --> bigger> ==> <($2, $1) --> smaller>>. gets changed to this: <<($1, $4) --> bigger> ==> <($2, $1) --> smaller>>. after input
 
-        NAR n = new Terminal(16);
+        NAR n = NARS.shell();
 
         String t = "<<($1, $2) --> bigger> ==> <($2, $1) --> smaller>>";
 

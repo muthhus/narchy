@@ -340,23 +340,20 @@ public class BagTest {
         Tensor f2 = samplingPriDist(bag, cap * 2, 4, 5);
 
 
-        {
-            int batches = cap * 100;
-            int batchSize = 4;
-            Tensor f1 = samplingPriDist(bag, batches, batchSize, 10);
-            String h = "cap=" + cap + " samples=" + (batches * batchSize);
-            System.out.println(h + ":\n\t" + f1.tsv2());
-            System.out.println();
+        int batches = cap * 100;
+        int batchSize = 4;
+        Tensor f1 = samplingPriDist(bag, batches, batchSize, 10);
+        String h = "cap=" + cap + " samples=" + (batches * batchSize);
+        System.out.println(h + ":\n\t" + f1.tsv2());
+        System.out.println();
 
-            float[] ff = f1.get();
+        float[] ff = f1.get();
 
-            //monotonically increasing
-            for (int j = 0; j < ff.length; j++) {
-                for (int i = 0; i < j - 1; i++) {
-                    assertTrue(ff[j] > ff[i]);
-                }
+        //monotonically increasing
+        for (int j = 0; j < ff.length; j++) {
+            for (int i = 0; i < j - 1; i++) {
+                assertTrue(ff[j] > ff[i]);
             }
-
         }
 
 

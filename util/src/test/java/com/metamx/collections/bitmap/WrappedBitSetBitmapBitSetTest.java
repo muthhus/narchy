@@ -82,7 +82,7 @@ public class WrappedBitSetBitmapBitSetTest {
 
         Set<Integer> union = Sets.union(extraBits, IntSetTestUtility.getSetBits());
 
-        Assert.assertTrue(IntSetTestUtility.equalSets(union, (WrappedBitSetBitmap) bitSet.union(bitExtraSet)));
+        Assert.assertTrue(IntSetTestUtility.equalSets(union, bitSet.union(bitExtraSet)));
     }
 
     @Test
@@ -94,7 +94,7 @@ public class WrappedBitSetBitmapBitSetTest {
 
         Set<Integer> intersection = Sets.intersection(extraBits, IntSetTestUtility.getSetBits());
 
-        Assert.assertTrue(IntSetTestUtility.equalSets(intersection, (WrappedBitSetBitmap) bitSet.intersection(bitExtraSet)));
+        Assert.assertTrue(IntSetTestUtility.equalSets(intersection, bitSet.intersection(bitExtraSet)));
     }
 
     @Test

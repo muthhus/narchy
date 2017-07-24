@@ -11,15 +11,14 @@ import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.budget.BudgetFunctions;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.control.premise.Derivation;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.UnifySubst;
+import nars.util.BudgetFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

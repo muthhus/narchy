@@ -244,6 +244,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final CheckedBarrier barrier = new CheckedBarrier(2);
         final Integer zero = makeElement(0);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 long startTime = System.nanoTime();
                 assertNull(q.poll(timeoutMillis(), MILLISECONDS));
@@ -290,6 +291,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final CheckedBarrier barrier = new CheckedBarrier(2);
         final Integer zero = makeElement(0);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 long startTime1 = System.nanoTime();
                 assertNull(q.poll(timeoutMillis(), MILLISECONDS));
@@ -317,6 +319,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final CheckedBarrier barrier = new CheckedBarrier(2);
         final Integer zero = makeElement(0);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 long startTime1 = System.nanoTime();
                 assertNull(q.poll(timeoutMillis(), MILLISECONDS));
@@ -344,6 +347,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final LinkedBlockingMultiQueue<QueueKey, Integer> q = createSingleQueue();
         final CountDownLatch threadStarted = new CountDownLatch(1);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() {
                 threadStarted.countDown();
                 try {
@@ -368,6 +372,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
     public void testTakeFromEmptyAfterInterrupt() {
         final LinkedBlockingMultiQueue<QueueKey, Integer> q = createSingleQueue();
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() {
                 Thread.currentThread().interrupt();
                 try {
@@ -390,6 +395,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final LinkedBlockingMultiQueue<QueueKey, Integer> q = createSingleQueue();
         final CountDownLatch threadStarted = new CountDownLatch(1);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() {
                 threadStarted.countDown();
                 try {
@@ -414,6 +420,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
     public void testTimedPollFromEmptyAfterInterrupt() {
         final LinkedBlockingMultiQueue<QueueKey, Integer> q = createSingleQueue();
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() {
                 Thread.currentThread().interrupt();
                 try {
@@ -608,6 +615,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         LinkedBlockingMultiQueue<QueueKey, Integer>.SubQueue sq = q.getSubQueue(QueueKey.A);
         final CountDownLatch pleaseInterrupt = new CountDownLatch(1);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 for (int i = 0; i < SIZE; ++i)
                     sq.put(i);
@@ -650,6 +658,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final CountDownLatch pleaseTake = new CountDownLatch(1);
         final CountDownLatch pleaseInterrupt = new CountDownLatch(1);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 for (int i = 0; i < capacity; i++)
                     sq.put(i);
@@ -683,6 +692,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final LinkedBlockingMultiQueue<QueueKey, Object>.SubQueue sq = q.getSubQueue(QueueKey.A);
         final CountDownLatch pleaseInterrupt = new CountDownLatch(1);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 sq.put(new Object());
                 sq.put(new Object());
@@ -744,6 +754,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final LinkedBlockingMultiQueue<QueueKey, Integer> q = populatedSingleQueue(SIZE);
         final CountDownLatch pleaseInterrupt = new CountDownLatch(1);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 for (int i = 0; i < SIZE; ++i) {
                     assertEquals(i, q.take().intValue());
@@ -844,6 +855,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final LinkedBlockingMultiQueue<QueueKey, Integer> q = populatedSingleQueue(SIZE);
         final CountDownLatch aboutToWait = new CountDownLatch(1);
         Thread t = newStartedThread(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 for (int i = 0; i < SIZE; ++i) {
                     long t0 = System.nanoTime();
@@ -1100,7 +1112,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
             assertEquals(SIZE - i, q1.totalSize());
             assertEquals(SIZE - i, sq1.size());
             for (int j = 0; j < i; ++j) {
-                Integer x = (Integer) (q2.remove());
+                Integer x = q2.remove();
                 assertFalse(sq1.contains(x));
             }
         }
@@ -1253,6 +1265,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         ExecutorService executor = Executors.newFixedThreadPool(2);
         final CheckedBarrier threadsStarted = new CheckedBarrier(2);
         executor.execute(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 assertFalse(sq.offer(three));
                 threadsStarted.await();
@@ -1261,6 +1274,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
             }
         });
         executor.execute(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 threadsStarted.await();
                 assertSame(one, q.take());
@@ -1279,6 +1293,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         final CheckedBarrier threadsStarted = new CheckedBarrier(2);
         ExecutorService executor = Executors.newFixedThreadPool(2);
         executor.execute(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 assertNull(q.poll());
                 threadsStarted.await();
@@ -1287,6 +1302,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
             }
         });
         executor.execute(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 threadsStarted.await();
                 sq.put(one);
@@ -1388,6 +1404,7 @@ public class LinkedBlockingMultiQueueTest extends TestCase {
         LinkedBlockingMultiQueue<QueueKey, Integer> q = populatedSingleQueue(SIZE);
         LinkedBlockingMultiQueue<QueueKey, Integer>.SubQueue sq = q.getSubQueue(QueueKey.A);
         Thread t = new Thread(new CheckedRunnable() {
+            @Override
             public void realRun() throws InterruptedException {
                 sq.put(new Integer(SIZE + 1));
             }

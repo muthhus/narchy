@@ -10,8 +10,8 @@ import java.util.Map;
 public class HashSlabPerformanceRun {
 
     public interface FloatWrapper extends Cursor {
-        public float getValue();
-        public void setValue(float value);
+        float getValue();
+        void setValue(float value);
     }
 
     public static void main(String[] args) {

@@ -29,6 +29,7 @@ public abstract class AbstractPollable<E> implements Pollable<E> {
      * @throws NoSuchElementException
      *             if this queue is empty
      */
+    @Override
     public E remove() {
         E x = poll();
         if (x != null)
@@ -48,6 +49,7 @@ public abstract class AbstractPollable<E> implements Pollable<E> {
      * @throws NoSuchElementException
      *             if this queue is empty
      */
+    @Override
     public E element() {
         E x = peek();
         if (x != null)

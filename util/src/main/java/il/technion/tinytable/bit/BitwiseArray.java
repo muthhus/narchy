@@ -1,9 +1,7 @@
 package il.technion.tinytable.bit;
 
 
-import java.io.Serializable;
-
-public class BitwiseArray extends AuxilaryBitSet implements Serializable {
+public class BitwiseArray extends AuxilaryBitSet {
 
     public final int bucketCapacity;
     public final int itemSize;

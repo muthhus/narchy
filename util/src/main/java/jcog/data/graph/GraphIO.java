@@ -241,7 +241,7 @@ public class GraphIO {
      *                  returned graph will be undirected.
      */
     public static Graph readNewscastGraph(String file, int direction)
-            throws IOException, java.io.FileNotFoundException {
+            throws IOException {
 
         NeighbourListGraph gr = new NeighbourListGraph(direction != 2);
         FileInputStream fis = new FileInputStream(file);

@@ -5,39 +5,39 @@ import com.insightfullogic.slab.Cursor;
 
 public interface SlabOperation extends Cursor {
 
-    public byte getMagic();
+    byte getMagic();
 
-    public void setMagic(byte magic);
+    void setMagic(byte magic);
 
-    public byte getOpCode();
+    byte getOpCode();
 
-    public void setOpCode(byte opCode);
+    void setOpCode(byte opCode);
 
-    public short getKeyLength();
+    short getKeyLength();
 
-    public void setKeyLength(short keyLength);
+    void setKeyLength(short keyLength);
 
-    public byte getExtraLength();
+    byte getExtraLength();
 
-    public void setExtraLength(byte extraLength);
+    void setExtraLength(byte extraLength);
 
-    public byte getDataType();
+    byte getDataType();
 
-    public void setDataType(byte dataType);
+    void setDataType(byte dataType);
 
-    public short getReserved();
+    short getReserved();
 
-    public void setReserved(short reserved);
+    void setReserved(short reserved);
 
-    public int getBodySize();
+    int getBodySize();
 
-    public void setBodySize(int bodySize);
+    void setBodySize(int bodySize);
 
-    public int getOpaque();
+    int getOpaque();
 
-    public void setOpaque(int opaque);
+    void setOpaque(int opaque);
 
-    public long getCas();
+    long getCas();
 
-    public void setCas(long cas);
+    void setCas(long cas);
 }

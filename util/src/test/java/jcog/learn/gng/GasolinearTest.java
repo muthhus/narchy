@@ -18,7 +18,7 @@ public class GasolinearTest {
 
             1f, 0.8f, 0.95f, 0.83f
         );
-        out.println(g.toString());
+        out.println(g);
 
         assertEquals(0, g.which(-0.1));
         assertEquals(0, g.which(0.1));

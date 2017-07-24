@@ -2,16 +2,14 @@ package nars;
 
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
+import nars.exe.FocusedExecutioner;
+import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex;
-import nars.nar.exe.FocusedExecutioner;
-import nars.nar.exe.MultiExecutioner;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
-import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.truth.Truth;

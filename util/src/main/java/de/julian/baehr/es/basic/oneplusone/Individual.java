@@ -3,7 +3,7 @@ package de.julian.baehr.es.basic.oneplusone;
 
 public class Individual {
 
-	private double[] objectiveParameterVector;
+	private final double[] objectiveParameterVector;
 	
 	private double fitness;
 	

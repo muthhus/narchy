@@ -59,7 +59,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
     private final ObjectIntPair<EnumClassifier<X>>[] dynTests;
 
     /** should probably be calibrated in relation to the executioner's processing rate */
-    private float activeTaskMomentum = 0.5f;
+    private final float activeTaskMomentum = 0.5f;
 
     public static class MixChannel {
 
@@ -82,7 +82,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
 
 
     @Nullable
-    public MixAgent agent = null;
+    public MixAgent agent;
 
 
     public final FloatSupplier score;
@@ -308,7 +308,7 @@ public class MixContRL<X extends Priority> extends Loop implements PSinks<X, CLi
 //            } else {
                 //TODO lerp the activation in proportion to the executor's rate, to ammortize the actual loss rather than just reset each cycle
             float a = total >= Pri.EPSILON ? nextActive[i] / total : 0f;
-            nextActive[i] = Util.lerp(activeTaskMomentum, prevActive[i], a);;
+            nextActive[i] = Util.lerp(activeTaskMomentum, prevActive[i], a);
             //}
         }
 

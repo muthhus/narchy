@@ -242,9 +242,9 @@ public class MurmurHash {
 			case 1 :
 				h ^= (data[length & ~7] & 0xff);
 				h *= m;
-		};
+		}
 
-		h ^= h >>> r;
+        h ^= h >>> r;
 		h *= m;
 		h ^= h >>> r;
 

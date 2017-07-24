@@ -5,7 +5,7 @@ import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.*;
 import nars.derive.constraint.*;
 import nars.derive.match.Ellipsis;
@@ -42,7 +42,8 @@ import static nars.$.newHashSet;
 import static nars.$.p;
 import static nars.$.v;
 import static nars.Op.*;
-import static nars.term.Terms.*;
+import static nars.term.Terms.concat;
+import static nars.term.Terms.maxLevel;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 

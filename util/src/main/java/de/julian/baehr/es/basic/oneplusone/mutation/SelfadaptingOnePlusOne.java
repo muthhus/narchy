@@ -7,11 +7,11 @@ import java.util.Random;
 
 public class SelfadaptingOnePlusOne implements IMutationOperation{
 
-	private Random random = new Random();
+	private final Random random = new Random();
 	
 	private double std = 1;
-	private int times = 0;
-	int better = 0;
+	private int times;
+	int better;
 	
 	@Override
 	public void mutate(Individual individual, IObjectiveFunction objectiveFunction) {

@@ -18,11 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Open-NARS.  If not, see <http://www.gnu.org/licenses/>.
  */
-package nars.budget;
+package nars.util;
 
 import jcog.pri.Pri;
 import jcog.pri.Priority;
-import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 
 /**

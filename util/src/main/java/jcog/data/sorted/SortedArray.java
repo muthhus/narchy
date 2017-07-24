@@ -68,7 +68,7 @@ public class SortedArray<E> implements Iterable<E> {
 
         int totalOffset = this.size - index - 1;
         if (totalOffset >= 0) {
-            E[] list = (E[]) this.list;
+            E[] list = this.list;
             E previous = list[index];
             if (totalOffset > 0) {
                 System.arraycopy(list, index + 1, list, index, totalOffset);
@@ -82,7 +82,7 @@ public class SortedArray<E> implements Iterable<E> {
     public void removeFast(int index) {
         int totalOffset = this.size - index - 1;
         if (totalOffset >= 0) {
-            E[] list = (E[]) this.list;
+            E[] list = this.list;
             if (totalOffset > 0) {
                 System.arraycopy(list, index + 1, list, index, totalOffset);
             }
@@ -176,7 +176,7 @@ public class SortedArray<E> implements Iterable<E> {
         float elementRank = cmp.floatValueOf(element);
         final int index = this.findInsertionIndex(elementRank, 0, s - 1, new int[1], cmp);
 
-        final E last = (E) list[s - 1];
+        final E last = list[s - 1];
         if (index == s || Util.fastCompare(cmp.floatValueOf(last), elementRank) < 0) {
             addInternal(element);
         } else {
@@ -239,7 +239,7 @@ public class SortedArray<E> implements Iterable<E> {
 
     private void addAtIndex(int index, E element) {
         int oldSize = this.size++;
-        E[] list = (E[]) this.list;
+        E[] list = this.list;
         if (list.length == oldSize) {
             E[] newItems = newArray(oldSize); //new Object[this.sizePlusFiftyPercent(oldSize)];
             if (index > 0) {
@@ -267,7 +267,7 @@ public class SortedArray<E> implements Iterable<E> {
 
     public E removeLast() {
         //if (size > 0)
-        return (E) this.list[--size];
+        return this.list[--size];
         //else
         //return null;
     }
@@ -515,7 +515,7 @@ public class SortedArray<E> implements Iterable<E> {
             final int[] rightBorder = {0};
             final int left = this.findInsertionIndex(cmp.floatValueOf(element), 0, size, rightBorder, cmp);
 
-            E[] l = (E[]) this.list;
+            E[] l = this.list;
             for (int index = left; index < rightBorder[0]; index++) {
                 if (element.equals(l[index])) {
                     return index;// element is found
@@ -694,7 +694,7 @@ public class SortedArray<E> implements Iterable<E> {
      */
     @Nullable
     public final E first() {
-        return this.isEmpty() ? null : (E) list[0];
+        return this.isEmpty() ? null : list[0];
     }
 
     /**

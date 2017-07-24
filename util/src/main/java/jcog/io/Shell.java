@@ -24,7 +24,7 @@ public class Shell {
 
     static final Executor exe = Executors.newSingleThreadExecutor();
 
-    public Shell(String... cmd) throws IOException, UnsupportedEncodingException {
+    public Shell(String... cmd) throws IOException {
         this.proc = new ProcessBuilder(cmd).redirectErrorStream(true).start();
 
         this.writer = new PrintWriter(new OutputStreamWriter(this.proc.getOutputStream(), "UTF-8"), true);

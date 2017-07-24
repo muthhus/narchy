@@ -5,13 +5,13 @@ import nars.op.Command;
 import nars.op.Operator;
 import nars.op.data.*;
 import nars.op.data.intersect;
+import nars.op.substitute;
 import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
-import nars.term.transform.substitute;
 import nars.term.var.Variable;
 
 import static nars.Op.*;

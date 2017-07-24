@@ -5,8 +5,8 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.conceptualize.ConceptBuilder;
-import nars.conceptualize.state.ConceptState;
+import nars.concept.build.ConceptBuilder;
+import nars.concept.state.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TaskTable;
@@ -25,7 +25,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.Op.*;
-import static nars.conceptualize.state.ConceptState.Deleted;
+import static nars.concept.state.ConceptState.Deleted;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
 public class BaseConcept<T extends Term> implements Concept, Termlike {

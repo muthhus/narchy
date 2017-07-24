@@ -261,8 +261,8 @@ public class DecisionTreeTrainingTest {
                 .add(5, 1, 0)
                 .add(5, 0, 1),
                 2,
-                5, new String[]{"LO", "HI"}
-        );
+                5,
+                "LO", "HI");
 
         tr.print();
 

@@ -3,7 +3,7 @@ package nars.derive;
 import com.google.common.collect.Lists;
 import jcog.Util;
 import nars.$;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.op.MatchOneSubterm;
 import nars.term.ProxyCompound;

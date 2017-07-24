@@ -105,12 +105,12 @@ public class FunctorTest {
 
 //    @Test
 //    public void testParseJSONTermFunction() throws Narsese.NarseseException {
-//        Term u = new Terminal().inputAndGet("fromJSON(\"{ \"a\": [1, 2] }\").").term();
+//        Term u = NARS.shell().inputAndGet("fromJSON(\"{ \"a\": [1, 2] }\").").term();
 //        assertEquals("{a(1,2)}", u.toString());
 //    }
 //    @Test
 //    public void testToStringJSONTermFunction() throws Narsese.NarseseException {
-//        Term u = new Terminal().inputAndGet("toJSON((x,y,z)).").term();
+//        Term u = NARS.shell().inputAndGet("toJSON((x,y,z)).").term();
 //        assertEquals("json(\"[\"x\",\"y\",\"z\"]\")", u.toString());
 //    }
 

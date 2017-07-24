@@ -3,7 +3,7 @@ package nars.derive;
 import jcog.Util;
 import jcog.math.ByteShuffler;
 import nars.$;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

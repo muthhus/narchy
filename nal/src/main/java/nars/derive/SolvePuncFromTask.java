@@ -1,6 +1,6 @@
 package nars.derive;
 
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.term.Compound;
 import nars.truth.func.TruthOperator;
 import org.jetbrains.annotations.NotNull;

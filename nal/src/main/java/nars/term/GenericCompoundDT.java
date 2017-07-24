@@ -5,7 +5,6 @@ import nars.Op;
 import nars.Param;
 import nars.derive.PatternCompound;
 import nars.term.container.TermContainer;
-import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.CONJ;

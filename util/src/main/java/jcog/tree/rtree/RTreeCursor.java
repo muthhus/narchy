@@ -21,7 +21,7 @@ public class RTreeCursor<T> {
 
     private final Space<T> space;
     FasterList<Leaf<T>> active = new FasterList();
-    int size = 0;
+    int size;
 
     public RTreeCursor(Space<T> space) {
         this.space = space;
@@ -125,7 +125,7 @@ public class RTreeCursor<T> {
 
         List<Leaf<T>> a;
         Leaf<T> l;
-        int i = 0, j = 0;
+        int i, j;
 
         public RCursorIterator(List<Leaf<T>> active) {
             this.a = active;

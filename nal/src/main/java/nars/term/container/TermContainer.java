@@ -2,12 +2,12 @@ package nars.term.container;
 
 import nars.$;
 import nars.Op;
+import nars.derive.mutate.CommutivePermutations;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
-import nars.term.mutate.CommutivePermutations;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;

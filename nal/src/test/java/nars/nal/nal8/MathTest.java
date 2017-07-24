@@ -11,7 +11,7 @@ public class MathTest {
 
 //    @Test
 //    public void testAdd1() {
-//        Terminal t = new Terminal();
+//        Terminal t = NARS.shell();
 //        t.log();
 //        t.input("(add(1,2,?x)<->result).");
 //        t.next();

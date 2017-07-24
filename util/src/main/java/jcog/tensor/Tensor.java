@@ -13,6 +13,7 @@ import java.util.function.Supplier;
 
 public interface Tensor extends Supplier<float[]> {
 
+    @Override
     default float[] get() {
         return snapshot();
     }
@@ -162,7 +163,7 @@ public interface Tensor extends Supplier<float[]> {
 
     default <X> Iterator<X> iterator(FloatToObjectFunction<X> map) {
         return new AbstractIterator<X>() {
-            int j = 0;
+            int j;
             final int limit = volume();
             @Override
             protected X computeNext() {

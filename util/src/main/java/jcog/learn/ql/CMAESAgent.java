@@ -34,19 +34,19 @@ public class CMAESAgent implements MultivariateFunction /*implements Agent*/ {
      */
     private final int out;
 
-    private MyCMAESOptimizer opt;
+    private final MyCMAESOptimizer opt;
     private final int population;
-    private double[] ins;
+    private final double[] ins;
     private float reward;
     //private double[] search;
 
-    private double[] outsNext;
+    private final double[] outsNext;
     public double[] outs;
 //    final DecideSoftmax decider = new DecideSoftmax(0.25f, 0.25f, 0.5f, new XorShift128PlusRandom(1));
 //    private int lastAction;
 
     final Random rng = new XorShift128PlusRandom(1);
-    double noise = 0.0f;
+    double noise;
 
     /**
      * assumes 0..1.0 range

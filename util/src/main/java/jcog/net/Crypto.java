@@ -13,7 +13,7 @@ import java.security.*;
 public class Crypto {
 
     public static void generatePubandPrivateKeyFiles(String path, String id)
-            throws NoSuchAlgorithmException, NoSuchProviderException, IOException, java.io.FileNotFoundException {
+            throws NoSuchAlgorithmException, NoSuchProviderException, IOException {
         SecureRandom r = new SecureRandom();
         KeyPairGenerator keyGen = KeyPairGenerator.getInstance("DSA", "SUN");
         keyGen.initialize(1024, r);
@@ -25,11 +25,9 @@ public class Crypto {
             sigfos.write(priv.getEncoded());
             sigfos.close();
         }
-        {
-            FileOutputStream sigfos = new FileOutputStream(new File(path, id + ".pub"));
-            sigfos.write(pub.getEncoded());
-            sigfos.close();
-        }
+        FileOutputStream sigfos = new FileOutputStream(new File(path, id + ".pub"));
+        sigfos.write(pub.getEncoded());
+        sigfos.close();
     }
 
     public static void main(String[] args) throws

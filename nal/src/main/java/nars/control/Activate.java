@@ -7,7 +7,6 @@ import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.task.ITask;
 import nars.task.UnaryTask;

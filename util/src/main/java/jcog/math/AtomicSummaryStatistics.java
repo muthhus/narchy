@@ -4,13 +4,12 @@ import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.eclipse.collections.api.block.procedure.primitive.DoubleProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
-import java.io.Serializable;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.DoubleAccumulator;
 import java.util.function.Consumer;
 
 /** see also: https://github.com/apache/spark/blob/master/core/src/main/scala/org/apache/spark/util/StatCounter.scala */
-public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure, Serializable, StatisticalSummary {
+public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure, StatisticalSummary {
 
     protected long count;
     protected double min;
@@ -18,7 +17,7 @@ public class AtomicSummaryStatistics implements FloatProcedure, DoubleProcedure,
     protected double mean;
     protected double sum;
 
-    CopyOnWriteArrayList<Consumer<AtomicSummaryStatistics>> onCommit = null;
+    CopyOnWriteArrayList<Consumer<AtomicSummaryStatistics>> onCommit;
 
     /**
      * NaN triggers reset

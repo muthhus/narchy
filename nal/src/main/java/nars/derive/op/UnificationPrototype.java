@@ -1,6 +1,6 @@
 package nars.derive.op;
 
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.derive.Conclusion;
 import nars.derive.Fork;

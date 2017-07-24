@@ -1,4 +1,4 @@
-package nars.conceptualize.state;
+package nars.concept.state;
 
 import jcog.Util;
 import jcog.data.MutableInteger;

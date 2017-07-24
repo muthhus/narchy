@@ -23,7 +23,7 @@ public interface AbstractBytes {
         }
     };
 
-    public static int hash(byte[] bytes, int from, int to) {
+    static int hash(byte[] bytes, int from, int to) {
         long l = hash64(bytes, from, to);
         return Util.hashCombine((int)(l >> 32), (int)l);
         //return Long.hashCode(l);

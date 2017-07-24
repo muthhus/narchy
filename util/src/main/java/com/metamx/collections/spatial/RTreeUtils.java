@@ -102,7 +102,7 @@ public class RTreeUtils {
         }
     }
 
-    public static void printRTreeNode(Node node, int level) throws Exception, com.fasterxml.jackson.core.JsonProcessingException {
+    public static void printRTreeNode(Node node, int level) throws Exception {
         System.out.printf(
                 "%sminCoords: %s, maxCoords: %s, numChildren: %d, isLeaf:%s%n",
                 makeDashes(level),
@@ -174,7 +174,7 @@ public class RTreeUtils {
         return true;
     }
 
-    private static void printNode(ImmutableNode node, int level) throws Exception, com.fasterxml.jackson.core.JsonProcessingException {
+    private static void printNode(ImmutableNode node, int level) throws Exception {
         System.out.printf(
                 "%sminCoords: %s, maxCoords: %s, numChildren: %d, isLeaf: %s%n",
                 makeDashes(level),

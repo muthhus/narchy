@@ -20,11 +20,11 @@ public class HaiQAgent extends HaiQ {
     public @NotNull Autoencoder ae;
     final BiFunction<Integer,Integer,Integer> numStates;
     float perceptionAlpha;
-    float perceptionNoise = 0f;
+    float perceptionNoise;
     float perceptionCorruption = 0.05f;
-    float perceptionForget = 0.0f;
+    float perceptionForget;
     public FloatSupplier perceptionError;
-    public float lastPerceptionError = 0;
+    public float lastPerceptionError;
     private int states;
 
     //float aeForget = 1f;

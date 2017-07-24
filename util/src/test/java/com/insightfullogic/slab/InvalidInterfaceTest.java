@@ -21,7 +21,7 @@ public class InvalidInterfaceTest {
 				{ InvalidReturnSetter.class }, { NoParameterSetter.class }, { IndexField.class } });
 	}
 
-	private Class<? extends Cursor> representingKlass;
+	private final Class<? extends Cursor> representingKlass;
 
 	public InvalidInterfaceTest(Class<? extends Cursor> representingKlass) {
 		this.representingKlass = representingKlass;
@@ -36,28 +36,29 @@ public class InvalidInterfaceTest {
 	// ---------------------------------------------------
 
 	public interface NoGettersOrSetters extends Cursor {
-		public void neitherGetterNorSetter();
+		void neitherGetterNorSetter();
 	}
 
 	public interface InvalidReturnGetter extends Cursor {
-		public Object getFoo();
+		Object getFoo();
 	}
 
 	public interface ParameterGetter extends Cursor {
-		public int getFoo(long bar);
+		int getFoo(long bar);
 	}
 
 	public interface InvalidReturnSetter extends Cursor {
-		public Object setFoo();
+		Object setFoo();
 	}
 
 	public interface NoParameterSetter extends Cursor {
-		public void setFoo();
+		void setFoo();
 	}
 
 	public interface IndexField extends Cursor {
-		public int getIndex();
-		public void setIndex(int index);
+		@Override
+        int getIndex();
+		void setIndex(int index);
 	}
 
 }

@@ -2,7 +2,6 @@ package org.intelligentjava.machinelearning.decisiontree.feature;
 
 import jcog.Texts;
 import jcog.learn.gng.Gasolinear;
-import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;

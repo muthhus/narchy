@@ -5,7 +5,7 @@ import java.util.Random;
 
 public class Discrete implements IRecombinator{
 
-	private Random random = new Random();
+	private final Random random = new Random();
 	
 	@Override
 	public double[] recombine(double[] v1, double[] v2) {

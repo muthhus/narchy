@@ -9,13 +9,11 @@ import jcog.pri.Deleteable;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
-import nars.$;
 import nars.Task;
 import nars.concept.Concept;
 import nars.gui.ConceptIcon;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.Truth;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
@@ -29,7 +27,6 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Consumer;
 

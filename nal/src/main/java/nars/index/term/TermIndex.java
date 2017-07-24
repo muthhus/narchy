@@ -6,7 +6,7 @@ import nars.Narsese;
 import nars.Op;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.conceptualize.ConceptBuilder;
+import nars.concept.build.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;

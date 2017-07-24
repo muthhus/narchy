@@ -8,21 +8,21 @@ import static org.junit.Assert.assertTrue;
 
 public class OtherTypesTest {
 	
-	public static interface OtherTypes extends Cursor {
-		public byte getByte();
-		public void setByte(byte value);
+	public interface OtherTypes extends Cursor {
+		byte getByte();
+		void setByte(byte value);
 		
-		public short getShort();
-		public void setShort(short value);
+		short getShort();
+		void setShort(short value);
 		
-		public float getFloat();
-		public void setFloat(float value);
+		float getFloat();
+		void setFloat(float value);
 
-		public boolean getBool();
-		public void setBool(boolean value);
+		boolean getBool();
+		void setBool(boolean value);
 
-		public char getChar();
-		public void setChar(char value);
+		char getChar();
+		void setChar(char value);
 	}
 
 	private static final Allocator<OtherTypes> allocator = Allocator.of(OtherTypes.class);

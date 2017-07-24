@@ -7,20 +7,23 @@ import static org.junit.Assert.assertEquals;
 
 public class StatisticsTest {
 
-	private static long allocated = 0;
-	private static long resized = 0;
-	private static long freed = 0;
+	private static long allocated;
+	private static long resized;
+	private static long freed;
 
 	private static final AllocationListener COUNTER = new AllocationListener() {
-		public void onResize(Allocator<?> by, int size, long sizeInBytes) {
+		@Override
+        public void onResize(Allocator<?> by, int size, long sizeInBytes) {
 			resized += sizeInBytes;
 		}
 
-		public void onFree(Allocator<?> by, int size, long sizeInBytes) {
+		@Override
+        public void onFree(Allocator<?> by, int size, long sizeInBytes) {
 			freed += sizeInBytes;
 		}
 
-		public void onAllocation(Allocator<?> by, int size, long sizeInBytes) {
+		@Override
+        public void onAllocation(Allocator<?> by, int size, long sizeInBytes) {
 			allocated += sizeInBytes;
 		}
 	};

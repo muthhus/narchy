@@ -11,7 +11,7 @@ public class AutoTensor extends ArrayTensor {
 
     private final Tensor in;
     private final dA a;
-    private double learnRate = 0.01f;
+    private final double learnRate = 0.01f;
     float noise = 0.0005f;
 
     public AutoTensor(Tensor input, int outputs) {

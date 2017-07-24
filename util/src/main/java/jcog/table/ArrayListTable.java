@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 /**
  * Items are available by an integer index
  */
-abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements Table<K, V>, Iterable<V> {
+abstract public class ArrayListTable<K, V> extends CollectorMap<K, V> implements Table<K, V> {
 
 
     protected int capacity;

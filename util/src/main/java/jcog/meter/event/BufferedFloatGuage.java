@@ -3,12 +3,10 @@ package jcog.meter.event;
 import jcog.math.RecycledSummaryStatistics;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
-import java.io.Serializable;
-
 /** buffers the result to avoid returning an incomplete value
  *  NOT thread safe
  * */
-public class BufferedFloatGuage implements FloatProcedure, Serializable {
+public class BufferedFloatGuage implements FloatProcedure {
 
     final RecycledSummaryStatistics data = new RecycledSummaryStatistics();
     float mean, sum;

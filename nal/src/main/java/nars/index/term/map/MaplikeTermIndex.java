@@ -1,8 +1,8 @@
 package nars.index.term.map;
 
 import nars.concept.PermanentConcept;
+import nars.index.term.StaticTermIndex;
 import nars.term.Termed;
-import nars.term.util.StaticTermIndex;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;

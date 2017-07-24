@@ -1,12 +1,8 @@
 package nars.table;
 
 import jcog.math.MultiStatistics;
-import nars.$;
-import nars.NAR;
-import nars.Narsese;
-import nars.Task;
+import nars.*;
 import nars.concept.BaseConcept;
-import nars.nar.Terminal;
 import nars.task.DerivedTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -23,7 +19,7 @@ public class RTreeBeliefTableTest {
 
     @Test
     public void testBasicOperations() throws Narsese.NarseseException {
-        NAR n = new Terminal();
+        NAR n = NARS.shell();
         BaseConcept X = (BaseConcept) n.conceptualize($.$("a:b"));
         RTreeBeliefTable t = new RTreeBeliefTable(4);
 
@@ -55,7 +51,7 @@ public class RTreeBeliefTableTest {
 
     @Test
     public void testAccuracy() throws Narsese.NarseseException {
-        NAR n = new Terminal();
+        NAR n = NARS.shell();
 
 
         int period = 3;

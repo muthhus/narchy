@@ -118,7 +118,7 @@ public abstract class CollectorMap<K, V> {
 //    }
 
     @Nullable public V remove(@NotNull K x) {
-        final Object[] removed = new Object[]{null};
+        final Object[] removed = {null};
         map.computeIfPresent(x, (k,v) -> {
             removeItem(v);
             removed[0] = v;

@@ -140,11 +140,7 @@ public enum TermGraph {
 
             int dt = t.dt();
             boolean reverse;
-            if (dt != DTERNAL && (dt < 0)) {
-                reverse = true;
-            } else {
-                reverse = false;
-            }
+            reverse = dt != DTERNAL && (dt < 0);
             float evi =
                     t.evi(when, dur);
             //dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();

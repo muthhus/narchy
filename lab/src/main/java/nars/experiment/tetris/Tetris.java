@@ -5,13 +5,10 @@ import nars.InterNAR;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.concept.SensorConcept;
 import nars.experiment.tetris.impl.TetrisState;
 import nars.term.atom.Atomic;
-import nars.truth.Truth;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
-import spacegraph.widget.meter.MatrixView;
 
 import static nars.$.$;
 import static nars.experiment.tetris.impl.TetrisState.*;

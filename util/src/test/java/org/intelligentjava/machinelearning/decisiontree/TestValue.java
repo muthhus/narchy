@@ -6,7 +6,7 @@ import java.util.function.Function;
 
 public class TestValue implements Function<Object,Object> {
     
-    private Object label;
+    private final Object label;
     
     public TestValue(Object label) {
         super();

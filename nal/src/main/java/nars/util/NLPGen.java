@@ -1,10 +1,7 @@
 package nars.util;
 
-import nars.Narsese;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.index.term.PatternTermIndex;
-import nars.nar.Terminal;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Unify;
@@ -21,7 +18,7 @@ import static nars.Op.VAR_PATTERN;
  */
 public class NLPGen {
 
-    final static Terminal terminal = new Terminal();
+    final NAR terminal = NARS.shell();
     final PatternTermIndex index = new PatternTermIndex();
 
     public interface Rule {

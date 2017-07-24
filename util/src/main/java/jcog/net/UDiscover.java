@@ -22,7 +22,7 @@ abstract public class UDiscover<P> extends Thread {
     final static int port = 6576;
     public static final int MAX_PAYLOAD_ID = 256;
     private final P id;
-    private int periodMS = 200;
+    private final int periodMS = 200;
     MulticastSocket ms;
 
 

@@ -1,8 +1,8 @@
 package nars.term;
 
 import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
-import nars.nar.Terminal;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -17,7 +17,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class TermIDTest {
 
-    static final NAR nar = new Terminal(8);
+    final NAR nar = NARS.shell();
 
 
     /* i will make these 3 pass soon, this is an improvement on the representation

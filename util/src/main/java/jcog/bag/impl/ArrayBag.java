@@ -36,7 +36,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     public float mass;
 
-    protected float min = 0, max = 0;
+    protected float min, max;
 
     public ArrayBag(PriMerge mergeFunction, @NotNull Map<X, Y> map) {
         this(0, mergeFunction, map);

@@ -74,7 +74,7 @@ public enum PackageUtility {
         return classes;
     }
 
-    public static List<Class> getClasses(String jarName, String packageName) throws IOException, FileNotFoundException {
+    public static List<Class> getClasses(String jarName, String packageName) throws IOException {
         List<Class> classes = new ArrayList<>();
 
         String cleanedPackageName = packageName.replaceAll("\\.", "/");

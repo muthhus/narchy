@@ -37,7 +37,7 @@ class Memoizer implements InvocationHandler {
      * @see #memoize(Object, int, long)
      */
     public static Object memoize(final Object origin) //
-            throws InstantiationException, IllegalAccessException {
+    {
         return memoize(origin, DEFAULT_CACHE_MAX_ELEMENTS, DEFAULT_CACHE_EXPIRE_MILLIS);
     }
 
@@ -101,7 +101,7 @@ class Memoizer implements InvocationHandler {
     }
 
     private Object invoke(final Method method, final Object[] args) //
-            throws Throwable, IllegalAccessException, IllegalArgumentException {
+            throws Throwable {
         try {
             return method.invoke(object, args);
         } catch (InvocationTargetException e) {
@@ -159,8 +159,8 @@ class Memoizer implements InvocationHandler {
         /**
          * Sample Interface to Memoize
          */
-        public static interface SampleInterface {
-            public String hash(final String in) throws NoSuchAlgorithmException;
+        public interface SampleInterface {
+            String hash(final String in) throws NoSuchAlgorithmException;
         }
 
         /**
@@ -189,12 +189,12 @@ class Memoizer implements InvocationHandler {
         /**
          * Simple Test / Benchmark
          */
-        public static void main(final String[] args) throws InstantiationException, IllegalAccessException, NoSuchAlgorithmException {
+        public static void main(final String[] args) throws NoSuchAlgorithmException {
             final int TOTAL = (int) 1e6;
             final String TEST_TEXT = "hello world";
             final int cacheElements = 1024;
             final long cacheMillis = 1000; // 1 second
-            final SampleInterface[] samples = new SampleInterface[]{
+            final SampleInterface[] samples = {
                     new SampleSlowImpl(), //
                     (SampleInterface) Memoizer.memoize(new SampleSlowImpl(), cacheElements, cacheMillis)
             };

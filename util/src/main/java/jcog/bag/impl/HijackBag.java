@@ -47,7 +47,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     private float min;
     private float max;
 
-    private float PRESSURE_THRESHOLD = 0.05f;
+    private final float PRESSURE_THRESHOLD = 0.05f;
 
     public HijackBag(int initialCapacity, int reprobes) {
         this(reprobes);
@@ -488,6 +488,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     /**
      * always >= 0
      */
+    @Override
     public float depressurize() {
         float pv = (float) pressure.getAndSet(0);
         if (pv >= 0) {

@@ -1,4 +1,4 @@
-package nars.nar.exe;
+package nars.exe;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;

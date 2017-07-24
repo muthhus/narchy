@@ -1,8 +1,9 @@
 package nars.term;
 
 import nars.$;
+import nars.NAR;
+import nars.NARS;
 import nars.Narsese;
-import nars.nar.Terminal;
 import org.junit.Test;
 
 import static nars.$.$;
@@ -31,7 +32,7 @@ public class TermNormalizationTest {
 
         assertEquals($.$(a), $.$(b));
 
-        Terminal t = new Terminal();
+        NAR t = NARS.shell();
         assertEquals(t.term(a), t.term(b));
     }
 }

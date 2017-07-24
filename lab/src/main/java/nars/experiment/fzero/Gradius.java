@@ -4,13 +4,9 @@ import java4k.gradius4k.Gradius4K;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
-import nars.Narsese;
 import nars.term.atom.Atomic;
 import nars.video.BufferedImageBitmap2D;
-import nars.video.PixelBag;
 import nars.video.Scale;
-
-import static nars.video.BufferedImageBitmap2D.ColorMode.R;
 
 /**
  * Created by me on 4/30/17.

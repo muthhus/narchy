@@ -1,18 +1,18 @@
 package nars;
 
 import jcog.random.XorShift128PlusRandom;
-import nars.conceptualize.ConceptBuilder;
-import nars.conceptualize.DefaultConceptBuilder;
-import nars.control.premise.Derivation;
+import nars.concept.build.ConceptBuilder;
+import nars.concept.build.DefaultConceptBuilder;
+import nars.control.Derivation;
 import nars.derive.DebugDerivationPredicate;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.derive.TrieDeriver;
+import nars.exe.Executioner;
+import nars.exe.FocusedExecutioner;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
-import nars.nar.exe.Executioner;
-import nars.nar.exe.FocusedExecutioner;
 import nars.op.stm.STMTemporalLinkage;
 import nars.time.CycleTime;
 import nars.time.RealTime;

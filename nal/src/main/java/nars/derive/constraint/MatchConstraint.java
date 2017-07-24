@@ -1,7 +1,7 @@
 package nars.derive.constraint;
 
 import nars.$;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.term.ProxyCompound;

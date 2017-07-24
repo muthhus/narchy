@@ -7,7 +7,6 @@ import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.*;
 import nars.bag.leak.LeakOut;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.time.Tense;

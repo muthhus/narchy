@@ -3,10 +3,8 @@ package jcog.net.attn;
 import il.technion.tinytable.TinyCountingTable;
 import jcog.Util;
 
-import java.io.Serializable;
 
-
-public class TagDigest extends TinyCountingTable implements TagSet, Serializable {
+public class TagDigest extends TinyCountingTable implements TagSet {
 
     static final int PRI_GRANULARITY = 10;
     private final String id;

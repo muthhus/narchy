@@ -18,12 +18,10 @@ package nars.term;
 
 import nars.*;
 import nars.concept.Concept;
-import nars.nar.Terminal;
 import nars.term.atom.Atomic;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermVector;
 import nars.term.container.TermVector1;
-import nars.term.util.InvalidTermException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -42,10 +40,8 @@ import static org.junit.Assert.*;
  * @author me
  */
 public class TermTest {
-    static {
-        Param.DEBUG = true;
-    }
-    static final NAR n = new Terminal(256);
+
+    final NAR n = NARS.shell();
 
 
     protected void assertEquivalentTerm(@NotNull String term1String, @NotNull String term2String) {
@@ -221,7 +217,7 @@ public class TermTest {
 //    public void testEscaping() {
 //        bidiEscape("c d", "x$# x", "\\\"sdkf sdfjk", "_ _");
 //
-////        NAR n = new Terminal().build();
+////        NAR n = NARS.shell().build();
 ////        n.addInput("<a --> \"b c\">.");
 ////        n.step(1);
 ////        n.finish(1);
@@ -314,7 +310,7 @@ public class TermTest {
 
 
 //    public void nullCachedName(String term) {
-//        NAR n = new Terminal();
+//        NAR n = NARS.shell();
 //        n.input(term + ".");
 //        n.run(1);
 //        assertNull("term name string was internally generated although it need not have been", ((Compound) n.concept(term).getTerm()).nameCached());
@@ -573,7 +569,7 @@ public class TermTest {
 //    @Test
 //    public void testSubtermsVector() {
 //
-//        NAR n = new Terminal();
+//        NAR n = NARS.shell();
 //
 //        Term a3 = n.term("c");
 //
@@ -611,7 +607,7 @@ public class TermTest {
             Term x = o.get();
             assertNotNull(x);
 
-            Terminal t = new Terminal(8);
+            NAR t = NARS.shell();
             t.believe(x);
 
             assertTrue(x + " should not have been allowed as a task content", false);
@@ -622,12 +618,12 @@ public class TermTest {
         }
     }
 
-    static final Terminal t = new Terminal(8);
 
-    public static void assertValidTermValidConceptInvalidTaskContent(String o) {
+
+    static void assertValidTermValidConceptInvalidTaskContent(String o) {
         try {
 
-            t.believe(o);
+            NARS.shell().believe(o);
 
             assertTrue(o + " should not have been allowed as a task content", false);
 
@@ -805,6 +801,7 @@ public class TermTest {
 
     public void testUniqueHash(@NotNull String a, @NotNull String b) throws Narsese.NarseseException {
 
+        NAR t = NARS.shell();
         int h1 = t.term(a).hashCode();
         int h2 = t.term(b).hashCode();
         assertNotEquals(h1, h2);

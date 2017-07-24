@@ -5,7 +5,7 @@ import jcog.trie.TrieNode;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.op.AbstractPatternOp.PatternOp;
 import nars.derive.op.MatchOneSubterm;
 import nars.derive.op.UnificationPrototype;

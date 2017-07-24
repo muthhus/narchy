@@ -1,8 +1,6 @@
 package org.intelligentjava.machinelearning.decisiontree;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Streams;
-import com.google.common.graph.*;
 import jcog.list.FasterList;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
@@ -192,7 +190,7 @@ public class DecisionTree<K, V> {
             // only binary splits for now - has feature first child node(left branch), does not have feature second child node(right branch).
             node = node.get(node.feature.test(value) ? 0 : 1);
         }
-        return (V) node.label;
+        return node.label;
     }
 
     /**
@@ -400,7 +398,7 @@ public class DecisionTree<K, V> {
 
         public void explain(BiConsumer<List<ObjectBooleanPair<Node<V>>>, LeafNode<V>> c, FasterList<ObjectBooleanPair<Node<V>>> path, int child) {
             assert(child == 0 || child == 1);
-            path.add(PrimitiveTuples.pair(this, child == 0 ? true : false));
+            path.add(PrimitiveTuples.pair(this, child == 0));
             get(child).explain(c, path);
             path.removeLast();
         }

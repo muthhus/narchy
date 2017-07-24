@@ -36,10 +36,10 @@ public class WrappedRoaringBitmapTest {
     @Parameterized.Parameters
     public static List<RoaringBitmapFactory[]> factoryClasses() {
         return Arrays.asList(
-                (RoaringBitmapFactory[]) Arrays.asList(
+                Arrays.asList(
                         new RoaringBitmapFactory(false)
                 ).toArray(new RoaringBitmapFactory[1]),
-                (RoaringBitmapFactory[]) Arrays.asList(
+                Arrays.asList(
                         new RoaringBitmapFactory(true)
                 ).toArray(new RoaringBitmapFactory[1])
         );

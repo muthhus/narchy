@@ -11,44 +11,55 @@ public class GameEventPOJO implements GameEvent {
 	
 	public GameEventPOJO() {}
 
-	public void move(int index) {
+	@Override
+    public void move(int index) {
 		throw new UnsupportedOperationException();
 	}
 	
-	public int getIndex() {
+	@Override
+    public int getIndex() {
 		throw new UnsupportedOperationException();
 	}
 
-	public void close() {}
+	@Override
+    public void close() {}
 
-	public int getId() {
+	@Override
+    public int getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	@Override
+    public void setId(int id) {
 		this.id = id;
 	}
 
-	public long getStrength() {
+	@Override
+    public long getStrength() {
 		return strength;
 	}
 
-	public void setStrength(long strength) {
+	@Override
+    public void setStrength(long strength) {
 		this.strength = strength;
 	}
 
-	public int getTarget() {
+	@Override
+    public int getTarget() {
 		return target;
 	}
 
-	public void setTarget(int target) {
+	@Override
+    public void setTarget(int target) {
 		this.target = target;
 	}
 
-	public void resize(int size) {
+	@Override
+    public void resize(int size) {
 		throw new UnsupportedOperationException();
 	}
 
+    @Override
     public int numObjects() {
         // TODO Auto-generated method stub
         return 0;

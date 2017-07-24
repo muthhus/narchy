@@ -175,7 +175,7 @@ public enum OneDHaar {
         file.close();
     }
     
-    private static double[] fileToPrimitiveDoubles(String filePath) throws IOException, FileNotFoundException {
+    private static double[] fileToPrimitiveDoubles(String filePath) throws IOException {
         FileInputStream fstream = new FileInputStream(filePath);
         BufferedReader br = new BufferedReader(new InputStreamReader(fstream));
         List<Double> aryOfDoubles = new ArrayList<>();

@@ -4,7 +4,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.control.CauseChannel;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.rule.PremiseRule;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;

@@ -38,17 +38,17 @@ import java.util.function.Function;
 public class River<In, Out>{
 //original name: public class ExecutorPipeline <In, Out>{
 
-    private Executor exec;
+    private final Executor exec;
     private final boolean preserveOrder;
 
     /** transfer function */
-    private Function<In, Out> each;
+    private final Function<In, Out> each;
 
-    @Nullable private Consumer<Throwable> exceptionHandler;
+    @Nullable private final Consumer<Throwable> exceptionHandler;
     @Nullable private River<Out, ?> next;
 
     private final AtomicLong orderCounter = new AtomicLong();
-    private long nextOutTaskNumber = 0;
+    private long nextOutTaskNumber;
     private final LongObjectHashMap<Out> orderMap = new LongObjectHashMap();
     private final ReentrantLock lock = new ReentrantLock();
 

@@ -37,7 +37,7 @@ public class FileCache {
                                           BiConsumer<Stream<X>, DataOutput> encoder,
                                           Function<DataInput, X> decoder,
                                           Logger logger
-    ) throws IOException, FileNotFoundException {
+    ) throws IOException {
 
         long lastModified = f.lastModified();
         long size = f.length();

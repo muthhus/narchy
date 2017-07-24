@@ -22,7 +22,7 @@ public class NARTest {
 
 //    @Test
 //    public void testEmptyMemoryToJSON() throws IOException, InterruptedException, ClassNotFoundException {
-//        Memory m = new Terminal().memory;
+//        Memory m = NARS.shell().memory;
 //        String j = JSON.omDeep.writeValueAsString(m);
 //        assertTrue(j.length() > 16);
 //
@@ -108,7 +108,7 @@ public class NARTest {
 
     @Test public void testBeforeNextFrameOnlyOnce() {
         AtomicInteger b = new AtomicInteger(0);
-        NAR n = new Terminal(64);
+        NAR n = NARS.shell();
 
         n.runLater(b::incrementAndGet);
         n.run(4);

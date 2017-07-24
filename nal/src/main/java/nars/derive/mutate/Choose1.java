@@ -1,4 +1,4 @@
-package nars.term.mutate;
+package nars.derive.mutate;
 
 import nars.$;
 import nars.derive.match.Ellipsis;

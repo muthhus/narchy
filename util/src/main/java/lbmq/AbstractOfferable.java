@@ -21,6 +21,7 @@ import java.util.Queue;
  */
 public abstract class AbstractOfferable<E> extends AbstractCollection<E> implements Offerable<E> {
 
+    @Override
     public boolean add(E e) {
         if (offer(e))
             return true;
@@ -54,6 +55,7 @@ public abstract class AbstractOfferable<E> extends AbstractCollection<E> impleme
      *             if not all the elements can be added at this time due to insertion restrictions
      * @see #add(Object)
      */
+    @Override
     public boolean addAll(Collection<? extends E> c) {
         if (c == null)
             throw new NullPointerException();

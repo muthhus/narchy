@@ -30,7 +30,7 @@ public interface Topic<V> {
     }
 
     /** warning this could grow large */
-    static final Map<Class,Field[]> fieldCache = new ConcurrentHashMap();
+    Map<Class,Field[]> fieldCache = new ConcurrentHashMap();
 
     static void each(Class c, Consumer<Field /* fieldName*/> f) {
         /** TODO cache the fields because reflection may be slow */

@@ -7,9 +7,9 @@ import java.util.Random;
 
 public class ConstantIsotropicGaussianMutation implements IMutationOperation{
 
-	private Random random = new Random();
+	private final Random random = new Random();
 	
-	private double std = 1;
+	private final double std = 1;
 	
 	@Override
 	public void mutate(Individual individual, IObjectiveFunction _null) {

@@ -24,7 +24,7 @@ import jcog.bag.Bag;
 import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
-import nars.conceptualize.state.ConceptState;
+import nars.concept.state.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Term;

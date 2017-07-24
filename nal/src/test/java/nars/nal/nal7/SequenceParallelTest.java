@@ -4,7 +4,7 @@
 //import nars.Op;
 //import nars.concept.Concept;
 //import nars.nar.Default;
-//import nars.nar.Terminal;
+//import nars.NARS;
 //import nars.task.Task;
 //import nars.term.Term;
 //import nars.term.Termed;
@@ -21,7 +21,7 @@
 ///** various tests of the Sequence and Parallel term types */
 //public class SequenceParallelTest {
 //
-//    static final NAR t = new Terminal(); //DURATION=5 by default
+//    static final NAR t = NARS.shell(); //DURATION=5 by default
 //    static final int DURATION = t.memory.duration();
 //
 //    @Test public void testSequenceTaskNormalization() {
@@ -250,14 +250,14 @@
 //    }
 //
 //    @Test public void testSingleTermSequence() {
-//        NAR nar = new Terminal();
+//        NAR nar = NARS.shell();
 //        Term x = nar.term("(&/, a)");
 //        assertNotNull(x);
 //        assertEquals(Atom.class, x.getClass());
 //    }
 //
 //    @Test public void testSequenceToString() {
-//        NAR nar = new Terminal();
+//        NAR nar = NARS.shell();
 //
 //        testSeqTermString(nar, "(&/,a,/1,b)");
 //        testSeqTermString(nar, "(&/,a,/3,b,/5,c,/10,d)");
@@ -285,7 +285,7 @@
 //
 ////    @Test public void testSequenceSentenceNormalization() {
 ////        //sequences at the top level as terms must not have any trailing intervals
-////        NAR nar = new Terminal();
+////        NAR nar = NARS.shell();
 ////
 ////        String tt = "(&/, a, /1, b, /2)";
 ////        Sequence term = nar.term(tt);
@@ -332,7 +332,7 @@
 //    }
 //
 //    @Test public void testDoesntLoseInfo() {
-//        NAR nar = new Terminal();
+//        NAR nar = NARS.shell();
 //        Term t = nar.term("<(&/, <$1 --> (/, open, _, door)>, /5) =/> <$1 --> (/, enter, _, room)>>");
 //        Concept t2 = nar.concept(t);
 //        String s1 = t.toString();

@@ -19,7 +19,7 @@ public class CLink<X extends Priority> extends RoaringBitmap implements Priority
 
     @Override
     public String toString() {
-        return ref.toString() + super.toString();
+        return ref + super.toString();
     }
 
     @Override
@@ -52,11 +52,7 @@ public class CLink<X extends Priority> extends RoaringBitmap implements Priority
 
     @Override
     public boolean delete() {
-        if (ref.delete()) {
-            //dont clear the bits yet, they may be used shortly afterward
-            return true;
-        }
-        return false;
+        return ref.delete();
     }
 
     @Override

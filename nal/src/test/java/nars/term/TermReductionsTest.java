@@ -1,11 +1,7 @@
 package nars.term;
 
-import nars.$;
-import nars.Narsese;
-import nars.Op;
-import nars.Task;
+import nars.*;
 import nars.io.NarseseTest;
-import nars.nar.Terminal;
 import nars.task.util.InvalidTaskException;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +30,6 @@ import static nars.$.task;
 import static nars.$.varDep;
 import static nars.Op.*;
 import static nars.term.TermTest.*;
-import static nars.term.TermTest.t;
 import static org.junit.Assert.*;
 
 /**
@@ -248,7 +243,7 @@ public class TermReductionsTest extends NarseseTest {
         //the repeats in the conjunction term can be replaced with a single event with equivalent start/stop time
         assertEquals(
                 "$.50 (x). 0⋈10 %1.0;.90%",
-                t.task("((x) &&+10 (x)). :|:").toString());
+                NARS.shell().task("((x) &&+10 (x)). :|:").toString());
     }
 
     @Test
@@ -527,7 +522,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testInvalidStatementIndepVarTask() throws Narsese.NarseseException {
-        Terminal t = new Terminal();
+        NAR t = NARS.shell();
         try {
             t.inputAndGet("at($1,$2,$3)");
             assertTrue(false);
@@ -691,7 +686,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testRepeatEvent() throws Narsese.NarseseException {
-        Terminal n = new Terminal();
+        NAR n = NARS.shell();
 
         for (String x : new String[]{
                 "((a) ==>+1 (a))",

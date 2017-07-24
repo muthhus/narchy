@@ -107,7 +107,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
             this.priority = priority;
         }
 
-        int nextIdx = 0;
+        int nextIdx;
 
         void addQueue(SubQueue subQueue) {
             queues.add(subQueue);
@@ -290,6 +290,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
         }
     }
 
+    @Override
     public E poll(long timeout, TimeUnit unit) throws InterruptedException {
         long remaining = unit.toNanos(timeout);
         DequeResult dequeResult;
@@ -318,6 +319,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
         return dequeResult.element;
     }
 
+    @Override
     public E take() throws InterruptedException {
         DequeResult dequeResult;
         int oldSize;
@@ -343,6 +345,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
         return dequeResult.element;
     }
 
+    @Override
     public E poll() {
         if (totalCount.get() == 0)
             return null;
@@ -369,6 +372,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
         return dequeResult.element;
     }
 
+    @Override
     public E peek() {
         if (totalCount.get() == 0)
             return null;
@@ -431,10 +435,12 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
         return dequed;
     }
 
+    @Override
     public int drainTo(Collection<? super E> c) {
         return drainTo(c, Integer.MAX_VALUE);
     }
 
+    @Override
     public int drainTo(Collection<? super E> c, int maxElements) {
         if (c == null)
             throw new NullPointerException();
@@ -482,6 +488,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
         private final AtomicInteger count = new AtomicInteger();
         private boolean enabled = true;
 
+        @Override
         public int remainingCapacity() {
             return capacity - count.get();
         }
@@ -499,6 +506,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
         /**
          * Atomically removes all of the elements from this queue. The queue will be empty after this call returns.
          */
+        @Override
         public void clear() {
             fullyLock();
             try {
@@ -580,6 +588,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
          * Return the number of elements in this sub queue. This method returns the actual number of elements,
          * regardless of whether the queue is enabled or not.
          */
+        @Override
         public int size() {
             return count.get();
         }
@@ -588,10 +597,12 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
          * Return whether the queue is empty. This method bases its return value in the actual number of elements,
          * regardless of whether the queue is enabled or not.
          */
+        @Override
         public boolean isEmpty() {
             return size() == 0;
         }
 
+        @Override
         public void put(E e) throws InterruptedException {
             if (e == null)
                 throw new NullPointerException();
@@ -629,6 +640,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
             return;
         }
 
+        @Override
         public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
             if (e == null)
                 throw new NullPointerException();
@@ -658,6 +670,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
             return true;
         }
 
+        @Override
         public boolean offer(E e) {
             if (e == null)
                 throw new NullPointerException();
@@ -685,6 +698,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
             return true;
         }
 
+        @Override
         public boolean remove(Object o) {
             if (o == null)
                 return false;
@@ -702,6 +716,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
             }
         }
 
+        @Override
         public boolean contains(Object o) {
             if (o == null)
                 return false;
@@ -795,6 +810,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
             }
         }
 
+        @Override
         public Object[] toArray() {
             fullyLock();
             try {
@@ -809,6 +825,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
             }
         }
 
+        @Override
         @SuppressWarnings("unchecked")
         public <T> T[] toArray(T[] a) {
             fullyLock();
@@ -836,6 +853,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
          *
          * @return an iterator over the elements in this queue in proper sequence
          */
+        @Override
         public Iterator<E> iterator() {
             return new Itr();
         }
@@ -861,6 +879,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
                 }
             }
 
+            @Override
             public boolean hasNext() {
                 return current != null;
             }
@@ -882,6 +901,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
                 }
             }
 
+            @Override
             public E next() {
                 fullyLock();
                 try {
@@ -897,6 +917,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
                 }
             }
 
+            @Override
             public void remove() {
                 if (lastRet == null)
                     throw new IllegalStateException();
@@ -928,7 +949,7 @@ public class LinkedBlockingMultiQueue<K, E> extends AbstractPollable<E> {
          * - this Node, meaning the successor is head.next 
          * - null, meaning there is no successor (this is the last node)
          */
-        Node<E> next = null;
+        Node<E> next;
 
         Node(E item) {
             this.item = item;

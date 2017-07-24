@@ -96,7 +96,7 @@ public class LongArrayBitVector extends AbstractBitVector implements Cloneable, 
 	 */
 
 	protected static int numWords(long size ) {
-		if ( ASSERTS ) assert ( size + WORD_MASK ) >>> LOG2_BITS_PER_WORD <= Integer.MAX_VALUE;
+        assert !ASSERTS || (size + WORD_MASK) >>> LOG2_BITS_PER_WORD <= Integer.MAX_VALUE;
 		return (int)( ( size + WORD_MASK ) >>> LOG2_BITS_PER_WORD );
 	}
 
@@ -107,7 +107,7 @@ public class LongArrayBitVector extends AbstractBitVector implements Cloneable, 
 	 * if <code>index</code> is -1.
 	 */
 	protected static int word(long index ) {
-		if ( ASSERTS ) assert index >>> LOG2_BITS_PER_WORD <= Integer.MAX_VALUE;
+        assert !ASSERTS || index >>> LOG2_BITS_PER_WORD <= Integer.MAX_VALUE;
 		return (int)( index >>> LOG2_BITS_PER_WORD );
 	}
 
@@ -701,7 +701,7 @@ public class LongArrayBitVector extends AbstractBitVector implements Cloneable, 
 		long h = 0x9e3779b97f4a7c13L ^ length;
 		int numWords = numWords( length );
 		for( int i = 0; i < numWords; i++ ) h ^= ( h << 5 ) + bits[ i ] + ( h >>> 2 );
-		if ( ASSERTS ) assert (int)( ( h >>> 32 ) ^ h ) == super.hashCode();
+        assert !ASSERTS || (int) ((h >>> 32) ^ h) == super.hashCode();
 		return (int)( ( h >>> 32 ) ^ h );
 	}
 	

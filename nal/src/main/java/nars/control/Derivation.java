@@ -1,8 +1,7 @@
-package nars.control.premise;
+package nars.control;
 
 import jcog.math.ByteShuffler;
 import nars.*;
-import nars.control.Premise;
 import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
@@ -20,8 +19,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.VAR_PATTERN;
-import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesAny;
-import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesDep;
+import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
+import static nars.op.substituteIfUnifies.substituteIfUnifiesDep;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 

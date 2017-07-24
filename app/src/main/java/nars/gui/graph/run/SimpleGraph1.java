@@ -8,12 +8,12 @@ import jcog.bag.Bag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.$;
+import nars.NARS;
 import nars.concept.Concept;
 import nars.control.Activate;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
 import nars.gui.graph.EdgeDirected;
-import nars.nar.Terminal;
 import nars.term.Term;
 import nars.term.Termed;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -44,7 +44,7 @@ public class SimpleGraph1 extends ConceptSpace {
     final Surface status = new Label("ready");
 
     public SimpleGraph1(int maxEdges) {
-        super(new Terminal(), maxEdges, maxEdges);
+        super(NARS.shell(), maxEdges, maxEdges);
 
 
         nodeBuilder = (x) ->

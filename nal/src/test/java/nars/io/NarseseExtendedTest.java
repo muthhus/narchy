@@ -1,10 +1,6 @@
 package nars.io;
 
-import nars.$;
-import nars.Narsese;
-import nars.Op;
-import nars.Task;
-import nars.nar.Terminal;
+import nars.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.time.Tense;
@@ -122,10 +118,9 @@ public class NarseseExtendedTest extends NarseseTest {
         }
     }
 
-    static final Terminal t = new Terminal(8);
 
     static void eqTask(String x, String b) throws Narsese.NarseseException {
-        Task a = t.task(x + '.');
+        Task a = NARS.shell().task(x + '.');
         assertNotNull(a);
         assertEquals(b, a.term().toString());
     }

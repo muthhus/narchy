@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.concept.dynamic.DynamicBeliefTable;
-import nars.nar.Terminal;
 import org.junit.Test;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class NAL7DurationTest {
 
     @Test
     public void testDurationDithering() throws Narsese.NarseseException {
-        Terminal n = new Terminal();
+        NAR n = NARS.shell();
         n.time.dur(5);
         assertEquals( $.$("((x) &| (y))"), n.term("((x) &&+1 (y))"));
         assertEquals( $.$("((x) &| (y))"), n.term("((x) &&-1 (y))"));

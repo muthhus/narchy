@@ -50,8 +50,8 @@ public class BitwiseArray2 extends AuxilaryBitSet {
 		return effectiveMod;
 	}
 	protected long Get(int bucketStart, int idx, int customSize, int mod) {
-		int effectiveMod = getModOffsetFix(idx, mod);;
-		int effectiveItemSize = getSizeFix(idx, customSize, mod);
+		int effectiveMod = getModOffsetFix(idx, mod);
+        int effectiveItemSize = getSizeFix(idx, customSize, mod);
 
 			int start = bucketStart + idx*customSize + effectiveMod;
 			return super.getBits(start, start + effectiveItemSize);

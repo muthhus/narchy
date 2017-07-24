@@ -312,6 +312,7 @@ public class TestCase {
     public abstract class CheckedRunnable implements Runnable {
         protected abstract void realRun() throws Throwable;
 
+        @Override
         public final void run() {
             try {
                 realRun();
@@ -338,6 +339,7 @@ public class TestCase {
             super(parties);
         }
 
+        @Override
         public int await() {
             try {
                 return super.await(2 * LONG_DELAY_MS, MILLISECONDS);

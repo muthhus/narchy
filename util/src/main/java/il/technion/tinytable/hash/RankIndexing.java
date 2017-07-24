@@ -162,7 +162,7 @@ public class RankIndexing {
         if (maxChainSize == 0) {
             I0[bucketId] &= ~(1L << chainNumber);
             IStar[bucketId] = shrinkOffset(IStar[bucketId], chain[0]);
-            return chain[maxChainSize];
+            return chain[0];
 
         } else {
             IStar[bucketId] = IStar[bucketId] & (~(1L << chain[maxChainSize - 1]));

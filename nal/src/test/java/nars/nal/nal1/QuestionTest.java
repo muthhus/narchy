@@ -84,7 +84,7 @@ public class QuestionTest {
 
 
 //    @Test public void testQuestionHandler() throws Narsese.NarseseException {
-//        NAR nar = new Terminal();
+//        NAR nar = NARS.shell();
 //
 //        final int[] s = {0};
 //        new TaskMatch("add(%1, %2, #x)", nar) {
@@ -105,7 +105,7 @@ public class QuestionTest {
 //    }
 
 //    @Test public void testOperationHandler() throws Narsese.NarseseException {
-//        NAR nar = new Terminal();
+//        NAR nar = NARS.shell();
 //
 //        final int[] s = {0};
 //        StringBuilder match = new StringBuilder();

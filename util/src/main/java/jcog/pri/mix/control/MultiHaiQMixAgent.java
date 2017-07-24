@@ -20,7 +20,7 @@ public class MultiHaiQMixAgent implements MixAgent {
      * shared QL input state
      */
     private int sharedInputState = -1;
-    public Autoencoder sharedPerception = null;
+    public Autoencoder sharedPerception;
     private float sharedPerceptionError;
 
     @Override

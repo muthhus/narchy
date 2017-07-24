@@ -334,7 +334,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
          * The caller's key (i.e., the key the caller of FileHashMap.put()
          * specified).
          */
-        private K key = null;
+        private K key;
 
     /*----------------------------------------------------------------------*\
                                Constructors
@@ -391,8 +391,9 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
          *
          * @param o The other object
          */
+        @Override
         public int compareTo(FileHashMapEntry o) {
-            FileHashMapEntry other = (FileHashMapEntry) o;
+            FileHashMapEntry other = o;
             Long thisPos = new Long(this.filePosition);
             Long otherPos = new Long(other.filePosition);
 
@@ -491,7 +492,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * to it.
      */
     private static class ValuesFile {
-        private RandomAccessFile file;
+        private final RandomAccessFile file;
 
         ValuesFile(File f)
                 throws IOException {
@@ -520,6 +521,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             // Nothing to do
         }
 
+        @Override
         public int compare(FileHashMapEntry<K> o1, FileHashMapEntry<K> o2) {
             return o1.compareTo(o2);
         }
@@ -550,10 +552,11 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             // Nothing to do
         }
 
+        @Override
         public int compare(FileHashMapEntry<K> o1, FileHashMapEntry<K> o2) {
             int cmp;
 
-            if ((cmp = (int) (o1.getObjectSize() - o2.getObjectSize())) == 0)
+            if ((cmp = o1.getObjectSize() - o2.getObjectSize()) == 0)
                 cmp = (int) (o1.getFilePosition() - o2.getFilePosition());
 
             return cmp;
@@ -582,14 +585,14 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
     private class EntryIterator implements Iterator<FileHashMapEntry<K>> {
         List<FileHashMapEntry<K>> entries;
         Iterator<FileHashMapEntry<K>> iterator;
-        FileHashMapEntry<K> currentEntry = null;
+        FileHashMapEntry<K> currentEntry;
 
         /**
          * The expectedSize value that the iterator believes that the backing
          * Map should have.  If this expectation is violated, the iterator
          * has detected concurrent modification.
          */
-        private int expectedSize = 0;
+        private int expectedSize;
 
         EntryIterator() {
             entries = FileHashMap.this.getSortedEntries();
@@ -597,10 +600,12 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             expectedSize = entries.size();
         }
 
+        @Override
         public boolean hasNext() {
             return iterator.hasNext();
         }
 
+        @Override
         public FileHashMapEntry<K> next() {
             if (expectedSize != FileHashMap.this.indexMap.size())
                 throw new ConcurrentModificationException();
@@ -616,6 +621,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             return currentEntry;
         }
 
+        @Override
         public void remove() {
             if ((currentEntry != null) && (expectedSize > 0)) {
                 K key = currentEntry.getKey();
@@ -645,14 +651,17 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             it = new EntryIterator();
         }
 
+        @Override
         public boolean hasNext() {
             return it.hasNext();
         }
 
+        @Override
         public V next() {
             return FileHashMap.this.readValueNoError(it.next());
         }
 
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }
@@ -669,10 +678,12 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             // Nothing to do
         }
 
+        @Override
         public void clear() {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public boolean contains(Object o) {
             boolean containsIt = false;
 
@@ -691,6 +702,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             return containsIt;
         }
 
+        @Override
         public boolean containsAll(Collection c) {
             boolean containsThem = true;
 
@@ -734,18 +746,22 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             return result;
         }
 
+        @Override
         public boolean isEmpty() {
             return indexMap.isEmpty();
         }
 
+        @Override
         public Iterator<V> iterator() {
             return new ValueIterator();
         }
 
+        @Override
         public boolean remove(Object o) {
             return (FileHashMap.this.remove(o) != null);
         }
 
+        @Override
         public int size() {
             return currentSize();
         }
@@ -765,7 +781,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * a FileHashMapEntry.
      */
     private class EntrySetEntry implements Map.Entry<K, V> {
-        private FileHashMapEntry<K> entry;
+        private final FileHashMapEntry<K> entry;
 
         EntrySetEntry(FileHashMapEntry<K> entry) {
             this.entry = entry;
@@ -785,10 +801,12 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
                             thisValue == null : mo.getValue().equals(thisValue));
         }
 
+        @Override
         public K getKey() {
             return entry.getKey();
         }
 
+        @Override
         public V getValue() {
             return FileHashMap.this.readValueNoError(entry);
         }
@@ -803,6 +821,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
                     (value == null ? 0 : value.hashCode());
         }
 
+        @Override
         public V setValue(V value) {
             throw new UnsupportedOperationException();
         }
@@ -819,6 +838,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             // Nothing to do
         }
 
+        @Override
         public void clear() {
             throw new UnsupportedOperationException();
         }
@@ -827,18 +847,22 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             return FileHashMap.this.containsValue(o.getValue());
         }
 
+        @Override
         public Iterator<Map.Entry<K, V>> iterator() {
             return new Iterator<Map.Entry<K, V>>() {
                 EntryIterator it = new EntryIterator();
 
+                @Override
                 public Map.Entry<K, V> next() {
-                    return (Map.Entry<K, V>) new EntrySetEntry(it.next());
+                    return new EntrySetEntry(it.next());
                 }
 
+                @Override
                 public boolean hasNext() {
                     return it.hasNext();
                 }
 
+                @Override
                 public void remove() {
                     it.remove();
                 }
@@ -863,14 +887,17 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public boolean removeAll(Collection c) {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public boolean retainAll(Collection c) {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public int size() {
             return FileHashMap.this.size();
         }
@@ -894,20 +921,23 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * will traverse the data file sequentially.
      */
     private class KeyIterator implements Iterator<K> {
-        private EntryIterator it;
+        private final EntryIterator it;
 
         KeyIterator() {
             it = new EntryIterator();
         }
 
+        @Override
         public boolean hasNext() {
             return it.hasNext();
         }
 
+        @Override
         public K next() {
             return it.next().getKey();
         }
 
+        @Override
         public void remove() {
             it.remove();
         }
@@ -920,20 +950,23 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * the associated values (as with the various iterators, above).
      */
     private class KeySet extends AbstractSet<K> {
-        ArrayList<K> keys = null;
+        ArrayList<K> keys;
 
         private KeySet() {
             // Nothing to do
         }
 
+        @Override
         public void clear() {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public boolean contains(Object o) {
             return FileHashMap.this.indexMap.containsKey(o);
         }
 
+        @Override
         public boolean containsAll(Collection c) {
             boolean contains = true;
             Iterator it = c.iterator();
@@ -967,26 +1000,32 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
             return FileHashMap.this.indexMap.keySet().hashCode();
         }
 
+        @Override
         public boolean isEmpty() {
             return FileHashMap.this.indexMap.isEmpty();
         }
 
+        @Override
         public Iterator<K> iterator() {
             return new KeyIterator();
         }
 
+        @Override
         public boolean remove(Object o) {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public boolean removeAll(Collection c) {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public boolean retainAll(Collection c) {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public int size() {
             return FileHashMap.this.currentSize();
         }
@@ -1012,38 +1051,38 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * FileHashMapEntry object. This index is stored on disk, in the index
      * file.
      */
-    private HashMap<K, FileHashMapEntry<K>> indexMap = null;
+    private HashMap<K, FileHashMapEntry<K>> indexMap;
 
     /**
      * The file prefix with which this object was created.
      */
-    private String filePrefix = null;
+    private String filePrefix;
 
     /**
      * The index file.
      */
-    private File indexFilePath = null;
+    private File indexFilePath;
 
     /**
      * The values file.
      */
-    private File valuesDBPath = null;
+    private File valuesDBPath;
 
     /**
      * The open values database.
      */
-    private ValuesFile valuesDB = null;
+    private ValuesFile valuesDB;
 
     /**
      * The flags specified to the constructor.
      */
-    private int flags = 0;
+    private int flags;
 
     /**
      * Whether or not the index has been modified since the file was
      * opened.
      */
-    private boolean modified = false;
+    private boolean modified;
 
     /**
      * Whether or not the object is still valid. See close().
@@ -1054,7 +1093,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * The value returned by the entrySet() method. It's created the first
      * time entrySet() is called.
      */
-    private EntrySet entrySetResult = null;
+    private EntrySet entrySetResult;
 
     /**
      * A set of gaps in the file, ordered sequentially by file position.
@@ -1062,7 +1101,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * object or key. This reference will be non-null only if the
      * RECLAIM_FILE_GAPS flag was passed to the constructor.
      */
-    private TreeSet<FileHashMapEntry<K>> fileGaps = null;
+    private TreeSet<FileHashMapEntry<K>> fileGaps;
 
     /*----------------------------------------------------------------------*\
                             Private Class Data
@@ -1192,7 +1231,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @see #FileHashMap(String)
      */
     public FileHashMap(String pathPrefix, int flags)
-            throws FileNotFoundException,
+            throws
             ClassNotFoundException,
             IOException {
         assert (((~ALL_FLAGS_MASK) & flags) == 0);
@@ -1286,6 +1325,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      *
      * @throws Throwable on error
      */
+    @Override
     protected void finalize()
             throws Throwable {
         try {
@@ -1306,6 +1346,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * closing it, deleting it, and reopening it. If an I/O error occurs at
      * any point, this object will be closed and marked invalid.</p>
      */
+    @Override
     public synchronized void clear() {
         checkValidity();
         indexMap.clear();
@@ -1333,7 +1374,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @see #save
      */
     public synchronized void close()
-            throws NotSerializableException,
+            throws
             IOException {
         if (valid) {
             if ((flags & TRANSIENT) != 0) {
@@ -1363,6 +1404,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @return <tt>true</tt> if this map contains a mapping for the specified
      * key, <tt>false</tt> otherwise.
      */
+    @Override
     public boolean containsKey(Object key) {
         checkValidity();
         return indexMap.containsKey(key);
@@ -1377,6 +1419,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @return <tt>true</tt> if this map maps one or more keys to the
      * specified value, <tt>false</tt> otherwise.
      */
+    @Override
     public boolean containsValue(Object value) {
         checkValidity();
         return new ValueSet().contains(value);
@@ -1419,13 +1462,14 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @see #values
      * @see UnsupportedOperationException
      */
+    @Override
     public Set<Map.Entry<K, V>> entrySet() {
         checkValidity();
 
         if (entrySetResult == null)
             entrySetResult = new EntrySet();
 
-        return (Set<Map.Entry<K, V>>) entrySetResult;
+        return entrySetResult;
     }
 
     /**
@@ -1462,6 +1506,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @throws NullPointerException key is <tt>null</tt>
      * @see #containsKey(Object)
      */
+    @Override
     public V get(Object key) {
         checkValidity();
 
@@ -1528,6 +1573,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      *
      * @return a set view of the keys contained in this map.
      */
+    @Override
     public Set<K> keySet() {
         checkValidity();
         return new KeySet();
@@ -1551,6 +1597,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @throws NullPointerException     the specified key or value is
      *                                  <tt>null</tt>.
      */
+    @Override
     public V put(K key, V value)
             throws ClassCastException,
             IllegalArgumentException,
@@ -1608,6 +1655,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @return previous value associated with specified key, or <tt>null</tt>
      * if there was no mapping for key.
      */
+    @Override
     public V remove(Object key) {
         checkValidity();
 
@@ -1654,8 +1702,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @see #close
      */
     public void save()
-            throws IOException,
-            NotSerializableException {
+            throws IOException {
         checkValidity();
 
         if (((flags & TRANSIENT) == 0) && modified)
@@ -1670,6 +1717,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      *
      * @return the number of key-value mappings in this map.
      */
+    @Override
     public int size() {
         checkValidity();
         return currentSize();
@@ -1695,6 +1743,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @see #keySet
      * @see #values
      */
+    @Override
     public Collection<V> values() {
         checkValidity();
 
@@ -1966,8 +2015,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
      * @see #readValue
      */
     private synchronized FileHashMapEntry<K> writeValue(K key, V obj)
-            throws IOException,
-            NotSerializableException {
+            throws IOException {
         ObjectOutputStream objStream;
         ByteArrayOutputStream byteStream;
         int size;

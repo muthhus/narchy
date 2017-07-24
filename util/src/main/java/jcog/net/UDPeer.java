@@ -83,9 +83,9 @@ public class UDPeer extends UDP {
     private final Random rng;
 
 
-    private AtomicBoolean
-            needChanged = new AtomicBoolean(false),
-            canChanged = new AtomicBoolean(false);
+    private final AtomicBoolean
+            needChanged = new AtomicBoolean(false);
+    private final AtomicBoolean canChanged = new AtomicBoolean(false);
 
 
     public UDPeer() throws IOException {

@@ -786,11 +786,11 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
         /**
          * Objective function value.
          */
-        private double value;
+        private final double value;
         /**
          * Penalty value for repair of out out of bounds points.
          */
-        private double penalty;
+        private final double penalty;
 
         /**
          * @param value   Function value.

@@ -2,7 +2,6 @@ package nars.task;
 
 import nars.*;
 import nars.concept.Concept;
-import nars.nar.Terminal;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;
 import org.jetbrains.annotations.NotNull;
@@ -78,7 +77,7 @@ public class TaskTest {
 //     * representation (which is perfect and lossless hash if truth epsilon
 //     * is sufficiently large) */
 //    @Test public void testTaskOrderByTruthViaHash() throws Narsese.NarseseException {
-//        Terminal n = new Terminal();
+//        Terminal n = NARS.shell();
 //        TreeSet<Task> t = new TreeSet<>();
 //        int count = 0;
 //        for (float f = 0; f < 1.0f; f += 0.3f)
@@ -177,7 +176,7 @@ public class TaskTest {
     }
 
     @Test public void testValid() throws Narsese.NarseseException {
-        Terminal tt = new Terminal();
+        NAR tt = NARS.shell();
         Task t = $.task("((&&,#1,(#1 &&+0 #3),(#2 &&+0 #3),(#2 &&+0 (toothbrush-->here))) ==>+0 lighter(I,toothbrush))", BELIEF, 1f, 0.9f).apply(tt);
         assertNotNull(t);
         Concept c = t.concept(tt,true);

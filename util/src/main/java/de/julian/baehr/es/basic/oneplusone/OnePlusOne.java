@@ -133,8 +133,8 @@ public class OnePlusOne {
 	
 	static void evaluate(List<Individual> individuals, IObjectiveFunction objectiveFunction){
 		for(Individual i : individuals)
-			i.calculateFitness(objectiveFunction);;
-	}
+			i.calculateFitness(objectiveFunction);
+    }
 	
 	static List<Individual> sort(List<Individual> individuals){
 		individuals.sort((i1, i2) -> Double.compare(i1.getFitness(), i2.getFitness()));

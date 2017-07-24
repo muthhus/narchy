@@ -8,7 +8,6 @@ import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.concept.FuzzyScalarConcepts;
-import nars.nar.Terminal;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.junit.Ignore;
@@ -42,7 +41,7 @@ public class FuzzyScalarConceptsTest {
     @Ignore
     @Test
     public void testRewardConceptsFuzzification3() {
-        NAR d = new Terminal();
+        NAR d = NARS.shell();
         MutableFloat m = new MutableFloat(0f);
 
         FloatPolarNormalized range = new FloatPolarNormalized(() -> m.floatValue());

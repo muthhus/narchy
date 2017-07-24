@@ -2,7 +2,6 @@ package nars.task;
 
 import com.google.common.collect.Lists;
 import nars.*;
-import nars.nar.Terminal;
 import nars.test.analyze.BeliefAnalysis;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +38,7 @@ public class RevectionTest {
 
     }
 
-    final static NAR n = new Terminal();
+    final static NAR n = NARS.shell();
 
 
     @Test

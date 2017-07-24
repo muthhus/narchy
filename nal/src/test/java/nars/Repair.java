@@ -1,11 +1,11 @@
 package nars;
 
 import jcog.pri.op.PriMerge;
+import nars.exe.FocusedExecutioner;
 import nars.nal.AbstractNALTest;
 import nars.nal.nal1.NAL1Test;
 import nars.nal.nal2.NAL2Test;
 import nars.nal.nal3.NAL3Test;
-import nars.nar.exe.FocusedExecutioner;
 import nars.util.OptiUnit;
 import org.intelligentjava.machinelearning.decisiontree.DecisionTree;
 import org.intelligentjava.machinelearning.decisiontree.FloatTable;

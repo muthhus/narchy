@@ -8,10 +8,9 @@ import il.technion.tinytable.hash.GreenHasher;
 import il.technion.tinytable.hash.RankIndexing;
 import org.eclipse.collections.api.list.primitive.IntList;
 
-import java.io.Serializable;
 import java.util.function.Function;
 
-public class TinyTable extends BitwiseArray implements Serializable {
+public class TinyTable extends BitwiseArray {
 
     /** used as an object pool for the rank indexing technique. In order to prevent dynamic memory allocation. */
     public final byte[] offsets;

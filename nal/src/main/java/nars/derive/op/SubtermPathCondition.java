@@ -1,6 +1,6 @@
 package nars.derive.op;
 
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.derive.AtomicPred;
 import nars.term.Compound;
 import nars.term.Term;

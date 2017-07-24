@@ -2,7 +2,7 @@ package nars.derive;
 
 import nars.$;
 import nars.Op;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

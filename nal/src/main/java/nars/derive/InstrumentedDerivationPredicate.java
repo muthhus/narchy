@@ -1,7 +1,7 @@
 package nars.derive;
 
 import nars.$;
-import nars.control.premise.Derivation;
+import nars.control.Derivation;
 import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;

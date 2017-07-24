@@ -60,7 +60,7 @@ public class StreamingNormalizer {
         float z = maxOrMin ? Float.NEGATIVE_INFINITY : Float.POSITIVE_INFINITY;
         for (int i = 0; i < dim; i++) {
             float m = n[i * 2 + (maxOrMin ? 0 : 1)];
-            if ((maxOrMin && m > z) || (!maxOrMin && m < z))
+            if (maxOrMin ? m > z : m < z)
                 z = m;
         }
         return z;

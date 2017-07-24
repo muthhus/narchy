@@ -2,8 +2,8 @@ package nars.rdfowl;
 
 import nars.NAR;
 import nars.NARS;
-import nars.nar.exe.BufferedExecutioner;
-import nars.nar.exe.Executioner;
+import nars.exe.BufferedExecutioner;
+import nars.exe.Executioner;
 import org.junit.Ignore;
 import org.junit.Test;
 

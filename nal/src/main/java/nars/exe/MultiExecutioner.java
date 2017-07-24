@@ -1,4 +1,4 @@
-package nars.nar.exe;
+package nars.exe;
 
 import jcog.Loop;
 import jcog.Util;

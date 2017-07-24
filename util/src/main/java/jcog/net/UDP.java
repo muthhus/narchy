@@ -70,7 +70,7 @@ public class UDP extends Loop {
 //        }
 //    }
 
-    public UDP(@Nullable InetAddress a, int port) throws IOException, SocketException {
+    public UDP(@Nullable InetAddress a, int port) throws IOException {
         super();
 
         c = DatagramChannel.open();

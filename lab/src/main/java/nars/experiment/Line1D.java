@@ -15,7 +15,6 @@ import spacegraph.layout.Grid;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meter.Plot2D;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 

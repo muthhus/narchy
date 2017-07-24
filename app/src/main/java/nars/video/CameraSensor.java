@@ -1,11 +1,9 @@
 package nars.video;
 
 import jcog.Util;
-import jcog.pri.mix.PSink;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
-import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;

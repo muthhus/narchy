@@ -2,11 +2,10 @@ package nars.term;
 
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
-import nars.conceptualize.DefaultConceptBuilder;
+import nars.concept.build.DefaultConceptBuilder;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MaplikeTermIndex;
-import nars.nar.Terminal;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
@@ -40,7 +39,7 @@ public class TermIndexTest {
     }
 
     void testIndex(@NotNull TermIndex i) throws Narsese.NarseseException {
-        Terminal t = new Terminal();
+        NAR t = NARS.shell();
         i.start(t);
 
         testTermSharing(i);
@@ -94,7 +93,7 @@ public class TermIndexTest {
 
     void testTermSharing(@NotNull TermIndex tt) throws Narsese.NarseseException {
 
-        tt.start(new Terminal());
+        tt.start(NARS.shell());
         testShared(tt, "<<x-->w> --> <y-->z>>");
         testShared(tt, "<a --> b>");
         testShared(tt, "(c, d)");

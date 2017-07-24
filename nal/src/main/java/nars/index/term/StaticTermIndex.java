@@ -1,6 +1,5 @@
-package nars.term.util;
+package nars.index.term;
 
-import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
