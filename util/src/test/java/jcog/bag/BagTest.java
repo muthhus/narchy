@@ -58,7 +58,7 @@ public class BagTest {
         assertEquals(1, c.size());
 
 
-        assertEquals(0, c.priMin(), 0.001f);
+        assertEquals(0, c.priMin(), Pri.EPSILON * 2);
 
         PriReference<String> x = c.get("x");
         assertNotNull(x);
