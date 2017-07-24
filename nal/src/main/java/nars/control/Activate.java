@@ -129,7 +129,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         //concept priority transfers into:
         //      its termlinks to subterms
         //      and their reverse links back to this
-        float pri = this.priElseZero();
+
+        float activationFactor = 1f; //priElseZero();
+
         if (localTemplates.length > 0) {
             float decayRate = 0.5f;
             float decayed = priElseZero() * (1f - decayRate);
@@ -145,7 +147,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
                     Concept localSubConcept = (Concept) localSub;
 
-                    nar.input(new Activate(localSubConcept, pri * subDecay));
+                    nar.input(new Activate(localSubConcept, activationFactor * subDecay));
 
                     localSubConcept.termlinks().putAsync(
                             new PLink(thisTerm, subDecayReverse)
@@ -207,13 +209,13 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         for (Termed localSub : localTemplates) {
 
-            if (localSub instanceof Concept) {
+            if (localSub instanceof Concept && !localSub.term().equals(id) /* dont self tasklink */) {
                 Concept localSubConcept = (Concept) localSub;
                 localSubConcept.tasklinks().putAsync(
                         new PLink(task, tfaEach)
                 );
 //                localSubConcept.termlinks().putAsync(
-//                        new PLink(taskTerm, tfaEach)
+//                        new PLink(task.term(), tfaEach)
 //                );
             }
 
@@ -259,14 +261,15 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //                ctpl = TermVector.the(sampledTermLink);
 //        }
 
-        if (ctpl != null) {
-            Set<Termed> tc =
-                    //new UnifiedSet<>(id.volume() /* estimate */);
-                    new HashSet(id.volume());
-            templates(tc, ctpl, nar, layers(id) - 1);
-            if (!tc.isEmpty())
-                return tc.toArray(new Termed[tc.size()]);
-        }
+        Set<Termed> tc =
+                //new UnifiedSet<>(id.volume() /* estimate */);
+                new HashSet(id.volume());
+        templates(tc, ctpl, nar, layers(id) - 1);
+
+        tc.add(id.term());
+
+        if (!tc.isEmpty())
+            return tc.toArray(new Termed[tc.size()]);
 
         //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
 
@@ -353,7 +356,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 return 3;
 
             case CONJ:
-                return 2;
+                return 3;
 
 //                int s = host.size();
 //                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {

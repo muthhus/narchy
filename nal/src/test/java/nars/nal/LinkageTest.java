@@ -50,12 +50,14 @@ public class LinkageTest extends AbstractNALTest {
         Concept ret = tester.nar.conceptualize(premise1);
         boolean passed = false;
         passed = isPassed2(premise2, ret, passed);
+        assertTrue(passed);
 
         Concept ret2 = tester.nar.conceptualize(premise2);
         boolean passed2 = false;
         passed2 = isPassed2(premise1, ret2, passed2);
+        assertTrue(passed2);
 
-        assertTrue(passed && passed2);
+
 //        if(passed && passed2) { //dummy to pass the test:
 //            tester.believe("<a --> b>");
 //        } else {

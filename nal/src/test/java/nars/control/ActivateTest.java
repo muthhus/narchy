@@ -81,7 +81,7 @@ public class ActivateTest {
 
         //layer 1:
         testTemplates("open:door",
-                "[door, open]");
+                "[door, open, (door-->open)]");
 
         //layer 2:
         testTemplates("open(John,door)",

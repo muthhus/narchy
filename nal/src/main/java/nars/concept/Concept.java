@@ -234,6 +234,55 @@ public interface Concept extends Termlike {
             e.printStackTrace();
         }
 
+                Consumer<Task> printTask = s -> {
+            try {
+                out.append(printIndent);
+                out.append(s.toString());
+                out.append(" ");
+                Object ll = s.lastLogged();
+                if (ll != null)
+                    out.append(ll.toString());
+                out.append('\n');
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        };
+
+        try {
+            if (showbeliefs) {
+                out.append(" Beliefs:");
+                if (beliefs().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    beliefs().forEachTask(printTask);
+                }
+                out.append(" Questions:");
+                if (questions().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    questions().forEachTask(printTask);
+                }
+            }
+
+            if (showgoals) {
+                out.append(" Goals:");
+                if (goals().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    goals().forEachTask(printTask);
+                }
+                out.append(" Quests:");
+                if (questions().isEmpty()) out.append(" none").append('\n');
+                else {
+                    out.append('\n');
+                    quests().forEachTask(printTask);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
     }
 
     @NotNull ConceptState state();
@@ -243,8 +292,8 @@ public interface Concept extends Termlike {
      */
     ConceptState state(@NotNull ConceptState c);
 
-    /** can return null if no templates */
-    @Nullable TermContainer templates();
+    /** should not include itself, although this will be included with these templates on activation */
+    @NotNull TermContainer templates();
 
 
     void process(Task task, @NotNull NAR n);

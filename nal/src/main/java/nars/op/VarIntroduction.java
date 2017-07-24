@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
+import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 
 /**
@@ -33,9 +34,10 @@ public abstract class VarIntroduction {
             return; //earliest failure test
 
         if (!(c.isNormalized())) {
-            c = normalizedOrNull(c, n.terms);
-            if (c == null)
+            Compound cc = compoundOrNull(normalizedOrNull(c, n.terms));
+            if (cc == null)
                 return;
+            c = cc;
         }
 
         List<Term> selections = select(c);

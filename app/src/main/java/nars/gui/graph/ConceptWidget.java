@@ -4,6 +4,7 @@ import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.bag.Bag;
 import jcog.bag.impl.PLinkArrayBag;
+import jcog.data.FloatParam;
 import jcog.pri.Deleteable;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
@@ -28,6 +29,7 @@ import spacegraph.render.JoglPhysics;
 import spacegraph.space.Cuboid;
 import spacegraph.space.EDraw;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Consumer;
 
@@ -111,12 +113,17 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
     public Surface onTouch(Collidable body, ClosestRay hitPoint, short[] buttons, JoglPhysics space) {
         Surface s = super.onTouch(body, hitPoint, buttons, space);
         if (s != null) {
-
         }
+
+        if (buttons.length > 0 && buttons[0] == 1) {
+            if (concept!=null)
+                concept.print();
+        }
+
         return s;
     }
 
-    final static Truth zero = $.t(0.5f, 0.01f);
+
 
     public void commit(ConceptVis conceptVis, ConceptSpace space) {
 
@@ -143,9 +150,12 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
                 conceptVis.apply(this, key);
 
 
+                float termlinkOpacity = conceptVis.termlinkOpacity.floatValue();
+                float tasklinkOpacity = conceptVis.tasklinkOpacity.floatValue();
                 edges.commit(x -> {
-                    x.get().update(ConceptWidget.this, priSum);
-                    x.get().decay(edgeDecayRate);
+                    TermEdge e = x.get();
+                    e.update(ConceptWidget.this, priSum, edgeDecayRate, termlinkOpacity, tasklinkOpacity);
+
                     x.priMult(edgeDecayRate);
                 });
 
@@ -305,7 +315,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
             return hash;
         }
 
-        public void update(ConceptWidget src, float conceptEdgePriSum) {
+        public void update(ConceptWidget src, float conceptEdgePriSum, float edgeDecayRate, float termlinkOpacity, float tasklinkOpacity) {
 
             float edgeSum = (termlinkPri + tasklinkPri);
 
@@ -326,8 +336,8 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
                 if (edgeSum > 0) {
                     this.b = 0.1f;
-                    this.r = 0.1f + 0.7f * (tasklinkPri / edgeSum);
-                    this.g = 0.1f + 0.7f * (termlinkPri / edgeSum);
+                    this.r = 0.1f + 0.8f * (tasklinkPri / edgeSum)* tasklinkOpacity;
+                    this.g = 0.1f + 0.8f * (termlinkPri / edgeSum)* termlinkOpacity;
                 } else {
                     this.r = this.g = this.b = 0.1f;
                 }
@@ -338,7 +348,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
                 this.a = //0.1f + 0.5f * Math.max(tasklinkPri, termlinkPri);
                         //0.1f + 0.9f * ff.pri(); //0.9f;
                         // 0.5f * edgeProp
-                        0.1f + 0.75f * Util.or(termlinkPri, tasklinkPri);
+                        0.1f + 0.75f * Util.or(termlinkPri , tasklinkPri );
 
                 this.attraction = 0f + 0.1f * edgeProp;// + priSum * 0.75f;// * 0.5f + 0.5f;
                 this.attractionDist = 0.1f + src.radius() + target.radius(); //target.radius() * 2f;// 0.25f; //1f + 2 * ( (1f - (qEst)));
@@ -347,6 +357,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
                 this.attraction = 0;
             }
 
+            decay(edgeDecayRate);
 
         }
 
@@ -356,11 +367,15 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
         }
     }
 
-    public interface ConceptVis {
-        void apply(ConceptWidget w, Term tt);
+    public static abstract class ConceptVis {
+
+        public final FloatParam termlinkOpacity = new FloatParam(1f, 0f, 1f);
+        public final FloatParam tasklinkOpacity = new FloatParam(1f, 0f, 1f);
+
+        public abstract void apply(ConceptWidget w, Term tt);
     }
 
-    public static class ConceptVis1 implements ConceptVis {
+    public static class ConceptVis1 extends ConceptVis {
 
         final float minSize = 0.1f;
         final float maxSize = 6f;
@@ -380,10 +395,10 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
         }
     }
 
-    public static class ConceptVis2 implements ConceptVis {
+    public static class ConceptVis2 extends ConceptVis {
 
-        final float minSize = 2f;
-        final float maxSize = 10f;
+        public FloatParam minSize = new FloatParam(2f, 0.1f, 5f);
+        public FloatParam maxSizeMult = new FloatParam(4f, 1f, 5f);
 
         @Override
         public void apply(ConceptWidget cw, Term tt) {
@@ -396,7 +411,10 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
             float ec = p;// + w2c((b + g + q)/2f);
 
             //sqrt because the area will be the sqr of this dimension
-            float nodeScale = (float) (minSize + Math.sqrt(ec) * maxSize);//1f + 2f * p;
+            float minSize = this.minSize.floatValue();
+            float nodeScale = (float) (minSize + Math.sqrt(ec) *
+                    minSize * maxSizeMult.floatValue()
+            );//1f + 2f * p;
             float l = nodeScale * 1.618f;
             float w = nodeScale;
             float h = 1; //nodeScale / (1.618f * 2);

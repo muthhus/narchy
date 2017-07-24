@@ -58,15 +58,14 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
     public static void main(String[] args) throws Narsese.NarseseException, FileNotFoundException {
 
-        Param.DEBUG = false;
+        Param.DEBUG = true;
+        //Param.TRACE = true;
+        NAR n = NARS.tmp();
+        //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
+        //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
+        float fps = 1f;
 
-
-        NAR n = new NARS().get();
-        n.DEFAULT_BELIEF_PRIORITY = 0.1f;
-        n.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        float fps = 2f;
-
-        csvPriority(n, "/tmp/x.csv");
+        //csvPriority(n, "/tmp/x.csv");
 
 //        Default n = O.of(new Default.DefaultTermIndex(512, new NARS.ExperimentalConceptBuilder()),
 //                new CycleTime(), new BufferedSynchronousExecutor(64, 0.5f)).the(Default.class);
@@ -106,7 +105,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //            500, 500
 //        );
 
-        NARSpace cs = new SimpleConceptGraph1(n,
+        SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
                 () -> (((FocusedExecutioner) (n.exe)).concepts)
                         .stream()
                         .map(x -> x instanceof Activate ? ((Activate)x) : null)
@@ -158,6 +157,8 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         SpaceGraph.window(
                 col(
+                        reflect(cs),
+                        reflect(cs.vis),
                         reflect(fd),
                         reflect(n.exe)
                         //new CheckBox("Atoms", atomsEnabled),
@@ -186,7 +187,12 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //            n.inputAt(i*2,"(" + ((char)('a' + i)) + "). :|:");
 
         //new DeductiveMeshTest(n, new int[]{3, 2}, 16384);
-        n.input("(a-->b).", "(b-->c).","(c-->d).");
+        n.log();
+        n.input(
+                //"(a-->b).", "(b-->c).","(c-->d)."
+
+                "$.50 at(SELF,{t001}). :|: %1.0;.90%", "$.70 (at(SELF,{t001}) &&+5 open({t001}))! %1.0;.90%" // //goal_ded_2
+        );
         //n.log();
 
         //n.onCycle(nn->{System.out.println(nn.time() + "\n" + n.exe.stats() + "\n\n");});

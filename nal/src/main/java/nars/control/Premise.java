@@ -119,7 +119,7 @@ public class Premise extends Pri implements ITask {
 
             int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
 
-            Term unified = unify( beliefTerm, task.term(), nar, matchTTL);
+            Term unified = unify(beliefTerm, task.term(), nar, matchTTL);
             if (unified != null) {
                 beliefTerm = unified;
                 reUnified = true;
@@ -135,15 +135,16 @@ public class Premise extends Pri implements ITask {
 
             BaseConcept beliefConcept = (BaseConcept) _beliefConcept;
 
-            BeliefTable table =
-                    (task.isGoal() || task.isQuest()) ?
-                            beliefConcept.goals() :
-                            beliefConcept.beliefs();
 
 
             Task match;
 
             if (task.isQuestOrQuestion() && (reUnified || beliefIsTask)) {
+                final BeliefTable answerTable =
+                        (task.isGoal() || task.isQuest()) ?
+                                beliefConcept.goals() :
+                                beliefConcept.beliefs();
+
 //                            //see if belief unifies with task (in reverse of previous unify)
 //                            if (questionTerm.varQuery() == 0 || (unify((Compound)beliefConcept.term(), questionTerm, nar) == null)) {
 //
@@ -151,7 +152,7 @@ public class Premise extends Pri implements ITask {
 //
 //                            }
                 long when = whenAnswer(task, now);
-                match = table.answer(when, now, dur, task, (Compound) beliefTerm, beliefConcept, nar);
+                match = answerTable.answer(when, now, dur, task,  beliefTerm, beliefConcept, nar);
                 if (match != null) {
                     @Nullable Task answered = task.onAnswered(match, nar);
                     if (answered != null) {
@@ -169,7 +170,7 @@ public class Premise extends Pri implements ITask {
                 }
             } else {
                 long when = whenMatch(task, now);
-                match = table.match(when, task, beliefTerm, true, nar);
+                match = beliefConcept.beliefs().match(when, task, beliefTerm, true, nar);
             }
 
             if (match != null && match.isBelief()) {
@@ -184,8 +185,6 @@ public class Premise extends Pri implements ITask {
 
         if (belief != null && belief.equals(task)) //do not repeat the same task for belief
             belief = null; //force structural transform; also prevents potential inductive feedback loop
-
-        //System.out.println(task + "\t" + beliefTerm + " ::: \t" + belief);
 
         d.run(this, task, belief, beliefTerm, ttlMax);
 

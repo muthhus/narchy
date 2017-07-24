@@ -6,7 +6,6 @@ import nars.Task;
 import nars.concept.BaseConcept;
 import nars.control.Cause;
 import nars.task.NALTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -80,7 +79,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long when, long now, int dur, @NotNull Task question, Compound template, BaseConcept beliefConcept, NAR nar) {
+        public Task answer(long when, long now, int dur, @NotNull Task question, Term template, BaseConcept beliefConcept, NAR nar) {
             return null;
         }
 
@@ -206,7 +205,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
     /** projects a match */
-    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Compound template, BaseConcept beliefConcept, NAR nar) {
+    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Term template, BaseConcept beliefConcept, NAR nar) {
 
 
         Task answer = match(when, question, question.term(), false, nar);

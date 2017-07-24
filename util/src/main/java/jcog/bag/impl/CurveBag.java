@@ -35,15 +35,17 @@ public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
         if (size == 1)
             return 0;
         else {
-            float i = random.nextFloat(); //uniform
             float min = this.min;
             float max = this.max;
             float diff = max - min;
-            if (diff > Pri.EPSILON) {
+            if (diff > Pri.EPSILON * size) {
+                float i = random.nextFloat(); //uniform
                 //normalize to the lack of dynamic range
                 i = Util.lerp(diff, i /* flat */, (i*i) /* curved */);
+                return Math.round(i * (size - 1));
+            } else {
+                return random.nextInt(size);
             }
-            return Math.round(i * (size - 1));
         }
     }
 

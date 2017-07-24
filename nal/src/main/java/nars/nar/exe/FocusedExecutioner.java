@@ -108,6 +108,10 @@ public class FocusedExecutioner extends Executioner {
 
             premises.pop(subCyclePremises, next::add);
 
+//            System.out.println("PREMISES");
+//            next.forEach(System.out::println);
+//            System.out.println("/PREMISES");
+
             execute(next);
         }
     }

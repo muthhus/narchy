@@ -13,14 +13,13 @@ import java.util.List;
 public class DynamicConceptSpace extends ConceptSpace {
 
     final Bagregate<Activate> bag;
-    private final int maxNodes;
+
     private final List next;
     final float bagUpdateRate = 0.1f;
 
     public DynamicConceptSpace(NAR nar, @NotNull Iterable<Activate> concepts, int maxNodes, int bufferedNodes, int maxEdgesPerNodeMin, int maxEdgesPerNodeMax) {
         super(nar, maxEdgesPerNodeMin, maxEdgesPerNodeMax);
 
-        this.maxNodes = maxNodes;
 
         bag = new Bagregate<>(concepts, maxNodes + bufferedNodes, bagUpdateRate) {
             @Override

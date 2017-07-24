@@ -1,10 +1,5 @@
 package nars.control.premise;
 
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.google.common.io.ByteArrayDataOutput;
-import jcog.Util;
-import jcog.byt.DynBytes;
 import jcog.math.ByteShuffler;
 import nars.*;
 import nars.control.Premise;
@@ -13,23 +8,17 @@ import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.task.DerivedTask;
-import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
-import nars.term.var.Variable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-
-import static nars.Op.Null;
 import static nars.Op.VAR_PATTERN;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.term.transform.substituteIfUnifies.substituteIfUnifiesDep;
@@ -324,6 +313,7 @@ public class Derivation extends Unify implements TermContext {
         } else if (beliefCause.length > 0) {
             this.parentCause = new short[]{beliefCause[0]};
         }
+
 
         deriver.test(this);
 

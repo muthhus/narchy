@@ -365,8 +365,9 @@ public class NAL8Test extends AbstractNALTest {
 
         TestNAR tester = test;
 
-        tester.input("at(SELF,{t001}). :|:");
-        tester.inputAt(10, "(at(SELF,{t001}) &&+5 open({t001}))!");
+        tester.log();
+        tester.inputAt(0, "at(SELF,{t001}). :|:");
+        tester.inputAt(0, "(at(SELF,{t001}) &&+5 open({t001}))!");
 
         tester.mustDesire(cycles, "open({t001})", 1.0f, 0.81f, 5);
 

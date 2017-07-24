@@ -113,7 +113,7 @@ public class PatrickTests extends AbstractNALTest {
 
         TestNAR tt = test;
         //Param.TRACE = true;
-        tt.log();
+
         tt.nar.time.dur(2);
         //tt.nar.truthResolution.setValue(0.1f);
         //tt.nar.termVolumeMax.setValue(18);

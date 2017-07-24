@@ -35,6 +35,8 @@ public enum TermGraph {
             g.addNode(s);
             c.termlinks().forEach(tl -> {
                 Term t = tl.get();
+                if (t.equals(s))
+                    return; //no self loop
                 g.addNode(t);
                 float p = tl.pri();
                 if (p==p)

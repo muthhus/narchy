@@ -126,6 +126,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             //process time with the unnegated term
             float[] confScale = {1f};
 
+
             @Nullable Term t1 = this.time.compute(c1,
                     d, occ, confScale
             );
