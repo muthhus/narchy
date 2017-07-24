@@ -83,12 +83,15 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
     @Override
     protected void in(@NotNull Task task, @NotNull Consumer<PriReference<Compound>> each) {
 
-        if (task.meta(Abbreviation.class)!=null)
+        Term taskTerm = task.term();
+        if ((!(taskTerm instanceof Compound)) || task.meta(Abbreviation.class)!=null)
             return;
 
         Priority b = task;
-        if (b != null)
-            input(b, each, (Compound)task.term(), 1f);
+        if (b != null) {
+
+            input(b, each, (Compound) taskTerm, 1f);
+        }
     }
 
     private void input(@NotNull Priority b, @NotNull Consumer<PriReference<Compound>> each, @NotNull Compound t, float scale) {

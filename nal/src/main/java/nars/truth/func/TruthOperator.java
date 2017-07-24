@@ -141,7 +141,7 @@ public interface TruthOperator {
                 boolean tn = T.isNegative();
                 boolean bn = B.isNegative();
                 Truth t = o.apply(T.negIf(tn), B.negIf(bn), m, minConf);
-                if (o == BeliefFunction.Comparison /* || o == GoalFunction.Comparison */) {
+                if (t!=null && (o == BeliefFunction.Comparison /* || o == GoalFunction.Comparison */)) {
                     //special case(s): commutive xor
                     if (tn ^ bn)
                         t = t.negated();
