@@ -1033,15 +1033,17 @@ public interface TimeFunctions {
                 } else {
                     //not overlapping at all, compute point interpolation
                     long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
-                    if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float)dist)/p.dur);
+                    if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float)dist)/p.dur) {
                         occReturn[0] = occInterpolate(t, b);
-
+                        return derived;
+                    }
                     return null;
                 }
             } else {
                 occReturn[0] = occReturn[1] = ETERNAL;
             }
         }
+        return derived;
 
 //        long occ = occInterpolate(t, b); //reset
 //
@@ -1319,7 +1321,6 @@ public interface TimeFunctions {
 ////        }
 //
 //        occReturn[0] = occ;
-        return derived;
 
     };
 
