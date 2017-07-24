@@ -67,7 +67,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(
                 new CurveBag(PriMerge.plus, new ConcurrentHashMap<>(capacity), n.random(), capacity
-        ), selectionRate, n);
+                ), selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;
@@ -84,7 +84,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
     protected void in(@NotNull Task task, @NotNull Consumer<PriReference<Compound>> each) {
 
         Term taskTerm = task.term();
-        if ((!(taskTerm instanceof Compound)) || task.meta(Abbreviation.class)!=null)
+        if ((!(taskTerm instanceof Compound)) || task.meta(Abbreviation.class) != null)
             return;
 
         Priority b = task;
@@ -100,7 +100,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
             return;
 
         if (vol <= volume.hi()) {
-            if (t.vars() == 0 && t.conceptual().equals(t) /* identical to its conceptualize */ ) {
+            if (t.conceptual().equals(t) /* identical to its conceptualize */) {
                 Concept abbreviable = (Concept) nar.concept(t);
                 if ((abbreviable == null) ||
                         !(abbreviable instanceof PermanentConcept) &&
@@ -188,34 +188,45 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
         if (abbreviation != null) {
 
             @Nullable Concept a = nar.concept(abbreviated);
-            if (a != null && a.term() instanceof Compound) {
+            if (a != null) {
+
+                assert(a.term() instanceof Compound);
 
                 if (a.putIfAbsent(Abbreviation.class, id) == null) {
 
-                    AliasConcept ac = AliasConcept.get(id, a, nar);
-                    Concept alias = aliasConcept ?
-                            nar.on(ac) : null;
+                    Task abbreviationTask = Task.tryTask(abbreviation, BELIEF, nar.terms, $.t(1f, abbreviationConfidence.floatValue()),
+                            (te, tr) -> {
+
+                        NALTask ta = new NALTask(
+                                te, BELIEF, tr,
+                                nar.time(), ETERNAL, ETERNAL,
+                                new long[]{nar.time.nextStamp()}
+                        );
+
+                        Term abbreviatedTerm = abbreviated.term();
+
+                        AliasConcept ac = AliasConcept.get(id, a, nar);
+                        Concept alias = aliasConcept ?
+                                nar.on(ac) : null;
+                        nar.terms.set(abbreviated, ac); //set the abbreviated term to resolve to the abbreviation
+
+                        Termed aliasTerm = alias != null ? alias : Atomic.the(id);
+                        ta.meta(Abbreviation.class, new Term[]{abbreviatedTerm, aliasTerm.term()});
+                        ta.log("Abbreviate"); //, abbreviatedTerm, aliasTerm
+                        ta.priority().setPri(b);
+
+                        nar.input(ta);
+                        logger.info("+ {}", ta);
+
+                        return ta;
+
+                        //if (abbreviation != null) {
+
+                        //logger.info("{} <=== {}", alias, abbreviatedTerm);
+
+                    });
 
 
-
-
-                    nar.terms.set(abbreviated, ac); //set the abbreviated term to resolve to the abbreviation
-
-                    Termed aliasTerm = alias != null ? alias : Atomic.the(id);
-
-                    //if (abbreviation != null) {
-
-                    //logger.info("{} <=== {}", alias, abbreviatedTerm);
-                    Term abbreviatedTerm = abbreviated.term();
-
-                    Task abbreviationTask = new NALTask(
-                            abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
-                            nar.time(), ETERNAL, ETERNAL,
-                            new long[]{nar.time.nextStamp()}
-                    );
-                    abbreviationTask.meta(Abbreviation.class, new Term[] { abbreviatedTerm, aliasTerm.term() });
-                    abbreviationTask.log("Abbreviate"); //, abbreviatedTerm, aliasTerm
-                    abbreviationTask.priority().setPri(b);
                     //abbreviationTask.priority();
 //        if (srcCopy == null) {
 //            delete();
@@ -230,8 +241,6 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 //
 //        return this;
 
-                    nar.input(abbreviationTask);
-                    logger.info("+ {}", abbreviationTask);
                     return true;
                 }
             }

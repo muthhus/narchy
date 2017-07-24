@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
@@ -976,6 +978,13 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return new PreciseTruth(freq(), e, false);
     }
 
+    @Nullable static Task tryTask(@NotNull Term t, byte punc, TermIndex index, Truth tr, BiFunction<Term, Truth, Task> res) {
+        ObjectBooleanPair<Term> x = tryContent(t, punc, index, true);
+        if (x!=null) {
+            return res.apply(x.getOne(), tr.negIf(x.getTwo()));
+        }
+        return null;
+    }
     /**
      * attempts to prepare a term for use as a Task content.
      *
