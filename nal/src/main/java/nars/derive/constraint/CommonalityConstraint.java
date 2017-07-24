@@ -14,7 +14,7 @@ public abstract class CommonalityConstraint extends MatchConstraint {
 
     private final Term other;
 
-    public CommonalityConstraint(String func, Term target, Term other) {
+    protected CommonalityConstraint(String func, Term target, Term other) {
         super(func, target, other);
         this.other = other;
     }
@@ -51,12 +51,10 @@ public abstract class CommonalityConstraint extends MatchConstraint {
     /**
      * equality will have already been tested prior to calling this
      */
-    @NotNull
     protected abstract boolean invalid(Compound x, Compound y);
 
     /**
      * equality will have already been tested prior to calling this
      */
-    @NotNull
     protected abstract boolean invalid(Term x, Compound y);
 }

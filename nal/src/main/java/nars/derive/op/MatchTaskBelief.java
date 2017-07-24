@@ -191,7 +191,7 @@ public class MatchTaskBelief extends ProxyCompound implements PrediTerm<Derivati
 
     }
 
-    private static boolean taskFirst(@Nullable Term task, @Nullable Term belief) {
+    private static boolean taskFirst(@NotNull Term task, @NotNull Term belief) {
 
 
 

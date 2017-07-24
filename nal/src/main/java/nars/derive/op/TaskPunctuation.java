@@ -3,7 +3,7 @@ package nars.derive.op;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
-import nars.derive.AtomicPred;
+import nars.derive.PrediTerm;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,10 +13,10 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 
     public final byte punc;
 
-    public static final TaskPunctuation Belief = new TaskPunctuation('.');
-    public static final TaskPunctuation Goal = new TaskPunctuation('!');
+    public static final PrediTerm Belief = new TaskPunctuation('.');
+    public static final PrediTerm Goal = new TaskPunctuation('!');
 
-    public static final AbstractPred<Derivation> QuestionOrQuest = new AbstractPred<Derivation>("task:\"?@\"") {
+    public static final PrediTerm<Derivation> QuestionOrQuest = new AbstractPred<Derivation>("task:\"?@\"") {
         @Override
         public boolean test(@NotNull Derivation o) {
             byte c = o.taskPunct;
@@ -24,7 +24,7 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
         }
     };
 
-    public static final AbstractPred<Derivation> Question = new AbstractPred<Derivation>("task:\"?\"") {
+    public static final PrediTerm<Derivation> Question = new AbstractPred<Derivation>("task:\"?\"") {
         @Override
         public boolean test(@NotNull Derivation o) {
             return o.taskPunct == Op.QUESTION;
@@ -32,7 +32,7 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 
     };
 
-    public static final AbstractPred<Derivation> Quest = new AbstractPred<Derivation>("task:\"@\"") {
+    public static final PrediTerm<Derivation> Quest = new AbstractPred<Derivation>("task:\"@\"") {
         @Override
         public boolean test(@NotNull Derivation o) {
             return o.taskPunct == Op.QUEST;
@@ -47,18 +47,18 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 //        }
 //        @Override public String toString() { return "task:\".\""; }
 //    };
-    public static final AtomicPred<Derivation> NotQuestion = new AtomicPred<>() {
-        @Override
-        public boolean test(@NotNull Derivation o) {
-            byte p = o.taskPunct;
-            return (p != Op.QUESTION && p != Op.QUEST);
-        }
-
-        @Override
-        public String toString() {
-            return "task:\".!\"";
-        }
-    };
+//    public static final AtomicPred<Derivation> NotQuestion = new AtomicPred<>() {
+//        @Override
+//        public boolean test(@NotNull Derivation o) {
+//            byte p = o.taskPunct;
+//            return (p != Op.QUESTION && p != Op.QUEST);
+//        }
+//
+//        @Override
+//        public String toString() {
+//            return "task:\".!\"";
+//        }
+//    };
 //    public static final AtomicBoolCondition NotBelief = new AtomicBoolCondition()  {
 //        @Override public boolean booleanValueOf(@NotNull PremiseEval o) {
 //            return (o.premise.task().punc() != Symbols.BELIEF);

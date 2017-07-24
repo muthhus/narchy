@@ -15,7 +15,7 @@ import static nars.time.Tense.ETERNAL;
  */
 abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
 
-    public TaskBeliefOccurrence(@NotNull String x) {
+    protected TaskBeliefOccurrence(@NotNull String x) {
         super(x);
     }
 
@@ -34,7 +34,7 @@ abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
 
 
     @Nullable
-    public static final TaskBeliefOccurrence bothEvents = new TaskBeliefOccurrence("(bothEvents)") {
+    public static final PrediTerm bothEvents = new TaskBeliefOccurrence("(bothEvents)") {
 
         @Override
         public boolean test(@NotNull Derivation m) {
@@ -44,7 +44,7 @@ abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
     };
 
     @Nullable
-    public static final TaskBeliefOccurrence eventsOrEternals = new TaskBeliefOccurrence("(eventsOrEternals)") {
+    public static final PrediTerm eventsOrEternals = new TaskBeliefOccurrence("(eventsOrEternals)") {
 
         @Override
         public boolean test(@NotNull Derivation m) {

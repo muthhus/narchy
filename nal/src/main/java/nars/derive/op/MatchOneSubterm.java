@@ -38,10 +38,8 @@ public final class MatchOneSubterm extends UnificationPrototype {
     protected PrediTerm build(@Nullable PrediTerm eachMatch) {
         assert(finish ? eachMatch != null : eachMatch == null): "conclusion wrong";
         if (!finish) {
-            assert(eachMatch == null);
             return new UnifySubterm(subterm, pattern);
         }else {
-            assert(eachMatch!=null);
             return new UnifySubtermThenConclude(subterm, pattern, eachMatch);
         }
     }
@@ -72,7 +70,7 @@ public final class MatchOneSubterm extends UnificationPrototype {
         private final int subterm;
         public final @Nullable PrediTerm eachMatch;
 
-        public UnifySubtermThenConclude(int subterm, @NotNull Term pattern, @Nullable PrediTerm eachMatch) {
+        public UnifySubtermThenConclude(int subterm, @NotNull Term pattern, @NotNull PrediTerm eachMatch) {
             super($.func("unify", $.the(subterm), pattern, eachMatch), pattern);
             this.subterm = subterm;
             this.eachMatch = eachMatch;

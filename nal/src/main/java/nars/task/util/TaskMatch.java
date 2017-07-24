@@ -5,7 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.Task;
-import nars.derive.AtomicPred;
+import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.term.Compound;
 import nars.term.Term;
@@ -14,11 +14,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * Generic handler for matching individual Tasks's
  */
-abstract public class TaskMatch extends AtomicPred<Task> implements Consumer<Task> {
+abstract public class TaskMatch  implements Consumer<Task>, Predicate<Task> {
 
     @NotNull protected final NAR nar;
     private final On on;
@@ -30,27 +31,27 @@ abstract public class TaskMatch extends AtomicPred<Task> implements Consumer<Tas
 
 
 
-    abstract public static class TermMatch extends AtomicPred<Term> {
-
-        public final Term term;
-
-        public TermMatch(String s) throws Narsese.NarseseException {
-            this($.$(s));
-        }
-
-        public TermMatch(Term t) {
-            this.term = t;
-        }
-
-        @Override
-        abstract public boolean test(Term p);
-
-        @NotNull
-        @Override
-        public String toString() {
-            return getClass().getSimpleName() + '(' + term + ')';
-        }
-    }
+//    abstract public static class TermMatch extends AtomicPred<Term> {
+//
+//        public final Term term;
+//
+//        public TermMatch(String s) throws Narsese.NarseseException {
+//            this($.$(s));
+//        }
+//
+//        public TermMatch(Term t) {
+//            this.term = t;
+//        }
+//
+//        @Override
+//        abstract public boolean test(Term p);
+//
+//        @NotNull
+//        @Override
+//        public String toString() {
+//            return getClass().getSimpleName() + '(' + term + ')';
+//        }
+//    }
 
     public TaskMatch(@NotNull NAR n) {
         this.nar = n;

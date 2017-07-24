@@ -50,10 +50,6 @@ abstract public class PatternCompound extends GenericCompoundDT  {
         size = size();
     }
 
-    @Override
-    public final boolean equals(Object obj) {
-        return Compound.equals(this, obj);
-    }
 
     @Override
     public boolean isCommutative() {
@@ -90,11 +86,9 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 
 
             //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
-            if (isCommutative()) {
-                return xsubs.unifyCommute(ysubs, subst);
-            } else {
-                return xsubs.unifyLinear(ysubs, subst);
-            }
+            return commutative ?
+                    xsubs.unifyCommute(ysubs, subst) :
+                    xsubs.unifyLinear(ysubs, subst);
 
         } else if (ty instanceof AliasConcept.AliasAtom) {
             Term abbreviated = ((AliasConcept.AliasAtom) ty).target;
@@ -180,6 +174,8 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                             return false;
                         }
                     } else {
+                        assert(false): "TODO check this case in PatternCompound ellipsis linear";
+
                         //previous match exists, match against what it had
 //                        if (i == xsize) {
 ////                        //SUFFIX - match the remaining terms against what the ellipsis previously collected
@@ -463,7 +459,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                         return true;
                     }
                 case 2:
-                    subst.termutes.add(new Choose2(subst, ellipsis, xFree, yFree));
+                    subst.termutes.add(new Choose2(ellipsis, subst, xFree, yFree));
                     return true;
                 default:
                     //3 or more combination

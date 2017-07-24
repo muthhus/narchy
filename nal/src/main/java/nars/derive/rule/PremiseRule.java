@@ -170,7 +170,7 @@ public class PremiseRule extends GenericCompound {
                 new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
                 new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
         if (belief!=null && goal!=null && !belief.single() && !goal.single())
-            s.add(BeliefPositive.beliefExists); //quick filter
+            s.add(BeliefPolarity.beliefExist); //quick filter
 
         //PREFIX
         {
@@ -240,11 +240,12 @@ public class PremiseRule extends GenericCompound {
 
         put("PatternOp1", rank--);
         put("PatternOp0", rank--);
+
+        put("BeliefExist", rank--);
+
         put(TaskBeliefOp.class, rank--);
 
         put(TaskPunctuation.class, rank--);
-
-        put(BeliefPositive.BeliefExists.class, rank--);
 
         put(TaskBeliefOccurrence.class, rank--);
 
@@ -252,8 +253,8 @@ public class PremiseRule extends GenericCompound {
 
         put(SubTermStructure.class, rank--);
 
-        put(TaskPositive.class, rank--); //includes both positive or negative
-        put(BeliefPositive.class, rank--); //includes both positive or negative
+        put(TaskPolarity.class, rank--); //includes both positive or negative
+        put(BeliefPolarity.class, rank--);
 
 
         put(Solve.class, rank--);
@@ -274,9 +275,10 @@ public class PremiseRule extends GenericCompound {
         if (b instanceof AbstractPatternOp.PatternOp)
             return "PatternOp" + (((AbstractPatternOp.PatternOp) b).subterm == 0 ? "0" : "1"); //split
 
-        if ((b == TaskPositive.the) || (b == TaskNegative.the)) return TaskPositive.class;
-        if (b == BeliefPositive.beliefExists) return BeliefPositive.BeliefExists.class;
-        if ((b == BeliefPositive.beliefPos) || (b == BeliefPositive.beliefNeg)) return BeliefPositive.class;
+        if ((b == TaskPolarity.pos) || (b == TaskPolarity.neg)) return TaskPolarity.class;
+
+        if (b == BeliefPolarity.beliefExist) return "BeliefExist";
+        if ((b == BeliefPolarity.beliefPos) || (b == BeliefPolarity.beliefNeg)) return BeliefPolarity.class;
 
         if (b.getClass() == TaskBeliefHas.class) return TaskBeliefHas.class;
 
@@ -284,7 +286,6 @@ public class PremiseRule extends GenericCompound {
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
         if (b == TaskPunctuation.Question) return TaskPunctuation.class;
         if (b == TaskPunctuation.Quest) return TaskPunctuation.class;
-        if (b == TaskPunctuation.NotQuestion) return TaskPunctuation.class;
         if (b == TaskPunctuation.QuestionOrQuest) return TaskPunctuation.class;
         if (b.getClass() == TaskBeliefOp.class) return TaskBeliefOp.class;
 
@@ -610,10 +611,10 @@ public class PremiseRule extends GenericCompound {
                 case "belief":
                     switch (XString) {
                         case "negative":
-                            pres.add(BeliefPositive.beliefNeg);
+                            pres.add(BeliefPolarity.beliefNeg);
                             break;
                         case "positive":
-                            pres.add(BeliefPositive.beliefPos);
+                            pres.add(BeliefPolarity.beliefPos);
                             break;
 
                         //HACK do somethign other than duplciate this with the "task" select below, and also generalize to all ops
@@ -629,10 +630,10 @@ public class PremiseRule extends GenericCompound {
                 case "task":
                     switch (XString) {
                         case "negative":
-                            pres.add(TaskNegative.the);
+                            pres.add(TaskPolarity.neg);
                             break;
                         case "positive":
-                            pres.add(TaskPositive.the);
+                            pres.add(TaskPolarity.pos);
                             break;
                         case "\"?\"":
                             pres.add(TaskPunctuation.Question);

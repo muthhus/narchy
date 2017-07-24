@@ -112,7 +112,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
                 /* TODO */, 64, 64, 7, 15);
 
 
-        SpaceGraph<Term> s = new SpaceGraph(
+        SpaceGraph<Term> s = new SpaceGraph<>(
 
                 cs.with(
 //                        new SpaceTransform<Term>() {

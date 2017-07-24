@@ -1,7 +1,10 @@
-package nars.derive;
+package nars.derive.instrument;
 
 import jcog.Texts;
 import nars.control.Derivation;
+import nars.derive.AndCondition;
+import nars.derive.Fork;
+import nars.derive.PrediTerm;
 import nars.derive.op.MatchTerm;
 import org.fusesource.jansi.Ansi;
 

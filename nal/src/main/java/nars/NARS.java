@@ -4,7 +4,7 @@ import jcog.random.XorShift128PlusRandom;
 import nars.concept.build.ConceptBuilder;
 import nars.concept.build.DefaultConceptBuilder;
 import nars.control.Derivation;
-import nars.derive.DebugDerivationPredicate;
+import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.derive.TrieDeriver;

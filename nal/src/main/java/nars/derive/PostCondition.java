@@ -185,7 +185,7 @@ public class PostCondition implements Serializable //since there can be multiple
     }
 
 
-    public final boolean modifiesPunctuation() {
+    final boolean modifiesPunctuation() {
         return puncOverride > 0;
     }
 

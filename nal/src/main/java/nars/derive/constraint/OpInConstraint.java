@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 public final class OpInConstraint extends MatchConstraint {
 
-    @NotNull
     private final int ops;
 
     public OpInConstraint(Term target, @NotNull Op... accepted) {

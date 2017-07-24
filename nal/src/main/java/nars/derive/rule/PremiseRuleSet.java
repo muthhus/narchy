@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 
@@ -33,6 +34,7 @@ import java.util.stream.Stream;
  */
 public class PremiseRuleSet extends HashSet<PremiseRule> {
 
+    private static final Pattern ruleImpl = Pattern.compile("\\|\\-");
     private final boolean permuteBackwards, permuteForwards;
 
     @NotNull
@@ -86,7 +88,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         this(index, (PremiseRule[]) parse($.terms, rules));
     }
 
-    public PremiseRuleSet(boolean permute, PatternTermIndex index, @NotNull PremiseRule... rules) {
+    public PremiseRuleSet(boolean permute, @NotNull PatternTermIndex index, @NotNull PremiseRule... rules) {
         super();
         this.patterns = index;
         for (PremiseRule p : rules) {
@@ -191,7 +193,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
 
-    final static Map<String,PremiseRule> lines = new ConcurrentHashMap<>();
+    final static Map<String,PremiseRule> lines = new ConcurrentHashMap<>(1024);
 //    static {
 //        Map<String, Compound> m;
 //        try {
@@ -248,7 +250,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     public static TermContainer parseRuleComponents(@NotNull String src, @NotNull TermIndex index) throws Narsese.NarseseException {
 
         //(Compound) index.parseRaw(src)
-        String[] ab = src.split("\\|\\-");
+        String[] ab = ruleImpl.split(src);
         if (ab.length != 2) {
             throw new Narsese.NarseseException("Rule component must have arity=2, separated by \"|-\": " + src);
         }
@@ -364,7 +366,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     }
 
     @NotNull
-    static PremiseRule normalize(@Nullable PremiseRule q, @NotNull PatternTermIndex index) {
+    static PremiseRule normalize(@NotNull PremiseRule q, @NotNull PatternTermIndex index) {
         return q.normalizeRule(index).setup(index);
     }
 

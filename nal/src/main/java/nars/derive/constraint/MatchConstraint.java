@@ -16,7 +16,7 @@ public abstract class MatchConstraint extends ProxyCompound implements PrediTerm
 
     public final Term target;
 
-    public MatchConstraint(String func, Term target, Term... args) {
+    protected MatchConstraint(String func, Term target, Term... args) {
         super($.impl(target, $.func(func, args)));
         this.target = target;
     }

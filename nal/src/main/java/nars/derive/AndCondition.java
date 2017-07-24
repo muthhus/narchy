@@ -82,7 +82,7 @@ public final class AndCondition extends ProxyCompound implements PrediTerm<Deriv
         if (p.size() == 1)
             return p;
 
-        SortedSet<MatchConstraint> constraints = new TreeSet<MatchConstraint>(MatchConstraint.costComparator);
+        SortedSet<MatchConstraint> constraints = new TreeSet<>(MatchConstraint.costComparator);
         Iterator<PrediTerm> il = p.iterator();
         while (il.hasNext()) {
             PrediTerm c = il.next();

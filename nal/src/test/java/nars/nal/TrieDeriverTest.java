@@ -7,7 +7,7 @@ import nars.Narsese;
 import nars.Task;
 import nars.control.Derivation;
 import nars.control.Premise;
-import nars.derive.DebugDerivationPredicate;
+import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.derive.TrieDeriver;

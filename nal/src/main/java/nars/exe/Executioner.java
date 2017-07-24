@@ -24,6 +24,7 @@ import java.util.function.Consumer;
  *
  */
 abstract public class Executioner implements Executor {
+
     @Nullable
     protected NAR nar;
 

@@ -31,7 +31,7 @@ public class Choose2 extends Termutator.AbstractTermutator {
     @NotNull
     private final ShuffledSubterms yy;
 
-    public Choose2(@NotNull Unify f, @NotNull Ellipsis xEllipsis, @NotNull SortedSet<Term> x, @NotNull SortedSet<Term> yFree) {
+    public Choose2(@NotNull Ellipsis xEllipsis, @NotNull Unify f, @NotNull SortedSet<Term> x, @NotNull SortedSet<Term> yFree) {
         super($.p(x), xEllipsis, $.p(yFree));
         this.f = f;
         this.xEllipsis = xEllipsis;

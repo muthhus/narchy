@@ -21,7 +21,7 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
 
     @NotNull
-    protected Compound id;
+    protected final Compound id;
 
     @NotNull
     protected final Compound pid;
@@ -33,7 +33,7 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
      */
     public final TreeSet<Conclusion> conclude = new TreeSet();
 
-    public UnificationPrototype(@NotNull Compound id, Term pattern) {
+    protected UnificationPrototype(@NotNull Compound id, Term pattern) {
         super(id);
         this.id = this.pid = id;
 
@@ -71,15 +71,9 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
                 om = conclude.first();
                 break;
             default:
-//                om = Fork.fork(
-//                    conclude.toArray(new Conclusion[cs])
-//                );
-                om = new Fork(conclude.toArray(new Conclusion[cs])) {
-                    @Override
-                    public boolean test(@NotNull Derivation m) {
-                        return super.test(m);
-                    }
-                };
+                om = Fork.fork(
+                    conclude.toArray(new Conclusion[cs])
+                );
                 break;
         }
 

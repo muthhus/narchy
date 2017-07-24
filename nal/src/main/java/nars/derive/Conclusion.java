@@ -79,9 +79,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
-        Term b0 = this.pattern, b1 = null;
-
-        b1 = d.transform(b0);
+        Term b1  = d.transform(this.pattern);
         if (b1 == null)
             return true;
         if (b1.vars(null) > 0) {
