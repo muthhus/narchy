@@ -149,13 +149,13 @@ public class TemporalTest {
     public void testParseOperationInFunctionalForm2() throws Narsese.NarseseException {
         assertEquals(
                 //"(do(that) &&+0 ((a)&&(b)))",
-                "( &&+0 ,do(that),(a),(b))",
+                "(&|,do(that),(a),(b))",
                 n.term("(do(that) &&+0 ((a)&&(b)))").toString());
 
         Termed<Term> nt = n.term("(((that)-->do) &&+0 ((a)&&(b)))");
         assertEquals(
                 //"(do(that) &&+0 ((a)&&(b)))",
-                "( &&+0 ,do(that),(a),(b))",
+                "(&|,do(that),(a),(b))",
                 nt.toString());
 
         //assertNotNull(n.conceptualize(nt, UnitBudget.One));
@@ -229,7 +229,7 @@ public class TemporalTest {
     @Test
     public void testCommutiveTemporality1() {
         testParse("(at(SELF,b) &&+5 goto(a))", "(at(SELF,b) &&+5 goto(a))");
-        testParse("(goto(a) &&+0 ((SELF,b)-->at))", "(goto(a) &&+0 at(SELF,b))");
+        testParse("(goto(a)&|((SELF,b)-->at))", "(goto(a) &&+0 at(SELF,b))");
         testParse("(goto(a)&&((SELF,b)-->at))", "(goto(a)&&at(SELF,b))");
     }
 
@@ -237,7 +237,7 @@ public class TemporalTest {
     public void testCommutiveTemporality2() {
         testParse("(at(SELF,b) &&+5 goto(a))");
         testParse("(goto(a) &&+5 at(SELF,b))");
-        testParse("(goto(a) &&+0 at(SELF,b))");
+        testParse("(goto(a)&|at(SELF,b))");
         testParse("(goto(a)&&at(SELF,b))");
     }
 
@@ -649,13 +649,13 @@ public class TemporalTest {
     public void testCommutivity() throws Narsese.NarseseException {
 
         assertTrue($("(b && a)").isCommutative());
-        assertTrue($("(b &&+0 a)").isCommutative());
+        assertTrue($("(b &| a)").isCommutative());
         assertFalse($("(b &&+1 a)").isCommutative());
         assertFalse($("(b &&+- a)").isCommutative());
 
 
-        Term abc = $("((a &&+0 b) &&+0 c)");
-        assertEquals("( &&+0 ,a,b,c)", abc.toString());
+        Term abc = $("((a &| b) &| c)");
+        assertEquals("(&|,a,b,c)", abc.toString());
         assertTrue(abc.isCommutative());
 
     }
@@ -858,7 +858,7 @@ public class TemporalTest {
 
         //TODO this will require a refactor allowing arbitrary function mapping matched dt source value to a target dt
         Term xz = $.terms.retemporalize(t, $.terms.retemporalizationZero);
-        assertEquals("((--,(happy)) &&+0 (--,((--,(o)) &&+0 (happy))))", xz.toString());
+        assertEquals("((--,(happy))&|(--,((--,(o))&|(happy))))", xz.toString());
     }
 
     @Test
@@ -868,7 +868,7 @@ public class TemporalTest {
         assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", u.toString());
 
         Term yz = $.terms.retemporalize(u, $.terms.retemporalizationZero);
-        assertEquals("((--,(happy)) &&+0 (--,((--,(o)) &&+0 (happy))))", yz.toString());
+        assertEquals("((--,(happy))&|(--,((--,(o))&|(happy))))", yz.toString());
 
         Term ye = $.terms.retemporalize(u, $.terms.retemporalizationDTERNAL);
         assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", ye.toString());

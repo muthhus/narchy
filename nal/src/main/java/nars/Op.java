@@ -501,8 +501,8 @@ public enum Op implements $ {
 
     public static final int StatementBits = Op.or(Op.INH, Op.SIM, Op.IMPL, Op.EQUI);
 
-    public static final int OpBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
-    public static final int EvalBits = OpBits; //just an alias for code readabiliy
+    public static final int opBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
+    public static final int EvalBits = opBits; //just an alias for code readabiliy
 
     public static final byte BELIEF = '.';
     public static final byte QUESTION = '?';
@@ -946,7 +946,7 @@ public enum Op implements $ {
      */
     @Nullable
     public static Pair<Atom, Compound> functor(@NotNull Term maybeOperation, TermContext index, boolean mustFunctor) {
-        if (maybeOperation instanceof Compound && maybeOperation.hasAll(Op.OpBits)) {
+        if (maybeOperation instanceof Compound && maybeOperation.hasAll(Op.opBits)) {
             Compound c = (Compound) maybeOperation;
             if (c.op() == INH) {
                 Term s0 = c.sub(0);
@@ -1402,15 +1402,29 @@ public enum Op implements $ {
      * writes this operator to a Writer in (human-readable) expanded UTF16 mode
      */
     public final void append(@NotNull Compound c, @NotNull Appendable w) throws IOException {
-        append(c, w, false);
+        append(c.dt(), w, false);
     }
 
     /**
      * writes this operator to a Writer in (human-readable) expanded UTF16 mode
      */
-    public final void append(@NotNull Compound c, @NotNull Appendable w, boolean invertDT) throws IOException {
-        int t = c.dt();
-        boolean hasTime = t != Tense.DTERNAL;
+    public final void append(int dt, @NotNull Appendable w, boolean invertDT) throws IOException {
+
+
+        if (dt == 0) {
+            //special case: parallel
+            String s;
+            switch (this) {
+                case CONJ: s = ("&|"); break;
+                case IMPL: s = ("=|>"); break;
+                case EQUI: s = ("<|>"); break;
+                default: throw new UnsupportedOperationException();
+            }
+            w.append(s);
+            return;
+        }
+
+        boolean hasTime = dt != Tense.DTERNAL;
 
         if (hasTime)
             w.append(' ');
@@ -1423,16 +1437,17 @@ public enum Op implements $ {
 
         if (hasTime) {
 
-            if (invertDT)
-                t = -t;
+                if (invertDT)
+                    dt = -dt;
 
-            if (t >= 0) w.append('+');
-            String ts;
-            if (t == XTERNAL)
-                ts = "-";
-            else
-                ts = Integer.toString(t);
-            w.append(ts).append(' ');
+                if (dt > 0) w.append('+');
+                String ts;
+                if (dt == XTERNAL)
+                    ts = "-";
+                else
+                    ts = Integer.toString(dt);
+                w.append(ts).append(' ');
+
         }
     }
 

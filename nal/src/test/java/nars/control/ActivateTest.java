@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.concept.Concept;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
@@ -25,8 +26,12 @@ public class ActivateTest {
         nar.run(1);
         Concept c = nar.conceptualize("a:b");
         for (int n = 0; n < 5; n++) {
-            c.termlinks().put(new PLink<>($(n + ":a"), 0.2f * n));
+            PLink<Term> inserted = new PLink<>($(n + ":a"), 0.2f * n);
+            System.out.println(inserted);
+            c.termlinks().put(inserted);
         }
+
+        System.out.println();
 
         HashBag<String> s = new HashBag();
         Activate cf = new Activate(c, 1f) {
@@ -55,7 +60,7 @@ public class ActivateTest {
 
         ObjectIntPair<String> top = s.topOccurrences(1).get(0);
         ObjectIntPair<String> bottom = s.bottomOccurrences(1).get(0);
-        assertEquals("(a-->1)", bottom.getOne());
+        assertEquals("(a-->0)", bottom.getOne());
         assertEquals("(a-->4)", top.getOne());
 
     }
@@ -77,23 +82,26 @@ public class ActivateTest {
         n.forEachConceptActive(System.out::println);
     }
 
-    @Test public void testTemplates() throws Narsese.NarseseException {
+    @Test public void testTemplates1() throws Narsese.NarseseException {
 
         //layer 1:
         testTemplates("open:door",
                 "[door, open, (door-->open)]");
-
+    }
+    @Test public void testTemplates2() throws Narsese.NarseseException {
         //layer 2:
         testTemplates("open(John,door)",
-                "[(John,door), open, door, John]");
-
+                "[(John,door), open, door, open(John,door), John]");
+    }
+    @Test public void testTemplates3() throws Narsese.NarseseException {
         //layer 3:
         testTemplates("(open(John,door) ==> #x)",
-                "[(John,door), open, #1, open(John,door), door, John]");
-
+                "[#1, door, (John,door), open, (open(John,door) ==>+- #1), open(John,door), John]");
+    }
+    @Test public void testTemplates4() throws Narsese.NarseseException {
         //dont descend past layer 3:
         testTemplates("(open(John,portal:interdimensional) ==> #x)",
-                "[open(John,(interdimensional-->portal)), #1, (John,(interdimensional-->portal)), (interdimensional-->portal), open, John]");
+                "[open(John,(interdimensional-->portal)), #1, (John,(interdimensional-->portal)), (interdimensional-->portal), open, John, (open(John,(interdimensional-->portal)) ==>+- #1)]");
     }
 
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {

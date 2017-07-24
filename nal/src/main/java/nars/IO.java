@@ -124,7 +124,7 @@ public class IO {
         Term tt = t.term();
 
         if (out instanceof ByteArrayDataOutput) {
-            tt.append((ByteArrayDataOutput)out);
+            tt.append((ByteArrayDataOutput) out);
         } else {
             out.write(IO.termToBytes(tt)); //buffer to bytes
         }
@@ -457,29 +457,17 @@ public class IO {
 
     public interface Printer {
 
-        //    static void appendSeparator(@NotNull Appendable p) throws IOException {
-        //        p.append(ARGUMENT_SEPARATOR);
-        //        //if (pretty) p.append(' ');
-        //    }
-        //
-        //    static void writeCompound1(@NotNull Op op, @NotNull Term singleTerm, @NotNull Appendable writer) throws IOException {
-        //        writer.append(COMPOUND_TERM_OPENER);
-        //        writer.append(op.str);
-        //        writer.append(ARGUMENT_SEPARATOR);
-        //        singleTerm.append(writer);
-        //        writer.append(COMPOUND_TERM_CLOSER);
-        //    }
-
         static void compoundAppend(@NotNull Compound c, @NotNull Appendable p) throws IOException {
 
             p.append(Op.COMPOUND_TERM_OPENER);
 
             c.op().append(c, p);
 
-            if (c.size() == 1)
+            TermContainer cs = c.subterms();
+            if (cs.size() == 1)
                 p.append(Op.ARGUMENT_SEPARATOR);
 
-            appendArgs(c, p);
+            appendArgs(cs, p);
 
             appendCloser(p);
 
@@ -501,7 +489,7 @@ public class IO {
         }
 
 
-        static void appendArgs(@NotNull Compound c, @NotNull Appendable p) throws IOException {
+        static void appendArgs(@NotNull TermContainer c, @NotNull Appendable p) throws IOException {
             int nterms = c.size();
 
             boolean bb = nterms > 1;
@@ -539,7 +527,7 @@ public class IO {
                     setAppend(c, p);
                     return;
                 case PROD:
-                    productAppend(c, p);
+                    productAppend(c.subterms(), p);
                     return;
 
                 //case INHERIT: inheritAppend(c, p, pretty); return;
@@ -554,15 +542,17 @@ public class IO {
             }
 
             if (op.statement || c.size() == 2) {
-                Term subj = c.sub(0);
 
                 //special case: functional form
-                if (op == INH && subj.op() == Op.PROD) {
-                    Term pred = c.sub(1);
-                    Op pOp = pred.op();
-                    if (pOp == ATOM) {
-                        operationAppend((Compound) c.sub(0), (Atomic) pred, p);
-                        return;
+                if (c.hasAll(Op.opBits)) {
+                    Term subj = c.sub(0);
+                    if (op == INH && subj.op() == Op.PROD) {
+                        Term pred = c.sub(1);
+                        Op pOp = pred.op();
+                        if (pOp == ATOM) {
+                            operationAppend((Compound) subj, (Atomic) pred, p);
+                            return;
+                        }
                     }
                 }
 
@@ -595,11 +585,16 @@ public class IO {
 //        }
 
         static void statementAppend(@NotNull Compound c, @NotNull Appendable p, @NotNull Op op) throws IOException {
-            Term a = Terms.subj(c);
-            Term b = Terms.pred(c);
+
+            @NotNull TermContainer cs = c.subterms();
+            Term a = cs.sub(0);
+            Term b = cs.sub(1);
+
+
+            p.append(Op.COMPOUND_TERM_OPENER);
+            boolean reversedDT;
 
             int dt = c.dt();
-            boolean reversedDT;
             if (c.op().commutative && dt != XTERNAL && dt != DTERNAL && dt < 0) {
                 reversedDT = true;
                 Term x = a;
@@ -609,10 +604,9 @@ public class IO {
                 reversedDT = false;
             }
 
-            p.append(Op.COMPOUND_TERM_OPENER);
             a.append(p);
 
-            op.append(c, p, reversedDT);
+            op.append(dt, p, reversedDT);
 
             b.append(p);
 
@@ -620,7 +614,7 @@ public class IO {
         }
 
 
-        static void productAppend(@NotNull Compound product, @NotNull Appendable p) throws IOException {
+        static void productAppend(@NotNull TermContainer product, @NotNull Appendable p) throws IOException {
 
             int s = product.size();
             p.append(Op.COMPOUND_TERM_OPENER);

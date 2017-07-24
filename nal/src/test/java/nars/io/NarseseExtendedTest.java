@@ -233,12 +233,12 @@ public class NarseseExtendedTest extends NarseseTest {
     }
 
     @Test public void testParallelTemporals() throws Narsese.NarseseException {
-        //TODO use &| in print out, it is 2 chars shorter
 
-        assertEquals("(a &&+0 b)", term("(a &| b)").toString());
-        assertEquals("(a <=>+0 b)", term("(a <|> b)").toString());
-        assertEquals("(a ==>+0 b)", term("(a =|> b)").toString());
-        assertEquals("( &&+0 ,a,b,c)", term("(&|, a, b, c)").toString());
+
+        assertEquals("(a<|>b)", term("(a <|> b)").toString());
+        assertEquals("(a=|>b)", term("(a =|> b)").toString());
+        assertEquals("(a&|b)", term("(a &| b)").toString());
+        assertEquals("(&|,a,b,c)", term("(&|, a, b, c)").toString());
     }
 
     @Test public void testImdex() throws Narsese.NarseseException {
@@ -251,7 +251,7 @@ public class NarseseExtendedTest extends NarseseTest {
 
         //test that the imdex is allowed in term identifiers
         assertEquals(
-                "( &&+0 ,(ball_left),(ball_right),((ball_right) &&+270 (--,(ball_left))))",
+                "(&|,(ball_left),(ball_right),((ball_right) &&+270 (--,(ball_left))))",
                 term("(((ball_left) &&+0 (ball_right)) &&+0 ((ball_right) &&+270 (--,(ball_left))))").toString()
         );
 

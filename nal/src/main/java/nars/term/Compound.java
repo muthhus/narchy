@@ -1002,7 +1002,7 @@ public interface Compound extends Term, IPair, TermContainer {
         //any contained evaluables
         boolean subsModified = false;
 
-        if (subterms().hasAll(OpBits)) {
+        if (subterms().hasAll(opBits)) {
             int s = xy.length;
             for (int i = 0, evalSubsLength = xy.length; i < evalSubsLength; i++) {
                 Term x = xy[i];

@@ -391,7 +391,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testTemporalConjunctionReduction1() throws Narsese.NarseseException {
-        assertEquals("(a &&+0 b)", $("(a &&+0 b)").toString());
+        assertEquals("(a&|b)", $("(a &&+0 b)").toString());
         assertEquals(
                 $("((--,(ball_left)) &&-270 (ball_right))"),
                 $("((ball_right) &&+270 (--,(ball_left)))"));
@@ -400,23 +400,23 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testTemporalConjunctionReduction2() throws Narsese.NarseseException {
-        assertEquals("(a &&+0 (b &&+1 c))", $("(a &&+0 (b &&+1 c))").toString());
+        assertEquals("(a&|(b &&+1 c))", $("(a &&+0 (b &&+1 c))").toString());
     }
 
     @Test
     public void testTemporalConjunctionReduction3() throws Narsese.NarseseException {
-        assertEquals("(a &&+0 b)", $("( (a &&+0 b) && (a &&+0 b) )").toString());
+        assertEquals("(a&|b)", $("( (a &&+0 b) && (a &&+0 b) )").toString());
     }
 
     @Test
     public void testTemporalConjunctionReduction5() throws Narsese.NarseseException {
-        assertEquals("((a &&+0 b)&&(a &&+1 b))",
-                $("( (a &&+0 b) && (a &&+1 b) )").toString());
+        assertEquals("((a&|b)&&(a &&+1 b))",
+                $("( (a&|b) && (a &&+1 b) )").toString());
     }
 
     @Test
     public void testTemporalConjunctionReduction4() throws Narsese.NarseseException {
-        assertEquals("(a &&+0 b)", $("( a &&+0 (b && b) )").toString());
+        assertEquals("(a&|b)", $("( a &&+0 (b && b) )").toString());
     }
 
 
@@ -424,14 +424,14 @@ public class TermReductionsTest extends NarseseTest {
     public void testTemporalNTermConjunctionParallel() throws Narsese.NarseseException {
         //+0 is the only case in which temporal && can have arity>2
         //TODO fix spacing:
-        assertEquals("( &&+0 ,a,b,c)", $("( a &&+0 (b &&+0 c) )").toString());
+        assertEquals("(&|,a,b,c)", $("( a &&+0 (b &&+0 c) )").toString());
     }
 
     @Ignore
     @Test
     public void testTemporalNTermEquivalenceParallel() throws Narsese.NarseseException {
         //+0 is the only case in which temporal && can have arity>2
-        assertEquals("(<=>+0, a, b, c)", $("( a <=>+0 (b <=>+0 c) )").toString());
+        assertEquals("(<|>, a, b, c)", $("( a <|> (b <|> c) )").toString());
     }
 
 
@@ -544,9 +544,9 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testConegatedConjunctionTerms0not() throws Narsese.NarseseException {
         //dont unwrap due to different 'dt'
-        assertEquals("((--,((y) &&+0 (z)))&&(x))", $("((x)&&--((y) &&+0 (z)))").toString());
+        assertEquals("((--,((y)&|(z)))&&(x))", $("((x)&&--((y) &&+0 (z)))").toString());
 
-        assertEquals("((--,((y)&&(z))) &&+0 (x))", $("((x) &&+0 --((y) && (z)))").toString());
+        assertEquals("((--,((y)&&(z)))&|(x))", $("((x) &&+0 --((y) && (z)))").toString());
     }
 
     @Test
@@ -802,7 +802,7 @@ public class TermReductionsTest extends NarseseTest {
         //$.76;.45;.70$ ( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right))). :3537: %.64;.15%
         //$.39;.44;.70$ (((--,(ball_left)) &&-233 (ball_right)) &&-1 ((ball_left) &&+0 (ball_right))). :3243: %.53;.23%
         assertEquals(
-                "( &&+0 ,(ball_left),(ball_right),((ball_right) &&+270 (--,(ball_left))))",
+                "(&|,(ball_left),(ball_right),((ball_right) &&+270 (--,(ball_left))))",
 
                 //HACK: this narsese parser isnt implemented yet:
                 //$("( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right)))")
@@ -886,18 +886,15 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testPromoteEternalToParallel() throws Narsese.NarseseException {
-        String s = "(a &&+0 (b && c))";
-        assertEquals(
-                "( &&+0 ,a,b,c)",
-                $(s).toString()
-        );
+        String s = "(a&|(b && c))";
+        assertEquals( "(&|,a,b,c)", $(s).toString() );
     }
 
     @Test
     public void testPromoteEternalToParallelDont() throws Narsese.NarseseException {
-        String s = "(a && (b &&+0 c))";
+        String s = "(a&&(b&|c))";
         assertEquals(
-                "(a&&(b &&+0 c))",
+                "(a&&(b&|c))",
                 $(s).toString()
         );
     }
@@ -906,14 +903,14 @@ public class TermReductionsTest extends NarseseTest {
     public void testCoNegatedConjunctionParallelEternal() throws Narsese.NarseseException {
         //mix of parallel and eternal
         assertEquals(False,
-                $("((--,(happy-->noid)) &&+0 ((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))")
+                $("((--,(happy-->noid))&|((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))")
         );
     }
 
     @Test
     public void testCoNegatedImplication() throws Narsese.NarseseException {
         assertEquals(False,
-                $("((--,$1) ==>+0 (((--,$1) &&+0 (--,#2)) &&+16 #2))")
+                $("((--,$1)=|>(((--,$1)&|(--,#2)) &&+16 #2))")
         );
     }
 
@@ -928,8 +925,8 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testConjImplReduction1() throws Narsese.NarseseException {
         assertEquals(
-                "((inside(bob,office) &&+0 inside(john,playground))==>inside(bob,kitchen))",
-                $("(inside(bob,office) &&+0 (inside(john,playground)==>inside(bob,kitchen)))").toString()
+                "((inside(bob,office)&|inside(john,playground))==>inside(bob,kitchen))",
+                $("(inside(bob,office)&|(inside(john,playground)==>inside(bob,kitchen)))").toString()
         );
     }
 

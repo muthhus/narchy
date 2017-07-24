@@ -73,7 +73,7 @@ public class TrieDeriverTest {
 
         System.out.println(d);
 
-        assertTrue(d.toString().contains("((?2 &&+0 %1),") );
+        assertTrue(d.toString().contains("((?2&|%1),") );
         assertTrue(d.toString().contains("(?2 &&+- %1)") );
 
 
@@ -156,12 +156,13 @@ public class TrieDeriverTest {
     }
 
     public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
-        NAR n = NARS.tmp(8);
+        NAR n = NARS.tmp();
 
         PrediTerm<Derivation> d = testCompile(n, rules )
                 .transform(DebugDerivationPredicate::new);
 
         Derivation der = new Derivation(n).cycle();
+        der.deriver = d;
 
         Set<Task> tasks = new LinkedHashSet();
         n.onTask(tasks::add);
@@ -170,6 +171,8 @@ public class TrieDeriverTest {
                 new PLink(n.task(task), 0.5f),
                 new PLink(n.term(belief), 0.5f)
         ).run(der, ttlMax);
+
+        n.run(1);  //to allow input tasks to get processed
 
         return tasks;
     }

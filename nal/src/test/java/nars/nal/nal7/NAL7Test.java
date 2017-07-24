@@ -909,11 +909,11 @@ public class NAL7Test extends AbstractNALTest {
                 .nar.believe($.parallel($("(x)"), $("(y)"), $("(z)")), 3, 1f, 0.9f);
 
         test
-                .mustBelieve(cycles, "((x) &&+0 (y))", 1f, 0.81f, 3)
-                .mustBelieve(cycles, "((y) &&+0 (z))", 1f, 0.81f, 3)
-                .mustBelieve(cycles, "((x) &&+0 (z))", 1f, 0.81f, 3)
+                .mustBelieve(cycles, "((x) &| (y))", 1f, 0.81f, 3)
+                .mustBelieve(cycles, "((y) &| (z))", 1f, 0.81f, 3)
+                .mustBelieve(cycles, "((x) &| (z))", 1f, 0.81f, 3)
                 .mustNotOutput(cycles, "((x) && (z))", BELIEF, 0, 3, ETERNAL) //the dternal (non-parallel) version of the term
-                .mustNotOutput(cycles, "((x) &&+0 (z))", BELIEF, 0, ETERNAL); //the correct form but at the wrong occurrence time
+                .mustNotOutput(cycles, "((x) &| (z))", BELIEF, 0, ETERNAL); //the correct form but at the wrong occurrence time
 
     }
 

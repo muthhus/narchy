@@ -41,12 +41,12 @@ public class NAL7DurationTest {
     public void testDurationDithering() throws Narsese.NarseseException {
         Terminal n = new Terminal();
         n.time.dur(5);
-        assertEquals( $.$("((x) &&+0 (y))"), n.term("((x) &&+1 (y))"));
-        assertEquals( $.$("((x) &&+0 (y))"), n.term("((x) &&-1 (y))"));
-        assertEquals( "( &&+0 ,(x),(y),(z))", n.term("(((x) &&+1 (y)) &&+1 (z))").toString());
+        assertEquals( $.$("((x) &| (y))"), n.term("((x) &&+1 (y))"));
+        assertEquals( $.$("((x) &| (y))"), n.term("((x) &&-1 (y))"));
+        assertEquals( "(&|,(x),(y),(z))", n.term("(((x) &&+1 (y)) &&+1 (z))").toString());
         assertEquals( $.$("((x) &&+6 (y))"), n.term("((x) &&+6 (y))"));
-        assertEquals( $.$("((x) ==>+0 (y))"), n.term("((x) ==>+1 (y))"));
-        assertEquals( $.$("((x) <=>+0 (y))"), n.term("((x) <=>+1 (y))"));
+        assertEquals( $.$("((x) =|> (y))"), n.term("((x) ==>+1 (y))"));
+        assertEquals( $.$("((x) <|> (y))"), n.term("((x) <=>+1 (y))"));
 
     }
 
