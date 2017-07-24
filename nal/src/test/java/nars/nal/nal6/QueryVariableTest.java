@@ -17,32 +17,45 @@ import static org.junit.Assert.*;
 
 public class QueryVariableTest {
 
-    @Test public void testNoVariableAnswer() throws Narsese.NarseseException {
+    @Test
+    public void testNoVariableAnswer() throws Narsese.NarseseException {
         testQuestionAnswer("<a --> b>", "<a --> b>");
     }
-    @Test public void testQueryVariableAnswerUnified() throws Narsese.NarseseException {
+
+    @Test
+    public void testQueryVariableAnswerUnified() throws Narsese.NarseseException {
 
         testQuestionAnswer("<a --> b>", "<?x --> b>");
     }
-    @Test public void testQueryVariableAnswerUnified2() throws Narsese.NarseseException {
+
+    @Test
+    public void testQueryVariableAnswerUnified2() throws Narsese.NarseseException {
         testQuestionAnswer("<c --> (a&b)>", "<?x --> (a&b)>");
     }
-    @Test public void testQueryVariableMatchesDepVar() throws Narsese.NarseseException {
+
+    @Test
+    public void testQueryVariableMatchesDepVar() throws Narsese.NarseseException {
         testQuestionAnswer("<#c --> (a&b)>", "<?x --> (a&b)>");
     }
-    @Test public void testQueryVariableMatchesIndepVar() throws Narsese.NarseseException {
+
+    @Test
+    public void testQueryVariableMatchesIndepVar() throws Narsese.NarseseException {
         testQuestionAnswer("($x ==> y($x))", "(?x ==> y(?x))");
     }
-    @Test public void testQueryVariableMatchesTemporally() throws Narsese.NarseseException {
+
+    @Test
+    public void testQueryVariableMatchesTemporally() throws Narsese.NarseseException {
         testQuestionAnswer("(x &&+1 y)", "(?x && y)");
     }
-    @Test public void testQueryVariableMatchesTemporally2() throws Narsese.NarseseException {
+
+    @Test
+    public void testQueryVariableMatchesTemporally2() throws Narsese.NarseseException {
         testQuestionAnswer("(e ==> (x &&+1 y))", "(e ==> (?x && y))");
     }
 
     @Test
     public void testQuery2() throws Narsese.NarseseException {
-         testQueryAnswered(32, 512);
+        testQueryAnswered(32, 512);
     }
 
     @Test
@@ -52,7 +65,7 @@ public class QueryVariableTest {
 
     void testQuestionAnswer(@NotNull String beliefString, @NotNull String question) throws Narsese.NarseseException {
 
-        int time = 128;
+        int time = 512;
 
         AtomicBoolean valid = new AtomicBoolean();
 
@@ -62,10 +75,12 @@ public class QueryVariableTest {
         assertNotNull(beliefTerm);
         nar.believe(beliefTerm, 1f, 0.9f);
         assertEquals(1, nar.tasks().count());
-        nar.question(question, Tense.ETERNAL, (q, a)-> {
+
+        nar.log();
+        nar.question(question, Tense.ETERNAL, (q, a) -> {
             //if (a.term().equals(beliefTerm)) {
-                valid.set(true);
-                q.delete();
+            valid.set(true);
+            q.delete();
             //}
         });
         assertEquals(2, nar.tasks().count());
@@ -85,18 +100,20 @@ public class QueryVariableTest {
 
 
         //this.activeTasks = activeTasks;
-        NAR n = new NARS().get();
-        n.nal(2);
-        n
-                //.log()
-                .input("<a <-> b>. %1.0;0.5%",
-                        "<b --> a>. %1.0;0.5%")
-                .run(cyclesBeforeQuestion)
-                .stopIf(b::get)
-                .question(question, ETERNAL, (q, a) -> {
-                    if (!a.isDeleted())
-                        b.set(true);
-                });
+        NAR n = NARS.tmpEternal();
+
+
+        n.input("<a <-> b>. %1.0;0.5%",
+                "<b --> a>. %1.0;0.5%");
+        n.run(cyclesBeforeQuestion);
+
+        n.stopIf(b::get);
+
+        n.question(question, ETERNAL, (q, a) -> {
+            if (!a.isDeleted())
+                b.set(true);
+        });
+
         n.run(cyclesAfterQuestion);
 
         assertTrue(b.get());

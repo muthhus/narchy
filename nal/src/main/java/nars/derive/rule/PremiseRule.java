@@ -796,7 +796,7 @@ public class PremiseRule extends GenericCompound {
                         return null; //uncomputable temporal basis
                     }
 
-                    TimeFunctions.shiftIfImmediate(p, occReturn, (Compound)derived);
+                    TimeFunctions.shiftIfImmediate(p, occReturn, derived);
 
                     //HACK retemporalize a non-temporal conjunction result
                     if (p.taskTerm.op() == CONJ && p.taskTerm.dt() != DTERNAL &&
@@ -813,11 +813,11 @@ public class PremiseRule extends GenericCompound {
                                     occReturn[0] += a;
                                     b -= a;
                                 }
-                                derived = compoundOrNull(CONJ.the(b - a, A, B));
+                                derived = CONJ.the(b - a, A, B);
                                 break;
                             default:
                                 assert (derived.dt() == DTERNAL);
-                                derived = compoundOrNull(p.terms.the((Compound)derived, 0));
+                                derived = p.terms.the((Compound)derived, 0);
                                 break;
                         }
                     }
@@ -867,7 +867,7 @@ public class PremiseRule extends GenericCompound {
                         }
                     }
 
-                    TimeFunctions.shiftIfImmediate(p, occReturn, (Compound)derived);
+                    TimeFunctions.shiftIfImmediate(p, occReturn, derived);
 
                     return filterEternalBasis(derived, p, occReturn);
                 };

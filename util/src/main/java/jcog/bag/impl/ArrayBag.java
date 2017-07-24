@@ -387,11 +387,14 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     @Override
     public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each) {
 
-        int s = size();
-        if (s == 0) return this;
+
 
         final Object[] ii = items.array();
-        if (ii.length == 0) return this; //to be safe
+        int s0 = ii.length;
+        if (s0 == 0) return this; //to be safe
+
+        int s = Math.min(s0,size());
+        if (s == 0) return this;
 
         int i = sampleStart(s);
 
@@ -403,7 +406,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
          */
 
         int nulls = 0; //# of nulls encountered. when this reaches the array length we know it is empty
-        while (!next.stop && nulls < ii.length) {
+        while (!next.stop && nulls < s0) {
             Y x = (Y) ii[i];
 
             if (x != null) {
@@ -424,7 +427,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 nulls++;
             }
 
-            if (++i == ii.length) i = 0; //increment with wrap-around
+            if (++i == s0) i = 0; //increment with wrap-around
         }
 
 //        if (modified) {

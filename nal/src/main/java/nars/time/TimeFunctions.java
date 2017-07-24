@@ -42,7 +42,7 @@ public interface TimeFunctions {
     /**
      * this duplicates most of what is in decomposeBeliefLate, TODO merge them
      */
-    static void shiftIfImmediate(@NotNull Derivation p, @NotNull long[] occReturn, Compound derived) {
+    static void shiftIfImmediate(@NotNull Derivation p, @NotNull long[] occReturn, Term derived) {
 
         if (derived.op() == CONJ && occReturn[0] != ETERNAL)
             occReturn[1] = occReturn[0] + derived.dtRange();

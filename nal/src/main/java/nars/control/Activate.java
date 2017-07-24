@@ -223,34 +223,34 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
     }
 
-    public void activateTaskExperiment1(NAR nar, float pri, Term thisTerm, BaseConcept cc) {
-        Termed[] taskTemplates = templates(cc, nar);
-
-        //if (templateConceptsCount > 0) {
-
-        //float momentum = 0.5f;
-        float taskTemplateActivation = pri / taskTemplates.length;
-        for (Termed ct : taskTemplates) {
-
-            Concept c = nar.conceptualize(ct);
-            //this concept activates task templates and termlinks to them
-            if (c instanceof Concept) {
-                c.termlinks().putAsync(
-                        new PLink(thisTerm, taskTemplateActivation)
-                );
-                nar.input(new Activate(c, taskTemplateActivation));
-
-//                        //reverse termlink from task template to this concept
-//                        //maybe this should be allowed for non-concept subterms
-//                        id.termlinks().putAsync(new PLink(c, taskTemplateActivation / 2)
-//                                //(concept ? (1f - momentum) : 1))
-//                        );
-
-            }
-
-
-        }
-    }
+//    public void activateTaskExperiment1(NAR nar, float pri, Term thisTerm, BaseConcept cc) {
+//        Termed[] taskTemplates = templates(cc, nar);
+//
+//        //if (templateConceptsCount > 0) {
+//
+//        //float momentum = 0.5f;
+//        float taskTemplateActivation = pri / taskTemplates.length;
+//        for (Termed ct : taskTemplates) {
+//
+//            Concept c = nar.conceptualize(ct);
+//            //this concept activates task templates and termlinks to them
+//            if (c instanceof Concept) {
+//                c.termlinks().putAsync(
+//                        new PLink(thisTerm, taskTemplateActivation)
+//                );
+//                nar.input(new Activate(c, taskTemplateActivation));
+//
+////                        //reverse termlink from task template to this concept
+////                        //maybe this should be allowed for non-concept subterms
+////                        id.termlinks().putAsync(new PLink(c, taskTemplateActivation / 2)
+////                                //(concept ? (1f - momentum) : 1))
+////                        );
+//
+//            }
+//
+//
+//        }
+//    }
 
     public static Termed[] templates(@NotNull Concept id, NAR nar) {
         TermContainer ctpl = id.templates();
@@ -285,10 +285,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         for (int i = 0; i < cs; i++) {
             Term b = ctpl.sub(i);
 
-            if (b.varQuery() > 0) continue;
-
             @Nullable Concept c =
-                    b instanceof Concept ? ((Concept) b) :
+                    //b instanceof Concept ? ((Concept) b) :
                             (b = b.unneg()).op().conceptualizable ?
                                     nar.conceptualize(b) : null;
 
@@ -329,6 +327,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         switch (host.op()) {
 
             case PROD:
+
 
             case SETe:
             case SETi:
