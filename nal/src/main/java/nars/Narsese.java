@@ -732,7 +732,7 @@ public class Narsese extends BaseParser<Object> {
      */
     Rule ColonReverseInheritance() {
         return sequence(
-                Term(false, true), ':', Term(),
+                Term(false, false), ':', Term(),
 
                 push($.inh(the(pop()), the(pop())))
                 ///*push(Compound.class), */push(the(pop())), push(the(pop())),
@@ -1054,7 +1054,8 @@ public class Narsese extends BaseParser<Object> {
 //                    throw new NarseseException("Too many operators involved: " + op + ',' + p + " in " + stack + ':' + vectorterms);
 //                }
 
-                op[0] = (Op) p;
+                if (op!=null)
+                    op[0] = (Op) p;
             }
         }
 

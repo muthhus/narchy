@@ -1039,6 +1039,7 @@ public class NAL7Test extends AbstractNALTest {
     public void preconImplyConjPost2() {
         //implication-based composition
 
+        //  y -> +3 -> a --> +2 --> x
         test
                 .input("(a ==>+2 x). :|:")
                 .input("(a ==>-3 y). :|:")
@@ -1075,7 +1076,9 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "( x <=>+2 y)", 1f, 0.45f)
                 .mustNotOutput(cycles, "( y ==>+2 x )", BELIEF, ETERNAL)
                 .mustNotOutput(cycles, "( y ==>-2 z )", BELIEF, ETERNAL)
-                .mustNotOutput(cycles, "( (x &&+2 y) ==>+5 z)", BELIEF, ETERNAL);
+                .mustNotOutput(cycles, "( (x &&+2 y) ==>+5 z)", BELIEF, ETERNAL)
+                .mustNotOutput(cycles, "( (x &&+2 y) ==>+1 z)", BELIEF, ETERNAL)
+        ;
     }
 
     @Test
@@ -1198,16 +1201,15 @@ public class NAL7Test extends AbstractNALTest {
 
         //1. test correct parse of the 3-ary parallel conj
         assertEquals("((a) &&+2 (&|,(b),(c),(d)))",
-                      $("((a) &&+2 (((b) &| (c)) &| (d)) )"));
+                      $("((a) &&+2 (((b) &| (c)) &| (d)) )").toString());
 
 
         test
                 .inputAt(1, "((a) &&+2 (c)). :|:")
-                .inputAt(3, "((b) &&+0 (d)). :|:")
+                .inputAt(3, "((b) &| (d)). :|:")
                 .mustBelieve(cycles,
-                        //"((a) &&+2 (&|, (b), (c), (d)))",
-                        "((a) &&+2 ( &&+0 ,(b),(c),(d)))",
-                        //"((a) &&+2 (((b) &| (c)) &| (d)) )",
+                        //"((a) &&+2 (&|, (b), (c), (d)))", //HACK <- this should work
+                        "((a) &&+2 (((b) &| (c)) &| (d)) )",
                         1f, 0.81f, 1, 3);
     }
 

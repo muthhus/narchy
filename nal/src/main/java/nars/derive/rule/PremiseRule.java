@@ -24,7 +24,6 @@ import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
-import nars.time.TimeFunctions;
 import nars.truth.func.BeliefFunction;
 import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
@@ -84,9 +83,6 @@ public class PremiseRule extends GenericCompound {
     @Nullable
     private MatchTaskBelief match;
 
-    @Nullable
-    private TimeFunctions timeFunction = TimeFunctions.Auto;
-
     /**
      * unless time(raw), projected belief truth will be used by default
      */
@@ -134,7 +130,7 @@ public class PremiseRule extends GenericCompound {
             throw new RuntimeException("unknown GoalFunction: " + post.goalTruth);
         }
 
-        Conclude conc = new Conclude(this, post.pattern, timeFunction);
+        Conclude conc = new Conclude(this, post.pattern);
 
         String beliefLabel = belief != null ? belief.toString() : "_";
         String goalLabel = goal != null ? goal.toString() : "_";
@@ -468,10 +464,6 @@ public class PremiseRule extends GenericCompound {
 //                    }
 //                    break;
 
-                case "time":
-                    timeFunction = time(pres, Y, Z, XString);
-                    break;
-
 //                case "temporal":
 //                    pres.add( Temporality.either;
 //                    break;
@@ -672,204 +664,6 @@ public class PremiseRule extends GenericCompound {
         constraints.add(new OpConstraint(x, v));
     }
 
-    private TimeFunctions time(Set<PrediTerm> pres, Term y, Term z, String XString) {
-        TimeFunctions timeFunction = TimeFunctions.Auto;
-        switch (XString) {
-            case "task":
-                timeFunction = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
-                    long occ = p.task.start();
-                    occReturn[0] = occ;
-                    boolean temporal = false;
-                    if (occ != ETERNAL) {
-                        temporal = true;
-                        Term yr = p.transform(y).eval(p.terms);
-                        int occShift = p.taskTerm.subtermTime(yr);
-                        if (occShift != DTERNAL)
-                            occReturn[0] += occShift;
-                    } else if (p.belief != null && p.belief.start() != ETERNAL) {
-                        temporal = true;
-                        occReturn[0] = p.belief.start();
-                        if (z != null) {
-                            //if Z occurrs in belief, then there is an additional shift
-                            @Nullable Term zr = p.transform(z).eval(p.terms);
-                            if (zr == null)
-                                return null;
-                            int relOccShift = p.taskTerm.subtermTime(zr);
-                            if (relOccShift != DTERNAL)
-                                occReturn[0] -= (relOccShift - p.taskTerm.dtRange());
-
-                            @Nullable Term yr = p.transform(y).eval(p.terms);
-                            if (yr == null)
-                                return null;
-                            int occShift = p.taskTerm.subtermTime(yr);
-                            if (occShift != DTERNAL)
-                                occReturn[0] += occShift;
-                        }
-                    }
-
-                    if (temporal && occReturn[0] == ETERNAL) {
-                        return null; //uncomputable temporal basis
-                    }
-
-                    TimeFunctions.shiftIfImmediate(p, occReturn, derived);
-
-                    //HACK retemporalize a non-temporal conjunction result
-                    if (p.taskTerm.op() == CONJ && p.taskTerm.dt() != DTERNAL &&
-                            derived.op() == CONJ && derived.dt() == DTERNAL) {
-
-                        switch (derived.size()) {
-                            case 2:
-                                Term A = derived.sub(0);
-                                int a = p.taskTerm.subtermTime(A);
-                                Term B = derived.sub(1);
-                                int b = p.taskTerm.subtermTime(B);
-                                if ((a > 0) && (occReturn[0] != ETERNAL)) {
-                                    //shift ahead, aligning the first subterm with its position in the task
-                                    occReturn[0] += a;
-                                    b -= a;
-                                }
-                                derived = CONJ.the(b - a, A, B);
-                                break;
-                            default:
-                                assert (derived.dt() == DTERNAL);
-                                derived = p.terms.the((Compound)derived, 0);
-                                break;
-                        }
-                    }
-                    return derived;  //return filterEternalBasis(derived, p, occReturn);
-                };
-                break;
-            case "belief":
-                timeFunction = (Term derived, @NotNull Derivation p, @NotNull long[] occReturn, @NotNull float[] confScale) -> {
-                    long occ;
-                    boolean temporal = false;
-                    if (!p.task.isEternal()) {
-                        temporal = true;
-                        //task determines occurrence if non-eternal
-                        occ = p.task.start();
-                        if (z != null) {
-                            //if Z occurrs in task, then there is an additional shift
-                            @Nullable Term zr = p.transform(z).eval(p.terms);
-                            if (zr == null)
-                                return null;
-                            int relOccShift = p.beliefTerm.subtermTime(zr);
-                            if (relOccShift != DTERNAL)
-                                occ -= relOccShift;
-                        }
-                    } else {
-                        if (p.belief != null) {
-                            if ((occ = p.belief.start()) != ETERNAL)
-                                temporal = true;
-                        } else {
-                            occ = ETERNAL;
-                        }
-                    }
-
-                    if (occ != ETERNAL) {
-                        occReturn[0] = occ;
-                        @Nullable Term yr = p.transform(y).eval(p.terms);
-                        if (yr == null)
-                            return null;
-                        int occShift = p.beliefTerm.subtermTime(yr);
-                        if (occShift != DTERNAL)
-                            occReturn[0] += occShift - yr.dtRange();
-                    } else {
-                        if (!temporal) {
-                            return derived;
-                        } else {
-                            return null; //uncomputable temporal basis
-                        }
-                    }
-
-                    TimeFunctions.shiftIfImmediate(p, occReturn, derived);
-
-                    return derived; //return filterEternalBasis(derived, p, occReturn);
-                };
-                break;
-            case "dtBeliefExact":
-                timeFunction = TimeFunctions.dtBeliefExact;
-                break;
-            case "dtBeliefReverse":
-                timeFunction = TimeFunctions.dtBeliefExact;
-                break;
-            case "dtTaskExact":
-                timeFunction = TimeFunctions.dtTaskExact;
-                break;
-
-            case "decomposeTask":
-                timeFunction = TimeFunctions.decomposeTask;
-                break;
-            case "decomposeTaskSubset":
-                timeFunction = TimeFunctions.decomposeTaskSubset;
-                break;
-            case "decomposeTaskComponents":
-                timeFunction = TimeFunctions.decomposeTaskComponents;
-                break;
-
-            case "beliefDTSimultaneous":
-                pres.add(TaskBeliefOccurrence.beliefDTSimultaneous);
-                break;
-
-            case "decomposeBelief":
-                timeFunction = TimeFunctions.decomposeBelief;
-                break;
-            case "decomposeBeliefLate":
-                timeFunction = TimeFunctions.decomposeBeliefLate;
-                break;
-
-            case "raw":
-                beliefProjected = false;
-                break;
-            case "dtCombine":
-                timeFunction = TimeFunctions.dtCombine;
-                pres.add(TaskBeliefOccurrence.eventsOrEternals);
-                break;
-            case "dtCombinePre":
-                timeFunction = TimeFunctions.dtCombinePre;
-                break;
-            case "dtCombinePost":
-                timeFunction = TimeFunctions.dtCombinePost;
-                break;
-
-            case "dtEvents":
-                timeFunction = TimeFunctions.occForward;
-                pres.add(TaskBeliefOccurrence.bothEvents);
-                minNAL = 7;
-                break;
-            case "dtEventsReverse":
-                timeFunction = TimeFunctions.occReverse;
-                pres.add(TaskBeliefOccurrence.bothEvents);
-                minNAL = 7;
-                break;
-            //NOTE THIS SHOULD ACTUALLY BE CALLED dtBeforeAfterOrEternal or something
-            case "dtEventsOrEternals":
-                timeFunction = TimeFunctions.occForward;
-                pres.add(TaskBeliefOccurrence.eventsOrEternals);
-                break;
-            case "dtEventsOrEternalsReverse":
-                timeFunction = TimeFunctions.occReverse;
-                pres.add(TaskBeliefOccurrence.eventsOrEternals);
-                break;
-
-            case "dtTminB":
-                timeFunction = TimeFunctions.dtTminB;
-                break;
-            case "dtBminT":
-                timeFunction = TimeFunctions.dtBminT;
-                break;
-
-            case "dtSum":
-                timeFunction = TimeFunctions.dtSum;
-                break;
-            case "dtSumReverse":
-                timeFunction = TimeFunctions.dtSumReverse;
-                break;
-
-            default:
-                throw new RuntimeException("invalid events parameters");
-        }
-        return timeFunction;
-    }
 
     private static void opNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
 

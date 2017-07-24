@@ -10,7 +10,6 @@ import nars.term.Compound;
 import nars.term.ProxyCompound;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.time.TimeFunctions;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -24,21 +23,16 @@ public final class Conclude extends ProxyCompound implements Function<NAR,Conclu
 
     @NotNull public final PremiseRule rule;
 
-    private final @NotNull TimeFunctions time;
-
     private final boolean varIntro;
 
     @NotNull public final Term pattern;
 
-    private final static AtomicInteger serial = new AtomicInteger();
 
-    public Conclude(@NotNull PremiseRule rule, @NotNull Term pattern, @NotNull TimeFunctions time) {
+    public Conclude(@NotNull PremiseRule rule, @NotNull Term pattern) {
 
-        super($.func("derive",
-                pattern, $.quote(/*"time" + */time.toString())));
+        super($.func("derive", pattern));
 
         this.rule = rule;
-        this.time = time;
 
 //        this.belief = belief;
 //        this.goal = goal;
@@ -60,9 +54,8 @@ public final class Conclude extends ProxyCompound implements Function<NAR,Conclu
 
     @Override
     public Conclusion apply(@NotNull NAR nar) {
-        int cid = serial.getAndIncrement();
         CauseChannel<Task> input = nar.newChannel(term());
-        return new Conclusion($.func("derive", /*$.the(cid), */sub(0) /* prod args */ ), pattern, time, varIntro, rule, input);
+        return new Conclusion($.func("derive", /*$.the(cid), */sub(0) /* prod args */ ), pattern, varIntro, rule, input);
     }
 
 

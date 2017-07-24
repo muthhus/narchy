@@ -897,7 +897,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     @Override
-    default void events(List<ObjectLongPair<Term>> events, long offset) {
+    @Deprecated default void events(List<ObjectLongPair<Term>> events, long offset) {
         Op o = op();
         if (o == CONJ) {
             int dt = dt();
@@ -934,6 +934,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 //            case NEG:
 //                return term(0).dtRange();
+
 
             case CONJ: {
                 Compound c = (Compound) this;

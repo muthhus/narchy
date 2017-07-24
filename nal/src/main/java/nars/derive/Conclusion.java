@@ -14,7 +14,6 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.var.Variable;
 import nars.time.Tense;
-import nars.time.TimeFunctions;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
@@ -47,15 +46,13 @@ public class Conclusion extends AbstractPred<Derivation> {
     public final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
     private final Term pattern;
     private final String rule;
-    private final TimeFunctions time;
     private final boolean varIntro;
     private final int minNAL;
 
-    public Conclusion(@NotNull Compound id, @NotNull Term pattern, @NotNull TimeFunctions time, boolean varIntro, @NotNull PremiseRule rule, CauseChannel<Task> input) {
+    public Conclusion(@NotNull Compound id, @NotNull Term pattern, boolean varIntro, @NotNull PremiseRule rule, CauseChannel<Task> input) {
         super(id);
         this.channel = input;
         this.pattern = pattern;
-        this.time = time;
         this.varIntro = varIntro;
         this.rule = rule.toString(); //only store toString of the rule to avoid remaining attached to the RuleSet
         this.minNAL = rule.minNAL;
@@ -119,15 +116,19 @@ public class Conclusion extends AbstractPred<Derivation> {
         Term c2;
         if (d.temporal) {
 
-            occ = Tense.ETERNAL_RANGE.clone();
+
 
             //process time with the unnegated term
-            float[] confScale = {1f};
+            //float[] confScale = {1f};
 
 
-            @Nullable Term t1 = this.time.compute(c1,
-                    d, occ, confScale
-            );
+            Temporalize t = Temporalize.solve(d, c1);
+            if (t==null)
+                return true; //invalid or impossible temporalization
+
+            occ = new long[] { t.start, t.end };
+
+            @Nullable Term t1 = t.conc;
 
             //temporalization failure, could not determine temporal attributes. seems this can happen normally
             if ((t1 == null || t1 instanceof Variable || t1 instanceof Bool) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
@@ -156,20 +157,20 @@ public class Conclusion extends AbstractPred<Derivation> {
             //                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
             //            }
 
-            //apply any non 1.0 the confidence scale
-            if (truth != null) {
-
-
-                float cf = confScale[0];
-                if (cf != 1) {
-                    throw new UnsupportedOperationException("yet");
-
-                    //                    truth = truth.confMultViaWeightMaxEternal(cf);
-                    //                    if (truth == null) {
-                    //                        throw new InvalidTaskException(content, "temporal leak");
-                    //                    }
-                }
-            }
+//            //apply any non 1.0 the confidence scale
+//            if (truth != null) {
+//
+//
+//                float cf = confScale[0];
+//                if (cf != 1) {
+//                    throw new UnsupportedOperationException("yet");
+//
+//                    //                    truth = truth.confMultViaWeightMaxEternal(cf);
+//                    //                    if (truth == null) {
+//                    //                        throw new InvalidTaskException(content, "temporal leak");
+//                    //                    }
+//                }
+//            }
 
 
             if (occ[1] == ETERNAL) occ[1] = occ[0];
