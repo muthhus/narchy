@@ -209,7 +209,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         for (Termed localSub : localTemplates) {
 
-            if (localSub instanceof Concept && !localSub.term().equals(id) /* dont self tasklink */) {
+            if (localSub instanceof Concept /*&& !localSub.term().equals(id)*/ /* dont self tasklink? */) {
                 Concept localSubConcept = (Concept) localSub;
                 localSubConcept.tasklinks().putAsync(
                         new PLink(task, tfaEach)

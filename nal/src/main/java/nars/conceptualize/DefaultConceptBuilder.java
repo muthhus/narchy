@@ -42,8 +42,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     public DefaultConceptBuilder() {
         this(
-                new DefaultConceptState("sleep", 48, 48, 8, 24, 24),
-                new DefaultConceptState("awake", 48, 48, 8, 24, 24)
+                new DefaultConceptState("sleep", 48, 48, 8, 32, 16),
+                new DefaultConceptState("awake", 48, 48, 8, 32, 16)
         );
     }
 
@@ -121,7 +121,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
      * can not be the content of Tasks yet may still exist as concepts
      */
     private BaseConcept newCompound(@NotNull Compound t) {
-        return new BaseConcept(t, this);
+        return new BaseConcept(t, BeliefTable.Empty, BeliefTable.Empty, QuestionTable.Empty, QuestionTable.Empty,
+                newLinkBags(t));
     }
 
     private BaseConcept newTask(@NotNull Compound t) {

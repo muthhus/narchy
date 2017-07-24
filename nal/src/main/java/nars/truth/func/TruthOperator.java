@@ -136,8 +136,18 @@ public interface TruthOperator {
         }
 
         @Override @Nullable public Truth apply(@Nullable Truth T, @Nullable Truth B, NAR m, float minConf) {
-            return ((B == null) || (T == null)) ? null :
-                    o.apply(T.negIf(T.isNegative()), B.negIf(B.isNegative()), m, minConf);
+            if ((B == null) || (T == null)) return null;
+            else {
+                boolean tn = T.isNegative();
+                boolean bn = B.isNegative();
+                Truth t = o.apply(T.negIf(tn), B.negIf(bn), m, minConf);
+                if (o == BeliefFunction.Comparison /* || o == GoalFunction.Comparison */) {
+                    //special case(s): commutive xor
+                    if (tn ^ bn)
+                        t = t.negated();
+                }
+                return t;
+            }
         }
 
         @NotNull @Override public final String toString() {
