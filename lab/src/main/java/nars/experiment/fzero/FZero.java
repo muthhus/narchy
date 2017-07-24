@@ -18,14 +18,14 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
 
-        float fps = 15f;
+        float fps = 10f;
 
 
         NAgentX.runRT((n)->{
 
             FZero a = null;
             try {
-                n.truthResolution.setValue(0.05f);
+                //n.truthResolution.setValue(0.05f);
                 a = new FZero(n);
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();

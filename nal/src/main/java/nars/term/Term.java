@@ -395,7 +395,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return this;
     }
 
-    default Term eval(TermContext index) {
+    @NotNull default Term eval(TermContext index) {
         if (!(index instanceof StaticTermIndex)) {
             Termed t = index.get(this, false); //resolve
             if (t != null)

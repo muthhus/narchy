@@ -9,7 +9,7 @@ public interface Termed<T extends Term> /* TODO finish implementing: extends Ter
 
 
 
-    Term term();
+    @NotNull Term term();
 
     @NotNull
     default Op op() { return term().op(); }

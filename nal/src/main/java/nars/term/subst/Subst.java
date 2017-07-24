@@ -10,6 +10,8 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.Null;
+
 
 public interface Subst  {
 
@@ -39,11 +41,10 @@ public interface Subst  {
     //boolean put(@NotNull Unify copied);
 
 
-    @Nullable default Term transform(@NotNull Term x) {
+    @NotNull default Term transform(@NotNull Term x) {
         Term y = xy(x);
-        if (y != null) {
+        if (y != null)
             return y; //an assigned substitution, whether a variable or other type of term
-        }
 
         if (!(x instanceof Compound))
             return x;
@@ -94,17 +95,15 @@ public interface Subst  {
             } else {
 
                 if (u == null || Term.invalidBoolSubterms(u, filterTrueFalse)) {
-                    return null;
+                    return Null;
                 }
 
-                if (this instanceof Derivation && u.varPattern() > 0) {
-                    //assert(false): "varPattern should have been filtered? " + u;
-                    return null;
-                }
+//                if (this instanceof Derivation && u.varPattern() > 0) {
+//                    //assert(false): "varPattern should have been filtered? " + u;
+//                    return null;
+//                }
 
-                if (!next.add(u))
-                    return null;
-
+                next.add(u);
             }
 
         }

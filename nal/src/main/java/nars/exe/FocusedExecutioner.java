@@ -31,7 +31,7 @@ import java.util.function.Predicate;
 public class FocusedExecutioner extends Executioner {
 
     public int subCycles = 2;
-    int subCycleConcepts = 6;
+    int subCycleConcepts = 3;
     int subCycleTasks = 16;
     int subCyclePremises = 6;
 

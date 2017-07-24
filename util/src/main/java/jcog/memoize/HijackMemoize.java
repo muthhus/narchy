@@ -102,7 +102,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
     final Function<K, V> func;
 
-    public final MwCounter
+    final MwCounter
             hit = new MwCounter(),  //existing item retrieved
             miss = new MwCounter(),  //a new item inserted that has not existed
             reject = new MwCounter(), //item prevented from insertion by existing items

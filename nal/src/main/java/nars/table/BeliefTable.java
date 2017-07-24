@@ -212,7 +212,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         if (answer == null || answer.isDeleted())
             return null;
 
-        boolean novel = true; //(answer instanceof AnswerTask); //includes: answers, revision, or dynamic
+        boolean novel = false; //(answer instanceof AnswerTask); //includes: answers, revision, or dynamic
                     //&& !(answer instanceof DynamicBeliefTask);
 
 
@@ -244,13 +244,12 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                 //            if (Param.DEBUG)
                 //                a.log("Answer Projected");
                 novel = true; //because it was projected
+                relevantTime = true;
                 answer = a;
             }
         }
 
-        if (novel && relevantTime && question.isQuestOrQuestion() &&
-                question.term().conceptual().equals(beliefConcept)
-            ) {
+        if (novel && relevantTime && question.isQuestOrQuestion()) {
             nar.input(answer);
         }
 

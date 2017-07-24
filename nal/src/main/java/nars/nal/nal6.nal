@@ -12,9 +12,7 @@
     //nature of such a rule."
 
     (M ==> P), (S ==> M), neqCom(P,S), time(dtSum), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
-        //cousin of: (A --> C), (B --> C), neqRCom(A,C)  |- (A --> B), (Punctuation:Question)
-        //TODO unit test:
-        //(S ==> P), (S ==> M), task("."), neqCom(P,S), time(dtBminT), notImplEqui(S), notEqui(P) |- (M ==>+- P), (Punctuation:Question)
+        //(S ==> M), (M ==> P), neqCom(P,S), time(dtSum), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
 
     (P ==> M), (S ==> M), neqCom(P,S), time(dtBminT), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Induction)
         //TODO unit test:
@@ -119,10 +117,10 @@
     Z, (X<=>Y), task("?"), time(dtBeliefExact) |- subIfUnifiesAny((X <=>+- Y), Y, Z), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
     //strong unification
-    (Y==>X),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:Deduction)
-    ((--,%Y)==>X),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:DeductionPN)
-    (X==>Y),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:Abduction)
-    (X<=>Y),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:Comparison)
+    (Y==>X),Z,task("."),time(decomposeTask)       |- subIfUnifiesAny(X,Y,Z), (Belief:Deduction)
+    ((--,%Y)==>X),Z,task("."),time(decomposeTask) |- subIfUnifiesAny(X,Y,Z), (Belief:DeductionPN)
+    (X==>Y),Z,task("."),time(decomposeTask)       |- subIfUnifiesAny(X,Y,Z), (Belief:Abduction)
+    (X<=>Y),Z,task("."),time(decomposeTask)       |- subIfUnifiesAny(X,Y,Z), (Belief:Comparison)
         //TODO check the truth here
 
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
@@ -168,8 +166,11 @@
     //((&&,A..+) ==> C), M, time(dtTaskExact), neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
     ((&&,M,A..+) ==> C), (B ==> M), time(dtSum), neqRCom(C,B)  |- ((&&,B,A..+) ==>+- C), (Belief:Deduction)
+        //TODO needs special handling to accurately time the precondition
     ((&&,B,A..+) ==> C), (B ==> M), time(dtTminB), neqRCom(C,M) |- ((&&,M,A..+) ==>+- C), (Belief:Abduction)
-    //((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neqRCom(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
+        //TODO needs special handling to accurately time the precondition
+
+    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C), time(dtBminT), neqRCom(B,M), notEqui(M), notImplEqui(B) |- (B ==>+- M), (Belief:Induction)
 
 
 

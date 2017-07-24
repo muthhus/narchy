@@ -92,6 +92,8 @@ public class Premise extends Pri implements ITask {
         if (task == null)
             return 0;
 
+
+
         //float taskPri = task.priElseZero();
 
 

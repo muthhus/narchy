@@ -29,7 +29,7 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = { 0, 1, 2, 4, 8, 16, 32 };
+    static final int[] sampleRadii = { 0, /*1,*/ 2, /*4,*/ 8, 16, 32 };
     final static int maxSamplesTruthpolated = 5;
 
     /** proportional to capacity (not size) */

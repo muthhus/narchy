@@ -4,17 +4,22 @@ import nars.Narsese;
 import nars.Op;
 import nars.derive.PatternCompound;
 import nars.derive.match.Ellipsis;
-import nars.derive.rule.PremiseRule;
 import nars.index.term.map.MapTermIndex;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.transform.VariableNormalization;
+import nars.term.var.AbstractVariable;
 import nars.term.var.Variable;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ConcurrentHashMap;
+
+import static nars.$.v;
+import static nars.Op.VAR_PATTERN;
 
 /**
  * Index which specifically holds the term components of a deriver ruleset.
@@ -132,7 +137,7 @@ public class PatternTermIndex extends MapTermIndex {
      */
     public @NotNull Compound pattern(@NotNull Compound x) {
 
-        Term y = x.transform(new PremiseRule.PremiseRuleVariableNormalization());
+        Term y = x.transform(new PremiseRuleVariableNormalization());
 
         assert(y!=null);
 
@@ -144,4 +149,85 @@ public class PatternTermIndex extends MapTermIndex {
         return pattern( (Compound) Narsese.the().term(s, false) );
     }
 
+    public static final class PremiseRuleVariableNormalization extends VariableNormalization {
+
+
+        public static final int ELLIPSIS_ZERO_OR_MORE_ID_OFFSET = 1 * 256;
+        public static final int ELLIPSIS_ONE_OR_MORE_ID_OFFSET = 2 * 256;
+        public static final int ELLIPSIS_TRANSFORM_ID_OFFSET = 3 * 256;
+
+        public PremiseRuleVariableNormalization() {
+            super(new UnifiedMap<>());
+        }
+
+        public static AbstractVariable varPattern(int i) {
+            return v(VAR_PATTERN, i);
+        }
+
+        @NotNull
+        @Override
+        protected Variable newVariable(@NotNull Variable x) {
+
+
+            int actualSerial = count;
+
+//            if (x instanceof Ellipsis.EllipsisTransformPrototype) {
+//                //special
+//
+//                Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype) x;
+//
+////                Term from = ep.from;
+////                if (from != Op.Imdex) from = applyAfter((GenericVariable)from);
+////                Term to = ep.to;
+////                if (to != Op.Imdex) to = applyAfter((GenericVariable)to);
+////
+//                return EllipsisTransform.make(varPattern(actualSerial + ELLIPSIS_TRANSFORM_ID_OFFSET), ep.from, ep.to, this);
+//
+//            } else
+            if (x instanceof Ellipsis.EllipsisPrototype) {
+                Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype) x;
+                return Ellipsis.EllipsisPrototype.make(actualSerial +
+                                (ep.minArity == 0 ? ELLIPSIS_ZERO_OR_MORE_ID_OFFSET : ELLIPSIS_ONE_OR_MORE_ID_OFFSET) //these need to be distinct
+                        , ep.minArity);
+            } else if (x instanceof Ellipsis) {
+
+                return x;
+
+                //throw new UnsupportedOperationException("?");
+//                int idOffset;
+//                if (v instanceof EllipsisTransform) {
+//                    idOffset = ELLIPSIS_TRANSFORM_ID_OFFSET;
+//                } else if (v instanceof EllipsisZeroOrMore) {
+//                    idOffset = ELLIPSIS_ZERO_OR_MORE_ID_OFFSET;
+//                } else if (v instanceof EllipsisOneOrMore) {
+//                    idOffset = ELLIPSIS_ONE_OR_MORE_ID_OFFSET;
+//                } else {
+//                    throw new RuntimeException("N/A");
+//                }
+//
+//                Variable r = ((Ellipsis) v).clone(varPattern(actualSerial + idOffset), this);
+//                offset = 0; //return to zero
+//                return r;
+            } /*else if (v instanceof GenericVariable) {
+                return ((GenericVariable) v).normalize(actualSerial); //HACK
+            } else {
+                return v(v.op(), actualSerial);
+            }*/
+            return super.newVariable(x);
+        }
+
+//        @Override
+//        public final boolean testSuperTerm(@NotNull Compound t) {
+//            //descend all, because VAR_PATTERN is not yet always considered a variable
+//            return true;
+//        }
+
+        @NotNull
+        public Term applyAfter(@NotNull Variable secondary) {
+            if (secondary.equals(Op.Imdex))
+                return secondary; //dont try to normalize any imdex
+            else
+                return apply(null, secondary);
+        }
+    }
 }

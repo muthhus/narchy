@@ -359,8 +359,8 @@ public interface TimeFunctions {
             dtExact(derived, occReturn, p, true, +1);
     TimeFunctions dtBeliefExact = (Term derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
             dtExact(derived, occReturn, p, false, +1);
-    TimeFunctions dtBeliefReverse = (Term derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
-            dtExact(derived, occReturn, p, false, -1);
+//    TimeFunctions dtBeliefReverse = (Term derived, @NotNull Derivation p, long[] occReturn, float[] confScale) ->
+//            dtExact(derived, occReturn, p, false, -1);
 
 
     /**
@@ -569,8 +569,16 @@ public interface TimeFunctions {
         long occ = ETERNAL;
 
         if (decomposeTask) {
+
             if (occDecomposed != ETERNAL) {
 
+                if (occOther!=ETERNAL) {
+                    //choose randomly between the two occurrence times
+                    Task which = chooseByConf(task, belief, p);
+                    if (which == otherTask) {
+                        occDecomposed = occOther;
+                    }
+                }
 
                 Compound rDecomposedTerm = compoundOrNull(resolve(decomposedTerm, p));
                 if (rDecomposedTerm != null) {

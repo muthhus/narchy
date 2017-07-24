@@ -667,7 +667,9 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(0, "(b). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
                 .mustNotOutput(cycles, "(a)", BELIEF, ETERNAL)
-                .mustBelieve(cycles, "(a)", 1f, 0.45f, -1 /* 0 ? */);
+                .mustBelieve(cycles, "(a)", 1f, 0.45f, -1)
+                .mustBelieve(cycles, "(a)", 1f, 0.45f, 0)
+        ;
         //.mustBelieve(cycles, "(a)", 1f, 0.45f, 0 /* occ */);
         //        /** because the two temporal events create a contradiction when evaluating the
         //         * derivation's result time, this tests decomposition's
@@ -714,6 +716,7 @@ public class NAL7Test extends AbstractNALTest {
         */
 
         test
+                .log()
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
                 .mustNotOutput(cycles, "(x)", BELIEF, 0f, 0.89f, 0f, 0.91f, 10)
@@ -1066,10 +1069,13 @@ public class NAL7Test extends AbstractNALTest {
     public void testPreconditionCombineVarying() { //may be equivalent to another case
 
         test
-                .believe("((x) ==>+5 (z))")
-                .believe("((y) ==>+3 (z))")
-                .mustBelieve(cycles, "( ((x) &&+2 (y)) ==>+3 (z))", 1f, 0.81f)
-                .mustNotOutput(cycles, "( ((x) &&+2 (y)) ==>+5 (z))", BELIEF, ETERNAL);
+                .believe("(x ==>+5 z)")
+                .believe("(y ==>+3 z)")
+                .mustBelieve(cycles, "( (x &&+2 y) ==>+3 z)", 1f, 0.81f)
+                .mustBelieve(cycles, "( x <=>+2 y)", 1f, 0.45f)
+                .mustNotOutput(cycles, "( y ==>+2 x )", BELIEF, ETERNAL)
+                .mustNotOutput(cycles, "( y ==>-2 z )", BELIEF, ETERNAL)
+                .mustNotOutput(cycles, "( (x &&+2 y) ==>+5 z)", BELIEF, ETERNAL);
     }
 
     @Test

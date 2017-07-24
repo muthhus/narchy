@@ -55,8 +55,8 @@ public class PremiseRule extends GenericCompound {
 
     public static final Atomic Task = Atomic.the("task");
     static final Atomic Belief = Atomic.the("belief");
-    static final Term TaskAny = $.func("task", Atomic.the("any"));
-    static final Term QUESTION_PUNCTUATION = $.inh(Atomic.the("Question"), Atomic.the("Punctuation"));
+    private static final Term TaskAny = $.func("task", Atomic.the("any"));
+    private static final Term QUESTION_PUNCTUATION = $.inh(Atomic.the("Question"), Atomic.the("Punctuation"));
 
 
     public boolean permuteBackward = false;
@@ -66,7 +66,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * conditions which can be tested before unification
      */
-    public PrediTerm[] PRE;
+    private PrediTerm[] PRE;
 
     /**
      * consequences applied after unification
@@ -90,15 +90,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * unless time(raw), projected belief truth will be used by default
      */
-    boolean beliefProjected = true;
-
-//    @Nullable
-//    private static final CompoundTransform truthSwap = new PremiseTruthTransform(true, true) {
-//        @Override
-//        public Term apply(@NotNull Term func) {
-//            return Atomic.the(func.toString() + 'X');
-//        }
-//    };
+    private boolean beliefProjected = true;
 
     /**
      * for printing complex terms as a recursive tree
@@ -108,12 +100,12 @@ public class PremiseRule extends GenericCompound {
     }
 
     @NotNull
-    public final Compound getPremise() {
+    private Compound getPremise() {
         return (Compound) sub(0);
     }
 
     @NotNull
-    public final Compound getConclusion() {
+    private Compound getConclusion() {
         return (Compound) sub(1);
     }
 
@@ -121,12 +113,6 @@ public class PremiseRule extends GenericCompound {
         super(PROD, premiseAndResult);
     }
 
-
-//    public final boolean validTaskPunctuation(final char p) {
-//        if ((p == Symbols.QUESTION) && !allowQuestionTask)
-//            return false;
-//        return true;
-//    }
 
 
     /**
@@ -170,9 +156,6 @@ public class PremiseRule extends GenericCompound {
                 new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
                 new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
 
-//        if (belief!=null && goal!=null && !belief.single() && !goal.single())
-//            s.add(BeliefPolarity.beliefExist); //quick filter TODO verify if this is safe with respect to questions
-
         //PREFIX
         {
             addAll(s, PRE);
@@ -198,46 +181,12 @@ public class PremiseRule extends GenericCompound {
         return l;
     }
 
-    //    public static void eachOperator(NAR nar, BiConsumer<Class, TermTransform> eachTransform) {
-//        for (Class<? extends TermTransform> c : PremiseRule.Operators) {
-//
-//            Constructor<?>[] ccc = c.getConstructors();
-//            try {
-//                int n = 0;
-//                TermTransform o = null;
-//                do {
-//                    Constructor cc = ccc[n++];
-//
-//                    if (Modifier.isPublic(cc.getModifiers())) {
-//                        int params = cc.getParameterCount();
-//                        if (params == 0) {
-//                            //default empty constructor
-//                            o = (c.newInstance());
-//                        } else if (params == 1) {
-//                            //HACK support 'NAR' only parameter constructor
-//                            o = ((TermTransform) cc.newInstance(nar));
-//                        }
-//                    }
-//                } while (o == null && n < ccc.length);
-//
-//                eachTransform.accept(c, o);
-//
-//            } catch (Exception e) {
-//                throw new RuntimeException("Invalid ImmediateTermTransform: " + c);
-//            }
-//
-//
-//        }
-//    }
-
-
     /**
      * higher is earlier
      */
-    static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
+    private static final HashMap<Object, Integer> preconditionScore = new HashMap() {{
 
         int rank = 50;
-
 
         put("PatternOp1", rank--);
         put("PatternOp0", rank--);
@@ -260,16 +209,6 @@ public class PremiseRule extends GenericCompound {
 
         put(Solve.class, rank--);
 
-//        put(TermNotEquals.class, rank--);
-
-//        put(PatternOpNot.class, rank--);
-
-
-//        put(SubTermOp.class, 10);
-//        put(TaskPunctuation.class, 9);
-//        put(TaskNegative.class, 8);
-//        put(SubTermStructure.class, 7);
-//        put(Solve.class, 1);
     }};
 
     private static Object classify(Term b) {
@@ -356,46 +295,21 @@ public class PremiseRule extends GenericCompound {
     }
 
     @NotNull
-    protected final Term getConclusionTermPattern() {
+    private Term getConclusionTermPattern() {
         return getConclusion().sub(0);
     }
 
 
-//    @Override
-//    public final String toString(boolean pretty) {
-//        return str;
-//    }
-
-//    @Nullable
-//    public final Term task() {
-//        return pattern.term(0);
-//    }
-//
-//    @Nullable
-//    public final Term belief() {
-//        return pattern.term(1);
-//    }
-
     /**
      * deduplicate and generate match-optimized compounds for rules
      */
-    public void compile(@NotNull TermIndex index) {
+    private void compile(@NotNull TermIndex index) {
         Term[] premisePattern = ((Compound) sub(0)).toArray();
         premisePattern[0] = index.get(premisePattern[0], true).term(); //task pattern
         premisePattern[1] = index.get(premisePattern[1], true).term(); //belief pattern
     }
 
-//    @NotNull
-//    public Term reified() {
-//
-//        //TODO include representation of precondition and postconditions
-//        return $.impl(
-//                p(getTask(), getBelief()),
-//                getConclusion()
-//        );
-//    }
-
-    static final CompoundTransform UppercaseAtomsToPatternVariables = (containingCompound, v) -> {
+    private static final CompoundTransform UppercaseAtomsToPatternVariables = (containingCompound, v) -> {
 
         if (v instanceof Atom) {
             String name = v.toString();
@@ -753,12 +667,12 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    public static void isOp(Set<PrediTerm> pres, Term taskTermPattern, Term beliefTermPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
+    private static void isOp(Set<PrediTerm> pres, Term taskTermPattern, Term beliefTermPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
         pres.add(new TaskBeliefHas(v.bit, taskTermPattern.contains(x), beliefTermPattern.contains(x)));
         constraints.add(new OpConstraint(x, v));
     }
 
-    public TimeFunctions time(Set<PrediTerm> pres, Term y, Term z, String XString) {
+    private TimeFunctions time(Set<PrediTerm> pres, Term y, Term z, String XString) {
         TimeFunctions timeFunction = TimeFunctions.Auto;
         switch (XString) {
             case "task":
@@ -768,9 +682,7 @@ public class PremiseRule extends GenericCompound {
                     boolean temporal = false;
                     if (occ != ETERNAL) {
                         temporal = true;
-                        @Nullable Term yr = p.transform(y).eval(p.terms);
-                        if (yr == null)
-                            return null;
+                        Term yr = p.transform(y).eval(p.terms);
                         int occShift = p.taskTerm.subtermTime(yr);
                         if (occShift != DTERNAL)
                             occReturn[0] += occShift;
@@ -824,8 +736,7 @@ public class PremiseRule extends GenericCompound {
                                 break;
                         }
                     }
-
-                    return filterEternalBasis(derived, p, occReturn);
+                    return derived;  //return filterEternalBasis(derived, p, occReturn);
                 };
                 break;
             case "belief":
@@ -872,48 +783,15 @@ public class PremiseRule extends GenericCompound {
 
                     TimeFunctions.shiftIfImmediate(p, occReturn, derived);
 
-                    return filterEternalBasis(derived, p, occReturn);
+                    return derived; //return filterEternalBasis(derived, p, occReturn);
                 };
                 break;
-
-//                        case "after":
-//                            pres.add(events.after);
-//                            break;
-//
-//                        case "eternal":
-//                            pres.add(events.eternal);
-//                            timeFunction = TimeFunctions.dternal;
-//                            break;
-//
-//                        case "afterOrEternal":
-//                            pres.add(events.afterOrEternal);
-//                            break;
-            /*case "taskPredicate":
-                pres.add( events.taskPredicate;
-                break;*/
-//                        case "dt":
-//                            timeFunction = TimeFunctions.occForward;
-//                            break;
-
-
-//                        case "dtBelief":
-//                            timeFunction = TimeFunctions.dtBelief;
-//                            break;
-//                        case "dtBeliefEnd":
-//                            timeFunction = TimeFunctions.dtBeliefEnd;
-//                            break;
             case "dtBeliefExact":
                 timeFunction = TimeFunctions.dtBeliefExact;
                 break;
             case "dtBeliefReverse":
                 timeFunction = TimeFunctions.dtBeliefExact;
                 break;
-//                        case "dtTask":
-//                            timeFunction = TimeFunctions.dtTask;
-//                            break;
-//                        case "dtTaskEnd":
-//                            timeFunction = TimeFunctions.dtTaskEnd;
-//                            break;
             case "dtTaskExact":
                 timeFunction = TimeFunctions.dtTaskExact;
                 break;
@@ -921,11 +799,6 @@ public class PremiseRule extends GenericCompound {
             case "decomposeTask":
                 timeFunction = TimeFunctions.decomposeTask;
                 break;
-//                        case "decomposeTaskIfTemporal":
-//                            pres.add(events.taskNotDTernal);
-//                            timeFunction = TimeFunctions.decomposeTask;
-//                            break;
-
             case "decomposeTaskSubset":
                 timeFunction = TimeFunctions.decomposeTaskSubset;
                 break;
@@ -937,16 +810,6 @@ public class PremiseRule extends GenericCompound {
                 pres.add(TaskBeliefOccurrence.beliefDTSimultaneous);
                 break;
 
-//                        case "decomposeTaskIfTermLinkBefore":
-//                            timeFunction = TimeFunctions.decomposeTask;
-//                            pres.add(IfTermLinkBefore.ifTermLinkBefore);
-//                            break;
-//
-//                        case "decomposeTaskIfBeliefBefore":
-//                            timeFunction = TimeFunctions.decomposeTask;
-//                            pres.add(IfTermLinkBefore.ifBeliefBefore);
-//                            break;
-
             case "decomposeBelief":
                 timeFunction = TimeFunctions.decomposeBelief;
                 break;
@@ -954,41 +817,9 @@ public class PremiseRule extends GenericCompound {
                 timeFunction = TimeFunctions.decomposeBeliefLate;
                 break;
 
-
-//                        case "dtForward":
-//                            timeFunction = TimeFunctions.occForward;
-//                            pres.add(events.bothTemporal);
-//                            break;
-
-//                        case "conjoin":
-//                            timeFunction = TimeFunctions.occForwardMerge;
-//                            pres.add(events.nonEternal);
-//                            break;
-
-
-//                        case "dtAfter":
-//                            timeFunction = TimeFunctions.occForward;
-//                            pres.add(events.nonEternal);
-//                            break;
-//                        case "dtAfterReverse":
-//                            timeFunction = TimeFunctions.occReverse;
-//                            pres.add(events.nonEternal);
-//                            break;
-
             case "raw":
                 beliefProjected = false;
                 break;
-
-//                        case "dtBefore":
-//                            timeFunction = TimeFunctions.occReverse;
-//                            pres.add(events.after);
-//                            break;
-
-//                        case "dtIfEvent":
-//                            temporalize = Temporalize.dtIfEvent;
-//                            break;
-
-
             case "dtCombine":
                 timeFunction = TimeFunctions.dtCombine;
                 pres.add(TaskBeliefOccurrence.eventsOrEternals);
@@ -1026,9 +857,6 @@ public class PremiseRule extends GenericCompound {
             case "dtBminT":
                 timeFunction = TimeFunctions.dtBminT;
                 break;
-//                        case "dtIntersect":
-//                            timeFunction = TimeFunctions.dtIntersect;
-//                            break;
 
             case "dtSum":
                 timeFunction = TimeFunctions.dtSum;
@@ -1036,9 +864,6 @@ public class PremiseRule extends GenericCompound {
             case "dtSumReverse":
                 timeFunction = TimeFunctions.dtSumReverse;
                 break;
-            //                        case "occMerge":
-//                            timeFunction = TimeFunctions.occMerge;
-//                            break;
 
             default:
                 throw new RuntimeException("invalid events parameters");
@@ -1046,70 +871,20 @@ public class PremiseRule extends GenericCompound {
         return timeFunction;
     }
 
-    public @Nullable Term filterEternalBasis(Term derived, @NotNull Derivation p, @NotNull long[] occReturn) {
-        if (derived == null)
-            return null;
+    private static void opNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
 
-        if (occReturn[0] == ETERNAL && (!p.task.isEternal() && (p.belief == null || !p.belief.isEternal())))
-            return null; //no temporal basis
-
-        return derived;
-    }
-
-    public static void opNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
-
-//        boolean prefiltered = false;
-//        if (t.equals(task)) {
-//            pres.add(new PatternOpNot(0, structure));
-//            prefiltered = true;
-//        } else if (t.equals(belief)) {
-//            pres.add(new PatternOpNot(1, structure));
-//            prefiltered = true;
-//        }
-//
-//        if (!prefiltered)
         constraints.add(new OpExclusionConstraint(t, structure));
     }
 
 
-    public static void opNotContaining(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
-
-
-        boolean prefiltered = false;
-//
-//        if (t.equals(task)) {
-//            pres.add(new PatternOpNotContaining(0, structure));
-//            prefiltered = true;
-//        } else if (t.equals(belief)) {
-//            pres.add(new PatternOpNotContaining(1, structure));
-//            prefiltered = true;
-//        }
-
-        //if (!prefiltered)
+    private static void opNotContaining(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
         constraints.add(new StructureExclusionConstraint(t, structure));
     }
 
-    public void neq(@NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
+    private void neq(@NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
         constraints.add(new NotEqualConstraint(x, y));
         constraints.add(new NotEqualConstraint(y, x));
     }
-
-
-//    /**
-//     * returns whether the prefilter was successful, otherwise a constraint must be tested
-//     */
-//    public boolean neqPrefilter(@NotNull Collection<BoolPredicate> pres, @NotNull Term task, @NotNull Term belief, @NotNull Term arg1, @NotNull Term arg2, Function<TaskBeliefSubterms, BoolPredicate[]> filter) {
-//        TaskBeliefSubterms tb = withinNonCommutive(task, belief, arg1, arg2);
-//        if (tb != null) {
-//            //cheaper to compute this in precondition
-//            BoolPredicate[] bp = filter.apply(tb);
-//            for (BoolPredicate b : bp)
-//                pres.add(b);
-//            return true;
-//        }
-//
-//        return false;
-//    }
 
 
     /**
@@ -1154,16 +929,6 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-//    @Override
-//    public Term clone(TermContainer subs) {
-//        return null;
-//    }
-
-    //    @Override
-//    public Term clone(Term[] x) {
-//        return new TaskRule((Compound)x[0], (Compound)x[1]);
-//    }
-
 
     /**
      * for each calculable "question reverse" rule,
@@ -1190,61 +955,6 @@ public class PremiseRule extends GenericCompound {
         }
     }
 
-
-//    static final Term BELIEF = $.the("Belief");
-//    static final Term DESIRE = $.the("Desire");
-
-    //    public PremiseRule negative(PatternIndex index) {
-//
-//        @NotNull Term tt = getTask();
-////        if (tt.op() == Op.ATOM) {
-////            //raw pattern var, no need to invert the rule
-////            //System.err.println("--- " + tt);
-////            //return null;
-////        } else {
-////            //System.err.println("NEG " + neg(tt));
-////        }
-//
-//        Compound newTask = (Compound) neg(tt);
-//        Term[] pp = getPremise().terms().clone();
-//        pp[0] = newTask;
-//
-//
-//        Map<Term,Term> negMap = Maps.mutable.of(tt, newTask);
-//        Term prevTask = pp[1];
-//        pp[1] = $.terms.remap(prevTask, negMap);
-//
-//
-//        Compound newPremise = (Compound) $.compound(getPremise().op(), pp);
-//
-//        @NotNull Compound prevConclusion = getConclusion();
-//        Compound newConclusion = (Compound) $.terms.remap(prevConclusion, negMap);
-//
-//        //only the task was affected
-//        if (newConclusion.equals(prevConclusion) && newTask.equals(prevTask))
-//            return null;
-//
-//        //Compound newConclusion = (Compound) terms.transform(getConclusion(), truthNegate);
-//
-//        @NotNull PremiseRule neg = PremiseRuleSet.normalize(new PremiseRule(newPremise, newConclusion), index);
-//
-//        //System.err.println(term(0) + " |- " + term(1) + "  " + "\t\t" + remapped);
-//
-//        return neg;
-//    }
-
-//    /**
-//     * safe negation
-//     */
-//    @NotNull
-//    private static Term neg(@NotNull Term x) {
-//        if (x.op() == NEG) {
-//            return ((Compound) x).term(0); //unwrap
-//        } else {
-//            //do this manually for premise rules since they will need to negate atoms which is not usually allowed
-//            return new GenericCompound(NEG, TermVector.the(x));
-//        }
-//    }
 
 
     @NotNull
@@ -1299,89 +1009,6 @@ public class PremiseRule extends GenericCompound {
 
         return PremiseRuleSet.normalize(new PremiseRule(TermVector.the(newPremise, newConclusion)), index);
 
-    }
-
-
-    public static final class PremiseRuleVariableNormalization extends VariableNormalization {
-
-
-        public static final int ELLIPSIS_ZERO_OR_MORE_ID_OFFSET = 1 * 256;
-        public static final int ELLIPSIS_ONE_OR_MORE_ID_OFFSET = 2 * 256;
-        public static final int ELLIPSIS_TRANSFORM_ID_OFFSET = 3 * 256;
-
-        public PremiseRuleVariableNormalization() {
-            super(new UnifiedMap<>());
-        }
-
-        public static AbstractVariable varPattern(int i) {
-            return v(VAR_PATTERN, i);
-        }
-
-        @NotNull
-        @Override
-        protected Variable newVariable(@NotNull Variable x) {
-
-
-            int actualSerial = count;
-
-//            if (x instanceof Ellipsis.EllipsisTransformPrototype) {
-//                //special
-//
-//                Ellipsis.EllipsisTransformPrototype ep = (Ellipsis.EllipsisTransformPrototype) x;
-//
-////                Term from = ep.from;
-////                if (from != Op.Imdex) from = applyAfter((GenericVariable)from);
-////                Term to = ep.to;
-////                if (to != Op.Imdex) to = applyAfter((GenericVariable)to);
-////
-//                return EllipsisTransform.make(varPattern(actualSerial + ELLIPSIS_TRANSFORM_ID_OFFSET), ep.from, ep.to, this);
-//
-//            } else
-            if (x instanceof Ellipsis.EllipsisPrototype) {
-                Ellipsis.EllipsisPrototype ep = (Ellipsis.EllipsisPrototype) x;
-                return Ellipsis.EllipsisPrototype.make(actualSerial +
-                                (ep.minArity == 0 ? ELLIPSIS_ZERO_OR_MORE_ID_OFFSET : ELLIPSIS_ONE_OR_MORE_ID_OFFSET) //these need to be distinct
-                        , ep.minArity);
-            } else if (x instanceof Ellipsis) {
-
-                return x;
-
-                //throw new UnsupportedOperationException("?");
-//                int idOffset;
-//                if (v instanceof EllipsisTransform) {
-//                    idOffset = ELLIPSIS_TRANSFORM_ID_OFFSET;
-//                } else if (v instanceof EllipsisZeroOrMore) {
-//                    idOffset = ELLIPSIS_ZERO_OR_MORE_ID_OFFSET;
-//                } else if (v instanceof EllipsisOneOrMore) {
-//                    idOffset = ELLIPSIS_ONE_OR_MORE_ID_OFFSET;
-//                } else {
-//                    throw new RuntimeException("N/A");
-//                }
-//
-//                Variable r = ((Ellipsis) v).clone(varPattern(actualSerial + idOffset), this);
-//                offset = 0; //return to zero
-//                return r;
-            } /*else if (v instanceof GenericVariable) {
-                return ((GenericVariable) v).normalize(actualSerial); //HACK
-            } else {
-                return v(v.op(), actualSerial);
-            }*/
-            return super.newVariable(x);
-        }
-
-//        @Override
-//        public final boolean testSuperTerm(@NotNull Compound t) {
-//            //descend all, because VAR_PATTERN is not yet always considered a variable
-//            return true;
-//        }
-
-        @NotNull
-        public Term applyAfter(@NotNull Variable secondary) {
-            if (secondary.equals(Op.Imdex))
-                return secondary; //dont try to normalize any imdex
-            else
-                return apply(null, secondary);
-        }
     }
 
 

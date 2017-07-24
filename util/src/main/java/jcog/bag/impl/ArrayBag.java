@@ -817,7 +817,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
                 while (true) {
                     while (i < cLenMin1 && cmpLT((Prioritized) c[++i], tempV)) ;
-                    while (cmpGT(c[--j], tempV)) ;
+                    while (j > 0 && /* <- that added */ cmpGT(c[--j], tempV)) ;
                     if (j < i) {
                         break;
                     }
