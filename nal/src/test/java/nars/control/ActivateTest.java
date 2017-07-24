@@ -38,9 +38,9 @@ public class ActivateTest {
             @Override
             protected void premise(Premise p, NAR nar) {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
-                if (p.termLink.get() instanceof Atom)
+                if (p.termLink instanceof Atom)
                     return ; //ignore
-                String tls = p.termLink.get().toString();
+                String tls = p.termLink.toString();
                 s.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
             }
         };

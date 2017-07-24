@@ -169,8 +169,9 @@ public class PremiseRule extends GenericCompound {
         Solve truth = puncOverride == 0 ?
                 new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
                 new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
-        if (belief!=null && goal!=null && !belief.single() && !goal.single())
-            s.add(BeliefPolarity.beliefExist); //quick filter
+
+//        if (belief!=null && goal!=null && !belief.single() && !goal.single())
+//            s.add(BeliefPolarity.beliefExist); //quick filter TODO verify if this is safe with respect to questions
 
         //PREFIX
         {

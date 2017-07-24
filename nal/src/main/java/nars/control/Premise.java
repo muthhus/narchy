@@ -37,12 +37,12 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Premise extends Pri implements ITask {
 
-    public final PriReference<Task> taskLink;
-    public final PriReference<Term> termLink;
+    public final Task taskLink;
+    public final Term termLink;
     private final int hash;
 
-    public Premise(@Nullable PriReference<Task> tasklink, @Nullable PriReference<Term> termlink) {
-        super(Param.tasktermLinkCombine.apply(tasklink.priElseZero(), termlink.priElseZero()));
+    public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri) {
+        super(pri);
         this.taskLink = tasklink;
         this.termLink = termlink;
         this.hash = Util.hashCombine(tasklink.hashCode(), termlink.hashCode());
@@ -87,8 +87,8 @@ public class Premise extends Pri implements ITask {
 
         //nar.emotion.count("Premise_run");
 
-        PriReference<Task> taskLink = this.taskLink;
-        final Task task = taskLink.get();
+        Task taskLink = this.taskLink;
+        final Task task = taskLink;
         if (task == null)
             return 0;
 
@@ -100,7 +100,7 @@ public class Premise extends Pri implements ITask {
         long now = d.time;
 
 
-        Term beliefTerm = termLink.get();
+        Term beliefTerm = termLink;
         Task belief = null;
 
 

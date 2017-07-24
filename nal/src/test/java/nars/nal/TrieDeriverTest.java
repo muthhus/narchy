@@ -167,10 +167,7 @@ public class TrieDeriverTest {
         Set<Task> tasks = new LinkedHashSet();
         n.onTask(tasks::add);
 
-        new Premise(
-                new PLink(n.task(task), 0.5f),
-                new PLink(n.term(belief), 0.5f)
-        ).run(der, ttlMax);
+        new Premise( n.task(task), n.term(belief), 0.5f ).run(der, ttlMax);
 
         n.run(1);  //to allow input tasks to get processed
 

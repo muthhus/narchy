@@ -185,7 +185,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             for (int j = 0, termlSize = terml.size(); j < termlSize; j++) {
                 PriReference<Term> termlink = terml.get(j);
 
-                premise( new Premise(tasklink, termlink), nar);
+                float pri = Param.tasktermLinkCombine.apply(tasklink.priElseZero(), termlink.priElseZero());
+                premise( new Premise(tasklink.get(), termlink.get(), pri), nar);
             }
         }
 
@@ -208,10 +209,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         for (Termed localSub : localTemplates) {
 
-            if (localSub instanceof Concept /*&& !localSub.term().equals(id)*/ /* dont self tasklink? */) {
+            if (localSub instanceof Concept) {
                 Concept localSubConcept = (Concept) localSub;
                 localSubConcept.tasklinks().putAsync(
-                        new PLink(task, tfaEach)
+                        new PLink<>(task, tfaEach)
                 );
 //                localSubConcept.termlinks().putAsync(
 //                        new PLink(task.term(), tfaEach)
@@ -265,7 +266,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 new HashSet(id.volume());
         templates(tc, ctpl, nar, layers(id) - 1);
 
-        tc.add(id.term());
+        tc.add(id.term()); //add the local term but not the concept. this prevents reinserting a tasklink
 
         if (!tc.isEmpty())
             return tc.toArray(new Termed[tc.size()]);
