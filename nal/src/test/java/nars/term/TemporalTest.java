@@ -8,6 +8,7 @@ import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.TreeSet;
@@ -744,6 +745,7 @@ public class TemporalTest {
         assertEquals("(y ==>+- x)", g.eternal().toString());
     }
 
+    @Ignore
     @Test
     public void testEqualsAnonymous3() throws Narsese.NarseseException {
         //        if (as == bs) {

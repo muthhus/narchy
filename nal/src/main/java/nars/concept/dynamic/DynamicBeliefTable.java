@@ -4,8 +4,6 @@ import jcog.list.FasterList;
 import jcog.pri.Priority;
 import nars.NAR;
 import nars.Task;
-import nars.concept.BaseConcept;
-import nars.control.Activate;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;

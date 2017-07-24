@@ -1,6 +1,5 @@
 package nars.derive;
 
-import jcog.pri.Priority;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -25,7 +24,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static nars.Op.NEG;
-import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 

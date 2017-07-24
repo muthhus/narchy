@@ -19,7 +19,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
 
 /**
  * Created by me on 12/4/16.

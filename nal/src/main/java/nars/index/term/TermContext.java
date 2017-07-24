@@ -1,6 +1,5 @@
 package nars.index.term;
 
-import nars.op.mental.AliasConcept;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;

@@ -1,10 +1,8 @@
 package nars.op;
 
-import jcog.bag.Bag;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.concept.PermanentConcept;
-import nars.table.BeliefTable;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;

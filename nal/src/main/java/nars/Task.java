@@ -32,7 +32,6 @@ import java.util.Objects;
 
 import static nars.Op.*;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
-import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
@@ -203,10 +202,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
         Term c = t.conceptual();
         if (c instanceof Variable || c instanceof Bool) {
-            fail(t, "no associated concept", safe);
+            return fail(t, "no associated concept", safe);
         }
 
-        return !(t instanceof Compound) || validTaskCompound((Compound) t, punc, safe);
+        return !(c instanceof Compound) || validTaskCompound((Compound)c, punc, safe);
     }
 
 //    @Nullable
@@ -267,7 +266,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             Term t = null; //root
             int pathLength = p.length;
             for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? comp : ((Compound) t).sub(p[i]);
+                t = (i == -1) ? comp : t.sub(p[i]);
                 Op o = t.op();
 
                 if (validIndepVarSuperterm(o)) {

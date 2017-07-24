@@ -23,16 +23,7 @@ import static nars.time.Tense.DTERNAL;
 abstract public class DynamicTruthModel {
 
 
-    /**
-     * N-ary intersection truth function of subterms
-     */
-    public static final DynamicTruthModel Intersection = new Intersection() {
-        @NotNull
-        @Override
-        public Term[] components(Term superterm) {
-            return ((Compound)superterm).toArray();
-        }
-    };
+
 
     @Nullable
     public DynTruth eval(Term superterm, boolean beliefOrGoal, long when, boolean stamp, NAR n) {
@@ -307,4 +298,21 @@ abstract public class DynamicTruthModel {
             return false;
         }
     }
+
+    /**
+     * N-ary intersection truth function of subterms
+     */
+    public static class DynamicIntersection extends DynamicTruthModel.Intersection {
+        private final Term[] subterms;
+
+        public DynamicIntersection(Compound term) {
+            this.subterms = term.toArray();
+        }
+        @NotNull
+        @Override
+        public Term[] components(Term superterm) {
+            return subterms;
+        }
+    }
+
 }

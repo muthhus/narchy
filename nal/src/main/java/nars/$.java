@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 
 /***

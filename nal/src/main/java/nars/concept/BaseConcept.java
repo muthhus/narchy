@@ -6,7 +6,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.conceptualize.ConceptBuilder;
-import nars.conceptualize.DefaultConceptBuilder;
 import nars.conceptualize.state.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;

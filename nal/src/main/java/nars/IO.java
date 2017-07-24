@@ -5,7 +5,6 @@ import com.google.common.io.ByteArrayDataOutput;
 import jcog.byt.DynBytes;
 import jcog.data.string.Utf8Writer;
 import jcog.pri.Prioritized;
-import nars.index.term.TermIndex;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;

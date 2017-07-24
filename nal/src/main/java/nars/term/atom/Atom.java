@@ -1,9 +1,7 @@
 package nars.term.atom;
 
 import nars.Op;
-import nars.index.term.TermContext;
 import nars.term.Term;
-import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.ATOM;

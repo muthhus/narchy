@@ -1,6 +1,5 @@
 package nars.term;
 
-import jcog.bag.Bag;
 import nars.$;
 import nars.NAR;
 import nars.concept.BaseConcept;

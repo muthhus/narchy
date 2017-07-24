@@ -5,7 +5,7 @@ import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
-import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.junit.runner.Description;
 import org.junit.runner.JUnitCore;
@@ -69,7 +69,7 @@ public class TestAggregator extends RunListener {
     }
 
     protected void describe(@NotNull Description d, boolean success) throws Narsese.NarseseException {
-        Compound x = $.negIf($.func("ok", getDescriptionTerm(d)), success);
+        Term x = $.negIf($.func("ok", getDescriptionTerm(d)), success);
         System.out.println(x);
         nar.believe(x);
     }

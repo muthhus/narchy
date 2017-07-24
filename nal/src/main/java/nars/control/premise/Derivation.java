@@ -140,9 +140,9 @@ public class Derivation extends Unify implements TermContext {
 
     private transient Term[][] currentMatch;
 
-    public /*static*/ final Cache<Transformation, Term> transformsCache; //works in static mode too
-    /*static*/ {
-    }
+//    public /*static*/ final Cache<Transformation, Term> transformsCache; //works in static mode too
+//    /*static*/ {
+//    }
 
 //    final MRUCache<Transformation, Term> transformsCache = new MRUCache<>(Param.DERIVATION_THREAD_TRANSFORM_CACHE_SIZE);
 
@@ -154,17 +154,17 @@ public class Derivation extends Unify implements TermContext {
 
         this.nar = nar;
 
-        Caffeine cb = Caffeine.newBuilder().executor(nar.exe);
-            //.executor(MoreExecutors.directExecutor());
-        int cs = Param.DERIVATION_TRANSFORM_CACHE_SIZE_PER_THREAD;
-        if (cs == -1)
-            cb.softValues();
-        else
-            cb.maximumSize(cs);
-
-        //cb.recordStats();
-
-        transformsCache = cb.build();
+//        Caffeine cb = Caffeine.newBuilder().executor(nar.exe);
+//            //.executor(MoreExecutors.directExecutor());
+//        int cs = Param.DERIVATION_TRANSFORM_CACHE_SIZE_PER_THREAD;
+//        if (cs == -1)
+//            cb.softValues();
+//        else
+//            cb.maximumSize(cs);
+//
+//        //cb.recordStats();
+//
+//        transformsCache = cb.build();
 
 
         substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
@@ -209,7 +209,7 @@ public class Derivation extends Unify implements TermContext {
             this.truthResolution = this.nar.truthResolution.floatValue();
             this.confMin = Math.max(truthResolution, this.nar.confMin.floatValue());
             this.deriver = nar.deriver();
-            transformsCache.cleanUp();
+            //transformsCache.cleanUp();
         }
         return this;
     }
@@ -427,100 +427,105 @@ public class Derivation extends Unify implements TermContext {
         nar.emotion.taskDerivations.increment();
     }
 
-    /**
-     * experimental memoization of transform results
-     */
-    @Override
-    @Nullable
-    public Term transform(@NotNull Term pattern) {
-
-        if (!Param.DERIVATION_TRANSFORM_CACHE) {
-            return super.transform(pattern); //xy.get(pattern); //fast variable resolution
-        }
-
-        Term y = xy(pattern);
-        if (y!=null) {
-            if (pattern instanceof Variable || y.vars(null) == 0) {
-//                if (xy.get(y)!=null)
-//                    System.out.println(y + " -> " + xy.get(y));
-
-                return y;
-            }
-            pattern = y;
-        }
-        if (pattern instanceof Atomic) {
-//            if (xy.get(x)!=null)
-//                System.out.println(x + " -> " + xy.get(x));
-            return pattern;
-        }
-
-//        if (x.OR(xx -> xx == Null))
-//            return Null;
-
-        Transformation key = Transformation.the((Compound) pattern, currentMatch);
-
-        //avoid recursive update problem on the single thread by splitting the get/put
-        Term value = transformsCache.getIfPresent(key);
-        if (value != null)
-            return value;
-
-        value = super.transform(key.pattern);
-        if (value == null)
-            value = Null;
-
-        transformsCache.put(key, value);
-
-        if (value == Null)
-            value = null;
-
-        return value;
+    public void reset() {
+        clear();
+        time = ETERNAL;
     }
 
-    final static class Transformation {
-        public final Compound pattern;
-        final byte[] assignments;
-        final int hash;
-
-        Transformation(Compound pattern, DynBytes assignments) {
-            this.pattern = pattern;
-            this.assignments = assignments.array();
-            this.hash = Util.hashCombine(assignments.hashCode(), pattern.hashCode());
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            //if (this == o) return true;
-            Transformation tthat = (Transformation) o;
-            if (hash != tthat.hash) return false;
-            return pattern.equals(tthat.pattern) && Arrays.equals(assignments, tthat.assignments);
-        }
-
-        @Override
-        public int hashCode() {
-            return hash;
-        }
-
-        static Transformation the(@NotNull Compound pattern, @NotNull Term[][] match) {
-
-            //TODO only include in the key the free variables in the pattern because there can be extra and this will cause multiple results that could have done the same thing
-            //FasterList<Term> key = new FasterList<>(currentMatch.length * 2 + 1);
-
-            DynBytes key = new DynBytes((2 * match.length + 1) * 8 /* estimate */);
-            pattern.append((ByteArrayDataOutput) key); //in 0th
-            key.writeByte(0);
-            for (Term[] m : match) {
-                Term var = m[0];
-                if (pattern.containsRecursively(var)) {
-                    var.append((ByteArrayDataOutput) key);
-                    key.writeByte(0);
-                    m[1].append((ByteArrayDataOutput) key);
-                    key.writeByte(0);
-                }
-            }
-            return new Transformation(pattern, key);
-        }
-
-    }
+//    /**
+//     * experimental memoization of transform results
+//     */
+//    @Override
+//    @Nullable
+//    public Term transform(@NotNull Term pattern) {
+//
+//        if (!Param.DERIVATION_TRANSFORM_CACHE) {
+//            return super.transform(pattern); //xy.get(pattern); //fast variable resolution
+//        }
+//
+//        Term y = xy(pattern);
+//        if (y!=null) {
+//            if (pattern instanceof Variable || y.vars(null) == 0) {
+////                if (xy.get(y)!=null)
+////                    System.out.println(y + " -> " + xy.get(y));
+//
+//                return y;
+//            }
+//            pattern = y;
+//        }
+//        if (pattern instanceof Atomic) {
+////            if (xy.get(x)!=null)
+////                System.out.println(x + " -> " + xy.get(x));
+//            return pattern;
+//        }
+//
+////        if (x.OR(xx -> xx == Null))
+////            return Null;
+//
+//        Transformation key = Transformation.the((Compound) pattern, currentMatch);
+//
+//        //avoid recursive update problem on the single thread by splitting the get/put
+//        Term value = transformsCache.getIfPresent(key);
+//        if (value != null)
+//            return value;
+//
+//        value = super.transform(key.pattern);
+//        if (value == null)
+//            value = Null;
+//
+//        transformsCache.put(key, value);
+//
+//        if (value == Null)
+//            value = null;
+//
+//        return value;
+//    }
+//
+//    final static class Transformation {
+//        public final Compound pattern;
+//        final byte[] assignments;
+//        final int hash;
+//
+//        Transformation(Compound pattern, DynBytes assignments) {
+//            this.pattern = pattern;
+//            this.assignments = assignments.array();
+//            this.hash = Util.hashCombine(assignments.hashCode(), pattern.hashCode());
+//        }
+//
+//        @Override
+//        public boolean equals(Object o) {
+//            //if (this == o) return true;
+//            Transformation tthat = (Transformation) o;
+//            if (hash != tthat.hash) return false;
+//            return pattern.equals(tthat.pattern) && Arrays.equals(assignments, tthat.assignments);
+//        }
+//
+//        @Override
+//        public int hashCode() {
+//            return hash;
+//        }
+//
+//        static Transformation the(@NotNull Compound pattern, @NotNull Term[][] match) {
+//
+//            //TODO only include in the key the free variables in the pattern because there can be extra and this will cause multiple results that could have done the same thing
+//            //FasterList<Term> key = new FasterList<>(currentMatch.length * 2 + 1);
+//
+//            DynBytes key = new DynBytes((2 * match.length + 1) * 8 /* estimate */);
+//            pattern.append((ByteArrayDataOutput) key); //in 0th
+//            key.writeByte(0);
+//            for (Term[] m : match) {
+//                Term var = m[0];
+//                if (pattern.containsRecursively(var)) {
+//                    var.append((ByteArrayDataOutput) key);
+//                    key.writeByte(0);
+//                    m[1].append((ByteArrayDataOutput) key);
+//                    key.writeByte(0);
+//                }
+//            }
+//            return new Transformation(pattern, key);
+//        }
+//
+//    }
 
 
 }

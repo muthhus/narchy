@@ -12,9 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 public class QueryVariableTest {

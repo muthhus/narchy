@@ -24,7 +24,7 @@ abstract public class UnaryTask<X> extends PLink<X> implements ITask {
         return
             (this == obj)
                 ||
-            (hash == obj.hashCode()) && ((obj.getClass() == getClass()) && id.equals(((UnaryTask) obj).id));
+            (hash == obj.hashCode()) && ((obj.getClass() == getClass()) && id.equals(((PLink) obj).id));
     }
 
 

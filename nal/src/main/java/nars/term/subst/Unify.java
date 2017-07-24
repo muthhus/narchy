@@ -58,9 +58,6 @@ public abstract class Unify extends Versioning implements Subst {
     //new LinkedHashSet();
 
     @NotNull
-    public final Versioning<Term> versioning = this;
-
-    @NotNull
     public final TermIndex terms;
 
     @NotNull
@@ -100,8 +97,8 @@ public abstract class Unify extends Versioning implements Subst {
         this.random = random;
         this.type = type;
 
-        xy = new ConstrainedVersionMap(versioning, Param.UnificationVariableCapInitial);
-        this.free = new Versioned<>(versioning, 1);
+        xy = new ConstrainedVersionMap(this, Param.UnificationVariableCapInitial);
+        this.free = new Versioned<>(this, 1);
         //this.freeCount = new Versioned<>(versioning, 8);
 
     }
@@ -129,11 +126,6 @@ public abstract class Unify extends Versioning implements Subst {
         } else {
             tryMatch(); //end of chain
         }
-    }
-
-    @Override
-    public void clear() {
-        versioning.clear();
     }
 
     @Nullable
@@ -250,7 +242,7 @@ public abstract class Unify extends Versioning implements Subst {
 
     @Override
     public String toString() {
-        return xy + "@" + versioning.ttl;
+        return xy + "@" + ((Versioning<Term>) this).ttl;
     }
 
 
@@ -338,7 +330,7 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
     public final int now() {
-        return versioning.size();
+        return this.size();
     }
 
 //    public final boolean revert(int then) {
@@ -419,7 +411,7 @@ public abstract class Unify extends Versioning implements Subst {
 //        Versioned<MatchConstraint> fastConstraints = null;
 
         ConstrainedVersionedTerm(boolean forMatchedType) {
-            super(versioning, 1);
+            super(Unify.this, 1);
             this.forMatchedType = forMatchedType;
         }
 
@@ -458,7 +450,7 @@ public abstract class Unify extends Versioning implements Subst {
         public boolean constrain(MatchConstraint m) {
 
             if (constraints == null)
-                constraints = new Versioned(versioning, 0);
+                constraints = new Versioned(Unify.this, 0);
 
             return constraints.set(m) != null;
         }

@@ -3,6 +3,7 @@ package nars.term.atom;
 import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 import nars.Op;
+import nars.term.Term;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,7 +37,7 @@ public abstract class AtomicToString implements Atomic {
                 (
                         u instanceof Atomic &&
                         hashCached == u.hashCode() &&
-                        opX() == ((Atomic) u).opX()) &&
+                        opX() == ((Term) u).opX()) &&
                         toString().equals(u.toString()
                 );
 

@@ -132,14 +132,13 @@ public enum TermGraph {
                 return;
 
             int dur = nar.dur();
-            Task t = nar.belief((Compound)c, when);
+            Task t = nar.belief(c.term(), when);
             if (t == null)
                 return;
 
             int dt = t.dt();
             boolean reverse;
             if (dt != DTERNAL && (dt < 0)) {
-                dt = -dt;
                 reverse = true;
             } else {
                 reverse = false;

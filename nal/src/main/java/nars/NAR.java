@@ -931,7 +931,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         exe.stop();
 
-        derivation.forEach(c -> c.transformsCache.invalidateAll());
+        derivation.forEach(c -> c.reset());
+        //derivation.forEach(c -> c.transformsCache.invalidateAll());
 
     }
 
@@ -1233,7 +1234,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * schedule a task to be executed no sooner than a given NAR time
      */
     public void at(long when, Runnable then) {
-        scheduled.add(PrimitiveTuples.pair(when, then));
+        if (when == time()) {
+            then.run();
+        } else {
+            scheduled.add(PrimitiveTuples.pair(when, then));
+        }
     }
 
     /** tasks in concepts */

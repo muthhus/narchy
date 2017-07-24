@@ -34,7 +34,6 @@ import static java.util.Arrays.copyOfRange;
 import static nars.derive.match.Ellipsis.firstEllipsis;
 import static nars.term.Terms.flatten;
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
@@ -53,14 +52,13 @@ public enum Op implements $ {
 
     NEG("--", 5, Args.One) {
         private Term neg(Term x) {
+
             if (x instanceof Compound) {
                 // (--,(--,P)) = P
                 if (x.op() == NEG)
                     return x.unneg();
             } else if (x instanceof Bool) {
-                if (x == False) return True;
-                if (x == True) return False;
-                else return Null;
+                return x.unneg();
             }
 
             return new UnitCompound1(NEG, x);
@@ -257,10 +255,10 @@ public enum Op implements $ {
 
             assert (u.length > 0 && (dt == 0 || dt == DTERNAL || dt == XTERNAL)); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
 
-            ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length * 2);
+            ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length);
 
             if (flatten(CONJ, u, dt, s) && !s.isEmpty()) {
-                TreeSet<Term> cs = junctionGroupNonDTSubterms(s);
+                SortedSet<Term> cs = junctionGroupNonDTSubterms(s);
                 if (!cs.isEmpty()) {
 
 
@@ -297,10 +295,9 @@ public enum Op implements $ {
                         return cs.first();
 
                     Term[] scs = Terms.sorted(cs);
-                    if (!Arrays.equals(scs, u))
-                        return CONJ.the(dt, scs);
-                    else
-                        return compound(CONJ, dt, scs);
+                    return !Arrays.equals(scs, u) ?
+                            CONJ.the(dt, scs) : //changed, recurse
+                            compound(CONJ, dt, scs);
                 }
             }
 
@@ -353,11 +350,11 @@ public enum Op implements $ {
          */
         private @NotNull TreeSet<Term> junctionGroupNonDTSubterms(@NotNull ObjectByteHashMap<Term> s) {
 
-            TreeSet<Term> outer = new TreeSet();
+            TreeSet<Term> outer = new TreeSet<>();
 
             for (ObjectBytePair<Term> xn : s.keyValuesView()) {
                 Term x = xn.getOne();
-                outer.add((xn.getTwo() < 0) ? NEG.the(x) : x);
+                outer.add($.negIf(x, xn.getTwo() < 0));
             }
             return outer;
 
@@ -918,10 +915,10 @@ public enum Op implements $ {
         if (a.equals(b))
             return Null; //empty set
 
-        //quick test: intersect the mask: if nothing in common, then it's entirely the first term
-        if ((a.structure() & b.structure()) == 0) {
-            return a;
-        }
+//        //quick test: intersect the mask: if nothing in common, then it's entirely the first term
+//        if ((a.structure() & b.structure()) == 0) {
+//            return a;
+//        }
 
         int size = a.size();
         List<Term> terms = $.newArrayList(size);
@@ -1023,10 +1020,11 @@ public enum Op implements $ {
 
             case INH:
 
-                if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
-                    return False;
                 if (subject.equals(predicate)) //equal test first to allow, ex: False<->False to result in True
                     return True;
+                if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
+                    return False;
+
 
 
                 boolean sNeg = subject.op() == NEG;
@@ -1034,10 +1032,12 @@ public enum Op implements $ {
                 if (sNeg && pNeg) {
                     subject = subject.unneg();
                     predicate = predicate.unneg();
-                } else if (sNeg && !pNeg) {
-                    return NEG.the(statement(op, dt, subject.unneg(), predicate)); //TODO loop and not recurse, needs negation flag to be applied at the end before returning
-                } else if (pNeg && !sNeg) {
-                    return NEG.the(statement(op, dt, subject, predicate.unneg()));
+                } else if (sNeg/* && !pNeg*/) {
+                    subject = subject.unneg();
+                    polarity = !polarity;
+                } else if (pNeg/* && !sNeg*/) {
+                    predicate = predicate.unneg();
+                    polarity = !polarity;
                 }
 
                 break;
@@ -1080,7 +1080,7 @@ public enum Op implements $ {
 //                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
 //            return null;
 //        }
-                if (!!subject.hasAny(InvalidEquivalenceTerm))
+                if (subject.hasAny(InvalidEquivalenceTerm))
                     throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
                 //return !t.opUnneg().in(InvalidEquivalenceTerm);
                 //        if ( instanceof Implication) || (subject instanceof Equivalence)
@@ -1088,7 +1088,7 @@ public enum Op implements $ {
 //                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
 //            return null;
 //        }
-                if (!!predicate.hasAny(InvalidEquivalenceTerm))
+                if (predicate.hasAny(InvalidEquivalenceTerm))
                     throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
 
 //                boolean subjNeg = subject.op() == NEG;
@@ -1131,7 +1131,7 @@ public enum Op implements $ {
                 //special case for implications: reduce to --predicate if the subject is False
                 if (isTrueOrFalse(subject /* antecedent */)) {
                     if (concurrent(dt))
-                        return $.negIf(predicate, subject == False);
+                        return $.negIf(predicate, polarity ? (subject == False) : (subject != False));
                     else {
                         return Null; //no temporal basis
                     }
@@ -1197,28 +1197,7 @@ public enum Op implements $ {
 
                 boolean subjConj = subject.op() == CONJ && concurrent(subject.dt());
                 boolean predConj = predicate.op() == CONJ && concurrent(predicate.dt());
-                if (subjConj && !predConj) {
-                    final Compound csub = (Compound) subject;
-                    //TermContainer subjs = csub.subterms();
-                    if (csub.containsRecursively(predicate, nonProduct)) {
-                        return False;
-//                        Term finalPredicate = predicate;
-//                        subject = the(CONJ, csub.dt(), subjs.asFiltered(z -> z.equals(finalPredicate)).toArray());
-//                        predicate = False;
-//                        return statement(op, dt, subject, predicate);
-                    }
-                } else if (predConj && !subjConj) {
-                    final Compound cpred = (Compound) predicate;
-                    //TermContainer preds = cpred.subterms();
-                    if (cpred.containsRecursively(subject, nonProduct)) {
-                        return False;
-//                        Term finalSubject = subject;
-//                        predicate = the(CONJ, cpred.dt(), preds.asFiltered(z -> z.equals(finalSubject)).toArray());
-//                        subject = False;
-//                        return statement(op, dt, subject, predicate);
-                    }
-
-                } else if (subjConj && predConj) {
+                if (subjConj && predConj) {
                     final Compound csub = (Compound) subject;
                     TermContainer subjs = csub.subterms();
                     final Compound cpred = (Compound) predicate;
@@ -1268,7 +1247,7 @@ public enum Op implements $ {
                         }
 
 
-                        return op.the(dt, subject, predicate);
+                        return $.negIf(op.the(dt, subject, predicate), !polarity);
                     }
                 }
             }
@@ -1302,10 +1281,7 @@ public enum Op implements $ {
 
 
         Term x = compound(op, dt, subject, predicate); //use the calculated ordering, not the TermContainer default for commutives
-        if (polarity)
-            return x;
-        else
-            return NEG.the(x);
+        return $.negIf(x, !polarity);
     }
 
     public static Op fromString(String s) {

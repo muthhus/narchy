@@ -2,9 +2,9 @@ package nars.op.data;
 
 import nars.$;
 import nars.Op;
-import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,9 +27,9 @@ public abstract class flat extends Functor.UnaryFunctor {
 
     @Override
     public @Nullable Term apply(Term x) {
-        if (x instanceof Compound) {
+        if (x instanceof TermContainer) {
             List<Term> l = $.newArrayList(x.volume());
-            collect(((Compound)x).toArray(), l);
+            collect(((TermContainer)x).toArray(), l);
             return result(l);
         } else {
             return null;
@@ -40,7 +40,7 @@ public abstract class flat extends Functor.UnaryFunctor {
     public static List<Term> collect(@NotNull Term[] x, @NotNull List<Term> l) {
         for (Term a : x) {
             if (a.op() == Op.PROD || a.op().isSet() || a.op() == Op.CONJ) {
-                ((Compound)a).copyInto(l);
+                ((TermContainer) a).copyInto(l);
             }
             else
                 l.add(a);

@@ -1,13 +1,11 @@
 package nars.op.mental;
 
-import com.google.common.io.ByteArrayDataOutput;
 import jcog.bag.Bag;
 import nars.NAR;
 import nars.Op;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.index.term.TermContext;
-import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;

@@ -8,7 +8,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;
-import static nars.truth.func.GoalFunction.StructuralDeduction;
 
 /**
  * Evaluates the truth of a premise
