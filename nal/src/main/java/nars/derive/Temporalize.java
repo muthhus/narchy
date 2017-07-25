@@ -6,6 +6,7 @@ import nars.control.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import org.intelligentjava.machinelearning.decisiontree.feature.P;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +32,7 @@ public class Temporalize {
         }
 
         abstract public long startAbs();
+        abstract public long endAbs();
 
         @Override
         public boolean equals(Object o) {
@@ -48,19 +50,40 @@ public class Temporalize {
         }
     }
 
+    static int dt(long a, long b) {
+        if (a == ETERNAL && b == ETERNAL) {
+            return DTERNAL;
+        } else if (a!=ETERNAL && b!=ETERNAL) {
+            return (int)(b - a); //TODO check for numeric precision loss
+        } else {
+            throw new UnsupportedOperationException("?"); //maybe just return DTERNAL
+        }
+    }
+
     static class AbsoluteEvent extends Event {
 
         public final long start, end;
 
         AbsoluteEvent(Term term, long start, long end) {
             super(term);
-            this.start = start;
-            this.end = end;
+
+            assert((start == ETERNAL && end == ETERNAL) || (start!=ETERNAL && end!=ETERNAL));
+
+            if (start <= end) {
+                this.start = start; this.end = end;
+            } else {
+                this.start = end; this.end = start;
+            }
         }
 
         @Override
         public long startAbs() {
             return start;
+        }
+
+        @Override
+        public long endAbs() {
+            return end;
         }
 
         @Override
@@ -87,9 +110,9 @@ public class Temporalize {
         private final Event rel;
         private final int start, end;
 
-        public RelativeEvent(Term term, Event e, int start, int end) {
+        public RelativeEvent(Term term, Event relativeToItsStart, int start, int end) {
             super(term);
-            this.rel = e;
+            this.rel = relativeToItsStart;
             this.start = start;
             this.end = end;
         }
@@ -101,6 +124,15 @@ public class Temporalize {
                 return ETERNAL;
             return rs + this.start;
         }
+
+        @Override
+        public long endAbs() {
+            long rs = rel.startAbs();
+            if (rs == ETERNAL)
+                return ETERNAL;
+            return rs + this.end;
+        }
+
         @Override
         public String toString() {
             if (start!=end) {
@@ -280,79 +312,36 @@ public class Temporalize {
 //
 //
 //
-//        if (unknown instanceof Compound) {
-//
-//
-//            Compound c = (Compound) unknown;
-//            Op o = c.op();
-//            if (o.temporal) {
-//                int dt = c.dt();
-//
-//                TermContainer tt = c.subterms();
-//                int l = tt.size();
-//
-//                if (dt == XTERNAL) {
-//                    assert (l == 2);
-//
-//                    //scalar variable reprsenting unknown interval
-//                    //IntVar xdt = intVar("~" + termID, lb, ub, true);
-//
-//                    Term a = tt.sub(0);
-//                    IntVar[] av = unknown(a);
-//
-//
-//                    Term b = tt.sub(1);
-//                    IntVar[] bv = unknown(b);
-//
-////                    arithm(av[0], "=", s).post();
-//
-//                    arithm(bv[0], "-", av[0], "=", dur).post(); //TODO check this
-//
-//                    //constraint on the duration (abs(e-s)); maybe a way to do this without 'or'
-////                    /*or*/(
-////                        arithm(s, "+", xdt, "=", e)
-////                        //,arithm(e, "+", xdt, "=", s)
-////                    ).post();
-//
-////                    /*or*/(
-////                        arithm(av[1], "+", xdt, "=", bv[0])
-////                        //arithm(bv[1], "+", xdt, "=", av[0]) //reverse
-////                    ).post();
-//
-//
-//                } else {
-//                    int dtr = unknown.dtRange();
-//                    //arithm(e, "-", s, "=", dtr).post(); //constraint on the duration
-//
-//                    boolean reverse;
-//                    int t;
-//                    if (dt < 0 && o.commutative /* conj & equi */) {
-//                        dt = -dt;
-//                        reverse = true;
-//                        t = dtr;
-//                    } else {
-//                        reverse = false;
-//                        t = 0;
-//                    }
-//
-//                    for (int i = 0; i < l; i++) {
-//                        if (i > 0)
-//                            t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
-//
-//                        Term st = tt.sub(reverse ? (l - 1 - i) : i);
-//                        int sdt = st.dtRange();
-//                        IntVar[] subvar = unknown(st);
-//                        if (!reverse) {
-//                            arithm(subvar[0], "-", var[0], "=", t).post();
-//                        } else {
-//                            arithm(var[1], "-", subvar[1], "=", t).post();
-//                        }
-//                        t += sdt; //the duration of the event
-//                    }
-//                }
-//            }
-//        }
-//        return var;
+        if (unknown instanceof Compound) {
+
+            Compound c = (Compound) unknown;
+            Op o = c.op();
+            if (o.temporal) {
+                int dt = c.dt();
+
+                if (dt == XTERNAL) {
+
+                    TermContainer tt = c.subterms();
+                    assert (tt.size() == 2);
+
+                    Term a = tt.sub(0);
+                    Event ae = unknown(a);
+
+                    Term b = tt.sub(1);
+                    Event be = unknown(b);
+
+                    if (ae != null && be != null) {
+                        return new AbsoluteEvent(
+                                o.the(dt(ae.endAbs(), be.startAbs()), new Term[]{a, b}),
+                                ae.startAbs(), be.endAbs()
+                        );
+                    } else {
+                        return null;
+                    }
+                }
+            }
+        }
+        //TODO know(variable, ETERNAL);
         return null;
     }
 
@@ -365,11 +354,9 @@ public class Temporalize {
      * TODO support differing copies of the same term as subterms uniquely identified by their subpaths from a root
      */
     @Nullable
-    public Term solve(@NotNull Term x) {
+    public Event solve(@NotNull Term x) {
 
-        unknown(x);
-
-        return null;
+        return unknown(x);
 
 //
 ////        String beforeSolve = toString();

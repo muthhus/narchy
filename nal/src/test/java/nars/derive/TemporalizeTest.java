@@ -2,13 +2,10 @@ package nars.derive;
 
 import nars.$;
 import nars.Narsese;
-
 import org.junit.Test;
 
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class TemporalizeTest {
 
@@ -53,22 +50,16 @@ public class TemporalizeTest {
                 new Temporalize().knowTerm($.$("((a &&+2 b) ==>-3 c)"), ETERNAL).toString());
     }
 
-//    @Test
-//    public void testSolveTerm() throws Narsese.NarseseException {
-//
-//        {
-//            Temporalize t = new Temporalize();
-//            t.know($.$("a"), 1, 1);
-//            t.know($.$("b"), 3, 3);
-//            assertEquals("(a &&+2 b)", t.solve($.$("(a &&+- b)")).toString());
-//        }
-//        {
-//            Temporalize t = new Temporalize();
-//            t.know($.$("a"), 1, 1);
-//            t.know($.$("b"), 3, 3);
-//            assertEquals("(a &&+2 b)", t.solve($.$("(b &&+- a)")).toString());
-//        }
-//    }
+    @Test
+    public void testSolveTermSimple() throws Narsese.NarseseException {
+
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("a"), 1);
+        t.knowTerm($.$("b"), 3);
+        assertEquals("(a &&+2 b)@[1..3]", t.solve($.$("(a &&+- b)")).toString());
+        assertEquals("(a &&+2 b)@[1..3]", t.solve($.$("(b &&+- a)")).toString());
+
+    }
 
 //    @Test
 //    public void testUnsolveableTerm() throws Narsese.NarseseException {
