@@ -5,10 +5,8 @@ import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.control.Derivation;
 import nars.derive.*;
 import nars.derive.constraint.*;
-import nars.derive.match.Ellipsis;
 import nars.derive.op.*;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;
@@ -21,13 +19,9 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.transform.CompoundTransform;
-import nars.term.transform.VariableNormalization;
-import nars.term.var.AbstractVariable;
-import nars.term.var.Variable;
 import nars.truth.func.BeliefFunction;
 import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,15 +30,11 @@ import java.util.function.BiConsumer;
 
 import static java.lang.Math.max;
 import static java.util.Collections.addAll;
-import static nars.$.newArrayList;
-import static nars.$.newHashSet;
-import static nars.$.p;
-import static nars.$.v;
-import static nars.Op.*;
+import static nars.$.*;
+import static nars.Op.CONJ;
+import static nars.Op.PROD;
 import static nars.term.Terms.concat;
 import static nars.term.Terms.maxLevel;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
 
 /**
  * A rule which matches a Premise and produces a Task
@@ -108,7 +98,6 @@ public class PremiseRule extends GenericCompound {
     public PremiseRule(TermContainer premiseAndResult) {
         super(PROD, premiseAndResult);
     }
-
 
 
     /**
@@ -469,9 +458,25 @@ public class PremiseRule extends GenericCompound {
                         case "raw":
                             beliefProjected = false;
                             break;
-                        default:
-                            //TODO warn about missing ones
+                        case "dtEvents":
+                            pres.add(TaskBeliefOccurrence.bothEvents);
+                            minNAL = 7;
                             break;
+                        case "dtEventsReverse":
+                            pres.add(TaskBeliefOccurrence.bothEvents);
+                            minNAL = 7;
+                            break;
+                        //NOTE THIS SHOULD ACTUALLY BE CALLED dtBeforeAfterOrEternal or something
+                        case "dtEventsOrEternals":
+                            pres.add(TaskBeliefOccurrence.eventsOrEternals);
+                            break;
+                        case "dtEventsOrEternalsReverse":
+                            pres.add(TaskBeliefOccurrence.eventsOrEternals);
+                            break;
+
+                        default:
+                            throw new UnsupportedOperationException("time(" + XString + ") unknown");
+                            //TODO warn about missing ones
                     }
                     break;
 
@@ -591,7 +596,6 @@ public class PremiseRule extends GenericCompound {
                     break;
 
 
-
                 default:
                     throw new RuntimeException("unhandled postcondition: " + predicateNameStr + " in " + this);
 
@@ -638,11 +642,11 @@ public class PremiseRule extends GenericCompound {
 
         //TODO add modifiers to affect minNAL (ex: anything temporal set to 7)
         //this will be raised by conclusion postconditions of higher NAL level
-        minNAL = max( minNAL,
-                    max( maxLevel(getConclusionTermPattern()),
-                        max( maxLevel(getTask()),
+        minNAL = max(minNAL,
+                max(maxLevel(getConclusionTermPattern()),
+                        max(maxLevel(getTask()),
                                 maxLevel(getBelief())
-                )));
+                        )));
 
 
         //        if (getConclusionTermPattern().containsTemporal()) {
@@ -735,7 +739,6 @@ public class PremiseRule extends GenericCompound {
     }
 
 
-
     /**
      * for each calculable "question reverse" rule,
      * supply to the consumer
@@ -760,7 +763,6 @@ public class PremiseRule extends GenericCompound {
             return clonePermutation(B, T, C, false, index);
         }
     }
-
 
 
     @NotNull

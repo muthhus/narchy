@@ -377,15 +377,16 @@ public enum Op implements $ {
 
         }
 
-        /** a combination nconjunction/implication reduction */
+        /** precondition combiner: a combination nconjunction/implication reduction */
         private Term implInConjReduction(final Term x /* possibly a conjunction */) {
 
             Op xo = x.op();
             if (xo != CONJ || !x.hasAny(IMPL))
                 return x; //fall-through
             int dt = x.dt();
-            if (dt==DTERNAL || dt==XTERNAL)
-                return x; //dont apply to eternal or xternal, only temporal
+
+            if (/*dt==DTERNAL || */dt==XTERNAL)
+                return x;
 
 
             //if there is only one implication subterm (first layer only), then fold into that.
