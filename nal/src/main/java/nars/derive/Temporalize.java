@@ -1,5 +1,6 @@
 package nars.derive;
 
+import nars.$;
 import nars.Op;
 import nars.Task;
 import nars.control.Derivation;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static nars.Op.CONJ;
+import static nars.Op.NEG;
 import static nars.time.Tense.*;
 
 /**
@@ -48,6 +50,30 @@ public class Temporalize {
         public int hashCode() {
             return term.hashCode();
         }
+
+        /** return a new instance with the term negated */
+        abstract public Event neg();
+
+        public Event neg(boolean isNeg) {
+            return isNeg ? neg() : this;
+        }
+    }
+
+    static int dt(Event a, Event b) {
+        if (a instanceof AbsoluteEvent && b instanceof AbsoluteEvent) {
+            return dt(a.startAbs(), b.endAbs());
+        } else if (a instanceof RelativeEvent && b instanceof RelativeEvent) {
+            RelativeEvent ra = (RelativeEvent)a;
+            RelativeEvent rb = (RelativeEvent)b;
+            if (ra.rel.equals(rb.rel)) {
+                //easy case
+                return rb.end - ra.start;
+            } else {
+                //needs solved in the constraint graph
+            }
+        }
+
+        throw new UnsupportedOperationException("?");
     }
 
     static int dt(long a, long b) {
@@ -78,6 +104,11 @@ public class Temporalize {
         }
 
         @Override
+        public Event neg() {
+            return new AbsoluteEvent($.neg(term) ,start,end);
+        }
+
+        @Override
         public long startAbs() {
             return start;
         }
@@ -102,9 +133,10 @@ public class Temporalize {
 
     public static class SolutionEvent extends AbsoluteEvent {
 
-        SolutionEvent(Term term, long start, long end) {
-            super(term, start, term.op()==CONJ ? end /* && */ : start /* ==> and <=> */);
+        SolutionEvent(Term term, long start) {
+            super(term, start, start + term.dtRange());
         }
+
     }
 
     static String timeStr(long when) {
@@ -123,6 +155,11 @@ public class Temporalize {
             this.rel = relativeToItsStart;
             this.start = start;
             this.end = end;
+        }
+
+        @Override
+        public Event neg() {
+            return new RelativeEvent($.neg(term), rel, start, end);
         }
 
         @Override
@@ -180,18 +217,24 @@ public class Temporalize {
 
         Temporalize model = new Temporalize();
 
-        model.know(task);
+        model.know(task, d);
         if (belief != null)
-            model.know(belief);
+            model.know(belief, d);
+
 
         return model.unknown(pattern);
     }
 
-    public void know(Task task) {
+    public void know(Task task, Derivation d) {
         assert (task.end() == task.start() + task.dtRange());
         Term taskTerm = task.term();
         AbsoluteEvent root = new AbsoluteEvent(taskTerm, task.start(), task.end());
         know(root, taskTerm, 0, taskTerm.dtRange());
+
+        Term t2 = d.transform(taskTerm);
+        if (!t2.equals(taskTerm)) {
+            know(root, t2, 0,  t2.dtRange());
+        }
     }
 
     Temporalize knowTerm(Term term) {
@@ -213,7 +256,6 @@ public class Temporalize {
      * @param occ superterm occurrence, may be ETERNAL
      */
     Event know(@Nullable Event root, Term term, int start, int end) {
-
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
         if (root.term != term) {
@@ -281,6 +323,15 @@ public class Temporalize {
 
                 }
 
+            } else {
+                //all these subterms will share their supercompounds time
+//                if (o.isSet() ) {
+//                    c.subterms().forEach(s -> know(root, s, start, end));
+//                }
+
+                /*c.subterms().recurseTerms((s) -> {
+                    know(root, s, start, end);
+                });*/
             }
         }
 
@@ -303,12 +354,14 @@ public class Temporalize {
     /**
      * using the lb and ub we can now create unknown variables to solve for
      */
-    Event unknown(Term unknown) {
+    Event unknown(Term pattern) {
+        boolean isNeg = pattern.op()==NEG;
+        if (isNeg)
+            pattern = pattern.unneg();
 
-        Event known = this.events.get(unknown);
+        Event known = this.events.get(pattern);
         if (known != null)
-            return known;
-
+            return known.neg(isNeg);
 
 //
 //        String termID = unknown.toString();
@@ -321,9 +374,9 @@ public class Temporalize {
 //
 //
 //
-        if (unknown instanceof Compound) {
+        if (pattern instanceof Compound) {
 
-            Compound c = (Compound) unknown;
+            Compound c = (Compound) pattern;
             Op o = c.op();
             if (o.temporal) {
                 int dt = c.dt();
@@ -341,9 +394,10 @@ public class Temporalize {
 
                     if (ae != null && be != null) {
                         return new SolutionEvent(
-                                o.the(dt(ae.endAbs(), be.startAbs()), new Term[]{a, b}),
-                                ae.startAbs(), be.endAbs()
-                        );
+                                o.the(dt(ae, be), new Term[]{a, b}),
+                                //ae.startAbs()
+                                o == CONJ  ? Math.min(ae.startAbs(), be.startAbs()) : ae.startAbs()
+                        ).neg(isNeg);
                     } else {
                         return null;
                     }

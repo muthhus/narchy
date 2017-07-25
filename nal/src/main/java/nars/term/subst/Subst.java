@@ -118,7 +118,10 @@ public interface Subst  {
 //                return null;
 //        }
 
-        return op.the(curr.dt(), next.array(Term[]::new));
+        if (!subs.equalTerms(next))
+            return op.the(curr.dt(), next.array(Term[]::new));
+        else
+            return curr;
     }
 
 

@@ -38,7 +38,7 @@ public class TemporalizeTest {
 
 
         Temporalize t = new Temporalize().knowTerm($.$("(a &&+2 (b &&+2 c))"));
-        assertEquals("[(b &&+2 c)@[2..4], b@2, (a &&+2 (b &&+2 c))@[0..4], a@0, c@4]", t.toString());
+        assertEquals("[b@2, ((a &&+2 b) &&+2 c)@[0..4], (a &&+2 b)@[0..2], a@0, c@4]", t.toString());
 
 
         assertEquals("[b@2, (a ==>+2 b)@0, a@0]",
@@ -56,9 +56,8 @@ public class TemporalizeTest {
         assertEquals("[b@0, (b <=>+2 a)@0, a@2]",
                 new Temporalize().knowTerm($.$("(a <=>-2 b)")).toString());
     }
-    @Test
-    public void testEventizeImplConj() throws Narsese.NarseseException {
 
+    @Test public void testEventizeImplConj() throws Narsese.NarseseException {
         assertEquals("[((a &&+2 b) ==>+3 c)@0, b@2, (a &&+2 b)@[0..2], a@0, c@5]",
                 new Temporalize().knowTerm($.$("((a &&+2 b) ==>+3 c)")).toString());
     }

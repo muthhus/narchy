@@ -246,6 +246,22 @@ public class TermReductionsTest extends NarseseTest {
                 NARS.shell().task("((x) &&+10 (x)). :|:").toString());
     }
 
+    @Test public void testEmbeddedConjNormalization() throws Narsese.NarseseException {
+        Compound alreadyNormalized = $("(((a) &&+1 (b)) &&+3 (d))");
+        Compound needsNormalized = $("((a) &&+1 ((b) &&+3 (d)))");
+        assertEquals(  needsNormalized, alreadyNormalized);
+        assertEquals(  needsNormalized.toString(), alreadyNormalized.toString() );
+        assertEquals(  needsNormalized.dt(), alreadyNormalized.dt() );
+        assertEquals(  needsNormalized.subterms(), alreadyNormalized.subterms() );
+    }
+
+    @Test public void testEmbeddedConjNormalizationWithNeg1() throws Narsese.NarseseException {
+        Compound a = $("(((a) &&+1 (b)) &&-3 (d))");
+        Compound b = $("((a) &&+1 ((b) &&-3 (d)))");
+        assertEquals(  b, a);
+        assertEquals(  b.toString(), a.toString());
+    }
+
     @Test
     public void testConjunctionEqual() throws Narsese.NarseseException {
         assertEquals(p, conj(p, p));

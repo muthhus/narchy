@@ -388,16 +388,16 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        return true;
 //    }
 
-    //    default boolean equalTerms(@NotNull List<Term> c) {
-//        int s = size();
-//        if (s !=c.size())
-//            return false;
-//        for (int i = 0; i < s; i++) {
-//            if (!sub(i).equals(c.get(i)))
-//                return false;
-//        }
-//        return true;
-//    }
+    default boolean equalTerms(@NotNull List<Term> c) {
+        int s = size();
+        if (s !=c.size())
+            return false;
+        for (int i = 0; i < s; i++) {
+            if (!sub(i).equals(c.get(i)))
+                return false;
+        }
+        return true;
+    }
     default boolean equalTerms(@NotNull Term[] c) {
         int s = size();
         if (s != c.length)

@@ -2,6 +2,7 @@ package nars.derive.match;
 
 import nars.$;
 import nars.Op;
+import nars.derive.PatternCompound;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
@@ -37,6 +38,7 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
     public final int sizeMin() {
         return minArity;
     }
+
 
 
     //public final Variable target;

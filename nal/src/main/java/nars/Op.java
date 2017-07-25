@@ -220,6 +220,15 @@ public enum Op implements $ {
             } else {
                 //NON-COMMUTIVE
 
+                if (tt[1].op()==CONJ && !concurrent(tt[1].dt())) {
+                    //convention: left align all sequences
+                    //ex: (x &&+ (y &&+ z))
+                    //      becomes
+                    //    ((x &&+ y) &&+ z)
+                    Compound st = (Compound)tt[1];
+                    return CONJ.the( st.dt(), CONJ.the(dt, tt[0], st.sub(0)), st.sub(1) );
+                }
+
                 assert (n == 2) : "invalid non-commutive conjunction arity!=2";
 
                 Term a = tt[0];

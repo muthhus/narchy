@@ -70,6 +70,19 @@ public class EllipsisMatch extends GenericCompound {
         }
     }
 
+    public boolean linearMatch(Compound y, int from) {
+        int s = size();
+
+        if (s + from > y.size())
+            return false; //size mismatch: would extend beyond y's size
+
+        for (int i = 0; i < s; i++) {
+            if (!sub(i).equals(y.sub(from+i))) //term mismatch
+                return false;
+        }
+        return true;
+    }
+
 //    /** HACK */
 //    @NotNull
 //    static Term[] expand(Term raw) {
