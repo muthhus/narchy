@@ -1,26 +1,29 @@
 package nars.derive;
 
 import com.google.common.base.Joiner;
+import nars.$;
 import nars.Op;
 import nars.Task;
 import nars.control.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import nars.term.transform.Retemporalize;
 import org.chocosolver.solver.Model;
 import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.exception.ContradictionException;
+import org.chocosolver.solver.variables.IVariableMonitor;
 import org.chocosolver.solver.variables.IntVar;
+import org.chocosolver.solver.variables.Variable;
+import org.chocosolver.solver.variables.events.IEventType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static nars.Op.CONJ;
-import static nars.Op.Null;
 import static nars.time.Tense.*;
-import static org.junit.Assert.assertTrue;
 
 /**
  * set missing temporal relations in a derivation using constraint solver
@@ -38,10 +41,10 @@ public class Temporalize extends Model {
 
     public long start = ETERNAL, end = ETERNAL;
     public Term conc;
-    final Map<Term, IntVar[]> known = new HashMap(), unknown = new HashMap();
+    final Map<Term, IntVar[]> events = new HashMap();
 
     @Nullable
-    public static Temporalize solve(@NotNull Derivation d, Term t) {
+    public static Temporalize solve(@NotNull Derivation d, Term pattern) {
 
         /*
         unknowns to solve otherwise the result is impossible:
@@ -132,11 +135,11 @@ public class Temporalize extends Model {
         //this represents a constant known range so this may not actually correspond to a variable
         //instead it may need to be represented as 1 or 2 constant values depending if it's point-like or an interval
         //IntVar i = intVar(term.toString(), start, end, true /* bounded domain */);
-        IntVar s, e;
+        IntVar s, dur;
         String termID = term.toString();
-        known.put(term, new IntVar[]{
-                s = intVar(termID + '>', start),
-                e = intVar('<' + termID, end)
+        events.put(term, new IntVar[]{
+                s = intVar(termID + '@', start),
+                dur = intVar(termID + '~', end-start)
         });
 
 
@@ -208,17 +211,20 @@ public class Temporalize extends Model {
     IntVar[] unknown(Term unknown) {
         assert (lb <= ub) : "solution range unknown: " + lb + ".." + ub;
 
-        IntVar[] known = this.known.get(unknown);
+        IntVar[] known = this.events.get(unknown);
         if (known != null)
             return known;
 
+
+
         String termID = unknown.toString();
-        IntVar s, e;
+        IntVar s, dur;
         IntVar[] var;
-        this.unknown.put(unknown, var = new IntVar[]{
-                s = intVar(termID + ">", lb, ub, true /* bounded domain */),
-                e = intVar("<" + termID, lb, ub, true /* bounded domain */),
+        this.events.put(unknown, var = new IntVar[]{
+                s = intVar(termID + "@", lb, ub, true),
+                dur = intVar(termID + "~", -Integer.MIN_VALUE/2, Integer.MAX_VALUE/2, true),
         });
+
 
 
         if (unknown instanceof Compound) {
@@ -236,23 +242,34 @@ public class Temporalize extends Model {
                     assert (l == 2);
 
                     //scalar variable reprsenting unknown interval
-                    IntVar xdt = intVar("~" + termID, lb, ub, true);
-
-                    arithm(e, "-", s, "=", xdt).post(); //constraint on the duration
+                    //IntVar xdt = intVar("~" + termID, lb, ub, true);
 
                     Term a = tt.sub(0);
                     IntVar[] av = unknown(a);
 
+
                     Term b = tt.sub(1);
                     IntVar[] bv = unknown(b);
 
-                    arithm(av[1], "+", xdt, "=", bv[1]).post();
+//                    arithm(av[0], "=", s).post();
 
+                    arithm(bv[0], "-", av[0], "=", dur).post(); //TODO check this
+
+                    //constraint on the duration (abs(e-s)); maybe a way to do this without 'or'
+//                    /*or*/(
+//                        arithm(s, "+", xdt, "=", e)
+//                        //,arithm(e, "+", xdt, "=", s)
+//                    ).post();
+
+//                    /*or*/(
+//                        arithm(av[1], "+", xdt, "=", bv[0])
+//                        //arithm(bv[1], "+", xdt, "=", av[0]) //reverse
+//                    ).post();
 
 
                 } else {
                     int dtr = unknown.dtRange();
-                    arithm(e, "-", s, "=", dtr).post(); //constraint on the duration
+                    //arithm(e, "-", s, "=", dtr).post(); //constraint on the duration
 
                     boolean reverse;
                     int t;
@@ -292,8 +309,13 @@ public class Temporalize extends Model {
                 ;
     }
 
-    @Nullable public Term solve(@NotNull Term t) {
-        unknown(t);
+    /**
+     * TODO support differing copies of the same term as subterms uniquely identified by their subpaths from a root
+     */
+    @Nullable
+    public Term solve(@NotNull Term x) {
+
+        unknown(x);
 
 //        String beforeSolve = toString();
 //        System.out.println(beforeSolve);
@@ -303,16 +325,27 @@ public class Temporalize extends Model {
         if (!solved)
             return null;
 
-        assertTrue(solved);
-
         String afterSolve = toString();
         System.out.println(afterSolve);
 
-        unknown.forEach((k,v) -> {
-           System.out.println(k + " " + Arrays.toString(v));
-        });
+//        unknown.forEach((k, v) -> {
+//            System.out.println(k + " " + Arrays.toString(v));
+//        });
 
-        //TODO attempt to construct new term with any solved numerics
-        return null;
+        return $.terms.retemporalize(x, new Retemporalize() {
+            @Override
+            public int dt(@NotNull Compound x) {
+
+                IntVar[] u = events.get(x);
+                if (u != null) {
+                    if (u[0].isInstantiated() && u[1].isInstantiated()) {
+                        int a = u[0].getValue();
+                        int b = a + u[1].getValue();
+                        return b - a;
+                    }
+                }
+                return XTERNAL; //unknown
+            }
+        });
     }
 }

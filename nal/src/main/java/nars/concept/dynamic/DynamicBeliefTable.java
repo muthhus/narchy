@@ -101,7 +101,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
         template = nar.terms.retemporalize(template,
                 target==null || target.isEternal() ?
-                nar.terms.retemporalizationDTERNAL : nar.terms.retemporalizationZero); //TODO move this somewhere else where it can use the NAR's index
+                nar.terms.retemporalizeDTERNAL : nar.terms.retemporalizeZero); //TODO move this somewhere else where it can use the NAR's index
         if (!(template instanceof Compound))
             return null; //??
 

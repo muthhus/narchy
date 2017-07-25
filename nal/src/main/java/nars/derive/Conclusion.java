@@ -188,7 +188,7 @@ public class Conclusion extends AbstractPred<Derivation> {
                 return true;
 
             Term Cv = normalizedOrNull(cu, d.terms,
-                    d.temporal ? d.terms.retemporalizationZero : d.terms.retemporalizationDTERNAL //select between eternal and parallel depending on the premises's temporality
+                    d.temporal ? d.terms.retemporalizeZero : d.terms.retemporalizeDTERNAL //select between eternal and parallel depending on the premises's temporality
             );
             if (Cv == null)
                 return true;

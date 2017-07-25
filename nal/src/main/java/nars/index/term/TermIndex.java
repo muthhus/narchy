@@ -13,6 +13,7 @@ import nars.term.Termed;
 import nars.term.subst.MapSubst;
 import nars.term.subst.MapSubst1;
 import nars.term.transform.CompoundTransform;
+import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -199,19 +200,8 @@ public abstract class TermIndex implements TermContext {
     }
 
 
+    abstract public Stream<Termed> stream();
 
-
-    public static boolean disallowTrueOrFalse(Op superOp) {
-
-        switch (superOp) {
-            case EQUI:
-            case IMPL:
-            case CONJ:
-                return false; //allow for these because reductions may apply if they are present
-            default:
-                return true;
-        }
-    }
 
 
 //    @Nullable
@@ -328,7 +318,7 @@ public abstract class TermIndex implements TermContext {
 
 
     @Nullable
-    public Term retemporalize(@NotNull Term tx, Retemporalization r) {
+    public Term retemporalize(@NotNull Term tx, Retemporalize r) {
         if (!(tx instanceof Compound)) return tx;
 
         Compound x = (Compound)tx;
@@ -360,38 +350,10 @@ public abstract class TermIndex implements TermContext {
     }
 
 
-    public final Retemporalization retemporalizationDTERNAL = new Retemporalization(DTERNAL);
-    public final Retemporalization retemporalizationZero = new Retemporalization(0);
-
-    abstract public Stream<Termed> stream();
+    public final Retemporalize retemporalizeDTERNAL = new Retemporalize.RetemporalizeNonXternal(DTERNAL);
+    public final Retemporalize retemporalizeZero = new Retemporalize.RetemporalizeNonXternal(0);
 
 
-    public class Retemporalization implements CompoundTransform {
 
-        final int dtIfXternal;
 
-        private Retemporalization(int dtIfXternal) {
-            this.dtIfXternal = dtIfXternal;
-        }
-
-        @Override
-        public boolean testSuperTerm(@NotNull Compound c) {
-            return (c.hasAny(Op.TemporalBits));
-        }
-
-        @Nullable
-        @Override
-        public Term apply(@Nullable Compound parent, @NotNull Term term) {
-            if (term instanceof Compound && term.hasAny(Op.TemporalBits)) {
-                Compound x = (Compound) term;
-                return x.transform(dt(x), this);
-            }
-            return term;
-        }
-
-        public int dt(@NotNull Compound x) {
-            int dt = x.dt();
-            return (dt==DTERNAL||dt==XTERNAL) ? dtIfXternal : dt;
-        }
-    }
 }

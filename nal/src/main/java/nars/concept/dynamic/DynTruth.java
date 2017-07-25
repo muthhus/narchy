@@ -102,7 +102,7 @@ public final class DynTruth implements Truthed {
             priority = new Pri(p);
         }
 
-        if (null == (c = nar.terms.retemporalize(c, nar.terms.retemporalizationZero)))
+        if (null == (c = nar.terms.retemporalize(c, nar.terms.retemporalizeZero)))
             return null;
 
 

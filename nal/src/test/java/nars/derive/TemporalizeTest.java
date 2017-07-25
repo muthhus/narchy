@@ -2,13 +2,17 @@ package nars.derive;
 
 import nars.$;
 import nars.Narsese;
+import nars.term.Term;
+import org.chocosolver.solver.Settings;
 import org.chocosolver.solver.Solver;
 import org.chocosolver.solver.explanations.Explanation;
+import org.chocosolver.util.ESat;
 import org.junit.Test;
 
 import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class TemporalizeTest {
@@ -50,12 +54,46 @@ public class TemporalizeTest {
     }
 
     @Test
-    public void testXternal() throws Narsese.NarseseException {
+    public void testSolveTerm() throws Narsese.NarseseException {
+
+        {
+            Temporalize t = new Temporalize();
+            t.known($.$("a"), 1, 1);
+            t.known($.$("b"), 3, 3);
+            assertEquals("(a &&+2 b)", t.solve($.$("(a &&+- b)")).toString());
+        }
+        {
+            Temporalize t = new Temporalize();
+            t.known($.$("a"), 1, 1);
+            t.known($.$("b"), 3, 3);
+            assertEquals("(a &&+2 b)", t.solve($.$("(b &&+- a)")).toString());
+        }
+    }
+
+    @Test
+    public void testUnsolveableTerm() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
+        t.set(new Settings() {
+            @Override
+            public boolean debugPropagation() {
+                return true;
+            }
+
+//            @Override
+//            public boolean warnUser() {
+//                return true;
+//            }
+
+            @Override
+            public boolean checkModel(Solver solver) {
+                return ESat.TRUE.equals(solver.isSatisfied());
+            }
+        });
 
         t.known($.$("a"), 1, 1);
-        t.known($.$("b"), 3, 3);
-        t.solve($.$("(a &&+- b)"));
+
+        //"b" is missing any temporal basis
+        assertEquals( "(a &&+- b)", t.solve($.$("(a &&+- b)")).toString() );
 
 
 //        assertEquals("",

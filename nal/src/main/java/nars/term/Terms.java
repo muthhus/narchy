@@ -10,6 +10,7 @@ import nars.index.term.TermIndex;
 import nars.term.atom.Atom;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
+import nars.term.transform.Retemporalize;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
@@ -393,10 +394,10 @@ public enum Terms { ;
     }
     @Nullable
     public static <T extends Term> T normalizedOrNull(@Nullable Term t, @NotNull TermIndex i) {
-        return (T)normalizedOrNull(t, i, i.retemporalizationDTERNAL);
+        return (T)normalizedOrNull(t, i, i.retemporalizeDTERNAL);
     }
     @Nullable
-    public static Term normalizedOrNull(@Nullable Term t, @NotNull TermIndex i, TermIndex.Retemporalization r) {
+    public static Term normalizedOrNull(@Nullable Term t, @NotNull TermIndex i, Retemporalize r) {
 
         if (t.isTemporal()) {
             //the compound indicated a potential dt, but the premise was actually atemporal;

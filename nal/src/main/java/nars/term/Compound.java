@@ -63,7 +63,6 @@ import java.util.function.Predicate;
 
 import static java.util.Collections.emptySet;
 import static nars.Op.*;
-import static nars.index.term.TermIndex.disallowTrueOrFalse;
 import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -1164,7 +1163,7 @@ public interface Compound extends Term, IPair, TermContainer {
         if (!t.testSuperTerm(this))
             return this;
 
-        boolean filterTrueFalse = disallowTrueOrFalse(op);
+        boolean filterTrueFalse = !op.allowsBool;
 
         @NotNull TermContainer srcSubs = this.subterms(); //for faster access, generally
         int s = srcSubs.size(), subtermMods = 0;
