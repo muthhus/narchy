@@ -83,13 +83,6 @@
             <scope>compile</scope>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.choco-solver/choco-solver -->
-        <dependency>
-            <groupId>org.choco-solver</groupId>
-            <artifactId>choco-solver</artifactId>
-            <version>4.0.4</version>
-        </dependency>
-
 
         <!-- http://mvnrepository.com/artifact/com.github.fge/grappa -->
         <dependency>
