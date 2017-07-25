@@ -83,6 +83,13 @@ public class TemporalizeTest {
 
     }
 
+    @Test public void testSolveIndirect() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("(a ==>+1 c)"), ETERNAL);
+        t.knowTerm($.$("a"), 0);
+        assertEquals("c@1", t.solve($.$("c")).toString());
+    }
+
 //    @Test
 //    public void testUnsolveableTerm() throws Narsese.NarseseException {
 //        Temporalize t = new Temporalize();
