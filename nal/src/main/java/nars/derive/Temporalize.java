@@ -363,17 +363,6 @@ public class Temporalize {
         if (known != null)
             return known.neg(isNeg);
 
-//
-//        String termID = unknown.toString();
-//        IntVar s, dur;
-//        IntVar[] var;
-//        this.events.put(unknown, var = new IntVar[]{
-//                s = intVar(termID + "@", lb, ub, true),
-//                dur = intVar(termID + "~", -Integer.MIN_VALUE/2, Integer.MAX_VALUE/2, true),
-//        });
-//
-//
-//
         if (pattern instanceof Compound) {
 
             Compound c = (Compound) pattern;
@@ -393,18 +382,20 @@ public class Temporalize {
                     Event be = unknown(b);
 
                     if (ae != null && be != null) {
-                        return new SolutionEvent(
-                                o.the(dt(ae, be), new Term[]{a, b}),
-                                //ae.startAbs()
-                                o == CONJ  ? Math.min(ae.startAbs(), be.startAbs()) : ae.startAbs()
-                        ).neg(isNeg);
-                    } else {
-                        return null;
+                        try {
+                            return new SolutionEvent(
+                                    o.the(dt(ae, be), new Term[]{a, b}),
+                                    //ae.startAbs()
+                                    o == CONJ ? Math.min(ae.startAbs(), be.startAbs()) : ae.startAbs()
+                            ).neg(isNeg);
+                        } catch (UnsupportedOperationException e) {
+                            //TODO
+                        }
                     }
                 }
             }
         }
-        //TODO know(variable, ETERNAL);
+
         return null;
     }
 

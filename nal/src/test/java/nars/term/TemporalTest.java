@@ -229,7 +229,7 @@ public class TemporalTest {
     @Test
     public void testCommutiveTemporality1() {
         testParse("(at(SELF,b) &&+5 goto(a))", "(at(SELF,b) &&+5 goto(a))");
-        testParse("(goto(a)&|((SELF,b)-->at))", "(goto(a) &&+0 at(SELF,b))");
+        testParse("(goto(a)&|((SELF,b)-->at))", "(goto(a)&|at(SELF,b))");
         testParse("(goto(a)&&((SELF,b)-->at))", "(goto(a)&&at(SELF,b))");
     }
 
@@ -546,7 +546,7 @@ public class TemporalTest {
     @Test
     public void testSubtermTimeRecursive() throws Narsese.NarseseException {
         Compound c = $("(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))");
-        assertEquals("", c.toString());
+        assertEquals("((((t2-->hold) &&+1 (t1-->at)) &&+3 (t1-->[opened])) &&+5 open(t1))", c.toString());
         assertEquals(0, c.subtermTime($("hold:t2")));
         assertEquals(1, c.subtermTime($("at:t1")));
         assertEquals(4, c.subtermTime($("[opened]:t1")));
