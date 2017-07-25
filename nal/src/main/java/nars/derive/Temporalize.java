@@ -8,11 +8,19 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.chocosolver.solver.Model;
+import org.chocosolver.solver.Solver;
+import org.chocosolver.solver.variables.IntVar;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import static nars.Op.CONJ;
+import static nars.Op.Null;
 import static nars.time.Tense.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * set missing temporal relations in a derivation using constraint solver
@@ -21,8 +29,16 @@ import static nars.time.Tense.*;
  */
 public class Temporalize extends Model {
 
+    /**
+     * lower and upper bounds of the potential solution universe
+     * this will be stretched by the union of the start/end times of the present task(s)
+     * and also by temporal relations present within them
+     */
+    public int lb = Integer.MAX_VALUE, ub = Integer.MIN_VALUE;
+
     public long start = ETERNAL, end = ETERNAL;
     public Term conc;
+    final Map<Term, IntVar[]> known = new HashMap(), unknown = new HashMap();
 
     @Nullable
     public static Temporalize solve(@NotNull Derivation d, Term t) {
@@ -51,7 +67,6 @@ public class Temporalize extends Model {
 
         Temporalize model = new Temporalize();
 
-
         //1. find a central root point about which all solutions are relative.
         // this is because choco doesnt support long's , only int's . and also it
         // works for all cases where belief and/or task are eternal.
@@ -78,6 +93,7 @@ public class Temporalize extends Model {
 
 
 
+
         /*        // 1. Create a Model
         Model model = new Model("my first problem");
         // 2. Create variables
@@ -96,23 +112,38 @@ public class Temporalize extends Model {
     }
 
     public void eventize(Task task, long root) {
-        eventize(task.term(), (int) (task.start() - root), (int) (task.end() - root));
+        known(task.term(), (int) (task.start() - root), (int) (task.end() - root));
     }
 
     /**
      * convenience method for testing: assumes start offset of zero, and dtRange taken from term
      */
     Temporalize eventize(Term term) {
-        eventize(term, 0, term.dtRange());
+        known(term, 0, term.dtRange());
         return this;
     }
+
 
     /**
      * recursively calculates the start and end time of all contained events within a term
      */
-    void eventize(Term term, int start, int end) {
+    void known(Term term, int start, int end) {
 
-        intVar(term.toString(), start, end, true /* bounded domain */);
+        //this represents a constant known range so this may not actually correspond to a variable
+        //instead it may need to be represented as 1 or 2 constant values depending if it's point-like or an interval
+        //IntVar i = intVar(term.toString(), start, end, true /* bounded domain */);
+        IntVar s, e;
+        String termID = term.toString();
+        known.put(term, new IntVar[]{
+                s = intVar(termID + '>', start),
+                e = intVar('<' + termID, end)
+        });
+
+
+        if (lb > start)
+            lb = start;
+        if (ub < end)
+            ub = end;
 
         if (term instanceof Compound) {
             Compound c = (Compound) term;
@@ -123,11 +154,11 @@ public class Temporalize extends Model {
                 if (dt == XTERNAL) {
 
                     //TODO UNKNOWN TO SOLVE FOR
+                    throw new RuntimeException("no unknowns may be added during this phase");
 
                 } else {
                     if (dt == DTERNAL)
                         dt = 0;
-
 
                     boolean reverse;
                     int t;
@@ -141,15 +172,15 @@ public class Temporalize extends Model {
                     }
 
                     TermContainer tt = c.subterms();
-                    int s = tt.size();
+                    int l = tt.size();
 
-                    for (int i = 0; i < s; i++) {
+                    for (int i = 0; i < l; i++) {
                         if (i > 0)
                             t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
 
-                        Term st = tt.sub(reverse ? (s - 1 - i) : i);
+                        Term st = tt.sub(reverse ? (l - 1 - i) : i);
                         int sdt = st.dtRange();
-                        eventize(st, t, t + sdt);
+                        known(st, t, t + sdt);
 
                         t += sdt; //the duration of the event
                     }
@@ -168,8 +199,120 @@ public class Temporalize extends Model {
 
     }
 
+    //arithm(a, "+", b, "=", c).post();
+
+
+    /**
+     * using the lb and ub we can now create unknown variables to solve for
+     */
+    IntVar[] unknown(Term unknown) {
+        assert (lb <= ub) : "solution range unknown: " + lb + ".." + ub;
+
+        IntVar[] known = this.known.get(unknown);
+        if (known != null)
+            return known;
+
+        String termID = unknown.toString();
+        IntVar s, e;
+        IntVar[] var;
+        this.unknown.put(unknown, var = new IntVar[]{
+                s = intVar(termID + ">", lb, ub, true /* bounded domain */),
+                e = intVar("<" + termID, lb, ub, true /* bounded domain */),
+        });
+
+
+        if (unknown instanceof Compound) {
+
+
+            Compound c = (Compound) unknown;
+            Op o = c.op();
+            if (o.temporal) {
+                int dt = c.dt();
+
+                TermContainer tt = c.subterms();
+                int l = tt.size();
+
+                if (dt == XTERNAL) {
+                    assert (l == 2);
+
+                    //scalar variable reprsenting unknown interval
+                    IntVar xdt = intVar("~" + termID, lb, ub, true);
+
+                    arithm(e, "-", s, "=", xdt).post(); //constraint on the duration
+
+                    Term a = tt.sub(0);
+                    IntVar[] av = unknown(a);
+
+                    Term b = tt.sub(1);
+                    IntVar[] bv = unknown(b);
+
+                    arithm(av[1], "+", xdt, "=", bv[1]).post();
+
+
+
+                } else {
+                    int dtr = unknown.dtRange();
+                    arithm(e, "-", s, "=", dtr).post(); //constraint on the duration
+
+                    boolean reverse;
+                    int t;
+                    if (dt < 0 && o.commutative /* conj & equi */) {
+                        dt = -dt;
+                        reverse = true;
+                        t = dtr;
+                    } else {
+                        reverse = false;
+                        t = 0;
+                    }
+
+                    for (int i = 0; i < l; i++) {
+                        if (i > 0)
+                            t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
+
+                        Term st = tt.sub(reverse ? (l - 1 - i) : i);
+                        int sdt = st.dtRange();
+                        IntVar[] subvar = unknown(st);
+                        if (!reverse) {
+                            arithm(subvar[0], "-", var[0], "=", t).post();
+                        } else {
+                            arithm(var[1], "-", subvar[1], "=", t).post();
+                        }
+                        t += sdt; //the duration of the event
+                    }
+                }
+            }
+        }
+        return var;
+    }
+
     @Override
     public String toString() {
-        return Joiner.on(',').join(getVars());
+        return Joiner.on(',').join(getVars()) + ":" +
+                Joiner.on(',').join(getCstrs())
+                ;
+    }
+
+    @Nullable public Term solve(@NotNull Term t) {
+        unknown(t);
+
+//        String beforeSolve = toString();
+//        System.out.println(beforeSolve);
+
+        Solver solver = getSolver();
+        boolean solved = solver.solve();
+        if (!solved)
+            return null;
+
+        assertTrue(solved);
+
+        String afterSolve = toString();
+        System.out.println(afterSolve);
+
+        unknown.forEach((k,v) -> {
+           System.out.println(k + " " + Arrays.toString(v));
+        });
+
+        //TODO attempt to construct new term with any solved numerics
+        return null;
     }
 }
