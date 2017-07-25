@@ -122,13 +122,13 @@ public class Conclusion extends AbstractPred<Derivation> {
             //float[] confScale = {1f};
 
 
-            Temporalize t = Temporalize.solve(d, c1);
+            Temporalize.Event t = Temporalize.solve(d, c1);
             if (t==null)
                 return true; //invalid or impossible temporalization
 
-            occ = new long[] { t.start, t.end };
+            occ = new long[] { t.startAbs(), t.endAbs() };
 
-            @Nullable Term t1 = t.conc;
+            @Nullable Term t1 = t.term;
 
             //temporalization failure, could not determine temporal attributes. seems this can happen normally
             if ((t1 == null || t1 instanceof Variable || t1 instanceof Bool) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {

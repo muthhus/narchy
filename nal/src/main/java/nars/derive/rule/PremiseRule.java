@@ -464,6 +464,17 @@ public class PremiseRule extends GenericCompound {
 //                    }
 //                    break;
 
+                case "time":
+                    switch (XString) {
+                        case "raw":
+                            beliefProjected = false;
+                            break;
+                        default:
+                            //TODO warn about missing ones
+                            break;
+                    }
+                    break;
+
 //                case "temporal":
 //                    pres.add( Temporality.either;
 //                    break;
@@ -578,6 +589,7 @@ public class PremiseRule extends GenericCompound {
                             throw new RuntimeException("Unknown task punctuation type: " + XString);
                     }
                     break;
+
 
 
                 default:

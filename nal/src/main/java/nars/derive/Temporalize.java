@@ -67,7 +67,8 @@ public class Temporalize {
         AbsoluteEvent(Term term, long start, long end) {
             super(term);
 
-            assert((start == ETERNAL && end == ETERNAL) || (start!=ETERNAL && end!=ETERNAL));
+            assert((start == ETERNAL && end == ETERNAL) || (start!=ETERNAL && end!=ETERNAL)):
+                "invalid semi-eternalization: " + start + " " + end;
 
             if (start <= end) {
                 this.start = start; this.end = end;
@@ -97,6 +98,13 @@ public class Temporalize {
                 return term + "@ETE";
         }
 
+    }
+
+    public static class SolutionEvent extends AbsoluteEvent {
+
+        SolutionEvent(Term term, long start, long end) {
+            super(term, start, term.op()==CONJ ? end /* && */ : start /* ==> and <=> */);
+        }
     }
 
     static String timeStr(long when) {
@@ -149,7 +157,7 @@ public class Temporalize {
     final Map<Term, Event> events = new HashMap();
 
     @Nullable
-    public static Temporalize solve(@NotNull Derivation d, Term pattern) {
+    public static Event solve(@NotNull Derivation d, Term pattern) {
 
         /*
         unknowns to solve otherwise the result is impossible:
@@ -176,12 +184,7 @@ public class Temporalize {
         if (belief != null)
             model.know(belief);
 
-        @Nullable Event y = model.unknown(pattern);
-        if (y != null) {
-            return null; //TODO
-        } else {
-            return null;
-        }
+        return model.unknown(pattern);
     }
 
     public void know(Task task) {
@@ -199,7 +202,7 @@ public class Temporalize {
      * convenience method for testing: assumes start offset of zero, and dtRange taken from term
      */
     Temporalize knowTerm(Term term, long when) {
-        know(new AbsoluteEvent(term, when, when + term.dtRange()), term, 0, term.dtRange());
+        know(new AbsoluteEvent(term, when, when!=ETERNAL ? when + term.dtRange() : ETERNAL), term, 0, term.dtRange());
         return this;
     }
 
@@ -236,37 +239,43 @@ public class Temporalize {
                     if (dt == DTERNAL)
                         dt = 0;
 
-                    boolean reverse;
-                    int t;
-                    if (dt < 0 && o.commutative /* conj & equi */) {
+                    TermContainer tt = c.subterms();
+                    if (dt < 0 && o.commutative) {
                         dt = -dt;
-                        reverse = true;
-                        t = end;
-                    } else {
-                        reverse = false;
-                        t = start;
+                        tt = c.reverse();
                     }
 
-                    TermContainer tt = c.subterms();
+                    int t = start;
+
                     int l = tt.size();
 
-                    for (int i = 0; i < l; i++) {
-                        if (i > 0)
+                    //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
+                    for (int i = 0; (i < l); i++) {
+
+                        Term st = tt.sub(i);
+                        int sdt = st.dtRange();
+
+                        int subStart = t;
+                        int subEnd = t + sdt;
+                        //System.out.println("\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
+                        know(root, st, subStart, subEnd);
+
+                        t = subEnd; //the duration of the event
+
+                        if (i < l-1)
                             t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
 
-                        Term st = tt.sub(reverse ? (l - 1 - i) : i);
-                        int sdt = st.dtRange();
-                        {
-                            know(root, st, t, t + sdt);
-                        }
-
-                        t += sdt; //the duration of the event
                     }
 
-                    //for conjunctions: by the end of the iteration we should be at the exact end of the interval
-                    if (o == CONJ) {
-                        assert (t == end) : "mis-aligned: " + start + "," + end + " but t=" + t;
-                    }
+
+//                    //for conjunctions: by the end of the iteration we should be at the exact end of the interval
+//                    if (o == CONJ) {
+//                        int expectedEnd = end;
+////                        if (t!=expectedEnd) {
+////                            throw new RuntimeException(term + " with dtRange=" + term.dtRange() + " mis-aligned: " + start + "," + end + " but t=" + t);
+////                        }
+//                        assert (t == expectedEnd) : term + " with dtRange=" + term.dtRange() + " mis-aligned: " + start + "," + end + " but t=" + t;
+//                    }
 
                     //for others: they are "pointers" which relate time points but do not define durations
 
@@ -331,7 +340,7 @@ public class Temporalize {
                     Event be = unknown(b);
 
                     if (ae != null && be != null) {
-                        return new AbsoluteEvent(
+                        return new SolutionEvent(
                                 o.the(dt(ae.endAbs(), be.startAbs()), new Term[]{a, b}),
                                 ae.startAbs(), be.endAbs()
                         );
@@ -347,7 +356,7 @@ public class Temporalize {
 
     @Override
     public String toString() {
-        return events.toString();
+        return events.values().toString();
     }
 
     /**

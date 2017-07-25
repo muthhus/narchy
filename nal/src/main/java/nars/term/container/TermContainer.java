@@ -1011,7 +1011,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return AND(s -> s.recurseTerms(parentsMust, whileTrue, parent));
     }
 
-//    /**
+    default TermContainer reverse() {
+        return size() > 1 ? new ReverseTermContainer(this) : this;
+    }
+
+    //    /**
 //     * returns a sorted and de-duplicated version of this container
 //     */
 //    default TermContainer sorted() {
