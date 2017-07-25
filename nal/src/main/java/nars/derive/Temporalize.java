@@ -8,7 +8,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.chocosolver.solver.Model;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -100,9 +99,12 @@ public class Temporalize extends Model {
         eventize(task.term(), (int) (task.start() - root), (int) (task.end() - root));
     }
 
-    /** convenience method for testing: assumes start offset of zero, and dtRange taken from term */
-    void eventize(Term term) {
+    /**
+     * convenience method for testing: assumes start offset of zero, and dtRange taken from term
+     */
+    Temporalize eventize(Term term) {
         eventize(term, 0, term.dtRange());
+        return this;
     }
 
     /**
@@ -115,14 +117,21 @@ public class Temporalize extends Model {
         if (term instanceof Compound) {
             Compound c = (Compound) term;
             Op o = c.op();
-            if (o == CONJ) {
+            if (o.temporal) {
                 int dt = c.dt();
 
-                if (dt != DTERNAL && dt != XTERNAL) {
+                if (dt == XTERNAL) {
+
+                    //TODO UNKNOWN TO SOLVE FOR
+
+                } else {
+                    if (dt == DTERNAL)
+                        dt = 0;
+
 
                     boolean reverse;
                     int t;
-                    if (dt < 0) {
+                    if (dt < 0 && o.commutative /* conj & equi */) {
                         dt = -dt;
                         reverse = true;
                         t = end;
@@ -135,13 +144,23 @@ public class Temporalize extends Model {
                     int s = tt.size();
 
                     for (int i = 0; i < s; i++) {
+                        if (i > 0)
+                            t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
+
                         Term st = tt.sub(reverse ? (s - 1 - i) : i);
                         int sdt = st.dtRange();
                         eventize(st, t, t + sdt);
-                        if (i < s-1)
-                            t += dt + sdt;
+
+                        t += sdt; //the duration of the event
                     }
-                    assert(t == end): "by the end of the iteration we should be at the exact end of the interval " + start + "," + end + " but t=" + t;
+
+                    //for conjunctions: by the end of the iteration we should be at the exact end of the interval
+                    if (o == CONJ) {
+                        assert (t == end) : "mis-aligned: " + start + "," + end + " but t=" + t;
+                    }
+
+                    //for others: they are "pointers" which relate time points but do not define durations
+
                 }
 
             }
