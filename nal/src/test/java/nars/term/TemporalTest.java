@@ -546,6 +546,7 @@ public class TemporalTest {
     @Test
     public void testSubtermTimeRecursive() throws Narsese.NarseseException {
         Compound c = $("(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))");
+        assertEquals("", c.toString());
         assertEquals(0, c.subtermTime($("hold:t2")));
         assertEquals(1, c.subtermTime($("at:t1")));
         assertEquals(4, c.subtermTime($("[opened]:t1")));

@@ -6,6 +6,7 @@ import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -70,14 +71,14 @@ public class EllipsisMatch extends GenericCompound {
         }
     }
 
-    public boolean linearMatch(Compound y, int from) {
+    public boolean linearMatch(Compound y, int from, @NotNull Unify subst) {
         int s = size();
 
         if (s + from > y.size())
             return false; //size mismatch: would extend beyond y's size
 
         for (int i = 0; i < s; i++) {
-            if (!sub(i).equals(y.sub(from+i))) //term mismatch
+            if (!y.sub(from+i).unify(sub(i), subst)) //term mismatch
                 return false;
         }
         return true;

@@ -176,10 +176,16 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                     } else {
                         //assert(false): "TODO check this case in PatternCompound ellipsis linear";
 
-                        EllipsisMatch ex = (EllipsisMatch) eMatched;
-                        if (!ex.linearMatch(Y, j))
-                            return false;
-                        j += ex.size();
+                        if (eMatched instanceof EllipsisMatch) {
+                            EllipsisMatch ex = (EllipsisMatch) eMatched;
+                            if (!ex.linearMatch(Y, j, subst))
+                                return false;
+                            j += ex.size();
+                        } else {
+                            //it is a single ellipsis term to unify against
+                            if (!sub(j).unify(eMatched, subst))
+                            j++;
+                        }
                     }
                         //previous match exists, match against what it had
 //                        if (i == xsize) {

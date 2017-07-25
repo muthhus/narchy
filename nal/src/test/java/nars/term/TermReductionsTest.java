@@ -256,10 +256,17 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test public void testEmbeddedConjNormalizationWithNeg1() throws Narsese.NarseseException {
+        String c = "(((d) &&+3 (a)) &&+1 (b))"; //corrected order
         Compound a = $("(((a) &&+1 (b)) &&-3 (d))");
-        Compound b = $("((a) &&+1 ((b) &&-3 (d)))");
-        assertEquals(  b, a);
-        assertEquals(  b.toString(), a.toString());
+        assertEquals(  c, a.toString());
+        assertEquals( a, $(c));
+    }
+
+    @Test public void testEmbeddedConjNormalization2() throws Narsese.NarseseException {
+        assertEquals(
+                "((((t2-->hold) &&+1 (t1-->at)) &&+3 (t1-->[opened])) &&+5 open(t1))",
+                $( "(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))").toString()
+        );
     }
 
     @Test

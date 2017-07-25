@@ -17,9 +17,11 @@ import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.eclipse.collections.impl.tuple.Tuples;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -31,8 +33,10 @@ import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.derive.match.Ellipsis.firstEllipsis;
+import static nars.term.Terms.compoundOrNull;
 import static nars.term.Terms.flatten;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 import static nars.time.Tense.XTERNAL;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
@@ -220,19 +224,21 @@ public enum Op implements $ {
             } else {
                 //NON-COMMUTIVE
 
-                if (tt[1].op()==CONJ && !concurrent(tt[1].dt())) {
-                    //convention: left align all sequences
-                    //ex: (x &&+ (y &&+ z))
-                    //      becomes
-                    //    ((x &&+ y) &&+ z)
-                    Compound st = (Compound)tt[1];
-                    return CONJ.the( st.dt(), CONJ.the(dt, tt[0], st.sub(0)), st.sub(1) );
-                }
 
                 assert (n == 2) : "invalid non-commutive conjunction arity!=2";
 
                 Term a = tt[0];
                 Term b = tt[1];
+
+                //convention: left align all sequences
+                //ex: (x &&+ (y &&+ z))
+                //      becomes
+                //    ((x &&+ y) &&+ z)
+                if (dt > 0 && (b.op()==CONJ && !concurrent(b.dt()))) {
+                    return merge(a, 0, b, dt);
+                } else if (dt < 0 && (a.op()==CONJ && !concurrent(a.dt()))) {
+                    return merge(b, 0, a, -dt);
+                }
 
                 int order = a.compareTo(b);
                 if (order == 0) {
@@ -244,6 +250,8 @@ public enum Op implements $ {
                     tt[1] = x; //swap
                     dt = -dt;
                 }
+
+
 
                 return implInConjReduction(
                         compound(CONJ, dt, tt)
@@ -422,6 +430,8 @@ public enum Op implements $ {
             return IMPL.the(implDT, ia, ib);
         }
     },
+
+
 
     //SPACE("+", true, 7, Args.GTEOne),
 
@@ -718,6 +728,80 @@ public enum Op implements $ {
     }
 
 
+    @Nullable
+    public static Term merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
+
+        List<ObjectLongPair<Term>> events = $.newArrayList();
+
+        a.events(events, aStart);
+        b.events(events, bStart);
+
+        events.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
+
+        int ee = events.size();
+        assert (ee > 1);
+
+        //group all parallel clusters
+        {
+            //Term head = events.get(0).getOne();
+            long headAt = events.get(0).getTwo();
+            int groupStart = -1;
+            for (int i = 1; i <= ee; i++) {
+                long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
+                if (nextAt == headAt) {
+                    if (groupStart == -1) groupStart = i - 1;
+                } else {
+                    if (groupStart != -1) {
+                        int groupEnd = i;
+                        Term[] p = new Term[groupEnd - groupStart];
+                        assert (p.length > 1);
+                        long when = events.get(groupStart).getTwo();
+                        for (int k = 0, j = groupStart; j < groupEnd; j++) {
+                            p[k++] = events.get(groupStart).getOne();
+                            events.remove(groupStart);
+                            i--;
+                            ee--;
+                        }
+                        Term replacement = $.parallel(p);
+                        if (replacement == null)
+                            return null; //failure
+                        if (events.isEmpty()) {
+                            //got them all here
+                            return replacement;
+                        }
+                        events.add(i, PrimitiveTuples.pair(replacement, when));
+                        i++;
+                        ee++;
+                        groupStart = -1; //reset
+                    }
+                }
+                headAt = nextAt;
+            }
+        }
+
+        {
+            if (ee == 1) {
+                return events.get(0).getOne();
+            } else if (ee == 0) {
+                return null;
+            }
+
+            Term head = events.get(0).getOne();
+            long headAt = events.get(0).getTwo();
+            for (int i = 1; i < ee; i++) {
+
+                Term next = events.get(i).getOne();
+                long nextAt = events.get(i).getTwo();
+
+                int dt = (int) (nextAt - headAt);
+                head = CONJ.the(dt, head, next);
+
+                headAt = nextAt;
+            }
+            return head;
+        }
+
+    }
 
 
     static final ImmutableMap<String, Op> stringToOperator;
