@@ -17,7 +17,7 @@ public class ConcurrentCurveBag<X extends Prioritized> extends CurveBag<X> {
     public ConcurrentCurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, Random rng, int cap) {
         super(mergeFunction, map, rng, cap);
 
-        this.toPut = new QueueLock<>(new DisruptorBlockingQueue(512), super::putAsync);
+        this.toPut = new QueueLock<>(new DisruptorBlockingQueue(32), super::putAsync);
     }
 
     @Override

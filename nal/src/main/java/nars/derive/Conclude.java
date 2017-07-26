@@ -13,7 +13,6 @@ import nars.term.atom.Atom;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 /**

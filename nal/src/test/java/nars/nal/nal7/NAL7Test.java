@@ -1135,14 +1135,16 @@ public class NAL7Test extends AbstractNALTest {
         // b +10 x
         //   -> b +30 e
 
+        //  b ==>+10 c ==>+20 e
         test
                 //.log()
-                .believe("((b-->x) ==>+10 (c-->x))")
-                .believe("((e-->x) ==>-20 (c-->x))")
-                .mustBelieve(cycles, "(x:e ==>-30 x:b)", 1f, 0.45f)
-                .mustBelieve(cycles, "(x:b ==>+30 x:e)", 1f, 0.45f)
-                .mustBelieve(cycles, "(x:b <=>+30 x:e)", 1f, 0.45f)
-                .mustNotOutput(cycles, "(x:b <=>-30 x:e)", BELIEF, ETERNAL);
+                .believe("(b ==>+10 c)")
+                .believe("(e ==>-20 c)")
+                .mustBelieve(cycles, "(e ==>-30 b)", 1f, 0.45f)
+                .mustBelieve(cycles, "(b ==>+30 e)", 1f, 0.45f)
+                .mustBelieve(cycles, "(b <=>+30 e)", 1f, 0.45f)
+                .mustNotOutput(cycles, "(b ==>+20 e)", BELIEF, ETERNAL)
+                .mustNotOutput(cycles, "(b <=>-30 e)", BELIEF, ETERNAL);
     }
 
     @Test

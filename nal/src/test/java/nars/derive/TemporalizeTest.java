@@ -1,8 +1,11 @@
 package nars.derive;
 
+import com.google.common.base.Joiner;
 import nars.$;
 import nars.Narsese;
 import org.junit.Test;
+
+import java.util.HashMap;
 
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
@@ -124,6 +127,25 @@ public class TemporalizeTest {
         assertEquals("(x ==>+5 z)@ETE", s.toString());
     }
 
+    @Test public void testSolveEternalButRelative2() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+
+        //  b ==>+10 c ==>+20 e
+
+        t.knowTerm($.$("(b ==>+10 c)"), ETERNAL);
+        t.knowTerm($.$("(e ==>-20 c)"), ETERNAL);
+
+        System.out.println( Joiner.on('\n').join( t.constraints.entrySet() ) );
+
+        HashMap h = new HashMap();
+        Temporalize.Event s = t.solve($.$("(b ==>+- e)"), h);
+
+        System.out.println();
+        System.out.println( Joiner.on('\n').join( h.entrySet() ) );
+
+        assertNotNull(s);
+        assertEquals("(b ==>+30 e)@ETE", s.toString());
+    }
 
 //    @Test
 //    public void testUnsolveableTerm() throws Narsese.NarseseException {

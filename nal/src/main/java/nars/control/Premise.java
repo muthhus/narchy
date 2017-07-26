@@ -6,7 +6,6 @@ package nars.control;
 
 import jcog.Util;
 import jcog.pri.Pri;
-import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
 import nars.Param;

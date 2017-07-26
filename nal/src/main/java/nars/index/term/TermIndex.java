@@ -3,7 +3,6 @@ package nars.index.term;
 import nars.Builtin;
 import nars.NAR;
 import nars.Narsese;
-import nars.Op;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.build.ConceptBuilder;
@@ -26,7 +25,6 @@ import java.util.stream.Stream;
 
 import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.XTERNAL;
 
 /**
  *
