@@ -39,7 +39,9 @@ public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
                 float i = random.nextFloat(); //uniform
                 //normalize to the lack of dynamic range
                 i = Util.lerp(diff, i /* flat */, (i*i) /* curved */);
-                return Math.round(i * (size - 1));
+                int j = (int)(i * (size-0.5f));
+                if (j == size) j--;
+                return j;
             } else {
                 return random.nextInt(size);
             }

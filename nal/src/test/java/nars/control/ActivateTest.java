@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
 import nars.NAR;
 import nars.NARS;
@@ -8,6 +9,7 @@ import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import org.eclipse.collections.api.bag.Bag;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.junit.Test;
@@ -16,24 +18,31 @@ import java.util.Arrays;
 
 import static nars.$.$;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ActivateTest {
 
     @Test
     public void testConceptFireLinkSelection() throws Narsese.NarseseException {
+        int count = 8;
+
         NAR nar = new NARS().get();
         nar.input("$0.01 a:b."); //low priority so it doesnt affect links
         nar.run(1);
+
+        System.out.println("inputs:\n");
+
         Concept c = nar.conceptualize("a:b");
-        for (int n = 0; n < 5; n++) {
-            PLink<Term> inserted = new PLink<>($(n + ":a"), 0.2f * n);
+        for (int n = 0; n < count; n++) {
+            PLink<Term> inserted = new PLink<>($(n + ":a"), ((1+n)/((float)count)));
             System.out.println(inserted);
             c.termlinks().put(inserted);
         }
 
         System.out.println();
 
-        HashBag<String> s = new HashBag();
+        HashBag<String> termlinkHits = new HashBag();
+        HashBag<String> premiseHits = new HashBag();
         Activate cf = new Activate(c, 1f) {
             @Override
             protected void premise(Premise p, NAR nar) {
@@ -41,27 +50,34 @@ public class ActivateTest {
                 if (p.termLink instanceof Atom)
                     return ; //ignore
                 String tls = p.termLink.toString();
-                s.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
+
+                premiseHits.addOccurrences(p.toString(), 1);
+                termlinkHits.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
             }
         };
 
         for (int i = 0; i < 500; i++)
             cf.run(nar);
 
-        s.forEachWithOccurrences((x,o)->{
-            System.out.println(o + "\t" + x);
-        });
+        System.out.println("termlinks pri (after):\n");
+        c.termlinks().print();
+
+        System.out.println("\ntermlink hits:\n");
+        termlinkHits.topOccurrences(termlinkHits.size()).forEach(System.out::println);
+
+        System.out.println("\npremise hits:\n");
+        premiseHits.topOccurrences(premiseHits.size()).forEach(System.out::println);
 
         System.out.println();
-
         c.print();
 
         System.out.println();
 
-        ObjectIntPair<String> top = s.topOccurrences(1).get(0);
-        ObjectIntPair<String> bottom = s.bottomOccurrences(1).get(0);
-        assertEquals("(a-->0)", bottom.getOne());
-        assertEquals("(a-->4)", top.getOne());
+        ObjectIntPair<String> top = termlinkHits.topOccurrences(1).get(0);
+        ObjectIntPair<String> bottom = termlinkHits.bottomOccurrences(1).get(0);
+        String min = bottom.getOne();
+        assertTrue("(a-->0)".equals(min) || "(a-->1)".equals(min)); //allow either 0 or 1
+        assertEquals("(a-->" + (count-1) + ")", top.getOne());
 
     }
 

@@ -406,6 +406,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         an insertion from another thread, it will not be available in this sampling
          */
 
+        boolean direction = random().nextBoolean();
         int nulls = 0; //# of nulls encountered. when this reaches the array length we know it is empty
         while (!next.stop && nulls < s0) {
             Y x = (Y) ii[i];
@@ -428,7 +429,11 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 nulls++;
             }
 
-            if (++i == s0) i = 0; //increment with wrap-around
+            if (direction) {
+                i++; if (i == s) i = 0;
+            } else {
+                i--; if (i == -1) i = s-1;
+            }
         }
 
 //        if (modified) {
@@ -516,7 +521,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             });
 
 
-            if (trash != null && trash[0]!=null) {
+            if (trash[0]!=null) {
                 //clear the entries from the map right away
                 //this should be done in a synchronized block along with what happens above
                 trash[0].forEach(x -> {
@@ -527,7 +532,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         }
 
         //this can be done outside critical section
-        if (trash != null && trash[0]!=null) {
+        if (trash[0]!=null) {
             trash[0].forEach(x -> {
                 if (x != incoming)
                     onRemoved(x);
