@@ -4,6 +4,7 @@ import nars.Op;
 import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Bool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +16,8 @@ public class SubUnify extends Unify {
     private final Unify parent;
     private @Nullable Term transformed;
 
-    @Nullable private Term result;
+    @Nullable
+    private Term result;
 
 
     public SubUnify(@NotNull Unify parent, @Nullable Op type) {
@@ -33,7 +35,7 @@ public class SubUnify extends Unify {
         this.ttl = parent.ttl; //load
         super.unify(x, y, finish);
         parent.ttl = ttl; //restore
-        return null;
+        return this;
     }
 
     //    @Override
@@ -63,6 +65,7 @@ public class SubUnify extends Unify {
 
     /**
      * terminate after the first match
+     *
      * @param match
      */
     @Override
@@ -70,8 +73,13 @@ public class SubUnify extends Unify {
 
         if (transformed != null) {
             Term result = transform(transformed);
-            if (result instanceof Compound) {
+            if (!(result instanceof Bool)) {
                 this.result = result;
+
+                //copy mappings to parent if succeeded
+                //this is needed to resolve task/belief to any transformations appearing in the conclusion
+                xy.forEach(parent::putXY);
+
                 stop(); //done
             }
         }
