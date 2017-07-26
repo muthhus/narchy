@@ -114,63 +114,16 @@ public class Conclusion extends AbstractPred<Derivation> {
         Term c2;
         if (d.temporal) {
 
+            Term t1 = Temporalize.solve(d, c1, occ = new long[] { ETERNAL, ETERNAL });
 
-
-            //process time with the unnegated term
-            //float[] confScale = {1f};
-
-
-            HashMap<Term, Temporalize.Time> times = new HashMap();
-            Temporalize.Event t = Temporalize.solve(d, c1, times);
-            if (t==null)
-                return true; //invalid or impossible temporalization
-
-            occ = new long[] { t.start(times).abs(), t.end(times).abs() };
-
-            @Nullable Term t1 = t.term;
-
-            //temporalization failure, could not determine temporal attributes. seems this can happen normally
-            if ((t1 == null || t1 instanceof Variable || t1 instanceof Bool) /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
-                //                 {
-                //                    //FOR DEBUGGING, re-run it
-                //                    Compound temporalized2 = this.time.compute(content,
-                //                            m, this, occReturn, confScale
-                //                    );
-                //                }
-
+            //invalid or impossible temporalization; could not determine temporal attributes. seems this can happen normally
+            if (t1 == null || t1 instanceof Variable || t1 instanceof Bool /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
 //                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure"
 //                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
 //                            );
 
                 return true;
             }
-
-//            int tdt = t2.dt();
-//            if (tdt == XTERNAL || tdt == -XTERNAL) {
-//                //throw new InvalidTermException(c1.op(), c1.dt(), "XTERNAL/DTERNAL leak");
-//                return true;
-//            }
-
-            //            if (Param.DEBUG && occReturn[0] != ETERNAL && Math.abs(occReturn[0] - DTERNAL) < 1000) {
-            //                //temporalizer.compute(content.term(), m, this, occReturn, confScale); //leave this commented for debugging
-            //                throw new NAR.InvalidTaskException(content, "temporalization resulted in suspicious occurrence time");
-            //            }
-
-//            //apply any non 1.0 the confidence scale
-//            if (truth != null) {
-//
-//
-//                float cf = confScale[0];
-//                if (cf != 1) {
-//                    throw new UnsupportedOperationException("yet");
-//
-//                    //                    truth = truth.confMultViaWeightMaxEternal(cf);
-//                    //                    if (truth == null) {
-//                    //                        throw new InvalidTaskException(content, "temporal leak");
-//                    //                    }
-//                }
-//            }
-
 
             if (occ[1] == ETERNAL) occ[1] = occ[0];
 
@@ -183,16 +136,16 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         if (varIntro) {
             Term cu = DepIndepVarIntroduction.varIntro(c2, nar);
-            if (cu instanceof Bool || (cu.equals(c2) /* keep only if it differs */))
+            if (cu instanceof Variable || cu instanceof Bool || (cu.equals(c2) /* keep only if it differs */))
                 return true;
 
-            Term Cv = normalizedOrNull(cu, d.terms,
-                    d.temporal ? d.terms.retemporalizeZero : d.terms.retemporalizeDTERNAL //select between eternal and parallel depending on the premises's temporality
-            );
-            if (Cv == null)
-                return true;
+//            Term Cv = normalizedOrNull(cu, d.terms,
+//                    d.temporal ? d.terms.retemporalizeZero : d.terms.retemporalizeDTERNAL //select between eternal and parallel depending on the premises's temporality
+//            );
+//            if (Cv == null)
+//                return true;
 
-            c2 = Cv;
+            c2 = cu;
         }
 
         byte punc = d.concPunc;

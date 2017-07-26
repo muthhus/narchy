@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.list.FasterList;
+import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Op;
 import nars.Task;
@@ -8,15 +9,13 @@ import nars.control.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static nars.Op.CONJ;
@@ -36,6 +35,16 @@ public class Temporalize {
      * constraint graph (lazily constructed)
      */
     final Map<Term, FasterList<Event>> constraints = new HashMap();
+    final Random random;
+
+    /** for testing */
+    protected Temporalize() {
+        this(new XorShift128PlusRandom(1));
+    }
+
+    public Temporalize(Random random) {
+        this.random = random;
+    }
 
     abstract static class Event implements Comparable<Event> {
 
@@ -113,8 +122,14 @@ public class Temporalize {
             if (ra.rel.equals(rb.rel)) {
                 //easy case
                 return rb.end - ra.start;
-            } else {
-                //needs solved in the constraint graph
+            }
+            if (ra.rel.equals(rb.term) && rb.rel.equals(ra.term)) {
+                //circular dependency: choose either, or average if they are opposite polarity
+                int forward = -ra.start;
+                int reverse = rb.start;
+                if (Math.signum(forward) == Math.signum(reverse)) {
+                    return (forward + reverse)/2;
+                }
             }
         }
 
@@ -131,7 +146,7 @@ public class Temporalize {
         } else if (a.base != ETERNAL && b.base != ETERNAL) {
             return (int) (b.abs() - a.abs()); //TODO check for numeric precision loss
         } else {
-            throw new UnsupportedOperationException(a.toString() + " .. " + b.toString()); //maybe just return DTERNAL
+            throw new UnsupportedOperationException(a + " .. " + b); //maybe just return DTERNAL
         }
     }
 
@@ -400,7 +415,9 @@ public class Temporalize {
 
 
     @Nullable
-    public static Event solve(@NotNull Derivation d, Term pattern, HashMap<Term, Time> times) {
+    public static Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
+
+
 
         /*
         unknowns to solve otherwise the result is impossible:
@@ -421,14 +438,26 @@ public class Temporalize {
         Task belief = d.belief;
 
 
-        Temporalize model = new Temporalize();
+        Temporalize model = new Temporalize(d.random);
 
         model.know(task, d);
         if (belief != null)
             model.know(belief, d);
 
-
-        return model.solve(pattern, times);
+        HashMap<Term, Temporalize.Time> times = new HashMap();
+        Event e = model.solve(pattern, times);
+        if (e!=null) {
+            if (e instanceof AbsoluteEvent) {
+                AbsoluteEvent a = (AbsoluteEvent)e; //faster, preferred since pre-calculated
+                occ[0] = a.start;
+                occ[1] = a.end;
+            } else {
+                occ[0] = e.start(times).abs();
+                occ[1] = e.end(times).abs();
+            }
+            return e.term;
+        }
+        return null;
     }
 
     public void know(Task task, Derivation d) {
@@ -594,7 +623,7 @@ public class Temporalize {
             target = target.unneg();
 
 
-        Event known = solveGraph(target, times);
+        Event known = solveEvent(target, times);
         if (known != null)
             return known.neg(isNeg);
 
@@ -610,22 +639,29 @@ public class Temporalize {
 
                     if (tt.size() == 2) {
 
-                        Term a = tt.sub(0);
-                        //Time at = solveTime(a, times);
-                        Event ea = solve(a, times);
-                        if (ea == null)
-                            return null;
-                        a = ea.term;
+                        Event ea, eb;
+                        if (random.nextBoolean()) {
+                            //forward order: sub 0 first
+                            ea = solveSub(times, tt, 0);
+                            if (ea == null) return null;
+                            eb = solveSub(times, tt, 1);
+                            if (eb == null) return null;
+                        } else {
+                            //reverse order: sub 1 first
+                            eb = solveSub(times, tt, 1);
+                            if (eb == null) return null;
+                            ea = solveSub(times, tt, 0);
+                            if (ea == null) return null;
+                        }
+
+                        Term a = ea.term;
                         Time at = ea.start(times);
 
                         if (at != null) {
 
-                            Term b = tt.sub(1);
                             //Time bt = solveTime(b, times);
-                            Event eb = solve(b, times);
-                            if (eb == null)
-                                return null;
-                            b = eb.term;
+
+                            Term b = eb.term;
                             Time bt = eb.start(times);
 
                             if (bt != null) {
@@ -643,7 +679,7 @@ public class Temporalize {
                                         } else if (ata == ETERNAL ^ bta == ETERNAL) {
                                             return null; //one is eternal the other isn't
                                         }
-                                        Term cj = $.negIf(o.merge(a, ata, b, bta) , isNeg);
+                                        Term cj = $.negIf(Op.merge(a, ata, b, bta) , isNeg);
                                         ///*Event e = */solveGraph(cj, times);
                                         long start = Math.min(at.abs() , bt.abs());
                                         Event e = new SolutionEvent(
@@ -657,7 +693,7 @@ public class Temporalize {
                                         if (sd != XTERNAL) {
                                             long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
                                             Event e = new SolutionEvent(
-                                                    o.the(sd, new Term[]{a, b}),
+                                                    o.the(sd, a, b),
                                                     start
                                             ).neg(isNeg);
                                             //know(null, e.term, start, start + e.term.dtRange());
@@ -681,6 +717,15 @@ public class Temporalize {
         return null;
     }
 
+    private Event solveSub(HashMap<Term, Time> times, TermContainer tt, int subterm) {
+        Term a = tt.sub(subterm);
+        //Time at = solveTime(a, times);
+        Event e = solve(a, times);
+        if (e == null)
+            return null;
+        return e;
+    }
+
     @Nullable
     private Time solveTime(Term target, HashMap<Term, Time> trail) {
 
@@ -699,59 +744,45 @@ public class Temporalize {
 
         trail.put(target, null); //placeholder to prevent infinite loop
 
-        List<Event> ea = constraints.get(target);
-        if (ea != null) {
-
-//            /** the most specific time that can be calculated */
-//            Time best = null;
-
-            for (Event x : ea) {
-                x.apply(trail);
-
-//                if (best == null) {
-//                    best = xs;
-//                } else {
-//                    //compare
-//                    if (xs.base != ETERNAL && best.base == ETERNAL) {
-//                        best = xs; //replace eternal with non-eternal time
-//                    } else if (xs.base != ETERNAL && (xs.offset != XTERNAL && xs.offset != DTERNAL) && (best.offset == XTERNAL || best.offset == DTERNAL)) {
-//                        best = xs;
-//                    }
-//                    //TODO other comparisons
-//                }
-            }
-
-
-
-//            return best;
+        Event e = solveEvent(target, trail);
+        Time t = e.start(trail);
+        if (t!=null) {
+            trail.put(target, t);
+        } else {
+            trail.remove(target); //remove the null plaeholder
         }
 
-        Time result = trail.get(target);
-        if (result == null)
-            trail.remove(target); //remove the null plaeholder
-        return result;
+        return t;
     }
 
 
-    private Event solveGraph(Term target, HashMap<Term, Time> trail) {
-        //compute indirect solution from constraint graph
-        //trail.add(target);
+    private Event solveEvent(Term target, HashMap<Term, Time> trail) {
 
         List<Event> ea = constraints.get(target);
-        if (ea != null) {
+        if (ea == null)
+            return null; //no idea how to solve that term
 
-            for (Event x : ea) {
-                Time xs = x.start(trail);
-                if (xs!=null)
-                    return x;
+
+        //Set<Event> events = new UnifiedSet<>(0);
+
+        for (int i = 0, eaSize = ea.size(); i < eaSize; i++) {
+            Event x = ea.get(i);
+            Time xs = x.start(trail);
+            if (xs != null) {
+                //events.add(x);
+                return x;
+            }
 //                if (xs != Unknown) {
-                    //System.out.println(target + " @ " + xs + " " + trail);
+            //System.out.println(target + " @ " + xs + " " + trail);
 //                    return x;
 //                }
-            }
-
-
         }
+//        int as = events.size();
+//        if (as > 0) {
+//            //choose randomly
+//            Event[] aa = events.toArray(new Event[as]);
+//            return aa[random.nextInt(as)];
+//        }
 
         return null;
     }

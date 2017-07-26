@@ -14,6 +14,7 @@ import nars.term.container.TermVector;
 import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
+import org.eclipse.collections.api.map.primitive.ObjectByteMap;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBytePair;
@@ -195,7 +196,7 @@ public enum Op implements $ {
                     int j = 0;
                     for (int i = 0; j < y.length; i++) {
                         Term uu = tt[i];
-                        if (!(uu == True)) // && (!uu.equals(False)))
+                        if (uu != True) // && (!uu.equals(False)))
                             y[j++] = uu;
                     }
 
@@ -318,7 +319,6 @@ public enum Op implements $ {
         }
 
 
-
 //        /**
 //         * array implementation of the conjunction true/false filter
 //         */
@@ -363,7 +363,7 @@ public enum Op implements $ {
          * measurements.
          *
          */
-        private @NotNull TreeSet<Term> junctionGroupNonDTSubterms(@NotNull ObjectByteHashMap<Term> s) {
+        private @NotNull SortedSet<Term> junctionGroupNonDTSubterms(@NotNull ObjectByteMap<Term> s) {
 
             TreeSet<Term> outer = new TreeSet<>();
 
@@ -596,7 +596,7 @@ public enum Op implements $ {
     /**
      * specifier for any NAL level
      */
-    public static final int ANY_LEVEL = 0;
+    private static final int ANY_LEVEL = 0;
     public static final int SetBits = or(Op.SETe, Op.SETi);
     public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
     public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
@@ -696,7 +696,7 @@ public enum Op implements $ {
      * creates new instance
      */
     @NotNull
-    public static Term compound(Op o, Term... subterms) {
+    private static Term compound(Op o, Term... subterms) {
 
         assert (!o.atomic);
 
@@ -898,80 +898,78 @@ public enum Op implements $ {
         return (dt == DTERNAL) || (dt == 0);
     }
 
-            @Nullable
-        static public Term merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
+    @Nullable
+    static public Term merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
 
-            List<ObjectLongPair<Term>> events = $.newArrayList();
+        List<ObjectLongPair<Term>> events = $.newArrayList();
 
-            a.events(events, aStart);
-            b.events(events, bStart);
+        a.events(events, aStart);
+        b.events(events, bStart);
 
-            events.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
+        events.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
 
-            int ee = events.size();
-            assert (ee > 1);
+        int ee = events.size();
+        assert (ee > 1);
 
-            //group all parallel clusters
-            {
-                //Term head = events.get(0).getOne();
-                long headAt = events.get(0).getTwo();
-                int groupStart = -1;
-                for (int i = 1; i <= ee; i++) {
-                    long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
-                    if (nextAt == headAt) {
-                        if (groupStart == -1) groupStart = i - 1;
-                    } else {
-                        if (groupStart != -1) {
-                            int groupEnd = i;
-                            Term[] p = new Term[groupEnd - groupStart];
-                            assert (p.length > 1);
-                            long when = events.get(groupStart).getTwo();
-                            for (int k = 0, j = groupStart; j < groupEnd; j++) {
-                                p[k++] = events.get(groupStart).getOne();
-                                events.remove(groupStart);
-                                i--;
-                                ee--;
-                            }
-                            Term replacement = $.parallel(p);
-                            if (replacement == null)
-                                return null; //failure
-                            if (events.isEmpty()) {
-                                //got them all here
-                                return replacement;
-                            }
-                            events.add(i, PrimitiveTuples.pair(replacement, when));
-                            i++;
-                            ee++;
-                            groupStart = -1; //reset
+        //group all parallel clusters
+        {
+            //Term head = events.get(0).getOne();
+            long headAt = events.get(0).getTwo();
+            int groupStart = -1;
+            for (int i = 1; i <= ee; i++) {
+                long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
+                if (nextAt == headAt) {
+                    if (groupStart == -1) groupStart = i - 1;
+                } else {
+                    if (groupStart != -1) {
+                        int groupEnd = i;
+                        Term[] p = new Term[groupEnd - groupStart];
+                        assert (p.length > 1);
+                        long when = events.get(groupStart).getTwo();
+                        for (int k = 0, j = groupStart; j < groupEnd; j++) {
+                            p[k++] = events.get(groupStart).getOne();
+                            events.remove(groupStart);
+                            i--;
+                            ee--;
                         }
+                        Term replacement = $.parallel(p);
+                        if (replacement == null)
+                            return null; //failure
+                        if (events.isEmpty()) {
+                            //got them all here
+                            return replacement;
+                        }
+                        events.add(i, PrimitiveTuples.pair(replacement, when));
+                        i++;
+                        ee++;
+                        groupStart = -1; //reset
                     }
-                    headAt = nextAt;
                 }
+                headAt = nextAt;
             }
-
-            {
-                if (ee == 1) {
-                    return events.get(0).getOne();
-                } else if (ee == 0) {
-                    return null;
-                }
-
-                Term head = events.get(0).getOne();
-                long headAt = events.get(0).getTwo();
-                for (int i = 1; i < ee; i++) {
-
-                    Term next = events.get(i).getOne();
-                    long nextAt = events.get(i).getTwo();
-
-                    int dt = (int) (nextAt - headAt);
-                    head = CONJ.the(dt, head, next);
-
-                    headAt = nextAt;
-                }
-                return head;
-            }
-
         }
+
+        if (ee == 1) {
+            return events.get(0).getOne();
+        } else if (ee == 0) {
+            return null;
+        }
+
+        Term head = events.get(0).getOne();
+        long headAt = events.get(0).getTwo();
+        for (int i = 1; i < ee; i++) {
+
+            Term next = events.get(i).getOne();
+            long nextAt = events.get(i).getTwo();
+
+            int dt = (int) (nextAt - headAt);
+            head = CONJ.the(dt, head, next);
+
+            headAt = nextAt;
+        }
+        return head;
+
+    }
 
 
     @NotNull
@@ -1063,7 +1061,7 @@ public enum Op implements $ {
 
 
     @NotNull
-    public static Term compound(Op op, int dt, Term... subterms) {
+    private static Term compound(Op op, int dt, Term... subterms) {
 
         //if (!subterms.internable())
         Term c = compound(op, subterms);
@@ -1395,7 +1393,7 @@ public enum Op implements $ {
             } else if (t.length - trues == 1) {
                 //find the element which is not true and return it
                 for (Term x : t) {
-                    if (!(x == True))
+                    if (x != True)
                         return x;
                 }
             } else {
@@ -1403,7 +1401,7 @@ public enum Op implements $ {
                 Term[] t2 = new Term[t.length - trues];
                 int yy = 0;
                 for (Term x : t) {
-                    if (!(x == True))
+                    if (x != True)
                         t2[yy++] = x;
                 }
                 t = t2;

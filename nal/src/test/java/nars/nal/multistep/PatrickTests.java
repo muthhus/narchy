@@ -124,11 +124,11 @@ public class PatrickTests extends AbstractNALTest {
         //tt.log();
         tt.input(
                 "made_of(toothbrush,plastic).",
-                "( ( made_of($1, plastic) &&+0 lighter(I, $1) ) ==>+10 <$1 --> [heated]>).",
+                "( ( made_of($1, plastic) &| lighter(I, $1) ) ==>+10 <$1 --> [heated]>).",
                 "(<$1 --> [heated]> ==>+10 <$1 --> [melted]>).",
-                "(<$1 --> [melted]> <=>+0 <$1 --> [pliable]>).",
-                "(( <$1 --> [pliable]> &&+0 reshape(I,$1)) ==>+10 <$1 --> [hardened]>).",
-                "(<$1 --> [hardened]> ==>+0 <$1 --> [unscrews]>).",
+                "(<$1 --> [melted]> <|> <$1 --> [pliable]>).",
+                "(( <$1 --> [pliable]> &| reshape(I,$1)) ==>+10 <$1 --> [hardened]>).",
+                "(<$1 --> [hardened]> =|> <$1 --> [unscrews]>).",
 
 //                "<toothbrush --> [unscrews]>! :|:", //make something that is here a screwdriver
 //                "<toothbrush --> [unscrews]>! :|:", //make something that is here a screwdriver

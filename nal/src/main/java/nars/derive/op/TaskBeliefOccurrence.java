@@ -7,9 +7,6 @@ import nars.derive.PrediTerm;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-
 /**
  * fast task/belief occurrence tests
  */

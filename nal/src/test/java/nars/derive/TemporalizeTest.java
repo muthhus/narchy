@@ -6,6 +6,7 @@ import nars.Narsese;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.TreeSet;
 
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
@@ -188,6 +189,39 @@ public class TemporalizeTest {
 
         assertNotNull(s);
         assertEquals("((x &&+2 y) &&+3 z)@ETE", s.toString());
+    }
+
+    @Test public void testImplToEquiCircularity() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("(x ==>+5 y)"), ETERNAL);
+        t.knowTerm($.$("(y ==>-5 x)"), ETERNAL);
+        assertEquals("(x <=>+5 y)@ETE", t.solve($.$("(x <=>+- y)")).toString());
+
+        //    @Test public void testImplToEquiCircularityAvg() throws Narsese.NarseseException {
+        //        Temporalize t = new Temporalize();
+        //        t.knowTerm($.$("(x ==>+6 y)"), ETERNAL);
+        //        t.knowTerm($.$("(y ==>-4 x)"), ETERNAL);
+        //        assertEquals("(x <=>+5 y)@ETE", t.solve($.$("(x <=>+- y)")).toString());
+        //    }
+
+    }
+    @Test public void testPreconImplConjPreConflict() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+
+        TreeSet<String> solutions = new TreeSet();
+
+        //multiple solutions since x is specified to occurr at 0, yet y also is so x also occurs at -1
+        t.knowTerm($.$("(y ==>+1 z)"), 0);
+        t.knowTerm($.$("(x ==>+2 z)"), 0);
+
+        for (int i = 0; i < 10; i++) {
+            Temporalize.Event s = t.solve($.$("((x &&+- y) ==>+- z)"));
+            assertNotNull(s);
+            solutions.add(s.toString());
+        }
+
+        //assertEquals(2, solutions.size());
+        assertEquals("[((x &&+1 y) ==>+1 z)@-1, ((x&|y) ==>+1 z)@0]", solutions.toString());
     }
 
 //    @Test

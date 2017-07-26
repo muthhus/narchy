@@ -35,7 +35,6 @@ import static nars.Op.CONJ;
 import static nars.Op.PROD;
 import static nars.term.Terms.concat;
 import static nars.term.Terms.maxLevel;
-import static nars.time.Tense.XTERNAL;
 
 /**
  * A rule which matches a Premise and produces a Task
