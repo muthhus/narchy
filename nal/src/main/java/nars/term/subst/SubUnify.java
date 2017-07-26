@@ -13,7 +13,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class SubUnify extends Unify {
 
-    private final Unify parent;
+    @NotNull private final Unify parent;
     private @Nullable Term transformed;
 
     @Nullable
@@ -78,7 +78,7 @@ public class SubUnify extends Unify {
 
                 //copy mappings to parent if succeeded
                 //this is needed to resolve task/belief to any transformations appearing in the conclusion
-                xy.forEach(parent::putXY);
+                xy.forEachVersioned(parent::putXY);
 
                 stop(); //done
             }

@@ -27,10 +27,9 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     }
 
     /**
-     *
      * @param context
-     * @param mapCap initial capacity of map (but can grow
-     * @param eleCap initial capacity of map elements (but can grow
+     * @param mapCap  initial capacity of map (but can grow
+     * @param eleCap  initial capacity of map elements (but can grow
      */
     public VersionMap(Versioning context, int mapCap, int eleCap) {
         this(context,
@@ -46,8 +45,6 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
         this.map = map;
         this.elementStackSizeDefault = elementStackSizeDefault;
     }
-
-
 
 
     @Nullable
@@ -81,7 +78,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
 
     @Override
     public boolean isEmpty() {
-        return size()==0;
+        return size() == 0;
         //throw new UnsupportedOperationException();
     }
 
@@ -93,10 +90,13 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     @Override
     public Set<Entry<X, Y>> entrySet() {
         ArrayUnenforcedSet<Entry<X, Y>> e = new ArrayUnenforcedSet<>();
-        map.forEach((k, v) -> e.add(
-            //TODO new LazyMapEntry(k, v)
-            new SimpleEntry<>(k, v.get()))
-        );
+        map.forEach((k, v) -> {
+            Y vv = v.get();
+            if (vv != null) {
+                //TODO new LazyMapEntry(k, v)
+                e.add(new SimpleEntry<>(k, vv));
+            }
+        });
         return e;
     }
 
@@ -127,7 +127,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
         throw new UnsupportedOperationException("use tryPut(k,v)");
     }
 
-     public boolean tryPut(X key, Y value) {
+    public boolean tryPut(X key, Y value) {
         return getOrCreateIfAbsent(key).set(value) != null;
     }
 
@@ -147,8 +147,7 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
         for (Entry<X, Versioned<Y>> e : ee) {
             Y y = e.getValue().get();
             if (y != null) {
-                X x = e.getKey();
-                if (!each.test(x, y)) {
+                if (!each.test(e.getKey(), y)) {
                     return false;
                 }
             }

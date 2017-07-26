@@ -1173,15 +1173,12 @@ public enum Op implements $ {
 //            return null;
 //        }
                 if (subject.hasAny(InvalidEquivalenceTerm))
-                    throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
-                //return !t.opUnneg().in(InvalidEquivalenceTerm);
-                //        if ( instanceof Implication) || (subject instanceof Equivalence)
-//                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
-//                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
-//            return null;
-//        }
+                    //throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
+                    return Null;
+
                 if (predicate.hasAny(InvalidEquivalenceTerm))
-                    throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
+                    //throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
+                    return Null;
 
 //                boolean subjNeg = subject.op() == NEG;
 //                boolean predNeg = predicate.op() == NEG;
