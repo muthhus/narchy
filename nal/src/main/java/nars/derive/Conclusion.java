@@ -126,7 +126,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             if (t==null)
                 return true; //invalid or impossible temporalization
 
-            occ = new long[] { t.startAbs(), t.endAbs() };
+            occ = new long[] { t.start(null).abs(), t.end(null).abs() };
 
             @Nullable Term t1 = t.term;
 

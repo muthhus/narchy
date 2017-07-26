@@ -1,7 +1,6 @@
 package nars.derive;
 
-import com.google.common.graph.MutableValueGraph;
-import com.google.common.graph.ValueGraphBuilder;
+import jcog.list.FasterList;
 import nars.$;
 import nars.Op;
 import nars.Task;
@@ -12,12 +11,12 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
+import static nars.derive.Temporalize.Time.Unknown;
 import static nars.time.Tense.*;
 
 /**
@@ -28,16 +27,17 @@ import static nars.time.Tense.*;
 public class Temporalize {
 
 
-    abstract static class Event {
+    abstract static class Event implements Comparable<Event> {
+
         public final Term term;
 
         Event(Term term) {
             this.term = term;
         }
 
-        abstract public long startAbs();
+        abstract public Time start(HashMap<Term,Time> trail);
 
-        abstract public long endAbs();
+        abstract public Time end(HashMap<Term,Time> trail);
 
         @Override
         public boolean equals(Object o) {
@@ -63,12 +63,36 @@ public class Temporalize {
             return isNeg ? neg() : this;
         }
 
-        abstract boolean isBound();
+        @Override
+        public int compareTo(@NotNull Temporalize.Event o) {
+            if (this == o) return 0;
+            else {
+                if (getClass() == o.getClass()) {
+                    //same class, rank by term volume
+                    if (this instanceof RelativeEvent) {
+                        Term x = ((RelativeEvent)this).rel.term();
+                        Term y = ((RelativeEvent)o).rel.term();
+                        int vc = Integer.compare(x.volume(), y.volume());
+                        if (vc == 0) {
+                            return x.compareTo(y);
+                        } else {
+                            return vc;
+                        }
+                    }
+                }
+
+                if (this instanceof AbsoluteEvent)
+                    return -1;
+                else
+                    return +1;
+
+            }
+        }
     }
 
     static int dt(Event a, Event b) {
         if (a instanceof AbsoluteEvent && b instanceof AbsoluteEvent) {
-            return dt(a.startAbs(), b.endAbs());
+            return dt(a.start(null), b.end(null));
         } else if (a instanceof RelativeEvent && b instanceof RelativeEvent) {
             RelativeEvent ra = (RelativeEvent) a;
             RelativeEvent rb = (RelativeEvent) b;
@@ -83,11 +107,14 @@ public class Temporalize {
         return XTERNAL;
     }
 
-    static int dt(long a, long b) {
-        if (a == ETERNAL && b == ETERNAL) {
-            return DTERNAL;
-        } else if (a != ETERNAL && b != ETERNAL) {
-            return (int) (b - a); //TODO check for numeric precision loss
+    static int dt(Time a, Time b) {
+
+        assert(a.base!=XTERNAL); assert(b.base!=XTERNAL);
+
+        if (a.base == ETERNAL && b.base == ETERNAL) {
+            return b.offset - a.offset; //relative offsets within an eternal context
+        } else if (a.base != ETERNAL && b.base != ETERNAL) {
+            return (int) (b.abs() - a.abs()); //TODO check for numeric precision loss
         } else {
             throw new UnsupportedOperationException("?"); //maybe just return DTERNAL
         }
@@ -118,13 +145,13 @@ public class Temporalize {
         }
 
         @Override
-        public long startAbs() {
-            return start;
+        public Time start(HashMap<Term,Time> ignored) {
+            return Time.the(start, XTERNAL);
         }
 
         @Override
-        public long endAbs() {
-            return end;
+        public Time end(HashMap<Term,Time> ignored) {
+            return Time.the(end, XTERNAL);
         }
 
         @Override
@@ -138,13 +165,9 @@ public class Temporalize {
                 return term + "@ETE";
         }
 
-        @Override
-        public boolean isBound() {
-            return true;
-        }
     }
 
-    public static class SolutionEvent extends AbsoluteEvent {
+    public class SolutionEvent extends AbsoluteEvent {
 
         SolutionEvent(Term term, long start) {
             super(term, start, start + term.dtRange());
@@ -155,14 +178,86 @@ public class Temporalize {
         }
     }
 
+    /** used for preserving an offset within an eternal context */
+    static class Time {
 
-    static class RelativeEvent extends Event {
-        private final Event rel;
+        public static Time Unknown = new Time(ETERNAL, XTERNAL);
+        public final long base;
+        public final int offset;
+
+        @Override
+        public String toString() {
+            return str(base) + "|" + str(offset);
+        }
+
+        static String str(int offset) {
+            if (offset == XTERNAL)
+                return "+-";
+            else
+                return Integer.toString(offset);
+        }
+        static String str(long base) {
+            if (base == ETERNAL)
+                return "ETE";
+            else
+                return Long.toString(base);
+        }
+
+        static Time the(long when) {
+            return the(when, 0);
+        }
+
+        static Time the(long base, int offset) {
+            if (base == ETERNAL && offset == XTERNAL)
+                return Unknown;
+            else {
+
+                if (base != ETERNAL && offset!=DTERNAL && offset!=XTERNAL)
+                    return new Time(base + offset, 0); //direct absolute
+                else
+                    return new Time(base, offset);
+            }
+        }
+
+        private Time(long base, int offset) {
+            this.base = base;
+            this.offset = offset;
+        }
+
+        public Time add(int offset) {
+
+            assert(this.offset!=DTERNAL && offset!=DTERNAL);
+
+            if (this.offset == XTERNAL)
+                return Time.the(base, offset); //set initial dt
+            else
+                return Time.the(base, this.offset + offset);
+        }
+
+        public long abs() {
+//            if (base == ETERNAL) {
+//                return ETERNAL;
+//            }
+//
+//            assert(offset!=XTERNAL);
+//            assert(offset!=DTERNAL);
+//            return base + offset;
+            return base;
+        }
+    }
+
+    class RelativeEvent extends Event {
+        private final Term rel;
         private final int start, end;
 
-        public RelativeEvent(Term term, Event relativeToItsStart, int start, int end) {
+        public RelativeEvent(Term term, Term relativeTo, int start) {
+            this(term, relativeTo, start, start + term.dtRange());
+        }
+
+        public RelativeEvent(Term term, Term relativeTo, int start, int end) {
             super(term);
-            this.rel = relativeToItsStart;
+            assert (!term.equals(relativeTo));
+            this.rel = relativeTo;
             this.start = start;
             this.end = end;
         }
@@ -173,29 +268,23 @@ public class Temporalize {
         }
 
         @Override
-        boolean isBound() {
-            return startAbs() != XTERNAL;
+        public Time start(HashMap<Term,Time> trail) {
+            return resolve(this.start, trail);
         }
 
         @Override
-        public long startAbs() {
-            return resolve(this.start);
+        public Time end(HashMap<Term,Time> trail) {
+            return resolve(this.end, trail);
         }
 
-        @Override
-        public long endAbs() {
-            return resolve(this.end);
-        }
+        protected Time resolve(int offset, HashMap<Term,Time> trail) {
 
-        protected long resolve(int offset) {
-            long rs = rel.startAbs();
-            if (rs == XTERNAL) return XTERNAL;
-            if (rs == ETERNAL) {
-                int dt = rel.term.dt();
-                //its ok only if the rel is an eternal too
-                return dt == DTERNAL ? ETERNAL : XTERNAL;
+            Time rt = solveTime(rel, trail);
+            if (rt!=null) {
+                return rt.add(offset);
+            } else {
+                return null;
             }
-            return rs + offset;
         }
 
         @Override
@@ -209,52 +298,74 @@ public class Temporalize {
 
     }
 
-    final Map<Term, Event> events = new HashMap();
-
     /**
      * constraint graph (lazily constructed)
      */
-    @Nullable MutableValueGraph<Event, Integer> graph;
+    final Map<Term, FasterList<Event>> constraints = new HashMap();
 
-    public MutableValueGraph<Event, Integer> graph() {
-        if (graph != null)
-            return graph;
+    protected void print() {
 
-        MutableValueGraph<Event, Integer> g = ValueGraphBuilder
-                //.undirected()
-                .directed()
-                .allowsSelfLoops(false)
-                .expectedNodeCount(events.size())
-                .build();
-
-        events.forEach((k, v) -> {
-            g.addNode(v);
-            Term vt = v.term;
-            if (vt.op().temporal) {
-                int d = vt.dt();
-                if (d != XTERNAL) {
-                    int s = vt.size();
-                    if (s == 2) {
-                        Term a = vt.sub(0);
-                        Event ae = events.get(a);
-                        Term b = vt.sub(1);
-                        Event be = events.get(b);
-                        if (ae != null && be != null && null == g.edgeValueOrDefault(ae, be, null)) {
-                            int at = vt.subtermTime(a);
-                            int bt = vt.subtermTime(b);
-                            g.putEdgeValue(ae, be, bt - at);
-                            //graph.putEdgeValue(be, ae, at - bt); //
-                        }
-
-                    } else if (s > 2) {
-                        //connect all the edges
-                    }
-                }
-            }
+        constraints.forEach((k, v) -> {
+            for (Event vv : v)
+                System.out.println(k + " " + vv);
         });
 
-        return graph = g;
+        System.out.println();
     }
+
+//    void add(Event v, MutableValueGraph<Event, Integer> g) {
+//
+////        if (g instanceof RelativeEvent) {
+////            add((((RelativeEvent) v).rel), g); //add relation first
+////        }
+//
+//        if (!g.addNode(v))
+//            return; //already added
+//
+//        Term vt = v.term;
+//        if (vt.op().temporal) {
+//            int d = vt.dt();
+//            if (d != XTERNAL) {
+//                int s = vt.size();
+//                if (s == 2) {
+//                    Term a = vt.sub(0);
+//                    Term b = vt.sub(1);
+//                    if (!a.equals(b)) {
+//                        Event ae = events.get(a);
+//                        if (ae != null) {
+//                            Event be = events.get(b);
+//                            if (be != null) {
+//                                int at = vt.subtermTime(a);
+//                                int bt = vt.subtermTime(b);
+//
+//                                Event from, to;
+//                                if (ae.term.compareTo(be.term) < 0) {
+//                                    from = ae; to = be;
+//                                } else {
+//                                    from = be; to = ae;
+//                                }
+//
+//                                if (null == g.edgeValueOrDefault(from, to, null)) {
+//                                    int delta;
+//                                    if (from == ae) {
+//                                        delta = bt - at;
+//                                    } else {
+//                                        delta = at - bt;
+//                                    }
+//                                    g.putEdgeValue(from, to, delta);
+//                                }
+//                            }
+//                        }
+//                    }
+//
+//                } else if (s > 2) {
+//                    //connect all the edges
+//                }
+//            }
+//        }
+//
+//
+//    }
 
 
     @Nullable
@@ -286,7 +397,7 @@ public class Temporalize {
             model.know(belief, d);
 
 
-        return model.unknown(pattern);
+        return model.solve(pattern);
     }
 
     public void know(Task task, Derivation d) {
@@ -299,10 +410,6 @@ public class Temporalize {
         if (!t2.equals(taskTerm)) {
             know(root, t2, 0, t2.dtRange());
         }
-    }
-
-    Temporalize knowTerm(Term term) {
-        return knowTerm(term, 0);
     }
 
     /**
@@ -319,16 +426,16 @@ public class Temporalize {
      *
      * @param occ superterm occurrence, may be ETERNAL
      */
-    Event know(@Nullable Event root, Term term, int start, int end) {
+    void know(@Nullable Event parent, Term term, int start, int end) {
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
-        if (root.term != term) {
-            Event exist = events.get(term);
+        if (parent.term != term) {
+            List<Event> exist = constraints.get(term);
             if (exist != null)
-                return exist;
+                return;
         }
 
-        Event event = add(root, term, start, end);
+        Event event = add(parent, term, start, end);
 
         if (term instanceof Compound) {
             Compound c = (Compound) term;
@@ -356,6 +463,7 @@ public class Temporalize {
                     int l = tt.size();
 
                     //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
+                    int lastSubStart = DTERNAL;
                     for (int i = 0; (i < l); i++) {
 
                         Term st = tt.sub(i);
@@ -364,13 +472,19 @@ public class Temporalize {
                         int subStart = t;
                         int subEnd = t + sdt;
                         //System.out.println("\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
-                        know(root, st, subStart, subEnd);
+                        know(parent, st, subStart, subEnd);
 
                         t = subEnd; //the duration of the event
 
                         if (i < l - 1)
                             t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
 
+                        if (i > 0) {
+                            //crosslink adjacent subterms
+                            add(tt.sub(i-1), new RelativeEvent(tt.sub(i-1), tt.sub(i), lastSubStart - subStart));
+                            add(tt.sub(i), new RelativeEvent(tt.sub(i), tt.sub(i-1), subStart - lastSubStart));
+                        }
+                        lastSubStart = subStart;
                     }
 
 
@@ -399,32 +513,47 @@ public class Temporalize {
             }
         }
 
-        return event;
     }
 
-    Event add(@Nullable Temporalize.@Nullable Event root, Term term, int start, int end) {
+    Event add(@Nullable Temporalize.Event root, Term term, int start, int end) {
         Event event;
-        long occ = root.startAbs();
-        events.put(term, event =
-                (occ != ETERNAL ?
-                        new AbsoluteEvent(term, occ + start, occ + end) :
-                        new RelativeEvent(term, root, start, end)
-                )
-        );
+        if (term.equals(root.term)) {
+            event = root;
+        } else {
+            Time occ = root.start(null);
+            assert(occ.base!=XTERNAL);
+            event = (occ.base != ETERNAL ?
+                new AbsoluteEvent(term, occ.abs() + start, occ.abs() + end) :
+                new RelativeEvent(term, root.term, start, end)
+            );
+        }
+        add(term, event);
         return event;
     }
 
 
-    /**
-     * using the lb and ub we can now create unknown variables to solve for
-     */
-    Event unknown(Term target) {
+
+    void add(Term term, Event event) {
+        FasterList<Event> l = constraints.computeIfAbsent(term, (t) -> new FasterList<>());
+        if (l.isEmpty()) {
+            l.add(event);
+        } else {
+            l.add(0, event);
+            l.sortThis();
+        }
+    }
+
+
+    /** Use with caution, for testing only */
+    Event solve(Term target) {
         boolean isNeg = target.op() == NEG;
         if (isNeg)
             target = target.unneg();
 
-        Event known = this.events.get(target);
-        if (known != null && known.isBound())
+        HashMap<Term,Time> times = new HashMap();
+
+        Event known = solveGraph(target, times);
+        if (known != null)
             return known.neg(isNeg);
 
         if (target instanceof Compound) {
@@ -440,104 +569,84 @@ public class Temporalize {
                     assert (tt.size() == 2);
 
                     Term a = tt.sub(0);
-                    Event ae = unknown(a);
+                    Time at = solveTime(a, times);
 
-                    Term b = tt.sub(1);
-                    Event be = unknown(b);
+                    if (at!=null) {
 
-                    if (ae != null && be != null) {
-                        int sd = dt(ae, be);
-                        if (sd != XTERNAL) {
-                            //direct solution found
-                            return new SolutionEvent(
-                                    o.the(sd, new Term[]{a, b}),
-                                    //ae.startAbs()
-                                    o == CONJ ? Math.min(ae.startAbs(), be.startAbs()) : ae.startAbs()
-                            ).neg(isNeg);
+                        Term b = tt.sub(1);
+                        Time bt = solveTime(b, times);
+
+                        if (bt != null) {
+
+                            int sd = dt(at, bt);
+                            if (sd != XTERNAL) {
+                                //direct solution found
+                                return new SolutionEvent(
+                                        o.the(sd, new Term[]{a, b}),
+                                        o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs()
+                                ).neg(isNeg);
+                            }
                         }
                     }
                 }
             }
         }
 
-        //compute indirect solution from constraint graph
-        MutableValueGraph<Event, Integer> g = graph();
+        return null;
+    }
 
-        SolutionEvent e = new SolutionEvent(target);
-        Set<Event> ea = g.adjacentNodes(e);
-        for (Event x : ea) {
-            if (!x.isBound())
-                continue;
+    @Nullable private Time solveTime(Term target, HashMap<Term,Time> trail) {
 
-            SolutionEvent se = null;
+        Time existing = trail.get(target);
+        if (existing!=null)
+            return existing;
 
-            //HACK if graph is directed, try both directions. this may be simplified if undirected and the terms are lexically ordered
-            if (se==null) {
-                Integer eToX = g.edgeValueOrDefault(e, x, null);
-                if (eToX != null) {
-                    se = new SolutionEvent(target, x.startAbs() - eToX);
-                }
+        trail.put(target, Unknown); //placeholder to prevent infinite loop
+
+        List<Event> ea = constraints.get(target);
+        if (ea != null) {
+
+            for (Event x : ea) {
+                Time xs = x.start(trail);
+                if (xs == null)
+                    continue;
+
+                //System.out.println(target + " @ " + xs + " " + trail);
+                trail.put(target, xs);
+                return xs;
             }
-            if (se==null) {
-                Integer xToE = g.edgeValueOrDefault(x, e, null);
-                if (xToE != null) {
-                    se = new SolutionEvent(target, x.startAbs() + xToE);
-                }
-            }
 
-            if (se!=null)
-                return se;
 
         }
 
+        return null;
+    }
+
+
+    private Event solveGraph(Term target, HashMap<Term,Time> trail) {
+        //compute indirect solution from constraint graph
+        //trail.add(target);
+
+        List<Event> ea = constraints.get(target);
+        if (ea != null) {
+
+            for (Event x : ea) {
+                Time xs = x.start(trail);
+                if (xs!= Unknown) {
+                    System.out.println(target + " @ " + xs + " " + trail);
+                    return x;
+                }
+            }
+
+
+        }
 
         return null;
     }
 
     @Override
     public String toString() {
-        return events.values().toString();
-    }
-
-    /**
-     * TODO support differing copies of the same term as subterms uniquely identified by their subpaths from a root
-     */
-    @Nullable
-    public Event solve(@NotNull Term x) {
-
-        return unknown(x);
-
-//
-////        String beforeSolve = toString();
-////        System.out.println(beforeSolve);
-//
-//        Solver solver = getSolver();
-//        boolean solved = solver.solve();
-//        if (!solved)
-//            return null;
-//
-//        String afterSolve = toString();
-//        System.out.println(afterSolve);
-//
-////        unknown.forEach((k, v) -> {
-////            System.out.println(k + " " + Arrays.toString(v));
-////        });
-//
-//        return $.terms.retemporalize(x, new Retemporalize() {
-//            @Override
-//            public int dt(@NotNull Compound x) {
-//
-//                IntVar[] u = events.get(x);
-//                if (u != null) {
-//                    if (u[0].isInstantiated() && u[1].isInstantiated()) {
-//                        int a = u[0].getValue();
-//                        int b = a + u[1].getValue();
-//                        return b - a;
-//                    }
-//                }
-//                return XTERNAL; //unknown
-//            }
-//        });
+        return constraints.values().stream().flatMap(Collection::stream).map(Object::toString).collect(Collectors.joining(","));
     }
 
 
