@@ -22,6 +22,8 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+
 import static nars.Op.NEG;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -122,11 +124,12 @@ public class Conclusion extends AbstractPred<Derivation> {
             //float[] confScale = {1f};
 
 
-            Temporalize.Event t = Temporalize.solve(d, c1);
+            HashMap<Term, Temporalize.Time> times = new HashMap();
+            Temporalize.Event t = Temporalize.solve(d, c1, times);
             if (t==null)
                 return true; //invalid or impossible temporalization
 
-            occ = new long[] { t.start(null).abs(), t.end(null).abs() };
+            occ = new long[] { t.start(times).abs(), t.end(times).abs() };
 
             @Nullable Term t1 = t.term;
 

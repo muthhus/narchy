@@ -25,7 +25,10 @@ import static nars.time.Tense.*;
  * @see http://choco-solver.readthedocs.io/en/latest/1_overview.html#directly
  */
 public class Temporalize {
-
+    /**
+     * constraint graph (lazily constructed)
+     */
+    final Map<Term, FasterList<Event>> constraints = new HashMap();
 
     abstract static class Event implements Comparable<Event> {
 
@@ -298,10 +301,7 @@ public class Temporalize {
 
     }
 
-    /**
-     * constraint graph (lazily constructed)
-     */
-    final Map<Term, FasterList<Event>> constraints = new HashMap();
+
 
     protected void print() {
 
@@ -369,7 +369,7 @@ public class Temporalize {
 
 
     @Nullable
-    public static Event solve(@NotNull Derivation d, Term pattern) {
+    public static Event solve(@NotNull Derivation d, Term pattern, HashMap<Term,Time> times) {
 
         /*
         unknowns to solve otherwise the result is impossible:
@@ -397,7 +397,7 @@ public class Temporalize {
             model.know(belief, d);
 
 
-        return model.solve(pattern);
+        return model.solve(pattern, times);
     }
 
     public void know(Task task, Derivation d) {
@@ -543,14 +543,15 @@ public class Temporalize {
         }
     }
 
-
-    /** Use with caution, for testing only */
     Event solve(Term target) {
+        return solve(target, new HashMap());
+    }
+
+    Event solve(Term target, HashMap<Term, Time> times) {
         boolean isNeg = target.op() == NEG;
         if (isNeg)
             target = target.unneg();
 
-        HashMap<Term,Time> times = new HashMap();
 
         Event known = solveGraph(target, times);
         if (known != null)
@@ -633,7 +634,7 @@ public class Temporalize {
             for (Event x : ea) {
                 Time xs = x.start(trail);
                 if (xs!= Unknown) {
-                    System.out.println(target + " @ " + xs + " " + trail);
+                    //System.out.println(target + " @ " + xs + " " + trail);
                     return x;
                 }
             }
