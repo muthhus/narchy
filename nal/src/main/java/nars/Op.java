@@ -235,13 +235,13 @@ public enum Op implements $ {
                 //      becomes
                 //    ((x &&+ y) &&+ z)
                 //TODO may need to count # of events, not number of conjunctions.
-                boolean imbalanced = false;
                 boolean aConj = a instanceof Compound && a.op() == CONJ;
                 int conjLeft = aConj ? conjSubtermCount(a) : 0;
                 boolean bConj = b instanceof Compound && b.op() == CONJ;
                 int conjRight = bConj ? conjSubtermCount(b) : 0;
-                if (conjLeft > 0 || conjRight > 0) {
+                if (conjLeft > 1 || conjRight > 0) {
                     //rebalance and align
+                    boolean imbalanced = false;
                     if (Math.abs(conjLeft - conjRight) > 1)
                         imbalanced = true; //one side has 2 or more than the other
 

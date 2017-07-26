@@ -18,6 +18,7 @@ import java.util.function.Function;
 import java.util.function.LongSupplier;
 
 import static nars.Op.BELIEF;
+import static nars.time.Tense.ETERNAL;
 
 
 /**
@@ -83,10 +84,17 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
         float next = value.floatValueOf(term);
         Truth truth = (next == next) ? truthFloatFunction.valueOf(this.currentValue = next) : null;
 
-        return set(term,
+        Task current = get();
+        long currentEnd = current!=null ? current.end() : ETERNAL;
+        Task nextTask = set(term,
                 truth,
                 stamp(truth, nar),
                 nar);
+        if (nextTask == current && !(nextTask!=null && nextTask.end()!=currentEnd))
+            return null; //dont input anything unless its a new task, or it has stretched
+        else
+            return nextTask;
+
 
 //        int maxT = this.maxTimeBetweenUpdates;
 //        boolean limitsMaxTime = maxT > 0;

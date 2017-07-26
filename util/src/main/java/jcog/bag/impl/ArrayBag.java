@@ -27,7 +27,7 @@ import java.util.function.Consumer;
  */
 abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable<X, Y> implements Bag<X, Y> {
 
-    public final PriMerge mergeFunction;
+    final PriMerge mergeFunction;
 
     /**
      * inbound pressure sum since last commit
@@ -38,7 +38,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     protected float min, max;
 
-    public ArrayBag(PriMerge mergeFunction, @NotNull Map<X, Y> map) {
+    protected ArrayBag(PriMerge mergeFunction, @NotNull Map<X, Y> map) {
         this(0, mergeFunction, map);
     }
 
@@ -49,7 +49,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         }
     }
 
-    public ArrayBag(@Deprecated int cap, PriMerge mergeFunction, @NotNull Map<X, Y> map) {
+    protected ArrayBag(@Deprecated int cap, PriMerge mergeFunction, @NotNull Map<X, Y> map) {
         super(new SortedPLinks(), map);
         this.mergeFunction = mergeFunction;
         setCapacity(cap);
@@ -266,7 +266,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         return cmpGT((Prioritized) o1, (Prioritized) o2);
     }
 
-    static boolean cmpGT(@Nullable Object o1, @Nullable float o2) {
+    static boolean cmpGT(/*@Nullable */Object o1, float o2) {
         return cmpGT((Prioritized) o1, o2);
     }
 
@@ -286,6 +286,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      */
     static boolean cmpGT(float o1, @Nullable Prioritized o2) {
         return (o1 < pCmp(o2));
+    }
+    static boolean cmpGT(float o1, float o2) {
+        return (o1 < o2);
     }
 
 
@@ -462,7 +465,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         X key = key(incoming);
 
         final boolean[] added = {false};
-        final @Nullable List[] trash = {null};
+        final @Nullable List<Y>[] trash = new List[1];
         Y inserted;
 
         synchronized (items) {
@@ -470,25 +473,27 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             inserted = map.compute(key, (kk, existing) -> {
                 if (existing != null) {
                     if (existing == incoming) {
-                        overflow.setValue(p);
-                        return existing; //no change
-                    }
+                        //no change
+                        if (overflow!=null)
+                            overflow.setValue(p);
+                    } else {
 
 
-                    int s = size();
-                    boolean atCap = s == capacity;
-                    float priBefore = (atCap ? existing.priElseZero() : -1 /* dont care */);
-                    float oo = mergeFunction.merge((Priority) existing /* HACK */, incoming);
+                        int s = size();
+                        boolean atCap = s == capacity;
+                        float priBefore = (atCap ? existing.priElseZero() : -1 /* dont care */);
+                        float oo = mergeFunction.merge((Priority) existing /* HACK */, incoming);
 
-                    if (overflow != null)
-                        overflow.add(oo);
+                        if (overflow != null)
+                            overflow.add(oo);
 
-                    float delta = existing.priElseZero() - priBefore;
-                    if (delta >= Pri.EPSILON) {
-                        if (atCap) {
-                            pressurize(delta);
+                        float delta = existing.priElseZero() - priBefore;
+                        if (delta >= Pri.EPSILON) {
+                            if (atCap) {
+                                pressurize(delta);
+                            }
+                            massAndSort(s);
                         }
-                        massAndSort(s);
                     }
                     return existing;
 
@@ -511,19 +516,19 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             });
 
 
-            if (trash[0] != null) {
+            if (trash != null && trash[0]!=null) {
                 //clear the entries from the map right away
                 //this should be done in a synchronized block along with what happens above
                 trash[0].forEach(x -> {
                     if (x != incoming)
-                        map.remove(x);
+                        map.remove(key(x));
                 });
             }
         }
 
         //this can be done outside critical section
-        if (trash[0] != null) {
-            ((List<Y>) (trash[0])).forEach(x -> {
+        if (trash != null && trash[0]!=null) {
+            trash[0].forEach(x -> {
                 if (x != incoming)
                     onRemoved(x);
             });
@@ -636,6 +641,16 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                     massAndSort(size());
                 }
             }
+            if (trash != null) {
+                trash.forEach(t -> {
+                    map.remove(key(t));
+                });
+            }
+        }
+
+        //then outside the synch:
+        if (trash != null) {
+            trash.forEach(this::onRemoved);
         }
 
     }
@@ -809,14 +824,20 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
                 swap(c, i, median);
 
-                if (cmpGT(c[left], c[right])) {
+                float cl = pCmp((Prioritized)c[left]);
+                float cr = pCmp((Prioritized)c[right]);
+                if (cmpGT(cl, cr)) {
                     swap(c, right, left);
+                    float x = cr; cr = cl; cl = x;
                 }
-                if (cmpGT(c[i], c[right])) {
+                float ci = pCmp((Prioritized)c[i]);
+                if (cmpGT(ci, cr)) {
                     swap(c, right, i);
+                    float x = cr; /*cr = ci;*/ ci = x;
                 }
-                if (cmpGT(c[left], c[i])) {
+                if (cmpGT(cl, ci)) {
                     swap(c, i, left);
+                    //float x = cl; cl = ci; ci = x;
                 }
 
                 Prioritized temp = (Prioritized) c[i];

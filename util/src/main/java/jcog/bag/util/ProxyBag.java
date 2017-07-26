@@ -18,11 +18,11 @@ abstract public class ProxyBag<X,Y> implements Bag<X,Y> {
 
     @NotNull Bag<X,Y> bag;
 
-    public ProxyBag(Bag<X,Y> delegate) {
+    protected ProxyBag(Bag<X, Y> delegate) {
         set(delegate);
     }
 
-    public void set(Bag<X,Y> delegate) {
+    public final void set(Bag<X,Y> delegate) {
         bag = delegate;
     }
 

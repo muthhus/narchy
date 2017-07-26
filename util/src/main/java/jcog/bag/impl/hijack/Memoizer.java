@@ -199,16 +199,15 @@ class Memoizer implements InvocationHandler {
                     (SampleInterface) Memoizer.memoize(new SampleSlowImpl(), cacheElements, cacheMillis)
             };
             //
-            long ts, diff;
             for (int k = 0; k < samples.length; k++) {
                 final SampleInterface base = samples[k & ~1];
                 final SampleInterface test = samples[k];
                 final String hdr = getHeader(base.getClass(), test.getClass());
-                ts = System.currentTimeMillis();
+                long ts = System.currentTimeMillis();
                 for (int i = 0; i < TOTAL; i++) {
                     test.hash(TEST_TEXT);
                 }
-                diff = System.currentTimeMillis() - ts;
+                long diff = System.currentTimeMillis() - ts;
                 System.out.println(hdr + '\t' + "diff=" + diff + "ms" + '\t' + //
                         test.hash(TEST_TEXT));
             }

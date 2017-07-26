@@ -47,14 +47,14 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     private float min;
     private float max;
 
-    private final float PRESSURE_THRESHOLD = 0.05f;
+    private static final float PRESSURE_THRESHOLD = 0.05f;
 
-    public HijackBag(int initialCapacity, int reprobes) {
+    protected HijackBag(int initialCapacity, int reprobes) {
         this(reprobes);
         setCapacity(initialCapacity);
     }
 
-    public HijackBag(int reprobes) {
+    protected HijackBag(int reprobes) {
         super(concurrency, 2 /* size, capacity */);
         this.reprobes = reprobes;
         this.map = new AtomicReference<>(EMPTY_ARRAY);
@@ -427,7 +427,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         int i = random.nextInt(c);
 
         BagSample next = BagSample.Next;
-        boolean modified = false;
+        //boolean modified = false;
         int seen = 0;
         while (seen++ < c) {
             V v = map.get(i);
@@ -436,7 +436,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
                 next = each.next(v);
                 if (next.remove) {
                     if (map.compareAndSet(i, v,null)) {
-                        modified = true;
+                        //modified = true;
                         //else: already removed
 
                         if (_onRemoved(v) <= 0)

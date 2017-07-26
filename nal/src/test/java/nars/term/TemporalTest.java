@@ -78,12 +78,12 @@ public class TemporalTest {
 
     @Test public void testAtemporalization2() throws Narsese.NarseseException {
 
-        assertEquals("(y &&+- (--,y))", $.<Compound>$("(y &&+3 (--,y))").eternal().toString());
+        assertEquals("((--,y) &&+- y)", $.<Compound>$("(y &&+3 (--,y))").eternal().toString());
     }
 
     @Test public void testAtemporalization3() throws Narsese.NarseseException {
 
-        assertEquals("(--,((x &&+- $1) ==>+- ($1 &&+- (--,y))))",
+        assertEquals("(--,((x &&+- $1) ==>+- ((--,y) &&+- $1)))",
                 $.<Compound>$("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))").eternal().toString());
     }
 
@@ -100,7 +100,7 @@ public class TemporalTest {
             Term c = $(s);
             assertTrue(c instanceof Compound);
 
-            assertEquals("(y &&+- (x ==>+- y))",
+            assertEquals("((x ==>+- y) &&+- y)",
                     c.eternal().toString());
         }
     }
@@ -109,7 +109,7 @@ public class TemporalTest {
         Compound x = $("((--,(($1&&x) ==>+1 ((--,y) &&+2 $1))) &&+3 (--,y))");
 
         Term y = x.eternal();
-        assertEquals("((--,y) &&+- (--,((x &&+- $1) ==>+- ($1 &&+- (--,y)))))", y.toString());
+        assertEquals("((--,((x &&+- $1) ==>+- ((--,y) &&+- $1))) &&+- (--,y))", y.toString());
     }
 
     @Test
@@ -179,15 +179,15 @@ public class TemporalTest {
 
     @Test
     public void testCommutiveTemporalityConjEquiv() {
-        testParse("((#1-->$2) <=>-20 ({(row,3)}-->$2))", "(({(row,3)}-->$2) <=>+20 (#1-->$2))");
-        testParse("(({(row,3)}-->$2) <=>+20 (#1-->$2))", "(({(row,3)}-->$2) <=>+20 (#1-->$2))");
+        testParse("((#1-->$2) <=>-20 ({(row,3)}-->$2))", "(({(row,3)}-->$1) <=>+20 (#2-->$1))");
+        testParse("(({(row,3)}-->$2) <=>+20 (#1-->$2))", "(({(row,3)}-->$1) <=>+20 (#2-->$1))");
 
-        testParse("((#1-->$2) &&-20 ({(row,3)}-->$2))", "(({(row,3)}-->$2) &&+20 (#1-->$2))");
+        testParse("((#1-->$2) &&-20 ({(row,3)}-->$2))", "(({(row,3)}-->$1) &&+20 (#2-->$1))");
     }
 
     @Test
     public void testCommutiveTemporalityConjEquiv2() {
-        testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "(({(row,3)}-->$2) &&+20 (#1-->$2))");
+        testParse("(({(row,3)}-->$2) &&+20 (#1-->$2))", "(({(row,3)}-->$1) &&+20 (#2-->$1))");
     }
 
     @Test
@@ -614,13 +614,6 @@ public class TemporalTest {
         assertEquals(4, $("(((z) &&+1 ((y) &&+2 (w))) &&+1 (x))").dtRange());
     }
 
-    @Test
-    public void testSubtermTestOffset() throws Narsese.NarseseException {
-        String x = "(({t001}-->[opened]) &&-5 (open({t001}) &&-5 ((({t001})-->at) &&-5 (({t002})-->hold))))";
-        String y = "(open({t001}) &&-5 ((({t001})-->at) &&-5 (({t002})-->hold)))";
-        assertEquals(0, $(x).subtermTime($(y)));
-
-    }
 
     @Test
     public void testSubtermNonCommutivePosNeg() throws Narsese.NarseseException {
@@ -786,7 +779,7 @@ public class TemporalTest {
     public void testAtemporalization1() throws Narsese.NarseseException {
         Term x = $("(((--,(tetris-->(_n,#2))) &&+1 $1) <=>+1 ($1 &&+0 (--,(tetris-->(_n,#2)))))");
         Term y = x.eternal();
-        assertEquals("(($1 &&+- (--,(tetris-->(_n,#2)))) <=>+- ($1 &&+- (--,(tetris-->(_n,#2)))))", y.toString());
+        assertEquals("(((--,(tetris-->(_n,#1))) &&+- $2) <=>+- ((--,(tetris-->(_n,#1))) &&+- $2))", y.toString());
     }
 
 

@@ -172,7 +172,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                 //? duplicate was found in sub-tree but we checked for duplicates above
 
 
-                if (contains(t, model))
+                if (nextBest.contains(t, model))
                     return null;
 
                 assert(false): "what to do with: " + t + " in " + parent;

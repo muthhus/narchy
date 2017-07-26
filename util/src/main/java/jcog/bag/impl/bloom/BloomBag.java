@@ -28,7 +28,7 @@ public class BloomBag<X> implements Bag<X,PriReference<X>> {
     private final Function<X, byte[]> hash;
 
     /** discretization level */
-    final float resolution = 32;
+    static final float resolution = 32;
 
     public BloomBag(int capacity, Function<X, byte[]> hashing) {
         this.hash = hashing;
@@ -43,7 +43,7 @@ public class BloomBag<X> implements Bag<X,PriReference<X>> {
     @Override
     public void setCapacity(int c) {
         if (list == null || capacity()!=c) {
-            this.list = new CircularArrayList<X>(c);
+            this.list = new CircularArrayList<>(c);
             this.pri = newTable();
             //return true;
         }

@@ -39,8 +39,8 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         RemoveAndStop(true, true)
         ;
 
-        public boolean remove;
-        public boolean stop;
+        public final boolean remove;
+        public final boolean stop;
 
         BagSample(boolean remove, boolean stop) {
             this.remove = remove;
@@ -338,7 +338,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     /**
      * resolves the key associated with a particular value
      */
-    K key(@NotNull V value);
+    K key(/*@NotNull*/ V value);
 
 
     default void print() {
