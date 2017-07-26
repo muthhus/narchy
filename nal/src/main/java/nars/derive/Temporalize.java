@@ -613,6 +613,8 @@ public class Temporalize {
                         Term a = tt.sub(0);
                         //Time at = solveTime(a, times);
                         Event ea = solve(a, times);
+                        if (ea == null)
+                            return null;
                         a = ea.term;
                         Time at = ea.start(times);
 
@@ -621,6 +623,8 @@ public class Temporalize {
                             Term b = tt.sub(1);
                             //Time bt = solveTime(b, times);
                             Event eb = solve(b, times);
+                            if (eb == null)
+                                return null;
                             b = eb.term;
                             Time bt = eb.start(times);
 
