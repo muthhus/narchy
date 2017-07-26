@@ -3,17 +3,13 @@ package nars.derive;
 import com.google.common.base.Joiner;
 import nars.$;
 import nars.Narsese;
-import nars.task.NALTask;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.TreeSet;
 
-import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class TemporalizeTest {
 
@@ -43,6 +39,7 @@ public class TemporalizeTest {
         assertEquals("b@5,b@5->a,(a &&+5 b)@[0..5],a@0,a@-5->b", new Temporalize()
                 .knowTerm($.$("(a &&+5 b)"), 0).toString());
     }
+
     @Test
     public void testEventize2b() throws Narsese.NarseseException {
 
@@ -65,13 +62,15 @@ public class TemporalizeTest {
         assertEquals("b@2,b@2->a,a@0,a@-2->b,(a <=>+2 b)@0",
                 new Temporalize().knowTerm($.$("(a <=>+2 b)"), 0).toString());
     }
+
     @Test
     public void testEventizeEquiReverse() throws Narsese.NarseseException {
         assertEquals("b@0,b@-2->a,(b <=>+2 a)@0,a@2,a@2->b",
                 new Temporalize().knowTerm($.$("(a <=>-2 b)"), 0).toString());
     }
 
-    @Test public void testEventizeImplConj() throws Narsese.NarseseException {
+    @Test
+    public void testEventizeImplConj() throws Narsese.NarseseException {
         assertEquals("((a &&+2 b) ==>+3 c)@0,b@2,b@2->a,a@0,a@-2->b,(a &&+2 b)@[0..2],(a &&+2 b)@[-5..-3]->c,c@5,c@5->(a &&+2 b)",
                 new Temporalize().knowTerm($.$("((a &&+2 b) ==>+3 c)"), 0).toString());
     }
@@ -97,7 +96,8 @@ public class TemporalizeTest {
 
     }
 
-    @Test public void testSolveIndirect() throws Narsese.NarseseException {
+    @Test
+    public void testSolveIndirect() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         t.knowTerm($.$("(a ==>+1 c)"), ETERNAL);
         t.knowTerm($.$("a"), 0);
@@ -105,7 +105,9 @@ public class TemporalizeTest {
         assertNotNull(s);
         assertEquals("c@1->a", s.toString());
     }
-    @Test public void testSolveIndirect2() throws Narsese.NarseseException {
+
+    @Test
+    public void testSolveIndirect2() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         t.knowTerm($.$("(b ==>+1 c)"), ETERNAL);
         t.knowTerm($.$("(a ==>+1 b)"), 0);
@@ -116,7 +118,8 @@ public class TemporalizeTest {
         assertEquals("a@0", s.toString());
     }
 
-    @Test public void testSolveEternalButRelative() throws Narsese.NarseseException {
+    @Test
+    public void testSolveEternalButRelative() throws Narsese.NarseseException {
         /*
                 .believe("(x ==>+2 y)")
                 .believe("(y ==>+3 z)")
@@ -131,7 +134,8 @@ public class TemporalizeTest {
         assertEquals("(x ==>+5 z)@ETE", s.toString());
     }
 
-    @Test public void testSolveRecursiveConjDecomposition() throws Narsese.NarseseException {
+    @Test
+    public void testSolveRecursiveConjDecomposition() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         t.knowTerm($.$("((x &&+1 y) &&+1 z)"), 0);
 
@@ -148,8 +152,11 @@ public class TemporalizeTest {
         assertEquals("(y ==>+1 z)@1", t.solve($.$("(y ==>+- z)")).toString());
     }
 
-    /** tests temporalization of pure events which overlap, or are separated by a distance below a proximal threshold (see Param.java) */
-    @Test public void testStatementEvents() throws Narsese.NarseseException {
+    /**
+     * tests temporalization of pure events which overlap, or are separated by a distance below a proximal threshold (see Param.java)
+     */
+    @Test
+    public void testStatementEvents() throws Narsese.NarseseException {
 //              .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
 //              .input(new NALTask($.$("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
 //                   .mustDesire(cycles, "(a-->c)", 1f, 0.4f, 10, 20)
@@ -161,9 +168,22 @@ public class TemporalizeTest {
         Temporalize.Event solution = t.solve($.$("(a-->c)"));
         assertNotNull(solution);
         assertEquals("(a-->c)@[10..20]", solution.toString());
+        assertNull("d not covered by known events", t.solve($.$("(a-->d)")));
     }
 
-    @Test public void testSolveEternalButRelative2() throws Narsese.NarseseException {
+    @Test
+    public void testStatementEventsOneEternal() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("(a-->b)"), ETERNAL); //these two overlap, so there should be a derivation
+        t.knowTerm($.$("(c-->b)"), 5, 25);
+
+        Temporalize.Event solution = t.solve($.$("(a-->c)"));
+        assertNotNull(solution);
+        assertEquals("(a-->c)@[5..25]", solution.toString());
+    }
+
+    @Test
+    public void testSolveEternalButRelative2() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
 
         //  b ==>+10 c ==>+20 e
@@ -183,7 +203,8 @@ public class TemporalizeTest {
         assertEquals("(b ==>+30 e)@ETE", s.toString());
     }
 
-    @Test public void testSolveConjSequenceMerge() throws Narsese.NarseseException {
+    @Test
+    public void testSolveConjSequenceMerge() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
 
         String A = "((a &&+3 c) &&+4 e)";
@@ -203,7 +224,8 @@ public class TemporalizeTest {
         assertEquals("((a &&+3 (b&|c)) &&+4 e)@[1..8]", s.toString());
     }
 
-    @Test public void testRecursiveSolution1() throws Narsese.NarseseException {
+    @Test
+    public void testRecursiveSolution1() throws Narsese.NarseseException {
         /*
                  believe("(x ==>+5 z)")
                 .believe("(y ==>+3 z)")
@@ -213,7 +235,7 @@ public class TemporalizeTest {
         t.knowTerm($.$("(x ==>+5 z)"), ETERNAL);
         t.knowTerm($.$("(y ==>+3 z)"), ETERNAL);
 
-        System.out.println( Joiner.on('\n').join( t.constraints.entrySet() ) );
+        System.out.println(Joiner.on('\n').join(t.constraints.entrySet()));
 
         {
             HashMap h = new HashMap();
@@ -222,7 +244,7 @@ public class TemporalizeTest {
         }
 
         //try for both impl and conj, they should produce similar results
-        for (String op : new String[] { "==>", "&&" }){
+        for (String op : new String[]{"==>", "&&"}) {
             HashMap h = new HashMap();
             Temporalize.Event s = t.solve($.$("((x &&+- y) " + op + "+- z)"), h);
 
@@ -237,7 +259,8 @@ public class TemporalizeTest {
 
     }
 
-    @Test public void testImplToEquiCircularity() throws Narsese.NarseseException {
+    @Test
+    public void testImplToEquiCircularity() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         t.knowTerm($.$("(x ==>+5 y)"), ETERNAL);
         t.knowTerm($.$("(y ==>-5 x)"), ETERNAL);
@@ -251,7 +274,9 @@ public class TemporalizeTest {
         //    }
 
     }
-    @Test public void testPreconImplConjPreConflict() throws Narsese.NarseseException {
+
+    @Test
+    public void testPreconImplConjPreConflict() throws Narsese.NarseseException {
 
         TreeSet<String> solutions = new TreeSet();
 
@@ -262,7 +287,7 @@ public class TemporalizeTest {
             t.knowTerm($.$("(y ==>+1 z)"), 0);
             t.knowTerm($.$("(x ==>+2 z)"), 0);
             Temporalize.Event s = t.solve($.$("((x &&+- y) ==>+- z)"));
-            if (s!=null) {
+            if (s != null) {
                 assertNotNull(s);
                 solutions.add(s.toString());
             }
