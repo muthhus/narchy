@@ -105,7 +105,7 @@ public class Temporalize {
     static int dt(Event a, Event b, HashMap<Term,Time> times) {
 
         if (a instanceof AbsoluteEvent && b instanceof AbsoluteEvent) {
-            return dt(a.end(times), b.start(times));
+            return dt(a.start(times), b.start(times));
             //return dt(a.start(times), b.end(times));
         } else if (a instanceof RelativeEvent && b instanceof RelativeEvent) {
             RelativeEvent ra = (RelativeEvent) a;
@@ -267,7 +267,10 @@ public class Temporalize {
 //            assert(offset!=XTERNAL);
 //            assert(offset!=DTERNAL);
 //            return base + offset;
-            return base;
+            if (base!=ETERNAL && offset!=DTERNAL && offset!=XTERNAL)
+                return base + offset;
+            else
+                return ETERNAL;
         }
     }
 
@@ -628,13 +631,22 @@ public class Temporalize {
                                         //conjunction merge, since the results could overlap
                                         //either a or b, or both are conjunctions. and the result will be conjunction
 
-                                        Term cj = o.merge(a, at.abs(), b, bt.abs());
-                                        long start = Math.min(at.abs(), bt.abs());
+                                        long ata = at.abs();
+                                        long bta = bt.abs();
+                                        if (ata == ETERNAL && bta == ETERNAL) {
+                                            ata = at.offset;
+                                            bta = bt.offset;
+                                        } else if (ata == ETERNAL ^ bta == ETERNAL) {
+                                            return null; //one is eternal the other isn't
+                                        }
+                                        Term cj = $.negIf(o.merge(a, ata, b, bta) , isNeg);
+                                        ///*Event e = */solveGraph(cj, times);
+                                        long start = Math.min(at.abs() , bt.abs());
                                         Event e = new SolutionEvent(
                                                 cj,
                                                 start
                                         ).neg(isNeg);
-                                        times.put(e.term, Time.the(start, 0));
+//                                        times.put(e.term, e.start(times));
                                         return e;
                                     } else {
                                         int sd = dt(ea, eb, times);
@@ -644,6 +656,7 @@ public class Temporalize {
                                                     o.the(sd, new Term[]{a, b}),
                                                     start
                                             ).neg(isNeg);
+                                            //know(null, e.term, start, start + e.term.dtRange());
                                             times.put(e.term, Time.the(start, 0));
                                             return e;
                                         }
