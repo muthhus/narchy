@@ -284,13 +284,24 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test public void testEmbeddedConjNormalizationWithNeg1() throws Narsese.NarseseException {
-        String c = "(((d) &&+3 (a)) &&+1 (b))"; //corrected order
-        Compound a = $("(((a) &&+1 (b)) &&-3 (d))");
-        assertEquals(  c, a.toString());
+        String d = "(((d) &&+3 (a)) &&+1 (b))"; //correct grouping
+        String c = "((d) &&+3 ((a) &&+1 (b)))"; //incorrect grouping
+        String a = "(((a) &&+1 (b)) &&-3 (d))"; //incorrect order
+
+        Term aa = $(a);
         Term cc = $(c);
-        a.printRecursive();
+        aa.printRecursive();
         cc.printRecursive();
-        assertEquals( a, cc);
+
+        assertEquals( aa, cc);
+
+        assertEquals(  d, aa.toString());
+        assertEquals(  d, cc.toString());
+
+        //correct subterm ordering by volume
+        assertTrue(aa.sub(0).size() > aa.sub(1).size() );
+        assertTrue(cc.sub(0).size() > cc.sub(1).size() );
+
     }
 
     @Test public void testEmbeddedConjNormalization2() throws Narsese.NarseseException {

@@ -236,13 +236,13 @@ public enum Op implements $ {
                 //    ((x &&+ y) &&+ z)
                 //TODO may need to count # of events, not number of conjunctions.
                 boolean aConj = a instanceof Compound && a.op() == CONJ;
-                int conjLeft = aConj ? conjSubtermCount(a) : 0;
+                int subEventsLeft = aConj ? conjSubEventCount(a) : 0;
                 boolean bConj = b instanceof Compound && b.op() == CONJ;
-                int conjRight = bConj ? conjSubtermCount(b) : 0;
-                if (conjLeft > 1 || conjRight > 0) {
+                int subEventsRight = bConj ? conjSubEventCount(b) : 0;
+                if (subEventsLeft > 0 || subEventsRight > 0) {
                     //rebalance and align
                     boolean imbalanced = false;
-                    if (Math.abs(conjLeft - conjRight) > 1)
+                    if (Math.abs(subEventsLeft - subEventsRight) > 1)
                         imbalanced = true; //one side has 2 or more than the other
 
                     if (dt > 0 && (imbalanced || (bConj && !concurrent(b.dt())))) {
@@ -270,8 +270,16 @@ public enum Op implements $ {
             }
         }
 
-        private int conjSubtermCount(Term a) {
-            return 1 + (a.volume() >= 5 ? ((Compound)a).count(t -> t.op()==CONJ && !concurrent(t.dt())) : 0);
+        private int conjSubEventCount(Term a) {
+            //TODO make an int reducer method for Term
+            final int[] subevents = {0};
+            ((Compound)a).recurseTerms(sub -> {
+                if (sub.op()==CONJ)
+                    subevents[0] += sub.size();
+            });
+            return subevents[0];
+
+            //return ((Compound)a).count(t -> t.op()==CONJ && !concurrent(t.dt()));
         }
 
         /**
@@ -439,10 +447,13 @@ public enum Op implements $ {
                 others = xo.the(conjDT, Terms.sorted(ss) /* assumes commutive since > 2 */);
             }
 
-            @NotNull Term ib = implication.sub(1); /* impl postcondition */
+            if (whichImpl == 0)
+                conjDT = -conjDT; //reverse dt if impl is from the 0th subterm
+
             Term ia =
                     CONJ.the(conjDT, others, implication.sub(0) /* impl precond */);
 
+            @NotNull Term ib = implication.sub(1); /* impl postcondition */
             return IMPL.the(implDT, ia, ib);
         }
     },
@@ -978,9 +989,11 @@ public enum Op implements $ {
             case 0:
                 return events.get(from).getOne();
             case 1:
-                return CONJ.the(
+                Term left = events.get(from).getOne();
+                Term right = events.get(to).getOne();
+                return conjNonCommFinal(
                     /* dt */ (int) (events.get(to).getTwo() - events.get(from).getTwo()),
-                        events.get(from).getOne(), events.get(to).getOne());
+                        left, right);
         }
 
         int center = (from + to) / 2;
@@ -997,7 +1010,11 @@ public enum Op implements $ {
 
         if (left == True) return right;
         if (right == True) return left;
+        return conjNonCommFinal(dt, left, right);
+    }
 
+    /** HACK */
+    private static Term conjNonCommFinal(int dt, Term left, Term right) {
         //System.out.println(left + " " + right + " " + left.compareTo(right));
         //return CONJ.the(dt, left, right);
         if (left.compareTo(right) > 0) {
@@ -1011,6 +1028,7 @@ public enum Op implements $ {
                 TermVector.the( left, right )
         ), dt);
     }
+
 //    protected static Term conjMergeLeftAlign(List<ObjectLongPair<Term>> events, int from, int to) {
 //        //Left aligned method:
 //        Term head = e0.getOne();
