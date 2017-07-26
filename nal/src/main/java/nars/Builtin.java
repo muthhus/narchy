@@ -18,6 +18,7 @@ import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import java.util.List;
 
 import static nars.Op.*;
+import static nars.time.Tense.DTERNAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -168,6 +169,12 @@ public class Builtin {
             Op oo = t.op();
             if (!oo.in(CONJ.bit))
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
+
+            if (t.dt()==DTERNAL) {
+                //HACK
+                //these wont be extracted as events in the below method, so use similar to the dropAnyConj
+                return $.func("dropAnyConj", t);
+            }
 
             Compound c = (Compound) t;  //for use in deriver, fail if any variable parameters
 
