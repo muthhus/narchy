@@ -486,7 +486,7 @@ public class Temporalize {
                 if (dt == XTERNAL) {
 
                     //TODO UNKNOWN TO SOLVE FOR
-                    throw new RuntimeException("no unknowns may be added during this phase");
+                    //throw new RuntimeException("no unknowns may be added during this phase");
 
                 } else {
                     if (dt == DTERNAL)
