@@ -370,7 +370,7 @@ public class TemporalTest {
             //co-negation
             Concept h = n.conceptualize($("(x " + op + "+- (--,x))"));
             assertEquals( (g.op() != Op.EQUI)?
-                    "(x " + op + "+- (--,x))" :
+                    "((--,x) " + op + "+- x)" :
                     "(x " + op + "+- x)", h.toString());
 
 
@@ -546,11 +546,12 @@ public class TemporalTest {
     @Test
     public void testSubtermTimeRecursive() throws Narsese.NarseseException {
         Compound c = $("(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))");
-        assertEquals("((((t2-->hold) &&+1 (t1-->at)) &&+3 (t1-->[opened])) &&+5 open(t1))", c.toString());
+        assertEquals("(((t2-->hold) &&+1 (t1-->at)) &&+3 ((t1-->[opened]) &&+5 open(t1)))", c.toString());
         assertEquals(0, c.subtermTime($("hold:t2")));
         assertEquals(1, c.subtermTime($("at:t1")));
         assertEquals(4, c.subtermTime($("[opened]:t1")));
         assertEquals(9, c.subtermTime($("open(t1)")));
+        assertEquals(9, c.dtRange());
     }
 
 
@@ -853,13 +854,13 @@ public class TemporalTest {
 
         String st = "((--,(happy)) && (--,((--,(o))&&(happy))))";
         Compound t = $.$(st);
-        assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", t.toString());
+        assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", t.toString());
         Term xe = $.terms.retemporalize(t, $.terms.retemporalizeDTERNAL);
-        assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", xe.toString());
+        assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", xe.toString());
 
         //TODO this will require a refactor allowing arbitrary function mapping matched dt source value to a target dt
         Term xz = $.terms.retemporalize(t, $.terms.retemporalizeZero);
-        assertEquals("((--,(happy))&|(--,((--,(o))&|(happy))))", xz.toString());
+        assertEquals("((--,((--,(o))&|(happy)))&|(--,(happy)))", xz.toString());
     }
 
     @Test

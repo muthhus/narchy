@@ -69,22 +69,22 @@ public class QueryVariableTest {
 
         AtomicBoolean valid = new AtomicBoolean();
 
-        NAR nar = NARS.tmpEternal();
+        NAR nar = NARS.tmp();
 
         Compound beliefTerm = compoundOrNull(nar.term(beliefString));
         assertNotNull(beliefTerm);
         nar.believe(beliefTerm, 1f, 0.9f);
         assertEquals(1, nar.tasks().count());
 
-        nar.log();
+        //nar.log();
         nar.question(question, Tense.ETERNAL, (q, a) -> {
             //if (a.term().equals(beliefTerm)) {
             valid.set(true);
             q.delete();
             //}
         });
-        assertEquals(2, nar.tasks().count());
         nar.run(time);
+        assertTrue(2 <= nar.tasks().count());
         assertTrue(valid.get());
 
     }

@@ -164,7 +164,7 @@ public class NarseseBaseTest extends NarseseTest {
         assertEquals(Op.CONJ, c.op());
         assertEquals(2, c.size());
         assertEquals(5, c.complexity());
-        assertEquals(Op.INH, c.sub(1).op());
+        assertEquals(Op.INH, c.sub(0).op()); //heavier term on the left
     }
 
 

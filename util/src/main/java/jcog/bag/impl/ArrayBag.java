@@ -116,7 +116,6 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         int additional = (toAdd != null) ? 1 : 0;
 
 
-
         int s = size();
         int nextSize = s + additional;
 
@@ -388,12 +387,11 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     public Bag<X, Y> sample(@NotNull Bag.BagCursor<? super Y> each) {
 
 
-
         final Object[] ii = items.array();
         int s0 = ii.length;
         if (s0 == 0) return this; //to be safe
 
-        int s = Math.min(s0,size());
+        int s = Math.min(s0, size());
         if (s == 0) return this;
 
         int i = sampleStart(s);
@@ -436,7 +434,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         return this;
     }
 
-    @Nullable @Override public Y remove(@NotNull X x) {
+    @Nullable
+    @Override
+    public Y remove(@NotNull X x) {
         synchronized (items) {
             return super.remove(x);
         }
@@ -461,6 +461,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
         X key = key(incoming);
 
+        final boolean[] added = {false};
         final @Nullable List[] trash = {null};
         Y inserted;
 
@@ -468,8 +469,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
             inserted = map.compute(key, (kk, existing) -> {
                 if (existing != null) {
-                    if (existing == incoming)
+                    if (existing == incoming) {
+                        overflow.setValue(p);
                         return existing; //no change
+                    }
 
 
                     int s = size();
@@ -502,6 +505,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                             return null;
                     }
 
+                    added[0] = true;
                     return incoming; //success
                 }
             });
@@ -523,6 +527,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 if (x != incoming)
                     onRemoved(x);
             });
+        }
+        if (added[0]) {
+            onAdded(inserted);
         }
 
 

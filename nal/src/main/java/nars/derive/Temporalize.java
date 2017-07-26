@@ -9,7 +9,6 @@ import nars.control.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -681,7 +680,7 @@ public class Temporalize {
                                         } else if (ata == ETERNAL ^ bta == ETERNAL) {
                                             return null; //one is eternal the other isn't
                                         }
-                                        Term newTerm = $.negIf(Op.merge(a, ata, b, bta) , isNeg);
+                                        Term newTerm = $.negIf(Op.conjMerge(a, ata, b, bta) , isNeg);
                                         long start = Math.min(at.abs() , bt.abs());
                                         Event e = new SolutionEvent( newTerm, start );
 //                                        times.put(e.term, e.start(times));

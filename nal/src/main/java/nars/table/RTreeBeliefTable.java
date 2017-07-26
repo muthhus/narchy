@@ -197,7 +197,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         @Nullable Object changed = task.stretchKey;
         if (changed!=null) {
 
-
             TaskRegion t = (TaskRegion)changed;
 
             boolean removed = tree.remove(t);
@@ -206,10 +205,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 t.end = task.end();
 
                 boolean ready = tree.add(t);
-                //if (!ready) ..
-                //assert(readded);
+                if (ready) {
+                    //assert(readded);
 
-                return t; //keep tracking
+                    return t; //keep tracking
+                } else {
+                    return null;
+                }
             }
         } /*else {
             TaskRegion tr = new TaskRegion(task);
@@ -361,6 +363,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     @Override
     public void add(@NotNull Task x, BaseConcept c, NAR n) {
+
+        if (x instanceof SignalTask && ((SignalTask) x).stretchKey!=null)
+            return; //already added and being managed
 
         this.nar = n;
 

@@ -266,17 +266,17 @@ public class NarseseExtendedTest extends NarseseTest {
 
         Compound x = term(input);
         //Terms.printRecursive(System.out, x);
-        assertEquals("(x<->(_,_))", x.toString());
+        assertEquals("((_,_)<->x)", x.toString());
 
         Term y = x.normalize();
         //Terms.printRecursive(System.out, y);
-        assertEquals("(x<->(#1,#2))", y.toString());
+        assertEquals("((#1,#2)<->x)", y.toString());
 
         Task question = task(x + "?");
-        assertEquals("(x<->(#1,#2))?", question.toStringWithoutBudget());
+        assertEquals("((#1,#2)<->x)?", question.toStringWithoutBudget());
 
         Task belief = task(x + ".");
-        assertEquals("(x<->(#1,#2)). %1.0;.90%", belief.toStringWithoutBudget());
+        assertEquals("((#1,#2)<->x). %1.0;.90%", belief.toStringWithoutBudget());
 
     }
 }

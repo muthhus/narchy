@@ -234,12 +234,22 @@ public enum Op implements $ {
                 //ex: (x &&+ (y &&+ z))
                 //      becomes
                 //    ((x &&+ y) &&+ z)
-                //TODO balance them for balanced hierarchical termlink activation
+                //TODO may need to count # of events, not number of conjunctions.
+                boolean imbalanced = false;
+                boolean aConj = a instanceof Compound && a.op() == CONJ;
+                int conjLeft = aConj ? conjSubtermCount(a) : 0;
+                boolean bConj = b instanceof Compound && b.op() == CONJ;
+                int conjRight = bConj ? conjSubtermCount(b) : 0;
+                if (conjLeft > 0 || conjRight > 0) {
+                    //rebalance and align
+                    if (Math.abs(conjLeft - conjRight) > 1)
+                        imbalanced = true; //one side has 2 or more than the other
 
-                if (dt > 0 && (b.op() == CONJ && !concurrent(b.dt()))) {
-                    return nullIfNull(merge(a, 0, b, dt+a.dtRange()));
-                } else if (dt < 0 && (a.op() == CONJ && !concurrent(a.dt()))) {
-                    return nullIfNull(merge(b, 0, a, -dt-b.dtRange()));
+                    if (dt > 0 && (imbalanced || (bConj && !concurrent(b.dt())))) {
+                        return nullIfNull(conjMerge(a, 0, b, dt + a.dtRange()));
+                    } else if (dt < 0 && (imbalanced || (aConj && !concurrent(a.dt())))) {
+                        return nullIfNull(conjMerge(b, 0, a, -dt - b.dtRange()));
+                    }
                 }
 
                 int order = a.compareTo(b);
@@ -254,10 +264,14 @@ public enum Op implements $ {
                 }
 
                 return implInConjReduction(
-                    compound(CONJ, dt, tt)
+                        compound(CONJ, dt, tt)
                 );
 
             }
+        }
+
+        private int conjSubtermCount(Term a) {
+            return 1 + (a.volume() >= 5 ? ((Compound)a).count(t -> t.op()==CONJ && !concurrent(t.dt())) : 0);
         }
 
         /**
@@ -901,7 +915,7 @@ public enum Op implements $ {
     }
 
     @Nullable
-    static public Term merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
+    static public Term conjMerge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
 
         List<ObjectLongPair<Term>> events = $.newArrayList();
 
@@ -915,63 +929,97 @@ public enum Op implements $ {
 
         //group all parallel clusters
         ObjectLongPair<Term> e0 = events.get(0);
-        {
-            //Term head = events.get(0).getOne();
-            long headAt = e0.getTwo();
-            int groupStart = -1;
-            for (int i = 1; i <= ee; i++) {
-                long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
-                if (nextAt == headAt) {
-                    if (groupStart == -1) groupStart = i - 1;
-                } else {
-                    if (groupStart != -1) {
-                        int groupEnd = i;
-                        Term[] p = new Term[groupEnd - groupStart];
-                        assert (p.length > 1);
-                        long when = events.get(groupStart).getTwo();
-                        for (int k = 0, j = groupStart; j < groupEnd; j++) {
-                            p[k++] = events.get(groupStart).getOne();
-                            events.remove(groupStart);
-                            i--;
-                            ee--;
-                        }
-                        Term replacement = CONJ.the(0, p);
-                        if (events.isEmpty()) {
-                            //got them all here
-                            return replacement;
-                        }
-                        events.add(i, PrimitiveTuples.pair(replacement, when));
-                        i++;
-                        ee++;
-                        groupStart = -1; //reset
-                    }
-                }
-                headAt = nextAt;
-            }
-        }
 
-        if (ee == 1) {
-            return e0.getOne();
-        } else if (ee == 0) {
-            return null;
-        }
-
-        Term head = e0.getOne();
+        //Term head = events.get(0).getOne();
         long headAt = e0.getTwo();
-        for (int i = 1; i < ee; i++) {
-
-            ObjectLongPair<Term> ei = events.get(i);
-            Term next = ei.getOne();
-            long nextAt = ei.getTwo();
-
-            int dt = (int) (nextAt - headAt);
-            head = CONJ.the(dt, head, next);
-
+        int groupStart = -1;
+        for (int i = 1; i <= ee; i++) {
+            long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
+            if (nextAt == headAt) {
+                if (groupStart == -1) groupStart = i - 1;
+            } else {
+                if (groupStart != -1) {
+                    int groupEnd = i;
+                    Term[] p = new Term[groupEnd - groupStart];
+                    assert (p.length > 1);
+                    long when = events.get(groupStart).getTwo();
+                    for (int k = 0, j = groupStart; j < groupEnd; j++) {
+                        p[k++] = events.get(groupStart).getOne();
+                        events.remove(groupStart);
+                        i--;
+                        ee--;
+                    }
+                    Term replacement = CONJ.the(0, p);
+                    if (events.isEmpty()) {
+                        //got them all here
+                        return replacement;
+                    }
+                    events.add(i, PrimitiveTuples.pair(replacement, when));
+                    i++;
+                    ee++;
+                    groupStart = -1; //reset
+                }
+            }
             headAt = nextAt;
         }
-        return head;
 
+        switch (ee) {
+            case 1:
+                return e0.getOne();
+            case 0:
+                return True;
+            default:
+                return conjMergeBalance(events, 0, ee-1);
+        }
     }
+    protected static Term conjMergeBalance(List<ObjectLongPair<Term>> events, int from, int to) {
+        int ee = to - from;
+        switch (ee) {
+            case 0:
+                return events.get(from).getOne();
+            case 1:
+                return CONJ.the(
+                    /* dt */ (int) (events.get(to).getTwo() - events.get(from).getTwo()),
+                        events.get(from).getOne(), events.get(to).getOne());
+        }
+
+        int center = (from + to) / 2;
+        int dt = (int) (events.get(center + 1).getTwo() - events.get(center).getTwo());
+        //dont send through CONJ.the:
+        Term left = conjMergeBalance(events, from, center);
+        Term right = conjMergeBalance(events, center + 1, to);
+
+        //System.out.println(left + " " + right + " " + left.compareTo(right));
+        //return CONJ.the(dt, left, right);
+        if (left.compareTo(right) > 0) {
+            //larger on left
+            dt = -dt;
+            Term t = right;
+            right = left;
+            left = t;
+        }
+        return new GenericCompoundDT(new GenericCompound(CONJ,
+                TermVector.the( left, right )
+        ), dt);
+    }
+//    protected static Term conjMergeLeftAlign(List<ObjectLongPair<Term>> events, int from, int to) {
+//        //Left aligned method:
+//        Term head = e0.getOne();
+//        long headAt = e0.getTwo();
+//        for (int i = 1; i < ee; i++) {
+//
+//            ObjectLongPair<Term> ei = events.get(i);
+//            Term next = ei.getOne();
+//            long nextAt = ei.getTwo();
+//
+//            int dt = (int) (nextAt - headAt);
+//            head = CONJ.the(dt, head, next);
+//
+//            headAt = nextAt;
+//        }
+//        return head;
+//    }
+
 
 
     @NotNull

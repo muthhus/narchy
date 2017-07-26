@@ -332,6 +332,13 @@ public interface Term extends Termlike, Comparable<Termlike> {
     default int compareTo(@NotNull Termlike y) {
         if (this.equals(y)) return 0;
 
+        //order first by volume. this is important for conjunctions which rely on volume-dependent ordering for balancing
+        //left should be heavier
+        //compareTo semantics state that a -1 value means left is less than right. we want the opposite
+        int diff2 = Integer.compare(y.volume(), volume());
+        if (diff2 != 0)
+            return diff2;
+
 //        int diff2 = Integer.compare(hashCode(), y.hashCode());
 //        if (diff2 != 0)
 //            return diff2;

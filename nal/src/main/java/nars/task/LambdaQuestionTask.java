@@ -53,7 +53,7 @@ public class LambdaQuestionTask extends NALTask {
     @Override
     public Task onAnswered(Task answer, NAR nar) {
         //answer = super.onAnswered(answer, nar);
-        answers.put(new PLinkUntilDeleted<>(answer, answer.priSafe(0)));
+        answers.putAsync(new PLinkUntilDeleted<>(answer, answer.priSafe(0)));
         return answer;
     }
 }

@@ -48,7 +48,7 @@ public class TemporalizeTest {
 
 
         Temporalize t = new Temporalize().knowTerm($.$("(a &&+2 (b &&+2 c))"), 0);
-        assertEquals("b@2,b@2->a,((a &&+2 b) &&+2 c)@[0..4],a@0,a@-2->b,(a &&+2 b)@[0..2],(a &&+2 b)@[-4..-2]->c,c@4,c@4->(a &&+2 b)", t.toString());
+        assertEquals("((a &&+2 b) &&+2 c)@[0..4],b@2,b@2->a,a@0,a@-2->b,(a &&+2 b)@[0..2],(a &&+2 b)@[-4..-2]->c,c@4,c@4->(a &&+2 b)", t.toString());
 
 
         assertEquals("b@2,b@2->a,a@0,a@-2->b,(a ==>+2 b)@0",

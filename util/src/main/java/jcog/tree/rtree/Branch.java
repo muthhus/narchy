@@ -169,8 +169,9 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                 }
 
             } else {
-                //duplicate was found in sub-tree but we checked for duplicates above
+                //? duplicate was found in sub-tree but we checked for duplicates above
                 assert(false): "what to do with: " + t + " in " + parent;
+                //probably ok, just merged with a subbranch?
                 //return null;
             }
 
@@ -282,21 +283,22 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     private int chooseLeaf(final T t, final HyperRegion tRect, Nodelike<T> parent, Spatialization<T> model) {
         if (size > 0) {
-            int bestNode = 0;
-            HyperRegion childMbr = child[0].region().mbr(tRect);
-            double tCost = tRect.cost();
-            double leastEnlargement = childMbr.cost() - (child[0].region().cost() + tCost);
-            double leastPerimeter = childMbr.perimeter();
+            int bestNode = -1;
+            double tCost = Double.POSITIVE_INFINITY;
+            double leastEnlargement = Double.POSITIVE_INFINITY;
+            double leastPerimeter = Double.POSITIVE_INFINITY;
 
-            for (int i = 1; i < size; i++) {
-                childMbr = child[i].region().mbr(tRect);
-                final double nodeEnlargement = childMbr.cost() - (child[i].region().cost() + tCost);
+            for (int i = 0; i < size; i++) {
+                HyperRegion cir = child[i].region();
+                HyperRegion childMbr = cir.mbr(tRect);
+                final double nodeEnlargement = childMbr.cost() - (cir.cost() + tCost);
+                double perimeter = childMbr.perimeter();
                 if (nodeEnlargement < leastEnlargement) {
                     leastEnlargement = nodeEnlargement;
-                    leastPerimeter = childMbr.perimeter();
+                    leastPerimeter = perimeter;
                     bestNode = i;
                 } else if (RTree.equals(nodeEnlargement, leastEnlargement)) {
-                    final double childPerimeter = childMbr.perimeter();
+                    final double childPerimeter = perimeter;
                     if (childPerimeter < leastPerimeter) {
                         leastEnlargement = nodeEnlargement;
                         leastPerimeter = childPerimeter;
@@ -305,6 +307,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                 } // else its not the least
 
             }
+            assert(bestNode != -1);
             return bestNode;
         } else {
             final Node<T, ?> n = model.newLeaf();

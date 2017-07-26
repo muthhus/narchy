@@ -248,7 +248,15 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test public void testEmbeddedConjNormalizationN2() throws Narsese.NarseseException {
         Compound alreadyNormalized = $("((a &&+1 b) &&+1 c)");
-        Compound needsNormalized = $("(a &&+1 (b &&+3 d))");
+        Compound needsNormalized = $("(a &&+1 (b &&+1 c))");
+        assertEquals(  needsNormalized, alreadyNormalized);
+        assertEquals(  needsNormalized.toString(), alreadyNormalized.toString() );
+        assertEquals(  needsNormalized.dt(), alreadyNormalized.dt() );
+        assertEquals(  needsNormalized.subterms(), alreadyNormalized.subterms() );
+    }
+    @Test public void testEmbeddedConjNormalizationN2Neg() throws Narsese.NarseseException {
+        Compound alreadyNormalized = $("((c &&+1 b) &&+1 a)");
+        Compound needsNormalized = $("(a &&-1 (b &&-1 c))");
         assertEquals(  needsNormalized, alreadyNormalized);
         assertEquals(  needsNormalized.toString(), alreadyNormalized.toString() );
         assertEquals(  needsNormalized.dt(), alreadyNormalized.dt() );
@@ -279,12 +287,15 @@ public class TermReductionsTest extends NarseseTest {
         String c = "(((d) &&+3 (a)) &&+1 (b))"; //corrected order
         Compound a = $("(((a) &&+1 (b)) &&-3 (d))");
         assertEquals(  c, a.toString());
-        assertEquals( a, $(c));
+        Term cc = $(c);
+        a.printRecursive();
+        cc.printRecursive();
+        assertEquals( a, cc);
     }
 
     @Test public void testEmbeddedConjNormalization2() throws Narsese.NarseseException {
         assertEquals(
-                "((((t2-->hold) &&+1 (t1-->at)) &&+3 (t1-->[opened])) &&+5 open(t1))",
+                "(((t2-->hold) &&+1 (t1-->at)) &&+3 ((t1-->[opened]) &&+5 open(t1)))",
                 $( "(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))").toString()
         );
     }
@@ -438,7 +449,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testTemporalConjunctionReduction2() throws Narsese.NarseseException {
-        assertEquals("(a&|(b &&+1 c))", $("(a &&+0 (b &&+1 c))").toString());
+        assertEquals("((b &&+1 c)&|a)", $("(a &&+0 (b &&+1 c))").toString());
     }
 
     @Test
@@ -599,7 +610,7 @@ public class TermReductionsTest extends NarseseTest {
     public void testConegatedConjunctionTerms2() throws Narsese.NarseseException {
         //(x && not(x&&y)) |- x && not(y)
         assertEquals(
-                "(#1&&(--,(robin-->swimmer)))",
+                "((--,(robin-->swimmer))&&#1)",
                 $("(#1 && --(#1&&(robin-->swimmer)))").toString()
         );
     }
@@ -839,13 +850,16 @@ public class TermReductionsTest extends NarseseTest {
     public void testGroupNonDTemporalParallelComponents() throws Narsese.NarseseException {
         //$.76;.45;.70$ ( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right))). :3537: %.64;.15%
         //$.39;.44;.70$ (((--,(ball_left)) &&-233 (ball_right)) &&-1 ((ball_left) &&+0 (ball_right))). :3243: %.53;.23%
+        Term c1 = $("((--,(ball_left)) &&-270 (ball_right)))");
+
+        assertEquals("((ball_right) &&+270 (--,(ball_left)))", c1.toString());
         assertEquals(
                 "(&|,(ball_left),(ball_right),((ball_right) &&+270 (--,(ball_left))))",
 
                 //HACK: this narsese parser isnt implemented yet:
                 //$("( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right)))")
 
-                parallel($("(ball_left)"), $("(ball_right)"), $("((--,(ball_left)) &&-270 (ball_right)))"))
+                parallel($("(ball_left)"), $("(ball_right)"), c1)
                         .toString());
 
     }
@@ -932,7 +946,7 @@ public class TermReductionsTest extends NarseseTest {
     public void testPromoteEternalToParallelDont() throws Narsese.NarseseException {
         String s = "(a&&(b&|c))";
         assertEquals(
-                "(a&&(b&|c))",
+                "((b&|c)&&a)",
                 $(s).toString()
         );
     }
