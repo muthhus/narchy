@@ -146,6 +146,27 @@ public class TemporalizeTest {
         assertNotNull(s);
         assertEquals("(b ==>+30 e)@ETE", s.toString());
     }
+    @Test public void testSolveConjSequenceMerge() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+
+        //  b ==>+10 c ==>+20 e
+
+        String A = "((a &&+3 c) &&+4 e)";
+        t.knowTerm($.$(A), 1);
+        String B = "b";
+        t.knowTerm($.$(B), 4);
+
+//        System.out.println( Joiner.on('\n').join( t.constraints.entrySet() ) );
+
+        HashMap h = new HashMap();
+        Temporalize.Event s = t.solve($.$("(" + A + " &&+- " + B + ")"), h);
+
+//        System.out.println();
+//        System.out.println( Joiner.on('\n').join( h.entrySet() ) );
+
+        assertNotNull(s);
+        assertEquals("((a &&+3 (b&|c)) &&+4 e)@[1..8]", s.toString());
+    }
 
 //    @Test
 //    public void testUnsolveableTerm() throws Narsese.NarseseException {

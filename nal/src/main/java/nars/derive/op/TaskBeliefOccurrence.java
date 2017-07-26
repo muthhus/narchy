@@ -43,8 +43,8 @@ abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
         }
     };
 
-    @Nullable
-    public static final PrediTerm eventsOrEternals = new TaskBeliefOccurrence("(eventsOrEternals)") {
+    /** same eternality */
+    @Nullable public static final PrediTerm eventsOrEternals = new TaskBeliefOccurrence("(eventsOrEternals)") {
 
         @Override
         public boolean test(@NotNull Derivation m) {

@@ -1218,6 +1218,10 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testInductionIntervalMerge3() {
 
+        //a 1
+        //c 4
+        //e 8
+        //b 4
         test
                 .inputAt(1, "(((a) &&+3 (c)) &&+4 (e)). :|:")
                 .inputAt(4, "(b). :|:")

@@ -147,7 +147,8 @@ public enum Op implements $ {
             //Term[] u = uu.length > 1 ? conjTrueFalseFilter(uu) : uu /* avoid true false filter if fall-through only-term anyway */;
 
 
-            final int n = tt.length;             assert(n>0);
+            final int n = tt.length;
+            assert (n > 0);
             switch (n) {
 
                 case 1:
@@ -231,9 +232,9 @@ public enum Op implements $ {
                 //ex: (x &&+ (y &&+ z))
                 //      becomes
                 //    ((x &&+ y) &&+ z)
-                if (dt > 0 && (b.op()==CONJ && !concurrent(b.dt()))) {
+                if (dt > 0 && (b.op() == CONJ && !concurrent(b.dt()))) {
                     return merge(a, 0, b, dt);
-                } else if (dt < 0 && (a.op()==CONJ && !concurrent(a.dt()))) {
+                } else if (dt < 0 && (a.op() == CONJ && !concurrent(a.dt()))) {
                     return merge(b, 0, a, -dt);
                 }
 
@@ -247,7 +248,6 @@ public enum Op implements $ {
                     tt[1] = x; //swap
                     dt = -dt;
                 }
-
 
 
                 return implInConjReduction(
@@ -317,6 +317,8 @@ public enum Op implements $ {
             return False;
         }
 
+
+
 //        /**
 //         * array implementation of the conjunction true/false filter
 //         */
@@ -382,7 +384,7 @@ public enum Op implements $ {
                 return x; //fall-through
             int dt = x.dt();
 
-            if (/*dt==DTERNAL || */dt==XTERNAL)
+            if (/*dt==DTERNAL || */dt == XTERNAL)
                 return x;
 
 
@@ -428,7 +430,6 @@ public enum Op implements $ {
             return IMPL.the(implDT, ia, ib);
         }
     },
-
 
 
     //SPACE("+", true, 7, Args.GTEOne),
@@ -726,82 +727,6 @@ public enum Op implements $ {
     }
 
 
-    @Nullable
-    public static Term merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
-
-        List<ObjectLongPair<Term>> events = $.newArrayList();
-
-        a.events(events, aStart);
-        b.events(events, bStart);
-
-        events.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
-
-        int ee = events.size();
-        assert (ee > 1);
-
-        //group all parallel clusters
-        {
-            //Term head = events.get(0).getOne();
-            long headAt = events.get(0).getTwo();
-            int groupStart = -1;
-            for (int i = 1; i <= ee; i++) {
-                long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
-                if (nextAt == headAt) {
-                    if (groupStart == -1) groupStart = i - 1;
-                } else {
-                    if (groupStart != -1) {
-                        int groupEnd = i;
-                        Term[] p = new Term[groupEnd - groupStart];
-                        assert (p.length > 1);
-                        long when = events.get(groupStart).getTwo();
-                        for (int k = 0, j = groupStart; j < groupEnd; j++) {
-                            p[k++] = events.get(groupStart).getOne();
-                            events.remove(groupStart);
-                            i--;
-                            ee--;
-                        }
-                        Term replacement = $.parallel(p);
-                        if (replacement == null)
-                            return null; //failure
-                        if (events.isEmpty()) {
-                            //got them all here
-                            return replacement;
-                        }
-                        events.add(i, PrimitiveTuples.pair(replacement, when));
-                        i++;
-                        ee++;
-                        groupStart = -1; //reset
-                    }
-                }
-                headAt = nextAt;
-            }
-        }
-
-        {
-            if (ee == 1) {
-                return events.get(0).getOne();
-            } else if (ee == 0) {
-                return null;
-            }
-
-            Term head = events.get(0).getOne();
-            long headAt = events.get(0).getTwo();
-            for (int i = 1; i < ee; i++) {
-
-                Term next = events.get(i).getOne();
-                long nextAt = events.get(i).getTwo();
-
-                int dt = (int) (nextAt - headAt);
-                head = CONJ.the(dt, head, next);
-
-                headAt = nextAt;
-            }
-            return head;
-        }
-
-    }
-
-
     static final ImmutableMap<String, Op> stringToOperator;
 
     static {
@@ -823,7 +748,6 @@ public enum Op implements $ {
         stringToOperator = Maps.immutable.ofMap(_stringToOperator);
 
         //System.out.println(Arrays.toString(byteSymbols));
-
 
 
 //        //Setup NativeOperator Character index hashtable
@@ -931,7 +855,10 @@ public enum Op implements $ {
         this.atomic = var || str.equals(".") /* atom */ || str.equals("`i") || str.equals("^") || str.equals("`");
 
         switch (str) {
-            case "||": case "{-]": case "-]-": case "-{-":
+            case "||":
+            case "{-]":
+            case "-]-":
+            case "-{-":
                 this.virtual = true;
                 break;
             default:
@@ -949,7 +876,7 @@ public enum Op implements $ {
                 allowsBool = false;
                 break;
         }
-        conceptualizable= !(var || virtual || str.equals("+") /* INT */);
+        conceptualizable = !(var || virtual || str.equals("+") /* INT */);
     }
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
@@ -970,6 +897,82 @@ public enum Op implements $ {
     public static boolean concurrent(int dt) {
         return (dt == DTERNAL) || (dt == 0);
     }
+
+            @Nullable
+        static public Term merge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
+
+            List<ObjectLongPair<Term>> events = $.newArrayList();
+
+            a.events(events, aStart);
+            b.events(events, bStart);
+
+            events.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
+
+            int ee = events.size();
+            assert (ee > 1);
+
+            //group all parallel clusters
+            {
+                //Term head = events.get(0).getOne();
+                long headAt = events.get(0).getTwo();
+                int groupStart = -1;
+                for (int i = 1; i <= ee; i++) {
+                    long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
+                    if (nextAt == headAt) {
+                        if (groupStart == -1) groupStart = i - 1;
+                    } else {
+                        if (groupStart != -1) {
+                            int groupEnd = i;
+                            Term[] p = new Term[groupEnd - groupStart];
+                            assert (p.length > 1);
+                            long when = events.get(groupStart).getTwo();
+                            for (int k = 0, j = groupStart; j < groupEnd; j++) {
+                                p[k++] = events.get(groupStart).getOne();
+                                events.remove(groupStart);
+                                i--;
+                                ee--;
+                            }
+                            Term replacement = $.parallel(p);
+                            if (replacement == null)
+                                return null; //failure
+                            if (events.isEmpty()) {
+                                //got them all here
+                                return replacement;
+                            }
+                            events.add(i, PrimitiveTuples.pair(replacement, when));
+                            i++;
+                            ee++;
+                            groupStart = -1; //reset
+                        }
+                    }
+                    headAt = nextAt;
+                }
+            }
+
+            {
+                if (ee == 1) {
+                    return events.get(0).getOne();
+                } else if (ee == 0) {
+                    return null;
+                }
+
+                Term head = events.get(0).getOne();
+                long headAt = events.get(0).getTwo();
+                for (int i = 1; i < ee; i++) {
+
+                    Term next = events.get(i).getOne();
+                    long nextAt = events.get(i).getTwo();
+
+                    int dt = (int) (nextAt - headAt);
+                    head = CONJ.the(dt, head, next);
+
+                    headAt = nextAt;
+                }
+                return head;
+            }
+
+        }
+
 
     @NotNull
     private static Term newDiff(@NotNull Op op, @NotNull Term... t) {
@@ -1046,7 +1049,7 @@ public enum Op implements $ {
                         Termed ff = index.getIfPresentElse(s1);
                         if (!mustFunctor || ff instanceof Functor) {
                             return Tuples.pair(
-                                    ((Atom)ff),
+                                    ((Atom) ff),
                                     ((Compound) s0)
                             );
                         }
@@ -1064,7 +1067,7 @@ public enum Op implements $ {
 
         //if (!subterms.internable())
         Term c = compound(op, subterms);
-        if (dt!=DTERNAL)
+        if (dt != DTERNAL)
             return new GenericCompoundDT((Compound) c, dt);
         return c;
 
@@ -1114,7 +1117,6 @@ public enum Op implements $ {
                     return True;
                 if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
                     return False;
-
 
 
                 boolean sNeg = subject.op() == NEG;
@@ -1505,10 +1507,17 @@ public enum Op implements $ {
             //special case: parallel
             String s;
             switch (this) {
-                case CONJ: s = ("&|"); break;
-                case IMPL: s = ("=|>"); break;
-                case EQUI: s = ("<|>"); break;
-                default: throw new UnsupportedOperationException();
+                case CONJ:
+                    s = ("&|");
+                    break;
+                case IMPL:
+                    s = ("=|>");
+                    break;
+                case EQUI:
+                    s = ("<|>");
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
             }
             w.append(s);
             return;
@@ -1527,16 +1536,16 @@ public enum Op implements $ {
 
         if (hasTime) {
 
-                if (invertDT)
-                    dt = -dt;
+            if (invertDT)
+                dt = -dt;
 
-                if (dt > 0) w.append('+');
-                String ts;
-                if (dt == XTERNAL)
-                    ts = "-";
-                else
-                    ts = Integer.toString(dt);
-                w.append(ts).append(' ');
+            if (dt > 0) w.append('+');
+            String ts;
+            if (dt == XTERNAL)
+                ts = "-";
+            else
+                ts = Integer.toString(dt);
+            w.append(ts).append(' ');
 
         }
     }
@@ -1620,7 +1629,8 @@ public enum Op implements $ {
             super(String.valueOf(Op.NullSym));
         }
 
-        @Override public @NotNull Term unneg() {
+        @Override
+        public @NotNull Term unneg() {
             return this;
         }
     }

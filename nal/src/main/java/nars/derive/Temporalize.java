@@ -615,13 +615,25 @@ public class Temporalize {
                         if (bt != null) {
 
                             try {
-                                int sd = dt(at, bt);
-                                if (sd != XTERNAL) {
-                                    //direct solution found
+                                if (o == CONJ && (a.op()==CONJ || b.op()==CONJ)) {
+                                    //conjunction merge, since the results could overlap
+                                    //either a or b, or both are conjunctions. and the result will be conjunction
+
+                                    Term cj = o.merge(a, at.abs(), b, bt.abs());
                                     return new SolutionEvent(
-                                            o.the(sd, new Term[]{a, b}),
-                                            o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs()
-                                    ).neg(isNeg);
+                                            cj,
+                                            Math.min(at.abs(), bt.abs())
+                                    );
+
+                                } else {
+                                    int sd = dt(at, bt);
+                                    if (sd != XTERNAL) {
+                                        //direct solution found
+                                        return new SolutionEvent(
+                                                o.the(sd, new Term[]{a, b}),
+                                                o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs()
+                                        ).neg(isNeg);
+                                    }
                                 }
                             } catch (UnsupportedOperationException e) {
                                 logger.warn("temporalization solution: {}", e.getMessage());
