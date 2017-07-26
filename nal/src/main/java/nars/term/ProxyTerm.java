@@ -354,10 +354,10 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.varPattern();
     }
 
-    @Override
-    public boolean unifyPossible(@Nullable Op t) {
-        return ref.unifyPossible(t);
-    }
+//    @Override
+//    public boolean unifyPossible(@Nullable Op t) {
+//        return ref.unifyPossible(t);
+//    }
 
     @Override
     public boolean isDynamic() {

@@ -43,21 +43,6 @@ public abstract class TermIndex implements TermContext {
     @Nullable
     public abstract Termed get(@NotNull Term key, boolean createIfMissing);
 
-//    @Override
-//    protected int dt(int dt) {
-//        NAR n = this.nar;
-//        if (n == null)
-//            return dt;
-//
-//        switch (dt) {
-//            case DTERNAL:
-//            case XTERNAL:
-//            case 0:
-//                return dt; //no-change
-//        }
-//
-//        return Math.abs(dt) < n.dur() ? 0 : dt;
-//    }
 
     /**
      * sets or replaces the existing value, unless the existing value is a PermanentConcept it must not
@@ -109,48 +94,6 @@ public abstract class TermIndex implements TermContext {
     public abstract void remove(@NotNull Term entry);
 
 
-//    public final HijacKache<Compound, Term> normalizations =
-//            new HijacKache<>(Param.NORMALIZATION_CACHE_SIZE, 4);
-//    public final HijacKache<ProtoCompound, Term> terms =
-//            new HijacKache<>(Param.TERM_CACHE_SIZE, 4);
-
-//    final Function<? super ProtoCompound, ? extends Term> termizer = pc -> {
-//
-//        return theSafe(pc.op(), pc.dt(), pc.terms() );
-//    };
-//
-//    private int volumeMax(Op op) {
-//        if (nar!=null) {
-//            return nar.termVolumeMax.intValue();
-//        } else {
-//            return Param.COMPOUND_VOLUME_MAX;
-//        }
-//    }
-
-//    @NotNull
-//    private final Term theSafe(@NotNull Op o, int dt, @NotNull Term[] u) {
-//        try {
-//            return super.the(o, dt, u);
-//            //return t == null ? False : t;
-//        } catch (@NotNull InvalidTermException | InvalidTaskException x) {
-//            if (Param.DEBUG_EXTRA) {
-//                logger.warn("{x} : {} {} {}", x, o, dt, u);
-//            }
-//        } catch (Throwable e) {
-//            logger.error("{x} : {} {} {}", e, o, dt, u);
-//        }
-//        return False; //place a False placeholder so that a repeat call will not have to discover this manually
-//    }
-
-//    @NotNull
-//    public final Term the(@NotNull Compound csrc, @NotNull TermContainer newSubs) {
-//        if (csrc.subterms().equals(newSubs)) {
-//            return csrc;
-//        } else {
-//            return the(csrc.op(), csrc.dt(), newSubs.terms());
-//        }
-//    }
-
     @NotNull
     public final Term the(@NotNull Compound csrc, @NotNull Term... args) {
         return csrc.equalTerms(args) ? csrc : csrc.op().the(csrc.dt(), args);
@@ -199,52 +142,6 @@ public abstract class TermIndex implements TermContext {
 
 
     abstract public Stream<Termed> stream();
-
-
-
-//    @Nullable
-//    public Term transform(@NotNull Compound src, @NotNull ByteList path, @NotNull Term replacement) {
-//        return transform(src, path, 0, replacement);
-//    }
-//
-//    @Nullable
-//    private Term transform(@NotNull Term src, @NotNull ByteList path, int depth, @NotNull Term replacement) {
-//        int ps = path.size();
-//        if (ps == depth)
-//            return replacement;
-//        if (ps < depth)
-//            throw new RuntimeException("path overflow");
-//
-//        if (!(src instanceof Compound))
-//            return src; //path wont continue inside an atom
-//
-//        int n = src.size();
-//        Compound csrc = (Compound) src;
-//
-//        Term[] target = new Term[n];
-//
-//
-//        boolean changed = false;
-//        for (int i = 0; i < n; ) {
-//            Term x = csrc.sub(i);
-//            Term y;
-//            if (path.get(depth) != i) {
-//                //unchanged subtree
-//                y = x;
-//            } else {
-//                //replacement is in this subtree
-//                y = transform(x, path, depth + 1, replacement);
-//                changed = true;
-//            }
-//
-//            target[i++] = y;
-//        }
-//
-//        if (!changed)
-//            return csrc;
-//
-//        return csrc.op().the(csrc.dt(), target);
-//    }
 
 
     /** un-normalized */
@@ -340,11 +237,6 @@ public abstract class TermIndex implements TermContext {
             return yy.normalize();
         }
 
-    }
-
-    @Nullable
-    public Term queryToDepVar(@NotNull Compound term) {
-        return term.transform(CompoundTransform.queryToDepVar);
     }
 
 

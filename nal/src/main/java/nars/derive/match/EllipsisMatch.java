@@ -106,7 +106,8 @@ public class EllipsisMatch extends GenericCompound {
 
     @Override
     public boolean isCommutative() {
-        throw new UnsupportedOperationException("it depends");
+        //throw new UnsupportedOperationException("it depends");
+        return false; //to be careful
     }
 
 

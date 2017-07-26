@@ -15,22 +15,22 @@ import static nars.time.Tense.ETERNAL;
  */
 abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
 
-    protected TaskBeliefOccurrence(@NotNull String x) {
+    TaskBeliefOccurrence(@NotNull String x) {
         super(x);
     }
 
-    public static final PrediTerm<Derivation> beliefDTSimultaneous = new TaskBeliefOccurrence("(beliefDTSimultaneous)") {
-
-        @Override
-        public boolean test(@NotNull Derivation m) {
-            if (m.belief != null) {
-                int dt = m.belief.dt();
-                return (dt == DTERNAL) || (dt == 0);
-            }
-            return false;
-        }
-
-    };
+//    public static final PrediTerm<Derivation> beliefDTSimultaneous = new TaskBeliefOccurrence("(beliefDTSimultaneous)") {
+//
+//        @Override
+//        public boolean test(@NotNull Derivation m) {
+//            if (m.belief != null) {
+//                int dt = m.belief.dt();
+//                return (dt == DTERNAL) || (dt == 0);
+//            }
+//            return false;
+//        }
+//
+//    };
 
 
     @Nullable
@@ -55,27 +55,27 @@ abstract public class TaskBeliefOccurrence extends AbstractPred<Derivation> {
         }
     };
 
-    /**
-     * task is before or simultaneous with belief which follows (T ... B)
-     */
-    @Nullable
-    public static final TaskBeliefOccurrence afterOrEternal = new TaskBeliefOccurrence("(afterOrEternal)") {
-
-        @Override
-        public boolean test(@NotNull Derivation m) {
-
-            /* true if belief is present and both task and belief are eternal */
-            Task b = m.belief;
-            if (b == null) return false;
-
-            long bOcc = b.start();
-            boolean bEternal = (bOcc == ETERNAL);
-
-            long tOcc = m.task.start();
-            boolean tEternal = (tOcc == ETERNAL);
-            return tEternal ?
-                    (bEternal) : //enforce lexical ordering so that the reverse isnt also computed
-                    (!bEternal && (bOcc <= tOcc));
-        }
-    };
+//    /**
+//     * task is before or simultaneous with belief which follows (T ... B)
+//     */
+//    @Nullable
+//    public static final TaskBeliefOccurrence afterOrEternal = new TaskBeliefOccurrence("(afterOrEternal)") {
+//
+//        @Override
+//        public boolean test(@NotNull Derivation m) {
+//
+//            /* true if belief is present and both task and belief are eternal */
+//            Task b = m.belief;
+//            if (b == null) return false;
+//
+//            long bOcc = b.start();
+//            boolean bEternal = (bOcc == ETERNAL);
+//
+//            long tOcc = m.task.start();
+//            boolean tEternal = (tOcc == ETERNAL);
+//            return tEternal ?
+//                    (bEternal) : //enforce lexical ordering so that the reverse isnt also computed
+//                    (!bEternal && (bOcc <= tOcc));
+//        }
+//    };
 }

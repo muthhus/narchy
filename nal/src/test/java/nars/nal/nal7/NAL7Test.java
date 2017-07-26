@@ -1319,14 +1319,19 @@ public class NAL7Test extends AbstractNALTest {
 //
 //    }
 
+//    static {
+//        Param.TRACE = true;
+//    }
+
     @Test
     public void testDecomposeImplPred() {
 
         test
-                .believe("( (a,#b) ==>+0 ( ( (x,#b) &| y) &| z ) )", Tense.Present, 1f, 0.9f)
-                .mustBelieve(cycles, "( (a,#b) ==>+0 (x,#b) )", 1f, 0.73f, 0)
-                .mustBelieve(cycles, "( (a,#b) ==>+0 y )", 1f, 0.73f, 0)
-                .mustBelieve(cycles, "( (a,#b) ==>+0 z )", 1f, 0.73f, 0)
+                .log()
+                .believe("( (a,#1) ==>+0 ( ( (x,#1) &| y) &| z ) )", Tense.Present, 1f, 0.9f)
+                .mustBelieve(cycles, "( (a,#1) =|> (x,#1) )", 1f, 0.73f, 0)
+                .mustBelieve(cycles, "( (a,#1) =|> y )", 1f, 0.73f, 0)
+                .mustBelieve(cycles, "( (a,#1) =|> z )", 1f, 0.73f, 0)
         ;
     }
 

@@ -79,12 +79,8 @@ public class Conclusion extends AbstractPred<Derivation> {
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
         Term b1  = d.transform(this.pattern);
-        if (b1 == null)
-            return true;
         if (b1.vars(null) > 0) {
             Term b2 = d.transform(b1);
-            if (b2 == null)
-                return true;
             //            if (!b1.equals(b2))
             //                System.out.println("second transform");
             b1 = b2;

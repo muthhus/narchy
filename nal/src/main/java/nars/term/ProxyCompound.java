@@ -87,10 +87,10 @@ public class ProxyCompound implements Compound/*, NonInternable*/ {
         return ref.OR(v);
     }
 
-    @Override
-    public boolean unifyPossible(@Nullable Op t) {
-        return ref.unifyPossible(t);
-    }
+//    @Override
+//    public boolean unifyPossible(@Nullable Op t) {
+//        return ref.unifyPossible(t);
+//    }
 
     @Override
     public boolean isDynamic() {

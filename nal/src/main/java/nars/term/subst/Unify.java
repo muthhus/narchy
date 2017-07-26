@@ -437,9 +437,7 @@ public abstract class Unify extends Versioning implements Subst {
                 int s = constraints.size();
                 for (int i = 0; i < s; i++) {
                     MatchConstraint cc = constraints.get(i);
-                    if (cc == null) /* why null? */
-                        throw new NullPointerException();
-                    //break;
+                    assert(cc!=null);
                     if (cc.invalid(x, Unify.this))
                         return false;
                 }

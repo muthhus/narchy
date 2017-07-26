@@ -13,6 +13,7 @@ import static nars.Op.VAR_QUERY;
 @FunctionalInterface public interface CompoundTransform  {
 
     CompoundTransform Identity = (parent, subterm) -> subterm;
+
     /**
      * change all query variables to dep vars
      */

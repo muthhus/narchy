@@ -930,10 +930,14 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default boolean unifyCommute(TermContainer y, @NotNull Unify subst) {
+
+        if (y.equals(this))
+            return true;
+
         //if there are no variables of the matching type, then it seems CommutivePermutations wouldnt match anyway
-        if (!unifyPossible(subst.type)) {
-            return false;
-        }
+//        if (!unifyPossible(subst.type)) {
+//            return false; //TODO this still may not be the final answer
+//        }
 
         //lexic sorted so that the formed termutator has a canonical representation, preventing permuted duplicates in the termute chain
         SortedSet<Term> xs = /*toSorted*/toSortedSet();

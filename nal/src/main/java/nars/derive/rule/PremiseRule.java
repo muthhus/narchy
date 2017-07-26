@@ -218,9 +218,9 @@ public class PremiseRule extends GenericCompound {
 //        if (b instanceof TermNotEquals) return TermNotEquals.class;
 
         if (b == TaskBeliefOccurrence.bothEvents) return TaskBeliefOccurrence.class;
-        if (b == TaskBeliefOccurrence.afterOrEternal) return TaskBeliefOccurrence.class;
+//        if (b == TaskBeliefOccurrence.afterOrEternal) return TaskBeliefOccurrence.class;
         if (b == TaskBeliefOccurrence.eventsOrEternals) return TaskBeliefOccurrence.class;
-        if (b == TaskBeliefOccurrence.beliefDTSimultaneous) return TaskBeliefOccurrence.class;
+//        if (b == TaskBeliefOccurrence.beliefDTSimultaneous) return TaskBeliefOccurrence.class;
 
         if (b instanceof SubTermStructure) return SubTermStructure.class;
 
@@ -550,6 +550,7 @@ public class PremiseRule extends GenericCompound {
                         case "\"&&\"":
                             pres.add(new TaskBeliefOp(CONJ, false, true));
                             break;
+                        default: throw new UnsupportedOperationException();
                     }
                     break;
 

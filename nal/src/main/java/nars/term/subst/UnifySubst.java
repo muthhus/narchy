@@ -22,7 +22,6 @@ public class UnifySubst extends Unify {
     final Predicate<Term> target;
     private Term a;
 
-    int matches;
 
     public UnifySubst(Op varType, @NotNull NAR n, Predicate<Term> target, int ttl) {
         super(n.terms, varType, n.random(), Param.UnificationStackMax, ttl);
@@ -35,15 +34,11 @@ public class UnifySubst extends Unify {
     @Override
     public Unify unify(@NotNull Term x, @NotNull Term y, boolean finish) {
         this.a = x;
-        this.matches = 0;
         super.unify(x, y, finish);
         return null;
     }
 
 
-    public int matches() {
-        return matches;
-    }
 
 
     @Override public void onMatch(Term[][] match) {
@@ -54,8 +49,8 @@ public class UnifySubst extends Unify {
 
 
             Term aa = resolve(a, xy);
-            if (aa!=null && target.test(aa))
-                matches++;
+            if (aa!=null)
+                target.test(aa);
 
 
 //        }

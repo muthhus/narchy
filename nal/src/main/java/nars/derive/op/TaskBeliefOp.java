@@ -14,7 +14,7 @@ public final class TaskBeliefOp extends AbstractPred<Derivation> {
     private final boolean belief;
 
     public TaskBeliefOp(Op op, boolean testTask, boolean testBelief) {
-        super($.func("op", $.quote(op.str), $.the(testTask ? "1" : "0"), $.the(testBelief ? "1" : "0")));
+        super($.func("op", $.quote(op.str), $.the(testTask ? 1 : 0), $.the(testBelief ? 1 : 0)));
         this.op = op.id;
         this.task = testTask;
         this.belief = testBelief;

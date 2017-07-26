@@ -441,8 +441,8 @@ public interface Compound extends Term, IPair, TermContainer {
             if (equals(ty))
                 return true;
 
-            if (vars(subst.type) == 0)
-                return false; //no free vars, the only way unification can proceed is if equal
+//            if (vars(subst.type) == 0)
+//                return false; //no free vars, the only way unification can proceed is if equal
 
             Op op = op();
             if (op != ty.op())
@@ -466,7 +466,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
             //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
-            if (isCommutative()) {
+            if (isCommutative() || y.isCommutative() /* in case one is XTERNAL and the other isn't; to be sure use this */) {
                 return xsubs.unifyCommute(ysubs, subst);
             } else {
                 return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);

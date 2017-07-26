@@ -16,6 +16,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import nars.term.transform.CompoundTransform;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.set.ImmutableSet;
@@ -332,7 +333,10 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
         int k = 0;
 
         arg[k++] = self;
-        arg[k/*++*/] = nar.terms.queryToDepVar($.negIf(s.term(), tr != null && tr.isNegative())); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+        arg[k/*++*/] =
+            ((Compound)$.negIf(s.term(), tr != null && tr.isNegative()))
+                    .transform(CompoundTransform.queryToDepVar); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+
 
 
         try {

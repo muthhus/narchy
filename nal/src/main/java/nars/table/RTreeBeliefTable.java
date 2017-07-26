@@ -339,7 +339,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             List<TaskRegion> tt = ct.topSorted(strongestTask, 2);
 
-            if (!tt.isEmpty()) {
 
                 switch (tt.size()) {
                     case 0:
@@ -355,7 +354,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                         return c != null ? c : a;
                 }
 
-            }
+
         }
 
         return null;
@@ -689,10 +688,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     public void remove(TaskRegion x) {
-        tree.removeAsync(x);
-    }
-
-    public void removeAsync(TaskRegion x) {
         tree.removeAsync(x);
     }
 
