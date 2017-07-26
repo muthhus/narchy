@@ -111,10 +111,11 @@ public class Temporalize {
         abstract public void apply(HashMap<Term, Time> trail);
     }
 
-    static int dt(Event a, Event b, HashMap<Term,Time> times) {
+    static int dt(Event a, Event b, HashMap<Term,Time> trail) {
 
-        if (a instanceof AbsoluteEvent && b instanceof AbsoluteEvent) {
-            return dt(a.start(times), b.start(times));
+        if (a instanceof AbsoluteEvent || b instanceof AbsoluteEvent) {
+            //at least one or both are absolute, forming a valid temporal grounding
+            return dt(a.start(trail), b.start(trail));
             //return dt(a.start(times), b.end(times));
         } else if (a instanceof RelativeEvent && b instanceof RelativeEvent) {
             RelativeEvent ra = (RelativeEvent) a;
@@ -180,7 +181,13 @@ public class Temporalize {
         }
 
         @Override
-        public Time start(HashMap<Term, Time> ignored) {
+        public Time start(@Nullable HashMap<Term, Time> ignored) {
+//            if(ignored!=null) {
+//                Time existingTime = ignored.get(term);
+//                if (existingTime != null) {
+//                    System.out.println("conflict?: " + existingTime + " " + Time.the(start, 0));
+//                }
+//            }
             return Time.the(start, 0);
         }
 
@@ -605,23 +612,20 @@ public class Temporalize {
 
     void add(Term term, Event event) {
         FasterList<Event> l = constraints.computeIfAbsent(term, (t) -> new FasterList<>());
-        if (l.isEmpty()) {
-            l.add(event);
-        } else {
-            l.add(0, event);
+        l.add(event);
+        if (l.size() > 1) {
             l.sortThis();
         }
     }
 
     Event solve(Term target) {
-        return solve(target, new HashMap());
+        return solve(target, new HashMap<>(target.volume()));
     }
 
     Event solve(Term target, HashMap<Term, Time> times) {
         boolean isNeg = target.op() == NEG;
         if (isNeg)
             target = target.unneg();
-
 
         Event known = solveEvent(target, times);
         if (known != null)
@@ -659,8 +663,6 @@ public class Temporalize {
 
                         if (at != null) {
 
-                            //Time bt = solveTime(b, times);
-
                             Term b = eb.term;
                             Time bt = eb.start(times);
 
@@ -675,29 +677,22 @@ public class Temporalize {
                                         long bta = bt.abs();
                                         if (ata == ETERNAL && bta == ETERNAL) {
                                             ata = at.offset;
-                                            bta = bt.offset;
+                                            bta = bt.offset + a.dtRange();
                                         } else if (ata == ETERNAL ^ bta == ETERNAL) {
                                             return null; //one is eternal the other isn't
                                         }
-                                        Term cj = $.negIf(Op.merge(a, ata, b, bta) , isNeg);
-                                        ///*Event e = */solveGraph(cj, times);
+                                        Term newTerm = $.negIf(Op.merge(a, ata, b, bta) , isNeg);
                                         long start = Math.min(at.abs() , bt.abs());
-                                        Event e = new SolutionEvent(
-                                                cj,
-                                                start
-                                        ).neg(isNeg);
+                                        Event e = new SolutionEvent( newTerm, start );
 //                                        times.put(e.term, e.start(times));
                                         return e;
                                     } else {
                                         int sd = dt(ea, eb, times);
                                         if (sd != XTERNAL) {
                                             long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
-                                            Event e = new SolutionEvent(
-                                                    o.the(sd, a, b),
-                                                    start
-                                            ).neg(isNeg);
-                                            //know(null, e.term, start, start + e.term.dtRange());
-                                            times.put(e.term, Time.the(start, 0));
+                                            Term newTerm = $.negIf(o.the(sd, a, b), isNeg);
+                                            Event e = new SolutionEvent( newTerm, start );
+                                            //times.put(e.term, Time.the(start, 0));
                                             return e;
                                         }
                                     }
@@ -719,11 +714,7 @@ public class Temporalize {
 
     private Event solveSub(HashMap<Term, Time> times, TermContainer tt, int subterm) {
         Term a = tt.sub(subterm);
-        //Time at = solveTime(a, times);
-        Event e = solve(a, times);
-        if (e == null)
-            return null;
-        return e;
+        return solve(a, times);
     }
 
     @Nullable
@@ -762,14 +753,13 @@ public class Temporalize {
         if (ea == null)
             return null; //no idea how to solve that term
 
+        int eas = ea.size(); assert(eas > 0);
 
-        //Set<Event> events = new UnifiedSet<>(0);
 
-        for (int i = 0, eaSize = ea.size(); i < eaSize; i++) {
+        for (int i = 0, eaSize = eas; i < eaSize; i++) {
             Event x = ea.get(i);
             Time xs = x.start(trail);
             if (xs != null) {
-                //events.add(x);
                 return x;
             }
 //                if (xs != Unknown) {
@@ -777,12 +767,6 @@ public class Temporalize {
 //                    return x;
 //                }
         }
-//        int as = events.size();
-//        if (as > 0) {
-//            //choose randomly
-//            Event[] aa = events.toArray(new Event[as]);
-//            return aa[random.nextInt(as)];
-//        }
 
         return null;
     }
