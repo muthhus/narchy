@@ -6,6 +6,7 @@ import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
+import nars.op.substitute;
 import nars.task.DerivedTask;
 import nars.term.Functor;
 import nars.term.Term;
@@ -116,9 +117,9 @@ public class Derivation extends Unify implements TermContext {
     private long[] evidenceDouble, evidenceSingle;
 
     public boolean cyclic, overlap;
-    //public final float overlapAmount;
 
-    private final Functor substituteIfUnifiesAny, substituteIfUnifiesDep, polarize;
+    /** deriver-local functors, which need to interact with the derivation directly */
+    private final Functor substituteIfUnifiesAny, substituteIfUnifiesDep, polarize, substitute;
 
     public float premisePri;
     public short[] parentCause;
@@ -166,6 +167,11 @@ public class Derivation extends Unify implements TermContext {
             }
             return compared.isNegative() ? $.neg(subterm) : subterm;
         });
+        substitute = new substitute() {
+            @Override protected void onChange(Term from, Term x, Term y, Term to) {
+                putXY(x, y); //TODO verify correct direction and whether reverse is also needed
+            }
+        };
     }
 
 
@@ -179,6 +185,8 @@ public class Derivation extends Unify implements TermContext {
                     return substituteIfUnifiesDep;
                 case "polarize":
                     return polarize;
+                case "substitute":
+                    return substitute;
             }
             return terms.get(x, createIfAbsent);
         }

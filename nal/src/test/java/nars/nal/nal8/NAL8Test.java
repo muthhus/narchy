@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 100;
+    final int cycles = 30;
 
     @Test
     public void subsent_1() {
@@ -656,9 +656,9 @@ public class NAL8Test extends AbstractNALTest {
         TestNAR tester = test;
 
         tester.input("(a:b<=>c:d)."); //ETERNAL
-        tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
-        tester.mustBelieve(cycles, "(a:b &&+0 e:f)", 1.0f, 0.81f, 0);
-        tester.mustNotOutput(cycles, "(a:b &&+0 e:f)", BELIEF, ETERNAL);
+        tester.input("(c:d &| e:f). :|:"); //PRESENT
+        tester.mustBelieve(cycles, "(a:b &| e:f)", 1.0f, 0.81f, 0);
+        tester.mustNotOutput(cycles, "(a:b &| e:f)", BELIEF, ETERNAL);
     }
 
     @Test

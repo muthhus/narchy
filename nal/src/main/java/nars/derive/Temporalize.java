@@ -784,7 +784,8 @@ public class Temporalize {
 
                 Event ce = solve(c, trail);
 
-                trail.remove(c);
+                if (trail.get(c)==null)
+                    trail.remove(c);
 
                 if (ce!=null) {
                     if (c.contains(a)) {
@@ -813,7 +814,7 @@ public class Temporalize {
 
             }
 
-            int retries = rr > 2 ? 1 : 0;
+            int retries = rr > 2 ? 2 : 1;
 
             for (int i = 0; i < retries; i++) {
 
