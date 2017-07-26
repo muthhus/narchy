@@ -20,7 +20,6 @@ public class NAL5BooleanConsistency {
 
         Param.DEBUG = true;
 
-        float confthresh = 0.67f;
 
 //        final Deriver e = Deriver.get(
 //                "induction.nal", "nal6.nal"
@@ -80,10 +79,10 @@ public class NAL5BooleanConsistency {
                         assertTrue("unrecognized true case", false);
 
 
-                    if (thisone && b!=null && b.isNegative() && b.conf() > confthresh)
+                    if (thisone && b!=null && b.isNegative() && b.conf() > 0)
                         assertTrue("wrong true case:\n" + t.proof(), false);
 
-                    if (!thisone && b!=null && b.isPositive() && b.conf() > confthresh)
+                    if (!thisone && b!=null && b.isPositive() && b.conf() > 0)
                         assertTrue("wrong false case:\n" + t.proof(), false);
 
                 }

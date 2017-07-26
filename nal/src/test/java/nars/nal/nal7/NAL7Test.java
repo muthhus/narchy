@@ -795,9 +795,9 @@ public class NAL7Test extends AbstractNALTest {
 
         test
                 .input("(((x) &&+1 (y)) &&+1 (z)). :|:")
-                .mustBelieve(cycles*2, "((x) &&+1 (y))", 1f, 0.81f, 0, 1)
-                .mustBelieve(cycles*2, "((y) &&+1 (z))", 1f, 0.81f, 1, 2)
-                .mustBelieve(cycles*2, "((x) &&+2 (z))", 1f, 0.81f, 0, 2);
+                .mustBelieve(cycles, "((x) &&+1 (y))", 1f, 0.81f, 0, 1)
+                .mustBelieve(cycles, "((y) &&+1 (z))", 1f, 0.81f, 1, 2)
+                .mustBelieve(cycles, "((x) &&+2 (z))", 1f, 0.81f, 0, 2);
     }
 
     @Test

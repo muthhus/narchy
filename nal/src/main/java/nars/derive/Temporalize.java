@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.list.FasterList;
+import jcog.math.Interval;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Op;
@@ -9,6 +10,8 @@ import nars.control.Derivation;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
+import nars.time.Tense;
+import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
+import static nars.Op.subterms;
 import static nars.time.Tense.*;
 
 /**
@@ -138,6 +142,35 @@ public class Temporalize {
         return XTERNAL;
     }
 
+    static long[] intersect(Event a, Event b, HashMap<Term, Time> trail) {
+        Time as = a.start(trail);
+        if (as!=null) {
+            Time bs = b.start(trail);
+            if (bs!=null) {
+                if (as.base == ETERNAL && bs.base == ETERNAL) {
+                    return Tense.ETERNAL_RANGE;
+                } else if (as.base != ETERNAL && bs.base != ETERNAL) {
+                    Time ae = a.end(trail);
+                    Time be = b.end(trail);
+                    Interval ab = Interval.intersect(as.base, ae.base, bs.base, be.base);
+                    return new long[] { ab.a, ab.b };
+                } else  {
+                    //one is eternal, the other isn't. use the non-eternal range
+                    long start, end;
+                    if (as.base==ETERNAL) {
+                        start = bs.base;
+                        end = b.end(trail).base;
+                    } else {
+                        start = as.base;
+                        end = a.end(trail).base;
+                    }
+                    return new long[] { start ,end };
+                }
+            }
+        }
+        return null;
+    }
+
     static int dt(Time a, Time b) {
 
         assert (a.base != XTERNAL);
@@ -213,7 +246,10 @@ public class Temporalize {
     public class SolutionEvent extends AbsoluteEvent {
 
         SolutionEvent(Term term, long start) {
-            super(term, start, start != ETERNAL ? start + term.dtRange() : ETERNAL);
+            this(term, start, start != ETERNAL ? start + term.dtRange() : ETERNAL);
+        }
+        SolutionEvent(Term term, long start, long end) {
+            super(term, start, end);
         }
 
 //        SolutionEvent(Term unknown) {
@@ -486,14 +522,16 @@ public class Temporalize {
      * convenience method for testing: assumes start offset of zero, and dtRange taken from term
      */
     Temporalize knowTerm(Term term, long when) {
-        Event e;
-        //if (when != ETERNAL) {
-        e = new AbsoluteEvent(term, when, when != ETERNAL ? when + term.dtRange() : ETERNAL);
-//        } else {
-//            e = null; //assume eternal otherwise
-//        }
+        return knowTerm(term, when, when != ETERNAL ? when + term.dtRange() : ETERNAL);
+    }
 
-        know(e, term, 0, term.dtRange());
+    /**
+     * convenience method for testing: assumes start offset of zero, and dtRange taken from term
+     */
+    Temporalize knowTerm(Term term, long from, long to) {
+        know(new AbsoluteEvent(term, from, to), term,
+                0, from!=ETERNAL ? (int)(to-from) : term.dtRange()
+        );
         return this;
     }
 
@@ -502,6 +540,7 @@ public class Temporalize {
      * recursively calculates the start and end time of all contained events within a term
      *
      * @param occ superterm occurrence, may be ETERNAL
+     * @param start, end - term-local temporal bounds
      */
     void know(@Nullable Event parent, Term term, int start, int end) {
 
@@ -624,12 +663,12 @@ public class Temporalize {
         return solve(target, new HashMap<>(target.volume()));
     }
 
-    Event solve(Term target, HashMap<Term, Time> times) {
+    Event solve(Term target, HashMap<Term, Time> trail) {
         boolean isNeg = target.op() == NEG;
         if (isNeg)
             target = target.unneg();
 
-        Event known = solveEvent(target, times);
+        Event known = solveEvent(target, trail);
         if (known != null)
             return known.neg(isNeg);
 
@@ -648,25 +687,25 @@ public class Temporalize {
                         Event ea, eb;
                         if (random.nextBoolean()) {
                             //forward order: sub 0 first
-                            ea = solveSub(times, tt, 0);
+                            ea = solveSub(trail, tt, 0);
                             if (ea == null) return null;
-                            eb = solveSub(times, tt, 1);
+                            eb = solveSub(trail, tt, 1);
                             if (eb == null) return null;
                         } else {
                             //reverse order: sub 1 first
-                            eb = solveSub(times, tt, 1);
+                            eb = solveSub(trail, tt, 1);
                             if (eb == null) return null;
-                            ea = solveSub(times, tt, 0);
+                            ea = solveSub(trail, tt, 0);
                             if (ea == null) return null;
                         }
 
                         Term a = ea.term;
-                        Time at = ea.start(times);
+                        Time at = ea.start(trail);
 
                         if (at != null) {
 
                             Term b = eb.term;
-                            Time bt = eb.start(times);
+                            Time bt = eb.start(trail);
 
                             if (bt != null) {
 
@@ -688,7 +727,7 @@ public class Temporalize {
                                         Event e = new SolutionEvent(newTerm, start);
                                         return e;
                                     } else {
-                                        int sd = dt(ea, eb, times);
+                                        int sd = dt(ea, eb, trail);
 //                                        if (o == CONJ && sd != DTERNAL && sd != XTERNAL) {
 //                                            sd -= a.dtRange(); sd -= b.dtRange();
 //                                        }
@@ -713,6 +752,47 @@ public class Temporalize {
                     }
                 }
             }
+        }
+
+        /** compute the temporal intersection of all involved terms. if they are coherent, then
+         * create the solved term as-is (since it will not contain any XTERNAL) with the appropriate
+         * temporal bounds. */
+
+        if (target.op().statement) {
+            Term a = target.sub(0);
+            Term b = target.sub(1);
+
+            //choose two absolute events which cover both 'a' and 'b' terms
+            List<Event> relevant = $.newArrayList();
+            Set<Term> uncovered = Sets.mutable.of(a,b);
+            for (Term c : constraints.keySet()) {
+                boolean relevance = false;
+
+                Event ce = solve(c, trail);
+                if (ce!=null) {
+                    if (c.contains(a)) {
+                        uncovered.remove(a);
+                        relevance = true;
+                    }
+                    if (c.contains(b)) {
+                        uncovered.remove(b);
+                        relevance = true;
+                    }
+                    if (relevance) relevant.add(ce);
+                }
+                if (uncovered.isEmpty())
+                    break; //got them all
+            }
+            if (!uncovered.isEmpty())
+                return null; //insufficient information
+
+            //HACK just use the only two for now, it is likely what is relevant anyway
+            Collections.shuffle(relevant, random);
+            long[] ii = intersect(relevant.get(0), relevant.get(1), trail);
+            if (ii!=null) {
+                return new SolutionEvent(target, ii[0], ii[1]);
+            }
+
         }
 
         return null;
