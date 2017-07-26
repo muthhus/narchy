@@ -6,6 +6,7 @@ import nars.control.Derivation;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;
@@ -92,8 +93,10 @@ abstract public class substituteIfUnifies extends Functor {
         Term input = a.sub(0);
 
         Term x = a.sub(1);
-        Term y = a.sub(2);
+        if (x instanceof Bool) return Null;
 
+        Term y = a.sub(2);
+        if (y instanceof Bool) return Null;
 
         boolean strict = a.subEquals(3, substitute.STRICT);
         if (x.equals(y))

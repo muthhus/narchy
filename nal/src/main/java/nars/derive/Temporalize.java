@@ -196,6 +196,9 @@ public class Temporalize {
         AbsoluteEvent(Term term, long start, long end) {
             super(term);
 
+            if (start!=ETERNAL && end==ETERNAL)
+                end = start; //point-like
+
             assert ((start == ETERNAL && end == ETERNAL) || (start != ETERNAL && end != ETERNAL)) :
                     "invalid semi-eternalization: " + start + " " + end;
 
@@ -801,10 +804,26 @@ public class Temporalize {
                 return null; //insufficient information
 
             //HACK just use the only two for now, it is likely what is relevant anyway
-            Collections.shuffle(relevant, random);
-            long[] ii = intersect(relevant.get(0), relevant.get(1), trail);
-            if (ii!=null) {
-                return new SolutionEvent(target, ii[0], ii[1]);
+            int rr = relevant.size();
+            switch (rr) {
+                case 0: return null; //can this happen?
+                case 1:
+                    Event r = relevant.get(0);
+                    return new SolutionEvent(target, r.start(trail).abs(), r.end(trail).abs());
+
+            }
+
+            int retries = rr > 2 ? 1 : 0;
+
+            for (int i = 0; i < retries; i++) {
+
+                if (rr>2)
+                    Collections.shuffle(relevant, random); //dont reshuffle if only 2, it's pointless; intersection is symmetric
+
+                long[] ii = intersect(relevant.get(0), relevant.get(1), trail);
+                if (ii!=null) {
+                    return new SolutionEvent(target, ii[0], ii[1]);
+                }
             }
 
         }
