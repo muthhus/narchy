@@ -795,9 +795,9 @@ public class NAL7Test extends AbstractNALTest {
 
         test
                 .input("(((x) &&+1 (y)) &&+1 (z)). :|:")
-                .mustBelieve(cycles, "((x) &&+1 (y))", 1f, 0.81f, 0, 1)
-                .mustBelieve(cycles, "((y) &&+1 (z))", 1f, 0.81f, 1, 2)
-                .mustBelieve(cycles, "((x) &&+2 (z))", 1f, 0.81f, 0, 2);
+                .mustBelieve(cycles*2, "((x) &&+1 (y))", 1f, 0.81f, 0, 1)
+                .mustBelieve(cycles*2, "((y) &&+1 (z))", 1f, 0.81f, 1, 2)
+                .mustBelieve(cycles*2, "((x) &&+2 (z))", 1f, 0.81f, 0, 2);
     }
 
     @Test
@@ -1268,9 +1268,9 @@ public class NAL7Test extends AbstractNALTest {
         */
 
         test
-                .inputAt(1, "(((d&&((a-->b) &&+1 (b-->c))) ==>+8 e) &&+9 (d-->e)). :|:")
-                .inputAt(1, "((d&&((a-->b) &&+1 (b-->c))) ==>+8 e). :|:")
-                .mustBelieve(cycles, "(d-->e)", 1f, 0.45f /*0.73f*/, 11 /* 10? */)
+                .inputAt(1, "(((((a-->b) &&+1 (b-->c))) ==>+8 e) &&+9 (d-->e)). :|:")
+                .inputAt(1, "((((a-->b) &&+1 (b-->c))) ==>+8 e). :|:")
+                .mustBelieve(cycles, "(d-->e)", 1f, 0.45f /*0.73f*/, 10 /* 10? */)
                 .mustNotOutput(cycles, "(d-->e)", BELIEF, ETERNAL, 1, 19);
     }
 

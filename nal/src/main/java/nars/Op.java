@@ -239,7 +239,7 @@ public enum Op implements $ {
                 int subEventsLeft = aConj ? conjSubEventCount(a) : 0;
                 boolean bConj = b instanceof Compound && b.op() == CONJ;
                 int subEventsRight = bConj ? conjSubEventCount(b) : 0;
-                if (subEventsLeft > 0 || subEventsRight > 0) {
+                if (subEventsLeft > 1 || subEventsRight > 0) {
                     //rebalance and align
                     boolean imbalanced = false;
                     if (Math.abs(subEventsLeft - subEventsRight) > 1)
@@ -974,16 +974,25 @@ public enum Op implements $ {
             headAt = nextAt;
         }
 
+        return conj(events);
+    }
+
+    /** constructs a correctly merged conjunction from a list of events */
+    public static Term conj(List<ObjectLongPair<Term>> events) {
+
+        int ee = events.size();
         switch (ee) {
-            case 1:
-                return e0.getOne();
             case 0:
                 return True;
+            case 1:
+                return events.get(0).getOne();
             default:
-                return conjMergeBalance(events, 0, ee-1);
+                return conj(events, 0, events.size()-1);
         }
     }
-    protected static Term conjMergeBalance(List<ObjectLongPair<Term>> events, int from, int to) {
+
+    /** constructs a correctly merged conjunction from a list of events, in the sublist specified by from..to (inclusive) */
+    public static Term conj(List<ObjectLongPair<Term>> events, int from, int to) {
         int ee = to - from;
         switch (ee) {
             case 0:
@@ -1000,21 +1009,23 @@ public enum Op implements $ {
         int dt = (int) (events.get(center + 1).getTwo() - events.get(center).getTwo());
 
 
-        Term left = conjMergeBalance(events, from, center);
-        if (left == False) return False;
-        if (left == Null) return Null;
+        Term left = conj(events, from, center);
 
-        Term right = conjMergeBalance(events, center + 1, to);
-        if (right == False) return False;
-        if (right == Null) return Null;
-
-        if (left == True) return right;
-        if (right == True) return left;
+        Term right = conj(events, center + 1, to);
         return conjNonCommFinal(dt, left, right);
     }
 
     /** HACK */
     private static Term conjNonCommFinal(int dt, Term left, Term right) {
+        if (left == False) return False;
+        if (left == Null) return Null;
+
+        if (right == False) return False;
+        if (right == Null) return Null;
+
+        if (left == True) return right;
+        if (right == True) return left;
+
         //System.out.println(left + " " + right + " " + left.compareTo(right));
         //return CONJ.the(dt, left, right);
         if (left.compareTo(right) > 0) {

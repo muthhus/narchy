@@ -128,6 +128,23 @@ public class TemporalizeTest {
         assertEquals("(x ==>+5 z)@ETE", s.toString());
     }
 
+    @Test public void testSolveRecursiveConjDecomposition() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("((x &&+1 y) &&+1 z)"), 0);
+
+        assertEquals("x@0", t.solve($.$("x")).toString());
+        assertEquals("y@1", t.solve($.$("y")).toString());
+        assertEquals("z@2", t.solve($.$("z")).toString());
+
+        assertEquals("(x &&+2 z)@[0..2]", t.solve($.$("(x &&+- z)")).toString());
+        assertEquals("(x &&+1 y)@[0..1]", t.solve($.$("(x &&+- y)")).toString());
+        assertEquals("(y &&+1 z)@[1..2]", t.solve($.$("(y &&+- z)")).toString());
+
+        assertEquals("(x ==>+2 z)@0", t.solve($.$("(x ==>+- z)")).toString());
+        assertEquals("(x ==>+1 y)@0", t.solve($.$("(x ==>+- y)")).toString());
+        assertEquals("(y ==>+1 z)@1", t.solve($.$("(y ==>+- z)")).toString());
+    }
+
     @Test public void testSolveEternalButRelative2() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
 
@@ -147,6 +164,7 @@ public class TemporalizeTest {
         assertNotNull(s);
         assertEquals("(b ==>+30 e)@ETE", s.toString());
     }
+
     @Test public void testSolveConjSequenceMerge() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
 

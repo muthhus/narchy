@@ -895,8 +895,10 @@ public interface Compound extends Term, IPair, TermContainer {
         return DTERNAL; //not found
     }
 
-    @Override
-    default void events(List<ObjectLongPair<Term>> events, long offset) {
+
+
+    /* collects any contained events within a conjunction*/
+    @Override default void events(List<ObjectLongPair<Term>> events, long offset) {
         Op o = op();
         if (o == CONJ) {
             int dt = dt();

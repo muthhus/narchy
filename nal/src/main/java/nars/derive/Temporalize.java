@@ -36,7 +36,9 @@ public class Temporalize {
     final Map<Term, FasterList<Event>> constraints = new HashMap();
     final Random random;
 
-    /** for testing */
+    /**
+     * for testing
+     */
     protected Temporalize() {
         this(new XorShift128PlusRandom(1));
     }
@@ -110,7 +112,7 @@ public class Temporalize {
         abstract public void apply(HashMap<Term, Time> trail);
     }
 
-    static int dt(Event a, Event b, HashMap<Term,Time> trail) {
+    static int dt(Event a, Event b, HashMap<Term, Time> trail) {
 
         if (a instanceof AbsoluteEvent || b instanceof AbsoluteEvent) {
             //at least one or both are absolute, forming a valid temporal grounding
@@ -128,7 +130,7 @@ public class Temporalize {
                 int forward = -ra.start;
                 int reverse = rb.start;
                 if (Math.signum(forward) == Math.signum(reverse)) {
-                    return (forward + reverse)/2;
+                    return (forward + reverse) / 2;
                 }
             }
         }
@@ -171,7 +173,7 @@ public class Temporalize {
 
         @Override
         public void apply(HashMap<Term, Time> trail) {
-            trail.put(term, Time.the(start,0)); //direct set
+            trail.put(term, Time.the(start, 0)); //direct set
         }
 
         @Override
@@ -211,7 +213,7 @@ public class Temporalize {
     public class SolutionEvent extends AbsoluteEvent {
 
         SolutionEvent(Term term, long start) {
-            super(term, start, start!=ETERNAL ?start + term.dtRange() : ETERNAL);
+            super(term, start, start != ETERNAL ? start + term.dtRange() : ETERNAL);
         }
 
 //        SolutionEvent(Term unknown) {
@@ -224,7 +226,7 @@ public class Temporalize {
      */
     static class Time {
 
-//        public static Time Unknown = new Time(ETERNAL, XTERNAL);
+        //        public static Time Unknown = new Time(ETERNAL, XTERNAL);
         public final long base;
         public final int offset;
 
@@ -248,16 +250,15 @@ public class Temporalize {
         }
 
 
-
         static Time the(long base, int offset) {
 //            if (base == ETERNAL && offset == XTERNAL)
 //                return Unknown;
 //            else {
 
-                if (base != ETERNAL && offset != DTERNAL && offset != XTERNAL)
-                    return new Time(base + offset, 0); //direct absolute
-                else
-                    return new Time(base, offset);
+            if (base != ETERNAL && offset != DTERNAL && offset != XTERNAL)
+                return new Time(base + offset, 0); //direct absolute
+            else
+                return new Time(base, offset);
 //            }
         }
 
@@ -269,7 +270,7 @@ public class Temporalize {
 
         public Time add(int offset) {
 
-            if (offset==0)
+            if (offset == 0)
                 return this;
 
             assert (this.offset != DTERNAL && offset != DTERNAL);
@@ -288,7 +289,7 @@ public class Temporalize {
 //            assert(offset!=XTERNAL);
 //            assert(offset!=DTERNAL);
 //            return base + offset;
-            if (base!=ETERNAL && offset!=DTERNAL && offset!=XTERNAL)
+            if (base != ETERNAL && offset != DTERNAL && offset != XTERNAL)
                 return base + offset;
             else
                 return ETERNAL;
@@ -314,7 +315,7 @@ public class Temporalize {
         @Override
         public void apply(HashMap<Term, Time> trail) {
             Time t = resolve(this.start, trail);
-            if (t!=null)
+            if (t != null)
                 trail.putIfAbsent(term, t); //direct set
         }
 
@@ -324,7 +325,8 @@ public class Temporalize {
         }
 
         @Override
-        @Nullable public Time start(HashMap<Term, Time> trail) {
+        @Nullable
+        public Time start(HashMap<Term, Time> trail) {
             return resolve(this.start, trail);
         }
 
@@ -333,7 +335,8 @@ public class Temporalize {
             return resolve(this.end, trail);
         }
 
-        @Nullable protected Time resolve(int offset, HashMap<Term, Time> trail) {
+        @Nullable
+        protected Time resolve(int offset, HashMap<Term, Time> trail) {
 
             Time rt = solveTime(rel, trail);
             if (rt != null) {
@@ -452,9 +455,9 @@ public class Temporalize {
 
         HashMap<Term, Temporalize.Time> times = new HashMap();
         Event e = model.solve(pattern, times);
-        if (e!=null) {
+        if (e != null) {
             if (e instanceof AbsoluteEvent) {
-                AbsoluteEvent a = (AbsoluteEvent)e; //faster, preferred since pre-calculated
+                AbsoluteEvent a = (AbsoluteEvent) e; //faster, preferred since pre-calculated
                 occ[0] = a.start;
                 occ[1] = a.end;
             } else {
@@ -485,7 +488,7 @@ public class Temporalize {
     Temporalize knowTerm(Term term, long when) {
         Event e;
         //if (when != ETERNAL) {
-            e = new AbsoluteEvent(term, when, when != ETERNAL ? when + term.dtRange() : ETERNAL);
+        e = new AbsoluteEvent(term, when, when != ETERNAL ? when + term.dtRange() : ETERNAL);
 //        } else {
 //            e = null; //assume eternal otherwise
 //        }
@@ -509,7 +512,7 @@ public class Temporalize {
                 return;
         }
 
-        if (parent!=null)
+        if (parent != null)
             add(parent, term, start, end);
 
         if (term instanceof Compound) {
@@ -680,18 +683,22 @@ public class Temporalize {
                                         } else if (ata == ETERNAL ^ bta == ETERNAL) {
                                             return null; //one is eternal the other isn't
                                         }
-                                        Term newTerm = $.negIf(Op.conjMerge(a, ata, b, bta) , isNeg);
-                                        long start = Math.min(at.abs() , bt.abs());
-                                        Event e = new SolutionEvent( newTerm, start );
-//                                        times.put(e.term, e.start(times));
+                                        Term newTerm = $.negIf(Op.conjMerge(a, ata, b, bta), isNeg);
+                                        long start = Math.min(at.abs(), bt.abs());
+                                        Event e = new SolutionEvent(newTerm, start);
                                         return e;
                                     } else {
                                         int sd = dt(ea, eb, times);
+//                                        if (o == CONJ && sd != DTERNAL && sd != XTERNAL) {
+//                                            sd -= a.dtRange(); sd -= b.dtRange();
+//                                        }
                                         if (sd != XTERNAL) {
-                                            long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
+
                                             Term newTerm = $.negIf(o.the(sd, a, b), isNeg);
-                                            Event e = new SolutionEvent( newTerm, start );
-                                            //times.put(e.term, Time.the(start, 0));
+
+                                            long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
+
+                                            Event e = new SolutionEvent(newTerm, start);
                                             return e;
                                         }
                                     }
@@ -725,7 +732,7 @@ public class Temporalize {
 //            if (existing == Unknown)
 //                return null;
 //            else
-                return existing;
+            return existing;
         }
         if (trail.containsKey(target))
             return null; //being procesed beneath in the stack
@@ -736,7 +743,7 @@ public class Temporalize {
 
         Event e = solveEvent(target, trail);
         Time t = e.start(trail);
-        if (t!=null) {
+        if (t != null) {
             trail.put(target, t);
         } else {
             trail.remove(target); //remove the null plaeholder
@@ -752,7 +759,8 @@ public class Temporalize {
         if (ea == null)
             return null; //no idea how to solve that term
 
-        int eas = ea.size(); assert(eas > 0);
+        int eas = ea.size();
+        assert (eas > 0);
 
 
         for (int i = 0, eaSize = eas; i < eaSize; i++) {

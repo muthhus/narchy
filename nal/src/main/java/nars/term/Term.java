@@ -411,6 +411,11 @@ public interface Term extends Termlike, Comparable<Termlike> {
         return this;
     }
 
+    /* collects any contained events */
+    default void events(List<ObjectLongPair<Term>> events) {
+        events(events, 0);
+    }
+
     default void events(List<ObjectLongPair<Term>> events, long dt) {
         events.add(PrimitiveTuples.pair(this, dt));
     }

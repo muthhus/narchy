@@ -13,6 +13,9 @@ import nars.term.atom.Atom;
 import nars.term.atom.IntAtom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+
+import java.util.List;
 
 import static nars.Op.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -85,34 +88,34 @@ public class Builtin {
     public static void load(NAR nar) {
 
 
-                    /** subterm, but specifically inside an ellipsis. otherwise pass through */
+        /** subterm, but specifically inside an ellipsis. otherwise pass through */
         nar.on(Functor.f("esubterm", (TermContainer c) -> {
 
 
-                Term x = c.sub(0, null);
-                if (x==null)
-                    return Null;
+            Term x = c.sub(0, null);
+            if (x == null)
+                return Null;
 
-                if (x instanceof Compound) {
-                    Term index = c.sub(1, null);
-                    int which;
-                    if (index != null) {
-                        if (index instanceof Variable)
-                            return Null;
+            if (x instanceof Compound) {
+                Term index = c.sub(1, null);
+                int which;
+                if (index != null) {
+                    if (index instanceof Variable)
+                        return Null;
 
-                        which = $.intValue(index, -1);
-                        if (which < 0) {
-                            return Null;
-                        }
-                    } else {
-                        //random
-                        which = nar.random().nextInt(x.size());
+                    which = $.intValue(index, -1);
+                    if (which < 0) {
+                        return Null;
                     }
-
-                    return ((TermContainer)x).sub(which);
+                } else {
+                    //random
+                    which = nar.random().nextInt(x.size());
                 }
-                return x;
-            }));
+
+                return ((TermContainer) x).sub(which);
+            }
+            return x;
+        }));
 
 
         /**
@@ -128,12 +131,12 @@ public class Builtin {
             if (!oo.in(CONJ.bit | SETi.bit | SETe.bit))
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
-            Compound c = (Compound)t;  //for use in deriver, fail if any variable parameters
+            Compound c = (Compound) t;  //for use in deriver, fail if any variable parameters
 
             int size = c.size();
 
             if (size < 2)
-                return Null;
+                return null;
 
             Term result;
             if (size == 2) {
@@ -142,12 +145,12 @@ public class Builtin {
                         oo.isSet() ?
                                 oo.the(c.sub(n)) :
                                 c.sub(n) //CONJ
-                        );
+                );
             } else {
-                Term[] y = new Term[size-1];
+                Term[] y = new Term[size - 1];
                 int except = nar.random().nextInt(size);
                 for (int i = 0, j = 0; i < size; i++) {
-                    if (i!=except) {
+                    if (i != except) {
                         y[j++] = c.sub(i);
                     }
                 }
@@ -160,6 +163,22 @@ public class Builtin {
             return result;
         }));
 
+        /** drops a random contained event, whether at first layer or below */
+        nar.on(Functor.f1((Atom) $.the("dropAnyEvent"), (Term t) -> {
+            Op oo = t.op();
+            if (!oo.in(CONJ.bit))
+                return Null;//returning the original value may cause feedback loop in callees expcting a change in value
+
+            Compound c = (Compound) t;  //for use in deriver, fail if any variable parameters
+
+            List<ObjectLongPair<Term>> ee = $.newArrayList(2);
+            c.events(ee, 0);
+
+            int toRemove = nar.random().nextInt(ee.size());
+            ee.remove(toRemove);
+
+            return Op.conj(ee);
+        }));
         nar.on("assertEquals", (op, args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
             assertEquals(/*msg,*/ 2, args.length);
@@ -169,8 +188,8 @@ public class Builtin {
         nar.on(Functor.f0("self", nar::self));
 
 
-        nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(n.belief((Compound)c, n.time()))));
-        nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(n.goal((Compound)c, n.time()))));
+        nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(n.belief((Compound) c, n.time()))));
+        nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(n.goal((Compound) c, n.time()))));
 
 //        nar.on("concept", (Operator) (op, a, nn) -> {
 //            Concept c = nn.concept(a[0]);
