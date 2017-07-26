@@ -135,13 +135,13 @@ public class TemporalizeTest {
         t.knowTerm($.$("(b ==>+10 c)"), ETERNAL);
         t.knowTerm($.$("(e ==>-20 c)"), ETERNAL);
 
-        System.out.println( Joiner.on('\n').join( t.constraints.entrySet() ) );
+//        System.out.println( Joiner.on('\n').join( t.constraints.entrySet() ) );
 
         HashMap h = new HashMap();
         Temporalize.Event s = t.solve($.$("(b ==>+- e)"), h);
 
-        System.out.println();
-        System.out.println( Joiner.on('\n').join( h.entrySet() ) );
+//        System.out.println();
+//        System.out.println( Joiner.on('\n').join( h.entrySet() ) );
 
         assertNotNull(s);
         assertEquals("(b ==>+30 e)@ETE", s.toString());

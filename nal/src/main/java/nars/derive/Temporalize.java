@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
-import static nars.derive.Temporalize.Time.Unknown;
 import static nars.time.Tense.*;
 
 /**
@@ -192,9 +191,9 @@ public class Temporalize {
             super(term, start, start + term.dtRange());
         }
 
-        SolutionEvent(Term unknown) {
-            super(unknown, XTERNAL, XTERNAL);
-        }
+//        SolutionEvent(Term unknown) {
+//            super(unknown, XTERNAL, XTERNAL);
+//        }
     }
 
     /**
@@ -202,7 +201,7 @@ public class Temporalize {
      */
     static class Time {
 
-        public static Time Unknown = new Time(ETERNAL, XTERNAL);
+//        public static Time Unknown = new Time(ETERNAL, XTERNAL);
         public final long base;
         public final int offset;
 
@@ -230,15 +229,15 @@ public class Temporalize {
         }
 
         static Time the(long base, int offset) {
-            if (base == ETERNAL && offset == XTERNAL)
-                return Unknown;
-            else {
+//            if (base == ETERNAL && offset == XTERNAL)
+//                return Unknown;
+//            else {
 
                 if (base != ETERNAL && offset != DTERNAL && offset != XTERNAL)
                     return new Time(base + offset, 0); //direct absolute
                 else
                     return new Time(base, offset);
-            }
+//            }
         }
 
         private Time(long base, int offset) {
@@ -643,18 +642,17 @@ public class Temporalize {
 
         Time existing = trail.get(target);
         if (existing != null) {
-            if (existing == Unknown)
-                return null;
-            else
+//            if (existing == Unknown)
+//                return null;
+//            else
                 return existing;
         }
         if (trail.containsKey(target))
             return null; //being procesed beneath in the stack
 
-        System.out.println(target + " ? " + trail);
+//        System.out.println(target + " ? " + trail);
 
-        trail.put(target, null);
-        //trail.put(target, Unknown); //placeholder to prevent infinite loop
+        trail.put(target, null); //placeholder to prevent infinite loop
 
         List<Event> ea = constraints.get(target);
         if (ea != null) {
@@ -665,7 +663,6 @@ public class Temporalize {
             for (Event x : ea) {
                 x.apply(trail);
 
-                System.out.println("\t" + target + " @ " + " " + trail);
 //                if (best == null) {
 //                    best = xs;
 //                } else {
@@ -700,10 +697,12 @@ public class Temporalize {
 
             for (Event x : ea) {
                 Time xs = x.start(trail);
-                if (xs != Unknown) {
-                    //System.out.println(target + " @ " + xs + " " + trail);
+                if (xs!=null)
                     return x;
-                }
+//                if (xs != Unknown) {
+                    //System.out.println(target + " @ " + xs + " " + trail);
+//                    return x;
+//                }
             }
 
 
