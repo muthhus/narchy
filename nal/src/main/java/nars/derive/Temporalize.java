@@ -153,7 +153,11 @@ public class Temporalize {
                     Time ae = a.end(trail);
                     Time be = b.end(trail);
                     Interval ab = Interval.intersect(as.base, ae.base, bs.base, be.base);
-                    return new long[] { ab.a, ab.b };
+                    if (ab!=null) {
+                        return new long[]{ab.a, ab.b};
+                    } else {
+                        //
+                    }
                 } else  {
                     //one is eternal, the other isn't. use the non-eternal range
                     long start, end;
@@ -767,8 +771,18 @@ public class Temporalize {
             Set<Term> uncovered = Sets.mutable.of(a,b);
             for (Term c : constraints.keySet()) {
                 boolean relevance = false;
+                if (c.equals(target))
+                    continue;
+
+                if (trail.containsKey(c))
+                    continue;
+
+                trail.put(c, null);
 
                 Event ce = solve(c, trail);
+
+                trail.remove(c);
+
                 if (ce!=null) {
                     if (c.contains(a)) {
                         uncovered.remove(a);

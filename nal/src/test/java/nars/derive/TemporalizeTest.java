@@ -156,7 +156,7 @@ public class TemporalizeTest {
      * tests temporalization of pure events which overlap, or are separated by a distance below a proximal threshold (see Param.java)
      */
     @Test
-    public void testStatementEvents() throws Narsese.NarseseException {
+    public void testStatementEventsBothTemporal() throws Narsese.NarseseException {
 //              .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
 //              .input(new NALTask($.$("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
 //                   .mustDesire(cycles, "(a-->c)", 1f, 0.4f, 10, 20)
@@ -169,6 +169,23 @@ public class TemporalizeTest {
         assertNotNull(solution);
         assertEquals("(a-->c)@[10..20]", solution.toString());
         assertNull("d not covered by known events", t.solve($.$("(a-->d)")));
+    }
+
+    /**
+     * tests temporalization of pure events which overlap, or are separated by a distance below a proximal threshold (see Param.java)
+     */
+    @Test
+    public void testStatementEventsNonOverlappingTemporal() throws Narsese.NarseseException {
+//              .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
+//              .input(new NALTask($.$("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
+//                   .mustDesire(cycles, "(a-->c)", 1f, 0.4f, 10, 20)
+
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("(a-->b)"), 10, 15); //these two overlap, so there should be a derivation
+        t.knowTerm($.$("(c-->b)"), 1, 5);
+
+        Temporalize.Event solution = t.solve($.$("(a-->c)"));
+        assertNull(solution);
     }
 
     @Test
