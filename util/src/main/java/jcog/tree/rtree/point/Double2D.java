@@ -94,10 +94,8 @@ public class Double2D implements HyperPoint, Comparable<Double2D> {
 
     @Override
     public int hashCode() {
-        int result;
-        long temp;
-        temp = Double.doubleToLongBits(x);
-        result = (int) (temp ^ (temp >>> 32));
+        long temp = Double.doubleToLongBits(x);
+        int result = (int) (temp ^ (temp >>> 32));
         temp = Double.doubleToLongBits(y);
         result = 31 * result + (int) (temp ^ (temp >>> 32));
         return result;

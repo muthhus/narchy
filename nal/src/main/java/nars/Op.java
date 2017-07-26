@@ -985,9 +985,18 @@ public enum Op implements $ {
 
         int center = (from + to) / 2;
         int dt = (int) (events.get(center + 1).getTwo() - events.get(center).getTwo());
-        //dont send through CONJ.the:
+
+
         Term left = conjMergeBalance(events, from, center);
+        if (left == False) return False;
+        if (left == Null) return Null;
+
         Term right = conjMergeBalance(events, center + 1, to);
+        if (right == False) return False;
+        if (right == Null) return Null;
+
+        if (left == True) return right;
+        if (right == True) return left;
 
         //System.out.println(left + " " + right + " " + left.compareTo(right));
         //return CONJ.the(dt, left, right);

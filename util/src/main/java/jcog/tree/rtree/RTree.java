@@ -47,7 +47,7 @@ public class RTree<T> implements Space<T> {
     @NotNull
     private Node<T, ?> root;
     private int size;
-    public Spatialization<T> model;
+    public final Spatialization<T> model;
 
 
     public RTree(@Nullable final Function<T, HyperRegion> spatialize) {
@@ -64,7 +64,7 @@ public class RTree<T> implements Space<T> {
     }
 
     @Override
-    public void clear() {
+    public final void clear() {
         this.size = 0;
         this.root = model.newLeaf();
     }

@@ -29,11 +29,16 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int[] sampleRadii = { 0, /*1,*/ 2, /*4,*/ 8, 16, 32 };
+    static final int minSampleRadiusInCycles = 0; //prevents sampling with 0 radius, if >0. used to provide precision in sub-duration ranges
+    static final int[] sampleRadii = { 0, 1, 2, /*4,*/ 8, /*16,*/ 32 };
     final static int maxSamplesTruthpolated = 5;
 
-    /** proportional to capacity (not size) */
-    final static float enoughSamplesRate = 0.1f;
+    /** proportional to capacity (not size).
+     * set to zero to allow only one sample to be evaluated on its own.
+     * values greater than 0 cause the table to report with a moving average
+     * effect which could reduce temporal precision.
+     * */
+    final static float enoughSamplesRate = 0f;
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -260,8 +265,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             RTreeCursor<TaskRegion> c = null;
             for (int r : sampleRadii) {
 
-                long from = when - r * dur;
-                long to = when + r * dur;
+                long from = when - Math.max(minSampleRadiusInCycles, r * dur);
+                long to = when + Math.max(minSampleRadiusInCycles, r * dur);
                 if (c == null)
                     c = cursor(from, to);
                 else

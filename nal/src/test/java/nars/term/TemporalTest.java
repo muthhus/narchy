@@ -228,17 +228,17 @@ public class TemporalTest {
 
     @Test
     public void testCommutiveTemporality1() {
+        testParse("(goto(a)&&((SELF,b)-->at))", "(at(SELF,b)&&goto(a))");
+        testParse("(goto(a)&|((SELF,b)-->at))", "(at(SELF,b)&|goto(a))");
         testParse("(at(SELF,b) &&+5 goto(a))", "(at(SELF,b) &&+5 goto(a))");
-        testParse("(goto(a)&|((SELF,b)-->at))", "(goto(a)&|at(SELF,b))");
-        testParse("(goto(a)&&((SELF,b)-->at))", "(goto(a)&&at(SELF,b))");
     }
 
     @Test
     public void testCommutiveTemporality2() {
+        testParse("(at(SELF,b)&&goto(a))");
+        testParse("(at(SELF,b)&|goto(a))");
         testParse("(at(SELF,b) &&+5 goto(a))");
         testParse("(goto(a) &&+5 at(SELF,b))");
-        testParse("(goto(a)&|at(SELF,b))");
-        testParse("(goto(a)&&at(SELF,b))");
     }
 
     @NotNull
@@ -869,13 +869,11 @@ public class TemporalTest {
         Compound u = $.$(su);
         assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", u.toString());
 
-        Term yz = $.terms.retemporalize(u, $.terms.retemporalizeZero);
-        assertEquals("((--,(happy))&|(--,((--,(o))&|(happy))))", yz.toString());
-
         Term ye = $.terms.retemporalize(u, $.terms.retemporalizeDTERNAL);
-        assertEquals("((--,(happy))&&(--,((--,(o))&&(happy))))", ye.toString());
+        assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", ye.toString());
 
-
+        Term yz = $.terms.retemporalize(u, $.terms.retemporalizeZero);
+        assertEquals("((--,((--,(o))&|(happy)))&|(--,(happy)))", yz.toString());
 
     }
 

@@ -51,13 +51,11 @@ public class RTreeCursor<T> {
     }
 
     public void forEach(Consumer<? super T> each) {
-        active.forEach(n -> {
-            n.forEach(each);
-        });
+        active.forEach(n -> n.forEach(each));
     }
 
     public FasterList<T> list() {
-        FasterList<T> l = new FasterList();
+        FasterList<T> l = new FasterList<>(size());
         forEach(l::add);
         return l;
     }
@@ -92,17 +90,17 @@ public class RTreeCursor<T> {
         if (iterator == null) return Collections.emptyList();
 
         if (max == 1) {
-            return new Top<T>(ranker).of(iterator).toList();
+            return new Top<>(ranker).of(iterator).toList();
         } else if (max == 2) {
-            return new Top2<T>(ranker).of(iterator).toList();
+            return new Top2<>(ranker).of(iterator).toList();
         } else {
             return ordering(new UniqueRanker(ranker)).greatestOf(iterator, max);
         }
     }
 
-    public List<T> topSorted(Ordering<T> cmp, int max) {
-        return cmp.greatestOf(iterator(), max);
-    }
+//    public List<T> topSorted(Ordering<T> cmp, int max) {
+//        return cmp.greatestOf(iterator(), max);
+//    }
 
     public static <T> Ordering<T> ordering(Comparator<T> cmp) {
         return Ordering.from(cmp);

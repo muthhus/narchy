@@ -32,7 +32,7 @@ import java.util.function.Predicate;
  * Node that will contain the data entries. Implemented by different type of SplitType leaf classes.
  * <p>
  * Created by jcairns on 4/30/15.
- *
+ * <p>
  * TODO just extend FastList<>
  */
 public class Leaf<T> implements Node<T, T> {
@@ -52,26 +52,26 @@ public class Leaf<T> implements Node<T, T> {
         return data[i];
     }
 
-     public double variance(int dim, Spatialization<T> model) {
-        double mean = region().center(dim);
-        double sumDiffSq = 0;
+    public double variance(int dim, Spatialization<T> model) {
         int s = size();
         if (s < 2)
             return 0;
+        double mean = region().center(dim);
+        double sumDiffSq = 0;
         for (int i = 0; i < s; i++) {
             T c = get(i);
             if (c == null) continue;
             double diff = model.region(c).center(dim) - mean;
-            sumDiffSq += diff*diff;
+            sumDiffSq += diff * diff;
         }
-        return sumDiffSq / s-1;
+        return sumDiffSq / s - 1;
     }
 
 
     @Override
     public Node<T, ?> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
 
-        if (parent!=null && !contains(t, model)) {
+        if (parent != null && !contains(t, model)) {
             Node<T, ?> next;
 
             if (size < model.max) {
@@ -89,7 +89,7 @@ public class Leaf<T> implements Node<T, T> {
             return next;
         } else {
 
-            return (parent==null && contains(t, model)) ? null : this;
+            return (parent == null && contains(t, model)) ? null : this;
         }
     }
 
@@ -148,7 +148,7 @@ public class Leaf<T> implements Node<T, T> {
             if (j < size) {
                 final int nRemaining = size - j;
                 System.arraycopy(data, j, data, i, nRemaining);
-                Arrays.fill(data, size-nRemoved, size, null);
+                Arrays.fill(data, size - nRemoved, size, null);
             } else {
                 Arrays.fill(data, i, size, null);
             }
@@ -164,7 +164,7 @@ public class Leaf<T> implements Node<T, T> {
 
     }
 
-     @Override
+    @Override
     public double perimeter(Spatialization<T> model) {
         double maxVolume = 0;
         for (int i = 0; i < size; i++) {
@@ -235,7 +235,7 @@ public class Leaf<T> implements Node<T, T> {
     public void forEach(Consumer<? super T> consumer) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
-            if (d!=null)
+            if (d != null)
                 consumer.accept(d);
         }
     }
@@ -263,7 +263,8 @@ public class Leaf<T> implements Node<T, T> {
 
     /**
      * Figures out which newly made leaf node (see split method) to add a data entry to.
-     *  @param l1Node left node
+     *
+     * @param l1Node left node
      * @param l2Node right node
      * @param t      data entry to be added
      * @param model
