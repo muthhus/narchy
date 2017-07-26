@@ -34,6 +34,7 @@ import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.derive.match.Ellipsis.firstEllipsis;
+import static nars.term.Term.nullIfNull;
 import static nars.term.Terms.flatten;
 import static nars.time.Tense.*;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
@@ -233,10 +234,12 @@ public enum Op implements $ {
                 //ex: (x &&+ (y &&+ z))
                 //      becomes
                 //    ((x &&+ y) &&+ z)
+                //TODO balance them for balanced hierarchical termlink activation
+
                 if (dt > 0 && (b.op() == CONJ && !concurrent(b.dt()))) {
-                    return merge(a, 0, b, dt);
+                    return nullIfNull(merge(a, 0, b, dt+a.dtRange()));
                 } else if (dt < 0 && (a.op() == CONJ && !concurrent(a.dt()))) {
-                    return merge(b, 0, a, -dt);
+                    return nullIfNull(merge(b, 0, a, -dt-b.dtRange()));
                 }
 
                 int order = a.compareTo(b);
@@ -250,9 +253,8 @@ public enum Op implements $ {
                     dt = -dt;
                 }
 
-
                 return implInConjReduction(
-                        compound(CONJ, dt, tt)
+                    compound(CONJ, dt, tt)
                 );
 
             }
@@ -912,9 +914,10 @@ public enum Op implements $ {
         assert (ee > 1);
 
         //group all parallel clusters
+        ObjectLongPair<Term> e0 = events.get(0);
         {
             //Term head = events.get(0).getOne();
-            long headAt = events.get(0).getTwo();
+            long headAt = e0.getTwo();
             int groupStart = -1;
             for (int i = 1; i <= ee; i++) {
                 long nextAt = (i != ee) ? events.get(i).getTwo() : ETERNAL;
@@ -932,9 +935,7 @@ public enum Op implements $ {
                             i--;
                             ee--;
                         }
-                        Term replacement = $.parallel(p);
-                        if (replacement == null)
-                            return null; //failure
+                        Term replacement = CONJ.the(0, p);
                         if (events.isEmpty()) {
                             //got them all here
                             return replacement;
@@ -950,17 +951,18 @@ public enum Op implements $ {
         }
 
         if (ee == 1) {
-            return events.get(0).getOne();
+            return e0.getOne();
         } else if (ee == 0) {
             return null;
         }
 
-        Term head = events.get(0).getOne();
-        long headAt = events.get(0).getTwo();
+        Term head = e0.getOne();
+        long headAt = e0.getTwo();
         for (int i = 1; i < ee; i++) {
 
-            Term next = events.get(i).getOne();
-            long nextAt = events.get(i).getTwo();
+            ObjectLongPair<Term> ei = events.get(i);
+            Term next = ei.getOne();
+            long nextAt = ei.getTwo();
 
             int dt = (int) (nextAt - headAt);
             head = CONJ.the(dt, head, next);

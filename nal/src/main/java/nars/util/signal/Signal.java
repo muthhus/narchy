@@ -4,6 +4,8 @@ import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.concept.BaseConcept;
+import nars.table.DefaultBeliefTable;
 import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -78,13 +80,21 @@ public class Signal extends AtomicReference<SignalTask> {
 
 
 
+                    if (current!=null)
+                        current.stretchKey = null;
+
                     //TODO move the task construction out of this critical update section?
                     next = task(term, nextTruth.truth(),
                             last, now,
                             stamper.getAsLong());
 
                 } else {
+
                     current.setEnd(now); //stretch existing
+
+                    if (current.stretchKey!=null) {
+                        current.stretchKey = ((DefaultBeliefTable)((BaseConcept)nar.concept(current)).table(current.punc)).temporal.stretch(current);
+                    }
                 }
 
                 this.lastUpdated = now;

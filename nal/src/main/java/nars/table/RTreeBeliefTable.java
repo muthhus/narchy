@@ -133,15 +133,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             throw new UnsupportedOperationException();
         }
 
-        public void updateOngoingTask() {
-
-            this.end = task.end();
-
-        }
-
-        public boolean hasStretched() {
-            return this.end != task.end();
-        }
 
         public boolean isDeleted() {
             return task != null && task.isDeleted();
@@ -154,9 +145,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     final Space<TaskRegion> tree;
-    final Set<TaskRegion> ongoing = Sets.newConcurrentHashSet();
 
-    private long lastUpdate = Long.MIN_VALUE;
     private transient NAR nar;
     //private final AtomicBoolean compressing = new AtomicBoolean(false);
 
@@ -187,69 +176,59 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                     @Override
                     public boolean add(TaskRegion tr) {
-                        Task task = tr.task;
-                        if (task instanceof SignalTask) {
-                            if (!ongoing.add(tr))
-                                return false; //already in
-                        }
-
                         if (super.add(tr)) {
                             //new insertion
-                            Activate.activate(tr.task, tr.task.priElseZero(), nar);
+                            Task task = tr.task;
+                            Activate.activate(task, task.priElseZero(), nar);
                             return true;
                         }
                         return false;
-                    }
-
-                    @Override
-                    public boolean remove(TaskRegion tr) {
-                        if (super.remove(tr)) {
-                            Task task = tr.task;
-                            if (task instanceof SignalTask)
-                                ongoing.remove(tr);
-                            return true;
-                        } else
-                            return false;
                     }
                 });
     }
 
 
+    @Override
+    public Object stretch(SignalTask task) {
+//            if (changed.isDeleted()) {
+//                remove(changed); //return true; //stop tracking
+//            }
 
-    public void updateSignalTasks(long now) {
-
-        if (this.lastUpdate == now)
-            return;
-
-        this.lastUpdate = now;
-
-        ongoing.removeIf((r) -> {
-
-            if (r.task.isDeleted())
-                return true; //stop tracking
-
-            if (r.hasStretched()) {
+        @Nullable Object changed = task.stretchKey;
+        if (changed!=null) {
 
 
-                boolean removed = tree.remove(r);
-                if (removed) {
+            TaskRegion t = (TaskRegion)changed;
 
-                    r.updateOngoingTask();
+            boolean removed = tree.remove(t);
+            if (removed) {
 
-                    boolean readded = tree.add(r);
-                    //assert(readded);
+                t.end = task.end();
 
-                    return false; //keep tracking
-                } else {
-                    return true; //stop tracking, this task was not in the tree
-                }
+                boolean ready = tree.add(t);
+                //if (!ready) ..
+                //assert(readded);
+
+                return t; //keep tracking
             }
-
-            return false; //keep tracking
-        });
-
-
+        } /*else {
+            TaskRegion tr = new TaskRegion(task);
+            if (tree.add(tr)) {
+                return tr;
+            } else {
+                return null; //couldnt add
+            }
+        }*/
+        return null;
     }
+
+//    public void updateSignalTasks(long now) {
+//
+//        if (this.lastUpdate == now)
+//            return;
+//
+//        this.lastUpdate = now;
+//    }
 
     public RTreeBeliefTable(int cap) {
         this();
@@ -268,11 +247,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         int ss = size();
         if (!tree.isEmpty()) {
 
-            long now = nar.time();
-            updateSignalTasks(now);
-
             int dur = nar.dur();
-
 
             FloatFunction<Task> ts = taskStrength(when, dur);
             FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task));
@@ -323,8 +298,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             return null;
 
         long now = nar.time();
-
-        updateSignalTasks(now);
 
         int dur = nar.dur();
 
@@ -389,12 +362,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public void add(@NotNull Task x, BaseConcept c, NAR n) {
 
-        updateSignalTasks(n.time());
-
         this.nar = n;
 
         TaskRegion tr = new TaskRegion(x);
         if (tree.add(tr)) {
+
+            if (x instanceof SignalTask)
+                ((SignalTask)x).stretchKey = tr;
 
             //check capacity overage
             int over = size() + 1 - capacity;

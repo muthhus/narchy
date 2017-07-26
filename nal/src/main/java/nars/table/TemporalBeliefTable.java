@@ -3,6 +3,7 @@ package nars.table;
 import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;
+import nars.task.SignalTask;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -38,6 +39,10 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
     void clear();
 
     void setCapacity(int temporals);
+
+    default public Object stretch(SignalTask changed) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     default Iterator<Task> iterator() {

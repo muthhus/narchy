@@ -246,13 +246,33 @@ public class TermReductionsTest extends NarseseTest {
                 NARS.shell().task("((x) &&+10 (x)). :|:").toString());
     }
 
-    @Test public void testEmbeddedConjNormalization() throws Narsese.NarseseException {
-        Compound alreadyNormalized = $("(((a) &&+1 (b)) &&+3 (d))");
-        Compound needsNormalized = $("((a) &&+1 ((b) &&+3 (d)))");
+    @Test public void testEmbeddedConjNormalizationN2() throws Narsese.NarseseException {
+        Compound alreadyNormalized = $("((a &&+1 b) &&+1 c)");
+        Compound needsNormalized = $("(a &&+1 (b &&+3 d))");
         assertEquals(  needsNormalized, alreadyNormalized);
         assertEquals(  needsNormalized.toString(), alreadyNormalized.toString() );
         assertEquals(  needsNormalized.dt(), alreadyNormalized.dt() );
         assertEquals(  needsNormalized.subterms(), alreadyNormalized.subterms() );
+    }
+
+    @Test public void testEmbeddedConjNormalizationN3() throws Narsese.NarseseException {
+
+        String ns = "((a &&+1 b) &&+1 (c &&+1 d))";
+        Compound normal = $(ns);
+        //normal.printRecursive();
+        assertEquals(3, normal.dtRange());
+        assertEquals(ns, normal.toString());
+
+        for (String unnormalized : new String[] {
+                "(a &&+1 (b &&+1 (c &&+1 d)))", //imbalanced towards right
+                "(((a &&+1 b) &&+1 c) &&+1 d)"  //imbalanced towards left
+        }) {
+            Compound u = $(unnormalized);
+            assertEquals(normal, u);
+            assertEquals(normal.toString(), u.toString());
+            assertEquals(normal.dt(), u.dt());
+            assertEquals(normal.subterms(), u.subterms());
+        }
     }
 
     @Test public void testEmbeddedConjNormalizationWithNeg1() throws Narsese.NarseseException {

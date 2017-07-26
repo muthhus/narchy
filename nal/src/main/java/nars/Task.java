@@ -332,7 +332,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
     @Nullable
     default Concept concept(@NotNull NAR n, boolean conceptualize) {
-        Concept c = conceptualize ? n.conceptualize(term()) : n.concept(term());
+        Term t = term();
+        Concept c = conceptualize ? n.conceptualize(t) : n.concept(t);
         if (c!=null) {
             return c;
         }
