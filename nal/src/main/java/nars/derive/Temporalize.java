@@ -102,22 +102,24 @@ public class Temporalize {
         abstract public void apply(HashMap<Term, Time> trail);
     }
 
-//    static int dt(Event a, Event b) {
-//        if (a instanceof AbsoluteEvent && b instanceof AbsoluteEvent) {
-//            return dt(a.start(null), b.end(null));
-//        } else if (a instanceof RelativeEvent && b instanceof RelativeEvent) {
-//            RelativeEvent ra = (RelativeEvent) a;
-//            RelativeEvent rb = (RelativeEvent) b;
-//            if (ra.rel.equals(rb.rel)) {
-//                //easy case
-//                return rb.end - ra.start;
-//            } else {
-//                //needs solved in the constraint graph
-//            }
-//        }
-//
-//        return XTERNAL;
-//    }
+    static int dt(Event a, Event b, HashMap<Term,Time> times) {
+
+        if (a instanceof AbsoluteEvent && b instanceof AbsoluteEvent) {
+            return dt(a.end(times), b.start(times));
+            //return dt(a.start(times), b.end(times));
+        } else if (a instanceof RelativeEvent && b instanceof RelativeEvent) {
+            RelativeEvent ra = (RelativeEvent) a;
+            RelativeEvent rb = (RelativeEvent) b;
+            if (ra.rel.equals(rb.rel)) {
+                //easy case
+                return rb.end - ra.start;
+            } else {
+                //needs solved in the constraint graph
+            }
+        }
+
+        return XTERNAL;
+    }
 
     static int dt(Time a, Time b) {
 
@@ -154,7 +156,7 @@ public class Temporalize {
 
         @Override
         public void apply(HashMap<Term, Time> trail) {
-            trail.put(term, Time.the(start)); //direct set
+            trail.put(term, Time.the(start,0)); //direct set
         }
 
         @Override
@@ -164,7 +166,7 @@ public class Temporalize {
 
         @Override
         public Time start(HashMap<Term, Time> ignored) {
-            return Time.the(start, XTERNAL);
+            return Time.the(start, 0);
         }
 
         @Override
@@ -188,7 +190,7 @@ public class Temporalize {
     public class SolutionEvent extends AbsoluteEvent {
 
         SolutionEvent(Term term, long start) {
-            super(term, start, start + term.dtRange());
+            super(term, start, start!=ETERNAL ?start + term.dtRange() : ETERNAL);
         }
 
 //        SolutionEvent(Term unknown) {
@@ -224,9 +226,7 @@ public class Temporalize {
                 return Long.toString(base);
         }
 
-        static Time the(long when) {
-            return the(when, 0);
-        }
+
 
         static Time the(long base, int offset) {
 //            if (base == ETERNAL && offset == XTERNAL)
@@ -247,6 +247,9 @@ public class Temporalize {
 
 
         public Time add(int offset) {
+
+            if (offset==0)
+                return this;
 
             assert (this.offset != DTERNAL && offset != DTERNAL);
 
@@ -600,46 +603,59 @@ public class Temporalize {
                 int dt = c.dt();
 
                 if (dt == XTERNAL) {
-
                     TermContainer tt = c.subterms();
-                    assert (tt.size() == 2);
 
-                    Term a = tt.sub(0);
-                    Time at = solveTime(a, times);
+                    if (tt.size() == 2) {
 
-                    if (at != null) {
+                        Term a = tt.sub(0);
+                        //Time at = solveTime(a, times);
+                        Event ea = solve(a, times);
+                        a = ea.term;
+                        Time at = ea.start(times);
 
-                        Term b = tt.sub(1);
-                        Time bt = solveTime(b, times);
+                        if (at != null) {
 
-                        if (bt != null) {
+                            Term b = tt.sub(1);
+                            //Time bt = solveTime(b, times);
+                            Event eb = solve(b, times);
+                            b = eb.term;
+                            Time bt = eb.start(times);
 
-                            try {
-                                if (o == CONJ && (a.op()==CONJ || b.op()==CONJ)) {
-                                    //conjunction merge, since the results could overlap
-                                    //either a or b, or both are conjunctions. and the result will be conjunction
+                            if (bt != null) {
 
-                                    Term cj = o.merge(a, at.abs(), b, bt.abs());
-                                    return new SolutionEvent(
-                                            cj,
-                                            Math.min(at.abs(), bt.abs())
-                                    );
+                                try {
+                                    if (o == CONJ && (a.op() == CONJ || b.op() == CONJ)) {
+                                        //conjunction merge, since the results could overlap
+                                        //either a or b, or both are conjunctions. and the result will be conjunction
 
-                                } else {
-                                    int sd = dt(at, bt);
-                                    if (sd != XTERNAL) {
-                                        //direct solution found
-                                        return new SolutionEvent(
-                                                o.the(sd, new Term[]{a, b}),
-                                                o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs()
+                                        Term cj = o.merge(a, at.abs(), b, bt.abs());
+                                        long start = Math.min(at.abs(), bt.abs());
+                                        Event e = new SolutionEvent(
+                                                cj,
+                                                start
                                         ).neg(isNeg);
+                                        times.put(e.term, Time.the(start, 0));
+                                        return e;
+                                    } else {
+                                        int sd = dt(ea, eb, times);
+                                        if (sd != XTERNAL) {
+                                            long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
+                                            Event e = new SolutionEvent(
+                                                    o.the(sd, new Term[]{a, b}),
+                                                    start
+                                            ).neg(isNeg);
+                                            times.put(e.term, Time.the(start, 0));
+                                            return e;
+                                        }
                                     }
+                                } catch (UnsupportedOperationException e) {
+                                    logger.warn("temporalization solution: {}", e.getMessage());
+                                    return null; //TODO
                                 }
-                            } catch (UnsupportedOperationException e) {
-                                logger.warn("temporalization solution: {}", e.getMessage());
-                                return null; //TODO
                             }
                         }
+                    } else {
+                        logger.warn("TODO unsupported xternal: " + target);
                     }
                 }
             }

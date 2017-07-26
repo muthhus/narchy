@@ -149,8 +149,6 @@ public class TemporalizeTest {
     @Test public void testSolveConjSequenceMerge() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
 
-        //  b ==>+10 c ==>+20 e
-
         String A = "((a &&+3 c) &&+4 e)";
         t.knowTerm($.$(A), 1);
         String B = "b";
@@ -166,6 +164,30 @@ public class TemporalizeTest {
 
         assertNotNull(s);
         assertEquals("((a &&+3 (b&|c)) &&+4 e)@[1..8]", s.toString());
+    }
+
+    @Test public void testRecursiveSolution1() throws Narsese.NarseseException {
+        /*
+                 believe("(x ==>+5 z)")
+                .believe("(y ==>+3 z)")
+                .mustBelieve(cycles, "( (x &&+2 y) ==>+3 z)", 1f, 0.81f)
+         */
+        Temporalize t = new Temporalize();
+        String A = "(x ==>+5 z)";
+        t.knowTerm($.$(A), ETERNAL);
+        String B = "(y ==>+3 z)";
+        t.knowTerm($.$(B), ETERNAL);
+
+//        System.out.println( Joiner.on('\n').join( t.constraints.entrySet() ) );
+
+        HashMap h = new HashMap();
+        Temporalize.Event s = t.solve($.$("((x &&+- y) &&+- z)"), h);
+
+        System.out.println();
+        System.out.println( Joiner.on('\n').join( h.entrySet() ) );
+
+        assertNotNull(s);
+        assertEquals("((x &&+2 y) &&+3 z)@ETE", s.toString());
     }
 
 //    @Test

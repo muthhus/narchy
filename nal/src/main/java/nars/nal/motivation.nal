@@ -20,3 +20,6 @@
     //question the precondition state
     X, (Y==>X), task("!") |-          Y, (Punctuation:Question)
 
+
+    //(X ==> Y), (X ==> Y), task("?") |- (?1 ==>+- Y), (Punctuation:Question)
+    //(X ==> Y), (X ==> Y), task("?") |- (X ==>+- ?1), (Punctuation:Question)

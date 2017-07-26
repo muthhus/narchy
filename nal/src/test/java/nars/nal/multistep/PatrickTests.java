@@ -47,9 +47,9 @@ public class PatrickTests extends AbstractNALTest {
         TestNAR tt = test;
         tt
 //.log()
-                .believe("(((/,REPRESENT,_,$3):$1 && (/,REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
-                .believe("(/,REPRESENT,_,ANIMAL):cat")
-                .believe("(/,REPRESENT,_,EATING):eats")
+                .believe("(((REPRESENT,_,$3):$1 && (REPRESENT,_,$4):$2) ==> REPRESENT:(($1,$2),($3,$4)))")
+                .believe("(REPRESENT,_,ANIMAL):cat")
+                .believe("(REPRESENT,_,EATING):eats")
 
 //should WORK with either of these two questions:
 //.askAt(1250,"REPRESENT:((eats,cat),?what)")

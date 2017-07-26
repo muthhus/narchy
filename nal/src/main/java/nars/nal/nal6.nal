@@ -20,7 +20,7 @@
 
     (M ==> P), (M ==> S), neqCom(P,S), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Abduction)
 
-    (P ==> M), (M ==> S), neqCom(P,S), notImplEqui(S), notEqui(P)   |- (S ==>+- P), (Belief:Exemplification)
+    (P ==> M), (M ==> S), neqCom(P,S), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Exemplification)
 
 
 //// implication to equivalence ////////////////////////////////////////////////////////////////////////////////////
@@ -56,10 +56,10 @@
     //Note: the P && S subterm of the conclusion may get rewritten with appropraite 'dt' as per dtCombinePre/dtCombinePost.
     //otherwise it will remain DTERNAL. using XTERNAL (&&+-) here is more trouble than its worth
 
-    (P ==> M), (S ==> M), neqRCom(S,P) |- ((P && S) ==>+- M), (Belief:Intersection)
+    (P ==> M), (S ==> M), neqRCom(S,P) |- ((P &&+- S) ==>+- M), (Belief:Intersection)
         //(P ==> M), (S ==> M), neqCom(P,S) |- ((%P || %S) ==>+- M), (Belief:Intersection)
 
-    (M ==> P), (M ==> S), neqRCom(S,P) |- (M ==>+- (P && S)), (Belief:Intersection)
+    (M ==> P), (M ==> S), neqRCom(S,P) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
         //(M ==> P), (M ==> S), neqCom(P,S) |- (M ==>+- (%P || %S)), (Belief:Union)
 
 
@@ -207,9 +207,6 @@
 //    (Z ==> (&&,C,A..+)), (Z ==> (&&,C,B..+)), neq(A..+,B..+) |- ((&&,B..+) ==>+- (&&,A..+)), (Belief:Abduction)
 
 
-    //(X ==> Y), (X ==> Y), task("?") |- (?1 ==>+- Y), (Punctuation:Question)
-    //(X ==> Y), (X ==> Y), task("?") |- (X ==>+- ?1), (Punctuation:Question)
-
 
 
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
@@ -226,10 +223,10 @@
         //(&&,(--,%X),A..+), X |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
 
-     ((&&,X,A..+) &&+- Z), Z |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-     (Z &&+- (&&,X,A..+)), Z |- (Z &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-        ((&&,X,A..+) &&+- (--,%Z)), Z |- (X &&+- (--,%Z)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-        ((--,%Z) &&+- (&&,X,A..+)), Z |- ((--,%Z) &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+     ((&&,X,A..+) && Z), Z |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+     (Z && (&&,X,A..+)), Z |- (Z &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+        ((&&,X,A..+) && (--,%Z)), Z |- (X &&+- (--,%Z)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+        ((--,%Z) && (&&,X,A..+)), Z |- ((--,%Z) &&+- X), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
      (&&,X,A..+), B, task("!") |- subIfUnifiesAny((&&,A..+),X,B), (Goal:Strong)
         (&&,(--,%X),A..+), B,  task("!") |- subIfUnifiesAny((&&,A..+),X,B), (Goal:StrongPN)
