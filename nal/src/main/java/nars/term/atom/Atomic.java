@@ -21,10 +21,6 @@ import static java.lang.Integer.MIN_VALUE;
 /** Base class for Atomic types. */
 public interface Atomic extends Term {
 
-    /** canonical byte representation of this atomic */
-    @Deprecated byte[] bytes();
-
-
     @Override
     default boolean OR(Predicate<Term> v) {
         return v.test(this);
@@ -54,7 +50,7 @@ public interface Atomic extends Term {
             //try to parse int
             int i = Texts.i(id, MIN_VALUE);
             if (i != MIN_VALUE)
-                return IntAtom.the(i); //parsed as integer, so
+                return Int.the(i); //parsed as integer, so
         }
 
         if (isQuoteNecessary(id))

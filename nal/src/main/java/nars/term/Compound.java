@@ -300,6 +300,44 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     @Nullable
+    default Term transform(@NotNull ByteList path, Term replacement) {
+        return transform(path, 0, replacement);
+    }
+
+    @Nullable
+    default Term transform(@NotNull ByteList path, int depth, Term replacement) {
+        final Compound src = this;
+        int ps = path.size();
+        if (ps == depth)
+            return replacement;
+        if (ps < depth)
+            throw new RuntimeException("path overflow");
+
+        if (!(src instanceof Compound))
+            return src; //path wont continue inside an atom
+
+        int n = src.size();
+        Compound csrc = (Compound) src;
+
+        Term[] target = new Term[n];
+
+        for (int i = 0; i < n; i++) {
+            Term x = csrc.sub(i);
+            if (path.get(depth) != i)
+                //unchanged subtree
+                target[i] = x;
+            else {
+                //replacement is in this subtree
+                target[i] = x instanceof Compound ? ((Compound)x).transform(path, depth + 1, replacement) : replacement;
+            }
+
+        }
+
+        return csrc.op().the(csrc.dt(), target);
+    }
+
+
+    @Nullable
     default <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
         X ss = subterm.apply(this);
         if (ss != null) {

@@ -1,38 +1,405 @@
-//package nars.op;
+package nars.term.atom;
+
+import com.google.common.collect.*;
+import com.google.common.io.ByteArrayDataOutput;
+import jcog.Util;
+import nars.$;
+import nars.Op;
+import nars.term.Compound;
+import nars.term.Term;
+import nars.term.subst.Unify;
+import org.eclipse.collections.api.list.primitive.ByteList;
+import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.list.primitive.IntInterval;
+import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
+import org.eclipse.collections.impl.tuple.Tuples;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.*;
+import java.util.function.BiPredicate;
+
+import static com.google.common.collect.BoundType.OPEN;
+import static nars.Op.INT;
+import static nars.Op.Null;
+
+/**
+ * 32-bit signed integer
+ */
+public class Int implements Atomic, Intlike {
+
+
+    public static Int the(int i) {
+        if (i >= 0 && i < MAX_CACHED_INTS) {
+            return digits[i];
+        } else {
+            return new Int(i);
+        }
+    }
+
+    public static Intlike range(int from, int to) {
+        return ((from == to) ? the(from) :
+                new IntRange(from, to));
+    }
+
+    final static int INT_ATOM = Term.opX(INT, 0);
+    final static int INT_RANGE = Term.opX(INT, 1);
+
+    public final int id;
+
+    final static int MAX_CACHED_INTS = 16;
+    private static final Int[] digits = new Int[MAX_CACHED_INTS];
+
+    static {
+        for (int i = 0; i < MAX_CACHED_INTS; i++) {
+            digits[i] = new Int(i);
+        }
+    }
+
+
+    Int(int i) {
+        this.id = i;
+    }
+
+    @Override
+    public @NotNull Term conceptual() {
+        return Null;
+    }
+
+    @Override
+    public void append(ByteArrayDataOutput out) {
+
+        out.writeByte(INT.id);
+        out.writeByte(0); //subtype
+        out.writeInt(id);
+
+    }
+
+    @Override
+    public Range range() {
+        return Range.singleton(id).canonical(DiscreteDomain.integers());
+    }
+
+
+    @Override
+    public final int opX() {
+        return INT_ATOM;
+    }
+
+
+    @Override
+    public final int hashCode() {
+        return id * 31;
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+        return this == obj || (obj instanceof Int && id == ((Int) obj).id);
+    }
+
+    @Override
+    public String toString() {
+        return Integer.toString(id);
+    }
+
+    @Override
+    public @NotNull Op op() {
+        return INT;
+    }
+
+    @Override
+    public int complexity() {
+        return 1;
+    }
+
+
+    @Override
+    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+        if (equals(y)) return true;
+        if (y instanceof IntRange) {
+            IntRange ir = (IntRange) y;
+            return (ir.from <= id && ir.to >= id);
+        }
+        return false;
+    }
+
+    public static Intlike the(Range<Integer> span) {
+        return range(span.lowerEndpoint(), span.upperEndpoint() - ((span.upperBoundType() == OPEN ? 1 : 0)));
+    }
+
+
+    /**
+     * a contiguous range of 1 or more integers
+     */
+    public static class IntRange implements Atomic, Intlike {
+
+        public final int from, to;
+        private final int hash;
+
+        /**
+         * from, to - inclusive interval
+         */
+        IntRange(int from, int to) {
+            assert (from < to);
+            this.from = from;
+            this.to = to;
+            this.hash = Util.hashCombine(INT_RANGE, from, to);
+        }
+
+        @Override
+        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+            if (equals(y)) return true;
+            if (y instanceof Int) {
+                int i = ((Int) y).id;
+                return (from <= i && to >= i);
+            }
+            return false;
+        }
+
+        @Override
+        public @NotNull String toString() {
+            return from + ".." + to;
+        }
+
+        @Override
+        public @NotNull Op op() {
+            return INT;
+        }
+
+        @Override
+        public int complexity() {
+            return 1;
+        }
+
+        @Override
+        public void append(ByteArrayDataOutput out) {
+
+            out.writeByte(INT.id);
+            out.writeByte(1); //subtype
+            out.writeInt(from);
+            out.writeInt(to);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o == this) return true;
+            if ((hash == o.hashCode()) && (o instanceof IntRange)) {
+                IntRange ir = (IntRange) o;
+                return ir.from == from && ir.to == to;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return hash;
+        }
+
+        @Override
+        public int opX() {
+            return INT_RANGE;
+        }
+
+        @Override
+        public Range range() {
+            return Range.closed(from, to).canonical(DiscreteDomain.integers());
+        }
+    }
+
+//    public static Term[] intersect(Term[] u) {
 //
-//import com.google.common.collect.*;
-//import nars.$;
-//import nars.Op;
-//import nars.term.Compound;
-//import nars.term.Term;
-//import nars.term.Terms;
-//import nars.term.atom.Atomic;
-//import nars.term.container.TermContainer;
-//import nars.term.container.TermVector;
-//import nars.term.obj.IntTerm;
-//import nars.term.obj.Termject.IntInterval;
-//import org.eclipse.collections.api.list.primitive.ByteList;
-//import org.eclipse.collections.api.tuple.Pair;
-//import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-//import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
-//import org.eclipse.collections.impl.tuple.Tuples;
-//import org.jetbrains.annotations.NotNull;
-//import org.jetbrains.annotations.Nullable;
-//import org.slf4j.Logger;
-//import org.slf4j.LoggerFactory;
+//        TreeSet<Intlike> integers = new TreeSet();
+//        for (Term x : u) {
+//            if (x.op() == INT) {
+//                integers.add((Intlike) x);
+//            }
+//        }
 //
-//import java.util.*;
-//import java.util.function.BiPredicate;
-//import java.util.function.Function;
+//        int ii = integers.size();
+//        if (ii < 2)
+//            return u; //one or less integers, do nothing about it
 //
-//import static nars.Op.CONJ;
-//import static nars.Op.INT;
-//import static nars.time.Tense.DTERNAL;
 //
-///**
-// * arithmetic rule mining & variable introduction
-// * WARNING: use of ByteArrayLists limits compound terms to max length of ~127
-// */
+//        TreeSet<Term> v = new TreeSet<>();
+//        for (Term uu : u)
+//            v.add(uu);
+//
+//        Intlike a = integers.pollFirst();
+//        Intlike b = integers.pollFirst();
+//        Range ar = a.range();
+//        Range br = b.range();
+//        if (ar.isConnected(br)) {
+//            Intlike combined = Int.the(ar.span(br));
+//            v.remove(a);
+//            v.remove(b);
+//            v.add(combined);
+//        }
+//
+//
+//        return v.toArray(new Term[v.size()]);
+//
+//    }
+
+    public static Term[] intersect(Term[] subs) {
+        //paths * extracted sequence of numbers at given path for each subterm
+        Map<ByteList, Pair<ByteHashSet, List<Term>>> data = new HashMap();
+
+
+        //analyze subtermss
+        final int[] i = {0};
+        for (Term f : subs) {
+//        for (int i = 0; i < subCount; i++) {
+//            //if a subterm is not an integer, check for equality of atoms (structure already compared abovec)
+//            @NotNull Term f = subs.term(i);
+
+            //first subterm: infer location of all inductables
+            int ii = i[0]++;
+            BiPredicate<ByteList, Term> collect = (p, t) -> {
+                if (!p.isEmpty() || (t.op() == INT)) {
+                    Pair<ByteHashSet, List<Term>> c = data.computeIfAbsent(p.toImmutable(), (pp) ->
+                            Tuples.pair(new ByteHashSet(), $.newArrayList(1)));
+                    c.getOne().add((byte) ii);
+                    c.getTwo().add(t);
+                }
+
+                return true;
+            };
+
+            //if (f instanceof Compound) {
+            f.pathsTo(x -> x, collect);
+            /*} else {
+                if (f instanceof IntTerm) //raw atomic int term
+                    data.put(new ByteArrayList(new byte[] {0}), $.newArrayList(f));
+            }*/
+        }
+
+        Set<Term> result = new HashSet();//new TreeSet();
+        Set<Term> subsumed = new HashSet();
+
+        for (Map.Entry<ByteList, Pair<ByteHashSet, List<Term>>> e : data.entrySet()) {
+            //data.forEach((pp, nn) -> {
+            ByteList pp = e.getKey();
+            Pair<ByteHashSet, List<Term>> nn = e.getValue();
+
+            ByteHashSet involved = nn.getOne();
+            int numInvolved = involved.size(); //# of subterms involved
+
+            //at least 2 subterms must contribute a value for each path
+            if (numInvolved < 2)
+                continue;
+
+            //for each path where the other numerics are uniformly equal (only one unique value)
+            /*if (new HashSet(nn).size()==1)*/
+
+
+            List<Intlike> ff = features(nn.getTwo());
+            int ffs = ff.size();
+            if (ffs == 0 || ffs >= numInvolved) {
+                //nothing would be gained; dont bother
+                continue;
+            }
+
+
+            for (Intlike f : ff) {
+                byte j = 0;
+                for (Term x : subs) {
+
+                    if (!involved.contains(j)) {
+                        result.add(x);
+                        //System.out.println("1: " + result);
+                    } else {
+
+
+                        //x is contained within range expression p
+                        Term xpp = x instanceof Compound ? ((Compound) x).sub(pp) : x;
+
+                        boolean connected;
+                        if (xpp instanceof Intlike) {
+                            connected = (f.range().isConnected(((Intlike) xpp).range()));
+                        } else {
+                            connected = false;
+                        }
+
+                        if (connected) {
+                            Term y = x instanceof Compound ?
+                                    ((Compound)x).transform(pp, f)
+                                    : f;
+                            //if (!y.equals(x)) {
+
+                            if (!x.equals(y)) {
+                                result.remove(x);
+                                subsumed.add(x);
+                            }
+                            result.add(y);
+                            //System.out.println(x + " 3: " + result + "\t + " + y);
+                            //}
+                        } else {
+                            result.add(x);
+                        }
+                    }
+                    j++;
+                }
+
+
+            }
+
+            int results = result.size();
+            if ((results == 1) /*|| (results > resultLimit * subCount)*/) {
+                break; //reduced to one or exploded, go no further
+            }
+        }
+
+        result.removeAll(subsumed);
+
+        if (result.isEmpty()) {
+            return subs;
+        } else {
+            return result.toArray(new Term[result.size()]); //recompressIfChanged(subs, result, depthRemain - 1);
+        }
+    }
+
+    @NotNull
+    private static List<Intlike> features(@NotNull List<Term> nnnt) {
+
+        RangeSet<Integer> intIntervals = ranges(nnnt);
+
+        //if (!intIntervals.isEmpty()) {
+        //Range<Integer> rNew = intIntervals.span();
+        //if (rNew.upperEndpoint() - rNew.lowerEndpoint() > 1) {
+
+        //boolean connected = true;
+        //Range q = null;
+
+
+        Set<Range<Integer>> srr = intIntervals.asRanges();
+
+        List<Intlike> ll = $.newArrayList(srr.size());
+
+        for (Range<Integer> rr : srr) {
+            int l = rr.lowerEndpoint();
+            int u = rr.upperEndpoint();
+            if (rr.lowerBoundType() == BoundType.OPEN)
+                l++;
+            if (rr.upperBoundType() == BoundType.OPEN)
+                u--;
+            ll.add(Int.range(l, u));
+        }
+
+        return ll;
+    }
+
+    @NotNull
+    public static RangeSet<Integer> ranges(@NotNull List<Term> term) {
+        TreeRangeSet<Integer> r = TreeRangeSet.create();
+        for (Term x : term) {
+            if (x instanceof Intlike) {
+                r.add(((Intlike)x).range());
+            }
+        }
+        return r;
+    }
+
+
+}
 //public class ArithmeticInduction {
 //
 //
@@ -287,18 +654,7 @@
 //    }
 //
 //
-//    @NotNull
-//    public static RangeSet<Integer> ranges(@NotNull List<Term> term) {
-//        TreeRangeSet<Integer> r = TreeRangeSet.create();
-//        for (Term x : term) {
-//            if (x instanceof IntInterval)
-//                r.add(((IntInterval) x).val);
-//            else if (x instanceof IntTerm)
-//                r.add(Range.singleton(((IntTerm) x).val()).canonical(DiscreteDomain.integers()));
-//        }
-//        return r;
-//    }
-//
+
 //
 //    @Nullable
 //    public static void intOrNull(@NotNull Term term, @NotNull IntArrayList target) {

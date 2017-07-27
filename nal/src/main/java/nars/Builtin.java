@@ -10,7 +10,7 @@ import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.IntAtom;
+import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
@@ -67,7 +67,7 @@ public class Builtin {
 
             Functor.f2("subterm", (Term x, Term index) -> {
                 try {
-                    if (x instanceof Compound && index instanceof IntAtom) {
+                    if (x instanceof Compound && index instanceof Int) {
                         return ((Compound) x).sub($.intValue(index));
                     }
                 } catch (NumberFormatException ignored) {

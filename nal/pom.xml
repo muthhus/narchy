@@ -50,6 +50,7 @@
             <scope>test</scope>
         </dependency>
 
+
         <!--<dependency>-->
         <!--<groupId>org.jacoco</groupId>-->
         <!--<artifactId>org.jacoco.agent</artifactId>-->
@@ -126,6 +127,7 @@
     </dependencies>
     <build>
 
+
         <resources>
             <resource>
                 <directory>src/main/java</directory>
@@ -168,7 +170,6 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <version>1.6.0</version>
             </plugin>
-
 
         </plugins>
     </build>

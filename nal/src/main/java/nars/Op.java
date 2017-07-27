@@ -1,12 +1,11 @@
 package nars;
 
 
+import com.google.common.collect.Range;
 import nars.derive.match.Ellipsislike;
 import nars.index.term.TermContext;
 import nars.term.*;
-import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
-import nars.term.atom.Bool;
+import nars.term.atom.*;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
@@ -103,6 +102,7 @@ public enum Op implements $ {
     SECTi("|", true, 3, Args.GTETwo) {
         @Override
         public Term the(int dt, Term[] u) {
+            u = Int.intersect(u);
             return intersect(u,
                     SECTi,
                     SETi,
@@ -273,8 +273,8 @@ public enum Op implements $ {
         private int conjSubEventCount(Term a) {
             //TODO make an int reducer method for Term
             final int[] subevents = {0};
-            ((Compound)a).recurseTerms(sub -> {
-                if (sub.op()==CONJ)
+            ((Compound) a).recurseTerms(sub -> {
+                if (sub.op() == CONJ)
                     subevents[0] += sub.size();
             });
             return subevents[0];
@@ -977,7 +977,9 @@ public enum Op implements $ {
         return conj(events);
     }
 
-    /** constructs a correctly merged conjunction from a list of events */
+    /**
+     * constructs a correctly merged conjunction from a list of events
+     */
     public static Term conj(List<ObjectLongPair<Term>> events) {
 
         int ee = events.size();
@@ -987,11 +989,13 @@ public enum Op implements $ {
             case 1:
                 return events.get(0).getOne();
             default:
-                return conj(events, 0, events.size()-1);
+                return conj(events, 0, events.size() - 1);
         }
     }
 
-    /** constructs a correctly merged conjunction from a list of events, in the sublist specified by from..to (inclusive) */
+    /**
+     * constructs a correctly merged conjunction from a list of events, in the sublist specified by from..to (inclusive)
+     */
     public static Term conj(List<ObjectLongPair<Term>> events, int from, int to) {
         int ee = to - from;
         switch (ee) {
@@ -1015,7 +1019,9 @@ public enum Op implements $ {
         return conjNonCommFinal(dt, left, right);
     }
 
-    /** HACK */
+    /**
+     * HACK
+     */
     private static Term conjNonCommFinal(int dt, Term left, Term right) {
         if (left == False) return False;
         if (left == Null) return Null;
@@ -1036,7 +1042,7 @@ public enum Op implements $ {
             left = t;
         }
         return new GenericCompoundDT(new GenericCompound(CONJ,
-                TermVector.the( left, right )
+                TermVector.the(left, right)
         ), dt);
     }
 
@@ -1057,7 +1063,6 @@ public enum Op implements $ {
 //        }
 //        return head;
 //    }
-
 
 
     @NotNull

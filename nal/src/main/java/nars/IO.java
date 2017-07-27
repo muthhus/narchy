@@ -11,11 +11,13 @@ import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.UnnormalizedVariable;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import org.eclipse.collections.api.set.primitive.IntSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -210,6 +212,13 @@ public class IO {
 
         switch (o) {
 
+            case INT: {
+                byte subType = in.readByte();
+                switch (subType) {
+                    case 0: return Int.the( in.readInt());
+                    case 1: return Int.range( in.readInt(), in.readInt() );
+                }
+            }
             case ATOM: {
 
                 String s = in.readUTF();

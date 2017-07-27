@@ -52,10 +52,7 @@ public abstract class AtomicToString implements Atomic {
         out.write(bytesCached);
     }
 
-    @Override
-    public final byte[] bytes() {
-        return bytesCached;
-    }
+
 
     @Override abstract public String toString();
 

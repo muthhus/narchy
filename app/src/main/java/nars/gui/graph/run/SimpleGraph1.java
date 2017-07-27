@@ -115,28 +115,29 @@ public class SimpleGraph1 extends ConceptSpace {
         this.next = n2;
         return this;
     }
-   protected <N,E> SimpleGraph1 commit(ValueGraph<N,E> g, FloatFunction<E> pri) {
-        List<Activate> n2 = $.newArrayList(g.nodes().size());
 
-
-        g.nodes().forEach(x -> {
-            //HACK todo use proxyterms in a cache
-            Concept c = nar.conceptualize(nodeTerm(x));
-            Bag<Term, PriReference<Term>> tl = c.termlinks();
-            //tl.clear();
-            g.successors(x).forEach( y -> {
-                tl.put(new PLink(nodeTerm(y),  pri.floatValueOf(
-                    g.edgeValue(x, y)
-                )));
-            } );
-            tl.commit();
-            n2.add(new Activate(c, 1f));
-        });
-
-        this.next = n2;
-        return this;
-    }
-
+//   protected <N,E> SimpleGraph1 commit(ValueGraph<N,E> g, FloatFunction<E> pri) {
+//        List<Activate> n2 = $.newArrayList(g.nodes().size());
+//
+//
+//        g.nodes().forEach(x -> {
+//            //HACK todo use proxyterms in a cache
+//            Concept c = nar.conceptualize(nodeTerm(x));
+//            Bag<Term, PriReference<Term>> tl = c.termlinks();
+//            //tl.clear();
+//            g.successors(x).forEach( y -> {
+//                tl.put(new PLink(nodeTerm(y),  pri.floatValueOf(
+//                    g.edgeValue(x, y)
+//                )));
+//            } );
+//            tl.commit();
+//            n2.add(new Activate(c, 1f));
+//        });
+//
+//        this.next = n2;
+//        return this;
+//    }
+//
     @NotNull
     private Termed nodeTerm(Object x) {
         return $.quote(System.identityHashCode(x) + " " + x.toString());

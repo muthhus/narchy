@@ -436,7 +436,7 @@ public abstract class NQuadsRDF {
         if (belief instanceof Compound) {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
-            return new TaskBuilder((Compound)belief, BELIEF, $.t(1f, nar.confDefault(BELIEF)))
+            return new TaskBuilder(belief, BELIEF, $.t(1f, nar.confDefault(BELIEF)))
                     .eternal().apply(nar);
         }
 

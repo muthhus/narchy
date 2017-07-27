@@ -19,7 +19,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.IntAtom;
+import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
@@ -658,7 +658,7 @@ public interface $ {
 
     @NotNull
     public static Atomic the(int v) {
-        return IntAtom.the((int) v);
+        return Int.the((int) v);
     }
 
     @NotNull
@@ -746,7 +746,7 @@ public interface $ {
 
         if (o instanceof Number) {
             if (o instanceof Integer)
-                return IntAtom.the(((Integer)o).intValue());
+                return Int.the(((Integer)o).intValue());
         }
 
         return Atomic.the(o.toString());
@@ -976,8 +976,8 @@ public interface $ {
     }
 
     public static int intValue(Term intTerm) throws NumberFormatException {
-        if (intTerm instanceof IntAtom)
-            return ((IntAtom) intTerm).id;
+        if (intTerm instanceof Int)
+            return ((Int) intTerm).id;
 //        if (intTerm instanceof Atom) {
 //            String xs = intTerm.toString();
 //            return Texts.i(xs);
@@ -987,8 +987,8 @@ public interface $ {
     }
 
     public static int intValue(Term intTerm, int ifNotInt) {
-        if (intTerm instanceof IntAtom)
-            return ((IntAtom) intTerm).id;
+        if (intTerm instanceof Int)
+            return ((Int) intTerm).id;
         else
             return ifNotInt;
     }

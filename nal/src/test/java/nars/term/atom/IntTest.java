@@ -1,14 +1,73 @@
-//package nars.op;
-//
-//import nars.$;
-//import nars.term.atom.Atomic;
-//import nars.term.obj.Termject;
-//import org.junit.Ignore;
-//import org.junit.Test;
-//
-//import static nars.$.*;
-//import static org.junit.Assert.assertEquals;
-//
+package nars.term.atom;
+
+import nars.*;
+import nars.term.Term;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import static nars.term.atom.Int.range;
+import static nars.term.atom.Int.the;
+import static org.junit.Assert.assertEquals;
+
+public class IntTest {
+
+    @Ignore
+    @Test
+    public void testVariableIntroduction() throws Narsese.NarseseException {
+        NAR n = NARS.shell();
+        n.log();
+        n.input(" ((3,x) ==>+1 (4,y)).");
+        // ((3,x) ==>+1 (add(3,1),y)).
+
+        n.run(10);
+    }
+
+    @Test
+    public void testIntRange1() throws Narsese.NarseseException {
+        Atomic ii = range(0, 2);
+        assertEquals("0..2", ii.toString());
+
+        NAR n = NARS.tmp();
+        n.log();
+        n.believe("(f(1) <-> 5)");
+        n.believe($.sim($.func("f", new Term[]{ii}), $.varDep(1)));
+        n.run(10);
+    }
+
+    @Test
+    public void testIntIntersectionReduction() throws Narsese.NarseseException {
+        //(P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
+        //(P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S & P) --> M), (Belief:Union)
+
+        //simple scalar agglomeration
+        assertEquals(
+                range(0, 1),
+                Op.SECTi.the(the(0), the(1))
+        );
+        NAR n = NARS.tmp();
+        n.log();
+        n.believe($.inh($.the(0), $.the("x")));
+        n.believe($.inh($.the(1), $.the("x")));
+        n.run(10);
+    }
+    @Test
+    public void testIntInProductIntersectionReduction() throws Narsese.NarseseException {
+
+        //simple scalar agglomeration
+        assertEquals(
+                //$.p(range(0,1), range(0, 2)),
+                "(|,(0,0..2),(0..1,1),(0..1,0..2))",
+                Op.SECTi.the($.p(0, 1), $.p(the(1), range(0,2))).toString()
+        );
+
+        NAR n = NARS.tmp();
+        n.log();
+        n.believe($.inh($.p(0, 1), $.the("x")));
+        n.believe($.inh($.p(the(1), range(0,2)), $.the("x")));
+        n.run(10);
+    }
+
+}
 ///**
 // * Created by me on 8/5/16.
 // */

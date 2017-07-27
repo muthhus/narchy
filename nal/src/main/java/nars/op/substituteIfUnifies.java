@@ -86,11 +86,8 @@ abstract public class substituteIfUnifies extends Functor {
     @Override
     public Term apply(@NotNull TermContainer a) {
 
-//        if (a.size() < 3) {
-//            throw new UnsupportedOperationException();
-//        }
-
         Term input = a.sub(0);
+        if (input instanceof Bool) return Null;
 
         Term x = a.sub(1);
         if (x instanceof Bool) return Null;
