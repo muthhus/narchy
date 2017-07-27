@@ -91,12 +91,24 @@ public class Premise extends Pri implements ITask {
         if (task == null)
             return 0;
 
+        NAR nar = d.nar;
+
+        Concept taskConcept = task.concept(nar, true);
+        if (taskConcept == null) {
+            if (Param.DEBUG) {
+                assert (false) : task + " could not be conceptualized"; //WHY was task even created
+            } else {
+                taskLink.delete();
+                task.delete();
+                delete();
+                return 0;
+            }
+        }
 
 
         //float taskPri = task.priElseZero();
 
 
-        NAR nar = d.nar;
         int dur = d.dur;
         long now = d.time;
 
@@ -105,8 +117,6 @@ public class Premise extends Pri implements ITask {
         Task belief = null;
 
 
-        Concept taskConcept = task.concept(nar, true);
-        assert (taskConcept != null) : task + " could not be conceptualized";
 
         Concept _beliefConcept = nar.conceptualize(beliefTerm);
         boolean beliefIsTask = _beliefConcept != null && taskConcept.equals(_beliefConcept);
