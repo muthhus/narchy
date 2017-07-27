@@ -5,6 +5,7 @@ import jcog.math.Interval;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
 import nars.term.Compound;
@@ -22,7 +23,6 @@ import java.util.stream.Collectors;
 
 import static nars.Op.CONJ;
 import static nars.Op.NEG;
-import static nars.Op.subterms;
 import static nars.time.Tense.*;
 
 /**
@@ -39,6 +39,7 @@ public class Temporalize {
      */
     final Map<Term, FasterList<Event>> constraints = new HashMap();
     final Random random;
+    public int dur = 1;
 
     /**
      * for testing
@@ -59,8 +60,10 @@ public class Temporalize {
             this.term = term;
         }
 
+        @Nullable
         abstract public Time start(HashMap<Term, Time> trail);
 
+        @Nullable
         abstract public Time end(HashMap<Term, Time> trail);
 
         @Override
@@ -144,31 +147,31 @@ public class Temporalize {
 
     static long[] intersect(Event a, Event b, HashMap<Term, Time> trail) {
         Time as = a.start(trail);
-        if (as!=null) {
+        if (as != null) {
             Time bs = b.start(trail);
-            if (bs!=null) {
+            if (bs != null) {
                 if (as.base == ETERNAL && bs.base == ETERNAL) {
                     return Tense.ETERNAL_RANGE;
                 } else if (as.base != ETERNAL && bs.base != ETERNAL) {
                     Time ae = a.end(trail);
                     Time be = b.end(trail);
                     Interval ab = Interval.intersect(as.base, ae.base, bs.base, be.base);
-                    if (ab!=null) {
+                    if (ab != null) {
                         return new long[]{ab.a, ab.b};
                     } else {
                         //
                     }
-                } else  {
+                } else {
                     //one is eternal, the other isn't. use the non-eternal range
                     long start, end;
-                    if (as.base==ETERNAL) {
+                    if (as.base == ETERNAL) {
                         start = bs.base;
                         end = b.end(trail).base;
                     } else {
                         start = as.base;
                         end = a.end(trail).base;
                     }
-                    return new long[] { start ,end };
+                    return new long[]{start, end};
                 }
             }
         }
@@ -196,7 +199,7 @@ public class Temporalize {
         AbsoluteEvent(Term term, long start, long end) {
             super(term);
 
-            if (start!=ETERNAL && end==ETERNAL)
+            if (start != ETERNAL && end == ETERNAL)
                 end = start; //point-like
 
             assert ((start == ETERNAL && end == ETERNAL) || (start != ETERNAL && end != ETERNAL)) :
@@ -255,6 +258,7 @@ public class Temporalize {
         SolutionEvent(Term term, long start) {
             this(term, start, start != ETERNAL ? start + term.dtRange() : ETERNAL);
         }
+
         SolutionEvent(Term term, long start, long end) {
             super(term, start, end);
         }
@@ -332,9 +336,12 @@ public class Temporalize {
 //            assert(offset!=XTERNAL);
 //            assert(offset!=DTERNAL);
 //            return base + offset;
-            if (base != ETERNAL && offset != DTERNAL && offset != XTERNAL)
-                return base + offset;
-            else
+            if (base != ETERNAL) {
+                if (offset == XTERNAL || offset == DTERNAL)
+                    return base;
+                else
+                    return base + offset;
+            } else
                 return ETERNAL;
         }
     }
@@ -489,8 +496,9 @@ public class Temporalize {
         Task task = d.task;
         Task belief = d.belief;
 
-
         Temporalize model = new Temporalize(d.random);
+
+        model.dur = d.dur;
 
         model.know(task, d);
         if (belief != null)
@@ -537,7 +545,7 @@ public class Temporalize {
      */
     Temporalize knowTerm(Term term, long from, long to) {
         know(new AbsoluteEvent(term, from, to), term,
-                0, from!=ETERNAL ? (int)(to-from) : term.dtRange()
+                0, from != ETERNAL ? (int) (to - from) : term.dtRange()
         );
         return this;
     }
@@ -546,7 +554,7 @@ public class Temporalize {
     /**
      * recursively calculates the start and end time of all contained events within a term
      *
-     * @param occ superterm occurrence, may be ETERNAL
+     * @param occ    superterm occurrence, may be ETERNAL
      * @param start, end - term-local temporal bounds
      */
     void know(@Nullable Event parent, Term term, int start, int end) {
@@ -771,7 +779,7 @@ public class Temporalize {
 
             //choose two absolute events which cover both 'a' and 'b' terms
             List<Event> relevant = $.newArrayList();
-            Set<Term> uncovered = Sets.mutable.of(a,b);
+            Set<Term> uncovered = Sets.mutable.of(a, b);
             for (Term c : constraints.keySet()) {
                 boolean relevance = false;
                 if (c.equals(target))
@@ -784,10 +792,10 @@ public class Temporalize {
 
                 Event ce = solve(c, trail);
 
-                if (trail.get(c)==null)
+                if (trail.get(c) == null)
                     trail.remove(c);
 
-                if (ce!=null) {
+                if (ce != null) {
                     if (c.contains(a)) {
                         uncovered.remove(a);
                         relevance = true;
@@ -807,7 +815,8 @@ public class Temporalize {
             //HACK just use the only two for now, it is likely what is relevant anyway
             int rr = relevant.size();
             switch (rr) {
-                case 0: return null; //can this happen?
+                case 0:
+                    return null; //can this happen?
                 case 1:
                     Event r = relevant.get(0);
                     return new SolutionEvent(target, r.start(trail).abs(), r.end(trail).abs());
@@ -818,15 +827,46 @@ public class Temporalize {
 
             for (int i = 0; i < retries; i++) {
 
-                if (rr>2)
+                if (rr > 2)
                     Collections.shuffle(relevant, random); //dont reshuffle if only 2, it's pointless; intersection is symmetric
 
-                long[] ii = intersect(relevant.get(0), relevant.get(1), trail);
-                if (ii!=null) {
+                Event ra = relevant.get(0);
+                Event rb = relevant.get(1);
+                long[] ii = intersect(ra, rb, trail);
+                if (ii != null) {
+                    //overlap or adjacent
                     return new SolutionEvent(target, ii[0], ii[1]);
-                }
-            }
+                } else {
+                    //not overlapping at all, compute point interpolation
+                    Time as = ra.start(trail);
+                    if (as != null) {
+                        Time bs = rb.start(trail);
+                        if (bs != null) {
+                            Time at = ra.end(trail);
+                            if (at != null) {
+                                Time bt = rb.end(trail);
+                                if (bt != null) {
+                                    long ta = as.abs();
+                                    long tz = at.abs();
+                                    if (tz == ETERNAL) tz = ta;
+                                    long ba = bs.abs();
+                                    long bz = bt.abs();
+                                    if (bz == ETERNAL) bz = ba;
+                                    long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
+                                    if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float) dist) / dur) {
+                                        long occ = ((ta + tz) / 2 + (ba + bz) / 2) / 2;
+                                        //occInterpolate(t, b);
+                                        return new SolutionEvent(target, occ);
+                                    }
+                                    return null;
+                                }
+                            }
+                        }
+                    }
 
+                }
+
+            }
         }
 
         return null;
