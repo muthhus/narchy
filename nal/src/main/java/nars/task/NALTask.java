@@ -7,6 +7,7 @@ import nars.Task;
 import nars.control.Cause;
 import nars.task.util.InvalidTaskException;
 import nars.term.Term;
+import nars.term.var.UnnormalizedVariable;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
@@ -72,6 +73,11 @@ public class NALTask extends Pri implements Task {
 
 
 
+        if (Param.DEBUG) {
+            term.recurseTerms(t -> {
+                assert (!(t instanceof UnnormalizedVariable));
+            });
+        }
 
         Task.taskContentValid(term, punc, null, false);
 

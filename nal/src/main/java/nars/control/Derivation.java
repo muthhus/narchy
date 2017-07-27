@@ -13,6 +13,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.subst.Unify;
+import nars.term.var.UnnormalizedVariable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
@@ -348,6 +349,14 @@ public class Derivation extends Unify implements TermContext {
 //        }
 
         try {
+
+//            x.recurseTerms(t -> {
+//                assert (!(t instanceof UnnormalizedVariable));
+//            });
+//            y.recurseTerms(t -> {
+//                assert (!(t instanceof UnnormalizedVariable));
+//            });
+
             unify(x, y, finish);
         } finally {
             this.forEachMatch = null;

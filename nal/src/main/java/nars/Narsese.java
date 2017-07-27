@@ -1212,7 +1212,7 @@ public class Narsese extends BaseParser<Object> {
             return (Task) x[0];
         }
 
-        Term content = /*m.normalize*/((Term) x[1]);
+        Term content = ((Term) x[1]).normalize();
         /*if (!(content instanceof Compound)) {
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
             //return Command.task($.func("log", content));

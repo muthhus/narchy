@@ -14,6 +14,7 @@ import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
+import nars.term.var.UnnormalizedVariable;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -307,6 +308,9 @@ public abstract class Unify extends Versioning implements Subst {
             x = x0;
 
             if (x instanceof Variable && x.op() == y.op()) {
+
+                assert(!(y instanceof UnnormalizedVariable)):
+                        y + " is unnormalized: " + this + " unifying terms containing an unnormalized variable";
 
                 //TODO check if this is already a common variable containing y
                 return putCommon((Variable) x, (Variable) y);
