@@ -187,9 +187,9 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         //new DeductiveMeshTest(n, new int[]{3, 2}, 16384);
         n.log();
         n.input(
-                //"(a-->b).", "(b-->c).","(c-->d)."
+                "(a-->b).", "(b-->c).","(c-->d)."
 
-                "$.50 at(SELF,{t001}). :|: %1.0;.90%", "$.70 (at(SELF,{t001}) &&+5 open({t001}))! %1.0;.90%" // //goal_ded_2
+                //"$.50 at(SELF,{t001}). :|: %1.0;.90%", "$.70 (at(SELF,{t001}) &&+5 open({t001}))! %1.0;.90%" // //goal_ded_2
         );
         //n.log();
 

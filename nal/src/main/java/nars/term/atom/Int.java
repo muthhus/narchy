@@ -10,10 +10,10 @@ import nars.term.Term;
 import nars.term.subst.Unify;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.list.primitive.IntInterval;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -112,15 +112,15 @@ public class Int implements Atomic, Intlike {
     }
 
 
-    @Override
-    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-        if (equals(y)) return true;
-        if (y instanceof IntRange) {
-            IntRange ir = (IntRange) y;
-            return (ir.from <= id && ir.to >= id);
-        }
-        return false;
-    }
+//    @Override
+//    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+//        if (equals(y)) return true;
+//        if (y instanceof IntRange) {
+//            IntRange ir = (IntRange) y;
+//            return (ir.min <= id && ir.max >= id);
+//        }
+//        return false;
+//    }
 
     public static Intlike the(Range<Integer> span) {
         return range(span.lowerEndpoint(), span.upperEndpoint() - ((span.upperBoundType() == OPEN ? 1 : 0)));
@@ -132,32 +132,32 @@ public class Int implements Atomic, Intlike {
      */
     public static class IntRange implements Atomic, Intlike {
 
-        public final int from, to;
+        public final int min, max;
         private final int hash;
 
         /**
          * from, to - inclusive interval
          */
-        IntRange(int from, int to) {
-            assert (from < to);
-            this.from = from;
-            this.to = to;
-            this.hash = Util.hashCombine(INT_RANGE, from, to);
+        IntRange(int min, int max) {
+            assert (min < max);
+            this.min = min;
+            this.max = max;
+            this.hash = Util.hashCombine(INT_RANGE, min, max);
         }
 
-        @Override
-        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-            if (equals(y)) return true;
-            if (y instanceof Int) {
-                int i = ((Int) y).id;
-                return (from <= i && to >= i);
-            }
-            return false;
-        }
+//        @Override
+//        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+//            if (equals(y)) return true;
+//            if (y instanceof Int) {
+//                int i = ((Int) y).id;
+//                return (min <= i && max >= i);
+//            }
+//            return false;
+//        }
 
         @Override
         public @NotNull String toString() {
-            return from + ".." + to;
+            return min + ".." + max;
         }
 
         @Override
@@ -175,8 +175,8 @@ public class Int implements Atomic, Intlike {
 
             out.writeByte(INT.id);
             out.writeByte(1); //subtype
-            out.writeInt(from);
-            out.writeInt(to);
+            out.writeInt(min);
+            out.writeInt(max);
         }
 
         @Override
@@ -184,7 +184,7 @@ public class Int implements Atomic, Intlike {
             if (o == this) return true;
             if ((hash == o.hashCode()) && (o instanceof IntRange)) {
                 IntRange ir = (IntRange) o;
-                return ir.from == from && ir.to == to;
+                return ir.min == min && ir.max == max;
             }
             return false;
         }
@@ -201,7 +201,7 @@ public class Int implements Atomic, Intlike {
 
         @Override
         public Range range() {
-            return Range.closed(from, to).canonical(DiscreteDomain.integers());
+            return Range.closed(min, max).canonical(DiscreteDomain.integers());
         }
     }
 
@@ -396,6 +396,69 @@ public class Int implements Atomic, Intlike {
             }
         }
         return r;
+    }
+    /**
+     * unroll IntInterval's
+     */
+    public static Iterator<Term> unrollInts(@NotNull Compound c) {
+        assert(!c.hasAny(Op.INT));
+            //return Iterators.singletonIterator(c); //no IntInterval's early exit
+
+        Compound cc = c;
+
+        Map<ByteList, IntRange> intervals = new HashMap();
+        c.pathsTo(x -> x instanceof IntRange ? ((IntRange) x) : null, (ByteList p, IntRange x) -> {
+            intervals.put(p.toImmutable(), x);
+            return true;
+        });
+
+        switch (intervals.size()) {
+
+            case 1: //1D
+            {
+                Map.Entry<ByteList, IntRange> e = intervals.entrySet().iterator().next();
+                IntRange i1 = e.getValue();
+                int max = i1.max;
+                int min = i1.min;
+                List<Term> t = $.newArrayList(1 + max - min);
+                for (int i = min; i <= max; i++) {
+                    @Nullable Term c1 = cc.transform(e.getKey(), $.the(i));
+                    if (c1 != null)
+                        t.add(c1);
+                }
+                return t.iterator();
+            }
+
+            case 2: //2D
+                Iterator<Map.Entry<ByteList, IntRange>> ee = intervals.entrySet().iterator();
+                Map.Entry<ByteList, IntRange> e1 = ee.next();
+                Map.Entry<ByteList, IntRange> e2 = ee.next();
+                IntRange i1 = e1.getValue();
+                IntRange i2 = e2.getValue();
+                int max1 = i1.max, min1 = i1.min, max2 = i2.max, min2 = i2.min;
+                List<Term> t = $.newArrayList((1 + max2 - min2) * (1 + max1 - min1));
+
+                for (int i = min1; i <= max1; i++) {
+                    for (int j = min2; j <= max2; j++) {
+                        Term c1 = cc.transform(e1.getKey(), $.the(i));
+                        if (!(c1 instanceof Compound))
+                            //throw new RuntimeException("how not transformed to compound");
+                            continue;
+                        Term c2 = ((Compound) c1).transform( e2.getKey(), $.the(j));
+                        if (!(c2 instanceof Compound))
+                            //throw new RuntimeException("how not transformed to compound");
+                            continue;
+                        t.add(c2);
+                    }
+                }
+                return t.iterator();
+
+            default:
+                //either there is none, or too many -- just use the term directly
+                return null;
+
+        }
+
     }
 
 

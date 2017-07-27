@@ -30,8 +30,8 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
     static final int minSampleRadiusInCycles = 0; //prevents sampling with 0 radius, if >0. used to provide precision in sub-duration ranges
-    static final int[] sampleRadii = { 0, 1, 2, /*4,*/ 16, 8*16 };
-    final static int maxSamplesTruthpolated = 5;
+    static final int[] sampleRadii = { 0, 2, /*4,*/ 8, 32 };
+    final static int maxSamplesTruthpolated = 3;
 
     /** proportional to capacity (not size).
      * set to zero to allow only one sample to be evaluated on its own.

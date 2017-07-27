@@ -302,7 +302,7 @@ public abstract class Unify extends Versioning implements Subst {
     public final boolean putXY(@NotNull Term x0, @NotNull Term y) {
         Term x = xy(x0);
         if (x != null) {
-            return !matchType(y) && unify(x, y); //!matchType is an attempt to prevent an infinite loop that can occurr
+            return unify(x, y);
         } else {
             x = x0;
 
