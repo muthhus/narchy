@@ -3,7 +3,6 @@ package nars.concept;
 import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Task;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.ScalarSignal;

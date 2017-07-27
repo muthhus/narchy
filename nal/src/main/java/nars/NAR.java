@@ -71,7 +71,6 @@ import static nars.$.$;
 import static nars.$.newArrayList;
 import static nars.Op.*;
 import static nars.term.Functor.f;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.ETERNAL;
 import static org.fusesource.jansi.Ansi.ansi;
 

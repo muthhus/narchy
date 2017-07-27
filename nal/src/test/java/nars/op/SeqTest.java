@@ -3,7 +3,6 @@ package nars.op;
 import com.google.common.base.Joiner;
 import jcog.list.CircularArrayList;
 import nars.*;
-import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -37,20 +36,20 @@ public class SeqTest {
     public static class Seq {
 
         final int capacity = 1024;
-        final Map<Term,CircularArrayList<Term>> seqs = new ConcurrentHashMap<>();
+        final Map<Term, CircularArrayList<Term>> seqs = new ConcurrentHashMap<>();
 
         float expThresh = 0.66f;
 
         public Seq on(NAR n) {
-            n.on( new seqAdd(n));
+            n.on(new seqAdd(n));
             n.on(Functor.f2("seq", (key, index) -> {
-                if (key.vars()==0 && index.vars()==0) {
+                if (key.vars() == 0 && index.vars() == 0) {
                     int i = $.intValue(index, Integer.MIN_VALUE);
-                    if (i!=Integer.MIN_VALUE) {
+                    if (i != Integer.MIN_VALUE) {
                         CircularArrayList<Term> c = seqs.get(key);
-                        if (c!=null) {
-                            synchronized(c) {
-                                return c.get(c.size()-1-i);
+                        if (c != null) {
+                            synchronized (c) {
+                                return c.get(c.size() - 1 - i);
                             }
                         }
                     }
@@ -69,12 +68,12 @@ public class SeqTest {
 
 
             public seqAdd(NAR n) {
-                super((Atom)$.the("seqAdd"), n);
+                super((Atom) $.the("seqAdd"), n);
             }
 
             @Override
             public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
-                if (t.isBelief() && !t.isEternal() && t.term().vars()==0) {
+                if (t.isBelief() && !t.isEternal() && t.term().vars() == 0) {
                     float e = t.expectation();
                     if (e > expThresh) {
                         Term[] args = Operator.args(t);
@@ -87,13 +86,10 @@ public class SeqTest {
                                 seq.add(belief);
                             }
 
-                            if (belief instanceof Compound) {
-                                Task u = Task.clone(t, belief);
-                                if (u != null)
-                                    return u.log("seqAdd(" + key + ")");
-                            } else {
-                                return null; //cant create a task from an atom
-                            }
+
+                            Task u = Task.clone(t, belief);
+                            if (u != null)
+                                return u.log("seqAdd(" + key + ")");
 
                         }
                     }

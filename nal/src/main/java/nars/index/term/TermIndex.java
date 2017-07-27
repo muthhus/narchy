@@ -212,10 +212,8 @@ public abstract class TermIndex implements TermContext {
 
 
     @Nullable
-    public Term retemporalize(@NotNull Term tx, Retemporalize r) {
-        if (!(tx instanceof Compound)) return tx;
+    public Term retemporalize(@NotNull Term x, Retemporalize r) {
 
-        Compound x = (Compound)tx;
 
         Term y = x.transform(r.dt(x), r);
         if (!(y instanceof Compound)) {

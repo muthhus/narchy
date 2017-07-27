@@ -5,7 +5,6 @@ import nars.derive.AbstractPred;
 import nars.derive.Conclusion;
 import nars.derive.Fork;
 import nars.derive.PrediTerm;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

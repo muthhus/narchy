@@ -4,7 +4,6 @@ import jcog.Texts;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;

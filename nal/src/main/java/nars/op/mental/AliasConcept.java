@@ -46,15 +46,6 @@ public final class AliasConcept extends BaseConcept {
             return target.eval(index);
         }
 
-        @Override
-        public void append(@NotNull Appendable w) throws IOException {
-            super.append(w);
-        }
-
-        //        @Override
-//        public void append(ByteArrayDataOutput out) {
-//            target.append(out); //serialize the expanded version
-//        }
 
         @Override
         public boolean equals(Object u) {

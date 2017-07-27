@@ -329,7 +329,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             int s = size();
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
-                if (x.equals(y) || ((x instanceof Compound) && (((Compound) x).containsRecursively(y)))) {
+                if (x.equals(y) || (!(x instanceof Atomic) && x.subterms().containsRecursively(y))) {
                     return true;
                 }
             }
@@ -342,7 +342,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             int s = size();
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
-                if (x.equals(y) || x.containsRecursively(y, subTermOf))
+                if (x.equals(y) || (!(x instanceof Atomic) && x.subterms().containsRecursively(y, subTermOf)))
                     return true;
             }
         }
@@ -394,31 +394,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    /**
-     * recursively
-     */
-    @NotNull
-    static boolean commonSubtermOrContainment(@NotNull Term a, @NotNull Term b) {
-
-        boolean aCompound = a instanceof Compound;
-        boolean bCompound = b instanceof Compound;
-        if (aCompound && bCompound) {
-            return commonSubterms((Compound) a, ((Compound) b), false);
-        } else {
-            if (aCompound && !bCompound) {
-                return ((Compound) a).contains(b);
-            } else if (bCompound && !aCompound) {
-                return ((Compound) b).contains(a);
-            } else {
-                //neither are compounds
-                return a.equals(b);
-            }
-        }
-
-    }
-
-
-//    /**
+    //    /**
 //     * scans first level only, not recursive
 //     */
 //    default boolean contains(Object o) {

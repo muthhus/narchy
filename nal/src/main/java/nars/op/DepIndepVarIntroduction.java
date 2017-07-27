@@ -4,7 +4,6 @@ import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
@@ -106,7 +105,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             Term t = null; //root
             int pathLength = p.length;
             for (int i = -1; i < pathLength-1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? input : ((Compound) t).sub(p[i]);
+                t = (i == -1) ? input : t.sub(p[i]);
                 Op o = t.op();
 
                 if (!depOrIndep && validIndepVarSuperterm(o)) {

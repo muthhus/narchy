@@ -7,7 +7,6 @@ import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.match.Ellipsis;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -4,7 +4,6 @@ import jcog.Util;
 import nars.IO;
 import nars.Op;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

@@ -5,7 +5,10 @@ import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
 import jcog.pri.PriReference;
-import nars.*;
+import nars.NAR;
+import nars.Op;
+import nars.Param;
+import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.dynamic.DynamicBeliefTable;
@@ -17,7 +20,6 @@ import nars.table.*;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atom;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -132,42 +134,42 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
-                        if (subj instanceof Compound) {
-                            Compound csubj = (Compound) subj;
 
-                            if (validUnwrappableSubterms(csubj.subterms())) {
-                                int s = csubj.size();
-                                FasterList<Term> lx = new FasterList(s);
-                                boolean valid = true;
-                                for (int i = 0; i < s; i++) {
-                                    Term csi = csubj.sub(i);
-                                    if (csi instanceof Int.IntRange) {
-                                        Int.unroll(csubj).forEachRemaining(dsi -> {
-                                             lx.add(INH.the(dsi, pred));
-                                        });
-                                    } else {
-                                        lx.add(INH.the(csi, pred));
-                                    }
+                        Compound csubj = (Compound) subj;
+
+                        if (validUnwrappableSubterms(csubj.subterms())) {
+                            int s = csubj.size();
+                            FasterList<Term> lx = new FasterList(s);
+                            boolean valid = true;
+                            for (int i = 0; i < s; i++) {
+                                Term csi = csubj.sub(i);
+                                if (csi instanceof Int.IntRange) {
+                                    Int.unroll(csubj).forEachRemaining(dsi -> {
+                                        lx.add(INH.the(dsi, pred));
+                                    });
+                                } else {
+                                    lx.add(INH.the(csi, pred));
                                 }
+                            }
 
-                                if (valid) {
-                                    Term[] x = lx.toArray(Term[]::new);
-                                    switch (so) {
-                                        case INT:
-                                        case PROD:
-                                        case SECTi:
-                                            dmt = new DynamicTruthModel.Intersection(x);
-                                            break;
-                                        case SECTe:
-                                            dmt = new DynamicTruthModel.Union(x);
-                                            break;
-                                        case DIFFi:
-                                            dmt = new DynamicTruthModel.Difference(x[0], x[1]);
-                                            break;
-                                    }
+                            if (valid) {
+                                Term[] x = lx.toArray(Term[]::new);
+                                switch (so) {
+                                    case INT:
+                                    case PROD:
+                                    case SECTi:
+                                        dmt = new DynamicTruthModel.Intersection(x);
+                                        break;
+                                    case SECTe:
+                                        dmt = new DynamicTruthModel.Union(x);
+                                        break;
+                                    case DIFFi:
+                                        dmt = new DynamicTruthModel.Difference(x[0], x[1]);
+                                        break;
                                 }
                             }
                         }
+
 
                     } /*else if (po.image) {
                         Compound img = (Compound) pred;
@@ -311,51 +313,12 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @Nullable
     public Termed apply(@NotNull Term term) {
 
-        //already a concept, assume it is from here
-        if (term instanceof Concept) {
+        //already a concept, or non-conceptualizable:  assume it is from here
+        if (term instanceof Concept || !term.op().conceptualizable) {
             return term;
         }
 
-        Concept result = null;
-
-
-        if (term instanceof Compound) {
-
-            result = newConcept(term);
-
-        } else {
-
-
-            if (term instanceof Variable) {
-                //final int s = this.serial;
-                //serial++;
-                //result = varBuilder.apply((Variable) term);
-                return term;
-            } else if (term instanceof Atom) {
-
-                return
-                        new BaseConcept(term, this);
-
-//                result = new AtomConcept((Atomic)term,
-//                        new HijackBag<>(32, 2, BudgetMerge.maxBlend, nar.random),
-//                        new HijackBag<>(32, 2, BudgetMerge.maxBlend, nar.random)
-//                );
-
-            }
-
-        }
-        if (result == null) {
-            /*throw new UnsupportedOperationException(
-                    "unknown conceptualization method for term \"" +
-                            term + "\" of class: " + term.getClass()
-            );*/
-            return null;
-        }
-
-
-        //logger.trace("{} conceptualized to {}", term, result);
-        return result;
-
+        return newConcept(term);
     }
 
     @NotNull

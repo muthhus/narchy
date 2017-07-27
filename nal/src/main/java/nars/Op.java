@@ -1,17 +1,18 @@
 package nars;
 
 
-import com.google.common.collect.Range;
 import nars.derive.match.Ellipsislike;
 import nars.index.term.TermContext;
 import nars.term.*;
-import nars.term.atom.*;
+import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
+import nars.term.atom.Bool;
+import nars.term.atom.Int;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.var.UnnormalizedVariable;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.primitive.ObjectByteMap;

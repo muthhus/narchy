@@ -1,17 +1,15 @@
 package nars.derive.instrument;
 
-import nars.$;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 abstract public class InstrumentedDerivationPredicate extends AbstractPred<Derivation> {
 
     protected InstrumentedDerivationPredicate(@NotNull PrediTerm<Derivation> inner) {
-        super(inner instanceof Compound ? (Compound)inner : $.p(inner));
+        super(inner);
     }
 
     @Override public boolean test(Derivation derivation) {

@@ -4,7 +4,6 @@ import nars.$;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

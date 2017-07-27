@@ -1,6 +1,5 @@
 package nars.control;
 
-import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
 import nars.NAR;
 import nars.NARS;
@@ -9,7 +8,6 @@ import nars.concept.Concept;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import org.eclipse.collections.api.bag.Bag;
 import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.junit.Test;

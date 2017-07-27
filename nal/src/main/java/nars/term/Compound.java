@@ -37,12 +37,9 @@ import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
 import nars.term.var.Variable;
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
-import org.eclipse.collections.impl.factory.Sets;
-import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
@@ -58,12 +55,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static java.util.Collections.emptySet;
 import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -231,115 +226,6 @@ public interface Compound extends Term, IPair, TermContainer {
 
     }
 
-    @Nullable
-    default byte[] pathTo(@NotNull Term subterm) {
-        if (subterm.equals(this)) return ArrayUtils.EMPTY_BYTE_ARRAY;
-        //if (!containsRecursively(subterm)) return null;
-        return pathTo(new ByteArrayList(0), this, subterm);
-    }
-
-
-    @Nullable
-    default Term transform(@NotNull ByteList path, Term replacement) {
-        return transform(path, 0, replacement);
-    }
-
-    @Nullable
-    default Term transform(@NotNull ByteList path, int depth, Term replacement) {
-        final Compound src = this;
-        int ps = path.size();
-        if (ps == depth)
-            return replacement;
-        if (ps < depth)
-            throw new RuntimeException("path overflow");
-
-        if (!(src instanceof Compound))
-            return src; //path wont continue inside an atom
-
-        int n = src.size();
-        Compound csrc = (Compound) src;
-
-        Term[] target = new Term[n];
-
-        for (int i = 0; i < n; i++) {
-            Term x = csrc.sub(i);
-            if (path.get(depth) != i)
-                //unchanged subtree
-                target[i] = x;
-            else {
-                //replacement is in this subtree
-                target[i] = x instanceof Compound ? ((Compound)x).transform(path, depth + 1, replacement) : replacement;
-            }
-
-        }
-
-        return csrc.op().the(csrc.dt(), target);
-    }
-
-
-    @Nullable
-    default <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
-        X ss = subterm.apply(this);
-        if (ss != null) {
-            if (!receiver.test(ByteLists.immutable.empty(), ss))
-                return false;
-        }
-        return pathsTo(new ByteArrayList(0), this, subterm, receiver);
-    }
-
-    @Nullable
-    static byte[] pathTo(@NotNull ByteArrayList p, Compound superTerm, @NotNull Term target) {
-        if (superTerm.impossibleSubTerm(target))
-            return null;
-
-        int n = superTerm.size();
-        for (int i = 0; i < n; i++) {
-            Term s = superTerm.sub(i);
-            if (s.equals(target)) {
-                p.add((byte) i);
-                return p.toArray();
-            }
-            if (s instanceof Compound) {
-                Compound cs = (Compound) s;
-                byte[] pt = pathTo(p, cs, target);
-                if (pt != null) {
-                    p.add((byte) i);
-                    return pt;
-                }
-
-            }
-        }
-
-        return null;
-    }
-
-    @Nullable
-    static <X> boolean pathsTo(@NotNull ByteArrayList p, Compound superTerm, @NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
-
-
-        int ppp = p.size();
-
-        int n = superTerm.size();
-        for (int i = 0; i < n; i++) {
-            Term s = superTerm.sub(i);
-            X ss = subterm.apply(s);
-
-            p.add((byte) i);
-
-            if (ss != null) {
-                if (!receiver.test(p, ss))
-                    return false;
-            }
-            if (s instanceof Compound) {
-                Compound cs = (Compound) s;
-                if (!pathsTo(p, cs, subterm, receiver))
-                    return false;
-            }
-            p.removeAtIndex(ppp);
-        }
-
-        return true;
-    }
 
     @NotNull
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
@@ -845,7 +731,7 @@ public interface Compound extends Term, IPair, TermContainer {
         //unwrap negation before recursion, it should be more efficient
         Op o = op();
         if (o == NEG) {
-            Compound inner = compoundOrNull(unneg());
+            Term inner = unneg();
             if (inner == null)
                 return this; //dont go further
             else {

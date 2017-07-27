@@ -7,6 +7,8 @@ package nars.op.data;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -48,12 +50,13 @@ public class reflect  {
         //  }
         return $.inh($.p(reflect(s.sub(0)), reflect(s.sub(1))), $.quote(operatorName));
     }
+
     @Nullable
-    public static Term sop(@NotNull Compound s, Term predicate) {
+    public static Term sop(@NotNull TermContainer s, Term predicate) {
         return $.inh($.p(reflect(s.sub(0)), reflect(s.sub(1))), predicate);
     }
     @Nullable
-    public static Term sop(String operatorName, @NotNull Compound c) {
+    public static Term sop(String operatorName, @NotNull TermContainer c) {
         Term[] m = new Term[c.size()];
         for (int i = 0; i < c.size(); i++) {
             if ((m[i] = reflect(c.sub(i))) == null)
@@ -83,15 +86,14 @@ public class reflect  {
     }
     
     @Nullable
-    public static Term reflect(Term node) {
-        if (!(node instanceof Compound)) {
-            return node;
+    public static Term reflect(Term t) {
+        if (t instanceof Atomic) {
+            return t;
         }
-        Compound t = (Compound)node;
         switch (t.op()) {
             //case INH: return sop(t, "inheritance");
             //case SIM:  return sop(t, "similarity");
-            default: return sop(t.op().toString(), t);
+            default: return sop(t.op().toString(), t.subterms());
         }
         
     }

@@ -1,7 +1,6 @@
 package nars.op;
 
 import nars.$;
-import nars.term.Compound;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;

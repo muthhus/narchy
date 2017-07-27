@@ -22,10 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-
 import static nars.Op.NEG;
-import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 
 /**

@@ -60,16 +60,15 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 
     /** slightly modified from general compound unification */
     @Override
-    public boolean unify(@NotNull Term ty, @NotNull Unify subst) {
+    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
 
-        if ((ty instanceof Compound) &&
-                op == ty.op() &&
-                ty.hasAll(structureNecessary) &&
-                size == ty.size()
+        if (
+                op == y.op() &&
+                y.hasAll(structureNecessary) &&
+                size == y.size()
                 //ty.volume() >= minVolumeNecessary
             ) {
 
-            Compound y = (Compound) ty;
             if (op.temporal) {
                 int sdur = subst.dur;
                 if (sdur >= 0) {
@@ -87,8 +86,8 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                     xsubs.unifyCommute(ysubs, subst) :
                     xsubs.unifyLinear(ysubs, subst);
 
-        } else if (ty instanceof AliasConcept.AliasAtom) {
-            Term abbreviated = ((AliasConcept.AliasAtom) ty).target;
+        } else if (y instanceof AliasConcept.AliasAtom) {
+            Term abbreviated = ((AliasConcept.AliasAtom) y).target;
             return abbreviated.equals(this) || unify(abbreviated, subst);
         }
 

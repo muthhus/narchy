@@ -1,7 +1,6 @@
 package nars.derive.constraint;
 
 import nars.Op;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;

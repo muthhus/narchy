@@ -7,7 +7,6 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.subst.Unify;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
@@ -310,7 +309,7 @@ public class Int implements Intlike {
 
 
                         //x is contained within range expression p
-                        Term xpp = x instanceof Compound ? x.sub(pp) : x;
+                        Term xpp = x.size() > 0 ? x.sub(pp) : x;
 
                         boolean connected;
                         if (xpp instanceof Intlike) {
@@ -321,7 +320,7 @@ public class Int implements Intlike {
 
                         if (connected) {
                             Term y = x instanceof Compound ?
-                                    ((Compound)x).transform(pp, f)
+                                    x.transform(pp, f)
                                     : f;
                             //if (!y.equals(x)) {
 
@@ -400,14 +399,13 @@ public class Int implements Intlike {
     /**
      * unroll IntInterval's
      */
-    public static Iterator<Term> unroll(@NotNull Compound c) {
+    public static Iterator<Term> unroll(@NotNull Term cc) {
         //assert(!c.hasAny(Op.INT));
             //return Iterators.singletonIterator(c); //no IntInterval's early exit
 
-        Compound cc = c;
 
         Map<ByteList, IntRange> intervals = new HashMap();
-        c.pathsTo(x -> x instanceof IntRange ? ((IntRange) x) : null, (ByteList p, IntRange x) -> {
+        cc.pathsTo(x -> x instanceof IntRange ? ((IntRange) x) : null, (ByteList p, IntRange x) -> {
             intervals.put(p.toImmutable(), x);
             return true;
         });
@@ -441,10 +439,7 @@ public class Int implements Intlike {
                 for (int i = min1; i <= max1; i++) {
                     for (int j = min2; j <= max2; j++) {
                         Term c1 = cc.transform(e1.getKey(), $.the(i));
-                        if (!(c1 instanceof Compound))
-                            //throw new RuntimeException("how not transformed to compound");
-                            continue;
-                        Term c2 = ((Compound) c1).transform( e2.getKey(), $.the(j));
+                        Term c2 = c1.transform( e2.getKey(), $.the(j));
                         if (!(c2 instanceof Compound))
                             //throw new RuntimeException("how not transformed to compound");
                             continue;

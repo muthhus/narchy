@@ -2,7 +2,6 @@ package nars.derive.match;
 
 import nars.$;
 import nars.Op;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.term.var.AbstractVariable;
@@ -149,10 +148,8 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
     @Nullable public static Ellipsis firstEllipsisRecursive(@NotNull Term x) {
         if (x instanceof Ellipsis)
             return (Ellipsis)x;
-        else if (x instanceof Compound)
-            return firstEllipsisRecursive((TermContainer)x);
         else
-            return null;
+            return firstEllipsisRecursive(x.subterms());
     }
 
     /** this needs to use .term(x) instead of Term[] because of shuffle terms */

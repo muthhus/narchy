@@ -8,6 +8,7 @@ import nars.$;
 import nars.Op;
 import nars.index.term.TermIndex;
 import nars.term.atom.Atom;
+import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.transform.Retemporalize;
@@ -298,7 +299,7 @@ public enum Terms { ;
         out.print(Integer.toBinaryString(x.structure()) + ')');
         out.println();
 
-        if (x instanceof Compound) {
+        if (!(x instanceof Atomic)) {
             for (Term z : ((Compound) x))
                 printRecursive(out, z, level + 1);
         }
@@ -319,7 +320,7 @@ public enum Terms { ;
 
         line.append(x);
 
-        if (x instanceof Compound) {
+        if (!(x instanceof Atomic)) {
             for (Term z : ((Compound) x))
                 printRecursive(z, level + 1, c);
         }
@@ -387,7 +388,7 @@ public enum Terms { ;
      * dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent
      */
     @Nullable
-    public static Compound compoundOrNull(@Nullable Term t) {
+    @Deprecated public static Compound compoundOrNull(@Nullable Term t) {
         if (t instanceof Compound) return (Compound) t;
         else
             return null;

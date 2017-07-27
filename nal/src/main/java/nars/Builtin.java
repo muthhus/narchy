@@ -113,7 +113,7 @@ public class Builtin {
                     which = nar.random().nextInt(x.size());
                 }
 
-                return ((TermContainer) x).sub(which);
+                return x.sub(which);
             }
             return x;
         }));

@@ -4,7 +4,6 @@ import jcog.data.FloatParam;
 import nars.NAR;
 import nars.Task;
 import nars.task.SignalTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -18,7 +17,6 @@ import java.util.function.Function;
 import java.util.function.LongSupplier;
 
 import static nars.Op.BELIEF;
-import static nars.time.Tense.ETERNAL;
 
 
 /**

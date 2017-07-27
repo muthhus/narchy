@@ -20,15 +20,14 @@ abstract public class Retemporalize implements CompoundTransform {
 
     @Nullable
     @Override
-    public final Term apply(@Nullable Compound parent, @NotNull Term term) {
-        if (term instanceof Compound && term.hasAny(Op.TemporalBits)) {
-            Compound x = (Compound) term;
+    public final Term apply(@Nullable Compound parent, @NotNull Term x) {
+        if (x.hasAny(Op.TemporalBits)) {
             return x.transform(dt(x), this);
         }
-        return term;
+        return x;
     }
 
-    abstract public int dt(@NotNull Compound x);
+    abstract public int dt(@NotNull Term x);
 
 
     @Deprecated  public static class RetemporalizeNonXternal extends Retemporalize {
@@ -39,7 +38,7 @@ abstract public class Retemporalize implements CompoundTransform {
             this.dtIfXternal = dtIfXternal;
         }
 
-        @Override public int dt(@NotNull Compound x) {
+        @Override public int dt(@NotNull Term x) {
             int dt = x.dt();
             return (dt==DTERNAL||dt==XTERNAL) ? dtIfXternal : dt;
         }

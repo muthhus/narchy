@@ -1,16 +1,15 @@
 package nars.nal;
 
-import jcog.pri.PLink;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.Task;
 import nars.control.Derivation;
 import nars.control.Premise;
-import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.derive.TrieDeriver;
+import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
 import nars.term.Term;

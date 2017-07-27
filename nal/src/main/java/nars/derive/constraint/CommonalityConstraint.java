@@ -1,6 +1,5 @@
 package nars.derive.constraint;
 
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;

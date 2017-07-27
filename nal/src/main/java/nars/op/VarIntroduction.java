@@ -76,9 +76,8 @@ public abstract class VarIntroduction {
 
         Term newContent = n.terms.replace(c, substs);
 
-        if ((newContent instanceof Compound) && !newContent.equals(c)) {
+        if (!newContent.equals(c)) {
             each.accept(newContent);
-
         }
 
 //        while (selections.hasNext()) {

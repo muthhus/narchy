@@ -7,7 +7,6 @@ import nars.Task;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.var.Variable;
@@ -102,8 +101,6 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         template = nar.terms.retemporalize(template,
                 target==null || target.isEternal() ?
                 nar.terms.retemporalizeDTERNAL : nar.terms.retemporalizeZero); //TODO move this somewhere else where it can use the NAR's index
-        if (!(template instanceof Compound))
-            return null; //??
 
         Task y = generate(template, when, nar);
 

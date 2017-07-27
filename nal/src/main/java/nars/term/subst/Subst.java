@@ -5,6 +5,7 @@ import nars.Op;
 import nars.derive.match.EllipsisMatch;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +50,7 @@ public interface Subst  {
         if (y != null)
             return y; //an assigned substitution, whether a variable or other type of term
 
-        if (!(x instanceof Compound))
+        if (x instanceof Atomic)
             return x;
 //        Op op = x.op();
 //        switch (op) {

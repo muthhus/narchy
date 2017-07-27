@@ -36,11 +36,6 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
     }
 
 
-    @Override
-    public void onRemoved(@NotNull Task t) {
-        //t.delete();
-    }
-
     @NotNull
     @Override
     public Task key(@NotNull Task value) {

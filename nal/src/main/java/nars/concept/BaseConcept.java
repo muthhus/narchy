@@ -10,7 +10,6 @@ import nars.concept.state.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TaskTable;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;

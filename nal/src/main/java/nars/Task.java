@@ -10,10 +10,9 @@ import nars.op.Command;
 import nars.task.*;
 import nars.task.util.AnswerBag;
 import nars.task.util.InvalidTaskException;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.Termlike;
+import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.var.Variable;
 import nars.time.Tense;
@@ -207,7 +206,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             return fail(t, "no associated concept", safe);
         }
 
-        return !(c instanceof Compound) || validTaskCompound((Compound)c, punc, safe);
+        return (c instanceof Atomic) || validTaskCompound(c, punc, safe);
     }
 
 //    @Nullable
@@ -220,7 +219,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
      * these can all be tested prenormalization, because normalization will not affect the result
      */
     @Nullable
-    static boolean validTaskCompound(@NotNull Compound t, byte punc, boolean safe) {
+    static boolean validTaskCompound(@NotNull Term t, byte punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
 
@@ -252,7 +251,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     }
 
 
-    static boolean indepValid(@NotNull Compound comp, @NotNull Term selected) {
+    static boolean indepValid(@NotNull Term comp, @NotNull Term selected) {
 
         List<byte[]> pp = comp.pathsTo(selected);
 

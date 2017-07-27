@@ -103,9 +103,6 @@ public interface QuestionTable extends TaskTable {
             return Integer.MAX_VALUE;
         }
 
-        @Override
-        public void capacity(int newCapacity) {
-            super.capacity(newCapacity);
-        }
+
     }
 }

@@ -82,10 +82,10 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
             monitors = new ConcurrentHashMap<>();
         }
 
-        @Override
-        public void register(@NotNull Monitor<?> monitor) {
-            super.register(monitor);
-        }
+//        @Override
+//        public void register(@NotNull Monitor<?> monitor) {
+//            super.register(monitor);
+//        }
 
         private void register(ObjectName objectName, DynamicMBean mbean) throws Exception {
             //synchronized (getLock(objectName)) {

@@ -6,7 +6,6 @@ import nars.Param;
 import nars.Task;
 import nars.control.Cause;
 import nars.control.Derivation;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
@@ -157,15 +156,16 @@ public class Revision {
     public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float curDepth, @NotNull Random rng, boolean mergeOrChoose) {
         if (a.equals(b)) {
             return a;
-        } else if (a instanceof Compound) {
+        }
+        int len = a.size();
+        if (len > 0) {
             boolean sameOp = a.op() == b.op();
-            int len = a.size();
+
             boolean sameSize = (len == b.size());
             if (sameSize && sameOp) {
-                Compound ca = (Compound) a;
-                Compound cb = (Compound) b;
+
                 if (a.op().temporal && len == 2) {
-                    return dtMergeTemporal(ca, cb, aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
+                    return dtMergeTemporal(a, b, aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
                 } else {
                     //assert(ca.dt()== cb.dt());
 
@@ -173,10 +173,10 @@ public class Revision {
 
                     Term[] x = new Term[len];
                     for (int i = 0; i < len; i++) {
-                        x[i] = intermpolate(ca.sub(i), cb.sub(i), aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
+                        x[i] = intermpolate(a.sub(i), b.sub(i), aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
                     }
 
-                    return ca.op().the( ca.dt(), x );
+                    return a.op().the( a.dt(), x );
                 }
             }
         }
@@ -186,7 +186,7 @@ public class Revision {
     }
 
     @NotNull
-    private static Term dtMergeTemporal(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @NotNull Random rng, boolean mergeOrChoose) {
+    private static Term dtMergeTemporal(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @NotNull Random rng, boolean mergeOrChoose) {
 
         int adt = a.dt();
 

@@ -6,6 +6,7 @@ import nars.term.atom.Atomic;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static nars.$.$;
@@ -16,12 +17,35 @@ import static org.junit.Assert.*;
  */
 public class TermContainerTest {
 
+    /**
+     * recursively
+     */
+    @NotNull
+    static boolean commonSubtermOrContainment(@NotNull Term a, @NotNull Term b) {
+
+        boolean aCompound = a instanceof Compound;
+        boolean bCompound = b instanceof Compound;
+        if (aCompound && bCompound) {
+            return TermContainer.commonSubterms((Compound) a, ((Compound) b), false);
+        } else {
+            if (aCompound && !bCompound) {
+                return ((Compound) a).contains(b);
+            } else if (bCompound && !aCompound) {
+                return ((Compound) b).contains(a);
+            } else {
+                //neither are compounds
+                return a.equals(b);
+            }
+        }
+
+    }
+
     @Test
     public void testCommonSubterms() throws Narsese.NarseseException {
-        assertTrue(TermContainer.commonSubtermOrContainment($("x"), $("x")));
-        assertFalse(TermContainer.commonSubtermOrContainment($("x"), $("y")));
-        assertTrue(TermContainer.commonSubtermOrContainment($("(x,y,z)"), $("y")));
-        assertFalse(TermContainer.commonSubtermOrContainment($("(x,y,z)"), $("w")));
+        assertTrue(commonSubtermOrContainment($("x"), $("x")));
+        assertFalse(commonSubtermOrContainment($("x"), $("y")));
+        assertTrue(commonSubtermOrContainment($("(x,y,z)"), $("y")));
+        assertFalse(commonSubtermOrContainment($("(x,y,z)"), $("w")));
         assertFalse(TermContainer.commonSubterms($("(a,b,c)"), $("(x,y,z)"), false));
         assertTrue(TermContainer.commonSubterms($("(x,y)"), $("(x,y,z)"), false));
     }

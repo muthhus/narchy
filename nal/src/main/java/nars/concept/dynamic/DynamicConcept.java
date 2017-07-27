@@ -3,7 +3,6 @@ package nars.concept.dynamic;
 import nars.NAR;
 import nars.concept.BaseConcept;
 import nars.table.BeliefTable;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,8 +1,6 @@
 package nars.concept.dynamic;
 
-import com.google.common.collect.Iterators;
 import jcog.list.FasterList;
-import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -11,16 +9,9 @@ import nars.concept.Concept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Int.IntRange;
 import nars.truth.Truth;
-import org.eclipse.collections.api.list.primitive.ByteList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
@@ -52,9 +43,6 @@ abstract public class DynamicTruthModel {
             boolean negated = subterm.op() == Op.NEG;
             if (negated)
                 subterm = subterm.unneg();
-
-            if (!(subterm instanceof Compound))
-                continue;
 
             Concept subConcept = n.concept(subterm);
             if (subConcept == null)

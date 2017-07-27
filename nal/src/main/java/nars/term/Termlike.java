@@ -31,6 +31,7 @@ public interface Termlike extends Termed {
     /**
      * number of subterms. if atomic, size=0
      */
+    @Override
     int size();
 
     /** (first-level only, non-recursive)

@@ -1319,8 +1319,8 @@ public class Narsese extends BaseParser<Object> {
     public static Term term(String s, boolean normalize) throws NarseseException {
 
         Term y = term(s);
-        if (normalize && y instanceof Compound) {
-            return nullIfNull(((Compound) y).normalize());
+        if (normalize) {
+            return nullIfNull(y.normalize());
         } else {
             return y;
 //            Termed existing = index.get(y, false);

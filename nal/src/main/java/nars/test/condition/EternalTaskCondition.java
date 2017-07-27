@@ -7,7 +7,6 @@ import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.task.Tasked;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.truth.Truth;
@@ -72,7 +71,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     final static int maxSimilars = 2;
 
-    @NotNull protected final TreeMap<Float, Task> similar = new TreeMap();
+    @NotNull
+    protected final TreeMap<Float, Task> similar = new TreeMap();
 
 //    @Override
 //    public final Truth getTruth() {
@@ -83,23 +83,23 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         //super(n.task(sentenceTerm + punc).normalize(n.memory));
 
 
-            if (freqMax < freqMin) throw new RuntimeException("freqMax < freqMin");
-            if (confMax < confMin) throw new RuntimeException("confMax < confMin");
+        if (freqMax < freqMin) throw new RuntimeException("freqMax < freqMin");
+        if (confMax < confMin) throw new RuntimeException("confMax < confMin");
 
-            if (creationEnd - creationStart < 1)
-                throw new RuntimeException("cycleEnd must be after cycleStart by at least 1 cycle");
+        if (creationEnd - creationStart < 1)
+            throw new RuntimeException("cycleEnd must be after cycleStart by at least 1 cycle");
 
-            this.nar = n;
+        this.nar = n;
 
-            this.creationStart = creationStart;
-            this.creationEnd = creationEnd;
-            this.freqMax = Math.min(1.0f, freqMax);
-            this.freqMin = Math.max(0.0f, freqMin);
-            this.confMax = Math.min(1.0f, confMax);
-            this.confMin = Math.max(0.0f, confMin);
-            this.punc = punc;
-            this.term =
-                    normalizedOrNull($.terms.term( sentenceTerm ).term(), $.terms);
+        this.creationStart = creationStart;
+        this.creationEnd = creationEnd;
+        this.freqMax = Math.min(1.0f, freqMax);
+        this.freqMin = Math.max(0.0f, freqMin);
+        this.confMax = Math.min(1.0f, confMax);
+        this.confMin = Math.max(0.0f, confMin);
+        this.punc = punc;
+        this.term =
+                normalizedOrNull($.terms.term(sentenceTerm).term(), $.terms);
     }
 
     @NotNull
@@ -120,21 +120,12 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             //50% for equal term
             dist += 0.2f;
             if (dist >= ifLessThan) return dist;
-        } else {
-            if (a instanceof Compound) { //b also a compound
-                if (a.dt() != b.dt()) {
-                    dist += 0.2f;
-                    if (dist >= ifLessThan) return dist;
-                }
-            }
         }
-
 
         if (a.size() != b.size()) {
             dist += 0.2f;
             if (dist >= ifLessThan) return dist;
         }
-
 
         if (a.structure() != b.structure()) {
             dist += 0.2f;
@@ -144,7 +135,12 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         //HACK use toString for now
         dist += Terms.levenshteinDistancePercent(
                 a.toString(),
-                b.toString()) * 0.2f;
+                b.toString()) * 0.4f;
+
+        if (a.dt() != b.dt()) {
+            dist += 0.2f;
+            if (dist >= ifLessThan) return dist;
+        }
 
         return dist;
     }
@@ -152,7 +148,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     @NotNull
     @Override
     public String toString() {
-        return term.toString() + ((char)punc) + " %" +
+        return term.toString() + ((char) punc) + " %" +
                 rangeStringN2(freqMin, freqMax) + ';' + rangeStringN2(confMin, confMax) + '%' + ' ' +
                 " creation: (" + creationStart + ',' + creationEnd + ')';
     }
@@ -252,7 +248,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             float fr = tt.freq();
             return (!(fr > freqMax)) && (!(fr < freqMin));
         } else {
-            return task.truth()==null;
+            return task.truth() == null;
         }
     }
 
@@ -295,50 +291,50 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         //synchronized (similar = this.similar) {
         similar = this.similar;
 
-            //TODO add the levenshtein distance of other task components
-            float worstDiff = similar.size() >= maxSimilars ? similar.lastKey() : Float.POSITIVE_INFINITY;
+        //TODO add the levenshtein distance of other task components
+        float worstDiff = similar.size() >= maxSimilars ? similar.lastKey() : Float.POSITIVE_INFINITY;
 
-            float difference = 0;
-            Term tterm = task.term();
-            difference +=
-                    tterm.equals(term) ? 0 : (term.volume());
+        float difference = 0;
+        Term tterm = task.term();
+        difference +=
+                tterm.equals(term) ? 0 : (term.volume());
+        if (difference >= worstDiff)
+            return;
+
+        if (task.isBeliefOrGoal()) {
+            float f = task.freq();
+            float freqDiff = Math.min(
+                    Math.abs(f - freqMin),
+                    Math.abs(f - freqMax));
+            difference += 2 * freqDiff;
             if (difference >= worstDiff)
                 return;
 
-            if (task.isBeliefOrGoal()) {
-                float f = task.freq();
-                float freqDiff = Math.min(
-                        Math.abs(f - freqMin),
-                        Math.abs(f - freqMax));
-                difference += 2 * freqDiff;
-                if (difference >= worstDiff)
-                    return;
-
-                float c = task.conf();
-                float confDiff = Math.min(
-                        Math.abs(c - confMin),
-                        Math.abs(c - confMax));
-                difference += 1 * confDiff;
-                if (difference >= worstDiff)
-                    return;
-            }
-
-            float termDifference =
-                    termDistance(tterm, term, worstDiff);
-            difference += 3 * termDifference;
-
+            float c = task.conf();
+            float confDiff = Math.min(
+                    Math.abs(c - confMin),
+                    Math.abs(c - confMax));
+            difference += 1 * confDiff;
             if (difference >= worstDiff)
                 return;
+        }
+
+        float termDifference =
+                termDistance(tterm, term, worstDiff);
+        difference += 3 * termDifference;
+
+        if (difference >= worstDiff)
+            return;
 
 
-            //TODO more efficient way than this
+        //TODO more efficient way than this
 
-            this.similar.put(difference, task);
+        this.similar.put(difference, task);
 
 
-            if (similar.size() > maxSimilars) {
-                similar.remove(similar.lastEntry().getKey());
-            }
+        if (similar.size() > maxSimilars) {
+            similar.remove(similar.lastEntry().getKey());
+        }
         //}
     }
 
@@ -433,13 +429,13 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             logger.error(msg);
 
             //synchronized (similar) {
-                if (!similar.isEmpty()) {
-                    similar.values().forEach(s -> {
-                        String pattern = "SIM\n{}";
-                        logger.info(pattern, s.proof());
-                        //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
-                    });
-                }
+            if (!similar.isEmpty()) {
+                similar.values().forEach(s -> {
+                    String pattern = "SIM\n{}";
+                    logger.info(pattern, s.proof());
+                    //logger.debug(s.getExplanation().replace("\n", "\n\t\t"));
+                });
+            }
             //}
         }
 

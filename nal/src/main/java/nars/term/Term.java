@@ -31,9 +31,9 @@ import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.Unify;
+import nars.term.transform.CompoundTransform;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
-import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.list.primitive.ImmutableByteList;
@@ -103,7 +103,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
     boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent);
 
-    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent)  {
+    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent) {
         return whileTrue.test(this);
     }
 
@@ -111,6 +111,125 @@ public interface Term extends Termlike, Comparable<Term> {
     default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
         return inSubtermsOf.test(this) && contains(t);
     }
+
+    /**
+     * returns an int[] path to the first occurrence of the specified subterm
+     *
+     * @return null if not a subterm, an empty int[] array if equal to this term, or a non-empty int[] array specifying subterm paths to reach it
+     */
+    @Nullable
+    default byte[] pathTo(@NotNull Term subterm) {
+        if (subterm.equals(this)) return ArrayUtils.EMPTY_BYTE_ARRAY;
+        //if (!containsRecursively(subterm)) return null;
+        return pathTo(new ByteArrayList(0), this, subterm);
+    }
+
+
+    @Nullable
+    default Term transform(@NotNull ByteList path, Term replacement) {
+        return transform(path, 0, replacement);
+    }
+
+    @Nullable
+    default Term transform(int newDT, @NotNull CompoundTransform t) {
+        return this;
+    }
+
+    @Nullable
+    default Term transform(@NotNull ByteList path, int depth, Term replacement) {
+        final Term src = this;
+        int ps = path.size();
+        if (ps == depth)
+            return replacement;
+        if (ps < depth)
+            throw new RuntimeException("path overflow");
+
+        if (src instanceof Atomic)
+            return src; //path wont continue inside an atom
+
+        int n = src.size();
+        Compound csrc = (Compound) src;
+
+        Term[] target = new Term[n];
+
+        for (int i = 0; i < n; i++) {
+            Term x = csrc.sub(i);
+            if (path.get(depth) != i)
+                //unchanged subtree
+                target[i] = x;
+            else {
+                //replacement is in this subtree
+                target[i] = x instanceof Atomic ? replacement : x.transform(path, depth + 1, replacement);
+            }
+
+        }
+
+        return csrc.op().the(csrc.dt(), target);
+    }
+
+
+    @Nullable
+    default <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+        X ss = subterm.apply(this);
+        if (ss != null) {
+            if (!receiver.test(ByteLists.immutable.empty(), ss))
+                return false;
+        }
+        return pathsTo(new ByteArrayList(0), this, subterm, receiver);
+    }
+
+    @Nullable
+    static byte[] pathTo(@NotNull ByteArrayList p, Term superTerm, @NotNull Term target) {
+        if (superTerm.impossibleSubTerm(target))
+            return null;
+
+        int n = superTerm.size();
+        for (int i = 0; i < n; i++) {
+            Term s = superTerm.sub(i);
+            if (s.equals(target)) {
+                p.add((byte) i);
+                return p.toArray();
+            }
+            if (s.size() > 0) {
+                byte[] pt = pathTo(p, s, target);
+                if (pt != null) {
+                    p.add((byte) i);
+                    return pt;
+                }
+
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
+    static <X> boolean pathsTo(@NotNull ByteArrayList p, Term superTerm, @NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
+
+
+        int ppp = p.size();
+
+        int n = superTerm.size();
+        for (int i = 0; i < n; i++) {
+            Term s = superTerm.sub(i);
+            X ss = subterm.apply(s);
+
+            p.add((byte) i);
+
+            if (ss != null) {
+                if (!receiver.test(p, ss))
+                    return false;
+            }
+            if (s.size() > 0) {
+                if (!pathsTo(p, s, subterm, receiver))
+                    return false;
+            }
+            p.removeAtIndex(ppp);
+        }
+
+        return true;
+    }
+
 
     @Nullable
     default Term commonParent(List<byte[]> subpaths) {
@@ -191,6 +310,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
     /**
      * equlity has already been tested prior to calling this
+     *
      * @param y     another term
      * @param subst the unification context
      * @return whether unification succeeded
@@ -382,7 +502,6 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
 
-
     /**
      * meta is int[] that collects term metadata:
      * 0: patternVar
@@ -421,16 +540,6 @@ public interface Term extends Termlike, Comparable<Term> {
 //        //TODO
 //    }
 
-    /**
-     * returns an int[] path to the first occurrence of the specified subterm
-     *
-     * @return null if not a subterm, an empty int[] array if equal to this term, or a non-empty int[] array specifying subterm paths to reach it
-     */
-    @Nullable
-    default byte[] pathTo(@NotNull Term subterm) {
-        return subterm.equals(this) ? ArrayUtils.EMPTY_BYTE_ARRAY : null;
-    }
-
     @NotNull
     default ByteList structureKey() {
         return structureKey(new ByteArrayList(volume() * 2 /* estimate */));
@@ -451,8 +560,11 @@ public interface Term extends Termlike, Comparable<Term> {
     default List<byte[]> pathsTo(Term subterm, int minLengthOfPathToReturn) {
         List<byte[]> list = $.newArrayList(0);
         pathsTo(
-            (x) -> x.equals(subterm) ? x : null,
-            (l, t) -> { if (l.size() >= minLengthOfPathToReturn) list.add(l.toArray()); return true; }
+                (x) -> x.equals(subterm) ? x : null,
+                (l, t) -> {
+                    if (l.size() >= minLengthOfPathToReturn) list.add(l.toArray());
+                    return true;
+                }
         );
         return list;
     }
@@ -461,17 +573,11 @@ public interface Term extends Termlike, Comparable<Term> {
         return pathsTo((x) -> subterm.equals(x) ? x : null, receiver);
     }
 
-    default <X> boolean pathsTo(@NotNull Function<Term, X> subterm, @NotNull BiPredicate<ByteList, X> receiver) {
-        X ss = subterm.apply(this);
-        if (ss != null)
-            return receiver.test(EmptyByteList, ss);
-        return true;
-    }
 
-    /** operator extended:
-     *     operator << 8 | sub-operator type rank for determing compareTo ordering
-     *
-     *     */
+    /**
+     * operator extended:
+     * operator << 8 | sub-operator type rank for determing compareTo ordering
+     */
     int opX();
 
     /**
@@ -497,7 +603,7 @@ public interface Term extends Termlike, Comparable<Term> {
 //        if (diff2 != 0)
 //            return diff2;
 
-        int d = Integer.compare(this.opX(), y.opX() );
+        int d = Integer.compare(this.opX(), y.opX());
         if (d != 0)
             return d;
 
@@ -509,11 +615,10 @@ public interface Term extends Termlike, Comparable<Term> {
 
             return Integer.compare(dt(), y.dt());
 
-        } else
-            {
+        } else {
             if ((this instanceof AbstractVariable) && (y instanceof AbstractVariable)) {
                 //hashcode serves as the ordering too
-                return Integer.compare(hashCode() , y.hashCode() );
+                return Integer.compare(hashCode(), y.hashCode());
             }
 
             //if the op is the same, it is required to be a subclass of Atomic
@@ -548,7 +653,8 @@ public interface Term extends Termlike, Comparable<Term> {
         return this;
     }
 
-    @NotNull default Term eval(TermContext index) {
+    @NotNull
+    default Term eval(TermContext index) {
         if (!(index instanceof StaticTermIndex)) {
             Termed t = index.get(this, false); //resolve
             if (t != null)
@@ -576,7 +682,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
     @NotNull
     static Term nullIfNull(@Nullable Term maybeNull) {
-        return (maybeNull==null) ? Null : maybeNull;
+        return (maybeNull == null) ? Null : maybeNull;
     }
 
 //    /** https://google.github.io/guava/releases/snapshot/api/docs/com/google/common/collect/TreeTraverser.html */
@@ -584,17 +690,23 @@ public interface Term extends Termlike, Comparable<Term> {
 //        return TreeTraverser.using(x -> x instanceof Compound ? ((Compound)x).subterms() : Collections.emptyList());
 //    }
 
-    /** opX function */
+    /**
+     * opX function
+     */
     private static int opX(Op o, byte subOp) {
         return o.id << 8 | subOp;
     }
 
-    /** for convenience, delegates to the byte function */
+    /**
+     * for convenience, delegates to the byte function
+     */
     static int opX(@NotNull Op o, int subOp) {
-        return opX(o, (byte)subOp);
+        return opX(o, (byte) subOp);
     }
 
-    /** if filterTrueFalse is false, only filters Null's */
+    /**
+     * if filterTrueFalse is false, only filters Null's
+     */
     static boolean invalidBoolSubterms(@NotNull Term u, boolean filterTrueFalse) {
         return u instanceof Bool && (filterTrueFalse || (u == Null));
     }
@@ -605,32 +717,44 @@ public interface Term extends Termlike, Comparable<Term> {
         return this;
     }
 
-    /** return null if none, cheaper than using an empty iterator */
-    @Nullable default Set<Term> varsUnique(@Nullable Op type) {
-        return null;
-    }
-    @Nullable default Set<Term> varsUnique(@Nullable Op type, @Nullable Set<Term> exceptIfHere) {
+    /**
+     * return null if none, cheaper than using an empty iterator
+     */
+    @Nullable
+    default Set<Term> varsUnique(@Nullable Op type) {
         return null;
     }
 
-    /** returns the term which identifies the concept that this term would be categorized by.
-     *  ex: any temporality is atemporalized.
-     * */
+    @Nullable
+    default Set<Term> varsUnique(@Nullable Op type, @Nullable Set<Term> exceptIfHere) {
+        return null;
+    }
+
+    /**
+     * returns the term which identifies the concept that this term would be categorized by.
+     * ex: any temporality is atemporalized.
+     */
     default @NotNull Term root() {
         return this;
     }
 
-    /** returns this term in a form which can identify a concept, or Null if it can't */
+    /**
+     * returns this term in a form which can identify a concept, or Null if it can't
+     */
     default @NotNull Term conceptual() {
         return root();
     }
 
-    /** erases temporal information, for use in computing root() */
+    /**
+     * erases temporal information, for use in computing root()
+     */
     default @NotNull Term eternal() {
         return this;
     }
 
-    default int dt() { return DTERNAL; }
+    default int dt() {
+        return DTERNAL;
+    }
 
     default Term normalize() {
         return this; //no change

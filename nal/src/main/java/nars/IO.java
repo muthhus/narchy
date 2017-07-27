@@ -17,7 +17,6 @@ import nars.term.var.UnnormalizedVariable;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import org.eclipse.collections.api.set.primitive.IntSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
