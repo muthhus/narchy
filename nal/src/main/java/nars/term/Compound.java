@@ -20,7 +20,6 @@
  */
 package nars.term;
 
-import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 import jcog.data.sexpression.IPair;
 import jcog.data.sexpression.Pair;

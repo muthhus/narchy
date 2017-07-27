@@ -6,7 +6,6 @@ import nars.Op;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.derive.rule.PremiseRule;
-import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -56,7 +55,7 @@ public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion
     public Conclusion apply(@NotNull NAR nar) {
         CauseChannel<Task> input = nar.newChannel(term());
         Term id = $.func("derive", /*$.the(cid), */sub(0) /* prod args */);
-        return new Conclusion((Compound) id, pattern, varIntro, rule, input);
+        return new Conclusion(id, pattern, varIntro, rule, input);
     }
 
 

@@ -110,11 +110,11 @@ abstract public class PatternCompound extends GenericCompoundDT  {
         }
 
 
-        abstract protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst);
+        abstract protected boolean matchEllipsis(@NotNull TermContainer y, @NotNull Unify subst);
 
         @Override
         public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
-            return op() == y.op() && y.hasAll(structureNecessary) && matchEllipsis((Compound) y, subst);
+            return op() == y.op() && y.hasAll(structureNecessary) && matchEllipsis(y.subterms(), subst);
         }
 
 
@@ -128,7 +128,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
         }
 
         @Override
-        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
+        protected boolean matchEllipsis(@NotNull TermContainer y, @NotNull Unify subst) {
             return matchEllipsedLinear(y, subst);
         }
 
@@ -141,7 +141,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
          * WARNING this implementation only works if there is one ellipse in the subterms
          * this is not tested for either
          */
-        protected final boolean matchEllipsedLinear(@NotNull Compound Y, @NotNull Unify subst) {
+        protected final boolean matchEllipsedLinear(@NotNull TermContainer Y, @NotNull Unify subst) {
 
             int i = 0, j = 0;
             int xsize = sizeCached;
@@ -354,7 +354,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
          * @param y the compound being matched to this
          */
         @Override
-        protected boolean matchEllipsis(@NotNull Compound y, @NotNull Unify subst) {
+        protected boolean matchEllipsis(@NotNull TermContainer y, @NotNull Unify subst) {
             //return subst.matchEllipsedCommutative(
             //        this, ellipsis, y
             //);

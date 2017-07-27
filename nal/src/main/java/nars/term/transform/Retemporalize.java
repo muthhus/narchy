@@ -6,7 +6,6 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
 abstract public class Retemporalize implements CompoundTransform {

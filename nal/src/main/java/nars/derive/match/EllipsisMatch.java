@@ -1,7 +1,6 @@
 package nars.derive.match;
 
 import nars.Op;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
@@ -43,7 +42,7 @@ public class EllipsisMatch extends GenericCompound {
     }
 
 
-    public static Term match(@NotNull Compound y, int from, int to) {
+    public static Term match(@NotNull TermContainer y, int from, int to) {
 
 
         if (from == to) {
@@ -67,7 +66,7 @@ public class EllipsisMatch extends GenericCompound {
         }
     }
 
-    public boolean linearMatch(Compound y, int from, @NotNull Unify subst) {
+    public boolean linearMatch(TermContainer y, int from, @NotNull Unify subst) {
         int s = size();
 
         if (s + from > y.size())
@@ -107,7 +106,7 @@ public class EllipsisMatch extends GenericCompound {
     }
 
 
-    public boolean addWhileMatching(@NotNull Compound y, @NotNull Collection<Term> target, int min) {
+    public boolean addWhileMatching(@NotNull TermContainer y, @NotNull Collection<Term> target, int min) {
         int n = 0;
         @NotNull TermContainer x = subterms();
         int xs = x.size();

@@ -9,7 +9,6 @@ import nars.derive.rule.PremiseRule;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.var.Variable;
@@ -48,7 +47,7 @@ public class Conclusion extends AbstractPred<Derivation> {
     private final boolean varIntro;
     private final int minNAL;
 
-    public Conclusion(@NotNull Compound id, @NotNull Term pattern, boolean varIntro, @NotNull PremiseRule rule, CauseChannel<Task> input) {
+    public Conclusion(@NotNull Term id, @NotNull Term pattern, boolean varIntro, @NotNull PremiseRule rule, CauseChannel<Task> input) {
         super(id);
         this.channel = input;
         this.pattern = pattern;

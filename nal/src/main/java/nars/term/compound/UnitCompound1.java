@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
-import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 
 /**

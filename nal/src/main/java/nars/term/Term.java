@@ -657,6 +657,7 @@ public interface Term extends Termlike, Comparable<Term> {
         //throw new RuntimeException("ordering exception: " + this + ", " + y);
     }
 
+    @Override
     default TermContainer subterms() {
         return TermVector.NoSubterms;
     }

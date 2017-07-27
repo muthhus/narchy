@@ -174,7 +174,6 @@ public class EllipsisTest {
             p = new PatternTermIndex().pattern(
                     getPattern(prefix, suffix)
             );
-            assert(p.isNormalized());
         }
 
 

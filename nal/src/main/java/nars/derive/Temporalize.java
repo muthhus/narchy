@@ -8,7 +8,6 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
