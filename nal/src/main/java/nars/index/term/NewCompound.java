@@ -84,7 +84,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
      * use only during actual builder step; should not be called while being compared
      */
     @Override
-    public Term[] subterms() {
+    public Term[] subs() {
         compact(); //compact the key
 
         Term[] tt = this.theArray();

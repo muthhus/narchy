@@ -23,7 +23,7 @@ public interface ProtoCompound extends TermContainer {
     Op op();
 
     /** subterms as an array for construction */
-    @NotNull Term[] subterms();
+    @NotNull Term[] subs();
 
     /** number subterms */
     @Override

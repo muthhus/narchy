@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.Op;
+import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,7 +12,9 @@ public interface Termed /* TODO finish implementing: extends Termlike */ {
 
     default int size() { return term().size(); }
 
-    default Term sub(int i) { return term().sub(i); }
+    default Term sub(int i) { return subterms().sub(i); }
+
+    default TermContainer subterms() { return term().subterms(); }
 
     @NotNull
     default Op op() { return term().op(); }

@@ -784,7 +784,7 @@ public class Temporalize {
             Set<Term> uncovered = Sets.mutable.of(a, b);
             for (Term c : constraints.keySet()) {
                 boolean relevance = false;
-                if (c.equals(c))
+                if (c.equals(target))
                     continue;
 
                 if (trail.containsKey(c))

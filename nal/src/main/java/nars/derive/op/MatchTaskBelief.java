@@ -36,7 +36,7 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
 
         List<PrediTerm> post = $.newArrayList();
 
-        compile(taskPattern, beliefPattern, pre, post, constraints);
+        compile(taskPattern, beliefPattern, pre, post);
 
         this.pre = pre;
         this.constraints = constraints; //sorted, at the end of the preMatch
@@ -73,8 +73,7 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
 
 
     private static void compile(@NotNull Term task, @NotNull Term belief,
-                                @NotNull List<PrediTerm> pre, @NotNull List<PrediTerm> code,
-                                @NotNull SortedSet<MatchConstraint> constraints) {
+                                @NotNull List<PrediTerm> pre, @NotNull List<PrediTerm> code) {
 
         //BoolPredicate preGuard = null;
 
@@ -117,15 +116,14 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
 //            pre.add(preGuard);
 
         //default case: exhaustively match both, with appropriate pruning guard preconditions
-        compileTaskBelief(pre, code, task, belief, constraints);
+        compileTaskBelief(pre, code, task, belief);
 
 
     }
 
     private static void compileTaskBelief(@NotNull List<PrediTerm> pre,
                                           @NotNull List<PrediTerm> code,
-                                          @Nullable Term task, @Nullable Term belief,
-                                          @NotNull SortedSet<MatchConstraint> constraints) {
+                                          @Nullable Term task, @Nullable Term belief) {
 
         boolean taskIsPatVar = task!=null && task.op() == Op.VAR_PATTERN;
 

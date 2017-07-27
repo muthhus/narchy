@@ -3,6 +3,7 @@ package nars.term;
 import com.google.common.io.ByteArrayDataOutput;
 import nars.Op;
 import nars.index.term.TermContext;
+import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
@@ -33,8 +34,14 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
+    public TermContainer subterms() {
+        return ref.subterms();
+    }
+
+
+    @Override
     public Term term() {
-        return ref.term();
+        return this;
     }
 
     @NotNull
@@ -58,13 +65,8 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.structure();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (size() > 0) {
-            return Compound.equals(this, o);
-        } else {
-            return ref.equals(o);
-        }
+    @Override public boolean equals(Object o) {
+        return Compound.equals(this, o);
     }
 
     @Override

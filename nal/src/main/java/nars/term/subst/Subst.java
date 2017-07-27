@@ -98,7 +98,7 @@ public interface Subst  {
 
             } else {
 
-                if (u == null || Term.invalidBoolSubterms(u, filterTrueFalse)) {
+                if (Term.invalidBoolSubterms(u, filterTrueFalse)) {
                     return Null;
                 }
 

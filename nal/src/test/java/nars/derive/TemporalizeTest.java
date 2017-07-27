@@ -3,6 +3,7 @@ package nars.derive;
 import com.google.common.base.Joiner;
 import nars.$;
 import nars.Narsese;
+import nars.term.Term;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -165,7 +166,8 @@ public class TemporalizeTest {
         t.knowTerm($.$("(a-->b)"), 10, 20); //these two overlap, so there should be a derivation
         t.knowTerm($.$("(c-->b)"), 5, 25);
 
-        Temporalize.Event solution = t.solve($.$("(a-->c)"));
+        Term st = nars.$.$("(a-->c)");
+        Temporalize.Event solution = t.solve(st);
         assertNotNull(solution);
         assertEquals("(a-->c)@[10..20]", solution.toString());
         assertNull("d not covered by known events", t.solve($.$("(a-->d)")));

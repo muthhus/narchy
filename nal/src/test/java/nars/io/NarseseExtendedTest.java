@@ -252,8 +252,8 @@ public class NarseseExtendedTest extends NarseseTest {
 
         //test that the imdex is allowed in term identifiers
         assertEquals(
-                "(&|,(ball_left),(ball_right),((ball_right) &&+270 (--,(ball_left))))",
-                term("(((ball_left) &&+0 (ball_right)) &&+0 ((ball_right) &&+270 (--,(ball_left))))").toString()
+                "(a_b)",
+                term("(a_b)").toString()
         );
 
 

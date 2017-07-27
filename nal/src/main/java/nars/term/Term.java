@@ -86,8 +86,10 @@ public interface Term extends Termlike, Comparable<Term> {
 
     void append(ByteArrayDataOutput out);
 
-//    @Override
-//    int size();
+    @Override
+    default int size() {
+        return subterms().size();
+    }
 
     @Override
     boolean equals(Object o);

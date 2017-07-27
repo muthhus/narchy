@@ -69,29 +69,21 @@ import static nars.time.Tense.XTERNAL;
 public interface Compound extends Term, IPair, TermContainer {
 
     static boolean equals(@NotNull Term a, @NotNull Object b) {
+
         if (a == b)
             return true;
-        if (a.hashCode() != b.hashCode())
+
+        if (!(b instanceof Term) || a.hashCode() != b.hashCode())
             return false;
 
-
-        Compound bc;
-        if (b instanceof Compound) {
-            bc = (Compound) b;
-        } /*else if (that instanceof CompoundConcept) { //Termed but not Task
-            cthat = ((CompoundConcept) that).term();
-            if (this == cthat)
-                return true;
-        } */ else {
-            return false;
-        }
+        Term bb = (Term) b;
 
         return
-                (a.subterms().equals(bc.subterms()))
-                        &&
-                        (a.op() == bc.op())
-                        &&
-                        (a.dt() == bc.dt())
+                (a.opX() == bb.opX())
+                &&
+                (a.subterms().equals(bb.subterms()))
+                &&
+                (a.dt() == bb.dt())
                 ;
 
         //subterm sharing:

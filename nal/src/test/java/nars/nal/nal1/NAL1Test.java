@@ -30,6 +30,10 @@ public class NAL1Test extends AbstractNALTest {
     }
 
 
+    static {
+        Param.TRACE = true;
+    }
+
     @Test
     public void deduction()  {
 
