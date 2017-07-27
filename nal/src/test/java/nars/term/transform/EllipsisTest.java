@@ -61,7 +61,7 @@ public class EllipsisTest {
             assertTrue(r.isNormalized());
 
             Compound x = getPattern();
-            assertTrue(x.isNormalized());
+
 
             //no unmatched variables
             ///x.forEach(xx -> { assertFalse(xx.toString() + " is var", xx instanceof Variable ); });
@@ -174,6 +174,7 @@ public class EllipsisTest {
             p = new PatternTermIndex().pattern(
                     getPattern(prefix, suffix)
             );
+            assert(p.isNormalized());
         }
 
 

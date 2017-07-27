@@ -20,7 +20,7 @@ import static nars.time.Tense.*;
 import static org.junit.Assert.*;
 
 
-public class TemporalTest {
+public class TemporalTermTest {
 
     @NotNull
     final NAR n = NARS.shell();
@@ -613,7 +613,14 @@ public class TemporalTest {
     @Test
     public void testDTRange() throws Narsese.NarseseException {
         assertEquals(1, $("((z) &&+1 (y))").dtRange());
-        assertEquals(2, $("((x) &&+1 ((z) &&+1 (y)))").dtRange());
+    }
+    @Test
+    public void testDTRange2() throws Narsese.NarseseException {
+        Term t = $("((x) &&+1 ((z) &&+1 (y)))");
+        assertEquals(2, t.dtRange());
+    }
+    @Test
+    public void testDTRange3() throws Narsese.NarseseException {
         assertEquals(4, $("((x) &&+1 ((z) &&+1 ((y) &&+2 (w))))").dtRange());
         assertEquals(4, $("(((z) &&+1 ((y) &&+2 (w))) &&+1 (x))").dtRange());
     }

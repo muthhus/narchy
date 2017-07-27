@@ -6,10 +6,12 @@ import nars.Op;
 import nars.Param;
 import nars.derive.PatternCompound;
 import nars.term.container.TermContainer;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.List;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
@@ -79,6 +81,15 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return Compound.super.normalize();
     }
 
+    @Override
+    public void events(List<ObjectLongPair<Term>> events) {
+        Compound.super.events(events);
+    }
+
+    @Override
+    public void events(List<ObjectLongPair<Term>> events, long dt) {
+        Compound.super.events(events, dt);
+    }
 
     @Override
     public void append(@NotNull Appendable p) throws IOException {
