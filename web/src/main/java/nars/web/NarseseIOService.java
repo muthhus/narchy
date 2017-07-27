@@ -87,7 +87,7 @@ public class NarseseIOService extends WebsocketService {
             if (n != null) {
                 socket.setAttribute("nar", n);
             } else {
-                System.err.println("could not build: " + builder);
+                System.err.println("could not builder: " + builder);
                 //TODO send error msg
             }
 

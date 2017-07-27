@@ -667,6 +667,8 @@ public class Temporalize {
 
 
     void add(Term term, Event event) {
+        term = term.unneg();
+
         FasterList<Event> l = constraints.computeIfAbsent(term, (t) -> new FasterList<>());
         l.add(event);
         if (l.size() > 1) {
@@ -703,15 +705,19 @@ public class Temporalize {
                         if (random.nextBoolean()) {
                             //forward order: sub 0 first
                             ea = solveSub(trail, tt, 0);
-                            if (ea == null) return null;
+                            if (ea == null)
+                                return null;
                             eb = solveSub(trail, tt, 1);
-                            if (eb == null) return null;
+                            if (eb == null)
+                                return null;
                         } else {
                             //reverse order: sub 1 first
                             eb = solveSub(trail, tt, 1);
-                            if (eb == null) return null;
+                            if (eb == null)
+                                return null;
                             ea = solveSub(trail, tt, 0);
-                            if (ea == null) return null;
+                            if (ea == null)
+                                return null;
                         }
 
                         Term a = ea.term;
@@ -819,7 +825,7 @@ public class Temporalize {
                     return null; //can this happen?
                 case 1:
                     Event r = relevant.get(0);
-                    return new SolutionEvent(target, r.start(trail).abs(), r.end(trail).abs());
+                    return new SolutionEvent($.negIf(target,isNeg), r.start(trail).abs(), r.end(trail).abs());
 
             }
 
@@ -835,7 +841,7 @@ public class Temporalize {
                 long[] ii = intersect(ra, rb, trail);
                 if (ii != null) {
                     //overlap or adjacent
-                    return new SolutionEvent(target, ii[0], ii[1]);
+                    return new SolutionEvent($.negIf(target,isNeg), ii[0], ii[1]);
                 } else {
                     //not overlapping at all, compute point interpolation
                     Time as = ra.start(trail);
@@ -856,9 +862,8 @@ public class Temporalize {
                                     if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float) dist) / dur) {
                                         long occ = ((ta + tz) / 2 + (ba + bz) / 2) / 2;
                                         //occInterpolate(t, b);
-                                        return new SolutionEvent(target, occ);
+                                        return new SolutionEvent($.negIf(target,isNeg), occ);
                                     }
-                                    return null;
                                 }
                             }
                         }
@@ -908,6 +913,8 @@ public class Temporalize {
 
 
     private Event solveEvent(Term target, HashMap<Term, Time> trail) {
+
+        target = target.unneg();
 
         List<Event> ea = constraints.get(target);
         if (ea == null)

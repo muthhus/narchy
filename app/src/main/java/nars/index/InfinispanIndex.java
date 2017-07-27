@@ -69,7 +69,7 @@
 //                //.addAdvancedExternalizer(new TaskExternalizer())
 //                .addAdvancedExternalizer(new PermanentConceptExternalizer())
 //                .addAdvancedExternalizer(new ConceptExternalizer())
-//                .build();
+//                .builder();
 //
 //
 //
@@ -83,7 +83,7 @@
 //                //cb.locking().concurrencyLevel(1);
 //                //cb.customInterceptors().addInterceptor();
 //                .jmxStatistics().disable()
-//                .build();
+//                .builder();
 //
 //
 //

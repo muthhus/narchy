@@ -665,7 +665,7 @@ public class CL_input {
 		usercmd_t cmd, oldcmd;
 		int checksumIndex;
 
-		// build a command even if not connected
+		// builder a command even if not connected
 
 		// save this command off for prediction
 		i = Globals.cls.netchan.outgoing_sequence & (Defines.CMD_BACKUP - 1);

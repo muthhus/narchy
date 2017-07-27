@@ -2,7 +2,7 @@
 //
 //import com.google.gson.Gson;
 //import nars.core.NAR;
-//import nars.build.Default;
+//import nars.builder.Default;
 //import nars.gui.NARSwing;
 //
 //import javax.swing.*;

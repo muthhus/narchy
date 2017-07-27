@@ -59,7 +59,7 @@
 //        this.maxEnd = calcMaxEnd();
 //    }
 //
-//    public static Builder build() {
+//    public static Builder builder() {
 //        return new Builder();
 //    }
 //

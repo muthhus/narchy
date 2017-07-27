@@ -6,7 +6,7 @@
 //
 //import automenta.vivisect.swing.NWindow;
 //import nars.core.NAR;
-//import nars.build.Neuromorphic;
+//import nars.builder.Neuromorphic;
 //import nars.gui.NARSwing;
 //import nars.gui.output.graph.ConceptGraphCanvas2;
 //import nars.gui.output.graph.ProcessingGraphPanel;
@@ -51,7 +51,7 @@
 //    }
 //    
 //    public static void main(String args[]) {
-//        NAR n = NAR.build(new Neuromorphic(4));
+//        NAR n = NAR.builder(new Neuromorphic(4));
 //        
 //        new SlowMesh(n, 3, 3);
 //        

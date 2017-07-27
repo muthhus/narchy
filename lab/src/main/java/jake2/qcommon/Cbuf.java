@@ -94,7 +94,7 @@ public final class Cbuf {
         int j;
         boolean ret = false;
 
-        // build the combined string to parse from
+        // builder the combined string to parse from
         int s = 0;
         int argc = Com.Argc();
         for (i = 1; i < argc; i++) {
@@ -130,7 +130,7 @@ public final class Cbuf {
             Cbuf.AddText(build);
 
 //        text = null;
-//        build = null;
+//        builder = null;
 
         return ret;
     }

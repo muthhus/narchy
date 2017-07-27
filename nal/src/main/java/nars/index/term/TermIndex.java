@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.Narsese;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.concept.build.ConceptBuilder;
+import nars.concept.builder.ConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -166,7 +166,7 @@ public abstract class TermIndex implements TermContext {
         @Nullable Termed c = get(term, createIfMissing);
         if (!(c instanceof Concept)) {
 //            if (createIfMissing) {
-//                throw new Concept.InvalidConceptException(term, "Failed to build concept");
+//                throw new Concept.InvalidConceptException(term, "Failed to builder concept");
 //            }
             return null;
         }

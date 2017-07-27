@@ -63,7 +63,7 @@
 //                }
 //                if (":-".equals(name))
 //                    sub.add(0, i + 1 < levels ? eclist.get(i + 1).getCurrentGoal() : s.term(0));
-//                else if (",".equals(name)) name = " ";//don't want to build the ,-tree
+//                else if (",".equals(name)) name = " ";//don't want to builder the ,-tree
 //                else name = null;//indicates that we have a normal compound
 //                int pos = sub.indexOf(ec.getCurrentGoal());
 //                if (bottom != null) sub.set(pos, bottom);

@@ -19,7 +19,7 @@ public class StaticTermIndex extends TermIndex {
 //        @Override
 //        protected Term the(ProtoCompound c) {
 ////            if (Math.random() < 0.01f)
-////                System.out.println(build.summary());
+////                System.out.println(builder.summary());
 //            return super.the(c);
 //        }
 

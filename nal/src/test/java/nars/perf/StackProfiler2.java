@@ -192,7 +192,7 @@ public class StackProfiler2 implements InternalProfiler {
 
 
                 //   - Discard everything that matches excluded patterns from the top of the stack
-                //   - Get the remaining number of stack lines and build the stack record
+                //   - Get the remaining number of stack lines and builder the stack record
 
 
                 Stream.of(info.getStackTrace())

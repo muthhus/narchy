@@ -340,7 +340,7 @@ public class Predict1 {
          setTaskLinkBagSize(4).
          setTermLinkBagSize(100).   
          simulationTime().                
-         build();
+         builder();
          */
 
         //new TextOutput(nar, System.out, 0.95f);

@@ -38,7 +38,7 @@
 //    final SimpleDirectedGraph<Term,CauseEdge> g;
 //
 //    final SetMultimap<Term /*Pattern*/, Term /*Incmoing Condition*/> conclusion =
-//            MultimapBuilder.linkedHashKeys().linkedHashSetValues().build();
+//            MultimapBuilder.linkedHashKeys().linkedHashSetValues().builder();
 //
 //    public TrieUnderiver(@NotNull TrieDeriver t) {
 //        this.deriver = t;

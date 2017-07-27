@@ -206,7 +206,7 @@ public enum TrieDeriver {
 
             if (p instanceof UnificationPrototype)
                 throw new UnsupportedOperationException();
-            //((MatchTermPrototype) p).build();
+            //((MatchTermPrototype) p).builder();
 
 //            TermTrie.indent(indent);
 //            out.println( /*Util.className(p) + ": " +*/ p);

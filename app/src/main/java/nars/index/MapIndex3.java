@@ -30,14 +30,14 @@
 //                .initialCapacity(capacity)
 //                .maximumSize(capacity*1024)
 //
-////                .build(new CacheLoader<TermContainer, MapIndex2.SubtermNode>() {
+////                .builder(new CacheLoader<TermContainer, MapIndex2.SubtermNode>() {
 ////
 ////                    @Override
 ////                    public SubtermNode load(@Nonnull TermContainer key) throws Exception {
 ////                        return null;
 ////                    }
 ////                });
-//                .build();
+//                .builder();
 //
 //// Lookup an entry, or null if not found
 //        //Graph graph = cache.getIfPresent(key);

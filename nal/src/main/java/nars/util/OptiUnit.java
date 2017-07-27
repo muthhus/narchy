@@ -38,7 +38,7 @@ import java.util.function.Predicate;
 public class OptiUnit<T> extends RunListener {
 
 //    final ListMultimap<SortedMap<String, Object>, SortedMap<String, Object>> log =
-//            MultimapBuilder.hashKeys().arrayListValues().build();
+//            MultimapBuilder.hashKeys().arrayListValues().builder();
 
     final List<Experiment> experiments = Collections.synchronizedList($.newArrayList());
 

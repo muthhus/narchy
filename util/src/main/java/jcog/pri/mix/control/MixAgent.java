@@ -9,7 +9,7 @@ public interface MixAgent {
     //agent = new HaiQAgent(numInputs, size*4, outs * 2);
     //agent.setQ(0.05f, 0.5f, 0.9f); // 0.1 0.5 0.9
 
-    //agent = CMAESAgent.build(numInputs, size /* level for each */ );
+    //agent = CMAESAgent.builder(numInputs, size /* level for each */ );
 
 
 //floatToDoubleArray(

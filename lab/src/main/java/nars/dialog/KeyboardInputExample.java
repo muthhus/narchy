@@ -18,8 +18,8 @@
 //public class KeyboardInputExample {
 //
 //    public static void main(String[] args) {
-//        //NAR n = NAR.build(new Neuromorphic().realTime());
-//        //NAR n = NAR.build(new Default().realTime());
+//        //NAR n = NAR.builder(new Neuromorphic().realTime());
+//        //NAR n = NAR.builder(new Default().realTime());
 //        //n.param.duration.set(100);
 //
 //        NAR n = new NAR(new Default());

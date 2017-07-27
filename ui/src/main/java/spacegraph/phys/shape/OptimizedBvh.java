@@ -533,11 +533,11 @@ public class OptimizedBvh implements Serializable {
 
 		int leftChildNodexIndex = curNodeIndex;
 
-		//build left child tree
+		//builder left child tree
 		buildTree(startIndex, splitIndex);
 
 		int rightChildNodexIndex = curNodeIndex;
-		// build right child tree
+		// builder right child tree
 		buildTree(splitIndex, endIndex);
 
 		//#ifdef DEBUG_TREE_BUILDING

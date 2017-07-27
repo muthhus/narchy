@@ -400,8 +400,8 @@ public class Int implements Atomic, Intlike {
     /**
      * unroll IntInterval's
      */
-    public static Iterator<Term> unrollInts(@NotNull Compound c) {
-        assert(!c.hasAny(Op.INT));
+    public static Iterator<Term> unroll(@NotNull Compound c) {
+        //assert(!c.hasAny(Op.INT));
             //return Iterators.singletonIterator(c); //no IntInterval's early exit
 
         Compound cc = c;
@@ -495,7 +495,7 @@ public class Int implements Atomic, Intlike {
 //        if (subCount < 2/* || !subs.hasAny(Op.INT)*/)
 //            return subs; //early exit condition
 //
-//        SetMultimap<ByteList, Term> subTermStructures = setSetMapBuilder.build();
+//        SetMultimap<ByteList, Term> subTermStructures = setSetMapBuilder.builder();
 //        int intContainingSubCount = 0;
 //        for (Term x : subs) {
 //            if (x.hasAny(Op.INT)) {
@@ -525,7 +525,7 @@ public class Int implements Atomic, Intlike {
 //        }
 //
 //        //group again according to appearance of unique atoms
-//        SetMultimap<List<Term>, Term> subAtomSeqs = setSetMapBuilder.build();
+//        SetMultimap<List<Term>, Term> subAtomSeqs = setSetMapBuilder.builder();
 //        for (Term x : subs) {
 //            if (x.hasAny(Op.INT))
 //                subAtomSeqs.put(atomSeq(x), x);

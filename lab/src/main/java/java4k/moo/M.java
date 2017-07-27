@@ -50,21 +50,21 @@ public class M extends GamePanel implements Runnable, MouseListener, KeyListener
 
 	String[] a_names = {
 		"Explore",
-		"build Outpost",
+		"builder Outpost",
 		"Colonise",
 		"Tax",
 		"improve Defences",
 		"trAde",
 		"Raid",
 		"Invade",
-		"build Warship",
+		"builder Warship",
 		"develop advanced fuels",
 		"develop terraforming",
 		"develop cloaking device",
 		"develop advanced economics",
 		"develop advanced weapons",
 		"develop long-range scanners",
-		"build transcendence device"
+		"builder transcendence device"
 		//"get max income",
 		//"smartinvade",
 		//"upgrade planets if needed"

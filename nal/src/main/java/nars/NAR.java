@@ -17,7 +17,7 @@ import jcog.util.IterableThreadLocal;
 import nars.Narsese.NarseseException;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.concept.build.ConceptBuilder;
+import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
 import nars.control.Activate;
 import nars.control.Cause;

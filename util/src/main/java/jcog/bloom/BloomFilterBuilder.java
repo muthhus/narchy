@@ -4,7 +4,7 @@ import jcog.bloom.hash.DefaultHashProvider;
 import jcog.bloom.hash.HashProvider;
 
 /**
- * {@link BloomFilterBuilder}s are the entry point to build different types of {@link LeakySet}s.
+ * {@link BloomFilterBuilder}s are the entry point to builder different types of {@link LeakySet}s.
  *
  * References:
  * [1] Phillip Bradford and Michael Katehakis. 2007. A probabilistic study on combinatorial expanders and hashing. DOI=http://dx.doi.org/10.1137/S009753970444630X

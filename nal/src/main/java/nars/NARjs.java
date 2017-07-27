@@ -26,11 +26,11 @@ public class NARjs {
 		js.eval("importPackage('nars.core')");
 		js.eval("importPackage('nars.nal')");
 		js.eval("importPackage('nars.nal.nal7')");
-		js.eval("importPackage('nars.build')");
+		js.eval("importPackage('nars.builder')");
 		js.eval("importPackage('nars.io')");
 		js.eval("importPackage('nars.gui')");
 
-		js.eval("function newDefaultNAR() { var x = new DefaultNARBuilder().build(); new TextOutput(x, System.out); return x; }");
+		js.eval("function newDefaultNAR() { var x = new DefaultNARBuilder().builder(); new TextOutput(x, System.out); return x; }");
 	}
 
 	public Object eval(String s) throws ScriptException {

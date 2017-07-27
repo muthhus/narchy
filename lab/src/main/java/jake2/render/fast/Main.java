@@ -647,7 +647,7 @@ public abstract class Main extends Base {
     void R_SetupFrame() {
         r_framecount++;
 
-        //	build the transformation matrix for the given view angles
+        //	builder the transformation matrix for the given view angles
         Math3D.VectorCopy(r_newrefdef.vieworg, r_origin);
 
         Math3D.AngleVectors(r_newrefdef.viewangles, vpn, vright, vup);

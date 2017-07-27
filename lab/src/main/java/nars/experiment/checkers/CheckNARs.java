@@ -17,7 +17,7 @@
 //
 //        new NARSwing(n);
 //
-//        Game g = new NALObjects(n).build("game", Game.class);
+//        Game g = new NALObjects(n).builder("game", Game.class);
 //        Board b = new Board(new HumanPlayer("Human1"), new HumanPlayer("Human2"), g);
 //        b.playWindow();
 //

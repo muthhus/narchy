@@ -24,7 +24,7 @@ public class MeterTest {
 	// for (int i= 0; i < 2; i++) {
 	// cst.track();
 	// {
-	// NAR n = new Default().build();
+	// NAR n = new Default().builder();
 	// //Thread.sleep((int)(Math.random()*90));
 	// }
 	// cst.commit();
@@ -47,7 +47,7 @@ public class MeterTest {
 	//
 	// for (int i= 0; i < 5; i++) {
 	// {
-	// NAR n = new Default().build();
+	// NAR n = new Default().builder();
 	// //Thread.sleep((int)(Math.random()*90));
 	// }
 	// cst.incident();

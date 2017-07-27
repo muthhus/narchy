@@ -701,7 +701,7 @@ public class SensitiveArea
    public static final String  MARKUP_MAIN      = "jhelp_engine_event_SensitiveArea";
 
    /**
-    * Parse XML markup parameters to build an area
+    * Parse XML markup parameters to builder an area
     * 
     * @param markup
     *           Markup name

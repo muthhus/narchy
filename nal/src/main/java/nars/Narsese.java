@@ -1301,7 +1301,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
 //    static LoadingCache<String, Term> singleTerms = Caffeine.newBuilder().maximumSize(32 * 1024)
-//            .build((s) -> {
+//            .builder((s) -> {
 //                ParsingResult r = singleTermParsers.get().run(s);
 //
 //                ValueStack stack = r.getValueStack();
@@ -1398,7 +1398,7 @@ public class Narsese extends BaseParser<Object> {
 ////		final ParseRunner runner
 ////				= new ParseRunner(parser.Term());
 //
-//		/* The class that will build the parse tree */
+//		/* The class that will builder the parse tree */
 //		final ParseTreeBuilder listener
 //				= new ParseTreeBuilder(repository);
 //

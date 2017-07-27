@@ -279,7 +279,7 @@ public abstract class Term implements Serializable, AbstractSubGoalTree {
      * Static service to create a Term from a string, providing an
      * external operator manager.
      * @param st the string representation of the term
-     * @param op the operator manager used to build the term
+     * @param op the operator manager used to builder the term
      * @return the term represented by the string
      * @throws InvalidTermException if the string does not represent a valid term
      */

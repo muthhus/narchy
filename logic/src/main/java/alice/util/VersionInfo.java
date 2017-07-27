@@ -38,6 +38,6 @@ public class VersionInfo
 		return getEngineVersion() + '.' + getSpecificVersion();
 	}
 	
-	/* Ant Task Implementation (for the the build file */
+	/* Ant Task Implementation (for the the builder file */
 	
 }

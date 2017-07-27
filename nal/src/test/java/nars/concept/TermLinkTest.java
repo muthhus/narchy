@@ -139,7 +139,7 @@ public class TermLinkTest {
 //
 //
 //        };
-//        n.next(); //build network
+//        n.next(); //builder network
 //        n.core.concepts.print();
 //
 ////        //activate neurons 1 and 3

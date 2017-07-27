@@ -3042,7 +3042,7 @@ public class Wiki implements Serializable
      */
     public Revision[] getRevisions(long[] oldids) throws IOException
     {
-        // build url and connect
+        // builder url and connect
         StringBuilder url = new StringBuilder(query);
         url.append("prop=revisions&rvprop=ids%7Ctimestamp%7Cuser%7Ccomment%7Cflags%7Csize%7Csha1&revids=");
         // chunkify oldids

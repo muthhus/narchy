@@ -1,7 +1,7 @@
 package nars.index.term;
 
-import nars.concept.build.ConceptBuilder;
-import nars.concept.build.DefaultConceptBuilder;
+import nars.concept.builder.ConceptBuilder;
+import nars.concept.builder.DefaultConceptBuilder;
 import nars.index.term.map.MapTermIndex;
 
 import java.util.HashMap;

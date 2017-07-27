@@ -1,4 +1,4 @@
-package nars.concept.build;
+package nars.concept.builder;
 
 import jcog.bag.Bag;
 import nars.NAR;

@@ -1558,7 +1558,7 @@ public final class SCR extends Globals {
             for (int j = 0; j < 256; j++)
                 cin.h_count[j] = counts[j] & 0xFF;
             
-            // build the nodes
+            // builder the nodes
             numhnodes = 256;
             int nodebase = 0 + prev * 256 * 2;
             int index = 0;

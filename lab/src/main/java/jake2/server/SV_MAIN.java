@@ -352,7 +352,7 @@ public class SV_MAIN {
      */
     public static void gotnewcl(int i, int challenge, String userinfo,
             netadr_t adr, int qport) {
-        // build a new connection
+        // builder a new connection
         // accept the new client
         // this is the only place a client_t is ever initialized
 

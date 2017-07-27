@@ -77,7 +77,7 @@
 //    public <X> X a(@NotNull Class<X> c, @NotNull How<X> h) {
 //        Possible<X> p = possible(c);
 //        Map m = p.permute(h);
-//        return (m != null) ? p.build(c, h.finish(c, m)) : null;
+//        return (m != null) ? p.builder(c, h.finish(c, m)) : null;
 //    }
 //
 //    /**
@@ -104,7 +104,7 @@
 //
 //
 //    public final MutableGraph<Object> how = GraphBuilder.
-//            directed().allowsSelfLoops(false).build();
+//            directed().allowsSelfLoops(false).builder();
 //
 //    protected O(Object... xx) {
 //        for (Object x : xx)
@@ -252,7 +252,7 @@
 //
 //        public final MutableGraph p = GraphBuilder.directed()
 //                //.nodeOrder(ElementOrder.<>natural())
-//                .allowsSelfLoops(false).build();
+//                .allowsSelfLoops(false).builder();
 //
 //        private final Class<X> what;
 //        private final O o;
@@ -399,7 +399,7 @@
 //            }
 //        }
 //
-//        public <X> X build(@NotNull Class<X> c, Map m) {
+//        public <X> X builder(@NotNull Class<X> c, Map m) {
 //            m.forEach((k,v)->{
 //                System.out.println("\t" + k + "\t = " + v);
 //            });

@@ -6,7 +6,7 @@
 //
 //import automenta.vivisect.dimensionalize.HyperassociativeMap;
 //import automenta.vivisect.swing.NWindow;
-//import nars.build.Default;
+//import nars.builder.Default;
 //import nars.core.Events.ConceptForget;
 //import nars.core.Events.ConceptNew;
 //import nars.core.NAR;

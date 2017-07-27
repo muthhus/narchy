@@ -217,7 +217,7 @@ public class TermTest {
 //    public void testEscaping() {
 //        bidiEscape("c d", "x$# x", "\\\"sdkf sdfjk", "_ _");
 //
-////        NAR n = NARS.shell().build();
+////        NAR n = NARS.shell().builder();
 ////        n.addInput("<a --> \"b c\">.");
 ////        n.step(1);
 ////        n.finish(1);

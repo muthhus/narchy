@@ -170,7 +170,7 @@ public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
 //            if (id != null) {
 //                builder.withTag("id", id);
 //            }
-//            //final TagList classTags = builder.build();
+//            //final TagList classTags = builder.builder();
 
             final Set<Field> fields = Reflection.getAllFields(obj.getClass());
             for (Field field : fields) {

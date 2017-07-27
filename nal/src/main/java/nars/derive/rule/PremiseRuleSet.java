@@ -208,7 +208,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 
 //    final static com.github.benmanes.caffeine.cache.Cache<String, Pair<Compound, String>> lines = Caffeine.newBuilder()
 //            .maximumSize(4 * 1024)
-//            .build();
+//            .builder();
 
     @NotNull
     static Stream<Pair<PremiseRule, String>> parse(@NotNull Stream<String> rawRules, @NotNull PatternTermIndex index) {

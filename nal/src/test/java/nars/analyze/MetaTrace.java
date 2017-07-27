@@ -180,7 +180,7 @@
 //
 //        analyzeAll(analyzer,
 //                //new File(MetaTrace.class.getClassLoader().getResource("..").toURI())
-//                new File("/home/me/opennars/nars_logic/build/classes/main")
+//                new File("/home/me/opennars/nars_logic/builder/classes/main")
 //        ,
 //
 //                (p)->{

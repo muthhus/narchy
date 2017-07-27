@@ -41,14 +41,14 @@ public class GImpactBvh {
 	protected PrimitiveManagerBase primitive_manager;
 
 	/**
-	 * This constructor doesn't build the tree. you must call buildSet.
+	 * This constructor doesn't builder the tree. you must call buildSet.
 	 */
 	public GImpactBvh() {
 		primitive_manager = null;
 	}
 
 	/**
-	 * This constructor doesn't build the tree. you must call buildSet.
+	 * This constructor doesn't builder the tree. you must call buildSet.
 	 */
 	public GImpactBvh(PrimitiveManagerBase primitive_manager) {
 		this.primitive_manager = primitive_manager;

@@ -81,16 +81,15 @@ public class FunctorTest {
         t.run(true);
     }
 
-//    @Test
-//    public void testExecutionREsultIsCondition() {
-//        Default d = new Default();
-//        d.log();
-//        d.input("(add(#x,1,#y) <=> inc(#x,#y)).");
-//        d.input("add(1,2,#x)! :|:");
-//        d.run(16);
-//        d.input("add(3,4,#x)! :|:");
-//        d.run(16);
-//    }
+    @Test
+    public void testExecutionResultIsCondition() throws Narsese.NarseseException {
+        NAR d = NARS.tmp();
+        d.log();
+        d.input("(add($x,1) <=> inc($x)).");
+        d.input("(inc(1) <=> two).");
+        d.run(128);
+        d.input("(inc(two) <=> ?x)?");
+    }
 
 //    @Test
 //    public void testJSON1() throws Narsese.NarseseException {

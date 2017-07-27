@@ -135,7 +135,7 @@ public class PMove {
                     pm.maxs, end);
 
             if (trace.allsolid) { // entity is trapped in another solid
-                pml.velocity[2] = 0; // don't build up falling damage
+                pml.velocity[2] = 0; // don't builder up falling damage
                 return;
             }
 

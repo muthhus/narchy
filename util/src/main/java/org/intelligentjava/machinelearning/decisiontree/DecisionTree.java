@@ -232,7 +232,7 @@ public class DecisionTree<K, V> {
 //                .directed()
 //                .nodeOrder(ElementOrder.unordered())
 //                .allowsSelfLoops(false)
-//                .build();
+//                .builder();
 //
 //        return root.graph(graph);
 //    }

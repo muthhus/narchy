@@ -1,4 +1,4 @@
-package nars.concept.build;
+package nars.concept.builder;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
@@ -25,13 +25,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static nars.Op.*;
-import static nars.time.Tense.DTERNAL;
 
 //import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
@@ -143,43 +141,43 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
-                        Compound csubj = (Compound) subj;
-                        if (validUnwrappableSubterms(csubj.subterms())) {
-                            int s = csubj.size();
-                            FasterList<Term> lx = new FasterList(s);
-                            boolean valid = true;
-                            boolean hasInts = false;
-                            for (int i = 0; i < s; i++) {
-                                Term csi = csubj.sub(i);
-                                if (csi instanceof Int.IntRange) {
-                                    hasInts = true; //added below
-                                } else {
-                                    lx.add(INH.the(csi, pred));
-                                }
-                            }
-                            if (hasInts) {
-                                Int.unrollInts(csubj).forEachRemaining(csi -> {
-                                    lx.add(INH.the(csi, pred));
-                                });
-                            }
+                        if (subj instanceof Compound) {
+                            Compound csubj = (Compound) subj;
 
-                            if (valid) {
-                                Term[] x = lx.toArray(Term[]::new);
-                                switch (so) {
-                                    case INT:
-                                    case PROD:
-                                    case SECTi:
-                                        dmt = new DynamicTruthModel.Intersection(x);
-                                        break;
-                                    case SECTe:
-                                        dmt = new DynamicTruthModel.Union(x);
-                                        break;
-                                    case DIFFi:
-                                        dmt = new DynamicTruthModel.Difference(x[0], x[1]);
-                                        break;
+                            if (validUnwrappableSubterms(csubj.subterms())) {
+                                int s = csubj.size();
+                                FasterList<Term> lx = new FasterList(s);
+                                boolean valid = true;
+                                for (int i = 0; i < s; i++) {
+                                    Term csi = csubj.sub(i);
+                                    if (csi instanceof Int.IntRange) {
+                                        Int.unroll(csubj).forEachRemaining(dsi -> {
+                                             lx.add(INH.the(dsi, pred));
+                                        });
+                                    } else {
+                                        lx.add(INH.the(csi, pred));
+                                    }
+                                }
+
+                                if (valid) {
+                                    Term[] x = lx.toArray(Term[]::new);
+                                    switch (so) {
+                                        case INT:
+                                        case PROD:
+                                        case SECTi:
+                                            dmt = new DynamicTruthModel.Intersection(x);
+                                            break;
+                                        case SECTe:
+                                            dmt = new DynamicTruthModel.Union(x);
+                                            break;
+                                        case DIFFi:
+                                            dmt = new DynamicTruthModel.Difference(x[0], x[1]);
+                                            break;
+                                    }
                                 }
                             }
                         }
+
                     } /*else if (po.image) {
                         Compound img = (Compound) pred;
                         Term[] ee;

@@ -42,7 +42,7 @@ public class BooleanChallenge implements Reaction<Class,Object[]> {
 
         //NAR n = new NAR(new Discretinuous());
         //new NARPrologMirror(n, 0.95f, true, true, false);
-        //NAR n = new CurveBagNARBuilder().build();
+        //NAR n = new CurveBagNARBuilder().builder();
 
         //new TraceWriter(n, System.out);
         new TextOutput(n, System.out);

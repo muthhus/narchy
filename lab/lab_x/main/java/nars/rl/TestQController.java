@@ -139,9 +139,9 @@ public class TestQController {
 //    }
     
     public static NAR newNAR() {
-        //return new Default().build();        
+        //return new Default().builder();
         return new Default2(512, 1, 1, 3)
-        //return build(g, g.param);
+        //return builder(g, g.param);
         ;
     }
     

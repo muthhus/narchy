@@ -5,7 +5,7 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
-import nars.concept.build.ConceptBuilder;
+import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;

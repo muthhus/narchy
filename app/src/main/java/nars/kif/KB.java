@@ -859,7 +859,7 @@ public class KB {
                 for (Object relation : relations) {
                     reln = (String) relation;
 
-                    // Here we evaluate getValence() to build the
+                    // Here we evaluate getValence() to builder the
                     // relationValences cache, and use its return
                     // value to fill in any info that might be missing
                     // from the "instance" cache.
@@ -1126,7 +1126,7 @@ public class KB {
             cacheRelnsWithRelnArgs();
             cacheRelationValences();
 
-            System.out.println("Total elapsed time to build all relation caches: "
+            System.out.println("Total elapsed time to builder all relation caches: "
                     + ((System.currentTimeMillis() - t1) / 1000.0)
                     + " seconds");
         } catch (Exception ex) {
@@ -1928,7 +1928,7 @@ public class KB {
             }
             System.out.println("INFO in KB.reloadFormatMaps(): "
                     + ((System.currentTimeMillis() - t1) / 1000.0)
-                    + " seconds to build KB.formatMap");
+                    + " seconds to builder KB.formatMap");
 
             t1 = System.currentTimeMillis();
             col = ask("arg", 0, "termFormat");
@@ -1957,7 +1957,7 @@ public class KB {
             }
             System.out.println("INFO in KB.reloadFormatMaps(): "
                     + ((System.currentTimeMillis() - t1) / 1000.0)
-                    + " seconds to build KB.termFormatMap");
+                    + " seconds to builder KB.termFormatMap");
         } catch (Exception ex) {
             ex.printStackTrace();
         }

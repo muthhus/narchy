@@ -683,7 +683,7 @@ public enum Op implements $ {
 //    }
 //        public static final Memoize<ProtoCompound, Termlike> cache =
 //                new HijackMemoize<>(buildTerm, 128 * 1024 + 1, 3);
-//        //CaffeineMemoize.build(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
+//        //CaffeineMemoize.builder(buildTerm, 128 * 1024, true /* Param.DEBUG*/);
 //
 //
 //        @NotNull
@@ -918,7 +918,7 @@ public enum Op implements $ {
         return x == True || x == False;
     }
 
-    //CaffeineMemoize.build(buildTerm, -1 /* softref */, true /* Param.DEBUG*/);
+    //CaffeineMemoize.builder(buildTerm, -1 /* softref */, true /* Param.DEBUG*/);
     //new NullMemoize<>(buildTerm);
 
     public static boolean concurrent(int dt) {

@@ -14,7 +14,7 @@
 //import nars.core.Events.CycleEnd;
 //import nars.core.Memory;
 //import nars.core.NAR;
-//import nars.build.Default;
+//import nars.builder.Default;
 //import nars.logic.ImmediateProcess;
 //import nars.logic.entity.Concept;
 //import nars.logic.entity.Sentence;

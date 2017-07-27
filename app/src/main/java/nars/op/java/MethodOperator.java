@@ -25,7 +25,7 @@
 // */
 //public class MethodOperator  {
 //
-//    static final TypeParser parser = TypeParser.newBuilder().build();
+//    static final TypeParser parser = TypeParser.newBuilder().builder();
 //    final static Logger logger = LoggerFactory.getLogger(MethodOperator.class);
 //
 //    @NotNull

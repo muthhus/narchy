@@ -1,8 +1,8 @@
 package nars;
 
 import jcog.random.XorShift128PlusRandom;
-import nars.concept.build.ConceptBuilder;
-import nars.concept.build.DefaultConceptBuilder;
+import nars.concept.builder.ConceptBuilder;
+import nars.concept.builder.DefaultConceptBuilder;
 import nars.control.Derivation;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;

@@ -103,7 +103,7 @@ public class AdaptiveResonanceTheory2
         {
             // if it is not empty - re-create it from the rest examples
             float score;
-            // build prototype but without instance which should be Deleted
+            // builder prototype but without instance which should be Deleted
             // at first -- prototype is the first item in the prototype sequence
             prot.set(iprot, sample.get(seq.get(iprot).get(0)));
             // if PE < vigilance -- it won't stop (infinite looping)
@@ -467,7 +467,7 @@ public class AdaptiveResonanceTheory2
                                 }
                                 else
                                 {
-                                    // re-build prototype - without the sample
+                                    // re-builder prototype - without the sample
                                     removeInstance(sample, i, prot, prot_index, prot_seq, param.beta, param.vigilance);
                                 } 
                             }

@@ -307,7 +307,7 @@ public class Secure {
 		buffer.setLittleEndian32(Options.keylayout);
 		buffer.setLittleEndian32(2600); // or 0ece
 		// // client
-		// build? we
+		// builder? we
 		// are 2600
 		// compatible
 		// :-)

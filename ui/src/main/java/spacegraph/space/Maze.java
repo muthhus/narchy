@@ -82,7 +82,7 @@ public class Maze extends CompoundSpatial {
 
 
 //
-//        Collections.addAll( l,  new RagDoll().build(world, v(0,0,20), 3f) );
+//        Collections.addAll( l,  new RagDoll().builder(world, v(0,0,20), 3f) );
     }
 
 

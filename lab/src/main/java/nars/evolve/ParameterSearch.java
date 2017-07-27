@@ -208,7 +208,7 @@
 ////
 ////        experiments.clear();
 ////        for (int i = 0; i < 15; i++) {
-////            NAR a = new Default().build();
+////            NAR a = new Default().builder();
 ////
 ////            //a.param().contrapositionPriority.set(i);
 ////            //System.out.println("contraposition priority=" + i + " = " + score(a));
@@ -226,7 +226,7 @@
 ////
 ////        experiments.clear();
 ////        for (int i = 0; i < 100; i+=5) {
-////            NAR a = new Default().build();
+////            NAR a = new Default().builder();
 ////
 ////            //a.param().contrapositionPriority.set(i);
 ////            //System.out.println("contraposition priority=" + i + " = " + score(a));

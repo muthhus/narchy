@@ -460,7 +460,7 @@ public class GImpactCollisionAlgorithm extends CollisionAlgorithm {
 			ptri0.applyTransform(orgtrans0);
 			ptri1.applyTransform(orgtrans1);
 
-			// build planes
+			// builder planes
 			ptri0.buildTriPlane();
 			ptri1.buildTriPlane();
 

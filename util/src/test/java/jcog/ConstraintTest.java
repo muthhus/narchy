@@ -156,7 +156,7 @@
 //
 //        /**
 //         evaluate all concepts involving these terms
-//         to build a set of constraints that can
+//         to builder a set of constraints that can
 //         be evaluated for consistency and solved for
 //         one or more unknown variables in terms
 //         of known ones

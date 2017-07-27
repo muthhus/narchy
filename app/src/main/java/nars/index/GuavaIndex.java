@@ -59,7 +59,7 @@
 //    }
 //
 //    public GuavaIndex(@NotNull CacheBuilder cb) {
-//        this.data = cb.build();
+//        this.data = cb.builder();
 //        this.subterms = new SoftValueHashMap();
 ////        subterms = CacheBuilder.newBuilder()
 ////                //.maximumSize(capacity)
@@ -68,7 +68,7 @@
 //////                    if (e.getCause()!= RemovalCause.REPLACED)
 //////                        System.err.println("guava remove: " + e + " : " + e.getCause() );
 //////                })
-////              .build();
+////              .builder();
 //    }
 //
 //    @Override

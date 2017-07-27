@@ -641,7 +641,7 @@ public class GameBase {
         // see if needpass needs updated
         CheckNeedPass();
 
-        // build the playerstate_t structures for all players
+        // builder the playerstate_t structures for all players
         ClientEndServerFrames();
     }
 

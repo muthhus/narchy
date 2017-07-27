@@ -895,7 +895,7 @@ public class MyCMAESOptimizer extends MultivariateOptimizer {
         }
     }
 
-    // -----Matrix utility functions similar to the Matlab build in functions------
+    // -----Matrix utility functions similar to the Matlab builder in functions------
 
     /**
      * @param m Input matrix

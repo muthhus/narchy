@@ -189,7 +189,7 @@ class MJCellUI extends Frame {
 		pnlLeft.setBackground(Color.lightGray);
 		pnlBotm.setBackground(Color.lightGray);
 
-		// build the menu
+		// builder the menu
 		mnuFile.removeAll();
 		mnuView.removeAll();
 		mnuAnim.removeAll();

@@ -85,7 +85,7 @@ public class StructTestCase extends TestCase {
 		Assert.assertEquals(0, notAnEmptyList.getArity());
 	}
 	
-	/** Use dotted structs to build lists with content */
+	/** Use dotted structs to builder lists with content */
 	public void testListAsDottedStruct() {
 		Struct notAnEmptyList = new Struct(".", new Struct("a"), new Struct(".", new Struct("b"), new Struct()));
 		Assert.assertTrue(notAnEmptyList.isList());

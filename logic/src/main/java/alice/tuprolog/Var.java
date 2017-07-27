@@ -68,7 +68,7 @@ public class Var extends Term {
     /**
      * Creates an anonymous variable
      * <p>
-     * This is equivalent to build a variable with name _
+     * This is equivalent to builder a variable with name _
      */
     public Var() {
         name = null;

@@ -222,7 +222,7 @@
             <!--<debugInformationGenerated>false</debugInformationGenerated>-->
             <!--<sourceMapsGenerated>false</sourceMapsGenerated>-->
             <!--<sourceFilesCopied>true</sourceFilesCopied>-->
-            <!--&lt;!&ndash;<targetDirectory>${project.build.sourceDirectory}/src/main/resources/_compiled</targetDirectory>&ndash;&gt;-->
+            <!--&lt;!&ndash;<targetDirectory>${project.builder.sourceDirectory}/src/main/resources/_compiled</targetDirectory>&ndash;&gt;-->
             <!--</configuration>-->
             <!--</execution>-->
             <!--</executions>-->

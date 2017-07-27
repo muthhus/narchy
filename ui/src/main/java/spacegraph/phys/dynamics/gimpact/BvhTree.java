@@ -174,10 +174,10 @@ class BvhTree {
 
 		setNodeBound(curIndex, node_bound);
 
-		// build left branch
+		// builder left branch
 		_build_sub_tree(primitive_boxes, startIndex, splitIndex);
 
-		// build right branch
+		// builder right branch
 		_build_sub_tree(primitive_boxes, splitIndex, endIndex);
 
 		node_array.setEscapeIndex(curIndex, num_nodes - curIndex);

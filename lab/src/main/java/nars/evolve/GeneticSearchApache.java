@@ -143,7 +143,7 @@
 //            throw new UnsupportedOperationException("Not supported yet.");
 //        }
 //
-//        public NAR build() {
+//        public NAR builder() {
 //            throw new UnsupportedOperationException("Not supported yet.");
 //        }
 //
@@ -173,7 +173,7 @@
 //
 //                System.out.print("    " + genome.toString());
 //
-//                final NAR n = genome.build();
+//                final NAR n = genome.builder();
 //
 //                double s = score(maxCycles, n);
 //

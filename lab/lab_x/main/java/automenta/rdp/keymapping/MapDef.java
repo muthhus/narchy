@@ -334,7 +334,7 @@ public class MapDef {
 		definition += "\t" + keyLocation;
 		definition += "\t0x" + Integer.toHexString(scancode);
 
-		// build and add modifiers as a set of flags in an integer value
+		// builder and add modifiers as a set of flags in an integer value
 		int modifiers = 0;
 		modifiers |= (shiftDown ? FLAG_SHIFT : 0);
 		modifiers |= (ctrlDown ? FLAG_CTRL : 0);

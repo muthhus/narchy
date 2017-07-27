@@ -113,7 +113,7 @@ public class ControlSurface extends LabeledPane {
         return new Label(k + " " + Texts.n4(f.floatValue()));
 //        int ki = 0;
 //        for (Object x : c) {
-//            g.children.add(build(ki, x, remainingDepth, built));
+//            g.children.add(builder(ki, x, remainingDepth, built));
 //            ki++;
 //        }
 //        return g;

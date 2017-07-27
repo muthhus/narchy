@@ -392,7 +392,7 @@
 //
 //        String concatenedSource = concatenateStringsWithNewLine(sources);
 //
-//        program = cl.createProgram(concatenedSource).build();
+//        program = cl.createProgram(concatenedSource).builder();
 //
 //        stage1Kernel = program.createCLKernel("stage1Kernel");
 //

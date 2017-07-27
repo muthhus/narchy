@@ -5,7 +5,7 @@ import nars.NAR;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.concept.build.ConceptBuilder;
+import nars.concept.builder.ConceptBuilder;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;

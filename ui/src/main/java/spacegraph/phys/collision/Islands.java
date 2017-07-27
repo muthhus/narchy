@@ -119,7 +119,7 @@ public class Islands {
 
     public void buildIslands(Intersecter intersecter, List<Collidable> collidables) {
 
-        //System.out.println("build islands");
+        //System.out.println("builder islands");
 
         BulletStats.pushProfile("islandUnionFindAndQuickSort");
         try {

@@ -140,7 +140,7 @@ public class A extends Applet implements Runnable {
 		enableEvents(48); // AWTEvent.MOUSE_EVENT_MASK |
 							// AWTEvent.MOUSE_MOTION_EVENT_MASK
 		g = (Graphics2D) getGraphics();
-		// build buffers for all pictures
+		// builder buffers for all pictures
 		buf = new BufferedImage[_SMLSPRIT];
 		bg = new Graphics2D[_SMLSPRIT];
 		for (i = 0; i < _SMLSPRIT; i++) {

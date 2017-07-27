@@ -81,7 +81,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
     }
 
     /**
-     * use only during actual build step; should not be called while being compared
+     * use only during actual builder step; should not be called while being compared
      */
     @Override
     public Term[] subterms() {

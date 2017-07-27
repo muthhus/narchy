@@ -440,7 +440,7 @@ public class SV_ENTS {
         SV_FatPVS(org);
         clientphs = CM.CM_ClusterPHS(clientcluster);
 
-        // build up the list of visible entities
+        // builder up the list of visible entities
         frame.num_entities = 0;
         frame.first_entity = SV_INIT.svs.next_client_entities;
 

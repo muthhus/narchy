@@ -216,7 +216,7 @@ public final class RC4 { // must be final for security reasons
 	 * Expands a user-key to a working key schedule.
 	 * <p>
 	 * The key bytes are first extracted from the user-key and then used to
-	 * build the contents of this key schedule.
+	 * builder the contents of this key schedule.
 	 * <p>
 	 * The method's only exceptions are when the user-key's contents are null,
 	 * or a byte array of zero length.

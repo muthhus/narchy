@@ -39,7 +39,7 @@ public final class MapTaskIndex implements TaskIndex {
 //                        logger.error("{} removal: {},{}", cause, k, v);
 //                })
 
-//                .build();
+//                .builder();
 //        tasks.cleanUp();
 //
 //        this.tasksMap = tasks.asMap();

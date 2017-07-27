@@ -154,7 +154,7 @@ public class AirPlaneLanding extends AbstractProblem {
 
         objective = VariableFactory.bounded("obj", 0, obj_ub, solver);
 
-        // build cost array
+        // builder cost array
         costLAT = new int[2 * n];
         maxCost = new TObjectIntHashMap<IntVar>();
         for (int i = 0; i < n; i++) {

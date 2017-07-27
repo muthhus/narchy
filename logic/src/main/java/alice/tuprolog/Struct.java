@@ -151,7 +151,7 @@ public class Struct extends Term {
             arg[0] = argList[index];
             arg[1] = new Struct(argList,index+1);
         } else {
-            // build an empty list
+            // builder an empty list
             name = "[]";
             arity = 0;
             arg = null;

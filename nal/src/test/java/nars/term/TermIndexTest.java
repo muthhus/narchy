@@ -2,7 +2,7 @@ package nars.term;
 
 import jcog.random.XorShift128PlusRandom;
 import nars.*;
-import nars.concept.build.DefaultConceptBuilder;
+import nars.concept.builder.DefaultConceptBuilder;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.MaplikeTermIndex;

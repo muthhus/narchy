@@ -60,7 +60,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
                 //new NonBlockingHashMap(cacheCapacity);
                 //new ConcurrentHashMap<>(cacheCapacity);
                 Caffeine.newBuilder()
-                        //.softValues().build();
+                        //.softValues().builder();
                         .removalListener((X k, Spatial<X> v, RemovalCause c) -> {
                             v.delete(dyn);
                         })

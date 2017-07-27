@@ -20,7 +20,7 @@
 //import automenta.vivisect.timeline.MultiTimeline;
 //import nars.core.Memory;
 //import nars.core.NAR;
-//import nars.build.Discretinuous;
+//import nars.builder.Discretinuous;
 //import automenta.vivisect.swing.NWindow;
 //import automenta.vivisect.timeline.BarChart;
 //import automenta.vivisect.timeline.Chart;
@@ -51,35 +51,35 @@
 //                    case 0:                        
 //                        Discretinuous d = new Discretinuous();
 //                        d.param.setForgetting(Memory.Forgetting.Periodic);                        
-//                        nar = d.build();
+//                        nar = d.builder();
 //                        (nar.param).conceptForgetDurations.set(5f);
 //                        break;
 //                    case 1:
 //                        Discretinuous e = new Discretinuous();
 //                        e.param.setForgetting(Memory.Forgetting.Periodic);                        
-//                        nar = e.build();
+//                        nar = e.builder();
 //                        (nar.param).conceptForgetDurations.set(5f);                        
 //                        break;
 //                    /*case 2:
-//                        nar = new ContinuousBagNARBuilder().build();
+//                        nar = new ContinuousBagNARBuilder().builder();
 //                        break;*/
 //                    /*case 2:
-//                        nar = new ContinuousBagNARBuilder().build();
+//                        nar = new ContinuousBagNARBuilder().builder();
 //                        break;*/                    /*case 2:
-//                        nar = new ContinuousBagNARBuilder().build();
+//                        nar = new ContinuousBagNARBuilder().builder();
 //                        break;*/
 //                    /*case 2:
-//                        nar = new ContinuousBagNARBuilder().build();
+//                        nar = new ContinuousBagNARBuilder().builder();
 //                        break;*/                    /*case 2:
-//                        nar = new ContinuousBagNARBuilder().build();
+//                        nar = new ContinuousBagNARBuilder().builder();
 //                        break;*/
 //                    /*case 2:
-//                        nar = new ContinuousBagNARBuilder().build();
+//                        nar = new ContinuousBagNARBuilder().builder();
 //                        break;*/                    /*case 2:
-//                        nar = new ContinuousBagNARBuilder().build();
+//                        nar = new ContinuousBagNARBuilder().builder();
 //                        break;*/
 //                    /*case 2:
-//                        nar = new ContinuousBagNARBuilder().build();
+//                        nar = new ContinuousBagNARBuilder().builder();
 //                        break;*/
 //                }
 //

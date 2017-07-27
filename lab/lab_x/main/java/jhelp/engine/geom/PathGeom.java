@@ -18,7 +18,7 @@ import jhelp.util.text.UtilText;
 import jhelp.xml.MarkupXML;
 
 /**
- * Path geom is build with a path for U, and path for V.<br>
+ * Path geom is builder with a path for U, and path for V.<br>
  * V path was repeat several times throw U path <br>
  * <br>
  * Last modification : 23 janv. 2009<br>
