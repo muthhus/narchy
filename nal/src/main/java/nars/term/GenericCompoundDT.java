@@ -1,5 +1,6 @@
 package nars.term;
 
+import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
 import nars.IO;
 import nars.Op;
@@ -59,10 +60,9 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return Compound.super.dt(dt);
     }
 
-    @NotNull
     @Override
-    public Term unneg() {
-        return Compound.super.unneg();
+    public void append(ByteArrayDataOutput out) {
+        Term.append( this, out);
     }
 
     @Override

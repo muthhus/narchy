@@ -181,17 +181,10 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.pathsTo(subterm, receiver);
     }
 
+
     @Override
     public int opX() {
         return ref.opX();
-    }
-
-
-
-    @NotNull
-    @Override
-    public Term unneg() {
-        return ref.unneg();
     }
 
     @Override

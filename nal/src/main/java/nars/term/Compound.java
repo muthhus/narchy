@@ -123,18 +123,7 @@ public interface Compound extends Term, IPair, TermContainer {
      */
     void setNormalized();
 
-    @NotNull
-    @Override
-    default public Term unneg() {
-        if (op() == NEG) {
-            Term x = sub(0);
-            if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
-                ((Compound) x).setNormalized();
-            }
-            return x;
-        }
-        return this;
-    }
+
 
 
     //    @NotNull
@@ -996,14 +985,6 @@ public interface Compound extends Term, IPair, TermContainer {
         return term.unneg();
     }
 
-    @Override
-    default void append(ByteArrayDataOutput out) {
-        Op o = op();
-        out.writeByte(o.id);
-        IO.writeTermContainer(out, subterms());
-        if (o.temporal)
-            out.writeInt(dt());
-    }
 
     //    default MutableSet<Term> toSetAtemporal() {
 //        int ss = size();

@@ -23,6 +23,7 @@ package nars.term;
 
 import com.google.common.io.ByteArrayDataOutput;
 import nars.$;
+import nars.IO;
 import nars.Op;
 import nars.index.term.StaticTermIndex;
 import nars.index.term.TermContext;
@@ -52,8 +53,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static nars.Op.CONJ;
-import static nars.Op.Null;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -84,7 +84,19 @@ public interface Term extends Termlike, Comparable<Term> {
     @Override
     int structure();
 
-    void append(ByteArrayDataOutput out);
+    default void append(ByteArrayDataOutput out) {
+        Term.append(this, out);
+    }
+
+    static void append(Term term, ByteArrayDataOutput out) {
+
+        Op o = term.op();
+        out.writeByte(o.id);
+        IO.writeTermContainer(out, term.subterms());
+        if (o.temporal)
+            out.writeInt(term.dt());
+
+    }
 
     @Override
     default int size() {
@@ -596,28 +608,15 @@ public interface Term extends Termlike, Comparable<Term> {
         if (diff2 != 0)
             return diff2;
 
-        int xSize = size();
-        int diff3 = Integer.compare(y.size(), xSize);
-        if (diff3 != 0)
-            return diff3;
-
-//        int diff2 = Integer.compare(hashCode(), y.hashCode());
-//        if (diff2 != 0)
-//            return diff2;
-
         int d = Integer.compare(this.opX(), y.opX());
         if (d != 0)
             return d;
 
-        if (xSize > 0 /* same # of subterms since size same */) {
+        if (this instanceof Atomic) {
+//            if (!(y instanceof Atomic))
+//                return -1;
+            assert (y instanceof Atomic) : "because volume should have been determined to be equal";
 
-            int c = TermContainer.compare(subterms(), y.subterms());
-            if (c != 0)
-                return c;
-
-            return Integer.compare(dt(), y.dt());
-
-        } else {
             if ((this instanceof AbstractVariable) && (y instanceof AbstractVariable)) {
                 //hashcode serves as the ordering too
                 return Integer.compare(hashCode(), y.hashCode());
@@ -636,8 +635,25 @@ public interface Term extends Termlike, Comparable<Term> {
             return this.toString().compareTo((/*(Atomic)*/y).toString());
             //return Hack.compare(toString(), y.toString());
 
-        }
+        } else {
 
+//        int xSize = size();
+//        int diff3 = Integer.compare(y.size(), xSize);
+//        if (diff3 != 0)
+//            return diff3;
+
+//        int diff2 = Integer.compare(hashCode(), y.hashCode());
+//        if (diff2 != 0)
+//            return diff2;
+
+
+            int c = TermContainer.compare(subterms(), y.subterms());
+            if (c != 0)
+                return c;
+
+            return Integer.compare(dt(), y.dt());
+
+        }
         //throw new RuntimeException("ordering exception: " + this + ", " + y);
     }
 
@@ -652,6 +668,13 @@ public interface Term extends Termlike, Comparable<Term> {
     @NotNull
     @Override
     default Term unneg() {
+        if (op() == NEG) {
+            Term x = sub(0);
+            if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
+                ((Compound) x).setNormalized();
+            }
+            return x;
+        }
         return this;
     }
 

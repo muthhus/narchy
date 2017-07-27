@@ -42,10 +42,6 @@ public class EllipsisMatch extends GenericCompound {
         }
     }
 
-    @Override
-    public int opX() {
-        throw new UnsupportedOperationException();
-    }
 
     public static Term match(@NotNull Compound y, int from, int to) {
 

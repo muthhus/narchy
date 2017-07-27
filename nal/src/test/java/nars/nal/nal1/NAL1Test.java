@@ -17,22 +17,9 @@ public class NAL1Test extends AbstractNALTest {
 
     @Override protected NAR nar() { return NARS.tmp(1); }
 
-    @Test
-    public void revision()  {
-
-        String belief = "<bird --> swimmer>";
-
-        test
-                .mustBelieve(4, belief, 0.87f, 0.91f)
-                .believe(belief)                 //.en("bird is a type of swimmer.");
-                .believe(belief, 0.10f, 0.60f)                 //.en("bird is probably not a type of swimmer."); //.en("bird is very likely to be a type of swimmer.");*/
-                ;
-    }
-
-
-    static {
-        Param.TRACE = true;
-    }
+//    static {
+//        Param.TRACE = true;
+//    }
 
     @Test
     public void deduction()  {
@@ -46,6 +33,21 @@ public class NAL1Test extends AbstractNALTest {
                         //.en("robin is a type of bird.");
                 .mustBelieve(CYCLES, "<robin --> animal>", 0.81f);
     }
+
+
+
+    @Test
+    public void revision()  {
+
+        String belief = "<bird --> swimmer>";
+
+        test
+                .mustBelieve(4, belief, 0.87f, 0.91f)
+                .believe(belief)                 //.en("bird is a type of swimmer.");
+                .believe(belief, 0.10f, 0.60f)                 //.en("bird is probably not a type of swimmer."); //.en("bird is very likely to be a type of swimmer.");*/
+                ;
+    }
+
 
     @Test
     public void abduction()  {
