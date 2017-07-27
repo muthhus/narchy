@@ -73,7 +73,9 @@ public class TemporalTest {
 
     @Test
     public void testAtemporalization() throws Narsese.NarseseException {
-        assertEquals("((x) ==>+- (y))", n.conceptualize(n.term("((x) ==>+10 (y))")).toString());
+        Term t = n.term("((x) ==>+10 (y))");
+        Concept c = n.conceptualize(t);
+        assertEquals("((x) ==>+- (y))", c.toString());
     }
 
     @Test public void testAtemporalization2() throws Narsese.NarseseException {
@@ -585,7 +587,9 @@ public class TemporalTest {
 
     @Test
     public void testSubtermConjInConj() throws Narsese.NarseseException {
-        Compound g = $("(((x) &&+1 (y)) &&+1 (z))");
+        String g0 = "(((x) &&+1 (y)) &&+1 (z))";
+        Compound g = $(g0);
+        assertEquals(g0, g.toString());
         assertEquals(0, g.subtermTime($("(x)")));
         assertEquals(1, g.subtermTime($("(y)")));
         assertEquals(2, g.subtermTime($("(z)")));

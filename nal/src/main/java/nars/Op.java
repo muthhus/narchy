@@ -234,7 +234,7 @@ public enum Op implements $ {
                 int subEventsLeft = aConj ? conjSubEventCount(a) : 0;
                 boolean bConj = b.op() == CONJ;
                 int subEventsRight = bConj ? conjSubEventCount(b) : 0;
-                if (subEventsLeft > 1 || subEventsRight > 0) {
+                if (subEventsLeft > 0 || subEventsRight > 0) {
                     //rebalance and align
                     boolean imbalanced = false;
                     if (Math.abs(subEventsLeft - subEventsRight) > 1)
@@ -622,7 +622,7 @@ public enum Op implements $ {
     public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);
     public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
 
-    final static Logger logger = LoggerFactory.getLogger(Op.class);
+
     public final boolean conceptualizable;
 
 //    public interface TermInstancer {

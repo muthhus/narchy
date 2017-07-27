@@ -134,16 +134,13 @@ public interface Compound extends Term, IPair, TermContainer {
     @NotNull
     @Override
     default public Term unneg() {
-        //probably rarely called; UnitCompound1 should be used for NEG's
-        //if (Param.DEBUG) assert (op() != NEG); //HACK for detection
-
-//        if (op() == NEG) {
-//            Term x = sub(0);
-//            if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
-//                ((Compound) x).setNormalized();
-//            }
-//            return x;
-//        }
+        if (op() == NEG) {
+            Term x = sub(0);
+            if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
+                ((Compound) x).setNormalized();
+            }
+            return x;
+        }
         return this;
     }
 
@@ -681,7 +678,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default boolean isTemporal() {
         return hasAny(Op.TemporalBits) &&
-                (isAny(Op.TemporalBits) && (dt() != DTERNAL))
+                (op().temporal && (dt() != DTERNAL))
                 ||
                 (subterms().isTemporal());
     }
@@ -809,17 +806,17 @@ public interface Compound extends Term, IPair, TermContainer {
     final static Logger logger = LoggerFactory.getLogger(Compound.class);
 
     @Nullable
-    default Compound normalize() {
+    default Term normalize() {
         if (this.isNormalized())
             return this; //TODO try not to let this happen
 
-        Term y;
+
 
         int vars = this.vars();
         int pVars = this.varPattern();
         int totalVars = vars + pVars;
 
-        Compound result;
+        Term y;
         if (totalVars > 0) {
             y = transform(
                     ((vars == 1) && (pVars == 0)) ?
@@ -828,25 +825,15 @@ public interface Compound extends Term, IPair, TermContainer {
                             new VariableNormalization(totalVars /* estimate */)
             );
 
-            if (y instanceof Compound) {
-                if (y != this) {
-                    Compound cy = (Compound) y;
-                    result = cy;
-                } else {
-                    result = this;
-                }
-            } else {
-                result = null;
-            }
 
         } else {
-            result = this;
+            y = this;
         }
 
-        if (result != null)
-            result.setNormalized();
+        if (y != null && y instanceof Compound)
+            ((Compound)y).setNormalized();
 
-        return result;
+        return y;
     }
 
     @Nullable
@@ -935,14 +922,15 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     @NotNull
     default Term eternal() {
-        if (!this.hasAny(Op.TemporalBits))// isTemporal())
+        if (!this.hasAny(Op.TemporalBits))
             return this;
 
-        Term[] s = this.toArray();
+        TermContainer subs = this.subterms();
+        Term[] s = subs.toArray();
 
         //1. determine if any subterms (excluding the term itself) get rewritten
         boolean subsChanged = false;
-        if (this.subterms().hasAny(Op.TemporalBits)) {
+        if (subs.hasAny(Op.TemporalBits)) {
 
             //atemporalize subterms first
 

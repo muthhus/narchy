@@ -569,55 +569,54 @@ public class Temporalize {
         if (parent != null)
             add(parent, term, start, end);
 
-        if (term instanceof Compound) {
-            Compound c = (Compound) term;
-            Op o = c.op();
-            if (o.temporal) {
-                int dt = c.dt();
 
-                if (dt == XTERNAL) {
+        Op o = term.op();
+        if (o.temporal) {
+            int dt = term.dt();
 
-                    //TODO UNKNOWN TO SOLVE FOR
-                    //throw new RuntimeException("no unknowns may be added during this phase");
+            if (dt == XTERNAL) {
 
-                } else {
-                    if (dt == DTERNAL)
-                        dt = 0;
+                //TODO UNKNOWN TO SOLVE FOR
+                //throw new RuntimeException("no unknowns may be added during this phase");
 
-                    TermContainer tt = c.subterms();
-                    if (dt < 0 && o.commutative) {
-                        dt = -dt;
-                        tt = c.reverse();
+            } else {
+                if (dt == DTERNAL)
+                    dt = 0;
+
+                TermContainer tt = term.subterms();
+                if (dt < 0 && o.commutative) {
+                    dt = -dt;
+                    tt = tt.reverse();
+                }
+
+                int t = start;
+
+                int l = tt.size();
+
+                //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
+                int lastSubStart = DTERNAL;
+                for (int i = 0; (i < l); i++) {
+
+                    Term st = tt.sub(i);
+                    int sdt = st.dtRange();
+
+                    int subStart = t;
+                    int subEnd = t + sdt;
+                    //System.out.println("\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
+                    know(parent, st, subStart, subEnd);
+
+                    t = subEnd; //the duration of the event
+
+                    if (i < l - 1)
+                        t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
+
+                    if (i > 0) {
+                        //crosslink adjacent subterms
+                        add(tt.sub(i - 1), new RelativeEvent(tt.sub(i - 1), tt.sub(i), lastSubStart - subStart));
+                        add(tt.sub(i), new RelativeEvent(tt.sub(i), tt.sub(i - 1), subStart - lastSubStart));
                     }
-
-                    int t = start;
-
-                    int l = tt.size();
-
-                    //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
-                    int lastSubStart = DTERNAL;
-                    for (int i = 0; (i < l); i++) {
-
-                        Term st = tt.sub(i);
-                        int sdt = st.dtRange();
-
-                        int subStart = t;
-                        int subEnd = t + sdt;
-                        //System.out.println("\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
-                        know(parent, st, subStart, subEnd);
-
-                        t = subEnd; //the duration of the event
-
-                        if (i < l - 1)
-                            t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
-
-                        if (i > 0) {
-                            //crosslink adjacent subterms
-                            add(tt.sub(i - 1), new RelativeEvent(tt.sub(i - 1), tt.sub(i), lastSubStart - subStart));
-                            add(tt.sub(i), new RelativeEvent(tt.sub(i), tt.sub(i - 1), subStart - lastSubStart));
-                        }
-                        lastSubStart = subStart;
-                    }
+                    lastSubStart = subStart;
+                }
 
 
 //                    //for conjunctions: by the end of the iteration we should be at the exact end of the interval
@@ -629,12 +628,12 @@ public class Temporalize {
 //                        assert (t == expectedEnd) : term + " with dtRange=" + term.dtRange() + " mis-aligned: " + start + "," + end + " but t=" + t;
 //                    }
 
-                    //for others: they are "pointers" which relate time points but do not define durations
+                //for others: they are "pointers" which relate time points but do not define durations
 
-                }
+            }
 
-            } else {
-                //all these subterms will share their supercompounds time
+        } else {
+            //all these subterms will share their supercompounds time
 //                if (o.isSet() ) {
 //                    c.subterms().forEach(s -> know(root, s, start, end));
 //                }
@@ -642,10 +641,9 @@ public class Temporalize {
                 /*c.subterms().recurseTerms((s) -> {
                     know(root, s, start, end);
                 });*/
-            }
         }
-
     }
+
 
     Event add(@NotNull Temporalize.Event root, Term term, int start, int end) {
         Event event;
@@ -689,91 +687,89 @@ public class Temporalize {
         if (known != null)
             return known.neg(isNeg);
 
-        if (target instanceof Compound) {
 
-            Compound c = (Compound) target;
-            Op o = c.op();
-            if (o.temporal) {
-                int dt = c.dt();
+        Op o = target.op();
+        if (o.temporal) {
+            int dt = target.dt();
 
-                if (dt == XTERNAL) {
-                    TermContainer tt = c.subterms();
+            if (dt == XTERNAL) {
+                TermContainer tt = target.subterms();
 
-                    if (tt.size() == 2) {
+                if (tt.size() == 2) {
 
-                        Event ea, eb;
-                        if (random.nextBoolean()) {
-                            //forward order: sub 0 first
-                            ea = solveSub(trail, tt, 0);
-                            if (ea == null)
-                                return null;
-                            eb = solveSub(trail, tt, 1);
-                            if (eb == null)
-                                return null;
-                        } else {
-                            //reverse order: sub 1 first
-                            eb = solveSub(trail, tt, 1);
-                            if (eb == null)
-                                return null;
-                            ea = solveSub(trail, tt, 0);
-                            if (ea == null)
-                                return null;
-                        }
+                    Event ea, eb;
+                    if (random.nextBoolean()) {
+                        //forward order: sub 0 first
+                        ea = solveSub(trail, tt, 0);
+                        if (ea == null)
+                            return null;
+                        eb = solveSub(trail, tt, 1);
+                        if (eb == null)
+                            return null;
+                    } else {
+                        //reverse order: sub 1 first
+                        eb = solveSub(trail, tt, 1);
+                        if (eb == null)
+                            return null;
+                        ea = solveSub(trail, tt, 0);
+                        if (ea == null)
+                            return null;
+                    }
 
-                        Term a = ea.term;
-                        Time at = ea.start(trail);
+                    Term a = ea.term;
+                    Time at = ea.start(trail);
 
-                        if (at != null) {
+                    if (at != null) {
 
-                            Term b = eb.term;
-                            Time bt = eb.start(trail);
+                        Term b = eb.term;
+                        Time bt = eb.start(trail);
 
-                            if (bt != null) {
+                        if (bt != null) {
 
-                                try {
-                                    if (o == CONJ && (a.op() == CONJ || b.op() == CONJ)) {
-                                        //conjunction merge, since the results could overlap
-                                        //either a or b, or both are conjunctions. and the result will be conjunction
+                            try {
+                                if (o == CONJ && (a.op() == CONJ || b.op() == CONJ)) {
+                                    //conjunction merge, since the results could overlap
+                                    //either a or b, or both are conjunctions. and the result will be conjunction
 
-                                        long ata = at.abs();
-                                        long bta = bt.abs();
-                                        if (ata == ETERNAL && bta == ETERNAL) {
-                                            ata = at.offset;
-                                            bta = bt.offset + a.dtRange();
-                                        } else if (ata == ETERNAL ^ bta == ETERNAL) {
-                                            return null; //one is eternal the other isn't
-                                        }
-                                        Term newTerm = $.negIf(Op.conjMerge(a, ata, b, bta), isNeg);
-                                        long start = Math.min(at.abs(), bt.abs());
-                                        Event e = new SolutionEvent(newTerm, start);
-                                        return e;
-                                    } else {
-                                        int sd = dt(ea, eb, trail);
+                                    long ata = at.abs();
+                                    long bta = bt.abs();
+                                    if (ata == ETERNAL && bta == ETERNAL) {
+                                        ata = at.offset;
+                                        bta = bt.offset + a.dtRange();
+                                    } else if (ata == ETERNAL ^ bta == ETERNAL) {
+                                        return null; //one is eternal the other isn't
+                                    }
+                                    Term newTerm = $.negIf(Op.conjMerge(a, ata, b, bta), isNeg);
+                                    long start = Math.min(at.abs(), bt.abs());
+                                    Event e = new SolutionEvent(newTerm, start);
+                                    return e;
+                                } else {
+                                    int sd = dt(ea, eb, trail);
 //                                        if (o == CONJ && sd != DTERNAL && sd != XTERNAL) {
 //                                            sd -= a.dtRange(); sd -= b.dtRange();
 //                                        }
-                                        if (sd != XTERNAL) {
+                                    if (sd != XTERNAL) {
 
-                                            Term newTerm = $.negIf(o.the(sd, a, b), isNeg);
+                                        Term newTerm = $.negIf(o.the(sd, a, b), isNeg);
 
-                                            long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
+                                        long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
 
-                                            Event e = new SolutionEvent(newTerm, start);
-                                            return e;
-                                        }
+                                        Event e = new SolutionEvent(newTerm, start);
+                                        return e;
                                     }
-                                } catch (UnsupportedOperationException e) {
-                                    logger.warn("temporalization solution: {}", e.getMessage());
-                                    return null; //TODO
                                 }
+                            } catch (UnsupportedOperationException e) {
+                                logger.warn("temporalization solution: {}", e.getMessage());
+                                return null; //TODO
                             }
                         }
-                    } else {
-                        logger.warn("TODO unsupported xternal: " + target);
                     }
+                } else {
+                    logger.warn("TODO unsupported xternal: " + target);
                 }
             }
         }
+
 
         /** compute the temporal intersection of all involved terms. if they are coherent, then
          * create the solved term as-is (since it will not contain any XTERNAL) with the appropriate
@@ -788,7 +784,7 @@ public class Temporalize {
             Set<Term> uncovered = Sets.mutable.of(a, b);
             for (Term c : constraints.keySet()) {
                 boolean relevance = false;
-                if (c.equals(target))
+                if (c.equals(c))
                     continue;
 
                 if (trail.containsKey(c))
@@ -825,7 +821,7 @@ public class Temporalize {
                     return null; //can this happen?
                 case 1:
                     Event r = relevant.get(0);
-                    return new SolutionEvent($.negIf(target,isNeg), r.start(trail).abs(), r.end(trail).abs());
+                    return new SolutionEvent($.negIf(target, isNeg), r.start(trail).abs(), r.end(trail).abs());
 
             }
 
@@ -841,7 +837,7 @@ public class Temporalize {
                 long[] ii = intersect(ra, rb, trail);
                 if (ii != null) {
                     //overlap or adjacent
-                    return new SolutionEvent($.negIf(target,isNeg), ii[0], ii[1]);
+                    return new SolutionEvent($.negIf(target, isNeg), ii[0], ii[1]);
                 } else {
                     //not overlapping at all, compute point interpolation
                     Time as = ra.start(trail);
@@ -862,7 +858,7 @@ public class Temporalize {
                                     if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float) dist) / dur) {
                                         long occ = ((ta + tz) / 2 + (ba + bz) / 2) / 2;
                                         //occInterpolate(t, b);
-                                        return new SolutionEvent($.negIf(target,isNeg), occ);
+                                        return new SolutionEvent($.negIf(target, isNeg), occ);
                                     }
                                 }
                             }

@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {
 
-    public AbstractPLink(float p) {
+    AbstractPLink(float p) {
         super(p);
     }
 
@@ -16,14 +16,18 @@ public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {
         if (this == that) return true;
 
         final X x = get();
-        return
-            (x!=null)
-                &&
-            (
-                x.equals(that)
-                    ||
-                ((that instanceof Supplier) && x.equals(((Supplier) that).get()))
-            );
+        if (that instanceof Supplier)
+            return x.equals(((Supplier)that).get());
+        else
+            return x.equals(that);
+//        return
+//            (x!=null)
+//                &&
+//            (
+//                x.equals(that)
+//                    ||
+//                ((that instanceof Supplier) && x.equals(((Supplier) that).get()))
+//            );
     }
 
 

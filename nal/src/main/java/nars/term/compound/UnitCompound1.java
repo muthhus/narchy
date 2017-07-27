@@ -44,13 +44,6 @@ public class UnitCompound1 extends TermVector1 implements Compound {
 //    }
 
 
-
-
-    @Override
-    public @NotNull Term unneg() {
-        return op == NEG ? sub : this;
-    }
-
     @Override
     public final int structure() {
         return structure;

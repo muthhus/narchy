@@ -57,6 +57,28 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return Compound.super.dt(dt);
     }
 
+    @NotNull
+    @Override
+    public Term unneg() {
+        return Compound.super.unneg();
+    }
+
+    @Override
+    public @NotNull Term root() {
+        return Compound.super.root();
+    }
+
+
+    @Override
+    public @NotNull Term eternal() {
+        return Compound.super.eternal();
+    }
+
+    @Override
+    public @Nullable Term normalize() {
+        return Compound.super.normalize();
+    }
+
 
     @Override
     public void append(@NotNull Appendable p) throws IOException {
@@ -134,23 +156,12 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
 
     @Override
     public boolean isCommutative() {
-        if (op().commutative) { //TODO only test dt() if equiv or conj
-            int dt = dt();
-            switch (dt) {
-                case 0:
-                case DTERNAL:
-                    return (size() > 1);
-                case XTERNAL:
-                default:
-                    return false;
-            }
-        }
-        return false;
+        return Compound.super.isCommutative();
     }
 
     @Override
     public boolean isTemporal() {
-        return (op().temporal && (dt != DTERNAL)) || subterms().isTemporal();
+        return Compound.super.isTemporal();
     }
 
 

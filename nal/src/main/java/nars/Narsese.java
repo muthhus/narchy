@@ -288,7 +288,7 @@ public class Narsese extends BaseParser<Object> {
 
                 optional(Budget(budget)),
 
-                Term(true, false), term.set(the(pop())),
+                Term(true, false, true), term.set(the(pop())),
 
                 s(),
 
@@ -427,7 +427,7 @@ public class Narsese extends BaseParser<Object> {
 
 
     public Rule Term() {
-        return Term(true, true);
+        return Term(true, true, true);
     }
 
 //    Rule nothing() {
@@ -441,7 +441,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     //@Cached
-    Rule Term(boolean oper, boolean meta) {
+    Rule Term(boolean oper, boolean meta, boolean temporal) {
         /*
                  <term> ::= <word>                             // an atomic constant term
                         | <variable>                         // an atomic variable term
@@ -476,7 +476,7 @@ public class Narsese extends BaseParser<Object> {
 
                         ),
 
-                        TemporalRelation(),
+                        seq(temporal, TemporalRelation()),
 
                         //Functional form of an Operation, ex: operate(p1,p2), TODO move to FunctionalOperationTerm() rule
                         seq(oper,
@@ -558,12 +558,12 @@ public class Narsese extends BaseParser<Object> {
 
                 "&|,", s(),
 
-                Term(true, false),
+                Term(true, false, true),
                 oneOrMore(sequence(
 
                         sepArgSep(),
 
-                        Term(true, false)
+                        Term(true, false, true)
                 )),
                 s(),
                 COMPOUND_TERM_CLOSER,
@@ -578,14 +578,14 @@ public class Narsese extends BaseParser<Object> {
 
                 COMPOUND_TERM_OPENER,
                 s(),
-                Term(true, false),
+                Term(true, false, true),
                 s(),
                 firstOf(
                         seq(OpTemporal(), CycleDelta()),
                         seq(OpTemporalParallel(), push(0) /* dt=0 */)
                 ),
                 s(),
-                Term(true, false),
+                Term(true, false, true),
                 s(),
                 COMPOUND_TERM_CLOSER,
 
@@ -732,7 +732,7 @@ public class Narsese extends BaseParser<Object> {
      */
     Rule ColonReverseInheritance() {
         return sequence(
-                Term(false, false), ':', Term(),
+                Term(false, false, false), ':', Term(),
 
                 push($.inh(the(pop()), the(pop())))
                 ///*push(Compound.class), */push(the(pop())), push(the(pop())),

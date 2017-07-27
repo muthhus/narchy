@@ -5,6 +5,7 @@ import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
+import nars.term.atom.Bool;
 import nars.term.subst.MapSubst;
 import nars.term.subst.Unify;
 import nars.term.transform.VariableNormalization;
@@ -106,8 +107,8 @@ public class TaskRule extends TaskMatch {
     @Override
     protected void accept(Task X, Map<Term, Term> xy) {
 
-        Compound y = compoundOrNull(new MapSubst(xy).transform(output));
-        if (y==null) return;
+        Term y = new MapSubst(xy).transform(output);
+        if (y instanceof Variable || y instanceof Bool) return;
 
         //        if (r == null)
 //            return null;

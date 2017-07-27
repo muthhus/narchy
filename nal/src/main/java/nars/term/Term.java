@@ -466,8 +466,8 @@ public interface Term extends Termlike, Comparable<Term> {
 
             case CONJ:
 
-                int dt = dt();
                 if (size() == 2) {
+                    int dt = dt();
 
                     switch (dt) {
                         case DTERNAL:
