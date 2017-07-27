@@ -6,6 +6,7 @@ import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.derive.PatternCompound;
+import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
@@ -13,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
@@ -94,6 +96,22 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     @Override
     public void append(@NotNull Appendable p) throws IOException {
         Compound.super.append(p);
+    }
+
+    @Override
+    public Term eval(TermContext index) {
+        return Compound.super.eval(index);
+    }
+
+    @Override
+    public Set<Term> varsUnique(@Nullable Op type) {
+        return Compound.super.varsUnique(type);
+    }
+
+    @Nullable
+    @Override
+    public Set<Term> varsUnique(@Nullable Op type, Set<Term> exceptIfHere) {
+        return Compound.super.varsUnique(type, exceptIfHere);
     }
 
     @NotNull

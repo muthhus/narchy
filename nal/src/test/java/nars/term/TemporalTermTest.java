@@ -863,8 +863,8 @@ public class TemporalTermTest {
         assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", xe.toString());
 
         //TODO this will require a refactor allowing arbitrary function mapping matched dt source value to a target dt
-        Term xz = $.terms.retemporalize(t, $.terms.retemporalizeZero);
-        assertEquals("((--,((--,(o))&|(happy)))&|(--,(happy)))", xz.toString());
+//        Term xz = $.terms.retemporalize(t, $.terms.retemporalizeZero);
+//        assertEquals("((--,((--,(o))&|(happy)))&|(--,(happy)))", xz.toString());
     }
 
     @Test

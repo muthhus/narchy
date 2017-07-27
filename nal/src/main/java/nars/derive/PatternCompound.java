@@ -41,7 +41,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                 //seed.structure() & ~(Op.VariableBits);
                 seed.structure() &
                         ~(Op.VAR_PATTERN.bit
-                                /* | Op.INH.bit | Op.PROD.bit*/ //? exclude: pattern var, inh and prod (for any functors)
+                            | Op.INH.bit | Op.PROD.bit //? exclude: pattern var, inh and prod (for any functors)
                 );
         commutative = super.isCommutative();
         op = op();

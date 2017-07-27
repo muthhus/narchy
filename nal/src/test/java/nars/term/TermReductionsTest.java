@@ -258,10 +258,10 @@ public class TermReductionsTest extends NarseseTest {
     @Test public void testEmbeddedConjNormalizationN2Neg() throws Narsese.NarseseException {
         Compound alreadyNormalized = $("((c &&+1 b) &&+1 a)");
         Compound needsNormalized = $("(a &&-1 (b &&-1 c))");
-        assertEquals(  needsNormalized, alreadyNormalized);
-        assertEquals(  needsNormalized.toString(), alreadyNormalized.toString() );
-        assertEquals(  needsNormalized.dt(), alreadyNormalized.dt() );
-        assertEquals(  needsNormalized.subterms(), alreadyNormalized.subterms() );
+        assertEquals(  alreadyNormalized, needsNormalized);
+        assertEquals(  alreadyNormalized.toString() , needsNormalized.toString());
+        assertEquals(  alreadyNormalized.dt(), needsNormalized.dt() );
+        assertEquals(  alreadyNormalized.subterms(), needsNormalized.subterms() );
     }
 
     @Test public void testEmbeddedConjNormalizationN3() throws Narsese.NarseseException {

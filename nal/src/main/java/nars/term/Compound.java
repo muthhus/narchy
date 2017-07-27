@@ -775,6 +775,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
             //it has been changed, so eval recursively until stable
             try {
+                assert(u!=this): "equality tested previously should have included identity check";
                 return u.eval(index);
             } catch (StackOverflowError e) {
                 logger.error("eval stack overflow: {} -> {}", this, u);

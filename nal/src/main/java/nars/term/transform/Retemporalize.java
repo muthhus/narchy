@@ -40,7 +40,7 @@ abstract public class Retemporalize implements CompoundTransform {
 
         @Override public int dt(@NotNull Term x) {
             int dt = x.dt();
-            return (dt==DTERNAL||dt==XTERNAL) ? dtIfXternal : dt;
+            return (dt==XTERNAL) ? dtIfXternal : dt;
         }
     }
 

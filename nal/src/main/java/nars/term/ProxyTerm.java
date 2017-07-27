@@ -204,7 +204,7 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public Set<Term> varsUnique(@NotNull Op type) {
+    public Set<Term> varsUnique(@Nullable Op type) {
         return ref.varsUnique(type);
     }
 

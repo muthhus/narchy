@@ -240,11 +240,18 @@ public enum Op implements $ {
                     if (Math.abs(subEventsLeft - subEventsRight) > 1)
                         imbalanced = true; //one side has 2 or more than the other
 
-                    if (dt > 0 && (imbalanced || (bConj && !concurrent(b.dt())))) {
+                    if (imbalanced) {
+                        if (dt < 0) {
+                            dt = -dt;
+                            Term x = a; a = b; b = x;
+                        }
                         return nullIfNull(conjMerge(a, 0, b, dt + a.dtRange()));
-                    } else if (dt < 0 && (imbalanced || (aConj && !concurrent(a.dt())))) {
-                        return nullIfNull(conjMerge(b, 0, a, -dt - b.dtRange()));
                     }
+//                    if (dt > 0 && (imbalanced /*|| (bConj && !concurrent(b.dt()))*/)) {
+//                        return nullIfNull(conjMerge(a, 0, b, dt + a.dtRange()));
+//                    } else if (dt < 0 && (imbalanced/* || (aConj && !concurrent(a.dt()))*/)) {
+//                        return nullIfNull(conjMerge(b, 0, a, -dt - b.dtRange()));
+//                    }
                 }
 
                 int order = a.compareTo(b);

@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.*;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 12/4/16.
@@ -102,7 +103,9 @@ public final class DynTruth implements Truthed {
             priority = new Pri(p);
         }
 
-        if (null == (c = nar.terms.retemporalize(c, nar.terms.retemporalizeZero)))
+        if (null == (c = nar.terms.retemporalize(c,
+                start == ETERNAL ? nar.terms.retemporalizeDTERNAL : nar.terms.retemporalizeZero
+        )))
             return null;
 
 
