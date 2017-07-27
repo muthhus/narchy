@@ -29,7 +29,6 @@ UIFiles
 
 jmh-result.text
 .gradle/
-*/build
 gradle/
 gradlew
 gradlew.bat
