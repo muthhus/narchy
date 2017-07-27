@@ -9,6 +9,7 @@ import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Bool;
+import nars.term.transform.Retemporalize;
 import nars.term.var.Variable;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -98,9 +99,21 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             }
         }
 
-        template = nar.terms.retemporalize(template,
-                target==null || target.isEternal() ?
-                nar.terms.retemporalizeDTERNAL : nar.terms.retemporalizeZero); //TODO move this somewhere else where it can use the NAR's index
+        Retemporalize tmp = target == null || target.isEternal() ?
+                nar.terms.retemporalizeDTERNAL : nar.terms.retemporalizeZero;
+        Term template2 = nar.terms.retemporalize(template, tmp);
+
+        if (template2 == null) {
+//            if (tmp == nar.terms.retemporalizeZero) {
+//                //try again with DTERNAL
+//                template2 = nar.terms.retemporalize(template, nar.terms.retemporalizeDTERNAL);
+//                if (template2 == null)
+//                    return null;
+//            }
+            return null;
+        }
+
+        template = template2;
 
         Task y = generate(template, when, nar);
 

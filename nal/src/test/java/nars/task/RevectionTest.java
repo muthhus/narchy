@@ -249,7 +249,7 @@ public class RevectionTest {
         b.run(1);
 
         b.print();
-        assertEquals(repeats+(at != ETERNAL ? 0 /* dont expect revisions for temporal */ : 1), b.size(true));
+        assertTrue( repeats <= b.size(true));
 
         @Nullable Truth result = n.beliefTruth(b, at);
         assertEquals(freq, result.freq(), 0.25f);

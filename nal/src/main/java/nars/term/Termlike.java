@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static nars.Op.*;
+
 /**
  * Features exhibited by, and which can classify terms
  * and termlike productions
@@ -34,10 +36,10 @@ public interface Termlike extends Termed {
     @Override
     int size();
 
-    /** (first-level only, non-recursive)
-     *  if contained within; doesnt match this term (if it's a term);
-     *  false if term is atomic since it can contain nothing
-     *
+    /**
+     * (first-level only, non-recursive)
+     * if contained within; doesnt match this term (if it's a term);
+     * false if term is atomic since it can contain nothing
      */
     boolean contains(Termlike t);
 
@@ -50,8 +52,10 @@ public interface Termlike extends Termed {
     }
 
 
-    /** whether any subterms (recursively) have
-     *  non-DTernal temporal relation */
+    /**
+     * whether any subterms (recursively) have
+     * non-DTernal temporal relation
+     */
     default boolean isTemporal() {
         return false;
     }
@@ -64,9 +68,10 @@ public interface Termlike extends Termed {
         return (structure() & structuralVector) != 0;
     }
 
-    /** tests if contains a term in the structural hash
-     *  WARNING currently this does not detect presence of pattern variables
-     * */
+    /**
+     * tests if contains a term in the structural hash
+     * WARNING currently this does not detect presence of pattern variables
+     */
     default boolean hasAny(@NotNull Op op) {
         return (op == Op.VAR_PATTERN) ? (varPattern() > 0) : hasAny(op.bit);
     }
@@ -75,20 +80,23 @@ public interface Termlike extends Termed {
         //if the OR produces a different result compared to subterms,
         // it means there is some component of the other term which is not found
         //return ((possibleSubtermStructure | existingStructure) != existingStructure);
-        return  (!hasAll(target.structure())) ||
+        return (!hasAll(target.structure())) ||
                 (impossibleSubTermVolume(target.volume()));
     }
 
-    /** if it's larger than this term it can not be equal to this.
+    /**
+     * if it's larger than this term it can not be equal to this.
      * if it's larger than some number less than that, it can't be a subterm.
      */
     default boolean impossibleSubTermOrEqualityVolume(int otherTermsVolume) {
         return otherTermsVolume > volume();
     }
 
-    /** tries to get the ith subterm (if this is a TermContainer),
-     *  or of is out of bounds or not a container,
-     *  returns the provided ifOutOfBounds */
+    /**
+     * tries to get the ith subterm (if this is a TermContainer),
+     * or of is out of bounds or not a container,
+     * returns the provided ifOutOfBounds
+     */
     @Nullable <T extends Term> T sub(int i, @Nullable T ifOutOfBounds);
 
     default boolean impossibleSubTermVolume(int otherTermVolume) {
@@ -126,22 +134,28 @@ public interface Termlike extends Termed {
                 (impossibleSubTermOrEqualityVolume(target.volume())));
     }
 
-    /** recurses all subterms (0th and 1st-layer only) while the result of the predicate is true;
-     *  returns true if all true
+    /**
+     * recurses all subterms (0th and 1st-layer only) while the result of the predicate is true;
+     * returns true if all true
      *
-     * @param v*/
+     * @param v
+     */
     boolean AND(Predicate<Term> v);
 
-    /** returns false if the supplied predicate fails for any of the recursive subterms of the specified type */
+    /**
+     * returns false if the supplied predicate fails for any of the recursive subterms of the specified type
+     */
     boolean ANDrecurse(@NotNull Predicate<Term> v);
 
     void recurseTerms(@NotNull Consumer<Term> v);
 
 
-    /** recurses all subterms until the result of the predicate becomes true;
-     *  returns true if any true
+    /**
+     * recurses all subterms until the result of the predicate becomes true;
+     * returns true if any true
      *
-     * @param v*/
+     * @param v
+     */
     boolean OR(Predicate<Term> v);
 
     boolean ORrecurse(@NotNull Predicate<Term> v);
@@ -152,7 +166,9 @@ public interface Termlike extends Termed {
 //        return 0;
 //    }
 
-    /** total # of variables, excluding pattern variables */
+    /**
+     * total # of variables, excluding pattern variables
+     */
     default int vars() {
         return varDep() + varIndep() + varQuery();
     }
@@ -162,68 +178,103 @@ public interface Termlike extends Termed {
 //    @Override int varQuery();
 //    @Override int varPattern();
 
-        /** # of contained independent variables in subterms (1st layer only) */
+    /**
+     * # of contained independent variables in subterms (1st layer only)
+     */
     @Override
-    default int varIndep() { return 0; }
-    /** # of contained dependent variables in subterms (1st layer only) */
-    @Override
-    default int varDep() { return 0; }
-    /** # of contained query variables in subterms (1st layer only) */
-    @Override
-    default int varQuery() { return 0; }
-    /** # of contained pattern variables in subterms (1st layer only) */
-    @Override
-    default int varPattern() { return 0; }
+    default int varIndep() {
+        return 0;
+    }
 
+    /**
+     * # of contained dependent variables in subterms (1st layer only)
+     */
+    @Override
+    default int varDep() {
+        return 0;
+    }
+
+    /**
+     * # of contained query variables in subterms (1st layer only)
+     */
+    @Override
+    default int varQuery() {
+        return 0;
+    }
+
+    /**
+     * # of contained pattern variables in subterms (1st layer only)
+     */
+    @Override
+    default int varPattern() {
+        return 0;
+    }
 
 
 //    default boolean unifyPossible(@Nullable Op t) {
 //        return (t == null) ? hasAny(Op.VariableBits) : hasAny(t);
 //    }
 
-    /** used to decide if a compound is "potentially" dynamic, or
-     *  whether it can safely be cached/memoized -- or if it must be evaluated.
-     *  if unsure, err on the side of caution and return true.
+    /**
+     * used to decide if a compound is "potentially" dynamic, or
+     * whether it can safely be cached/memoized -- or if it must be evaluated.
+     * if unsure, err on the side of caution and return true.
      */
     default boolean isDynamic() {
+        int c = complexity();
+        if (c >= 2 && hasAll(EvalBits)) {
+            return
+                ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
+                    ||
+                (c >= 3 && OR(Termlike::isDynamic))); /* possible function in subterms */
+        }
         return false;
     }
 
-    /** return whether a subterm op at an index is an operator.
+    /**
+     * return whether a subterm op at an index is an operator.
      * if there is no subterm or the index is out of bounds, returns false.
      */
     default boolean subIs(int i, Op o) {
         Term x = sub(i, null);
         return x != null && x.op() == o;
     }
+
     default boolean subIs(int i, Term maybeEquals) {
         Term x = sub(i, null);
         return x != null && x.equals(maybeEquals);
     }
 
-    /** compares this term's op with 'thisOp', then performs subIs(i, sub) */
+    /**
+     * compares this term's op with 'thisOp', then performs subIs(i, sub)
+     */
     default boolean subIs(Op thisOp, int i, Term sub) {
-        if (op()!=thisOp)
+        if (op() != thisOp)
             return false;
 
         return subIs(i, sub);
     }
 
-    /** if type is null, returns total # of variables */
+    /**
+     * if type is null, returns total # of variables
+     */
     default int vars(@Nullable Op type) {
         if (type == null)
             return vars() + varPattern();
 
         switch (type) {
-            case VAR_PATTERN: return varPattern();
-            case VAR_QUERY: return varQuery();
-            case VAR_DEP: return varDep();
-            case VAR_INDEP: return varIndep();
+            case VAR_PATTERN:
+                return varPattern();
+            case VAR_QUERY:
+                return varQuery();
+            case VAR_DEP:
+                return varDep();
+            case VAR_INDEP:
+                return varIndep();
         }
 
         throw new UnsupportedOperationException();
     }
-
 
 
 }

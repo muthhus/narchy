@@ -783,8 +783,8 @@ public class Temporalize {
             Set<Term> uncovered = Sets.mutable.of(a, b);
             for (Term c : constraints.keySet()) {
                 boolean relevance = false;
-                if (c.equals(target))
-                    continue;
+//                if (c.equals(target))
+//                    continue;
 
                 if (trail.containsKey(c))
                     continue;
@@ -797,11 +797,11 @@ public class Temporalize {
                     trail.remove(c);
 
                 if (ce != null) {
-                    if (c.contains(a)) {
+                    if (c.containsRecursively(a)) {
                         uncovered.remove(a);
                         relevance = true;
                     }
-                    if (c.contains(b)) {
+                    if (c.containsRecursively(b)) {
                         uncovered.remove(b);
                         relevance = true;
                     }

@@ -8,7 +8,6 @@ import nars.$;
 import nars.Op;
 import nars.index.term.TermIndex;
 import nars.term.atom.Atom;
-import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.transform.Retemporalize;
@@ -36,7 +35,8 @@ import static nars.time.Tense.DTERNAL;
  *
  * @author me
  */
-public enum Terms { ;
+public enum Terms {
+    ;
 
     /**
      * TODO decide on some reasonable coding scheme for bundling these numeric values
@@ -240,7 +240,6 @@ public enum Terms { ;
 //    }
 
 
-
     @NotNull
     public static Term[] reverse(@NotNull Term[] arg) {
         int l = arg.length;
@@ -252,7 +251,9 @@ public enum Terms { ;
     }
 
 
-    /** warning may rearrange items in the input */
+    /**
+     * warning may rearrange items in the input
+     */
     public static Term[] sorted(@NotNull Term... arg) {
         int len = arg.length;
         switch (len) {
@@ -278,7 +279,7 @@ public enum Terms { ;
                 SortedList<Term> x = new SortedList<>(arg, new Term[arg.length]);
                 return x.toArrayRecycled(Term[]::new);
 
-                //return sortUniquely(arg); //<- may also work but seems slower
+            //return sortUniquely(arg); //<- may also work but seems slower
 
         }
     }
@@ -299,10 +300,10 @@ public enum Terms { ;
         out.print(Integer.toBinaryString(x.structure()) + ')');
         out.println();
 
-        if (!(x instanceof Atomic)) {
-            for (Term z : ((Compound) x))
-                printRecursive(out, z, level + 1);
-        }
+
+        for (Term z : x.subterms())
+            printRecursive(out, z, level + 1);
+
     }
 
     /**
@@ -320,14 +321,13 @@ public enum Terms { ;
 
         line.append(x);
 
-        if (!(x instanceof Atomic)) {
-            for (Term z : ((Compound) x))
-                printRecursive(z, level + 1, c);
-        }
+
+        for (Term z : x.subterms())
+            printRecursive(z, level + 1, c);
+
 
         c.accept(line.toString());
     }
-
 
 
     public static int maxLevel(@NotNull Term term) {
@@ -388,15 +388,18 @@ public enum Terms { ;
      * dangerous because some operations involving concepts can naturally reduce to atoms, and using this interprets them as non-existent
      */
     @Nullable
-    @Deprecated public static Compound compoundOrNull(@Nullable Term t) {
+    @Deprecated
+    public static Compound compoundOrNull(@Nullable Term t) {
         if (t instanceof Compound) return (Compound) t;
         else
             return null;
     }
+
     @Nullable
     public static <T extends Term> T normalizedOrNull(@Nullable Term t, @NotNull TermIndex i) {
-        return (T)normalizedOrNull(t, i, i.retemporalizeDTERNAL);
+        return (T) normalizedOrNull(t, i, i.retemporalizeDTERNAL);
     }
+
     @Nullable
     public static Term normalizedOrNull(@Nullable Term t, @NotNull TermIndex i, Retemporalize r) {
 
@@ -404,11 +407,10 @@ public enum Terms { ;
             //the compound indicated a potential dt, but the premise was actually atemporal;
             // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
             return i.retemporalize(t, r); //retemporalize does normalize at the end
-        } else  {
+        } else {
             return t.normalize();
         }
     }
-
 
 
     /**
@@ -514,19 +516,22 @@ public enum Terms { ;
             //oi.sort((a, b) -> Integer.compare(a.volume(), b.volume())); //sorted by volume
 
             oi.removeIf(b ->
-                oi.anySatisfy(
-                    a ->
-                        (a != b) &&
-                        a.containsRecursively(b)
-                )
+                    oi.anySatisfy(
+                            a ->
+                                    (a != b) &&
+                                            a.containsRecursively(b)
+                    )
             );
         }
 
         return oi;
     }
 
-    /** returns a list but its contents will be unique */
-    @Nullable static FasterList<Term> getUniqueRepeats(@NotNull Term c, @NotNull ToIntFunction<Term> score, int minCount) {
+    /**
+     * returns a list but its contents will be unique
+     */
+    @Nullable
+    static FasterList<Term> getUniqueRepeats(@NotNull Term c, @NotNull ToIntFunction<Term> score, int minCount) {
         HashBag<Term> uniques = Terms.subtermScore(c, score);
         int us = uniques.size();
         if (us == 0)
@@ -548,7 +553,7 @@ public enum Terms { ;
      */
     @NotNull
     public static HashBag<Term> subtermScore(@NotNull Term c, @NotNull ToIntFunction<Term> score) {
-        HashBag<Term> uniques = new HashBag<>(c.volume()/2);
+        HashBag<Term> uniques = new HashBag<>(c.volume() / 2);
 
         c.recurseTerms((Term subterm) -> {
             int s = score.applyAsInt(subterm);
@@ -558,8 +563,6 @@ public enum Terms { ;
 
         return uniques;
     }
-
-
 
 
     /**
@@ -670,7 +673,7 @@ public enum Terms { ;
             return (Term) a;
 
         Term[] c = TermContainer.intersect(a, b);
-        return (c == null || c.length == 0) ? Null : (Compound)(o.the(c));
+        return (c == null || c.length == 0) ? Null : (Compound) (o.the(c));
     }
 
     @NotNull

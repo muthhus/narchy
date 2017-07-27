@@ -19,6 +19,8 @@ import static nars.Op.*;
 public abstract class Param  {
 
 
+    /** must be big enough to support as many layers of compound terms as exist in an eval */
+    public static final int MAX_EVAL_RECURSION = 16;
 
     /**
      * use this for advanced error checking, at the expense of lower performance.

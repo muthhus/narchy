@@ -77,6 +77,11 @@ abstract public class Bool extends AtomicToString {
     }
 
     @Override
+    public @NotNull Term evalSafe(TermContext index, int remain) {
+        return this;
+    }
+
+    @Override
     public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
         throw never("unify");
     }

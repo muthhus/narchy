@@ -110,17 +110,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return size() <= i ? false : sub(i).equals(x);
     }
 
-    @Override
-    default boolean isDynamic() {
-        if (!hasAll(EvalBits))
-            return false;
-
-        int c = complexity();
-        return
-                (c >= 2) && ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
-                        ||
-                        (c >= 3 && OR(Termlike::isDynamic))); /* possible function in subterms */
-    }
 
 //    @Override
 //    default int subCount(Op o) {

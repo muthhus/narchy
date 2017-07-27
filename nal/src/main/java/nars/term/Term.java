@@ -25,6 +25,7 @@ import com.google.common.io.ByteArrayDataOutput;
 import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.Param;
 import nars.index.term.StaticTermIndex;
 import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
@@ -679,8 +680,12 @@ public interface Term extends Termlike, Comparable<Term> {
         return this;
     }
 
-    @NotNull
     default Term eval(TermContext index) {
+        return evalSafe(index, Param.MAX_EVAL_RECURSION);
+    }
+
+    @NotNull
+    default Term evalSafe(TermContext index, int remain) {
         if (!(index instanceof StaticTermIndex)) {
             Termed t = index.get(this, false); //resolve
             if (t != null)
@@ -785,5 +790,7 @@ public interface Term extends Termlike, Comparable<Term> {
     default Term normalize() {
         return this; //no change
     }
+
+
 }
 

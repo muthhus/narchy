@@ -40,8 +40,8 @@ public final class AliasConcept extends BaseConcept {
         }
 
         @Override
-        public Term eval(TermContext index) {
-            return target.eval(index);
+        public Term evalSafe(TermContext index, int remain) {
+            return target.evalSafe(index, remain);
         }
 
 

@@ -106,7 +106,7 @@ public class UnnormalizedVariable extends AtomicToString implements Variable {
     }
 
     @Override
-    public Term eval(TermContext index) {
+    public Term evalSafe(TermContext index, int remain) {
         throw new UnsupportedOperationException();
     }
 

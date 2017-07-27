@@ -295,7 +295,7 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
 
     @Override
     public boolean isDynamic() {
-        return false; //concepts themselves are always non-dynamic
+        throw new UnsupportedOperationException("concepts should not be tested for evaluability");
     }
 
 

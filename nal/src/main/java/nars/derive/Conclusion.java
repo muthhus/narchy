@@ -91,6 +91,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         nar.emotion.derivationEval.increment();
 
 
+        //TODO cache eval terms
         Term c1 = b1.eval(d);
         if (c1 instanceof Variable || c1 instanceof Bool) return true;
 

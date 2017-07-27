@@ -188,8 +188,8 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public Term eval(TermContext index) {
-        return ref.eval(index);
+    public Term evalSafe(TermContext index, int remain) {
+        return ref.evalSafe(index, remain);
     }
 
     @Override
@@ -309,20 +309,7 @@ public class ProxyTerm<T extends Term> implements Term {
 //        return ref.unifyPossible(t);
 //    }
 
-    @Override
-    public boolean isDynamic() {
-        return ref.isDynamic();
-    }
 
-    @Override
-    public boolean subIs(int i, Op o) {
-        return ref.subIs(i, o);
-    }
-
-    @Override
-    public boolean subIs(int i, Term maybeEquals) {
-        return ref.subIs(i, maybeEquals);
-    }
 
     @Override
     public boolean subIs(Op thisOp, int i, Term sub) {

@@ -21,6 +21,7 @@ import nars.util.BudgetFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -180,7 +181,22 @@ public class Premise extends Pri implements ITask {
                 }
             } else {
                 long when = whenMatch(task, now);
-                match = beliefConcept.beliefs().match(when, task, beliefTerm, true, nar);
+
+                boolean tryMatch = true;
+                if (beliefIsTask && task.punc()==BELIEF && task.during(when)) {
+                    if (Math.abs(when-now) >= dur) {
+                        //try projecting to now (maybe also a future time) because it will be a different time
+                        when = now;
+                    } else {
+                        //leave belief blank. it already matches itself
+                        tryMatch = false;
+                    }
+                }
+                if (tryMatch) {
+                    match = beliefConcept.beliefs().match(when, task, beliefTerm, true, nar);
+                } else {
+                    match = null;
+                }
             }
 
             if (match != null && match.isBelief()) {
