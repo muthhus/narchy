@@ -75,14 +75,14 @@ public class EDCGLibrary extends Library {
     // Java guards for Prolog predicates
 
     public boolean phrase_guard_2(Term arg0, Term arg1) throws PrologError {
-        arg0 = arg0.getTerm();
+        arg0 = arg0.term();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         return true;
     }
 
     public boolean phrase_guard_3(Term arg0, Term arg1, Term arg2) throws PrologError {
-        arg0 = arg0.getTerm();
+        arg0 = arg0.term();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         return true;

@@ -105,7 +105,7 @@ public abstract class Number extends Term implements Comparable<Number> {
      * Gets the actual term referred by this Term.
      */
     @Override
-    public Term getTerm() {
+    public Term term() {
         return this;
     }
     

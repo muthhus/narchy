@@ -43,9 +43,9 @@ public class Parser {
         PredicateExpr predicate = new PredicateExpr(parseTermList());        
         if (!lexer.accept(TK_RET)) {            
             throw new MalformedExpressionException();
-        }        
-        boolean multipleResult = false;
+        }
         lexer.next();
+        boolean multipleResult = false;
         if (lexer.lastToken() == TK_BRA_OPEN) {
             multipleResult = true;
         }
@@ -58,9 +58,9 @@ public class Parser {
         return new SignatureExpr(predicate, new PredicateExpr(parseTermList()),multipleResult);                                
     }
     
-    public List<VariableExpr> parseTermList() {        
-        Vector<VariableExpr> variables = new Vector<>();
+    public List<VariableExpr> parseTermList() {
         lexer.next();
+        Vector<VariableExpr> variables = new Vector<>();
         while (lexer.lastToken() != TK_PAR_CLOSE && lexer.lastToken() != TK_BRA_CLOSE) {
             variables.add(parseVariable());            
             lexer.next();

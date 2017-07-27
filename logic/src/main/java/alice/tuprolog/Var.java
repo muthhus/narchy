@@ -134,11 +134,10 @@ public class Var extends Term {
      */
     @Override
     Term copy(AbstractMap<Var, Var> vMap, int idExecCtx) {
-        Term tt = getTerm();
+        Term tt = term();
         if (tt == this) {
-            Var v = vMap.computeIfAbsent(this, k -> new Var(name, idExecCtx, 0, timestamp));
             //No occurence of v before
-            return v;
+            return vMap.computeIfAbsent(this, k -> new Var(name, idExecCtx, 0, timestamp));
         } else {
             return tt.copy(vMap, idExecCtx);
         }
@@ -158,7 +157,7 @@ public class Var extends Term {
         } else {
             v = (Var) temp;
         }
-        Term t = getTerm();
+        Term t = term();
         if (t instanceof Var) {
             Object tt = substMap.get(t);
             if (tt == null) {
@@ -216,7 +215,7 @@ public class Var extends Term {
      * for bound variable it is the bound term.
      */
     @Override
-    public Term getTerm() {
+    public Term term() {
         Term tt = this;
         Term t = link;
         while (t != null) {
@@ -271,37 +270,37 @@ public class Var extends Term {
 
     @Override
     public boolean isEmptyList() {
-        Term t = getTerm();
+        Term t = term();
         return t != this && t.isEmptyList();
     }
 
     @Override
     public boolean isAtomic() {
-        Term t = getTerm();
+        Term t = term();
         return t != this && t.isAtomic();
     }
 
     @Override
     public boolean isCompound() {
-        Term t = getTerm();
+        Term t = term();
         return t != this && t.isCompound();
     }
 
     @Override
     public boolean isAtom() {
-        Term t = getTerm();
+        Term t = term();
         return t != this && t.isAtom();
     }
 
     @Override
     public boolean isList() {
-        Term t = getTerm();
+        Term t = term();
         return t != this && t.isList();
     }
 
     @Override
     public boolean isGround() {
-        Term t = getTerm();
+        Term t = term();
         return t != this && t.isGround();
     }
 
@@ -357,7 +356,7 @@ public class Var extends Term {
      */
     @Override
     long resolveTerm(long count) {
-        Term tt = getTerm();
+        Term tt = term();
         if (tt != this) {
             return tt.resolveTerm(count);
         } else {
@@ -397,9 +396,9 @@ public class Var extends Term {
      */
     @Override
     boolean unify(List<Var> vl1, List<Var> vl2, Term t) {
-        Term tt = getTerm();
+        Term tt = term();
         if (tt == this) {
-            t = t.getTerm();
+            t = t.term();
             if (t instanceof Var) {
                 if (this == t) {
                     //try{
@@ -448,9 +447,9 @@ public class Var extends Term {
 	  */
     @Override
     public boolean isGreater(Term t) {
-        Term tt = getTerm();
+        Term tt = term();
         if (tt == this) {
-            t = t.getTerm();
+            t = t.term();
             return t instanceof Var && timestamp > ((Var) t).timestamp;
         } else {
             return tt.isGreater(t);
@@ -459,9 +458,9 @@ public class Var extends Term {
 
     @Override
     public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
-        Term tt = getTerm();
+        Term tt = term();
         if (tt == this) {
-            t = t.getTerm();
+            t = t.term();
             if (!(t instanceof Var)) return false;
             //System.out.println("Compare di tt "+tt+" con t "+t);
             //System.out.println("vorder "+vorder);
@@ -475,9 +474,9 @@ public class Var extends Term {
 
     @Override
     public boolean isEqual(Term t) {
-        Term tt = getTerm();
+        Term tt = term();
         if (tt == this) {
-            t = t.getTerm();
+            t = t.term();
             return (t instanceof Var && timestamp == ((Var) t).timestamp);
         } else {
             return tt.isEqual(t);
@@ -495,9 +494,9 @@ public class Var extends Term {
      */
     @Override
     public String toString() {
-        Term tt = getTerm();
+        Term tt = term();
         if (name != null) {
-            return tt == this ? completeName.toString() : completeName + " / " + tt.toString();
+            return tt == this ? completeName.toString() : completeName + " / " + tt;
         } else {
             return tt == this ? ANY + hashCode() : tt.toString();
         }
@@ -510,7 +509,7 @@ public class Var extends Term {
      * bound variable
      */
     public String toStringFlattened() {
-        Term tt = getTerm();
+        Term tt = term();
         if (name != null) {
             return tt == this ? completeName.toString() : tt.toString();
         } else {

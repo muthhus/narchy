@@ -25,25 +25,23 @@ public class JavaDynamicClassLoader extends AbstractDynamicClassLoader
 	
 	@Override
 	public Class<?> findClass(String className) throws ClassNotFoundException
-	{  
-	    Class<?> result = null;  
-	    String classNameReplaced = className.replace(".", File.separator);
-	    
-	    result = classCache.get(className);
-	    if (result != null)  
+	{
+
+		Class<?> result = classCache.get(className);
+		if (result != null)
 	        return result;  
 	    try {
 			return findSystemClass(className);
 		} catch (ClassNotFoundException e) {
 			
-		} 
-	    for (URL aURL : listURLs) {
+		}
+		String classNameReplaced = className.replace(".", File.separator);
+		for (URL aURL : listURLs) {
 	    	try {
 	    		InputStream is = null;
-	    		byte[] classByte = null;
-	    		
-	    		
-	    		if(aURL.toString().endsWith(".jar"))
+
+
+				if(aURL.toString().endsWith(".jar"))
 	    		{
 	    			aURL = new URL("jar", "", aURL + "!/" + classNameReplaced + ".class");
 	    			is = aURL.openConnection().getInputStream();
@@ -51,12 +49,12 @@ public class JavaDynamicClassLoader extends AbstractDynamicClassLoader
 	    		
 	    		if(aURL.toString().indexOf('/', aURL.toString().length() - 1) != -1)
 	    		{
-	    			aURL = new URL(aURL.toString() + classNameReplaced + ".class");
+	    			aURL = new URL(aURL + classNameReplaced + ".class");
 	    			is = aURL.openConnection().getInputStream();
 	    		}
-	    		
-	    		classByte = getClassData(is);
-	            try {
+
+				byte[] classByte = getClassData(is);
+				try {
 	            	result = defineClass(className, classByte, 0, classByte.length, null);  
 	        		classCache.put(className, result);
 	        		

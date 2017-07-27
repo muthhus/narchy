@@ -112,9 +112,6 @@ public class LibraryManager
 	public synchronized Library loadClass(String className, String... paths) throws InvalidLibraryException
 	{
 		Library lib = null;
-		URL[] urls = null;
-		ClassLoader loader = null;
-		String dexPath;
 
 		try
 		{
@@ -123,14 +120,15 @@ public class LibraryManager
 			 * 
 			 * Dalvik Virtual Machine
 			 */
+			ClassLoader loader = null;
 			if (System.getProperty("java.vm.name").equals("Dalvik"))
 			{
 				/*
 				 * Only the first path is used. Dex file doesn't contain .class files 
 				 * and therefore getResource() method can't be used to locate the files at runtime.
 				 */
-				
-				dexPath = paths[0];
+
+				String dexPath = paths[0];
 
 				/**
 				 * Description of DexClassLoader
@@ -157,7 +155,7 @@ public class LibraryManager
 				lib = (Library) Class.forName(className, true, loader).newInstance();
 			} else
 			{
-				urls = new URL[paths.length];
+				URL[] urls = new URL[paths.length];
 
 				for (int i = 0; i < paths.length; i++)
 				{

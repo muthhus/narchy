@@ -46,27 +46,15 @@ public class IPIdentifier {
         int index_port=name.indexOf(':');
         int index_at=name.indexOf('@');
         if (index_port!=-1){
-            if (index_at!=-1){
-                return name.substring(0,index_at);
-            } else {
-                return "";
-            }
+            return index_at != -1 ? name.substring(0, index_at) : "";
         } else {
-            if (index_at!=-1){
-                return name.substring(0,index_at);
-            } else {
-                return name;
-            }
+            return index_at != -1 ? name.substring(0, index_at) : name;
         }
     }
 
     static public String getAddress(String name){
         int index_at=name.indexOf('@');
-        if (index_at==-1){
-            return "";
-        } else {
-            return name.substring(index_at+1,name.length());
-        }
+        return index_at == -1 ? "" : name.substring(index_at + 1, name.length());
     }
 
     /*

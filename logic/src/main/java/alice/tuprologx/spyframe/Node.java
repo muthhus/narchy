@@ -17,7 +17,7 @@ public class Node{
   /** The displayed text of the node.*/
   public String text;
   public Color textcolor;
-  public Color bgcolor;
+  public final Color bgcolor;
   public Color bordercolor;
 
   /**Creates a node with the specified text. Default colors are

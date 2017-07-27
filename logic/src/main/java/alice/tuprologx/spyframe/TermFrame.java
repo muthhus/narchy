@@ -35,7 +35,7 @@ public class TermFrame extends JFrame implements ActionListener{
             node.textcolor = node.bordercolor = Color.BLUE;
             if (var.isBound()) {
                 node.kids = new Node[1];
-                node.kids[0] = makeTreeFrom(var.getTerm());
+                node.kids[0] = makeTreeFrom(var.term());
             }
         } else if (term instanceof alice.tuprolog.Number) {
             node.textcolor = node.bordercolor = Color.MAGENTA;
@@ -51,8 +51,8 @@ public class TermFrame extends JFrame implements ActionListener{
     }
 };
 
-  JTextField input;
-  Tree<Term> ptt;
+  final JTextField input;
+  final Tree<Term> ptt;
 
   /** Constructs a new TermFrame.
    *  @param term the prolog term to be displayed.

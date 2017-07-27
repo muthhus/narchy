@@ -90,7 +90,7 @@ public abstract class Term<X extends Term<?>> {
 		}
         else if (JavaTerm.matches(t)) {
 			//return (Z)JavaTerm.unmarshalObject((alice.tuprolog.Struct)t.getTerm());
-			return uncheckedCast(JavaTerm.unmarshalObject((alice.tuprolog.Struct)t.getTerm()));
+			return uncheckedCast(JavaTerm.unmarshalObject((alice.tuprolog.Struct)t.term()));
 		}                
         else if (Cons.matches(t)) {
 			//return (Z)Cons.unmarshal((alice.tuprolog.Struct)t);

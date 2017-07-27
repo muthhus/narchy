@@ -14,7 +14,7 @@ package alice.tuprologx.pj.model;
  * @author maurizio
  */
 public class Double extends Term<Double> {
-	java.lang.Double _theDouble;
+	final java.lang.Double _theDouble;
 
 	@Override
     public <Z> Z/*java.lang.Double*/ toJava() {

@@ -123,14 +123,14 @@ public class IOLibrary extends Library {
     /************************************************************/
     
     public boolean see_1(Term arg) throws PrologError {
-        arg = arg.getTerm();
+        arg = arg.term();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (!arg.isAtom()) {
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom",
                     arg);
         }
-        Struct arg0 = (Struct) arg.getTerm();
+        Struct arg0 = (Struct) arg.term();
         if (inputStream != stdIn) /* If the current inputStream is the StandardInput it will not be closed */
             try {
                 inputStream.close();
@@ -171,14 +171,14 @@ public class IOLibrary extends Library {
     }
 
     public boolean tell_1(Term arg) throws PrologError {
-        arg = arg.getTerm();
+        arg = arg.term();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (!arg.isAtom()) {
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom",
                     arg);
         }
-        Struct arg0 = (Struct) arg.getTerm();
+        Struct arg0 = (Struct) arg.term();
         if (outputStream != stdOut) /* If the current outputStream is the StandardOutput it will not be closed */
             try {
                 outputStream.close();
@@ -218,14 +218,14 @@ public class IOLibrary extends Library {
     }
 
     public boolean put_1(Term arg) throws PrologError {
-        arg = arg.getTerm();
+        arg = arg.term();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (!arg.isAtom()) {
             throw PrologError.type_error(engine.getEngineManager(), 1,
                     "character", arg);
         } else {
-            Struct arg0 = (Struct) arg.getTerm();
+            Struct arg0 = (Struct) arg.term();
             String ch = arg0.name();
             if (ch.length() > 1) {
                 throw PrologError.type_error(engine.getEngineManager(), 1,
@@ -275,14 +275,14 @@ public class IOLibrary extends Library {
     }
 
     public boolean tab_1(Term arg) throws PrologError {
-        arg = arg.getTerm();
+        arg = arg.term();
         if (arg instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (!(arg instanceof Int))
             throw PrologError.type_error(engine.getEngineManager(), 1,
                     "integer", arg);
         // int n = ((Int)arg).intValue(); // OLD BUGGED  VERSION (signaled by MViroli) 
-        int n = ((Int)arg.getTerm()).intValue(); // NEW CORRECT VERSION (by MViroli, EDenti)
+        int n = ((Int)arg.term()).intValue(); // NEW CORRECT VERSION (by MViroli, EDenti)
         if (outputStreamName.equals(STDOUT_NAME)) { /* Changed from STDOUT_NAME to STDOUT_NAME */
             for (int i = 0; i < n; i++) {
                 getEngine().stdOutput(" ");
@@ -303,7 +303,7 @@ public class IOLibrary extends Library {
     }
 
     public boolean read_1(Term arg0) throws PrologError {
-        arg0 = arg0.getTerm();
+        arg0 = arg0.term();
         int ch = 0;
 
         boolean open_apices = false;
@@ -324,7 +324,6 @@ public class IOLibrary extends Library {
             if (ch == -1) {
                 break;
             }
-            boolean can_add = true;
 
             if (ch == '\'') {
                 open_apices = !open_apices;
@@ -338,6 +337,7 @@ public class IOLibrary extends Library {
                 }
             }
 
+            boolean can_add = true;
             if (can_add) {
                 st += Character.toString(((char) ch));
             }
@@ -354,7 +354,7 @@ public class IOLibrary extends Library {
     }
 
     public boolean write_1(Term arg0) throws PrologError {
-        arg0 = arg0.getTerm();
+        arg0 = arg0.term();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (outputStreamName.equals(STDOUT_NAME)) { /* Changed from "stdout" to STDOUT_NAME */
@@ -372,7 +372,7 @@ public class IOLibrary extends Library {
     }
 
     public boolean print_1(Term arg0) throws PrologError {
-        arg0 = arg0.getTerm();
+        arg0 = arg0.term();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine, 1);
         if (outputStreamName.equals(STDOUT_NAME)) { /* Changed from "stdout" to STDOUT_NAME */
@@ -417,18 +417,18 @@ public class IOLibrary extends Library {
      */
     public boolean text_from_file_2(Term file_name, Term text)
             throws PrologError {
-        file_name = file_name.getTerm();
+        file_name = file_name.term();
         if (file_name instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (!file_name.isAtom())
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom",
                     file_name);
-        Struct fileName = (Struct) file_name.getTerm();
-        Struct goal = null;
+        Struct fileName = (Struct) file_name.term();
         String path = alice.util.Tools.removeApices(fileName.toString());
         if(! new File(path).isAbsolute()) {
             path = engine.getCurrentDirectory()  + File.separator + path;
         }
+        Struct goal = null;
         try {
             goal = new Struct(alice.util.Tools.loadText(path));
         } catch (IOException e) {
@@ -447,7 +447,7 @@ public class IOLibrary extends Library {
      * @return true if seed Term has a valid long value, false otherwise
      */
     public boolean set_seed_1(Term t) throws PrologError {
-        t = t.getTerm();
+        t = t.term();
         if( !(t instanceof Number) ) {
             throw PrologError.type_error(engine.getEngineManager(), 1, "Integer Number", t);
         }
@@ -464,7 +464,7 @@ public class IOLibrary extends Library {
     }
 
     public boolean rand_int_2(Term argNum, Term num) {
-        alice.tuprolog.Number arg = (alice.tuprolog.Number) argNum.getTerm();
+        alice.tuprolog.Number arg = (alice.tuprolog.Number) argNum.term();
         return unify(num, new Int(gen.nextInt(arg.intValue())));
     }
 
@@ -480,8 +480,8 @@ public class IOLibrary extends Library {
 
     public boolean solve_file_goal_guard_2(Term arg0, Term arg1)
             throws PrologError {
-        arg0 = arg0.getTerm();
-        arg1 = arg1.getTerm();
+        arg0 = arg0.term();
+        arg1 = arg1.term();
         if (arg1 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 2);
         if (!arg1.isAtom() && !arg1.isCompound()) {
@@ -522,7 +522,7 @@ public class IOLibrary extends Library {
     
 
     public boolean write_base_1(Term arg0) throws PrologError {
-        arg0 = arg0.getTerm();
+        arg0 = arg0.term();
         
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);

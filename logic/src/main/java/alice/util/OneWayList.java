@@ -98,8 +98,7 @@ public final class OneWayList<E> {
     
     private String toString(String elems){
         String elem;
-        if(head==null) elem = "null";
-            else elem = head.toString();
+        elem = head == null ? "null" : head.toString();
         if(tail==null) return elems+ ',' +elem;
         return elems+ ',' +tail.toString(elem);
     }

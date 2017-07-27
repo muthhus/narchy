@@ -132,10 +132,10 @@ public class TextUtilities
      */
     public static int findWordStart(String line, int pos, String noWordSep)
     {
-        char ch = line.charAt(pos - 1);
 
         if(noWordSep == null)
             noWordSep = "";
+        char ch = line.charAt(pos - 1);
         boolean selectNoLetter = (!Character.isLetterOrDigit(ch)
             && noWordSep.indexOf(ch) == -1);
 
@@ -161,10 +161,10 @@ public class TextUtilities
      */
     public static int findWordEnd(String line, int pos, String noWordSep)
     {
-        char ch = line.charAt(pos);
 
         if(noWordSep == null)
             noWordSep = "";
+        char ch = line.charAt(pos);
         boolean selectNoLetter = (!Character.isLetterOrDigit(ch)
             && noWordSep.indexOf(ch) == -1);
 

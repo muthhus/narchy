@@ -27,7 +27,7 @@ public class Server_Socket extends AbstractSocket{
 	
 	@Override
 	boolean unify(List<Var> varsUnifiedArg1, List<Var> varsUnifiedArg2, Term t) {
-		t = t.getTerm();
+		t = t.term();
         if (t instanceof Var) {
             return t.unify(varsUnifiedArg1, varsUnifiedArg2, this);
         } else if (t instanceof AbstractSocket && ((AbstractSocket) t).isServerSocket()) {

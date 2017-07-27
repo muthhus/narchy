@@ -331,10 +331,7 @@ public class TextAreaPainter extends JComponent implements TabExpander
     @Override
     public String getToolTipText(MouseEvent evt)
     {
-        if(highlights != null)
-            return highlights.getToolTipText(evt);
-        else
-            return null;
+        return highlights != null ? highlights.getToolTipText(evt) : null;
     }
 
     /**
@@ -481,10 +478,10 @@ public class TextAreaPainter extends JComponent implements TabExpander
     // package-private members
     int currentLineIndex;
     Token currentLineTokens;
-    Segment currentLine;
+    final Segment currentLine;
 
     // protected members
-    protected JEditTextArea textArea;
+    protected final JEditTextArea textArea;
 
     protected SyntaxStyle[] styles;
     protected Color caretColor;
@@ -498,8 +495,8 @@ public class TextAreaPainter extends JComponent implements TabExpander
     protected boolean bracketHighlight;
     protected boolean paintInvalid;
     protected boolean eolMarkers;
-    protected int cols;
-    protected int rows;
+    protected final int cols;
+    protected final int rows;
 
     protected int tabSize;
     protected FontMetrics fm;
@@ -509,12 +506,12 @@ public class TextAreaPainter extends JComponent implements TabExpander
     protected void paintLine(Graphics gfx, TokenMarker tokenMarker,
         int line, int x)
     {
-        Font defaultFont = getFont();
-        Color defaultColor = getForeground();
 
         currentLineIndex = line;
         int y = textArea.lineToY(line);
 
+        Color defaultColor = getForeground();
+        Font defaultFont = getFont();
         if(line < 0 || line >= textArea.getLineCount())
         {
             if(paintInvalid)

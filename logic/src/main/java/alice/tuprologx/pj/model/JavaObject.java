@@ -17,7 +17,7 @@ import alice.tuprologx.pj.engine.PJ;
  */
 public class JavaObject<O> extends Term<JavaObject<O>> {
     
-    O _theObject;
+    final O _theObject;
     
     /** Creates a new instance of JavaObject */
     public JavaObject(O o) {

@@ -17,8 +17,9 @@
  */
 package alice.tuprolog;
 
+import jcog.list.FasterList;
+
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,18 +115,8 @@ public abstract class Library implements Serializable, IPrimitives {
     protected boolean unify(Term a0,Term a1) {
         return engine.unify(a0,a1);
     }
-    
-    /**
-     * tries to unify two terms
-     *
-     * The runtime (demonstration) context currently used by the engine
-     * is deployed and altered.
-     */
-    protected boolean match(Term a0,Term a1) {
-        return Prolog.match(a0,a1);
-    }
-    
-    
+
+
     /**
      * Evaluates an expression. Returns null value if the argument
      * is not an evaluable expression
@@ -137,7 +128,7 @@ public abstract class Library implements Serializable, IPrimitives {
     protected Term evalExpression(Term term) throws Throwable {
         if (term == null)
             return null;
-        Term val = term.getTerm();
+        Term val = term.term();
         if (val instanceof Struct) {
             final Struct t = (Struct) val;
             boolean primitive = t.isPrimitive();
@@ -184,9 +175,9 @@ public abstract class Library implements Serializable, IPrimitives {
         try {
             java.lang.reflect.Method[] mlist = this.getClass().getMethods();
             Map<Integer,List<PrimitiveInfo>> mapPrimitives = new HashMap<>();
-            mapPrimitives.put(PrimitiveInfo.DIRECTIVE, new ArrayList<>());
-            mapPrimitives.put(PrimitiveInfo.FUNCTOR, new ArrayList<>());
-            mapPrimitives.put(PrimitiveInfo.PREDICATE, new ArrayList<>());
+            mapPrimitives.put(PrimitiveInfo.DIRECTIVE, new FasterList<>());
+            mapPrimitives.put(PrimitiveInfo.FUNCTOR, new FasterList<>());
+            mapPrimitives.put(PrimitiveInfo.PREDICATE, new FasterList<>());
             //{new ArrayList<PrimitiveInfo>(), new ArrayList<PrimitiveInfo>(), new ArrayList<PrimitiveInfo>()};
             
             for (int i = 0; i < mlist.length; i++) {
@@ -232,9 +223,9 @@ public abstract class Library implements Serializable, IPrimitives {
                                 //
                                 // adding also or synonims
                                 //
-                                String[] stringFormat = {"directive","predicate","functor"};
                                 if (opMappingCached != null) {
-                                    for (int j=0; j<opMappingCached.length; j++){
+                                    String[] stringFormat = {"directive", "predicate", "functor"};
+                                    for (int j = 0; j<opMappingCached.length; j++){
                                         String[] map = opMappingCached[j];
                                         if (map[2].equals(stringFormat[type]) && map[1].equals(rawName)){
                                             key = map[0] + '/' + arity;
@@ -245,12 +236,15 @@ public abstract class Library implements Serializable, IPrimitives {
                                 }
                             }
                         }
-                    } catch (Exception ex) {}
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                 }
                 
             }
             return mapPrimitives;
         } catch (Exception ex) {
+            ex.printStackTrace();
             return null;
         }
     }

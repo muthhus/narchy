@@ -18,8 +18,8 @@ public abstract class PrologTree {
     /** Creates a new instance of PredicateTree */
     public static class PredicateExpr extends PrologTree {
         
-        public String name;
-        public List<VariableExpr> variables;
+        public final String name;
+        public final List<VariableExpr> variables;
         
         PredicateExpr(String name, List<VariableExpr> vars) {
             this.name = name;
@@ -38,8 +38,8 @@ public abstract class PrologTree {
     
     public static class VariableExpr extends PrologTree {
         
-        public String name;
-        public List<Character> annotations;
+        public final String name;
+        public final List<Character> annotations;
         
         VariableExpr(String name, List<Character> ann) {
             this.name = name;
@@ -61,9 +61,9 @@ public abstract class PrologTree {
     
     public static class SignatureExpr extends PrologTree {
         
-        public PredicateExpr inputTree;
-        public PredicateExpr outputTree;
-        public boolean multipleResult;
+        public final PredicateExpr inputTree;
+        public final PredicateExpr outputTree;
+        public final boolean multipleResult;
         
         SignatureExpr(PredicateExpr left, PredicateExpr right, boolean multiple) {
             this.inputTree = left;

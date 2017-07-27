@@ -52,7 +52,7 @@ class FamilyClausesIndex<K extends Comparable<? super K>>
             LinkedList<Node<K, LinkedList<ClauseInfo>>> buf = new LinkedList<>();
             buf.add(root);
 
-            while(buf.size() > 0){
+            while(!buf.isEmpty()){
                 Node<K, LinkedList<ClauseInfo>> n = buf.remove();
                 
                 if(first){

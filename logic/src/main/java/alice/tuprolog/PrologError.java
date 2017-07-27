@@ -58,7 +58,7 @@ public class PrologError extends Throwable {
 		//return new PrologError(new Struct("error", errorTerm, tuPrologTerm));		
 		String descriptionError =  "Instantiation error" +
 		" in argument " + argNo + 
-		" of " + engineManager.getEnv().currentContext.currentGoal.toString();
+		" of " + engineManager.getEnv().currentContext.currentGoal;
 		return new PrologError(new Struct("error", errorTerm, tuPrologTerm), descriptionError);
 		/**/	
 	}
@@ -74,7 +74,7 @@ public class PrologError extends Throwable {
 		//return new PrologError(new Struct("error", errorTerm, tuPrologTerm));	
 		String descriptionError =  "Type error" + 
 		" in argument " + argNo + 
-		" of " + e.getEnv().currentContext.currentGoal.toString();
+		" of " + e.getEnv().currentContext.currentGoal;
 		return new PrologError(new Struct("error", errorTerm, tuPrologTerm), descriptionError);
 		/**/
 	}
@@ -86,7 +86,7 @@ public class PrologError extends Throwable {
 		//return new PrologError(new Struct("error", errorTerm, tuPrologTerm));	
 		String descriptionError =  "Domain error" + 
 		" in argument " + argNo + 
-		" of " + e.getEnv().currentContext.currentGoal.toString();
+		" of " + e.getEnv().currentContext.currentGoal;
 		return new PrologError(new Struct("error", errorTerm, tuPrologTerm), descriptionError);
 		/**/		
 	}
@@ -98,7 +98,7 @@ public class PrologError extends Throwable {
 		//return new PrologError(new Struct("error", errorTerm, tuPrologTerm));	
 		String descriptionError =  "Existence error" + 
 		" in argument " + argNo + 
-		" of " + e.getEnv().currentContext.currentGoal.toString();
+		" of " + e.getEnv().currentContext.currentGoal;
 		return new PrologError(new Struct("error", errorTerm, tuPrologTerm), descriptionError);
 		/**/		
 	}
@@ -109,7 +109,7 @@ public class PrologError extends Throwable {
 		/*Castagna 06/2011*/
 		//return new PrologError(new Struct("error", errorTerm, tuPrologTerm));	
 		String descriptionError =  "Permission error" + 
-		" in  " + e.getEnv().currentContext.currentGoal.toString();	
+		" in  " + e.getEnv().currentContext.currentGoal;
 		return new PrologError(new Struct("error", errorTerm, tuPrologTerm), descriptionError);
 		/**/		
 	}
@@ -121,7 +121,7 @@ public class PrologError extends Throwable {
 		//return new PrologError(new Struct("error", errorTerm, tuPrologTerm));
 		String descriptionError =  "Representation error" + 
 		" in argument " + argNo + 
-		" of " + e.getEnv().currentContext.currentGoal.toString();
+		" of " + e.getEnv().currentContext.currentGoal;
 		return new PrologError(new Struct("error", errorTerm, tuPrologTerm), descriptionError);
 		/**/
 	}
@@ -133,7 +133,7 @@ public class PrologError extends Throwable {
 		//return new PrologError(new Struct("error", errorTerm, tuPrologTerm));	
 		String descriptionError =  "Evaluation error" + 
 		" in argument " + argNo + 
-		" of " + e.getEnv().currentContext.currentGoal.toString();
+		" of " + e.getEnv().currentContext.currentGoal;
 		return new PrologError(new Struct("error", errorTerm, tuPrologTerm), descriptionError);
 		/**/		
 	}
@@ -144,7 +144,7 @@ public class PrologError extends Throwable {
 		/*Castagna 06/2011*/		
 		//return new PrologError(new Struct("error", errorTerm, tuPrologTerm));		
 		String descriptionError =  "Resource error" + 
-		" in " + e.getEnv().currentContext.currentGoal.toString();
+		" in " + e.getEnv().currentContext.currentGoal;
 		return new PrologError(new Struct("error", errorTerm, tuPrologTerm), descriptionError);
 		/**/		
 	}
@@ -159,9 +159,7 @@ public class PrologError extends Throwable {
 		/*Castagna 06/2011*/
 		//return new PrologError(new Struct("error", errorTerm, tuPrologTerm));
 
-		int[] errorInformation = {clause, line, position};
-		String[] nameInformation = {"clause", "line", "position"};
-		String syntaxErrorDescription = message.getTerm().toString();
+		String syntaxErrorDescription = message.term().toString();
 
 		//Sostituzione degli eventuali caratteri di nuova linea con uno spazio
 		syntaxErrorDescription = NEWLINE.matcher(syntaxErrorDescription).replaceAll(Matcher.quoteReplacement(" "));
@@ -174,6 +172,8 @@ public class PrologError extends Throwable {
 		String descriptionError = "Syntax error";
 
 		boolean firstSignificativeInformation = true;
+		String[] nameInformation = {"clause", "line", "position"};
+		int[] errorInformation = {clause, line, position};
 		for(int i = 0; i < errorInformation.length; i++)
 		{
 			if(errorInformation[i] != -1)

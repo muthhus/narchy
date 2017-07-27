@@ -30,14 +30,12 @@ public class PrologSolution<Q extends Term<?>, S extends Term<?>> /*implements I
     }
 
     public <Z extends Term<?>> Z getVarValue(String varName) throws alice.tuprolog.NoSolutionException {
-        alice.tuprolog.Term retValue;        
-        retValue = _solveInfo.getVarValue(varName);
+        alice.tuprolog.Term retValue = _solveInfo.getVarValue(varName);
         return Term.unmarshal(retValue);
     }
 
     public <Z extends Term<?>> Z getTerm(String varName) throws alice.tuprolog.NoSolutionException, UnknownVarException {
-        alice.tuprolog.Term retValue;                
-        retValue = _solveInfo.getTerm(varName);
+        alice.tuprolog.Term retValue = _solveInfo.getTerm(varName);
         return Term.unmarshal(retValue);
     }
 
@@ -54,20 +52,17 @@ public class PrologSolution<Q extends Term<?>, S extends Term<?>> /*implements I
     }
 
     public S getSolution() throws alice.tuprolog.NoSolutionException {
-        alice.tuprolog.Term retValue;        
-        retValue = _solveInfo.getSolution();
+        alice.tuprolog.Term retValue = _solveInfo.getSolution();
         return Term.unmarshal(retValue);
     }
 
     public Q getQuery() {
-        alice.tuprolog.Term retValue;        
-        retValue = _solveInfo.getQuery();
+        alice.tuprolog.Term retValue = _solveInfo.getQuery();
         return Term.unmarshal(retValue);
     }
 
     public List<Term<?>> getBindingVars() throws alice.tuprolog.NoSolutionException {
-        List<alice.tuprolog.Var> retValue;        
-        retValue = _solveInfo.getBindingVars();
+        List<alice.tuprolog.Var> retValue = _solveInfo.getBindingVars();
         Vector<Term<?>> bindings = new Vector<>();
         for (alice.tuprolog.Term t : retValue) {
             bindings.add(Term.unmarshal(t));

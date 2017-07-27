@@ -19,7 +19,7 @@ import java.util.Vector;
  */
 public class JavaTerm<O> extends Compound<JavaTerm<O>> {
 
-    public static HashMap<String, Class<?>> hashtable = new HashMap<>();
+    public static final HashMap<String, Class<?>> hashtable = new HashMap<>();
 
     @SuppressWarnings("serial")
 	static class TermifiableStruct<O> extends alice.tuprolog.Struct {
@@ -39,8 +39,8 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
         }
     }
 
-    Class<?> _class;
-    java.util.Collection<Term<?>> _properties;
+    final Class<?> _class;
+    final java.util.Collection<Term<?>> _properties;
 
     public JavaTerm(O o) {        
         this(o.getClass(), getProperties(o));
@@ -95,7 +95,7 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
             e.printStackTrace();
             throw new UnsupportedOperationException(e);
         }
-        if (termArr == null || termArr.size() == 0) {
+        if (termArr == null || termArr.isEmpty()) {
                 throw new IllegalArgumentException();
 
             }
@@ -184,7 +184,7 @@ public class JavaTerm<O> extends Compound<JavaTerm<O>> {
 //        catch (Exception e) {
 //            return false;
 //        }
-        return (t instanceof TermifiableStruct<?>) || ((t.getTerm() instanceof alice.tuprolog.Struct) && hashtable.containsKey(((alice.tuprolog.Struct)t.getTerm()).name()));
+        return (t instanceof TermifiableStruct<?>) || ((t.term() instanceof alice.tuprolog.Struct) && hashtable.containsKey(((alice.tuprolog.Struct)t.term()).name()));
     }
     
     static <Z> JavaTerm<Z> unmarshalObject(alice.tuprolog.Struct s) {

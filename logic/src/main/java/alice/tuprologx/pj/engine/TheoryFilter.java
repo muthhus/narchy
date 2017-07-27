@@ -10,8 +10,8 @@ import java.util.Vector;
  */
 public class TheoryFilter {
     
-	protected Theory _theory;
-    protected Theory _filter;
+	protected final Theory _theory;
+    protected final Theory _filter;
     protected PJProlog _engine;
     
     private static final String base_filter_string = "filter(L,R):-filter(L,[],R).\n"+

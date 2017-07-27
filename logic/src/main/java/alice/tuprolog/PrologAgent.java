@@ -54,9 +54,9 @@ public class PrologAgent extends Prolog {
         addOutputListener(defaultOutputListener);
     }
 
-    public PrologAgent(String theory){
-        this(theory, (String)null);
-    }
+//    public PrologAgent(String theory){
+//        this(theory, (String)null);
+//    }
 
     /**
      * Builds a prolog agent providing it a theory and a goal
@@ -121,7 +121,7 @@ public class PrologAgent extends Prolog {
 
             return new Iterator<>() {
 
-                Solution s = run(goal);
+                final Solution s = run(goal);
 
                 public Term next = s.getSolution();
 
@@ -136,11 +136,7 @@ public class PrologAgent extends Prolog {
                     Term next = this.next;
 
                     try {
-                        if (hasOpenAlternatives()) {
-                            this.next = solveNext().getSolution();
-                        } else {
-                            this.next = null;
-                        }
+                        this.next = hasOpenAlternatives() ? solveNext().getSolution() : null;
                     } catch (NoMoreSolutionException | NoSolutionException e) {
                         this.next = null;
                     }
@@ -198,7 +194,7 @@ public class PrologAgent extends Prolog {
     
     
     static final class AgentThread extends Thread {
-        PrologAgent agent;
+        final PrologAgent agent;
         AgentThread(PrologAgent agent){
             this.agent=agent;
         }

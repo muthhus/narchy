@@ -18,8 +18,8 @@ package alice.util;
 @SuppressWarnings("serial")
 public class V2d implements java.io.Serializable {
 
-    public float x;
-	public float y;
+    public final float x;
+	public final float y;
 
     public V2d(float x,float y){
         this.x=x;

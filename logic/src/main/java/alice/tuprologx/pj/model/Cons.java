@@ -11,7 +11,7 @@ import java.util.Vector;
 public class Cons<H extends Term<?>, R extends Compound<?>> extends Compound<Cons<H,R>> implements Iterable<Term> {
         
     
-    String _theName;
+    final String _theName;
     H _theHead;	
     R _theRest;
 

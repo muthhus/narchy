@@ -577,12 +577,12 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
      * 
      */
     static String removeTrailing(String input, int tokenOffset){
-    	int i = tokenOffset;
-    	String out=input;
-    	
-    	try {
+
+        try {
 	    	char c = input.charAt(tokenOffset-1);
-	    	while(c == '\n'){
+            String out = input;
+            int i = tokenOffset;
+            while(c == '\n'){
 	    		out=input.substring(0, i);
 	    		i--;
 	        	c = input.charAt(i);
@@ -625,7 +625,7 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
     private static int isCharacterCodeConstantToken(int typec, String svalc) {
         if (svalc != null) {
             if (svalc.length() == 1)
-                return (int) svalc.charAt(0);
+                return svalc.charAt(0);
             if (svalc.length() > 1) {
 // TODO the following charachters is not implemented:
 //                * 1 meta escape sequence (* 6.4.2.1 *) todo
@@ -651,8 +651,8 @@ public class Tokenizer extends StreamTokenizer implements Serializable {
      * used to implement lookahead for two tokens, super.pushBack() only handles one pushBack..
      */
     private static class PushBack {
-        int typea;
-        String svala;
+        final int typea;
+        final String svala;
 
         public PushBack(int i, String s) {
             typea = i;

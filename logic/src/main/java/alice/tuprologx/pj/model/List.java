@@ -18,7 +18,7 @@ import java.util.Vector;
  */
 public class List<X extends Term<?>> extends Term<List<X>> implements Iterable<X> {
 //public class List<X extends Term<?>> extends Compound<List<X>> {
-	protected java.util.Vector<X> _theList;
+	protected final java.util.Vector<X> _theList;
         
         public final static List<?> NIL = new List<>(new Vector<>());
         

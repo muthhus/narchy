@@ -142,7 +142,7 @@ public class Double extends Number {
      */
     @Override
     public boolean isGreater(Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Number) {
             return value>((Number)t).doubleValue();
         } else if (t instanceof Struct) {
@@ -152,7 +152,7 @@ public class Double extends Number {
     
     @Override
     public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Number) {
             return value>((Number)t).doubleValue();
         } else if (t instanceof Struct) {
@@ -165,7 +165,7 @@ public class Double extends Number {
      */
     @Override
     public boolean isEqual(Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Number) {
             Number n = (Number) t;
             if (!n.isReal())
@@ -182,7 +182,7 @@ public class Double extends Number {
      */
     @Override
     boolean unify(List<Var> vl1, List<Var> vl2, Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Var) {
             return t.unify(vl2, vl1, this);
         } else if (t instanceof Number && ((Number) t).isReal()) {

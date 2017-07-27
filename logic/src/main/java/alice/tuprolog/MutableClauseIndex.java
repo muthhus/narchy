@@ -100,7 +100,7 @@ public final class MutableClauseIndex extends ConcurrentHashMap<String,FamilyCla
 //	}
 
 	private static class CompleteIterator implements Iterator<ClauseInfo> {
-		Iterator<FamilyClausesList> values;
+		final Iterator<FamilyClausesList> values;
 		Iterator<ClauseInfo> workingList;
 		//private boolean busy = false;
 

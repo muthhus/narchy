@@ -13,8 +13,8 @@ import java.io.InputStreamReader;
 @SuppressWarnings("serial")
 public class PrologRepl extends Automaton implements OutputListener, SpyListener, WarningListener/*Castagna 06/2011*/, ExceptionListener/**/{
 
-	BufferedReader  stdin;
-    Prolog          engine;
+	final BufferedReader  stdin;
+    final Prolog          engine;
 
 
     static final String incipit =
@@ -116,12 +116,12 @@ public class PrologRepl extends Automaton implements OutputListener, SpyListener
         String s = "";
         try {
             for (Var v: result.getBindingVars()) {
-                if ( !v.isAnonymous() && v.isBound() && (!(v.getTerm() instanceof Var) || (!((Var) (v.getTerm())).getName().startsWith("_")))) {
-                    s += v.getName() + " / " + v.getTerm() + '\n';
+                if ( !v.isAnonymous() && v.isBound() && (!(v.term() instanceof Var) || (!((Var) (v.term())).getName().startsWith("_")))) {
+                    s += v.getName() + " / " + v.term() + '\n';
                 }
             }
             /*Castagna 06/2011*/
-            if(s.length()>0){
+            if(!s.isEmpty()){
             /**/
                 s.substring(0,s.length()-1);    
             }

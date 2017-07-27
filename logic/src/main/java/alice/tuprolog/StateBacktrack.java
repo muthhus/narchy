@@ -40,7 +40,7 @@ public class StateBacktrack extends State {
      * @see alice.tuprolog.AbstractRunState#doJob()
      */
     @Override
-    void doJob(Engine e) {
+    void run(Engine e) {
         ChoicePointContext curChoice = e.choicePointSelector.fetch();
         //verify ChoicePoint
         if (curChoice == null) {
@@ -55,7 +55,7 @@ public class StateBacktrack extends State {
         
         //deunify variables and reload old goal
         e.currentContext = curChoice.executionContext;
-        Term curGoal = e.currentContext.goalsToEval.backTo(curChoice.indexSubGoal).getTerm();
+        Term curGoal = e.currentContext.goalsToEval.backTo(curChoice.indexSubGoal).term();
         if (!(curGoal instanceof Struct)) {
             e.nextState = c.END_FALSE;
             return;
@@ -70,7 +70,6 @@ public class StateBacktrack extends State {
         List<Var> varsToDeunify = stopDeunify.getHead();
         Var.free(varsToDeunify);
         varsToDeunify.clear();
-        SubGoalId fatherIndex;
         // bring parent contexts to a previous state in the demonstration
         do {
             // deunify variables in sibling contexts
@@ -82,11 +81,11 @@ public class StateBacktrack extends State {
             if (curCtx.fatherCtx == null)
                 break;
             stopDeunify = curCtx.fatherVarsList;
-            fatherIndex = curCtx.fatherGoalId;
+            SubGoalId fatherIndex = curCtx.fatherGoalId;
 
             Term prevGoal = curGoal;
             curCtx = curCtx.fatherCtx;
-            curGoal = curCtx.goalsToEval.backTo(fatherIndex).getTerm();
+            curGoal = curCtx.goalsToEval.backTo(fatherIndex).term();
             if (!(curGoal instanceof Struct) || prevGoal == curGoal) {
                 e.nextState = c.END_FALSE;
                 return;

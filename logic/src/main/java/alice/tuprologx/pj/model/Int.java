@@ -14,7 +14,7 @@ package alice.tuprologx.pj.model;
  * @author maurizio
  */
 public class Int extends Term<Int> {
-	Integer _theInt;
+	final Integer _theInt;
 
 	@Override
     public <Z> Z/*Integer*/ toJava() {

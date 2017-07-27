@@ -263,8 +263,8 @@ public class RBTree<K extends Comparable<? super K>,V>
     }
 
     private void insertCase2(Node<K,V> n) {
-        if (nodeColor(n.parent) == Color.BLACK)
-            return; // Tree is still valid
+        if (nodeColor(n.parent) == Color.BLACK) {
+        }
         else
             insertCase3(n);
     }
@@ -350,8 +350,8 @@ public class RBTree<K extends Comparable<? super K>,V>
     }
 
     private void deleteCase1(Node<K,V> n) {
-        if (n.parent == null)
-            return;
+        if (n.parent == null) {
+        }
         else
             deleteCase2(n);
     }

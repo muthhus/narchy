@@ -150,9 +150,9 @@ public class PJLibrary extends Library {
 	 * Creates of a java object - not backtrackable case
 	 */
 	public boolean java_object_3(Term className, Term argl, Term id) {
-		className = className.getTerm();
-		Struct arg = (Struct) argl.getTerm();
-		id = id.getTerm();
+		className = className.term();
+		Struct arg = (Struct) argl.term();
+		id = id.term();
 		try {
 			if (!className.isAtom()) {
 				return false;
@@ -212,7 +212,7 @@ public class PJLibrary extends Library {
 	 * predicate java_object (as second choice, for backtracking)
 	 */
 	public   boolean destroy_object_1(Term id) {
-		id = id.getTerm();
+		id = id.term();
 		try {
 			if (id.isGround()) {
 				unregisterDynamic((Struct)id);
@@ -229,23 +229,22 @@ public class PJLibrary extends Library {
 	 * Creates of a java class
 	 */
 	public   boolean java_class_4(Term clSource, Term clName, Term clPathes, Term id) {
-		Struct classSource = (Struct) clSource.getTerm();
-		Struct className = (Struct) clName.getTerm();
-		Struct classPathes = (Struct) clPathes.getTerm();
-		id = id.getTerm();
+		Struct classSource = (Struct) clSource.term();
+		Struct className = (Struct) clName.term();
+		Struct classPathes = (Struct) clPathes.term();
+		id = id.term();
 		try {
 			String fullClassName = alice.util.Tools.removeApices(className.toString());
-			
-			String fullClassPath = fullClassName.replace('.', '/');
+
 			Iterator<? extends Term> it = classPathes.listIterator();
 			String cp = "";
 			while (it.hasNext()) {
-				if (cp.length() > 0) {
+				if (!cp.isEmpty()) {
 					cp += ";";
 				}
 				cp += alice.util.Tools.removeApices(it.next().toString());
 			}
-			if (cp.length() > 0) {
+			if (!cp.isEmpty()) {
 				cp = " -classpath " + cp;
 			}
 			
@@ -254,6 +253,7 @@ public class PJLibrary extends Library {
 			//System.out.println("class source: "+text+
 			//                   "\nid: "+id+
 			//                   "\npath: "+fullClassPath);
+			String fullClassPath = fullClassName.replace('.', '/');
 			try {
 				FileWriter file = new FileWriter(fullClassPath + ".java");
 				file.write(text);
@@ -299,10 +299,9 @@ public class PJLibrary extends Library {
 	 *
 	 */
 	public boolean java_call_3(Term objId, Term method_name, Term idResult) {
-		objId = objId.getTerm();
-		idResult = idResult.getTerm();
-		Struct method = (Struct) method_name.getTerm();
-		Object obj = null;
+		objId = objId.term();
+		idResult = idResult.term();
+		Struct method = (Struct) method_name.term();
 		Signature args = null;
 		String methodName = null;
 		try {
@@ -331,7 +330,7 @@ public class PJLibrary extends Library {
             
 			//System.out.println(args);
 			String objName = alice.util.Tools.removeApices(objId.toString());
-			obj = currentObjects.get(objName);
+			Object obj = currentObjects.get(objName);
 			Object res = null;
 			
 			if (obj != null) {                
@@ -425,13 +424,13 @@ public class PJLibrary extends Library {
 	 */
 	private boolean java_set(Term objId, Term fieldTerm, Term what) {
 		//System.out.println("SET "+objId+" "+fieldTerm+" "+what);
-		what = what.getTerm();
+		what = what.term();
 		if (!fieldTerm.isAtom() || what instanceof Var)
 			return false;
 		String fieldName = ((Struct) fieldTerm).name();
-		Object obj = null;
 		try {
 			Class<?> cl = null;
+			Object obj = null;
 			if (objId.isCompound() &&
 					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
 				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
@@ -505,9 +504,9 @@ public class PJLibrary extends Library {
 			return false;
 		}
 		String fieldName = ((Struct) fieldTerm).name();
-		Object obj = null;
 		try {
 			Class<?> cl = null;
+			Object obj = null;
 			if (objId.isCompound() &&
 					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
 				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
@@ -567,18 +566,17 @@ public class PJLibrary extends Library {
 	}
 	
 	public boolean java_array_set_primitive_3(Term obj_id, Term i, Term what) {
-		Struct objId = (Struct) obj_id.getTerm();
-		Number index = (Number) i.getTerm();
-		what = what.getTerm();
+		Struct objId = (Struct) obj_id.term();
+		Number index = (Number) i.term();
+		what = what.term();
 		//System.out.println("SET "+objId+" "+fieldTerm+" "+what);
-		Object obj = null;
 		if (!index.isInteger()){
 			return false;
 		}
 		try {
-			Class<?> cl = null;
 			String objName = alice.util.Tools.removeApices(objId.toString());
-			obj = currentObjects.get(objName);
+			Object obj = currentObjects.get(objName);
+			Class<?> cl = null;
 			if (obj != null) {
 				cl = obj.getClass();
 			} else {
@@ -666,18 +664,17 @@ public class PJLibrary extends Library {
 	}
 	
 	public   boolean java_array_get_primitive_3(Term obj_id, Term i, Term what) {
-		Struct objId = (Struct) obj_id.getTerm();
-		Number index = (Number) i.getTerm();
-		what = what.getTerm();
+		Struct objId = (Struct) obj_id.term();
+		Number index = (Number) i.term();
+		what = what.term();
 		//System.out.println("SET "+objId+" "+fieldTerm+" "+what);
-		Object obj = null;
 		if (!index.isInteger()) {
 			return false;
 		}
 		try {
-			Class<?> cl = null;
 			String objName = alice.util.Tools.removeApices(objId.toString());
-			obj = currentObjects.get(objName);
+			Object obj = currentObjects.get(objName);
+			Class<?> cl = null;
 			if (obj != null) {
 				cl = obj.getClass();
 			} else {
@@ -711,11 +708,7 @@ public class PJLibrary extends Library {
                 }
                 case "class [Z":
                     boolean b = Array.getBoolean(obj, index.intValue());
-                    if (b) {
-                        return unify(what, Term.TRUE);
-                    } else {
-                        return unify(what, Term.FALSE);
-                    }
+					return b ? unify(what, Term.TRUE) : unify(what, Term.FALSE);
                 case "class [B": {
                     Term value = new Int(Array.getByte(obj, index.intValue()));
                     return unify(what, value);
@@ -816,11 +809,7 @@ public class PJLibrary extends Library {
                         break;
                     default:
                         Object obj = currentObjects.get(name);
-                        if (obj == null) {
-                            values[i] = name;
-                        } else {
-                            values[i] = obj;
-                        }
+						values[i] = obj == null ? name : obj;
                         types[i] = values[i].getClass();
                         break;
                 }
@@ -846,11 +835,7 @@ public class PJLibrary extends Library {
 					return parse_as(values, types, i, tc.getTerm(0), tc.getTerm(1));
 				} else {
 					Object obj = currentObjects.get(alice.util.Tools.removeApices(tc.toString()));
-					if (obj == null) {
-						values[i] = alice.util.Tools.removeApices(tc.toString());
-					} else {
-						values[i] = obj;
-					}
+					values[i] = obj == null ? alice.util.Tools.removeApices(tc.toString()) : obj;
 					types[i] = values[i].getClass();
 				}
 			} else if (term instanceof Var && !((Var) term).isBound()) {
@@ -875,7 +860,7 @@ public class PJLibrary extends Library {
 		try {
 			if (!(castWhat instanceof Number)) {
 				String castTo_name = alice.util.Tools.removeApices(((Struct) castTo).name());
-				String castWhat_name = alice.util.Tools.removeApices(castWhat.getTerm().toString());
+				String castWhat_name = alice.util.Tools.removeApices(castWhat.term().toString());
 				//System.out.println(castWhat_name+" "+castTo_name);
 				if (castTo_name.equals("java.lang.String") && 
 						castWhat_name.equals("true")){
@@ -1034,11 +1019,7 @@ public class PJLibrary extends Library {
 		}
 		try {
 			if (Boolean.class.isInstance(obj)) {
-				if ((Boolean) obj) {
-					return unify(id, Term.TRUE);
-				} else {
-					return unify(id, Term.FALSE);
-				}
+				return (Boolean) obj ? unify(id, Term.TRUE) : unify(id, Term.FALSE);
 			} else if (Byte.class.isInstance(obj)) {
 				return unify(id, new Int(((Byte) obj).intValue()));
 			} else if (Short.class.isInstance(obj)) {
@@ -1102,7 +1083,7 @@ public class PJLibrary extends Library {
 				// object already referenced
 				return false;
 			} else {
-				String raw_name = alice.util.Tools.removeApices(id.getTerm().toString());
+				String raw_name = alice.util.Tools.removeApices(id.term().toString());
 				staticObjects.put(raw_name, obj);
 				staticObjects_inverse.put(obj, id);
 				return true;
@@ -1290,10 +1271,10 @@ public class PJLibrary extends Library {
 					return true;
 				} else {
 					// verify of the id is already used
-					String raw_name = alice.util.Tools.removeApices(id.getTerm().toString());
+					String raw_name = alice.util.Tools.removeApices(id.term().toString());
 					Object linkedobj = currentObjects.get(raw_name);
 					if (linkedobj == null) {
-						registerDynamic((Struct)(id.getTerm()), obj);
+						registerDynamic((Struct)(id.term()), obj);
 						//log("ground id for a new obj: "+id+" as ref for "+obj);
 						return true;
 					} else {
@@ -1352,8 +1333,7 @@ public class PJLibrary extends Library {
                                        Class<?>[] argClasses, Object... argValues) throws NoSuchMethodException {
 		// first try for exact match
 		try {
-			Method m = target.getMethod(name, argClasses);
-			return m;
+			return target.getMethod(name, argClasses);
 		} catch (NoSuchMethodException e) {
 			if (argClasses.length == 0) { // if no args & no exact match, out of luck
 				return null;
@@ -1575,7 +1555,7 @@ public class PJLibrary extends Library {
 						pclasses[i].equals(java.lang.Integer.TYPE)) {
 					// arg required: a float, arg provided: an int
 					// so we need an explicit conversion...
-					newvalues[i] = (float) ((Integer) values[i]).intValue();
+					newvalues[i] = (float) (Integer) values[i];
 				} else if (mclasses[i].equals(java.lang.Double.TYPE) &&
 						pclasses[i].equals(java.lang.Integer.TYPE)) {
 					// arg required: a double, arg provided: an int
@@ -1603,8 +1583,8 @@ public class PJLibrary extends Library {
  */
 @SuppressWarnings("serial")
 class Signature implements Serializable {
-	Class<?>[] types;
-	Object[] values;
+	final Class<?>[] types;
+	final Object[] values;
 	
 	public Signature(Object[] v, Class<?>... c) {
 		values = v;
@@ -1637,10 +1617,10 @@ class ClassLoader extends java.lang.ClassLoader {
  */
 @SuppressWarnings("serial")
 class ListenerInfo implements Serializable {
-	public String listenerInterfaceName;
-	public EventListener listener;
+	public final String listenerInterfaceName;
+	public final EventListener listener;
 	//public String eventName;
-	public String eventFullClass;
+	public final String eventFullClass;
 	
 	public ListenerInfo(EventListener l, String eventClass, String n) {
 		listener = l;

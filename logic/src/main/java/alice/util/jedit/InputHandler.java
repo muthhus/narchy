@@ -342,11 +342,8 @@ public abstract class InputHandler extends KeyAdapter
                         return (JEditTextArea)c;
                     else if(c == null)
                         break;
-                    if(c instanceof JPopupMenu)
-                        c = ((JPopupMenu)c)
-                            .getInvoker();
-                    else
-                        c = c.getParent();
+                    c = c instanceof JPopupMenu ? ((JPopupMenu) c)
+                            .getInvoker() : c.getParent();
                 }
             }
         }

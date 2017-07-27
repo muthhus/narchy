@@ -19,7 +19,7 @@ import java.io.InputStream;
  * miscellaneous static services
  *
  */
-public class Tools extends Object {
+public class Tools {
 
     
     /**
@@ -81,10 +81,6 @@ public class Tools extends Object {
     }
     
     public static String removeApices(String st){
-        if (st.startsWith("'")&&st.endsWith("'")){
-            return st.substring(1,st.length()-1);
-       } else {
-           return st;
-       }
+        return st.startsWith("'") && st.endsWith("'") ? st.substring(1, st.length() - 1) : st;
     }
 }

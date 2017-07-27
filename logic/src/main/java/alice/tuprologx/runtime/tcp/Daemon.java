@@ -10,8 +10,8 @@ import java.net.Socket;
 class Acceptor implements Runnable {
     ObjectOutputStream outStream;
     ObjectInputStream  inStream;
-    Socket socket;
-    PrologImpl core;
+    final Socket socket;
+    final PrologImpl core;
     boolean  initOk=true;
 
     Acceptor(Socket s,   PrologImpl core_){
@@ -47,10 +47,10 @@ class Acceptor implements Runnable {
 }
 
 public class Daemon implements Runnable {
-    public static int DEFAULT_PORT = 3203;
+    public static final int DEFAULT_PORT = 3203;
     ServerSocket s;
-    alice.tuprolog.Prolog   core;
-    PrologImpl coreTCP;
+    final alice.tuprolog.Prolog   core;
+    final PrologImpl coreTCP;
 
     public Daemon(alice.tuprolog.Prolog core_) throws IOException {
         core=core_;

@@ -35,7 +35,7 @@ public class StateGoalSelection extends State {
      * @see alice.tuprolog.AbstractRunState#doJob()
      */
     @Override
-    void doJob(Engine e) {
+    void run(Engine e) {
         Term curGoal = null;
         while (curGoal == null) {
             curGoal = e.currentContext.goalsToEval.fetch();
@@ -50,7 +50,7 @@ public class StateGoalSelection extends State {
                 e.currentContext = e.currentContext.fatherCtx;
             } else {
                 // Caso di individuazione curGoal
-                Term goal_app = curGoal.getTerm();
+                Term goal_app = curGoal.term();
                 if (!(goal_app instanceof Struct)) {
                     e.nextState = c.END_FALSE;
                     return;

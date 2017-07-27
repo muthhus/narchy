@@ -241,7 +241,7 @@ public class Struct extends Term {
     public Term getTerm(int index) {
             if (!(arg[index] instanceof Var))
                 return arg[index];
-            return arg[index].getTerm();
+            return arg[index].term();
     }
     
     
@@ -302,12 +302,12 @@ public class Struct extends Term {
      * Check is this struct is clause or directive
      */
     public boolean isClause() {
-        return(name.equals(":-") && arity > 1 && arg[0].getTerm() instanceof Struct);
+        return(name.equals(":-") && arity > 1 && arg[0].term() instanceof Struct);
         //return(name.equals(":-") && arity == 2 && arg[0].getTerm() instanceof Struct);
     }    
     
     @Override
-    public Term getTerm() {
+    public Term term() {
         return this;
     }
     
@@ -351,7 +351,7 @@ public class Struct extends Term {
      */
     @Override
     public boolean isGreater(Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (!(t instanceof Struct)) {
             return true;
         } else {
@@ -378,7 +378,7 @@ public class Struct extends Term {
     
     @Override
     public boolean isGreaterRelink(Term t, ArrayList<String> vorder) {
-        t = t.getTerm();
+        t = t.term();
         if (!(t instanceof Struct)) {
             return true;
         } else {
@@ -410,7 +410,7 @@ public class Struct extends Term {
      */
     @Override
     public boolean isEqual(Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Struct) {
             Struct ts = (Struct) t;
             if (arity == ts.arity && name.equals(ts.name)) {
@@ -499,7 +499,7 @@ public class Struct extends Term {
                 //--------------------------------
                 // we want to resolve only not linked variables:
                 // so linked variables must get the linked term
-                term=term.getTerm();
+                term=term.term();
                 //--------------------------------
                 if (term instanceof Var) {
                     Var t = (Var) term;
@@ -552,7 +552,7 @@ public class Struct extends Term {
     public Term listHead() {
         if (!isList())
             throw new UnsupportedOperationException("The structure " + this + " is not a list.");
-        return arg[0].getTerm();
+        return arg[0].term();
     }
     
     /**
@@ -566,7 +566,7 @@ public class Struct extends Term {
     public Struct listTail() {
         if (!isList())
             throw new UnsupportedOperationException("The structure " + this + " is not a list.");
-        return (Struct) arg[1].getTerm() ;
+        return (Struct) arg[1].term() ;
     }
     
     /**
@@ -584,7 +584,7 @@ public class Struct extends Term {
         int count = 0;
         while (!t.isEmptyList()) {
             count++;
-            t = (Struct) t.arg[1].getTerm();
+            t = (Struct) t.arg[1].term();
         }
         return count;
     }
@@ -612,7 +612,7 @@ public class Struct extends Term {
         Struct t = new Struct();
         Term[] arg = this.arg;
         for(int c = arity - 1;c >= 0;c--) {
-            t = new Struct(arg[c].getTerm(),t);
+            t = new Struct(arg[c].term(),t);
         }
         return new Struct(new Struct(name),t);
     }
@@ -624,11 +624,11 @@ public class Struct extends Term {
      * If this structure is not a list, null object is returned
      */
     Struct fromList() {
-        Term ft = arg[0].getTerm();
+        Term ft = arg[0].term();
         if (!ft.isAtom()) {
             return null;
         }
-        Struct at = (Struct) arg[1].getTerm();
+        Struct at = (Struct) arg[1].term();
         LinkedList<Term> al = new LinkedList<>();
         while (!at.isEmptyList()) {
             if (!at.isList()) {
@@ -682,7 +682,7 @@ public class Struct extends Term {
     @Override
     boolean unify(List<Var> vl1,List<Var> vl2,Term t) {
         // In fase di unificazione bisogna annotare tutte le variabili della struct completa.
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Struct) {
             Struct ts = (Struct) t;
             final int arity = this.arity;
@@ -761,8 +761,8 @@ public class Struct extends Term {
     }
     
     private String toString0() {
-        Term h = arg[0].getTerm();
-        Term t = arg[1].getTerm();
+        Term h = arg[0].term();
+        Term t = arg[1].term();
         if (t.isList()) {
             Struct tl = (Struct) t;
             if (tl.isEmptyList()) {
@@ -770,10 +770,8 @@ public class Struct extends Term {
             }
             return (h instanceof Var ? ((Var) h).toStringFlattened() : h.toString()) + ',' + tl.toString0();
         } else {
-            String h0;
-            String t0;
-            h0 = h instanceof Var ? ((Var) h).toStringFlattened() : h.toString();
-            t0 = t instanceof Var ? ((Var) t).toStringFlattened() : t.toString();
+            String h0 = h instanceof Var ? ((Var) h).toStringFlattened() : h.toString();
+            String t0 = t instanceof Var ? ((Var) t).toStringFlattened() : t.toString();
             return (h0 + '|' + t0);
         }
     }
@@ -782,7 +780,7 @@ public class Struct extends Term {
         if (arity == 0) {
             return "";
         } else if (arity==1 && !((arg[0] instanceof Struct) && ((Struct)arg[0]).name().equals(","))){
-            return arg[0].getTerm().toString();
+            return arg[0].term().toString();
         } else {
             // comma case 
             Term head = ((Struct)arg[0]).getTerm(0);
@@ -790,10 +788,10 @@ public class Struct extends Term {
             StringBuilder buf = new StringBuilder(head.toString());
             while (tail instanceof Struct && ((Struct)tail).name().equals(",")){
                 head = ((Struct)tail).getTerm(0);
-                buf.append(',').append(head.toString());
+                buf.append(',').append(head);
                 tail = ((Struct)tail).getTerm(1);
             }
-            buf.append(',').append(tail.toString());
+            buf.append(',').append(tail);
             return buf.toString();
             //    return arg[0]+","+((Struct)arg[1]).toString0_bracket();
         }
@@ -801,7 +799,7 @@ public class Struct extends Term {
     
     private String toStringAsList(OperatorManager op) {
         Term h = arg[0];
-        Term t = arg[1].getTerm();
+        Term t = arg[1].term();
         if (t.isList()) {
             Struct tl = (Struct)t;
             if (tl.isEmptyList()){
@@ -815,15 +813,14 @@ public class Struct extends Term {
     
     @Override
     String toStringAsArg(OperatorManager op, int prio, boolean x) {
-        int      p = 0;
-        String   v;
-        
+
         if (name.equals(".") && arity == 2) {
             return arg[0].isEmptyList() ? "[]" : '[' + toStringAsList(op) + ']';
         } else if (name.equals("{}")) {
             return('{' + toString0_bracket() + '}');
         }
-        
+
+        int p = 0;
         if (arity == 2) {
             if ((p = op.opPrio(name,"xfx")) >= OperatorManager.OP_LOW) {
                 return(
@@ -884,7 +881,7 @@ public class Struct extends Term {
                         ((x ? p >= prio : p > prio) ? ")" : ""));
             }
         }
-        v = (Parser.isAtom(name) ? name : '\'' + name + '\'');
+        String v = (Parser.isAtom(name) ? name : '\'' + name + '\'');
         if (arity == 0) {
             return v;
         }

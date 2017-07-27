@@ -63,12 +63,7 @@ public class Clause<H extends Term<?>, B extends Term<?>> extends Compound2<H,B>
 
     @Override
     public Struct marshal() {
-        if (!isFact()) {
-            return super.marshal();
-        }
-        else {
-            return (Struct)getHead().marshal();
-        }
+        return !isFact() ? super.marshal() : (Struct) getHead().marshal();
     }
     
     public boolean match(String name, int arity) {

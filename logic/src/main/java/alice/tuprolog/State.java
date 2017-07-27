@@ -27,7 +27,7 @@ abstract class State {
     protected EngineRunner c;
     protected String stateName;
     
-    abstract void doJob(Engine e);
+    abstract void run(Engine e);
     
     public String toString() {
         return stateName;

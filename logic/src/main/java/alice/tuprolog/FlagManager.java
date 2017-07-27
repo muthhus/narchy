@@ -17,26 +17,21 @@
  */
 package alice.tuprolog;
 
-import java.util.ArrayList;
+import jcog.list.FasterList;
 
 /**
  * Administrator of flags declared
  * 
  * @author Alex Benini
  */
-class FlagManager {
-
-    /* flag list */
-    private final ArrayList<Flag> flags;
+class FlagManager extends FasterList<Flag> {
 
     /**
 	 * mediator owner of the manager
 	 */
     protected Prolog mediator;
 
-    FlagManager() {
-        flags = new ArrayList<>();
-    }
+
 
     /**
      * Config this Manager
@@ -50,14 +45,12 @@ class FlagManager {
      */
     public synchronized boolean defineFlag(String name, Struct valueList, Term defValue,
             boolean modifiable, String libName) {
-        flags.add(new Flag(name, valueList, defValue, modifiable, libName));
+        this.add(new Flag(name, valueList, defValue, modifiable, libName));
         return true;
     }
 
     public synchronized boolean setFlag(String name, Term value) {
-        java.util.Iterator<Flag> it = flags.iterator();
-        while (it.hasNext()) {
-            Flag flag = it.next();
+        for (Flag flag : this) {
             if (flag.getName().equals(name)) {
                 if (flag.isModifiable() && flag.isValidValue(value)) {
                     flag.setValue(value);
@@ -72,9 +65,7 @@ class FlagManager {
 
     public synchronized Struct getPrologFlagList() {
         Struct flist = new Struct();
-        java.util.Iterator<Flag> it = flags.iterator();
-        while (it.hasNext()) {
-            Flag fl = it.next();
+        for (Flag fl : this) {
             flist = new Struct(new Struct("flag", new Struct(fl.getName()), fl
                     .getValue()), flist);
         }
@@ -82,9 +73,7 @@ class FlagManager {
     }
 
     public synchronized Term getFlag(String name) {
-        java.util.Iterator<Flag> it = flags.iterator();
-        while (it.hasNext()) {
-            Flag fl = it.next();
+        for (Flag fl : this) {
             if (fl.getName().equals(name)) {
                 return fl.getValue();
             }
@@ -95,9 +84,7 @@ class FlagManager {
     // restituisce true se esiste un flag di nome name, e tale flag ?
     // modificabile
     public boolean isModifiable(String name) {
-        java.util.Iterator<Flag> it = flags.iterator();
-        while (it.hasNext()) {
-            Flag flag = it.next();
+        for (Flag flag : this) {
             if (flag.getName().equals(name)) {
                 return flag.isModifiable();
             }
@@ -108,9 +95,7 @@ class FlagManager {
     // restituisce true se esiste un flag di nome name, e Value ? un valore
     // ammissibile per tale flag
     public boolean isValidValue(String name, Term value) {
-        java.util.Iterator<Flag> it = flags.iterator();
-        while (it.hasNext()) {
-            Flag flag = it.next();
+        for (Flag flag : this) {
             if (flag.getName().equals(name)) {
                 return flag.isValidValue(value);
             }

@@ -53,7 +53,7 @@ public class PrologMetaField {
     private void initTheory() {
         String fname = _theField.getName();
         String pname =_annotation.predicate();
-        if (pname.length() == 0)
+        if (pname.isEmpty())
             pname = fname;
         _template = new Theory(pname + "(X):-this(Z), Z."+ fname + " <- get(X).\n" +
                              pname + " := V:-this(Z), Z."+ fname + " <- set(V).\n");

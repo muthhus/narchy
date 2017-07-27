@@ -162,7 +162,7 @@ public class TheoryManager {
      * predicate indicator passed as a parameter
      */
     public /*synchronized*/ boolean abolish(Struct pi) {
-        if (!(pi instanceof Struct) || !pi.isGround() || !(pi.getArity() == 2))
+        if (!(pi instanceof Struct) || !pi.isGround() || pi.getArity() != 2)
             throw new IllegalArgumentException(pi + " is not a valid Struct");
         if (!pi.name().equals("/"))
             throw new IllegalArgumentException(pi + " has not the valid predicate name. Espected '/' but was " + pi.name());

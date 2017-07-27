@@ -16,8 +16,8 @@ import java.util.Hashtable;
 
 public abstract class AbstractDynamicClassLoader extends ClassLoader
 {
-	protected ArrayList<URL> listURLs;
-	protected Hashtable<String, Class<?>> classCache = new Hashtable<>();
+	protected final ArrayList<URL> listURLs;
+	protected final Hashtable<String, Class<?>> classCache = new Hashtable<>();
 	
 	public AbstractDynamicClassLoader()
 	{

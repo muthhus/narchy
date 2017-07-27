@@ -34,7 +34,7 @@ public final class SubGoalTree extends FasterList<AbstractSubGoalTree> implement
         if (i.hasNext())
             result += i.next().toString();
         while (i.hasNext()) {
-            result += " , " + i.next().toString();
+            result += " , " + i.next();
         }
         return result + " ] ";
     }

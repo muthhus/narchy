@@ -194,9 +194,9 @@ public class OOLibrary extends Library {
      * @throws JavaException
      */
     public boolean new_object_3(Term className, Term argl, Term id) throws JavaException {
-        className = className.getTerm();
-        Struct arg = (Struct) argl.getTerm();
-        id = id.getTerm();
+        className = className.term();
+        Struct arg = (Struct) argl.term();
+        id = id.term();
         try {
             if (!className.isAtom()) {
                 throw new JavaException(new ClassNotFoundException(
@@ -291,7 +291,7 @@ public class OOLibrary extends Library {
     			if (mname.startsWith("getFunction"))
     				myLambdaInstance=(T) m.invoke(myLambdaFactory);
     		}
-    		id = id.getTerm();
+    		id = id.term();
     		if (bindDynamicObject(id, myLambdaInstance))
     			return true;
     		else
@@ -308,7 +308,7 @@ public class OOLibrary extends Library {
      * @throws JavaException
      */
     public boolean destroy_object_1(Term id) throws JavaException {
-        id = id.getTerm();
+        id = id.term();
         try {
             if (id.isGround()) {
                 unregisterDynamic((Struct) id);
@@ -338,28 +338,28 @@ public class OOLibrary extends Library {
      * @throws JavaException
      */
 	public boolean new_class_4(Term clSource, Term clName, Term clPathes,Term id) throws JavaException {
-		Struct classSource = (Struct) clSource.getTerm();
-		Struct className = (Struct) clName.getTerm();
-		Struct classPathes = (Struct) clPathes.getTerm();
-		id = id.getTerm();
+		Struct classSource = (Struct) clSource.term();
+		Struct className = (Struct) clName.term();
+		Struct classPathes = (Struct) clPathes.term();
+		id = id.term();
 		try {
             String fullClassName = alice.util.Tools.removeApices(className.toString());
 
-            String fullClassPath = fullClassName.replace('.', '/');
             Iterator<? extends Term> it = classPathes.listIterator();
             String cp = "";
             while (it.hasNext()) {
-                if (cp.length() > 0) {
+                if (!cp.isEmpty()) {
                     cp += ";";
                 }
                 cp += alice.util.Tools.removeApices(it.next()
                         .toString());
             }
-            if (cp.length() > 0) {
+            if (!cp.isEmpty()) {
                 cp = " -classpath " + cp;
             }
 
             String text = alice.util.Tools.removeApices(classSource.toString());
+            String fullClassPath = fullClassName.replace('.', '/');
             try {
                 FileWriter file = new FileWriter(fullClassPath + ".java");
                 file.write(text);
@@ -388,16 +388,15 @@ public class OOLibrary extends Library {
             }
             try 
             {
-            	Class<?> the_class;
-            	
-            	/**
+
+                /**
             	 * @author Alessio Mercurio
             	 * 
             	 * On Dalvik VM we can only use the DexClassLoader.
             	 */
 
-                the_class = Class.forName(fullClassName, true, System.getProperty("java.vm.name").equals("Dalvik") ? dynamicLoader : new ClassLoader());
-                
+                Class<?> the_class = Class.forName(fullClassName, true, System.getProperty("java.vm.name").equals("Dalvik") ? dynamicLoader : new ClassLoader());
+
                 if (bindDynamicObject(id, the_class))
                     return true;
                 else
@@ -423,11 +422,10 @@ public class OOLibrary extends Library {
 	 */
 	public boolean java_call_3(Term objId, Term method_name, Term idResult)
 			throws JavaException {
-		objId = objId.getTerm();
-		idResult = idResult.getTerm();
-		Struct method = (Struct) method_name.getTerm();
-		Object obj = null;
-		Signature args = null;
+		objId = objId.term();
+		idResult = idResult.term();
+		Struct method = (Struct) method_name.term();
+        Signature args = null;
 		String methodName = null;
 		try {
 			methodName = method.name();
@@ -457,8 +455,8 @@ public class OOLibrary extends Library {
 				throw new JavaException(new IllegalArgumentException());
 			}
 			String objName = alice.util.Tools.removeApices(objId.toString());
-			obj = staticObjects.containsKey(objName) ? staticObjects.get(objName) : currentObjects.get(objName);
-			Object res = null;
+            Object obj = staticObjects.containsKey(objName) ? staticObjects.get(objName) : currentObjects.get(objName);
+            Object res = null;
 
 			if (obj != null) {
 				Class<?> cl = obj.getClass();
@@ -548,7 +546,7 @@ public class OOLibrary extends Library {
     public boolean set_classpath_1(Term paths) throws JavaException
     {
     	try {
-    		paths = paths.getTerm();
+    		paths = paths.term();
         	if(!paths.isList())
         		throw new IllegalArgumentException();
         	String[] listOfPaths = getStringArrayFromStruct((Struct) paths);
@@ -577,13 +575,12 @@ public class OOLibrary extends Library {
 	public boolean get_classpath_1(Term paths) throws JavaException
     {
     	try {
-    		paths = paths.getTerm();
+    		paths = paths.term();
     		if(!(paths instanceof Var))
     			throw new IllegalArgumentException();
     		URL[] urls = dynamicLoader.getURLs();
         	String stringURLs = null;
-        	Term pathTerm = null;
-        	if(urls.length > 0)
+            if(urls.length > 0)
         	{
 	        	stringURLs = "[";
 	     
@@ -597,8 +594,8 @@ public class OOLibrary extends Library {
         	}
         	else
         		stringURLs = "[]";
-        	pathTerm = Term.createTerm(stringURLs);
-        	return unify(paths, pathTerm);
+            Term pathTerm = Term.createTerm(stringURLs);
+            return unify(paths, pathTerm);
     	}catch(IllegalArgumentException e)
         {
         	Prolog.warn("Illegal list of paths " + paths);
@@ -613,13 +610,13 @@ public class OOLibrary extends Library {
      * set the field value of an object
      */
     private boolean java_set(Term objId, Term fieldTerm, Term what) {
-        what = what.getTerm();
+        what = what.term();
         if (!fieldTerm.isAtom() || what instanceof Var)
             return false;
         String fieldName = ((Struct) fieldTerm).name();
-        Object obj = null;
         try {
             Class<?> cl = null;
+            Object obj = null;
             if(objId.isCompound() && ((Struct) objId).name().equals("class"))
             {
             	String clName = null;
@@ -700,9 +697,9 @@ public class OOLibrary extends Library {
             return false;
         }
         String fieldName = ((Struct) fieldTerm).name();
-        Object obj = null;
         try {
             Class<?> cl = null;
+            Object obj = null;
             if(objId.isCompound() && ((Struct) objId).name().equals("class"))
             {
             	String clName = null;
@@ -769,18 +766,17 @@ public class OOLibrary extends Library {
     
     public boolean java_array_set_primitive_3(Term obj_id, Term i, Term what)
             throws JavaException {
-        Struct objId = (Struct) obj_id.getTerm();
-        Number index = (Number) i.getTerm();
-        what = what.getTerm();
-        Object obj = null;
+        Struct objId = (Struct) obj_id.term();
+        Number index = (Number) i.term();
+        what = what.term();
         if (!index.isInteger()) {
             throw new JavaException(new IllegalArgumentException(index
                     .toString()));
         }
         try {
-            Class<?> cl = null;
             String objName = alice.util.Tools.removeApices(objId.toString());
-            obj = currentObjects.get(objName);
+            Object obj = currentObjects.get(objName);
+            Class<?> cl = null;
             if (obj != null) {
                 cl = obj.getClass();
             } else {
@@ -885,17 +881,16 @@ public class OOLibrary extends Library {
      * @throws JavaException
      */
     public boolean java_array_get_primitive_3(Term obj_id, Term i, Term what) throws JavaException {
-        Struct objId = (Struct) obj_id.getTerm();
-        Number index = (Number) i.getTerm();
-        what = what.getTerm();
-        Object obj = null;
+        Struct objId = (Struct) obj_id.term();
+        Number index = (Number) i.term();
+        what = what.term();
         if (!index.isInteger()) {
             throw new JavaException(new IllegalArgumentException(index.toString()));
         }
         try {
-            Class<?> cl = null;
             String objName = alice.util.Tools.removeApices(objId.toString());
-            obj = currentObjects.get(objName);
+            Object obj = currentObjects.get(objName);
+            Class<?> cl = null;
             if (obj != null) {
                 cl = obj.getClass();
             } else {
@@ -1175,7 +1170,7 @@ public class OOLibrary extends Library {
                 String castTo_name = alice.util.Tools
                         .removeApices(((Struct) castTo).name());
                 String castWhat_name = alice.util.Tools.removeApices(castWhat
-                        .getTerm().toString());
+                        .term().toString());
                 // System.out.println(castWhat_name+" "+castTo_name);
                 if (castTo_name.equals("java.lang.String")
                         && castWhat_name.equals("true")) {
@@ -1405,7 +1400,7 @@ public class OOLibrary extends Library {
                 // object already referenced
                 return false;
             } else {
-                String raw_name = alice.util.Tools.removeApices(id.getTerm()
+                String raw_name = alice.util.Tools.removeApices(id.term()
                         .toString());
                 staticObjects.put(raw_name, obj);
                 staticObjects_inverse.put(obj, id);
@@ -1429,15 +1424,14 @@ public class OOLibrary extends Library {
      */
     public boolean register_1(Term id) throws JavaException
     {
-    	id = id.getTerm();
-    	Object obj =  null; 
-    	try
+    	id = id.term();
+        try
         {
-        	obj = getRegisteredDynamicObject((Struct) id);
-        	return register((Struct)id, obj);
+            Object obj = getRegisteredDynamicObject((Struct) id);
+            return register((Struct)id, obj);
         }catch(InvalidObjectIdException e)
         {
-        	Prolog.warn("Illegal object id " + id.toString());
+        	Prolog.warn("Illegal object id " + id);
             throw new JavaException(e);
         }
     }
@@ -1456,13 +1450,13 @@ public class OOLibrary extends Library {
      */
     public boolean unregister_1(Term id) throws JavaException
     {
-    	id = id.getTerm(); 
+    	id = id.term();
     	try
         {
         	return unregister((Struct)id);
         }catch(InvalidObjectIdException e)
         {
-        	Prolog.warn("Illegal object id " + id.toString());
+        	Prolog.warn("Illegal object id " + id);
             throw new JavaException(e);
         }
     }
@@ -1649,10 +1643,10 @@ public class OOLibrary extends Library {
                 } else {
                     // verify of the id is already used
                     String raw_name = alice.util.Tools.removeApices(id
-                            .getTerm().toString());
+                            .term().toString());
                     Object linkedobj = currentObjects.get(raw_name);
                     if (linkedobj == null) {
-                        registerDynamic((Struct) (id.getTerm()), obj);
+                        registerDynamic((Struct) (id.term()), obj);
                         // log("ground id for a new obj: "+id+" as ref for "+obj);
                         return true;
                     } else {
@@ -1713,8 +1707,7 @@ public class OOLibrary extends Library {
             throws NoSuchMethodException {
         // first try for exact match
         try {
-            Method m = target.getMethod(name, argClasses);
-            return m;
+            return target.getMethod(name, argClasses);
         } catch (NoSuchMethodException e) {
             if (argClasses.length == 0) { // if no args & no exact match, out of
                 // luck
@@ -1972,8 +1965,8 @@ public class OOLibrary extends Library {
  */
 @SuppressWarnings("serial")
 class Signature implements Serializable {
-   Class<?>[] types;
-   Object[] values;
+   final Class<?>[] types;
+   final Object[] values;
 
     public Signature(Object[] v, Class<?>... c) {
         values = v;
@@ -2007,10 +2000,10 @@ class ClassLoader extends java.lang.ClassLoader {
  */
 @SuppressWarnings("serial")
 class ListenerInfo implements Serializable {
-    public String listenerInterfaceName;
-    public EventListener listener;
+    public final String listenerInterfaceName;
+    public final EventListener listener;
     // public String eventName;
-   public String eventFullClass;
+   public final String eventFullClass;
 
     public ListenerInfo(EventListener l, String eventClass, String n) {
         listener = l;

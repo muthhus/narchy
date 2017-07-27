@@ -45,10 +45,7 @@ public abstract class TokenMarker
 
         LineInfo info = lineInfo[lineIndex];
         LineInfo prev;
-        if(lineIndex == 0)
-            prev = null;
-        else
-            prev = lineInfo[lineIndex - 1];
+        prev = lineIndex == 0 ? null : lineInfo[lineIndex - 1];
 
         byte oldToken = info.token;
         byte token = markTokensImpl(prev == null ?
@@ -172,8 +169,8 @@ public abstract class TokenMarker
     {
         if (lines <= 0)
             return;
-        int len = index + lines;
         length -= lines;
+        int len = index + lines;
         System.arraycopy(lineInfo,len,lineInfo,
             index,lineInfo.length - len);
     }

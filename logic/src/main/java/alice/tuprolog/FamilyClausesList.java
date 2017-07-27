@@ -121,10 +121,7 @@ public class FamilyClausesList extends
 	@Override
 	public ClauseInfo removeLast() {
 		int s = size();
-		if (s == 0)
-			return null;
-		else
-			return remove(s -1);
+		return s == 0 ? null : remove(s - 1);
 
 //		ClauseInfo ci = getLast();
 //		if (remove(ci)){
@@ -176,7 +173,7 @@ public class FamilyClausesList extends
 	public List<ClauseInfo> get(Term goal){
 		// Gets the correct list and encapsulates it in ReadOnlyLinkedList
 		if(goal instanceof Struct){
-			Struct g = (Struct) goal.getTerm();
+			Struct g = (Struct) goal.term();
 
 			/*
 			 * If no arguments no optimization can be applied
@@ -188,7 +185,7 @@ public class FamilyClausesList extends
 			}
 
 			/* Retrieves first argument and checks type */
-			Term t = g.term(0).getTerm();
+			Term t = g.term(0).term();
 			if(t instanceof Var){
 				/*
 				 * if first argument is an unbounded variable,
@@ -264,13 +261,13 @@ public class FamilyClausesList extends
 		// See FamilyClausesList.get(Term): same concept
 		Term clause = ci.getHead();
 		if(clause instanceof Struct){
-			Struct g = (Struct) clause.getTerm();
+			Struct g = (Struct) clause.term();
 
 			if(g.getArity() == 0){
 				return;
 			}
 
-			Term t = g.term(0).getTerm();
+			Term t = g.term(0).term();
 			if(t instanceof Var){
 				numCompClausesIndex.insertAsShared(ci, first);
 				constantCompClausesIndex.insertAsShared(ci, first);
@@ -305,13 +302,13 @@ public class FamilyClausesList extends
 	void unregister(ClauseInfo ci) {
 		Term clause = ci.getHead();
 		if(clause != null){
-			Struct g = (Struct) clause.getTerm();
+			Struct g = (Struct) clause.term();
 
 			if(g.getArity() == 0){
 				return;
 			}
 
-			Term t = g.term(0).getTerm();
+			Term t = g.term(0).term();
 			if(t instanceof Var){
 				numCompClausesIndex.removeShared(ci);
 				constantCompClausesIndex.removeShared(ci);

@@ -116,7 +116,7 @@ public class J2PProxyFactory extends ProxyFactory {
     /**
 	 * If the value of this variable is not null, the class file of the generated proxy class is written under the directory specified by this variable.  For example, if the value is  <code>"."</code>, then the class file is written under the current directory.  This method is for debugging. <p>The default value is null.
 	 */
-    public String writeDirectory;
+    public final String writeDirectory;
 
     private static final Class<?> OBJECT_TYPE = Object.class;
 
@@ -146,16 +146,16 @@ public class J2PProxyFactory extends ProxyFactory {
      *
      * @since 3.4
      */
-    public static boolean useCache = true; 
+    public static final boolean useCache = true;
 
     private static final WeakHashMap<ClassLoader,Map<CacheKey,CacheKey>> proxyCache = new WeakHashMap<>();
 
     static class CacheKey {
-        String classes;
-        MethodFilter filter;
+        final String classes;
+        final MethodFilter filter;
         private final int hash;
         WeakReference<Class<?>> proxyClass;
-        MethodHandler handler;
+        final MethodHandler handler;
 
         public CacheKey(Class<?> superClass, Class<?>[] interfaces,
                         MethodFilter f, MethodHandler h)
@@ -386,7 +386,7 @@ public class J2PProxyFactory extends ProxyFactory {
 	 * A provider used by <code>createClass()</code> for obtaining a class loader. <code>get()</code> on this <code>ClassLoaderProvider</code> object is called to obtain a class loader. <p>The value of this field can be updated for changing the default implementation. <p>Example: <ul><pre> ProxyFactory.classLoaderProvider = new ProxyFactory.ClassLoaderProvider() { public ClassLoader get(ProxyFactory pf) { return Thread.currentThread().getContextClassLoader(); } }; </pre></ul>
 	 * @since   3.4
 	 */
-    public ClassLoaderProvider classLoaderProvider
+    public final ClassLoaderProvider classLoaderProvider
         = pf -> ((J2PProxyFactory)pf).getClassLoader0();
 
     @Override
@@ -479,11 +479,12 @@ public class J2PProxyFactory extends ProxyFactory {
         return classname + "_$$_javassist_" + counter++;
     }
 
-    private ClassFile make() throws CannotCompileException {
-        String superName, classname;
+    private ClassFile make() throws CannotCompileException, DuplicateMemberException {
         if (interfaces == null)
             interfaces = new Class[0];
 
+        String classname;
+        String superName;
         if (superClass == null) {
             superClass = OBJECT_TYPE;
             superName = superClass.getName();
@@ -571,8 +572,7 @@ public class J2PProxyFactory extends ProxyFactory {
 
     private static void addMethodsHolder(ClassFile cf, ConstPool cp,
                                          String classname, int size)
-        throws CannotCompileException
-    {
+            throws DuplicateMemberException {
         FieldInfo finfo = new FieldInfo(cp, HOLDER, HOLDER_TYPE);
         finfo.setAccessFlags(AccessFlag.PRIVATE | AccessFlag.STATIC);
         cf.addField(finfo);
@@ -587,8 +587,7 @@ public class J2PProxyFactory extends ProxyFactory {
     }
 
     private static void addSetter(String classname, ClassFile cf, ConstPool cp)
-        throws CannotCompileException
-    {
+            throws DuplicateMemberException {
         MethodInfo minfo = new MethodInfo(cp, HANDLER_SETTER,
                                           HANDLER_SETTER_TYPE);
         minfo.setAccessFlags(AccessFlag.PUBLIC);
@@ -640,8 +639,7 @@ public class J2PProxyFactory extends ProxyFactory {
 
     private static void override(String thisClassname, Method meth, String prefix,
                                  int index, String desc, ClassFile cf, ConstPool cp)
-        throws CannotCompileException
-    {
+            throws DuplicateMemberException {
         Class<?> declClass = meth.getDeclaringClass();
         String delegatorName = prefix + index + meth.getName();
         if (Modifier.isAbstract(meth.getModifiers()))
@@ -661,8 +659,7 @@ public class J2PProxyFactory extends ProxyFactory {
     }
 
     private void makeConstructors(String thisClassName, ClassFile cf,
-            ConstPool cp, String classname) throws CannotCompileException
-    {
+            ConstPool cp, String classname) throws DuplicateMemberException {
         Constructor<?>[] cons = superClass.getDeclaredConstructors();
         for (int i = 0; i < cons.length; i++) {
             Constructor<?> c = cons[i];
@@ -711,19 +708,13 @@ public class J2PProxyFactory extends ProxyFactory {
         else {
             String p = getPackageName(from);
             String q = getPackageName(meth.getDeclaringClass().getName());
-            if (p == null)
-                return q == null;
-            else
-                return p.equals(q);
+            return p == null ? q == null : p.equals(q);
         }
     }
 
     private static String getPackageName(String name) {
         int i = name.lastIndexOf('.');
-        if (i < 0)
-            return null;
-        else
-            return name.substring(0, i);
+        return i < 0 ? null : name.substring(0, i);
     }
 
     private static HashMap<String,Method> getMethods(Class<?> superClass, Class<?>... interfaceTypes) {
@@ -829,12 +820,11 @@ public class J2PProxyFactory extends ProxyFactory {
          * return ($r)handler.invoke(this, methods[index * 2],
          *                methods[index * 2 + 1], $args);
          */
-        int origIndex = index * 2;
-        int delIndex = index * 2 + 1;
-        int arrayVar = args + 1;
         code.addGetstatic(thisClassName, HOLDER, HOLDER_TYPE);
+        int arrayVar = args + 1;
         code.addAstore(arrayVar);
         code.addAload(arrayVar);
+        int origIndex = index * 2;
         code.addIconst(origIndex);
         code.addOpcode(Opcode.AALOAD);
         code.addOpcode(Opcode.IFNONNULL);
@@ -842,6 +832,7 @@ public class J2PProxyFactory extends ProxyFactory {
         code.addIndex(0);
 
         callFindMethod(code, "findSuperMethod", arrayVar, origIndex, meth.getName(), desc);
+        int delIndex = index * 2 + 1;
         callFindMethod(code, "findMethod", arrayVar, delIndex, delegatorName, desc);
 
         code.write16bit(pc, code.currentPc() - pc + 1);
@@ -945,10 +936,10 @@ public class J2PProxyFactory extends ProxyFactory {
     }
 
     private static void makeParameterList(Bytecode code, Class<?>... params) {
-        int regno = 1;
         int n = params.length;
         code.addIconst(n);
         code.addAnewarray("java/lang/Object");
+        int regno = 1;
         for (int i = 0; i < n; i++) {
             code.addOpcode(Opcode.DUP);
             code.addIconst(i);
@@ -980,9 +971,6 @@ public class J2PProxyFactory extends ProxyFactory {
      */
     private static void callFindMethod(Bytecode code, String findMethod,
             int arrayVar, int index, String methodName, String desc) {
-        String findClass = RuntimeSupport.class.getName();
-        String findDesc
-            = "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/reflect/Method;";
 
         code.addAload(arrayVar);
         code.addIconst(index);
@@ -992,6 +980,8 @@ public class J2PProxyFactory extends ProxyFactory {
             code.addAload(0);
             code.addLdc(methodName);
             code.addLdc(desc);
+            String findDesc = "(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)Ljava/lang/reflect/Method;";
+            String findClass = RuntimeSupport.class.getName();
             code.addInvokestatic(findClass, findMethod, findDesc);
         }
 

@@ -18,8 +18,7 @@ public class ChoicePointStore {
             pointer = cpc;
             return;
         }
-        ChoicePointContext oldCtx = pointer;
-        cpc.prevChoicePointContext = oldCtx;
+        cpc.prevChoicePointContext = pointer;
         pointer = cpc;
     }
     

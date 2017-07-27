@@ -224,7 +224,7 @@ public class Tokenizer {
                 }                
                 t.value = buf;                
             }
-            return buf.length()!=0;
+            return !buf.isEmpty();
         }
     };
 

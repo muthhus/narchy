@@ -105,7 +105,7 @@ public class KeywordMap
     /**
 	 * @uml.property  name="mapLength"
 	 */
-    protected int mapLength;
+    protected final int mapLength;
 
     protected int getStringMapKey(String s)
     {
@@ -131,9 +131,9 @@ public class KeywordMap
             this.next = next;
         }
 
-        public char[] keyword;
-        public byte id;
-        public Keyword next;
+        public final char[] keyword;
+        public final byte id;
+        public final Keyword next;
     }
 
     private final Keyword[] map;

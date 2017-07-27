@@ -35,7 +35,7 @@ public class StateInit extends State {
      * @see alice.tuprolog.AbstractRunState#doJob()
      */
     @Override
-    void doJob(Engine e) {
+    void run(Engine e) {
         e.prepareGoal();
         
         /* Initialize first executionContext */

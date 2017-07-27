@@ -39,16 +39,16 @@ public class StateRuleSelection extends State {
      * @see alice.tuprolog.AbstractRunState#doJob()
      */
     @Override
-    void doJob(Engine e) {
+    void run(Engine e) {
         /*----------------------------------------------------
          * Individuo compatibleGoals e
          * stabilisco se derivo da Backtracking.
          */
         Struct goal = e.currentContext.currentGoal;
-        boolean fromBacktracking = true;
         ChoicePointContext alternative = e.currentAlternative;
-        ClauseStore clauseStore;
         e.currentAlternative = null;
+        ClauseStore clauseStore;
+        boolean fromBacktracking = true;
         if (alternative == null) {
             /* from normal evaluation */
             fromBacktracking = false;

@@ -18,7 +18,6 @@
 package alice.tuprolog;
 
 import java.io.Serializable;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -172,11 +171,9 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
      */
     public Term getVarValue(String varName) throws NoSolutionException {
         if (isSuccess) {
-            Iterator<Var> it = bindings.iterator();
-            while (it.hasNext()) {
-                Var v = it.next();
-                if (v!=null && v.getName().equals(varName)) {
-                    return v.getTerm();
+            for (Var v : bindings) {
+                if (v != null && v.getName().equals(varName)) {
+                    return v.term();
                 }
             }
             return null;
@@ -194,16 +191,14 @@ public class Solution implements Serializable/*, ISolution<Term,Term,Term>*/  {
     public String toString() {
         if (isSuccess) {
             StringBuilder st = new StringBuilder("yes");
-            if (bindings.size() > 0) {
+            if (!bindings.isEmpty()) {
                 st.append(".\n");
             } else {
                 st.append(". ");
             }
-            Iterator<Var> it = bindings.iterator();
-            while(it.hasNext()) {
-                Var v = it.next();
-                if (v != null && !v.isAnonymous() && v.isBound() && 
-                        (!(v.getTerm() instanceof Var) || (!((Var) (v.getTerm())).getName().startsWith("_")))) {
+            for (Var v : bindings) {
+                if (v != null && !v.isAnonymous() && v.isBound() &&
+                        (!(v.term() instanceof Var) || (!((Var) (v.term())).getName().startsWith("_")))) {
                     st.append(v);
                     st.append("  ");
                 }

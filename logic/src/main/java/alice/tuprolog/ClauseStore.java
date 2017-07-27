@@ -1,6 +1,7 @@
 package alice.tuprolog;
 
 import alice.util.OneWayList;
+import jcog.list.FasterList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -73,7 +74,7 @@ public class ClauseStore {
      * @return true if compatible or false otherwise.
      */
     protected boolean existCompatibleClause() {
-        List<Term> saveUnifications = deunify(vars, new ArrayList(vars.size()));
+        List<Term> saveUnifications = deunify(vars, new FasterList<>(vars.size()));
         boolean found = checkCompatibility(goal);
         reunify(vars, saveUnifications);
         return found;

@@ -49,8 +49,8 @@ public class PrologInvocationContext {
     public Term<?> buildGoal(Object... args) {
         Term<?>[] tlist = new Term<?>[variableNames.size()];
         int i = 0;
-        int pos;
         for (String name : variableNames) {
+            int pos;
             if ((pos = inputVariables.indexOf(name)) != -1) {
                 tlist[i] = (Term<?>)args[pos];
             }
@@ -270,7 +270,7 @@ public class PrologInvocationContext {
                     throw new NoSolutionException();
                 }
                 else if (!_result.hasNext() && !exceptionOnFailure) {
-                    return (outputVariables.size()==0) ? Boolean.FALSE : null;
+                    return (outputVariables.isEmpty()) ? Boolean.FALSE : null;
                 }
                 class SolutionIterator implements Iterator<Object> {
                     
@@ -293,19 +293,14 @@ public class PrologInvocationContext {
                         else {
                             Term<?>[] termList = new Term<?>[size];
                             int i = 0;
-                            int pos;
                             for (Term<?> t : res) {
+                                int pos;
                                 if ((pos = outputVariables.indexOf(variableNames.get(i)))!=-1) {
                                     termList[pos] = formatTerm(t);
                                 }
                                 i++;
                             }
-                            if (termList.length > 1) {
-                                return Cons.make(res.getName(),termList);                              
-                            }
-                            else {
-                                return termList[0];                              
-                            }
+                            return termList.length > 1 ? Cons.make(res.getName(), termList) : termList[0];
                         }
                     }
                     @Override
@@ -321,14 +316,14 @@ public class PrologInvocationContext {
                     throw new NoSolutionException();
                 }
                 else if (!si.isSuccess() && !exceptionOnFailure) {
-                    return (outputVariables.size()==0) ? Boolean.FALSE : null;
+                    return (outputVariables.isEmpty()) ? Boolean.FALSE : null;
                 }
-                Object result = null;
                 if (!si.isSuccess() && exceptionOnFailure) {
                     throw new NoSolutionException();
                 }                                
                 Cons<?,?> res = si.getSolution();
-                int size = outputVariables.size();                
+                int size = outputVariables.size();
+                Object result = null;
                 if (size == 0) {
                     result = si.isSuccess() ? Boolean.TRUE : Boolean.FALSE;
                 }
@@ -342,12 +337,7 @@ public class PrologInvocationContext {
                         }
                         i++;
                     }
-                    if (termList.length > 1) {
-                            result = Cons.make(res.getName(),termList);                              
-                        }
-                        else {
-                            result = termList[0];                              
-                        }
+                    result = termList.length > 1 ? Cons.make(res.getName(), termList) : termList[0];
                 }                                    
                 return result;
             }
@@ -358,9 +348,6 @@ public class PrologInvocationContext {
     }
     
     private Term<?> formatTerm(Term<?> t) {
-        if (t instanceof Var<?> && !keepSubstitutions)
-            return ((Var<?>)t).getValue();
-        else
-            return t;
+        return t instanceof Var<?> && !keepSubstitutions ? ((Var<?>) t).getValue() : t;
     }
 }

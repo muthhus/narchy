@@ -169,8 +169,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         }
         catch (Exception e) {
             env.getMessager().printMessage(ERROR,ERR_PREDICATE_MALFORMED,md);
-            return;
-        }        
+        }
     }
     
     private void checkSignature(String s,ExecutableElement md) {                        
@@ -182,13 +181,11 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         }
         catch (Exception e) {
             env.getMessager().printMessage(ERROR,ERR_SIGNATURE_MALFORMED,md);
-            return;
-        }        
+        }
     }
     
     private static Theory checkTheory(String theory) {
-        Theory t = null;                  
-        t = new Theory(theory);                            
+        Theory t = new Theory(theory);
         /*if (t == null) {
             env.getMessager().printMessage(ERROR,ERR_THEORY_INVALID,enclosingDeclaration);
         } */       
@@ -215,7 +212,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
             checkReturnType(pm.keepSubstitutions(),md,pm);                        
         }                        
         else if (signature == null && predicate != null) {
-            if (pm.keepSubstitutions() == false) {
+            if (!pm.keepSubstitutions()) {
                 env.getMessager().printMessage(WARNING,ERR_KEEP_SUBST_DEFAULTS_TRUE,md);
             }
             checkTypeVariables(md,pm);
@@ -239,7 +236,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
         
         TypeMirror requiredType = null;
         
-        if (signature.outputTree.variables.size() == 0) {            
+        if (signature.outputTree.variables.isEmpty()) {
             requiredType=boolType;
         }
         else {
@@ -470,7 +467,7 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
     
     private class TypeParser {
     
-        StringTokenizer lexer;
+        final StringTokenizer lexer;
         String currentToken;
     
         private TypeParser(String s) {
@@ -490,19 +487,14 @@ public class PJAnnotationProcessor extends ElementScanner6<Void,Void> implements
             catch (Exception e) {
                 return env.getTypeUtils().getDeclaredType(env.getElementUtils().getTypeElement(baseName));
             }
-            TypeMirror[] params = parseTypes();                
-            if (!wildcard) {                
-                return env.getTypeUtils().getDeclaredType(env.getElementUtils().getTypeElement(baseName), params);                
-            }
-            else {            
-                return env.getTypeUtils().getWildcardType(null,null);                    
-            }
+            TypeMirror[] params = parseTypes();
+            return !wildcard ? env.getTypeUtils().getDeclaredType(env.getElementUtils().getTypeElement(baseName), params) : env.getTypeUtils().getWildcardType(null, null);
         }
 
-        public TypeMirror[] parseTypes() {                
-            Vector<TypeMirror> types = new Vector<>();
+        public TypeMirror[] parseTypes() {
             if (currentToken.equals("<")) {
-                while (!currentToken.equals(">")) {                
+                Vector<TypeMirror> types = new Vector<>();
+                while (!currentToken.equals(">")) {
                     currentToken = lexer.nextToken();                
                     types.add(parseType());
                 }        

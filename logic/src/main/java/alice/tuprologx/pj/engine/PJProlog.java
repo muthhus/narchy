@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
  */
 public class PJProlog /*extends alice.tuprolog.Prolog*/ {
     
-    protected alice.tuprolog.Prolog engine;
+    protected final alice.tuprolog.Prolog engine;
     
     public PJProlog() {
         engine = new alice.tuprolog.Prolog();        
@@ -49,8 +49,7 @@ public class PJProlog /*extends alice.tuprolog.Prolog*/ {
         }
 
     public <G extends Term<?>, S extends Term<?>> PrologSolution<G,S> solve(G g) {
-        Solution retValue;
-        retValue = engine.solve(g.marshal());        
+        Solution retValue = engine.solve(g.marshal());
         return new PrologSolution<>(retValue);
     }
     

@@ -22,63 +22,63 @@ package alice.tuprolog;
  */
 public class StateGoalEvaluation extends State {
 
-	public StateGoalEvaluation(EngineRunner c) {
-		this.c = c;
-		stateName = "Eval";
-	}
+    public StateGoalEvaluation(EngineRunner c) {
+        this.c = c;
+        stateName = "Eval";
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see alice.tuprolog.AbstractRunState#doJob()
-	 */
-	@Override
-	void doJob(Engine e) {
-		if (e.currentContext.currentGoal.isPrimitive()) {
-			// Recupero primitiva
-			PrimitiveInfo primitive = e.currentContext.currentGoal
-			.getPrimitive();
-			try {
-				e.nextState = (primitive
-						.evalAsPredicate(e.currentContext.currentGoal)) ?
-						c.GOAL_SELECTION
-								: c.BACKTRACK;
-			} catch (HaltException he) {
-				e.nextState = c.END_HALT;
-			} catch (Throwable t) {
+    /*
+     * (non-Javadoc)
+     *
+     * @see alice.tuprolog.AbstractRunState#doJob()
+     */
+    @Override
+    void run(Engine e) {
+        if (e.currentContext.currentGoal.isPrimitive()) {
+            // Recupero primitiva
+            PrimitiveInfo primitive = e.currentContext.currentGoal
+                    .getPrimitive();
+            try {
+                e.nextState = (primitive
+                        .evalAsPredicate(e.currentContext.currentGoal)) ?
+                        c.GOAL_SELECTION
+                        : c.BACKTRACK;
+            } catch (HaltException he) {
+                e.nextState = c.END_HALT;
+            } catch (Throwable t) {
 
-				if (t instanceof PrologError) {
-					// cast da Throwable a PrologError
-					PrologError error = (PrologError) t;
-					// sostituisco il gol in cui si ? verificato l'errore con il
-					// subgoal throw/1
-					e.currentContext.currentGoal = new Struct("throw", error.getError());
-					/*Castagna 06/2011*/					
-					e.manager.exception(error.toString());
+                if (t instanceof PrologError) {
+                    // cast da Throwable a PrologError
+                    PrologError error = (PrologError) t;
+                    // sostituisco il gol in cui si ? verificato l'errore con il
+                    // subgoal throw/1
+                    e.currentContext.currentGoal = new Struct("throw", error.getError());
+                    /*Castagna 06/2011*/
+                    e.manager.exception(error.toString());
 					/**/
-				} else if (t instanceof JavaException) {
-					// cast da Throwable a JavaException
-					JavaException exception = (JavaException) t;
+                } else if (t instanceof JavaException) {
+                    // cast da Throwable a JavaException
+                    JavaException exception = (JavaException) t;
 
-					// sostituisco il gol in cui si ? verificato l'errore con il
-					// subgoal java_throw/1
-					e.currentContext.currentGoal = new Struct("java_throw", exception.getException());
-					/*Castagna 06/2011*/					
-					e.manager.exception(exception.getException().toString());
+                    // sostituisco il gol in cui si ? verificato l'errore con il
+                    // subgoal java_throw/1
+                    e.currentContext.currentGoal = new Struct("java_throw", exception.getException());
+					/*Castagna 06/2011*/
+                    e.manager.exception(exception.getException().toString());
 					/**/
 
-					//TODO logging
-					System.err.println( ((JavaException) t).getException() );
-				}
+                    //TODO logging
+                    System.err.println(((JavaException) t).getException());
+                }
 
-				// mi sposto nello stato EXCEPTION
-				e.nextState = c.EXCEPTION;
-			}
-			// Incremento il counter dei passi di dimostrazione
-			e.nDemoSteps++;
-		} else {
-			e.nextState = c.RULE_SELECTION;
-		}
-	}
+                // mi sposto nello stato EXCEPTION
+                e.nextState = c.EXCEPTION;
+            }
+            // Incremento il counter dei passi di dimostrazione
+            e.nDemoSteps++;
+        } else {
+            e.nextState = c.RULE_SELECTION;
+        }
+    }
 
 }

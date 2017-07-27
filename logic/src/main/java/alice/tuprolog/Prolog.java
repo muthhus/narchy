@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
 
 
@@ -58,9 +59,9 @@ public class Prolog  {
 	/* exception activated ? */
 	private boolean exception;
 	/**/
-	private final ArrayList<OutputListener> outputListeners;
+	private final CopyOnWriteArrayList<OutputListener> outputListeners;
 	/* listeners registrated for virtual machine internal events */
-	private final ArrayList<SpyListener> spyListeners;
+	private final CopyOnWriteArrayList<SpyListener> spyListeners;
 
 	/* listeners registrated for virtual machine state change events */
 	//private final ArrayList<WarningListener> warningListeners;
@@ -68,7 +69,7 @@ public class Prolog  {
 
 	/*Castagna 06/2011*/
 	/* listeners registrated for virtual machine state exception events */
-	@Deprecated private final ArrayList<ExceptionListener> exceptionListeners;
+	@Deprecated private final CopyOnWriteArrayList<ExceptionListener> exceptionListeners;
 	/**/
 
 	/* listeners to theory events */
@@ -148,10 +149,10 @@ public class Prolog  {
 	 */
 	private Prolog(boolean spy, ClauseIndex dynamics) {
 
-		outputListeners = new ArrayList<>();
-		spyListeners = new ArrayList<>();
+		outputListeners = new CopyOnWriteArrayList<>();
+		spyListeners = new CopyOnWriteArrayList<>();
 		/*Castagna 06/2011*/
-		exceptionListeners = new ArrayList<>();
+		exceptionListeners = new CopyOnWriteArrayList<>();
 		/**/
 		this.spy = spy;
 
@@ -418,7 +419,7 @@ public class Prolog  {
 	 *
 	 *  @return the list of the operators
 	 */
-	public java.util.List<Operator> getCurrentOperatorList() {	//no syn
+	public java.util.List<Operator> operators() {	//no syn
 		return opManager.getOperators();
 	}
 
@@ -529,8 +530,7 @@ public class Prolog  {
 	 * @return true if open alternatives are present
 	 */
 	public boolean hasOpenAlternatives() {		//no syn
-		boolean b =  engineManager.hasOpenAlternatives();
-		return b;
+		return engineManager.hasOpenAlternatives();
 	}
 
 	/**
@@ -620,7 +620,7 @@ public class Prolog  {
 	 * Checks the spy state of the engine
 	 * @return  true if the engine emits spy information
 	 */
-	public synchronized boolean isSpy() {
+	public boolean isSpy() {
 		return spy;
 	}
 
@@ -708,7 +708,7 @@ public class Prolog  {
 	 *
 	 * @param m the output string
 	 */
-	public synchronized void stdOutput(String m) {
+	public void stdOutput(String m) {
 		notifyOutput(new OutputEvent(this, m));
 	}
 
@@ -719,7 +719,7 @@ public class Prolog  {
 	 *
 	 * @param l the listener
 	 */
-	public synchronized void addOutputListener(OutputListener l) {
+	public void addOutputListener(OutputListener l) {
 		outputListeners.add(l);
 	}
 
@@ -756,7 +756,7 @@ public class Prolog  {
 	 *
 	 * @param l the listener
 	 */
-	public synchronized void addSpyListener(SpyListener l) {
+	public void addSpyListener(SpyListener l) {
 		spy = true;
 		spyListeners.add(l);
 	}
@@ -776,7 +776,7 @@ public class Prolog  {
 	 *
 	 * @param l the listener
 	 */
-	public synchronized void addExceptionListener(ExceptionListener l) {
+	public void addExceptionListener(ExceptionListener l) {
 		exceptionListeners.add(l);
 	}
 	/**/
@@ -786,7 +786,7 @@ public class Prolog  {
 	 *
 	 * @param l the listener
 	 */
-	public synchronized void removeOutputListener(OutputListener l) {
+	public void removeOutputListener(OutputListener l) {
 		outputListeners.remove(l);
 	}
 
@@ -1046,13 +1046,11 @@ public class Prolog  {
 	public Term termSolve(String st){
 		try{
 			Parser p = new Parser(opManager, st);
-			Term t = p.nextTerm(true);
-			return t;
+			return p.nextTerm(true);
 		}catch(InvalidTermException e)
 		{
 			String s = "null";
-			Term t = Term.createTerm(s);
-			return t;
+			return Term.createTerm(s);
 		}
 	}
 

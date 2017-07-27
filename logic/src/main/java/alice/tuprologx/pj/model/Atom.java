@@ -16,7 +16,7 @@ import java.util.Collections;
  * @author maurizio
  */
 public class Atom extends Term<Atom> {
-	String _theAtom;
+	final String _theAtom;
 
 	public Atom (String s) {_theAtom=s;}
 	

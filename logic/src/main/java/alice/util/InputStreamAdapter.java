@@ -25,9 +25,8 @@ public class InputStreamAdapter extends InputStream {
 	@Override
 	public int read() throws IOException {
 		int x = reader.read();
-		
-		if(x == -1) return -1;
-		else return x & 0xFF;
+
+        return x == -1 ? -1 : x & 0xFF;
 	}
 	
 	/**

@@ -50,7 +50,7 @@ public class Long extends Number {
      */
     @Override
     final public float floatValue() {
-        return (float) value;
+        return value;
     }
     
     /**
@@ -59,7 +59,7 @@ public class Long extends Number {
      */
     @Override
     final public double doubleValue() {
-        return (double) value;
+        return value;
     }
     
     /**
@@ -146,7 +146,7 @@ public class Long extends Number {
      */
     @Override
     public boolean isGreater(Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Number) {
             return value > ( (Number) t ).longValue();
         } else if (t instanceof Struct) {
@@ -170,7 +170,7 @@ public class Long extends Number {
      */
     @Override
     public boolean isEqual(Term t) {
-        t = t.getTerm();
+        t = t.term();
         return t instanceof Number && value == ((Number) t).longValue();
     }
     
@@ -180,7 +180,7 @@ public class Long extends Number {
      */
     @Override
     boolean unify(List<Var> vl1, List<Var> vl2, Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Var) {
             return t.unify(vl1, vl2, this);
         } else if (t instanceof Number && ((Number) t).isInteger()) {
@@ -199,7 +199,7 @@ public class Long extends Number {
      */
     @Override
     public int compareTo(Number o) {
-        return (java.lang.Long.valueOf(value)).compareTo(o.longValue());
+        return java.lang.Long.compare(value, o.longValue());
     }
     
 }

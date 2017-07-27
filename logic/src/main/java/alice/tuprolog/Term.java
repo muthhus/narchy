@@ -89,8 +89,8 @@ public abstract class Term implements Serializable, AbstractSubGoalTree {
     {
         return this==t || ((t instanceof Term) && isEqual((Term) t));
     }
-    
-    
+
+
     /**
      * is term greater than term t?
      */
@@ -105,7 +105,7 @@ public abstract class Term implements Serializable, AbstractSubGoalTree {
     /**
 	 * Gets the actual term referred by this Term. if the Term is a bound variable, the method gets the Term linked to the variable
 	 */
-    public abstract Term getTerm();
+    public abstract Term term();
     
     
     /**

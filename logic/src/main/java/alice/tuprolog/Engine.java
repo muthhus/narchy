@@ -31,7 +31,7 @@ public class Engine /*Castagna 06/2011*/implements IEngine/**/{
 
 	//PrintStream log;
 	State  nextState;
-	Term   query;
+	final Term   query;
 	Struct startGoal;
 	Collection<Var> goalVars;
 	int    nDemoSteps;
@@ -40,7 +40,7 @@ public class Engine /*Castagna 06/2011*/implements IEngine/**/{
 	ChoicePointContext currentAlternative;
 	ChoicePointStore choicePointSelector;
 	boolean mustStop;
-	EngineRunner manager;
+	final EngineRunner manager;
 
 
 	public Engine(EngineRunner manager, Term query) {
@@ -77,7 +77,7 @@ public class Engine /*Castagna 06/2011*/implements IEngine/**/{
 				break;
 			}
 
-			nextState.doJob(this);
+			nextState.run(this);
 
 			if (manager.isSpy()) {
 				manager.spy(nextState.toString(), this);
@@ -85,7 +85,7 @@ public class Engine /*Castagna 06/2011*/implements IEngine/**/{
 			
 
 		} while (!(nextState instanceof StateEnd));
-		nextState.doJob(this);
+		nextState.run(this);
 
 		return (StateEnd)(nextState);
 	}
@@ -113,9 +113,7 @@ public class Engine /*Castagna 06/2011*/implements IEngine/**/{
 		return l;
 	}
 
-	public ChoicePointStore getChoicePointStore() {
-		return choicePointSelector;
-	}
+//	public ChoicePointStore getChoicePointStore() {	return choicePointSelector;	}
 
 	void prepareGoal() {
 		LinkedHashMap<Var,Var> goalVars = new LinkedHashMap<>();

@@ -16,13 +16,16 @@ public class EngineManager implements java.io.Serializable {
 
     private final Prolog vm;
 
-    private static final ThreadLocal<Integer> threads = new ThreadLocal<>();    //key: pid; obj: id
+
 
     private final EngineRunner er1 = new EngineRunner(0);
     private final AtomicInteger id = new AtomicInteger();
 
-    private final ConcurrentHashMap<Integer, EngineRunner> runners
+
+    private static final ThreadLocal<Integer> threads = new ThreadLocal<>();    //key: pid; obj: id
+     private final ConcurrentHashMap<Integer, EngineRunner> runners
             = new ConcurrentHashMap<>();    //key: id; obj: runner
+
     private final ConcurrentHashMap<String, TermQueue> queues
             = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, ReentrantLock> locks
@@ -41,10 +44,11 @@ public class EngineManager implements java.io.Serializable {
         if (goal == null)
             return false;
 
+        //TODO Thread.currentThread().getId()
         int id = this.id.incrementAndGet();
 
         if (goal instanceof Var)
-            goal = goal.getTerm();
+            goal = goal.term();
 
         EngineRunner er = new EngineRunner(id) {
             @Override
@@ -92,11 +96,10 @@ public class EngineManager implements java.io.Serializable {
 		/*toSPY
 		 * System.out.println("Thread id "+runnerId()+" - prelevo la soluzione (read) del thread di id: "+er.getId());
 		 */
-        Solution solution = er.read();
-		/*toSPY
+        /*toSPY
 		 * System.out.println("Soluzione: "+solution);
 		 */
-        return solution;
+        return er.read();
     }
 
     public boolean hasNext(int id) {
@@ -279,7 +282,7 @@ public class EngineManager implements java.io.Serializable {
      * @return L'EngineRunner associato al thread di id specificato.
      */
 
-    private final EngineRunner runner(int id) {
+    private EngineRunner runner(int id) {
         //if (!runners.containsKey(id)) return null;
         //synchronized (runners) {
         //synchronized (runners) {
@@ -295,11 +298,7 @@ public class EngineManager implements java.io.Serializable {
         //synchronized(threads){
         Integer id = threads.get();
         //synchronized (runners) {
-        if (id!=null) {
-            return runner(id);
-        } else {
-            return er1;
-        }
+        return id != null ? runner(id) : er1;
 
         //}
         //}

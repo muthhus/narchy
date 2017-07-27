@@ -48,7 +48,7 @@ public class Int extends Number {
      */
     @Override
     final public float floatValue() {
-        return (float) value;
+        return value;
     }
     
     /**
@@ -57,7 +57,7 @@ public class Int extends Number {
      */
     @Override
     final public double doubleValue() {
-        return (double) value;
+        return value;
     }
     
     /**
@@ -146,7 +146,7 @@ public class Int extends Number {
      */
     @Override
     public boolean isGreater(Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Number) {
             return value>((Number)t).intValue();
         } else if (t instanceof Struct) {
@@ -169,7 +169,7 @@ public class Int extends Number {
      */
     @Override
     public boolean isEqual(Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Number) {
             Number n = (Number) t;
             if (!n.isInteger())
@@ -185,7 +185,7 @@ public class Int extends Number {
      */
     @Override
     boolean unify(List<Var> vl1, List<Var> vl2, Term t) {
-        t = t.getTerm();
+        t = t.term();
         if (t instanceof Var) {
             return t.unify(vl2, vl1, this);
         } else if (t instanceof Number && ((Number) t).isInteger()) {
@@ -204,7 +204,7 @@ public class Int extends Number {
      */
     @Override
     public int compareTo(Number o) {
-        return (Integer.valueOf(value)).compareTo(o.intValue());
+        return Integer.compare(value, o.intValue());
     }
     
 }

@@ -35,7 +35,7 @@ public class ISOLibrary extends Library {
     }
 
     public boolean atom_length_2(Term arg0, Term len) throws PrologError {
-        arg0 = arg0.getTerm();
+        arg0 = arg0.term();
         if (arg0 instanceof Var)
             throw PrologError.instantiation_error(engine.getEngineManager(), 1);
         if (!arg0.isAtom())
@@ -46,8 +46,8 @@ public class ISOLibrary extends Library {
     }
 
     public boolean atom_chars_2(Term arg0, Term arg1) throws PrologError {
-        arg0 = arg0.getTerm();
-        arg1 = arg1.getTerm();
+        arg0 = arg0.term();
+        arg1 = arg1.term();
         if (arg0 instanceof Var) {
             if (!arg1.isList()) {
                 throw PrologError.type_error(engine.getEngineManager(), 2,
@@ -98,8 +98,8 @@ public class ISOLibrary extends Library {
     }
 
     public boolean char_code_2(Term arg0, Term arg1) throws PrologError {
-        arg0 = arg0.getTerm();
-        arg1 = arg1.getTerm();
+        arg0 = arg0.term();
+        arg1 = arg1.term();
         if (arg1 instanceof Var) {
             if (arg0.isAtom()) {
                 String st = ((Struct) arg0).name();
@@ -350,7 +350,7 @@ public class ISOLibrary extends Library {
         if (val0 instanceof Number && val1 instanceof Number) {
             int x = ((Number) val0).intValue();
             int y = ((Number) val1).intValue();
-            int f = new java.lang.Double(Math.floor((double) x / (double) y))
+            int f = new java.lang.Double(Math.floor((double) x / y))
                     .intValue();
             return new Int(x - (f * y));
         }
@@ -397,22 +397,22 @@ public class ISOLibrary extends Library {
                 //
                 ":- flag(bounded, [true,false], true, false).\n"
                 + ":- flag(max_integer, ["
-                + Integer.valueOf(Integer.MAX_VALUE).toString()
+                + Integer.MAX_VALUE
                 + "], "
-                + Integer.valueOf(Integer.MAX_VALUE).toString()
+                + Integer.MAX_VALUE
                 + ",false).\n"
                 + ":- flag(min_integer, ["
-                + Integer.valueOf(Integer.MIN_VALUE).toString()
+                + Integer.MIN_VALUE
                 + "], "
-                + Integer.valueOf(Integer.MIN_VALUE).toString()
+                + Integer.MIN_VALUE
                 + ",false).\n"
                 + ":- flag(integer_rounding_function, [up,down], down, false).\n"
                 + ":- flag(char_conversion,[on,off],off,false).\n"
                 + ":- flag(debug,[on,off],off,false).\n"
                 + ":- flag(max_arity, ["
-                + Integer.valueOf(Integer.MAX_VALUE).toString()
+                + Integer.MAX_VALUE
                 + "], "
-                + Integer.valueOf(Integer.MAX_VALUE).toString()
+                + Integer.MAX_VALUE
                 + ",false).\n"
                 + ":- flag(undefined_predicate, [error,fail,warning], fail, false).\n"
                 + ":- flag(double_quotes, [atom,chars,codes], atom, false).\n"
@@ -458,7 +458,7 @@ public class ISOLibrary extends Library {
 
     public boolean sub_atom_guard_5(Term arg0, Term arg1, Term arg2, Term arg3, Term arg4)
             throws PrologError {
-        arg0 = arg0.getTerm();
+        arg0 = arg0.term();
         if (!arg0.isAtom())
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom", arg0);
         return true;

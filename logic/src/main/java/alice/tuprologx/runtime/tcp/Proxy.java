@@ -13,38 +13,37 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
     ObjectOutputStream out;
     ObjectInputStream  in;
 
-    public Proxy(String host) throws IOException  {
+    public Proxy(String host) throws IOException, java.net.UnknownHostException {
         socket=new Socket(host,alice.tuprologx.runtime.tcp.Daemon.DEFAULT_PORT);
         out=new ObjectOutputStream(socket.getOutputStream());
         in=new ObjectInputStream(socket.getInputStream());
     }
 
-    public Proxy(String host, int port) throws IOException  {
+    public Proxy(String host, int port) throws IOException, java.net.UnknownHostException {
         socket=new Socket(host,port);
         out=new ObjectOutputStream(socket.getOutputStream());
         in=new ObjectInputStream(socket.getInputStream());
     }
 
     @Override
-    public void clearTheory() throws Exception {
+    public void clearTheory() throws IOException {
         out.writeObject(new NetMsg("clearTheory"));
         out.flush();
     }
 
     @Override
-    public Theory getTheory() throws Exception {
+    public Theory getTheory() throws IOException, ClassNotFoundException {
         out.writeObject(new NetMsg("getTheory"));
         out.flush();
         Boolean b=(Boolean)in.readObject();
         if (b){
-            Theory th=(Theory)in.readObject();
-            return th;
+            return (Theory)in.readObject();
         }
         return null;
     }
 
     @Override
-    public void setTheory(Theory th) throws Exception {
+    public void setTheory(Theory th) throws IOException, ClassNotFoundException, InvalidTheoryException {
         out.writeObject(new NetMsg("setTheory"));
         out.writeObject(th);
         out.flush();
@@ -55,7 +54,7 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
     }
 
     @Override
-    public void addTheory(Theory th) throws Exception {
+    public void addTheory(Theory th) throws IOException, ClassNotFoundException, InvalidTheoryException {
         out.writeObject(new NetMsg("addTheory"));
         out.writeObject(th);
         out.flush();
@@ -67,62 +66,58 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
 
 
     @Override
-    public Solution solve(String st) throws Exception {
+    public Solution solve(String st) throws IOException, ClassNotFoundException, MalformedGoalException {
         out.writeObject(new NetMsg("solveString"));
         out.writeObject(st);
         out.flush();
         Boolean b=(Boolean)in.readObject();
         if (b){
-            Solution info=(Solution)in.readObject();
-            return info;
+            return (Solution)in.readObject();
         } else {
             throw new MalformedGoalException();
         }
     }
 
     @Override
-    public Solution solve(Term term) throws Exception {
+    public Solution solve(Term term) throws IOException, ClassNotFoundException, MalformedGoalException {
         out.writeObject(new NetMsg("solveTerm"));
         out.writeObject(term);
         out.flush();
         Boolean b=(Boolean)in.readObject();
         if (b){
-            Solution info=(Solution)in.readObject();
-            return info;
+            return (Solution)in.readObject();
         } else {
             throw new MalformedGoalException();
         }
     }
 
     @Override
-    public Solution solveNext() throws Exception {
+    public Solution solveNext() throws IOException, ClassNotFoundException, NoSolutionException {
         out.writeObject(new NetMsg("solveNext"));
         out.flush();
         Boolean b=(Boolean)in.readObject();
         if (b){
-            Solution info=(Solution)in.readObject();
-            return info;
+            return (Solution)in.readObject();
         } else {
             throw new NoSolutionException();
         }
     }
 
     @Override
-    public boolean hasOpenAlternatives() throws Exception {
+    public boolean hasOpenAlternatives() throws IOException, ClassNotFoundException {
         out.writeObject(new NetMsg("hasOpenAlternatives"));
         out.flush();
-        Boolean b=(Boolean)in.readObject();
-        return b;
+        return (Boolean)in.readObject();
     }
 
     @Override
-    public void solveHalt() throws Exception {
+    public void solveHalt() throws IOException {
         out.writeObject(new NetMsg("solveHalt"));
         out.flush();
     }
 
     @Override
-    public void solveEnd()  throws Exception {
+    public void solveEnd() throws IOException {
         out.writeObject(new NetMsg("solveEnd"));
         out.flush();
     }
@@ -130,7 +125,7 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
 
 
     @Override
-    public void loadLibrary(String st) throws Exception{
+    public void loadLibrary(String st) throws IOException, ClassNotFoundException, InvalidLibraryException {
         out.writeObject(new NetMsg("loadLibrary"));
         out.writeObject(st);
         out.flush();
@@ -141,7 +136,7 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
     }
 
     @Override
-    public void unloadLibrary(String st) throws Exception {
+    public void unloadLibrary(String st) throws IOException, ClassNotFoundException, InvalidLibraryException {
         out.writeObject(new NetMsg("unloadLibrary"));
         out.writeObject(st);
         out.flush();

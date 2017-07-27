@@ -28,17 +28,17 @@ final public class Operator implements Serializable {
     /**
 	 * operator name
 	 */
-    public String name;
+    public final String name;
     
     /**
 	 * type(xf,yf,fx,fy,xfx,xfy,yfy,yfx
 	 */
-    public String type;
+    public final String type;
     
     /**
 	 * priority
 	 */
-    public int prio;
+    public final int prio;
     
 /*Castagna 06/2011*/public/**/ Operator(String name_,String type_,int prio_) {
         name = name_;

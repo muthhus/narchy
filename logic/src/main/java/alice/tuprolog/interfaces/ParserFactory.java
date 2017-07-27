@@ -26,16 +26,16 @@ public class ParserFactory {
      * creating a Parser specifing how to handle operators
      * and what text to parse
      */
-    public static IParser createParser(IOperatorManager op, String theory) {
-    	return new Parser((OperatorManager)op, theory);
+    public static IParser createParser(OperatorManager op, String theory) {
+    	return new Parser(op, theory);
     }
     
     /**
      * creating a Parser specifing how to handle operators
      * and what text to parse
      */
-    public static IParser createParser(IOperatorManager op, String theory, HashMap<Term, Integer> mapping) {
-    	return new Parser((OperatorManager)op, theory, mapping);
+    public static IParser createParser(OperatorManager op, String theory, HashMap<Term, Integer> mapping) {
+    	return new Parser(op, theory, mapping);
     }
 
 }

@@ -115,7 +115,7 @@ public class PrimitiveInfo {
      * evaluates the primitive as a predicate
      * @throws Exception if invocation primitive failure
      */
-    public boolean evalAsPredicate(Struct g) throws Throwable {
+    public boolean evalAsPredicate(Struct g) throws Throwable, IllegalAccessException, IllegalArgumentException {
         for (int i=0; i<primitive_args.length; i++) {
             primitive_args[i] = g.term(i);
         }

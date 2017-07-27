@@ -19,7 +19,7 @@ public class Tree<T> extends JComponent{
 	private static final long serialVersionUID = 1L;
 public static final Font defaultfont=new Font(Font.SANS_SERIF, Font.PLAIN, 12);
   /**The totree to consult for constructing the tree.*/
-  protected ToTree<T> totree;
+  protected final ToTree<T> totree;
   /** The font to be used for rendering the tree nodes.*/
   protected Font font;
   /** The root of the tree.*/

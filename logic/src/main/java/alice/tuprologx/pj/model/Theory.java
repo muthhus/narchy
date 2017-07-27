@@ -145,8 +145,7 @@ public class Theory extends List<Clause<?,?>> {
 //        return clauses;
 //    }
     
-    private static Collection<Clause<?,?>> parseTheory(String s) {         
-        Vector<Clause<?,?>> clauses = new Vector<>();
+    private static Collection<Clause<?,?>> parseTheory(String s) {
         alice.tuprolog.Theory t = null;
         try {
             t = new alice.tuprolog.Theory(s);
@@ -154,6 +153,7 @@ public class Theory extends List<Clause<?,?>> {
         catch (Exception e) {
             throw new UnsupportedOperationException(e);
         }
+        Vector<Clause<?, ?>> clauses = new Vector<>();
         for (java.util.Iterator<? extends alice.tuprolog.Term> it = t.iterator(engine); it.hasNext();) {
             alice.tuprolog.Struct st = (alice.tuprolog.Struct) it.next();                        
             //Clause<?,?> clause = new Clause(Term.unmarshal(st.getArg(0)),Term.unmarshal(st.getArg(1)));

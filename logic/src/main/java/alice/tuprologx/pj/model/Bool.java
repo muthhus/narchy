@@ -14,7 +14,7 @@ package alice.tuprologx.pj.model;
  * @author maurizio
  */
 public class Bool extends Term<Bool> {
-	Boolean _theBool;        
+	final Boolean _theBool;
         
 	// public Boolean toJava() { return _theBool; } // ED 2013-05-12
 	@Override
@@ -30,10 +30,7 @@ public class Bool extends Term<Bool> {
         static Bool unmarshal(alice.tuprolog.Struct b) {
             if (!matches(b))
                 throw new UnsupportedOperationException();
-            if (b.isEqual(alice.tuprolog.Struct.TRUE))
-                return new Bool(Boolean.TRUE);
-            else 
-                return new Bool(Boolean.FALSE);
+            return b.isEqual(alice.tuprolog.Struct.TRUE) ? new Bool(Boolean.TRUE) : new Bool(Boolean.FALSE);
         }
         
         static boolean matches(alice.tuprolog.Term t) {            

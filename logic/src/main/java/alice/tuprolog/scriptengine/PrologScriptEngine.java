@@ -53,7 +53,7 @@ public class PrologScriptEngine implements ScriptEngine, ExceptionListener, Outp
     protected ScriptContext defaultContext;
     
     /* And instance of prolog used to solve the given scripts */
-    protected Prolog prolog;
+    protected final Prolog prolog;
     
     /* Current Standard Output and Error */
     protected Writer outputWriter, errorWriter;
@@ -131,7 +131,6 @@ public class PrologScriptEngine implements ScriptEngine, ExceptionListener, Outp
     @Override
     public Object eval(String script, Bindings bindings) throws ScriptException {
     	String theory = (String)bindings.get(THEORY);
-        Solution info = null;
         
         /*
         As the jsr-223 part SCR.4.2.6 Bindings :
@@ -171,8 +170,8 @@ public class PrologScriptEngine implements ScriptEngine, ExceptionListener, Outp
             if(theory != null)
                 prolog.setTheory(new Theory(theory));
 
-            info = useSolveNext ? prolog.solveNext() : prolog.solve(script);
-           
+            Solution info = useSolveNext ? prolog.solveNext() : prolog.solve(script);
+
             previousScript = script;
             
             if(solveVars != null)
@@ -186,7 +185,7 @@ public class PrologScriptEngine implements ScriptEngine, ExceptionListener, Outp
             if(info.isSuccess()) {
                 solveVars = info.getBindingVars();
                 for(Var v : solveVars)            
-                    bindings.put(v.getName(), v.getTerm().toString());             
+                    bindings.put(v.getName(), v.term().toString());
             }
             
             useSolveNext = info.hasOpenAlternatives();

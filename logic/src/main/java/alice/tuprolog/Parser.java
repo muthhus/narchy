@@ -56,7 +56,7 @@ public class Parser implements /*Castagna 06/2011*/IParser,/**/ Serializable
 	private static class IdentifiedTerm {
 		private final int priority;
 		private final Term result;
-		public IdentifiedTerm(int priority, Term result) {
+		IdentifiedTerm(int priority, Term result) {
 			this.priority = priority;
 			this.result = result;
 		}

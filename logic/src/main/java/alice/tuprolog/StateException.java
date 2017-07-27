@@ -18,7 +18,7 @@ public class StateException extends State {
     }
 
     @Override
-    void doJob(Engine e) {
+    void run(Engine e) {
         String errorType = e.currentContext.currentGoal.name();
         if (errorType.equals("throw"))
             prologError(e);
@@ -61,7 +61,7 @@ public class StateException extends State {
                 // il processo di unificazione tra l?argomento di throw/1 e il
                 // secondo argomento di catch/3
                 Term handlerTerm = e.currentContext.currentGoal.term(2);
-                Term curHandlerTerm = handlerTerm.getTerm();
+                Term curHandlerTerm = handlerTerm.term();
                 if (!(curHandlerTerm instanceof Struct)) {
                     e.nextState = c.END_FALSE;
                     return;
@@ -135,13 +135,13 @@ public class StateException extends State {
                 // essere preparati per l?esecuzione, mantenendo le sostituzioni
                 // effettuate durante il processo di unificazione tra
                 // l'eccezione e il catcher
-                Term curHandlerTerm = handlerTerm.getTerm();
+                Term curHandlerTerm = handlerTerm.term();
                 if (!(curHandlerTerm instanceof Struct)) {
                     e.nextState = c.END_FALSE;
                     return;
                 }
                 Term finallyTerm = e.currentContext.currentGoal.term(2);
-                Term curFinallyTerm = finallyTerm.getTerm();
+                Term curFinallyTerm = finallyTerm.term();
                 // verifico se c'? il blocco finally
                 boolean isFinally = true;
                 if (curFinallyTerm instanceof Int) {

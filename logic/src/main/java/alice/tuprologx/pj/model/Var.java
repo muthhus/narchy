@@ -8,7 +8,9 @@
  */
 
 package alice.tuprologx.pj.model;
-        
+
+import java.lang.reflect.Method;
+
 /**
  *
  * @author maurizio
@@ -16,16 +18,19 @@ package alice.tuprologx.pj.model;
 public class Var<X extends Term<?>> extends Term<X> {
 		X _theValue;
         String _theName;
-        private static java.lang.reflect.Method _setLink;
+        private static final java.lang.reflect.Method _setLink;
         
         static {
+            Method sl;
             try {
-                _setLink = alice.tuprolog.Var.class.getDeclaredMethod("setLink", alice.tuprolog.Term.class);
-                _setLink.setAccessible(true);                
+                sl = alice.tuprolog.Var.class.getDeclaredMethod("setLink", alice.tuprolog.Term.class);
+                sl.setAccessible(true);
             }
             catch(Exception e) {
+                sl = null;
                 e.printStackTrace();
             }
+            _setLink = sl;
         }
 
 	public Var(String name) {_theName = name;}
@@ -62,7 +67,7 @@ public class Var<X extends Term<?>> extends Term<X> {
         if (!matches(a))
             throw new UnsupportedOperationException();
         //return new Var<Term<?>>(a.getName(),a.isBound() ? Term.unmarshal(a.getTerm()) : null);            
-        return a.isBound() ? Term.unmarshal(a.getTerm()) : new Var<>(a.getName(), null);
+        return a.isBound() ? Term.unmarshal(a.term()) : new Var<>(a.getName(), null);
     }
     
     static boolean matches(alice.tuprolog.Term t) {

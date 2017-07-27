@@ -52,7 +52,7 @@ public class ClauseInfo {
     /**
 	 * if the clause is part of a theory in a lib (null if not)
 	 */
-    String libName;
+    final String libName;
     
     
     //usata da Find
@@ -191,13 +191,13 @@ public class ClauseInfo {
     public String toString() {
         // default prio: xfx
         String st=indentPredicates(clause.term(1));
-        return( clause.term(0).toString() + " :-\n\t"+st+".\n");
+        return( clause.term(0) + " :-\n\t"+st+".\n");
     }
     
     static private String indentPredicates(Term t) {
         if (t instanceof Struct) {
             Struct co=(Struct)t;
-            return co.name().equals(",") ? co.term(0).toString() + ",\n\t" + indentPredicates(co.term(1)) : t.toString();
+            return co.name().equals(",") ? co.term(0) + ",\n\t" + indentPredicates(co.term(1)) : t.toString();
         } else {
             return t.toString();
         }

@@ -37,7 +37,7 @@ public class QueryEvent extends PrologEvent {
     @Override
     public String toString() {
         return "QueryEvent(" +
-                info.getQuery() + "," + info +
+                info.getQuery() + ',' + info +
                 ')';
     }
 

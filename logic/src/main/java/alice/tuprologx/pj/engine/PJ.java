@@ -46,7 +46,7 @@ public class PJ implements MethodHandler {
     }
 
     @SuppressWarnings("unchecked")
-	public static <T> T newInstance(Class<?> cl, Theory init) throws Exception {
+	public static <T> T newInstance(Class<?> cl, Theory init) throws NoSuchMethodException, IllegalArgumentException, InstantiationException, IllegalAccessException, java.lang.reflect.InvocationTargetException {
             J2PProxyFactory pf = new J2PProxyFactory();
             pf.setSuperclass(cl.isInterface() ? Object.class : cl);
             pf.setInterfaces(cl.isInterface() ?
@@ -85,7 +85,7 @@ public class PJ implements MethodHandler {
     }
 
     @Override
-    public Object invoke(Object receiver, Method method, Method proceed, Object[] args) throws Throwable {
+    public Object invoke(Object receiver, Method method, Method proceed, Object[] args) throws IllegalAccessException, IllegalArgumentException, java.lang.reflect.InvocationTargetException, ClassNotFoundException, alice.tuprolog.InvalidTheoryException {
         if (method.getDeclaringClass().equals(PrologObject.class)) {
             return invokeInternal(receiver, method, args); //dispatch PrologObject interface calls!
         }
@@ -182,8 +182,7 @@ public class PJ implements MethodHandler {
     private static Theory getTheory(Object o) {
         try {
             java.lang.reflect.Field metaclass_field = o.getClass().getField("_prolog$Theory");
-            Theory t = (Theory)metaclass_field.get(o);            
-            return t;
+            return (Theory)metaclass_field.get(o);
         }
         catch (Exception e) {
             throw new UnsupportedOperationException(e);
@@ -215,10 +214,7 @@ public class PJ implements MethodHandler {
         //return engine.getJavaObject(t); 
         try {
             Object obj = engine().getPJLibrary().getRegisteredObject(t);
-            if (obj == null)
-                return engine().getPJLibrary().getRegisteredDynamicObject(t);
-            else
-                return obj;
+            return obj == null ? engine().getPJLibrary().getRegisteredDynamicObject(t) : obj;
         }
         catch (Exception e) {
             return null;

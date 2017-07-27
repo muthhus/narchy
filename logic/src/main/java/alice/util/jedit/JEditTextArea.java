@@ -64,7 +64,7 @@ public class JEditTextArea extends JComponent
 	 * them left of the horizontal scroll bar. In jEdit, the status
 	 * bar is added this way.
 	 */
-	public static String LEFT_OF_SCROLLBAR = "los";
+	public static final String LEFT_OF_SCROLLBAR = "los";
 
 	/**
 	 * Creates a new JEditTextArea with the default settings.
@@ -522,10 +522,7 @@ public class JEditTextArea extends JComponent
 					return x;
 				}
 
-				if(id == Token.NULL)
-					fm = painter.getFontMetrics();
-				else
-					fm = styles[id].getFontMetrics(defaultFont);
+                fm = id == Token.NULL ? painter.getFontMetrics() : styles[id].getFontMetrics(defaultFont);
 
 				int length = tokens.length;
 
@@ -573,11 +570,8 @@ public class JEditTextArea extends JComponent
 			{
 				char c = segmentArray[i + segmentOffset];
 				int charWidth;
-				if(c == '\t')
-					charWidth = (int)painter.nextTabStop(width,i)
-					- width;
-				else
-					charWidth = fm.charWidth(c);
+                charWidth = c == '\t' ? (int) painter.nextTabStop(width, i)
+                        - width : fm.charWidth(c);
 
 				if(painter.isBlockCaretEnabled())
 				{
@@ -608,21 +602,17 @@ public class JEditTextArea extends JComponent
 						= tokenMarker.markTokens(lineSegment,line);
 			}
 
-			int offset = 0;
-			//Toolkit toolkit = painter.getToolkit();
+            //Toolkit toolkit = painter.getToolkit();
 			Font defaultFont = painter.getFont();
 			SyntaxStyle[] styles = painter.getStyles();
 
-			for(;;)
+			for(int offset = 0; ;)
 			{
 				byte id = tokens.id;
 				if(id == Token.END)
 					return offset;
 
-				if(id == Token.NULL)
-					fm = painter.getFontMetrics();
-				else
-					fm = styles[id].getFontMetrics(defaultFont);
+                fm = id == Token.NULL ? painter.getFontMetrics() : styles[id].getFontMetrics(defaultFont);
 
 				int length = tokens.length;
 
@@ -630,11 +620,8 @@ public class JEditTextArea extends JComponent
 				{
 					char c = segmentArray[segmentOffset + offset + i];
 					int charWidth;
-					if(c == '\t')
-						charWidth = (int)painter.nextTabStop(width,offset + i)
-						- width;
-					else
-						charWidth = fm.charWidth(c);
+                    charWidth = c == '\t' ? (int) painter.nextTabStop(width, offset + i)
+                            - width : fm.charWidth(c);
 
 					if(painter.isBlockCaretEnabled())
 					{
@@ -750,10 +737,7 @@ public class JEditTextArea extends JComponent
 	{
 		Element lineElement = document.getDefaultRootElement()
 				.getElement(line);
-		if(lineElement == null)
-			return -1;
-		else
-			return lineElement.getStartOffset();
+        return lineElement == null ? -1 : lineElement.getStartOffset();
 	}
 
 	/**
@@ -766,10 +750,7 @@ public class JEditTextArea extends JComponent
 	{
 		Element lineElement = document.getDefaultRootElement()
 				.getElement(line);
-		if(lineElement == null)
-			return -1;
-		else
-			return lineElement.getEndOffset();
+        return lineElement == null ? -1 : lineElement.getEndOffset();
 	}
 
 	/**
@@ -780,11 +761,8 @@ public class JEditTextArea extends JComponent
 	{
 		Element lineElement = document.getDefaultRootElement()
 				.getElement(line);
-		if(lineElement == null)
-			return -1;
-		else
-			return lineElement.getEndOffset()
-					- lineElement.getStartOffset() - 1;
+        return lineElement == null ? -1 : lineElement.getEndOffset()
+                - lineElement.getStartOffset() - 1;
 	}
 
 	/**
@@ -1552,12 +1530,12 @@ public class JEditTextArea extends JComponent
 	}
 
 	// protected members
-	protected static String CENTER = "center";
-	protected static String RIGHT = "right";
-	protected static String BOTTOM = "bottom";
+	protected static final String CENTER = "center";
+	protected static final String RIGHT = "right";
+	protected static final String BOTTOM = "bottom";
 
 	protected static JEditTextArea focusedComponent;
-	protected static Timer caretTimer;
+	protected static final Timer caretTimer;
 
 	protected TextAreaPainter painter;
 
@@ -1646,11 +1624,8 @@ public class JEditTextArea extends JComponent
 				document.getDefaultRootElement());
 
 		int count;
-		if(ch == null)
-			count = 0;
-		else
-			count = ch.getChildrenAdded().length -
-			ch.getChildrenRemoved().length;
+        count = ch == null ? 0 : ch.getChildrenAdded().length -
+                ch.getChildrenRemoved().length;
 
 		int line = getLineOfOffset(evt.getOffset());
 		if(count == 0)
@@ -1862,18 +1837,12 @@ public class JEditTextArea extends JComponent
 			int length = evt.getLength();
 
 			int newStart;
-			int newEnd;
 
-			if(selectionStart > offset || (selectionStart
-					== selectionEnd && selectionStart == offset))
-				newStart = selectionStart + length;
-			else
-				newStart = selectionStart;
+            newStart = selectionStart > offset || (selectionStart
+                    == selectionEnd && selectionStart == offset) ? selectionStart + length : selectionStart;
 
-			if(selectionEnd >= offset)
-				newEnd = selectionEnd + length;
-			else
-				newEnd = selectionEnd;
+            int newEnd;
+            newEnd = selectionEnd >= offset ? selectionEnd + length : selectionEnd;
 
 			select(newStart,newEnd);
 		}
@@ -1887,24 +1856,18 @@ public class JEditTextArea extends JComponent
 			int length = evt.getLength();
 
 			int newStart;
-			int newEnd;
 
-			if(selectionStart > offset)
+            if(selectionStart > offset)
 			{
-				if(selectionStart > offset + length)
-					newStart = selectionStart - length;
-				else
-					newStart = offset;
+                newStart = selectionStart > offset + length ? selectionStart - length : offset;
 			}
 			else
 				newStart = selectionStart;
 
-			if(selectionEnd > offset)
+            int newEnd;
+            if(selectionEnd > offset)
 			{
-				if(selectionEnd > offset + length)
-					newEnd = selectionEnd - length;
-				else
-					newEnd = offset;
+                newEnd = selectionEnd > offset + length ? selectionEnd - length : offset;
 			}
 			else
 				newEnd = selectionEnd;
@@ -2032,15 +1995,15 @@ public class JEditTextArea extends JComponent
 
 			// Ok, it's not a bracket... select the word
 			String lineText = getLineText(line);
-			char ch = lineText.charAt(Math.max(0,offset - 1));
 
-			String noWordSep = (String)document.getProperty("noWordSep");
+            String noWordSep = (String)document.getProperty("noWordSep");
 			if(noWordSep == null)
 				noWordSep = "";
 
 			// If the user clicked on a non-letter char,
 			// we select the surrounding non-letters
-			boolean selectNoLetter = (!Character
+            char ch = lineText.charAt(Math.max(0, offset - 1));
+            boolean selectNoLetter = (!Character
 					.isLetterOrDigit(ch)
 					&& noWordSep.indexOf(ch) == -1);
 

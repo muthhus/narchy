@@ -4,6 +4,8 @@
  */
 package alice.tuprolog;
 
+import org.eclipse.collections.impl.list.mutable.primitive.BooleanArrayList;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -38,7 +40,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
     private boolean solving;
     private Term query;
     private TermQueue msgs;
-    private ArrayList<Boolean> next;
+    private BooleanArrayList next;
     private int countNext;
     private Lock lockVar;               
     private Condition cond;
@@ -104,7 +106,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         solving = false;
         sinfo = null;
         msgs = new TermQueue();
-        next = new ArrayList<>();
+        next = new BooleanArrayList();
         countNext = 0;
         lockVar = new ReentrantLock();  
         cond = lockVar.newCondition();
@@ -120,7 +122,7 @@ public class EngineRunner implements java.io.Serializable, Runnable{
         mediator.spy(action,env);
     }
     
-    void warn(String message) {
+    static void warn(String message) {
         Prolog.warn(message);
     }
     

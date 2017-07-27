@@ -18,8 +18,8 @@ package alice.util;
 @SuppressWarnings("serial")
 public class P2d implements java.io.Serializable {
 
-    public float x;
-	public float y;
+    public final float x;
+	public final float y;
 
     public P2d(float x,float y){
         this.x=x;

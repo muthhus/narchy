@@ -217,7 +217,6 @@ public class DefaultInputHandler extends InputHandler
                     evt.consume();
                 }
                 currentBindings = bindings;
-                return;
             }
             else if(o instanceof ActionListener)
             {
@@ -227,13 +226,11 @@ public class DefaultInputHandler extends InputHandler
                     evt.getSource(),null);
 
                 evt.consume();
-                return;
             }
             else if(o instanceof Hashtable)
             {
                 currentBindings = (Hashtable<KeyStroke, Object>)o;
                 evt.consume();
-                return;
             }
         }
     }
@@ -343,12 +340,9 @@ public class DefaultInputHandler extends InputHandler
         if(key.length() == 1)
         {
             char ch = Character.toUpperCase(key.charAt(0));
-            if(modifiers == 0)
-                return KeyStroke.getKeyStroke(ch);
-            else
-                return KeyStroke.getKeyStroke(ch,modifiers);
+            return modifiers == 0 ? KeyStroke.getKeyStroke(ch) : KeyStroke.getKeyStroke(ch, modifiers);
         }
-        else if(key.length() == 0)
+        else if(key.isEmpty())
         {
             System.err.println("Invalid key stroke: " + keyStroke);
             return null;
