@@ -74,7 +74,7 @@ import static nars.time.Tense.*;
     private List log;
 
 
-    public TaskBuilder(@NotNull Compound t, byte punct, float freq, @NotNull NAR nar) throws InvalidTaskException {
+    public TaskBuilder(@NotNull Term t, byte punct, float freq, @NotNull NAR nar) throws InvalidTaskException {
         this(t, punct, $.t(freq, nar.confDefault(punct)));
     }
 

@@ -31,7 +31,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 
 
 
-    private final Compound term;
+    private final Term term;
 
 
 
@@ -47,7 +47,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 
 
 
-    public ScalarSignal(@NotNull NAR n, @NotNull Compound t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, FloatParam resolution) {
+    public ScalarSignal(@NotNull NAR n, @NotNull Term t, FloatFunction<Term> value, @Nullable FloatToObjectFunction<Truth> truthFloatFunction, FloatParam resolution) {
         super(BELIEF, resolution);
 
         pri(()->n.priorityDefault(BELIEF));
@@ -154,7 +154,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 //    }
 
     @NotNull
-    public Compound term() {
+    public Term term() {
         return term;
     }
 

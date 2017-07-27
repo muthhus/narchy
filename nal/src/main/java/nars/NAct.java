@@ -5,6 +5,7 @@ import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.procedure.primitive.BooleanProcedure;
@@ -38,7 +39,7 @@ public interface NAct {
      * its initial state will remain indetermined until the first feedback is generated.
      */
     @Nullable
-    default ActionConcept actionToggle(@NotNull Compound s, @NotNull Runnable on, @NotNull Runnable off) {
+    default ActionConcept actionToggle(@NotNull Term s, @NotNull Runnable on, @NotNull Runnable off) {
         ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             boolean next = d != null && d.freq() > 0.5f;
             return toggle(on, off, next);
@@ -83,7 +84,7 @@ public interface NAct {
      * push-buttons like keyboard keys. by default with no desire the state is off.   the off procedure will not be called immediately.
      */
     @Nullable
-    default GoalActionConcept actionTriState(@NotNull Compound s, @NotNull IntConsumer i) {
+    default GoalActionConcept actionTriState(@NotNull Term s, @NotNull IntConsumer i) {
         return actionTriState(s, (v) -> {
             i.accept(v);
             return true;
@@ -95,7 +96,7 @@ public interface NAct {
      * initial state is neutral.
      */
     @Nullable
-    default GoalActionConcept actionTriState(@NotNull Compound cc, @NotNull IntPredicate i) {
+    default GoalActionConcept actionTriState(@NotNull Term cc, @NotNull IntPredicate i) {
         //final int[] state = {0};
         GoalActionConcept m = new GoalActionConcept(cc, this, (b, d) -> {
             //radius of center dead zone; diameter = 2x this
@@ -258,7 +259,7 @@ public interface NAct {
     }
 
     @Nullable
-    default ActionConcept actionToggle(@NotNull Compound s, @NotNull BooleanProcedure onChange) {
+    default ActionConcept actionToggle(@NotNull Term s, @NotNull BooleanProcedure onChange) {
         return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false));
     }
 //
@@ -338,7 +339,7 @@ public interface NAct {
     }
 
     @NotNull
-    default GoalActionConcept action(@NotNull Compound s, @NotNull GoalActionConcept.MotorFunction update) {
+    default GoalActionConcept action(@NotNull Term s, @NotNull GoalActionConcept.MotorFunction update) {
         return addAction( new GoalActionConcept(s, this, update) );
     }
 
@@ -365,7 +366,7 @@ public interface NAct {
      * update function receives a value in 0..1.0 corresponding directly to the present goal frequency
      */
     @NotNull
-    default GoalActionConcept actionUnipolar(@NotNull Compound s, @NotNull FloatToFloatFunction update) {
+    default GoalActionConcept actionUnipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         return action(s, (b, d) -> {
             float o = (d != null) ? d.freq() : 0.5f /*Float.NaN*/;
             float f = update.valueOf(o);

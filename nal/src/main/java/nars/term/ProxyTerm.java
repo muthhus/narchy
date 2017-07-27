@@ -60,7 +60,11 @@ public class ProxyTerm<T extends Term> implements Term {
 
     @Override
     public boolean equals(Object o) {
-        return ref.equals(o);
+        if (size() > 0) {
+            return Compound.equals(this, o);
+        } else {
+            return ref.equals(o);
+        }
     }
 
     @Override
@@ -201,10 +205,7 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.opX();
     }
 
-    @Override
-    public int compareTo(@NotNull Termlike y) {
-        return ref.compareTo(y);
-    }
+
 
     @NotNull
     @Override

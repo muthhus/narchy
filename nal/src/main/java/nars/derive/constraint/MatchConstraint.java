@@ -3,8 +3,6 @@ package nars.derive.constraint;
 import nars.$;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
-import nars.derive.PrediTerm;
-import nars.term.ProxyCompound;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
@@ -12,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Comparator;
 
 
-public abstract class MatchConstraint extends ProxyCompound implements PrediTerm<Derivation> {
+public abstract class MatchConstraint extends AbstractPred<Derivation> {
 
     public final Term target;
 

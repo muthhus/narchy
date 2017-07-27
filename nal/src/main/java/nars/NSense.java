@@ -42,17 +42,17 @@ public interface NSense {
 
 
     @NotNull
-    default SensorConcept sense(@NotNull Compound term, @NotNull BooleanSupplier value)  {
+    default SensorConcept sense(@NotNull Term term, @NotNull BooleanSupplier value)  {
         return sense(term, () -> value.getAsBoolean() ? 1f : 0f);
     }
 
     @NotNull
-    default SensorConcept sense(@NotNull Compound term, FloatSupplier value)  {
+    default SensorConcept sense(@NotNull Term term, FloatSupplier value)  {
         return sense(term, value, (x) -> $.t(x, nar().confDefault(Op.BELIEF)));
     }
 
     @NotNull
-    default SensorConcept sense(@NotNull Compound term, FloatSupplier value, FloatToObjectFunction<Truth> truthFunc) {
+    default SensorConcept sense(@NotNull Term term, FloatSupplier value, FloatToObjectFunction<Truth> truthFunc) {
         SensorConcept s = new SensorConcept(term, nar(), value, truthFunc);
 
         addSensor(s);
@@ -176,11 +176,11 @@ public interface NSense {
     }
 
 
-    default SensorConcept senseNumberDifference(Compound id, FloatSupplier v) {
+    default SensorConcept senseNumberDifference(Term id, FloatSupplier v) {
         return senseNumber(id, new FloatPolarNormalized( new FirstOrderDifferenceFloat(()->nar().time(), v)) );
     }
 
-    default SensorConcept senseNumber(@NotNull Compound id, FloatSupplier v) {
+    default SensorConcept senseNumber(@NotNull Term id, FloatSupplier v) {
         SensorConcept c = new SensorConcept(id, nar(), v,
                 (x) -> t(Util.unitize(x), nar().confDefault(Op.BELIEF))
         );

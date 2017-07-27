@@ -5,6 +5,7 @@ import nars.Op;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
 import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,7 +15,7 @@ public enum AbstractPatternOp  {
     ;
 
     @NotNull
-    static Compound name(@NotNull Class c, int subterm, String param) {
+    static Term name(@NotNull Class c, int subterm, String param) {
         return $.func(c.getSimpleName(), $.the('p' + Integer.toString(subterm))
                 , $.quote(param));
     }

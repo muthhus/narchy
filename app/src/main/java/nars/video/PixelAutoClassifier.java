@@ -95,7 +95,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
             for (int j = 0; j < nh; j++) {
                 Term coord= $.p(coord('x', i, nw), coord('y', j, nh));
                 for (int k = 0; k < states; k++) {
-                    Compound term = $.func(root, coord, $.the(k));
+                    Term term = $.func(root, coord, $.the(k));
                     int ii = i;  int jj = j; int kk = k;
                     agent.sense(term, () -> pixEnable[ii][jj][kk] ? 1f : Float.NaN, (v) -> $.t(v, pixConf[ii][jj]));
                 }

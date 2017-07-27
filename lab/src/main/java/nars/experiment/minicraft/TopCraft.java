@@ -105,7 +105,7 @@ public class TopCraft extends NAgentX {
         senseSwitch("tile(cra,left)", ()->craft.player.tile(-1,0).id, 0, tileMax);
 
         InputHandler input = craft.input;
-        actionToggle($.func("fire", "cra"), (b) -> input.attack.toggle(b)/*, 16*/ );
+        actionToggle($.func("fire", "cra"), input.attack::toggle/*, 16*/ );
         actionTriState($.func("move","cra", "X"), (i)->{
            boolean l = false, r = false;
            switch (i) {

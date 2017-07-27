@@ -146,7 +146,7 @@ public class Twenglish {
 //                            tokens
 //                    )
 
-            Compound q = $.func("hear", Atomic.the(source), tokens);
+            Term q = $.func("hear", Atomic.the(source), tokens);
 
             TaskBuilder newtask = new TaskBuilder(q, BELIEF, 1f, n).present(n); //n.task(q + ". %0.95|0.95%");
             tt.add(newtask); //TODO non-string construct

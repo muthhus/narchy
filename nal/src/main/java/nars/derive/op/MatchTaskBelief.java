@@ -3,10 +3,11 @@ package nars.derive.op;
 import nars.$;
 import nars.Op;
 import nars.control.Derivation;
+import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.match.Ellipsis;
-import nars.term.ProxyCompound;
+import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +17,7 @@ import java.util.Set;
 import java.util.SortedSet;
 
 
-public class MatchTaskBelief extends ProxyCompound implements PrediTerm<Derivation> {
+public class MatchTaskBelief extends AbstractPred<Derivation> {
 
 
 
@@ -30,7 +31,7 @@ public class MatchTaskBelief extends ProxyCompound implements PrediTerm<Derivati
 
 
     public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull SortedSet<MatchConstraint> constraints) {
-        super( $.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ) );
+        super((Compound) $.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ));
 
         List<PrediTerm> pre = $.newArrayList();
 

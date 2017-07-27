@@ -1,7 +1,6 @@
 package nars.table;
 
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Sets;
 import com.google.common.collect.Streams;
 import jcog.Util;
 import jcog.tree.rtree.*;
@@ -30,14 +29,18 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
     static final int minSampleRadiusInCycles = 0; //prevents sampling with 0 radius, if >0. used to provide precision in sub-duration ranges
-    static final int[] sampleRadii = { 0, 2, /*4,*/ 8, 32 };
-    final static int maxSamplesTruthpolated = 3;
 
-    /** proportional to capacity (not size).
+    /** in fractions of the table's contained temporal range */
+    static final float[] sampleRadii = { 0f, 0.01f, 0.125f, 0.5f };
+
+    final static int maxSamplesTruthpolated = 5;
+
+    /**
+     * proportional to capacity (not size).
      * set to zero to allow only one sample to be evaluated on its own.
      * values greater than 0 cause the table to report with a moving average
      * effect which could reduce temporal precision.
-     * */
+     */
     final static float enoughSamplesRate = 0f;
 
 
@@ -200,9 +203,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //            }
 
         @Nullable Object changed = task.stretchKey;
-        if (changed!=null) {
+        if (changed != null) {
 
-            TaskRegion t = (TaskRegion)changed;
+            TaskRegion t = (TaskRegion) changed;
 
             boolean removed = tree.remove(t);
             if (removed) {
@@ -248,7 +251,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     public Truth truth(long when, EternalTable eternal, NAR nar) {
 
 
-
         final Task ete = eternal != null ? eternal.strongest() : null;
 
         int ss = size();
@@ -263,10 +265,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             int enoughSampled = Math.min(ss, Math.round(Math.max(1, enoughSamplesRate * capacity)));
 
             RTreeCursor<TaskRegion> c = null;
-            for (int r : sampleRadii) {
+            float range = this.timeRange();
+            for (float rFrac : sampleRadii) {
+                if (range == 0f && rFrac > 0) break; //dont keep expanding beyond the one timepoint exists
 
-                long from = when - Math.max(minSampleRadiusInCycles, r * dur);
-                long to = when + Math.max(minSampleRadiusInCycles, r * dur);
+                long from = when - (long) Math.max(minSampleRadiusInCycles, rFrac * range);
+                long to = when + (long) Math.max(minSampleRadiusInCycles, rFrac * range);
                 if (c == null)
                     c = cursor(from, to);
                 else
@@ -298,10 +302,19 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     }
 
+    /**
+     * timerange spanned by entries in this table
+     */
+    public float timeRange() {
+        if (tree.isEmpty())
+            return 0f;
+        return (float) tree.root().region().range(0);
+    }
+
     @Override
     public Task match(long when, @Nullable Task against, NAR nar) {
 
-        if (size()==0)
+        if (size() == 0)
             return null;
 
         long now = nar.time();
@@ -312,27 +325,32 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         FloatFunction<Task> ts = taskStrength(when, dur);
         FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task);
 
-        for (int r : sampleRadii) {
-            RTreeCursor<TaskRegion> ct = cursor(when - r * dur, when + r * dur);
-            if (ct.size()==0)
+        float range = this.timeRange();
+        for (float rFrac : sampleRadii) {
+            if (range == 0f && rFrac > 0) break; //dont keep expanding beyond the one timepoint exists
+
+            long from = when - (long) Math.max(minSampleRadiusInCycles, rFrac * range);
+            long to = when + (long) Math.max(minSampleRadiusInCycles, rFrac * range);
+            RTreeCursor<TaskRegion> ct = cursor(from, to);
+            if (ct.size() == 0)
                 continue;
 
             List<TaskRegion> tt = ct.topSorted(strongestTask, 2);
 
 
-                switch (tt.size()) {
-                    case 0:
-                        return null;
-                    case 1:
-                        return tt.get(0).task;
+            switch (tt.size()) {
+                case 0:
+                    return null;
+                case 1:
+                    return tt.get(0).task;
 
-                    default:
-                        Task a = tt.get(0).task;
-                        Task b = tt.get(1).task;
+                default:
+                    Task a = tt.get(0).task;
+                    Task b = tt.get(1).task;
 
-                        Task c = Revision.merge(a, b, now, nar.confMin.floatValue(), nar.random());
-                        return c != null ? c : a;
-                }
+                    Task c = Revision.merge(a, b, now, nar.confMin.floatValue(), nar.random());
+                    return c != null ? c : a;
+            }
 
 
         }
@@ -369,7 +387,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public void add(@NotNull Task x, BaseConcept c, NAR n) {
 
-        if (x instanceof SignalTask && ((SignalTask) x).stretchKey!=null)
+        if (x instanceof SignalTask && ((SignalTask) x).stretchKey != null)
             return; //already added and being managed
 
         this.nar = n;
@@ -378,7 +396,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         if (tree.add(tr)) {
 
             if (x instanceof SignalTask)
-                ((SignalTask)x).stretchKey = tr;
+                ((SignalTask) x).stretchKey = tr;
 
             //check capacity overage
             int over = size() + 1 - capacity;
@@ -389,7 +407,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     Task ii = toActivate.get(i);
 
                     Activate aa = Activate.activate(ii, ii.priElseZero(), c, n);
-                    if (aa!=null)
+                    if (aa != null)
                         n.input(aa);
                 }
             }

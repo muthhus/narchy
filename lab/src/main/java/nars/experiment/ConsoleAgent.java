@@ -210,7 +210,7 @@ public abstract class ConsoleAgent extends NAgentX {
                 }
             });
             for (char c : vocabulary) {
-                Compound ct = $.func(Atomic.the("write"), $.quote(String.valueOf(c)), id);
+                Term ct = $.func(Atomic.the("write"), $.quote(String.valueOf(c)), id);
 
 //                    ActionConcept m = new GoalActionConcept(ct, nar(), (b, d) -> {
 //                        boolean next = d != null && d.expectation() > 0.75f;

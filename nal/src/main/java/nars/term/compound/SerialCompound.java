@@ -93,7 +93,7 @@ public class SerialCompound extends DynBytes implements Compound {
     }
 
     @Override
-    public int compareTo(@NotNull Termlike y) {
+    public int compareTo(@NotNull Term y) {
         throw new UnsupportedOperationException(); //TODO impl in a subclass
     }
 

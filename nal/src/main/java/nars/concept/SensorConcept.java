@@ -30,7 +30,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);
 
 
-    public SensorConcept(@NotNull Compound c, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
+    public SensorConcept(@NotNull Term c, @NotNull NAR n, FloatSupplier signal, FloatToObjectFunction<Truth> truth) {
         super(c,
                 new SensorBeliefTable(n.conceptBuilder.newTemporalBeliefTable(c)),
                 null, n);

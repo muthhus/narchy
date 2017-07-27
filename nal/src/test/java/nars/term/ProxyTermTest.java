@@ -17,7 +17,7 @@ public class ProxyTermTest {
                 x.getName() + "(" + Arrays.toString(x.getParameterTypes()) + ")";
 
 
-        for (Class proxy : new Class[] { ProxyTerm.class, ProxyCompound.class }) {
+        for (Class proxy : new Class[] { ProxyTerm.class }) {
             int unoverriden = 0;
             for (Method m : proxy.getMethods()) {
                 Class<?> c = m.getDeclaringClass();

@@ -7,7 +7,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.term.Compound;
-import nars.term.ProxyCompound;
+import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -19,7 +19,7 @@ import java.util.List;
  * manages a set of concepts whose beliefs represent components of an
  * N-ary (N>=1) discretization of a varying scalar (32-bit floating point) signal.
  * expects values which have been normalized to 0..1.0 range (ex: use NormalizedFloat) */
-public class FuzzyScalarConcepts extends ProxyCompound {
+public class FuzzyScalarConcepts extends ProxyTerm {
 
     private final FloatSupplier input;
 

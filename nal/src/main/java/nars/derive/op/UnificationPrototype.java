@@ -21,10 +21,8 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
 
 
     @NotNull
-    protected final Compound id;
+    protected final Term id;
 
-    @NotNull
-    protected final Compound pid;
 
     public final Term pattern;
 
@@ -33,9 +31,9 @@ abstract public class UnificationPrototype extends AbstractPred<Derivation> {
      */
     public final TreeSet<Conclusion> conclude = new TreeSet();
 
-    protected UnificationPrototype(@NotNull Compound id, Term pattern) {
+    protected UnificationPrototype(@NotNull Term id, Term pattern) {
         super(id);
-        this.id = this.pid = id;
+        this.id = id;
 
         this.pattern = pattern;
     }

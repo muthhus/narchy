@@ -150,28 +150,26 @@ public interface $ {
     }
 
 
-    public static @NotNull Compound func(@NotNull String opTerm, @NotNull Term... arg) {
+    public static @NotNull Term func(@NotNull String opTerm, @NotNull Term... arg) {
         return func(Atomic.the(opTerm), arg);
     }
 
-    public static @NotNull Compound func(@NotNull String opTerm, @NotNull List<Term> arg) {
-        return func(Atomic.the(opTerm), arg.toArray(new Term[arg.size()]));
-    }
 
-    public static @NotNull Compound func(@NotNull String opTerm, @NotNull String... arg) throws Narsese.NarseseException {
+
+    public static @NotNull Term func(@NotNull String opTerm, @NotNull String... arg) throws Narsese.NarseseException {
         return func(Atomic.the(opTerm), $.array(arg));
     }
 
     /**
      * function ((a,b)==>c) aka: c(a,b)
      */
-    @NotNull public static Compound func(@NotNull Atomic opTerm, @NotNull Term... arg) {
-        return (Compound) INH.the( $.p(arg), opTerm );
+    @NotNull public static Term func(@NotNull Atomic opTerm, @NotNull Term... arg) {
+        return INH.the( $.p(arg), opTerm );
     }
 
     @NotNull
-    public static Compound func(@NotNull Atomic opTerm, @NotNull Collection<Term> arg) {
-        return (Compound) INH.the( $.p(arg), opTerm );
+    public static Term func(@NotNull Atomic opTerm, @NotNull Collection<Term> arg) {
+        return INH.the( $.p(arg), opTerm );
     }
 
 

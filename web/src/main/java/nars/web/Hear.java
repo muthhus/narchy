@@ -115,7 +115,7 @@ public class Hear extends Loop {
 
     private void hear(Term prev, Term next) {
 
-        Compound term =
+        Term term =
                 context!=null ?
                         $.func("hear", next, context) :
                         $.func("hear", next);

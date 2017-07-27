@@ -11,7 +11,7 @@ import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
-public class GenericCompoundDT extends ProxyCompound {
+public class GenericCompoundDT extends ProxyTerm<Compound> {
 
     /**
      * numeric (term or "dt" temporal relation)

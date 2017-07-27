@@ -7,7 +7,7 @@ import nars.Task;
 import nars.control.CauseChannel;
 import nars.derive.rule.PremiseRule;
 import nars.term.Compound;
-import nars.term.ProxyCompound;
+import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import org.eclipse.collections.api.tuple.Pair;
@@ -18,7 +18,7 @@ import java.util.function.Function;
 /**
  * Conclusion builder
  */
-public final class Conclude extends ProxyCompound implements Function<NAR,Conclusion> {
+public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion> {
 
     @NotNull public final PremiseRule rule;
 
@@ -54,7 +54,8 @@ public final class Conclude extends ProxyCompound implements Function<NAR,Conclu
     @Override
     public Conclusion apply(@NotNull NAR nar) {
         CauseChannel<Task> input = nar.newChannel(term());
-        return new Conclusion($.func("derive", /*$.the(cid), */sub(0) /* prod args */ ), pattern, varIntro, rule, input);
+        Term id = $.func("derive", /*$.the(cid), */sub(0) /* prod args */);
+        return new Conclusion((Compound) id, pattern, varIntro, rule, input);
     }
 
 

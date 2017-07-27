@@ -124,47 +124,47 @@ public class PremiseRule extends GenericCompound {
         String beliefLabel = belief != null ? belief.toString() : "_";
         String goalLabel = goal != null ? goal.toString() : "_";
 
-        List<Term> args = $.newArrayList(
-                $.the(beliefLabel),
-                $.the(goalLabel)
-        );
+        FasterList<Term> args = new FasterList();
+        args.add($.the(beliefLabel));
+        args.add($.the(goalLabel));
         if (puncOverride != 0)
             args.add($.quote(((char) puncOverride)));
 
         if (!beliefProjected)
             args.add($.the("unproj"));
 
-        Compound ii = $.func("truth", args);
+        Compound ii = (Compound) $.func("truth", args.toArray(Term[]::new));
 
 
-        Solve truth = puncOverride == 0 ?
-                new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
-                new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
 
-        //PREFIX
-        {
-            addAll(s, PRE);
+    Solve truth = puncOverride == 0 ?
+            new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
+            new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
 
-            s.add(truth);
+    //PREFIX
+    {
+        addAll(s, PRE);
 
-            s.addAll(match.pre);
+        s.add(truth);
 
-        }
+        s.addAll(match.pre);
 
-        List<Term> l = sort(new FasterList(s));
+    }
+
+    List<Term> l = sort(new FasterList(s));
 
         l.addAll(match.constraints);
 
-        //SUFFIX (order already determined for matching)
-        {
+    //SUFFIX (order already determined for matching)
+    {
 
-            l.addAll(match.post);
+        l.addAll(match.post);
 
-            ((UnificationPrototype) match.post.get(match.post.size() - 1)).conclude.add(conc.apply(nar));
-        }
+        ((UnificationPrototype) match.post.get(match.post.size() - 1)).conclude.add(conc.apply(nar));
+    }
 
         return l;
-    }
+}
 
     /**
      * higher is earlier
@@ -549,7 +549,8 @@ public class PremiseRule extends GenericCompound {
                         case "\"&&\"":
                             pres.add(new TaskBeliefOp(CONJ, false, true));
                             break;
-                        default: throw new UnsupportedOperationException();
+                        default:
+                            throw new UnsupportedOperationException();
                     }
                     break;
 

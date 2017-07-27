@@ -36,9 +36,6 @@ abstract public class PatternCompound extends GenericCompoundDT  {
     PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
         super(new GenericCompound(seed.op(), subterms), seed.dt());
 
-        if (seed.isNormalized())
-            this.setNormalized();
-
         sizeCached = seed.size();
         structureNecessary =
                 //seed.structure() & ~(Op.VariableBits);

@@ -29,6 +29,7 @@ import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.subst.Unify;
 import nars.term.var.AbstractVariable;
 import nars.term.var.UnnormalizedVariable;
@@ -55,7 +56,7 @@ import static nars.Op.Null;
 import static nars.time.Tense.DTERNAL;
 
 
-public interface Term extends Termlike, Comparable<Termlike> {
+public interface Term extends Termlike, Comparable<Term> {
 
 
     //@NotNull public static final int[] ZeroIntArray = new int[0];
@@ -329,7 +330,7 @@ public interface Term extends Termlike, Comparable<Termlike> {
      * GLOBAL TERM COMPARATOR FUNCTION
      */
     @Override
-    default int compareTo(@NotNull Termlike y) {
+    default int compareTo(@NotNull Term y) {
         if (this.equals(y)) return 0;
 
         //order first by volume. this is important for conjunctions which rely on volume-dependent ordering for balancing
@@ -339,36 +340,29 @@ public interface Term extends Termlike, Comparable<Termlike> {
         if (diff2 != 0)
             return diff2;
 
+        int xSize = size();
+        int diff3 = Integer.compare(y.size(), xSize);
+        if (diff3 != 0)
+            return diff3;
+
 //        int diff2 = Integer.compare(hashCode(), y.hashCode());
 //        if (diff2 != 0)
 //            return diff2;
 
-        int d = Integer.compare(this.opX(), ((Term)y).opX() );
+        int d = Integer.compare(this.opX(), y.opX() );
         if (d != 0)
             return d;
 
-//        if (y instanceof ProxyTerm)
-//            y = ((ProxyTerm)y).ref; //de-ref
+        if (xSize > 0 /* same # of subterms since size same */) {
 
+            int c = TermContainer.compare(subterms(), y.subterms());
+            if (c != 0)
+                return c;
 
-        if (this instanceof Compound) {
+            return Integer.compare(dt(), y.dt());
 
-            Compound cx = (Compound) this;
-            Compound cy = (Compound) y;
-
-//            TermContainer cxx = cx.subterms();
-//            TermContainer cyy = cy.subterms();
-
-            //if (!cx.equals(cy)) {
-                int c = TermContainer.compare(cx, cy);
-                if (c != 0)
-                    return c;
-            //}
-
-            return Integer.compare(cx.dt(), cy.dt());
-
-        } else if ((this instanceof Atomic) && (y instanceof Atomic)) {
-
+        } else
+            {
             if ((this instanceof AbstractVariable) && (y instanceof AbstractVariable)) {
                 //hashcode serves as the ordering too
                 return Integer.compare(hashCode() , y.hashCode() );
@@ -389,7 +383,11 @@ public interface Term extends Termlike, Comparable<Termlike> {
 
         }
 
-        throw new RuntimeException("ordering exception: " + this + ", " + y);
+        //throw new RuntimeException("ordering exception: " + this + ", " + y);
+    }
+
+    default TermContainer subterms() {
+        return TermVector.NoSubterms;
     }
 
 

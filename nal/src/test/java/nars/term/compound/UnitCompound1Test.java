@@ -50,7 +50,7 @@ public class UnitCompound1Test {
     public void testUnitCompound3() {
         Atomic x = Atomic.the("x");
         Atomic y = Atomic.the("y");
-        Compound c = $.func(x, y);
+        Term c = $.func(x, y);
         System.out.println(c);
         assertEquals("(y)", c.sub(0).toString());
         assertEquals("x", c.sub(1).toString());

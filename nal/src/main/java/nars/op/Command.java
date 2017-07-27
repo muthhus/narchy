@@ -53,7 +53,7 @@ abstract public class Command extends BaseConcept implements PermanentConcept {
     }
 
 
-    static Task task(Compound content, long when) {
+    static Task task(Term content, long when) {
         return new NALTask(content, Op.COMMAND, null, when, when, when, new long[] { });
     }
 

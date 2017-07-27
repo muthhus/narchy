@@ -161,7 +161,7 @@ public class KIFInput implements Runnable {
          *
          */
 
-        Compound y = null;
+        Term y = null;
         switch (root) {
             case "subrelation":
             case "subclass":

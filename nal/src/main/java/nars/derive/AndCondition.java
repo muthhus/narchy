@@ -6,7 +6,6 @@ import nars.$;
 import nars.control.Derivation;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.op.MatchOneSubterm;
-import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +17,7 @@ import java.util.function.Function;
 /**
  * TODO generify beyond only Derivation
  */
-public final class AndCondition extends ProxyCompound implements PrediTerm<Derivation> {
+public final class AndCondition extends AbstractPred<Derivation> {
 
     //private static final Term AND_ATOM = $.quote("&&");
 
@@ -125,7 +124,7 @@ public final class AndCondition extends ProxyCompound implements PrediTerm<Deriv
 //    }
 
 
-    public @Nullable PrediTerm without(PrediTerm condition) {
+    public @Nullable PrediTerm<Derivation> without(PrediTerm<Derivation> condition) {
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
         PrediTerm[] x = ArrayUtils.removeElement(cache, condition);
         if (x.length == cache.length)

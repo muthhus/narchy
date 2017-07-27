@@ -340,7 +340,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
 
 
         try {
-            Compound ff = $.func(reify(s.punc()), arg);
+            Term ff = $.func(reify(s.punc()), arg);
             return Terms.compoundOrNull($.negIf(ff, false));
 
         } catch (Exception e) {

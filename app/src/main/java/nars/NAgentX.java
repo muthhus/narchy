@@ -118,7 +118,7 @@ abstract public class NAgentX extends NAgent {
                             ),THREADS, 2))
                     .time(clock)
                     .index(
-                        new CaffeineIndex(16 * 1024 )
+                        new CaffeineIndex(64 * 1024 )
                         //    new HijackTermIndex(128 * 1024,  4)
                     )
                     .get();
@@ -126,7 +126,7 @@ abstract public class NAgentX extends NAgent {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.5f);
+        n.beliefConfidence(0.9f);
         n.goalConfidence(0.5f);
 
 
@@ -135,7 +135,7 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
-        n.termVolumeMax.setValue(32);
+        n.termVolumeMax.setValue(24);
 
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);

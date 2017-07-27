@@ -58,7 +58,7 @@ abstract public class Bool extends AtomicToString {
     }
 
     @Override
-    public int compareTo(@NotNull Termlike y) {
+    public int compareTo(@NotNull Term y) {
         if (this == y) {
             return 0;
         } else {

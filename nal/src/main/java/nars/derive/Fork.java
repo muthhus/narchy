@@ -4,7 +4,6 @@ import jcog.Util;
 import jcog.math.ByteShuffler;
 import nars.$;
 import nars.control.Derivation;
-import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +16,7 @@ import java.util.function.Function;
  *
  * TODO generify beyond only Derivation
  */
-public class Fork extends ProxyCompound implements PrediTerm<Derivation> {
+public class Fork extends AbstractPred<Derivation> {
 
     @NotNull
     public final PrediTerm<Derivation>[] cache;

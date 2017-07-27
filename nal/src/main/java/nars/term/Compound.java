@@ -73,7 +73,7 @@ import static nars.time.Tense.XTERNAL;
  */
 public interface Compound extends Term, IPair, TermContainer {
 
-    static boolean equals(@NotNull Compound a, @NotNull Object b) {
+    static boolean equals(@NotNull Term a, @NotNull Object b) {
         if (a == b)
             return true;
         if (a.hashCode() != b.hashCode())
@@ -520,7 +520,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     //TODO generalize
-    static boolean matchTemporalDT(Compound aa, Compound bb, int dur) {
+    static boolean matchTemporalDT(Term aa, Term bb, int dur) {
         int a = aa.dt();
         if (a == XTERNAL || a == DTERNAL) return true;
         int b = bb.dt();

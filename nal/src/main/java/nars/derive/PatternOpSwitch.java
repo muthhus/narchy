@@ -3,7 +3,6 @@ package nars.derive;
 import nars.$;
 import nars.Op;
 import nars.control.Derivation;
-import nars.term.ProxyCompound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +12,7 @@ import java.util.function.Function;
 /**
  * Created by me on 5/21/16.
  */
-public final class PatternOpSwitch extends ProxyCompound implements PrediTerm<Derivation> {
+public final class PatternOpSwitch extends AbstractPred<Derivation> {
 
     public final EnumMap<Op,PrediTerm<Derivation>> cases;
     public final PrediTerm[] swtch;
