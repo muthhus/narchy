@@ -251,8 +251,8 @@ abstract public class DynamicTruthModel {
     public static class DynamicIntersection extends DynamicTruthModel.Intersection {
         private final Term[] subterms;
 
-        public DynamicIntersection(Compound term) {
-            this.subterms = term.toArray();
+        public DynamicIntersection(Term term) {
+            this.subterms = term.subterms().toArray();
         }
         @NotNull
         @Override

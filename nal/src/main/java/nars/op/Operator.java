@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 @Deprecated @FunctionalInterface public interface Operator {
 
     static Term[] args(Task t) {
-        return ((Compound)(t.term(0)/*subject*/)).toArray();
+        return ((Compound)(t.sub(0)/*subject*/)).toArray();
     }
 
     /**

@@ -28,8 +28,8 @@ public class StructuralSimilarity implements Consumer<Task> {
     @Override
     public void accept(Task q) {
         if (q.isQuestion() && q.op() == Op.SIM) {
-            Term a = q.term(0);
-            Term b = q.term(1);
+            Term a = q.sub(0);
+            Term b = q.sub(1);
             if (a.op() == Op.SETe && b.op() == Op.SETe) {
                 Compound A = (Compound) a;
                 Compound B = (Compound) b;

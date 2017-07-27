@@ -28,14 +28,6 @@ public abstract class CommonalityConstraint extends MatchConstraint {
 
         if (x.equals(y)) {
             return true;
-        }
-
-        if (y instanceof Compound) {
-            Compound C = (Compound) y;
-            return x instanceof Compound ?
-                    invalid((Compound) x, C)
-                    :
-                    invalid(/*(Term)*/x, C);
         } else {
             return invalid(x, y);
         }
@@ -48,13 +40,5 @@ public abstract class CommonalityConstraint extends MatchConstraint {
     @NotNull
     protected abstract boolean invalid(Term x, Term y);
 
-    /**
-     * equality will have already been tested prior to calling this
-     */
-    protected abstract boolean invalid(Compound x, Compound y);
 
-    /**
-     * equality will have already been tested prior to calling this
-     */
-    protected abstract boolean invalid(Term x, Compound y);
 }

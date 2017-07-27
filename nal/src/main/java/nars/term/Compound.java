@@ -112,6 +112,11 @@ public interface Compound extends Term, IPair, TermContainer {
 //        }
     }
 
+    @Override
+    default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
+        return inSubtermsOf.test(this) && subterms().containsRecursively(t, inSubtermsOf);
+    }
+
     @NotNull
     TermContainer subterms();
 
@@ -130,71 +135,6 @@ public interface Compound extends Term, IPair, TermContainer {
      * if the compound tracks normalization state, this will set the flag internally
      */
     void setNormalized();
-
-    /**
-     * gets the set of unique recursively contained terms of a specific type
-     * TODO generalize to a provided lambda predicate selector
-     */
-    @NotNull
-    default MutableSet<Term> recurseTermsToSet(@NotNull Op onlyType) {
-        if (!hasAny(onlyType))
-            return Sets.mutable.empty();
-
-        MutableSet<Term> t = new UnifiedSet(1);//$.newHashSet(volume() /* estimate */);
-
-        //TODO use an additional predicate to cull subterms which don't contain the target type
-        recurseTerms((t1) -> {
-            if (t1.op() == onlyType) //TODO make recurseTerms by Op then it can navigate to subterms using structure hash
-                t.add(t1);
-        });
-        return t;
-    }
-
-
-    /**
-     * returns whether the set operation caused a change or not
-     */
-    @NotNull
-    default boolean termsToSet(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
-        boolean r = false;
-
-        TermContainer tt = subterms();
-        int l = tt.size();
-        for (int i = 0; i < l; i++) {
-            @NotNull Term s = tt.sub(i);
-            if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
-                r |= (addOrRemoved) ? t.add(s) : t.remove(s);
-                if (!addOrRemoved && r) //on removal we can exit early
-                    return true;
-            }
-        }
-        return r;
-    }
-
-    @NotNull
-    default boolean termsToSetRecurse(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
-        final boolean[] r = {false};
-        Predicate<Term> selector = (Predicate<Term>) (s) -> {
-
-            if (!addOrRemoved && r[0]) { //on removal we can exit early
-                return false;
-            }
-
-            if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
-                r[0] |= (addOrRemoved) ? t.add(s) : t.remove(s);
-            }
-
-            return true;
-        };
-
-        if (inStructure != -1)
-            recurseTerms((p) -> p.hasAny(inStructure), selector);
-        else
-            recurseTerms(any -> true, selector);
-
-        return r[0];
-    }
-
 
     @NotNull
     @Override
@@ -234,12 +174,12 @@ public interface Compound extends Term, IPair, TermContainer {
      * temporary: this will be replaced with a smart visitor api
      */
     @Override
-    default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
+    default boolean recurseTerms(BiPredicate<Term, Term> whileTrue) {
         return recurseTerms(whileTrue, this);
     }
 
     @Override
-    default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, @Nullable Compound parent) {
+    default boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent) {
         if (whileTrue.test(this, parent)) {
             return subterms().recurseSubTerms(whileTrue, this);
         }
@@ -247,12 +187,12 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    default boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue) {
+    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue) {
         return recurseTerms(parentsMust, whileTrue, this);
     }
 
     @Override
-    default boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, @Nullable Compound parent) {
+    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, @Nullable Term parent) {
         if (parentsMust.test(this)) {
             return subterms().recurseTerms(parentsMust, whileTrue, this);
         }
@@ -550,34 +490,7 @@ public interface Compound extends Term, IPair, TermContainer {
 //        return ptr;
 //    }
 
-    @Nullable
-    default Term sub(@NotNull ByteList path) {
-        Term ptr = this;
-        int s = path.size();
-        for (int i = 0; i < s; i++)
-            if ((ptr = ptr.sub(path.get(i), null)) == null)
-                return null;
-        return ptr;
-    }
 
-    /**
-     * extracts a subterm provided by the address tuple
-     * returns null if specified subterm does not exist
-     */
-    @Nullable
-    default Term sub(@NotNull byte... path) {
-        return sub(path.length, path);
-    }
-
-    @Nullable
-    default Term sub(int n, @NotNull byte... path) {
-        Term ptr = this;
-        for (int i = 0; i < n; i++) {
-            if ((ptr = ptr.sub((int) path[i], null)) == null)
-                return null;
-        }
-        return ptr;
-    }
 
     default Term sub(int i, @Nullable Term ifOutOfBounds) {
         return subterms().sub(i, ifOutOfBounds);
@@ -844,40 +757,40 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    @Override
-    default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
-        if (other instanceof Variable)
-            return true;
-
-//        if (op() == NEG)
-//            throw new UnsupportedOperationException("left hand side should already be unneg'd");
+//    @Override
+//    default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
+//        if (other instanceof Variable)
+//            return true;
 //
-//        if (other.op()==NEG)
-//            other = other.unneg();
-
-        Op op = op();
-        if (!(other.op() == op))
-            return false;
-
-        int s = size();
-
-        if (other.size() == s) {
-
-            if (requireSameTime)
-                if (((Compound) other).dt() != dt())
-                    return false;
-
-            Compound o = (Compound) other;
-            Term[] a = toArray();
-            Term[] b = o.toArray();
-            for (int i = 0; i < s; i++) {
-                if (!a[i].equalsIgnoringVariables(b[i], requireSameTime))
-                    return false;
-            }
-            return true;
-        }
-        return false;
-    }
+////        if (op() == NEG)
+////            throw new UnsupportedOperationException("left hand side should already be unneg'd");
+////
+////        if (other.op()==NEG)
+////            other = other.unneg();
+//
+//        Op op = op();
+//        if (!(other.op() == op))
+//            return false;
+//
+//        int s = size();
+//
+//        if (other.size() == s) {
+//
+//            if (requireSameTime)
+//                if (((Compound) other).dt() != dt())
+//                    return false;
+//
+//            Compound o = (Compound) other;
+//            Term[] a = toArray();
+//            Term[] b = o.toArray();
+//            for (int i = 0; i < s; i++) {
+//                if (!a[i].equalsIgnoringVariables(b[i], requireSameTime))
+//                    return false;
+//            }
+//            return true;
+//        }
+//        return false;
+//    }
 
     @Override
     default boolean isTemporal() {
@@ -885,52 +798,6 @@ public interface Compound extends Term, IPair, TermContainer {
                 (isAny(Op.TemporalBits) && (dt() != DTERNAL))
                 ||
                 (subterms().isTemporal());
-    }
-
-    @Override
-    default int subtermTime(@NotNull Term x) {
-
-        if (equals(x))
-            return 0;
-
-        if (impossibleSubTerm(x))
-            return DTERNAL;
-
-        int dt = dt();
-        int idt;
-        boolean reverse;
-
-        //TODO do shuffled search to return different equivalent results wherever they may appear
-
-        Op op = op();
-        boolean shift;
-        if (!op.temporal || dt == DTERNAL || dt == XTERNAL || dt == 0) {
-            idt = 0; //parallel or eternal, no dt increment
-            reverse = false;
-            shift = false;
-        } else {
-            shift = op == CONJ;
-            idt = dt;
-            if (idt < 0) {
-                idt = -idt;
-                reverse = true;
-            } else {
-                reverse = false;
-            }
-        }
-
-        @NotNull TermContainer yy = subterms();
-        int ys = yy.size();
-        int offset = 0;
-        for (int yi = 0; yi < ys; yi++) {
-            Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
-            int sdt = yyy.subtermTime(x);
-            if (sdt != DTERNAL)
-                return sdt + offset;
-            offset += idt + ((shift && yyy.op() == CONJ) ? yyy.dtRange() : 0);
-        }
-
-        return DTERNAL; //not found
     }
 
 
@@ -966,52 +833,6 @@ public interface Compound extends Term, IPair, TermContainer {
         events.add(PrimitiveTuples.pair(this, offset));
     }
 
-    @Override
-    default int dtRange() {
-        Op o = op();
-        switch (o) {
-
-//            case NEG:
-//                return term(0).dtRange();
-
-
-            case CONJ: {
-                Compound c = (Compound) this;
-                int dt = c.dt();
-                if (c.size() == 2) {
-
-                    switch (dt) {
-                        case DTERNAL:
-                        case XTERNAL:
-                        case 0:
-                            dt = 0;
-                            break;
-                        default:
-                            dt = Math.abs(dt);
-                            break;
-                    }
-
-                    return c.sub(0).dtRange() + (dt) + c.sub(1).dtRange();
-
-                } else {
-                    int s = 0;
-
-                    TermContainer tt = subterms();
-                    int l = tt.size();
-                    for (int i = 0; i < l; i++) {
-                        @NotNull Term x = tt.sub(i);
-                        s = Math.max(s, x.dtRange());
-                    }
-
-                    return s;
-                }
-            }
-
-            default:
-                return 0;
-        }
-
-    }
 
 
     @Override
@@ -1100,41 +921,6 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
     final static Logger logger = LoggerFactory.getLogger(Compound.class);
-
-    @Nullable
-    default Term commonParent(List<byte[]> subpaths) {
-        int subpathsSize = subpaths.size();
-        assert (subpathsSize > 0);
-
-        int c = 0;
-
-        int shortest = Integer.MAX_VALUE;
-        for (int i = 0, subpathsSize1 = subpaths.size(); i < subpathsSize1; i++) {
-            shortest = Math.min(shortest, subpaths.get(i).length);
-        }
-
-        //find longest common prefix
-        int i;
-        done:
-        for (i = 0; i < shortest; i++) {
-            byte toMatch = 0;
-            for (int j = 0, subPathsSize; j < subpathsSize; j++) {
-                byte[] p = subpaths.get(j);
-                if (j == 0) {
-                    toMatch = p[i];
-                } else if (toMatch != p[i]) {
-                    break done; //first mismatch, done
-                } //else: continue downwards
-            }
-            //all matched, proceed downward to the next layer
-        }
-        if (i == 0)
-            return this;
-        else {
-            return sub(i, subpaths.get(0));
-        }
-
-    }
 
     @Nullable
     default Compound normalize() {
@@ -1278,15 +1064,15 @@ public interface Compound extends Term, IPair, TermContainer {
             for (int i = 0; i < cs; i++) {
 
                 Term xi = s[i];
-                if (xi instanceof Compound) {
-                    Term yi = xi.eternal();
-                    if (yi instanceof Bool)
-                        return Null;
-                    if (!xi.equals(yi)) {
-                        s[i] = yi;
-                        subsChanged = true;
-                    }
+
+                Term yi = xi.eternal();
+                if (yi instanceof Bool)
+                    return Null;
+                if (!xi.equals(yi)) {
+                    s[i] = yi;
+                    subsChanged = true;
                 }
+
             }
         }
 
@@ -1320,9 +1106,9 @@ public interface Compound extends Term, IPair, TermContainer {
             return this; //no change is necessary
         }
 
-        Compound y = compoundOrNull(
+        Term y =
                 subsChanged ? o.the(nextDT, s) : this.dt(nextDT)
-        );
+        ;
         if (y == null)
             return Null;
 
@@ -1333,24 +1119,15 @@ public interface Compound extends Term, IPair, TermContainer {
     @NotNull
     default Term root() {
 
-        Compound term = compoundOrNull(unneg());
-        if (term == null) return Null;
+        Term term = unneg().eternal();
 
-        term = compoundOrNull(((Compound) term).eternal());
-        if (term == null) return Null;
 
         //atemporalizing can reset normalization state of the result instance
         //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
-        //if (isNormalized()) {
-        term = compoundOrNull(((Compound) term).normalize());
-        if (term == null) return Null;
-        //}
+        term = term.normalize(); if (term == null) return Null;
 
-        term = compoundOrNull(term.unneg() /* once again to be sure */);
-        if (term == null) return Null;
-
-        return term;
+        return term.unneg();
     }
 
     @Override

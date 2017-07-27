@@ -31,7 +31,7 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
 
 
     public MatchTaskBelief(@NotNull Term taskPattern, Term beliefPattern, @NotNull SortedSet<MatchConstraint> constraints) {
-        super((Compound) $.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ));
+        super($.func(MatchTaskBelief.class.getSimpleName(), taskPattern ,beliefPattern ));
 
         List<PrediTerm> pre = $.newArrayList();
 

@@ -516,12 +516,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public Task goal(@NotNull Compound term) {
+    public Task goal(@NotNull Term term) {
         return goal(term, true);
     }
 
     @NotNull
-    public Task goal(@NotNull Compound term, boolean trueOrFalse) {
+    public Task goal(@NotNull Term term, boolean trueOrFalse) {
         return goal(term, trueOrFalse, confDefault(BELIEF));
     }
 
@@ -531,7 +531,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public Task goal(@NotNull Compound term, boolean trueOrFalse, float conf) {
+    public Task goal(@NotNull Term term, boolean trueOrFalse, float conf) {
         return goal(term, trueOrFalse ? 1.0f : 0f, conf);
     }
 
@@ -560,7 +560,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             throw new InvalidTaskException(term, "insufficient confidence");
 
 
-        Task y = new NALTask((Compound) term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[]{time.nextStamp()});
+        Task y = new NALTask(term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[]{time.nextStamp()});
         y.setPri(pri);
 
         input(y);
@@ -585,7 +585,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         assert ((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
 
         return inputAndGet(
-                new NALTask((Compound) term.unneg(), punc, null,
+                new NALTask( term.unneg(), punc, null,
                         time(), when, when,
                         new long[]{time.nextStamp()}
                 ).budget(this)
@@ -741,15 +741,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return t;
     }
 
-    @Nullable
-    public Compound post(@NotNull Compound c) {
-        Compound d = compoundOrNull(post((Term) c));
-        if (d == null)
-            return c; //unchanged because post-processing resulted in invalid or non-compound
-        else
-            return d;
-    }
-
 
 //    protected void processDuplicate(@NotNull Task input, Task existing) {
 //        if (existing != input) {
@@ -843,7 +834,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             @Override
             public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
                 Term c = t.term();
-                o.run((Atomic) (c.sub(1, null)), ((Compound) (t.term().sub(0, null))).toArray(), nar);
+                o.run((Atomic) (c.sub(1)), ((Compound) (t.term().sub(0))).toArray(), nar);
                 return t;
             }
 

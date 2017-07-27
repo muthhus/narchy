@@ -30,6 +30,7 @@ import static nars.$.task;
 import static nars.$.varDep;
 import static nars.Op.*;
 import static nars.term.TermTest.*;
+import static nars.time.Tense.DTERNAL;
 import static org.junit.Assert.*;
 
 /**
@@ -761,9 +762,11 @@ public class TermReductionsTest extends NarseseTest {
         }) {
             Term t = $(x);
             assertTrue(x + " :: " + t, t instanceof Compound);
+            assertTrue(t.dt()!=DTERNAL);
 
             Task y = task(t, Op.BELIEF, t(1f, 0.9f)).apply(n);
 
+             y.term().printRecursive();
             assertEquals(x, y.term().toString());
 
         }

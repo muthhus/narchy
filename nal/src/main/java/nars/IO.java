@@ -212,13 +212,12 @@ public class IO {
 
         switch (o) {
 
-            case INT: {
+            case INT:
                 byte subType = in.readByte();
                 switch (subType) {
                     case 0: return Int.the( in.readInt());
                     case 1: return Int.range( in.readInt(), in.readInt() );
                 }
-            }
             case ATOM: {
 
                 String s = in.readUTF();
@@ -545,7 +544,7 @@ public class IO {
                 case NEG:
                     //special case disjunction: (--,(&&,.....))
                     if (Terms.isDisjunction(c)) {
-                        compoundAppend(Op.DISJ.toString(), ((Compound) c.sub(0)).subterms(), $::neg, p);
+                        compoundAppend(Op.DISJ.toString(), c.sub(0).subterms(), $::neg, p);
                         return;
                     }
             }

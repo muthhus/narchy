@@ -10,6 +10,7 @@ import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.atom.Atom;
+import nars.term.container.TermContainer;
 import org.eclipse.collections.api.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,7 +40,7 @@ public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion
         Term pp = pattern;
 
         //HACK unwrap varIntro so we can apply it at the end of the derivation process, not before like other functors
-        Pair<Atom, Compound> outerFunctor = Op.functor(pp, $.terms, false);
+        Pair<Atom, TermContainer> outerFunctor = Op.functor(pp, $.terms, false);
         if (outerFunctor != null && outerFunctor.getOne().toString().equals("varIntro")) {
             varIntro = true;
             pp = outerFunctor.getTwo().sub(0);

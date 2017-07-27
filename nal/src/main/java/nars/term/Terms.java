@@ -501,7 +501,7 @@ public enum Terms { ;
      * returns the most optimal subterm that can be replaced with a variable, or null if one does not meet the criteria
      */
     @Nullable
-    public static FasterList<Term> substAllRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
+    public static FasterList<Term> substAllRepeats(@NotNull Term c, @NotNull ToIntFunction<Term> score, int minCount) {
         FasterList<Term> oi = getUniqueRepeats(c, score, minCount);
         if (oi == null || oi.isEmpty())
             return null;
@@ -516,8 +516,7 @@ public enum Terms { ;
                 oi.anySatisfy(
                     a ->
                         (a != b) &&
-                        (a instanceof Compound) &&
-                        ((Compound) a).containsRecursively(b)
+                        a.containsRecursively(b)
                 )
             );
         }
@@ -526,7 +525,7 @@ public enum Terms { ;
     }
 
     /** returns a list but its contents will be unique */
-    @Nullable static FasterList<Term> getUniqueRepeats(@NotNull Compound c, @NotNull ToIntFunction<Term> score, int minCount) {
+    @Nullable static FasterList<Term> getUniqueRepeats(@NotNull Term c, @NotNull ToIntFunction<Term> score, int minCount) {
         HashBag<Term> uniques = Terms.subtermScore(c, score);
         int us = uniques.size();
         if (us == 0)
@@ -547,7 +546,7 @@ public enum Terms { ;
      * counts the repetition occurrence count of each subterm within a compound
      */
     @NotNull
-    public static HashBag<Term> subtermScore(@NotNull Compound c, @NotNull ToIntFunction<Term> score) {
+    public static HashBag<Term> subtermScore(@NotNull Term c, @NotNull ToIntFunction<Term> score) {
         HashBag<Term> uniques = new HashBag<>(c.volume()/2);
 
         c.recurseTerms((Term subterm) -> {
@@ -665,30 +664,30 @@ public enum Terms { ;
     }
 
     @NotNull
-    public static Term intersect(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
-        if (a.equals(b))
-            return a;
+    public static Term intersect(@NotNull Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
+        if (a.equals(b) && a instanceof Term)
+            return (Term) a;
 
         Term[] c = TermContainer.intersect(a, b);
         return (c == null || c.length == 0) ? Null : (Compound)(o.the(c));
     }
 
     @NotNull
-    public static Compound union(@NotNull Op o, @NotNull Compound a, @NotNull Compound b) {
-        if (a.equals(b))
-            return a;
+    public static Term union(@NotNull Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
+        if (a.equals(b) && a instanceof Term)
+            return (Term) a;
 
         TreeSet<Term> t = new TreeSet<>();
         a.copyInto(t);
         b.copyInto(t);
         int as = a.size();
         int bs = b.size();
-        int maxSize = Math.max(as, bs);
-        if (t.size() == maxSize) {
-            //the smaller is contained by the larger other
-            return as > bs ? a : b;
-        }
-        return (Compound) $.the(o, t);
+//        int maxSize = Math.max(as, bs);
+//        if (t.size() == maxSize) {
+//            //the smaller is contained by the larger other
+//            return as > bs ? a : b;
+//        }
+        return $.the(o, t);
     }
 
     public static boolean reflex(@NotNull Term sub0, @NotNull Term sub1) {

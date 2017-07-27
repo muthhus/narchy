@@ -72,20 +72,13 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.hashCode();
     }
 
-    @Override
-    public boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
-        return ref.recurseTerms(whileTrue);
-    }
+
 
     @Override
-    public boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, @Nullable Compound parent) {
+    public boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent) {
         return ref.recurseTerms(whileTrue, parent);
     }
 
-    @Override
-    public boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, Compound parent) {
-        return ref.recurseTerms(parentsMust, whileTrue, parent);
-    }
 
     @Override
     public boolean isCommutative() {
@@ -144,24 +137,10 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public int subtermTime(@NotNull Term x) {
-        return ref.subtermTime(x);
-    }
-
-    @Override
-    public int dtRange() {
-        return ref.dtRange();
-    }
-
-    @Override
     public void init(@NotNull int[] meta) {
         ref.init(meta);
     }
 
-    @Override
-    public boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
-        return ref.equalsIgnoringVariables(other, requireSameTime);
-    }
 
     @Override
     public @Nullable byte[] pathTo(@NotNull Term subterm) {
@@ -250,33 +229,8 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public boolean containsRecursively(Term t) {
-        return ref.containsRecursively(t);
-    }
-
-    @Override
-    public boolean containsRecursively(Term t, Predicate<Compound> inSubtermsOf) {
-        return ref.containsRecursively(t, inSubtermsOf);
-    }
-
-    @Override
     public boolean isTemporal() {
         return ref.isTemporal();
-    }
-
-    @Override
-    public boolean hasAll(int structuralVector) {
-        return ref.hasAll(structuralVector);
-    }
-
-    @Override
-    public boolean hasAny(int structuralVector) {
-        return ref.hasAny(structuralVector);
-    }
-
-    @Override
-    public boolean hasAny(@NotNull Op op) {
-        return ref.hasAny(op);
     }
 
     @Override

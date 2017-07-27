@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.concept.BaseConcept;
 import nars.table.BeliefTable;
 import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -13,7 +14,7 @@ public final class DynamicConcept extends BaseConcept {
     @NotNull
     @Deprecated final NAR nar;
 
-    public DynamicConcept(@NotNull Compound term, BeliefTable beliefs, BeliefTable goals, NAR nar) {
+    public DynamicConcept(@NotNull Term term, BeliefTable beliefs, BeliefTable goals, NAR nar) {
         super(term, beliefs, goals, nar.conceptBuilder);
         this.nar = nar;
     }

@@ -20,10 +20,10 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
     final DynamicTruthModel model;
     private final boolean beliefOrGoal;
-    private final Compound term;
+    private final Term term;
 
 
-    public DynamicBeliefTable(Compound c, TemporalBeliefTable t, DynamicTruthModel model, boolean beliefOrGoal) {
+    public DynamicBeliefTable(Term c, TemporalBeliefTable t, DynamicTruthModel model, boolean beliefOrGoal) {
         super(t);
         this.term = c;
         this.model = model;

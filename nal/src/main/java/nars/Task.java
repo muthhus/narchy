@@ -13,6 +13,7 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.Termlike;
 import nars.term.atom.Bool;
 import nars.term.var.Variable;
 import nars.time.Tense;
@@ -668,12 +669,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     }
 
 
-    @Nullable
-    @Deprecated default Term term(int i) {
-        return term().sub(i, null);
-    }
-
-
     default boolean cyclic() {
         return Stamp.isCyclic(stamp());
     }
@@ -920,10 +915,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
         Term inputTerm = cmd.term();
         if (inputTerm.hasAll(Op.EvalBits) && inputTerm.op() == INH) {
-            Term func = inputTerm.sub(1, null);
-            if (func.op() == ATOM) {
-                Term args = inputTerm.sub(0, null);
-                if (args.op() == PROD) {
+            Term func = inputTerm.sub(1);
+            if (func!=Null && func.op() == ATOM) {
+                Term args = inputTerm.sub(0);
+                if (args!=Null && args.op() == PROD) {
                     Concept funcConcept = nar.concept(func);
                     if (funcConcept instanceof Command) {
                         Command o = (Command) funcConcept;

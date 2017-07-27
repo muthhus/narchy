@@ -5,11 +5,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** has, or is associated with a specific term */
-public interface Termed<T extends Term> /* TODO finish implementing: extends Termlike */ {
-
-
+public interface Termed /* TODO finish implementing: extends Termlike */ {
 
     @NotNull Term term();
+
+    default int size() { return term().size(); }
+
+    default Term sub(int i) { return term().sub(i); }
 
     @NotNull
     default Op op() { return term().op(); }

@@ -96,7 +96,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     }
 
     @Nullable
-    final Concept newConcept(@NotNull Compound t) {
+    final Concept newConcept(@NotNull Term t) {
 
 
         if (t.volume() > nar.termVolumeMax.intValue()) {
@@ -105,25 +105,16 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return null;
         }
 
-        @NotNull Compound tt = t;
         boolean validForTask = Task.taskContentValid(t, (byte) 0, null /*nar -- checked above */, true);
         if (!validForTask) {
-            return newCompound(tt);
+            return new BaseConcept(t, BeliefTable.Empty, BeliefTable.Empty, QuestionTable.Empty, QuestionTable.Empty,
+                    newLinkBags(t));
         } else {
-            return newTask(tt);
+            return newTask(t);
         }
     }
 
-    /**
-     * for fragmentary concepts which by themselves or due to being un-normalizable,
-     * can not be the content of Tasks yet may still exist as concepts
-     */
-    private BaseConcept newCompound(@NotNull Compound t) {
-        return new BaseConcept(t, BeliefTable.Empty, BeliefTable.Empty, QuestionTable.Empty, QuestionTable.Empty,
-                newLinkBags(t));
-    }
-
-    private BaseConcept newTask(@NotNull Compound t) {
+    private BaseConcept newTask(@NotNull Term t) {
         DynamicTruthModel dmt = null;
 
         switch (t.op()) {
@@ -330,7 +321,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
         if (term instanceof Compound) {
 
-            result = newConcept((Compound) term);
+            result = newConcept(term);
 
         } else {
 

@@ -25,7 +25,7 @@ import static nars.Op.Null;
 /**
  * 32-bit signed integer
  */
-public class Int implements Atomic, Intlike {
+public class Int implements Intlike {
 
 
     public static Int the(int i) {
@@ -130,7 +130,7 @@ public class Int implements Atomic, Intlike {
     /**
      * a contiguous range of 1 or more integers
      */
-    public static class IntRange implements Atomic, Intlike {
+    public static class IntRange implements Intlike {
 
         public final int min, max;
         private final int hash;
@@ -310,7 +310,7 @@ public class Int implements Atomic, Intlike {
 
 
                         //x is contained within range expression p
-                        Term xpp = x instanceof Compound ? ((Compound) x).sub(pp) : x;
+                        Term xpp = x instanceof Compound ? x.sub(pp) : x;
 
                         boolean connected;
                         if (xpp instanceof Intlike) {

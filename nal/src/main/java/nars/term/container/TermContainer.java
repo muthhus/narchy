@@ -14,6 +14,7 @@ import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFuncti
 import org.eclipse.collections.api.block.predicate.primitive.IntObjectPredicate;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
+import org.eclipse.collections.impl.factory.Sets;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,6 @@ import static nars.Op.*;
 public interface TermContainer extends Termlike, Iterable<Term> {
 
     @NotNull TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[]{});
-
 
 
     //TODO optionally allow atomic structure positions to differ
@@ -117,8 +117,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
         int c = complexity();
         return
-                (c >=2) && ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
-                                ||
+                (c >= 2) && ((op() == INH && subIs(0, PROD) && subIs(1, ATOM)) /* potential function */
+                        ||
                         (c >= 3 && OR(Termlike::isDynamic))); /* possible function in subterms */
     }
 
@@ -235,7 +235,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * recursively
      */
     @NotNull
-    static boolean hasCommonSubtermsRecursive(@NotNull Compound a, @NotNull Compound b, boolean excludeVariables) {
+    static boolean hasCommonSubtermsRecursive(@NotNull Term a, @NotNull Term b, boolean excludeVariables) {
 
         int commonStructure = a.structure() & b.structure();
         if (excludeVariables)
@@ -245,11 +245,73 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             return false;
 
         Set<Term> scratch = new HashSet(/*a.size() + b.size()*/);
-        a.termsToSetRecurse(commonStructure, scratch, true);
-        return b.termsToSetRecurse(commonStructure, scratch, false);
+        a.subterms().termsToSetRecurse(commonStructure, scratch, true);
+        return b.subterms().termsToSetRecurse(commonStructure, scratch, false);
+    }
+
+    /**
+     * gets the set of unique recursively contained terms of a specific type
+     * TODO generalize to a provided lambda predicate selector
+     */
+    @NotNull
+    default MutableSet<Term> recurseTermsToSet(@NotNull Op onlyType) {
+        if (!hasAny(onlyType))
+            return Sets.mutable.empty();
+
+        MutableSet<Term> t = new UnifiedSet(1);//$.newHashSet(volume() /* estimate */);
+
+        //TODO use an additional predicate to cull subterms which don't contain the target type
+        recurseTerms((t1) -> {
+            if (t1.op() == onlyType) //TODO make recurseTerms by Op then it can navigate to subterms using structure hash
+                t.add(t1);
+        });
+        return t;
     }
 
 
+    /**
+     * returns whether the set operation caused a change or not
+     */
+    @NotNull
+    default boolean termsToSet(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
+        boolean r = false;
+
+        TermContainer tt = subterms();
+        int l = tt.size();
+        for (int i = 0; i < l; i++) {
+            @NotNull Term s = tt.sub(i);
+            if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
+                r |= (addOrRemoved) ? t.add(s) : t.remove(s);
+                if (!addOrRemoved && r) //on removal we can exit early
+                    return true;
+            }
+        }
+        return r;
+    }
+
+    @NotNull
+    default boolean termsToSetRecurse(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
+        final boolean[] r = {false};
+        Predicate<Term> selector = (Predicate<Term>) (s) -> {
+
+            if (!addOrRemoved && r[0]) { //on removal we can exit early
+                return false;
+            }
+
+            if (inStructure == -1 || ((s.structure() & inStructure) > 0)) {
+                r[0] |= (addOrRemoved) ? t.add(s) : t.remove(s);
+            }
+
+            return true;
+        };
+
+        if (inStructure != -1)
+            recurseTerms((p) -> p.hasAny(inStructure), selector, null);
+        else
+            recurseTerms(any -> true, selector, null);
+
+        return r[0];
+    }
 
     /**
      * Check the subterms (first level only) for a target term
@@ -274,23 +336,18 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
         return false;
     }
-    default boolean containsRecursively(@NotNull Term y, Predicate<Compound> subTermOf) {
+
+    default boolean containsRecursively(@NotNull Term y, Predicate<Term> subTermOf) {
         if (!impossibleSubTerm(y)) {
             int s = size();
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
-                if (x.equals(y))
+                if (x.equals(y) || x.containsRecursively(y, subTermOf))
                     return true;
-                if (x instanceof Compound) {
-                    Compound cx = (Compound) x;
-                    if (subTermOf.test(cx) && cx.containsRecursively(y, subTermOf))
-                        return true;
-                }
             }
         }
         return false;
     }
-
 
 
 //    default boolean containsTermAtemporally(@NotNull Term b) {
@@ -390,7 +447,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     default boolean equalTerms(@NotNull List<Term> c) {
         int s = size();
-        if (s !=c.size())
+        if (s != c.size())
             return false;
         for (int i = 0; i < s; i++) {
             if (!sub(i).equals(c.get(i)))
@@ -398,6 +455,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
         return true;
     }
+
     default boolean equalTerms(@NotNull Term[] c) {
         int s = size();
         if (s != c.length)
@@ -414,7 +472,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    /** an array of the subterms, which an implementation may allow
+    /**
+     * an array of the subterms, which an implementation may allow
      * direct access to its internal array which if modified will
      * lead to disaster. by default, it will call 'toArray' which
      * guarantees a clone. override with caution
@@ -815,7 +874,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * a must be in input, and output must be of size input.length-1
      * equality is compared by instance for speed
      */
-    @NotNull static Term[] exceptByInstance(@NotNull Term[] input, Term a, @NotNull Term[] output) {
+    @NotNull
+    static Term[] exceptByInstance(@NotNull Term[] input, Term a, @NotNull Term[] output) {
 //        int targetLen = input.size() - 1;
 //        if (output.length!= targetLen) {
 //            throw new RuntimeException("wrong size");
@@ -974,7 +1034,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-
     /**
      * match a range of subterms of Y.
      */
@@ -997,7 +1056,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
     }
 
-    default boolean recurseSubTerms(BiPredicate<Term, Compound> whileTrue, Compound parent) {
+    default boolean recurseSubTerms(BiPredicate<Term, Term> whileTrue, Compound parent) {
         int s = size();
         for (int i = 0; i < s; i++) {
             if (!sub(i).recurseTerms(whileTrue, parent))
@@ -1005,12 +1064,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
         return true;
     }
+
     @Override
     default void recurseTerms(@NotNull Consumer<Term> v) {
         forEach(s -> s.recurseTerms(v));
     }
 
-    default boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, Compound parent) {
+    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent) {
         return AND(s -> s.recurseTerms(parentsMust, whileTrue, parent));
     }
 

@@ -11,6 +11,7 @@ import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.var.UnnormalizedVariable;
+import nars.term.var.Variable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.primitive.ObjectByteMap;
@@ -53,17 +54,10 @@ public enum Op implements $ {
 
     NEG("--", 5, Args.One) {
         private Term neg(Term x) {
-
-            if (x instanceof Compound) {
-                // (--,(--,P)) = P
-                if (x.op() == NEG)
-                    return x.unneg();
-            } else if (x instanceof Bool) {
+            if (x instanceof Bool || x.op()==NEG)
                 return x.unneg();
-            }
-
-            return new UnitCompound1(NEG, x);
-
+            else
+                return new UnitCompound1(NEG, x);
         }
 
         @Override
@@ -235,9 +229,9 @@ public enum Op implements $ {
                 //      becomes
                 //    ((x &&+ y) &&+ z)
                 //TODO may need to count # of events, not number of conjunctions.
-                boolean aConj = a instanceof Compound && a.op() == CONJ;
+                boolean aConj = a.op() == CONJ;
                 int subEventsLeft = aConj ? conjSubEventCount(a) : 0;
-                boolean bConj = b instanceof Compound && b.op() == CONJ;
+                boolean bConj = b.op() == CONJ;
                 int subEventsRight = bConj ? conjSubEventCount(b) : 0;
                 if (subEventsLeft > 1 || subEventsRight > 0) {
                     //rebalance and align
@@ -273,13 +267,11 @@ public enum Op implements $ {
         private int conjSubEventCount(Term a) {
             //TODO make an int reducer method for Term
             final int[] subevents = {0};
-            ((Compound) a).recurseTerms(sub -> {
+            a.recurseTerms(sub -> {
                 if (sub.op() == CONJ)
                     subevents[0] += sub.size();
             });
             return subevents[0];
-
-            //return ((Compound)a).count(t -> t.op()==CONJ && !concurrent(t.dt()));
         }
 
         /**
@@ -310,8 +302,8 @@ public enum Op implements $ {
                         Term x = csi.next();
 
                         if (x.op() == NEG && x.subIs(0, CONJ)) { //DISJUNCTION
-                            Compound disj = (Compound) x.unneg();
-                            SortedSet<Term> disjSubs = disj.toSortedSet();
+                            Term disj = x.unneg();
+                            SortedSet<Term> disjSubs = disj.subterms().toSortedSet();
                             //factor out occurrences of the disj's contents outside the disjunction, so remove from inside it
                             if (disjSubs.removeAll(cs)) {
                                 //reconstruct disj if changed
@@ -413,16 +405,16 @@ public enum Op implements $ {
 
 
             //if there is only one implication subterm (first layer only), then fold into that.
-            final Compound conj = (Compound) x;
+            final Term conj = x;
             int whichImpl = -1;
             int conjSize = conj.size();
-            Compound implication = null;
+            Term implication = null;
             int implDT = XTERNAL;
             for (int i = 0; i < conjSize; i++) {
                 if (conj.subIs(i, Op.IMPL)) {
                     //only handle the first implication in this iteration
                     whichImpl = i;
-                    implication = (Compound) conj.sub(whichImpl);
+                    implication = conj.sub(whichImpl);
                     implDT = implication.dt();
                     if (implDT == XTERNAL) {
                         //dont proceed any further if XTERNAL
@@ -438,10 +430,10 @@ public enum Op implements $ {
             Term others;
             int conjDT = conj.dt();
             if (conjSize == 2) {
-                others = x.sub(1 - whichImpl, null);
+                others = x.sub(1 - whichImpl);
             } else {
                 //more than 2; group them as one term
-                @NotNull TreeSet<Term> ss = conj.toSortedSet();
+                @NotNull TreeSet<Term> ss = conj.subterms().toSortedSet();
                 assert (ss.remove(implication)) : "must have removed something";
 
                 others = xo.the(conjDT, Terms.sorted(ss) /* assumes commutive since > 2 */);
@@ -567,7 +559,6 @@ public enum Op implements $ {
 
     public static final char ARGUMENT_SEPARATOR = ',';
 
-    public static final char IMAGE_PLACE_HOLDER = '_';
     public static final char SET_INT_CLOSER = ']';
     public static final char SET_EXT_CLOSER = '}';
     public static final char COMPOUND_TERM_OPENER = '(';
@@ -1082,7 +1073,7 @@ public enum Op implements $ {
                 if (et0.equals(et1) || et0.containsRecursively(et1, nonProduct) || et1.containsRecursively(et0, nonProduct))
                     return Null;
                 else if ((et0.op() == set && et1.op() == set))
-                    return difference(set, (Compound) et0, (Compound) et1);
+                    return difference(set, et0.subterms(), et1.subterms());
                 else
                     return compound(op, DTERNAL, t);
 
@@ -1094,7 +1085,7 @@ public enum Op implements $ {
     }
 
     @NotNull
-    public static Term difference(@NotNull Op o, @NotNull Compound a, @NotNull TermContainer b) {
+    public static Term difference(@NotNull Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
 
         if (a.equals(b))
             return Null; //empty set
@@ -1115,8 +1106,8 @@ public enum Op implements $ {
         }
 
         int retained = terms.size();
-        if (retained == size) { //same as 'a'
-            return a;
+        if (retained == size && a instanceof Term) { //same as 'a', quick re-use of instance
+            return (Term)a;
         } else if (retained == 0) {
             return Null; //empty set
         } else {
@@ -1129,19 +1120,19 @@ public enum Op implements $ {
      * decode a term which may be a functor, return null if it isnt
      */
     @Nullable
-    public static Pair<Atom, Compound> functor(@NotNull Term maybeOperation, TermContext index, boolean mustFunctor) {
-        if (maybeOperation instanceof Compound && maybeOperation.hasAll(Op.opBits)) {
-            Compound c = (Compound) maybeOperation;
+    public static Pair<Atom, TermContainer> functor(@NotNull Term maybeOperation, TermContext index, boolean mustFunctor) {
+        if (maybeOperation.hasAll(Op.opBits)) {
+            Term c = maybeOperation;
             if (c.op() == INH) {
                 Term s0 = c.sub(0);
-                if (s0 instanceof Compound && s0.op() == PROD) {
+                if (s0.op() == PROD) {
                     Term s1 = c.sub(1);
                     if (s1 instanceof Atom /*&& s1.op() == ATOM*/) {
                         Termed ff = index.getIfPresentElse(s1);
                         if (!mustFunctor || ff instanceof Functor) {
                             return Tuples.pair(
                                     ((Atom) ff),
-                                    ((Compound) s0)
+                                    s0.subterms()
                             );
                         }
 
@@ -1158,9 +1149,8 @@ public enum Op implements $ {
 
         //if (!subterms.internable())
         Term c = compound(op, subterms);
-        if (dt != DTERNAL)
-            return new GenericCompoundDT((Compound) c, dt);
-        return c;
+        return ((c instanceof Compound) && (dt != DTERNAL)) ?
+                new GenericCompoundDT((Compound) c, dt) : c;
 
 //        else
 //            return compound(new NewCompound(op, subterms), dt);
@@ -1178,7 +1168,7 @@ public enum Op implements $ {
         return bits;
     }
 
-    public static final Predicate<Compound> nonProduct = c -> c.op() != PROD;
+    public static final Predicate<Term> nonProduct = c -> c.op() != PROD;
     private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
     private static final int InvalidImplicationSubj = or(EQUI, IMPL);
     private static final int InvalidImplicationPred = or(EQUI);
@@ -1340,7 +1330,7 @@ public enum Op implements $ {
 
                 // (C ==>+- (A ==>+- B))   <<==>>  ((C &&+- A) ==>+- B)
                 if (predicate.op() == IMPL) {
-                    Compound cpr = (Compound) predicate;
+                    Term cpr = predicate;
                     int cprDT = cpr.dt();
                     //if (cprDT != XTERNAL) {
                     Term a = cpr.sub(0);
@@ -1378,9 +1368,9 @@ public enum Op implements $ {
                 boolean subjConj = subject.op() == CONJ && concurrent(subject.dt());
                 boolean predConj = predicate.op() == CONJ && concurrent(predicate.dt());
                 if (subjConj && predConj) {
-                    final Compound csub = (Compound) subject;
+                    final Term csub = subject;
                     TermContainer subjs = csub.subterms();
-                    final Compound cpred = (Compound) predicate;
+                    final Term cpred = predicate;
                     TermContainer preds = cpred.subterms();
 
                     Term[] common = TermContainer.intersect(subjs, preds);
@@ -1537,13 +1527,13 @@ public enum Op implements $ {
 
         if ((o1 == setUnion) && (o2 == setUnion)) {
             //the set type that is united
-            return Terms.union(setUnion, (Compound) term1, (Compound) term2);
+            return Terms.union(setUnion, term1.subterms(), term2.subterms());
         }
 
 
         if ((o1 == setIntersection) && (o2 == setIntersection)) {
             //the set type which is intersected
-            return Terms.intersect(setIntersection, (Compound) term1, (Compound) term2);
+            return Terms.intersect(setIntersection, term1.subterms(), term2.subterms());
         }
 
         if (o2 == intersection && o1 != intersection) {

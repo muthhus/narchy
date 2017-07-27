@@ -300,8 +300,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             } else /*if (!b.equals(id))*/ {
 
                     if (tc.add(b)) { //variable or other non-conceptualizable term
-                        if (layersRemain > 0 && b instanceof Compound) {
-                            e = ((Compound) b).subterms();
+                        if (layersRemain > 0) {
+                            e = b.subterms();
                         }
                     }
 

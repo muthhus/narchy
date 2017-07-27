@@ -28,9 +28,9 @@ public abstract class VarIntroduction {
 
     }
 
-    public void accept(@NotNull Compound c, @NotNull Consumer<Compound> each, NAR n) {
+    public void accept(@NotNull Term c, @NotNull Consumer<Term> each, NAR n) {
 
-        if (!c.hasAny(ConjOrStatementBits) || c.volume() < 2)
+        if (c.volume() < 2 || !c.hasAny(ConjOrStatementBits))
             return; //earliest failure test
 
         if (!(c.isNormalized())) {
@@ -77,7 +77,7 @@ public abstract class VarIntroduction {
         Term newContent = n.terms.replace(c, substs);
 
         if ((newContent instanceof Compound) && !newContent.equals(c)) {
-            each.accept((Compound) newContent);
+            each.accept(newContent);
 
         }
 
@@ -106,11 +106,11 @@ public abstract class VarIntroduction {
 
 
     @Nullable
-    abstract protected FasterList<Term> select(Compound input);
+    abstract protected FasterList<Term> select(Term input);
 
 
     /** provides the next terms that will be substituted in separate permutations; return null to prevent introduction */
-    abstract protected Term next(@NotNull Compound input, @NotNull Term selection, int order);
+    abstract protected Term next(@NotNull Term input, @NotNull Term selection, int order);
     /*{
         return $.varQuery("c" + iteration);
     }*/

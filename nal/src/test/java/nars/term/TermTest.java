@@ -778,7 +778,7 @@ public class TermTest {
         Termed c = n.term("<(&&, <#1 --> M>, <#2 --> M>) ==> <#1 --> nonsense>>");
         assertNotEquals(a, c);
 
-        Termed<Compound> x = n.term("(&&, <#1 --> M>, <#2 --> M>)");
+        Termed x = n.term("(&&, <#1 --> M>, <#2 --> M>)");
         Term xa = x.term().sub(0);
         Term xb = x.term().sub(1);
         int o1 = xa.compareTo(xb);

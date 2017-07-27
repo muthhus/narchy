@@ -1212,11 +1212,7 @@ public class Narsese extends BaseParser<Object> {
             return (Task) x[0];
         }
 
-        Term contentRaw = (Term) x[1];
-        if (!(contentRaw instanceof Compound))
-            throw new NarseseException("Invalid task term");
-
-        Term content = /*m.normalize*/((Compound) contentRaw);
+        Term content = /*m.normalize*/((Term) x[1]);
         /*if (!(content instanceof Compound)) {
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
             //return Command.task($.func("log", content));
@@ -1252,7 +1248,7 @@ public class Narsese extends BaseParser<Object> {
             }
 
             TaskBuilder ttt =
-                    new TaskBuilder((Compound) content, punct, t1)
+                    new TaskBuilder(content, punct, t1)
                             .time(
                                     m.time(), //creation time
                                     Tense.getRelativeOccurrence(

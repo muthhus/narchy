@@ -1,17 +1,21 @@
 package nars.term;
 
 import jcog.Util;
+import nars.IO;
 import nars.Op;
 import nars.Param;
 import nars.derive.PatternCompound;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.io.IOException;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
-public class GenericCompoundDT extends ProxyTerm<Compound> {
+public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
 
     /**
      * numeric (term or "dt" temporal relation)
@@ -21,7 +25,6 @@ public class GenericCompoundDT extends ProxyTerm<Compound> {
 
     public GenericCompoundDT(Compound base, int dt) {
         super(base);
-
 
 
         if (Param.DEBUG) {
@@ -34,7 +37,7 @@ public class GenericCompoundDT extends ProxyTerm<Compound> {
             if (op.temporal && (op != CONJ && size != 2))
                 throw new InvalidTermException(op, dt, "Invalid dt value for operator", subterms.toArray());
 
-            if (dt!=XTERNAL && op().commutative && size()==2) {
+            if (dt != XTERNAL && op().commutative && size() == 2) {
                 if (sub(0).compareTo(sub(1)) > 0)
                     throw new RuntimeException("invalid ordering");
             }
@@ -46,10 +49,33 @@ public class GenericCompoundDT extends ProxyTerm<Compound> {
 
         assert dt != DTERNAL || this instanceof PatternCompound : "use GenericCompound if dt==DTERNAL";
         int baseHash = base.hashCode();
-        this.hashDT = dt!=DTERNAL ? Util.hashCombine(baseHash, dt) : baseHash;
+        this.hashDT = dt != DTERNAL ? Util.hashCombine(baseHash, dt) : baseHash;
     }
 
-//    @Override
+    @Override
+    public Term dt(int dt) {
+        return Compound.super.dt(dt);
+    }
+
+
+    @Override
+    public void append(@NotNull Appendable p) throws IOException {
+        Compound.super.append(p);
+    }
+
+    @NotNull
+    @Override
+    public String toString() {
+        return IO.Printer.stringify(this).toString();
+    }
+
+
+    @Override
+    public @Nullable Term sub(int i, @Nullable Term ifOutOfBounds) {
+        return ref.sub(i, ifOutOfBounds);
+    }
+
+    //    @Override
 //    public boolean equals(Object obj) {
 //        if (this == obj) return true;
 //
@@ -97,6 +123,16 @@ public class GenericCompoundDT extends ProxyTerm<Compound> {
 //    }
 
     @Override
+    public @NotNull TermContainer subterms() {
+        return ref.subterms();
+    }
+
+    @Override
+    public void setNormalized() {
+        ref.setNormalized();
+    }
+
+    @Override
     public boolean isCommutative() {
         if (op().commutative) { //TODO only test dt() if equiv or conj
             int dt = dt();
@@ -128,7 +164,13 @@ public class GenericCompoundDT extends ProxyTerm<Compound> {
         return dt;
     }
 
-//    @Override
+    @Override
+    public Term term() {
+        return this;
+    }
+
+
+    //    @Override
 //    public Compound dt(int nextDT) {
 //        if (nextDT == this.dt)
 //            return this;

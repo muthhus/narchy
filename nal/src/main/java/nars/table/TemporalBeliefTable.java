@@ -40,7 +40,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
     void setCapacity(int temporals);
 
-    default public Object stretch(SignalTask changed) {
+    default Object stretch(SignalTask changed) {
         throw new UnsupportedOperationException();
     }
 

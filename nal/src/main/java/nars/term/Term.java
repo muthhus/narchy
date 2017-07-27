@@ -52,8 +52,10 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import static nars.Op.CONJ;
 import static nars.Op.Null;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 
 public interface Term extends Termlike, Comparable<Term> {
@@ -94,15 +96,82 @@ public interface Term extends Termlike, Comparable<Term> {
     int hashCode();
 
 
-    default boolean recurseTerms(BiPredicate<Term, Compound> whileTrue) {
+    default boolean recurseTerms(BiPredicate<Term, Term> whileTrue) {
         return recurseTerms(whileTrue, null);
     }
 
 
-    boolean recurseTerms(BiPredicate<Term, Compound> whileTrue, @Nullable Compound parent);
+    boolean recurseTerms(BiPredicate<Term, Term> whileTrue, @Nullable Term parent);
 
-    default boolean recurseTerms(Predicate<Compound> parentsMust, Predicate<Term> whileTrue, Compound parent)  {
+    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent)  {
         return whileTrue.test(this);
+    }
+
+    @Override
+    default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
+        return inSubtermsOf.test(this) && contains(t);
+    }
+
+    @Nullable
+    default Term commonParent(List<byte[]> subpaths) {
+        int subpathsSize = subpaths.size();
+        assert (subpathsSize > 0);
+
+        int shortest = Integer.MAX_VALUE;
+        for (int i = 0, subpathsSize1 = subpaths.size(); i < subpathsSize1; i++) {
+            shortest = Math.min(shortest, subpaths.get(i).length);
+        }
+
+        //find longest common prefix
+        int i;
+        done:
+        for (i = 0; i < shortest; i++) {
+            byte toMatch = 0;
+            for (int j = 0; j < subpathsSize; j++) {
+                byte[] p = subpaths.get(j);
+                if (j == 0) {
+                    toMatch = p[i];
+                } else if (toMatch != p[i]) {
+                    break done; //first mismatch, done
+                } //else: continue downwards
+            }
+            //all matched, proceed downward to the next layer
+        }
+        if (i == 0)
+            return this;
+        else {
+            return sub(i, subpaths.get(0));
+        }
+
+    }
+
+    @Nullable
+    default Term sub(@NotNull ByteList path) {
+        Term ptr = this;
+        int s = path.size();
+        for (int i = 0; i < s; i++)
+            if ((ptr = ptr.sub(path.get(i))) == Null)
+                return Null;
+        return ptr;
+    }
+
+    /**
+     * extracts a subterm provided by the address tuple
+     * returns null if specified subterm does not exist
+     */
+    @Nullable
+    default Term sub(@NotNull byte... path) {
+        return sub(path.length, path);
+    }
+
+    @Nullable
+    default Term sub(int n, @NotNull byte... path) {
+        Term ptr = this;
+        for (int i = 0; i < n; i++) {
+            if ((ptr = ptr.sub((int) path[i])) == Null)
+                return Null;
+        }
+        return ptr;
     }
 
     /**
@@ -221,18 +290,97 @@ public interface Term extends Termlike, Comparable<Term> {
      * @return DTERNAL if the subterm was not found
      */
     default int subtermTime(@NotNull Term x) {
-        if (this.equals(x)) //unneg().equalsIgnoringVariables(x))
+        if (equals(x))
             return 0;
-        else
+
+        if (impossibleSubTerm(x))
             return DTERNAL;
+
+        int dt = dt();
+        int idt;
+        boolean reverse;
+
+        //TODO do shuffled search to return different equivalent results wherever they may appear
+
+        Op op = op();
+        boolean shift;
+        if (!op.temporal || dt == DTERNAL || dt == XTERNAL || dt == 0) {
+            idt = 0; //parallel or eternal, no dt increment
+            reverse = false;
+            shift = false;
+        } else {
+            shift = op == CONJ;
+            idt = dt;
+            if (idt < 0) {
+                idt = -idt;
+                reverse = true;
+            } else {
+                reverse = false;
+            }
+        }
+
+        @NotNull TermContainer yy = subterms();
+        int ys = yy.size();
+        int offset = 0;
+        for (int yi = 0; yi < ys; yi++) {
+            Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
+            int sdt = yyy.subtermTime(x);
+            if (sdt != DTERNAL)
+                return sdt + offset;
+            offset += idt + ((shift && yyy.op() == CONJ) ? yyy.dtRange() : 0);
+        }
+
+        return DTERNAL; //not found
     }
 
     /**
      * total span across time represented by a sequence conjunction compound
      */
     default int dtRange() {
-        return 0;
+        Op o = op();
+        switch (o) {
+
+            case NEG:
+                return sub(0).dtRange();
+
+
+            case CONJ:
+
+                int dt = dt();
+                if (size() == 2) {
+
+                    switch (dt) {
+                        case DTERNAL:
+                        case XTERNAL:
+                        case 0:
+                            dt = 0;
+                            break;
+                        default:
+                            dt = Math.abs(dt);
+                            break;
+                    }
+
+                    return sub(0).dtRange() + (dt) + sub(1).dtRange();
+
+                } else {
+                    int s = 0;
+
+                    TermContainer tt = subterms();
+                    int l = tt.size();
+                    for (int i = 0; i < l; i++) {
+                        @NotNull Term x = tt.sub(i);
+                        s = Math.max(s, x.dtRange());
+                    }
+
+                    return s;
+                }
+
+            default:
+                return 0;
+        }
+
     }
+
 
 
     /**
@@ -261,9 +409,9 @@ public interface Term extends Termlike, Comparable<Term> {
 
     }
 
-    default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
-        return (this instanceof Variable) || (other instanceof Variable) || equals(other);
-    }
+//    default boolean equalsIgnoringVariables(@NotNull Term other, boolean requireSameTime) {
+//        return (this instanceof Variable) || (other instanceof Variable) || equals(other);
+//    }
 
 
 //    default public boolean hasAll(final Op... op) {

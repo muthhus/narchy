@@ -332,7 +332,7 @@ public class IRCNLP extends IRC {
                     if (start >= now - dur) {
                         if (tt.subIs(Op.INH, 1, $.the("hear"))) {
                             if (tt.subIs(0, PROD) && tt.sub(0).subIs(0, Op.ATOM)) {
-                                speak(tt.sub(0).sub(0, null), start - now, bot);
+                                speak(tt.sub(0).sub(0), start - now, bot);
                             }
                         }
                     }

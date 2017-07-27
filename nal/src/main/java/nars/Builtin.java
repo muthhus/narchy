@@ -67,8 +67,8 @@ public class Builtin {
 
             Functor.f2("subterm", (Term x, Term index) -> {
                 try {
-                    if (x instanceof Compound && index instanceof Int) {
-                        return ((Compound) x).sub($.intValue(index));
+                    if (index instanceof Int) {
+                        return x.sub($.intValue(index));
                     }
                 } catch (NumberFormatException ignored) {
                 }

@@ -44,7 +44,7 @@ public interface Termlike extends Termed {
         return contains(t);
     }
 
-    default boolean containsRecursively(Term t, Predicate<Compound> inSubtermsOf) {
+    default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {
         return contains(t);
     }
 
@@ -89,8 +89,6 @@ public interface Termlike extends Termed {
      *  or of is out of bounds or not a container,
      *  returns the provided ifOutOfBounds */
     @Nullable <T extends Term> T sub(int i, @Nullable T ifOutOfBounds);
-
-    default <T extends Term> T sub(int i) { return (T)sub(i, Op.Null); }
 
     default boolean impossibleSubTermVolume(int otherTermVolume) {
 //        return otherTermVolume >

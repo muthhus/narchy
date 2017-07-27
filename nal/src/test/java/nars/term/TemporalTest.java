@@ -152,7 +152,7 @@ public class TemporalTest {
                 "(&|,do(that),(a),(b))",
                 n.term("(do(that) &&+0 ((a)&&(b)))").toString());
 
-        Termed<Term> nt = n.term("(((that)-->do) &&+0 ((a)&&(b)))");
+        Termed nt = n.term("(((that)-->do) &&+0 ((a)&&(b)))");
         assertEquals(
                 //"(do(that) &&+0 ((a)&&(b)))",
                 "(&|,do(that),(a),(b))",
@@ -167,7 +167,7 @@ public class TemporalTest {
 
     @Test
     public void testAnonymization2() throws Narsese.NarseseException {
-        Termed<Term> nn = n.term("((do(that) &&+1 (a)) ==>+2 (b))");
+        Termed nn = n.term("((do(that) &&+1 (a)) ==>+2 (b))");
         assertEquals("((do(that) &&+1 (a)) ==>+2 (b))", nn.toString());
 
 
@@ -287,7 +287,7 @@ public class TemporalTest {
     }
 
     void testParse(String input, String expected) {
-        Termed<Term> t = null;
+        Termed t = null;
         try {
             t = n.term(input);
         } catch (Narsese.NarseseException e) {

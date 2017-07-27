@@ -124,7 +124,7 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
 
     @Override
     public TermContainer templates() {
-        return term instanceof Compound ? ((Compound)term).subterms() : TermContainer.NoSubterms;
+        return term.subterms();
     }
 
     /**

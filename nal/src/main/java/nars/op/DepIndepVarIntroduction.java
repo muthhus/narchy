@@ -46,13 +46,13 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     @Nullable
     @Override
-    protected FasterList<Term> select(Compound input) {
+    protected FasterList<Term> select(Term input) {
         return Terms.substAllRepeats(input, depIndepFilter, 2);
     }
 
     @Nullable
     @Override
-    protected Term next(@NotNull Compound input, @NotNull Term selected, int order) {
+    protected Term next(@NotNull Term input, @NotNull Term selected, int order) {
 
         if (selected.equals(Imdex))
             return null;
@@ -151,10 +151,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
             boolean negated = x.op() == NEG;
             Term xx = negated ? x.unneg() : x;
 
-            if (!(xx instanceof Compound))
-                return x;
-
-            accept((Compound)xx, y -> only[0] = y, n);
+            accept(xx, y -> only[0] = y, n);
 
             Term o = only[0];
             return (o == Null) ? Null : $.negIf(o, negated);

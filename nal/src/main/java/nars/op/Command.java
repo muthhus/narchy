@@ -36,7 +36,7 @@ abstract public class Command extends BaseConcept implements PermanentConcept {
     public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
         Term c = t.term();
         try {
-            run(c.sub(1, null), ((Compound) (t.term(0))).toArray(), nar);
+            run((Atomic)c.sub(1), ((Compound) (t.sub(0))).toArray(), nar);
             return t;
         } catch (Throwable error) {
             if (Param.DEBUG)
