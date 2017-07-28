@@ -66,9 +66,16 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
         return bias + super.value() * amplitude;
     }
 
-    public void set(float bias, float amplitude) {
+    public CauseChannel set(float bias, float amplitude) {
+        return amplitude(amplitude).bias(bias);
+    }
+    public CauseChannel bias(float bias) {
         this.bias = bias;
-        this.amplitude = amplitude;
+        return this;
+    }
+    public CauseChannel amplitude(float amp) {
+        this.amplitude = amp;
+        return this;
     }
 
 }

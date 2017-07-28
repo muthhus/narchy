@@ -32,7 +32,9 @@ public interface Atomic extends Term {
     @NotNull
     static Atomic the(@NotNull String id) {
         int l = id.length();
-        assert(l>0);
+        if (l == 0)
+            System.out.println("wtf");
+        assert(l>0): "attempted zero-length Atomic id";
 
         //special cases
         if (l ==1) {

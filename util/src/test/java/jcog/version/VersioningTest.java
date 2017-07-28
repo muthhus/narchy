@@ -53,7 +53,7 @@ public class VersioningTest {
         assertEquals(0, w.size());
         assertEquals(0, w.size());
         assertEquals(0, mvx.size());
-        assertEquals("{x=null}", m.toString());
+        assertEquals("{}", m.toString());
 
         assertNull(m.get("x")); //removed from map because it did not exist at version 0 which is effectively empty
 

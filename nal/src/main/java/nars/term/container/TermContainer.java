@@ -790,22 +790,22 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         for (int i = 0; i < s; i++) {
             Term x = a.sub(i);
             Term y = b.sub(i);
-//            if (x instanceof Variable && y instanceof Variable) {
-//                if (inequalVariable == -1 && !x.equals(y))
-//                    inequalVariable = i; //test below; allow differing non-variable terms to determine sort order first
-//
-//            } else {
+            if (x instanceof Variable && y instanceof Variable) {
+                if (inequalVariable == -1 && !x.equals(y))
+                    inequalVariable = i; //test below; allow differing non-variable terms to determine sort order first
+
+            } else {
                 int d = x.compareTo(y);
                 if (d != 0) {
                     return d;
                 }
-//            }
+            }
         }
 
-//        //2nd-stage:
-//        if (inequalVariable != -1) {
-//            return a.sub(inequalVariable).compareTo(b.sub(inequalVariable));
-//        }
+        //2nd-stage:
+        if (inequalVariable != -1) {
+            return a.sub(inequalVariable).compareTo(b.sub(inequalVariable));
+        }
 
 
         return 0;

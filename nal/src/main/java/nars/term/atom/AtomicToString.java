@@ -19,15 +19,12 @@ public abstract class AtomicToString implements Atomic {
     public AtomicToString(Op op, @Nullable String s) {
         if (s == null) s = toString(); //must be a constant method
         int slen = s.length();
+
         this.bytesCached = ArrayUtils.addAll(
-            new byte[] { (op!=null ? op : op()) .id, (byte)(slen>>8), (byte)slen },
+            new byte[] { (op!=null ? op : op()) .id, (byte)(slen>>8 & 0xff), (byte)(slen&0xff) },
             s.getBytes()
         );
         this.hashCached = Util.hashWangJenkins( s.hashCode() );
-    }
-
-    public AtomicToString() {
-        this(null, null);
     }
 
     @Override public boolean equals(Object u) {

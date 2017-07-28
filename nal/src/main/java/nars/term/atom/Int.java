@@ -7,6 +7,7 @@ import nars.$;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.subst.Unify;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
@@ -111,15 +112,15 @@ public class Int implements Intlike {
     }
 
 
-//    @Override
-//    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-//        if (equals(y)) return true;
-//        if (y instanceof IntRange) {
-//            IntRange ir = (IntRange) y;
-//            return (ir.min <= id && ir.max >= id);
-//        }
-//        return false;
-//    }
+    @Override
+    public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+        if (equals(y)) return true;
+        if (y instanceof IntRange) {
+            IntRange ir = (IntRange) y;
+            return (ir.min <= id && ir.max >= id);
+        }
+        return false;
+    }
 
     public static Intlike the(Range<Integer> span) {
         return range(span.lowerEndpoint(), span.upperEndpoint() - ((span.upperBoundType() == OPEN ? 1 : 0)));
@@ -145,15 +146,15 @@ public class Int implements Intlike {
             this.hash = Util.hashCombine(INT_RANGE, min, max);
         }
 
-//        @Override
-//        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
-//            if (equals(y)) return true;
-//            if (y instanceof Int) {
-//                int i = ((Int) y).id;
-//                return (min <= i && max >= i);
-//            }
-//            return false;
-//        }
+        @Override
+        public boolean unify(@NotNull Term y, @NotNull Unify subst) {
+            if (equals(y)) return true;
+            if (y instanceof Int) {
+                int i = ((Int) y).id;
+                return (min <= i && max >= i);
+            }
+            return false;
+        }
 
         @Override
         public @NotNull String toString() {

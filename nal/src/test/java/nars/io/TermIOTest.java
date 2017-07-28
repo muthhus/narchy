@@ -148,6 +148,9 @@ public class TermIOTest {
         assertEqualSerialize(nar.inputAndGet("<a-->(b==>c)>!"));
         assertEqualSerialize(nar.inputAndGet("<a-->(b==>c)>?"));
         assertEqualSerialize(nar.inputAndGet("$0.1 (b-->c)! %1.0;0.8%"));
+        assertEqualSerialize(nar.inputAndGet("$0.1 (b-->c)! :|: %1.0;0.8%"));
+        assertEqualSerialize(nar.inputAndGet("$0.1 (a ==>+4 (b-->c)). :|: %1.0;0.8%"));
+        assertEqualSerialize(nar.inputAndGet("$0.1 (1 ==>+4 (2-->3)). :|: %1.0;0.8%"));
     }
 
     @Test

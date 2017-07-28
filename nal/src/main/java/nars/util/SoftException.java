@@ -40,7 +40,7 @@ public class SoftException extends RuntimeException {
     @Override
     public String toString() {
         String m = getMessage();
-        return (m!=null ? m + "\n" : "") + Joiner.on("\n").join(stack);
+        return (m!=null ? m + "\n" : "") + (stack!=null ? Joiner.on("\n").join(stack) : "");
     }
 
     @Override

@@ -28,12 +28,17 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     private static final float DEFAULT_RATE = 8;
 
     public final NAR nar;
-    public final LeakOut out;
-    private final CauseChannel<Task> receive;
+    public final LeakOut send;
+    public final CauseChannel<Task> recv;
 
 
     public InterNAR(NAR nar) throws IOException {
         this(nar, DEFAULT_RATE, 0);
+    }
+
+    InterNAR pri(float priFactor) {
+        recv.amplitude = priFactor;
+        return this;
     }
 
     /**
@@ -61,9 +66,9 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
         super(port, discover);
         this.nar = nar;
 
-        this.receive = nar.newInputChannel(this);
+        this.recv = nar.newInputChannel(this);
 
-        this.out = new LeakOut(nar, 256, outRate) {
+        this.send = new LeakOut(nar, 256, outRate) {
             @Override protected float send(Task x) {
 
                 if (connected()) {
@@ -102,7 +107,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     @Override
     public void stop() {
         super.stop();
-        out.stop();
+        send.stop();
     }
 
     //        @Override
@@ -118,7 +123,15 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     @Override
     protected void onTell(UDPeer.UDProfile connected, Msg m) {
 
-        Task x = IO.taskFromBytes(m.data());
+        Task x;
+
+        try {
+            x = IO.taskFromBytes(m.data());
+        } catch (Exception e) {
+            logger.warn("bad Task: {} len={}", m, m.dataLength() );
+            return;
+        }
+
         if (x!=null) {
             if (x.isQuestOrQuestion()) {
                 //reconstruct a question task with an onAnswered handler to reply with answers to the sender
@@ -129,7 +142,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
 
             //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
             logger.debug("recv {} from {}", x, m.origin());
-            receive.input(x);
+            recv.input(x);
         }
     }
 

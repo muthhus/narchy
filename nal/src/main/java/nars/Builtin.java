@@ -48,6 +48,8 @@ public class Builtin {
             Functor.f1Const("toChars", x -> $.p(x.toString().toCharArray(), $::the)),
             Functor.f1Const("complexity", x -> $.the(x.complexity())),
 
+            Functor.f0("shutdown", ()->System.exit(0)),
+
             new flat.flatProduct(),
             new similaritree(),
 

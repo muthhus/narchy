@@ -580,6 +580,7 @@ public enum Op implements $ {
     public static final char STAMP_SEPARATOR = ';';
     public static final char STAMP_STARTER = ':';
 
+
     public final boolean allowsBool;
 
     /**
@@ -876,7 +877,8 @@ public enum Op implements $ {
         //negation does not contribute to structure vector
         this.bit = (1 << ordinal());
 
-        this.atomic = var || str.equals(".") /* atom */ || str.equals("`i") || str.equals("^") || str.equals("`");
+        final Set<String> ATOMICS = Set.of(".", "+");
+        this.atomic = var || ATOMICS.contains(str);
 
         switch (str) {
             case "||":

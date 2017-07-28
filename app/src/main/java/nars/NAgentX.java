@@ -101,8 +101,8 @@ abstract public class NAgentX extends NAgent {
 
         RealTime clock =
                 durFPS >= 10 ?
-                        new RealTime.CS(true) :
-                        new RealTime.DSHalf(true);
+                        new RealTime.CS() :
+                        new RealTime.DSHalf();
 
         clock.durFPS(durFPS);
 
@@ -128,7 +128,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.5f);
 
 
-        float priFactor = 0.5f;
+        float priFactor = 0.1f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;

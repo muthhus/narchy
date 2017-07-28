@@ -1,6 +1,7 @@
 package nars;
 
 
+import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import jcog.byt.DynBytes;
 import jcog.data.string.Utf8Writer;
@@ -75,9 +76,7 @@ public class IO {
     public static NALTask readTask(@NotNull DataInput in) throws IOException {
 
 
-        Compound preterm = compoundOrNull(readTerm(in));
-        if (preterm == null)
-            throw new IOException("invalid task term");
+        Term preterm = readTerm(in);
 
         final Term term = preterm.normalize();
         if (term == null)
@@ -216,6 +215,7 @@ public class IO {
                 switch (subType) {
                     case 0: return Int.the( in.readInt());
                     case 1: return Int.range( in.readInt(), in.readInt() );
+                    default: throw new UnsupportedOperationException();
                 }
             case ATOM: {
 

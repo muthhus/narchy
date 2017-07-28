@@ -1,6 +1,5 @@
 package nars;
 
-import com.google.common.util.concurrent.RateLimiter;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TextColor;
@@ -11,7 +10,6 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
-import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminal;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminalServer;
 import jcog.bag.impl.PLinkArrayBag;
@@ -20,11 +18,9 @@ import jcog.event.On;
 import jcog.pri.PLink;
 import jcog.pri.op.PriMerge;
 import nars.op.Command;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,14 +59,20 @@ public class TelnetServer extends TelnetTerminalServer {
                 .then(Hear::wiki)
                 .get();
 
-        nar.startFPS(1f);
+        nar.startFPS(10f);
 
-        new TelnetServer(nar,1024);
+        try {
+            InterNAR i = new InterNAR(nar);
+            i.recv.amplitude(0.1f);
+            i.runFPS(5);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        new TelnetServer(nar, 1024);
 
 
     }
-
-
 
 
     private class TelnetSession extends Thread {
@@ -125,8 +127,6 @@ public class TelnetServer extends TelnetTerminalServer {
                 window.setHints(Collections.singletonList(Window.Hint.FULL_SCREEN));
 
 
-
-
                 //p.setSize(new TerminalSize(screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows())); //TODO update with resize
 
                 //final Table<String> table2 = new Table<String>("Pri", "Term", "Truth");
@@ -138,9 +138,6 @@ public class TelnetServer extends TelnetTerminalServer {
 //                model.addRow("Row3", "Row3", "Row3");
 
 
-
-
-
 //                p.setLayoutManager(new LinearLayout(Direction.VERTICAL));
 //                p.addComponent(new Button("Button", () -> {
 //                    final BasicWindow messageBox = new BasicWindow("Response");
@@ -149,7 +146,6 @@ public class TelnetServer extends TelnetTerminalServer {
 //                            new Button("Close", messageBox::close)));
 //                    textGUI.addWindow(messageBox);
 //                }).withBorder(Borders.singleLine("This is a button")));
-
 
 
                 Panel p = new Panel(new BorderLayout());
@@ -164,8 +160,9 @@ public class TelnetServer extends TelnetTerminalServer {
                 ), TOP);
 
                 TaskListBox table = new TaskListBox(64);
-                p.addComponent(Panels.grid(2,
-                    table, new EmotionDashboard()
+                p.addComponent(//Panels.grid(2,
+                    Panels.horizontal(
+                        table, new EmotionDashboard()
                 ), CENTER);
 
                 final InputTextBox input = new InputTextBox();
@@ -258,13 +255,13 @@ public class TelnetServer extends TelnetTerminalServer {
 
             visible.setValue(capacity);
 
-            tasks = new PLinkArrayBag(capacity*2, PriMerge.max, new ConcurrentHashMap());
+            tasks = new PLinkArrayBag(capacity * 2, PriMerge.avg, new ConcurrentHashMap());
 
             onTask = nar.eventTaskProcess.on/*Weak*/(t -> {
                 tasks.put(new PLink<>(t, t.priElseZero()));
                 update();
             });
-            onCycle = nar.eventCycleStart.on/*Weak*/((n)->this.update());
+            onCycle = nar.eventCycleStart.on/*Weak*/((n) -> this.update());
 
         }
 
@@ -272,9 +269,9 @@ public class TelnetServer extends TelnetTerminalServer {
 
             if (changed.compareAndSet(false, true)) {
                 TextGUI gui = getTextGUI();
-                if (gui!=null) {
+                if (gui != null) {
                     TextGUIThread guiThread = gui.getGUIThread();
-                    if (guiThread!=null) {
+                    if (guiThread != null) {
                         guiThread.invokeLater(this::render);
                     }
                 }
@@ -354,13 +351,13 @@ public class TelnetServer extends TelnetTerminalServer {
             super(new BorderLayout());
 
 
-            stats = new TextBox(new TerminalSize(40,30),
+            stats = new TextBox(new TerminalSize(40, 30),
                     TextBox.Style.MULTI_LINE);
             stats.setReadOnly(true);
 
             addComponent(stats, CENTER);
 
-            on = nar.eventCycleStart.on/*Weak*/((n)->this.update());
+            on = nar.eventCycleStart.on/*Weak*/((n) -> this.update());
         }
 
         private final StringBuilder sb = new StringBuilder(1024);
@@ -368,10 +365,15 @@ public class TelnetServer extends TelnetTerminalServer {
         protected void update() {
             if (busy.compareAndSet(false, true)) {
                 getTextGUI().getGUIThread().invokeLater(() -> {
-                    sb.setLength(0);
+
                     nar.stats(sb);
+
+                    String s = sb.toString();
+                    sb.setLength(0);
+                    s.replace('\t', ' ');
+
                     busy.set(false);
-                    stats.setText(sb.toString());
+                    stats.setText(s);
                 });
             }
         }

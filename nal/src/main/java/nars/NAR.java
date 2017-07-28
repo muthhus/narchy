@@ -1498,7 +1498,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                         Task xx = IO.taskFromBytes(b);
                         if (xx == null || !xx.equals(x)) {
                             //this can happen if a subterm is decompressed only to discover that it contradicts another part of the compound it belongs within
-                            //logger.error("task serialization problem: {} != {}", _x, xx);
+                            logger.error("task serialization problem: {} != {}", _x, xx);
                         } else {
 
                             oo.write(b);

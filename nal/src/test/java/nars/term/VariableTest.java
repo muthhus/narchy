@@ -147,7 +147,15 @@ public class VariableTest {
     /** tests term sort order consistency */
     @Test public void testVariableSubtermSortAffect1() {
 
-        testVariableSorting("((($1-->key)&&($2-->lock))==>open($1,$2))", "((($1-->lock)&&($2-->key))==>open($2,$1))");
+        testVariableSorting(
+                "((($1-->lock)&&($2-->key))==>open($2,$1))",
+                "((($1-->key)&&($2-->lock))==>open($1,$2))"
+                );
+        testVariableSorting(
+                "((($1-->key)&&($2-->lock))==>open($1,$2))",
+                "((($1-->lock)&&($2-->key))==>open($2,$1))"
+
+                );
 
     }
 //    @Test public void testEqualityOfVariablesAndTheirConceptInstances() {

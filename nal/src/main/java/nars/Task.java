@@ -201,12 +201,14 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
 //        }
 
-        Term c = t.conceptual();
-        if (c instanceof Variable || c instanceof Bool) {
-            return fail(t, "no associated concept", safe);
+        {
+            Term c = t.conceptual();
+            if (c instanceof Variable || c instanceof Bool) {
+                return fail(t, "no associated concept", safe);
+            }
         }
 
-        return (c instanceof Atomic) || validTaskCompound(c, punc, safe);
+        return (t instanceof Atomic) || validTaskCompound(t, punc, safe);
     }
 
 //    @Nullable
