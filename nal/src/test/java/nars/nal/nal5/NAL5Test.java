@@ -21,7 +21,7 @@ public class NAL5Test extends AbstractNALTest {
 //        return AbstractNALTest.nars(5);
 //    }
 
-    final int cycles = 750;
+    final int cycles = 50;
 
     @Before
     public void nal() { test.nar.nal(5); }
@@ -561,7 +561,18 @@ public class NAL5Test extends AbstractNALTest {
     }
 
     @Test
-    public void testNegPosImplicationPred() {
+    public void testDeductionNegPosImplicationPred() {
+
+        test
+                //.log()
+                .input("(y). %1.0;0.90%")
+                .input("((--,(y)) ==> (x)).")
+                .mustBelieve(cycles, "(x)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
+        ;
+    }
+    @Test
+    public void testAbductionNegPosImplicationPred() {
 
         test
                 //.log()
@@ -571,6 +582,39 @@ public class NAL5Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
         ;
     }
+
+     @Test
+    public void testAbductionNegNegImplicationPred() {
+
+        test
+                .input("(y). %1.0;0.90%")
+                .input("(--,((--,(x)) ==> (y))).")
+                .mustBelieve(cycles, "(x)", 1.0f, 0.45f)
+                .mustNotOutput(cycles, "(x)", BELIEF, 0.0f, 0.5f, 0, 1, ETERNAL)
+        ;
+    }
+
+    @Test
+    public void testAbductionPosNegImplicationPred() {
+
+        test
+                .input("(y). %1.0;0.90%")
+                .input("(--,((x) ==> (y))).")
+                .mustBelieve(cycles, "(x)", 0.0f, 0.45f)
+                .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
+        ;
+    }
+      @Test
+    public void testDeductionPosNegImplicationPred() {
+
+        test
+                .input("(y). %1.0;0.90%")
+                .input("(--,((y) ==> (x))).")
+                .mustBelieve(cycles, "(x)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
+        ;
+    }
+
 //    @Test public void testNegNegImplicationPred() {
 //        test()
 //                .input("(--,(y)).")

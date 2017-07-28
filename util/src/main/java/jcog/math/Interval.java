@@ -144,6 +144,11 @@ public class Interval {
 		long b = min(y1, y2);
 		return a <= b ? b - a : -1;
 	}
+	public static int intersectLength(int x1, int y1, int x2, int y2) {
+		int a = max(x1, x2);
+		int b = min(y1, y2);
+		return a <= b ? b - a : -1;
+	}
 
 	@Nullable public static Interval intersect(long x1, long x2, long y1, long y2) {
 		return new Interval(x1, x2).intersection(new Interval(y1, y2));

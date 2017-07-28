@@ -3,6 +3,7 @@ package nars.term.atom;
 import com.google.common.collect.*;
 import com.google.common.io.ByteArrayDataOutput;
 import jcog.Util;
+import jcog.math.Interval;
 import nars.$;
 import nars.Op;
 import nars.term.Compound;
@@ -150,10 +151,24 @@ public class Int implements Intlike {
         public boolean unify(@NotNull Term y, @NotNull Unify subst) {
             if (equals(y)) return true;
             if (y instanceof Int) {
-                int i = ((Int) y).id;
-                return (min <= i && max >= i);
+                return intersects((Int)y);
+            } else if (y instanceof IntRange) {
+                IntRange z = (IntRange) y;
+                return contains(z) || z.contains(this);
             }
             return false;
+        }
+
+        public boolean intersects(Int y) {
+            int i = y.id;
+            return (min <= i && max >= i);
+        }
+
+        public boolean connects(IntRange y) {
+            return Interval.intersectLength(min, max, y.min, y.max) >= 0;
+        }
+        public boolean contains(IntRange y) {
+            return (y.min > min) && (y.max < max);
         }
 
         @Override
