@@ -16,6 +16,7 @@ import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 
 import java.util.List;
+import java.util.Random;
 
 import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
@@ -48,7 +49,7 @@ public class Builtin {
             Functor.f1Const("toChars", x -> $.p(x.toString().toCharArray(), $::the)),
             Functor.f1Const("complexity", x -> $.the(x.complexity())),
 
-            Functor.f0("shutdown", ()->System.exit(0)),
+            Functor.f0("shutdown", () -> System.exit(0)),
 
             new flat.flatProduct(),
             new similaritree(),
@@ -131,41 +132,25 @@ public class Builtin {
          *
          * this also filter a single variable (depvar) from being a result
          */
-        nar.on(Functor.f1((Atom) $.the("dropAnyConj"), (Term t) -> {
+        nar.on(Functor.f1((Atom) $.the("dropAnySet"), (Term t) -> {
             Op oo = t.op();
-            if (!oo.in(CONJ.bit | SETi.bit | SETe.bit))
+            if (!oo.in(SETi.bit | SETe.bit))
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
-            Compound c = (Compound) t;  //for use in deriver, fail if any variable parameters
-
-            int size = c.size();
-
-            if (size < 2)
-                return null;
-
-            Term result;
-            if (size == 2) {
-                int n = nar.random().nextInt(2);
-                result = Term.nullIfNull(
-                        oo.isSet() ?
-                                oo.the(c.sub(n)) :
-                                c.sub(n) //CONJ
-                );
-            } else {
-                Term[] y = new Term[size - 1];
-                int except = nar.random().nextInt(size);
-                for (int i = 0, j = 0; i < size; i++) {
-                    if (i != except) {
-                        y[j++] = c.sub(i);
-                    }
-                }
-                result = Term.nullIfNull($.the(c.op(), c.dt(), y));
+            int size = t.size();
+            switch (size) {
+                case 0:
+                    assert(false): "empty set impossible here";
+                    return Null;
+                case 1:
+                    return Null; /* can't shrink below one element */
+                case 2:
+                    int n = nar.random().nextInt(2);
+                    return oo.the(t.sub(n)) /* keep the remaining term wrapped in a set */;
+                default:
+                    Term[] y = dropRandom(nar.random(), t.subterms());
+                    return oo.the(y);
             }
-
-//            if (result instanceof Variable)
-//                return Null;
-
-            return result;
         }));
 
         /** drops a random contained event, whether at first layer or below */
@@ -175,21 +160,32 @@ public class Builtin {
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
             if (t.dt() == DTERNAL) {
-                //HACK
-                //these wont be extracted as events in the below method, so use similar to the dropAnyConj
-                return $.func("dropAnyConj", t);
+                switch (t.size()) {
+                    case 0:
+                    case 1:
+                        throw new RuntimeException("degenerate conjunction cases");
+
+                    case 2:
+                        return t.sub(nar.random().nextInt(2)); //one of the two
+
+                    default:
+                        return CONJ.the(DTERNAL, dropRandom(nar.random(), t.subterms()));
+                }
+            } else {
+                //recursive event-based decomposition and recomposition
+
+                Compound c = (Compound) t;  //for use in deriver, fail if any variable parameters
+
+                List<ObjectLongPair<Term>> ee = $.newArrayList(2);
+                c.events(ee, 0);
+
+                int toRemove = nar.random().nextInt(ee.size());
+                ee.remove(toRemove);
+
+                return Op.conj(ee);
             }
-
-            Compound c = (Compound) t;  //for use in deriver, fail if any variable parameters
-
-            List<ObjectLongPair<Term>> ee = $.newArrayList(2);
-            c.events(ee, 0);
-
-            int toRemove = nar.random().nextInt(ee.size());
-            ee.remove(toRemove);
-
-            return Op.conj(ee);
         }));
+
         nar.on("assertEquals", (op, args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
             assertEquals(/*msg,*/ 2, args.length);
@@ -374,6 +370,19 @@ public class Builtin {
 //            }
 //        });
 
+    }
+
+    static Term[] dropRandom(Random random, TermContainer t) {
+        int size = t.size();
+        assert(size > 1);
+        Term[] y = new Term[size - 1];
+        int except = random.nextInt(size);
+        for (int i = 0, j = 0; i < size; i++) {
+            if (i != except) {
+                y[j++] = t.sub(i);
+            }
+        }
+        return y;
     }
 
 
