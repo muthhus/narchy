@@ -657,6 +657,7 @@ public class CL_tent {
                 s[i].endtime = Globals.cl.time
                         + MSG.ReadLong(Globals.net_message);
                 s[i].think = new cl_sustain_t.ThinkAdapter() {
+                    @Override
                     void think(cl_sustain_t self) {
                         CL_newfx.ParticleSteamEffect2(self);
                     }
@@ -709,6 +710,7 @@ public class CL_tent {
             MSG.ReadPos(Globals.net_message, s[i].org);
             s[i].endtime = Globals.cl.time + 2100;
             s[i].think = new cl_sustain_t.ThinkAdapter() {
+                @Override
                 void think(cl_sustain_t self) {
                     CL_newfx.Widowbeamout(self);
                 }
@@ -742,6 +744,7 @@ public class CL_tent {
             MSG.ReadPos(Globals.net_message, s[i].org);
             s[i].endtime = Globals.cl.time + 1000;
             s[i].think = new cl_sustain_t.ThinkAdapter() {
+                @Override
                 void think(cl_sustain_t self) {
                     CL_newfx.Nukeblast(self);
                 }

@@ -15,25 +15,25 @@ public abstract class LevelObject implements Comparator<LevelObject> {
 	public boolean collidable = true;
 	
 	/** Is drop down object */
-	public boolean isDropDown = false;
+	public boolean isDropDown;
 	
 	/** Is drop down object */
-	public boolean isRollOver = false;
+	public boolean isRollOver;
 	
 	/** Is drop down object */
-	public boolean isGate = false;
+	public boolean isGate;
 	
-	public boolean isStripStart = false;
-	public int flagOr = 0;
+	public boolean isStripStart;
+	public int flagOr;
 	
 	/** The score to add object is triggered */
-	public int score = 0;
+	public int score;
 	
 	/** The bounce factor  */
 	public float bounce = 0.75f;	
 	
 	/** Object behaviour */
-	public int behaviorId = 0;
+	public int behaviorId;
 
 	/** location of object */
 	public Point p;
@@ -115,7 +115,8 @@ public abstract class LevelObject implements Comparator<LevelObject> {
 	/**
 	 * Implements Comparator.
 	 */
-	public int compare(LevelObject o1, LevelObject o2) {
+	@Override
+    public int compare(LevelObject o1, LevelObject o2) {
 		return o1.getSortValue() - o2.getSortValue();
 	}
 }

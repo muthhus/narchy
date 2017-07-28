@@ -27,9 +27,9 @@ public class PacMan {
 	public String text;
 	public int score;
 	private int previousDotCount;
-	int ghostEatCount = 0;
+	int ghostEatCount;
 	CopyOnWriteArrayList<PacComponent.SplashModel> splashes;
-	int fruitTime = 0;
+	int fruitTime;
 
 	public PacMan() {
 
@@ -324,7 +324,7 @@ public class PacMan {
 
 	}
 
-	public static void main(String[] args) throws InterruptedException {
+	public static void main(String[] args) {
 		
 		PacMan game = new PacMan();
 

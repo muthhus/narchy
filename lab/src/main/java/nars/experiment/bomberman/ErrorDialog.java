@@ -24,7 +24,7 @@ public class ErrorDialog
         /** store the stack trace (error message) into a string variable */
         CharArrayWriter writer = new CharArrayWriter();
         e.printStackTrace(new PrintWriter(writer, true));
-        String result = new String(" " + writer.toString() + "\n" +
+        String result = new String(" " + writer + "\n" +
         " CLICK OK TO TERMINATE THE PROGRAM.");
         
         /** create a text field and put the error message into it */
@@ -60,7 +60,7 @@ public class ErrorDialog
         /** store the stack trace (error message) into a string variable */
         CharArrayWriter writer = new CharArrayWriter();
         e.printStackTrace(new PrintWriter(writer, true));
-        String result = new String(" " + writer.toString());
+        String result = new String(" " + writer);
         
         /** create a text field and put the error message into it */
         JTextArea ta = new JTextArea(result);

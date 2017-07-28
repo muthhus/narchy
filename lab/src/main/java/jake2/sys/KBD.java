@@ -32,8 +32,8 @@ package jake2.sys;
 abstract public class KBD {
 	
 	// motion values
-	public static int mx = 0;
-	public static int my = 0;
+	public static int mx;
+	public static int my;
 	
 	abstract public void Init();
 

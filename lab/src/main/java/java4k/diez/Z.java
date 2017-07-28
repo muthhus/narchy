@@ -147,8 +147,8 @@ public class Z extends GamePanel {
 	boolean keyboard[] = new boolean[0x10000]; // Keyboard map
 
 	// Generic variables
-	int i, j, k = 0, m, n = 0;
-	float x = 0, y, z = 0, r;
+	int i, j, k, m, n;
+	float x, y, z, r;
 	float dx, dz;
 
 	int buildings;
@@ -159,17 +159,17 @@ public class Z extends GamePanel {
 	long time; // Current time
 	long lastTime; // Time at the start of the last frame
 	long deltaTime; // Delta frame time
-	long deadTime = 0; // Time player is dead
+	long deadTime; // Time player is dead
 
 	// Player
-	float playerX = 0, playerY, playerZ = 0; // Player coordinates
-	float playerA = 0, sinPlayerA, cosPlayerA; // Player rotational angle
-	boolean attacking, lastAttacking = false; // Player Attack
-	int blood = 0; // Blood on axe
+	float playerX, playerY, playerZ; // Player coordinates
+	float playerA, sinPlayerA, cosPlayerA; // Player rotational angle
+	boolean attacking, lastAttacking; // Player Attack
+	int blood; // Blood on axe
 
 	// World map positions
 	int px, pz; // Player position on current tile
-	int ex = 0, ez = 0; // Entity position on current tile
+	int ex, ez; // Entity position on current tile
 	int tx, tz; // Renderer column on current tile
 
 	// Rendering
@@ -826,7 +826,7 @@ public class Z extends GamePanel {
 
 				// Get tile colour
 				if (heightYT[i] <= 0) // Water
-					c = 0x000020 + 0x010101 * (int) ((0x20 * i) / DEPTH);
+					c = 0x000020 + 0x010101 * (0x20 * i) / DEPTH;
 				else { // Terrain
 					c = tileColour[tileType][tx & 0xff][tz & 0xff];
 					// Modulate with base location to give a bit of variety
@@ -1007,7 +1007,7 @@ public class Z extends GamePanel {
 				n = -80 + i + (keyboard[' '] ? 0 : 100) + SCREENWIDTH / 2;
 				m = 40 + j + (keyboard[' '] ? 350 : 16);
 				if (m < SCREENHEIGHT)
-					screenData[SCREENWIDTH * m + n] = draw ? 0 : 0x040208 + 0x010101 * (int) ((150 - i + j) / 10) + 0x010000 * ((300 - i + j) * blood / 500);
+					screenData[SCREENWIDTH * m + n] = draw ? 0 : 0x040208 + 0x010101 * (150 - i + j) / 10 + 0x010000 * ((300 - i + j) * blood / 500);
 				else
 					break;
 			}

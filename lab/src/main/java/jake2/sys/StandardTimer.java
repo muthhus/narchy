@@ -15,7 +15,8 @@ class StandardTimer extends Timer {
 		base = System.currentTimeMillis();
 	}
 	
-	public long currentTimeMillis() {
+	@Override
+    public long currentTimeMillis() {
 		long time = System.currentTimeMillis();
 		long delta = time - base;
 		if (delta < 0) {

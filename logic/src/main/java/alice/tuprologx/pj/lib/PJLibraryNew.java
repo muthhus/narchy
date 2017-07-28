@@ -116,7 +116,7 @@ public class PJLibraryNew extends OOLibrary {
         catch (Throwable ex) {
             return false;
         }
-        return clazz == null ? false : clazz.isAnnotationPresent(PrologClass.class);
+        return clazz != null && clazz.isAnnotationPresent(PrologClass.class);
     }
 
     public boolean prolog_method_1(Term method) {

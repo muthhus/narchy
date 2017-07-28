@@ -127,7 +127,7 @@ public abstract class Mesh extends Light {
 
     private final FloatBuffer textureArrayBuf = Lib.newFloatBuffer(qfiles.MAX_VERTS * 2);
 
-    boolean isFilled = false;
+    boolean isFilled;
 
     float[] tmpVec = {0, 0, 0};
 
@@ -454,6 +454,7 @@ public abstract class Mesh extends Light {
     /**
      * R_DrawAliasModel
      */
+    @Override
     void R_DrawAliasModel(entity_t e) {
         if ((e.flags & Defines.RF_WEAPONMODEL) == 0) {
             if (R_CullAliasModel(e))

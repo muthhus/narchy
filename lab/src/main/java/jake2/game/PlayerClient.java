@@ -29,15 +29,17 @@ import jake2.util.Math3D;
 
 public class PlayerClient {
 
-    public static int player_die_i = 0;
+    public static int player_die_i;
     
     /**
      * player_die. 
      */
     static final EntDieAdapter player_die = new EntDieAdapter() {
-    	public String getID() { return "player_die"; }
+    	@Override
+        public String getID() { return "player_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             int n;
     
             Math3D.VectorClear(self.avelocity);
@@ -133,7 +135,9 @@ public class PlayerClient {
         }
     };
     static final EntThinkAdapter SP_FixCoopSpots = new EntThinkAdapter() {
-    	public String getID() { return "SP_FixCoopSpots"; }
+    	@Override
+        public String getID() { return "SP_FixCoopSpots"; }
+        @Override
         public boolean think(edict_t self) {
     
             edict_t spot;
@@ -169,7 +173,9 @@ public class PlayerClient {
         }
     };
     static final EntThinkAdapter SP_CreateCoopSpots = new EntThinkAdapter() {
-    	public String getID() { return "SP_CreateCoopSpots"; }
+    	@Override
+        public String getID() { return "SP_CreateCoopSpots"; }
+        @Override
         public boolean think(edict_t self) {
     
             edict_t spot;
@@ -204,14 +210,18 @@ public class PlayerClient {
     };
     // player pain is handled at the end of the frame in P_DamageFeedback
     static final EntPainAdapter player_pain = new EntPainAdapter() {
-    	public String getID() { return "player_pain"; }
+    	@Override
+        public String getID() { return "player_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
         }
     };
     static final EntDieAdapter body_die = new EntDieAdapter() {
-    	public String getID() { return "body_die"; }
+    	@Override
+        public String getID() { return "body_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
     
             int n;
     
@@ -231,8 +241,9 @@ public class PlayerClient {
     // pmove doesn't need to know about passent and contentmask
     public static final pmove_t.TraceAdapter PM_trace = new pmove_t.TraceAdapter() {
     
+        @Override
         public trace_t trace(float[] start, float[] mins, float[] maxs,
-                float[] end) {
+                             float[] end) {
             if (pm_passent.health > 0)
                 return game_import_t.trace(start, mins, maxs, end, pm_passent,
                         Defines.MASK_PLAYERSOLID);

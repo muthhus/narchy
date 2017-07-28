@@ -1378,7 +1378,7 @@ public class Wiki implements Serializable
         String[] titles = constructTitleString(pages);
         for (String temp : titles)
         {
-            String line = fetch(url.toString() + temp, "getPageInfo");
+            String line = fetch(url + temp, "getPageInfo");
 
             // form: <page pageid="239098" ns="0" title="BitTorrent" ... >
             // <protection />
@@ -2248,7 +2248,7 @@ public class Wiki implements Serializable
             if (plcontinue == null)
                 line = fetch(url.toString(), "getLinksOnPage");
             else
-                line = fetch(url.toString() + "&plcontinue=" + encode(plcontinue, false), "getLinksOnPage");
+                line = fetch(url + "&plcontinue=" + encode(plcontinue, false), "getLinksOnPage");
             plcontinue = parseAttribute(line, "plcontinue", 0);
 
             // xml form: <pl ns="6" title="page name" />
@@ -2283,7 +2283,7 @@ public class Wiki implements Serializable
             if (eloffset == null)
                 line = fetch(url.toString(), "getExternalLinksOnPage");
             else
-                line = fetch(url.toString() + "&eloffset=" + encode(eloffset, false), "getExternalLinksOnPage");
+                line = fetch(url + "&eloffset=" + encode(eloffset, false), "getExternalLinksOnPage");
             eloffset = parseAttribute(line, "eloffset", 0);
 
             // xml form: <pl ns="6" title="page name" />
@@ -2409,7 +2409,7 @@ public class Wiki implements Serializable
         String[] temp = constructTitleString(titles);
         for (String blah : temp)
         {
-            String line = fetch(url.toString() + blah, "resolveRedirects");
+            String line = fetch(url + blah, "resolveRedirects");
 
             // expected form: <redirects><r from="Main page" to="Main Page"/>
             // <r from="Home Page" to="Home page"/>...</redirects>
@@ -2480,7 +2480,7 @@ public class Wiki implements Serializable
             if (rvcontinue == null)
                 line = fetch(url.toString(), "getPageHistory");
             else
-                line = fetch(url.toString() + "&rvcontinue=" + rvcontinue, "getPageHistory");
+                line = fetch(url + "&rvcontinue=" + rvcontinue, "getPageHistory");
             rvcontinue = parseAttribute(line, "rvcontinue", 0);
 
             // parse stuff
@@ -2499,7 +2499,7 @@ public class Wiki implements Serializable
             for (int i = 0; i < size; i++)
             {
                 if (i == 0)
-                    temp[0].sizediff = temp[i].size;
+                    temp[0].sizediff = temp[0].size;
                 else
                     temp[i].sizediff = temp[i].size - temp[i - 1].size;
                 if (i != size - 1)
@@ -2577,7 +2577,7 @@ public class Wiki implements Serializable
         {
             String response;
             if (drvcontinue != null)
-                response = fetch(url.toString() + "&drvcontinue=" + encode(drvcontinue, false), "getDeletedHistory");
+                response = fetch(url + "&drvcontinue=" + encode(drvcontinue, false), "getDeletedHistory");
             else
                 response = fetch(url.toString(), "getDeletedHistory");
             drvcontinue = parseAttribute(response, "drvcontinue", 0);
@@ -2665,7 +2665,7 @@ public class Wiki implements Serializable
         {
             String response;
             if (adrcontinue != null)
-                response = fetch(url.toString() + "&adrcontinue=" + encode(adrcontinue, false), "deletedContribs");
+                response = fetch(url + "&adrcontinue=" + encode(adrcontinue, false), "deletedContribs");
             else
                 response = fetch(url.toString(), "deletedContribs");
             adrcontinue = parseAttribute(response, "adrcontinue", 0);
@@ -2731,7 +2731,7 @@ public class Wiki implements Serializable
             if (drcontinue == null)
                 text = fetch(url.toString(), "deletedPrefixIndex");
             else
-                text = fetch(url.toString() + "&gadrcontinue=" + encode(drcontinue, false), "deletedPrefixIndex");
+                text = fetch(url + "&gadrcontinue=" + encode(drcontinue, false), "deletedPrefixIndex");
             drcontinue = parseAttribute(text, "gadrcontinue", 0);
 
             for (int x = text.indexOf("<page ", 0); x > 0; x = text.indexOf("<page ", ++x))
@@ -3063,7 +3063,7 @@ public class Wiki implements Serializable
         // fetch and parse
         for (String chunk : chunks)
         {
-            String line = fetch(url.toString() + chunk, "getRevision");
+            String line = fetch(url + chunk, "getRevision");
 
             for (int i = line.indexOf("<page "); i > 0; i = line.indexOf("<page ", ++i))
             {
@@ -3845,7 +3845,7 @@ public class Wiki implements Serializable
             if (aicontinue == null)
                 line = fetch(url.toString(), "getUploads");
             else
-                line = fetch(url.toString() + "&aicontinue=" + aicontinue, "getUploads");
+                line = fetch(url + "&aicontinue=" + aicontinue, "getUploads");
             aicontinue = parseAttribute(line, "aicontinue", 0);
 
             for (int i = line.indexOf("<img "); i > 0; i = line.indexOf("<img ", ++i))
@@ -4308,7 +4308,7 @@ public class Wiki implements Serializable
         // fetch data
         do
         {
-            String line = fetch(temp.toString() + uccontinue + ucstart, "contribs");
+            String line = fetch(temp + uccontinue + ucstart, "contribs");
 
             // set offset parameter
             if (line.contains("uccontinue"))
@@ -4625,7 +4625,7 @@ public class Wiki implements Serializable
         String wlstart = "";
         do
         {
-            String line = fetch(url.toString() + "&wlstart=" + wlstart, "watchlist");
+            String line = fetch(url + "&wlstart=" + wlstart, "watchlist");
             wlstart = parseAttribute(line, "wlstart", 0);
 
             // xml form: <item pageid="16396" revid="176417" ns="0" title="API:Query - Lists" />
@@ -4792,7 +4792,7 @@ public class Wiki implements Serializable
             if (blcontinue == null)
                 line = fetch(url.toString(), "whatLinksHere");
             else
-                line = fetch(url.toString() + "&blcontinue=" + blcontinue, "whatLinksHere");
+                line = fetch(url + "&blcontinue=" + blcontinue, "whatLinksHere");
             blcontinue = parseAttribute(line, "blcontinue", 0);
 
             // xml form: <bl pageid="217224" ns="0" title="Mainpage" redirect="" />
@@ -4833,7 +4833,7 @@ public class Wiki implements Serializable
             if (eicontinue == null)
                 line = fetch(url.toString(), "whatTranscludesHere");
             else
-                line = fetch(url.toString() + "&eicontinue=" + eicontinue, "whatTranscludesHere");
+                line = fetch(url + "&eicontinue=" + eicontinue, "whatTranscludesHere");
             eicontinue = parseAttribute(line, "eicontinue", 0);
 
             // xml form: <ei pageid="7997510" ns="0" title="Maike Evers" />
@@ -4937,7 +4937,7 @@ public class Wiki implements Serializable
         {
             if (!next.isEmpty())
                 next = "&cmcontinue=" + encode(next, false);
-            String line = fetch(url.toString() + next, "getCategoryMembers");
+            String line = fetch(url + next, "getCategoryMembers");
             next = parseAttribute(line, "cmcontinue", 0);
 
             // xml form: <cm pageid="24958584" ns="3" title="User talk:86.29.138.185" />
@@ -5027,7 +5027,7 @@ public class Wiki implements Serializable
         do
         {
             // if this is the last page of results then there is no euoffset parameter
-            String line = fetch(url.toString() + euoffset, "linksearch");
+            String line = fetch(url + euoffset, "linksearch");
             euoffset = parseAttribute(line, "euoffset", 0);
 
             // xml form: <eu ns="0" title="Main Page" url="http://example.com" />
@@ -5121,7 +5121,7 @@ public class Wiki implements Serializable
         List<LogEntry> entries = new ArrayList<>(1333);
         do
         {
-            String line = fetch(urlBase.toString() + bkstart, "getIPBlockList");
+            String line = fetch(urlBase + bkstart, "getIPBlockList");
             bkstart = parseAttribute(line, "bkstart", 0);
 
             // parse xml
@@ -5156,12 +5156,12 @@ public class Wiki implements Serializable
         if (start != null)
         {
             logRecord.append(" from ");
-            logRecord.append(start.getTime().toString());
+            logRecord.append(start.getTime());
         }
         if (end != null)
         {
             logRecord.append(" to ");
-            logRecord.append(end.getTime().toString());
+            logRecord.append(end.getTime());
         }
         int size = entries.size();
         logRecord.append(" (");
@@ -5336,7 +5336,7 @@ public class Wiki implements Serializable
         List<LogEntry> entries = new ArrayList<>(6667); // should be enough
         do
         {
-            String line = fetch(url.toString() + "&lestart=" + lestart, "getLogEntries");
+            String line = fetch(url + "&lestart=" + lestart, "getLogEntries");
             lestart = parseAttribute(line, "lestart", 0);
 
             // parse xml. We need to repeat the test because the XML may contain more than the required amount.
@@ -5989,7 +5989,7 @@ public class Wiki implements Serializable
             if (iwblcontinue.isEmpty())
                 line = fetch(url.toString(), "getInterWikiBacklinks");
             else
-                line = fetch(url.toString() + "&iwblcontinue=" + iwblcontinue, "getInterWikiBacklinks");
+                line = fetch(url + "&iwblcontinue=" + iwblcontinue, "getInterWikiBacklinks");
             iwblcontinue = parseAttribute(line, "iwblcontinue", 0);
 
             // xml form: <iw pageid="24163544" ns="0" title="Elisabeth_of_Wroclaw" iwprefix="pl" iwtitle="Main_Page" />
@@ -6465,7 +6465,7 @@ public class Wiki implements Serializable
         private final String user;
         private final String title;
         private String rollbacktoken;
-        private int size;
+        private final int size;
         private int sizediff;
         private boolean summaryDeleted, userDeleted, contentDeleted;
         private boolean pageDeleted;

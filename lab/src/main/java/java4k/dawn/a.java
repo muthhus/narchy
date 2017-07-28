@@ -11,7 +11,7 @@ import java.util.Random;
 
 //import java.awt.Font;
 
-public class a extends GamePanel implements Runnable, KeyListener, MouseListener, MouseMotionListener {
+public class a extends GamePanel {
     @Override
 	public void keyTyped(KeyEvent e) {}
 	@Override
@@ -36,15 +36,15 @@ public class a extends GamePanel implements Runnable, KeyListener, MouseListener
 	}
 	@Override
 	public void keyPressed(KeyEvent e) {
-		key[((KeyEvent) e).getKeyCode()] = true;
+		key[e.getKeyCode()] = true;
 	}
 	@Override
 	public void keyReleased(KeyEvent e) {
-		key[((KeyEvent) e).getKeyCode()] = false;
+		key[e.getKeyCode()] = false;
 	}
 	
 	boolean key[] = new boolean[65535];
-	boolean click = false;
+	boolean click;
 	int my, mx;
 	BufferStrategy strategy;
 	

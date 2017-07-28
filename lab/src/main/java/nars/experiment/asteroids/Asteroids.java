@@ -33,14 +33,14 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
     int starPositionSeed;
     boolean upKey, downKey, leftKey, rightKey, spaceKey, shiftKey, SKey, DKey, PKey, FKey, escKey, RKey;
     boolean isExplosionShip;
-    boolean isMainInstr = false, instrSwitched = false;
-    boolean pauseKeyActivated = false;
+    boolean isMainInstr, instrSwitched;
+    boolean pauseKeyActivated;
     boolean selectionMoved;
     boolean spaceKeyActivated;
     int gameState;
     DecimalFormat df = new DecimalFormat("#.##");
 
-    private Color clearColor =
+    private final Color clearColor =
             //new Color(0,0,0,0.1f);
             //new Color(0,0,0,0.9f);
             Color.BLACK;
@@ -113,11 +113,13 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
 
     }
     
+    @Override
     public void paint(Graphics g) //Method that draws everything
     {
         g.drawImage(offscreen, 0, 0, this);
     }
     
+    @Override
     public void keyPressed(KeyEvent e) {
         
         // Checks what key is being pressed
@@ -172,6 +174,7 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
         
     }
     
+    @Override
     public void keyReleased(KeyEvent e) {
         
         //Checks when keys are released
@@ -232,14 +235,17 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
         
     }
     
+    @Override
     public void keyTyped(KeyEvent e) {
         // Not using this, but Java's key press code doesn't work without alll three related methods.
     }
     
+    @Override
     public void update(Graphics g) {
 
     }
     
+    @Override
     public void actionPerformed(ActionEvent e) {
         frame();
         
@@ -349,7 +355,7 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
             try {
                 drawHUD();
             } catch (Exception e) {
-            };
+            }
             drawShip();
 
         } else if (gameState == 2) {
@@ -753,8 +759,8 @@ public class Asteroids extends JFrame implements KeyListener, ActionListener {
             drawHUD();
         }
         catch(Exception e)
-        {};
-        
+        {}
+
         if (shopSelection > 9)
         {
             shopSelection = 0;

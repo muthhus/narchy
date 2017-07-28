@@ -247,6 +247,7 @@ public abstract class Warp extends Model {
 	 * boundaries so that turbulent and sky warps
 	 * can be done reasonably.
 	 */
+    @Override
     void GL_SubdivideSurface(msurface_t fa) {
         float[][] verts = tmpVerts;
         float[] vec;
@@ -275,7 +276,8 @@ public abstract class Warp extends Model {
 	 * EmitWaterPolys
 	 * Does a water warp on the pre-fragmented glpoly_t chain
 	 */
-	void EmitWaterPolys(msurface_t fa)
+    @Override
+    void EmitWaterPolys(msurface_t fa)
 	{
 		float rdt = r_newrefdef.time;
 
@@ -544,7 +546,8 @@ public abstract class Warp extends Model {
 	/**
 	 * R_AddSkySurface
 	 */
-	void R_AddSkySurface(msurface_t fa)
+    @Override
+    void R_AddSkySurface(msurface_t fa)
 	{
 	    // calculate vertex values for sky box
         for (glpoly_t p = fa.polys; p != null; p = p.next) {
@@ -560,7 +563,8 @@ public abstract class Warp extends Model {
 	/**
 	 * R_ClearSkyBox
 	 */
-	void R_ClearSkyBox()
+    @Override
+    void R_ClearSkyBox()
 	{
 		float[] skymins0 = skymins[0];
 		float[] skymins1 = skymins[1];
@@ -622,7 +626,8 @@ public abstract class Warp extends Model {
 	/**
 	 * R_DrawSkyBox
 	 */
-	void R_DrawSkyBox()
+    @Override
+    void R_DrawSkyBox()
 	{
 		int i;
 
@@ -675,7 +680,8 @@ public abstract class Warp extends Model {
 	 * @param rotate
 	 * @param axis
 	 */
-	public void R_SetSky(String name, float rotate, float[] axis)
+	@Override
+    public void R_SetSky(String name, float rotate, float[] axis)
 	{
 		assert (axis.length == 3) : "vec3_t bug";
 		String pathname;

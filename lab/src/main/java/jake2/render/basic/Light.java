@@ -88,6 +88,7 @@ public abstract class Light extends Warp {
     /*
      * ============= R_RenderDlights =============
      */
+    @Override
     void R_RenderDlights() {
         int i;
         dlight_t l;
@@ -126,6 +127,7 @@ public abstract class Light extends Warp {
     /*
      * ============= R_MarkLights =============
      */
+    @Override
     void R_MarkLights(dlight_t light, int bit, mnode_t node) {
         cplane_t splitplane;
         float dist;
@@ -180,6 +182,7 @@ public abstract class Light extends Warp {
     /*
      * ============= R_PushDlights =============
      */
+    @Override
     void R_PushDlights() {
         int i;
         dlight_t l;
@@ -319,6 +322,7 @@ public abstract class Light extends Warp {
     /*
      * =============== R_LightPoint ===============
      */
+    @Override
     void R_LightPoint(float[] p, float[] color) {
         assert (p.length == 3) : "vec3_t bug";
         assert (color.length == 3) : "rgb bug";
@@ -442,6 +446,7 @@ public abstract class Light extends Warp {
     /*
      * * R_SetCacheState
      */
+    @Override
     void R_SetCacheState(msurface_t surf) {
         int maps;
 
@@ -457,6 +462,7 @@ public abstract class Light extends Warp {
      * Combine and scale multiple lightmaps into the floating format in
      * blocklights ===============
      */
+    @Override
     void R_BuildLightMap(msurface_t surf, IntBuffer dest, int stride) {
         int smax, tmax;
         int r, g, b, a, max;

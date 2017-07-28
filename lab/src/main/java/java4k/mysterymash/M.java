@@ -524,13 +524,15 @@ public class M extends Applet implements Runnable {
 	private int mousePos;
 	// Encoded as (x | (y <<< 9)), and is in display resolution, not
 	// render resolution.
-	private boolean mouseClick = false;
+	private boolean mouseClick;
 
-	public void start() {
+	@Override
+    public void start() {
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 		while (!isActive()) {
 			Thread.yield();
 		}
@@ -2011,7 +2013,8 @@ public class M extends Applet implements Runnable {
 		}
 	}
 
-	public boolean handleEvent(Event e) {
+	@Override
+    public boolean handleEvent(Event e) {
 		// Process the key and mouse events.
 		// Note that this can miss key and mouse events if they happen faster
 		// than the frame processing can accept them.  The "fix" is to only

@@ -13,8 +13,8 @@ import java.util.ArrayList;
  */
 public class Editor extends JFrame {
 	
-	ObjectPropertiesUI propsPnl = new ObjectPropertiesUI();;
-	JPanel statusBar = new JPanel();
+	ObjectPropertiesUI propsPnl = new ObjectPropertiesUI();
+    JPanel statusBar = new JPanel();
 	
 	/**
 	 * Creates an editor.
@@ -77,7 +77,7 @@ public class Editor extends JFrame {
 			LevelObject obj = handle.getLevelObject();
 			if (obj != null && !uniqueObjs.contains(obj)) {
 				uniqueObjs.add(obj);
-				selectionStr += "" + obj.toString() + " ";
+				selectionStr += "" + obj + " ";
 			}
 		}
 		selectionStr = selectionStr.trim().equals("") ? "Nothing selected" : selectionStr;

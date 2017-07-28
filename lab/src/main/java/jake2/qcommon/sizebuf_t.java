@@ -31,12 +31,12 @@ import java.util.Arrays;
  * sizebuf_t
  */
 public final class sizebuf_t {
-	public boolean allowoverflow = false;
-	public boolean overflowed = false;
-	public byte[] data = null;
-	public int maxsize = 0;
-	public int cursize = 0;
-	public int readcount = 0;
+	public boolean allowoverflow;
+	public boolean overflowed;
+	public byte[] data;
+	public int maxsize;
+	public int cursize;
+	public int readcount;
 	
 	public void clear()
 	{

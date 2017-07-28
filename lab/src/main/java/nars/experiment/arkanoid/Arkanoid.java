@@ -168,7 +168,7 @@ public class Arkanoid extends JFrame implements KeyListener {
 			x = Math.min(x, SCREEN_WIDTH-1);
 			x = Math.max(x, 0);
 
-			return (float)(x/SCREEN_WIDTH);
+			return x/SCREEN_WIDTH;
 		}
 	}
 

@@ -89,7 +89,7 @@ public class edict_t {
 
     public int flags;
 
-    public String model = null;
+    public String model;
 
     /** sv.time when the object was freed. */
     public float freetime;
@@ -97,7 +97,7 @@ public class edict_t {
     //
     // only used locally in game, not by server
     //
-    public String message = null;
+    public String message;
 
     public String classname = "";
 
@@ -108,21 +108,21 @@ public class edict_t {
     /** set in qe3, -1 = up, -2 = down */
     public float angle;
 
-    public String target = null;
+    public String target;
 
-    public String targetname = null;
+    public String targetname;
 
-    public String killtarget = null;
+    public String killtarget;
 
-    public String team = null;
+    public String team;
 
-    public String pathtarget = null;
+    public String pathtarget;
 
-    public String deathtarget = null;
+    public String deathtarget;
 
-    public String combattarget = null;
+    public String combattarget;
 
-    public edict_t target_ent = null;
+    public edict_t target_ent;
 
     public float speed, accel, decel;
 
@@ -145,9 +145,9 @@ public class edict_t {
 
     /** use for lowgrav artifact, flares. */
 
-    public edict_t goalentity = null;
+    public edict_t goalentity;
 
-    public edict_t movetarget = null;
+    public edict_t movetarget;
 
     public float yaw_speed;
 
@@ -155,19 +155,19 @@ public class edict_t {
 
     public float nextthink;
 
-    public EntThinkAdapter prethink = null;
+    public EntThinkAdapter prethink;
 
-    public EntThinkAdapter think = null;
+    public EntThinkAdapter think;
 
-    public EntBlockedAdapter blocked = null;
+    public EntBlockedAdapter blocked;
 
-    public EntTouchAdapter touch = null;
+    public EntTouchAdapter touch;
 
-    public EntUseAdapter use = null;
+    public EntUseAdapter use;
 
-    public EntPainAdapter pain = null;
+    public EntPainAdapter pain;
 
-    public EntDieAdapter die = null;
+    public EntDieAdapter die;
 
     /** Are all these legit? do we need more/less of them? */
     public float touch_debounce_time;
@@ -194,7 +194,7 @@ public class edict_t {
     public float powerarmor_time;
 
     /** target_changelevel. */
-    public String map = null;
+    public String map;
 
     /** Height above origin where eyesight is determined. */
     public int viewheight;
@@ -212,26 +212,26 @@ public class edict_t {
 
     public int count;
 
-    public edict_t chain = null;
+    public edict_t chain;
 
-    public edict_t enemy = null;
+    public edict_t enemy;
 
-    public edict_t oldenemy = null;
+    public edict_t oldenemy;
 
-    public edict_t activator = null;
+    public edict_t activator;
 
-    public edict_t groundentity = null;
+    public edict_t groundentity;
 
     public int groundentity_linkcount;
 
-    public edict_t teamchain = null;
+    public edict_t teamchain;
 
-    public edict_t teammaster = null;
+    public edict_t teammaster;
 
     /** can go in client only. */
-    public edict_t mynoise = null;
+    public edict_t mynoise;
 
-    public edict_t mynoise2 = null;
+    public edict_t mynoise2;
 
     public int noise_index;
 

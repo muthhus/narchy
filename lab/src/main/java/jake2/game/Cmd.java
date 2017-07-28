@@ -41,6 +41,7 @@ import java.util.Vector;
  */
 public final class Cmd {
     static final xcommand_t List_f = new xcommand_t() {
+        @Override
         public void execute() {
             cmd_function_t cmd = Cmd.cmd_functions;
             int i = 0;
@@ -55,6 +56,7 @@ public final class Cmd {
     };
 
     static final xcommand_t Exec_f = new xcommand_t() {
+        @Override
         public void execute() {
             if (Cmd.Argc() != 2) {
                 Com.Printf("exec <filename> : execute a script file\n");
@@ -76,6 +78,7 @@ public final class Cmd {
     };
 
     static final xcommand_t Echo_f = new xcommand_t() {
+        @Override
         public void execute() {
             for (int i = 1; i < Cmd.Argc(); i++) {
                 Com.Printf(Cmd.Argv(i) + ' ');
@@ -85,6 +88,7 @@ public final class Cmd {
     };
 
     static final xcommand_t Alias_f = new xcommand_t() {
+        @Override
         public void execute() {
             cmdalias_t a = null;
             if (Cmd.Argc() == 1) {
@@ -131,12 +135,13 @@ public final class Cmd {
     };
 
     public static final xcommand_t Wait_f = new xcommand_t() {
+        @Override
         public void execute() {
             Globals.cmd_wait = true;
         }
     };
 
-    public static cmd_function_t cmd_functions = null;
+    public static cmd_function_t cmd_functions;
 
     public static int cmd_argc;
 

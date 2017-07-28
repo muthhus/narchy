@@ -228,7 +228,7 @@ public final class FS extends Globals {
         return -1;
     }
 
-    public static int file_from_pak = 0;
+    public static int file_from_pak;
 
     /*
      * FOpenFile
@@ -889,16 +889,19 @@ public final class FS extends Globals {
      */
     public static void InitFilesystem() {
         Cmd.AddCommand("path", new xcommand_t() {
+            @Override
             public void execute() {
                 Path_f();
             }
         });
         Cmd.AddCommand("link", new xcommand_t() {
+            @Override
             public void execute() {
                 Link_f();
             }
         });
         Cmd.AddCommand("dir", new xcommand_t() {
+            @Override
             public void execute() {
                 Dir_f();
             }

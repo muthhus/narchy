@@ -1329,7 +1329,8 @@ public class a extends JFrame {
 	/**
 	 * Sets the k member with the key states.
 	 */
-	public void processKeyEvent(KeyEvent e) {
+	@Override
+    public void processKeyEvent(KeyEvent e) {
 	    k[e.getKeyCode()] = (e.getID() == 401);
 	}
 	

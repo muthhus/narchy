@@ -39,32 +39,35 @@ public class I4Kopter extends Applet {
     private BufferedImage bufferImage;
     private BufferedImage backgroundImage;
     private BufferedImage helicopterImage1, helicopterImage2;
-    private int w = 800, h = 400;                   // height and width of screen
-    private Random random = new Random();          
-    private boolean keyPressed=false, paused=false;
+    private final int w = 800;
+    private final int h = 400;                   // height and width of screen
+    private final Random random = new Random();
+    private boolean keyPressed, paused;
     private int heliY, heliX;                       // helicopter position X,Y
-    private double speed = 0.0, gravity = 1.6;      
+    private double speed, gravity = 1.6;
     private Point[] obstacles;                      // use Point's to store obstacle offset
-    private int pathHeight = 250;                   // height of 'rockless path'
-    private int backgroundLength = 17*this.w;       // number of screen lengths
-    private int widthBar = 20;                      // rock-bar-width
-    private int oheight  = 59;                      // height of obstacle
-    private long lasted  = 0;                       // use time as score
+    private final int pathHeight = 250;                   // height of 'rockless path'
+    private final int backgroundLength = 17*this.w;       // number of screen lengths
+    private final int widthBar = 20;                      // rock-bar-width
+    private final int oheight  = 59;                      // height of obstacle
+    private long lasted;                       // use time as score
 
     public I4Kopter(){
         super();
     }
 
+    @Override
     public void init(){
         this.setSize(this.w, this.h);
         this.enableEvents(AWTEvent.KEY_EVENT_MASK);
         this.setVisible(true);
     }
 
+    @Override
     public void start(){
 
-        this.heliY = (int) this.h/2;
-        this.heliX = (int) this.w/5;
+        this.heliY = this.h /2;
+        this.heliX = this.w /5;
 
         bufferImage = new BufferedImage(this.w, this.h, BufferedImage.TYPE_INT_RGB);
         backgroundImage = new BufferedImage(backgroundLength, this.h, BufferedImage.TYPE_INT_RGB);
@@ -181,7 +184,7 @@ public class I4Kopter extends Applet {
             loop();
             Graphics g =  this.getGraphics();
             g.setColor(Color.YELLOW);
-            g.drawString(" you lasted: "+(long)lasted/1000+" seconds ", heliX+200, 200);
+            g.drawString(" you lasted: "+ lasted /1000+" seconds ", heliX+200, 200);
             try{ Thread.sleep(1400); }catch(Exception e){}
         }
     }
@@ -190,7 +193,7 @@ public class I4Kopter extends Applet {
 
         // calculate which obstacle we can hit
 
-        int i = (int) (bufferOffset+heliX)/widthBar + 1;
+        int i = (bufferOffset+heliX) /widthBar + 1;
 
         // obstacle is dummy
         if(obstacles[i].x == -1 || obstacles[i+1].x == -1){ return false; }
@@ -266,8 +269,8 @@ public class I4Kopter extends Applet {
                         int oldOffset, newOffset;
 
                         for(int i = 1; i < 1000; i++){
-                            oldOffset = (int) ((i-1)*2)/2;
-                            newOffset = (int) (i*2)/2;
+                            oldOffset = (i-1)*2 /2;
+                            newOffset = i*2 /2;
                             frameGraphics = this.getGraphics();
                             frameGraphics.setColor(Color.YELLOW);
                             frameGraphics.drawOval(heliX - newOffset, heliY - newOffset, i*2, i*2);
@@ -310,6 +313,7 @@ public class I4Kopter extends Applet {
 
     }
 
+    @Override
     public void processKeyEvent(KeyEvent k){
 
         int keyID = k.getID();

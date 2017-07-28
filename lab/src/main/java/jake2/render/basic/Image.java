@@ -92,6 +92,7 @@ public abstract class Image extends Main {
         numgltextures = 0;
     }
 
+    @Override
     void GL_SetTexturePalette(int[] palette) {
 
         assert (palette != null && palette.length == 256) : "int palette[256] bug";
@@ -154,6 +155,7 @@ public abstract class Image extends Main {
 
     final int[] lastmodes = { -1, -1 };
 
+    @Override
     void GL_TexEnv(int mode /* GLenum */
     ) {
 
@@ -163,6 +165,7 @@ public abstract class Image extends Main {
         }
     }
 
+    @Override
     void GL_Bind(int texnum) {
 
         if ((gl_nobind.value != 0) && (draw_chars != null)) {
@@ -251,6 +254,7 @@ public abstract class Image extends Main {
     /*
      * =============== GL_TextureMode ===============
      */
+    @Override
     void GL_TextureMode(String string) {
 
         int i;
@@ -287,6 +291,7 @@ public abstract class Image extends Main {
     /*
      * =============== GL_TextureAlphaMode ===============
      */
+    @Override
     void GL_TextureAlphaMode(String string) {
 
         int i;
@@ -307,6 +312,7 @@ public abstract class Image extends Main {
     /*
      * =============== GL_TextureSolidMode ===============
      */
+    @Override
     void GL_TextureSolidMode(String string) {
         int i;
         for (i = 0; i < NUM_GL_SOLID_MODES; i++) {
@@ -326,6 +332,7 @@ public abstract class Image extends Main {
     /*
      * =============== GL_ImageList_f ===============
      */
+    @Override
     void GL_ImageList_f() {
 
         image_t image;
@@ -437,7 +444,7 @@ public abstract class Image extends Main {
         // Sys_Error ("Scrap_AllocBlock: full");
     }
 
-    int scrap_uploads = 0;
+    int scrap_uploads;
 
     void Scrap_Upload() {
         scrap_uploads++;
@@ -1348,7 +1355,7 @@ public abstract class Image extends Main {
                                                               // array
                 GL_Bind(image.texnum);
 
-                if (bits == 8) {
+                if (8 == 8) {
                     image.has_alpha = GL_Upload8(pic, width, height,
                             (image.type != it_pic && image.type != it_sky),
                             image.type == it_sky);
@@ -1521,6 +1528,7 @@ public abstract class Image extends Main {
     /*
      * =============== R_RegisterSkin ===============
      */
+    @Override
     public image_t R_RegisterSkin(String name) {
         return GL_FindImage(name, it_skin);
     }
@@ -1563,6 +1571,7 @@ public abstract class Image extends Main {
     /*
      * =============== Draw_GetPalette ===============
      */
+    @Override
     protected void Draw_GetPalette() {
         int r, g, b;
         byte[][] palette = new byte[1][]; //new byte[768];
@@ -1593,6 +1602,7 @@ public abstract class Image extends Main {
     /*
      * =============== GL_InitImages ===============
      */
+    @Override
     void GL_InitImages() {
         int i, j;
         float g = vid_gamma.value;
@@ -1645,6 +1655,7 @@ public abstract class Image extends Main {
     /*
      * =============== GL_ShutdownImages ===============
      */
+    @Override
     void GL_ShutdownImages() {
         image_t image;
 

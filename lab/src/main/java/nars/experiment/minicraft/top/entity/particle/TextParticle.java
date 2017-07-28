@@ -8,7 +8,7 @@ import nars.experiment.minicraft.top.gfx.Screen;
 public class TextParticle extends Entity {
 	private final String msg;
 	private final int col;
-	private int time = 0;
+	private int time;
 	public double xa, ya, za;
 	public double xx, yy, zz;
 

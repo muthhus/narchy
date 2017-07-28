@@ -65,9 +65,9 @@ public class P extends GamePanel {
 	// =================================================================================================================
 
 	// GLOBALS
-	private static int WIDTH = 800;
-	private static int HEIGHT = 600;
-	private static float NANOTIME = 1000000000;
+	private static final int WIDTH = 800;
+	private static final int HEIGHT = 600;
+	private static final float NANOTIME = 1000000000;
 
 	// INDEX CONSTANTS
 	private static final int MOUSE_X = 255;
@@ -162,7 +162,8 @@ public class P extends GamePanel {
 
 
 
-	public void run() {
+	@Override
+    public void run() {
 		try {
 			 {
 				// =====================================================================================================
@@ -200,7 +201,7 @@ public class P extends GamePanel {
 					// wave[1][index] = index - FP_S1;
 				}
 				new Thread(new Runnable() {
-					int sequence = 0;
+					int sequence;
 
 					@Override
 					public void run() {
@@ -380,7 +381,7 @@ public class P extends GamePanel {
 						}
 						if (i == 0) {
 							j = 2 * linesInShape;
-							solids[i][j + X] = solids[i][X];
+							solids[0][j + X] = solids[i][X];
 							solids[i][j + Y] = solids[i][Y];
 							// solidsX[i][n + 1] = 0;
 							// solidsY[i][n + 1] = 0;
@@ -790,7 +791,7 @@ public class P extends GamePanel {
 		return false;
 	}
 
-	private static String str_colors = "u0080u8080" // COLOR_BACKGROUND
+	private static final String str_colors = "u0080u8080" // COLOR_BACKGROUND
 			+ "u00d0ud0d0" // COLOR_FACE
 			+ "u00c0uc0c0" // COLOR_WALL
 			+ "u0070u7070" // +1

@@ -28,7 +28,8 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static nars.Op.*;
+import static nars.Op.ZeroProduct;
+import static nars.Op.concurrent;
 
 
 /**
@@ -770,7 +771,10 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     static int compare(@NotNull TermContainer a, @NotNull TermContainer b) {
 
+        if (a.equals(b)) return 0;
         int diff;
+        if ((diff = Integer.compare(a.volume(), b.volume())) != 0)
+            return diff;
 
         int s;
         if ((diff = Integer.compare((s = a.size()), b.size())) != 0)
@@ -782,30 +786,26 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //        if ((diff = Integer.compare(a.structure(), b.structure())) != 0)
 //            return diff;
 
-//        if ((diff = Integer.compare(a.volume(), b.volume())) != 0)
-//            return diff;
-
-
         int inequalVariable = -1; //only need to compare the first non-equal variable term
         for (int i = 0; i < s; i++) {
             Term x = a.sub(i);
             Term y = b.sub(i);
-            if (x instanceof Variable && y instanceof Variable) {
-                if (inequalVariable == -1 && !x.equals(y))
-                    inequalVariable = i; //test below; allow differing non-variable terms to determine sort order first
-
-            } else {
+//            if (x instanceof Variable && y instanceof Variable) {
+//                if (inequalVariable == -1 && !x.equals(y))
+//                    inequalVariable = i; //test below; allow differing non-variable terms to determine sort order first
+//
+//            } else {
                 int d = x.compareTo(y);
                 if (d != 0) {
                     return d;
                 }
-            }
+//            }
         }
 
-        //2nd-stage:
-        if (inequalVariable != -1) {
-            return a.sub(inequalVariable).compareTo(b.sub(inequalVariable));
-        }
+//        //2nd-stage:
+//        if (inequalVariable != -1) {
+//            return a.sub(inequalVariable).compareTo(b.sub(inequalVariable));
+//        }
 
 
         return 0;

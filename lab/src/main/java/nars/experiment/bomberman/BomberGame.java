@@ -20,28 +20,28 @@ import java.io.File;
 public class BomberGame extends JPanel
 implements ActionListener {
     /** main frame object */
-    private BomberMain main = null;
+    private BomberMain main;
     /** game over flag */
-    private boolean gameOver = false;
+    private boolean gameOver;
     /** map object */
-    private BomberMap map = null;
+    private BomberMap map;
     /** winner */
     private int winner = -1;
     /** timer */
-    private Timer timer = null;
+    private Timer timer;
     /** elapsed seconds */
-    private int elapsedSec = 0;
+    private int elapsedSec;
 
     /** rendering hints */
-    private static Object hints = null;
+    private static Object hints;
     /** end game images */
-    private static Image[] images = null;
+    private static Image[] images;
     /** total number of players */
     public static int totalPlayers = 4;
     /** players alive */
     public static int playersLeft = totalPlayers;
     /** player objects */
-    public static BomberPlayer[] players = null;
+    public static BomberPlayer[] players;
 
     static
     {
@@ -60,7 +60,7 @@ implements ActionListener {
              RenderingHints.VALUE_ANTIALIAS_ON);
             h.put(RenderingHints.KEY_COLOR_RENDERING,
              RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            hints = (RenderingHints)h;
+            hints = h;
         }
 
         String path = BomberMain.RP + "Images/BomberEndGame/";
@@ -93,7 +93,7 @@ implements ActionListener {
     public BomberGame(BomberMain main, BomberMap map, int totalPlayers) {
         this.main = main;
         this.map = map;
-        this.totalPlayers = this.playersLeft = totalPlayers;
+        BomberGame.totalPlayers = playersLeft = totalPlayers;
 
         /** load the images */
         try {
@@ -111,7 +111,7 @@ implements ActionListener {
 
         /** double buffer on */
         setDoubleBuffered(true);
-        setBounds(0, 0, 17 << main.shiftCount, 17 << main.shiftCount);
+        setBounds(0, 0, 17 << BomberMain.shiftCount, 17 << BomberMain.shiftCount);
         /** set it to opaque */
         setOpaque(false);
         /** add it to the top layer */
@@ -153,6 +153,7 @@ implements ActionListener {
      * Drawing handler.
      * @param graphics graphics handle
      */
+    @Override
     public void paint(Graphics graphics) {
         Graphics g = graphics;
         /** if game is active */
@@ -253,6 +254,7 @@ implements ActionListener {
         }
     }
 
+    @Override
     public void actionPerformed(ActionEvent evt) {
         /** increased elapsed time */
         elapsedSec += 1;

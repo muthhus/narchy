@@ -133,7 +133,7 @@ public enum SampleLoader
     /** digitize provided function at sample rate (ex: 44.1kh) */
     public static SonarSample digitize(FloatToFloatFunction f, int sampleRate, int duration) {
 
-        int samples = (int)(duration * sampleRate);
+        int samples = duration * sampleRate;
         SonarSample ss = new SonarSample(new float[samples], sampleRate);
         float[] b = ss.buf;
         float t = 0, dt = 1.0f / sampleRate;

@@ -116,10 +116,10 @@ public class Key extends Globals {
 	public static final int K_MWHEELDOWN = 239;
 	public static final int K_MWHEELUP = 240;
 
-	static int anykeydown = 0;
+	static int anykeydown;
 	static int key_waiting;
-	static int history_line = 0;
-	static boolean shift_down = false;
+	static int history_line;
+	static boolean shift_down;
 	static final int[] key_repeats = new int[256];
 	//static int[] keyshift = new int[256];
 	static final boolean[] menubound = new boolean[256];
@@ -344,7 +344,7 @@ public class Key extends Globals {
 			}
 			switch (Globals.cls.key_dest) {
 				case Defines.key_message :
-					Key.Message(key);
+					Key.Message(K_ESCAPE);
 					break;
 				case Defines.key_menu :
 					Menu.Keydown(key);
@@ -716,7 +716,8 @@ public class Key extends Globals {
 	}
 
 	public static final xcommand_t Bind_f = new xcommand_t() {
-		public void execute() {
+		@Override
+        public void execute() {
 			Key_Bind_f();
 		}
 	};
@@ -764,7 +765,8 @@ public class Key extends Globals {
 	}
 
 	static final xcommand_t Unbind_f = new xcommand_t() {
-		public void execute() {
+		@Override
+        public void execute() {
 			Key_Unbind_f();
 		}
 	};
@@ -786,7 +788,8 @@ public class Key extends Globals {
 	}
 
 	static final xcommand_t Unbindall_f = new xcommand_t() {
-		public void execute() {
+		@Override
+        public void execute() {
 			Key_Unbindall_f();
 		}
 	};
@@ -797,7 +800,8 @@ public class Key extends Globals {
 	}
 
 	static final xcommand_t Bindlist_f = new xcommand_t() {
-		public void execute() {
+		@Override
+        public void execute() {
 			Key_Bindlist_f();
 		}
 	};

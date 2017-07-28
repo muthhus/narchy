@@ -64,8 +64,8 @@ public class Channel {
 	private static int numChannels; 
 
     // stream handling
-    private static boolean streamingEnabled = false;
-    private static int streamQueue = 0;
+    private static boolean streamingEnabled;
+    private static int streamQueue;
     
 	// sound attributes
 	private int type;
@@ -197,7 +197,7 @@ public class Channel {
 
         // stop streaming
         al.alSourceStop(source);
-        int[] tmpCount = new int[]{0};
+        int[] tmpCount = {0};
         al.alGetSourcei(source, AL.AL_BUFFERS_QUEUED, tmpCount, 0);
         int count = tmpCount[0];
         Com.DPrintf("unqueue " + count + " buffers\n");
@@ -214,7 +214,7 @@ public class Channel {
         int[] buffer = tmp;
         int source = channels[numChannels].sourceId;
         
-        int[] tmp = new int[]{0};
+        int[] tmp = {0};
         al.alGetSourcei(source, AL.AL_BUFFERS_PROCESSED, tmp, 0);
         int processed = tmp[0];
         al.alGetSourcei(source, AL.AL_SOURCE_STATE, tmp, 0);
@@ -323,7 +323,7 @@ public class Channel {
 		Channel ch;
 		int sourceId;
 		int state;
-        int[] tmp = new int[]{0};
+        int[] tmp = {0};
 
 		for (int i = 0; i < numChannels; i++) {
 			ch = channels[i];

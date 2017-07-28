@@ -58,6 +58,7 @@ public class Q2DataDialog extends javax.swing.JDialog {
 
         setResizable(false);
         addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
@@ -288,6 +289,7 @@ public class Q2DataDialog extends javax.swing.JDialog {
         }
 
 
+        @Override
         public void paint(Graphics g) {
             g.drawImage(image, 0, 0, null);
         }
@@ -335,6 +337,7 @@ public class Q2DataDialog extends javax.swing.JDialog {
             constraints.anchor = GridBagConstraints.WEST;
             JLabel label = new JLabel("select baseq2 directory from existing Quake2 installation");
             label.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     dir.setSelected(true);
                 }
@@ -345,6 +348,7 @@ public class Q2DataDialog extends javax.swing.JDialog {
             constraints.gridy = 2;
             label = new JLabel("download and install Quake2 demo data (38MB)");
             label.addMouseListener(new MouseAdapter() {
+                @Override
                 public void mouseClicked(MouseEvent e) {
                     install.setSelected(true);
                 }
@@ -618,6 +622,7 @@ public class Q2DataDialog extends javax.swing.JDialog {
             running = false;
         }
 
+        @Override
         public void run() {
             synchronized (this) {
                 running = true;

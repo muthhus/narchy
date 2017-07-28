@@ -56,7 +56,7 @@ public final class Reduce implements Function {
         Node result = arguments.secondArg();
         Arguments candidates = arguments.thirdArg().eval(assignments);
         for (int i = 0; i < candidates.args(); i++) {
-            result = new ConstantNode(f.evaluate(new Arguments(new Node[]{result, candidates.arg(i)}), assignments), f.sig().returnType());
+            result = new ConstantNode(f.evaluate(new Arguments(result, candidates.arg(i)), assignments), f.sig().returnType());
         }
         return result.eval(assignments);
     }

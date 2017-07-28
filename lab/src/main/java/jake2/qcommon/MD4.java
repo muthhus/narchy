@@ -80,7 +80,8 @@ public class MD4 extends MessageDigest implements Cloneable {
 	/**
 	 * Returns a copy of this MD object.
 	 */
-	public Object clone() {
+	@Override
+    public Object clone() {
 		return new MD4(this);
 	}
 
@@ -91,7 +92,8 @@ public class MD4 extends MessageDigest implements Cloneable {
 	 * Resets this object disregarding any temporary data present at the
 	 * time of the invocation of this call.
 	 */
-	public void engineReset() {
+	@Override
+    public void engineReset() {
 		// initial values of MD4 i.e. A, B, C, D
 		// as per rfc-1320; they are low-order byte first
 		context[0] = 0x67452301;
@@ -106,7 +108,8 @@ public class MD4 extends MessageDigest implements Cloneable {
 	/**
 	 * Continues an MD4 message digest using the input byte.
 	 */
-	public void engineUpdate(byte b) {
+	@Override
+    public void engineUpdate(byte b) {
 		// compute number of bytes still unhashed; ie. present in buffer
 		int i = (int) (count % BLOCK_LENGTH);
 		count++; // update number of bytes
@@ -127,7 +130,8 @@ public class MD4 extends MessageDigest implements Cloneable {
 	 * @param    offset    start of meaningful bytes in input
 	 * @param    len        count of bytes in input block to consider
 	 */
-	public void engineUpdate(byte[] input, int offset, int len) {
+	@Override
+    public void engineUpdate(byte[] input, int offset, int len) {
 		// make sure we don't exceed input's allocated size/length
 		if (offset < 0 || len < 0 || (long) offset + len > input.length)
 			throw new ArrayIndexOutOfBoundsException();
@@ -158,7 +162,8 @@ public class MD4 extends MessageDigest implements Cloneable {
 	 *
 	 * @return the array of bytes for the resulting hash value.
 	 */
-	public byte[] engineDigest() {
+	@Override
+    public byte[] engineDigest() {
 		// pad output to 56 mod 64; as RFC1320 puts it: congruent to 448 mod 512
 		int bufferNdx = (int) (count % BLOCK_LENGTH);
 		int padLen = (bufferNdx < 56) ? (56 - bufferNdx) : (120 - bufferNdx);

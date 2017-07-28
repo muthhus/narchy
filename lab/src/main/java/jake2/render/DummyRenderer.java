@@ -27,159 +27,184 @@ public class DummyRenderer implements refexport_t {
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#Init(int, int)
 	 */
-	public boolean Init(int vid_xpos, int vid_ypos) {
+	@Override
+    public boolean Init(int vid_xpos, int vid_ypos) {
 		return false;
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#Shutdown()
 	 */
-	public void Shutdown() {
+	@Override
+    public void Shutdown() {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#BeginRegistration(java.lang.String)
 	 */
-	public void BeginRegistration(String map) {
+	@Override
+    public void BeginRegistration(String map) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#RegisterModel(java.lang.String)
 	 */
-	public model_t RegisterModel(String name) {
+	@Override
+    public model_t RegisterModel(String name) {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#RegisterSkin(java.lang.String)
 	 */
-	public image_t RegisterSkin(String name) {
+	@Override
+    public image_t RegisterSkin(String name) {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#RegisterPic(java.lang.String)
 	 */
-	public image_t RegisterPic(String name) {
+	@Override
+    public image_t RegisterPic(String name) {
 		return null;
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#SetSky(java.lang.String, float, float[])
 	 */
-	public void SetSky(String name, float rotate, float[] axis) {
+	@Override
+    public void SetSky(String name, float rotate, float[] axis) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#EndRegistration()
 	 */
-	public void EndRegistration() {
+	@Override
+    public void EndRegistration() {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#RenderFrame(jake2.client.refdef_t)
 	 */
-	public void RenderFrame(refdef_t fd) {
+	@Override
+    public void RenderFrame(refdef_t fd) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#DrawGetPicSize(Dimension, java.lang.String)
 	 */
-	public void DrawGetPicSize(Dimension dim, String name) {
+	@Override
+    public void DrawGetPicSize(Dimension dim, String name) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#DrawPic(int, int, java.lang.String)
 	 */
-	public void DrawPic(int x, int y, String name) {
+	@Override
+    public void DrawPic(int x, int y, String name) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#DrawStretchPic(int, int, int, int, java.lang.String)
 	 */
-	public void DrawStretchPic(int x, int y, int w, int h, String name) {
+	@Override
+    public void DrawStretchPic(int x, int y, int w, int h, String name) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#DrawChar(int, int, int)
 	 */
-	public void DrawChar(int x, int y, int num) {
+	@Override
+    public void DrawChar(int x, int y, int num) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#DrawTileClear(int, int, int, int, java.lang.String)
 	 */
-	public void DrawTileClear(int x, int y, int w, int h, String name) {
+	@Override
+    public void DrawTileClear(int x, int y, int w, int h, String name) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#DrawFill(int, int, int, int, int)
 	 */
-	public void DrawFill(int x, int y, int w, int h, int c) {
+	@Override
+    public void DrawFill(int x, int y, int w, int h, int c) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#DrawFadeScreen()
 	 */
-	public void DrawFadeScreen() {
+	@Override
+    public void DrawFadeScreen() {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#DrawStretchRaw(int, int, int, int, int, int, byte[])
 	 */
-	public void DrawStretchRaw(int x, int y, int w, int h, int cols, int rows, byte[] data) {
+	@Override
+    public void DrawStretchRaw(int x, int y, int w, int h, int cols, int rows, byte[] data) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#CinematicSetPalette(byte[])
 	 */
-	public void CinematicSetPalette(byte[] palette) {
+	@Override
+    public void CinematicSetPalette(byte[] palette) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#BeginFrame(float)
 	 */
-	public boolean BeginFrame(float camera_separation) {
+	@Override
+    public boolean BeginFrame(float camera_separation) {
 	    return true;
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#EndFrame()
 	 */
-	public void EndFrame() {
+	@Override
+    public void EndFrame() {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#AppActivate(boolean)
 	 */
-	public void AppActivate(boolean activate) {
+	@Override
+    public void AppActivate(boolean activate) {
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#updateScreen(jake2.qcommon.xcommand_t)
 	 */
-	public void updateScreen(xcommand_t callback) {
+	@Override
+    public void updateScreen(xcommand_t callback) {
 	    callback.execute();
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#apiVersion()
 	 */
-	public int apiVersion() {
+	@Override
+    public int apiVersion() {
 		return 0;
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#getModeList()
 	 */
-	public List<MonitorMode> getModeList() {
+	@Override
+    public List<MonitorMode> getModeList() {
 		return new ArrayList<>();
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.client.refexport_t#getKeyboardHandler()
 	 */
-	public KBD getKeyboardHandler() {
+	@Override
+    public KBD getKeyboardHandler() {
 		return null;
 	}
 

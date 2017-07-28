@@ -40,9 +40,9 @@ public class entity_state_t implements Cloneable
 	}
 
 	/** edict index. TODO: this is critical. The index has to be proper managed. */
-	public int number = 0; 
+	public int number;
 	// TODO: why was this introduced?
-	public edict_t surrounding_ent = null;
+	public edict_t surrounding_ent;
 	public float[] origin = { 0, 0, 0 };
 	public float[] angles = { 0, 0, 0 };
 	

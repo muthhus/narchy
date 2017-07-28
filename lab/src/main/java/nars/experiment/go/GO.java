@@ -14,9 +14,9 @@ public class GO extends JPanel implements MouseListener{
 	ArrayList<int[][]> boardHist = new ArrayList<int[][]>();
 	Color bg = new Color(0xA2,0x64,0x18);
 	static int[][] board = new int[21][21];
-	int turn = 0;
-	static int blackP =0;
-	static int whiteP =0;
+	int turn;
+	static int blackP;
+	static int whiteP;
 	
 	{
 		for(int i =0;i<21;i++){
@@ -36,6 +36,7 @@ public class GO extends JPanel implements MouseListener{
   }
 
   
+  @Override
   public void paintComponent(Graphics g) {
 
     g.setColor(bg);
@@ -144,7 +145,8 @@ public class GO extends JPanel implements MouseListener{
   }
  
   int p;
-  boolean kamikaze = false;
+  boolean kamikaze;
+@Override
 public void mouseReleased(MouseEvent e ) {
 	
 	int x = e.getX();
@@ -198,37 +200,37 @@ public void mouseReleased(MouseEvent e ) {
 		kamikaze = false;
 		
 		if(board[x][y+1]==2/board[x][y]  &&  checkSurround(x,y+1,2/board[x][y])){
-			p = removeGroup(x,y+1,2/board[x][y]);;
-			if(turn%2==0)
+			p = removeGroup(x,y+1,2/board[x][y]);
+            if(turn%2==0)
 				blackP += p;
 			else
 				whiteP += p;
 		}
 		if(board[x+1][y]==2/board[x][y] && checkSurround(x+1,y,2/board[x][y])){
-			p = removeGroup(x+1,y,2/board[x][y]);;
-			if(turn%2==0)
+			p = removeGroup(x+1,y,2/board[x][y]);
+            if(turn%2==0)
 				blackP += p;
 			else
 				whiteP += p;
 		}
 		if(board[x][y-1]==2/board[x][y] && checkSurround(x,y-1,2/board[x][y])){
-			p = removeGroup(x,y-1,2/board[x][y]);;
-			if(turn%2==0)
+			p = removeGroup(x,y-1,2/board[x][y]);
+            if(turn%2==0)
 				blackP += p;
 			else
 				whiteP += p;
 		}
 		if(board[x-1][y]==2/board[x][y] && checkSurround(x-1,y,2/board[x][y])){
-			p = removeGroup(x-1,y,2/board[x][y]);;
-			if(turn%2==0)
+			p = removeGroup(x-1,y,2/board[x][y]);
+            if(turn%2==0)
 				blackP += p;
 			else
 				whiteP += p;
 		}
 		
 		if(checkSurround(x,y,board[x][y])){
-			p = removeGroup(x,y,board[x][y]);;
-			if(turn%2==1)
+			p = removeGroup(x,y,board[x][y]);
+            if(turn%2==1)
 				blackP += p;
 			else
 				whiteP += p;
@@ -272,10 +274,7 @@ public void mouseReleased(MouseEvent e ) {
 					checkSurround(x-1,y,c,checked)&&
 					checkSurround(x,y-1,c,checked));
 		}
-		else if(board[x][y]==0)
-			return false;
-		else 
-			return true;
+		else return board[x][y] != 0;
 	}
 	public static boolean checkSurround(int x, int y, int c, boolean[][] checked){
 		
@@ -313,13 +312,17 @@ public void mouseReleased(MouseEvent e ) {
 		return 0;
 	}
 
+@Override
 public void mouseClicked(MouseEvent arg0) {
 }
+@Override
 public void mouseEntered(MouseEvent arg0) {
 }
+@Override
 public void mouseExited(MouseEvent arg0) {
 }
-public void mousePressed(MouseEvent arg0) {	
+@Override
+public void mousePressed(MouseEvent arg0) {
 }
 }
 

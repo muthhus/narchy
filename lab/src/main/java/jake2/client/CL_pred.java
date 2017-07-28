@@ -243,12 +243,14 @@ public class CL_pred {
         pmove_t pm = new pmove_t();
 
         pm.trace = new pmove_t.TraceAdapter() {
+            @Override
             public trace_t trace(float[] start, float[] mins, float[] maxs,
-                    float[] end) {
+                                 float[] end) {
                 return PMTrace(start, mins, maxs, end);
             }
         };
         pm.pointcontents = new pmove_t.PointContentsAdapter() {
+            @Override
             public int pointcontents(float[] point) {
                 return PMpointcontents(point);
             }

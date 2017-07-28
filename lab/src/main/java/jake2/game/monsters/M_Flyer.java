@@ -361,7 +361,9 @@ public class M_Flyer {
     static int sound_die;
 
     public static final EntInteractAdapter flyer_sight = new EntInteractAdapter() {
-    	public String getID() { return "flyer_sight"; }
+    	@Override
+        public String getID() { return "flyer_sight"; }
+        @Override
         public boolean interact(edict_t self, edict_t other) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_sight, 1,
                     Defines.ATTN_NORM, 0);
@@ -370,7 +372,9 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_idle = new EntThinkAdapter() {
-    	public String getID() { return "flyer_idle"; }
+    	@Override
+        public String getID() { return "flyer_idle"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_idle, 1,
                     Defines.ATTN_IDLE, 0);
@@ -379,7 +383,9 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_pop_blades = new EntThinkAdapter() {
-    	public String getID() { return "flyer_pop_blades"; }
+    	@Override
+        public String getID() { return "flyer_pop_blades"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_sproing, 1,
                     Defines.ATTN_NORM, 0);
@@ -387,7 +393,7 @@ public class M_Flyer {
         }
     };
 
-    static final mframe_t[] flyer_frames_stand = new mframe_t[] {
+    static final mframe_t[] flyer_frames_stand = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -437,7 +443,7 @@ public class M_Flyer {
     static final mmove_t flyer_move_stand = new mmove_t(FRAME_stand01, FRAME_stand45,
             flyer_frames_stand, null);
 
-    static final mframe_t[] flyer_frames_walk = new mframe_t[] {
+    static final mframe_t[] flyer_frames_walk = {
             new mframe_t(GameAI.ai_walk, 5, null),
             new mframe_t(GameAI.ai_walk, 5, null),
             new mframe_t(GameAI.ai_walk, 5, null),
@@ -487,7 +493,7 @@ public class M_Flyer {
     static final mmove_t flyer_move_walk = new mmove_t(FRAME_stand01, FRAME_stand45,
             flyer_frames_walk, null);
 
-    static final mframe_t[] flyer_frames_run = new mframe_t[] {
+    static final mframe_t[] flyer_frames_run = {
             new mframe_t(GameAI.ai_run, 10, null),
             new mframe_t(GameAI.ai_run, 10, null),
             new mframe_t(GameAI.ai_run, 10, null),
@@ -538,7 +544,9 @@ public class M_Flyer {
             flyer_frames_run, null);
 
     static final EntThinkAdapter flyer_run = new EntThinkAdapter() {
-    	public String getID() { return "flyer_run"; }
+    	@Override
+        public String getID() { return "flyer_run"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0)
                 self.monsterinfo.currentmove = flyer_move_stand;
@@ -549,7 +557,9 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_walk = new EntThinkAdapter() {
-    	public String getID() { return "flyer_walk"; }
+    	@Override
+        public String getID() { return "flyer_walk"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = flyer_move_walk;
             return true;
@@ -557,7 +567,9 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_stand = new EntThinkAdapter() {
-    	public String getID() { return "flyer_stand"; }
+    	@Override
+        public String getID() { return "flyer_stand"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = flyer_move_stand;
             return true;
@@ -565,7 +577,9 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_nextmove = new EntThinkAdapter() {
-    	public String getID() { return "flyer_nextmove"; }
+    	@Override
+        public String getID() { return "flyer_nextmove"; }
+        @Override
         public boolean think(edict_t self) {
             if (nextmove == ACTION_attack1)
                 self.monsterinfo.currentmove = flyer_move_start_melee;
@@ -577,7 +591,7 @@ public class M_Flyer {
         }
     };
 
-    static final mframe_t[] flyer_frames_start = new mframe_t[] {
+    static final mframe_t[] flyer_frames_start = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -588,7 +602,7 @@ public class M_Flyer {
     static final mmove_t flyer_move_start = new mmove_t(FRAME_start01, FRAME_start06,
             flyer_frames_start, null);
 
-    static final mframe_t[] flyer_frames_stop = new mframe_t[] {
+    static final mframe_t[] flyer_frames_stop = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -601,7 +615,9 @@ public class M_Flyer {
             flyer_frames_stop, null);
 
     static EntThinkAdapter flyer_stop = new EntThinkAdapter() {
-    	public String getID() { return "flyer_stop"; }
+    	@Override
+        public String getID() { return "flyer_stop"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = flyer_move_stop;
             return true;
@@ -609,14 +625,16 @@ public class M_Flyer {
     };
 
     static EntThinkAdapter flyer_start = new EntThinkAdapter() {
-    	public String getID() { return "flyer_start"; }
+    	@Override
+        public String getID() { return "flyer_start"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = flyer_move_start;
             return true;
         }
     };
 
-    static final mframe_t[] flyer_frames_rollright = new mframe_t[] {
+    static final mframe_t[] flyer_frames_rollright = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -630,7 +648,7 @@ public class M_Flyer {
     static mmove_t flyer_move_rollright = new mmove_t(FRAME_rollr01,
             FRAME_rollr09, flyer_frames_rollright, null);
 
-    static final mframe_t[] flyer_frames_rollleft = new mframe_t[] {
+    static final mframe_t[] flyer_frames_rollleft = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -644,7 +662,7 @@ public class M_Flyer {
     static mmove_t flyer_move_rollleft = new mmove_t(FRAME_rollf01,
             FRAME_rollf09, flyer_frames_rollleft, null);
 
-    static final mframe_t[] flyer_frames_pain3 = new mframe_t[] {
+    static final mframe_t[] flyer_frames_pain3 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -653,7 +671,7 @@ public class M_Flyer {
     static final mmove_t flyer_move_pain3 = new mmove_t(FRAME_pain301, FRAME_pain304,
             flyer_frames_pain3, flyer_run);
 
-    static final mframe_t[] flyer_frames_pain2 = new mframe_t[] {
+    static final mframe_t[] flyer_frames_pain2 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -662,7 +680,7 @@ public class M_Flyer {
     static final mmove_t flyer_move_pain2 = new mmove_t(FRAME_pain201, FRAME_pain204,
             flyer_frames_pain2, flyer_run);
 
-    static final mframe_t[] flyer_frames_pain1 = new mframe_t[] {
+    static final mframe_t[] flyer_frames_pain1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -676,7 +694,7 @@ public class M_Flyer {
     static final mmove_t flyer_move_pain1 = new mmove_t(FRAME_pain101, FRAME_pain109,
             flyer_frames_pain1, flyer_run);
 
-    static final mframe_t[] flyer_frames_defense = new mframe_t[] {
+    static final mframe_t[] flyer_frames_defense = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -688,7 +706,7 @@ public class M_Flyer {
     static mmove_t flyer_move_defense = new mmove_t(FRAME_defens01,
             FRAME_defens06, flyer_frames_defense, null);
 
-    static final mframe_t[] flyer_frames_bankright = new mframe_t[] {
+    static final mframe_t[] flyer_frames_bankright = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -700,7 +718,7 @@ public class M_Flyer {
     static mmove_t flyer_move_bankright = new mmove_t(FRAME_bankr01,
             FRAME_bankr07, flyer_frames_bankright, null);
 
-    static final mframe_t[] flyer_frames_bankleft = new mframe_t[] {
+    static final mframe_t[] flyer_frames_bankleft = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -713,7 +731,9 @@ public class M_Flyer {
             FRAME_bankl07, flyer_frames_bankleft, null);
 
     static final EntThinkAdapter flyer_fireleft = new EntThinkAdapter() {
-    	public String getID() { return "flyer_fireleft"; }
+    	@Override
+        public String getID() { return "flyer_fireleft"; }
+        @Override
         public boolean think(edict_t self) {
             flyer_fire(self, Defines.MZ2_FLYER_BLASTER_1);
             return true;
@@ -721,14 +741,16 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_fireright = new EntThinkAdapter() {
-    	public String getID() { return "flyer_fireright"; }
+    	@Override
+        public String getID() { return "flyer_fireright"; }
+        @Override
         public boolean think(edict_t self) {
             flyer_fire(self, Defines.MZ2_FLYER_BLASTER_2);
             return true;
         }
     };
 
-    static final mframe_t[] flyer_frames_attack2 = new mframe_t[] {
+    static final mframe_t[] flyer_frames_attack2 = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -752,7 +774,9 @@ public class M_Flyer {
             FRAME_attak217, flyer_frames_attack2, flyer_run);
 
     static final EntThinkAdapter flyer_slash_left = new EntThinkAdapter() {
-    	public String getID() { return "flyer_slash_left"; }
+    	@Override
+        public String getID() { return "flyer_slash_left"; }
+        @Override
         public boolean think(edict_t self) {
             float[] aim = { 0, 0, 0 };
 
@@ -765,7 +789,9 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_slash_right = new EntThinkAdapter() {
-    	public String getID() { return "flyer_slash_right"; }
+    	@Override
+        public String getID() { return "flyer_slash_right"; }
+        @Override
         public boolean think(edict_t self) {
             float[] aim = { 0, 0, 0 };
 
@@ -778,7 +804,9 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_loop_melee = new EntThinkAdapter() {
-    	public String getID() { return "flyer_loop_melee"; }
+    	@Override
+        public String getID() { return "flyer_loop_melee"; }
+        @Override
         public boolean think(edict_t self) {
             /*
              * if (random() <= 0.5) self.monsterinfo.currentmove =
@@ -789,7 +817,7 @@ public class M_Flyer {
         }
     };
 
-    static final mframe_t[] flyer_frames_start_melee = new mframe_t[] {
+    static final mframe_t[] flyer_frames_start_melee = {
             new mframe_t(GameAI.ai_charge, 0, flyer_pop_blades),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -800,7 +828,7 @@ public class M_Flyer {
     static final mmove_t flyer_move_start_melee = new mmove_t(FRAME_attak101,
             FRAME_attak106, flyer_frames_start_melee, flyer_loop_melee);
 
-    static final mframe_t[] flyer_frames_end_melee = new mframe_t[] {
+    static final mframe_t[] flyer_frames_end_melee = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null) };
@@ -808,7 +836,7 @@ public class M_Flyer {
     static final mmove_t flyer_move_end_melee = new mmove_t(FRAME_attak119,
             FRAME_attak121, flyer_frames_end_melee, flyer_run);
 
-    static final mframe_t[] flyer_frames_loop_melee = new mframe_t[] {
+    static final mframe_t[] flyer_frames_loop_melee = {
             new mframe_t(GameAI.ai_charge, 0, null), // Loop Start
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, flyer_slash_left),
@@ -827,7 +855,9 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_check_melee = new EntThinkAdapter() {
-    	public String getID() { return "flyer_check_melee"; }
+    	@Override
+        public String getID() { return "flyer_check_melee"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameUtil.range(self, self.enemy) == Defines.RANGE_MELEE)
                 if (Lib.random() <= 0.8)
@@ -844,7 +874,9 @@ public class M_Flyer {
             FRAME_attak118, flyer_frames_loop_melee, flyer_check_melee);
 
     static final EntThinkAdapter flyer_attack = new EntThinkAdapter() {
-    	public String getID() { return "flyer_attack"; }
+    	@Override
+        public String getID() { return "flyer_attack"; }
+        @Override
         public boolean think(edict_t self) {
             /*
              * if (random() <= 0.5) self.monsterinfo.currentmove =
@@ -857,7 +889,9 @@ public class M_Flyer {
     };
 
     static EntThinkAdapter flyer_setstart = new EntThinkAdapter() {
-    	public String getID() { return "flyer_setstart"; }
+    	@Override
+        public String getID() { return "flyer_setstart"; }
+        @Override
         public boolean think(edict_t self) {
             nextmove = ACTION_run;
             self.monsterinfo.currentmove = flyer_move_start;
@@ -866,7 +900,9 @@ public class M_Flyer {
     };
 
     static final EntThinkAdapter flyer_melee = new EntThinkAdapter() {
-    	public String getID() { return "flyer_melee"; }
+    	@Override
+        public String getID() { return "flyer_melee"; }
+        @Override
         public boolean think(edict_t self) {
             //			flyer.nextmove = ACTION_attack1;
             //	 self.monsterinfo.currentmove = flyer_move_stop;
@@ -876,7 +912,9 @@ public class M_Flyer {
     };
 
     static final EntPainAdapter flyer_pain = new EntPainAdapter() {
-    	public String getID() { return "flyer_pain"; }
+    	@Override
+        public String getID() { return "flyer_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
             int n;
 
@@ -909,9 +947,11 @@ public class M_Flyer {
     };
 
     static final EntDieAdapter flyer_die = new EntDieAdapter() {
-    	public String getID() { return "flyer_die"; }
+    	@Override
+        public String getID() { return "flyer_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_die, 1,
                     Defines.ATTN_NORM, 0);
             GameMisc.BecomeExplosion1(self);

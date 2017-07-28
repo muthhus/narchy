@@ -606,7 +606,7 @@ public final class BuiltIn extends Library {
 	 }
 
 	 public void include_1(Term theory) throws
-			 InvalidTheoryException, IOException, java.io.FileNotFoundException {
+			 InvalidTheoryException, IOException {
 		 theory = theory.term();
          String path = alice.util.Tools.removeApices(theory.toString());
          if(! new File(path).isAbsolute()) {

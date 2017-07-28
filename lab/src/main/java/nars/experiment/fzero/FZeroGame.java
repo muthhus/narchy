@@ -29,16 +29,16 @@ public class FZeroGame extends JFrame implements Runnable {
 
   public static final int FULL_POWER = 80;
   public static final int MAX_VEL = 20;
-  public boolean thrust = false, left = false, right = false;
-  public double playerAngle = 0;
+  public boolean thrust, left, right;
+  public double playerAngle;
   public BufferedImage image = new BufferedImage(
           320, 240, BufferedImage.TYPE_INT_RGB);
 
   public final double[][] vehicleMetrics = new double[10][9];
 
   boolean[] K = new boolean[65535]; // pressed keys
-  public double power = 0;
-  public int rank = 0;
+  public double power;
+  public int rank;
   public int frameDelayMS = 30;
   double rotVel = 0.03;
 
@@ -46,6 +46,7 @@ public class FZeroGame extends JFrame implements Runnable {
     new Thread(this).start();
   }
 
+  @Override
   public void run() {
     final double VIEWER_X = 159.5;
     final double VIEWER_Y = 32;
@@ -616,6 +617,7 @@ public class FZeroGame extends JFrame implements Runnable {
     return (int)(255 * Math.pow((Math.cos(angle) + 1) / 2, light) / dark);
   }
 
+  @Override
   protected void processKeyEvent(KeyEvent e) {
     K[e.getKeyCode()] = e.getID() == 401;
   }

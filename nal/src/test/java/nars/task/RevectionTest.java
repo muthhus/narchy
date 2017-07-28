@@ -14,7 +14,6 @@ import java.util.Set;
 
 import static nars.Op.BELIEF;
 import static nars.task.RevisionTest.newNAR;
-import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.c2w;
 import static nars.truth.TruthFunctions.w2c;
 import static org.junit.Assert.assertEquals;

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class a extends GamePanel {
 
   // keys
-  private boolean[] a = new boolean[65535];
+  private final boolean[] a = new boolean[65535];
   
   public a() {
     super(true);
@@ -1368,7 +1368,7 @@ public class a extends GamePanel {
         for(j = 0; j < 3; j++) {
           g.drawImage(tiles[TILE_PLAYER_0 + ((arrowTime >> 3) & 1) 
                   + playerSpriteOffset], 
-              (int)playerX + (j - 1) * FRAME_WIDTH, 
+              playerX + (j - 1) * FRAME_WIDTH,
               (int)playerY + (i - 1) * FRAME_HEIGHT, null);  
         }
       }      

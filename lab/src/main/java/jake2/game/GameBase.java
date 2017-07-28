@@ -388,6 +388,7 @@ public class GameBase {
     }
 
     public static final EdictFindFilter findByTarget = new EdictFindFilter() {
+        @Override
         public boolean matches(edict_t e, String s) {
             if (e.targetname == null)
                 return false;
@@ -396,6 +397,7 @@ public class GameBase {
     };
 
     public static final EdictFindFilter findByClass = new EdictFindFilter() {
+        @Override
         public boolean matches(edict_t e, String s) {
             return e.classname.equalsIgnoreCase(s);
         }
@@ -653,6 +655,7 @@ public class GameBase {
     public static void GetGameApi(game_import_t imp) {
         gi = imp;
         gi.pointcontents = new pmove_t.PointContentsAdapter() {
+            @Override
             public int pointcontents(float[] o) {
                 return SV_WORLD.SV_PointContents(o);
             }

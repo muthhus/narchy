@@ -303,24 +303,22 @@ public class LevelGen {
 			}
 		}
 
-		{
-			int r = 2;
-			for (int i = 0; i < w * h / 400; i++) {
-				int x = random.nextInt(w);
-				int y = random.nextInt(h);
-				for (int j = 0; j < 30; j++) {
-					int xx = x + random.nextInt(5) - random.nextInt(5);
-					int yy = y + random.nextInt(5) - random.nextInt(5);
-					if (xx >= r && yy >= r && xx < w - r && yy < h - r) {
-						if (map[xx + yy * w] == Tile.rock.id) {
-							map[xx + yy * w] = (byte) ((Tile.ironOre.id & 0xff) + depth - 1);
-						}
-					}
-				}
-			}
-		}
+        int r = 2;
+        for (int i = 0; i < w * h / 400; i++) {
+            int x = random.nextInt(w);
+            int y = random.nextInt(h);
+            for (int j = 0; j < 30; j++) {
+                int xx = x + random.nextInt(5) - random.nextInt(5);
+                int yy = y + random.nextInt(5) - random.nextInt(5);
+                if (xx >= r && yy >= r && xx < w - r && yy < h - r) {
+                    if (map[xx + yy * w] == Tile.rock.id) {
+                        map[xx + yy * w] = (byte) ((Tile.ironOre.id & 0xff) + depth - 1);
+                    }
+                }
+            }
+        }
 
-		if (depth < 3) {
+        if (depth < 3) {
 			int count = 0;
 			stairsLoop: for (int i = 0; i < w * h / 100; i++) {
 				int x = random.nextInt(w - 20) + 10;

@@ -45,7 +45,7 @@ public class Art
 
     public static SonarSample[] samples = new SonarSample[100];
 
-    private static Sequence[] songs = new Sequence[10];
+    private static final Sequence[] songs = new Sequence[10];
     private static Sequencer sequencer;
 
 

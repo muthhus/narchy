@@ -404,7 +404,9 @@ public class M_Boss2 {
     static int sound_search1;
 
     static final EntThinkAdapter boss2_stand = new EntThinkAdapter() {
-    	public String getID() { return "boss2_stand"; }
+    	@Override
+        public String getID() { return "boss2_stand"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = boss2_move_stand;
             return true;
@@ -412,7 +414,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter boss2_run = new EntThinkAdapter() {
-    	public String getID() { return "boss2_run"; }
+    	@Override
+        public String getID() { return "boss2_run"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0)
                 self.monsterinfo.currentmove = boss2_move_stand;
@@ -423,7 +427,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter boss2_walk = new EntThinkAdapter() {
-    	public String getID() { return "boss2_walk"; }
+    	@Override
+        public String getID() { return "boss2_walk"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = boss2_move_stand;
 
@@ -433,7 +439,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter boss2_attack = new EntThinkAdapter() {
-    	public String getID() { return "boss2_attack"; }
+    	@Override
+        public String getID() { return "boss2_attack"; }
+        @Override
         public boolean think(edict_t self) {
             float[] vec = { 0, 0, 0 };
 
@@ -455,7 +463,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter boss2_attack_mg = new EntThinkAdapter() {
-    	public String getID() { return "boss2_attack_mg"; }
+    	@Override
+        public String getID() { return "boss2_attack_mg"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = boss2_move_attack_mg;
             return true;
@@ -463,7 +473,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter boss2_reattack_mg = new EntThinkAdapter() {
-    	public String getID() { return "boss2_reattack_mg"; }
+    	@Override
+        public String getID() { return "boss2_reattack_mg"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameUtil.infront(self, self.enemy))
                 if (Lib.random() <= 0.7)
@@ -477,7 +489,9 @@ public class M_Boss2 {
     };
 
     static final EntPainAdapter boss2_pain = new EntPainAdapter() {
-    	public String getID() { return "boss2_pain"; }
+    	@Override
+        public String getID() { return "boss2_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
             if (self.health < (self.max_health / 2))
                 self.s.skinnum = 1;
@@ -504,7 +518,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter boss2_dead = new EntThinkAdapter() {
-    	public String getID() { return "boss2_dead"; }
+    	@Override
+        public String getID() { return "boss2_dead"; }
+        @Override
         public boolean think(edict_t self) {
             Math3D.VectorSet(self.mins, -56, -56, 0);
             Math3D.VectorSet(self.maxs, 56, 56, 80);
@@ -517,9 +533,11 @@ public class M_Boss2 {
     };
 
     static final EntDieAdapter boss2_die = new EntDieAdapter() {
-    	public String getID() { return "boss2_die"; }
+    	@Override
+        public String getID() { return "boss2_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_death, 1,
                     Defines.ATTN_NONE, 0);
             self.deadflag = Defines.DEAD_DEAD;
@@ -531,7 +549,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter Boss2_CheckAttack = new EntThinkAdapter() {
-    	public String getID() { return "Boss2_CheckAttack"; }
+    	@Override
+        public String getID() { return "Boss2_CheckAttack"; }
+        @Override
         public boolean think(edict_t self) {
             float[] spot1 = { 0, 0, 0 }, spot2 = { 0, 0, 0 };
             float[] temp = { 0, 0, 0 };
@@ -614,7 +634,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter boss2_search = new EntThinkAdapter() {
-    	public String getID() { return "boss2_search"; }
+    	@Override
+        public String getID() { return "boss2_search"; }
+        @Override
         public boolean think(edict_t self) {
             if (Lib.random() < 0.5)
                 game_import_t.sound(self, Defines.CHAN_VOICE, sound_search1, 1,
@@ -624,7 +646,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter Boss2Rocket = new EntThinkAdapter() {
-    	public String getID() { return "Boss2Rocket"; }
+    	@Override
+        public String getID() { return "Boss2Rocket"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 };
             float[] start = { 0, 0, 0 };
@@ -681,7 +705,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter boss2_firebullet_right = new EntThinkAdapter() {
-    	public String getID() { return "boss2_firebullet_right"; }
+    	@Override
+        public String getID() { return "boss2_firebullet_right"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 }, target = { 0,
                     0, 0 };
@@ -710,7 +736,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter boss2_firebullet_left = new EntThinkAdapter() {
-    	public String getID() { return "boss2_firebullet_left"; }
+    	@Override
+        public String getID() { return "boss2_firebullet_left"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 }, target = { 0,
                     0, 0 };
@@ -740,7 +768,9 @@ public class M_Boss2 {
     };
 
     static final EntThinkAdapter Boss2MachineGun = new EntThinkAdapter() {
-    	public String getID() { return "Boss2MachineGun"; }
+    	@Override
+        public String getID() { return "Boss2MachineGun"; }
+        @Override
         public boolean think(edict_t self) {
             /*
              * RST: this was disabled ! float[] forward={0,0,0}, right={0,0,0};
@@ -764,7 +794,7 @@ public class M_Boss2 {
         }
     };
 
-    static final mframe_t[] boss2_frames_stand = new mframe_t[] {
+    static final mframe_t[] boss2_frames_stand = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -790,7 +820,7 @@ public class M_Boss2 {
     static final mmove_t boss2_move_stand = new mmove_t(FRAME_stand30, FRAME_stand50,
             boss2_frames_stand, null);
 
-    static final mframe_t[] boss2_frames_fidget = new mframe_t[] {
+    static final mframe_t[] boss2_frames_fidget = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -825,7 +855,7 @@ public class M_Boss2 {
     static mmove_t boss2_move_fidget = new mmove_t(FRAME_stand1, FRAME_stand30,
             boss2_frames_fidget, null);
 
-    static final mframe_t[] boss2_frames_walk = new mframe_t[] {
+    static final mframe_t[] boss2_frames_walk = {
             new mframe_t(GameAI.ai_walk, 8, null),
             new mframe_t(GameAI.ai_walk, 8, null),
             new mframe_t(GameAI.ai_walk, 8, null),
@@ -850,7 +880,7 @@ public class M_Boss2 {
     static final mmove_t boss2_move_walk = new mmove_t(FRAME_walk1, FRAME_walk20,
             boss2_frames_walk, null);
 
-    static final mframe_t[] boss2_frames_run = new mframe_t[] {
+    static final mframe_t[] boss2_frames_run = {
             new mframe_t(GameAI.ai_run, 8, null),
             new mframe_t(GameAI.ai_run, 8, null),
             new mframe_t(GameAI.ai_run, 8, null),
@@ -875,7 +905,7 @@ public class M_Boss2 {
     static final mmove_t boss2_move_run = new mmove_t(FRAME_walk1, FRAME_walk20,
             boss2_frames_run, null);
 
-    static final mframe_t[] boss2_frames_attack_pre_mg = new mframe_t[] {
+    static final mframe_t[] boss2_frames_attack_pre_mg = {
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 1, null),
@@ -890,7 +920,7 @@ public class M_Boss2 {
             FRAME_attack9, boss2_frames_attack_pre_mg, null);
 
     //	   Loop this
-    static final mframe_t[] boss2_frames_attack_mg = new mframe_t[] {
+    static final mframe_t[] boss2_frames_attack_mg = {
             new mframe_t(GameAI.ai_charge, 1, Boss2MachineGun),
             new mframe_t(GameAI.ai_charge, 1, Boss2MachineGun),
             new mframe_t(GameAI.ai_charge, 1, Boss2MachineGun),
@@ -901,7 +931,7 @@ public class M_Boss2 {
     static final mmove_t boss2_move_attack_mg = new mmove_t(FRAME_attack10,
             FRAME_attack15, boss2_frames_attack_mg, null);
 
-    static final mframe_t[] boss2_frames_attack_post_mg = new mframe_t[] {
+    static final mframe_t[] boss2_frames_attack_post_mg = {
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 1, null),
@@ -910,7 +940,7 @@ public class M_Boss2 {
     static final mmove_t boss2_move_attack_post_mg = new mmove_t(FRAME_attack16,
             FRAME_attack19, boss2_frames_attack_post_mg, boss2_run);
 
-    static final mframe_t[] boss2_frames_attack_rocket = new mframe_t[] {
+    static final mframe_t[] boss2_frames_attack_rocket = {
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 1, null),
@@ -936,7 +966,7 @@ public class M_Boss2 {
     static final mmove_t boss2_move_attack_rocket = new mmove_t(FRAME_attack20,
             FRAME_attack40, boss2_frames_attack_rocket, boss2_run);
 
-    static final mframe_t[] boss2_frames_pain_heavy = new mframe_t[] {
+    static final mframe_t[] boss2_frames_pain_heavy = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -959,7 +989,7 @@ public class M_Boss2 {
     static final mmove_t boss2_move_pain_heavy = new mmove_t(FRAME_pain2,
             FRAME_pain19, boss2_frames_pain_heavy, boss2_run);
 
-    static final mframe_t[] boss2_frames_pain_light = new mframe_t[] {
+    static final mframe_t[] boss2_frames_pain_light = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -968,7 +998,7 @@ public class M_Boss2 {
     static final mmove_t boss2_move_pain_light = new mmove_t(FRAME_pain20,
             FRAME_pain23, boss2_frames_pain_light, boss2_run);
 
-    static final mframe_t[] boss2_frames_death = new mframe_t[] {
+    static final mframe_t[] boss2_frames_death = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),

@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public class a extends GamePanel {
 
 	// keys
-	private boolean[] a = new boolean[32768];
+	private final boolean[] a = new boolean[32768];
 
 	@Override
 	public void start() {
@@ -39,7 +39,8 @@ public class a extends GamePanel {
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 
 		final float GRAVITY = 0.05f;
 		final int JUMP_SPEED = -1;

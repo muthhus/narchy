@@ -5,7 +5,7 @@ import nars.experiment.minicraft.top.item.FurnitureItem;
 import nars.experiment.minicraft.top.item.PowerGloveItem;
 
 public class Furniture extends Entity {
-	private int pushTime = 0;
+	private int pushTime;
 	private int pushDir = -1;
 	public int col, sprite;
 	public String name;

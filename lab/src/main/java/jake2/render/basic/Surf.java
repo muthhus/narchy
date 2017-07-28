@@ -558,7 +558,8 @@ public abstract class Surf extends Draw {
 	of alpha_surfaces will draw back to front, giving proper ordering.
 	================
 	*/
-	void R_DrawAlphaSurfaces()
+    @Override
+    void R_DrawAlphaSurfaces()
 	{
 		msurface_t s;
 		float intens;
@@ -949,7 +950,8 @@ public abstract class Surf extends Draw {
 	R_DrawBrushModel
 	=================
 	*/
-	void R_DrawBrushModel(entity_t e)
+    @Override
+    void R_DrawBrushModel(entity_t e)
 	{
 		float[] mins = {0, 0, 0};
 		float[] maxs = {0, 0, 0};
@@ -1169,7 +1171,8 @@ public abstract class Surf extends Draw {
 	R_DrawWorld
 	=============
 	*/
-	void R_DrawWorld()
+    @Override
+    void R_DrawWorld()
 	{
 		entity_t	ent = new entity_t();
 		// auto cycle the world frame for texture animation
@@ -1238,7 +1241,8 @@ public abstract class Surf extends Draw {
 	cluster
 	===============
 	*/
-	void R_MarkLeaves()
+    @Override
+    void R_MarkLeaves()
 	{
 		byte[] vis;
 		//byte[] fatvis = new byte[Defines.MAX_MAP_LEAFS / 8];

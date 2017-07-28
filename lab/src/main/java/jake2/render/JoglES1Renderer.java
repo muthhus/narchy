@@ -63,6 +63,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#Init()
      */
+    @Override
     public boolean Init(int vid_xpos, int vid_ypos) {
         // init the OpenGL drivers
         impl.setGLDriver(this);
@@ -81,6 +82,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#Shutdown()
      */
+    @Override
     public void Shutdown() {
         impl.R_Shutdown();
     }
@@ -88,6 +90,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#BeginRegistration(java.lang.String)
      */
+    @Override
     public final void BeginRegistration(String map) {
         activateGLContext(true);
         impl.R_BeginRegistration(map);
@@ -96,6 +99,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#RegisterModel(java.lang.String)
      */
+    @Override
     public final model_t RegisterModel(String name) {
         activateGLContext(true);
         return impl.R_RegisterModel(name);
@@ -104,6 +108,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#RegisterSkin(java.lang.String)
      */
+    @Override
     public final image_t RegisterSkin(String name) {
         activateGLContext(true);
         return impl.R_RegisterSkin(name);
@@ -112,6 +117,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#RegisterPic(java.lang.String)
      */
+    @Override
     public final image_t RegisterPic(String name) {
         activateGLContext(true);
         return impl.Draw_FindPic(name);
@@ -119,6 +125,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#SetSky(java.lang.String, float, float[])
      */
+    @Override
     public final void SetSky(String name, float rotate, float[] axis) {
         activateGLContext(true);
         impl.R_SetSky(name, rotate, axis);
@@ -127,6 +134,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#EndRegistration()
      */
+    @Override
     public final void EndRegistration() {
         activateGLContext(true);
         impl.R_EndRegistration();
@@ -135,6 +143,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#RenderFrame(jake2.client.refdef_t)
      */
+    @Override
     public final void RenderFrame(refdef_t fd) {
         impl.R_RenderFrame(fd);
     }
@@ -142,6 +151,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#DrawGetPicSize(Dimension, java.lang.String)
      */
+    @Override
     public final void DrawGetPicSize(Dimension dim, String name) {
         impl.Draw_GetPicSize(dim, name);
     }
@@ -149,6 +159,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#DrawPic(int, int, java.lang.String)
      */
+    @Override
     public final void DrawPic(int x, int y, String name) {
         impl.Draw_Pic(x, y, name);
     }
@@ -156,6 +167,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#DrawStretchPic(int, int, int, int, java.lang.String)
      */
+    @Override
     public final void DrawStretchPic(int x, int y, int w, int h, String name) {
         impl.Draw_StretchPic(x, y, w, h, name);
     }
@@ -163,6 +175,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#DrawChar(int, int, int)
      */
+    @Override
     public final void DrawChar(int x, int y, int num) {
         activateGLContext(true);
         impl.Draw_Char(x, y, num);
@@ -171,6 +184,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#DrawTileClear(int, int, int, int, java.lang.String)
      */
+    @Override
     public final void DrawTileClear(int x, int y, int w, int h, String name) {
         impl.Draw_TileClear(x, y, w, h, name);
     }
@@ -178,6 +192,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#DrawFill(int, int, int, int, int)
      */
+    @Override
     public final void DrawFill(int x, int y, int w, int h, int c) {
         impl.Draw_Fill(x, y, w, h, c);
     }
@@ -185,6 +200,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#DrawFadeScreen()
      */
+    @Override
     public final void DrawFadeScreen() {
         impl.Draw_FadeScreen();
     }
@@ -192,6 +208,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#DrawStretchRaw(int, int, int, int, int, int, byte[])
      */
+    @Override
     public final void DrawStretchRaw(int x, int y, int w, int h, int cols, int rows, byte[] data) {
         impl.Draw_StretchRaw(x, y, w, h, cols, rows, data);
     }
@@ -199,6 +216,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#CinematicSetPalette(byte[])
      */
+    @Override
     public final void CinematicSetPalette(byte[] palette) {
         impl.R_SetPalette(palette);
     }
@@ -206,6 +224,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#BeginFrame(float)
      */
+    @Override
     public final boolean BeginFrame(float camera_separation) {
         return impl.R_BeginFrame(camera_separation);
     }
@@ -213,6 +232,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#EndFrame()
      */
+    @Override
     public final void EndFrame() {
         endFrame();
     }
@@ -220,19 +240,23 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     /** 
      * @see jake2.client.refexport_t#AppActivate(boolean)
      */
+    @Override
     public final void AppActivate(boolean activate) {
         appActivate(activate);
     }
 
+    @Override
     public void screenshot() {
         activateGLContext(true);
         impl.GL_ScreenShot_f();
     }
 
+    @Override
     public final int apiVersion() {
         return Defines.API_VERSION;
     }
 
+    @Override
     public KBD getKeyboardHandler() {
         return kbd;
     }
@@ -240,6 +264,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
     // Ref interface
     // ============================================================================
 
+    @Override
     public final String getName() {
         return DRIVER_NAME;
     }
@@ -248,6 +273,7 @@ final class JoglES1Renderer extends JoglES1Driver implements refexport_t, Ref {
         return DRIVER_NAME;
     }
 
+    @Override
     public final refexport_t GetRefAPI(RenderAPI renderer) {
         this.impl = renderer;
         return this;

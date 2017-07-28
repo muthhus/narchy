@@ -128,7 +128,12 @@ public class FocusedExecutioner extends Executioner {
         try {
             if (x.isDeleted())
                 return;
-            x.run(nar);
+
+            if (x instanceof Activate) {
+                ((Activate)x).hypothesize(nar).forEach(premises::putAsync);
+            } else {
+                x.run(nar);
+            }
         } catch (Throwable e) {
             if (Param.DEBUG) {
                 throw e;

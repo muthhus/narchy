@@ -31,8 +31,10 @@ import jake2.util.Math3D;
 public class PlayerWeapon {
 
     public static final EntThinkAdapter Weapon_Grenade = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_Grenade"; }
+    	@Override
+        public String getID() { return "Weapon_Grenade"; }
 
+        @Override
         public boolean think(edict_t ent) {
             if ((ent.client.newweapon != null)
                     && (ent.client.weaponstate == Defines.WEAPON_READY)) {
@@ -143,8 +145,10 @@ public class PlayerWeapon {
      */
 
     public static final EntThinkAdapter weapon_grenadelauncher_fire = new EntThinkAdapter() {
-    	public String getID() { return "weapon_grenadelauncher_fire"; }
+    	@Override
+        public String getID() { return "weapon_grenadelauncher_fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
             float[] offset = { 0, 0, 0 };
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 };
@@ -183,8 +187,10 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_GrenadeLauncher = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_GrenadeLauncher"; }
+    	@Override
+        public String getID() { return "Weapon_GrenadeLauncher"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             int pause_frames[] = { 34, 51, 59, 0 };
@@ -205,8 +211,10 @@ public class PlayerWeapon {
      */
 
     public static final EntThinkAdapter Weapon_RocketLauncher_Fire = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_RocketLauncher_Fire"; }
+    	@Override
+        public String getID() { return "Weapon_RocketLauncher_Fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             float[] offset = { 0, 0, 0 }, start = { 0, 0, 0 };
@@ -253,8 +261,10 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_RocketLauncher = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_RocketLauncher"; }
+    	@Override
+        public String getID() { return "Weapon_RocketLauncher"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             int pause_frames[] = { 25, 33, 42, 50, 0 };
@@ -267,8 +277,10 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_Blaster_Fire = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_Blaster_Fire"; }
+    	@Override
+        public String getID() { return "Weapon_Blaster_Fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             int damage;
@@ -285,8 +297,10 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_Blaster = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_Blaster"; }
+    	@Override
+        public String getID() { return "Weapon_Blaster"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             int pause_frames[] = { 19, 32, 0 };
@@ -299,8 +313,10 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_HyperBlaster_Fire = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_HyperBlaster_Fire"; }
+    	@Override
+        public String getID() { return "Weapon_HyperBlaster_Fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
             float rotation;
             float[] offset = { 0, 0, 0 };
@@ -370,7 +386,9 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_HyperBlaster = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_HyperBlaster"; }
+    	@Override
+        public String getID() { return "Weapon_HyperBlaster"; }
+        @Override
         public boolean think(edict_t ent) {
 
             int pause_frames[] = { 0 };
@@ -383,7 +401,9 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_Machinegun = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_Machinegun"; }
+    	@Override
+        public String getID() { return "Weapon_Machinegun"; }
+        @Override
         public boolean think(edict_t ent) {
 
             int pause_frames[] = { 23, 45, 0 };
@@ -396,7 +416,9 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_Chaingun = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_Chaingun"; }
+    	@Override
+        public String getID() { return "Weapon_Chaingun"; }
+        @Override
         public boolean think(edict_t ent) {
 
             int pause_frames[] = { 38, 43, 51, 61, 0 };
@@ -418,8 +440,10 @@ public class PlayerWeapon {
      */
 
     public static final EntThinkAdapter weapon_shotgun_fire = new EntThinkAdapter() {
-    	public String getID() { return "weapon_shotgun_fire"; }
+    	@Override
+        public String getID() { return "weapon_shotgun_fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             float[] start = { 0, 0, 0 };
@@ -473,7 +497,9 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_Shotgun = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_Shotgun"; }
+    	@Override
+        public String getID() { return "Weapon_Shotgun"; }
+        @Override
         public boolean think(edict_t ent) {
             int pause_frames[] = { 22, 28, 34, 0 };
             int fire_frames[] = { 8, 9, 0 };
@@ -485,8 +511,10 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter weapon_supershotgun_fire = new EntThinkAdapter() {
-    	public String getID() { return "weapon_supershotgun_fire"; }
+    	@Override
+        public String getID() { return "weapon_supershotgun_fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             float[] start = { 0, 0, 0 };
@@ -543,7 +571,9 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_SuperShotgun = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_SuperShotgun"; }
+    	@Override
+        public String getID() { return "Weapon_SuperShotgun"; }
+        @Override
         public boolean think(edict_t ent) {
 
             int pause_frames[] = { 29, 42, 57, 0 };
@@ -563,8 +593,10 @@ public class PlayerWeapon {
      * ======================================================================
      */
     public static final EntThinkAdapter weapon_railgun_fire = new EntThinkAdapter() {
-    	public String getID() { return "weapon_railgun_fire"; }
+    	@Override
+        public String getID() { return "weapon_railgun_fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             float[] start = { 0, 0, 0 };
@@ -615,8 +647,10 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_Railgun = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_Railgun"; }
+    	@Override
+        public String getID() { return "Weapon_Railgun"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             int pause_frames[] = { 56, 0 };
@@ -636,8 +670,10 @@ public class PlayerWeapon {
      */
 
     public static final EntThinkAdapter weapon_bfg_fire = new EntThinkAdapter() {
-    	public String getID() { return "weapon_bfg_fire"; }
+    	@Override
+        public String getID() { return "weapon_bfg_fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             float[] offset = { 0, 0, 0 }, start = { 0, 0, 0 };
@@ -700,7 +736,9 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Weapon_BFG = new EntThinkAdapter() {
-    	public String getID() { return "Weapon_BFG"; }
+    	@Override
+        public String getID() { return "Weapon_BFG"; }
+        @Override
         public boolean think(edict_t ent) {
 
             Weapon_Generic(ent, 8, 32, 55, 58, pause_frames, fire_frames,
@@ -722,8 +760,10 @@ public class PlayerWeapon {
      * ================
      */
     public static final ItemUseAdapter Use_Weapon = new ItemUseAdapter() {
-    	public String getID() { return "Use_Weapon"; }
+    	@Override
+        public String getID() { return "Use_Weapon"; }
 
+        @Override
         public void use(edict_t ent, gitem_t item) {
             int ammo_index;
             gitem_t ammo_item;
@@ -765,7 +805,9 @@ public class PlayerWeapon {
      */
 
     public static final ItemDropAdapter Drop_Weapon = new ItemDropAdapter() {
-    	public String getID() { return "Drop_Weapon"; }
+    	@Override
+        public String getID() { return "Drop_Weapon"; }
+        @Override
         public void drop(edict_t ent, gitem_t item) {
             int index;
 
@@ -795,8 +837,10 @@ public class PlayerWeapon {
      */
 
     public static final EntThinkAdapter Machinegun_Fire = new EntThinkAdapter() {
-    	public String getID() { return "Machinegun_Fire"; }
+    	@Override
+        public String getID() { return "Machinegun_Fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             int i;
@@ -887,8 +931,10 @@ public class PlayerWeapon {
     };
 
     public static final EntThinkAdapter Chaingun_Fire = new EntThinkAdapter() {
-    	public String getID() { return "Chaingun_Fire"; }
+    	@Override
+        public String getID() { return "Chaingun_Fire"; }
 
+        @Override
         public boolean think(edict_t ent) {
 
             int i;
@@ -1014,7 +1060,9 @@ public class PlayerWeapon {
     public static final int[] fire_frames = { 9, 17, 0 };
 
     public static final EntInteractAdapter Pickup_Weapon = new EntInteractAdapter() {
-    	public String getID() { return "Pickup_Weapon"; }
+    	@Override
+        public String getID() { return "Pickup_Weapon"; }
+        @Override
         public boolean interact(edict_t ent, edict_t other) {
             int index;
             gitem_t ammo;

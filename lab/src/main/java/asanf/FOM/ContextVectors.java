@@ -41,6 +41,7 @@ public class ContextVectors<E> extends DTMatrix<E> implements Iterable<E> {
     }
 
 
+    @Override
     public Iterator<E> iterator() {
         return getConcepts().iterator();
     }

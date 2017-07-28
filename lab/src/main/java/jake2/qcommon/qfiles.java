@@ -293,10 +293,10 @@ public class qfiles {
 		/*
 		 * new members for vertex array handling
 		 */
-		public FloatBuffer textureCoordBuf = null;
-		public ShortBuffer vertexIndexBuf = null;
-		public int[] counts = null;
-		public ShortBuffer[] indexElements = null;
+		public FloatBuffer textureCoordBuf;
+		public ShortBuffer vertexIndexBuf;
+		public int[] counts;
+		public ShortBuffer[] indexElements;
 	}
 	
 	/*

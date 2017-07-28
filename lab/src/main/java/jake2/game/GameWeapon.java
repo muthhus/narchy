@@ -31,10 +31,12 @@ import jake2.util.Math3D;
 public class GameWeapon {
 
     static final EntTouchAdapter blaster_touch = new EntTouchAdapter() {
-    	public String getID() { return "blaster_touch"; }
+    	@Override
+        public String getID() { return "blaster_touch"; }
     
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             int mod;
     
             if (other == self.owner)
@@ -82,7 +84,9 @@ public class GameWeapon {
     };
     
     static final EntThinkAdapter Grenade_Explode = new EntThinkAdapter() {
-    	public String getID() { return "Grenade_Explode"; }
+    	@Override
+        public String getID() { return "Grenade_Explode"; }
+        @Override
         public boolean think(edict_t ent) {
             float[] origin = { 0, 0, 0 };
             int mod;
@@ -142,9 +146,11 @@ public class GameWeapon {
         }
     };
     static final EntTouchAdapter Grenade_Touch = new EntTouchAdapter() {
-    	public String getID() { return "Grenade_Touch"; }
+    	@Override
+        public String getID() { return "Grenade_Touch"; }
+        @Override
         public void touch(edict_t ent, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             if (other == ent.owner)
                 return;
     
@@ -182,9 +188,11 @@ public class GameWeapon {
      * =================
      */
     static final EntTouchAdapter rocket_touch = new EntTouchAdapter() {
-    	public String  getID() { return "rocket_touch"; }
+    	@Override
+        public String  getID() { return "rocket_touch"; }
+        @Override
         public void touch(edict_t ent, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             float[] origin = { 0, 0, 0 };
             int n;
     
@@ -243,7 +251,9 @@ public class GameWeapon {
      * =================
      */
     static final EntThinkAdapter bfg_explode = new EntThinkAdapter() {
-    	public String getID() { return "bfg_explode"; }
+    	@Override
+        public String getID() { return "bfg_explode"; }
+        @Override
         public boolean think(edict_t self) {
             edict_t ent;
             float points;
@@ -296,9 +306,11 @@ public class GameWeapon {
     };
     
     static final EntTouchAdapter bfg_touch = new EntTouchAdapter() {
-    	public String getID() { return "bfg_touch"; }
+    	@Override
+        public String getID() { return "bfg_touch"; }
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             if (other == self.owner)
                 return;
     
@@ -343,7 +355,9 @@ public class GameWeapon {
     };
     
     static final EntThinkAdapter bfg_think = new EntThinkAdapter() {
-    	public String getID() { return "bfg_think"; }
+    	@Override
+        public String getID() { return "bfg_think"; }
+        @Override
         public boolean think(edict_t self) {
             edict_t ent;
             edict_t ignore;

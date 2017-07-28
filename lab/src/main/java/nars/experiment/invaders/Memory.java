@@ -4,7 +4,7 @@ public class Memory {
 	public int a, b,c,d,e,h,l; //8 bit registers
 	public int int_enable;
 	public int sp, pc; //16 bit registers	
-	private int[] mem;	
+	private final int[] mem;
 	boolean cy, p, s, z, ac; //flags
 	public Memory(){
 		mem = new int[16000];

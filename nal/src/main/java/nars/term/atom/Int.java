@@ -131,6 +131,7 @@ public class Int implements Intlike {
      */
     public static class IntRange implements Intlike {
 
+
         public final int min, max;
         private final int hash;
 
@@ -192,6 +193,8 @@ public class Int implements Intlike {
         public int hashCode() {
             return hash;
         }
+
+        public long hash64() { return (max << 32) | min; }
 
         @Override
         public int opX() {

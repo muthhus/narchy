@@ -36,7 +36,7 @@ public class sfx_t {
 	
 	// is used for AL buffers
 	public int bufferId = -1;
-	public boolean isCached = false;
+	public boolean isCached;
 	
 	public void clear() {
 		name = truename = null;

@@ -490,163 +490,195 @@ public class CL_input {
 	 */
 	static void InitInput() {
 		Cmd.AddCommand("centerview", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN.CenterView();
 			}
 		});
 
 		Cmd.AddCommand("+moveup", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_UpDown();
 			}
 		});
 		Cmd.AddCommand("-moveup", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_UpUp();
 			}
 		});
 		Cmd.AddCommand("+movedown", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_DownDown();
 			}
 		});
 		Cmd.AddCommand("-movedown", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_DownUp();
 			}
 		});
 		Cmd.AddCommand("+left", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_LeftDown();
 			}
 		});
 		Cmd.AddCommand("-left", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_LeftUp();
 			}
 		});
 		Cmd.AddCommand("+right", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_RightDown();
 			}
 		});
 		Cmd.AddCommand("-right", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_RightUp();
 			}
 		});
 		Cmd.AddCommand("+forward", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_ForwardDown();
 			}
 		});
 		Cmd.AddCommand("-forward", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_ForwardUp();
 			}
 		});
 		Cmd.AddCommand("+back", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_BackDown();
 			}
 		});
 		Cmd.AddCommand("-back", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_BackUp();
 			}
 		});
 		Cmd.AddCommand("+lookup", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_LookupDown();
 			}
 		});
 		Cmd.AddCommand("-lookup", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_LookupUp();
 			}
 		});
 		Cmd.AddCommand("+lookdown", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_LookdownDown();
 			}
 		});
 		Cmd.AddCommand("-lookdown", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_LookdownUp();
 			}
 		});
 		Cmd.AddCommand("+strafe", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_StrafeDown();
 			}
 		});
 		Cmd.AddCommand("-strafe", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_StrafeUp();
 			}
 		});
 		Cmd.AddCommand("+moveleft", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_MoveleftDown();
 			}
 		});
 		Cmd.AddCommand("-moveleft", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_MoveleftUp();
 			}
 		});
 		Cmd.AddCommand("+moveright", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_MoverightDown();
 			}
 		});
 		Cmd.AddCommand("-moveright", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_MoverightUp();
 			}
 		});
 		Cmd.AddCommand("+speed", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_SpeedDown();
 			}
 		});
 		Cmd.AddCommand("-speed", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_SpeedUp();
 			}
 		});
 		Cmd.AddCommand("+attack", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_AttackDown();
 			}
 		});
 		Cmd.AddCommand("-attack", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_AttackUp();
 			}
 		});
 		Cmd.AddCommand("+use", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_UseDown();
 			}
 		});
 		Cmd.AddCommand("-use", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_UseUp();
 			}
 		});
 		Cmd.AddCommand("impulse", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_Impulse();
 			}
 		});
 		Cmd.AddCommand("+klook", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_KLookDown();
 			}
 		});
 		Cmd.AddCommand("-klook", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				IN_KLookUp();
 			}
 		});

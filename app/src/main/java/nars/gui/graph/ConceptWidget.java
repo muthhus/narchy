@@ -41,9 +41,9 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
     //caches a reference to the current concept
     public Concept concept;
     private transient ConceptSpace space;
-    public float pri = 0;
+    public float pri;
 
-    private float edgeDecayRate = 0.5f;
+    private final float edgeDecayRate = 0.5f;
 
 
     public ConceptWidget(Termed x) {

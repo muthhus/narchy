@@ -5,7 +5,8 @@ import java.awt.*;
 
 public class QuadBezier extends JPanel {
 	
-	public void paintComponent(Graphics g) {		
+	@Override
+    public void paintComponent(Graphics g) {
 		float[] xs = {100, 200, 200, 200, 300};
 		float[] ys = {100, 100, 200, 150, 200};
 		

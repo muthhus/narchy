@@ -5,8 +5,8 @@ import java.util.Iterator;
 
 public class Taxonomy<E> implements Iterable<E>{
 
-	private double[][] relations;
-    private ArrayList<E> concepts;
+	private final double[][] relations;
+    private final ArrayList<E> concepts;
    
 //    public Taxonomy(int size){
 //    	relations = new double[size][size];

@@ -205,8 +205,8 @@ public final class B extends GamePanel {
 	private static final int WIDTH = TABLE_WIDTH * BLOCK_SIZE;
 	private static final int HEIGHT = TABLE_HEIGHT * BLOCK_SIZE;
 
-	private Image screenBuffer;
-	private int[] table;
+	private final Image screenBuffer;
+	private final int[] table;
 	private int playerX;
 	private int playerY;
 	private int level;

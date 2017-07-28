@@ -7,14 +7,14 @@ public class Flipper extends LevelObject {
 	
 	public static final float ANGLE_SCALE = 127 / (2 * (float) Math.PI);
 	
-	double angle = 0;
-	public int length = 0;
+	double angle;
+	public int length;
 	boolean leftFlipper = true;
-	public int minAngle = 0;
-	public int maxAngle = 0;
+	public int minAngle;
+	public int maxAngle;
 	
-	private FlipperHandle handle = new FlipperHandle();
-	private Flipper outerInstance;
+	private final FlipperHandle handle = new FlipperHandle();
+	private final Flipper outerInstance;
 	
 	
 	/**
@@ -54,7 +54,8 @@ public class Flipper extends LevelObject {
 	 * Draws itself to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void draw(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void draw(Graphics2D g, LevelPanel levelPanel) {
 		g.setColor(Color.WHITE);
 		int startDeg = (int) -Math.toDegrees(toAngle(minAngle));
 		int arcDeg = (int) -Math.toDegrees(toAngle(maxAngle) - toAngle(minAngle));
@@ -65,7 +66,8 @@ public class Flipper extends LevelObject {
 	 * Draws the handles to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
 		handle.draw(g, levelPanel);
 	}	
 	
@@ -73,7 +75,8 @@ public class Flipper extends LevelObject {
 	 * The public properties to show in the editor ui.
 	 * @return the properties to show
 	 */
-	public Field[] getProperties() {
+	@Override
+    public Field[] getProperties() {
 		return getFields("visible", "collidable", "score", "bounce"
 				, "behaviorId", "p", "minAngle", "maxAngle");
 	}	
@@ -88,7 +91,8 @@ public class Flipper extends LevelObject {
 		 * Overrides Handle. Gets the endpoint.
 		 * @return the handles endpoint
 		 */
-		public Point getCenter() {
+		@Override
+        public Point getCenter() {
 			return p;
 		}
 		
@@ -97,7 +101,8 @@ public class Flipper extends LevelObject {
 		 * distance dragged.
 		 * @param p where the handle is dragged to
 		 */
-		public void dragged(int dx, int dy) {
+		@Override
+        public void dragged(int dx, int dy) {
 			p.translate(dx, dy);
 		}
 		
@@ -105,7 +110,8 @@ public class Flipper extends LevelObject {
 		 * Gets the level object the hangle controlls. Can be null.
 		 * @return the level object
 		 */
-		public LevelObject getLevelObject() {
+		@Override
+        public LevelObject getLevelObject() {
 			return outerInstance;
 		}
 	}

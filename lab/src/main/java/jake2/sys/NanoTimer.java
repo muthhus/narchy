@@ -15,7 +15,8 @@ public final class NanoTimer extends Timer {
 		base = System.nanoTime();
 	}
 	
-	public long currentTimeMillis() {
+	@Override
+    public long currentTimeMillis() {
 		long time = System.nanoTime();
 		long delta = time - base;
 		if (delta < 0) {

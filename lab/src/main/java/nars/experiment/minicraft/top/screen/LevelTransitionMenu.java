@@ -4,7 +4,7 @@ import nars.experiment.minicraft.top.gfx.Screen;
 
 public class LevelTransitionMenu extends Menu {
 	private final int dir;
-	private int time = 0;
+	private int time;
 
 	public LevelTransitionMenu(int dir) {
 		this.dir = dir;

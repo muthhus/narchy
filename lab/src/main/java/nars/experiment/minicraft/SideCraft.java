@@ -109,7 +109,7 @@ public class SideCraft extends NAgentX {
     }
 
 
-    float prevScore = 0;
+    float prevScore;
     final int gameFramesPerCycle = 1;
 
     @Override

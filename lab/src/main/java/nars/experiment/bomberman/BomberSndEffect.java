@@ -30,7 +30,7 @@ public class BomberSndEffect extends Thread {
             }
             catch (Exception e) { }
             /** open file */
-            ((SoundPlayer)sound).open();
+            sound.open();
             /** then play sound */
             sound.change(0, false);
         }

@@ -13,13 +13,13 @@ public class Proxy implements alice.tuprologx.runtime.tcp.Prolog {
     ObjectOutputStream out;
     ObjectInputStream  in;
 
-    public Proxy(String host) throws IOException, java.net.UnknownHostException {
+    public Proxy(String host) throws IOException {
         socket=new Socket(host,alice.tuprologx.runtime.tcp.Daemon.DEFAULT_PORT);
         out=new ObjectOutputStream(socket.getOutputStream());
         in=new ObjectInputStream(socket.getInputStream());
     }
 
-    public Proxy(String host, int port) throws IOException, java.net.UnknownHostException {
+    public Proxy(String host, int port) throws IOException {
         socket=new Socket(host,port);
         out=new ObjectOutputStream(socket.getOutputStream());
         in=new ObjectInputStream(socket.getInputStream());

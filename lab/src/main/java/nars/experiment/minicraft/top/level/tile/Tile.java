@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class Tile {
 	public static Tile[] tiles = new Tile[256];
-	public static int tickCount = 0;
+	public static int tickCount;
 	public static Tile none = new Tile(-1);
     protected Random random = new Random();
 
@@ -43,10 +43,10 @@ public class Tile {
 
 	public final byte id;
 
-	public boolean connectsToGrass = false;
-	public boolean connectsToSand = false;
-	public boolean connectsToLava = false;
-	public boolean connectsToWater = false;
+	public boolean connectsToGrass;
+	public boolean connectsToSand;
+	public boolean connectsToLava;
+	public boolean connectsToWater;
 
 	public Tile(int id) {
 		this.id = (byte) id;

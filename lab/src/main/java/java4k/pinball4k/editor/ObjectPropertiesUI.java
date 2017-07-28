@@ -13,7 +13,7 @@ import java.util.ArrayList;
 public class ObjectPropertiesUI extends JPanel {
 	
 	public ArrayList<LevelObject> selection = new ArrayList<LevelObject>();
-	private MyTableModel tableModel = new MyTableModel();
+	private final MyTableModel tableModel = new MyTableModel();
 	
 	public ObjectPropertiesUI() {
 		JTable table = new JTable(tableModel);
@@ -39,15 +39,18 @@ public class ObjectPropertiesUI extends JPanel {
 	}
 	
 	class MyTableModel extends AbstractTableModel {
-		public int getRowCount() {
+		@Override
+        public int getRowCount() {
 			return getFields().length;
 		}
 			
-		public int getColumnCount() {
+		@Override
+        public int getColumnCount() {
 			return 2;
 		}
 
-		public Object getValueAt(int row, int column) {
+		@Override
+        public Object getValueAt(int row, int column) {
 			Field field = getFields()[row];
 			if (column == 0) {
 				return field.getName() + " (" + field.getType().getSimpleName() + ")";
@@ -64,11 +67,13 @@ public class ObjectPropertiesUI extends JPanel {
 			return "error";
 		}		  		
 		
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
+		@Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
 			return (columnIndex == 1);
 		}
 		
-		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		@Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			for (LevelObject obj : selection) {
 				try {
 					Field field = getFields()[rowIndex];

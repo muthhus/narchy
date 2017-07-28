@@ -15,7 +15,7 @@ import java.io.OutputStream;
 /**
  * Created by me on 11/14/16.
  */
-public class ConsoleTerminal extends ConsoleSurface implements Appendable {
+public class ConsoleTerminal extends ConsoleSurface {
 
 
     public final DefaultVirtualTerminal term;

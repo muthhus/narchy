@@ -176,7 +176,9 @@ public class GameTurret {
     }
 
     static final EntBlockedAdapter turret_blocked = new EntBlockedAdapter() {
-    	public String getID() { return "turret_blocked"; }
+    	@Override
+        public String getID() { return "turret_blocked"; }
+        @Override
         public void blocked(edict_t self, edict_t other) {
             edict_t attacker;
 
@@ -193,7 +195,9 @@ public class GameTurret {
     };
 
     static final EntThinkAdapter turret_breach_think = new EntThinkAdapter() {
-    	public String getID() { return "turret_breach_think"; }
+    	@Override
+        public String getID() { return "turret_breach_think"; }
+        @Override
         public boolean think(edict_t self) {
 
             edict_t ent;
@@ -305,7 +309,9 @@ public class GameTurret {
     };
 
     static final EntThinkAdapter turret_breach_finish_init = new EntThinkAdapter() {
-    	public String getID() { return "turret_breach_finish_init"; }
+    	@Override
+        public String getID() { return "turret_breach_finish_init"; }
+        @Override
         public boolean think(edict_t self) {
 
             // get and save info for muzzle location
@@ -332,9 +338,11 @@ public class GameTurret {
      * turret_breach.
      */
     static final EntDieAdapter turret_driver_die = new EntDieAdapter() {
-    	public String getID() { return "turret_driver_die"; }
+    	@Override
+        public String getID() { return "turret_driver_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
 
             edict_t ent;
 
@@ -356,7 +364,9 @@ public class GameTurret {
     };
 
     static final EntThinkAdapter turret_driver_think = new EntThinkAdapter() {
-    	public String getID() { return "turret_driver_think"; }
+    	@Override
+        public String getID() { return "turret_driver_think"; }
+        @Override
         public boolean think(edict_t self) {
 
             float[] target = { 0, 0, 0 };
@@ -409,7 +419,9 @@ public class GameTurret {
     };
 
     public static final EntThinkAdapter turret_driver_link = new EntThinkAdapter() {
-    	public String getID() { return "turret_driver_link"; }
+    	@Override
+        public String getID() { return "turret_driver_link"; }
+        @Override
         public boolean think(edict_t self) {
 
             float[] vec = { 0, 0, 0 };

@@ -55,10 +55,11 @@ public abstract class JoglES1Driver extends JoglGL2ES1 implements GLDriver {
         super();
     }
 
-    private NEWTWin newtWin = null;
+    private NEWTWin newtWin;
 
     public abstract String getName();
     
+    @Override
     public List<MonitorMode> getModeList() {
         if(null == newtWin) {
             throw new RuntimeException("NEWTWin not yet initialized.");
@@ -66,6 +67,7 @@ public abstract class JoglES1Driver extends JoglGL2ES1 implements GLDriver {
         return newtWin.getModeList();        
     }
     
+    @Override
     public int setMode(Dimension dim, int mode, boolean fullscreen) {
         if(null == newtWin) {
             newtWin = new NEWTWin();
@@ -80,6 +82,7 @@ public abstract class JoglES1Driver extends JoglGL2ES1 implements GLDriver {
         return res;
     }
 
+    @Override
     public void shutdown() {
         if(null != newtWin) {
             newtWin.shutdown();
@@ -89,6 +92,7 @@ public abstract class JoglES1Driver extends JoglGL2ES1 implements GLDriver {
     /**
      * @return true
      */
+    @Override
     public boolean init(int xpos, int ypos) {
         // clear the screen
         // first buffer
@@ -111,19 +115,23 @@ public abstract class JoglES1Driver extends JoglGL2ES1 implements GLDriver {
         return activateGLContext(false);
     }
 
+    @Override
     public void endFrame() {
         newtWin.endFrame();
         // deactivate();
     }
 
+    @Override
     public void appActivate(boolean activate) {
         // do nothing
     }
 
+    @Override
     public void enableLogging(boolean enable) {
         // do nothing
     }
 
+    @Override
     public void logNewFrame() {
         // do nothing
     }
@@ -131,6 +139,7 @@ public abstract class JoglES1Driver extends JoglGL2ES1 implements GLDriver {
     /*
      * @see jake2.client.refexport_t#updateScreen()
      */
+    @Override
     public void updateScreen(xcommand_t callback) {
         callback.execute();
     }

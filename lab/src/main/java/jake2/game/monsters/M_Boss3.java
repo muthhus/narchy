@@ -29,7 +29,9 @@ import jake2.util.Math3D;
 public class M_Boss3 {
 
     static final EntUseAdapter Use_Boss3 = new EntUseAdapter() {
-    	public String getID() { return "Use_Boss3"; }
+    	@Override
+        public String getID() { return "Use_Boss3"; }
+        @Override
         public void use(edict_t ent, edict_t other, edict_t activator) {
             game_import_t.WriteByte(Defines.svc_temp_entity);
             game_import_t.WriteByte(Defines.TE_BOSSTPORT);
@@ -40,7 +42,9 @@ public class M_Boss3 {
     };
 
     static final EntThinkAdapter Think_Boss3Stand = new EntThinkAdapter() {
-    	public String getID() { return "Think_Boss3Stand"; }
+    	@Override
+        public String getID() { return "Think_Boss3Stand"; }
+        @Override
         public boolean think(edict_t ent) {
             if (ent.s.frame == M_Boss32.FRAME_stand260)
                 ent.s.frame = M_Boss32.FRAME_stand201;

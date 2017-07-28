@@ -19,8 +19,8 @@ public class WaveletBag implements Bitmap2D {
 
     public static final int NUM_LEVELS = 2;
     final Supplier<BufferedImage> source;
-    private int px;
-    private int py;
+    private final int px;
+    private final int py;
 
 
     GrayF32 image;

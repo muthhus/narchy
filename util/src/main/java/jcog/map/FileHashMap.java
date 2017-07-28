@@ -592,7 +592,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
          * Map should have.  If this expectation is violated, the iterator
          * has detected concurrent modification.
          */
-        private int expectedSize;
+        private final int expectedSize;
 
         EntryIterator() {
             entries = FileHashMap.this.getSortedEntries();
@@ -1076,7 +1076,7 @@ public class FileHashMap<K, V> extends AbstractMap<K, V> {
     /**
      * The flags specified to the constructor.
      */
-    private int flags;
+    private final int flags;
 
     /**
      * Whether or not the index has been modified since the file was

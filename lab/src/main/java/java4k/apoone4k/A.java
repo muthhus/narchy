@@ -33,12 +33,12 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-public class A extends GamePanel implements Runnable {
+public class A extends GamePanel {
 
 	private static final int WIDTH = 640;
 	private static final int HEIGHT = 480;
 
-	private static final int[][] l = new int[][] { {}, { 310, 300, 20, 20 }, { 200, 460, 30, 20, 400, 460, 30, 20 },
+	private static final int[][] l = { {}, { 310, 300, 20, 20 }, { 200, 460, 30, 20, 400, 460, 30, 20 },
 
 	{ 310, 130, 30, 30 }, { 200, 300, 40, 20, 400, 300, 40, 20 }, { 200, 450, 30, 30, 360, 450, 30, 30, 530, 450, 30, 30 },
 
@@ -58,7 +58,7 @@ public class A extends GamePanel implements Runnable {
 
 			{ 120, 0, 10, 110, 160, 150, 10, 10, 520, 0, 10, 110, 560, 150, 10, 10 }, { 220, 300, 175, 20 }, { 200, 417, 20, 63, 500, 412, 20, 68 }, };
 
-	private static final Color[] rc = new Color[] { Color.BLACK, Color.WHITE, Color.YELLOW, Color.BLUE, Color.DARK_GRAY, Color.LIGHT_GRAY, Color.ORANGE };
+	private static final Color[] rc = { Color.BLACK, Color.WHITE, Color.YELLOW, Color.BLUE, Color.DARK_GRAY, Color.LIGHT_GRAY, Color.ORANGE };
 
 	private boolean[] pressed = new boolean[256];
 
@@ -92,10 +92,10 @@ public class A extends GamePanel implements Runnable {
 	 * 2 = velocity in x-Richtung
 	 * 3 = velocity in y-Richtung
 	 * 4 = Zeit die es noch sichtbar ist */
-	private float[] ex = null;
+	private float[] ex;
 
-	private BufferedImage offscreenImage;
-	private Graphics2D offscreennGraphics;
+	private final BufferedImage offscreenImage;
+	private final Graphics2D offscreennGraphics;
 
 	@Override
 	public Dimension getPreferredSize() {
@@ -229,7 +229,7 @@ public class A extends GamePanel implements Runnable {
 					if ((p[0] + 30 >= l[lev][i]) && (p[1] + 30 >= l[lev][i + 1]) && (p[0] <= l[lev][i] + l[lev][i + 2]) && (p[1] <= l[lev][i + 1] + l[lev][i + 3])) {
 						// falls ja dann Tod += 1 und Partikeleffekte erstellen und Spieler auf die Startposition zur�cksetzen
 						p[3] += 1;
-						ex = new float[(int) (5 * (int) (Math.random() * 15 + 20))];
+						ex = new float[5 * (int) (Math.random() * 15 + 20)];
 						for (int z = 0; z < ex.length; z += 5) {
 							ex[z] = p[0] + 12;
 							ex[z + 1] = p[1] + 12;

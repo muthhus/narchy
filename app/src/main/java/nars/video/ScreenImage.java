@@ -210,17 +210,15 @@ public class ScreenImage
 	static void layoutComponent(Component component)
 	{
 		//synchronized (component.getTreeLock())
-		{
-			component.doLayout();
+        component.doLayout();
 
-    	    if (component instanceof Container)
-        	{
-            	for (Component child : ((Container)component).getComponents())
-	            {
-    	            layoutComponent(child);
-        	    }
-	        }
-    	}
+        if (component instanceof Container)
+        {
+            for (Component child : ((Container)component).getComponents())
+            {
+                layoutComponent(child);
+            }
+        }
     }
 
 

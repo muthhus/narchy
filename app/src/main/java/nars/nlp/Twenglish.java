@@ -22,7 +22,6 @@ import nars.$;
 import nars.NAR;
 import nars.Narsese;
 import nars.task.TaskBuilder;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;

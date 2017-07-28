@@ -10,7 +10,8 @@ public class PMI implements CorrelationFunction{
 	
 
 	
-	public double calculateCorrelation(double p_x, double p_y, double p_x_y) {
+	@Override
+    public double calculateCorrelation(double p_x, double p_y, double p_x_y) {
 		
 		int isZero = new Double(p_x_y).compareTo(0.0);
 		int isOne = new Double(p_x_y).compareTo(1.0);

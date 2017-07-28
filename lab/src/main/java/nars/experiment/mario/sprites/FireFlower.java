@@ -7,13 +7,13 @@ import nars.experiment.mario.LevelScene;
 public class FireFlower extends Sprite
 {
     @SuppressWarnings("unused")
-	private int width = 4;
+	private final int width = 4;
     int height = 24;
 
-    private LevelScene world;
+    private final LevelScene world;
     public int facing;
 
-    public boolean avoidCliffs = false;
+    public boolean avoidCliffs;
     private int life;
 
     public FireFlower(LevelScene world, int x, int y)
@@ -34,6 +34,7 @@ public class FireFlower extends Sprite
         life = 0;
     }
 
+    @Override
     public void collideCheck()
     {
         float xMarioD = world.mario.x - x;
@@ -49,6 +50,7 @@ public class FireFlower extends Sprite
         }
     }
 
+    @Override
     public void move()
     {
         if (life<9)

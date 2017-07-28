@@ -271,7 +271,7 @@ public class KIFInput implements Runnable {
                     Term a = args.get(0);
                     Term b = args.get(1);
                     Variable v0 = nextVar(VAR_INDEP);
-                    y = (Compound) $.equi($.prop(v0, a), $.neg($.prop(v0, b)));
+                    y = $.equi($.prop(v0, a), $.neg($.prop(v0, b)));
                 }
                 break;
             case "documentation":
@@ -307,13 +307,13 @@ public class KIFInput implements Runnable {
                 if (z != null) {
                     switch (z.toString()) {
                         case "and":
-                            y = (Compound) $.conj(args.toArray(new Term[args.size()]));
+                            y = $.conj(args.toArray(new Term[args.size()]));
                             break;
                         case "or":
-                            y = (Compound) $.disj(args.toArray(new Term[args.size()]));
+                            y = $.disj(args.toArray(new Term[args.size()]));
                             break;
                         case "not":
-                            y = (Compound) $.neg(args.get(0));
+                            y = $.neg(args.get(0));
                             break;
                         default:
                             y = $.inh($.p(args), z); //HACK

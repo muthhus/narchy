@@ -54,7 +54,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         }
     }
 
-    public static void main(String[] args) throws Narsese.NarseseException, FileNotFoundException {
+    public static void main(String[] args) throws Narsese.NarseseException {
 
         Param.DEBUG = true;
         //Param.TRACE = true;
@@ -224,7 +224,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
     }
 
-    public static void csvPriority(NAR n, String path) throws FileNotFoundException {
+    public static void csvPriority(NAR n, String path) {
 
         CSVOutput csv = new CSVOutput(
                 //new File(path),

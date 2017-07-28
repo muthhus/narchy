@@ -17,7 +17,7 @@ class MJBoard extends Panel implements Runnable {
 	public static final int MAX_CELLSIZE = 32; // max. cell size, in pixels
 	public Thread caThread;
 	public final MJPalette mjPal; // color palette
-	private boolean InitDone;
+	private final boolean InitDone;
 	private final MJCellUI mjUI; // the user interface object (parent)
 	public int AnimDelay = 100; // default delay between cycles
 	public int RefreshStep = 1; // refresh every 1 cycle
@@ -38,7 +38,8 @@ class MJBoard extends Panel implements Runnable {
 
 	// local controls
 	private final Panel pnlBotm; // bottom panel, for scrollbar and buttons
-	private Scrollbar hSbar, vSbar; // scrollbars
+	private final Scrollbar hSbar;
+    private final Scrollbar vSbar; // scrollbars
 	private final int sbarWidth = 16; // scrollbars width
 	private final Button btnZoomIn = new Button("+");
 	private final Button btnZoomOut = new Button("-");

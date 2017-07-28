@@ -6,23 +6,23 @@ import nars.experiment.mario.LevelScene;
 
 public class Fireball extends Sprite
 {
-    private static float GROUND_INERTIA = 0.89f;
-    private static float AIR_INERTIA = 0.89f;
+    private static final float GROUND_INERTIA = 0.89f;
+    private static final float AIR_INERTIA = 0.89f;
 
     private float runTime;
-    private boolean onGround = false;
+    private boolean onGround;
 
-    private int width = 4;
+    private final int width = 4;
     int height = 24;
 
-    private LevelScene world;
+    private final LevelScene world;
     public int facing;
 
-    public boolean avoidCliffs = false;
+    public boolean avoidCliffs;
     public int anim;
 
-    public boolean dead = false;
-    private int deadTime = 0;
+    public boolean dead;
+    private int deadTime;
 
     public Fireball(LevelScene world, float x, float y, int facing)
     {
@@ -44,6 +44,7 @@ public class Fireball extends Sprite
         ya = 4;
     }
 
+    @Override
     public void move()
     {
         if (deadTime > 0)

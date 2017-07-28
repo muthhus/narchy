@@ -55,7 +55,7 @@ import static spacegraph.math.v3.v;
  * @author jezek2
  */
 
-abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListener, KeyListener {
+abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 
 
 
@@ -65,7 +65,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements GLEventListene
     private boolean simulating = true;
     private float lastFrameTime;
 
-    private int maxSubsteps = 0; //set to zero for variable timing
+    private final int maxSubsteps = 0; //set to zero for variable timing
     protected float aspect;
 
 

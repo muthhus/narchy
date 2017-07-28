@@ -67,24 +67,24 @@ public final class STMTemporalLinkage extends STM {
     }
 
 
-    protected void link(@NotNull Task t, float strength, float tPri, Task u) {
+    protected void link(@NotNull Task ta, float strength, float tPri, Task tb) {
 
 
         /** current task's... */
-        float interStrength = tPri * u.priSafe(0) * strength;
+        float interStrength = tPri * tb.priSafe(0) * strength;
         if (interStrength >= Pri.EPSILON) {
-            Concept ac = t.concept(nar, false);
-            if (ac != null) {
-                Concept bc = u.concept(nar, false);
-                if (bc != null && !bc.equals(ac)) { //null or same concept?
+            Concept ca = ta.concept(nar, false);
+            if (ca != null) {
+                Concept cb = tb.concept(nar, false);
+                if (cb != null && !cb.equals(ca)) { //null or same concept?
 
                     //TODO handle overflow?
-                    bc.termlinks().put(new PLink(ac.term(), interStrength));
-                    ac.termlinks().put(new PLink(bc.term(), interStrength));
+                    cb.termlinks().put(new PLink(ca.term(), interStrength));
+                    ca.termlinks().put(new PLink(cb.term(), interStrength));
 
                     //tasklinks, not sure:
-                    //        tgtConcept.tasklinks().put( new RawPLink(srcTask, scaleSrcTgt));
-                    //        srcConcept.tasklinks().put( new RawPLink(tgtTask, scaleTgtSrc));
+                    cb.tasklinks().putAsync( new PLink<>(ta, interStrength));
+                    ca.tasklinks().putAsync( new PLink<>(tb, interStrength));
 
                 }
             }

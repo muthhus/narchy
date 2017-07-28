@@ -15,19 +15,19 @@ public class LevelPanel extends JComponent implements MouseListener
 	
 	public static LevelPanel instance;
 
-	public enum State {SELECT, LINE, SIRCLE, ARROW, TRIGGER, FLIPPER, BEZIER};
-	
-	private State currentState = State.SELECT;
+	public enum State {SELECT, LINE, SIRCLE, ARROW, TRIGGER, FLIPPER, BEZIER}
+
+    private State currentState = State.SELECT;
 	
 	GroupUI groupUI;
 	Editor editor;
 	Level level;
 	
-	private static boolean snapToGrid = true;
-	private ArrayList<Point> clickedPoints = new ArrayList<Point>();
-	private Point pressedPoint = null;
-	private Point draggedPoint = null;
-	private Point movedPoint = null;
+	private static final boolean snapToGrid = true;
+	private final ArrayList<Point> clickedPoints = new ArrayList<Point>();
+	private Point pressedPoint;
+	private Point draggedPoint;
+	private Point movedPoint;
 
 	JToolBar toolbar = new JToolBar();
 	JToggleButton selectBtn = new JToggleButton("Select");
@@ -51,14 +51,14 @@ public class LevelPanel extends JComponent implements MouseListener
 		
 	// The directory that is opened in the file choosers. Is updated when a
 	// file is opened or saved.
-	File currentDirectory = null;
-	File currentFile = null;
+	File currentDirectory;
+	File currentFile;
 	
 	Rectangle selectRect = new Rectangle();
 	ArrayList<Handle> selection = new ArrayList<Handle>();
-	boolean dragSelection = false;
+	boolean dragSelection;
 	
-	private BufferedImage backgroundImage = null;
+	private BufferedImage backgroundImage;
 	
 	public LevelPanel(Editor editor) {
 		super();
@@ -146,6 +146,7 @@ public class LevelPanel extends JComponent implements MouseListener
 	/**
 	 * Overrides JComponent. Draws the level.
 	 */
+    @Override
     protected void paintComponent(Graphics g) {
     	try {
             g.setColor(Color.BLACK);
@@ -245,13 +246,14 @@ public class LevelPanel extends JComponent implements MouseListener
      */
     public static Point snapToGrid(Point p) {
     	if (snapToGrid) {
-        	return new Point((p.x + 2) / 4 * 4, (int) (Math.round(p.y / 6f) * 6)); 
+        	return new Point((p.x + 2) / 4 * 4, Math.round(p.y / 6f) * 6);
     	}
     	
     	return p;
     }
 
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == selectBtn) {
 			setState(State.SELECT);
 		} else if (e.getSource() == lineBtn) {
@@ -322,18 +324,22 @@ public class LevelPanel extends JComponent implements MouseListener
 		repaint();
 	}
 
-	public void mouseClicked(MouseEvent e) {
+	@Override
+    public void mouseClicked(MouseEvent e) {
 		clickedPoints.add(snapToGrid(e.getPoint()));
 		handleClick(clickedPoints);
 	}
 
-	public void mouseEntered(MouseEvent e) {
+	@Override
+    public void mouseEntered(MouseEvent e) {
 	}
 
-	public void mouseExited(MouseEvent e) {
+	@Override
+    public void mouseExited(MouseEvent e) {
 	}
 
-	public void mousePressed(MouseEvent e) {
+	@Override
+    public void mousePressed(MouseEvent e) {
 		dragSelection = false;
 		if (e.getButton() == MouseEvent.BUTTON1) {
 			
@@ -369,7 +375,8 @@ public class LevelPanel extends JComponent implements MouseListener
 		requestFocusInWindow();
 	}
 
-	public void mouseReleased(MouseEvent e) {
+	@Override
+    public void mouseReleased(MouseEvent e) {
 		try {
 			selectRect = new Rectangle();
 			if (dragSelection) {
@@ -393,7 +400,8 @@ public class LevelPanel extends JComponent implements MouseListener
 		}
 	}
 
-	public void mouseDragged(MouseEvent e) {
+	@Override
+    public void mouseDragged(MouseEvent e) {
 		try {
 			Point lastDraggedPoint = draggedPoint;
 			movedPoint = snapToGrid(e.getPoint());
@@ -417,12 +425,14 @@ public class LevelPanel extends JComponent implements MouseListener
 		}
 	}
 
-	public void mouseMoved(MouseEvent e) {
+	@Override
+    public void mouseMoved(MouseEvent e) {
 		movedPoint = snapToGrid(e.getPoint());
 		repaint();
 	}
 
-	public void keyPressed(KeyEvent e) {
+	@Override
+    public void keyPressed(KeyEvent e) {
 		try {
 			boolean ctrlDown = ((e.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0);
 			if (ctrlDown) {
@@ -492,10 +502,12 @@ public class LevelPanel extends JComponent implements MouseListener
 		}
 	}
 
-	public void keyReleased(KeyEvent e) {
+	@Override
+    public void keyReleased(KeyEvent e) {
 	}
 
-	public void keyTyped(KeyEvent e) {
+	@Override
+    public void keyTyped(KeyEvent e) {
 	}
 	
 	/**
@@ -678,7 +690,8 @@ public class LevelPanel extends JComponent implements MouseListener
 			thread.start();
 		}
 		
-		public void run() {
+		@Override
+        public void run() {
 			try {
 				int bytesRead = 0;
 				byte[] data = new byte[1024];

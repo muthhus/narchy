@@ -148,7 +148,7 @@ public class MIDI {
 
     }
 
-    public static void main(String[] arg) throws LineUnavailableException, Narsese.NarseseException, FileNotFoundException {
+    public static void main(String[] arg) throws LineUnavailableException {
         new MIDI();
     }
 

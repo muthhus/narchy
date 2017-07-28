@@ -67,7 +67,7 @@ public class Pacman extends NAgentX {
     }
 
 
-    int lastScore = 0;
+    int lastScore;
 
     @Override
     protected float act() {

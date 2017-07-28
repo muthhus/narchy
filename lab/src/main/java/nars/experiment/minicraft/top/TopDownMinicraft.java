@@ -30,7 +30,7 @@ public class TopDownMinicraft extends Canvas implements Runnable {
 
     public final BufferedImage image = new BufferedImage(WIDTH, HEIGHT, BufferedImage.TYPE_INT_RGB);
     private final int[] pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-    private boolean running = false;
+    private boolean running;
     private Screen screen;
     private Screen lightScreen;
     public final InputHandler input = new InputHandler(this);
@@ -61,8 +61,8 @@ public class TopDownMinicraft extends Canvas implements Runnable {
 
     }
 
-    private int tickCount = 0;
-    public int gameTime = 0;
+    private int tickCount;
+    public int gameTime;
 
     private Level level;
     private Level[] levels = new Level[5];
@@ -72,8 +72,8 @@ public class TopDownMinicraft extends Canvas implements Runnable {
     public Menu menu;
     private int playerDeadTime;
     private int pendingLevelChange;
-    private int wonTimer = 0;
-    public boolean hasWon = false;
+    private int wonTimer;
+    public boolean hasWon;
 
 
     public void setMenu(Menu menu) {
@@ -131,9 +131,9 @@ public class TopDownMinicraft extends Canvas implements Runnable {
         }
     }
 
-    int frames = 0;
-    int ticks = 0;
-    double unprocessed = 0;
+    int frames;
+    int ticks;
+    double unprocessed;
 
     @Override
     public void run() {
@@ -194,33 +194,32 @@ public class TopDownMinicraft extends Canvas implements Runnable {
         tickCount++;
         /*if (!hasFocus()) {
             input.releaseAll();
-        } else */{
-            if (!player.removed && !hasWon) gameTime++;
+        } else */
+        if (!player.removed && !hasWon) gameTime++;
 
-            input.tick();
-            if (menu != null) {
-                menu.tick();
+        input.tick();
+        if (menu != null) {
+            menu.tick();
+        } else {
+            if (player.removed) {
+                playerDeadTime++;
+                if (playerDeadTime > 60) {
+                    die();
+
+                }
             } else {
-                if (player.removed) {
-                    playerDeadTime++;
-                    if (playerDeadTime > 60) {
-                        die();
-
-                    }
-                } else {
-                    if (pendingLevelChange != 0) {
-                        setMenu(new LevelTransitionMenu(pendingLevelChange));
-                        pendingLevelChange = 0;
-                    }
+                if (pendingLevelChange != 0) {
+                    setMenu(new LevelTransitionMenu(pendingLevelChange));
+                    pendingLevelChange = 0;
                 }
-                if (wonTimer > 0) {
-                    if (--wonTimer == 0) {
-                        win();
-                    }
-                }
-                level.tick();
-                Tile.tickCount++;
             }
+            if (wonTimer > 0) {
+                if (--wonTimer == 0) {
+                    win();
+                }
+            }
+            level.tick();
+            Tile.tickCount++;
         }
 
 

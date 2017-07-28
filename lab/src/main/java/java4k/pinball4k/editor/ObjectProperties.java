@@ -9,11 +9,11 @@ public class ObjectProperties {
 	public boolean collidable = true;
 	
 	/** The score to add object is triggered */
-	public int score = 0;
+	public int score;
 	
 	/** The bounce factor  */
 	public float bounce = 0.75f;	
 	
 	/** Object behaviour */
-	public int behaviorId = 0;
+	public int behaviorId;
 }

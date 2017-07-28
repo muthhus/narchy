@@ -37,7 +37,7 @@ package spacegraph.math;
  * be normalized.
  *
  */
-public class Vector3d extends Tuple3d implements java.io.Serializable {
+public class Vector3d extends Tuple3d {
 
     // Combatible with 1.1
     static final long serialVersionUID = 3761969948420550442L;

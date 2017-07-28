@@ -243,6 +243,7 @@ public final class V extends Globals {
     }
 
     static final xcommand_t Gun_Next_f = new xcommand_t() {
+        @Override
         public void execute() {
             gun_frame++;
             Com.Printf("frame " + gun_frame + '\n');
@@ -250,6 +251,7 @@ public final class V extends Globals {
     };
 
     static final xcommand_t Gun_Prev_f = new xcommand_t() {
+        @Override
         public void execute() {
             gun_frame--;
             if (gun_frame < 0)
@@ -259,6 +261,7 @@ public final class V extends Globals {
     };
 
     static final xcommand_t Gun_Model_f = new xcommand_t() {
+        @Override
         public void execute() {
             if (Cmd.Argc() != 2) {
                 gun_model = null;
@@ -387,6 +390,7 @@ public final class V extends Globals {
      * ============= V_Viewpos_f =============
      */
     static final xcommand_t Viewpos_f = new xcommand_t() {
+        @Override
         public void execute() {
             Com.Printf("(%i %i %i) : %i\n", new Vargs(4).add(
                     (int) cl.refdef.vieworg[0]).add((int) cl.refdef.vieworg[1])

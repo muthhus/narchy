@@ -25,7 +25,7 @@ public class NarseseIOService extends WebsocketService {
     //static final Logger logger = LoggerFactory.getLogger(NarseseIOService.class);
 
 
-    private float fps = 4f;
+    private final float fps = 4f;
 
 //    final AppenderBase appender;
 

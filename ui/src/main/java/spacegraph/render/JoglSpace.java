@@ -40,7 +40,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static final GLU glu = new GLU();
     public static final GLUT glut = new GLUT();
 
-    public GLWindow window = null;
+    public GLWindow window;
     protected GL2 gl;
 
 
@@ -326,18 +326,16 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
                     if (justStarted) {
                         justStarted = false;
-                        {
 
-                            isAnimating = true;
-                            if (drawablesEmpty) {
-                                pauseIssued = true; // isAnimating:=false @ pause below
-                            } else {
-                                pauseIssued = false;
-                                setDrawablesExclCtxState(exclusiveContext); // may re-enable exclusive context
-                            }
-                            //GameAnimatorControl.this.notifyAll(); // Wakes up 'waitForStartedCondition' sync -and resume from pause or drawablesEmpty
-
+                        isAnimating = true;
+                        if (drawablesEmpty) {
+                            pauseIssued = true; // isAnimating:=false @ pause below
+                        } else {
+                            pauseIssued = false;
+                            setDrawablesExclCtxState(exclusiveContext); // may re-enable exclusive context
                         }
+                        //GameAnimatorControl.this.notifyAll(); // Wakes up 'waitForStartedCondition' sync -and resume from pause or drawablesEmpty
+
                     }
                     if (!pauseIssued && !quitIssued) { // RUN
                         try {

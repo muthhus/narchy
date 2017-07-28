@@ -68,11 +68,13 @@ public class G extends Applet implements Runnable {
 	final static int BULLET_SPEED = 4;
 	final static int ENEMY_SPEED = 2;
 
-	public void start() {
+	@Override
+    public void start() {
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 		setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 		this.enableEvents(AWTEvent.KEY_EVENT_MASK);
 		BufferedImage screen = new BufferedImage(WINDOW_WIDTH, WINDOW_HEIGHT, BufferedImage.TYPE_INT_RGB);
@@ -602,7 +604,8 @@ public class G extends Applet implements Runnable {
 		}
 	}
 
-	public void processKeyEvent(KeyEvent e) {
+	@Override
+    public void processKeyEvent(KeyEvent e) {
 		int keyCode = e.getKeyCode();
 		if (e.getID() == KeyEvent.KEY_PRESSED) {
 			if (keyCode == KeyEvent.VK_SPACE)

@@ -29,13 +29,13 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-public class a extends GamePanel implements Runnable {
+public class a extends GamePanel {
 
 	private static final int WIDTH = 512;
 	private static final int HEIGHT = 512;
 
 	// keys
-	private boolean[] a = new boolean[32768];
+	private final boolean[] a = new boolean[32768];
 
 	final int TILE_EMPTY = 0;
 	final int TILE_SOLID = 1;
@@ -78,25 +78,25 @@ public class a extends GamePanel implements Runnable {
 	BufferedImage image2 = new BufferedImage(256, 85, 2);
 	Graphics2D g = (Graphics2D) image.getGraphics();
 	Graphics2D g3 = (Graphics2D) image.getGraphics();
-	Graphics2D g2 = null;
+	Graphics2D g2;
 
-	float playerX = 0;
-	float playerY = 0;
-	float playerZ = 0;
-	float playerAngle = 0;
-	float playerVx = 0;
-	float playerVy = 0;
-	float playerVz = 0;
-	float playerVa = 0;
-	float playerGravity = 0;
-	float playerRestoreVx = 0;
-	float playerRestoreVz = 0;
-	int playerRestoreCount = 0;
-	boolean playerFalling = false;
-	boolean playerRestoring = false;
+	float playerX;
+	float playerY;
+	float playerZ;
+	float playerAngle;
+	float playerVx;
+	float playerVy;
+	float playerVz;
+	float playerVa;
+	float playerGravity;
+	float playerRestoreVx;
+	float playerRestoreVz;
+	int playerRestoreCount;
+	boolean playerFalling;
+	boolean playerRestoring;
 
-	boolean showingBoard = false;
-	boolean beatLevel = false;
+	boolean showingBoard;
+	boolean beatLevel;
 
 	boolean fading = true;
 	boolean fadingOut = true;
@@ -107,12 +107,12 @@ public class a extends GamePanel implements Runnable {
 	int i;
 	int j;
 	int k;
-	int cloudX = 0;
-	int counter = 0;
-	int time = 0;
-	int timeCounter = 0;
-	int level = 0;
-	int beatLevelCounter = 0;
+	int cloudX;
+	int counter;
+	int time;
+	int timeCounter;
+	int level;
+	int beatLevelCounter;
 	int fade = 255;
 
 	AffineTransform affineTransform = new AffineTransform();
@@ -121,9 +121,9 @@ public class a extends GamePanel implements Runnable {
 	int[][] floorMap = new int[60416][2];
 	int[] pixels = new int[65536];
 	int[][] sky = new int[256][256];
-	int[][] world = null;
+	int[][] world;
 
-	Random random = null;
+	Random random;
 
 	int[] shadowMap = new int[60416];
 

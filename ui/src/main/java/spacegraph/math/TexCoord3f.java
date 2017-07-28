@@ -36,7 +36,7 @@ package spacegraph.math;
  * floating point x,y,z coordinates.
  *
  */
-public class TexCoord3f extends Tuple3f implements java.io.Serializable {
+public class TexCoord3f extends Tuple3f {
 
     // Combatible with 1.1
     static final long serialVersionUID = -3517736544731446513L;

@@ -1713,6 +1713,11 @@ public enum Op implements $ {
             super(String.valueOf(Op.NullSym));
         }
 
+        final static int rankBoolNull = Term.opX(ATOM, 0);
+        @Override public final int opX() {
+        return rankBoolNull;
+    }
+
         @Override
         public @NotNull Term unneg() {
             return this;
@@ -1723,6 +1728,11 @@ public enum Op implements $ {
         public BoolFalse() {
             super(String.valueOf(Op.FalseSym));
         }
+
+        final static int rankBoolFalse = Term.opX(ATOM, 1);
+        @Override public final int opX() {
+        return rankBoolFalse;
+    }
 
         @NotNull
         @Override
@@ -1735,6 +1745,11 @@ public enum Op implements $ {
         public BoolTrue() {
             super(String.valueOf(Op.TrueSym));
         }
+
+        final static int rankBoolTrue = Term.opX(ATOM, 2);
+        @Override public final int opX() {
+        return rankBoolTrue;
+    }
 
         @NotNull
         @Override

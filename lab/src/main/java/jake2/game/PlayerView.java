@@ -1049,5 +1049,5 @@ public class PlayerView {
 
     public static float bobfracsin; // sin(bobfrac*M_PI)}
 
-    private static int xxxi = 0;
+    private static int xxxi;
 }

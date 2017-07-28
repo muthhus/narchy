@@ -748,15 +748,13 @@ public class CL_ents {
 				ent.angles[0] = 0;
 				ent.angles[1] = Math3D.anglemod(Globals.cl.time / 2) + s1.angles[1];
 				ent.angles[2] = 180;
-				{
-					float[] forward = { 0, 0, 0 };
-					float[] start = { 0, 0, 0 };
+                float[] forward = { 0, 0, 0 };
+                float[] start = { 0, 0, 0 };
 
-					Math3D.AngleVectors(ent.angles, forward, null, null);
-					Math3D.VectorMA(ent.origin, 64, forward, start);
-					V.AddLight(start, 100, 1, 0, 0);
-				}
-			} else { // interpolate angles
+                Math3D.AngleVectors(ent.angles, forward, null, null);
+                Math3D.VectorMA(ent.origin, 64, forward, start);
+                V.AddLight(start, 100, 1, 0, 0);
+            } else { // interpolate angles
 				float a1, a2;
 
 				for (i = 0; i < 3; i++) {

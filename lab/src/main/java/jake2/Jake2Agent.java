@@ -30,13 +30,12 @@ import static nars.$.$;
  */
 public class Jake2Agent extends NAgentX implements Runnable {
 
-    private PixelAutoClassifier camAE = null;
-    ByteBuffer seen = null;
+    ByteBuffer seen;
     int width, height;
     boolean see = true;
 
-    final int[] nBits = new int[]{8, 8, 8};
-    final int[] bOffs1 = new int[]{2, 1, 0};
+    final int[] nBits = {8, 8, 8};
+    final int[] bOffs1 = {2, 1, 0};
 
     final ColorSpace raster = ColorSpace.getInstance(1000);
     final ComponentColorModel colorModel = new ComponentColorModel(raster, nBits, false, false, 1, 0);
@@ -47,7 +46,7 @@ public class Jake2Agent extends NAgentX implements Runnable {
         WritableRaster raster1 = Raster.createInterleavedRaster(
                 new DataBufferByte(bb, bb.length), width, height, width * 3, 3, bOffs1, new Point(0, 0));
 
-        BufferedImage b = new BufferedImage(colorModel, raster1, false, (Hashtable) null);
+        BufferedImage b = new BufferedImage(colorModel, raster1, false, null);
         return b;
     };
 

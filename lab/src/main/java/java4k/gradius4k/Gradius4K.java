@@ -32,7 +32,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class Gradius4K extends GamePanel implements Runnable {
+public class Gradius4K extends GamePanel {
 
     // keys
     public boolean[] keys = new boolean[32768];
@@ -43,10 +43,10 @@ public class Gradius4K extends GamePanel implements Runnable {
     public static final int VK_UP = 0x26;
     public static final int VK_DOWN = 0x28;
     public static final int VK_SHOOT = 0x42;
-    public int score = 0;
+    public int score;
     public int playerDead = 1;
     public int SPEED = 4;
-    public float cameraX = 0;
+    public float cameraX;
     public float[] player = new float[256];
 
     public int DIE_TIME = 60; //how long player remains dead
@@ -109,6 +109,7 @@ public class Gradius4K extends GamePanel implements Runnable {
 
     }
 
+    @Override
     public void run() {
 
 
@@ -272,605 +273,601 @@ public class Gradius4K extends GamePanel implements Runnable {
 
         while (true) {
 
-            {
 
+            // -- update starts ----------------------------------------------------
 
-                // -- update starts ----------------------------------------------------
+            if (playerDead > 0 && --playerDead == 0) {
 
-                if (playerDead > 0 && --playerDead == 0) {
+                // reset level
+                queue.clear();
+                cameraX = 0;
+                cameraVx = level == 3 ? 8 : 0.5f;
+                bossMode = false;
+                halfPipeOffset = 0;
 
-                    // reset level
-                    queue.clear();
-                    cameraX = 0;
-                    cameraVx = level == 3 ? 8 : 0.5f;
-                    bossMode = false;
-                    halfPipeOffset = 0;
+                if (fireworks < 0) {
+                    // player continues onto next level
+                    fireworks = 0;
+                    queue.add(player);
+                    player[OBJ_X] -= 2304;
+                } else {
+                    // create player
+                    player = new float[256];
+                    queue.add(player);
+                    player[OBJ_TYPE] = TYPE_PLAYER;
+                    player[OBJ_SPRITE] = 4816;
+                    player[OBJ_SCALE_X] = 1.5f;
+                    player[OBJ_SCALE_Y] = 1;
+                    player[OBJ_X] = 64;
+                    player[OBJ_Y] = 128;
+                    playerGun = 1;
+                }
 
-                    if (fireworks < 0) {
-                        // player continues onto next level
-                        fireworks = 0;
-                        queue.add(player);
-                        player[OBJ_X] -= 2304;
-                    } else {
-                        // create player
-                        player = new float[256];
-                        queue.add(player);
-                        player[OBJ_TYPE] = TYPE_PLAYER;
-                        player[OBJ_SPRITE] = 4816;
-                        player[OBJ_SCALE_X] = 1.5f;
-                        player[OBJ_SCALE_Y] = 1;
-                        player[OBJ_X] = 64;
-                        player[OBJ_Y] = 128;
-                        playerGun = 1;
+                // create level map
+                levelMap = new int[8][256];
+                for (x = 24; x < 72; x++) {
+                    levelMap[0][x] = 1;
+                    levelMap[7][x] = 1;
+                }
+                for (y = 0, z = 18 * level; y < 6; y++) {
+                    for (x = 0; x < 3; x++) {
+                        k = S.charAt(z++);
+                        for (i = 0; i < 16; i++) {
+                            levelMap[y + 1][24 + (x << 4) + i] = k & 1;
+                            k >>= 1;
+                        }
                     }
+                }
 
-                    // create level map
-                    levelMap = new int[8][256];
-                    for (x = 24; x < 72; x++) {
-                        levelMap[0][x] = 1;
-                        levelMap[7][x] = 1;
+                if (level == 2) {
+                    // create force fields
+                    for (x = 0; x < 6; x++) {
+                        float[] enemy = new float[256];
+                        queue.add(enemy);
+                        enemy[OBJ_TYPE] = TYPE_ENEMY;
+                        enemy[OBJ_X] = 785 + (x << 8) + (random.nextInt(8) << 5);
+                        enemy[OBJ_Y] = enemy[OBJ_Y2] = 128;
+                        enemy[OBJ_SPRITE] = 2302;
+                        enemy[OBJ_SCALE_X] = 2;
+                        enemy[OBJ_SCALE_Y] = 24;
+                        enemy[OBJ_HITS] = 4096;
+                        enemy[OBJ_SHOOT_DELAY] = 64;
+                        enemy[OBJ_FORCE_FIELD] = 1;
                     }
-                    for (y = 0, z = 18 * level; y < 6; y++) {
-                        for (x = 0; x < 3; x++) {
-                            k = S.charAt(z++);
-                            for (i = 0; i < 16; i++) {
-                                levelMap[y + 1][24 + (x << 4) + i] = k & 1;
-                                k >>= 1;
+                }
+
+                if (level == 3) {
+                    for (x = 0; x < 5; x++) {
+                        // create power up
+                        float[] powerUp = new float[256];
+                        queue.add(powerUp);
+                        powerUp[OBJ_TYPE] = TYPE_POWER_UP;
+                        powerUp[OBJ_X] = 264 + (x << 5);
+                        powerUp[OBJ_Y] = 128;
+                        powerUp[OBJ_SCALE_X] = 1;
+                        powerUp[OBJ_SCALE_Y] = 1;
+                        powerUp[OBJ_SPRITE] = 18463;
+                    }
+                }
+
+                if (level == 4) {
+                    for (i = 0; i < 32; i++) {
+                        // create shrinker
+                        float[] shrinker = new float[256];
+                        queue.add(shrinker);
+                        shrinker[OBJ_TYPE] = TYPE_ENEMY;
+                        shrinker[OBJ_X] = 800 + (random.nextInt(22) << 6);
+                        shrinker[OBJ_Y] = shrinker[OBJ_Y2] = 64 + (random.nextInt(3) << 6);
+                        shrinker[OBJ_SCALE_X] = 4;
+                        shrinker[OBJ_SCALE_Y] = 4;
+                        shrinker[OBJ_SPRITE] = 2338;
+                        shrinker[OBJ_HITS] = 4096;
+                        shrinker[OBJ_TIMER] = 4096;
+                        shrinker[OBJ_SHRINKER] = 1;
+                    }
+                }
+
+                if (level == 7) {
+                    for (k = 0; k < 3; k++) {
+                        for (j = 0; j < 3; j++) {
+                            mag = 2.09f * j;
+                            dy = (float) Math.sin(mag);
+                            dx = (float) Math.cos(mag);
+                            for (i = 0; i < 7; i++) {
+                                // create fan blade
+                                float[] blade = new float[256];
+                                queue.add(blade);
+                                blade[OBJ_TYPE] = TYPE_ENEMY;
+                                blade[OBJ_X2] = (k << 8) + 896;
+                                if (k == 0) {
+                                    blade[OBJ_Y2] = 0.01f;
+                                } else if (k == 1) {
+                                    blade[OBJ_Y2] = -0.01f;
+                                } else {
+                                    blade[OBJ_Y2] = 0.012f;
+                                }
+                                blade[OBJ_SCALE_X] = 1;
+                                blade[OBJ_SCALE_Y] = 1;
+                                blade[OBJ_SPRITE] = 2301;
+                                blade[OBJ_HITS] = 4096;
+                                blade[OBJ_TIMER] = 4096;
+                                blade[OBJ_ANGLE] = mag;
+                                blade[OBJ_RADIUS] = i << 4;
+                                blade[OBJ_FAN_BLADE] = 1;
                             }
                         }
                     }
+                }
+            }
 
-                    if (level == 2) {
-                        // create force fields
-                        for (x = 0; x < 6; x++) {
-                            float[] enemy = new float[256];
-                            queue.add(enemy);
-                            enemy[OBJ_TYPE] = TYPE_ENEMY;
-                            enemy[OBJ_X] = 785 + (x << 8) + (random.nextInt(8) << 5);
-                            enemy[OBJ_Y] = enemy[OBJ_Y2] = 128;
-                            enemy[OBJ_SPRITE] = 2302;
-                            enemy[OBJ_SCALE_X] = 2;
-                            enemy[OBJ_SCALE_Y] = 24;
-                            enemy[OBJ_HITS] = 4096;
-                            enemy[OBJ_SHOOT_DELAY] = 64;
-                            enemy[OBJ_FORCE_FIELD] = 1;
-                        }
+            if (cameraX >= 2304) {
+                cameraVx = 0;
+                if (!bossMode) {
+                    bossMode = true;
+
+                    // create boss
+                    float[] boss = new float[256];
+                    queue.add(boss);
+                    boss[OBJ_TYPE] = TYPE_ENEMY;
+                    boss[OBJ_X] = 2624;
+                    boss[OBJ_Y] = boss[OBJ_Y2] = 128;
+                    boss[OBJ_VX] = -1;
+                    if (level == 0) {
+                        boss[OBJ_SPRITE] = 21128;
+                    } else if (level == 1) {
+                        boss[OBJ_SPRITE] = 26679;
+                    } else if (level == 2) {
+                        boss[OBJ_SPRITE] = 29320;
+                    } else if (level == 3) {
+                        boss[OBJ_SPRITE] = 35123;
+                    } else if (level == 4) {
+                        boss[OBJ_SPRITE] = 39148;
+                    } else if (level == 5) {
+                        boss[OBJ_SPRITE] = 43096;
+                    } else if (level == 6) {
+                        boss[OBJ_SPRITE] = 54784;
+                    } else {
+                        boss[OBJ_SPRITE] = 51319;
                     }
+                    boss[OBJ_SCALE_X] = 4 + (level >> 1);
+                    boss[OBJ_SCALE_Y] = 4 + (level >> 1);
+                    boss[OBJ_RADIUS] = 8 + 1.5f * level;
+                    boss[OBJ_HITS] = 512;
+                    boss[OBJ_SHOOT_DELAY] = 32 - level;
+                    boss[OBJ_BOSS] = 1;
+                }
+            }
+            cameraX += cameraVx;
 
-                    if (level == 3) {
-                        for (x = 0; x < 5; x++) {
+            if (fireworks > 0) {
+                if (--fireworks == 0) {
+                    if (level == 7) {
+                        fireworks = 64;
+                    } else {
+                        fireworks = -1;
+                        playerDead = 1;
+                        level++;
+                    }
+                } else if ((fireworks & 3) == 0) {
+                    float[] explosionSeed = new float[256];
+                    queue.add(explosionSeed);
+                    explosionSeed[OBJ_TYPE] = TYPE_EXPLOSION_SEED;
+                    explosionSeed[OBJ_X] = random.nextInt(256) + cameraX;
+                    explosionSeed[OBJ_Y] = random.nextInt(256);
+                    explosionSeed[OBJ_NONRENDERABLE] = 1;
+                }
+            }
+
+            if (bossMode) {
+                if (fireworks == 0) {
+                    halfPipeOffset += 0.5f;
+                }
+            } else if (((counter++) & 0xFF) == 0) {
+                float Y = 0;
+                for (i = 0; i < 16; i++) {
+                    Y = 48 + (random.nextInt(6) << 5);
+                    if (levelMap[(int) Y >> 5][((int) cameraX >> 5) + 8] == 0 && levelMap[((int) Y >> 5) + 1][((int) cameraX >> 5) + 8] == 0) {
+                        break;
+                    }
+                }
+
+                if (level != 3) {
+                    if (!(level == 1 || level == 7) || cameraX < 384 || (level == 7 && cameraX > 1408)) {
+                        if (random.nextBoolean()) {
+                            for (i = 0; i < 5; i++) {
+                                // create wave enemy
+                                float[] enemy = new float[256];
+                                queue.add(enemy);
+                                enemy[OBJ_TYPE] = TYPE_ENEMY;
+                                enemy[OBJ_X] = cameraX + 256 + i * 24;
+                                enemy[OBJ_Y] = enemy[OBJ_Y2] = Y;
+                                enemy[OBJ_VX] = -1;
+                                enemy[OBJ_SPRITE] = 8518;
+                                enemy[OBJ_SCALE_X] = 1;
+                                enemy[OBJ_SCALE_Y] = 1;
+                                enemy[OBJ_ANGLE] = -1.2f * i;
+                                enemy[OBJ_RADIUS] = 8;
+                                enemy[OBJ_HITS] = 1;
+                                enemy[OBJ_SHOOT_DELAY] = 240;
+                            }
+                        } else if (level == 6) {
+                            for (i = 0; i < 3; i++) {
+                                // create attractor enemy
+                                dx = 6.28f * random.nextFloat();
+                                float[] enemy = new float[256];
+                                queue.add(enemy);
+                                enemy[OBJ_TYPE] = TYPE_ENEMY;
+                                enemy[OBJ_X] = cameraX + 256 + 20 * i;
+                                enemy[OBJ_Y] = Y + 20 * i;
+                                enemy[OBJ_SPRITE] = 47180;
+                                enemy[OBJ_SCALE_X] = 1;
+                                enemy[OBJ_SCALE_Y] = 1;
+                                enemy[OBJ_HITS] = 1;
+                                enemy[OBJ_SHOOT_DELAY] = 240;
+                                enemy[OBJ_VX] = (float) Math.cos(dx);
+                                enemy[OBJ_VY] = (float) Math.sin(dy);
+                                enemy[OBJ_ATTRACTOR] = 1;
+                            }
+                        } else {
+                            // create triplet enemy
+                            for (i = 0; i < 3; i++) {
+                                float[] enemy = new float[256];
+                                queue.add(enemy);
+                                enemy[OBJ_TYPE] = TYPE_ENEMY;
+                                enemy[OBJ_X] = cameraX + 256;
+                                enemy[OBJ_Y] = enemy[OBJ_Y2] = Y + 20 * i;
+                                enemy[OBJ_VX] = -1;
+                                enemy[OBJ_SPRITE] = 12375;
+                                enemy[OBJ_SCALE_X] = 1;
+                                enemy[OBJ_SCALE_Y] = 1;
+                                enemy[OBJ_HITS] = 1;
+                                enemy[OBJ_SHOOT_DELAY] = 240;
+                            }
+                        }
+                    } else if (level == 1 && cameraX > 512) {
+                        // create bubble enemy
+                        float[] enemy = new float[256];
+                        queue.add(enemy);
+                        enemy[OBJ_TYPE] = TYPE_ENEMY;
+                        enemy[OBJ_X] = cameraX + 320;
+                        enemy[OBJ_Y] = enemy[OBJ_Y2] = Y + 20 * i;
+                        enemy[OBJ_VX] = -0.5f;
+                        enemy[OBJ_SPRITE] = 2301;
+                        enemy[OBJ_SCALE_X] = 4;
+                        enemy[OBJ_SCALE_Y] = 4;
+                        enemy[OBJ_HITS] = 2;
+                        enemy[OBJ_TIMER] = 4096;
+                        enemy[OBJ_SHOOT_DELAY] = 4096;
+                        enemy[OBJ_BUBBLE] = 1;
+                        enemy[OBJ_RADIUS] = 8;
+                    }
+                }
+            }
+
+            boolean playerExploded = false;
+
+            for (i = queue.size() - 1; i >= 0; i--) {
+                float[] object = queue.get(i);
+
+                if (object[OBJ_REMOVE] == 1) {
+                    queue.remove(i);
+                    continue;
+                }
+
+                switch ((int) object[OBJ_TYPE]) {
+                    case TYPE_PLAYER:
+
+                        // moves automatically with the camera
+                        object[OBJ_X] += cameraVx;
+
+                        // update player position based on user input
+                        if (keys[VK_UP]) {
+                            if (object[OBJ_Y] > 11) {
+                                object[OBJ_Y] -= SPEED;
+                            }
+                        } else if (keys[VK_DOWN]) {
+                            if (object[OBJ_Y] < 220) {
+                                object[OBJ_Y] += SPEED;
+                            }
+                        }
+                        if (keys[VK_LEFT]) {
+                            if (object[OBJ_X] > cameraX + 13) {
+                                object[OBJ_X] -= SPEED;
+                            }
+                        } else if (keys[VK_RIGHT]) {
+                            if (object[OBJ_X] < cameraX + 243) {
+                                object[OBJ_X] += SPEED;
+                            }
+                        }
+
+                        if (playerShootDelay > 0) {
+                            playerShootDelay--; // prevent player from shooting continuously
+                        } else if (keys[VK_SHOOT]) {
+                            playerShootDelay = 10;
+
+                            // player shoots
+                            for (k = 0; k < 2; k++) {
+                                for (j = 0; j < playerGun; j++) {
+                                    // create player lazers
+                                    float[] bullet = new float[256];
+                                    queue.add(bullet);
+                                    bullet[OBJ_TYPE] = TYPE_BULLET;
+                                    bullet[OBJ_X] = object[OBJ_X] + 24 * (float) Math.cos(0.25f * j);
+                                    bullet[OBJ_Y] = object[OBJ_Y] + (k == 0 ? 24 : -24) * (float) Math.sin(0.25f * j);
+                                    bullet[OBJ_SPRITE] = 733;
+                                    bullet[OBJ_VX] = 7.5f + cameraVx;
+                                    bullet[OBJ_SCALE_X] = 1.5f;
+                                    bullet[OBJ_SCALE_Y] = 0.25f;
+                                }
+                            }
+                        }
+
+                        // test if player hits enemy
+                        for (j = queue.size() - 1; j >= 0; j--) {
+                            float[] enemy = queue.get(j);
+                            if ((enemy[OBJ_TYPE] == TYPE_ENEMY || enemy[OBJ_TYPE] == TYPE_POWER_UP) && object[OBJ_X] - 12 < enemy[OBJ_X] + 8 * enemy[OBJ_SCALE_X]
+                                    && object[OBJ_X] + 12 > enemy[OBJ_X] - 8 * enemy[OBJ_SCALE_X] && object[OBJ_Y] - 8 < enemy[OBJ_Y] + 8 * enemy[OBJ_SCALE_Y]
+                                    && object[OBJ_Y] + 8 > enemy[OBJ_Y] - 8 * enemy[OBJ_SCALE_Y]) {
+                                if (enemy[OBJ_TYPE] == TYPE_POWER_UP) {
+                                    // collect power up
+                                    enemy[OBJ_REMOVE] = 1;
+                                    if (playerGun < 5) {
+                                        playerGun++;
+                                    }
+                                } else if (enemy[OBJ_DISABLED] == 0) {
+                                    // player collided with enemy
+                                    playerExploded = true;
+                                }
+                            }
+                        }
+
+                        // test if player hits wall
+                        if (levelMap[((((int) object[OBJ_Y]) - 5) >> 5) & 7][((((int) object[OBJ_X])) >> 5) & 0xFF] == 1
+                                || levelMap[((((int) object[OBJ_Y]) + 5) >> 5) & 7][((((int) object[OBJ_X])) >> 5) & 0xFF] == 1
+                                || levelMap[((((int) object[OBJ_Y])) >> 5) & 7][((((int) object[OBJ_X]) - 7) >> 5) & 0xFF] == 1
+                                || levelMap[((((int) object[OBJ_Y])) >> 5) & 7][((((int) object[OBJ_X]) + 7) >> 5) & 0xFF] == 1) {
+                            playerExploded = true;
+                        }
+
+                        break;
+                    case TYPE_EXPLOSION:
+                        object[OBJ_X] += object[OBJ_VX];
+                        object[OBJ_Y] += object[OBJ_VY];
+                        object[OBJ_SCALE_X] *= 0.8f;
+                        object[OBJ_SCALE_Y] *= 0.8f;
+                        if (--object[OBJ_TIMER] == 0) {
+                            object[OBJ_REMOVE] = 1;
+                        }
+                        break;
+                    case TYPE_EXPLOSION_SEED:
+                        object[OBJ_REMOVE] = 1;
+                        for (j = (object[OBJ_WALL_EXPLOSION] == 1) ? 16 : 128; j >= 0; j--) {
+                            // create explosion from seed
+                            float[] explosion = new float[256];
+                            queue.add(explosion);
+                            explosion[OBJ_TYPE] = TYPE_EXPLOSION;
+                            explosion[OBJ_X] = object[OBJ_X];
+                            explosion[OBJ_Y] = object[OBJ_Y];
+                            dx = 6.28f * random.nextFloat();
+                            dy = ((object[OBJ_WALL_EXPLOSION] == 1) ? 1 : 3) * random.nextFloat();
+                            explosion[OBJ_VX] = dy * (float) Math.sin(dx);
+                            explosion[OBJ_VY] = dy * (float) Math.cos(dx);
+                            explosion[OBJ_SPRITE] = 56;
+                            explosion[OBJ_TIMER] = 15;
+                            explosion[OBJ_SCALE_X] = 4;
+                            explosion[OBJ_SCALE_Y] = 4;
+                        }
+                        if (object[OBJ_MAKE_POWER_UP] == 1) {
                             // create power up
                             float[] powerUp = new float[256];
                             queue.add(powerUp);
                             powerUp[OBJ_TYPE] = TYPE_POWER_UP;
-                            powerUp[OBJ_X] = 264 + (x << 5);
-                            powerUp[OBJ_Y] = 128;
+                            powerUp[OBJ_X] = object[OBJ_X];
+                            powerUp[OBJ_Y] = object[OBJ_Y];
                             powerUp[OBJ_SCALE_X] = 1;
                             powerUp[OBJ_SCALE_Y] = 1;
                             powerUp[OBJ_SPRITE] = 18463;
                         }
-                    }
-
-                    if (level == 4) {
-                        for (i = 0; i < 32; i++) {
-                            // create shrinker
-                            float[] shrinker = new float[256];
-                            queue.add(shrinker);
-                            shrinker[OBJ_TYPE] = TYPE_ENEMY;
-                            shrinker[OBJ_X] = 800 + (random.nextInt(22) << 6);
-                            shrinker[OBJ_Y] = shrinker[OBJ_Y2] = 64 + (random.nextInt(3) << 6);
-                            shrinker[OBJ_SCALE_X] = 4;
-                            shrinker[OBJ_SCALE_Y] = 4;
-                            shrinker[OBJ_SPRITE] = 2338;
-                            shrinker[OBJ_HITS] = 4096;
-                            shrinker[OBJ_TIMER] = 4096;
-                            shrinker[OBJ_SHRINKER] = 1;
-                        }
-                    }
-
-                    if (level == 7) {
-                        for (k = 0; k < 3; k++) {
-                            for (j = 0; j < 3; j++) {
-                                mag = 2.09f * j;
-                                dy = (float) Math.sin(mag);
-                                dx = (float) Math.cos(mag);
-                                for (i = 0; i < 7; i++) {
-                                    // create fan blade
-                                    float[] blade = new float[256];
-                                    queue.add(blade);
-                                    blade[OBJ_TYPE] = TYPE_ENEMY;
-                                    blade[OBJ_X2] = (k << 8) + 896;
-                                    if (k == 0) {
-                                        blade[OBJ_Y2] = 0.01f;
-                                    } else if (k == 1) {
-                                        blade[OBJ_Y2] = -0.01f;
-                                    } else {
-                                        blade[OBJ_Y2] = 0.012f;
-                                    }
-                                    blade[OBJ_SCALE_X] = 1;
-                                    blade[OBJ_SCALE_Y] = 1;
-                                    blade[OBJ_SPRITE] = 2301;
-                                    blade[OBJ_HITS] = 4096;
-                                    blade[OBJ_TIMER] = 4096;
-                                    blade[OBJ_ANGLE] = mag;
-                                    blade[OBJ_RADIUS] = i << 4;
-                                    blade[OBJ_FAN_BLADE] = 1;
-                                }
+                        break;
+                    case TYPE_BULLET:
+                        object[OBJ_X] += object[OBJ_VX];
+                        object[OBJ_Y] += object[OBJ_VY];
+                        if (object[OBJ_X] < cameraX - 32 || object[OBJ_X] > cameraX + 287 || object[OBJ_Y] < -32 || object[OBJ_Y] > 287) {
+                            // bullet flew off screen, remove it
+                            object[OBJ_REMOVE] = 1;
+                        } else if (levelMap[((int) object[OBJ_Y] >> 5) & 7][((int) object[OBJ_X] >> 5) & 0xFF] == 1) {
+                            // bullet hit wall, create small explosion
+                            object[OBJ_REMOVE] = 1;
+                            if (object[OBJ_ENEMY_BULLET] == 0) {
+                                float[] explosionSeed = new float[256];
+                                queue.add(explosionSeed);
+                                explosionSeed[OBJ_TYPE] = TYPE_EXPLOSION_SEED;
+                                explosionSeed[OBJ_X] = object[OBJ_X];
+                                explosionSeed[OBJ_Y] = object[OBJ_Y];
+                                explosionSeed[OBJ_NONRENDERABLE] = 1;
+                                explosionSeed[OBJ_WALL_EXPLOSION] = 1;
                             }
-                        }
-                    }
-                }
-
-                if (cameraX >= 2304) {
-                    cameraVx = 0;
-                    if (!bossMode) {
-                        bossMode = true;
-
-                        // create boss
-                        float[] boss = new float[256];
-                        queue.add(boss);
-                        boss[OBJ_TYPE] = TYPE_ENEMY;
-                        boss[OBJ_X] = 2624;
-                        boss[OBJ_Y] = boss[OBJ_Y2] = 128;
-                        boss[OBJ_VX] = -1;
-                        if (level == 0) {
-                            boss[OBJ_SPRITE] = 21128;
-                        } else if (level == 1) {
-                            boss[OBJ_SPRITE] = 26679;
-                        } else if (level == 2) {
-                            boss[OBJ_SPRITE] = 29320;
-                        } else if (level == 3) {
-                            boss[OBJ_SPRITE] = 35123;
-                        } else if (level == 4) {
-                            boss[OBJ_SPRITE] = 39148;
-                        } else if (level == 5) {
-                            boss[OBJ_SPRITE] = 43096;
-                        } else if (level == 6) {
-                            boss[OBJ_SPRITE] = 54784;
-                        } else {
-                            boss[OBJ_SPRITE] = 51319;
-                        }
-                        boss[OBJ_SCALE_X] = 4 + (level >> 1);
-                        boss[OBJ_SCALE_Y] = 4 + (level >> 1);
-                        boss[OBJ_RADIUS] = 8 + 1.5f * level;
-                        boss[OBJ_HITS] = 512;
-                        boss[OBJ_SHOOT_DELAY] = 32 - level;
-                        boss[OBJ_BOSS] = 1;
-                    }
-                }
-                cameraX += cameraVx;
-
-                if (fireworks > 0) {
-                    if (--fireworks == 0) {
-                        if (level == 7) {
-                            fireworks = 64;
-                        } else {
-                            fireworks = -1;
-                            playerDead = 1;
-                            level++;
-                        }
-                    } else if ((fireworks & 3) == 0) {
-                        float[] explosionSeed = new float[256];
-                        queue.add(explosionSeed);
-                        explosionSeed[OBJ_TYPE] = TYPE_EXPLOSION_SEED;
-                        explosionSeed[OBJ_X] = random.nextInt(256) + cameraX;
-                        explosionSeed[OBJ_Y] = random.nextInt(256);
-                        explosionSeed[OBJ_NONRENDERABLE] = 1;
-                    }
-                }
-
-                if (bossMode) {
-                    if (fireworks == 0) {
-                        halfPipeOffset += 0.5f;
-                    }
-                } else if (((counter++) & 0xFF) == 0) {
-                    float Y = 0;
-                    for (i = 0; i < 16; i++) {
-                        Y = 48 + (random.nextInt(6) << 5);
-                        if (levelMap[(int) Y >> 5][((int) cameraX >> 5) + 8] == 0 && levelMap[((int) Y >> 5) + 1][((int) cameraX >> 5) + 8] == 0) {
-                            break;
-                        }
-                    }
-
-                    if (level != 3) {
-                        if (!(level == 1 || level == 7) || cameraX < 384 || (level == 7 && cameraX > 1408)) {
-                            if (random.nextBoolean()) {
-                                for (i = 0; i < 5; i++) {
-                                    // create wave enemy
-                                    float[] enemy = new float[256];
-                                    queue.add(enemy);
-                                    enemy[OBJ_TYPE] = TYPE_ENEMY;
-                                    enemy[OBJ_X] = cameraX + 256 + i * 24;
-                                    enemy[OBJ_Y] = enemy[OBJ_Y2] = Y;
-                                    enemy[OBJ_VX] = -1;
-                                    enemy[OBJ_SPRITE] = 8518;
-                                    enemy[OBJ_SCALE_X] = 1;
-                                    enemy[OBJ_SCALE_Y] = 1;
-                                    enemy[OBJ_ANGLE] = -1.2f * i;
-                                    enemy[OBJ_RADIUS] = 8;
-                                    enemy[OBJ_HITS] = 1;
-                                    enemy[OBJ_SHOOT_DELAY] = 240;
-                                }
-                            } else if (level == 6) {
-                                for (i = 0; i < 3; i++) {
-                                    // create attractor enemy
-                                    dx = 6.28f * random.nextFloat();
-                                    float[] enemy = new float[256];
-                                    queue.add(enemy);
-                                    enemy[OBJ_TYPE] = TYPE_ENEMY;
-                                    enemy[OBJ_X] = cameraX + 256 + 20 * i;
-                                    enemy[OBJ_Y] = Y + 20 * i;
-                                    enemy[OBJ_SPRITE] = 47180;
-                                    enemy[OBJ_SCALE_X] = 1;
-                                    enemy[OBJ_SCALE_Y] = 1;
-                                    enemy[OBJ_HITS] = 1;
-                                    enemy[OBJ_SHOOT_DELAY] = 240;
-                                    enemy[OBJ_VX] = (float) Math.cos(dx);
-                                    enemy[OBJ_VY] = (float) Math.sin(dy);
-                                    enemy[OBJ_ATTRACTOR] = 1;
-                                }
-                            } else {
-                                // create triplet enemy
-                                for (i = 0; i < 3; i++) {
-                                    float[] enemy = new float[256];
-                                    queue.add(enemy);
-                                    enemy[OBJ_TYPE] = TYPE_ENEMY;
-                                    enemy[OBJ_X] = cameraX + 256;
-                                    enemy[OBJ_Y] = enemy[OBJ_Y2] = Y + 20 * i;
-                                    enemy[OBJ_VX] = -1;
-                                    enemy[OBJ_SPRITE] = 12375;
-                                    enemy[OBJ_SCALE_X] = 1;
-                                    enemy[OBJ_SCALE_Y] = 1;
-                                    enemy[OBJ_HITS] = 1;
-                                    enemy[OBJ_SHOOT_DELAY] = 240;
-                                }
-                            }
-                        } else if (level == 1 && cameraX > 512) {
-                            // create bubble enemy
-                            float[] enemy = new float[256];
-                            queue.add(enemy);
-                            enemy[OBJ_TYPE] = TYPE_ENEMY;
-                            enemy[OBJ_X] = cameraX + 320;
-                            enemy[OBJ_Y] = enemy[OBJ_Y2] = Y + 20 * i;
-                            enemy[OBJ_VX] = -0.5f;
-                            enemy[OBJ_SPRITE] = 2301;
-                            enemy[OBJ_SCALE_X] = 4;
-                            enemy[OBJ_SCALE_Y] = 4;
-                            enemy[OBJ_HITS] = 2;
-                            enemy[OBJ_TIMER] = 4096;
-                            enemy[OBJ_SHOOT_DELAY] = 4096;
-                            enemy[OBJ_BUBBLE] = 1;
-                            enemy[OBJ_RADIUS] = 8;
-                        }
-                    }
-                }
-
-                boolean playerExploded = false;
-
-                for (i = queue.size() - 1; i >= 0; i--) {
-                    float[] object = queue.get(i);
-
-                    if (object[OBJ_REMOVE] == 1) {
-                        queue.remove(i);
-                        continue;
-                    }
-
-                    switch ((int) object[OBJ_TYPE]) {
-                        case TYPE_PLAYER:
-
-                            // moves automatically with the camera
-                            object[OBJ_X] += cameraVx;
-
-                            // update player position based on user input
-                            if (keys[VK_UP]) {
-                                if (object[OBJ_Y] > 11) {
-                                    object[OBJ_Y] -= SPEED;
-                                }
-                            } else if (keys[VK_DOWN]) {
-                                if (object[OBJ_Y] < 220) {
-                                    object[OBJ_Y] += SPEED;
-                                }
-                            }
-                            if (keys[VK_LEFT]) {
-                                if (object[OBJ_X] > cameraX + 13) {
-                                    object[OBJ_X] -= SPEED;
-                                }
-                            } else if (keys[VK_RIGHT]) {
-                                if (object[OBJ_X] < cameraX + 243) {
-                                    object[OBJ_X] += SPEED;
-                                }
-                            }
-
-                            if (playerShootDelay > 0) {
-                                playerShootDelay--; // prevent player from shooting continuously
-                            } else if (keys[VK_SHOOT]) {
-                                playerShootDelay = 10;
-
-                                // player shoots
-                                for (k = 0; k < 2; k++) {
-                                    for (j = 0; j < playerGun; j++) {
-                                        // create player lazers
-                                        float[] bullet = new float[256];
-                                        queue.add(bullet);
-                                        bullet[OBJ_TYPE] = TYPE_BULLET;
-                                        bullet[OBJ_X] = object[OBJ_X] + 24 * (float) Math.cos(0.25f * j);
-                                        bullet[OBJ_Y] = object[OBJ_Y] + (k == 0 ? 24 : -24) * (float) Math.sin(0.25f * j);
-                                        bullet[OBJ_SPRITE] = 733;
-                                        bullet[OBJ_VX] = 7.5f + cameraVx;
-                                        bullet[OBJ_SCALE_X] = 1.5f;
-                                        bullet[OBJ_SCALE_Y] = 0.25f;
-                                    }
-                                }
-                            }
-
-                            // test if player hits enemy
-                            for (j = queue.size() - 1; j >= 0; j--) {
-                                float[] enemy = queue.get(j);
-                                if ((enemy[OBJ_TYPE] == TYPE_ENEMY || enemy[OBJ_TYPE] == TYPE_POWER_UP) && object[OBJ_X] - 12 < enemy[OBJ_X] + 8 * enemy[OBJ_SCALE_X]
-                                        && object[OBJ_X] + 12 > enemy[OBJ_X] - 8 * enemy[OBJ_SCALE_X] && object[OBJ_Y] - 8 < enemy[OBJ_Y] + 8 * enemy[OBJ_SCALE_Y]
-                                        && object[OBJ_Y] + 8 > enemy[OBJ_Y] - 8 * enemy[OBJ_SCALE_Y]) {
-                                    if (enemy[OBJ_TYPE] == TYPE_POWER_UP) {
-                                        // collect power up
-                                        enemy[OBJ_REMOVE] = 1;
-                                        if (playerGun < 5) {
-                                            playerGun++;
-                                        }
-                                    } else if (enemy[OBJ_DISABLED] == 0) {
-                                        // player collided with enemy
-                                        playerExploded = true;
-                                    }
-                                }
-                            }
-
-                            // test if player hits wall
-                            if (levelMap[((((int) object[OBJ_Y]) - 5) >> 5) & 7][((((int) object[OBJ_X])) >> 5) & 0xFF] == 1
-                                    || levelMap[((((int) object[OBJ_Y]) + 5) >> 5) & 7][((((int) object[OBJ_X])) >> 5) & 0xFF] == 1
-                                    || levelMap[((((int) object[OBJ_Y])) >> 5) & 7][((((int) object[OBJ_X]) - 7) >> 5) & 0xFF] == 1
-                                    || levelMap[((((int) object[OBJ_Y])) >> 5) & 7][((((int) object[OBJ_X]) + 7) >> 5) & 0xFF] == 1) {
+                        } else if (object[OBJ_ENEMY_BULLET] == 1) {
+                            if (fireworks > 0) {
+                                // remove enemy bullets if player beat the boss
+                                object[OBJ_REMOVE] = 1;
+                            } else if (playerDead == 0 // test if bullet hits player
+                                    && object[OBJ_X] >= player[OBJ_X] - 8 && object[OBJ_Y] >= player[OBJ_Y] - 8 && object[OBJ_X] <= player[OBJ_X] + 8 && object[OBJ_Y] <= player[OBJ_Y] + 8) {
                                 playerExploded = true;
                             }
+                        } else {
+                            // test if bullet hits enemy
+                            for (j = queue.size() - 1; j >= 0; j--) {
+                                float[] enemy = queue.get(j);
+                                if (enemy[OBJ_TYPE] == TYPE_ENEMY && enemy[OBJ_DISABLED] == 0 && object[OBJ_X] >= enemy[OBJ_X] - 8 * enemy[OBJ_SCALE_X]
+                                        && object[OBJ_Y] >= enemy[OBJ_Y] - 8 * enemy[OBJ_SCALE_Y] && object[OBJ_X] <= enemy[OBJ_X] + 8 * enemy[OBJ_SCALE_X]
+                                        && object[OBJ_Y] <= enemy[OBJ_Y] + 8 * enemy[OBJ_SCALE_Y]) {
 
-                            break;
-                        case TYPE_EXPLOSION:
-                            object[OBJ_X] += object[OBJ_VX];
-                            object[OBJ_Y] += object[OBJ_VY];
-                            object[OBJ_SCALE_X] *= 0.8f;
-                            object[OBJ_SCALE_Y] *= 0.8f;
-                            if (--object[OBJ_TIMER] == 0) {
-                                object[OBJ_REMOVE] = 1;
-                            }
-                            break;
-                        case TYPE_EXPLOSION_SEED:
-                            object[OBJ_REMOVE] = 1;
-                            for (j = (object[OBJ_WALL_EXPLOSION] == 1) ? 16 : 128; j >= 0; j--) {
-                                // create explosion from seed
-                                float[] explosion = new float[256];
-                                queue.add(explosion);
-                                explosion[OBJ_TYPE] = TYPE_EXPLOSION;
-                                explosion[OBJ_X] = object[OBJ_X];
-                                explosion[OBJ_Y] = object[OBJ_Y];
-                                dx = 6.28f * random.nextFloat();
-                                dy = ((object[OBJ_WALL_EXPLOSION] == 1) ? 1 : 3) * random.nextFloat();
-                                explosion[OBJ_VX] = dy * (float) Math.sin(dx);
-                                explosion[OBJ_VY] = dy * (float) Math.cos(dx);
-                                explosion[OBJ_SPRITE] = 56;
-                                explosion[OBJ_TIMER] = 15;
-                                explosion[OBJ_SCALE_X] = 4;
-                                explosion[OBJ_SCALE_Y] = 4;
-                            }
-                            if (object[OBJ_MAKE_POWER_UP] == 1) {
-                                // create power up
-                                float[] powerUp = new float[256];
-                                queue.add(powerUp);
-                                powerUp[OBJ_TYPE] = TYPE_POWER_UP;
-                                powerUp[OBJ_X] = object[OBJ_X];
-                                powerUp[OBJ_Y] = object[OBJ_Y];
-                                powerUp[OBJ_SCALE_X] = 1;
-                                powerUp[OBJ_SCALE_Y] = 1;
-                                powerUp[OBJ_SPRITE] = 18463;
-                            }
-                            break;
-                        case TYPE_BULLET:
-                            object[OBJ_X] += object[OBJ_VX];
-                            object[OBJ_Y] += object[OBJ_VY];
-                            if (object[OBJ_X] < cameraX - 32 || object[OBJ_X] > cameraX + 287 || object[OBJ_Y] < -32 || object[OBJ_Y] > 287) {
-                                // bullet flew off screen, remove it
-                                object[OBJ_REMOVE] = 1;
-                            } else if (levelMap[((int) object[OBJ_Y] >> 5) & 7][((int) object[OBJ_X] >> 5) & 0xFF] == 1) {
-                                // bullet hit wall, create small explosion
-                                object[OBJ_REMOVE] = 1;
-                                if (object[OBJ_ENEMY_BULLET] == 0) {
+                                    object[OBJ_REMOVE] = 1;
+                                    score++;
+
                                     float[] explosionSeed = new float[256];
                                     queue.add(explosionSeed);
                                     explosionSeed[OBJ_TYPE] = TYPE_EXPLOSION_SEED;
-                                    explosionSeed[OBJ_X] = object[OBJ_X];
-                                    explosionSeed[OBJ_Y] = object[OBJ_Y];
                                     explosionSeed[OBJ_NONRENDERABLE] = 1;
-                                    explosionSeed[OBJ_WALL_EXPLOSION] = 1;
-                                }
-                            } else if (object[OBJ_ENEMY_BULLET] == 1) {
-                                if (fireworks > 0) {
-                                    // remove enemy bullets if player beat the boss
-                                    object[OBJ_REMOVE] = 1;
-                                } else if (playerDead == 0 // test if bullet hits player
-                                        && object[OBJ_X] >= player[OBJ_X] - 8 && object[OBJ_Y] >= player[OBJ_Y] - 8 && object[OBJ_X] <= player[OBJ_X] + 8 && object[OBJ_Y] <= player[OBJ_Y] + 8) {
-                                    playerExploded = true;
-                                }
-                            } else {
-                                // test if bullet hits enemy
-                                for (j = queue.size() - 1; j >= 0; j--) {
-                                    float[] enemy = queue.get(j);
-                                    if (enemy[OBJ_TYPE] == TYPE_ENEMY && enemy[OBJ_DISABLED] == 0 && object[OBJ_X] >= enemy[OBJ_X] - 8 * enemy[OBJ_SCALE_X]
-                                            && object[OBJ_Y] >= enemy[OBJ_Y] - 8 * enemy[OBJ_SCALE_Y] && object[OBJ_X] <= enemy[OBJ_X] + 8 * enemy[OBJ_SCALE_X]
-                                            && object[OBJ_Y] <= enemy[OBJ_Y] + 8 * enemy[OBJ_SCALE_Y]) {
+                                    if (--enemy[OBJ_HITS] == 0) {
 
-                                        object[OBJ_REMOVE] = 1;
-                                        score++;
-
-                                        float[] explosionSeed = new float[256];
-                                        queue.add(explosionSeed);
-                                        explosionSeed[OBJ_TYPE] = TYPE_EXPLOSION_SEED;
-                                        explosionSeed[OBJ_NONRENDERABLE] = 1;
-                                        if (--enemy[OBJ_HITS] == 0) {
-
-                                            if (enemy[OBJ_BOSS] == 1) {
-                                                // start fireworks if beat boss
-                                                fireworks = 512;
-                                            }
-
-                                            // enemy ran out of hit points and is killed
-                                            enemy[OBJ_REMOVE] = 1;
-                                            if (enemy[OBJ_BUBBLE] == 1 && enemy[OBJ_SCALE_X] > 1) {
-                                                for (k = 0; k < 2; k++) {
-                                                    // create bubble enemy
-                                                    float[] bubble = new float[256];
-                                                    queue.add(bubble);
-                                                    bubble[OBJ_TYPE] = TYPE_ENEMY;
-                                                    bubble[OBJ_VX] = random.nextFloat() - 0.5f;
-                                                    bubble[OBJ_SPRITE] = 2301;
-                                                    bubble[OBJ_SCALE_X] = enemy[OBJ_SCALE_X] * 0.75f;
-                                                    bubble[OBJ_SCALE_Y] = enemy[OBJ_SCALE_Y] * 0.75f;
-                                                    bubble[OBJ_X] = enemy[OBJ_X];
-                                                    bubble[OBJ_Y] = bubble[OBJ_Y2] = enemy[OBJ_Y] + (k - 0.5f) * bubble[OBJ_SCALE_Y] * 16;
-                                                    bubble[OBJ_HITS] = 1;
-                                                    bubble[OBJ_TIMER] = 4096;
-                                                    bubble[OBJ_SHOOT_DELAY] = 4096;
-                                                    bubble[OBJ_BUBBLE] = 1;
-                                                    bubble[OBJ_RADIUS] = 8;
-                                                    bubble[OBJ_ANGLE] = 6.28f * random.nextFloat();
-                                                }
-                                            } else {
-                                                explosionSeed[OBJ_X] = enemy[OBJ_X];
-                                                explosionSeed[OBJ_Y] = enemy[OBJ_Y];
-                                                explosionSeed[OBJ_MAKE_POWER_UP] = random.nextInt(13) == 0 ? 1 : 0;
-                                            }
-                                        } else {
-                                            // enemy lost a hit point, create small explosion
-                                            explosionSeed[OBJ_X] = object[OBJ_X];
-                                            explosionSeed[OBJ_Y] = object[OBJ_Y];
-                                            explosionSeed[OBJ_WALL_EXPLOSION] = 1;
-
-                                            if (enemy[OBJ_SHRINKER] == 1) {
-                                                enemy[OBJ_SCALE_X] -= 0.25f;
-                                                enemy[OBJ_SCALE_Y] -= 0.25f;
-                                                if (enemy[OBJ_SCALE_X] <= 0.5f) {
-                                                    enemy[OBJ_HITS] = 1;
-                                                }
-                                            }
+                                        if (enemy[OBJ_BOSS] == 1) {
+                                            // start fireworks if beat boss
+                                            fireworks = 512;
                                         }
 
+                                        // enemy ran out of hit points and is killed
+                                        enemy[OBJ_REMOVE] = 1;
+                                        if (enemy[OBJ_BUBBLE] == 1 && enemy[OBJ_SCALE_X] > 1) {
+                                            for (k = 0; k < 2; k++) {
+                                                // create bubble enemy
+                                                float[] bubble = new float[256];
+                                                queue.add(bubble);
+                                                bubble[OBJ_TYPE] = TYPE_ENEMY;
+                                                bubble[OBJ_VX] = random.nextFloat() - 0.5f;
+                                                bubble[OBJ_SPRITE] = 2301;
+                                                bubble[OBJ_SCALE_X] = enemy[OBJ_SCALE_X] * 0.75f;
+                                                bubble[OBJ_SCALE_Y] = enemy[OBJ_SCALE_Y] * 0.75f;
+                                                bubble[OBJ_X] = enemy[OBJ_X];
+                                                bubble[OBJ_Y] = bubble[OBJ_Y2] = enemy[OBJ_Y] + (k - 0.5f) * bubble[OBJ_SCALE_Y] * 16;
+                                                bubble[OBJ_HITS] = 1;
+                                                bubble[OBJ_TIMER] = 4096;
+                                                bubble[OBJ_SHOOT_DELAY] = 4096;
+                                                bubble[OBJ_BUBBLE] = 1;
+                                                bubble[OBJ_RADIUS] = 8;
+                                                bubble[OBJ_ANGLE] = 6.28f * random.nextFloat();
+                                            }
+                                        } else {
+                                            explosionSeed[OBJ_X] = enemy[OBJ_X];
+                                            explosionSeed[OBJ_Y] = enemy[OBJ_Y];
+                                            explosionSeed[OBJ_MAKE_POWER_UP] = random.nextInt(13) == 0 ? 1 : 0;
+                                        }
+                                    } else {
+                                        // enemy lost a hit point, create small explosion
+                                        explosionSeed[OBJ_X] = object[OBJ_X];
+                                        explosionSeed[OBJ_Y] = object[OBJ_Y];
+                                        explosionSeed[OBJ_WALL_EXPLOSION] = 1;
+
+                                        if (enemy[OBJ_SHRINKER] == 1) {
+                                            enemy[OBJ_SCALE_X] -= 0.25f;
+                                            enemy[OBJ_SCALE_Y] -= 0.25f;
+                                            if (enemy[OBJ_SCALE_X] <= 0.5f) {
+                                                enemy[OBJ_HITS] = 1;
+                                            }
+                                        }
                                     }
-                                }
-                            }
-                            break;
-                        case TYPE_ENEMY:
-                            if (fireworks > 0) {
-                                // remove enemy if player beat boss
-                                object[OBJ_REMOVE] = 1;
-                            }
-                            if (object[OBJ_FAN_BLADE] == 1) {
-                                object[OBJ_ANGLE] += object[OBJ_Y2];
-                                object[OBJ_X] = object[OBJ_X2] + object[OBJ_RADIUS] * (float) Math.cos(object[OBJ_ANGLE]);
-                                object[OBJ_Y] = 128 + object[OBJ_RADIUS] * (float) Math.sin(object[OBJ_ANGLE]);
-                            } else if (object[OBJ_ATTRACTOR] == 1) {
-                                if ((object[OBJ_VX] < 0 && (levelMap[(((int) object[OBJ_Y]) >> 5) & 7][(((int) (object[OBJ_X] - 12 * object[OBJ_SCALE_X])) >> 5) & 0xFF] == 1))
-                                        || (object[OBJ_VY] > 0 && (levelMap[(((int) object[OBJ_Y]) >> 5) & 7][(((int) (object[OBJ_X] + 12 * object[OBJ_SCALE_X])) >> 5) & 0xFF] == 1))) {
-                                    object[OBJ_VX] = -object[OBJ_VX];
-                                }
-                                if ((object[OBJ_VY] < 0 && (levelMap[((int) (object[OBJ_Y] - 12 * object[OBJ_SCALE_Y]) >> 5) & 7][(((int) (object[OBJ_X])) >> 5) & 0xFF] == 1))
-                                        || (object[OBJ_VY] > 0 && (levelMap[((int) (object[OBJ_Y] + 12 * object[OBJ_SCALE_Y]) >> 5) & 7][(((int) (object[OBJ_X])) >> 5) & 0xFF] == 1))) {
-                                    object[OBJ_VY] = -object[OBJ_VY];
-                                }
-                                dx = player[OBJ_X] - object[OBJ_X];
-                                dy = player[OBJ_Y] - object[OBJ_Y];
-                                mag = 64 * (float) Math.sqrt(dx * dx + dy * dy);
-                                object[OBJ_VX] += dx / mag;
-                                object[OBJ_VY] += dy / mag;
-                                object[OBJ_VX] *= 0.995f;
-                                object[OBJ_VY] *= 0.995f;
-                                object[OBJ_X] += object[OBJ_VX];
-                                object[OBJ_Y] += object[OBJ_VY];
-                            } else {
-                                if ((object[OBJ_VX] < 0 && (levelMap[(((int) object[OBJ_Y]) >> 5) & 7][(((int) (object[OBJ_X] - 12 * object[OBJ_SCALE_X])) >> 5) & 0xFF] == 1 || (object[OBJ_BUBBLE] == 0 && object[OBJ_X] < cameraX
-                                        + 12 * object[OBJ_SCALE_X])))
-                                        || (object[OBJ_VX] > 0 && (levelMap[(((int) object[OBJ_Y]) >> 5) & 7][(((int) (object[OBJ_X] + 12 * object[OBJ_SCALE_X])) >> 5) & 0xFF] == 1 || (object[OBJ_BOSS] == 1 && object[OBJ_X]
-                                        + 8 * object[OBJ_SCALE_X] >= 2560)))) {
-                                    object[OBJ_VX] = -object[OBJ_VX] + cameraVx;
-                                }
 
-                                if (levelMap[(((int) (object[OBJ_Y] - 8 * object[OBJ_SCALE_Y])) >> 5) & 7][((((int) object[OBJ_X])) >> 5) & 0xFF] == 1) {
-                                    object[OBJ_Y2]++;
                                 }
-                                if (levelMap[(((int) (object[OBJ_Y] + 8 * object[OBJ_SCALE_Y])) >> 5) & 7][((((int) object[OBJ_X])) >> 5) & 0xFF] == 1) {
-                                    object[OBJ_Y2]--;
-                                }
-                                object[OBJ_X] += object[OBJ_VX];
-                                object[OBJ_Y] = object[OBJ_Y2] + object[OBJ_RADIUS] * (float) Math.sin(object[OBJ_ANGLE]);
-                                object[OBJ_ANGLE] += 0.075f;
                             }
+                        }
+                        break;
+                    case TYPE_ENEMY:
+                        if (fireworks > 0) {
+                            // remove enemy if player beat boss
+                            object[OBJ_REMOVE] = 1;
+                        }
+                        if (object[OBJ_FAN_BLADE] == 1) {
+                            object[OBJ_ANGLE] += object[OBJ_Y2];
+                            object[OBJ_X] = object[OBJ_X2] + object[OBJ_RADIUS] * (float) Math.cos(object[OBJ_ANGLE]);
+                            object[OBJ_Y] = 128 + object[OBJ_RADIUS] * (float) Math.sin(object[OBJ_ANGLE]);
+                        } else if (object[OBJ_ATTRACTOR] == 1) {
+                            if ((object[OBJ_VX] < 0 && (levelMap[(((int) object[OBJ_Y]) >> 5) & 7][(((int) (object[OBJ_X] - 12 * object[OBJ_SCALE_X])) >> 5) & 0xFF] == 1))
+                                    || (object[OBJ_VY] > 0 && (levelMap[(((int) object[OBJ_Y]) >> 5) & 7][(((int) (object[OBJ_X] + 12 * object[OBJ_SCALE_X])) >> 5) & 0xFF] == 1))) {
+                                object[OBJ_VX] = -object[OBJ_VX];
+                            }
+                            if ((object[OBJ_VY] < 0 && (levelMap[((int) (object[OBJ_Y] - 12 * object[OBJ_SCALE_Y]) >> 5) & 7][(((int) (object[OBJ_X])) >> 5) & 0xFF] == 1))
+                                    || (object[OBJ_VY] > 0 && (levelMap[((int) (object[OBJ_Y] + 12 * object[OBJ_SCALE_Y]) >> 5) & 7][(((int) (object[OBJ_X])) >> 5) & 0xFF] == 1))) {
+                                object[OBJ_VY] = -object[OBJ_VY];
+                            }
+                            dx = player[OBJ_X] - object[OBJ_X];
+                            dy = player[OBJ_Y] - object[OBJ_Y];
+                            mag = 64 * (float) Math.sqrt(dx * dx + dy * dy);
+                            object[OBJ_VX] += dx / mag;
+                            object[OBJ_VY] += dy / mag;
+                            object[OBJ_VX] *= 0.995f;
+                            object[OBJ_VY] *= 0.995f;
+                            object[OBJ_X] += object[OBJ_VX];
+                            object[OBJ_Y] += object[OBJ_VY];
+                        } else {
+                            if ((object[OBJ_VX] < 0 && (levelMap[(((int) object[OBJ_Y]) >> 5) & 7][(((int) (object[OBJ_X] - 12 * object[OBJ_SCALE_X])) >> 5) & 0xFF] == 1 || (object[OBJ_BUBBLE] == 0 && object[OBJ_X] < cameraX
+                                    + 12 * object[OBJ_SCALE_X])))
+                                    || (object[OBJ_VX] > 0 && (levelMap[(((int) object[OBJ_Y]) >> 5) & 7][(((int) (object[OBJ_X] + 12 * object[OBJ_SCALE_X])) >> 5) & 0xFF] == 1 || (object[OBJ_BOSS] == 1 && object[OBJ_X]
+                                    + 8 * object[OBJ_SCALE_X] >= 2560)))) {
+                                object[OBJ_VX] = -object[OBJ_VX] + cameraVx;
+                            }
+
+                            if (levelMap[(((int) (object[OBJ_Y] - 8 * object[OBJ_SCALE_Y])) >> 5) & 7][((((int) object[OBJ_X])) >> 5) & 0xFF] == 1) {
+                                object[OBJ_Y2]++;
+                            }
+                            if (levelMap[(((int) (object[OBJ_Y] + 8 * object[OBJ_SCALE_Y])) >> 5) & 7][((((int) object[OBJ_X])) >> 5) & 0xFF] == 1) {
+                                object[OBJ_Y2]--;
+                            }
+                            object[OBJ_X] += object[OBJ_VX];
+                            object[OBJ_Y] = object[OBJ_Y2] + object[OBJ_RADIUS] * (float) Math.sin(object[OBJ_ANGLE]);
+                            object[OBJ_ANGLE] += 0.075f;
+                        }
+                        if (object[OBJ_FORCE_FIELD] == 1) {
+                            object[OBJ_SPRITE] = object[OBJ_SPRITE] == 766 ? 2302 : 766;
+                        }
+                        if (object[OBJ_TIMER] > 0) {
+                            object[OBJ_TIMER]--;
+                        } else {
+                            object[OBJ_TIMER] = object[OBJ_SHOOT_DELAY];
+
                             if (object[OBJ_FORCE_FIELD] == 1) {
-                                object[OBJ_SPRITE] = object[OBJ_SPRITE] == 766 ? 2302 : 766;
-                            }
-                            if (object[OBJ_TIMER] > 0) {
-                                object[OBJ_TIMER]--;
+                                // toggle force field enabled
+                                object[OBJ_DISABLED] = object[OBJ_DISABLED] == 1 ? 0 : 1;
                             } else {
-                                object[OBJ_TIMER] = object[OBJ_SHOOT_DELAY];
-
-                                if (object[OBJ_FORCE_FIELD] == 1) {
-                                    // toggle force field enabled
-                                    object[OBJ_DISABLED] = object[OBJ_DISABLED] == 1 ? 0 : 1;
-                                } else {
-                                    // enemy shoots
-                                    float[] bullet = new float[256];
-                                    queue.add(bullet);
-                                    bullet[OBJ_X] = object[OBJ_X];
-                                    bullet[OBJ_Y] = object[OBJ_Y];
-                                    bullet[OBJ_TYPE] = TYPE_BULLET;
-                                    bullet[OBJ_ENEMY_BULLET] = 1;
-                                    bullet[OBJ_SPRITE] = 2338;
-                                    bullet[OBJ_SCALE_X] = 0.5f;
-                                    bullet[OBJ_SCALE_Y] = 0.5f;
-                                    bullet[OBJ_NONRENDERABLE] = 0;
-                                    dx = player[OBJ_X] - bullet[OBJ_X];
-                                    dy = player[OBJ_Y] - bullet[OBJ_Y];
-                                    mag = 0.5f * (float) Math.sqrt(dx * dx + dy * dy);
-                                    bullet[OBJ_VX] = dx / mag + cameraVx;
-                                    bullet[OBJ_VY] = dy / mag;
-                                }
+                                // enemy shoots
+                                float[] bullet = new float[256];
+                                queue.add(bullet);
+                                bullet[OBJ_X] = object[OBJ_X];
+                                bullet[OBJ_Y] = object[OBJ_Y];
+                                bullet[OBJ_TYPE] = TYPE_BULLET;
+                                bullet[OBJ_ENEMY_BULLET] = 1;
+                                bullet[OBJ_SPRITE] = 2338;
+                                bullet[OBJ_SCALE_X] = 0.5f;
+                                bullet[OBJ_SCALE_Y] = 0.5f;
+                                bullet[OBJ_NONRENDERABLE] = 0;
+                                dx = player[OBJ_X] - bullet[OBJ_X];
+                                dy = player[OBJ_Y] - bullet[OBJ_Y];
+                                mag = 0.5f * (float) Math.sqrt(dx * dx + dy * dy);
+                                bullet[OBJ_VX] = dx / mag + cameraVx;
+                                bullet[OBJ_VY] = dy / mag;
                             }
-                            if (object[OBJ_X] + 128 < cameraX) {
-                                object[OBJ_REMOVE] = 1;
-                            }
-                            break;
-                        case TYPE_POWER_UP:
-                            if (object[OBJ_X] + 8 < cameraX) {
-                                object[OBJ_REMOVE] = 1;
-                            }
-                            if (object[OBJ_TIMER] > 0) {
-                                object[OBJ_TIMER]--;
-                            } else {
-                                object[OBJ_TIMER] = 4;
-                                object[OBJ_SPRITE] = (object[OBJ_SPRITE] == 17137) ? 18463 : 17137;
-                            }
-                            break;
-                    }
+                        }
+                        if (object[OBJ_X] + 128 < cameraX) {
+                            object[OBJ_REMOVE] = 1;
+                        }
+                        break;
+                    case TYPE_POWER_UP:
+                        if (object[OBJ_X] + 8 < cameraX) {
+                            object[OBJ_REMOVE] = 1;
+                        }
+                        if (object[OBJ_TIMER] > 0) {
+                            object[OBJ_TIMER]--;
+                        } else {
+                            object[OBJ_TIMER] = 4;
+                            object[OBJ_SPRITE] = (object[OBJ_SPRITE] == 17137) ? 18463 : 17137;
+                        }
+                        break;
                 }
-
-                if (playerExploded) {
-                    player[OBJ_REMOVE] = 1;
-                    float[] explosionSeed = new float[256];
-                    queue.add(explosionSeed);
-                    explosionSeed[OBJ_TYPE] = TYPE_EXPLOSION_SEED;
-                    explosionSeed[OBJ_X] = player[OBJ_X];
-                    explosionSeed[OBJ_Y] = player[OBJ_Y];
-                    explosionSeed[OBJ_NONRENDERABLE] = 1;
-
-                    this.playerDead = DIE_TIME;
-                }
-
-                // -- update ends ------------------------------------------------------
-
             }
+
+            if (playerExploded) {
+                player[OBJ_REMOVE] = 1;
+                float[] explosionSeed = new float[256];
+                queue.add(explosionSeed);
+                explosionSeed[OBJ_TYPE] = TYPE_EXPLOSION_SEED;
+                explosionSeed[OBJ_X] = player[OBJ_X];
+                explosionSeed[OBJ_Y] = player[OBJ_Y];
+                explosionSeed[OBJ_NONRENDERABLE] = 1;
+
+                this.playerDead = DIE_TIME;
+            }
+
+            // -- update ends ------------------------------------------------------
 
             // -- render starts ------------------------------------------------------
 

@@ -7,7 +7,7 @@ import nars.experiment.minicraft.top.item.resource.Resource;
 
 public class Slime extends Mob {
 	private int xa, ya;
-	private int jumpTime = 0;
+	private int jumpTime;
 	private final int lvl;
 
 	public Slime(int lvl) {

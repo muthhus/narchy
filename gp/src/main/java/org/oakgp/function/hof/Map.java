@@ -60,7 +60,7 @@ public final class Map implements Function {
         List<Node> result = new ArrayList<>(args);
         for (int i = 0; i < args; i++) {
             Node inputNode = candidates.arg(i);
-            Object evaluateResult = f.evaluate(new Arguments(new Node[]{inputNode}), assignments);
+            Object evaluateResult = f.evaluate(new Arguments(inputNode), assignments);
             ConstantNode outputNode = new ConstantNode(evaluateResult, returnType);
             result.add(outputNode);
         }

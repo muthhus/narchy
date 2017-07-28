@@ -22,7 +22,7 @@
 package jake2.game;
 
 public class gitem_t {
-    private static int id = 0;
+    private static int id;
 
     public gitem_t(int xxx) {
         index = xxx;

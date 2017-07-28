@@ -41,9 +41,9 @@ public final class IN extends Globals {
 
     public static boolean mouse_avail = true;
 
-    static boolean mouse_active = false;
+    static boolean mouse_active;
 
-    static boolean ignorefirst = false;
+    static boolean ignorefirst;
 
     static final int mouse_buttonstate = 0;
 
@@ -114,23 +114,27 @@ public final class IN extends Globals {
         Globals.m_side = Cvar.Get("m_side", "0.8", 0);
 
         Cmd.AddCommand("+mlook", new xcommand_t() {
+            @Override
             public void execute() {
                 MLookDown();
             }
         });
         Cmd.AddCommand("-mlook", new xcommand_t() {
+            @Override
             public void execute() {
                 MLookUp();
             }
         });
 
         Cmd.AddCommand("force_centerview", new xcommand_t() {
+            @Override
             public void execute() {
                 Force_CenterView_f();
             }
         });
 
         Cmd.AddCommand("togglemouse", new xcommand_t() {
+            @Override
             public void execute() {
                 toggleMouse();
             }

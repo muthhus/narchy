@@ -24,7 +24,7 @@ public class ToolItem extends Item {
 	};
 
 	public ToolType type;
-	public int level = 0;
+	public int level;
 
 	public ToolItem(ToolType type, int level) {
 		this.type = type;

@@ -479,7 +479,7 @@ public class J2PProxyFactory extends ProxyFactory {
         return classname + "_$$_javassist_" + counter++;
     }
 
-    private ClassFile make() throws CannotCompileException, DuplicateMemberException {
+    private ClassFile make() throws CannotCompileException {
         if (interfaces == null)
             interfaces = new Class[0];
 

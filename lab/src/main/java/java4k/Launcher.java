@@ -35,7 +35,8 @@ public class Launcher {
 		JList list = new JList(gameListModel);
 		list.setCellRenderer(new GameListRenderer());
 		list.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent evt) {
+			@Override
+            public void mouseClicked(MouseEvent evt) {
 				JList list = (JList) evt.getSource();
 				if (evt.getClickCount() == 1) {
 					int index = list.locationToIndex(evt.getPoint());
@@ -203,7 +204,8 @@ public class Launcher {
 		try {
 			final Launcher launcher = new Launcher();
 			SwingUtilities.invokeLater(new Runnable() {
-				public void run() {
+				@Override
+                public void run() {
 					launcher.startUI();
 				}
 			});

@@ -8,10 +8,10 @@ import nars.experiment.minicraft.top.gfx.Screen;
 public class ContainerMenu extends Menu {
 	private final Player player;
 	private final Inventory container;
-	private int selected = 0;
+	private int selected;
 	private final String title;
 	private int oSelected;
-	private int window = 0;
+	private int window;
 
 	public ContainerMenu(Player player, String title, Inventory container) {
 		this.player = player;

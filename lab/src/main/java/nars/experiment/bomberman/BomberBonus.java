@@ -14,23 +14,23 @@ import java.awt.*;
  */
 public class BomberBonus extends Thread {
     /** map object */
-    private BomberMap map = null;
+    private BomberMap map;
     /** position */
-    private int x = 0;
-    private int y = 0;
+    private int x;
+    private int y;
     /** frame count */
-    private int frame = 0;
+    private int frame;
     /** alive flag */
     private boolean alive = true;
     /** bonus type */
-    private int type = 0;
+    private int type;
     /** bomb sprite image handles */
-    private Image[] images = null;
+    private Image[] images;
     /** rendering hints */
-    private static Object hints = null;
+    private static Object hints;
 
-    private static int FIRE = 0;
-    private static int BOMB = 1;
+    private static final int FIRE = 0;
+    private static final int BOMB = 1;
 
     static {
         /** if java runtime is Java 2 */
@@ -48,7 +48,7 @@ public class BomberBonus extends Thread {
              RenderingHints.VALUE_ANTIALIAS_ON);
             h.put(RenderingHints.KEY_COLOR_RENDERING,
              RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            hints = (RenderingHints)h;
+            hints = h;
         }
     }
 
@@ -73,6 +73,7 @@ public class BomberBonus extends Thread {
     /**
      * Main loop.
      */
+    @Override
     public synchronized void run() {
         while (alive) {
             /** draw the bonus */

@@ -70,7 +70,7 @@ public class PMove {
 
     public static final float pm_accelerate = 10;
 
-    public static float pm_airaccelerate = 0;
+    public static float pm_airaccelerate;
 
     public static final float pm_wateraccelerate = 10;
 

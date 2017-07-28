@@ -32,7 +32,7 @@ import java.util.Random;
 public class a extends GamePanel {
 
   // keys
-  private boolean[] a = new boolean[32768];
+  private final boolean[] a = new boolean[32768];
 
   @Override
   public void start() {
@@ -88,6 +88,7 @@ public class a extends GamePanel {
   // explosion
   // 11 - size
 
+  @Override
   public void run() {
     
     int[][][] stages = new int[6][80][16];
@@ -120,7 +121,6 @@ public class a extends GamePanel {
              : i == 17 ? 0xFFABABAB
              : i == 18 ? 0xFF008B00
              : i == 19 ? 0xFF626262
-             : i == 20 ? 0xFF000000
              : 0xFF000000;
       if (i == 12) {
         j -= 5;
@@ -572,16 +572,15 @@ public class a extends GamePanel {
               
               break;
             }
-            case 11: {// mine
-              float vx = player[3] - object[3];
-              float vy = player[4] - object[4];
-              float mag = vx * vx + vy * vy;
-              if (object[11]-- == 0) {
-                object[11] = 2;
-                object[2] = mag > 8192 ? -1 : object[2] == 11 ? 12 : 11;
-              }
-              break;
-            }
+            case 11: // mine
+                float vx = player[3] - object[3];
+                float vy = player[4] - object[4];
+                float mag = vx * vx + vy * vy;
+                if (object[11]-- == 0) {
+                  object[11] = 2;
+                  object[2] = mag > 8192 ? -1 : object[2] == 11 ? 12 : 11;
+                }
+                break;
           }
 
           // boss can spawn enemies

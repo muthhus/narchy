@@ -75,7 +75,7 @@ public class VID extends Globals {
 
 	// Global variables used internally by this module
 	// void *reflib_library;		// Handle to refresh DLL 
-	static boolean reflib_active = false;
+	static boolean reflib_active;
 	// const char so_file[] = "/etc/quake2.conf";
 
 	/*
@@ -323,7 +323,8 @@ public class VID extends Globals {
 		
 		/* Add some console commands that we want to handle */
 		Cmd.AddCommand ("vid_restart", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				Restart_f();
 			}
 		});
@@ -589,7 +590,8 @@ public class VID extends Globals {
 		s_ref_list.x = 0;
 		s_ref_list.y = 0;
 		s_ref_list.callback = new Menu.mcallback() {
-			public void execute(Object self) {
+			@Override
+            public void execute(Object self) {
 				DriverCallback(self);
 			}
 		};
@@ -607,7 +609,8 @@ public class VID extends Globals {
 		s_screensize_slider.minvalue = 3;
 		s_screensize_slider.maxvalue = 12;
 		s_screensize_slider.callback = new Menu.mcallback() {
-			public void execute(Object self) {
+			@Override
+            public void execute(Object self) {
 				ScreenSizeCallback(self);
 			}
 		};
@@ -616,7 +619,8 @@ public class VID extends Globals {
 		s_brightness_slider.y	= 30;
 		s_brightness_slider.name	= "brightness";
 		s_brightness_slider.callback =  new Menu.mcallback() {
-			public void execute(Object self) {
+			@Override
+            public void execute(Object self) {
 				BrightnessCallback(self);
 			}
 		};
@@ -631,7 +635,8 @@ public class VID extends Globals {
 		s_fs_box.itemnames = yesno_names;
 		s_fs_box.curvalue = (int)vid_fullscreen.value;
 		s_fs_box.callback = new Menu.mcallback() {
-			public void execute(Object o) {
+			@Override
+            public void execute(Object o) {
 				int fs = ((Menu.menulist_s)o).curvalue;
 				if (fs == 0) {
 					s_mode_list.itemnames = resolutions;
@@ -675,7 +680,8 @@ public class VID extends Globals {
 		s_defaults_action.x    = 0;
 		s_defaults_action.y    = 100;
 		s_defaults_action.callback = new Menu.mcallback() {
-			public void execute(Object self) {
+			@Override
+            public void execute(Object self) {
 				ResetDefaults(self);
 			}
 		};
@@ -685,7 +691,8 @@ public class VID extends Globals {
 		s_apply_action.x    = 0;
 		s_apply_action.y    = 110;
 		s_apply_action.callback = new Menu.mcallback() {
-			public void execute(Object self) {
+			@Override
+            public void execute(Object self) {
 				ApplyChanges(self);
 			}
 		};

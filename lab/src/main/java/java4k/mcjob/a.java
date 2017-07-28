@@ -31,7 +31,7 @@ import java.util.Random;
 public class a extends Applet implements Runnable {
 
 	// keys
-	private boolean[] a = new boolean[32768];
+	private final boolean[] a = new boolean[32768];
 
 	@Override
 	public void start() {
@@ -39,7 +39,8 @@ public class a extends Applet implements Runnable {
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 
 		final int SPRITE_DIGIT_0 = 0;
 		final int SPRITE_DIGIT_1 = 1;

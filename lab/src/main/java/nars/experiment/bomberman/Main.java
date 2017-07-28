@@ -13,12 +13,12 @@ import javax.swing.*;
 */
 public class Main
 {
-    public static BomberMain bomberMain = null;
+    public static BomberMain bomberMain;
 
     /** relative path */
     public static final String RP = "./";
     /** flag: whether current machine's java runtime is version 2 or not */
-    public static boolean J2 = false;
+    public static boolean J2;
 
 
       /**

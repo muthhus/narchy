@@ -3,10 +3,7 @@ package nars.gui.graph.run;
 import com.google.common.graph.Graph;
 import com.google.common.graph.GraphBuilder;
 import com.google.common.graph.MutableGraph;
-import com.google.common.graph.ValueGraph;
-import jcog.bag.Bag;
 import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import nars.$;
 import nars.NARS;
 import nars.concept.Concept;
@@ -16,7 +13,6 @@ import nars.gui.graph.ConceptWidget;
 import nars.gui.graph.EdgeDirected;
 import nars.term.Term;
 import nars.term.Termed;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
@@ -40,7 +36,7 @@ import static spacegraph.layout.Grid.col;
  */
 public class SimpleGraph1 extends ConceptSpace {
 
-    ConceptWidget touched = null;
+    ConceptWidget touched;
     final Surface status = new Label("ready");
 
     public SimpleGraph1(int maxEdges) {
@@ -99,7 +95,7 @@ public class SimpleGraph1 extends ConceptSpace {
     }
 
     //TODO use AtomicReference
-    List<Activate> nodes = $.newArrayList(), next = null;
+    List<Activate> nodes = $.newArrayList(), next;
 
     protected SimpleGraph1 commit(Graph g) {
         List<Activate> n2 = $.newArrayList(g.nodes().size());
@@ -140,7 +136,7 @@ public class SimpleGraph1 extends ConceptSpace {
 //
     @NotNull
     private Termed nodeTerm(Object x) {
-        return $.quote(System.identityHashCode(x) + " " + x.toString());
+        return $.quote(System.identityHashCode(x) + " " + x);
     }
 
     @Override

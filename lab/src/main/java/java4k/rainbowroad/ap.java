@@ -31,7 +31,7 @@ import java.util.ArrayList;
 public class ap extends GamePanel {
 
   // keys
-  private boolean[] a = new boolean[65535];
+  private final boolean[] a = new boolean[65535];
   
   public ap() {
     new Thread(this).start();

@@ -255,11 +255,8 @@ public abstract class Entity implements java.io.Serializable {
 			return false;
 		}
 		int bottom = (int) this.getBottom(tileSize);
-		if (pos.y > bottom) {
-			return false;
-		}
-		return true;
-	}
+        return pos.y <= bottom;
+    }
 	
 	public void draw(GraphicsHandler g, float cameraX, float cameraY, int screenWidth,
 			int screenHeight, int tileSize) {

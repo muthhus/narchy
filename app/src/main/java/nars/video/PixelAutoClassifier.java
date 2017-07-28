@@ -7,7 +7,6 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Op;
 import nars.concept.SensorConcept;
-import nars.term.Compound;
 import nars.term.Term;
 import spacegraph.Surface;
 import spacegraph.widget.meter.MatrixView;
@@ -41,7 +40,7 @@ public class PixelAutoClassifier extends Autoencoder implements Consumer<NAR> {
     private final int nw, nh;
     private final int pw, ph;
     private final NAgent agent;
-    private boolean reconstruct = true;
+    private final boolean reconstruct = true;
     public boolean learn = true;
 
 

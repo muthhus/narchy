@@ -29,7 +29,9 @@ import nars.Param;
 import nars.index.term.StaticTermIndex;
 import nars.index.term.TermContext;
 import nars.term.atom.Atomic;
+import nars.term.atom.AtomicToString;
 import nars.term.atom.Bool;
+import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.subst.Unify;
@@ -40,6 +42,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.list.primitive.ImmutableByteList;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.eclipse.collections.impl.block.factory.Comparators;
 import org.eclipse.collections.impl.factory.primitive.ByteLists;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
@@ -48,6 +51,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
@@ -614,39 +618,34 @@ public interface Term extends Termlike, Comparable<Term> {
             return d;
 
         if (this instanceof Atomic) {
-//            if (!(y instanceof Atomic))
-//                return -1;
+
             assert (y instanceof Atomic) : "because volume should have been determined to be equal";
 
-            if ((this instanceof AbstractVariable) && (y instanceof AbstractVariable)) {
+            if ((this instanceof AbstractVariable) /*&& (y instanceof AbstractVariable)*/) {
                 //hashcode serves as the ordering too
                 return Integer.compare(hashCode(), y.hashCode());
+            } else if (this instanceof Int) {
+                return Integer.compare(((Int)this).id, ((Int)y).id);
+            } else if (this instanceof Int.IntRange) {
+                return Long.compareUnsigned(((Int.IntRange)this).hash64(), ((Int.IntRange)y).hash64());
+            } else if (this instanceof AtomicToString) {
+//                boolean gx = this instanceof UnnormalizedVariable;
+//                boolean gy = y instanceof UnnormalizedVariable;
+//                if (gx && !gy)
+//                    return -1;
+//                if (!gx && gy)
+//                    return +1;
+
+                //if the op is the same, it is required to be a subclass of Atomic
+                //which should have an ordering determined by its toString()
+                return this.toString().compareTo((/*(Atomic)*/y).toString());
+                //return Hack.compare(toString(), y.toString());
+            } else {
+                throw new UnsupportedOperationException("unimplemented comparison: " + this + " " + y);
             }
 
-            //if the op is the same, it is required to be a subclass of Atomic
-            //which should have an ordering determined by its toString()
-
-            boolean gx = this instanceof UnnormalizedVariable;
-            boolean gy = y instanceof UnnormalizedVariable;
-            if (gx && !gy)
-                return -1;
-            if (!gx && gy)
-                return +1;
-
-            return this.toString().compareTo((/*(Atomic)*/y).toString());
-            //return Hack.compare(toString(), y.toString());
 
         } else {
-
-//        int xSize = size();
-//        int diff3 = Integer.compare(y.size(), xSize);
-//        if (diff3 != 0)
-//            return diff3;
-
-//        int diff2 = Integer.compare(hashCode(), y.hashCode());
-//        if (diff2 != 0)
-//            return diff2;
-
 
             int c = TermContainer.compare(subterms(), y.subterms());
             if (c != 0)
@@ -655,6 +654,7 @@ public interface Term extends Termlike, Comparable<Term> {
             return Integer.compare(dt(), y.dt());
 
         }
+
         //throw new RuntimeException("ordering exception: " + this + ", " + y);
     }
 

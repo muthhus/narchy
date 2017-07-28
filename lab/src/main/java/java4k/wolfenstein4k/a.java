@@ -32,14 +32,16 @@ import java.util.Random;
 public class a extends GamePanel {
 
 	// keys
-	private boolean[] a = new boolean[32768];
+	private final boolean[] a = new boolean[32768];
 
-	public void start() {
+	@Override
+    public void start() {
 		enableEvents(8);
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 
 		// offsets indices into the string where the level stage begins
 		final int[] LEVEL_OFFSETS = { 174, 200, 227, 256, 282, 309 };
@@ -735,7 +737,7 @@ public class a extends GamePanel {
 					ArrayList<float[]> objects = objectMap[ly & 15][lx & 15];
 					if (objects.size() > 0) {
 						for (k = 0; k < objects.size(); k++) {
-							float[] object = (float[]) objects.get(k);
+							float[] object = objects.get(k);
 
 							float ox = 0;
 							float oy = 0;
@@ -815,7 +817,7 @@ public class a extends GamePanel {
 
 				// texture X coordinate
 				int textureX = (int) (xHit ? my : mx) & 63;
-				if ((xHit && fx > 0) || (!xHit && fy < 0)) {
+				if (xHit ? fx > 0 : fy < 0) {
 					textureX = 63 - textureX;
 				}
 
@@ -910,7 +912,8 @@ public class a extends GamePanel {
 		}
 	}
 
-	public void processKeyEvent(KeyEvent keyEvent) {
+	@Override
+    public void processKeyEvent(KeyEvent keyEvent) {
 
 		final int VK_LEFT = 0x25;
 		final int VK_RIGHT = 0x27;

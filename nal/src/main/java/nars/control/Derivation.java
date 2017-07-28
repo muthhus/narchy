@@ -13,13 +13,13 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.subst.Unify;
-import nars.term.var.UnnormalizedVariable;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.Op.Null;
 import static nars.Op.VAR_PATTERN;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesDep;
@@ -166,7 +166,10 @@ public class Derivation extends Unify implements TermContext {
             } else {
                 compared = beliefTruth;
             }
-            return compared.isNegative() ? $.neg(subterm) : subterm;
+            if (compared == null)
+                return Null;
+            else
+                return compared.isNegative() ? $.neg(subterm) : subterm;
         });
         substitute = new substitute() {
             @Override protected void onChange(Term from, Term x, Term y, Term to) {

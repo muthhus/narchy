@@ -52,22 +52,22 @@ public class A extends GamePanel {
 	int ys;
 	int xt;
 	int yt;
-	int mem0 = 0;
-	int mem1 = 0;
-	int zBoardLength = 0;
-	int playerFiring = 0;
-	int dungeonLevel = 0;
-	int difficulty = 0;
-	int currentEntity = 0;
-	int endCounter = 0;
-	int playerMana = 0;
-	int equipmentRating = 0;
+	int mem0;
+	int mem1;
+	int zBoardLength;
+	int playerFiring;
+	int dungeonLevel;
+	int difficulty;
+	int currentEntity;
+	int endCounter;
+	int playerMana;
+	int equipmentRating;
 	int gameState = 1;
 
 	double oldxe;
 	double oldye;
 
-	boolean keyPressed = false;
+	boolean keyPressed;
 
 	Rectangle oldRectangle;
 
@@ -123,7 +123,7 @@ public class A extends GamePanel {
 
 	final String gameData = "aaagaaagaaagaaagaaaeaabebcasbaasbcarcdalcaascdacdaakdabjdacieeapfabofgcpcdacefbpegcoabafgaamhaaeiaamiaacjaacjaarjabrjacrkmkminkjijiijihfbkeeaaaaeeaaaaaaaaeeaaaaaaaaaaaaaaaaaaeeeeaaaaaeeeeaeaaaeeaeeeaaaaaaaeeaaaaaaaeeeaaaaaaeeaeaaaaaaeaaeeaaaaaeaaaeaaaaeeaaeeaaaaaaeeaaaaaaaaeeaaaaaaaaaaaaaaaaaaeeeeaaaaaeeeeaeaaaeeaeeeaaaaaaaeeaaaaaaaaeeaaaaaaaeaeaaaaaaaeaeaaaaaaaeaeaaaaaaeeeeaaaaaaaaeeaaaaaaaaeeaaaaaaaaaaaaaaaaaeeeeaaaaaeaaeaeaaaeaaeeeaaaaaaaaeaaaaaaaaeeaaaaaaaeaeaaaaaaeaaaeaaaaaeaaaeaaaaeeaaeeaaaaaaaeeaaaaaaaaeeaaaaaaaaaaaaaaaaaeeeeaaaaaeaaeaeaaaeaaeeeaaaaaaaaeaaaaaaaaeeaaaaaaaeaeaaaaaaaeaeaaaaaaaeaeaaaaaaeeeeaaaaaaeaaaaaaeaeaaaaaeaeaaaaaeaeaaaaaeeeaaaaeeeeeaaeeeeeeaaaeeeeeaaaeeeeeaaaeeeeeaaaeeeeeeaaaeeeeeeaaaeeeeeaaaeaaaaaaeaeaaaaaeaeaaaaaeaeaaaaaeeeaaaaeeeeeaaeeeeeeaaaeeeeeaaaeeeeeaaaeeeeeaaaeeeeeeaaeeeeeeaaaeeeeeeaaaaaaaeaaaeaaaaeaeaeaeaeeaaaaaaaeeeeaeaaeaeeeeeaeeaeeeeeaaeeaaaeaeaaaaaaeaaaeaaaaaeaaaeaaaaeaaaaaaaaeaeaaaaeaaaaaeeaeaeaeaeeeeaaaeaeeeeeaeaeaaeeeeeaeaaaeaeaaaeaaeaaaeaaaaaeaaaeaaaeaaeeaeeeeaaeeeaaeaaeeeaaeeaaeaaaeaeeeeeaeaaeeeaaeaaeeeaaaaeeaeaaaaaaaeeaaaeeaeeaaaaeeeaeaaaeeeaeeaaaeaaaeaeeeeeaeeaeeeaaeaaeeeaaeaaeaeeaeaeeaaaeeeaaaaaeeeeeeaaaaaaaeeaaaaaaeeaaaeeeeaaaeeaaaaeaeeaaaeeaaeeeeeaaeeeaaaaaeeeeeeaeaaaaaeeaaaeeeeaaaeeaaaaaaeaaaeeaaeeaaeaaaaeeeeaaaaaaaaaaaaeeeeeeaaeaeeeeeeaeeaaaaaeaeeeeeeeeaeeeeaeeeaeeeeeeeeaaeeeeeeeaeeeeeeeaeeaaaaaeaeaaaaaaeaaeeaaaaaeaeeeeeeeeaeeeeaeeeaeeeeeeeeaaeeeeeeeaaaaeaaeaaeaaaaeaeaaeaeaeaeaaeaeaeaeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
 
-	private boolean k[] = new boolean[4];
+	private final boolean[] k = new boolean[4];
 	private int v, w;
 
 	long nextFrameStart;
@@ -897,11 +897,11 @@ public class A extends GamePanel {
 			case MouseEvent.MOUSE_PRESSED:
 				down = true;
 			case MouseEvent.MOUSE_RELEASED:
-				k[((MouseEvent) e).getButton()] = down;
+				k[e.getButton()] = down;
 			case MouseEvent.MOUSE_MOVED:
 			case MouseEvent.MOUSE_DRAGGED:
-				v = ((MouseEvent) e).getX();
-				w = ((MouseEvent) e).getY();
+				v = e.getX();
+				w = e.getY();
 			}
 		}
 

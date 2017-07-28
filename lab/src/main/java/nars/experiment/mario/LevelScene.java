@@ -16,11 +16,11 @@ import java.util.List;
 
 public class LevelScene extends Scene implements SpriteContext
 {
-    private boolean renderBackground = false;
+    private final boolean renderBackground = false;
 
-    private List<Sprite> sprites = new ArrayList<Sprite>();
-    private List<Sprite> spritesToAdd = new ArrayList<Sprite>();
-    private List<Sprite> spritesToRemove = new ArrayList<Sprite>();
+    private final List<Sprite> sprites = new ArrayList<Sprite>();
+    private final List<Sprite> spritesToAdd = new ArrayList<Sprite>();
+    private final List<Sprite> spritesToRemove = new ArrayList<Sprite>();
 
     public Level level;
     public final Mario mario;
@@ -28,21 +28,21 @@ public class LevelScene extends Scene implements SpriteContext
     private int tick;
 
     public LevelRenderer layer;
-    private BgRenderer[] bgLayer = new BgRenderer[2];
+    private final BgRenderer[] bgLayer = new BgRenderer[2];
 
-    private GraphicsConfiguration graphicsConfiguration;
+    private final GraphicsConfiguration graphicsConfiguration;
 
-    public boolean paused = false;
-    public int startTime = 0;
+    public boolean paused;
+    public int startTime;
     private int timeLeft;
 
     //    private Recorder recorder = new Recorder();
     //    private Replayer replayer = null;
     
-    private long levelSeed;
-    private MarioComponent renderer;
-    private int levelType;
-    private int levelDifficulty;
+    private final long levelSeed;
+    private final MarioComponent renderer;
+    private final int levelType;
+    private final int levelDifficulty;
 
     public LevelScene(GraphicsConfiguration graphicsConfiguration, MarioComponent renderer, long seed, int levelDifficulty, int type)
     {
@@ -55,6 +55,7 @@ public class LevelScene extends Scene implements SpriteContext
 
     }
 
+    @Override
     public void init()
     {
 
@@ -110,7 +111,7 @@ public class LevelScene extends Scene implements SpriteContext
         tick = 0;
     }
 
-    public int fireballsOnScreen = 0;
+    public int fireballsOnScreen;
 
     List<Shell> shellsToCheck = new ArrayList<Shell>();
 
@@ -126,6 +127,7 @@ public class LevelScene extends Scene implements SpriteContext
         fireballsToCheck.add(fireball);
     }
 
+    @Override
     public void tick()
     {
         timeLeft--;
@@ -306,9 +308,10 @@ public class LevelScene extends Scene implements SpriteContext
         spritesToRemove.clear();
     }
     
-    private DecimalFormat df = new DecimalFormat("00");
-    private DecimalFormat df2 = new DecimalFormat("000");
+    private final DecimalFormat df = new DecimalFormat("00");
+    private final DecimalFormat df2 = new DecimalFormat("000");
 
+    @Override
     public void render(Graphics g, float alpha)
     {
         int xCam = (int) (mario.xOld + (mario.x - mario.xOld) * alpha) - 160;
@@ -384,7 +387,7 @@ public class LevelScene extends Scene implements SpriteContext
 //                init();
             }
 
-            renderBlackout(g, (int) (mario.xDeathPos - xCam), (int) (mario.yDeathPos - yCam), (int) (320 - t));
+            renderBlackout(g, mario.xDeathPos - xCam, mario.yDeathPos - yCam, (int) (320 - t));
         }
 
         if (mario.deathTime > 0)
@@ -458,17 +461,20 @@ public class LevelScene extends Scene implements SpriteContext
     }
 
 
+    @Override
     public void addSprite(Sprite sprite)
     {
         spritesToAdd.add(sprite);
         sprite.tick();
     }
 
+    @Override
     public void removeSprite(Sprite sprite)
     {
         spritesToRemove.add(sprite);
     }
 
+    @Override
     public float getX(float alpha)
     {
         int xCam = (int) (mario.xOld + (mario.x - mario.xOld) * alpha) - 160;
@@ -481,6 +487,7 @@ public class LevelScene extends Scene implements SpriteContext
         return xCam + 160;
     }
 
+    @Override
     public float getY(float alpha)
     {
         return 0;

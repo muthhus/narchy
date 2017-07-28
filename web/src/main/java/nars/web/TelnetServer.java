@@ -63,13 +63,14 @@ public class TelnetServer {
 
         private final TelnetTerminal terminal;
         private volatile TerminalSize size;
-        private NAR nar;
+        private final NAR nar;
 
         public TelnetSession(TelnetTerminal terminal, NAR nar) {
             this.terminal = terminal;
             this.nar = nar;
         }
 
+        @Override
         public void run() {
             nar.startFPS(3f);
 
@@ -116,6 +117,7 @@ public class TelnetServer {
 
                 };
                 table.setListItemRenderer(new AbstractListBox.ListItemRenderer() {
+                    @Override
                     public void drawItem(TextGUIGraphics graphics, AbstractListBox listBox, int index, Object item, boolean selected, boolean focused) {
 
                         Task t = (Task) item; //HACK use generic variables

@@ -10,9 +10,9 @@ package nars.experiment.bomberman; /**
  */
 public class BomberKeyQueue {
     /** head and tail nodes */
-    private Node head = null, tail = null;
+    private Node head, tail;
     /** total nodes */
-    private int totalItems = 0;
+    private int totalItems;
 
     /**
      * Default constructor.
@@ -144,9 +144,9 @@ public class BomberKeyQueue {
      */
     private class Node {
         /** the key data */
-        public  byte data = 0x00;
+        public  byte data;
         /** pointers / links */
-        public Node prev = null, next = null;
+        public Node prev, next;
 
         /**
          * Construct with data

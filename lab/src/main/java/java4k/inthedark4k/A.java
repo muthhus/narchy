@@ -1232,7 +1232,7 @@ public class A extends GamePanel {
 				}
 				int x = (int) (Math.random() * mazeWidth);
 				int z = (int) (Math.random() * mazeHeight);
-				if ((x != (int) (playerX / CELL_SIZE) || z != (int) (playerZ / CELL_SIZE)) && maze[x][z] != 0) {
+				if ((x != playerX / CELL_SIZE || z != playerZ / CELL_SIZE) && maze[x][z] != 0) {
 					addEntity(
 							entities,
 							// TYPE

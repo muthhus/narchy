@@ -49,7 +49,7 @@ import java.awt.*;
  * all colors.
  *
  */
-public class Color3b extends Tuple3b implements java.io.Serializable {
+public class Color3b extends Tuple3b {
 
     // Compatible with 1.1
     static final long serialVersionUID = 6632576088353444794L;

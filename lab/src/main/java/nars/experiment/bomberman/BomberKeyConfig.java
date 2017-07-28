@@ -19,7 +19,7 @@ import java.io.ObjectOutputStream;
  */
 public abstract class BomberKeyConfig {
     /** the keys */
-    public static int[][] keys = null;
+    public static int[][] keys;
     /** player numbers enumerations */
     public static final int P1 = 0;
     public static final int P2 = 1;
@@ -78,7 +78,7 @@ public abstract class BomberKeyConfig {
             ObjectOutputStream outputStream =
             new ObjectOutputStream(new FileOutputStream("BomberKeyConfig.dat"));
             /** write the file */
-            outputStream.writeObject((int[][])keys);
+            outputStream.writeObject(keys);
             /** close the file */
             outputStream.close();
         }

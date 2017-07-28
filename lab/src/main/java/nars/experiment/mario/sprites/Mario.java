@@ -9,15 +9,15 @@ import nars.experiment.mario.level.Level;
 
 public class Mario extends Sprite
 {
-    public static boolean large = false;
-    public static boolean fire = false;
-    public static int coins = 0;
+    public static boolean large;
+    public static boolean fire;
+    public static int coins;
     public static int lives = 3;
     public static String levelString = "none";
-    private int kill_reward_coins = 4;
-    private static int medical_bill = 2;
-    private int retirement_benefit = 8;
-    private int burial_cost = 4;
+    private final int kill_reward_coins = 4;
+    private static final int medical_bill = 2;
+    private final int retirement_benefit = 8;
+    private final int burial_cost = 4;
 
     public static void resetStatic()
     {
@@ -35,35 +35,35 @@ public class Mario extends Sprite
     public static final int KEY_JUMP = 4;
     public static final int KEY_SPEED = 5;
 
-    private static float GROUND_INERTIA = 0.89f;
-    private static float AIR_INERTIA = 0.89f;
+    private static final float GROUND_INERTIA = 0.89f;
+    private static final float AIR_INERTIA = 0.89f;
 
     public boolean[] keys;
     private float runTime;
-    boolean wasOnGround = false;
-    boolean onGround = false;
-    private boolean mayJump = false;
-    private boolean ducking = false;
-    private boolean sliding = false;
-    private int jumpTime = 0;
+    boolean wasOnGround;
+    boolean onGround;
+    private boolean mayJump;
+    private boolean ducking;
+    private boolean sliding;
+    private int jumpTime;
     private float xJumpSpeed;
     private float yJumpSpeed;
-    private boolean canShoot = false;
+    private boolean canShoot;
 
     int width = 4;
     int height = 24;
 
-    private LevelScene world;
+    private final LevelScene world;
     public int facing;
-    private int powerUpTime = 0;
+    private int powerUpTime;
 
     public int xDeathPos, yDeathPos;
 
-    public int deathTime = 0;
-    public int winTime = 0;
-    private int invulnerableTime = 0;
+    public int deathTime;
+    public int winTime;
+    private int invulnerableTime;
 
-    public Sprite carried = null;
+    public Sprite carried;
     private static Mario instance;
 
     public Mario(LevelScene world)
@@ -127,6 +127,7 @@ public class Mario extends Sprite
         blink(true);
     }
 
+    @Override
     public void move()
     {
         if (winTime > 0)
@@ -187,14 +188,7 @@ public class Mario extends Sprite
 
         if (onGround)
         {
-            if (keys[KEY_DOWN] && large)
-            {
-                ducking = true;
-            }
-            else
-            {
-                ducking = false;
-            }
+            ducking = keys[KEY_DOWN] && large;
         }
 
         if (xa > 2)
@@ -714,7 +708,7 @@ public class Mario extends Sprite
     {
         coins += medical_bill;
 
-        instance.//world.sound.play(Art.samples[Art.SAMPLE_MARIO_1UP], instance, 1, 1, 1);
+        //world.sound.play(Art.samples[Art.SAMPLE_MARIO_1UP], instance, 1, 1, 1);
         lives++;
         if (lives==99)
         {

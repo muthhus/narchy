@@ -37,7 +37,7 @@ package spacegraph.math;
  *
  * @since vecmath 1.3
  */
-public class TexCoord4f extends Tuple4f implements java.io.Serializable {
+public class TexCoord4f extends Tuple4f {
 
     // Combatible with 1.1
     static final long serialVersionUID = -3517736544731446513L;

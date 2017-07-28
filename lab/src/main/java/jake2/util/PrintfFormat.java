@@ -3100,22 +3100,22 @@ public class PrintfFormat {
 		 * formatted with thousands' grouping characters.
 		 * For other conversions the flag is ignored.
 		 */
-		private boolean thousands = false;
+		private boolean thousands;
 		/**
 		 * The result of the conversion will be
 		 * left-justified within the field.
 		 */
-		private boolean leftJustify = false;
+		private boolean leftJustify;
 		/**
 		 * The result of a signed conversion will always
 		 * begin with a sign (+ or -).
 		 */
-		private boolean leadingSign = false;
+		private boolean leadingSign;
 		/**
 		 * Flag indicating that left padding with spaces is
 		 * specified.
 		 */
-		private boolean leadingSpace = false;
+		private boolean leadingSpace;
 		/**
 		 * For an o conversion, increase the precision to
 		 * force the first digit of the result to be a
@@ -3127,27 +3127,27 @@ public class PrintfFormat {
 		 * conversions, trailing zeros will not be removed
 		 * from the result.
 		 */
-		private boolean alternateForm = false;
+		private boolean alternateForm;
 		/**
 		 * Flag indicating that left padding with zeroes is
 		 * specified.
 		 */
-		private boolean leadingZeros = false;
+		private boolean leadingZeros;
 		/**
 		 * Flag indicating that the field width is *.
 		 */
-		private boolean variableFieldWidth = false;
+		private boolean variableFieldWidth;
 		/**
 		 * If the converted value has fewer bytes than the
 		 * field width, it will be padded with spaces or
 		 * zeroes.
 		 */
-		private int fieldWidth = 0;
+		private int fieldWidth;
 		/**
 		 * Flag indicating whether or not the field width
 		 * has been set.
 		 */
-		private boolean fieldWidthSet = false;
+		private boolean fieldWidthSet;
 		/**
 		 * The minimum number of digits to appear for the
 		 * d, i, o, u, x, or X conversions.  The number of
@@ -3157,58 +3157,58 @@ public class PrintfFormat {
 		 * conversions.  The maximum number of bytes to be
 		 * printed from a string in s and S conversions.
 		 */
-		private int precision = 0;
+		private int precision;
 		/** Default precision. */
 		private final static int defaultDigits = 6;
 		/**
 		 * Flag indicating that the precision is *.
 		 */
-		private boolean variablePrecision = false;
+		private boolean variablePrecision;
 		/**
 		 * Flag indicating whether or not the precision has
 		 * been set.
 		 */
-		private boolean precisionSet = false;
+		private boolean precisionSet;
 		/*
 		 */
-		private boolean positionalSpecification = false;
-		private int argumentPosition = 0;
-		private boolean positionalFieldWidth = false;
-		private int argumentPositionForFieldWidth = 0;
-		private boolean positionalPrecision = false;
-		private int argumentPositionForPrecision = 0;
+		private boolean positionalSpecification;
+		private int argumentPosition;
+		private boolean positionalFieldWidth;
+		private int argumentPositionForFieldWidth;
+		private boolean positionalPrecision;
+		private int argumentPositionForPrecision;
 		/**
 		 * Flag specifying that a following d, i, o, u, x,
 		 * or X conversion character applies to a type
 		 * short int.
 		 */
-		private boolean optionalh = false;
+		private boolean optionalh;
 		/**
 		 * Flag specifying that a following d, i, o, u, x,
 		 * or X conversion character applies to a type lont
 		 * int argument.
 		 */
-		private boolean optionall = false;
+		private boolean optionall;
 		/**
 		 * Flag specifying that a following e, E, f, g, or
 		 * G conversion character applies to a type double
 		 * argument.  This is a noop in Java.
 		 */
-		private boolean optionalL = false;
+		private boolean optionalL;
 		/** Control string type. */
-		private char conversionCharacter = '\0';
+		private char conversionCharacter;
 		/**
 		 * Position within the control string.  Used by
 		 * the constructor.
 		 */
-		private int pos = 0;
+		private int pos;
 		/** Literal or control format string. */
 		private String fmt;
 	}
 	/** Vector of control strings and format literals. */
 	private final Vector vFmt = new Vector();
 	/** Character position.  Used by the constructor. */
-	private int cPos = 0;
+	private int cPos;
 	/** Character position.  Used by the constructor. */
-	private DecimalFormatSymbols dfs = null;
+	private DecimalFormatSymbols dfs;
 }

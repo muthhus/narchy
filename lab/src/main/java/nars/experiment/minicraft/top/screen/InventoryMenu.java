@@ -7,7 +7,7 @@ import nars.experiment.minicraft.top.item.Item;
 
 public class InventoryMenu extends Menu {
 	private final Player player;
-	private int selected = 0;
+	private int selected;
 
 	public InventoryMenu(Player player) {
 		this.player = player;

@@ -9,11 +9,13 @@ import java.awt.image.BufferedImage;
 
 public class G extends Applet implements Runnable //Frame
 {
+    @Override
     public void start()
     {
         new Thread(this).start();
     }
 
+    @Override
     public void run()// throws Exception
     {
         try {
@@ -603,7 +605,7 @@ public class G extends Applet implements Runnable //Frame
                         addSprite( st, sx, sy, sd, sceneryB, X + 4, YB + 4 );
 //                  System.out.println( "sTH=" + sceneryTH + " sT=" + sceneryT );
                     if( sceneryT == GT_DOWN )
-                        addSprite( st, sx, sy, sd, sceneryT, X + 4, YT + 12 );
+                        addSprite( st, sx, sy, sd, GT_DOWN, X + 4, YT + 12 );
                     else
                         addSprite( st, sx, sy, sd, sceneryT, X + 4, YT + 4 );
 
@@ -911,7 +913,8 @@ public class G extends Applet implements Runnable //Frame
         return -1;
     }
 
-    public void processEvent( AWTEvent e )
+    @Override
+    public void processEvent(AWTEvent e )
     {
         if( e.getID() == KeyEvent.KEY_PRESSED )
         {
@@ -933,6 +936,6 @@ public class G extends Applet implements Runnable //Frame
         }*/
     }
 
-    private boolean[]           m_keysDown = new boolean[1024];
+    private final boolean[]           m_keysDown = new boolean[1024];
     //private volatile MouseEvent m_mouseEvent;
 }

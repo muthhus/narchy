@@ -144,43 +144,43 @@ public class M extends Applet implements Runnable {
 	// UDP Data Messages
 	private MulticastSocket socket; // Server Socket
 	private DatagramPacket txPacket, rxPacket; // UDP Datagrams
-	private byte[] txMsg = new byte[IDSIZE + 4 * ENTITIES * VARIABLES];
-	private byte[] rxMsg = new byte[IDSIZE + 4 * ENTITIES * VARIABLES];
+	private final byte[] txMsg = new byte[IDSIZE + 4 * ENTITIES * VARIABLES];
+	private final byte[] rxMsg = new byte[IDSIZE + 4 * ENTITIES * VARIABLES];
 	private InetAddress group; // Multicast IP Address
 
 	// Database of currently connected players
-	private InetAddress[] address = new InetAddress[PLAYERS];
-	private int[] port = new int[PLAYERS];
-	private long[] timestamp = new long[PLAYERS];
-	private long[] process = new long[PLAYERS];
-	private volatile int[][][] LANdata = new int[PLAYERS][ENTITIES][VARIABLES];
-	private volatile int[][][] LANbuffer = new int[PLAYERS][ENTITIES][VARIABLES];
+	private final InetAddress[] address = new InetAddress[PLAYERS];
+	private final int[] port = new int[PLAYERS];
+	private final long[] timestamp = new long[PLAYERS];
+	private final long[] process = new long[PLAYERS];
+	private final int[][][] LANdata = new int[PLAYERS][ENTITIES][VARIABLES];
+	private final int[][][] LANbuffer = new int[PLAYERS][ENTITIES][VARIABLES];
 
 	// Process data
-	private int processID = (int) ((System.nanoTime() >> 16) & 0xffffffff);
-	private boolean receiveThread = false; // Thread usage flag
+	private final int processID = (int) ((System.nanoTime() >> 16) & 0xffffffff);
+	private boolean receiveThread; // Thread usage flag
 
 	//
 	// Graphics Engine Class Variables
 	//
 
-	private float[] sin = new float[36000]; // Precalculate trig
-	private float[] cos = new float[36000]; // functions
-	private float[] rayAngleFix = new float[SCREENWIDTH]; // Perspective
-	private float[] cosRayAngleFix = new float[SCREENWIDTH]; // Fix
-	private float[] zMap = new float[DEPTH]; // Non-linear z function
-	private float[][][] tiles = new float[TILETYPES][TILESIZE][TILESIZE]; // Tile height maps
-	private int[][] map = new int[MAPSIZE][MAPSIZE]; // World map
+	private final float[] sin = new float[36000]; // Precalculate trig
+	private final float[] cos = new float[36000]; // functions
+	private final float[] rayAngleFix = new float[SCREENWIDTH]; // Perspective
+	private final float[] cosRayAngleFix = new float[SCREENWIDTH]; // Fix
+	private final float[] zMap = new float[DEPTH]; // Non-linear z function
+	private final float[][][] tiles = new float[TILETYPES][TILESIZE][TILESIZE]; // Tile height maps
+	private final int[][] map = new int[MAPSIZE][MAPSIZE]; // World map
 
 	//
 	// Game Engine Class Variables
 	//
 
-	private float[][][] localData = new float[PLAYERS][ENTITIES][VARIABLES];
-	private long[] fireballTimeout = new long[ENEMIES + PLAYERFIREBALLS];
-	private boolean[] castle = new boolean[4];
+	private final float[][][] localData = new float[PLAYERS][ENTITIES][VARIABLES];
+	private final long[] fireballTimeout = new long[ENEMIES + PLAYERFIREBALLS];
+	private final boolean[] castle = new boolean[4];
 
-	private boolean keyboard[] = new boolean[0x10000]; // Keyboard map
+	private final boolean[] keyboard = new boolean[0x10000]; // Keyboard map
 	private boolean mouse; // Mouse button
 	private volatile int mouseX, mouseY; // Mouse coords
 
@@ -189,7 +189,8 @@ public class M extends Applet implements Runnable {
 		new Thread(this).start(); // Start receive thread
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 
 		// Generic Variables
 		int i, j, k, m;

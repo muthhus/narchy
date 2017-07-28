@@ -16,52 +16,52 @@ import java.io.File;
  */
 public class BomberPlayer extends Thread {
     /** game object handle */
-    public BomberGame game = null;
+    public BomberGame game;
     /** map object handle */
-    private BomberMap map = null;
+    private BomberMap map;
     /** player's own bomb grid (must have for synchronization) */
-    public boolean[][] bombGrid = null;
+    public boolean[][] bombGrid;
     /** input key queue */
-    private BomberKeyQueue keyQueue = null;
+    private BomberKeyQueue keyQueue;
     /** bomb key is down or not */
-    private boolean bombKeyDown = false;
+    private boolean bombKeyDown;
     /** direction keys down */
-    private byte dirKeysDown = 0x00;
+    private byte dirKeysDown;
     /** current direction key down */
-    private byte currentDirKeyDown = 0x00;
+    private byte currentDirKeyDown;
     /** sprite width */
     private final int width = BomberMain.size;
     /** sprite height */
     private final int height = 44 / (32 / BomberMain.size);
     /** is exploding flag */
-    private boolean isExploding = false;
+    private boolean isExploding;
     /** is dead flag */
-    private boolean isDead = false;
+    private boolean isDead;
     /** whether a key is pressed or not */
-    private boolean keyPressed = false;
+    private boolean keyPressed;
     /** the player's input keys */
-    private int[] keys = null;
+    private int[] keys;
     /** total bombs the player has */
     public int totalBombs = 1;
     /** total bombs the player used */
-    public int usedBombs = 0;
+    public int usedBombs;
     /** the player's fire strength */
     public int fireLength = 2;
     /** if player is alive */
     public boolean isActive = true;
     /** player position */
-    public int x = 0;
-    public int y = 0;
+    public int x;
+    public int y;
     /** player's number */
-    private int playerNo = 0;
+    private int playerNo;
     /** user's state : default to face down */
     private int state = DOWN;
     /** flag : whether the player is moving or not */
-    private boolean moving = false;
+    private boolean moving;
     /** sprite frame number */
-    private int frame = 0;
+    private int frame;
     /** clear mode flag */
-    private boolean clear = false;
+    private boolean clear;
 
     /** byte enumerations */
     private static final byte BUP = 0x01;
@@ -77,9 +77,9 @@ public class BomberPlayer extends Thread {
     private static final int BOMB = 4;
     private static final int EXPLODING = 4;
     /** all player sprite images */
-    private static Image[][][] sprites = null;
+    private static Image[][][] sprites;
     /** rendering hints */
-    private static Object hints = null;
+    private static Object hints;
 
     static {
         /** if java runtime is Java 2 */
@@ -97,7 +97,7 @@ public class BomberPlayer extends Thread {
              RenderingHints.VALUE_ANTIALIAS_ON);
             h.put(RenderingHints.KEY_COLOR_RENDERING,
              RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            hints = (RenderingHints)h;
+            hints = h;
         }
 
         /** create the images */
@@ -394,6 +394,7 @@ public class BomberPlayer extends Thread {
     /**
      * Main loop
      */
+    @Override
     public void run()
     {
         /** can move flat */

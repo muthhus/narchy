@@ -17,11 +17,11 @@ import java.util.Vector;
  */
 public class BomberMap extends JPanel {
     /** frame object */
-    private BomberMain main;
+    private final BomberMain main;
     /** game over flag */
     private boolean gameOver;
     /** background color */
-    private Color backgroundColor;
+    private final Color backgroundColor;
     /** the map grid array */
     public int[][] grid;
     /** fire grid */
@@ -31,9 +31,9 @@ public class BomberMap extends JPanel {
     /** bonus grid */
     public BomberBonus[][] bonusGrid;
     /** bombs */
-    private Vector bombs;
+    private final Vector bombs;
     /** bonuses */
-    private Vector bonuses;
+    private final Vector bonuses;
 
     /**
      * Bomb info class
@@ -60,7 +60,7 @@ public class BomberMap extends JPanel {
     }
 
     /** image handles for the map images */
-    private static Image[][] mapImages;
+    private static final Image[][] mapImages;
     /** bomb images */
     public static Image[] bombImages;
     /** fire images */
@@ -86,9 +86,9 @@ public class BomberMap extends JPanel {
     public static final int BRICK = 1;
     public static final int BOMB = 3;
     /** random level generator */
-    private static BomberRandInt levelRand;
+    private static final BomberRandInt levelRand;
     /** random bonus generator */
-    private static BomberRandInt bonusRand;
+    private static final BomberRandInt bonusRand;
     /** current level */
     public static int level;
     /** rendering hints */

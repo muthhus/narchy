@@ -36,7 +36,7 @@ import javax.sound.sampled.*;
  */
 public class SND_JAVA extends Globals {
 
-	static boolean snd_inited= false;
+	static boolean snd_inited;
 
 	static cvar_t sndbits;
 	static cvar_t sndspeed;
@@ -56,13 +56,14 @@ public class SND_JAVA extends Globals {
   	static class SoundThread extends Thread {
   		final byte[] b;
 		final SourceDataLine l;
-		int pos = 0;
-		boolean running = false;
+		int pos;
+		boolean running;
   		public SoundThread(byte[] buffer, SourceDataLine line) {
   			b = buffer;
   			l = line;
   		}
-  		public void run() {
+  		@Override
+        public void run() {
   			running = true;
   			while (running) {
   				line.write(b, pos, 512);

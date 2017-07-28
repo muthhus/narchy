@@ -33,7 +33,7 @@ import java.util.Random;
 public class a extends GamePanel {
 
 	// keys
-	private boolean[] a = new boolean[32768];
+	private final boolean[] a = new boolean[32768];
 
 
 	@Override
@@ -43,7 +43,8 @@ public class a extends GamePanel {
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 
 		final int Z0 = 256;
 		final int FLOOR_Y = -64;

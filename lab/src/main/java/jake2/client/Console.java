@@ -42,7 +42,8 @@ import java.util.Arrays;
 public final class Console extends Globals {
 
     public static final xcommand_t ToggleConsole_f = new xcommand_t() {
-	public void execute() {
+	@Override
+    public void execute() {
 	    SCR.EndLoadingPlaque(); // get rid of loading plaque
 
 	    if (Globals.cl.attractloop) {
@@ -74,13 +75,15 @@ public final class Console extends Globals {
     };
 
     public static final xcommand_t Clear_f = new xcommand_t() {
-	public void execute() {
+	@Override
+    public void execute() {
 	    Arrays.fill(Globals.con.text, (byte) ' ');
 	}
     };
 
     public static final xcommand_t Dump_f = new xcommand_t() {
-	public void execute() {
+	@Override
+    public void execute() {
 
 	    int l, x;
 	    int line;
@@ -243,7 +246,8 @@ public final class Console extends Globals {
      * ================ Con_ToggleChat_f ================
      */
     static final xcommand_t ToggleChat_f = new xcommand_t() {
-	public void execute() {
+	@Override
+    public void execute() {
 	    Key.ClearTyping();
 
 	    if (cls.key_dest == key_console) {
@@ -262,7 +266,8 @@ public final class Console extends Globals {
      * ================ Con_MessageMode_f ================
      */
     static final xcommand_t MessageMode_f = new xcommand_t() {
-	public void execute() {
+	@Override
+    public void execute() {
 	    chat_team = false;
 	    cls.key_dest = key_message;
 	}
@@ -272,7 +277,8 @@ public final class Console extends Globals {
      * ================ Con_MessageMode2_f ================
      */
     static final xcommand_t MessageMode2_f = new xcommand_t() {
-	public void execute() {
+	@Override
+    public void execute() {
 	    chat_team = true;
 	    cls.key_dest = key_message;
 	}

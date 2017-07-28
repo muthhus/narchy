@@ -1000,7 +1000,9 @@ public class M_Actor {
             "Adrianator", "Rambear", "Titus", "Bitterman" };
 
     static final EntThinkAdapter actor_stand = new EntThinkAdapter() {
+        @Override
         public String getID() { return "actor_stand";}
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = actor_move_stand;
 
@@ -1013,7 +1015,7 @@ public class M_Actor {
         }
     };
 
-    static final mframe_t[] actor_frames_stand = new mframe_t[] {
+    static final mframe_t[] actor_frames_stand = {
             new mframe_t(GameAI.ai_stand, 0f, null),
             new mframe_t(GameAI.ai_stand, 0f, null),
             new mframe_t(GameAI.ai_stand, 0f, null),
@@ -1075,14 +1077,16 @@ public class M_Actor {
             actor_frames_walk, null);
 
     static final EntThinkAdapter actor_walk = new EntThinkAdapter() {
+        @Override
         public String getID() { return "actor_walk";}
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = actor_move_walk;
             return true;
         }
     };
 
-    static final mframe_t[] actor_frames_run = new mframe_t[] {
+    static final mframe_t[] actor_frames_run = {
             new mframe_t(GameAI.ai_run, 4, null),
             new mframe_t(GameAI.ai_run, 15, null),
             new mframe_t(GameAI.ai_run, 15, null),
@@ -1100,7 +1104,9 @@ public class M_Actor {
             actor_frames_run, null);
 
     static final EntThinkAdapter actor_run = new EntThinkAdapter() {
+        @Override
         public String getID() { return "actor_run";}
+        @Override
         public boolean think(edict_t self) {
             if ((GameBase.level.time < self.pain_debounce_time)
                     && (self.enemy == null)) {
@@ -1122,7 +1128,7 @@ public class M_Actor {
         }
     };
 
-    static final mframe_t[] actor_frames_pain1 = new mframe_t[] {
+    static final mframe_t[] actor_frames_pain1 = {
             new mframe_t(GameAI.ai_move, -5, null),
             new mframe_t(GameAI.ai_move, 4, null),
             new mframe_t(GameAI.ai_move, 1, null) };
@@ -1130,7 +1136,7 @@ public class M_Actor {
     static final mmove_t actor_move_pain1 = new mmove_t(FRAME_pain101, FRAME_pain103,
             actor_frames_pain1, actor_run);
 
-    static final mframe_t[] actor_frames_pain2 = new mframe_t[] {
+    static final mframe_t[] actor_frames_pain2 = {
             new mframe_t(GameAI.ai_move, -4, null),
             new mframe_t(GameAI.ai_move, 4, null),
             new mframe_t(GameAI.ai_move, 0, null) };
@@ -1138,7 +1144,7 @@ public class M_Actor {
     static final mmove_t actor_move_pain2 = new mmove_t(FRAME_pain201, FRAME_pain203,
             actor_frames_pain2, actor_run);
 
-    static final mframe_t[] actor_frames_pain3 = new mframe_t[] {
+    static final mframe_t[] actor_frames_pain3 = {
             new mframe_t(GameAI.ai_move, -1, null),
             new mframe_t(GameAI.ai_move, 1, null),
             new mframe_t(GameAI.ai_move, 0, null) };
@@ -1146,7 +1152,7 @@ public class M_Actor {
     static final mmove_t actor_move_pain3 = new mmove_t(FRAME_pain301, FRAME_pain303,
             actor_frames_pain3, actor_run);
 
-    static final mframe_t[] actor_frames_flipoff = new mframe_t[] {
+    static final mframe_t[] actor_frames_flipoff = {
             new mframe_t(GameAI.ai_turn, 0, null),
             new mframe_t(GameAI.ai_turn, 0, null),
             new mframe_t(GameAI.ai_turn, 0, null),
@@ -1165,7 +1171,7 @@ public class M_Actor {
     static final mmove_t actor_move_flipoff = new mmove_t(FRAME_flip01, FRAME_flip14,
             actor_frames_flipoff, actor_run);
 
-    static final mframe_t[] actor_frames_taunt = new mframe_t[] {
+    static final mframe_t[] actor_frames_taunt = {
             new mframe_t(GameAI.ai_turn, 0, null),
             new mframe_t(GameAI.ai_turn, 0, null),
             new mframe_t(GameAI.ai_turn, 0, null),
@@ -1191,7 +1197,9 @@ public class M_Actor {
             "Check your targets" };
 
     static final EntPainAdapter actor_pain = new EntPainAdapter() {
+        @Override
         public String getID() { return "actor_pain";}
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
 
             int n;
@@ -1237,7 +1245,9 @@ public class M_Actor {
     };
 
     static final EntThinkAdapter actor_dead = new EntThinkAdapter() {
+        @Override
         public String getID() { return "actor_dead";}
+        @Override
         public boolean think(edict_t self) {
             Math3D.VectorSet(self.mins, -16, -16, -24);
             Math3D.VectorSet(self.maxs, 16, 16, -8);
@@ -1249,7 +1259,7 @@ public class M_Actor {
         }
     };
 
-    static final mframe_t[] actor_frames_death1 = new mframe_t[] {
+    static final mframe_t[] actor_frames_death1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, -13, null),
@@ -1261,7 +1271,7 @@ public class M_Actor {
     static final mmove_t actor_move_death1 = new mmove_t(FRAME_death101,
             FRAME_death107, actor_frames_death1, actor_dead);
 
-    static final mframe_t[] actor_frames_death2 = new mframe_t[] {
+    static final mframe_t[] actor_frames_death2 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 7, null),
             new mframe_t(GameAI.ai_move, -6, null),
@@ -1280,9 +1290,11 @@ public class M_Actor {
             FRAME_death213, actor_frames_death2, actor_dead);
 
     static final EntDieAdapter actor_die = new EntDieAdapter() {
+        @Override
         public String getID() { return "actor_die";}
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             int n;
 
             //	check for gib
@@ -1319,7 +1331,9 @@ public class M_Actor {
     };
 
     static final EntThinkAdapter actor_fire = new EntThinkAdapter() {
+        @Override
         public String getID() { return "actor_fire";}
+        @Override
         public boolean think(edict_t self) {
             actorMachineGun(self);
 
@@ -1332,7 +1346,7 @@ public class M_Actor {
         }
     };
 
-    static final mframe_t[] actor_frames_attack = new mframe_t[] {
+    static final mframe_t[] actor_frames_attack = {
             new mframe_t(GameAI.ai_charge, -2, actor_fire),
             new mframe_t(GameAI.ai_charge, -2, null),
             new mframe_t(GameAI.ai_charge, 3, null),
@@ -1342,7 +1356,9 @@ public class M_Actor {
             FRAME_attak04, actor_frames_attack, actor_run);
 
     static final EntThinkAdapter actor_attack = new EntThinkAdapter() {
+        @Override
         public String getID() { return "actor_attack";}
+        @Override
         public boolean think(edict_t self) {
             int n;
 
@@ -1356,7 +1372,9 @@ public class M_Actor {
     };
 
     static final EntUseAdapter actor_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "actor_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             float v[] = { 0, 0, 0 };
 
@@ -1396,9 +1414,11 @@ public class M_Actor {
      */
 
     static final EntTouchAdapter target_actor_touch = new EntTouchAdapter() {
+        @Override
         public String getID() { return "target_actor_touch";}
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             float v[] = { 0, 0, 0 };
 
             if (other.movetarget != self)

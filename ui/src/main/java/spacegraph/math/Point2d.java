@@ -36,7 +36,7 @@ package spacegraph.math;
  * point x,y coordinates.
  *
  */
-public class Point2d extends Tuple2d implements java.io.Serializable {
+public class Point2d extends Tuple2d {
 
     // Compatible with 1.1
     static final long serialVersionUID = 1133748791492571954L;

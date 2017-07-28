@@ -103,7 +103,7 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
         return term;
     }
 
-    public boolean evalAsDirective(Struct d) throws Throwable, IllegalAccessException {
+    public boolean evalAsDirective(Struct d) throws Throwable {
         PrimitiveInfo pd = ((Struct) identifyDirective(d)).getPrimitive();
         if (pd != null) {
             try {

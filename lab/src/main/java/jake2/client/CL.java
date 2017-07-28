@@ -95,6 +95,7 @@ public final class CL {
      * Stop recording a demo.
      */
     static final xcommand_t Stop_f = new xcommand_t() {
+        @Override
         public void execute() {
             try {
 
@@ -126,6 +127,7 @@ public final class CL {
      * Begins recording a demo from the current position.
      */
     static final xcommand_t Record_f = new xcommand_t() {
+        @Override
         public void execute() {
             try {
                 String name;
@@ -236,6 +238,7 @@ public final class CL {
      * ForwardToServer_f
      */
     static final xcommand_t ForwardToServer_f = new xcommand_t() {
+        @Override
         public void execute() {
             if (Globals.cls.state != Defines.ca_connected
                     && Globals.cls.state != Defines.ca_active) {
@@ -256,6 +259,7 @@ public final class CL {
      * Pause_f
      */
     static final xcommand_t Pause_f = new xcommand_t() {
+        @Override
         public void execute() {
             // never pause in multiplayer
 
@@ -273,6 +277,7 @@ public final class CL {
      * Quit_f
      */
     static final xcommand_t Quit_f = new xcommand_t() {
+        @Override
         public void execute() {
             Disconnect();
             Com.Quit();
@@ -283,6 +288,7 @@ public final class CL {
      * Connect_f
      */
     static final xcommand_t Connect_f = new xcommand_t() {
+        @Override
         public void execute() {
             String server;
 
@@ -318,6 +324,7 @@ public final class CL {
      * Send the rest of the command line over as an unconnected command.
      */
     static final xcommand_t Rcon_f = new xcommand_t() {
+        @Override
         public void execute() {
 
             if (Globals.rcon_client_password.string.length() == 0) {
@@ -364,6 +371,7 @@ public final class CL {
     };
 
     static final xcommand_t Disconnect_f = new xcommand_t() {
+        @Override
         public void execute() {
             Com.Error(Defines.ERR_DROP, "Disconnected from server");
         }
@@ -375,6 +383,7 @@ public final class CL {
      * Just sent as a hint to the client that they should drop to full console.
      */
     static final xcommand_t Changing_f = new xcommand_t() {
+        @Override
         public void execute() {
             //ZOID
             //if we are downloading, we don't change!
@@ -396,6 +405,7 @@ public final class CL {
      * The server is changing levels.
      */
     static final xcommand_t Reconnect_f = new xcommand_t() {
+        @Override
         public void execute() {
             //ZOID
             //if we are downloading, we don't change! This so we don't suddenly
@@ -430,6 +440,7 @@ public final class CL {
      * PingServers_f
      */
     static final xcommand_t PingServers_f = new xcommand_t() {
+        @Override
         public void execute() {
             int i;
             netadr_t adr = new netadr_t();
@@ -491,6 +502,7 @@ public final class CL {
      * Load or download any custom player skins and models.
      */
     static final xcommand_t Skins_f = new xcommand_t() {
+        @Override
         public void execute() {
             int i;
 
@@ -511,6 +523,7 @@ public final class CL {
      * Userinfo_f
      */
     static final xcommand_t Userinfo_f = new xcommand_t() {
+        @Override
         public void execute() {
             Com.Printf("User info settings:\n");
             Info.Print(Cvar.Userinfo());
@@ -524,6 +537,7 @@ public final class CL {
      * all sounds.
      */
     static final xcommand_t Snd_Restart_f = new xcommand_t() {
+        @Override
         public void execute() {
             S.Shutdown();
             S.Init();
@@ -544,6 +558,7 @@ public final class CL {
      * the server.
      */
     static final xcommand_t Precache_f = new xcommand_t() {
+        @Override
         public void execute() {
             // Yet another hack to let old demos work the old precache sequence.
             if (Cmd.Argc() < 2) {
@@ -577,7 +592,7 @@ public final class CL {
      * FIXME: this is a callback from Sys_Quit and Com_Error. It would be better
      * to run quit through here before the final handoff to the sys code.
      */
-    static boolean isdown = false;
+    static boolean isdown;
 
     /**
      * WriteDemoMessage
@@ -771,7 +786,7 @@ public final class CL {
 
         c = Cmd.Argv(0);
         
-        Com.Println(Globals.net_from.toString() + ": " + c);
+        Com.Println(Globals.net_from + ": " + c);
 
         // server connection
         if (c.equals("client_connect")) {

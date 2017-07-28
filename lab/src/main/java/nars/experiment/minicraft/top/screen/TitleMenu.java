@@ -6,7 +6,7 @@ import nars.experiment.minicraft.top.gfx.Screen;
 import nars.experiment.minicraft.top.sound.Sound;
 
 public class TitleMenu extends Menu {
-	private int selected = 0;
+	private final int selected = 0;
 
 	private static final String[] options = { "Start game", "How to play", "About" };
 

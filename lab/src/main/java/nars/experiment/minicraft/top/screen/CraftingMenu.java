@@ -15,7 +15,7 @@ import java.util.List;
 
 public class CraftingMenu extends Menu {
 	private final Player player;
-	private int selected = 0;
+	private int selected;
 
 	private final List<Recipe> recipes;
 

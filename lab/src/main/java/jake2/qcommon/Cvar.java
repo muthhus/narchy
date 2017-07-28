@@ -223,6 +223,7 @@ public class Cvar extends Globals {
      */
     
     static final xcommand_t Set_f = new xcommand_t() {
+        @Override
         public void execute() {
             int c;
             int flags;
@@ -257,6 +258,7 @@ public class Cvar extends Globals {
      * List command, lists all available commands.
      */
     static final xcommand_t List_f = new xcommand_t() {
+        @Override
         public void execute() {
             cvar_t var;
             int i;

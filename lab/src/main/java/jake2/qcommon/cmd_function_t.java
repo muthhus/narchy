@@ -29,7 +29,7 @@ package jake2.qcommon;
  * cmd_function_t
  */
 public final class cmd_function_t {
-	public cmd_function_t next = null;
-	public String name = null;
+	public cmd_function_t next;
+	public String name;
 	public xcommand_t function;
 }

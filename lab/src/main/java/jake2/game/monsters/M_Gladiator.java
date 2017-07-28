@@ -234,7 +234,9 @@ public class M_Gladiator {
     static int sound_sight;
 
     static final EntThinkAdapter gladiator_idle = new EntThinkAdapter() {
-    	public String getID() { return "gladiator_idle"; }
+    	@Override
+        public String getID() { return "gladiator_idle"; }
+        @Override
         public boolean think(edict_t self) {
 
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_idle, 1,
@@ -244,7 +246,9 @@ public class M_Gladiator {
     };
 
     static final EntInteractAdapter gladiator_sight = new EntInteractAdapter() {
-    	public String getID() { return "gladiator_sight"; }
+    	@Override
+        public String getID() { return "gladiator_sight"; }
+        @Override
         public boolean interact(edict_t self, edict_t other) {
 
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_sight, 1,
@@ -254,7 +258,9 @@ public class M_Gladiator {
     };
 
     static final EntThinkAdapter gladiator_search = new EntThinkAdapter() {
-    	public String getID() { return "gladiator_search"; }
+    	@Override
+        public String getID() { return "gladiator_search"; }
+        @Override
         public boolean think(edict_t self) {
 
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_search, 1,
@@ -264,7 +270,9 @@ public class M_Gladiator {
     };
 
     static final EntThinkAdapter gladiator_cleaver_swing = new EntThinkAdapter() {
-    	public String getID() { return "gladiator_cleaver_swing"; }
+    	@Override
+        public String getID() { return "gladiator_cleaver_swing"; }
+        @Override
         public boolean think(edict_t self) {
 
             game_import_t.sound(self, Defines.CHAN_WEAPON, sound_cleaver_swing,
@@ -273,7 +281,7 @@ public class M_Gladiator {
         }
     };
 
-    static final mframe_t[] gladiator_frames_stand = new mframe_t[] {
+    static final mframe_t[] gladiator_frames_stand = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -286,7 +294,9 @@ public class M_Gladiator {
             FRAME_stand7, gladiator_frames_stand, null);
 
     static final EntThinkAdapter gladiator_stand = new EntThinkAdapter() {
-    	public String getID() { return "gladiator_stand"; }
+    	@Override
+        public String getID() { return "gladiator_stand"; }
+        @Override
         public boolean think(edict_t self) {
 
             self.monsterinfo.currentmove = gladiator_move_stand;
@@ -294,7 +304,7 @@ public class M_Gladiator {
         }
     };
 
-    static final mframe_t[] gladiator_frames_walk = new mframe_t[] {
+    static final mframe_t[] gladiator_frames_walk = {
             new mframe_t(GameAI.ai_walk, 15, null),
             new mframe_t(GameAI.ai_walk, 7, null),
             new mframe_t(GameAI.ai_walk, 6, null),
@@ -316,7 +326,9 @@ public class M_Gladiator {
             gladiator_frames_walk, null);
 
     static final EntThinkAdapter gladiator_walk = new EntThinkAdapter() {
-    	public String getID() { return "gladiator_walk"; }
+    	@Override
+        public String getID() { return "gladiator_walk"; }
+        @Override
         public boolean think(edict_t self) {
 
             self.monsterinfo.currentmove = gladiator_move_walk;
@@ -325,7 +337,7 @@ public class M_Gladiator {
         }
     };
 
-    static final mframe_t[] gladiator_frames_run = new mframe_t[] {
+    static final mframe_t[] gladiator_frames_run = {
             new mframe_t(GameAI.ai_run, 23, null),
             new mframe_t(GameAI.ai_run, 14, null),
             new mframe_t(GameAI.ai_run, 14, null),
@@ -337,7 +349,9 @@ public class M_Gladiator {
             gladiator_frames_run, null);
 
     static final EntThinkAdapter gladiator_run = new EntThinkAdapter() {
-    	public String getID() { return "gladiator_run"; }
+    	@Override
+        public String getID() { return "gladiator_run"; }
+        @Override
         public boolean think(edict_t self) {
 
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0)
@@ -350,7 +364,9 @@ public class M_Gladiator {
     };
 
     static final EntThinkAdapter GaldiatorMelee = new EntThinkAdapter() {
-    	public String getID() { return "GaldiatorMelee"; }
+    	@Override
+        public String getID() { return "GaldiatorMelee"; }
+        @Override
         public boolean think(edict_t self) {
 
             float[] aim = { 0, 0, 0 };
@@ -366,7 +382,7 @@ public class M_Gladiator {
         }
     };
 
-    static final mframe_t[] gladiator_frames_attack_melee = new mframe_t[] {
+    static final mframe_t[] gladiator_frames_attack_melee = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -389,7 +405,9 @@ public class M_Gladiator {
             FRAME_melee17, gladiator_frames_attack_melee, gladiator_run);
 
     static final EntThinkAdapter gladiator_melee = new EntThinkAdapter() {
-    	public String getID() { return "gladiator_melee"; }
+    	@Override
+        public String getID() { return "gladiator_melee"; }
+        @Override
         public boolean think(edict_t self) {
 
             self.monsterinfo.currentmove = gladiator_move_attack_melee;
@@ -398,7 +416,9 @@ public class M_Gladiator {
     };
 
     static final EntThinkAdapter GladiatorGun = new EntThinkAdapter() {
-    	public String getID() { return "GladiatorGun"; }
+    	@Override
+        public String getID() { return "GladiatorGun"; }
+        @Override
         public boolean think(edict_t self) {
 
             float[] start = { 0, 0, 0 };
@@ -424,7 +444,7 @@ public class M_Gladiator {
         }
     };
 
-    static final mframe_t[] gladiator_frames_attack_gun = new mframe_t[] {
+    static final mframe_t[] gladiator_frames_attack_gun = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -439,7 +459,9 @@ public class M_Gladiator {
             FRAME_attack9, gladiator_frames_attack_gun, gladiator_run);
 
     static final EntThinkAdapter gladiator_attack = new EntThinkAdapter() {
-    	public String getID() { return "gladiator_attack"; }
+    	@Override
+        public String getID() { return "gladiator_attack"; }
+        @Override
         public boolean think(edict_t self) {
 
             float range;
@@ -462,7 +484,7 @@ public class M_Gladiator {
         }
     };
 
-    static final mframe_t[] gladiator_frames_pain = new mframe_t[] {
+    static final mframe_t[] gladiator_frames_pain = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -473,7 +495,7 @@ public class M_Gladiator {
     static final mmove_t gladiator_move_pain = new mmove_t(FRAME_pain1, FRAME_pain6,
             gladiator_frames_pain, gladiator_run);
 
-    static final mframe_t[] gladiator_frames_pain_air = new mframe_t[] {
+    static final mframe_t[] gladiator_frames_pain_air = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -486,7 +508,9 @@ public class M_Gladiator {
             FRAME_painup7, gladiator_frames_pain_air, gladiator_run);
 
     static final EntPainAdapter gladiator_pain = new EntPainAdapter() {
-    	public String getID() { return "gladiator_pain"; }
+    	@Override
+        public String getID() { return "gladiator_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
 
             if (self.health < (self.max_health / 2))
@@ -520,7 +544,9 @@ public class M_Gladiator {
     };
 
     static final EntThinkAdapter gladiator_dead = new EntThinkAdapter() {
-    	public String getID() { return "gladiator_dead"; }
+    	@Override
+        public String getID() { return "gladiator_dead"; }
+        @Override
         public boolean think(edict_t self) {
 
             Math3D.VectorSet(self.mins, -16, -16, -24);
@@ -533,7 +559,7 @@ public class M_Gladiator {
         }
     };
 
-    static final mframe_t[] gladiator_frames_death = new mframe_t[] {
+    static final mframe_t[] gladiator_frames_death = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -561,9 +587,11 @@ public class M_Gladiator {
             FRAME_death22, gladiator_frames_death, gladiator_dead);
 
     static final EntDieAdapter gladiator_die = new EntDieAdapter() {
-    	public String getID() { return "gladiator_die"; }
+    	@Override
+        public String getID() { return "gladiator_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             int n;
 
             //	check for gib

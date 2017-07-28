@@ -430,6 +430,7 @@ public final class Menu extends Key {
     static final int MAIN_ITEMS = 5;
 
     static xcommand_t Main_Draw = new xcommand_t() {
+        @Override
         public void execute() {
             Main_Draw();
         }
@@ -481,6 +482,7 @@ public final class Menu extends Key {
     }
 
     static keyfunc_t Main_Key = new keyfunc_t() {
+        @Override
         public String execute(int key) {
             return Main_Key(key);
         }
@@ -537,6 +539,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_Main = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_Main_f();
         }
@@ -544,10 +547,12 @@ public final class Menu extends Key {
 
     static void Menu_Main_f() {
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 Main_Draw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return Main_Key(key);
             }
@@ -598,6 +603,7 @@ public final class Menu extends Key {
         s_join_network_server_action.y = 0;
         s_join_network_server_action.name = " join network server";
         s_join_network_server_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 JoinNetworkServerFunc(o);
             }
@@ -609,6 +615,7 @@ public final class Menu extends Key {
         s_start_network_server_action.y = 10;
         s_start_network_server_action.name = " start network server";
         s_start_network_server_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 StartNetworkServerFunc(o);
             }
@@ -620,6 +627,7 @@ public final class Menu extends Key {
         s_player_setup_action.y = 20;
         s_player_setup_action.name = " player setup";
         s_player_setup_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 PlayerSetupFunc(o);
             }
@@ -639,6 +647,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_Multiplayer = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_Multiplayer_f();
         }
@@ -647,10 +656,12 @@ public final class Menu extends Key {
     static void Menu_Multiplayer_f() {
         Multiplayer_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 Multiplayer_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return Multiplayer_MenuKey(key);
             }
@@ -823,6 +834,7 @@ public final class Menu extends Key {
         s_keys_menu.x = (int) (viddef.getWidth() * 0.50);
         s_keys_menu.nitems = 0;
         s_keys_menu.cursordraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 KeyCursorDrawFunc((menuframework_s) o);
             }
@@ -833,6 +845,7 @@ public final class Menu extends Key {
         s_keys_attack_action.x = 0;
         s_keys_attack_action.y = y;
         s_keys_attack_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -845,6 +858,7 @@ public final class Menu extends Key {
         s_keys_change_weapon_action.x = 0;
         s_keys_change_weapon_action.y = y += 9;
         s_keys_change_weapon_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -858,6 +872,7 @@ public final class Menu extends Key {
         s_keys_walk_forward_action.x = 0;
         s_keys_walk_forward_action.y = y += 9;
         s_keys_walk_forward_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -870,6 +885,7 @@ public final class Menu extends Key {
         s_keys_backpedal_action.x = 0;
         s_keys_backpedal_action.y = y += 9;
         s_keys_backpedal_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -882,6 +898,7 @@ public final class Menu extends Key {
         s_keys_turn_left_action.x = 0;
         s_keys_turn_left_action.y = y += 9;
         s_keys_turn_left_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -894,6 +911,7 @@ public final class Menu extends Key {
         s_keys_turn_right_action.x = 0;
         s_keys_turn_right_action.y = y += 9;
         s_keys_turn_right_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -906,6 +924,7 @@ public final class Menu extends Key {
         s_keys_run_action.x = 0;
         s_keys_run_action.y = y += 9;
         s_keys_run_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -918,6 +937,7 @@ public final class Menu extends Key {
         s_keys_step_left_action.x = 0;
         s_keys_step_left_action.y = y += 9;
         s_keys_step_left_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -930,6 +950,7 @@ public final class Menu extends Key {
         s_keys_step_right_action.x = 0;
         s_keys_step_right_action.y = y += 9;
         s_keys_step_right_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -943,6 +964,7 @@ public final class Menu extends Key {
         s_keys_sidestep_action.x = 0;
         s_keys_sidestep_action.y = y += 9;
         s_keys_sidestep_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -956,6 +978,7 @@ public final class Menu extends Key {
         s_keys_look_up_action.x = 0;
         s_keys_look_up_action.y = y += 9;
         s_keys_look_up_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -969,6 +992,7 @@ public final class Menu extends Key {
         s_keys_look_down_action.x = 0;
         s_keys_look_down_action.y = y += 9;
         s_keys_look_down_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -982,6 +1006,7 @@ public final class Menu extends Key {
         s_keys_center_view_action.x = 0;
         s_keys_center_view_action.y = y += 9;
         s_keys_center_view_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -995,6 +1020,7 @@ public final class Menu extends Key {
         s_keys_mouse_look_action.x = 0;
         s_keys_mouse_look_action.y = y += 9;
         s_keys_mouse_look_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1008,6 +1034,7 @@ public final class Menu extends Key {
         s_keys_keyboard_look_action.x = 0;
         s_keys_keyboard_look_action.y = y += 9;
         s_keys_keyboard_look_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1021,6 +1048,7 @@ public final class Menu extends Key {
         s_keys_move_up_action.x = 0;
         s_keys_move_up_action.y = y += 9;
         s_keys_move_up_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1034,6 +1062,7 @@ public final class Menu extends Key {
         s_keys_move_down_action.x = 0;
         s_keys_move_down_action.y = y += 9;
         s_keys_move_down_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1047,6 +1076,7 @@ public final class Menu extends Key {
         s_keys_inventory_action.x = 0;
         s_keys_inventory_action.y = y += 9;
         s_keys_inventory_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1060,6 +1090,7 @@ public final class Menu extends Key {
         s_keys_inv_use_action.x = 0;
         s_keys_inv_use_action.y = y += 9;
         s_keys_inv_use_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1073,6 +1104,7 @@ public final class Menu extends Key {
         s_keys_inv_drop_action.x = 0;
         s_keys_inv_drop_action.y = y += 9;
         s_keys_inv_drop_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1086,6 +1118,7 @@ public final class Menu extends Key {
         s_keys_inv_prev_action.x = 0;
         s_keys_inv_prev_action.y = y += 9;
         s_keys_inv_prev_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1099,6 +1132,7 @@ public final class Menu extends Key {
         s_keys_inv_next_action.x = 0;
         s_keys_inv_next_action.y = y += 9;
         s_keys_inv_next_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1112,6 +1146,7 @@ public final class Menu extends Key {
         s_keys_help_computer_action.x = 0;
         s_keys_help_computer_action.y = y += 9;
         s_keys_help_computer_action.ownerdraw = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DrawKeyBindingFunc(o);
             }
@@ -1151,6 +1186,7 @@ public final class Menu extends Key {
     }
 
     static xcommand_t Keys_MenuDraw = new xcommand_t() {
+        @Override
         public void execute() {
             Keys_MenuDraw_f();
         }
@@ -1162,6 +1198,7 @@ public final class Menu extends Key {
     }
 
     static keyfunc_t Keys_MenuKey = new keyfunc_t() {
+        @Override
         public String execute(int key) {
             return Keys_MenuKey_f(key);
         }
@@ -1204,6 +1241,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_Keys = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_Keys_f();
         }
@@ -1212,10 +1250,12 @@ public final class Menu extends Key {
     static void Menu_Keys_f() {
         Keys_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 Keys_MenuDraw_f();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return Keys_MenuKey_f(key);
             }
@@ -1457,6 +1497,7 @@ public final class Menu extends Key {
         s_options_sfxvolume_slider.y = 0;
         s_options_sfxvolume_slider.name = "effects volume";
         s_options_sfxvolume_slider.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 UpdateVolumeFunc(o);
             }
@@ -1470,6 +1511,7 @@ public final class Menu extends Key {
         s_options_cdvolume_box.y = 10;
         s_options_cdvolume_box.name = "CD music";
         s_options_cdvolume_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 UpdateCDVolumeFunc(o);
             }
@@ -1483,6 +1525,7 @@ public final class Menu extends Key {
         s_options_quality_list.y = 20;
         s_options_quality_list.name = "sound";
         s_options_quality_list.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 UpdateSoundQualityFunc(o);
             }
@@ -1494,6 +1537,7 @@ public final class Menu extends Key {
         s_options_sensitivity_slider.y = 50;
         s_options_sensitivity_slider.name = "mouse speed";
         s_options_sensitivity_slider.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 MouseSpeedFunc(o);
             }
@@ -1506,6 +1550,7 @@ public final class Menu extends Key {
         s_options_alwaysrun_box.y = 60;
         s_options_alwaysrun_box.name = "always run";
         s_options_alwaysrun_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 AlwaysRunFunc(o);
             }
@@ -1517,6 +1562,7 @@ public final class Menu extends Key {
         s_options_invertmouse_box.y = 70;
         s_options_invertmouse_box.name = "invert mouse";
         s_options_invertmouse_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 InvertMouseFunc(o);
             }
@@ -1528,6 +1574,7 @@ public final class Menu extends Key {
         s_options_lookspring_box.y = 80;
         s_options_lookspring_box.name = "lookspring";
         s_options_lookspring_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 LookspringFunc(o);
             }
@@ -1539,6 +1586,7 @@ public final class Menu extends Key {
         s_options_lookstrafe_box.y = 90;
         s_options_lookstrafe_box.name = "lookstrafe";
         s_options_lookstrafe_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 LookstrafeFunc(o);
             }
@@ -1550,6 +1598,7 @@ public final class Menu extends Key {
         s_options_freelook_box.y = 100;
         s_options_freelook_box.name = "free look";
         s_options_freelook_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 FreeLookFunc(o);
             }
@@ -1561,6 +1610,7 @@ public final class Menu extends Key {
         s_options_crosshair_box.y = 110;
         s_options_crosshair_box.name = "crosshair";
         s_options_crosshair_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 CrosshairFunc(o);
             }
@@ -1578,6 +1628,7 @@ public final class Menu extends Key {
         s_options_joystick_box.y = 120;
         s_options_joystick_box.name = "use joystick";
         s_options_joystick_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 JoystickFunc(o);
             }
@@ -1589,6 +1640,7 @@ public final class Menu extends Key {
         s_options_customize_options_action.y = 140;
         s_options_customize_options_action.name = "customize controls";
         s_options_customize_options_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 CustomizeControlsFunc(o);
             }
@@ -1599,6 +1651,7 @@ public final class Menu extends Key {
         s_options_defaults_action.y = 150;
         s_options_defaults_action.name = "reset defaults";
         s_options_defaults_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 ControlsResetDefaultsFunc(o);
             }
@@ -1609,6 +1662,7 @@ public final class Menu extends Key {
         s_options_console_action.y = 160;
         s_options_console_action.name = "go to console";
         s_options_console_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 ConsoleFunc(o);
             }
@@ -1645,6 +1699,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_Options = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_Options_f();
         }
@@ -1653,10 +1708,12 @@ public final class Menu extends Key {
     static void Menu_Options_f() {
         Options_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 Options_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return Options_MenuKey(key);
             }
@@ -1672,6 +1729,7 @@ public final class Menu extends Key {
      */
 
     static final xcommand_t Menu_Video = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_Video_f();
         }
@@ -1680,10 +1738,12 @@ public final class Menu extends Key {
     static void Menu_Video_f() {
         VID.MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 VID.MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return VID.MenuKey(key);
             }
@@ -1892,6 +1952,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_Credits = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_Credits_f();
         }
@@ -1928,10 +1989,12 @@ public final class Menu extends Key {
 
         credits_start_time = cls.realtime;
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 Credits_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return Credits_Key(key);
             }
@@ -2018,6 +2081,7 @@ public final class Menu extends Key {
         s_easy_game_action.y = 0;
         s_easy_game_action.name = "easy";
         s_easy_game_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 EasyGameFunc(o);
             }
@@ -2029,6 +2093,7 @@ public final class Menu extends Key {
         s_medium_game_action.y = 10;
         s_medium_game_action.name = "medium";
         s_medium_game_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 MediumGameFunc(o);
             }
@@ -2040,6 +2105,7 @@ public final class Menu extends Key {
         s_hard_game_action.y = 20;
         s_hard_game_action.name = "hard";
         s_hard_game_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 HardGameFunc(o);
             }
@@ -2053,6 +2119,7 @@ public final class Menu extends Key {
         s_load_game_action.y = 40;
         s_load_game_action.name = "load game";
         s_load_game_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 LoadGameFunc(o);
             }
@@ -2064,6 +2131,7 @@ public final class Menu extends Key {
         s_save_game_action.y = 50;
         s_save_game_action.name = "save game";
         s_save_game_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 SaveGameFunc(o);
             }
@@ -2075,6 +2143,7 @@ public final class Menu extends Key {
         s_credits_action.y = 60;
         s_credits_action.name = "credits";
         s_credits_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 CreditsFunc(o);
             }
@@ -2103,6 +2172,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_Game = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_Game_f();
         }
@@ -2111,10 +2181,12 @@ public final class Menu extends Key {
     static void Menu_Game_f() {
         Game_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 Game_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return Game_MenuKey(key);
             }
@@ -2205,6 +2277,7 @@ public final class Menu extends Key {
             s_loadgame_actions[i].flags = QMF_LEFT_JUSTIFY;
             s_loadgame_actions[i].localdata[0] = i;
             s_loadgame_actions[i].callback = new mcallback() {
+                @Override
                 public void execute(Object o) {
                     LoadGameCallback(o);
                 }
@@ -2237,6 +2310,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_LoadGame = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_LoadGame_f();
         }
@@ -2245,10 +2319,12 @@ public final class Menu extends Key {
     static void Menu_LoadGame_f() {
         LoadGame_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 LoadGame_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return LoadGame_MenuKey(key);
             }
@@ -2299,6 +2375,7 @@ public final class Menu extends Key {
             s_savegame_actions[i].localdata[0] = i + 1;
             s_savegame_actions[i].flags = QMF_LEFT_JUSTIFY;
             s_savegame_actions[i].callback = new mcallback() {
+                @Override
                 public void execute(Object o) {
                     SaveGameCallback(o);
                 }
@@ -2323,6 +2400,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_SaveGame = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_SaveGame_f();
         }
@@ -2334,10 +2412,12 @@ public final class Menu extends Key {
 
         SaveGame_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 SaveGame_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return SaveGame_MenuKey(key);
             }
@@ -2460,6 +2540,7 @@ public final class Menu extends Key {
         s_joinserver_address_book_action.x = 0;
         s_joinserver_address_book_action.y = 0;
         s_joinserver_address_book_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 AddressBookFunc(o);
             }
@@ -2471,6 +2552,7 @@ public final class Menu extends Key {
         s_joinserver_search_action.x = 0;
         s_joinserver_search_action.y = 10;
         s_joinserver_search_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 SearchLocalGamesFunc(o);
             }
@@ -2490,6 +2572,7 @@ public final class Menu extends Key {
             s_joinserver_server_actions[i].x = 0;
             s_joinserver_server_actions[i].y = 40 + i * 10;
             s_joinserver_server_actions[i].callback = new mcallback() {
+                @Override
                 public void execute(Object o) {
                     JoinServerFunc(o);
                 }
@@ -2519,6 +2602,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_JoinServer = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_JoinServer_f();
         }
@@ -2527,10 +2611,12 @@ public final class Menu extends Key {
     static void Menu_JoinServer_f() {
         JoinServer_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 JoinServer_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return JoinServer_MenuKey(key);
             }
@@ -2774,6 +2860,7 @@ public final class Menu extends Key {
         else
             s_rules_box.curvalue = 0;
         s_rules_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 RulesChangeFunc(o);
             }
@@ -2840,6 +2927,7 @@ public final class Menu extends Key {
         s_startserver_dmoptions_action.y = 108;
         s_startserver_dmoptions_action.statusbar = null;
         s_startserver_dmoptions_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMOptionsFunc(o);
             }
@@ -2851,6 +2939,7 @@ public final class Menu extends Key {
         s_startserver_start_action.x = 24;
         s_startserver_start_action.y = 128;
         s_startserver_start_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 StartServerActionFunc(o);
             }
@@ -2892,17 +2981,20 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_StartServer = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_StartServer_f();
         }
     };
 
     static final xcommand_t startServer_MenuDraw = new xcommand_t() {
+        @Override
         public void execute() {
             StartServer_MenuDraw();
         }
     };
     static final keyfunc_t startServer_MenuKey = new keyfunc_t() {
+        @Override
         public String execute(int key) {
             return StartServer_MenuKey(key);
         }        
@@ -3089,6 +3181,7 @@ public final class Menu extends Key {
         s_falls_box.y = y;
         s_falls_box.name = "falling damage";
         s_falls_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3101,6 +3194,7 @@ public final class Menu extends Key {
         s_weapons_stay_box.y = y += 10;
         s_weapons_stay_box.name = "weapons stay";
         s_weapons_stay_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3113,6 +3207,7 @@ public final class Menu extends Key {
         s_instant_powerups_box.y = y += 10;
         s_instant_powerups_box.name = "instant powerups";
         s_instant_powerups_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3126,6 +3221,7 @@ public final class Menu extends Key {
         s_powerups_box.y = y += 10;
         s_powerups_box.name = "allow powerups";
         s_powerups_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3137,6 +3233,7 @@ public final class Menu extends Key {
         s_health_box.x = 0;
         s_health_box.y = y += 10;
         s_health_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3150,6 +3247,7 @@ public final class Menu extends Key {
         s_armor_box.y = y += 10;
         s_armor_box.name = "allow armor";
         s_armor_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3162,6 +3260,7 @@ public final class Menu extends Key {
         s_spawn_farthest_box.y = y += 10;
         s_spawn_farthest_box.name = "spawn farthest";
         s_spawn_farthest_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3175,6 +3274,7 @@ public final class Menu extends Key {
         s_samelevel_box.y = y += 10;
         s_samelevel_box.name = "same map";
         s_samelevel_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3187,6 +3287,7 @@ public final class Menu extends Key {
         s_force_respawn_box.y = y += 10;
         s_force_respawn_box.name = "force respawn";
         s_force_respawn_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3200,6 +3301,7 @@ public final class Menu extends Key {
         s_teamplay_box.y = y += 10;
         s_teamplay_box.name = "teamplay";
         s_teamplay_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3211,6 +3313,7 @@ public final class Menu extends Key {
         s_allow_exit_box.y = y += 10;
         s_allow_exit_box.name = "allow exit";
         s_allow_exit_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3223,6 +3326,7 @@ public final class Menu extends Key {
         s_infinite_ammo_box.y = y += 10;
         s_infinite_ammo_box.name = "infinite ammo";
         s_infinite_ammo_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3236,6 +3340,7 @@ public final class Menu extends Key {
         s_fixed_fov_box.y = y += 10;
         s_fixed_fov_box.name = "fixed FOV";
         s_fixed_fov_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3248,6 +3353,7 @@ public final class Menu extends Key {
         s_quad_drop_box.y = y += 10;
         s_quad_drop_box.name = "quad drop";
         s_quad_drop_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3260,6 +3366,7 @@ public final class Menu extends Key {
         s_friendlyfire_box.y = y += 10;
         s_friendlyfire_box.name = "friendly fire";
         s_friendlyfire_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DMFlagCallback(o);
             }
@@ -3276,6 +3383,7 @@ public final class Menu extends Key {
             s_no_mines_box.y = y += 10;
             s_no_mines_box.name = "remove mines";
             s_no_mines_box.callback = new mcallback() {
+                @Override
                 public void execute(Object o) {
                     DMFlagCallback(o);
                 }
@@ -3288,6 +3396,7 @@ public final class Menu extends Key {
             s_no_nukes_box.y = y += 10;
             s_no_nukes_box.name = "remove nukes";
             s_no_nukes_box.callback = new mcallback() {
+                @Override
                 public void execute(Object o) {
                     DMFlagCallback(o);
                 }
@@ -3300,6 +3409,7 @@ public final class Menu extends Key {
             s_stack_double_box.y = y += 10;
             s_stack_double_box.name = "2x/4x stacking off";
             s_stack_double_box.callback = new mcallback() {
+                @Override
                 public void execute(Object o) {
                     DMFlagCallback(o);
                 }
@@ -3312,6 +3422,7 @@ public final class Menu extends Key {
             s_no_spheres_box.y = y += 10;
             s_no_spheres_box.name = "remove spheres";
             s_no_spheres_box.callback = new mcallback() {
+                @Override
                 public void execute(Object o) {
                     DMFlagCallback(o);
                 }
@@ -3366,6 +3477,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_DMOptions = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_DMOptions_f();
         }
@@ -3374,10 +3486,12 @@ public final class Menu extends Key {
     static void Menu_DMOptions_f() {
         DMOptions_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 DMOptions_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return DMOptions_MenuKey(key);
             }
@@ -3448,6 +3562,7 @@ public final class Menu extends Key {
         s_allow_download_box.y = y += 20;
         s_allow_download_box.name = "allow downloading";
         s_allow_download_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DownloadCallback(o);
             }
@@ -3461,6 +3576,7 @@ public final class Menu extends Key {
         s_allow_download_maps_box.y = y += 20;
         s_allow_download_maps_box.name = "maps";
         s_allow_download_maps_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DownloadCallback(o);
             }
@@ -3474,6 +3590,7 @@ public final class Menu extends Key {
         s_allow_download_players_box.y = y += 10;
         s_allow_download_players_box.name = "player models/skins";
         s_allow_download_players_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DownloadCallback(o);
             }
@@ -3487,6 +3604,7 @@ public final class Menu extends Key {
         s_allow_download_models_box.y = y += 10;
         s_allow_download_models_box.name = "models";
         s_allow_download_models_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DownloadCallback(o);
             }
@@ -3500,6 +3618,7 @@ public final class Menu extends Key {
         s_allow_download_sounds_box.y = y += 10;
         s_allow_download_sounds_box.name = "sounds";
         s_allow_download_sounds_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DownloadCallback(o);
             }
@@ -3531,6 +3650,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_DownloadOptions = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_DownloadOptions_f();
         }
@@ -3539,10 +3659,12 @@ public final class Menu extends Key {
     static void Menu_DownloadOptions_f() {
         DownloadOptions_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 DownloadOptions_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return DownloadOptions_MenuKey(key);
             }
@@ -3591,6 +3713,7 @@ public final class Menu extends Key {
     }
 
     static keyfunc_t AddressBook_MenuKey = new keyfunc_t() {
+        @Override
         public String execute(int key) {
             return AddressBook_MenuKey_f(key);
         }
@@ -3606,6 +3729,7 @@ public final class Menu extends Key {
     }
 
     static xcommand_t AddressBook_MenuDraw = new xcommand_t() {
+        @Override
         public void execute() {
             AddressBook_MenuDraw_f();
         }
@@ -3617,6 +3741,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_AddressBook = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_AddressBook_f();
         }
@@ -3625,10 +3750,12 @@ public final class Menu extends Key {
     static void Menu_AddressBook_f() {
         AddressBook_MenuInit();
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 AddressBook_MenuDraw_f();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return AddressBook_MenuKey_f(key);
             }
@@ -3977,6 +4104,7 @@ public final class Menu extends Key {
         s_player_model_box.x = -56;
         s_player_model_box.y = 70;
         s_player_model_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 ModelCallback(o);
             }
@@ -4010,6 +4138,7 @@ public final class Menu extends Key {
         s_player_handedness_box.name = null;
         s_player_handedness_box.cursor_offset = -48;
         s_player_handedness_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 HandednessCallback(o);
             }
@@ -4032,6 +4161,7 @@ public final class Menu extends Key {
         s_player_rate_box.name = null;
         s_player_rate_box.cursor_offset = -48;
         s_player_rate_box.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 RateCallback(o);
             }
@@ -4046,6 +4176,7 @@ public final class Menu extends Key {
         s_player_download_action.y = 186;
         s_player_download_action.statusbar = null;
         s_player_download_action.callback = new mcallback() {
+            @Override
             public void execute(Object o) {
                 DownloadOptionsFunc(o);
             }
@@ -4171,6 +4302,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_PlayerConfig = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_PlayerConfig_f();
         }
@@ -4184,10 +4316,12 @@ public final class Menu extends Key {
         }
         Menu_SetStatusBar(s_multiplayer_menu, null);
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 PlayerConfig_MenuDraw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return PlayerConfig_MenuKey(key);
             }
@@ -4234,6 +4368,7 @@ public final class Menu extends Key {
     }
 
     static final xcommand_t Menu_Quit = new xcommand_t() {
+        @Override
         public void execute() {
             Menu_Quit_f();
         }
@@ -4241,10 +4376,12 @@ public final class Menu extends Key {
 
     static void Menu_Quit_f() {
         PushMenu(new xcommand_t() {
+            @Override
             public void execute() {
                 Quit_Draw();
             }
         }, new keyfunc_t() {
+            @Override
             public String execute(int key) {
                 return Quit_Key(key);
             }
@@ -4568,7 +4705,7 @@ public final class Menu extends Key {
                 if (citem != null)
                     if (citem.type != MTYPE_SEPARATOR)
                         break;
-                m.cursor += dir;
+                m.cursor += 1;
                 if (m.cursor >= m.nitems)
                     m.cursor = 0;
             }

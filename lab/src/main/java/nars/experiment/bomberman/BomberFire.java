@@ -12,14 +12,14 @@ import java.awt.*;
 
 public class BomberFire extends Thread {
     /** map object */
-    private BomberMap map;
+    private final BomberMap map;
     /** map grid handle */
-    private int[][] grid;
+    private final int[][] grid;
     /** position */
-    private int x;
-    private int y;
+    private final int x;
+    private final int y;
     /** fire type */
-    private int type;
+    private final int type;
     /** frame count */
     private int frame;
     /** owner */

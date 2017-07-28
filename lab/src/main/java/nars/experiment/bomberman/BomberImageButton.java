@@ -15,7 +15,7 @@ import java.awt.*;
  */
 public class BomberImageButton {
     /** this object's container */
-    private JPanel panel;
+    private final JPanel panel;
     /** x co-ordinate where the image is drawn */
     private int x;
     /** y co-ordinate where the image is drawn */
@@ -23,18 +23,18 @@ public class BomberImageButton {
     /** ID of object (for command) */
     private int ID;
     /** image width */
-    private int w;
+    private final int w;
     /** image height */
-    private int h;
+    private final int h;
     /** area the object controls */
     private Rectangle rect;
     /** the images of the button: normal / outerglowed */
-    private Image[] images;
+    private final Image[] images;
     /** stae of button: normal / outglowed */
-    private int state = 0;
+    private int state;
 
     /** rendering hints */
-    private static Object hints = null;
+    private static Object hints;
 
     static {
         /** if java runtime is Java 2 */
@@ -52,7 +52,7 @@ public class BomberImageButton {
              RenderingHints.VALUE_ANTIALIAS_ON);
             h.put(RenderingHints.KEY_COLOR_RENDERING,
              RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            hints = (RenderingHints)h;
+            hints = h;
         }
     }
 

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class Maze {
 	
-	public static enum Direction { 
+	public enum Direction {
 		
 		up, left, down, right; 
 		
@@ -33,7 +33,7 @@ public class Maze {
 		}
 	
 	}
-	public static enum Fruit {
+	public enum Fruit {
 		none, red, yellow, blue
 	}
 	public Fruit fruit = Fruit.none;
@@ -92,16 +92,16 @@ public class Maze {
 		for(int ix = 0; ix < ghostCage.width; ix++ ) {
 			for(int iy = 0; iy < ghostCage.height; iy++ ) {
 				
-				if(full.dots[(int)((offset.x + ix) / 2)][(int)((offset.y + iy) / 2)]) {
+				if(full.dots[(offset.x + ix) / 2][(offset.y + iy) / 2]) {
 					
-					full.dots[(int)((offset.x + ix) / 2)][(int)((offset.y + iy) / 2)] = false;
+					full.dots[(offset.x + ix) / 2][(offset.y + iy) / 2] = false;
 					full.dotCount --;
 					
 				}
 				
 				if(iy == 1 && ix > 2 && ix < ghostCage.width - 3) {
 					
-					full.tiles[ix + offset.x][iy + offset.y] = 3;
+					full.tiles[ix + offset.x][1 + offset.y] = 3;
 					continue;
 					
 				}
@@ -256,7 +256,7 @@ public class Maze {
 				
 				if(isDot(x, y)) {
 						
-					boolean[] corners = new boolean[]{false, false, false, false}; //top left, top right, bottom left, bottom right
+					boolean[] corners = {false, false, false, false}; //top left, top right, bottom left, bottom right
 					
 					if(!isWall(tiles[x-2][y-1]) || !isWall(tiles[x-1][y-2])) corners[0] = true;
 					if(!isWall(tiles[x+2][y-1]) || !isWall(tiles[x+1][y-2])) corners[1] = true;
@@ -290,11 +290,9 @@ public class Maze {
 		if(isWall(tiles[x - 1][y])) return false;
 		if(isWall(tiles[x + 1][y])) return false;
 		if(isWall(tiles[x][y - 1])) return false;
-		if(isWall(tiles[x][y + 1])) return false;
-		
-		return true;
-		
-	}
+        return !isWall(tiles[x][y + 1]);
+
+    }
 	
 	void generate() {
 		
@@ -350,24 +348,20 @@ public class Maze {
 	public static boolean isWall(byte b) {
 		
 		if(b == 3) return true;
-		if(b == 2) return true;
-		
-		return false;
-		
-	}
+        return b == 2;
+
+    }
 	
 	public static boolean isWall(byte b, Direction d) {
 		
 		if(b == 3 && d != Direction.up) return true;
-		if(b == 2) return true;
-		
-		return false;
-		
-	}
+        return b == 2;
+
+    }
 	
 	public boolean isBigFood(int x, int y) {
 		
-		int[] check = new int[]{x, y};
+		int[] check = {x, y};
 		
 		for(int[] place : this.bigDots) {
 			

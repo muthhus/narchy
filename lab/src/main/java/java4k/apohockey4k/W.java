@@ -40,9 +40,9 @@ public class W extends GamePanel {
 	private static final int WIDTH = 440;
 	private static final int HEIGHT = 600;
 
-	private final static Color[] COLOR_ORDER = new Color[] { Color.CYAN, Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.MAGENTA };
+	private final static Color[] COLOR_ORDER = { Color.CYAN, Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.MAGENTA };
 
-	private final static int[] WALLS = new int[] { 10, 10, 6, 286, 10, 304, 6, 286, 440 - 16, 10, 6, 286, 440 - 16, 304, 6, 286, 17, 7, 103, 6, 440 - 120, 7, 103, 6, 17, 587, 103, 6, 440 - 120, 587,
+	private final static int[] WALLS = { 10, 10, 6, 286, 10, 304, 6, 286, 440 - 16, 10, 6, 286, 440 - 16, 304, 6, 286, 17, 7, 103, 6, 440 - 120, 7, 103, 6, 17, 587, 103, 6, 440 - 120, 587,
 			103, 6, };
 
 	/**
@@ -67,8 +67,8 @@ public class W extends GamePanel {
 	private int colors[];
 	private float[] paddleVec;
 
-	private BufferedImage offscreenImage;
-	private Graphics2D offscreenGraphics;
+	private final BufferedImage offscreenImage;
+	private final Graphics2D offscreenGraphics;
 
 	public W() {
 		super(true);
@@ -276,7 +276,7 @@ public class W extends GamePanel {
 				}
 
 				// move paddle
-				float speed = (float) paddleVec[3] * 10 * 30;
+				float speed = paddleVec[3] * 10 * 30;
 				double alpha = paddleVec[2];
 				if (alpha > 360) {
 					alpha = 360 - alpha;
@@ -483,9 +483,9 @@ public class W extends GamePanel {
 				float add = 200f / (width / 2f - 2f);
 				int alpha = 255 - ((int) ((width / 2 - 2 - w) * add));
 				offscreenGraphics.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), alpha));
-				offscreenGraphics.drawOval((int) (playerspaddle[i] - width / 2 + 2 + w), (int) (playerspaddle[i + 1] - width / 2 + 2 + w), (int) (60 + 2 * (width / 2 - 2 - w)),
+				offscreenGraphics.drawOval((int) (playerspaddle[i] - width / 2 + 2 + w), (int) (playerspaddle[i + 1] - width / 2 + 2 + w), 60 + 2 * (width / 2 - 2 - w),
 						60 + 2 * (width / 2 - 2 - w));
-				offscreenGraphics.drawOval((int) (playerspaddle[i] + width / 2 - 2 - w), (int) (playerspaddle[i + 1] + width / 2 - 2 - w), (int) (60 - 2 * (width / 2 - 2 - w)),
+				offscreenGraphics.drawOval((int) (playerspaddle[i] + width / 2 - 2 - w), (int) (playerspaddle[i + 1] + width / 2 - 2 - w), 60 - 2 * (width / 2 - 2 - w),
 						60 - 2 * (width / 2 - 2 - w));
 			}
 

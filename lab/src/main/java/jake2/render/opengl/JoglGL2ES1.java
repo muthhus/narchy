@@ -14,7 +14,7 @@ public class JoglGL2ES1 implements QGL {
 
     private GL2ES1 gl;
     protected ImmModeSink ims;
-    private boolean inBlock = false; // within begin/end
+    private boolean inBlock; // within begin/end
 
     JoglGL2ES1() {
     }
@@ -29,6 +29,7 @@ public class JoglGL2ES1 implements QGL {
                 GL.GL_STATIC_DRAW);
     }
 
+    @Override
     public void glBegin(int mode) {
         if(inBlock) {
             throw new GLException("glBegin already called");
@@ -37,6 +38,7 @@ public class JoglGL2ES1 implements QGL {
         inBlock = true;
     }
 
+    @Override
     public void glEnd() {
         if(!inBlock) {
             throw new GLException("glBegin not called");
@@ -45,10 +47,12 @@ public class JoglGL2ES1 implements QGL {
         inBlock = false;
     }
 
+    @Override
     public void glColor3f(float red, float green, float blue) {
         glColor4f(red, green, blue, 1f);
     }
 
+    @Override
     public void glColor3ub(byte red, byte green, byte blue) {
         if(inBlock) {
             ims.glColor3ub(red, green, blue);
@@ -57,6 +61,7 @@ public class JoglGL2ES1 implements QGL {
         }
     }
     
+    @Override
     public void glColor4f(float red, float green, float blue, float alpha) {
         if(inBlock) {
             ims.glColor4f(red, green, blue, alpha);
@@ -65,6 +70,7 @@ public class JoglGL2ES1 implements QGL {
         }
     }
 
+    @Override
     public void glColor4ub(byte red, byte green, byte blue, byte alpha) {
         if(inBlock) {
             ims.glColor4ub(red, green, blue, alpha);
@@ -73,6 +79,7 @@ public class JoglGL2ES1 implements QGL {
         }
     }
 
+    @Override
     public void glTexCoord2f(float s, float t) {
         if(inBlock) {
             ims.glTexCoord2f(s, t);
@@ -81,6 +88,7 @@ public class JoglGL2ES1 implements QGL {
         }
     }
 
+    @Override
     public void glVertex2f(float x, float y) {
         if(inBlock) {
             ims.glVertex2f(x, y);
@@ -89,6 +97,7 @@ public class JoglGL2ES1 implements QGL {
         }
     }
 
+    @Override
     public void glVertex3f(float x, float y, float z) {
         if(inBlock) {
             ims.glVertex3f(x, y, z);
@@ -97,62 +106,77 @@ public class JoglGL2ES1 implements QGL {
         }
     }
 
+    @Override
     public void glAlphaFunc(int func, float ref) {
         gl.glAlphaFunc(func, ref);
     }
 
+    @Override
     public void glBindTexture(int target, int texture) {
         gl.glBindTexture(target, texture);
     }
 
+    @Override
     public void glBlendFunc(int sfactor, int dfactor) {
         gl.glBlendFunc(sfactor, dfactor);
     }
 
+    @Override
     public void glClear(int mask) {
         gl.glClear(mask);
     }
 
+    @Override
     public void glClearColor(float red, float green, float blue, float alpha) {
         gl.glClearColor(red, green, blue, alpha);
     }
 
+    @Override
     public void glColorPointer(int size, boolean unsigned, int stride, ByteBuffer pointer) {
         gl.glColorPointer(size, GL_UNSIGNED_BYTE, stride, pointer);
     }
 
+    @Override
     public void glColorPointer(int size, int stride, FloatBuffer pointer) {
         gl.glColorPointer(size, GL_FLOAT, stride, pointer);
     }
 
+    @Override
     public void glCullFace(int mode) {
         gl.glCullFace(mode);
     }
 
+    @Override
     public void glDeleteTextures(IntBuffer textures) {
         gl.glDeleteTextures(textures.limit(), textures);
     }
 
+    @Override
     public void glDepthFunc(int func) {
         gl.glDepthFunc(func);
     }
 
+    @Override
     public void glDepthMask(boolean flag) {
         gl.glDepthMask(flag);
     }
 
+    @Override
     public void glDepthRange(double zNear, double zFar) {
         gl.glDepthRangef((float)zNear, (float)zFar);
     }
 
+    @Override
     public void glDisable(int cap) {
         gl.glDisable(cap);
     }
 
+    @Override
     public void glDisableClientState(int cap) {
         gl.glDisableClientState(cap);
     }
 
+    @Override
     public void glDrawArrays(int mode, int first, int count) {
         switch(mode) {
             case GL_QUAD_STRIP:
@@ -172,6 +196,7 @@ public class JoglGL2ES1 implements QGL {
         // }
     }
 
+    @Override
     public void glDrawBuffer(int mode) {
         // FIXME: ignored  
         if(GL.GL_BACK != mode) {
@@ -179,6 +204,7 @@ public class JoglGL2ES1 implements QGL {
         }
     }
 
+    @Override
     public void glDrawElements(int mode, ShortBuffer indices) {
         switch(mode) {
             case GL_QUAD_STRIP:
@@ -201,41 +227,49 @@ public class JoglGL2ES1 implements QGL {
         // }
     }
 
+    @Override
     public void glEnable(int cap) {
         gl.glEnable(cap);
     }
 
+    @Override
     public void glEnableClientState(int cap) {
         gl.glEnableClientState(cap);
     }
 
+    @Override
     public void glFinish() {
         gl.glFinish();
     }
 
+    @Override
     public void glFlush() {
         gl.glFlush();
     }
 
+    @Override
     public void glFrustum(double left, double right, double bottom,
-            double top, double zNear, double zFar) {
+                          double top, double zNear, double zFar) {
         gl.glFrustum(left, right, bottom, top, zNear, zFar);
     }
 
+    @Override
     public int glGetError() {
         return gl.glGetError();
     }
 
+    @Override
     public void glGetFloat(int pname, FloatBuffer params) {
         gl.glGetFloatv(pname, params);
     }
 
     private static final String GL_EXT_point_parameters = "GL_EXT_point_parameters";
     
+    @Override
     public String glGetString(int name) {
         if( GL.GL_EXTENSIONS == name ) {
             StringBuilder sb = new StringBuilder();
-            sb.append(gl.glGetString(name));
+            sb.append(gl.glGetString(GL.GL_EXTENSIONS));
             sb.append(" GL_ARB_multitexture");
             sb.append(' ').append(GL_EXT_point_parameters);
             return sb.toString();
@@ -243,10 +277,12 @@ public class JoglGL2ES1 implements QGL {
         return gl.glGetString(name);
     }
 
+    @Override
     public void glHint(int target, int mode) {
         gl.glHint(target, mode);
     }
 
+    @Override
     public void glInterleavedArrays(int format, int stride, FloatBuffer pointer) {
         // gl.glInterleavedArrays(GL_T2F_V3F, glpoly_t.BYTE_STRIDE, globalPolygonInterleavedBuf);        
         // gl.glInterleavedArrays(format, stride, pointer);
@@ -269,69 +305,85 @@ public class JoglGL2ES1 implements QGL {
         buf.position(pos);
     }
 
+    @Override
     public void glLoadIdentity() {
         gl.glLoadIdentity();
     }
 
+    @Override
     public void glLoadMatrix(FloatBuffer m) {
         gl.glLoadMatrixf(m);
     }
 
+    @Override
     public void glMatrixMode(int mode) {
         gl.glMatrixMode(mode);
     }
 
+    @Override
     public void glOrtho(double left, double right, double bottom, double top, double zNear, double zFar) {
         gl.glOrtho(left, right, bottom, top, zNear, zFar);
     }
 
+    @Override
     public void glPixelStorei(int pname, int param) {
         gl.glPixelStorei(pname, param);
     }
 
+    @Override
     public void glPolygonMode(int face, int mode) {
         if( GL_FRONT_AND_BACK != face || GL_FILL != mode ) { // if !default
             System.err.println("IGNORED: glPolygonMode(0x"+Integer.toHexString(face)+", 0x"+Integer.toHexString(mode)+ ')');
         }
     }
 
+    @Override
     public void glPopMatrix() {
         gl.glPopMatrix();
     }
 
+    @Override
     public void glPushMatrix() {
         gl.glPushMatrix();
     }
 
+    @Override
     public void glReadPixels(int x, int y, int width, int height, int format, int type, ByteBuffer pixels) {
         gl.glReadPixels(x, y, width, height, format, type, pixels);
     }
 
+    @Override
     public void glRotatef(float angle, float x, float y, float z) {
         gl.glRotatef(angle, x, y, z);
     }
 
+    @Override
     public void glScalef(float x, float y, float z) {
         gl.glScalef(x, y, z);
     }
 
+    @Override
     public void glScissor(int x, int y, int width, int height) {
         gl.glScissor(x, y, width, height);
     }
 
+    @Override
     public void glShadeModel(int mode) {
         gl.glShadeModel(mode);
     }
 
+    @Override
     public void glTexCoordPointer(int size, int stride, FloatBuffer pointer) {
         gl.glTexCoordPointer(size, GL_FLOAT, stride, pointer);
     }
 
+    @Override
     public void glTexEnvi(int target, int pname, int param) {
         gl.glTexEnvi(target, pname, param);
     }
 
-    public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, 
+    @Override
+    public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border,
                              int format, int type, ByteBuffer pixels) {
         switch(internalformat) {
             case 3: internalformat= ( GL.GL_RGBA == format ) ? GL.GL_RGBA : GL.GL_RGB; break;
@@ -340,7 +392,8 @@ public class JoglGL2ES1 implements QGL {
         gl.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
     }
 
-    public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border, 
+    @Override
+    public void glTexImage2D(int target, int level, int internalformat, int width, int height, int border,
                              int format, int type, IntBuffer pixels) {
         switch(internalformat) {
             case 3: internalformat= ( GL.GL_RGBA == format ) ? GL.GL_RGBA : GL.GL_RGB; break;
@@ -349,71 +402,87 @@ public class JoglGL2ES1 implements QGL {
         gl.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
     }
 
+    @Override
     public void glTexParameterf(int target, int pname, float param) {
         gl.glTexParameterf(target, pname, param);
     }
 
+    @Override
     public void glTexParameteri(int target, int pname, int param) {
         gl.glTexParameteri(target, pname, param);
     }
 
-    public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height, 
+    @Override
+    public void glTexSubImage2D(int target, int level, int xoffset, int yoffset, int width, int height,
                                 int format, int type, IntBuffer pixels) {
         gl.glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
     }
 
+    @Override
     public void glTranslatef(float x, float y, float z) {
         gl.glTranslatef(x, y, z);
     }
 
+    @Override
     public void glVertexPointer(int size, int stride, FloatBuffer pointer) {
         gl.glVertexPointer(size, GL_FLOAT, stride, pointer);
     }
 
+    @Override
     public void glViewport(int x, int y, int width, int height) {
         gl.glViewport(x, y, width, height);
     }
 
+    @Override
     public void glColorTable(int target, int internalFormat, int width, int format, int type, ByteBuffer data) {
         // nop / FIXME gl.glColorTable(target, internalFormat, width, format, type, data);
         System.err.println("IGNORED: glColorTable(0x"+Integer.toHexString(target)+", 0x"+Integer.toHexString(internalFormat)+", ..)");
     }
 
+    @Override
     public void glActiveTextureARB(int texture) {
         gl.glActiveTexture(texture);
     }
 
+    @Override
     public void glClientActiveTextureARB(int texture) {
         gl.glClientActiveTexture(texture);
     }
 
+    @Override
     public void glPointSize(float size) {
         gl.glPointSize(size);
     }
 
+    @Override
     public void glPointParameterEXT(int pname, FloatBuffer pfParams) {
         gl.glPointParameterfv(pname, pfParams);
     }
 
+    @Override
     public void glPointParameterfEXT(int pname, float param) {
         gl.glPointParameterf(pname, param);
     }
 
+    @Override
     public void glLockArraysEXT(int first, int count) {
         // nop / FIXME gl.glLockArraysEXT(first, count);
         System.err.println("IGNORED: glLockArraysEXT(0x"+Integer.toHexString(first)+", 0x"+Integer.toHexString(count)+", ..)");
     }
 
+    @Override
     public void glArrayElement(int index) {
         // nop / FIXME gl.glArrayElement(index);
         System.err.println("IGNORED: glArrayElement(0x"+Integer.toHexString(index)+ ')');
     }
 
+    @Override
     public void glUnlockArraysEXT() {
         // nop / FIXME gl.glUnlockArraysEXT();
         System.err.println("IGNORED: glUnlockArraysEXT()");
     }
 
+    @Override
     public void glMultiTexCoord2f(int target, float s, float t) {
         // nop / FIXME gl.glMultiTexCoord2f(target, s, t);
         System.err.println("IGNORED: glMultiTexCoord2f(0x"+Integer.toHexString(target)+", "+s+", "+t+ ')');
@@ -422,6 +491,7 @@ public class JoglGL2ES1 implements QGL {
     /*
      * util extensions
      */
+    @Override
     public void setSwapInterval(int interval) {
         gl.setSwapInterval(interval);
     }

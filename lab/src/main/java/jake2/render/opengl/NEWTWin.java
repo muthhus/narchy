@@ -40,17 +40,17 @@ public class NEWTWin {
     /** Required due to AWT lock of surface, if Applet! */
     final static boolean FORCE_RELEASE_CTX_VAL = true; 
     
-    MonitorMode oldDisplayMode = null;
-    volatile Screen screen = null;
-    volatile GLWindow window = null;
-    volatile GameAnimatorControl animCtrl = null;
+    MonitorMode oldDisplayMode;
+    volatile Screen screen;
+    volatile GLWindow window;
+    volatile GameAnimatorControl animCtrl;
     /** Encapsulateed AWT dependency */
-    public volatile Object canvasObj = null;
-    boolean forceReleaseCtx = false;
-    volatile boolean shouldQuit = false;
-    volatile boolean shouldPause = false;
-    volatile boolean shouldReparent = false;
-    volatile boolean isAnimating = false;
+    public volatile Object canvasObj;
+    boolean forceReleaseCtx;
+    volatile boolean shouldQuit;
+    volatile boolean shouldPause;
+    volatile boolean shouldReparent;
+    volatile boolean isAnimating;
 
     public List<MonitorMode> getModeList() {
         if( null != window ) {
@@ -118,25 +118,25 @@ public class NEWTWin {
         }
         final GLCapabilities caps = new GLCapabilities(glp);
         CapabilitiesChooser chooser = null; // default
-        {
-            final cvar_t v = Cvar.Get("jogl_rgb565", "0", 0);
-            if( v.value != 0f ) {
-                caps.setRedBits(5);
-                caps.setGreenBits(6);
-                caps.setBlueBits(5);
-                chooser = new GenericGLCapabilitiesChooser(); // don't trust native GL-TK chooser
-            }
+        final cvar_t v = Cvar.Get("jogl_rgb565", "0", 0);
+        if( v.value != 0f ) {
+            caps.setRedBits(5);
+            caps.setGreenBits(6);
+            caps.setBlueBits(5);
+            chooser = new GenericGLCapabilitiesChooser(); // don't trust native GL-TK chooser
         }
-        
+
         window = GLWindow.create(screen, caps);
         window.setAutoSwapBufferMode(false);
         window.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DO_NOTHING_ON_CLOSE); // we do handle QUIT on our own, no GLWindow.display() called.
         window.setCapabilitiesChooser(chooser);
         window.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowDestroyNotify(WindowEvent e) {
                 shouldQuit = null != window; // not applet and not already in shutdown ?
             }
 
+            @Override
             public void windowResized(WindowEvent e) {
                 propagateNewSize();
             }
@@ -162,8 +162,7 @@ public class NEWTWin {
         
         isAnimating = true; // no display() invocation on other thread!
 
-        {
-//        if( !fullscreen && Globals.appletMode ) {
+        //        if( !fullscreen && Globals.appletMode ) {
 //            forceReleaseCtx = FORCE_RELEASE_CTX_VAL;
 //
 //            // Notify the size listener about the change
@@ -210,22 +209,21 @@ public class NEWTWin {
 //            }
 //            System.err.println("XXX waited = "+w+" * 100 ms");
 //        } else {
-            forceReleaseCtx = false;            
-            canvasObj = null;
-            
-            if (fullscreen) {
-                MonitorMode mm = findDisplayMode(newDim);
-                final DimensionImmutable smDim = mm.getSurfaceSize().getResolution();
-                newDim.setWidth( smDim.getWidth() );
-                newDim.setHeight( smDim.getHeight() );
-                mainMonitor.setCurrentMode(mm);
-                VID.Printf(Defines.PRINT_ALL, "...MonitorMode "+mm+'\n');
-                window.setFullscreen(true);
-            }
-            
-            window.setVisible(true);
-            window.requestFocus();
+        forceReleaseCtx = false;
+        canvasObj = null;
+
+        if (fullscreen) {
+            MonitorMode mm = findDisplayMode(newDim);
+            final DimensionImmutable smDim = mm.getSurfaceSize().getResolution();
+            newDim.setWidth( smDim.getWidth() );
+            newDim.setHeight( smDim.getHeight() );
+            mainMonitor.setCurrentMode(mm);
+            VID.Printf(Defines.PRINT_ALL, "...MonitorMode "+mm+'\n');
+            window.setFullscreen(true);
         }
+
+        window.setVisible(true);
+        window.requestFocus();
         if( !window.isNativeValid()|| !window.isRealized() ) {
             throw new RuntimeException("NEWT window didn't not realize: "+window);
         }

@@ -32,15 +32,15 @@ abstract public class Bool extends AtomicToString {
         return ATOM;
     }
 
+
+
     @Override
     public String toString() {
         return id;
     }
 
-    final static int AtomBool = Term.opX(ATOM, 0);
-    @Override public final int opX() {
-        return AtomBool;
-    }
+    abstract public int opX();
+
 
     @NotNull
     @Override

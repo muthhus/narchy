@@ -48,9 +48,9 @@ public final class Polygon extends glpoly_t {
     private static final FloatBuffer buffer = Lib.newFloatBuffer(MAX_BUFFER_VERTICES
             * STRIDE);
 
-    private static int bufferIndex = 0;
+    private static int bufferIndex;
 
-    private static int polyCount = 0;
+    private static int polyCount;
 
     private static final Polygon[] polyCache = new Polygon[MAX_POLYS];
     static {
@@ -93,62 +93,77 @@ public final class Polygon extends glpoly_t {
     // vertex (index 2, 3, 4)
     // textureCoord1 (index 5, 6)
 
+    @Override
     public final float s1(int index) {
         return buffer.get((index + pos) * STRIDE);
     }
 
+    @Override
     public final void s1(int index, float value) {
         buffer.put((index + pos) * STRIDE, value);
     }
 
+    @Override
     public final float t1(int index) {
         return buffer.get((index + pos) * STRIDE + 1);
     }
 
+    @Override
     public final void t1(int index, float value) {
         buffer.put((index + pos) * STRIDE + 1, value);
     }
 
+    @Override
     public final float x(int index) {
         return buffer.get((index + pos) * STRIDE + 2);
     }
 
+    @Override
     public final void x(int index, float value) {
         buffer.put((index + pos) * STRIDE + 2, value);
     }
 
+    @Override
     public final float y(int index) {
         return buffer.get((index + pos) * STRIDE + 3);
     }
 
+    @Override
     public final void y(int index, float value) {
         buffer.put((index + pos) * STRIDE + 3, value);
     }
 
+    @Override
     public final float z(int index) {
         return buffer.get((index + pos) * STRIDE + 4);
     }
 
+    @Override
     public final void z(int index, float value) {
         buffer.put((index + pos) * STRIDE + 4, value);
     }
 
+    @Override
     public final float s2(int index) {
         return buffer.get((index + pos) * STRIDE + 5);
     }
 
+    @Override
     public final void s2(int index, float value) {
         buffer.put((index + pos) * STRIDE + 5, value);
     }
 
+    @Override
     public final float t2(int index) {
         return buffer.get((index + pos) * STRIDE + 6);
     }
 
+    @Override
     public final void t2(int index, float value) {
         buffer.put((index + pos) * STRIDE + 6, value);
     }
 
+    @Override
     public final void beginScrolling(float scroll) {
         int index = pos * STRIDE;
         for (int i = 0; i < numverts; i++, index += STRIDE) {
@@ -157,6 +172,7 @@ public final class Polygon extends glpoly_t {
         }
     }
 
+    @Override
     public final void endScrolling() {
         int index = pos * STRIDE;
         for (int i = 0; i < numverts; i++, index += STRIDE) {

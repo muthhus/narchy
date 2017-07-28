@@ -99,7 +99,7 @@ public class Outputs {
 
     private final NAR nar;
 
-    boolean verify = false;
+    boolean verify;
 
 
     public Outputs(IntFunction<Compound> namer, int maxStates, NAgent a, FloatToFloatFunction transferFunction) {

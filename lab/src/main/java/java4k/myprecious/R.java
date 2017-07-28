@@ -37,12 +37,14 @@ public class R extends Applet implements Runnable {
 	
 	private boolean left, right, up, down, n, p, r;
 	
-	public void start() {
+	@Override
+    public void start() {
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
 		new Thread(this).start();
 	}
 	
-	public void run() {
+	@Override
+    public void run() {
 //		setSize(400, 400); // f�r den AppletViewer
 		String s = "";
 		
@@ -304,7 +306,7 @@ public class R extends Applet implements Runnable {
 						for (y = 1; y < 15; y += 1) {
 							for (x = 1; x < 11; x += 1) {
 								if (y == 1) {
-									gBack.drawImage(iBackground.getSubimage(2 * 32, 3 * 32, 32, 32), (x - 1) * 32, (y - 1) * 32, null);	
+									gBack.drawImage(iBackground.getSubimage(2 * 32, 3 * 32, 32, 32), (x - 1) * 32, (1 - 1) * 32, null);
 								}
 								levelBlocks[y][x] = 0;
 								level[y][x] = Integer.valueOf(LEVELS.substring(curLevel * 144 + (y-1) * 10 + (x-1), curLevel * 144 + (y-1) * 10 + x));
@@ -615,7 +617,7 @@ public class R extends Applet implements Runnable {
 			for (y = 1; y < 15; y += 1) {
 				for (x = 1; x < 11; x += 1) {
 					if (level[y][x] == 8) {
-						g.drawImage(iBackground.getSubimage(2 * 32, 0 * 32, 64, 64), (x-1) * 32 + (int)(levelBlocks[y+16][x]), (y) * 32 + (int)(levelBlocks[y][x]), null);
+						g.drawImage(iBackground.getSubimage(2 * 32, 0 * 32, 64, 64), (x-1) * 32 + levelBlocks[y+16][x], (y) * 32 + levelBlocks[y][x], null);
 					}
 					if (level[y][x] == 2) {
 						i = 0;
@@ -627,8 +629,8 @@ public class R extends Applet implements Runnable {
 						if (bPlayerFall) {
 							i = 1;
 						}
-						g.setTransform(AffineTransform.getRotateInstance(Math.toRadians((gravity) * 90), (x-1) * 32 + (int)(levelBlocks[y+16][x]) + 16, (y) * 32 + (int)(levelBlocks[y][x]) + 16));
-						g.drawImage(iBackground.getSubimage(i * 32, j * 32, 32, 32), (x-1) * 32 + (int)(levelBlocks[y+16][x]), (y) * 32 + (int)(levelBlocks[y][x]), null);	
+						g.setTransform(AffineTransform.getRotateInstance(Math.toRadians((gravity) * 90), (x-1) * 32 + levelBlocks[y+16][x] + 16, (y) * 32 + levelBlocks[y][x] + 16));
+						g.drawImage(iBackground.getSubimage(i * 32, j * 32, 32, 32), (x-1) * 32 + levelBlocks[y+16][x], (y) * 32 + levelBlocks[y][x], null);
 						g.setTransform(oldAffineTransform);
 					}
 				}
@@ -695,9 +697,9 @@ public class R extends Applet implements Runnable {
 			try {
 				Thread.sleep(10);
 			} catch (Exception e) { /** nicht sch�n aber selten */
-			};
+			}
 
-			if (!isActive()) {
+            if (!isActive()) {
 				return;
 			}
 		}

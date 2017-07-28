@@ -458,7 +458,9 @@ public class M_Hover {
     static int sound_search2;
 
     static final EntThinkAdapter hover_reattack = new EntThinkAdapter() {
-    	public String getID() { return "hover_reattack"; }
+    	@Override
+        public String getID() { return "hover_reattack"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.enemy.health > 0)
                 if (GameUtil.visible(self, self.enemy))
@@ -472,7 +474,9 @@ public class M_Hover {
     };
 
     static final EntThinkAdapter hover_fire_blaster = new EntThinkAdapter() {
-    	public String getID() { return "hover_fire_blaster"; }
+    	@Override
+        public String getID() { return "hover_fire_blaster"; }
+        @Override
         public boolean think(edict_t self) {
             float[] start = { 0, 0, 0 };
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 };
@@ -501,7 +505,9 @@ public class M_Hover {
     };
 
     static final EntThinkAdapter hover_stand = new EntThinkAdapter() {
-    	public String getID() { return "hover_stand"; }
+    	@Override
+        public String getID() { return "hover_stand"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = hover_move_stand;
             return true;
@@ -509,7 +515,9 @@ public class M_Hover {
     };
 
     static final EntThinkAdapter hover_run = new EntThinkAdapter() {
-    	public String getID() { return "hover_run"; }
+    	@Override
+        public String getID() { return "hover_run"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0)
                 self.monsterinfo.currentmove = hover_move_stand;
@@ -520,7 +528,9 @@ public class M_Hover {
     };
 
     static final EntThinkAdapter hover_walk = new EntThinkAdapter() {
-    	public String getID() { return "hover_walk"; }
+    	@Override
+        public String getID() { return "hover_walk"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = hover_move_walk;
             return true;
@@ -528,7 +538,9 @@ public class M_Hover {
     };
 
     static final EntThinkAdapter hover_start_attack = new EntThinkAdapter() {
-    	public String getID() { return "hover_start_attack"; }
+    	@Override
+        public String getID() { return "hover_start_attack"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = hover_move_start_attack;
             return true;
@@ -536,7 +548,9 @@ public class M_Hover {
     };
 
     static final EntThinkAdapter hover_attack = new EntThinkAdapter() {
-    	public String getID() { return "hover_attack"; }
+    	@Override
+        public String getID() { return "hover_attack"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = hover_move_attack1;
             return true;
@@ -544,7 +558,9 @@ public class M_Hover {
     };
 
     static final EntPainAdapter hover_pain = new EntPainAdapter() {
-    	public String getID() { return "hover_pain"; }
+    	@Override
+        public String getID() { return "hover_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
             if (self.health < (self.max_health / 2))
                 self.s.skinnum = 1;
@@ -576,7 +592,9 @@ public class M_Hover {
     };
 
     static final EntThinkAdapter hover_deadthink = new EntThinkAdapter() {
-    	public String getID() { return "hover_deadthink"; }
+    	@Override
+        public String getID() { return "hover_deadthink"; }
+        @Override
         public boolean think(edict_t self) {
             if (null == self.groundentity
                     && GameBase.level.time < self.timestamp) {
@@ -589,7 +607,9 @@ public class M_Hover {
     };
 
     static final EntThinkAdapter hover_dead = new EntThinkAdapter() {
-    	public String getID() { return "hover_dead"; }
+    	@Override
+        public String getID() { return "hover_dead"; }
+        @Override
         public boolean think(edict_t self) {
             Math3D.VectorSet(self.mins, -16, -16, -24);
             Math3D.VectorSet(self.maxs, 16, 16, -8);
@@ -603,9 +623,11 @@ public class M_Hover {
     };
 
     static final EntDieAdapter hover_die = new EntDieAdapter() {
-    	public String getID() { return "hover_die"; }
+    	@Override
+        public String getID() { return "hover_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             int n;
 
             //	check for gib
@@ -644,7 +666,9 @@ public class M_Hover {
     };
 
     static final EntInteractAdapter hover_sight = new EntInteractAdapter() {
-    	public String getID() { return "hover_sight"; }
+    	@Override
+        public String getID() { return "hover_sight"; }
+        @Override
         public boolean interact(edict_t self, edict_t other) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_sight, 1,
                     Defines.ATTN_NORM, 0);
@@ -653,7 +677,9 @@ public class M_Hover {
     };
 
     static final EntThinkAdapter hover_search = new EntThinkAdapter() {
-    	public String getID() { return "hover_search"; }
+    	@Override
+        public String getID() { return "hover_search"; }
+        @Override
         public boolean think(edict_t self) {
             if (Lib.random() < 0.5)
                 game_import_t.sound(self, Defines.CHAN_VOICE, sound_search1, 1,
@@ -665,7 +691,7 @@ public class M_Hover {
         }
     };
 
-    static final mframe_t[] hover_frames_stand = new mframe_t[] {
+    static final mframe_t[] hover_frames_stand = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -700,7 +726,7 @@ public class M_Hover {
     static final mmove_t hover_move_stand = new mmove_t(FRAME_stand01, FRAME_stand30,
             hover_frames_stand, null);
 
-    static final mframe_t[] hover_frames_stop1 = new mframe_t[] {
+    static final mframe_t[] hover_frames_stop1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -714,7 +740,7 @@ public class M_Hover {
     static mmove_t hover_move_stop1 = new mmove_t(FRAME_stop101, FRAME_stop109,
             hover_frames_stop1, null);
 
-    static final mframe_t[] hover_frames_stop2 = new mframe_t[] {
+    static final mframe_t[] hover_frames_stop2 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -727,7 +753,7 @@ public class M_Hover {
     static mmove_t hover_move_stop2 = new mmove_t(FRAME_stop201, FRAME_stop208,
             hover_frames_stop2, null);
 
-    static final mframe_t[] hover_frames_takeoff = new mframe_t[] {
+    static final mframe_t[] hover_frames_takeoff = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, -2, null),
             new mframe_t(GameAI.ai_move, 5, null),
@@ -762,7 +788,7 @@ public class M_Hover {
     static mmove_t hover_move_takeoff = new mmove_t(FRAME_takeof01,
             FRAME_takeof30, hover_frames_takeoff, null);
 
-    static final mframe_t[] hover_frames_pain3 = new mframe_t[] {
+    static final mframe_t[] hover_frames_pain3 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -776,7 +802,7 @@ public class M_Hover {
     static final mmove_t hover_move_pain3 = new mmove_t(FRAME_pain301, FRAME_pain309,
             hover_frames_pain3, hover_run);
 
-    static final mframe_t[] hover_frames_pain2 = new mframe_t[] {
+    static final mframe_t[] hover_frames_pain2 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -793,7 +819,7 @@ public class M_Hover {
     static final mmove_t hover_move_pain2 = new mmove_t(FRAME_pain201, FRAME_pain212,
             hover_frames_pain2, hover_run);
 
-    static final mframe_t[] hover_frames_pain1 = new mframe_t[] {
+    static final mframe_t[] hover_frames_pain1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 2, null),
@@ -826,13 +852,13 @@ public class M_Hover {
     static final mmove_t hover_move_pain1 = new mmove_t(FRAME_pain101, FRAME_pain128,
             hover_frames_pain1, hover_run);
 
-    static final mframe_t[] hover_frames_land = new mframe_t[] { new mframe_t(
+    static final mframe_t[] hover_frames_land = { new mframe_t(
             GameAI.ai_move, 0, null) };
 
     static mmove_t hover_move_land = new mmove_t(FRAME_land01, FRAME_land01,
             hover_frames_land, null);
 
-    static final mframe_t[] hover_frames_forward = new mframe_t[] {
+    static final mframe_t[] hover_frames_forward = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -872,7 +898,7 @@ public class M_Hover {
     static mmove_t hover_move_forward = new mmove_t(FRAME_forwrd01,
             FRAME_forwrd35, hover_frames_forward, null);
 
-    static final mframe_t[] hover_frames_walk = new mframe_t[] {
+    static final mframe_t[] hover_frames_walk = {
             new mframe_t(GameAI.ai_walk, 4, null),
             new mframe_t(GameAI.ai_walk, 4, null),
             new mframe_t(GameAI.ai_walk, 4, null),
@@ -912,7 +938,7 @@ public class M_Hover {
     static final mmove_t hover_move_walk = new mmove_t(FRAME_forwrd01,
             FRAME_forwrd35, hover_frames_walk, null);
 
-    static final mframe_t[] hover_frames_run = new mframe_t[] {
+    static final mframe_t[] hover_frames_run = {
             new mframe_t(GameAI.ai_run, 10, null),
             new mframe_t(GameAI.ai_run, 10, null),
             new mframe_t(GameAI.ai_run, 10, null),
@@ -952,7 +978,7 @@ public class M_Hover {
     static final mmove_t hover_move_run = new mmove_t(FRAME_forwrd01, FRAME_forwrd35,
             hover_frames_run, null);
 
-    static final mframe_t[] hover_frames_death1 = new mframe_t[] {
+    static final mframe_t[] hover_frames_death1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -968,7 +994,7 @@ public class M_Hover {
     static final mmove_t hover_move_death1 = new mmove_t(FRAME_death101,
             FRAME_death111, hover_frames_death1, hover_dead);
 
-    static final mframe_t[] hover_frames_backward = new mframe_t[] {
+    static final mframe_t[] hover_frames_backward = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -997,7 +1023,7 @@ public class M_Hover {
     static mmove_t hover_move_backward = new mmove_t(FRAME_backwd01,
             FRAME_backwd24, hover_frames_backward, null);
 
-    static final mframe_t[] hover_frames_start_attack = new mframe_t[] {
+    static final mframe_t[] hover_frames_start_attack = {
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 1, null) };
@@ -1005,7 +1031,7 @@ public class M_Hover {
     static final mmove_t hover_move_start_attack = new mmove_t(FRAME_attak101,
             FRAME_attak103, hover_frames_start_attack, hover_attack);
 
-    static final mframe_t[] hover_frames_attack1 = new mframe_t[] {
+    static final mframe_t[] hover_frames_attack1 = {
             new mframe_t(GameAI.ai_charge, -10, hover_fire_blaster),
             new mframe_t(GameAI.ai_charge, -10, hover_fire_blaster),
             new mframe_t(GameAI.ai_charge, 0, hover_reattack), };
@@ -1013,7 +1039,7 @@ public class M_Hover {
     static final mmove_t hover_move_attack1 = new mmove_t(FRAME_attak104,
             FRAME_attak106, hover_frames_attack1, null);
 
-    static final mframe_t[] hover_frames_end_attack = new mframe_t[] {
+    static final mframe_t[] hover_frames_end_attack = {
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 1, null) };
 

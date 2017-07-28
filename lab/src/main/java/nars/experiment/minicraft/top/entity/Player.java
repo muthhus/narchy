@@ -27,7 +27,7 @@ public class Player extends Mob {
 	public int score;
 	public int maxStamina = 10;
 	private int onStairDelay;
-	public int invulnerableTime = 0;
+	public int invulnerableTime;
 
 	public Player(TopDownMinicraft game, InputHandler input) {
 		this.game = game;

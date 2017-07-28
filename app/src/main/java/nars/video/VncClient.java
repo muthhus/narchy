@@ -22,6 +22,7 @@ import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 import com.jogamp.opengl.util.texture.spi.LEDataInputStream;
+import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
@@ -647,7 +648,7 @@ public class VncClient {
 
         return new Surface() {
 
-            Texture texture = null;
+            Texture texture;
 
             @Override
             protected void paint(GL2 gl) {
@@ -668,7 +669,7 @@ public class VncClient {
                     int ww = (int)renderer.vncImage.get().getWidth();
                     int hh = (int)renderer.vncImage.get().getHeight();
                     byte[] data = new byte[ww * hh * 4];
-                    vncReader.getPixels(0,0,ww,hh, WritablePixelFormat.getByteBgraInstance(), data, 0, ww*4);
+                    vncReader.getPixels(0,0,ww,hh, PixelFormat.getByteBgraInstance(), data, 0, ww*4);
 
                     tt = tgaTexture(ww, hh, true, data);
 

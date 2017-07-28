@@ -14,12 +14,14 @@ public class A extends Applet implements Runnable {
 	final static int itemnum = 8000;
 	final static int grazenum = 2000;
 
-	public void start() {
+	@Override
+    public void start() {
 		enableEvents(AWTEvent.KEY_EVENT_MASK);
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 		boolean newGame = true;
 		for (;;) {
 			if (newGame) {
@@ -531,7 +533,8 @@ public class A extends Applet implements Runnable {
 		appletGraphics.drawImage(screen, 0, 0, null);
 	}
 
-	public void processKeyEvent(KeyEvent e) {
+	@Override
+    public void processKeyEvent(KeyEvent e) {
 		keys[e.getKeyCode()] = (e.getID() == KeyEvent.KEY_PRESSED);
 	}
 }

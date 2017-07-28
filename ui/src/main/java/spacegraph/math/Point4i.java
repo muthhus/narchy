@@ -37,7 +37,7 @@ package spacegraph.math;
  *
  * @since vecmath 1.2
  */
-public class Point4i extends Tuple4i implements java.io.Serializable {
+public class Point4i extends Tuple4i {
 
     // Combatible with 1.2
     static final long serialVersionUID = 620124780244617983L;

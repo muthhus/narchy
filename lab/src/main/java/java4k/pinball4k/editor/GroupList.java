@@ -6,9 +6,9 @@ import javax.swing.event.ListDataListener;
 import java.util.ArrayList;
 
 public class GroupList implements ListModel {
-	private ArrayList<ArrayList<LevelObject>> groups = new ArrayList<ArrayList<LevelObject>>();
+	private final ArrayList<ArrayList<LevelObject>> groups = new ArrayList<ArrayList<LevelObject>>();
 	
-	private ArrayList<ListDataListener> listeners = new ArrayList<ListDataListener>();
+	private final ArrayList<ListDataListener> listeners = new ArrayList<ListDataListener>();
 
 	public void add(ArrayList<LevelObject> obj) {
 		groups.add(obj);
@@ -63,7 +63,8 @@ public class GroupList implements ListModel {
 	 *  (non-Javadoc)
 	 * @see javax.swing.ListModel#getSize()
 	 */
-	public int getSize() {
+	@Override
+    public int getSize() {
 		return groups.size();
 	}
 
@@ -71,7 +72,8 @@ public class GroupList implements ListModel {
 	 *  (non-Javadoc)
 	 * @see javax.swing.ListModel#addListDataListener(javax.swing.event.ListDataListener)
 	 */
-	public void addListDataListener(ListDataListener l) {
+	@Override
+    public void addListDataListener(ListDataListener l) {
 		listeners.add(l);
 	}
 
@@ -79,7 +81,8 @@ public class GroupList implements ListModel {
 	 *  (non-Javadoc)
 	 * @see javax.swing.ListModel#getElementAt(int)
 	 */
-	public Object getElementAt(int index) {
+	@Override
+    public Object getElementAt(int index) {
 		return groups.get(index);
 	}
 
@@ -87,7 +90,8 @@ public class GroupList implements ListModel {
 	 *  (non-Javadoc)
 	 * @see javax.swing.ListModel#removeListDataListener(javax.swing.event.ListDataListener)
 	 */
-	public void removeListDataListener(ListDataListener l) {
+	@Override
+    public void removeListDataListener(ListDataListener l) {
 		listeners.remove(l);
 	}
 

@@ -160,17 +160,13 @@ public class ForceDirected implements spacegraph.phys.constraint.BroadConstraint
         else if (len >= maxDist)
             return;
 
-        float s = (float) (speed / ( 1 + ( len*len )));
+        float s = speed / ( 1 + ( len*len ));
 
         v3 v = v(delta.x * s, delta.y * s, delta.z * s );
-        {
-            ((Dynamic) x).velAdd(v);
-        }
+        ((Dynamic) x).velAdd(v);
 
-        {
-            v.negate();
-            ((Dynamic) y).velAdd(v);
-        }
+        v.negate();
+        ((Dynamic) y).velAdd(v);
 
     }
 

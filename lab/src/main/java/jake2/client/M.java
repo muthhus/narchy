@@ -361,7 +361,9 @@ public final class M {
     }
 
     public static final EntThinkAdapter M_droptofloor = new EntThinkAdapter() {
+        @Override
         public String getID() { return "m_drop_to_floor";}
+        @Override
         public boolean think(edict_t ent) {
             float[] end = { 0, 0, 0 };
             trace_t trace;
@@ -460,7 +462,9 @@ public final class M {
 
     /** Stops the Flies. */
     public static final EntThinkAdapter M_FliesOff = new EntThinkAdapter() {
+        @Override
         public String getID() { return "m_fliesoff";}
+        @Override
         public boolean think(edict_t self) {
             self.s.effects &= ~Defines.EF_FLIES;
             self.s.sound = 0;
@@ -470,7 +474,9 @@ public final class M {
 
     /** Starts the Flies as setting the animation flag in the entity. */
     public static final EntThinkAdapter M_FliesOn = new EntThinkAdapter() {
+        @Override
         public String getID() { return "m_flies_on";}
+        @Override
         public boolean think(edict_t self) {
             if (self.waterlevel != 0)
                 return true;
@@ -485,7 +491,9 @@ public final class M {
 
     /** Adds some flies after a random time */
     public static final EntThinkAdapter M_FlyCheck = new EntThinkAdapter() {
+        @Override
         public String getID() { return "m_fly_check";}
+        @Override
         public boolean think(edict_t self) {
 
             if (self.waterlevel != 0)

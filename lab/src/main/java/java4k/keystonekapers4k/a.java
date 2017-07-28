@@ -31,7 +31,7 @@ import java.util.Random;
 public class a extends Applet implements Runnable {
 
 	// keys
-	private boolean[] a = new boolean[32768];
+	private final boolean[] a = new boolean[32768];
 
 	@Override
 	public void start() {
@@ -39,7 +39,8 @@ public class a extends Applet implements Runnable {
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 
 		final String S = "\u0000\u00ec\uecec\u6f6f\u6f32\u8432\uaaaa\uaafc\ufc54\ue8e8\u4ad2\ud240\ubbbb\u35a2\ua22a\u8686\u1d48\u4800\ud2a4\u4a18\u1aa7\ud6d6\ud64a\u4a4a\ua71a\u1ab8\u3232\uc848\u48e8\ucc63\u0044\u0042\u72c2\u65a0\ue142\u9e82\u84fc\ud400\u0000\u0006\u1011\u1212\u1110\u0006\u0202\u0202\u0202\n\u0000\u0606\u0606\u0600\u0000\u000e\u0e13\u1313\u1414\u1414\u1414\u1414\u1414\n\u0000\u0a09\u0808\u0808\u090b\n\u0e0e\u0e0e\u0e0e\u0e0e\u0000\f\u0808\u090b\u0806\u0506\u0708\u090a\u0014\u0000\u0000\f\u0c0c\u0c0c\u0d0d\u0d0d\u0d0d\u0d0d\u0d0d\u0014\u0e0f\u0e0c\u0c0c\u0c0c\u0f0e\u0f0e\u0f0e\u0f0e\u0f0f\u0f0f\u0006\u0000\u0000\u0000\u0001\u0202\u0303\u0405\u0607\u0707\u0707\u0707\u0808\u0808\u0809\u003c\u6666\u6666\u663c\u0018\u1c18\u1818\u183c\u003c\u6260\u3c06\u067e\u003c\u6260\u3060\u623c\u0030\u3834\u327e\u3030\u007e\u0606\u3e60\u623e\u003c\u4606\u3e66\u663c\u007e\u4260\u3018\u1818\u003c\u6666\u3c66\u663c\u003c\u6666\u7c60\u623c\u3c7e\u7e7e\u7e3c\u585a\ufafa\ufefe\u001e\uc0cc\ufbf7\u6f1e\u0406\u001e\uc1cd\ufbf6\u6e1e\u0406\u2481\u0000\u3c66\u5adb\ua5ff\ubde7\ubde7\u0000\u1842\u3c66\u5adb\ua5ff\ubde7\ubde7\u3c24\uffff\uffff\uffff\uffff\uff55\u7f55\u7f55\u7f90\ufe66\u006c\u3810\u387c\ufefe\ufefe\ufe7c\u183c\u3c3c\u7e1c\u3c1c\u1c18\u2c7e\u6e7e\u6e7e\u7c7c\u2c7c\u183c\u3c3c\u7e1c\u3c1c\u1c18\u2cbe\uee7e\u6c7e\u7eff\uc101\u183c\u3c3c\u7e9c\ubc9c\u9c98\u7e2f\u7d6c\u7fcd\u0000\u0000\u183c\u3c3c\u7e1c\u3c1c\u1c18\u2cbe\uee7e\u2c3c\u3f3f\uc140\u183c\u3c3c\u7e1c\u3c1c\u1c18\u2c3c\u3c7c\u7c3c\u7e7e\u0a18\u183c\u3c3c\u7e1c\u3c1c\u1c18\u2c3c\u7c7c\u2c7e\u7e3e\u6204\u3078\u7878\ufc38\u7838\u3830\u1c1e\u3f6f\u7f1e\u0e00\u0000\u1c1c\u1c1c\u3c1c\u1c0c\u0e4e\u7e3e\u0c1c\u3e36\u2663\u0101\u1c1c\u1c1c\u3c1c\u1c4c\u4c7e\u3f1d\u1d3c\u7d4f\u46c0\u0000\u1c1c\u1c1c\u3c1c\u1c0c\u0e4e\u7e3e\u0c1c\u1c14\u1711\u6120\u1c1c\u1c1c\u3c1c\u1c0c\u0c1c\u1c3c\u3c1c\u3c68\u7e0a\u0a18\u1c1c\u1c1c\u3c1c\u1c0c\u0c1c\u3c3c\u1c3c\u7466\u4622\u4204\u3078\u7878\u78fc";
 
@@ -582,7 +583,7 @@ public class a extends Applet implements Runnable {
 								if (level > 7) {
 									object = new int[32];
 									queue.add(object);
-									object[OBJ_TYPE] = j;
+									object[OBJ_TYPE] = MAP_BALL;
 									object[OBJ_FLOOR] = i;
 									object[OBJ_X] = y + ((enemyDirection > 0) ? 64 : -64);
 									object[OBJ_Y3] = 51 + (i << 5);
@@ -601,7 +602,7 @@ public class a extends Applet implements Runnable {
 								if (level > 4) {
 									object = new int[32];
 									queue.add(object);
-									object[OBJ_TYPE] = j;
+									object[OBJ_TYPE] = MAP_RADIO;
 									object[OBJ_FLOOR] = i;
 									object[OBJ_X] = x + 104;
 									object[OBJ_Y] = 43 + (i << 5);
@@ -632,7 +633,7 @@ public class a extends Applet implements Runnable {
 								if (level > 9) {
 									object = new int[32];
 									queue.add(object);
-									object[OBJ_TYPE] = j;
+									object[OBJ_TYPE] = MAP_SHOPPING_CART;
 									object[OBJ_FLOOR] = i;
 									object[OBJ_X] = y + ((enemyDirection > 0) ? 64 : -64);
 									object[OBJ_Y] = 47 + (i << 5);

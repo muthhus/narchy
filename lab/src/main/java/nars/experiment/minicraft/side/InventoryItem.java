@@ -31,7 +31,7 @@ public class InventoryItem implements java.io.Serializable {
 		if (this.getItem().item_id != item.item_id) {
 			return count;
 		}
-		int maxCount = this.maxCount;
+		int maxCount = InventoryItem.maxCount;
 		if (this.getItem().getClass() == Tool.class) {
 			maxCount = 1;
 		}

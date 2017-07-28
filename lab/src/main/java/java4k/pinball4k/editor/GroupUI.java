@@ -15,11 +15,11 @@ import java.util.ArrayList;
 public class GroupUI extends JPanel implements ActionListener, ListSelectionListener {
 
 	private GroupList groups;
-	private LevelPanel levelPanel;
-	private JList myList;
-	private JButton upBtn = new JButton("Up");
-	private JButton downBtn = new JButton("Down");
-	private JButton deleteBtn = new JButton("Delete");
+	private final LevelPanel levelPanel;
+	private final JList myList;
+	private final JButton upBtn = new JButton("Up");
+	private final JButton downBtn = new JButton("Down");
+	private final JButton deleteBtn = new JButton("Delete");
 	
 	
 	public GroupUI(GroupList groups, LevelPanel levelPanel) {
@@ -50,7 +50,8 @@ public class GroupUI extends JPanel implements ActionListener, ListSelectionList
 		myList.setModel(groups);
 	}
 	
-	public void actionPerformed(ActionEvent e) {
+	@Override
+    public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == deleteBtn) {
 			groups.remove((ArrayList<LevelObject>) myList.getSelectedValue());
 		} else if (e.getSource() == upBtn) {
@@ -69,7 +70,8 @@ public class GroupUI extends JPanel implements ActionListener, ListSelectionList
 	}
 
 	class GroupsCellRenderer extends JLabel implements ListCellRenderer {
-		public Component getListCellRendererComponent(
+		@Override
+        public Component getListCellRendererComponent(
 	    	       JList list,              // the list
 	    	       Object value,            // value to display
 	    	       int index,               // cell index
@@ -96,7 +98,8 @@ public class GroupUI extends JPanel implements ActionListener, ListSelectionList
 	/**
 	 * Implements ListSelectionListener.
 	 */
-	public void valueChanged(ListSelectionEvent e) {
+	@Override
+    public void valueChanged(ListSelectionEvent e) {
 		if (myList.getSelectedValue() != null) {
 			ArrayList<LevelObject> group = (ArrayList<LevelObject>) myList.getSelectedValue();
 			levelPanel.setSelection(group);

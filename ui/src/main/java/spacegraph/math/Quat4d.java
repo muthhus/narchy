@@ -36,7 +36,7 @@ package spacegraph.math;
  * point x,y,z,w coordinates.  The quaternion is always normalized.
  *
  */
-public class Quat4d extends Tuple4d implements java.io.Serializable {
+public class Quat4d extends Tuple4d {
 
   // Combatible with 1.1
   static final long serialVersionUID = 7577479888820201099L;

@@ -22,13 +22,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import static java.util.Collections.emptyList;
+
 /**
  * concept firing, activation, etc
  */
 public class Activate extends UnaryTask<Concept> implements Termed {
 
     static final int TASKLINKS_SAMPLED = 2;
-    static final int TERMLINKS_SAMPLED = 3;
+    static final int TERMLINKS_SAMPLED = 2;
 
 
     public Activate(@NotNull Concept c, float pri) {
@@ -98,14 +100,17 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     }
 
     @Override
-    public ITask[] run(NAR nar) {
+    @Deprecated public ITask[] run(NAR nar) {
+        throw new UnsupportedOperationException("use hypothesize method to feedback to callee the premises, not the NAR which could be a super-executioner");
+    }
 
+    public List<Premise> hypothesize(NAR nar) {
         nar.emotion.conceptFires.increment();
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks().commit();//.normalize(0.1f);
         if (tasklinks.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
-            return null;
+            return emptyList();
         }
 
         int talSampled = Math.min(tasklinks.size(), TASKLINKS_SAMPLED);
@@ -113,7 +118,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         tasklinks.sample(talSampled, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) {
             //nar.emotion.count("ConceptFire_run_but_zero_taskslinks_selected");
-            return null;
+            return emptyList();
         }
 
 
@@ -167,32 +172,35 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         List<PriReference<Term>> terml;
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
         if (termlinks.isEmpty()) {
-            terml = Collections.emptyList();
+            terml = emptyList();
         } else {
             int tlSampled = Math.min(termlinks.size(), TERMLINKS_SAMPLED);
             terml = $.newArrayList(tlSampled);
             termlinks.sample(tlSampled, ((Consumer<PriReference<Term>>) terml::add));
         }
 
-        for (int i = 0, tasklSize = taskl.size(); i < tasklSize; i++) {
+        int tasklSize = taskl.size();
+        int termlSize = terml.size();
+        List<Premise> premises = $.newArrayList(tasklSize * termlSize);
+
+        for (int i = 0; i < tasklSize; i++) {
             PriReference<Task> tasklink = taskl.get(i);
 
             if (localTemplateConcepts > 0) {
                 activateSubterms(tasklink, localTemplates, localTemplateConcepts);
             }
 
-            for (int j = 0, termlSize = terml.size(); j < termlSize; j++) {
+            for (int j = 0; j < termlSize; j++) {
                 PriReference<Term> termlink = terml.get(j);
 
                 float pri = Param.tasktermLinkCombine.apply(tasklink.priElseZero(), termlink.priElseZero());
-                premise( new Premise(tasklink.get(), termlink.get(), pri), nar);
+                premises.add( new Premise(tasklink.get(), termlink.get(), pri) );
             }
         }
 
         nar.terms.commit(id); //index cache update
 
-        return null;
-
+        return premises;
     }
 
     public void activateSubterms(PriReference<Task> tasklink, Termed[] localTemplates, int localTemplateConcepts) {
@@ -372,7 +380,4 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
     }
 
-    protected void premise(Premise p, NAR nar) {
-        nar.input(p);
-    }
 }

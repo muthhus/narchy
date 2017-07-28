@@ -14,22 +14,22 @@ import java.awt.*;
  */
 public class BomberBomb extends Thread {
     /** map object */
-    private BomberMap map = null;
+    private BomberMap map;
     /** position */
-    private int x = 0;
-    private int y = 0;
+    private int x;
+    private int y;
     /** frame count */
-    private int frame = 0;
+    private int frame;
     /** alive flag */
     private boolean alive = true;
     /** owner */
-    private int owner = 0;
+    private int owner;
     /** count down : 3000 ms */
     private int countDown = 3900;
     /** bomb sprite image handles */
-    private static Image[] images = null;
+    private static Image[] images;
     /** rendering hints */
-    private static Object hints = null;
+    private static Object hints;
 
     static {
         /** if java runtime is Java 2 */
@@ -47,7 +47,7 @@ public class BomberBomb extends Thread {
              RenderingHints.VALUE_ANTIALIAS_ON);
             h.put(RenderingHints.KEY_COLOR_RENDERING,
              RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            hints = (RenderingHints)h;
+            hints = h;
         }
     }
 
@@ -64,7 +64,7 @@ public class BomberBomb extends Thread {
         this.x = x;
         this.y = y;
         this.owner = owner - 1;
-        this.images = BomberMap.bombImages;
+        images = BomberMap.bombImages;
 
         map.grid[x >> BomberMain.shiftCount][y >> BomberMain.shiftCount] =
         BomberMap.BOMB;
@@ -75,6 +75,7 @@ public class BomberBomb extends Thread {
     /**
      * Main loop.
      */
+    @Override
     public synchronized void run() {
         while (alive) {
             /** draw the bomb */

@@ -17,19 +17,19 @@ import java.io.File;
  */
 public class BomberMenu extends JPanel {
     /** main frame pointer */
-    private BomberMain main = null;
+    private BomberMain main;
     /** image button objects */
-    private BomberImageButton[] imageButtons = null;
+    private BomberImageButton[] imageButtons;
     /** current selection */
     private int selection = P2;
 
     /** background image object */
-    private static Image backgroundImg = null;
+    private static Image backgroundImg;
     /** button images */
-    private static Image[] buttonImagesDown = null;
-    private static Image[] buttonImagesUp = null;
+    private static Image[] buttonImagesDown;
+    private static Image[] buttonImagesUp;
     /** rendering hints */
-    private static Object hints = null;
+    private static Object hints;
     /** options enumeration */
     private static final int P2 = 0;
     private static final int P3 = 1;
@@ -53,7 +53,7 @@ public class BomberMenu extends JPanel {
              RenderingHints.VALUE_ANTIALIAS_ON);
             h.put(RenderingHints.KEY_COLOR_RENDERING,
              RenderingHints.VALUE_COLOR_RENDER_QUALITY);
-            hints = (RenderingHints)h;
+            hints = h;
         }
 
         /** create the image objects */
@@ -91,8 +91,8 @@ public class BomberMenu extends JPanel {
     public BomberMenu(BomberMain main) {
         this.main = main;
         /** set the menu dimensions */
-        setPreferredSize(new Dimension(17 << main.shiftCount,
-        17 << main.shiftCount));
+        setPreferredSize(new Dimension(17 << BomberMain.shiftCount,
+        17 << BomberMain.shiftCount));
         /** turn on double buffer */
         setDoubleBuffered(true);
 
@@ -121,10 +121,10 @@ public class BomberMenu extends JPanel {
             imageButtons[i] = new BomberImageButton(this, images);
         }
         /** calculate distance between each button */
-        int dy = buttonImagesDown[0].getHeight(this) / (32 / main.size * 2);
+        int dy = buttonImagesDown[0].getHeight(this) / (32 / BomberMain.size * 2);
         /** setup the buttons' positions */
         for (int i = P2; i <= EXIT; i++)
-            imageButtons[i].setInfo(0, (280 / (32 / main.size)) + (dy * i), i);
+            imageButtons[i].setInfo(0, (280 / (32 / BomberMain.size)) + (dy * i), i);
         /** set current selection to Player 2 */
         imageButtons[P2].setBevel(true);
     }
@@ -196,6 +196,7 @@ public class BomberMenu extends JPanel {
      * Painting method.
      * @param g graphics handler
      */
+    @Override
     public void paint(Graphics graphics) {
         Graphics g = graphics;
         /** if java runtime is Java 2 */
@@ -203,7 +204,7 @@ public class BomberMenu extends JPanel {
         /** if java runtime isn't Java 2 */
         else {
             g.drawImage(backgroundImg, 0, 0, 17 <<
-            main.shiftCount, 17 << main.shiftCount, this);
+                    BomberMain.shiftCount, 17 << BomberMain.shiftCount, this);
         }
         for (int i = 0; i < 5; i++) if (imageButtons[i] != null)
             imageButtons[i].paint(g);
@@ -218,6 +219,6 @@ public class BomberMenu extends JPanel {
         /** set the rendering hints */
         g2.setRenderingHints((RenderingHints)hints);
         g2.drawImage(backgroundImg, 0, 0, 17 <<
-        main.shiftCount, 17 << main.shiftCount, this);
+                BomberMain.shiftCount, 17 << BomberMain.shiftCount, this);
     }
 }

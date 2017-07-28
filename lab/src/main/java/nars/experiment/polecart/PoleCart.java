@@ -25,7 +25,7 @@ public class PoleCart extends NAgentX {
 
 
     private final SensorConcept xVel, x;
-    private AtomicBoolean drawFinished = new AtomicBoolean(true);
+    private final AtomicBoolean drawFinished = new AtomicBoolean(true);
 
     public static void main(String[] arg) {
         runRT((n) -> {
@@ -55,7 +55,7 @@ public class PoleCart extends NAgentX {
 
     float posMin = -2f, posMax = +2f;
     float velMax = 10;
-    public boolean manualOverride = false;
+    public boolean manualOverride;
 
     // Constants used for physics
     public static final double cartMass = 1.;
@@ -144,10 +144,12 @@ public class PoleCart extends NAgentX {
         this.panel = new JPanel(new BorderLayout()) {
             public Stroke stroke = new BasicStroke(4);
 
+            @Override
             public void paint(Graphics g) {
                 update(g);
             }
 
+            @Override
             public void update(Graphics g) {
                 Dimension d = panel.getSize();
                 Color cartColor = Color.ORANGE;
@@ -226,6 +228,7 @@ public class PoleCart extends NAgentX {
 
         f.addKeyListener(new KeyAdapter() {
 
+            @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyChar() == 'o') {
                     manualOverride = !manualOverride;

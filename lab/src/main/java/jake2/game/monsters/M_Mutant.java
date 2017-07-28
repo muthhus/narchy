@@ -362,7 +362,9 @@ public class M_Mutant {
     //	SOUNDS
     //
     static final EntThinkAdapter mutant_step = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_step"; }
+    	@Override
+        public String getID(){ return "mutant_step"; }
+        @Override
         public boolean think(edict_t self) {
             int n;
             n = (Lib.rand() + 1) % 3;
@@ -380,7 +382,9 @@ public class M_Mutant {
     };
 
     static final EntInteractAdapter mutant_sight = new EntInteractAdapter() {
-    	public String getID(){ return "mutant_sight"; }
+    	@Override
+        public String getID(){ return "mutant_sight"; }
+        @Override
         public boolean interact(edict_t self, edict_t other) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_sight, 1,
                     Defines.ATTN_NORM, 0);
@@ -389,7 +393,9 @@ public class M_Mutant {
     };
 
     static final EntThinkAdapter mutant_search = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_search"; }
+    	@Override
+        public String getID(){ return "mutant_search"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_search, 1,
                     Defines.ATTN_NORM, 0);
@@ -398,7 +404,9 @@ public class M_Mutant {
     };
 
     static EntThinkAdapter mutant_swing = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_swing"; }
+    	@Override
+        public String getID(){ return "mutant_swing"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_swing, 1,
                     Defines.ATTN_NORM, 0);
@@ -410,7 +418,7 @@ public class M_Mutant {
     //	STAND
     //
 
-    static final mframe_t[] mutant_frames_stand = new mframe_t[] {
+    static final mframe_t[] mutant_frames_stand = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -477,7 +485,9 @@ public class M_Mutant {
             FRAME_stand151, mutant_frames_stand, null);
 
     static final EntThinkAdapter mutant_stand = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_stand"; }
+    	@Override
+        public String getID(){ return "mutant_stand"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = mutant_move_stand;
             return true;
@@ -489,7 +499,9 @@ public class M_Mutant {
     //
 
     static final EntThinkAdapter mutant_idle_loop = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_idle_loop"; }
+    	@Override
+        public String getID(){ return "mutant_idle_loop"; }
+        @Override
         public boolean think(edict_t self) {
             if (Lib.random() < 0.75)
                 self.monsterinfo.nextframe = FRAME_stand155;
@@ -497,7 +509,7 @@ public class M_Mutant {
         }
     };
 
-    static final mframe_t[] mutant_frames_idle = new mframe_t[] {
+    static final mframe_t[] mutant_frames_idle = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -518,7 +530,9 @@ public class M_Mutant {
             FRAME_stand164, mutant_frames_idle, mutant_stand);
 
     static final EntThinkAdapter mutant_idle = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_idle"; }
+    	@Override
+        public String getID(){ return "mutant_idle"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = mutant_move_idle;
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_idle, 1,
@@ -531,7 +545,7 @@ public class M_Mutant {
     //	WALK
     //
 
-    static final mframe_t[] mutant_frames_walk = new mframe_t[] {
+    static final mframe_t[] mutant_frames_walk = {
             new mframe_t(GameAI.ai_walk, 3, null),
             new mframe_t(GameAI.ai_walk, 1, null),
             new mframe_t(GameAI.ai_walk, 5, null),
@@ -549,14 +563,16 @@ public class M_Mutant {
             mutant_frames_walk, null);
 
     static final EntThinkAdapter mutant_walk_loop = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_walk_loop"; }
+    	@Override
+        public String getID(){ return "mutant_walk_loop"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = mutant_move_walk;
             return true;
         }
     };
 
-    static final mframe_t[] mutant_frames_start_walk = new mframe_t[] {
+    static final mframe_t[] mutant_frames_start_walk = {
             new mframe_t(GameAI.ai_walk, 5, null),
             new mframe_t(GameAI.ai_walk, 5, null),
             new mframe_t(GameAI.ai_walk, -2, null),
@@ -566,7 +582,9 @@ public class M_Mutant {
             FRAME_walk04, mutant_frames_start_walk, mutant_walk_loop);
 
     static final EntThinkAdapter mutant_walk = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_walk"; }
+    	@Override
+        public String getID(){ return "mutant_walk"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = mutant_move_start_walk;
             return true;
@@ -577,7 +595,7 @@ public class M_Mutant {
     //	RUN
     //
 
-    static final mframe_t[] mutant_frames_run = new mframe_t[] {
+    static final mframe_t[] mutant_frames_run = {
             new mframe_t(GameAI.ai_run, 40, null),
             new mframe_t(GameAI.ai_run, 40, mutant_step),
             new mframe_t(GameAI.ai_run, 24, null),
@@ -589,7 +607,9 @@ public class M_Mutant {
             mutant_frames_run, null);
 
     static final EntThinkAdapter mutant_run = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_run"; }
+    	@Override
+        public String getID(){ return "mutant_run"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0)
                 self.monsterinfo.currentmove = mutant_move_stand;
@@ -605,7 +625,9 @@ public class M_Mutant {
     //
 
     static final EntThinkAdapter mutant_hit_left = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_hit_left"; }
+    	@Override
+        public String getID(){ return "mutant_hit_left"; }
+        @Override
         public boolean think(edict_t self) {
             float[] aim = { 0, 0, 0 };
 
@@ -621,7 +643,9 @@ public class M_Mutant {
     };
 
     static final EntThinkAdapter mutant_hit_right = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_hit_right"; }
+    	@Override
+        public String getID(){ return "mutant_hit_right"; }
+        @Override
         public boolean think(edict_t self) {
             float[] aim = { 0, 0, 0 };
 
@@ -637,7 +661,9 @@ public class M_Mutant {
     };
 
     static final EntThinkAdapter mutant_check_refire = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_check_refire"; }
+    	@Override
+        public String getID(){ return "mutant_check_refire"; }
+        @Override
         public boolean think(edict_t self) {
             if (null == self.enemy || !self.enemy.inuse
                     || self.enemy.health <= 0)
@@ -650,7 +676,7 @@ public class M_Mutant {
         }
     };
 
-    static final mframe_t[] mutant_frames_attack = new mframe_t[] {
+    static final mframe_t[] mutant_frames_attack = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, mutant_hit_left),
@@ -663,7 +689,9 @@ public class M_Mutant {
             FRAME_attack15, mutant_frames_attack, mutant_run);
 
     static final EntThinkAdapter mutant_melee = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_melee"; }
+    	@Override
+        public String getID(){ return "mutant_melee"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = mutant_move_attack;
             return true;
@@ -675,10 +703,12 @@ public class M_Mutant {
     //
 
     static final EntTouchAdapter mutant_jump_touch = new EntTouchAdapter() {
-    	public String getID(){ return "mutant_jump_touch"; }
+    	@Override
+        public String getID(){ return "mutant_jump_touch"; }
 
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             if (self.health <= 0) {
                 self.touch = null;
                 return;
@@ -712,7 +742,9 @@ public class M_Mutant {
     };
 
     static final EntThinkAdapter mutant_jump_takeoff = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_jump_takeoff"; }
+    	@Override
+        public String getID(){ return "mutant_jump_takeoff"; }
+        @Override
         public boolean think(edict_t self) {
 
             float[] forward = { 0, 0, 0 };
@@ -732,7 +764,9 @@ public class M_Mutant {
     };
 
     static final EntThinkAdapter mutant_check_landing = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_check_landing"; }
+    	@Override
+        public String getID(){ return "mutant_check_landing"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.groundentity != null) {
                 game_import_t.sound(self, Defines.CHAN_WEAPON, sound_thud, 1,
@@ -750,7 +784,7 @@ public class M_Mutant {
         }
     };
 
-    static final mframe_t[] mutant_frames_jump = new mframe_t[] {
+    static final mframe_t[] mutant_frames_jump = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 17, null),
             new mframe_t(GameAI.ai_charge, 15, mutant_jump_takeoff),
@@ -764,7 +798,9 @@ public class M_Mutant {
             FRAME_attack08, mutant_frames_jump, mutant_run);
 
     static final EntThinkAdapter mutant_jump = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_jump"; }
+    	@Override
+        public String getID(){ return "mutant_jump"; }
+        @Override
         public boolean think(edict_t self) {
 
             self.monsterinfo.currentmove = mutant_move_jump;
@@ -776,7 +812,9 @@ public class M_Mutant {
     //	CHECKATTACK
     //
     static final EntThinkAdapter mutant_check_melee = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_check_melee"; }
+    	@Override
+        public String getID(){ return "mutant_check_melee"; }
+        @Override
         public boolean think(edict_t self) {
             return GameUtil.range(self, self.enemy) == Defines.RANGE_MELEE;
 
@@ -784,7 +822,9 @@ public class M_Mutant {
     };
 
     static final EntThinkAdapter mutant_check_jump = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_check_jump"; }
+    	@Override
+        public String getID(){ return "mutant_check_jump"; }
+        @Override
         public boolean think(edict_t self) {
 
             float[] v = { 0, 0, 0 };
@@ -813,7 +853,9 @@ public class M_Mutant {
     };
 
     static final EntThinkAdapter mutant_checkattack = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_checkattack"; }
+    	@Override
+        public String getID(){ return "mutant_checkattack"; }
+        @Override
         public boolean think(edict_t self) {
 
             if (null == self.enemy || self.enemy.health <= 0)
@@ -838,7 +880,7 @@ public class M_Mutant {
     //	PAIN
     //
 
-    static final mframe_t[] mutant_frames_pain1 = new mframe_t[] {
+    static final mframe_t[] mutant_frames_pain1 = {
             new mframe_t(GameAI.ai_move, 4, null),
             new mframe_t(GameAI.ai_move, -3, null),
             new mframe_t(GameAI.ai_move, -8, null),
@@ -848,7 +890,7 @@ public class M_Mutant {
     static final mmove_t mutant_move_pain1 = new mmove_t(FRAME_pain101,
             FRAME_pain105, mutant_frames_pain1, mutant_run);
 
-    static final mframe_t[] mutant_frames_pain2 = new mframe_t[] {
+    static final mframe_t[] mutant_frames_pain2 = {
             new mframe_t(GameAI.ai_move, -24, null),
             new mframe_t(GameAI.ai_move, 11, null),
             new mframe_t(GameAI.ai_move, 5, null),
@@ -859,7 +901,7 @@ public class M_Mutant {
     static final mmove_t mutant_move_pain2 = new mmove_t(FRAME_pain201,
             FRAME_pain206, mutant_frames_pain2, mutant_run);
 
-    static final mframe_t[] mutant_frames_pain3 = new mframe_t[] {
+    static final mframe_t[] mutant_frames_pain3 = {
             new mframe_t(GameAI.ai_move, -22, null),
             new mframe_t(GameAI.ai_move, 3, null),
             new mframe_t(GameAI.ai_move, 3, null),
@@ -876,7 +918,9 @@ public class M_Mutant {
             FRAME_pain311, mutant_frames_pain3, mutant_run);
 
     static final EntPainAdapter mutant_pain = new EntPainAdapter() {
-    	public String getID(){ return "mutant_pain"; }
+    	@Override
+        public String getID(){ return "mutant_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
             float r;
 
@@ -912,7 +956,9 @@ public class M_Mutant {
     //	DEATH
     //
     static final EntThinkAdapter mutant_dead = new EntThinkAdapter() {
-    	public String getID(){ return "mutant_dead"; }
+    	@Override
+        public String getID(){ return "mutant_dead"; }
+        @Override
         public boolean think(edict_t self) {
             Math3D.VectorSet(self.mins, -16, -16, -24);
             Math3D.VectorSet(self.maxs, 16, 16, -8);
@@ -925,7 +971,7 @@ public class M_Mutant {
         }
     };
 
-    static final mframe_t[] mutant_frames_death1 = new mframe_t[] {
+    static final mframe_t[] mutant_frames_death1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -939,7 +985,7 @@ public class M_Mutant {
     static final mmove_t mutant_move_death1 = new mmove_t(FRAME_death101,
             FRAME_death109, mutant_frames_death1, mutant_dead);
 
-    static final mframe_t[] mutant_frames_death2 = new mframe_t[] {
+    static final mframe_t[] mutant_frames_death2 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -955,9 +1001,11 @@ public class M_Mutant {
             FRAME_death210, mutant_frames_death2, mutant_dead);
 
     static final EntDieAdapter mutant_die = new EntDieAdapter() {
-    	public String getID(){ return "mutant_die"; }
+    	@Override
+        public String getID(){ return "mutant_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             int n;
 
             if (self.health <= self.gib_health) {
@@ -1003,7 +1051,9 @@ public class M_Mutant {
      * Trigger_Spawn Sight
      */
     public static final EntThinkAdapter SP_monster_mutant = new EntThinkAdapter() {
-    	public String getID(){ return "SP_monster_mutant"; }
+    	@Override
+        public String getID(){ return "SP_monster_mutant"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameBase.deathmatch.value != 0) {
                 GameUtil.G_FreeEdict(self);

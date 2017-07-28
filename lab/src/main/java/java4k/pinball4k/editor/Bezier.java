@@ -10,9 +10,9 @@ public class Bezier extends LevelObject {
 	public Point p3;
 	public int subdivs = 8;
 	
-	private EndpointHandle p1Handle = new EndpointHandle(0);
-	private EndpointHandle p2Handle = new EndpointHandle(1);
-	private EndpointHandle p3Handle = new EndpointHandle(2);
+	private final EndpointHandle p1Handle = new EndpointHandle(0);
+	private final EndpointHandle p2Handle = new EndpointHandle(1);
+	private final EndpointHandle p3Handle = new EndpointHandle(2);
 	
 	public Bezier(Point p1, Point p2, Point p3) {
 		this.p = new Point(p1);
@@ -28,7 +28,8 @@ public class Bezier extends LevelObject {
 	 * Draws itself to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void draw(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void draw(Graphics2D g, LevelPanel levelPanel) {
 		g.setColor(Color.WHITE);
 		float x0 = p.x;
 		float y0 = p.y;
@@ -69,7 +70,8 @@ public class Bezier extends LevelObject {
 	 * Draws the handles to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
 		p1Handle.draw(g, levelPanel);
 		p2Handle.draw(g, levelPanel);
 		p3Handle.draw(g, levelPanel);
@@ -79,7 +81,8 @@ public class Bezier extends LevelObject {
 	 * The public properties to show in the editor ui.
 	 * @return the properties to show
 	 */
-	public Field[] getProperties() {
+	@Override
+    public Field[] getProperties() {
 		return getFields("visible", "collidable", "isRollOver", "score", "bounce", "behaviorId", "p", "p2", "p3", "subdivs");
 	}	
 	
@@ -97,7 +100,7 @@ public class Bezier extends LevelObject {
 	 *
 	 */
 	class EndpointHandle extends Handle {
-		int pointIdx = 0;
+		int pointIdx;
 		EndpointHandle(int pointIdx) {
 			this.pointIdx = pointIdx;
 		}
@@ -106,7 +109,8 @@ public class Bezier extends LevelObject {
 		 * Overrides Handle. Gets the endpoint.
 		 * @return the handles endpoint
 		 */
-		public Point getCenter() {
+		@Override
+        public Point getCenter() {
 			if (pointIdx == 1) {
 				return p2;
 			} else if (pointIdx == 2) {
@@ -121,7 +125,8 @@ public class Bezier extends LevelObject {
 		 * the distance dragged.
 		 * @param p where the handle is dragged to
 		 */
-		public void dragged(int dx, int dy) {
+		@Override
+        public void dragged(int dx, int dy) {
 			getCenter().translate(dx, dy);
 		}
 		
@@ -129,7 +134,8 @@ public class Bezier extends LevelObject {
 		 * Gets the level object the hangle controlls. Can be null.
 		 * @return the level object
 		 */
-		public LevelObject getLevelObject() {
+		@Override
+        public LevelObject getLevelObject() {
 			return Bezier.this;
 		}
 	}

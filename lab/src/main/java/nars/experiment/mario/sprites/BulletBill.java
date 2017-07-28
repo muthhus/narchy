@@ -7,17 +7,17 @@ import nars.experiment.mario.LevelScene;
 public class BulletBill extends Sprite
 {
     @SuppressWarnings("unused")
-	private int width = 4;
+	private final int width = 4;
     int height = 24;
 
-    private LevelScene world;
+    private final LevelScene world;
     public int facing;
 
-    public boolean avoidCliffs = false;
+    public boolean avoidCliffs;
     public int anim;
 
-    public boolean dead = false;
-    private int deadTime = 0;
+    public boolean dead;
+    private int deadTime;
 
 
     public BulletBill(LevelScene world, float x, float y, int dir)
@@ -40,6 +40,7 @@ public class BulletBill extends Sprite
         this.facing = dir;
     }
 
+    @Override
     public void collideCheck()
     {
         if (dead) return;
@@ -68,6 +69,7 @@ public class BulletBill extends Sprite
         }
     }
 
+    @Override
     public void move()
     {
         if (deadTime > 0)
@@ -105,6 +107,7 @@ public class BulletBill extends Sprite
         return true;
     }
     
+    @Override
     public boolean fireballCollideCheck(Fireball fireball)
     {
         if (deadTime != 0) return false;
@@ -122,6 +125,7 @@ public class BulletBill extends Sprite
         return false;
     }      
 
+    @Override
     public boolean shellCollideCheck(Shell shell)
     {
         if (deadTime != 0) return false;

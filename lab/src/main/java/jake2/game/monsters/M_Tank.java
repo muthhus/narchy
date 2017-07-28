@@ -643,7 +643,9 @@ public class M_Tank {
     //
 
     static final EntInteractAdapter tank_sight = new EntInteractAdapter() {
-    	public String getID(){ return "tank_sight"; }
+    	@Override
+        public String getID(){ return "tank_sight"; }
+        @Override
         public boolean interact(edict_t self, edict_t other) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_sight, 1,
                     Defines.ATTN_NORM, 0);
@@ -652,7 +654,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter tank_footstep = new EntThinkAdapter() {
-    	public String getID(){ return "tank_footstep"; }
+    	@Override
+        public String getID(){ return "tank_footstep"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_BODY, sound_step, 1,
                     Defines.ATTN_NORM, 0);
@@ -661,7 +665,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter tank_thud = new EntThinkAdapter() {
-    	public String getID(){ return "tank_thud"; }
+    	@Override
+        public String getID(){ return "tank_thud"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_BODY, sound_thud, 1,
                     Defines.ATTN_NORM, 0);
@@ -670,7 +676,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter tank_windup = new EntThinkAdapter() {
-    	public String getID(){ return "tank_windup"; }
+    	@Override
+        public String getID(){ return "tank_windup"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_WEAPON, sound_windup, 1,
                     Defines.ATTN_NORM, 0);
@@ -679,7 +687,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter tank_idle = new EntThinkAdapter() {
-    	public String getID(){ return "tank_idle"; }
+    	@Override
+        public String getID(){ return "tank_idle"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_idle, 1,
                     Defines.ATTN_IDLE, 0);
@@ -691,7 +701,7 @@ public class M_Tank {
     // stand
     //
 
-    static final mframe_t[] tank_frames_stand = new mframe_t[] {
+    static final mframe_t[] tank_frames_stand = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -727,7 +737,9 @@ public class M_Tank {
             tank_frames_stand, null);
 
     static final EntThinkAdapter tank_stand = new EntThinkAdapter() {
-    	public String getID(){ return "tank_stand"; }
+    	@Override
+        public String getID(){ return "tank_stand"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = tank_move_stand;
             return true;
@@ -738,7 +750,9 @@ public class M_Tank {
     // walk
     //
     static final EntThinkAdapter tank_run = new EntThinkAdapter() {
-    	public String getID(){ return "tank_run"; }
+    	@Override
+        public String getID(){ return "tank_run"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.enemy != null && self.enemy.client != null)
                 self.monsterinfo.aiflags |= Defines.AI_BRUTAL;
@@ -761,14 +775,16 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter tank_walk = new EntThinkAdapter() {
-    	public String getID(){ return "tank_walk"; }
+    	@Override
+        public String getID(){ return "tank_walk"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = tank_move_walk;
             return true;
         }
     };
 
-    static final mframe_t[] tank_frames_start_walk = new mframe_t[] {
+    static final mframe_t[] tank_frames_start_walk = {
             new mframe_t(GameAI.ai_walk, 0, null),
             new mframe_t(GameAI.ai_walk, 6, null),
             new mframe_t(GameAI.ai_walk, 6, null),
@@ -777,7 +793,7 @@ public class M_Tank {
     static mmove_t tank_move_start_walk = new mmove_t(FRAME_walk01,
             FRAME_walk04, tank_frames_start_walk, tank_walk);
 
-    static final mframe_t[] tank_frames_walk = new mframe_t[] {
+    static final mframe_t[] tank_frames_walk = {
             new mframe_t(GameAI.ai_walk, 4, null),
             new mframe_t(GameAI.ai_walk, 5, null),
             new mframe_t(GameAI.ai_walk, 3, null),
@@ -798,7 +814,7 @@ public class M_Tank {
     static final mmove_t tank_move_walk = new mmove_t(FRAME_walk05, FRAME_walk20,
             tank_frames_walk, null);
 
-    static final mframe_t[] tank_frames_stop_walk = new mframe_t[] {
+    static final mframe_t[] tank_frames_stop_walk = {
             new mframe_t(GameAI.ai_walk, 3, null),
             new mframe_t(GameAI.ai_walk, 3, null),
             new mframe_t(GameAI.ai_walk, 2, null),
@@ -812,7 +828,7 @@ public class M_Tank {
     // run
     //
 
-    static final mframe_t[] tank_frames_start_run = new mframe_t[] {
+    static final mframe_t[] tank_frames_start_run = {
             new mframe_t(GameAI.ai_run, 0, null),
             new mframe_t(GameAI.ai_run, 6, null),
             new mframe_t(GameAI.ai_run, 6, null),
@@ -821,7 +837,7 @@ public class M_Tank {
     static final mmove_t tank_move_start_run = new mmove_t(FRAME_walk01,
             FRAME_walk04, tank_frames_start_run, tank_run);
 
-    static final mframe_t[] tank_frames_run = new mframe_t[] {
+    static final mframe_t[] tank_frames_run = {
             new mframe_t(GameAI.ai_run, 4, null),
             new mframe_t(GameAI.ai_run, 5, null),
             new mframe_t(GameAI.ai_run, 3, null),
@@ -842,7 +858,7 @@ public class M_Tank {
     static final mmove_t tank_move_run = new mmove_t(FRAME_walk05, FRAME_walk20,
             tank_frames_run, null);
 
-    static final mframe_t[] tank_frames_stop_run = new mframe_t[] {
+    static final mframe_t[] tank_frames_stop_run = {
             new mframe_t(GameAI.ai_run, 3, null),
             new mframe_t(GameAI.ai_run, 3, null),
             new mframe_t(GameAI.ai_run, 2, null),
@@ -856,7 +872,7 @@ public class M_Tank {
     // pain
     //
 
-    static final mframe_t[] tank_frames_pain1 = new mframe_t[] {
+    static final mframe_t[] tank_frames_pain1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -865,7 +881,7 @@ public class M_Tank {
     static final mmove_t tank_move_pain1 = new mmove_t(FRAME_pain101, FRAME_pain104,
             tank_frames_pain1, tank_run);
 
-    static final mframe_t[] tank_frames_pain2 = new mframe_t[] {
+    static final mframe_t[] tank_frames_pain2 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -875,7 +891,7 @@ public class M_Tank {
     static final mmove_t tank_move_pain2 = new mmove_t(FRAME_pain201, FRAME_pain205,
             tank_frames_pain2, tank_run);
 
-    static final mframe_t[] tank_frames_pain3 = new mframe_t[] {
+    static final mframe_t[] tank_frames_pain3 = {
             new mframe_t(GameAI.ai_move, -7, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -897,7 +913,9 @@ public class M_Tank {
             tank_frames_pain3, tank_run);
 
     static final EntPainAdapter tank_pain = new EntPainAdapter() {
-    	public String getID(){ return "tank_pain"; }
+    	@Override
+        public String getID(){ return "tank_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
             if (self.health < (self.max_health / 2))
                 self.s.skinnum |= 1;
@@ -943,7 +961,9 @@ public class M_Tank {
     //
 
     static final EntThinkAdapter TankBlaster = new EntThinkAdapter() {
-    	public String getID(){ return "TankBlaster"; }
+    	@Override
+        public String getID(){ return "TankBlaster"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 };
             float[] start = { 0, 0, 0 };
@@ -976,7 +996,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter TankStrike = new EntThinkAdapter() {
-    	public String getID(){ return "TankStrike"; }
+    	@Override
+        public String getID(){ return "TankStrike"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_WEAPON, sound_strike, 1,
                     Defines.ATTN_NORM, 0);
@@ -986,7 +1008,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter TankRocket = new EntThinkAdapter() {
-    	public String getID(){ return "TankRocket"; }
+    	@Override
+        public String getID(){ return "TankRocket"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 };
             float[] start = { 0, 0, 0 };
@@ -1020,7 +1044,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter TankMachineGun = new EntThinkAdapter() {
-    	public String getID(){ return "TankMachineGun"; }
+    	@Override
+        public String getID(){ return "TankMachineGun"; }
+        @Override
         public boolean think(edict_t self) {
 
             float[] dir = { 0, 0, 0 };
@@ -1063,7 +1089,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter tank_reattack_blaster = new EntThinkAdapter() {
-    	public String getID(){ return "tank_reattack_blaster"; }
+    	@Override
+        public String getID(){ return "tank_reattack_blaster"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameBase.skill.value >= 2)
                 if (GameUtil.visible(self, self.enemy))
@@ -1077,7 +1105,7 @@ public class M_Tank {
         }
     };
 
-    static final mframe_t[] tank_frames_attack_blast = new mframe_t[] {
+    static final mframe_t[] tank_frames_attack_blast = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -1100,7 +1128,7 @@ public class M_Tank {
     static final mmove_t tank_move_attack_blast = new mmove_t(FRAME_attak101,
             FRAME_attak116, tank_frames_attack_blast, tank_reattack_blaster);
 
-    static final mframe_t[] tank_frames_reattack_blast = new mframe_t[] {
+    static final mframe_t[] tank_frames_reattack_blast = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, TankBlaster),
@@ -1112,7 +1140,7 @@ public class M_Tank {
     static final mmove_t tank_move_reattack_blast = new mmove_t(FRAME_attak111,
             FRAME_attak116, tank_frames_reattack_blast, tank_reattack_blaster);
 
-    static final mframe_t[] tank_frames_attack_post_blast = new mframe_t[] {
+    static final mframe_t[] tank_frames_attack_post_blast = {
             new mframe_t(GameAI.ai_move, 0, null), // 17)
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 2, null),
@@ -1125,7 +1153,9 @@ public class M_Tank {
             FRAME_attak122, tank_frames_attack_post_blast, tank_run);
 
     static final EntThinkAdapter tank_poststrike = new EntThinkAdapter() {
-    	public String getID(){ return "tank_poststrike"; }
+    	@Override
+        public String getID(){ return "tank_poststrike"; }
+        @Override
         public boolean think(edict_t self) {
             self.enemy = null;
             tank_run.think(self);
@@ -1134,7 +1164,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter tank_doattack_rocket = new EntThinkAdapter() {
-    	public String getID(){ return "tank_doattack_rocket"; }
+    	@Override
+        public String getID(){ return "tank_doattack_rocket"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = tank_move_attack_fire_rocket;
             return true;
@@ -1142,7 +1174,9 @@ public class M_Tank {
     };
 
     static final EntThinkAdapter tank_refire_rocket = new EntThinkAdapter() {
-    	public String getID(){ return "tank_refire_rocket"; }
+    	@Override
+        public String getID(){ return "tank_refire_rocket"; }
+        @Override
         public boolean think(edict_t self) {
             // Only on hard or nightmare
             if (GameBase.skill.value >= 2)
@@ -1157,7 +1191,7 @@ public class M_Tank {
         }
     };
 
-    static final mframe_t[] tank_frames_attack_strike = new mframe_t[] {
+    static final mframe_t[] tank_frames_attack_strike = {
             new mframe_t(GameAI.ai_move, 3, null),
             new mframe_t(GameAI.ai_move, 2, null),
             new mframe_t(GameAI.ai_move, 2, null),
@@ -1200,7 +1234,7 @@ public class M_Tank {
     static final mmove_t tank_move_attack_strike = new mmove_t(FRAME_attak201,
             FRAME_attak238, tank_frames_attack_strike, tank_poststrike);
 
-    static final mframe_t[] tank_frames_attack_pre_rocket = new mframe_t[] {
+    static final mframe_t[] tank_frames_attack_pre_rocket = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -1230,7 +1264,7 @@ public class M_Tank {
     static final mmove_t tank_move_attack_pre_rocket = new mmove_t(FRAME_attak301,
             FRAME_attak321, tank_frames_attack_pre_rocket, tank_doattack_rocket);
 
-    static final mframe_t[] tank_frames_attack_fire_rocket = new mframe_t[] {
+    static final mframe_t[] tank_frames_attack_fire_rocket = {
             new mframe_t(GameAI.ai_charge, -3, null), // Loop Start 22 )
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, TankRocket), // 24)
@@ -1245,7 +1279,7 @@ public class M_Tank {
     static final mmove_t tank_move_attack_fire_rocket = new mmove_t(FRAME_attak322,
             FRAME_attak330, tank_frames_attack_fire_rocket, tank_refire_rocket);
 
-    static final mframe_t[] tank_frames_attack_post_rocket = new mframe_t[] {
+    static final mframe_t[] tank_frames_attack_post_rocket = {
             new mframe_t(GameAI.ai_charge, 0, null), // 31)
             new mframe_t(GameAI.ai_charge, -1, null),
             new mframe_t(GameAI.ai_charge, -1, null),
@@ -1277,7 +1311,7 @@ public class M_Tank {
     static final mmove_t tank_move_attack_post_rocket = new mmove_t(FRAME_attak331,
             FRAME_attak353, tank_frames_attack_post_rocket, tank_run);
 
-    static final mframe_t[] tank_frames_attack_chain = new mframe_t[] {
+    static final mframe_t[] tank_frames_attack_chain = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -1312,7 +1346,9 @@ public class M_Tank {
             FRAME_attak429, tank_frames_attack_chain, tank_run);
 
     static final EntThinkAdapter tank_attack = new EntThinkAdapter() {
-    	public String getID(){ return "tank_attack"; }
+    	@Override
+        public String getID(){ return "tank_attack"; }
+        @Override
         public boolean think(edict_t self) {
             float[] vec = { 0, 0, 0 };
             float range;
@@ -1360,7 +1396,9 @@ public class M_Tank {
     // death
     //
     static final EntThinkAdapter tank_dead = new EntThinkAdapter() {
-    	public String getID(){ return "tank_dead"; }
+    	@Override
+        public String getID(){ return "tank_dead"; }
+        @Override
         public boolean think(edict_t self) {
             Math3D.VectorSet(self.mins, -16, -16, -16);
             Math3D.VectorSet(self.maxs, 16, 16, -0);
@@ -1372,7 +1410,7 @@ public class M_Tank {
         }
     };
 
-    static final mframe_t[] tank_frames_death1 = new mframe_t[] {
+    static final mframe_t[] tank_frames_death1 = {
             new mframe_t(GameAI.ai_move, -7, null),
             new mframe_t(GameAI.ai_move, -2, null),
             new mframe_t(GameAI.ai_move, -2, null),
@@ -1410,9 +1448,11 @@ public class M_Tank {
             FRAME_death132, tank_frames_death1, tank_dead);
 
     static final EntDieAdapter tank_die = new EntDieAdapter() {
-    	public String getID(){ return "tank_die"; }
+    	@Override
+        public String getID(){ return "tank_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             int n;
 
             // check for gib
@@ -1464,7 +1504,9 @@ public class M_Tank {
      * Trigger_Spawn Sight
      */
     public static final EntThinkAdapter SP_monster_tank = new EntThinkAdapter() {
-    	public String getID(){ return "SP_monster_tank"; }
+    	@Override
+        public String getID(){ return "SP_monster_tank"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameBase.deathmatch.value != 0) {
                 GameUtil.G_FreeEdict(self);

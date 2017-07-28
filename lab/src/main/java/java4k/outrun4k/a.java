@@ -32,7 +32,7 @@ import java.util.Random;
 public class a extends Applet implements Runnable {
 
   // keys
-  private boolean[] a = new boolean[32768];
+  private final boolean[] a = new boolean[32768];
 
   @Override
   public void start() {
@@ -40,6 +40,7 @@ public class a extends Applet implements Runnable {
     new Thread(this).start();
   }
 
+  @Override
   public void run() {
 
     final int SEGMENTS = 4096;

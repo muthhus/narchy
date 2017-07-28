@@ -7,14 +7,14 @@ import nars.experiment.minicraft.top.level.tile.Tile;
 import nars.experiment.minicraft.top.sound.Sound;
 
 public class Mob extends Entity {
-	protected int walkDist = 0;
-	public int dir = 0;
-	public int hurtTime = 0;
+	protected int walkDist;
+	public int dir;
+	public int hurtTime;
 	protected int xKnockback, yKnockback;
 	public int maxHealth = 10;
 	public int health = maxHealth;
-	public int swimTimer = 0;
-	public int tickTime = 0;
+	public int swimTimer;
+	public int tickTime;
 
 	public Mob() {
 		x = y = 8;

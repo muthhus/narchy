@@ -23,14 +23,11 @@ package nars.term;
 import jcog.Util;
 import jcog.data.sexpression.IPair;
 import jcog.data.sexpression.Pair;
-import nars.$;
 import nars.IO;
 import nars.Op;
-import nars.Param;
 import nars.index.term.NewCompound;
 import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
-import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
@@ -700,12 +697,11 @@ public interface Compound extends Term, IPair, TermContainer {
 
     default Term evalSafe(TermContext index, int remain) {
 
+        if (!isDynamic())
+            return this;
+
         if (remain-- <= 0)
             return null;
-
-        //the presence of these bits means that somewhere in the subterms is a functor to eval
-        if (!isDynamic()) //!hasAll(Op.EvalBits))
-            return this;
 
         Op o = op();
 

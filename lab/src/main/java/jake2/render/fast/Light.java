@@ -106,7 +106,8 @@ public abstract class Light extends Warp {
 	/**
 	 * R_RenderDlights
 	 */
-	void R_RenderDlights()
+    @Override
+    void R_RenderDlights()
 	{
 		if (gl_flashblend.value == 0)
 			return;
@@ -143,7 +144,8 @@ public abstract class Light extends Warp {
 	/**
 	 * R_MarkLights
 	 */
-	void R_MarkLights (dlight_t light, int bit, mnode_t node)
+    @Override
+    void R_MarkLights (dlight_t light, int bit, mnode_t node)
 	{
 		if (node.contents != -1)
 			return;
@@ -201,7 +203,8 @@ public abstract class Light extends Warp {
 	/**
 	 * R_PushDlights
 	 */
-	void R_PushDlights()
+    @Override
+    void R_PushDlights()
 	{
 		if (gl_flashblend.value != 0)
 			return;
@@ -358,7 +361,8 @@ public abstract class Light extends Warp {
 	/**
 	 * R_LightPoint
 	 */
-	void R_LightPoint (float[] p, float[] color)
+    @Override
+    void R_LightPoint (float[] p, float[] color)
 	{
 		assert (p.length == 3) : "vec3_t bug";
 		assert (color.length == 3) : "rgb bug";
@@ -490,7 +494,8 @@ public abstract class Light extends Warp {
 	/**
 	 * R_SetCacheState
 	 */
-	void R_SetCacheState( msurface_t surf )
+    @Override
+    void R_SetCacheState( msurface_t surf )
 	{
 
 		float[] cached_light = surf.cached_light;
@@ -509,7 +514,8 @@ public abstract class Light extends Warp {
 	 *
 	 * Combine and scale multiple lightmaps into the floating format in blocklights
 	 */
-	void R_BuildLightMap(msurface_t surf, IntBuffer dest, int stride)
+    @Override
+    void R_BuildLightMap(msurface_t surf, IntBuffer dest, int stride)
 	{
         int r, g, b, a, max;
         int i, j;

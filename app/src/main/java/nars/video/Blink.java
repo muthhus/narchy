@@ -15,10 +15,10 @@ public class Blink implements Bitmap2D {
     /**
      * percentage of duty cycle during which input is visible
      */
-    private FloatParam visibleProb = new FloatParam(0, 0, 1f);
+    private final FloatParam visibleProb = new FloatParam(0, 0, 1f);
 
     final Random rng = new XorShift128PlusRandom(1);
-    boolean blinked = false;
+    boolean blinked;
 
     public Blink(Bitmap2D in, float rate) {
         this.in = in;

@@ -23,7 +23,7 @@ public class RealDecisionTree extends DecisionTree<Integer, Float> {
     public final FloatTable<String> table;
     public final DiscretizedScalarFeature[] cols;
     @Nullable
-    private String[] rangeLabels;
+    private final String[] rangeLabels;
 
 
     /**

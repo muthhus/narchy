@@ -437,26 +437,31 @@ public final class SCR extends Globals {
         // register our commands
         //
         Cmd.AddCommand("timerefresh", new xcommand_t() {
+            @Override
             public void execute() {
                 TimeRefresh_f();
             }
         });
         Cmd.AddCommand("loading", new xcommand_t() {
+            @Override
             public void execute() {
                 Loading_f();
             }
         });
         Cmd.AddCommand("sizeup", new xcommand_t() {
+            @Override
             public void execute() {
                 SizeUp_f();
             }
         });
         Cmd.AddCommand("sizedown", new xcommand_t() {
+            @Override
             public void execute() {
                 SizeDown_f();
             }
         });
         Cmd.AddCommand("sky", new xcommand_t() {
+            @Override
             public void execute() {
                 Sky_f();
             }
@@ -1308,6 +1313,7 @@ public final class SCR extends Globals {
     }
 
     private static final xcommand_t updateScreenCallback = new xcommand_t() {
+        @Override
         public void execute() {
             UpdateScreen2();
         }
@@ -1332,9 +1338,9 @@ public final class SCR extends Globals {
             scr_dirty.y2 = y;
     }
 
-    private static int lastframes = 0;
+    private static int lastframes;
 
-    private static int lasttime = 0;
+    private static int lasttime;
 
     private static String fpsvalue = "";
 

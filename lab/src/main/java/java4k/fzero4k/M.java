@@ -605,6 +605,7 @@ public class M extends JFrame {
     return (int)(255 * Math.pow((Math.cos(angle) + 1) / 2, light) / dark);
   }
 
+  @Override
   protected void processKeyEvent(KeyEvent e) {
     K[e.getKeyCode()] = e.getID() == 401;
   }

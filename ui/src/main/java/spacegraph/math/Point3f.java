@@ -36,7 +36,7 @@ package spacegraph.math;
  * x,y,z coordinates.
  *
  */
-public class Point3f extends Tuple3f implements java.io.Serializable {
+public class Point3f extends Tuple3f {
 
 
     // Compatible with 1.1

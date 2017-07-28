@@ -176,6 +176,7 @@ public abstract class Base implements QGLConst, RenderAPI {
 
     protected GLDriver glImpl;
 
+    @Override
     public void setGLDriver(GLDriver driver) {
         glImpl = driver;
         gl = (QGL)driver;

@@ -60,13 +60,13 @@ public abstract class Main extends Base {
 
 	// this a hack for function pointer test
 	// default disabled
-	boolean qglColorTableEXT = false;
-	boolean qglSelectTextureSGIS = false;
-	boolean qglActiveTextureARB = false;
-	boolean qglPointParameterfEXT = false;
-	boolean qglLockArraysEXT = false;
-	boolean qglMTexCoord2fSGIS = false;
-	boolean qwglSwapIntervalEXT = false;
+	boolean qglColorTableEXT;
+	boolean qglSelectTextureSGIS;
+	boolean qglActiveTextureARB;
+	boolean qglPointParameterfEXT;
+	boolean qglLockArraysEXT;
+	boolean qglMTexCoord2fSGIS;
+	boolean qwglSwapIntervalEXT;
 
 	//	=================
 	//  abstract methods
@@ -74,7 +74,8 @@ public abstract class Main extends Base {
 	protected abstract void Draw_GetPalette();
 
 	abstract void GL_ImageList_f();
-	public abstract void GL_ScreenShot_f();
+	@Override
+    public abstract void GL_ScreenShot_f();
 	abstract void GL_SetTexturePalette(int[] palette);
 	abstract void GL_Strings_f();
 
@@ -772,7 +773,7 @@ public abstract class Main extends Base {
 	R_Clear
 	=============
 	*/
-	int trickframe = 0;
+	int trickframe;
 
 	void R_Clear() {
 		if (gl_ztrick.value != 0.0f) {
@@ -923,7 +924,8 @@ public abstract class Main extends Base {
 	
 	@@@@@@@@@@@@@@@@@@@@@
 	*/
-	public void R_RenderFrame(refdef_t fd) {
+	@Override
+    public void R_RenderFrame(refdef_t fd) {
 		R_RenderView(fd);
 		R_SetLightLevel();
 		R_SetGL2D();
@@ -998,23 +1000,27 @@ public abstract class Main extends Base {
 		vid_ref = Cvar.Get("vid_ref", "jogl", Defines.CVAR_ARCHIVE);
 
 		Cmd.AddCommand("imagelist", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				GL_ImageList_f();
 			}
 		});
 
 		Cmd.AddCommand("screenshot", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				glImpl.screenshot();
 			}
 		});
 		Cmd.AddCommand("modellist", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				Mod_Modellist_f();
 			}
 		});
 		Cmd.AddCommand("gl_strings", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				GL_Strings_f();
 			}
 		});
@@ -1080,7 +1086,8 @@ public abstract class Main extends Base {
         return R_Init(0, 0);
     }
     
-	public boolean R_Init(int vid_xpos, int vid_ypos) {
+	@Override
+    public boolean R_Init(int vid_xpos, int vid_ypos) {
 
 		assert(Warp.SIN.length == 256) : "warpsin table bug";
 
@@ -1106,7 +1113,8 @@ public abstract class Main extends Base {
 		return true;
 	}
 
-	public boolean R_Init2() {
+	@Override
+    public boolean R_Init2() {
 		VID.MenuInit();
         
 		/*
@@ -1336,7 +1344,8 @@ public abstract class Main extends Base {
 	R_Shutdown
 	===============
 	*/
-	public void R_Shutdown() {
+	@Override
+    public void R_Shutdown() {
 		Cmd.RemoveCommand("modellist");
 		Cmd.RemoveCommand("screenshot");
 		Cmd.RemoveCommand("imagelist");
@@ -1357,7 +1366,8 @@ public abstract class Main extends Base {
 	R_BeginFrame
 	@@@@@@@@@@@@@@@@@@@@@
 	*/
-	public boolean R_BeginFrame(float camera_separation) {
+	@Override
+    public boolean R_BeginFrame(float camera_separation) {
 	    
 	    vid.update();
 	    
@@ -1479,7 +1489,8 @@ public abstract class Main extends Base {
 	R_SetPalette
 	=============
 	*/
-	public void R_SetPalette(byte[] palette) {
+	@Override
+    public void R_SetPalette(byte[] palette) {
 		// 256 RGB values (768 bytes)
 		// or null
 		int i;

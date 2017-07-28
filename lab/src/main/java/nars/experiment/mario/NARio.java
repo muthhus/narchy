@@ -20,7 +20,7 @@ public class NARio extends NAgentX {
     private final MarioComponent mario;
 
 
-    private SensorConcept vx;
+    private final SensorConcept vx;
 
     public NARio(NAR nar) throws Narsese.NarseseException {
         super("", nar);

@@ -349,7 +349,7 @@ public final class NET {
             // the socket have to be broadcastable
             newsocket.setBroadcast(true);
         } catch (Exception e) {
-            Com.Println("Error: " + e.toString());
+            Com.Println("Error: " + e);
             newsocket = null;
         }
         return newsocket;

@@ -151,7 +151,7 @@ public abstract class Mesh extends Light {
 
     final FloatBuffer vertexArrayBuf = Lib.newFloatBuffer(qfiles.MAX_VERTS * 3);
 
-    boolean isFilled = false;
+    boolean isFilled;
 
     float[] tmpVec = { 0, 0, 0 };
 
@@ -533,27 +533,25 @@ public abstract class Mesh extends Light {
             Math3D.VectorAdd(e.origin, bbox[i], bbox[i]);
         }
 
-        {
-            int p, f;
-            int aggregatemask = ~0; // 0xFFFFFFFF
+        int p, f;
+        int aggregatemask = ~0; // 0xFFFFFFFF
 
-            for (p = 0; p < 8; p++) {
-                int mask = 0;
+        for (p = 0; p < 8; p++) {
+            int mask = 0;
 
-                for (f = 0; f < 4; f++) {
-                    float dp = Math3D.DotProduct(frustum[f].normal, bbox[p]);
+            for (f = 0; f < 4; f++) {
+                float dp = Math3D.DotProduct(frustum[f].normal, bbox[p]);
 
-                    if ((dp - frustum[f].dist) < 0) {
-                        mask |= (1 << f);
-                    }
+                if ((dp - frustum[f].dist) < 0) {
+                    mask |= (1 << f);
                 }
-
-                aggregatemask &= mask;
             }
 
-            return aggregatemask != 0;
-
+            aggregatemask &= mask;
         }
+
+        return aggregatemask != 0;
+
     }
 
     /*
@@ -561,6 +559,7 @@ public abstract class Mesh extends Light {
      * 
      * =================
      */
+    @Override
     void R_DrawAliasModel(entity_t e) {
         int i;
         qfiles.dmdl_t paliashdr;

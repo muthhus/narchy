@@ -12,13 +12,13 @@ public class LevelRenderer
     private int xCam;
     private int yCam;
     public BufferedImage image;
-    private Graphics2D g;
+    private final Graphics2D g;
     private static final Color transparent = new Color(0, 0, 0, 0);
     private Level level;
 
     @SuppressWarnings("unused")
-	private Random random = new Random();
-    public boolean renderBehaviors = false;
+	private final Random random = new Random();
+    public boolean renderBehaviors;
 
     int width;
     int height;

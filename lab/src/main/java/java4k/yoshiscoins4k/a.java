@@ -30,7 +30,7 @@ import java.util.Random;
 
 public class a extends Applet implements Runnable {
 
-	private int[] a = new int[3];
+	private final int[] a = new int[3];
 
 	private static final int STONE_EMPTY = 0;
 	private static final int STONE_X = 1;
@@ -198,7 +198,8 @@ public class a extends Applet implements Runnable {
 		board[7][1] = NODE_TIE;
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 
 		final float GRAVITY = 0.5f;
 		final float COIN_JUMP_VY = -0.8f;

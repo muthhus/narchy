@@ -13,6 +13,7 @@ import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static nars.$.$;
 import static org.junit.Assert.assertEquals;
@@ -41,9 +42,10 @@ public class ActivateTest {
 
         HashBag<String> termlinkHits = new HashBag();
         HashBag<String> premiseHits = new HashBag();
-        Activate cf = new Activate(c, 1f) {
-            @Override
-            protected void premise(Premise p, NAR nar) {
+        Activate cf = new Activate(c, 1f);
+
+        for (int i = 0; i < 500; i++) {
+            cf.hypothesize(nar).forEach(p -> {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
                 if (p.termLink instanceof Atom)
                     return ; //ignore
@@ -51,11 +53,8 @@ public class ActivateTest {
 
                 premiseHits.addOccurrences(p.toString(), 1);
                 termlinkHits.addOccurrences(/*tasklink.get() + " " +*/ tls, 1);
-            }
-        };
-
-        for (int i = 0; i < 500; i++)
-            cf.run(nar);
+            });
+        }
 
         System.out.println("termlinks pri (after):\n");
         c.termlinks().print();

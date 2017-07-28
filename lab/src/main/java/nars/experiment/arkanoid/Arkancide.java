@@ -19,7 +19,7 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam = false;
+    static boolean cam;
 
     public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
@@ -130,7 +130,7 @@ public class Arkancide extends NAgentX {
 //            );
 
             SpaceGraph.window(Vis.beliefCharts(100,
-                    Lists.newArrayList(new Term[]{ab.term(), a.term(), b.term(), c.term()}),
+                    Lists.newArrayList(ab.term(), a.term(), b.term(), c.term()),
                     nar), 600, 600);
 //            nar.onTask(t -> {
 //                if (t instanceof DerivedTask && t.isGoal()) {

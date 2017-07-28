@@ -88,7 +88,7 @@ public class DefaultTermizer implements Termizer {
         if (o instanceof Term) return (Term)o;
 
         if (o instanceof String)
-            return $.quote((String) o);
+            return $.quote(o);
 
         if (o instanceof Boolean)
             return ((Boolean) o) ? TRUE : FALSE;

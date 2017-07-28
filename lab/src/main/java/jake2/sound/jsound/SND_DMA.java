@@ -64,7 +64,7 @@ public class SND_DMA extends SND_MIX {
 
     static int s_registration_sequence;
 
-    static boolean sound_started = false;
+    static boolean sound_started;
 
     static final float[] listener_origin = { 0, 0, 0 };
 
@@ -164,21 +164,25 @@ public class SND_DMA extends SND_MIX {
                                                                   // specific
 
             Cmd.AddCommand("play", new xcommand_t() {
+                @Override
                 public void execute() {
                     Play();
                 }
             });
             Cmd.AddCommand("stopsound", new xcommand_t() {
+                @Override
                 public void execute() {
                     StopAllSounds();
                 }
             });
             Cmd.AddCommand("soundlist", new xcommand_t() {
+                @Override
                 public void execute() {
                     SoundList();
                 }
             });
             Cmd.AddCommand("soundinfo", new xcommand_t() {
+                @Override
                 public void execute() {
                     SoundInfo_f();
                 }
@@ -1033,9 +1037,9 @@ public class SND_DMA extends SND_MIX {
         Update_();
     }
 
-    static int buffers = 0;
+    static int buffers;
 
-    static int oldsamplepos = 0;
+    static int oldsamplepos;
 
     static void GetSoundtime() {
         int samplepos;

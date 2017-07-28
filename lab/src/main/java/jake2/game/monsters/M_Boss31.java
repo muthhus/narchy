@@ -449,7 +449,9 @@ public class M_Boss31 {
      */
 
     static final EntThinkAdapter jorg_search = new EntThinkAdapter() {
-    	public String getID() { return "jorg_search"; }
+    	@Override
+        public String getID() { return "jorg_search"; }
+        @Override
         public boolean think(edict_t self) {
             float r;
 
@@ -469,7 +471,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_idle = new EntThinkAdapter() {
-    	public String getID() { return "jorg_idle"; }
+    	@Override
+        public String getID() { return "jorg_idle"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_idle, 1,
                     Defines.ATTN_NORM, 0);
@@ -478,7 +482,9 @@ public class M_Boss31 {
     };
 
     static EntThinkAdapter jorg_death_hit = new EntThinkAdapter() {
-    	public String getID() { return "jorg_death_hit"; }
+    	@Override
+        public String getID() { return "jorg_death_hit"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_BODY, sound_death_hit, 1,
                     Defines.ATTN_NORM, 0);
@@ -487,7 +493,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_step_left = new EntThinkAdapter() {
-    	public String getID() { return "jorg_step_left"; }
+    	@Override
+        public String getID() { return "jorg_step_left"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_BODY, sound_step_left, 1,
                     Defines.ATTN_NORM, 0);
@@ -496,7 +504,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_step_right = new EntThinkAdapter() {
-    	public String getID() { return "jorg_step_right"; }
+    	@Override
+        public String getID() { return "jorg_step_right"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_BODY, sound_step_right, 1,
                     Defines.ATTN_NORM, 0);
@@ -505,7 +515,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_stand = new EntThinkAdapter() {
-    	public String getID() { return "jorg_stand"; }
+    	@Override
+        public String getID() { return "jorg_stand"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = jorg_move_stand;
             return true;
@@ -513,7 +525,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_reattack1 = new EntThinkAdapter() {
-    	public String getID() { return "jorg_reattack1"; }
+    	@Override
+        public String getID() { return "jorg_reattack1"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameUtil.visible(self, self.enemy))
                 if (Lib.random() < 0.9)
@@ -531,7 +545,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_attack1 = new EntThinkAdapter() {
-    	public String getID() { return "jorg_attack1"; }
+    	@Override
+        public String getID() { return "jorg_attack1"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = jorg_move_attack1;
             return true;
@@ -539,7 +555,9 @@ public class M_Boss31 {
     };
 
     static final EntPainAdapter jorg_pain = new EntPainAdapter() {
-    	public String getID() { return "jorg_pain"; }
+    	@Override
+        public String getID() { return "jorg_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
             if (self.health < (self.max_health / 2))
                 self.s.skinnum = 1;
@@ -599,7 +617,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorgBFG = new EntThinkAdapter() {
-    	public String getID() { return "jorgBFG"; }
+    	@Override
+        public String getID() { return "jorgBFG"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 };
 
@@ -630,7 +650,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_firebullet_right = new EntThinkAdapter() {
-    	public String getID() { return "jorg_firebullet_right"; }
+    	@Override
+        public String getID() { return "jorg_firebullet_right"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 }, target = { 0,
                     0, 0 };
@@ -658,7 +680,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_firebullet_left = new EntThinkAdapter() {
-    	public String getID() { return "jorg_firebullet_left"; }
+    	@Override
+        public String getID() { return "jorg_firebullet_left"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 }, target = { 0,
                     0, 0 };
@@ -686,7 +710,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_firebullet = new EntThinkAdapter() {
-    	public String getID() { return "jorg_firebullet"; }
+    	@Override
+        public String getID() { return "jorg_firebullet"; }
+        @Override
         public boolean think(edict_t self) {
             jorg_firebullet_left.think(self);
             jorg_firebullet_right.think(self);
@@ -695,7 +721,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_attack = new EntThinkAdapter() {
-    	public String getID() { return "jorg_attack"; }
+    	@Override
+        public String getID() { return "jorg_attack"; }
+        @Override
         public boolean think(edict_t self) {
             float[] vec = { 0, 0, 0 };
             float range = 0;
@@ -719,7 +747,9 @@ public class M_Boss31 {
 
     /** Was disabled. RST. */
     static final EntThinkAdapter jorg_dead = new EntThinkAdapter() {
-    	public String getID() { return "jorg_dead"; }
+    	@Override
+        public String getID() { return "jorg_dead"; }
+        @Override
         public boolean think(edict_t self) {
             /*
              * edict_t tempent;
@@ -742,9 +772,11 @@ public class M_Boss31 {
     };
 
     static final EntDieAdapter jorg_die = new EntDieAdapter() {
-    	public String getID() { return "jorg_die"; }
+    	@Override
+        public String getID() { return "jorg_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_death, 1,
                     Defines.ATTN_NORM, 0);
             self.deadflag = Defines.DEAD_DEAD;
@@ -756,7 +788,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter Jorg_CheckAttack = new EntThinkAdapter() {
-    	public String getID() { return "Jorg_CheckAttack"; }
+    	@Override
+        public String getID() { return "Jorg_CheckAttack"; }
+        @Override
         public boolean think(edict_t self) {
             float[] spot1 = { 0, 0, 0 }, spot2 = { 0, 0, 0 };
             float[] temp = { 0, 0, 0 };
@@ -842,7 +876,7 @@ public class M_Boss31 {
     //	   stand
     //
 
-    static final mframe_t[] jorg_frames_stand = new mframe_t[] {
+    static final mframe_t[] jorg_frames_stand = {
             new mframe_t(GameAI.ai_stand, 0, jorg_idle),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -904,7 +938,7 @@ public class M_Boss31 {
     static final mmove_t jorg_move_stand = new mmove_t(FRAME_stand01, FRAME_stand51,
             jorg_frames_stand, null);
 
-    static final mframe_t[] jorg_frames_run = new mframe_t[] {
+    static final mframe_t[] jorg_frames_run = {
             new mframe_t(GameAI.ai_run, 17, jorg_step_left),
             new mframe_t(GameAI.ai_run, 0, null),
             new mframe_t(GameAI.ai_run, 0, null),
@@ -927,7 +961,7 @@ public class M_Boss31 {
     //	   walk
     //
 
-    static final mframe_t[] jorg_frames_start_walk = new mframe_t[] {
+    static final mframe_t[] jorg_frames_start_walk = {
             new mframe_t(GameAI.ai_walk, 5, null),
             new mframe_t(GameAI.ai_walk, 6, null),
             new mframe_t(GameAI.ai_walk, 7, null),
@@ -937,7 +971,7 @@ public class M_Boss31 {
     static mmove_t jorg_move_start_walk = new mmove_t(FRAME_walk01,
             FRAME_walk05, jorg_frames_start_walk, null);
 
-    static final mframe_t[] jorg_frames_walk = new mframe_t[] {
+    static final mframe_t[] jorg_frames_walk = {
             new mframe_t(GameAI.ai_walk, 17, null),
             new mframe_t(GameAI.ai_walk, 0, null),
             new mframe_t(GameAI.ai_walk, 0, null),
@@ -956,7 +990,7 @@ public class M_Boss31 {
     static final mmove_t jorg_move_walk = new mmove_t(FRAME_walk06, FRAME_walk19,
             jorg_frames_walk, null);
 
-    static final mframe_t[] jorg_frames_end_walk = new mframe_t[] {
+    static final mframe_t[] jorg_frames_end_walk = {
             new mframe_t(GameAI.ai_walk, 11, null),
             new mframe_t(GameAI.ai_walk, 0, null),
             new mframe_t(GameAI.ai_walk, 0, null),
@@ -968,7 +1002,9 @@ public class M_Boss31 {
             jorg_frames_end_walk, null);
 
     static final EntThinkAdapter jorg_walk = new EntThinkAdapter() {
-    	public String getID() { return "jorg_walk"; }
+    	@Override
+        public String getID() { return "jorg_walk"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = jorg_move_walk;
             return true;
@@ -976,7 +1012,9 @@ public class M_Boss31 {
     };
 
     static final EntThinkAdapter jorg_run = new EntThinkAdapter() {
-    	public String getID() { return "jorg_run"; }
+    	@Override
+        public String getID() { return "jorg_run"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0)
                 self.monsterinfo.currentmove = jorg_move_stand;
@@ -986,7 +1024,7 @@ public class M_Boss31 {
         }
     };
 
-    static final mframe_t[] jorg_frames_pain3 = new mframe_t[] {
+    static final mframe_t[] jorg_frames_pain3 = {
             new mframe_t(GameAI.ai_move, -28, null),
             new mframe_t(GameAI.ai_move, -6, null),
             new mframe_t(GameAI.ai_move, -3, jorg_step_left),
@@ -1016,7 +1054,7 @@ public class M_Boss31 {
     static final mmove_t jorg_move_pain3 = new mmove_t(FRAME_pain301, FRAME_pain325,
             jorg_frames_pain3, jorg_run);
 
-    static final mframe_t[] jorg_frames_pain2 = new mframe_t[] {
+    static final mframe_t[] jorg_frames_pain2 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null) };
@@ -1024,7 +1062,7 @@ public class M_Boss31 {
     static final mmove_t jorg_move_pain2 = new mmove_t(FRAME_pain201, FRAME_pain203,
             jorg_frames_pain2, jorg_run);
 
-    static final mframe_t[] jorg_frames_pain1 = new mframe_t[] {
+    static final mframe_t[] jorg_frames_pain1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null) };
@@ -1032,7 +1070,7 @@ public class M_Boss31 {
     static final mmove_t jorg_move_pain1 = new mmove_t(FRAME_pain101, FRAME_pain103,
             jorg_frames_pain1, jorg_run);
 
-    static final mframe_t[] jorg_frames_death1 = new mframe_t[] {
+    static final mframe_t[] jorg_frames_death1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -1092,7 +1130,7 @@ public class M_Boss31 {
     static final mmove_t jorg_move_death = new mmove_t(FRAME_death01, FRAME_death50,
             jorg_frames_death1, jorg_dead);
 
-    static final mframe_t[] jorg_frames_attack2 = new mframe_t[] {
+    static final mframe_t[] jorg_frames_attack2 = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -1110,7 +1148,7 @@ public class M_Boss31 {
     static final mmove_t jorg_move_attack2 = new mmove_t(FRAME_attak201,
             FRAME_attak213, jorg_frames_attack2, jorg_run);
 
-    static final mframe_t[] jorg_frames_start_attack1 = new mframe_t[] {
+    static final mframe_t[] jorg_frames_start_attack1 = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -1123,7 +1161,7 @@ public class M_Boss31 {
     static final mmove_t jorg_move_start_attack1 = new mmove_t(FRAME_attak101,
             FRAME_attak108, jorg_frames_start_attack1, jorg_attack1);
 
-    static final mframe_t[] jorg_frames_attack1 = new mframe_t[] {
+    static final mframe_t[] jorg_frames_attack1 = {
             new mframe_t(GameAI.ai_charge, 0, jorg_firebullet),
             new mframe_t(GameAI.ai_charge, 0, jorg_firebullet),
             new mframe_t(GameAI.ai_charge, 0, jorg_firebullet),
@@ -1134,7 +1172,7 @@ public class M_Boss31 {
     static final mmove_t jorg_move_attack1 = new mmove_t(FRAME_attak109,
             FRAME_attak114, jorg_frames_attack1, jorg_reattack1);
 
-    static final mframe_t[] jorg_frames_end_attack1 = new mframe_t[] {
+    static final mframe_t[] jorg_frames_end_attack1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),

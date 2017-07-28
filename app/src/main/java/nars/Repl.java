@@ -99,7 +99,7 @@ public class Repl {
                 try {
                     nar.input(line);
                 } catch (Exception e) {
-                    terminal.writer().println(e.toString());
+                    terminal.writer().println(e);
                 }
 
             }
@@ -139,7 +139,7 @@ public class Repl {
         private final ZMQ.Context context;
         private final ZMQ.Socket publisher;
         private final Thread thread;
-        private ZMQ.Socket subscriber;
+        private final ZMQ.Socket subscriber;
 
         public InterNAR2(NAR n, int port) {
             //super("tcp://0.0.0.0:" + port);

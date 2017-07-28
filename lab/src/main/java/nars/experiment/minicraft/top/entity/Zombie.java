@@ -8,7 +8,7 @@ import nars.experiment.minicraft.top.item.resource.Resource;
 public class Zombie extends Mob {
 	private int xa, ya;
 	private final int lvl;
-	private int randomWalkTime = 0;
+	private int randomWalkTime;
 
 	public Zombie(int lvl) {
 		this.lvl = lvl;

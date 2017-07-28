@@ -14,7 +14,7 @@ import java.util.List;
 
 public abstract class Recipe implements ListItem {
 	public List<Item> costs = new ArrayList<>();
-	public boolean canCraft = false;
+	public boolean canCraft;
 	public Item resultTemplate;
 
 	public Recipe(Item resultTemplate) {

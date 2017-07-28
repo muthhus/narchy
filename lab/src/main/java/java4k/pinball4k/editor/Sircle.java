@@ -5,10 +5,10 @@ import java.lang.reflect.Field;
 
 public class Sircle extends LevelObject {
 	public int radius;
-	private SircleHandle handle;
-	private RadiusHandle radiusHandle;
+	private final SircleHandle handle;
+	private final RadiusHandle radiusHandle;
 	
-	private Sircle outerInstance;
+	private final Sircle outerInstance;
 	
 	public Sircle(Point p1, Point p2) {
 		this.p = new Point(p1);
@@ -25,7 +25,8 @@ public class Sircle extends LevelObject {
 	 * Draws itself to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void draw(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void draw(Graphics2D g, LevelPanel levelPanel) {
 		g.setColor(Color.WHITE);
     	g.fillOval(p.x - radius, p.y - radius, radius * 2, radius * 2);
 	}	
@@ -34,7 +35,8 @@ public class Sircle extends LevelObject {
 	 * Draws the handles to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
     	handle.draw(g, levelPanel);
     	radiusHandle.draw(g, levelPanel);
 	}	
@@ -43,11 +45,13 @@ public class Sircle extends LevelObject {
 	 * The public properties to show in the editor ui.
 	 * @return the properties to show
 	 */
-	public Field[] getProperties() {
+	@Override
+    public Field[] getProperties() {
 		return getFields("visible", "collidable", "isRollOver", "score", "bounce", "behaviorId", "p", "radius");
 	}	
 	
-	public int getSortValue() {
+	@Override
+    public int getSortValue() {
 		int val = super.getSortValue();
 		return (radius << 26) | (val >>> 6);
 	}
@@ -59,7 +63,8 @@ public class Sircle extends LevelObject {
 		 * Gets the center of the handle.
 		 * @return the center
 		 */
-		public Point getCenter() {
+		@Override
+        public Point getCenter() {
 			return p;
 		}
 		
@@ -67,7 +72,8 @@ public class Sircle extends LevelObject {
 		 * The handle is dragged to the specified location
 		 * @param pos where the handle was dragged to 
 		 */
-		public void dragged(int dx, int dy) {
+		@Override
+        public void dragged(int dx, int dy) {
 			p.translate(dx, dy);
 		}		
 		
@@ -75,7 +81,8 @@ public class Sircle extends LevelObject {
 		 * Gets the level object the hangle controlls. Can be null.
 		 * @return the level object
 		 */
-		public LevelObject getLevelObject() {
+		@Override
+        public LevelObject getLevelObject() {
 			return outerInstance;
 		}
 	}
@@ -94,7 +101,8 @@ public class Sircle extends LevelObject {
 		 * Gets the center of the handle.
 		 * @return the center
 		 */
-		public Point getCenter() {
+		@Override
+        public Point getCenter() {
 			return new Point(p.x + radius, p.y);
 		}
 		
@@ -102,7 +110,8 @@ public class Sircle extends LevelObject {
 		 * The handle is dragged to the specified location
 		 * @param pos where the handle was dragged to 
 		 */
-		public void dragged(int dx, int dy) {
+		@Override
+        public void dragged(int dx, int dy) {
 			radius += dx;
 	    	//radius = (int) p.distance(pos);
 		}		
@@ -111,7 +120,8 @@ public class Sircle extends LevelObject {
 		 * Gets the level object the hangle controlls. Can be null.
 		 * @return the level object
 		 */
-		public LevelObject getLevelObject() {
+		@Override
+        public LevelObject getLevelObject() {
 			return null;
 		}
 	}

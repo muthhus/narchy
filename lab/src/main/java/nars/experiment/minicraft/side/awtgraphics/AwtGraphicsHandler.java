@@ -104,9 +104,9 @@ public class AwtGraphicsHandler extends GraphicsHandler {
 
 		Graphics cg = canvas.getGraphics();
 		cg.drawImage(buffer, 0, 0, null);
-		cg.dispose();;
+		cg.dispose();
 
-		//strategy.show();
+        //strategy.show();
 	}
 	
 	@Override

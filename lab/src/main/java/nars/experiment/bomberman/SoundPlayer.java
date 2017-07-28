@@ -44,7 +44,7 @@ public class SoundPlayer extends JPanel implements Runnable, LineListener, MetaE
     /** flag: change of sound */
     private boolean bump;
     /** flag: paused or not */
-    private boolean paused = false;
+    private boolean paused;
     /** flag: loop or not */
     public boolean loop = true;
     /** volumn */
@@ -372,7 +372,7 @@ public class SoundPlayer extends JPanel implements Runnable, LineListener, MetaE
             {
                 try
                 {
-                    thread.sleep(99);
+                    Thread.sleep(99);
                 }
                 catch (Exception e)
                 {
@@ -393,7 +393,7 @@ public class SoundPlayer extends JPanel implements Runnable, LineListener, MetaE
             clip.start();
             try
             {
-                thread.sleep(99);
+                Thread.sleep(99);
             }
             catch (Exception e)
             { }
@@ -402,7 +402,7 @@ public class SoundPlayer extends JPanel implements Runnable, LineListener, MetaE
             {
                 try
                 {
-                    thread.sleep(99);
+                    Thread.sleep(99);
                 }
                 catch (Exception e)
                 {
@@ -421,6 +421,7 @@ public class SoundPlayer extends JPanel implements Runnable, LineListener, MetaE
      * Must have method.
      * @param event line event
      */
+    @Override
     public void update(LineEvent event)
     {
         if (event.getType() == LineEvent.Type.STOP && !paused)
@@ -433,6 +434,7 @@ public class SoundPlayer extends JPanel implements Runnable, LineListener, MetaE
      * Must have method.
      * @param message meta message
      */
+    @Override
     public void meta(MetaMessage message)
     {
         /** 47 is end of track */
@@ -482,6 +484,7 @@ public class SoundPlayer extends JPanel implements Runnable, LineListener, MetaE
     /**
      * Thread method.
      */
+    @Override
     public void run() {
         /** iterate */
         do
@@ -674,13 +677,14 @@ public class SoundPlayer extends JPanel implements Runnable, LineListener, MetaE
      * @return whether something is playing or not
      */
      public boolean isPlaying() {
-        return (startB.getText().equals("Start") ? false : true);
+        return (!startB.getText().equals("Start"));
      }
 
     /**
      * Action listener.
      * @param e action event
      */
+    @Override
     public void actionPerformed(ActionEvent e)
     {
         /** get source of event */

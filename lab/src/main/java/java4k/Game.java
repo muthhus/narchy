@@ -5,15 +5,15 @@ import java.awt.*;
 
 public interface Game  {
 	
-	public void start();
+	void start();
 	
-	public void stop();
+	void stop();
 	
-	public JPanel getPanel();
+	JPanel getPanel();
 	
-	public Dimension getPreferredSize();
+	Dimension getPreferredSize();
 	
-	public void processAWTEvent(AWTEvent e);
+	void processAWTEvent(AWTEvent e);
 	
 //	public void updateGame(); 
 //	public void repaintGame(); // TODO override paintComponent() in GamePanel

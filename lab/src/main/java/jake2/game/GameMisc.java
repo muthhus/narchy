@@ -900,7 +900,9 @@ public class GameMisc {
     }
 
     public static final EntUseAdapter Use_Areaportal = new EntUseAdapter() {
+        @Override
         public String getID() { return "use_areaportal";}
+        @Override
         public void use(edict_t ent, edict_t other, edict_t activator) {
             ent.count ^= 1; // toggle state
             //	gi.dprintf ("portalstate: %i = %i\n", ent.style, ent.count);
@@ -917,7 +919,9 @@ public class GameMisc {
      */
 
     static final EntThinkAdapter SP_func_areaportal = new EntThinkAdapter() {
+        @Override
         public String getID() { return "sp_func_areaportal";}
+        @Override
         public boolean think(edict_t ent) {
             ent.use = Use_Areaportal;
             ent.count = 0; // always start closed;
@@ -931,9 +935,11 @@ public class GameMisc {
      * path_corner targeted touches it
      */
     public static final EntTouchAdapter path_corner_touch = new EntTouchAdapter() {
+        @Override
         public String getID() { return "path_corner_touch";}
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             float[] v = { 0, 0, 0 };
             edict_t next;
 
@@ -991,9 +997,11 @@ public class GameMisc {
      * going after the activator. If hold is selected, it will stay here.
      */
     public static final EntTouchAdapter point_combat_touch = new EntTouchAdapter() {
+        @Override
         public String getID() { return "point_combat_touch";}
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             edict_t activator;
 
             if (other.movetarget != self)
@@ -1050,7 +1058,9 @@ public class GameMisc {
      * level. Don't use
      */
     public static final EntThinkAdapter TH_viewthing = new EntThinkAdapter() {
+        @Override
         public String getID() { return "th_viewthing";}
+        @Override
         public boolean think(edict_t ent) {
             ent.s.frame = (ent.s.frame + 1) % 7;
             ent.nextthink = GameBase.level.time + Defines.FRAMETIME;
@@ -1068,7 +1078,9 @@ public class GameMisc {
     public static final int START_OFF = 1;
 
     public static final EntUseAdapter light_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "light_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             if ((self.spawnflags & START_OFF) != 0) {
                 game_import_t.configstring(Defines.CS_LIGHTS + self.style, "m");
@@ -1095,7 +1107,9 @@ public class GameMisc {
      */
 
     static final EntUseAdapter func_wall_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "func_wall_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             if (self.solid == Defines.SOLID_NOT) {
                 self.solid = Defines.SOLID_BSP;
@@ -1117,9 +1131,11 @@ public class GameMisc {
      * is solid bmodel that will fall if it's support it removed.
      */
     static final EntTouchAdapter func_object_touch = new EntTouchAdapter() {
+        @Override
         public String getID() { return "func_object_touch";}
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             // only squash thing we fall on top of
             if (plane == null)
                 return;
@@ -1134,7 +1150,9 @@ public class GameMisc {
     };
 
     static final EntThinkAdapter func_object_release = new EntThinkAdapter() {
+        @Override
         public String getID() { return "func_object_release";}
+        @Override
         public boolean think(edict_t self) {
             self.movetype = Defines.MOVETYPE_TOSS;
             self.touch = func_object_touch;
@@ -1143,7 +1161,9 @@ public class GameMisc {
     };
 
     static final EntUseAdapter func_object_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "func_object_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             self.solid = Defines.SOLID_BSP;
             self.svflags &= ~Defines.SVF_NOCLIENT;
@@ -1168,9 +1188,11 @@ public class GameMisc {
      * chunk per 25 of mass (up to 16). So 800 gives the most.
      */
     public static final EntDieAdapter func_explosive_explode = new EntDieAdapter() {
+        @Override
         public String getID() { return "func_explosive_explode";}
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             float[] origin = { 0, 0, 0 };
             float[] chunkorigin = { 0, 0, 0 };
             float[] size = { 0, 0, 0 };
@@ -1236,7 +1258,9 @@ public class GameMisc {
     };
 
     public static final EntUseAdapter func_explosive_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "func_explosive_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             func_explosive_explode.die(self, self, other, self.health,
                     Globals.vec3_origin);
@@ -1244,7 +1268,9 @@ public class GameMisc {
     };
 
     public static final EntUseAdapter func_explosive_spawn = new EntUseAdapter() {
+        @Override
         public String getID() { return "func_explosive_spawn";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             self.solid = Defines.SOLID_BSP;
             self.svflags &= ~Defines.SVF_NOCLIENT;
@@ -1260,9 +1286,11 @@ public class GameMisc {
      */
 
     public static final EntTouchAdapter barrel_touch = new EntTouchAdapter() {
+        @Override
         public String getID() { return "barrel_touch";}
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             float ratio;
             float[] v = { 0, 0, 0 };
 
@@ -1277,7 +1305,9 @@ public class GameMisc {
     };
 
     public static final EntThinkAdapter barrel_explode = new EntThinkAdapter() {
+        @Override
         public String getID() { return "barrel_explode";}
+        @Override
         public boolean think(edict_t self) {
 
             float[] org = { 0, 0, 0 };
@@ -1376,9 +1406,11 @@ public class GameMisc {
     };
 
     public static final EntDieAdapter barrel_delay = new EntDieAdapter() {
+        @Override
         public String getID() { return "barrel_delay";}
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
 
             self.takedamage = Defines.DAMAGE_NO;
             self.nextthink = GameBase.level.time + 2 * Defines.FRAMETIME;
@@ -1396,7 +1428,9 @@ public class GameMisc {
      */
 
     static final EntUseAdapter misc_blackhole_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "misc_blavkhole_use";}
+        @Override
         public void use(edict_t ent, edict_t other, edict_t activator) {
             /*
              * gi.WriteByte (svc_temp_entity); gi.WriteByte (TE_BOSSTPORT);
@@ -1408,7 +1442,9 @@ public class GameMisc {
     };
 
     static final EntThinkAdapter misc_blackhole_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "misc_blackhole_think";}
+        @Override
         public boolean think(edict_t self) {
 
             if (++self.s.frame < 19)
@@ -1426,7 +1462,9 @@ public class GameMisc {
      */
 
     static final EntThinkAdapter misc_eastertank_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "misc_eastertank_think";}
+        @Override
         public boolean think(edict_t self) {
             if (++self.s.frame < 293)
                 self.nextthink = GameBase.level.time + Defines.FRAMETIME;
@@ -1443,7 +1481,9 @@ public class GameMisc {
      */
 
     static final EntThinkAdapter misc_easterchick_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "misc_easterchick_think";}
+        @Override
         public boolean think(edict_t self) {
             if (++self.s.frame < 247)
                 self.nextthink = GameBase.level.time + Defines.FRAMETIME;
@@ -1459,7 +1499,9 @@ public class GameMisc {
      * QUAKED misc_easterchick2 (1 .5 0) (-32 -32 0) (32 32 32)
      */
     static final EntThinkAdapter misc_easterchick2_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "misc_easterchick2_think";}
+        @Override
         public boolean think(edict_t self) {
             if (++self.s.frame < 287)
                 self.nextthink = GameBase.level.time + Defines.FRAMETIME;
@@ -1478,7 +1520,9 @@ public class GameMisc {
      */
 
     public static final EntThinkAdapter commander_body_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "commander_body_think";}
+        @Override
         public boolean think(edict_t self) {
             if (++self.s.frame < 24)
                 self.nextthink = GameBase.level.time + Defines.FRAMETIME;
@@ -1493,7 +1537,9 @@ public class GameMisc {
     };
 
     public static final EntUseAdapter commander_body_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "commander_body_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             self.think = commander_body_think;
             self.nextthink = GameBase.level.time + Defines.FRAMETIME;
@@ -1503,7 +1549,9 @@ public class GameMisc {
     };
 
     public static final EntThinkAdapter commander_body_drop = new EntThinkAdapter() {
+        @Override
         public String getID() { return "commander_body_group";}
+        @Override
         public boolean think(edict_t self) {
             self.movetype = Defines.MOVETYPE_TOSS;
             self.s.origin[2] += 2;
@@ -1516,7 +1564,9 @@ public class GameMisc {
      * of the banner. The banner is 128 tall.
      */
     static final EntThinkAdapter misc_banner_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "misc_banner_think";}
+        @Override
         public boolean think(edict_t ent) {
             ent.s.frame = (ent.s.frame + 1) % 16;
             ent.nextthink = GameBase.level.time + Defines.FRAMETIME;
@@ -1530,9 +1580,11 @@ public class GameMisc {
      * model. Comes in 6 exciting different poses!
      */
     static final EntDieAdapter misc_deadsoldier_die = new EntDieAdapter() {
+        @Override
         public String getID() { return "misc_deadsoldier_die";}
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             int n;
 
             if (self.health > -80)
@@ -1558,7 +1610,9 @@ public class GameMisc {
      */
 
     static final EntUseAdapter misc_viper_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "misc_viper_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             self.svflags &= ~Defines.SVF_NOCLIENT;
             self.use = GameFunc.train_use;
@@ -1571,9 +1625,11 @@ public class GameMisc {
      * should the bomb make?
      */
     static final EntTouchAdapter misc_viper_bomb_touch = new EntTouchAdapter() {
+        @Override
         public String getID() { return "misc_viper_bomb_touch";}
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             GameUtil.G_UseTargets(self, self.activator);
 
             self.s.origin[2] = self.absmin[2] + 1;
@@ -1584,7 +1640,9 @@ public class GameMisc {
     };
 
     static final EntThinkAdapter misc_viper_bomb_prethink = new EntThinkAdapter() {
+        @Override
         public String getID() { return "misc_viper_bomb_prethink";}
+        @Override
         public boolean think(edict_t self) {
 
             float[] v = { 0, 0, 0 };
@@ -1608,7 +1666,9 @@ public class GameMisc {
     };
 
     static final EntUseAdapter misc_viper_bomb_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "misc_viper_bomb_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             edict_t viper = null;
 
@@ -1645,7 +1705,9 @@ public class GameMisc {
      */
 
     static final EntUseAdapter misc_strogg_ship_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "misc_strogg_ship_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             self.svflags &= ~Defines.SVF_NOCLIENT;
             self.use = GameFunc.train_use;
@@ -1657,7 +1719,9 @@ public class GameMisc {
      * QUAKED misc_satellite_dish (1 .5 0) (-64 -64 0) (64 64 128)
      */
     static final EntThinkAdapter misc_satellite_dish_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "misc_satellite_dish_think";}
+        @Override
         public boolean think(edict_t self) {
             self.s.frame++;
             if (self.s.frame < 38)
@@ -1667,7 +1731,9 @@ public class GameMisc {
     };
 
     static final EntUseAdapter misc_satellite_dish_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "misc_satellite_dish_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             self.s.frame = 0;
             self.think = misc_satellite_dish_think;
@@ -1680,7 +1746,9 @@ public class GameMisc {
      */
 
     static final EntUseAdapter target_string_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "target_string_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             edict_t e;
             int n, l;
@@ -1724,7 +1792,9 @@ public class GameMisc {
     public static final int CLOCK_MESSAGE_SIZE = 16;
 
     public static final EntThinkAdapter func_clock_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "func_clock_think";}
+        @Override
         public boolean think(edict_t self) {
             if (null == self.enemy) {
 
@@ -1793,7 +1863,9 @@ public class GameMisc {
     };
 
     public static final EntUseAdapter func_clock_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "func_clock_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             if (0 == (self.spawnflags & 8))
                 self.use = null;
@@ -1807,9 +1879,11 @@ public class GameMisc {
     //=================================================================================
 
     static final EntTouchAdapter teleporter_touch = new EntTouchAdapter() {
+        @Override
         public String getID() { return "teleporter_touch";}
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             edict_t dest;
             int i;
 
@@ -1864,7 +1938,9 @@ public class GameMisc {
      */
 
     public static final EntThinkAdapter SP_misc_teleporter_dest = new EntThinkAdapter() {
+        @Override
         public String getID() { return "SP_misc_teleporter_dest";}
+        @Override
         public boolean think(edict_t ent) {
             game_import_t.setmodel(ent, "models/objects/dmspot/tris.md2");
             ent.s.skinnum = 0;
@@ -1878,7 +1954,9 @@ public class GameMisc {
     };
 
     public static final EntThinkAdapter gib_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "gib_think";}
+        @Override
         public boolean think(edict_t self) {
             self.s.frame++;
             self.nextthink = GameBase.level.time + Defines.FRAMETIME;
@@ -1893,9 +1971,11 @@ public class GameMisc {
     };
 
     public static final EntTouchAdapter gib_touch = new EntTouchAdapter() {
+        @Override
         public String getID() { return "gib_touch";}
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             float[] normal_angles = { 0, 0, 0 }, right = { 0, 0, 0 };
     
             if (null == self.groundentity)
@@ -1921,9 +2001,11 @@ public class GameMisc {
     };
 
     public static final EntDieAdapter gib_die = new EntDieAdapter() {
+        @Override
         public String getID() { return "gib_die";}
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             GameUtil.G_FreeEdict(self);
         }
     };
@@ -1932,9 +2014,11 @@ public class GameMisc {
      * Debris
      */
     public static final EntDieAdapter debris_die = new EntDieAdapter() {
+        @Override
         public String getID() { return "debris_die";}
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             GameUtil.G_FreeEdict(self);
         }
     };

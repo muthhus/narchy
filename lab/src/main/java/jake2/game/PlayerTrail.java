@@ -45,7 +45,7 @@ public class PlayerTrail {
 
     static int trail_head;
 
-    static boolean trail_active = false;
+    static boolean trail_active;
     static {
         //TODO: potential error
         for (int n = 0; n < TRAIL_LENGTH; n++)

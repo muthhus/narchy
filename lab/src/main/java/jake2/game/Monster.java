@@ -292,7 +292,9 @@ public class Monster {
     }
 
     public static final EntThinkAdapter monster_think = new EntThinkAdapter() {
+        @Override
         public String getID() { return "monster_think";}
+        @Override
         public boolean think(edict_t self) {
 
             M.M_MoveFrame(self);
@@ -308,7 +310,9 @@ public class Monster {
     };
 
     public static final EntThinkAdapter monster_triggered_spawn = new EntThinkAdapter() {
+        @Override
         public String getID() { return "monster_trigger_spawn";}
+        @Override
         public boolean think(edict_t self) {
 
             self.s.origin[2] += 1;
@@ -335,7 +339,9 @@ public class Monster {
     //	we have a one frame delay here so we don't telefrag the guy who activated
     // us
     public static final EntUseAdapter monster_triggered_spawn_use = new EntUseAdapter() {
+        @Override
         public String getID() { return "monster_trigger_spawn_use";}
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             self.think = monster_triggered_spawn;
             self.nextthink = GameBase.level.time + Defines.FRAMETIME;
@@ -346,7 +352,9 @@ public class Monster {
     };
 
     public static final EntThinkAdapter monster_triggered_start = new EntThinkAdapter() {
+        @Override
         public String getID() { return "monster_triggered_start";}
+        @Override
         public boolean think(edict_t self) {
             if (self.index == 312)
                 Com.Printf("monster_triggered_start\n");

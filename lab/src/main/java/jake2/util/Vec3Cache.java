@@ -15,7 +15,7 @@ package jake2.util;
 public final class Vec3Cache {
     
     private static final float[][] cache = new float[64][3];
-    private static int index = 0;
+    private static int index;
 
     public static final float[] get() {
         //max = Math.max(index, max);

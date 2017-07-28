@@ -35,7 +35,7 @@ package spacegraph.math;
  * A 4 element unit quaternion represented by single precision floating
  * point x,y,z,w coordinates.  The quaternion is always normalized.
  */
-public class Quat4f extends Tuple4f implements java.io.Serializable {
+public class Quat4f extends Tuple4f {
 
     // Combatible with 1.1
     static final long serialVersionUID = 2675933778405442383L;

@@ -26,7 +26,7 @@ import java.util.function.Predicate;
  */
 public final class MaxGenerationsTerminator implements Predicate<RankedCandidates> {
     private final int maxGenerations;
-    private int ctr = 0;
+    private int ctr;
 
     /**
      * Constructs a new {@code Predicate} that will return {@code true} once the specified number of generations have been run.

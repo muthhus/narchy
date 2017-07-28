@@ -111,53 +111,53 @@ public class a extends GamePanel {
 	int y;
 	int z;
 
-	int counter = 0;
+	int counter;
 
-	int cameraY = 0;
-	int cameraY2 = 0;
+	int cameraY;
+	int cameraY2;
 
-	int tileX = 0;
-	int tileY = 0;
+	int tileX;
+	int tileY;
 
-	int cursorX = 0;
-	int cursorY = 0;
+	int cursorX;
+	int cursorY;
 
-	int swapTileLeft = 0;
-	int swapTileRight = 0;
-	int swapX = 0;
-	int swapY = 0;
-	int swapOffset = 0;
-	int bonusTime = 0;
-	int cameraYTarget = 0;
-	int dangerBounce = 0;
+	int swapTileLeft;
+	int swapTileRight;
+	int swapX;
+	int swapY;
+	int swapOffset;
+	int bonusTime;
+	int cameraYTarget;
+	int dangerBounce;
 
-	int limitTileY = 0;
-	int limitLine = 0;
+	int limitTileY;
+	int limitLine;
 
-	int explodeID = 0;
+	int explodeID;
 
-	int dying = 0;
-	int winning = 0;
-	int level = 0;
+	int dying;
+	int winning;
+	int level;
 
-	int countdown = 0;
-	int countdownZ = 0;
+	int countdown;
+	int countdownZ;
 	int fadeIntensity = 255;
 	int fadeState = FADE_IN;
 
-	int score = 0;
-	int lastScore = 0;
-	int lastLevel = 0;
+	int score;
+	int lastScore;
+	int lastLevel;
 
-	float timer = 0;
-	float initialSpeed = 0;
+	float timer;
+	float initialSpeed;
 
-	boolean cursorExpanded = false;
+	boolean cursorExpanded;
 	boolean mouseReleased = true;
-	boolean swapping = false;
-	boolean drawFlash = false;
-	boolean cameraBlocked = false;
-	boolean resetLevel = false;
+	boolean swapping;
+	boolean drawFlash;
+	boolean cameraBlocked;
+	boolean resetLevel;
 
 	boolean menuMode = true;
 	int overButton = OVER_NONE;
@@ -165,13 +165,13 @@ public class a extends GamePanel {
 	Random random = new Random();
 	AffineTransform affineTransform = new AffineTransform();
 
-	boolean[] dangerColumns = null;
-	int[][] tiles = null;
-	int[][] fallingTiles = null;
-	int[][] bouncingTiles = null;
-	int[][] explodingTiles = null;
-	int[][] explodeIDs = null;
-	int[] explodeCounts = null;
+	boolean[] dangerColumns;
+	int[][] tiles;
+	int[][] fallingTiles;
+	int[][] bouncingTiles;
+	int[][] explodingTiles;
+	int[][] explodeIDs;
+	int[] explodeCounts;
 	int[] pixels = new int[256];
 	ArrayList<int[]> explosions = new ArrayList<int[]>();
 	ArrayList<int[]> chains = new ArrayList<int[]>();
@@ -182,7 +182,7 @@ public class a extends GamePanel {
 	Graphics2D offscreenGraphics;
 
 	// keys
-	private int[] a = new int[4];
+	private final int[] a = new int[4];
 
 	long nextFrameStartTime;
 

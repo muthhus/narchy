@@ -148,34 +148,34 @@ public class a extends GamePanel {
 	int z;
 
 	int gameState = GAME_STATE_ENTRY;
-	int counter = 0;
+	int counter;
 	int playerX = 208;
 	float playerFx = playerX;
-	float playerVy = 0;
+	float playerVy;
 	int playerY = GROUND_Y;
 	float playerFy = playerY;
-	int playerWalkIndex = 0;
-	int playerWhipping = 0;
+	int playerWalkIndex;
+	int playerWhipping;
 	int playerPower = 16;
-	int playerX1 = 0;
-	int playerY1 = 0;
-	int playerX2 = 0;
-	int playerY2 = 0;
-	int whipX1 = 0;
-	int whipY1 = 0;
-	int whipX2 = 0;
-	int whipY2 = 0;
-	int playerDead = 0;
-	int playerStunned = 0;
-	boolean playerWalking = false;
+	int playerX1;
+	int playerY1;
+	int playerX2;
+	int playerY2;
+	int whipX1;
+	int whipY1;
+	int whipX2;
+	int whipY2;
+	int playerDead;
+	int playerStunned;
+	boolean playerWalking;
 	boolean playerReversed = true;
-	boolean playerKneeling = false;
-	boolean playerJumping = false;
-	boolean playerThrowing = false;
+	boolean playerKneeling;
+	boolean playerJumping;
+	boolean playerThrowing;
 	boolean whipReleased = true;
 	boolean jumpReleased = true;
 	boolean subweaponReleased = true;
-	boolean playerHurt = false;
+	boolean playerHurt;
 
 	int headY = 50;
 	int draculaX = 216;
@@ -183,7 +183,7 @@ public class a extends GamePanel {
 	int draculaState = DRACULA_STATE_FADE_IN;
 	int draculaCounter = 0xFF;
 	boolean draculaReversed = true;
-	boolean draculaOpened = false;
+	boolean draculaOpened;
 	boolean firstFadeIn = true;
 	boolean draculaRight = true;
 
@@ -192,14 +192,14 @@ public class a extends GamePanel {
 	AffineTransform affineTransform = new AffineTransform();
 	BufferedImage[][] alphaSprites = new BufferedImage[256][SPRITES];
 	BufferedImage[] sprites = alphaSprites[255];
-	BufferedImage[] sprites2 = null;
+	BufferedImage[] sprites2;
 	ArrayList<float[]> queue = new ArrayList<float[]>();
 	ArrayList<float[]> crosses = new ArrayList<float[]>();
 	Random random = new Random();
 	float[] head = new float[32];
 
 	// keys
-	private boolean[] a = new boolean[32768];
+	private final boolean[] a = new boolean[32768];
 
 	long nextFrameStartTime;
 	

@@ -118,7 +118,6 @@ public class Premise extends Pri implements ITask {
         Task belief = null;
 
 
-
         Concept _beliefConcept = nar.conceptualize(beliefTerm);
         boolean beliefIsTask = _beliefConcept != null && taskConcept.equals(_beliefConcept);
 

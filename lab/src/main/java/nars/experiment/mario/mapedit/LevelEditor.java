@@ -21,10 +21,10 @@ public class LevelEditor extends JFrame implements ActionListener
     private JButton loadButton;
     private JButton saveButton;
     private JTextField nameField;
-    private LevelEditView levelEditView;
-    private TilePicker tilePicker;
+    private final LevelEditView levelEditView;
+    private final TilePicker tilePicker;
     
-    private JCheckBox[] bitmapCheckboxes = new JCheckBox[8];
+    private final JCheckBox[] bitmapCheckboxes = new JCheckBox[8];
 
     public LevelEditor()
     {
@@ -76,6 +76,7 @@ public class LevelEditor extends JFrame implements ActionListener
             final int id = i;
             bitmapCheckboxes[i].addActionListener(new ActionListener()
             {
+                @Override
                 public void actionPerformed(ActionEvent arg0)
                 {
                     int bm = Level.TILE_BEHAVIORS[tilePicker.pickedTile&0xff]&0xff;
@@ -112,6 +113,7 @@ public class LevelEditor extends JFrame implements ActionListener
         return panel;
     }
 
+    @Override
     public void actionPerformed(ActionEvent e)
     {
         try

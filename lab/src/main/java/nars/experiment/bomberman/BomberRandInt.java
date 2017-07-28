@@ -16,14 +16,14 @@ package nars.experiment.bomberman; /**
  */
 public class BomberRandInt {
     /** lowest integer in the range */
-    private int low = 0;
+    private int low;
     /** highest integer in the range */
-    private int high = 0;
+    private int high;
 
     /** stack size */
     private static final int BUFFER_SIZE = 101;
     /** stack to hold random doubles */
-    private static double[] buffer = new double[BUFFER_SIZE];
+    private static final double[] buffer = new double[BUFFER_SIZE];
 
     /**
      * Fill the stack with 101 random doubles using the built-in random double

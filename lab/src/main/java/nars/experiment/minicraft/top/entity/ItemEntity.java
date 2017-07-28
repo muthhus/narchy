@@ -7,14 +7,14 @@ import nars.experiment.minicraft.top.sound.Sound;
 
 public class ItemEntity extends Entity {
 	private final int lifeTime;
-	protected int walkDist = 0;
-	protected int dir = 0;
-	public int hurtTime = 0;
+	protected int walkDist;
+	protected int dir;
+	public int hurtTime;
 	protected int xKnockback, yKnockback;
 	public double xa, ya, za;
 	public double xx, yy, zz;
 	public Item item;
-	private int time = 0;
+	private int time;
 
 	public ItemEntity(Item item, int x, int y) {
 		this.item = item;

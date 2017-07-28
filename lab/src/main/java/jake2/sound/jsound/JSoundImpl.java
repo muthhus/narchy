@@ -21,7 +21,8 @@ public class JSoundImpl  implements Sound {
 		S.register(new JSoundImpl());
 	}
 
-	public boolean Init() {
+	@Override
+    public boolean Init() {
 		SND_DMA.Init();
 		return SND_DMA.sound_started;
 	}
@@ -29,73 +30,84 @@ public class JSoundImpl  implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.SoundImpl#Shutdown()
 	 */
-	public void Shutdown() {
+	@Override
+    public void Shutdown() {
 		SND_DMA.Shutdown();
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.sound.SoundImpl#StartSound(float[], int, int, jake2.sound.sfx_t, float, float, float)
 	 */
-	public void StartSound(float[] origin, int entnum, int entchannel, sfx_t sfx, float fvol, float attenuation, float timeofs) {
+	@Override
+    public void StartSound(float[] origin, int entnum, int entchannel, sfx_t sfx, float fvol, float attenuation, float timeofs) {
 		SND_DMA.StartSound(origin, entnum, entchannel, sfx, fvol, attenuation, timeofs);
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.sound.SoundImpl#StopAllSounds()
 	 */
-	public void StopAllSounds() {
+	@Override
+    public void StopAllSounds() {
 		SND_DMA.StopAllSounds();
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.sound.SoundImpl#Update(float[], float[], float[], float[])
 	 */
-	public void Update(float[] origin, float[] forward, float[] right, float[] up) {
+	@Override
+    public void Update(float[] origin, float[] forward, float[] right, float[] up) {
 		SND_DMA.Update(origin, forward, right, up);
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#getName()
 	 */
-	public String getName() {
+	@Override
+    public String getName() {
 		return "jsound";
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#BeginRegistration()
 	 */
-	public void BeginRegistration() {
+	@Override
+    public void BeginRegistration() {
 		SND_DMA.BeginRegistration();
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#RegisterSound(java.lang.String)
 	 */
-	public sfx_t RegisterSound(String sample) {
+	@Override
+    public sfx_t RegisterSound(String sample) {
 		return SND_DMA.RegisterSound(sample);
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#EndRegistration()
 	 */
-	public void EndRegistration() {
+	@Override
+    public void EndRegistration() {
 		SND_DMA.EndRegistration();
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#StartLocalSound(java.lang.String)
 	 */
-	public void StartLocalSound(String sound) {
+	@Override
+    public void StartLocalSound(String sound) {
 		SND_DMA.StartLocalSound(sound);
 	}
 
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#RawSamples(int, int, int, int, byte[])
 	 */
-	public void RawSamples(int samples, int rate, int width, int channels, ByteBuffer data) {
+	@Override
+    public void RawSamples(int samples, int rate, int width, int channels, ByteBuffer data) {
 		SND_DMA.RawSamples(samples, rate, width, channels, data);
 	}
     
+    @Override
     public void disableStreaming() {
     }
 

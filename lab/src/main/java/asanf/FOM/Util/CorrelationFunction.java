@@ -5,6 +5,6 @@ package asanf.FOM.Util;
  */
 public interface CorrelationFunction {
 	
-	public double calculateCorrelation(double freq_x, double freq_y, double freq_xy);
+	double calculateCorrelation(double freq_x, double freq_y, double freq_xy);
 
 }

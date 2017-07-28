@@ -10,7 +10,7 @@ import nars.experiment.minicraft.top.level.tile.Tile;
 
 public class FurnitureItem extends Item {
 	public Furniture furniture;
-	public boolean placed = false;
+	public boolean placed;
 
 	public FurnitureItem(Furniture furniture) {
 		this.furniture = furniture;

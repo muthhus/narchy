@@ -6,10 +6,10 @@ import nars.experiment.minicraft.top.sound.Sound;
 
 public class AirWizard extends Mob {
 	private int xa, ya;
-	private int randomWalkTime = 0;
-	private int attackDelay = 0;
-	private int attackTime = 0;
-	private int attackType = 0;
+	private int randomWalkTime;
+	private int attackDelay;
+	private int attackTime;
+	private int attackType;
 
 	public AirWizard() {
 		x = random.nextInt(64 * 16);

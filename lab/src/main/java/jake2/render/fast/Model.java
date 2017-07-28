@@ -70,7 +70,8 @@ public abstract class Model extends Surf {
 	Mod_PointInLeaf
 	===============
 	*/
-	mleaf_t Mod_PointInLeaf(float[] p, model_t model)
+    @Override
+    mleaf_t Mod_PointInLeaf(float[] p, model_t model)
 	{
 		mnode_t node;
 		float	d;
@@ -151,7 +152,8 @@ public abstract class Model extends Surf {
 	Mod_ClusterPVS
 	==============
 	*/
-	byte[] Mod_ClusterPVS(int cluster, model_t model)
+    @Override
+    byte[] Mod_ClusterPVS(int cluster, model_t model)
 	{
 		if (cluster == -1 || model.vis == null)
 			return mod_novis;
@@ -167,7 +169,8 @@ public abstract class Model extends Surf {
 	Mod_Modellist_f
 	================
 	*/
-	void Mod_Modellist_f()
+    @Override
+    void Mod_Modellist_f()
 	{
 		int i;
 		model_t	mod;
@@ -192,7 +195,8 @@ public abstract class Model extends Surf {
 	Mod_Init
 	===============
 	*/
-	void Mod_Init()
+    @Override
+    void Mod_Init()
 	{
 		// init mod_known
 		for (int i=0; i < MAX_MOD_KNOWN; i++) {
@@ -1164,7 +1168,8 @@ public abstract class Model extends Surf {
 	Specifies the model that will be used as the world
 	@@@@@@@@@@@@@@@@@@@@@
 	*/
-	public void R_BeginRegistration(String model)
+	@Override
+    public void R_BeginRegistration(String model)
 	{
 		resetModelArrays();
 		Polygon.reset();
@@ -1193,7 +1198,8 @@ public abstract class Model extends Surf {
 
 	@@@@@@@@@@@@@@@@@@@@@
 	*/
-	public model_t R_RegisterModel(String name)
+	@Override
+    public model_t R_RegisterModel(String name)
 	{
 		model_t	mod = null;
 		int		i;
@@ -1237,7 +1243,8 @@ public abstract class Model extends Surf {
 
 	@@@@@@@@@@@@@@@@@@@@@
 	*/
-	public void R_EndRegistration()
+	@Override
+    public void R_EndRegistration()
 	{
 		model_t	mod;
 
@@ -1278,7 +1285,8 @@ public abstract class Model extends Surf {
 	Mod_FreeAll
 	================
 	*/
-	void Mod_FreeAll()
+    @Override
+    void Mod_FreeAll()
 	{
 		for (int i=0 ; i<mod_numknown ; i++)
 		{

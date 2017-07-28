@@ -205,4 +205,10 @@ public interface Space<T> extends Nodelike<T> {
 //        };
     }
 
+    default List<T> asList() {
+        int s = size();
+        List<T> l = new FasterList<>(s);
+        iterator().forEachRemaining(l::add);
+        return l;
+    }
 }

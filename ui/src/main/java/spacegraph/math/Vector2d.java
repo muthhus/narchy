@@ -36,7 +36,7 @@ package spacegraph.math;
  * point x,y coordinates.
  *
  */
-public class Vector2d extends Tuple2d implements java.io.Serializable {
+public class Vector2d extends Tuple2d {
 
     // Combatible with 1.1
     static final long serialVersionUID = 8572646365302599857L;

@@ -8,9 +8,9 @@ public class Arrow extends LevelObject {
 	public static int nextId = 1;
 	public int id = nextId++;
 	public int angle;
-	private ArrowHandle handle;
+	private final ArrowHandle handle;
 	
-	private Arrow outerInstance;
+	private final Arrow outerInstance;
 	
 	public Arrow(Point p1, Point p2) {
 		this.p = new Point(p1);
@@ -31,7 +31,8 @@ public class Arrow extends LevelObject {
 	 * Draws itself to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void draw(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void draw(Graphics2D g, LevelPanel levelPanel) {
 		g.setColor(Color.WHITE);
 		g.fillArc(p.x, p.y, radius * 2, radius * 2, angle*2, 45);
 	}	
@@ -40,7 +41,8 @@ public class Arrow extends LevelObject {
 	 * Draws the handles to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
     	handle.draw(g, levelPanel);
 	}	
 	
@@ -48,11 +50,13 @@ public class Arrow extends LevelObject {
 	 * The public properties to show in the editor ui.
 	 * @return the properties to show
 	 */
-	public Field[] getProperties() {
+	@Override
+    public Field[] getProperties() {
 		return getFields("visible", "collidable", "score", "bounce", "behaviorId", "p", "angle");
 	}	
 	
-	public int getSortValue() {
+	@Override
+    public int getSortValue() {
 		return angle;
 	}
 
@@ -63,7 +67,8 @@ public class Arrow extends LevelObject {
 		 * Gets the center of the handle.
 		 * @return the center
 		 */
-		public Point getCenter() {
+		@Override
+        public Point getCenter() {
 			return new Point(p.x+40, p.y+40);
 		}
 		
@@ -71,7 +76,8 @@ public class Arrow extends LevelObject {
 		 * The handle is dragged to the specified location
 		 * @param pos where the handle was dragged to 
 		 */
-		public void dragged(int dx, int dy) {
+		@Override
+        public void dragged(int dx, int dy) {
 			p.translate(dx, dy);
 		}		
 		
@@ -79,7 +85,8 @@ public class Arrow extends LevelObject {
 		 * Gets the level object the hangle controlls. Can be null.
 		 * @return the level object
 		 */
-		public LevelObject getLevelObject() {
+		@Override
+        public LevelObject getLevelObject() {
 			return Arrow.this;
 		}
 	}

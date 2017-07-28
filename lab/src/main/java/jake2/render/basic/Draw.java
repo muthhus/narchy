@@ -50,7 +50,8 @@ public abstract class Draw extends Image {
 	Draw_InitLocal
 	===============
 	*/
-	void Draw_InitLocal() {
+    @Override
+    void Draw_InitLocal() {
 		// load console characters (don't bilerp characters)
 		draw_chars = GL_FindImage("pics/conchars.pcx", it_pic);
 		GL_Bind(draw_chars.texnum);
@@ -67,7 +68,8 @@ public abstract class Draw extends Image {
 	smoothly scrolled off.
 	================
 	*/
-	public void Draw_Char(int x, int y, int num) {
+	@Override
+    public void Draw_Char(int x, int y, int num) {
 
 		num &= 255;
 	
@@ -102,7 +104,8 @@ public abstract class Draw extends Image {
 	Draw_FindPic
 	=============
 	*/
-	public image_t Draw_FindPic(String name) {
+	@Override
+    public image_t Draw_FindPic(String name) {
 		image_t image = null;
 		String fullname;
 
@@ -122,7 +125,8 @@ public abstract class Draw extends Image {
 	Draw_GetPicSize
 	=============
 	*/
-	public void Draw_GetPicSize(Dimension dim, String pic)	{
+	@Override
+    public void Draw_GetPicSize(Dimension dim, String pic)	{
 
 		image_t image = Draw_FindPic(pic);
 		dim.setWidth((image != null) ? image.width : -1);
@@ -134,7 +138,8 @@ public abstract class Draw extends Image {
 	Draw_StretchPic
 	=============
 	*/
-	public void Draw_StretchPic (int x, int y, int w, int h, String pic) {
+	@Override
+    public void Draw_StretchPic (int x, int y, int w, int h, String pic) {
 		
 		image_t image;
 
@@ -173,7 +178,8 @@ public abstract class Draw extends Image {
 	Draw_Pic
 	=============
 	*/
-	public void Draw_Pic(int x, int y, String pic)
+	@Override
+    public void Draw_Pic(int x, int y, String pic)
 	{
 		image_t image;
 
@@ -214,7 +220,8 @@ public abstract class Draw extends Image {
 	refresh window.
 	=============
 	*/
-	public void Draw_TileClear(int x, int y, int w, int h, String pic) {
+	@Override
+    public void Draw_TileClear(int x, int y, int w, int h, String pic) {
 		image_t	image;
 
 		image = Draw_FindPic(pic);
@@ -251,7 +258,8 @@ public abstract class Draw extends Image {
 	Fills a box of pixels with a single color
 	=============
 	*/
-	public void Draw_Fill(int x, int y, int w, int h, int colorIndex)	{
+	@Override
+    public void Draw_Fill(int x, int y, int w, int h, int colorIndex)	{
 
 		if ( colorIndex > 255)
 			Com.Error(Defines.ERR_FATAL, "Draw_Fill: bad color");
@@ -285,7 +293,8 @@ public abstract class Draw extends Image {
 	Draw_FadeScreen
 	================
 	*/
-	public void Draw_FadeScreen()	{
+	@Override
+    public void Draw_FadeScreen()	{
 		gl.glEnable(GL_BLEND);
 		gl.glDisable(GL_TEXTURE_2D);
 		gl.glColor4f(0, 0, 0, 0.8f);
@@ -311,7 +320,8 @@ final IntBuffer image32=Lib.newIntBuffer(256*256);
 	Draw_StretchRaw
 	=============
 	*/
-	public void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte[] data)
+	@Override
+    public void Draw_StretchRaw (int x, int y, int w, int h, int cols, int rows, byte[] data)
 	{
 		int i, j, trows;
 		int sourceIndex;

@@ -8,13 +8,15 @@ public class AppletLauncher extends JApplet
     private static final long serialVersionUID = -2238077255106243788L;
 
     private MarioComponent mario;
-    private boolean started = false;
+    private boolean started;
 
+    @Override
     public void init()
     {
     	this.setSize(640, 480);
     }
 
+    @Override
     public void start()
     {
         if (!started)
@@ -31,6 +33,7 @@ public class AppletLauncher extends JApplet
         }
     }
 
+    @Override
     public void stop()
     {
         if (started)

@@ -93,26 +93,26 @@ public class A extends Applet implements Runnable {
 	private int chalenge = 170;
 
 	// x,y, player fire only
-	private int[][] firetable = new int[2][128];
+	private final int[][] firetable = new int[2][128];
 	// x,y,dx,dy,display,damage
-	private double[][] enemy_fire = new double[6][128];
+	private final double[][] enemy_fire = new double[6][128];
 	// x,y, type, timeleft,big
-	private int[][] explode = new int[5][128];
+	private final int[][] explode = new int[5][128];
 	// x,y,dx,dy,pic,life,isboss, fire, score (=maxlife)
-	private int[][] enemy = new int[8][128];
-	private boolean boss = false;
+	private final int[][] enemy = new int[8][128];
+	private boolean boss;
 	private int emax = 100;
 	private int gamestatus = GAMESTART;
-	private int wave = 0;
-	private int firestatus1 = 0;
-	private int firestatus2 = 0;
+	private int wave;
+	private int firestatus1;
+	private int firestatus2;
 	private int sens = 1;
-	private int lastwave = 0;
+	private int lastwave;
 	private int level = 1;
 	private int score;
 	private int energy = 100;
-	private int nextship = 0;
-	private int nextshoot = 0;
+	private int nextship;
+	private int nextshoot;
 	private Random rand;
 	private boolean r = true;
 	// WARNING "randomly" used! care in functions
@@ -122,9 +122,10 @@ public class A extends Applet implements Runnable {
 	private long timer;
 	private Graphics2D g, bg[];
 	private BufferedImage buf[];
-	private int frame = 0;
+	private int frame;
 
-	public void init() {
+	@Override
+    public void init() {
 		rand = new Random();
 		// generate colortable, easy to acces and not too big
 		for (x = 1; x < 6; x++)
@@ -239,16 +240,19 @@ public class A extends Applet implements Runnable {
 			makeexp(EXPLODE_FOE + k * 10, 1 + k * 5, 4);
 	}
 
-	public void start() {
+	@Override
+    public void start() {
 		new Thread(this).start();
 	}
 
-	public void stop() {
+	@Override
+    public void stop() {
 		// stop game loop
 		r = false;
 	}
 
-	protected void processMouseMotionEvent(MouseEvent e) {
+	@Override
+    protected void processMouseMotionEvent(MouseEvent e) {
 		if (gamestatus == GAMERUN) {
 			dx = e.getX();
 			dy = e.getY();
@@ -279,7 +283,8 @@ public class A extends Applet implements Runnable {
 		}
 	}
 
-	protected void processMouseEvent(MouseEvent e) {
+	@Override
+    protected void processMouseEvent(MouseEvent e) {
 		if (e.getID() == 504 || e.getID() == 505)
 			return;// enter or exit, useless
 		// firestatus = NOFIRE;// default
@@ -303,7 +308,8 @@ public class A extends Applet implements Runnable {
 		// e.consume();
 	}
 
-	public void run() { // gameloop
+	@Override
+    public void run() { // gameloop
 		while (r) {
 			// next frame
 			bg[BKBUFFER].setColor(BLACK);

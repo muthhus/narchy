@@ -8,13 +8,13 @@ public class Line extends LevelObject {
 	
 	private static int nextId = 1;
 	
-	private int id = 0;
+	private int id;
 	
 	public Point p2;
 	
-	private LineHandle lineHandle = new LineHandle();
-	private EndpointHandle p1Handle = new EndpointHandle(true);
-	private EndpointHandle p2Handle = new EndpointHandle(false);
+	private final LineHandle lineHandle = new LineHandle();
+	private final EndpointHandle p1Handle = new EndpointHandle(true);
+	private final EndpointHandle p2Handle = new EndpointHandle(false);
 	
 	public Line(Line line) {
 		this(line.p, line.p2);
@@ -43,7 +43,8 @@ public class Line extends LevelObject {
 	 * Draws itself to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void draw(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void draw(Graphics2D g, LevelPanel levelPanel) {
 		g.setColor(Color.WHITE);
 		if (levelPanel.getState() == LevelPanel.State.SELECT) {
 			if (levelPanel.isSelected(this)) {
@@ -69,7 +70,8 @@ public class Line extends LevelObject {
 	 * Draws the handles to the specified graphics object
 	 * @param g where to draw
 	 */
-	public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
+	@Override
+    public void drawHandles(Graphics2D g, LevelPanel levelPanel) {
 		p1Handle.draw(g, levelPanel);
 		p2Handle.draw(g, levelPanel);
 	}		
@@ -78,7 +80,8 @@ public class Line extends LevelObject {
 	 * The public properties to show in the editor ui.
 	 * @return the properties to show
 	 */
-	public Field[] getProperties() {
+	@Override
+    public Field[] getProperties() {
 		return getFields("visible", "collidable", "isDropDown", "isRollOver"
 				, "isGate", "score", "bounce", "behaviorId", "p", "p2");
 	}	
@@ -104,10 +107,12 @@ public class Line extends LevelObject {
 		 * Draws itself to the specified graphics object
 		 * @param g where to draw
 		 */
-		public void draw(Graphics2D g, LevelPanel levelPanel) {
+		@Override
+        public void draw(Graphics2D g, LevelPanel levelPanel) {
 		}
 		
-		public boolean intersects(Rectangle rect) {
+		@Override
+        public boolean intersects(Rectangle rect) {
 			Line2D.Float line = new Line2D.Float(p, p2);
 			if (rect.width <= 1 && rect.height <= 1) {
 				return line.ptSegDist(new Point(rect.x, rect.y)) < 5;
@@ -126,7 +131,8 @@ public class Line extends LevelObject {
 		 * Overrides Handle. Gets the endpoint.
 		 * @return the handles endpoint
 		 */
-		public Point getCenter() {
+		@Override
+        public Point getCenter() {
 			return p;
 		}
 		
@@ -135,7 +141,8 @@ public class Line extends LevelObject {
 		 * the distance dragged.
 		 * @param p where the handle is dragged to
 		 */
-		public void dragged(int dx, int dy) {
+		@Override
+        public void dragged(int dx, int dy) {
 			if (!LevelPanel.instance.selection.contains(p1Handle) && !LevelPanel.instance.selection.contains(p2Handle)) {
 				p.translate(dx, dy);
 				p2.translate(dx, dy);
@@ -146,7 +153,8 @@ public class Line extends LevelObject {
 		 * Gets the level object the hangle controlls. Can be null.
 		 * @return the level object
 		 */
-		public LevelObject getLevelObject() {
+		@Override
+        public LevelObject getLevelObject() {
 			return Line.this;
 		}
 	}
@@ -166,7 +174,8 @@ public class Line extends LevelObject {
 		 * Overrides Handle. Gets the endpoint.
 		 * @return the handles endpoint
 		 */
-		public Point getCenter() {
+		@Override
+        public Point getCenter() {
 			return handleFirstEndpoint ? p : p2;
 		}
 		
@@ -175,7 +184,8 @@ public class Line extends LevelObject {
 		 * the distance dragged.
 		 * @param p where the handle is dragged to
 		 */
-		public void dragged(int dx, int dy) {
+		@Override
+        public void dragged(int dx, int dy) {
 			getCenter().translate(dx, dy);
 		}
 		
@@ -183,7 +193,8 @@ public class Line extends LevelObject {
 		 * Gets the level object the hangle controlls. Can be null.
 		 * @return the level object
 		 */
-		public LevelObject getLevelObject() {
+		@Override
+        public LevelObject getLevelObject() {
 			return Line.this;
 		}
 	}

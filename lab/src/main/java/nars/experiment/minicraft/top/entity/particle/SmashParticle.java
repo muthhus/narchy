@@ -6,7 +6,7 @@ import nars.experiment.minicraft.top.gfx.Screen;
 import nars.experiment.minicraft.top.sound.Sound;
 
 public class SmashParticle extends Entity {
-	private int time = 0;
+	private int time;
 
 	public SmashParticle(int x, int y) {
 		this.x = x;

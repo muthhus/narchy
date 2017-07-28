@@ -81,40 +81,40 @@ public class a extends GamePanel {
 	final Color[] explodingFlashColors = new Color[16];
 
 	int i;
-	int j = 0;
+	int j;
 	int k;
 	int x;
 	int y;
 	int z;
 
-	int level = 0;
-	int score = 0;
+	int level;
+	int score;
 	int playerX = 76;
 	int playerBulletX = 79;
 	float playerBulletY = 175;
 	float playerBulletSpeed = 4;
 	boolean fireReleased = true;
-	int advanceSprite = 0;
+	int advanceSprite;
 	int extraLives = 2;
 	int extraDemons = 5;
 	int nextLevelDelay = 1;
 	float shootTimer = 1;
 	int shootCounter = 1;
-	int playerExploding = 0;
-	int gameOver = 0;
-	boolean shooting = false;
-	boolean shoot = false;
-	boolean lasers = false;
-	boolean tinyEnemies = false;
-	float demonSpeed = 0;
-	float shootDelay = 0;
-	float bulletSpeed = 0;
+	int playerExploding;
+	int gameOver;
+	boolean shooting;
+	boolean shoot;
+	boolean lasers;
+	boolean tinyEnemies;
+	float demonSpeed;
+	float shootDelay;
+	float bulletSpeed;
 	boolean demoMode = true;
 	int demoTargetX = 76;
-	int demoShootDelay = 0;
-	int gameOverDelay = 0;
-	int noShootDelay = 0;
-	boolean paused = false;
+	int demoShootDelay;
+	int gameOverDelay;
+	int noShootDelay;
+	boolean paused;
 	boolean pauseReleased = true;
 
 	BufferedImage[] sprites;
@@ -131,7 +131,7 @@ public class a extends GamePanel {
 	ArrayList<float[]>[] demonsInRows = new ArrayList[4];
 
 	// keys
-	private boolean[] a = new boolean[32768];
+	private final boolean[] a = new boolean[32768];
 
 	long nextFrameStartTime;
 
@@ -798,14 +798,14 @@ public class a extends GamePanel {
 
 			if (playerExploding > 0) {
 				// draw player's ship exploding
-				offscreenGraphics.drawImage(sprites[(playerExploding >> 3) + 15], (int) playerX - 4, 153, null);
+				offscreenGraphics.drawImage(sprites[(playerExploding >> 3) + 15], playerX - 4, 153, null);
 			} else {
 				// draw player bullet
 				offscreenGraphics.setColor(playerBulletColor);
 				offscreenGraphics.fillRect(playerBulletX, (int) playerBulletY, 1, 8);
 
 				// draw player's ship
-				offscreenGraphics.drawImage(sprites[14], (int) playerX, 174, null);
+				offscreenGraphics.drawImage(sprites[14], playerX, 174, null);
 			}
 		}
 

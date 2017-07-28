@@ -6,7 +6,7 @@ package asanf.FOM;
 import java.util.HashSet;
 
 public class StopWords {
-	private static String[] s_stopWords = { "m", "a", "about", "above", "above", "across", "after", "afterwards",
+	private static final String[] s_stopWords = { "m", "a", "about", "above", "above", "across", "after", "afterwards",
 			"again", "against", "all", "almost", "alone", "along", "already", "also", "although", "always", "am",
 			"among", "amongst", "amoungst", "amount", "an", "and", "another", "any", "anyhow", "anyone", "anything",
 			"anyway", "anywhere", "are", "around", "as", "at", "back", "be", "became", "because", "become", "becomes",
@@ -36,7 +36,7 @@ public class StopWords {
 			"will", "with", "within", "without", "would", "yet", "you", "your", "yours", "yourself", "yourselves",
 			"the", "like", "use", "generally", "example" };
 
-	private HashSet<String> stopWords;
+	private final HashSet<String> stopWords;
 
 	public StopWords() {
 		stopWords = new HashSet<String>(s_stopWords.length);

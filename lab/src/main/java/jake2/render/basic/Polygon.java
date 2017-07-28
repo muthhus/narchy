@@ -40,9 +40,9 @@ public final class Polygon extends glpoly_t {
 
     private static final float[] buffer = new float[MAX_BUFFER_VERTICES * STRIDE];
 
-    private static int bufferIndex = 0;
+    private static int bufferIndex;
 
-    private static int polyCount = 0;
+    private static int polyCount;
 
     private static final Polygon[] polyCache = new Polygon[MAXPOLYS];
     static {
@@ -75,66 +75,82 @@ public final class Polygon extends glpoly_t {
         flags = 0;
     }
 
+    @Override
     public final float x(int index) {
         return buffer[offset(index)];
     }
 
+    @Override
     public final void x(int index, float value) {
         buffer[offset(index)] = value;
     }
 
+    @Override
     public final float y(int index) {
         return buffer[offset(index) + 1];
     }
 
+    @Override
     public final void y(int index, float value) {
         buffer[offset(index) + 1] = value;
     }
 
+    @Override
     public final float z(int index) {
         return buffer[offset(index) + 2];
     }
 
+    @Override
     public final void z(int index, float value) {
         buffer[offset(index) + 2] = value;
     }
 
+    @Override
     public final float s1(int index) {
         return buffer[offset(index) + 3];
     }
 
+    @Override
     public final void s1(int index, float value) {
         buffer[offset(index) + 3] = value;
     }
 
+    @Override
     public final float t1(int index) {
         return buffer[offset(index) + 4];
     }
 
+    @Override
     public final void t1(int index, float value) {
         buffer[offset(index) + 4] = value;
     }
 
+    @Override
     public final float s2(int index) {
         return buffer[offset(index) + 5];
     }
 
+    @Override
     public final void s2(int index, float value) {
         buffer[offset(index) + 5] = value;
     }
 
+    @Override
     public final float t2(int index) {
         return buffer[offset(index) + 6];
     }
 
+    @Override
     public final void t2(int index, float value) {
         buffer[offset(index) + 6] = value;
     }
 
+    @Override
     public final void beginScrolling(float value) {
         // not in use
     }
 
+    @Override
     public final void endScrolling() {
         // not in use
     }

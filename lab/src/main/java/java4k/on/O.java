@@ -33,13 +33,15 @@ import java.util.Random;
  */
 public class O extends Applet implements Runnable {
 
-	private boolean[] keys = new boolean[32767];
+	private final boolean[] keys = new boolean[32767];
 
-	public void start() {
+	@Override
+    public void start() {
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 		// Required for Mac
 		while (!isActive()) {
 			Thread.yield();
@@ -888,8 +890,7 @@ public class O extends Applet implements Runnable {
 								int pp3 = 1;
 								if (i < PLASMA_MAX_HITS_COUNT) {
 									pp3 = plasmaHittingUnitIndex[i];
-									;
-								}
+                                }
 								if (pp3 > 0) {
 									int p0x = units[pp0 + UNIT_IDX_X];
 									int p0y = units[pp0 + UNIT_IDX_Y];
@@ -1055,7 +1056,8 @@ public class O extends Applet implements Runnable {
 		}
 	}
 
-	public boolean handleEvent(Event e) {
+	@Override
+    public boolean handleEvent(Event e) {
 		// Process the key and mouse events.
 		// Note that this can miss key and mouse events if they happen faster
 		// than the frame processing can accept them.  Fixing this, though,

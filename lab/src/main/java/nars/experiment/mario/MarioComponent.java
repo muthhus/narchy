@@ -30,13 +30,14 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     private static final long serialVersionUID = 739318775993206607L;
     public static final int TICKS_PER_SECOND = 24;
 
-    private boolean running = false;
-    private int width, height;
+    private boolean running;
+    private final int width;
+    private final int height;
     private GraphicsConfiguration graphicsConfiguration;
     public Scene scene;
     private Audio sound;
     @SuppressWarnings("unused")
-	private boolean focused = false;
+	private boolean focused;
     private MapScene mapScene;
     int delay;
     public BufferedImage image;
@@ -115,10 +116,12 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         }
     }
 
+    @Override
     public void paint(Graphics g)
     {
     }
 
+    @Override
     public void update(Graphics g)
     {
     }
@@ -138,6 +141,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         running = false;
     }
 
+    @Override
     public void run()
     {
         graphicsConfiguration = getGraphicsConfiguration();
@@ -220,11 +224,13 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
         }
     }
 
+    @Override
     public void keyPressed(KeyEvent arg0)
     {
         toggleKey(arg0.getKeyCode(), true);
     }
 
+    @Override
     public void keyReleased(KeyEvent arg0)
     {
         toggleKey(arg0.getKeyCode(), false);
@@ -250,15 +256,18 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 //        }
     }
 
+    @Override
     public void keyTyped(KeyEvent arg0)
     {
     }
 
+    @Override
     public void focusGained(FocusEvent arg0)
     {
         focused = true;
     }
 
+    @Override
     public void focusLost(FocusEvent arg0)
     {
         focused = false;

@@ -24,7 +24,7 @@ public class PacComponent extends JComponent {
 		this.game = g;
 		
 		this.setPreferredSize(new Dimension(400, 400));
-		size = (int)(Math.min((int)Math.round((getWidth()) / (game.maze.width + 3)), (int)Math.round((getHeight()) / (game.maze.height + 5))));
+		size = Math.min(Math.round((getWidth()) / (game.maze.width + 3)), Math.round((getHeight()) / (game.maze.height + 5)));
 		
 	}
 	
@@ -33,8 +33,8 @@ public class PacComponent extends JComponent {
 		
 		int mWidth = game.maze.width;
 		int mHeight = game.maze.height;
-		size = (int)(Math.min((int)Math.round((getWidth()) / (mWidth + 0)),
-				(int)Math.round((getHeight()) / (mHeight + 0))));
+		size = Math.min(Math.round((getWidth()) / (mWidth + 0)),
+                Math.round((getHeight()) / (mHeight + 0)));
 		Point offset =
 				new Point(0,0);
 				//new Point((int)Math.round(getWidth() - (size * mWidth)) / 2, (int)Math.round(getHeight() - (size * mHeight))/2);
@@ -229,7 +229,7 @@ public class PacComponent extends JComponent {
 	
 	Rectangle getTileBounds(double x, double y, Point offset) {
 		
-		Rectangle tile = new Rectangle(offset.x + (int)Math.round(x * size), offset.y + (int)Math.round(y * size), (int)(size), (int)(size));
+		Rectangle tile = new Rectangle(offset.x + (int)Math.round(x * size), offset.y + (int)Math.round(y * size), size, size);
 		
 		return tile;
 		

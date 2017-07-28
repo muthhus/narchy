@@ -545,7 +545,9 @@ public class M_Float {
     static int sound_sight;
 
     static final EntInteractAdapter floater_sight = new EntInteractAdapter() {
-    	public String getID() { return "floater_sight"; }
+    	@Override
+        public String getID() { return "floater_sight"; }
+        @Override
         public boolean interact(edict_t self, edict_t other) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_sight, 1,
                     Defines.ATTN_NORM, 0);
@@ -554,7 +556,9 @@ public class M_Float {
     };
 
     static final EntThinkAdapter floater_idle = new EntThinkAdapter() {
-    	public String getID() { return "floater_idle"; }
+    	@Override
+        public String getID() { return "floater_idle"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_idle, 1,
                     Defines.ATTN_IDLE, 0);
@@ -563,7 +567,9 @@ public class M_Float {
     };
 
     static final EntThinkAdapter floater_fire_blaster = new EntThinkAdapter() {
-    	public String getID() { return "floater_fire_blaster"; }
+    	@Override
+        public String getID() { return "floater_fire_blaster"; }
+        @Override
         public boolean think(edict_t self) {
             float[] start = { 0, 0, 0 };
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 };
@@ -592,7 +598,7 @@ public class M_Float {
         }
     };
 
-    static final mframe_t[] floater_frames_stand1 = new mframe_t[] {
+    static final mframe_t[] floater_frames_stand1 = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -649,7 +655,7 @@ public class M_Float {
     static final mmove_t floater_move_stand1 = new mmove_t(FRAME_stand101,
             FRAME_stand152, floater_frames_stand1, null);
 
-    static final mframe_t[] floater_frames_stand2 = new mframe_t[] {
+    static final mframe_t[] floater_frames_stand2 = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -707,7 +713,9 @@ public class M_Float {
             FRAME_stand252, floater_frames_stand2, null);
 
     static final EntThinkAdapter floater_stand = new EntThinkAdapter() {
-    	public String getID() { return "floater_stand"; }
+    	@Override
+        public String getID() { return "floater_stand"; }
+        @Override
         public boolean think(edict_t self) {
             if (Lib.random() <= 0.5)
                 self.monsterinfo.currentmove = floater_move_stand1;
@@ -717,7 +725,7 @@ public class M_Float {
         }
     };
 
-    static final mframe_t[] floater_frames_activate = new mframe_t[] {
+    static final mframe_t[] floater_frames_activate = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -753,7 +761,9 @@ public class M_Float {
             FRAME_actvat31, floater_frames_activate, null);
 
     static final EntThinkAdapter floater_run = new EntThinkAdapter() {
-    	public String getID() { return "floater_run"; }
+    	@Override
+        public String getID() { return "floater_run"; }
+        @Override
         public boolean think(edict_t self) {
 
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0)
@@ -765,7 +775,7 @@ public class M_Float {
         }
     };
 
-    static final mframe_t[] floater_frames_attack1 = new mframe_t[] {
+    static final mframe_t[] floater_frames_attack1 = {
             new mframe_t(GameAI.ai_charge, 0, null), // Blaster attack)
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -790,7 +800,9 @@ public class M_Float {
     static final float[] aim = { Defines.MELEE_DISTANCE, 0, 0 };
 
     static final EntThinkAdapter floater_wham = new EntThinkAdapter() {
-    	public String getID() { return "floater_wham"; }
+    	@Override
+        public String getID() { return "floater_wham"; }
+        @Override
         public boolean think(edict_t self) {
 
             game_import_t.sound(self, Defines.CHAN_WEAPON, sound_attack3, 1,
@@ -800,7 +812,7 @@ public class M_Float {
         }
     };
 
-    static final mframe_t[] floater_frames_attack2 = new mframe_t[] {
+    static final mframe_t[] floater_frames_attack2 = {
             new mframe_t(GameAI.ai_charge, 0, null), // Claws
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -833,7 +845,9 @@ public class M_Float {
             FRAME_attak225, floater_frames_attack2, floater_run);
 
     static final EntThinkAdapter floater_zap = new EntThinkAdapter() {
-    	public String getID() { return "floater_zap"; }
+    	@Override
+        public String getID() { return "floater_zap"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 };
             float[] origin = { 0, 0, 0 };
@@ -870,7 +884,7 @@ public class M_Float {
         }
     };
 
-    static final mframe_t[] floater_frames_attack3 = new mframe_t[] {
+    static final mframe_t[] floater_frames_attack3 = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -911,7 +925,7 @@ public class M_Float {
     static final mmove_t floater_move_attack3 = new mmove_t(FRAME_attak301,
             FRAME_attak334, floater_frames_attack3, floater_run);
 
-    static final mframe_t[] floater_frames_death = new mframe_t[] {
+    static final mframe_t[] floater_frames_death = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -927,7 +941,9 @@ public class M_Float {
             new mframe_t(GameAI.ai_move, 0, null) };
 
     static final EntThinkAdapter floater_dead = new EntThinkAdapter() {
-    	public String getID() { return "floater_dead"; }
+    	@Override
+        public String getID() { return "floater_dead"; }
+        @Override
         public boolean think(edict_t self) {
             Math3D.VectorSet(self.mins, -16, -16, -24);
             Math3D.VectorSet(self.maxs, 16, 16, -8);
@@ -942,7 +958,7 @@ public class M_Float {
     static mmove_t floater_move_death = new mmove_t(FRAME_death01,
             FRAME_death13, floater_frames_death, floater_dead);
 
-    static final mframe_t[] floater_frames_pain1 = new mframe_t[] {
+    static final mframe_t[] floater_frames_pain1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -954,7 +970,7 @@ public class M_Float {
     static final mmove_t floater_move_pain1 = new mmove_t(FRAME_pain101,
             FRAME_pain107, floater_frames_pain1, floater_run);
 
-    static final mframe_t[] floater_frames_pain2 = new mframe_t[] {
+    static final mframe_t[] floater_frames_pain2 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -967,7 +983,7 @@ public class M_Float {
     static final mmove_t floater_move_pain2 = new mmove_t(FRAME_pain201,
             FRAME_pain208, floater_frames_pain2, floater_run);
 
-    static final mframe_t[] floater_frames_pain3 = new mframe_t[] {
+    static final mframe_t[] floater_frames_pain3 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -984,7 +1000,7 @@ public class M_Float {
     static mmove_t floater_move_pain3 = new mmove_t(FRAME_pain301,
             FRAME_pain312, floater_frames_pain3, floater_run);
 
-    static final mframe_t[] floater_frames_walk = new mframe_t[] {
+    static final mframe_t[] floater_frames_walk = {
             new mframe_t(GameAI.ai_walk, 5, null),
             new mframe_t(GameAI.ai_walk, 5, null),
             new mframe_t(GameAI.ai_walk, 5, null),
@@ -1041,7 +1057,7 @@ public class M_Float {
     static final mmove_t floater_move_walk = new mmove_t(FRAME_stand101,
             FRAME_stand152, floater_frames_walk, null);
 
-    static final mframe_t[] floater_frames_run = new mframe_t[] {
+    static final mframe_t[] floater_frames_run = {
             new mframe_t(GameAI.ai_run, 13, null),
             new mframe_t(GameAI.ai_run, 13, null),
             new mframe_t(GameAI.ai_run, 13, null),
@@ -1099,7 +1115,9 @@ public class M_Float {
             FRAME_stand152, floater_frames_run, null);
 
     static final EntThinkAdapter floater_walk = new EntThinkAdapter() {
-    	public String getID() { return "floater_walk"; }
+    	@Override
+        public String getID() { return "floater_walk"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = floater_move_walk;
             return true;
@@ -1107,7 +1125,9 @@ public class M_Float {
     };
 
     static final EntThinkAdapter floater_attack = new EntThinkAdapter() {
-    	public String getID() { return "floater_attack"; }
+    	@Override
+        public String getID() { return "floater_attack"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = floater_move_attack1;
             return true;
@@ -1115,7 +1135,9 @@ public class M_Float {
     };
 
     static final EntThinkAdapter floater_melee = new EntThinkAdapter() {
-    	public String getID() { return "floater_melee"; }
+    	@Override
+        public String getID() { return "floater_melee"; }
+        @Override
         public boolean think(edict_t self) {
 
             if (Lib.random() < 0.5)
@@ -1127,7 +1149,9 @@ public class M_Float {
     };
 
     static final EntPainAdapter floater_pain = new EntPainAdapter() {
-    	public String getID() { return "floater_pain"; }
+    	@Override
+        public String getID() { return "floater_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
             int n;
 
@@ -1155,10 +1179,12 @@ public class M_Float {
     };
 
     static final EntDieAdapter floater_die = new EntDieAdapter() {
-    	public String getID() { return "floater_die"; }
+    	@Override
+        public String getID() { return "floater_die"; }
 
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_death1, 1,
                     Defines.ATTN_NORM, 0);
             GameMisc.BecomeExplosion1(self);

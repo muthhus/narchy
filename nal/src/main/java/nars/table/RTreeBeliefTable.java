@@ -3,9 +3,11 @@ package nars.table;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import jcog.Util;
+import jcog.pri.Pri;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
 import jcog.util.Top2;
+import jcog.util.UniqueRanker;
 import nars.$;
 import nars.NAR;
 import nars.Task;
@@ -24,14 +26,17 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import static jcog.tree.rtree.RTreeCursor.ordering;
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
     static final int minSampleRadiusInCycles = 0; //prevents sampling with 0 radius, if >0. used to provide precision in sub-duration ranges
 
-    /** in fractions of the table's contained temporal range */
-    static final float[] sampleRadii = { 0f, 0.01f, 0.125f, 0.5f };
+    /**
+     * in fractions of the table's contained temporal range
+     */
+    static final float[] sampleRadii = {0f, 0.1f, 0.25f, 0.5f, 1f};
 
     final static int maxSamplesTruthpolated = 5;
 
@@ -42,6 +47,15 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * effect which could reduce temporal precision.
      */
     final static float enoughSamplesRate = 0f;
+
+    /**
+     * if the szie is less than or equal to this value, all the entries will
+     * be evaluated when matching a task or interpolating a truth.
+     */
+    private final static int EVAL_ALL_LESS_THAN_TASKS = 4; /* 2*2 */
+
+
+    private transient NAR nar = null;
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -154,7 +168,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     final Space<TaskRegion> tree;
 
-    private transient NAR nar;
     //private final AtomicBoolean compressing = new AtomicBoolean(false);
 
     public RTreeBeliefTable() {
@@ -170,12 +183,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                 float activation = i.priElseZero();
                 float before = e.priElseZero();
+                ((NALTask) e).merge(i);
                 float after = e.priAdd(activation);
                 activation = (after - before);
 
-                ((NALTask) e).merge(i);
 
-                Activate.activate(e, activation, nar);
+                if (activation > Pri.EPSILON)
+                    Activate.activate(e, activation, nar);
             }
         };
 
@@ -253,8 +267,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         final Task ete = eternal != null ? eternal.strongest() : null;
 
-        int ss = size();
-        if (!tree.isEmpty()) {
+        int s = size();
+        if (s > 0) {
 
             int dur = nar.dur();
 
@@ -262,44 +276,55 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task));
 
             float confMin = nar.confMin.floatValue();
-            int enoughSampled = Math.min(ss, Math.round(Math.max(1, enoughSamplesRate * capacity)));
+            int enoughSampled = Math.min(s, Math.round(Math.max(1, enoughSamplesRate * capacity)));
 
-            RTreeCursor<TaskRegion> c = null;
-            float range = this.timeRange();
-            for (float rFrac : sampleRadii) {
-                if (range == 0f && rFrac > 0) break; //dont keep expanding beyond the one timepoint exists
+            List<TaskRegion> tt;
+            if (s <= EVAL_ALL_LESS_THAN_TASKS) {
+                tt = ordering(new UniqueRanker<>(strongestTask))
+                        .greatestOf(tree.iterator(), maxSamplesTruthpolated);
+            } else {
+                RTreeCursor<TaskRegion> c = null;
 
-                long from = when - (long) Math.max(minSampleRadiusInCycles, rFrac * range);
-                long to = when + (long) Math.max(minSampleRadiusInCycles, rFrac * range);
-                if (c == null)
-                    c = cursor(from, to);
-                else
-                    c.in(timeRange(from, to)); //recycle
+                float range = this.timeRange();
+                for (float rFrac : sampleRadii) {
+                    if (range == 0f && rFrac > 0) break; //dont keep expanding beyond the one timepoint exists
 
-                if (c.size() >= enoughSampled)
-                    break;
-            }
+                    long from = when - (long) Math.max(minSampleRadiusInCycles, rFrac * range);
+                    long to = when + (long) Math.max(minSampleRadiusInCycles, rFrac * range);
+                    if (c == null)
+                        c = cursor(from, to);
+                    else
+                        c.in(timeRange(from, to)); //recycle
 
-            if (c != null && c.size() > 0) {
+                    if (c.size() >= enoughSampled)
+                        break;
+                }
 
-
-                List<TaskRegion> tt = c.topSorted(strongestTask, maxSamplesTruthpolated);
-                int tts = tt.size();
-                if (tts > 0) {
-                    //applying eternal should not influence the scan for temporal so it is left null here
-                    @Nullable PreciseTruth t = TruthPolation.truth(
-                            ete, when, dur, tt);
-                    if (t != null /*&& t.conf() >= confMin*/) {
-                        return t.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1f);
-                    }
+                if (c != null && c.size() > 0) {
+                    tt = c.topSorted(strongestTask, maxSamplesTruthpolated);
+                } else {
+                    tt = Collections.emptyList();
                 }
             }
 
+            return truth(when, nar, ete, dur, confMin, tt); //eternal included
         }
-
 
         return ete != null ? ete.truth() : null;
 
+    }
+
+    static Truth truth(long when, NAR nar, Task ete, int dur, float confMin, List<TaskRegion> tt) {
+        int tts = tt.size();
+        if (tts > 0) {
+            //applying eternal should not influence the scan for temporal so it is left null here
+            @Nullable PreciseTruth t = TruthPolation.truth(
+                    ete, when, dur, tt);
+            if (t != null /*&& t.conf() >= confMin*/) {
+                return t.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1f);
+            }
+        }
+        return null;
     }
 
     /**
@@ -314,10 +339,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public Task match(long when, @Nullable Task against, NAR nar) {
 
-        if (size() == 0)
+        int s = size();
+        if (s == 0)
             return null;
-
-        long now = nar.time();
 
         int dur = nar.dur();
 
@@ -325,34 +349,21 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         FloatFunction<Task> ts = taskStrength(when, dur);
         FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task);
 
-        float range = this.timeRange();
-        for (float rFrac : sampleRadii) {
-            if (range == 0f && rFrac > 0) break; //dont keep expanding beyond the one timepoint exists
+        if (s <= EVAL_ALL_LESS_THAN_TASKS) {
+            return match(nar, when, new Top2<>(strongestTask).of(tree.iterator()).toList());
+        } else {
 
-            long from = when - (long) Math.max(minSampleRadiusInCycles, rFrac * range);
-            long to = when + (long) Math.max(minSampleRadiusInCycles, rFrac * range);
-            RTreeCursor<TaskRegion> ct = cursor(from, to);
-            if (ct.size() == 0)
-                continue;
+            float range = this.timeRange();
+            for (float rFrac : sampleRadii) {
 
-            List<TaskRegion> tt = ct.topSorted(strongestTask, 2);
+                long from = when - (long) Math.max(minSampleRadiusInCycles, rFrac * range);
+                long to = when + (long) Math.max(minSampleRadiusInCycles, rFrac * range);
+                RTreeCursor<TaskRegion> ct = cursor(from, to);
+                if (ct.size() == 0)
+                    continue;
 
-
-            switch (tt.size()) {
-                case 0:
-                    return null;
-                case 1:
-                    return tt.get(0).task;
-
-                default:
-                    Task a = tt.get(0).task;
-                    Task b = tt.get(1).task;
-
-                    Task c = Revision.merge(a, b, now, nar.confMin.floatValue(), nar.random());
-                    return c != null ? c : a;
+                return match(nar, when, ct.topSorted(strongestTask, 2));
             }
-
-
         }
 
         return null;
@@ -360,14 +371,22 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     }
 
-//    public static <X> FloatFunction<X> neg(FloatFunction<X> f) {
-//        return (x) -> -f.floatValueOf(x);
-//    }
+    static Task match(NAR nar, long when, List<TaskRegion> tt) {
+        switch (tt.size()) {
+            case 0:
+                return null;
+            case 1:
+                return tt.get(0).task;
 
-//    protected MutableList<TaskRegion> timeDistanceSortedList(long start, long end, long now) {
-//        RTreeCursor<TaskRegion> c = cursor(start, end);
-//        return c.listSorted((t) -> t.task.timeDistance(now));
-//    }
+            default:
+                Task a = tt.get(0).task;
+                Task b = tt.get(1).task;
+
+                Task c = Revision.merge(a, b, when, nar.confMin.floatValue(), nar.random());
+                return c != null ? c : a;
+        }
+    }
+
 
     private RTreeCursor<TaskRegion> cursor(long start, long end) {
         return tree.cursor(timeRange(start, end));
@@ -387,12 +406,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public void add(@NotNull Task x, BaseConcept c, NAR n) {
 
-        if (x instanceof SignalTask && ((SignalTask) x).stretchKey != null)
-            return; //already added and being managed
+
+//        if (x instanceof SignalTask && ((SignalTask) x).stretchKey != null)
+//            return; //already added and being managed
 
         this.nar = n;
 
-        TaskRegion tr = new TaskRegion(x);
+        TaskRegion tr = x instanceof SignalTask && ((SignalTask) x).stretchKey != null ?
+                            ((TaskRegion)((SignalTask) x).stretchKey) :
+                            new TaskRegion(x);
+
         if (tree.add(tr)) {
 
             if (x instanceof SignalTask)
@@ -401,15 +424,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             //check capacity overage
             int over = size() + 1 - capacity;
             if (over > 0) {
-                List<Task> toActivate = addAfterCompressing(tr, n);
-
-                for (int i = 0, toActivateSize = toActivate.size(); i < toActivateSize; i++) {
-                    Task ii = toActivate.get(i);
-
-                    Activate aa = Activate.activate(ii, ii.priElseZero(), c, n);
-                    if (aa != null)
-                        n.input(aa);
-                }
+                addAfterCompressing(tr, n).forEach(ii ->
+                    n.input(Activate.activate(ii, ii.priElseZero(), c, n))
+                );
             }
         }
     }
@@ -447,7 +464,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 Top<TaskRegion> deleteVictim = new Top<>(weakestTask);
                 Top<Leaf<TaskRegion>> mergeVictim = new Top<>(weakestRegion);
 
-                compressNext(tree.root(), deleteVictim, mergeVictim, inputConf, nar);
+                compressNext(tree.root(), deleteVictim, mergeVictim, inputConf, now, dur);
 
                 //decide to remove or merge:
                 @Nullable TaskRegion toRemove = deleteVictim.the;
@@ -455,23 +472,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 if (toRemove == null && toMerge == null)
                     return; //failed to compress
 
-                //float confMin = toRemove != null ? toRemove.task.conf() : nar.confMin.floatValue();
                 Task activation = null;
-
-//                    if (toRemove != null && toMerge!=null) {
-//                        Truth toRemoveNow = toRemove.task.truth(now, dur);
-//                        TaskRegion toMergeRegion = (TaskRegion) (toMerge.region());
-//                        float toMergeNow = (float) toMergeRegion.center(2); /* confMean*/ //not a fair comparison, so i use confMax/n
-//                        if (toRemoveNow == null) {
-//                            toRemove = null;
-//                        } else {
-//                            if (toRemoveNow.conf() >= toMergeNow)
-//                                toMerge = null;
-//                            else
-//                                toRemove = null;
-//                        }
-//
-//                    }
 
                 if (toMerge != null && (activation = compressMerge(toMerge, now, dur, nar.confMin.floatValue(), nar.random())) != null) {
                     toActivate.add(activation);
@@ -535,34 +536,26 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         remove(t);
     }
 
-    private void compressNext(Node<TaskRegion, ?> next, Consumer<TaskRegion> deleteVictim, Consumer<Leaf<TaskRegion>> mergeVictim, float inputConf, NAR nar) {
+    void compressNext(Node<TaskRegion, ?> next, Consumer<TaskRegion> deleteVictim, Consumer<Leaf<TaskRegion>> mergeVictim, float inputConf, long now, int dur) {
         if (next instanceof Leaf) {
 
-            compressLeaf((Leaf) next, deleteVictim, inputConf, nar.time(), nar.dur());
+            compressLeaf((Leaf) next, deleteVictim, inputConf, now, dur);
 
             if (next.size() > 1)
                 mergeVictim.accept((Leaf) next);
 
         } else if (next instanceof Branch) {
-            compressBranch((Branch) next, deleteVictim, mergeVictim, inputConf, nar);
+            compressBranch((Branch) next, deleteVictim, mergeVictim, inputConf, now, dur);
         } else {
             throw new RuntimeException();
         }
     }
 
-    private void compressBranch(Branch<TaskRegion> b, Consumer<TaskRegion> deleteVictims, Consumer<Leaf<TaskRegion>> mergeVictims, float inputConf, NAR nar) {
+    void compressBranch(Branch<TaskRegion> b, Consumer<TaskRegion> deleteVictims, Consumer<Leaf<TaskRegion>> mergeVictims, float inputConf, long now, int dur) {
         //options:
         //a. smallest
         //b. oldest
         //c. other metrics
-
-        long now = nar.time();
-
-//        HyperRegion branchBounds = b.bounds();
-//        double branchTimeRange = branchBounds.range(0);
-//        double branchFreqRange = branchBounds.range(1);
-
-        int dur = nar.dur();
 
 
         //List<Node<TaskRegion, ?>> weakest = b.childMinList( weaknessTask(now, dur ), sizeBefore / 2);
@@ -586,13 +579,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
 
             if (weakest.a != null)
-                compressNext(weakest.a, deleteVictims, mergeVictims, inputConf, nar);
+                compressNext(weakest.a, deleteVictims, mergeVictims, inputConf, now, dur);
             if (weakest.b != null)
-                compressNext(weakest.b, deleteVictims, mergeVictims, inputConf, nar);
+                compressNext(weakest.b, deleteVictims, mergeVictims, inputConf, now, dur);
         }
     }
 
-    private void compressLeaf(Leaf<TaskRegion> l, Consumer<TaskRegion> deleteVictims, float inputConf, long now, int dur) {
+    void compressLeaf(Leaf<TaskRegion> l, Consumer<TaskRegion> deleteVictims, float inputConf, long now, int dur) {
 
         int size = l.size;
         Object[] ld = l.data;

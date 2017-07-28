@@ -36,7 +36,7 @@ package spacegraph.math;
  * x,y,z coordinates.
  *
  */
-public class Point3d extends Tuple3d implements java.io.Serializable {
+public class Point3d extends Tuple3d {
 
     // Compatible with 1.1
     static final long serialVersionUID = 5718062286069042927L;

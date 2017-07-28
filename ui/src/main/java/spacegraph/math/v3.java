@@ -41,7 +41,7 @@ import java.util.Random;
  * x,y,z coordinates.  If this value represents a normal, then it should
  * be normalized.
  */
-public class v3 extends Tuple3f implements java.io.Serializable {
+public class v3 extends Tuple3f {
 
     // Combatible with 1.1
     static final long serialVersionUID = -7031930069184524614L;

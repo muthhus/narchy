@@ -359,6 +359,7 @@ public class NAL7Test extends AbstractNALTest {
 
         TestNAR tester = test;
 
+        tester.log();
         tester.input("<(John,door) --> open>. :|:");
         tester.inputAt(4, "<(John,room) --> enter>. :|:");
 

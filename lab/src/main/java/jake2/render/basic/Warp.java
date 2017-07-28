@@ -242,6 +242,7 @@ public abstract class Warp extends Model {
      */
     final float[][] tmpVerts = new float[64][3];
 
+    @Override
     void GL_SubdivideSurface(msurface_t fa) {
         float[][] verts = tmpVerts;
         float[] vec;
@@ -277,6 +278,7 @@ public abstract class Warp extends Model {
      * 
      * Does a water warp on the pre-fragmented glpoly_t chain =============
      */
+    @Override
     void EmitWaterPolys(msurface_t fa) {
         glpoly_t p, bp;
         int i;
@@ -510,6 +512,7 @@ public abstract class Warp extends Model {
     /*
      * R_AddSkySurface
      */
+    @Override
     void R_AddSkySurface(msurface_t fa) {
         // calculate vertex values for sky box
         for (glpoly_t p = fa.polys; p != null; p = p.next) {
@@ -525,6 +528,7 @@ public abstract class Warp extends Model {
     /*
      * ============== R_ClearSkyBox ==============
      */
+    @Override
     void R_ClearSkyBox() {
         int i;
 
@@ -574,6 +578,7 @@ public abstract class Warp extends Model {
      */
     final int[] skytexorder = { 0, 2, 1, 3, 4, 5 };
 
+    @Override
     void R_DrawSkyBox() {
         int i;
 
@@ -621,6 +626,7 @@ public abstract class Warp extends Model {
     // 3dstudio environment map names
     final String[] suf = { "rt", "bk", "lf", "ft", "up", "dn" };
 
+    @Override
     public void R_SetSky(String name, float rotate, float[] axis) {
         assert (axis.length == 3) : "vec3_t bug";
         int i;

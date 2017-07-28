@@ -10,7 +10,7 @@ import nars.test.agent.Line1DSimplest;
 public class Line1DQ {
 
 
-    public static void main(String[] args) throws Narsese.NarseseException {
+    public static void main(String[] args) {
         //Param.DEBUG = true;
 
         NAR n = new NARS().get();

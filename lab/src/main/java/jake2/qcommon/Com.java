@@ -85,7 +85,7 @@ public final class Com
 		rd_flusher= null;
 	}
 
-	static boolean recursive= false;
+	static boolean recursive;
 
 	static String msg= "";
 
@@ -250,7 +250,8 @@ public final class Com
 
 	public static final xcommand_t Error_f= new xcommand_t()
 	{
-		public void execute() throws longjmpException
+		@Override
+        public void execute() throws longjmpException
 		{
 			Error(Defines.ERR_FATAL, Cmd.Argv(1));
 		}

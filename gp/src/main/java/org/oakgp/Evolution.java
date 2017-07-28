@@ -558,7 +558,7 @@ public final class Evolution {
     }
 
     private final class ProcessRunnerImpl implements ProcessRunner {
-        private Predicate<RankedCandidates> terminator;
+        private final Predicate<RankedCandidates> terminator;
 
         @SuppressWarnings("unchecked")
         private ProcessRunnerImpl(List<Predicate<RankedCandidates>> terminators) {

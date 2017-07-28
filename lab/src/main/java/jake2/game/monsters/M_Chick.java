@@ -640,7 +640,9 @@ public class M_Chick {
     static int sound_search;
 
     static final EntThinkAdapter ChickMoan = new EntThinkAdapter() {
-    	public String getID() { return "ChickMoan"; }
+    	@Override
+        public String getID() { return "ChickMoan"; }
+        @Override
         public boolean think(edict_t self) {
             if (Lib.random() < 0.5)
                 game_import_t.sound(self, Defines.CHAN_VOICE, sound_idle1, 1,
@@ -652,7 +654,7 @@ public class M_Chick {
         }
     };
 
-    static final mframe_t[] chick_frames_fidget = new mframe_t[] {
+    static final mframe_t[] chick_frames_fidget = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -685,7 +687,9 @@ public class M_Chick {
             new mframe_t(GameAI.ai_stand, 0, null) };
 
     static final EntThinkAdapter chick_stand = new EntThinkAdapter() {
-    	public String getID() { return "chick_stand"; }
+    	@Override
+        public String getID() { return "chick_stand"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = chick_move_stand;
             return true;
@@ -696,7 +700,9 @@ public class M_Chick {
             FRAME_stand230, chick_frames_fidget, chick_stand);
 
     static final EntThinkAdapter chick_fidget = new EntThinkAdapter() {
-    	public String getID() { return "chick_fidget"; }
+    	@Override
+        public String getID() { return "chick_fidget"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0)
                 return true;
@@ -706,7 +712,7 @@ public class M_Chick {
         }
     };
 
-    static final mframe_t[] chick_frames_stand = new mframe_t[] {
+    static final mframe_t[] chick_frames_stand = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -742,7 +748,9 @@ public class M_Chick {
             FRAME_stand130, chick_frames_stand, null);
 
     static final EntThinkAdapter chick_run = new EntThinkAdapter() {
-    	public String getID() { return "chick_run"; }
+    	@Override
+        public String getID() { return "chick_run"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0) {
                 self.monsterinfo.currentmove = chick_move_stand;
@@ -759,7 +767,7 @@ public class M_Chick {
         }
     };
 
-    static final mframe_t[] chick_frames_start_run = new mframe_t[] {
+    static final mframe_t[] chick_frames_start_run = {
             new mframe_t(GameAI.ai_run, 1, null),
             new mframe_t(GameAI.ai_run, 0, null),
             new mframe_t(GameAI.ai_run, 0, null),
@@ -774,7 +782,7 @@ public class M_Chick {
     static final mmove_t chick_move_start_run = new mmove_t(FRAME_walk01,
             FRAME_walk10, chick_frames_start_run, chick_run);
 
-    static final mframe_t[] chick_frames_run = new mframe_t[] {
+    static final mframe_t[] chick_frames_run = {
             new mframe_t(GameAI.ai_run, 6, null),
             new mframe_t(GameAI.ai_run, 8, null),
             new mframe_t(GameAI.ai_run, 13, null),
@@ -789,7 +797,7 @@ public class M_Chick {
     static final mmove_t chick_move_run = new mmove_t(FRAME_walk11, FRAME_walk20,
             chick_frames_run, null);
 
-    static final mframe_t[] chick_frames_walk = new mframe_t[] {
+    static final mframe_t[] chick_frames_walk = {
             new mframe_t(GameAI.ai_walk, 6, null),
             new mframe_t(GameAI.ai_walk, 8, null),
             new mframe_t(GameAI.ai_walk, 13, null),
@@ -805,14 +813,16 @@ public class M_Chick {
             chick_frames_walk, null);
 
     static final EntThinkAdapter chick_walk = new EntThinkAdapter() {
-    	public String getID() { return "chick_walk"; }
+    	@Override
+        public String getID() { return "chick_walk"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = chick_move_walk;
             return true;
         }
     };
 
-    static final mframe_t[] chick_frames_pain1 = new mframe_t[] {
+    static final mframe_t[] chick_frames_pain1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -822,7 +832,7 @@ public class M_Chick {
     static final mmove_t chick_move_pain1 = new mmove_t(FRAME_pain101, FRAME_pain105,
             chick_frames_pain1, chick_run);
 
-    static final mframe_t[] chick_frames_pain2 = new mframe_t[] {
+    static final mframe_t[] chick_frames_pain2 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -832,7 +842,7 @@ public class M_Chick {
     static final mmove_t chick_move_pain2 = new mmove_t(FRAME_pain201, FRAME_pain205,
             chick_frames_pain2, chick_run);
 
-    static final mframe_t[] chick_frames_pain3 = new mframe_t[] {
+    static final mframe_t[] chick_frames_pain3 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, -6, null),
@@ -859,7 +869,9 @@ public class M_Chick {
             chick_frames_pain3, chick_run);
 
     static final EntPainAdapter chick_pain = new EntPainAdapter() {
-    	public String getID() { return "chick_pain"; }
+    	@Override
+        public String getID() { return "chick_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
             float r;
 
@@ -895,7 +907,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter chick_dead = new EntThinkAdapter() {
-    	public String getID() { return "chick_dead"; }
+    	@Override
+        public String getID() { return "chick_dead"; }
+        @Override
         public boolean think(edict_t self) {
             Math3D.VectorSet(self.mins, -16, -16, 0);
             Math3D.VectorSet(self.maxs, 16, 16, 16);
@@ -907,7 +921,7 @@ public class M_Chick {
         }
     };
 
-    static final mframe_t[] chick_frames_death2 = new mframe_t[] {
+    static final mframe_t[] chick_frames_death2 = {
             new mframe_t(GameAI.ai_move, -6, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, -1, null),
@@ -935,7 +949,7 @@ public class M_Chick {
     static final mmove_t chick_move_death2 = new mmove_t(FRAME_death201,
             FRAME_death223, chick_frames_death2, chick_dead);
 
-    static final mframe_t[] chick_frames_death1 = new mframe_t[] {
+    static final mframe_t[] chick_frames_death1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, -7, null),
@@ -953,10 +967,12 @@ public class M_Chick {
             FRAME_death112, chick_frames_death1, chick_dead);
 
     static final EntDieAdapter chick_die = new EntDieAdapter() {
-    	public String getID() { return "chick_die"; }
+    	@Override
+        public String getID() { return "chick_die"; }
 
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             int n;
 
             //		   check for gib
@@ -1000,7 +1016,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter chick_duck_down = new EntThinkAdapter() {
-    	public String getID() { return "chick_duck_down"; }
+    	@Override
+        public String getID() { return "chick_duck_down"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_DUCKED) != 0)
                 return true;
@@ -1014,7 +1032,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter chick_duck_hold = new EntThinkAdapter() {
-    	public String getID() { return "chick_duck_hold"; }
+    	@Override
+        public String getID() { return "chick_duck_hold"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameBase.level.time >= self.monsterinfo.pausetime)
                 self.monsterinfo.aiflags &= ~Defines.AI_HOLD_FRAME;
@@ -1025,7 +1045,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter chick_duck_up = new EntThinkAdapter() {
-    	public String getID() { return "chick_duck_up"; }
+    	@Override
+        public String getID() { return "chick_duck_up"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.aiflags &= ~Defines.AI_DUCKED;
             self.maxs[2] += 32;
@@ -1035,7 +1057,7 @@ public class M_Chick {
         }
     };
 
-    static final mframe_t[] chick_frames_duck = new mframe_t[] {
+    static final mframe_t[] chick_frames_duck = {
             new mframe_t(GameAI.ai_move, 0, chick_duck_down),
             new mframe_t(GameAI.ai_move, 1, null),
             new mframe_t(GameAI.ai_move, 4, chick_duck_hold),
@@ -1048,7 +1070,9 @@ public class M_Chick {
             chick_frames_duck, chick_run);
 
     static final EntDodgeAdapter chick_dodge = new EntDodgeAdapter() {
-    	public String getID() { return "chick_dodge"; }
+    	@Override
+        public String getID() { return "chick_dodge"; }
+        @Override
         public void dodge(edict_t self, edict_t attacker, float eta) {
             if (Lib.random() > 0.25)
                 return;
@@ -1061,7 +1085,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter ChickSlash = new EntThinkAdapter() {
-    	public String getID() { return "ChickSlash"; }
+    	@Override
+        public String getID() { return "ChickSlash"; }
+        @Override
         public boolean think(edict_t self) {
             float[] aim = { 0, 0, 0 };
 
@@ -1074,7 +1100,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter ChickRocket = new EntThinkAdapter() {
-    	public String getID() { return "ChickRocket"; }
+    	@Override
+        public String getID() { return "ChickRocket"; }
+        @Override
         public boolean think(edict_t self) {
             float[] forward = { 0, 0, 0 }, right = { 0, 0, 0 };
             float[] start = { 0, 0, 0 };
@@ -1098,7 +1126,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter Chick_PreAttack1 = new EntThinkAdapter() {
-    	public String getID() { return "Chick_PreAttack1"; }
+    	@Override
+        public String getID() { return "Chick_PreAttack1"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_VOICE,
                     sound_missile_prelaunch, 1, Defines.ATTN_NORM, 0);
@@ -1107,7 +1137,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter ChickReload = new EntThinkAdapter() {
-    	public String getID() { return "ChickReload"; }
+    	@Override
+        public String getID() { return "ChickReload"; }
+        @Override
         public boolean think(edict_t self) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_missile_reload,
                     1, Defines.ATTN_NORM, 0);
@@ -1116,7 +1148,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter chick_attack1 = new EntThinkAdapter() {
-    	public String getID() { return "chick_attack1"; }
+    	@Override
+        public String getID() { return "chick_attack1"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = chick_move_attack1;
             return true;
@@ -1124,7 +1158,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter chick_rerocket = new EntThinkAdapter() {
-    	public String getID() { return "chick_rerocket"; }
+    	@Override
+        public String getID() { return "chick_rerocket"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.enemy.health > 0) {
                 if (GameUtil.range(self, self.enemy) > Defines.RANGE_MELEE)
@@ -1139,7 +1175,7 @@ public class M_Chick {
         }
     };
 
-    static final mframe_t[] chick_frames_start_attack1 = new mframe_t[] {
+    static final mframe_t[] chick_frames_start_attack1 = {
             new mframe_t(GameAI.ai_charge, 0, Chick_PreAttack1),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -1157,7 +1193,7 @@ public class M_Chick {
     static final mmove_t chick_move_start_attack1 = new mmove_t(FRAME_attak101,
             FRAME_attak113, chick_frames_start_attack1, null);
 
-    static final mframe_t[] chick_frames_attack1 = new mframe_t[] {
+    static final mframe_t[] chick_frames_attack1 = {
             new mframe_t(GameAI.ai_charge, 19, ChickRocket),
             new mframe_t(GameAI.ai_charge, -6, null),
             new mframe_t(GameAI.ai_charge, -5, null),
@@ -1176,7 +1212,7 @@ public class M_Chick {
     static final mmove_t chick_move_attack1 = new mmove_t(FRAME_attak114,
             FRAME_attak127, chick_frames_attack1, null);
 
-    static final mframe_t[] chick_frames_end_attack1 = new mframe_t[] {
+    static final mframe_t[] chick_frames_end_attack1 = {
             new mframe_t(GameAI.ai_charge, -3, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, -6, null),
@@ -1187,7 +1223,9 @@ public class M_Chick {
             FRAME_attak132, chick_frames_end_attack1, chick_run);
 
     static final EntThinkAdapter chick_reslash = new EntThinkAdapter() {
-    	public String getID() { return "chick_reslash"; }
+    	@Override
+        public String getID() { return "chick_reslash"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.enemy.health > 0) {
                 if (GameUtil.range(self, self.enemy) == Defines.RANGE_MELEE)
@@ -1204,7 +1242,7 @@ public class M_Chick {
         }
     };
 
-    static final mframe_t[] chick_frames_slash = new mframe_t[] {
+    static final mframe_t[] chick_frames_slash = {
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 7, ChickSlash),
             new mframe_t(GameAI.ai_charge, -7, null),
@@ -1218,7 +1256,7 @@ public class M_Chick {
     static final mmove_t chick_move_slash = new mmove_t(FRAME_attak204,
             FRAME_attak212, chick_frames_slash, null);
 
-    static final mframe_t[] chick_frames_end_slash = new mframe_t[] {
+    static final mframe_t[] chick_frames_end_slash = {
             new mframe_t(GameAI.ai_charge, -6, null),
             new mframe_t(GameAI.ai_charge, -1, null),
             new mframe_t(GameAI.ai_charge, -6, null),
@@ -1228,14 +1266,16 @@ public class M_Chick {
             FRAME_attak216, chick_frames_end_slash, chick_run);
 
     static final EntThinkAdapter chick_slash = new EntThinkAdapter() {
-    	public String getID() { return "chick_slash"; }
+    	@Override
+        public String getID() { return "chick_slash"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = chick_move_slash;
             return true;
         }
     };
 
-    static final mframe_t[] chick_frames_start_slash = new mframe_t[] {
+    static final mframe_t[] chick_frames_start_slash = {
             new mframe_t(GameAI.ai_charge, 1, null),
             new mframe_t(GameAI.ai_charge, 8, null),
             new mframe_t(GameAI.ai_charge, 3, null) };
@@ -1244,7 +1284,9 @@ public class M_Chick {
             FRAME_attak203, chick_frames_start_slash, chick_slash);
 
     static final EntThinkAdapter chick_melee = new EntThinkAdapter() {
-    	public String getID() { return "chick_melee"; }
+    	@Override
+        public String getID() { return "chick_melee"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = chick_move_start_slash;
             return true;
@@ -1252,7 +1294,9 @@ public class M_Chick {
     };
 
     static final EntThinkAdapter chick_attack = new EntThinkAdapter() {
-    	public String getID() { return "chick_attack"; }
+    	@Override
+        public String getID() { return "chick_attack"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.currentmove = chick_move_start_attack1;
             return true;
@@ -1260,7 +1304,9 @@ public class M_Chick {
     };
 
     static final EntInteractAdapter chick_sight = new EntInteractAdapter() {
-    	public String getID() { return "chick_sight"; }
+    	@Override
+        public String getID() { return "chick_sight"; }
+        @Override
         public boolean interact(edict_t self, edict_t other) {
             game_import_t.sound(self, Defines.CHAN_VOICE, sound_sight, 1,
                     Defines.ATTN_NORM, 0);

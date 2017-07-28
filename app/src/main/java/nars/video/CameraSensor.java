@@ -115,11 +115,11 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
             //'p';
 
             if (i >= sx && i >= sy) {
-                xy = Atomic.the(levelPrefix + x[ix++].toString() + y[iy++].toString());
+                xy = Atomic.the(levelPrefix + x[ix++].toString() + y[iy++]);
             } else if (i >= sx) {
                 xy = Atomic.the(levelPrefix + x[ix++].toString() + "_");
             } else { //if (i < y.length) {
-                xy = Atomic.the(levelPrefix + "_" + y[iy++].toString());
+                xy = Atomic.the(levelPrefix + "_" + y[iy++]);
             }
             r[i] = xy;
         }

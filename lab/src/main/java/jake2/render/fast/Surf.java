@@ -293,6 +293,7 @@ public abstract class Surf extends Draw {
      * The BSP tree is waled front to back, so unwinding the chain
      * of alpha_surfaces will draw back to front, giving proper ordering.
      */
+    @Override
     void R_DrawAlphaSurfaces() {
         r_world_matrix.clear();
         //
@@ -594,6 +595,7 @@ public abstract class Surf extends Draw {
     /**
      * R_DrawBrushModel
      */
+    @Override
     void R_DrawBrushModel(entity_t e) {
         if (currentmodel.nummodelsurfaces == 0)
             return;
@@ -787,6 +789,7 @@ public abstract class Surf extends Draw {
     /**
      * R_DrawWorld
      */
+    @Override
     void R_DrawWorld() {
         if (r_drawworld.value == 0)
             return;
@@ -843,6 +846,7 @@ public abstract class Surf extends Draw {
      * Mark the leaves and nodes that are in the PVS for the current
      * cluster
      */
+    @Override
     void R_MarkLeaves() {
         if (r_oldviewcluster == r_viewcluster && r_oldviewcluster2 == r_viewcluster2 && r_novis.value == 0 && r_viewcluster != -1)
             return;

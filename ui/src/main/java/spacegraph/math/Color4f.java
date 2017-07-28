@@ -46,7 +46,7 @@ import java.awt.*;
  * all colors.
  *
  */
-public class Color4f extends Tuple4f implements java.io.Serializable {
+public class Color4f extends Tuple4f {
 
     // Compatible with 1.1
     static final long serialVersionUID = 8577680141580006740L;

@@ -33,7 +33,7 @@ import java.util.Random;
 public class a extends GamePanel {
 
 	// keys
-	private boolean[] a = new boolean[32768];
+	private final boolean[] a = new boolean[32768];
 
 	@Override
 	public void start() {
@@ -41,7 +41,8 @@ public class a extends GamePanel {
 		new Thread(this).start();
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 
 		final int VK_LEFT = 0x25;
 		final int VK_RIGHT = 0x27;

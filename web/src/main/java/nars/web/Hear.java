@@ -8,7 +8,6 @@ import nars.*;
 import nars.concept.Concept;
 import nars.nlp.Twenglish;
 import nars.op.Command;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
@@ -37,7 +36,7 @@ public class Hear extends Loop {
     float confFactor = 1f;
 
     /** use 0 to disable the eternal off */
-    float offConf = 0f;
+    float offConf;
 
     public static Loop hear(NAR nar, String msg, String src, int wordDelayMS) {
         return hear(nar ,msg ,src, wordDelayMS, 1f);

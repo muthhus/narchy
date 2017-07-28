@@ -56,7 +56,7 @@ public class Globals extends Defines {
 	/*
 	 * global variables
 	 */
-	public static int curtime = 0;
+	public static int curtime;
 	public static boolean cmd_wait;
 
 	public static int alias_count;
@@ -129,7 +129,7 @@ public class Globals extends Defines {
 	public static int time_before_ref;
 	public static int time_after_ref;
 
-	public static FileWriter log_stats_file = null;
+	public static FileWriter log_stats_file;
 
 	public static cvar_t m_pitch;
 	public static cvar_t m_yaw;
@@ -349,7 +349,7 @@ public class Globals extends Defines {
 			-0.688191f, -0.587785f, -0.425325f }
 	};
 
-	public static boolean userinfo_modified = false;
+	public static boolean userinfo_modified;
 
 	public static cvar_t cvar_vars;
 	public static final console_t con = new console_t();
@@ -360,7 +360,7 @@ public class Globals extends Defines {
 
 	public static final String[] keybindings = new String[256];
 	public static final boolean[] keydown = new boolean[256];
-	public static boolean chat_team = false;
+	public static boolean chat_team;
 	public static String chat_buffer = "";
 	public static final byte[][] key_lines = new byte[32][];
 	public static int key_linepos;
@@ -380,7 +380,7 @@ public class Globals extends Defines {
 	public static final netadr_t net_from = new netadr_t();
 	
 	// logfile
-	public static RandomAccessFile logfile = null;
+	public static RandomAccessFile logfile;
 	
 	public static final float[] vec3_origin = { 0.0f, 0.0f, 0.0f };
 

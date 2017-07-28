@@ -1384,7 +1384,7 @@ public class KB {
      */
     public ArrayList ask(String kind, int argnum, String term) {
 
-        return (ArrayList) formulas.get(kind.compareTo("arg") == 0 ? kind + '-' + new Integer(argnum).toString() + '-' + term : kind + '-' + term);
+        return (ArrayList) formulas.get(kind.compareTo("arg") == 0 ? kind + '-' + new Integer(argnum) + '-' + term : kind + '-' + term);
     }
 
     /**
@@ -1409,7 +1409,7 @@ public class KB {
             Set keys = kif.formulas.keySet();
             for (Object key1 : keys) {
                 String key = (String) key1;
-                ArrayList newFormulas = new ArrayList((Collection) kif.formulas.get(key));
+                ArrayList newFormulas = new ArrayList(kif.formulas.get(key));
                 if (formulas.containsKey(key)) {
                     ArrayList oldFormulas = (ArrayList) formulas.get(key);
                     for (Object newFormula1 : newFormulas) {

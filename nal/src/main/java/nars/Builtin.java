@@ -97,25 +97,27 @@ public class Builtin {
             if (x == null)
                 return Null;
 
-            if (x instanceof Compound) {
-                Term index = c.sub(1, null);
-                int which;
-                if (index != null) {
-                    if (index instanceof Variable)
-                        return Null;
+            Term index = c.sub(1, Null);
+            if (index == Null)
+                return Null;
 
-                    which = $.intValue(index, -1);
-                    if (which < 0) {
-                        return Null;
-                    }
-                } else {
-                    //random
-                    which = nar.random().nextInt(x.size());
+            int which;
+            if (index != null) {
+                if (index instanceof Variable)
+                    return Null;
+
+                which = $.intValue(index, -1);
+                if (which < 0) {
+                    return Null;
                 }
-
-                return x.sub(which);
+            } else {
+                //random
+                which = nar.random().nextInt(x.size());
             }
-            return x;
+
+            return x.sub(which);
+
+
         }));
 
 
@@ -170,7 +172,7 @@ public class Builtin {
             if (!oo.in(CONJ.bit))
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
-            if (t.dt()==DTERNAL) {
+            if (t.dt() == DTERNAL) {
                 //HACK
                 //these wont be extracted as events in the below method, so use similar to the dropAnyConj
                 return $.func("dropAnyConj", t);

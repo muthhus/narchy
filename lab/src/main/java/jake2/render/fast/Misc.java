@@ -61,7 +61,8 @@ public final class Misc extends Mesh {
 		{0,0,0,0,0,0,0,0},
 	};
 
-	void R_InitParticleTexture()
+	@Override
+    void R_InitParticleTexture()
 	{
 		int		x,y;
 		byte[] data = new byte[8 * 8 * 4];
@@ -119,7 +120,8 @@ public final class Misc extends Mesh {
 	/**
 	 * GL_ScreenShot_f
 	 */
-	public void GL_ScreenShot_f() {
+	@Override
+    public void GL_ScreenShot_f() {
 	    StringBuilder sb = new StringBuilder(FS.Gamedir() + "/scrshot/jake00.tga");
 	    FS.CreatePath(sb.toString());
 	    File file = new File(sb.toString());
@@ -192,7 +194,8 @@ public final class Misc extends Mesh {
 	/*
 	** GL_Strings_f
 	*/
-	void GL_Strings_f()	{
+    @Override
+    void GL_Strings_f()	{
 		VID.Printf(Defines.PRINT_ALL, "GL_VENDOR: " + gl_config.vendor_string + '\n');
 		VID.Printf(Defines.PRINT_ALL, "GL_RENDERER: " + gl_config.renderer_string + '\n');
 		VID.Printf(Defines.PRINT_ALL, "GL_VERSION: " + gl_config.version_string + '\n');
@@ -202,7 +205,8 @@ public final class Misc extends Mesh {
 	/*
 	** GL_SetDefaultState
 	*/
-	void GL_SetDefaultState()
+    @Override
+    void GL_SetDefaultState()
 	{
 		gl.glClearColor(1f,0f, 0.5f , 0.5f); // original quake2
 		//gl.gl.glClearColor(0, 0, 0, 0); // replaced with black
@@ -272,7 +276,8 @@ public final class Misc extends Mesh {
 
 	}
 
-	void GL_UpdateSwapInterval()
+	@Override
+    void GL_UpdateSwapInterval()
 	{
 		if ( gl_swapinterval.modified )
 		{

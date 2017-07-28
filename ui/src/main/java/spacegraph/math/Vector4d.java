@@ -36,7 +36,7 @@ package spacegraph.math;
  * x,y,z,w coordinates.
  *
  */
-public class Vector4d extends Tuple4d implements java.io.Serializable {
+public class Vector4d extends Tuple4d {
 
     // Compatible with 1.1
     static final long serialVersionUID = 3938123424117448700L;

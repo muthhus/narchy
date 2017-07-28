@@ -30,10 +30,10 @@ public class Level {
 	private static final int DEFAULT_WIDTH = 256*4;
 	private static final int DEFAULT_HEIGHT = 256*6;
 
-	private int width = DEFAULT_WIDTH;
-	private int height = DEFAULT_HEIGHT;
+	private final int width = DEFAULT_WIDTH;
+	private final int height = DEFAULT_HEIGHT;
 	
-	private ArrayList<LevelObject> levelObjects = new ArrayList<LevelObject>();
+	private final ArrayList<LevelObject> levelObjects = new ArrayList<LevelObject>();
 	public GroupList groups = new GroupList();
 	
 	/**

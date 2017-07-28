@@ -237,7 +237,9 @@ public class GameTrigger {
 
     // the wait time has passed, so set back up for another activation
     public static final EntThinkAdapter multi_wait = new EntThinkAdapter() {
-    	public String getID(){ return "multi_wait"; }
+    	@Override
+        public String getID(){ return "multi_wait"; }
+        @Override
         public boolean think(edict_t ent) {
 
             ent.nextthink = 0;
@@ -246,7 +248,9 @@ public class GameTrigger {
     };
 
     static final EntUseAdapter Use_Multi = new EntUseAdapter() {
-    	public String getID(){ return "Use_Multi"; }
+    	@Override
+        public String getID(){ return "Use_Multi"; }
+        @Override
         public void use(edict_t ent, edict_t other, edict_t activator) {
             ent.activator = activator;
             multi_trigger(ent);
@@ -254,9 +258,11 @@ public class GameTrigger {
     };
 
     static final EntTouchAdapter Touch_Multi = new EntTouchAdapter() {
-    	public String getID(){ return "Touch_Multi"; }
+    	@Override
+        public String getID(){ return "Touch_Multi"; }
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             if (other.client != null) {
                 if ((self.spawnflags & 2) != 0)
                     return;
@@ -287,7 +293,9 @@ public class GameTrigger {
      * 1) secret 2) beep beep 3) large switch 4) set "message" to text string
      */
     static final EntUseAdapter trigger_enable = new EntUseAdapter() {
-    	public String getID(){ return "trigger_enable"; }
+    	@Override
+        public String getID(){ return "trigger_enable"; }
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             self.solid = Defines.SOLID_TRIGGER;
             self.use = Use_Multi;
@@ -300,7 +308,9 @@ public class GameTrigger {
      * trigger cannot be touched, it can only be fired by other events.
      */
     public static final EntUseAdapter trigger_relay_use = new EntUseAdapter() {
-    	public String getID(){ return "trigger_relay_use"; }
+    	@Override
+        public String getID(){ return "trigger_relay_use"; }
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             GameUtil.G_UseTargets(self, activator);
         }
@@ -321,7 +331,9 @@ public class GameTrigger {
      */
 
     static final EntUseAdapter trigger_key_use = new EntUseAdapter() {
-    	public String getID(){ return "trigger_key_use"; }
+    	@Override
+        public String getID(){ return "trigger_key_use"; }
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             int index;
 
@@ -397,8 +409,10 @@ public class GameTrigger {
      * fire all of it's targets and remove itself.
      */
     static final EntUseAdapter trigger_counter_use = new EntUseAdapter() {
-    	public String getID(){ return "trigger_counter_use"; }
+    	@Override
+        public String getID(){ return "trigger_counter_use"; }
 
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             if (self.count == 0)
                 return;
@@ -439,9 +453,11 @@ public class GameTrigger {
     public static int windsound;
 
     static final EntTouchAdapter trigger_push_touch = new EntTouchAdapter() {
-    	public String getID(){ return "trigger_push_touch"; }
+    	@Override
+        public String getID(){ return "trigger_push_touch"; }
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             if (Lib.strcmp(other.classname, "grenade") == 0) {
                 Math3D.VectorScale(self.movedir, self.speed * 10,
                         other.velocity);
@@ -478,8 +494,10 @@ public class GameTrigger {
      *  
      */
     static final EntUseAdapter hurt_use = new EntUseAdapter() {
-    	public String getID(){ return "hurt_use"; }
+    	@Override
+        public String getID(){ return "hurt_use"; }
 
+        @Override
         public void use(edict_t self, edict_t other, edict_t activator) {
             if (self.solid == Defines.SOLID_NOT)
                 self.solid = Defines.SOLID_TRIGGER;
@@ -493,9 +511,11 @@ public class GameTrigger {
     };
 
     static final EntTouchAdapter hurt_touch = new EntTouchAdapter() {
-    	public String getID(){ return "hurt_touch"; }
+    	@Override
+        public String getID(){ return "hurt_touch"; }
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             int dflags;
 
             if (other.takedamage == 0)
@@ -539,10 +559,12 @@ public class GameTrigger {
      */
 
     static final EntTouchAdapter trigger_gravity_touch = new EntTouchAdapter() {
-    	public String getID(){ return "trigger_gravity_touch"; }
+    	@Override
+        public String getID(){ return "trigger_gravity_touch"; }
 
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             other.gravity = self.gravity;
         }
     };
@@ -563,9 +585,11 @@ public class GameTrigger {
      */
 
     static final EntTouchAdapter trigger_monsterjump_touch = new EntTouchAdapter() {
-    	public String getID(){ return "trigger_monsterjump_touch"; }
+    	@Override
+        public String getID(){ return "trigger_monsterjump_touch"; }
+        @Override
         public void touch(edict_t self, edict_t other, cplane_t plane,
-                csurface_t surf) {
+                          csurface_t surf) {
             if ((other.flags & (Defines.FL_FLY | Defines.FL_SWIM)) != 0)
                 return;
             if ((other.svflags & Defines.SVF_DEADMONSTER) != 0)

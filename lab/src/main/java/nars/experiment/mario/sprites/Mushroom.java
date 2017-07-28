@@ -6,27 +6,27 @@ import nars.experiment.mario.LevelScene;
 
 public class Mushroom extends Sprite
 {
-    private static float GROUND_INERTIA = 0.89f;
-    private static float AIR_INERTIA = 0.89f;
+    private static final float GROUND_INERTIA = 0.89f;
+    private static final float AIR_INERTIA = 0.89f;
 
     private float runTime;
-    private boolean onGround = false;
+    private boolean onGround;
     @SuppressWarnings("unused")
-	private boolean mayJump = false;
+	private boolean mayJump;
     @SuppressWarnings("unused")
-	private int jumpTime = 0;
+	private int jumpTime;
     @SuppressWarnings("unused")
 	private float xJumpSpeed;
     @SuppressWarnings("unused")
 	private float yJumpSpeed;
 
-    private int width = 4;
+    private final int width = 4;
     int height = 24;
 
-    private LevelScene world;
+    private final LevelScene world;
     public int facing;
 
-    public boolean avoidCliffs = false;
+    public boolean avoidCliffs;
     private int life;
 
     public Mushroom(LevelScene world, int x, int y)
@@ -46,6 +46,7 @@ public class Mushroom extends Sprite
         life = 0;
     }
 
+    @Override
     public void collideCheck()
     {
         float xMarioD = world.mario.x - x;
@@ -61,6 +62,7 @@ public class Mushroom extends Sprite
         }
     }
 
+    @Override
     public void move()
     {
         if (life<9)
@@ -214,6 +216,7 @@ public class Mushroom extends Sprite
         return blocking;
     }
 
+    @Override
     public void bumpCheck(int xTile, int yTile)
     {
         if (x + width > xTile * 16 && x - width < xTile * 16 + 16 && yTile==(int)((y-1)/16))

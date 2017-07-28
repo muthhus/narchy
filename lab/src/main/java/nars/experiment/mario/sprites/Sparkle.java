@@ -30,6 +30,7 @@ public class Sparkle extends Sprite
         life = 10+(int)(Math.random()*timeSpan);
     }
 
+    @Override
     public void move()
     {
         if (life>10)

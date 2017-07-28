@@ -21,12 +21,12 @@ public class BomberMain extends JFrame {
     /** relative path for files */
     public static String RP = BomberMenu.class.getResource(".").getPath();
     /** menu object */
-    private BomberMenu menu = null;
+    private BomberMenu menu;
     /** game object */
-    private BomberGame game = null;
+    private BomberGame game;
 
     /** sound effect player */
-    public static BomberSndEffect sndEffectPlayer = null;
+    public static BomberSndEffect sndEffectPlayer;
     /** this is used to calculate the dimension of the game */
     public static final int shiftCount = 4;
     /** this is the size of each square in the game */
@@ -46,6 +46,7 @@ public class BomberMain extends JFrame {
              * Handles window closing events.
              * @param evt window event
              */
+            @Override
             public void windowClosing(WindowEvent evt) {
                 /** terminate the program */
                 System.exit(0);
@@ -58,6 +59,7 @@ public class BomberMain extends JFrame {
              * Handles key pressed events.
              * @param evt keyboard event
              */
+            @Override
             public void keyPressed(KeyEvent evt) {
                 if (menu != null) menu.keyPressed(evt);
                 if (game != null) game.keyPressed(evt);
@@ -67,6 +69,7 @@ public class BomberMain extends JFrame {
              * Handles key released events.
              * @param evt keyboard event
              */
+            @Override
             public void keyReleased(KeyEvent evt) {
                 if (game != null) game.keyReleased(evt);
             }

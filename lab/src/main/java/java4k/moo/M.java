@@ -11,8 +11,8 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferStrategy;
 import java.util.Random;
 
-public class M extends GamePanel implements Runnable, MouseListener, KeyListener {
-	MouseEvent click = null;
+public class M extends GamePanel {
+	MouseEvent click;
 	boolean key[] = new boolean[65535];
 	BufferStrategy strategy;
 	Random r = new Random();
@@ -556,7 +556,8 @@ public class M extends GamePanel implements Runnable, MouseListener, KeyListener
 		return hps > 1 && e_human[selE];
 	}
 
-	public void run() {
+	@Override
+    public void run() {
 		int p;
 		for (p = 0; p < 24; p++) {
 			search: while (true) {
@@ -775,21 +776,29 @@ public class M extends GamePanel implements Runnable, MouseListener, KeyListener
 		}
 	}
 
-	public void mouseClicked(MouseEvent e) {}
-	public void mousePressed(MouseEvent e) {
+	@Override
+    public void mouseClicked(MouseEvent e) {}
+	@Override
+    public void mousePressed(MouseEvent e) {
 		click = e;
 	}
-	public void mouseReleased(MouseEvent e) {}
-	public void mouseEntered(MouseEvent e) {}
-	public void mouseExited(MouseEvent e) {}
+	@Override
+    public void mouseReleased(MouseEvent e) {}
+	@Override
+    public void mouseEntered(MouseEvent e) {}
+	@Override
+    public void mouseExited(MouseEvent e) {}
 
-	public void keyTyped(KeyEvent e) {}
+	@Override
+    public void keyTyped(KeyEvent e) {}
 
-	public void keyPressed(KeyEvent e) {
-		key[((KeyEvent) e).getKeyCode()] = true;
+	@Override
+    public void keyPressed(KeyEvent e) {
+		key[e.getKeyCode()] = true;
 	}
 
-	public void keyReleased(KeyEvent e) {
-		key[((KeyEvent) e).getKeyCode()] = false;
+	@Override
+    public void keyReleased(KeyEvent e) {
+		key[e.getKeyCode()] = false;
 	}
 }

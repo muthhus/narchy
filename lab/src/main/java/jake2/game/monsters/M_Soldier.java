@@ -1005,7 +1005,9 @@ public class M_Soldier {
     static int sound_cock;
 
     static final EntThinkAdapter soldier_dead = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_dead"; }
+    	@Override
+        public String getID(){ return "soldier_dead"; }
+        @Override
         public boolean think(edict_t self) {
 
             Math3D.VectorSet(self.mins, -16, -16, -24);
@@ -1019,9 +1021,11 @@ public class M_Soldier {
     };
 
     static final EntDieAdapter soldier_die = new EntDieAdapter() {
-    	public String getID(){ return "soldier_die"; }
+    	@Override
+        public String getID(){ return "soldier_die"; }
+        @Override
         public void die(edict_t self, edict_t inflictor, edict_t attacker,
-                int damage, float[] point) {
+                        int damage, float[] point) {
             int n;
 
             // check for gib
@@ -1082,7 +1086,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_attack1_refire1 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_attack1_refire1"; }
+    	@Override
+        public String getID(){ return "soldier_attack1_refire1"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.s.skinnum > 1)
                 return true;
@@ -1100,7 +1106,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_attack1_refire2 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_attack1_refire2"; }
+    	@Override
+        public String getID(){ return "soldier_attack1_refire2"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.s.skinnum < 2)
                 return true;
@@ -1116,7 +1124,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_attack2_refire1 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_attack2_refire1"; }
+    	@Override
+        public String getID(){ return "soldier_attack2_refire1"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.s.skinnum > 1)
                 return true;
@@ -1134,7 +1144,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_attack2_refire2 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_attack2_refire2"; }
+    	@Override
+        public String getID(){ return "soldier_attack2_refire2"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.s.skinnum < 2)
                 return true;
@@ -1150,7 +1162,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_attack3_refire = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_attack3_refire"; }
+    	@Override
+        public String getID(){ return "soldier_attack3_refire"; }
+        @Override
         public boolean think(edict_t self) {
             if ((GameBase.level.time + 0.4) < self.monsterinfo.pausetime)
                 self.monsterinfo.nextframe = FRAME_attak303;
@@ -1159,7 +1173,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_attack6_refire = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_attack6_refire"; }
+    	@Override
+        public String getID(){ return "soldier_attack6_refire"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.enemy.health <= 0)
                 return true;
@@ -1175,7 +1191,9 @@ public class M_Soldier {
 
     // ATTACK6 (run & shoot)
     static final EntThinkAdapter soldier_fire8 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_fire8"; }
+    	@Override
+        public String getID(){ return "soldier_fire8"; }
+        @Override
         public boolean think(edict_t self) {
             soldier_fire(self, 7);
             return true;
@@ -1185,7 +1203,9 @@ public class M_Soldier {
     // ATTACK1 (blaster/shotgun)
 
     static final EntThinkAdapter soldier_fire1 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_fire1"; }
+    	@Override
+        public String getID(){ return "soldier_fire1"; }
+        @Override
         public boolean think(edict_t self) {
             soldier_fire(self, 0);
             return true;
@@ -1195,7 +1215,9 @@ public class M_Soldier {
     // ATTACK2 (blaster/shotgun)
 
     static final EntThinkAdapter soldier_fire2 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_fire2"; }
+    	@Override
+        public String getID(){ return "soldier_fire2"; }
+        @Override
         public boolean think(edict_t self) {
             soldier_fire(self, 1);
             return true;
@@ -1203,7 +1225,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_duck_down = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_duck_down"; }
+    	@Override
+        public String getID(){ return "soldier_duck_down"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_DUCKED) != 0)
                 return true;
@@ -1217,7 +1241,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_fire3 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_fire3"; }
+    	@Override
+        public String getID(){ return "soldier_fire3"; }
+        @Override
         public boolean think(edict_t self) {
             soldier_duck_down.think(self);
             soldier_fire(self, 2);
@@ -1228,7 +1254,9 @@ public class M_Soldier {
     // ATTACK4 (machinegun)
 
     static final EntThinkAdapter soldier_fire4 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_fire4"; }
+    	@Override
+        public String getID(){ return "soldier_fire4"; }
+        @Override
         public boolean think(edict_t self) {
             soldier_fire(self, 3);
             //
@@ -1247,7 +1275,9 @@ public class M_Soldier {
     //
 
     static final EntThinkAdapter soldier_fire6 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_fire6"; }
+    	@Override
+        public String getID(){ return "soldier_fire6"; }
+        @Override
         public boolean think(edict_t self) {
             soldier_fire(self, 5);
             return true;
@@ -1255,7 +1285,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_fire7 = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_fire7"; }
+    	@Override
+        public String getID(){ return "soldier_fire7"; }
+        @Override
         public boolean think(edict_t self) {
             soldier_fire(self, 6);
             return true;
@@ -1263,7 +1295,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_idle = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_idle"; }
+    	@Override
+        public String getID(){ return "soldier_idle"; }
+        @Override
         public boolean think(edict_t self) {
             if (Lib.random() > 0.8)
                 game_import_t.sound(self, Defines.CHAN_VOICE, sound_idle, 1,
@@ -1273,7 +1307,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_stand = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_stand"; }
+    	@Override
+        public String getID(){ return "soldier_stand"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.currentmove == soldier_move_stand3)
                     || (Lib.random() < 0.8))
@@ -1288,7 +1324,9 @@ public class M_Soldier {
     // WALK
     //
     static final EntThinkAdapter soldier_walk1_random = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_walk1_random"; }
+    	@Override
+        public String getID(){ return "soldier_walk1_random"; }
+        @Override
         public boolean think(edict_t self) {
             if (Lib.random() > 0.1)
                 self.monsterinfo.nextframe = FRAME_walk101;
@@ -1297,7 +1335,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_walk = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_walk"; }
+    	@Override
+        public String getID(){ return "soldier_walk"; }
+        @Override
         public boolean think(edict_t self) {
             if (Lib.random() < 0.5)
                 self.monsterinfo.currentmove = soldier_move_walk1;
@@ -1308,7 +1348,9 @@ public class M_Soldier {
     };
 
     static final EntThinkAdapter soldier_run = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_run"; }
+    	@Override
+        public String getID(){ return "soldier_run"; }
+        @Override
         public boolean think(edict_t self) {
             if ((self.monsterinfo.aiflags & Defines.AI_STAND_GROUND) != 0) {
                 self.monsterinfo.currentmove = soldier_move_stand1;
@@ -1327,7 +1369,9 @@ public class M_Soldier {
     };
 
     static final EntPainAdapter soldier_pain = new EntPainAdapter() {
-    	public String getID(){ return "soldier_pain"; }
+    	@Override
+        public String getID(){ return "soldier_pain"; }
+        @Override
         public void pain(edict_t self, edict_t other, float kick, int damage) {
             float r;
             int n;
@@ -1380,7 +1424,9 @@ public class M_Soldier {
     //
 
     static final EntThinkAdapter soldier_duck_up = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_duck_up"; }
+    	@Override
+        public String getID(){ return "soldier_duck_up"; }
+        @Override
         public boolean think(edict_t self) {
             self.monsterinfo.aiflags &= ~Defines.AI_DUCKED;
             self.maxs[2] += 32;
@@ -1391,7 +1437,9 @@ public class M_Soldier {
     };
 
     static final EntInteractAdapter soldier_sight = new EntInteractAdapter() {
-    	public String getID(){ return "soldier_sight"; }
+    	@Override
+        public String getID(){ return "soldier_sight"; }
+        @Override
         public boolean interact(edict_t self, edict_t other) {
             if (Lib.random() < 0.5)
                 game_import_t.sound(self, Defines.CHAN_VOICE, sound_sight1, 1,
@@ -1414,7 +1462,9 @@ public class M_Soldier {
     //
 
     static final EntThinkAdapter SP_monster_soldier_x = new EntThinkAdapter() {
-    	public String getID(){ return "SP_monster_soldier_x"; }
+    	@Override
+        public String getID(){ return "SP_monster_soldier_x"; }
+        @Override
         public boolean think(edict_t self) {
 
             self.s.modelindex = game_import_t
@@ -1457,7 +1507,9 @@ public class M_Soldier {
      * Trigger_Spawn Sight
      */
     public static final EntThinkAdapter SP_monster_soldier_light = new EntThinkAdapter() {
-    	public String getID(){ return "SP_monster_soldier_light"; }
+    	@Override
+        public String getID(){ return "SP_monster_soldier_light"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameBase.deathmatch.value != 0) {
                 GameUtil.G_FreeEdict(self);
@@ -1485,7 +1537,9 @@ public class M_Soldier {
      */
 
     public static final EntThinkAdapter SP_monster_soldier = new EntThinkAdapter() {
-    	public String getID(){ return "SP_monster_soldier"; }
+    	@Override
+        public String getID(){ return "SP_monster_soldier"; }
+        @Override
         public boolean think(edict_t self) {
             Com.DPrintf("Spawning a soldier at " + self.s.origin[0] + ' ' +
                     self.s.origin[1] + ' ' +
@@ -1515,7 +1569,9 @@ public class M_Soldier {
      * Trigger_Spawn Sight
      */
     public static final EntThinkAdapter SP_monster_soldier_ss = new EntThinkAdapter() {
-    	public String getID(){ return "SP_monster_soldier_ss"; }
+    	@Override
+        public String getID(){ return "SP_monster_soldier_ss"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameBase.deathmatch.value != 0) {
                 GameUtil.G_FreeEdict(self);
@@ -1600,7 +1656,9 @@ public class M_Soldier {
     }
 
     static final EntThinkAdapter soldier_cock = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_cock"; }
+    	@Override
+        public String getID(){ return "soldier_cock"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.s.frame == FRAME_stand322)
                 game_import_t.sound(self, Defines.CHAN_WEAPON, sound_cock, 1,
@@ -1613,7 +1671,7 @@ public class M_Soldier {
     };
 
     // STAND
-    static final mframe_t[] soldier_frames_stand1 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_stand1 = {
             new mframe_t(GameAI.ai_stand, 0, soldier_idle),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -1648,7 +1706,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_stand1 = new mmove_t(FRAME_stand101,
             FRAME_stand130, soldier_frames_stand1, soldier_stand);
 
-    static final mframe_t[] soldier_frames_stand3 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_stand3 = {
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
             new mframe_t(GameAI.ai_stand, 0, null),
@@ -1692,7 +1750,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_stand3 = new mmove_t(FRAME_stand301,
             FRAME_stand339, soldier_frames_stand3, soldier_stand);
 
-    static final mframe_t[] soldier_frames_walk1 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_walk1 = {
             new mframe_t(GameAI.ai_walk, 3, null),
             new mframe_t(GameAI.ai_walk, 6, null),
             new mframe_t(GameAI.ai_walk, 2, null),
@@ -1730,7 +1788,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_walk1 = new mmove_t(FRAME_walk101,
             FRAME_walk133, soldier_frames_walk1, null);
 
-    static final mframe_t[] soldier_frames_walk2 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_walk2 = {
             new mframe_t(GameAI.ai_walk, 4, null),
             new mframe_t(GameAI.ai_walk, 4, null),
             new mframe_t(GameAI.ai_walk, 9, null),
@@ -1749,14 +1807,14 @@ public class M_Soldier {
     // RUN
     //
 
-    static final mframe_t[] soldier_frames_start_run = new mframe_t[] {
+    static final mframe_t[] soldier_frames_start_run = {
             new mframe_t(GameAI.ai_run, 7, null),
             new mframe_t(GameAI.ai_run, 5, null) };
 
     static final mmove_t soldier_move_start_run = new mmove_t(FRAME_run01,
             FRAME_run02, soldier_frames_start_run, soldier_run);
 
-    static final mframe_t[] soldier_frames_run = new mframe_t[] {
+    static final mframe_t[] soldier_frames_run = {
             new mframe_t(GameAI.ai_run, 10, null),
             new mframe_t(GameAI.ai_run, 11, null),
             new mframe_t(GameAI.ai_run, 11, null),
@@ -1772,7 +1830,9 @@ public class M_Soldier {
     //
 
     static final EntThinkAdapter soldier_duck_hold = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_duck_hold"; }
+    	@Override
+        public String getID(){ return "soldier_duck_hold"; }
+        @Override
         public boolean think(edict_t self) {
             if (GameBase.level.time >= self.monsterinfo.pausetime)
                 self.monsterinfo.aiflags &= ~Defines.AI_HOLD_FRAME;
@@ -1786,7 +1846,7 @@ public class M_Soldier {
     // PAIN
     //
 
-    static final mframe_t[] soldier_frames_pain1 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_pain1 = {
             new mframe_t(GameAI.ai_move, -3, null),
             new mframe_t(GameAI.ai_move, 4, null),
             new mframe_t(GameAI.ai_move, 1, null),
@@ -1796,7 +1856,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_pain1 = new mmove_t(FRAME_pain101,
             FRAME_pain105, soldier_frames_pain1, soldier_run);
 
-    static final mframe_t[] soldier_frames_pain2 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_pain2 = {
             new mframe_t(GameAI.ai_move, -13, null),
             new mframe_t(GameAI.ai_move, -1, null),
             new mframe_t(GameAI.ai_move, 2, null),
@@ -1808,7 +1868,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_pain2 = new mmove_t(FRAME_pain201,
             FRAME_pain207, soldier_frames_pain2, soldier_run);
 
-    static final mframe_t[] soldier_frames_pain3 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_pain3 = {
             new mframe_t(GameAI.ai_move, -8, null),
             new mframe_t(GameAI.ai_move, 10, null),
             new mframe_t(GameAI.ai_move, -4, null),
@@ -1831,7 +1891,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_pain3 = new mmove_t(FRAME_pain301,
             FRAME_pain318, soldier_frames_pain3, soldier_run);
 
-    static final mframe_t[] soldier_frames_pain4 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_pain4 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -1875,7 +1935,7 @@ public class M_Soldier {
             Defines.MZ2_SOLDIER_MACHINEGUN_6, Defines.MZ2_SOLDIER_MACHINEGUN_7,
             Defines.MZ2_SOLDIER_MACHINEGUN_8 };
 
-    static final mframe_t[] soldier_frames_attack1 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_attack1 = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, soldier_fire1),
@@ -1892,7 +1952,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_attack1 = new mmove_t(FRAME_attak101,
             FRAME_attak112, soldier_frames_attack1, soldier_run);
 
-    static final mframe_t[] soldier_frames_attack2 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_attack2 = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
@@ -1915,7 +1975,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_attack2 = new mmove_t(FRAME_attak201,
             FRAME_attak218, soldier_frames_attack2, soldier_run);
 
-    static final mframe_t[] soldier_frames_attack3 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_attack3 = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, soldier_fire3),
@@ -1929,7 +1989,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_attack3 = new mmove_t(FRAME_attak301,
             FRAME_attak309, soldier_frames_attack3, soldier_run);
 
-    static final mframe_t[] soldier_frames_attack4 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_attack4 = {
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, null),
             new mframe_t(GameAI.ai_charge, 0, soldier_fire4),
@@ -1940,7 +2000,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_attack4 = new mmove_t(FRAME_attak401,
             FRAME_attak406, soldier_frames_attack4, soldier_run);
 
-    static final mframe_t[] soldier_frames_attack6 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_attack6 = {
             new mframe_t(GameAI.ai_charge, 10, null),
             new mframe_t(GameAI.ai_charge, 4, null),
             new mframe_t(GameAI.ai_charge, 12, null),
@@ -1959,7 +2019,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_attack6 = new mmove_t(FRAME_runs01,
             FRAME_runs14, soldier_frames_attack6, soldier_run);
 
-    static final mframe_t[] soldier_frames_duck = new mframe_t[] {
+    static final mframe_t[] soldier_frames_duck = {
             new mframe_t(GameAI.ai_move, 5, soldier_duck_down),
             new mframe_t(GameAI.ai_move, -1, soldier_duck_hold),
             new mframe_t(GameAI.ai_move, 1, null),
@@ -1969,7 +2029,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_duck = new mmove_t(FRAME_duck01, FRAME_duck05,
             soldier_frames_duck, soldier_run);
 
-    static final mframe_t[] soldier_frames_death1 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_death1 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, -10, null),
             new mframe_t(GameAI.ai_move, -10, null),
@@ -2010,7 +2070,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_death1 = new mmove_t(FRAME_death101,
             FRAME_death136, soldier_frames_death1, soldier_dead);
 
-    static final mframe_t[] soldier_frames_death2 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_death2 = {
             new mframe_t(GameAI.ai_move, -5, null),
             new mframe_t(GameAI.ai_move, -5, null),
             new mframe_t(GameAI.ai_move, -5, null),
@@ -2050,7 +2110,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_death2 = new mmove_t(FRAME_death201,
             FRAME_death235, soldier_frames_death2, soldier_dead);
 
-    static final mframe_t[] soldier_frames_death3 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_death3 = {
             new mframe_t(GameAI.ai_move, -5, null),
             new mframe_t(GameAI.ai_move, -5, null),
             new mframe_t(GameAI.ai_move, -5, null),
@@ -2100,7 +2160,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_death3 = new mmove_t(FRAME_death301,
             FRAME_death345, soldier_frames_death3, soldier_dead);
 
-    static final mframe_t[] soldier_frames_death4 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_death4 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -2158,7 +2218,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_death4 = new mmove_t(FRAME_death401,
             FRAME_death453, soldier_frames_death4, soldier_dead);
 
-    static final mframe_t[] soldier_frames_death5 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_death5 = {
             new mframe_t(GameAI.ai_move, -5, null),
             new mframe_t(GameAI.ai_move, -5, null),
             new mframe_t(GameAI.ai_move, -5, null),
@@ -2187,7 +2247,7 @@ public class M_Soldier {
     static final mmove_t soldier_move_death5 = new mmove_t(FRAME_death501,
             FRAME_death524, soldier_frames_death5, soldier_dead);
 
-    static final mframe_t[] soldier_frames_death6 = new mframe_t[] {
+    static final mframe_t[] soldier_frames_death6 = {
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
             new mframe_t(GameAI.ai_move, 0, null),
@@ -2205,7 +2265,9 @@ public class M_Soldier {
     // ATTACK3 (duck and shoot)
 
     static final EntThinkAdapter soldier_attack = new EntThinkAdapter() {
-    	public String getID(){ return "soldier_attack"; }
+    	@Override
+        public String getID(){ return "soldier_attack"; }
+        @Override
         public boolean think(edict_t self) {
             if (self.s.skinnum < 4) {
                 if (Lib.random() < 0.5)
@@ -2220,7 +2282,9 @@ public class M_Soldier {
     };
 
     static final EntDodgeAdapter soldier_dodge = new EntDodgeAdapter() {
-    	public String getID(){ return "soldier_dodge"; }
+    	@Override
+        public String getID(){ return "soldier_dodge"; }
+        @Override
         public void dodge(edict_t self, edict_t attacker, float eta) {
             float r;
 

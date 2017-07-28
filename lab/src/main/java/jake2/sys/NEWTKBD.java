@@ -9,12 +9,13 @@ final public class NEWTKBD extends KBD
 {
 	public static final InputListener listener = new InputListener();
 	// static Cursor emptyCursor = null;
-	static Window c = null;
+	static Window c;
 	
-	static int win_w2 = 0;
-	static int win_h2 = 0;
+	static int win_w2;
+	static int win_h2;
 	
-	public void Init() {
+	@Override
+    public void Init() {
 	}
 
         // Used only for the applet case
@@ -23,12 +24,14 @@ final public class NEWTKBD extends KBD
             handleCreateAndConfigureNotify(window);
         }
 
-	public void Update() {
+	@Override
+    public void Update() {
 		// get events
 		HandleEvents();
 	}
 
-	public void Close() {
+	@Override
+    public void Close() {
 	}
 	
 	private void HandleEvents() 
@@ -197,7 +200,8 @@ final public class NEWTKBD extends KBD
 		return key;
 	}
 	
-	public void Do_Key_Event(int key, boolean down) {
+	@Override
+    public void Do_Key_Event(int key, boolean down) {
 		Key.Event(key, down, Timer.Milliseconds());
 	}
 	
@@ -205,7 +209,8 @@ final public class NEWTKBD extends KBD
 	    c.warpPointer(c.getWidth()/2, c.getHeight()/2);
 	}
 	
-	public void installGrabs()
+	@Override
+    public void installGrabs()
 	{
 	    /*
 		if (emptyCursor == null) {
@@ -218,7 +223,8 @@ final public class NEWTKBD extends KBD
 	    centerMouse();
 	}
 	
-	public void uninstallGrabs()
+	@Override
+    public void uninstallGrabs()
 	{
 	    /*
 		c.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));

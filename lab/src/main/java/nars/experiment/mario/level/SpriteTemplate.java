@@ -9,10 +9,10 @@ public class SpriteTemplate
 {
     public int lastVisibleTick = -1;
     public Sprite sprite;
-    public boolean isDead = false;
-    private boolean winged;
+    public boolean isDead;
+    private final boolean winged;
     
-    private int type;
+    private final int type;
     
     public SpriteTemplate(int type, boolean winged)
     {

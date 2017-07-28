@@ -36,7 +36,7 @@ public abstract class glpoly_t {
 	public int flags; // for SURF_UNDERWATER (not needed anymore?)
 	
 	// the array position (glDrawArrays) 
-	public int pos = 0;
+	public int pos;
 	
 	protected glpoly_t() {
 	}

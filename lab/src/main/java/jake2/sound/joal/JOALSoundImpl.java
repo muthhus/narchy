@@ -52,7 +52,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.SoundImpl#Init()
 	 */
-	public boolean Init() {
+	@Override
+    public boolean Init() {
 		        
 		try {
 		    alc = ALFactory.getALC();
@@ -77,22 +78,26 @@ public final class JOALSoundImpl implements Sound {
 		Com.Printf("... using " + count + " channels\n");
 		al.alDistanceModel(AL.AL_INVERSE_DISTANCE_CLAMPED);
 		Cmd.AddCommand("play", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				Play();
 			}
 		});
 		Cmd.AddCommand("stopsound", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				StopAllSounds();
 			}
 		});
 		Cmd.AddCommand("soundlist", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				SoundList();
 			}
 		});
 		Cmd.AddCommand("soundinfo", new xcommand_t() {
-			public void execute() {
+			@Override
+            public void execute() {
 				SoundInfo_f();
 			}
 		});
@@ -159,7 +164,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.SoundImpl#Shutdown()
 	 */
-	public void Shutdown() {
+	@Override
+    public void Shutdown() {
 		StopAllSounds();
 		Channel.shutdown();
 		al.alDeleteBuffers(buffers.length, buffers, 0);
@@ -183,7 +189,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.SoundImpl#StartSound(float[], int, int, jake2.sound.sfx_t, float, float, float)
 	 */
-	public void StartSound(float[] origin, int entnum, int entchannel, sfx_t sfx, float fvol, float attenuation, float timeofs) {
+	@Override
+    public void StartSound(float[] origin, int entnum, int entchannel, sfx_t sfx, float fvol, float attenuation, float timeofs) {
 
 		if (sfx == null)
 			return;
@@ -208,7 +215,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.SoundImpl#Update(float[], float[], float[], float[])
 	 */
-	public void Update(float[] origin, float[] forward, float[] right, float[] up) {
+	@Override
+    public void Update(float[] origin, float[] forward, float[] right, float[] up) {
 		Channel.convertVector(origin, listenerOrigin);		
 		al.alListenerfv(AL.AL_POSITION, listenerOrigin, 0);
 
@@ -248,7 +256,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.SoundImpl#StopAllSounds()
 	 */
-	public void StopAllSounds() {
+	@Override
+    public void StopAllSounds() {
 		// mute the listener (master)
 		if (al!=null)
 			al.alListenerf(AL.AL_GAIN, 0);
@@ -259,7 +268,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#getName()
 	 */
-	public String getName() {
+	@Override
+    public String getName() {
 		return "joal";
 	}
 
@@ -269,7 +279,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#BeginRegistration()
 	 */
-	public void BeginRegistration() {
+	@Override
+    public void BeginRegistration() {
 		s_registration_sequence++;
 		s_registering = true;
 	}
@@ -277,7 +288,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#RegisterSound(java.lang.String)
 	 */
-	public sfx_t RegisterSound(String name) {
+	@Override
+    public sfx_t RegisterSound(String name) {
 		sfx_t sfx = FindName(name, true);
 		sfx.registration_sequence = s_registration_sequence;
 
@@ -290,7 +302,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#EndRegistration()
 	 */
-	public void EndRegistration() {
+	@Override
+    public void EndRegistration() {
 		int i;
 		sfx_t sfx;
 
@@ -470,7 +483,8 @@ public final class JOALSoundImpl implements Sound {
 	/* (non-Javadoc)
 	 * @see jake2.sound.Sound#StartLocalSound(java.lang.String)
 	 */
-	public void StartLocalSound(String sound) {
+	@Override
+    public void StartLocalSound(String sound) {
 		sfx_t sfx = RegisterSound(sound);
 		if (sfx == null) {
 			Com.Printf("S_StartLocalSound: can't cache " + sound + '\n');
@@ -484,6 +498,7 @@ public final class JOALSoundImpl implements Sound {
     /* (non-Javadoc)
      * @see jake2.sound.Sound#RawSamples(int, int, int, int, byte[])
      */
+    @Override
     public void RawSamples(int samples, int rate, int width, int channels, ByteBuffer data) {
         int format;
         if (channels == 2) {
@@ -510,6 +525,7 @@ public final class JOALSoundImpl implements Sound {
         Channel.updateStream(data, samples * channels * width, format, rate);
     }
     
+    @Override
     public void disableStreaming() {
         Channel.disableStreaming();
     }
