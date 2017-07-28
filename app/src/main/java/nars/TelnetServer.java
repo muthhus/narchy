@@ -1,5 +1,7 @@
 package nars;
 
+import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.RateLimiter;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TextColor;
@@ -8,8 +10,8 @@ import com.googlecode.lanterna.graphics.ThemeDefinition;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
-import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.screen.TerminalScreen;
+import com.googlecode.lanterna.terminal.MouseCaptureMode;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminal;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminalServer;
 import jcog.bag.impl.PLinkArrayBag;
@@ -22,11 +24,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.googlecode.lanterna.gui2.BorderLayout.Location.*;
+import static com.googlecode.lanterna.gui2.Window.Hint.NO_POST_RENDERING;
 
 /**
  * https://github.com/mabe02/lanterna/blob/master/src/test/java/com/googlecode/lanterna/terminal/TelnetTerminalTest.java
@@ -37,6 +41,8 @@ public class TelnetServer extends TelnetTerminalServer {
     final static org.slf4j.Logger logger = LoggerFactory.getLogger(TelnetServer.class);
     private final NAR nar;
 
+    final Set<TelnetSession> sessions = Sets.newConcurrentHashSet(); //holds ref
+
     public TelnetServer(NAR n, int port) throws IOException {
         super(port, Charset.forName("utf-8"));
         this.nar = n;
@@ -46,7 +52,10 @@ public class TelnetServer extends TelnetTerminalServer {
             TelnetTerminal conn = acceptConnection();
             if (conn != null) {
                 logger.info("connect from {}", conn.getRemoteSocketAddress());
-                new TelnetSession(conn).start();
+                TelnetSession session = new TelnetSession(conn);
+                session.setUncaughtExceptionHandler((t, e) -> session.end());
+                sessions.add(session);
+                session.start();
             }
         }
     }
@@ -59,12 +68,12 @@ public class TelnetServer extends TelnetTerminalServer {
                 .then(Hear::wiki)
                 .get();
 
-        nar.startFPS(10f);
+        nar.startFPS(2f);
 
         try {
             InterNAR i = new InterNAR(nar);
             i.recv.amplitude(0.1f);
-            i.runFPS(5);
+            i.runFPS(2);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -79,7 +88,8 @@ public class TelnetServer extends TelnetTerminalServer {
 
 
         private final TelnetTerminal terminal;
-        private volatile TerminalSize size;
+        private TerminalScreen screen;
+        final RateLimiter guiUpdates = RateLimiter.create(4f);
 
         public TelnetSession(TelnetTerminal terminal) {
             this.terminal = terminal;
@@ -88,10 +98,13 @@ public class TelnetServer extends TelnetTerminalServer {
         @Override
         public void run() {
 
-            Screen screen = null;
+
             try {
+                terminal.setMouseCaptureMode(MouseCaptureMode.CLICK);
+
                 screen = new TerminalScreen(terminal);
                 screen.startScreen();
+
 
                 final MultiWindowTextGUI textGUI = new MultiWindowTextGUI(screen);
                 textGUI.setBlockingIO(false);
@@ -124,7 +137,8 @@ public class TelnetServer extends TelnetTerminalServer {
                 textGUI.setTheme(st);
 
                 final BasicWindow window = new BasicWindow();
-                window.setHints(Collections.singletonList(Window.Hint.FULL_SCREEN));
+                window.setHints(List.of(Window.Hint.FULL_SCREEN, NO_POST_RENDERING));
+                window.setEnableDirectionBasedMovements(true);
 
 
                 //p.setSize(new TerminalSize(screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows())); //TODO update with resize
@@ -159,45 +173,61 @@ public class TelnetServer extends TelnetTerminalServer {
                         options
                 ), TOP);
 
-                TaskListBox table = new TaskListBox(64);
-                p.addComponent(//Panels.grid(2,
-                    Panels.horizontal(
-                        table, new EmotionDashboard()
-                ), CENTER);
+
+                ActionListBox menu = new ActionListBox();
+                Runnable defaultMenu;
+                menu.addItem("Tasks", defaultMenu = () -> {
+                    p.addComponent(new TaskListBox(64), CENTER);
+                });
+                menu.addItem("Stats", () -> {
+                    p.addComponent(new EmotionDashboard(), CENTER);
+                });
+
 
                 final InputTextBox input = new InputTextBox();
-                textGUI.getGUIThread().invokeLater(input::takeFocus);
+                p.addComponent(menu, LEFT);
                 p.addComponent(input, BOTTOM);
-
-                //p.addComponent(new Button("end", window::close));
-
                 window.setComponent(p);
 
+                textGUI.getGUIThread().invokeLater(defaultMenu);
+                textGUI.getGUIThread().invokeLater(input::takeFocus);
 
                 textGUI.addWindowAndWait(window);
+
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                if (screen != null) {
-                    try {
-                        screen.stopScreen();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
 
+                end();
+            }
+        }
+
+        final void end() {
+
+            if (screen != null) {
+                try {
+                    screen.stopScreen();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            if (terminal != null) {
                 try {
                     terminal.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+
+            sessions.remove(this);
         }
 
 
         private class InputTextBox extends TextBox {
             public InputTextBox() {
-                super(new TerminalSize(20, 2));
+                super(new TerminalSize(20, 1));
+                setVerticalFocusSwitching(true);
             }
 
             @Override
@@ -234,152 +264,183 @@ public class TelnetServer extends TelnetTerminalServer {
         }
 
 
-    }
-
-    private class TaskListBox extends AbstractListBox {
-
-        public final PLinkArrayBag<Task> tasks;
-
-
-        public final AtomicBoolean paused = new AtomicBoolean(false);
-        private final AtomicBoolean changed = new AtomicBoolean(false);
-        public final MutableInteger visible = new MutableInteger();
-        private final On onCycle, onTask;
-
-        //final RateLimiter widgetUpdateRate = RateLimiter.create(0.25f);
-
-        public TaskListBox(int capacity) {
-            super();
-
-            setListItemRenderer(new TaskListRenderer());
-
-            visible.setValue(capacity);
-
-            tasks = new PLinkArrayBag(capacity * 2, PriMerge.avg, new ConcurrentHashMap());
-
-            onTask = nar.eventTaskProcess.on/*Weak*/(t -> {
-                tasks.put(new PLink<>(t, t.priElseZero()));
-                update();
+        On newUpdater(/* TODO AtomicBoolean busy, */Runnable r) {
+            return nar.eventCycleStart.on((n) -> {
+                if (guiUpdates.tryAcquire())
+                    r.run();
             });
-            onCycle = nar.eventCycleStart.on/*Weak*/((n) -> this.update());
-
         }
 
-        public void update() {
+        private class TaskListRenderer extends AbstractListBox.ListItemRenderer {
 
-            if (changed.compareAndSet(false, true)) {
-                TextGUI gui = getTextGUI();
-                if (gui != null) {
-                    TextGUIThread guiThread = gui.getGUIThread();
-                    if (guiThread != null) {
-                        guiThread.invokeLater(this::render);
-                    }
-                }
+            final ThemeDefinition themeDefinition;
+
+            private TaskListRenderer(AbstractListBox table) {
+                this.themeDefinition = table.getTheme().getDefinition(AbstractListBox.class);
             }
-        }
+
+            @Override
+            public void drawItem(TextGUIGraphics graphics, AbstractListBox table, int index, Object item, boolean selected, boolean focused) {
+
+                Task t = (Task) item; //HACK use generic variables
 
 
-        protected void render() {
-
-            changed.set(false);
-            tasks.commit();
-            clearItems();
-
-            tasks.forEach(visible.intValue(), t -> addItem(t.get()));
-
-
-            //                        model.addRow(
-            //                                Texts.n4(t.pri()),
-            //                                t.term().toString() + Character.valueOf((char) t.punc()),
-            //                                t.truth()!=null ? t.truth().toString() : "");
-            //setViewTopRow(Math.max(0,model.getRowCount()-getVisibleRows()));
-
-
-        }
-
-    }
-
-    private class TaskListRenderer extends AbstractListBox.ListItemRenderer {
-
-        @Override
-        public void drawItem(TextGUIGraphics graphics, AbstractListBox table, int index, Object item, boolean selected, boolean focused) {
-
-            Task t = (Task) item; //HACK use generic variables
-
-            ThemeDefinition themeDefinition = table.getTheme().getDefinition(AbstractListBox.class);
-
-            if (selected && focused) {
-                graphics.applyThemeStyle(themeDefinition.getSelected());
-            } else {
-                graphics.applyThemeStyle(themeDefinition.getNormal());
-                int c = (int) (t.pri() * 200 + 55);
-                int r, g, b;
-                if (t.isBelief()) {
-                    r = g = b = c;
-                } else if (t.isGoal()) {
-                    g = c;
-                    r = b = 5;
-                } else if (t.isQuestOrQuestion()) {
-                    b = c;
-                    r = g = 5;
+                if (selected && focused) {
+                    graphics.applyThemeStyle(themeDefinition.getSelected());
                 } else {
-                    r = g = b = 255; //command
+                    graphics.applyThemeStyle(themeDefinition.getNormal());
+                    int c = (int) (t.priElseZero() * 200 + 55);
+                    int r, g, b;
+                    if (t.isBelief()) {
+                        r = g = b = c / 2;
+                    } else if (t.isGoal()) {
+                        g = c;
+                        r = b = 5;
+                    } else if (t.isQuestOrQuestion()) {
+                        b = c;
+                        r = g = 5;
+                    } else {
+                        r = g = b = 255; //command
+                    }
+
+                    graphics.setForegroundColor(
+                            TextColor.Indexed.fromRGB(r, g, b)
+                    );
                 }
 
-                graphics.setForegroundColor(
-                        TextColor.Indexed.fromRGB(r, g, b)
-                );
+                String label = t.toString(nar).toString();
+                //getLabel(listBox, index, item);
+                int cols = graphics.getSize().getColumns() - 1;
+                label = TerminalTextUtils.fitString(label, cols);
+                int w = TerminalTextUtils.getColumnWidth(label);
+                while (w < cols) {
+                    label += " ";
+                    w++;
+                }
+                graphics.putString(0, 0, label);
             }
-
-            String label = t.toString(nar).toString();
-            //getLabel(listBox, index, item);
-            int cols = graphics.getSize().getColumns();
-            label = TerminalTextUtils.fitString(label, cols);
-            while (TerminalTextUtils.getColumnWidth(label) < cols) {
-                label += " ";
-            }
-            graphics.putString(0, 0, label);
-        }
-    }
-
-    private class EmotionDashboard extends Panel {
-        private final TextBox stats;
-        private final On on;
-        private AtomicBoolean busy = new AtomicBoolean(false);
-
-        public EmotionDashboard() {
-            super(new BorderLayout());
-
-
-            stats = new TextBox(new TerminalSize(40, 30),
-                    TextBox.Style.MULTI_LINE);
-            stats.setReadOnly(true);
-
-            addComponent(stats, CENTER);
-
-            on = nar.eventCycleStart.on/*Weak*/((n) -> this.update());
         }
 
-        private final StringBuilder sb = new StringBuilder(1024);
+        private class EmotionDashboard extends Panel {
+            private final TextBox stats;
+            private final On on;
+            private AtomicBoolean busy = new AtomicBoolean(false);
 
-        protected void update() {
-            if (busy.compareAndSet(false, true)) {
-                getTextGUI().getGUIThread().invokeLater(() -> {
+            public EmotionDashboard() {
+                super(new BorderLayout());
 
+
+                stats = new TextBox(" \n \n");
+                stats.setReadOnly(true);
+                stats.setHorizontalFocusSwitching(true);
+                stats.setVerticalFocusSwitching(true);
+
+
+                addComponent(stats, CENTER);
+
+                on = newUpdater(this::update);
+            }
+
+            @Override
+            public synchronized void onRemoved(Container container) {
+                on.off();
+            }
+
+            private final StringBuilder sb = new StringBuilder(1024);
+
+            protected void update() {
+                if (busy.compareAndSet(false, true)) {
                     nar.stats(sb);
 
                     String s = sb.toString();
                     sb.setLength(0);
                     s.replace('\t', ' ');
 
-                    busy.set(false);
-                    stats.setText(s);
-                });
+                    getTextGUI().getGUIThread().invokeLater(() -> {
+                        stats.setText(s);
+                        busy.set(false);
+                    });
+                }
             }
+
+
         }
 
+        private class TaskListBox extends AbstractListBox {
+
+            public final PLinkArrayBag<Task> tasks;
+
+
+            public final AtomicBoolean paused = new AtomicBoolean(false);
+            private final AtomicBoolean changed = new AtomicBoolean(false);
+            public final MutableInteger visible = new MutableInteger();
+            private final On onCycle, onTask;
+
+            float updateRate = 1f;
+
+            //final RateLimiter widgetUpdateRate = RateLimiter.create(0.25f);
+
+
+            @Override
+            public synchronized void onRemoved(Container container) {
+                onCycle.off();
+                onTask.off();
+            }
+
+            public TaskListBox(int capacity) {
+                super();
+
+                setListItemRenderer(new TaskListRenderer(this));
+
+                visible.setValue(capacity);
+
+                tasks = new PLinkArrayBag(capacity * 2, PriMerge.avg, new ConcurrentHashMap());
+
+                onTask = nar.eventTaskProcess.on(t -> {
+                    tasks.put(new PLink<>(t, updateRate * t.priElseZero()));
+                    update();
+                });
+                onCycle = newUpdater(this::update);
+
+            }
+
+            public void update() {
+
+                if (changed.compareAndSet(false, true)) {
+                    TextGUI gui = getTextGUI();
+                    if (gui != null) {
+                        TextGUIThread guiThread = gui.getGUIThread();
+                        if (guiThread != null) {
+                            guiThread.invokeLater(this::render);
+                        }
+                    }
+                }
+            }
+
+
+            protected void render() {
+
+                changed.set(false);
+                tasks.commit();
+                clearItems();
+
+                tasks.forEach(visible.intValue(), t -> addItem(t.get()));
+
+
+                //                        model.addRow(
+                //                                Texts.n4(t.pri()),
+                //                                t.term().toString() + Character.valueOf((char) t.punc()),
+                //                                t.truth()!=null ? t.truth().toString() : "");
+                //setViewTopRow(Math.max(0,model.getRowCount()-getVisibleRows()));
+
+
+            }
+
+        }
 
     }
+
+
 }
 
 //                p.addComponent(new AbstractInteractableComponent() {

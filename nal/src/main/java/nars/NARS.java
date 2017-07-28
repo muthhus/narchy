@@ -214,7 +214,7 @@ public class NARS {
 
 
             if (threadSafe)
-                index = ()->new CaffeineIndex(-1);
+                index = ()->new CaffeineIndex(128 * 1024 /*HACK */);
         }
 
         @Override

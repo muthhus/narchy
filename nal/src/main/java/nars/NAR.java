@@ -1452,7 +1452,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     public @NotNull NAR inputBinary(@NotNull File input) throws IOException {
-        return inputBinary(new FileInputStream(input));
+        return inputBinary(new BufferedInputStream(new FileInputStream(input), 64 * 1024));
     }
 
     @NotNull public NAR outputBinary(@NotNull File f, boolean append) throws IOException {
@@ -1550,7 +1550,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         int count = 0;
 
-        while ((i.available() > 0) || (i.available() > 0) || (ii.available() > 0)) {
+        while (i.available() > 0 /*|| (i.available() > 0) || (ii.available() > 0)*/) {
             Task t = IO.readTask(ii);
             input(t);
             count++;

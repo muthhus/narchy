@@ -6,6 +6,7 @@ import nars.exe.FocusedExecutioner;
 import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
@@ -28,6 +29,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
@@ -133,14 +135,14 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
-        n.termVolumeMax.setValue(24);
+        n.termVolumeMax.setValue(32);
 
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
         MySTMClustered stm = new MySTMClustered(n, 32, BELIEF, 3, true, 8f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 3, true, 2);
-        Inperience inp = new Inperience(n, 0.01f, 8);
-        //Abbreviation abb = new Abbreviation(n, "z", 4, 12, 1f, 32);
+        Inperience inp = new Inperience(n, 0.05f, 8);
+        //Abbreviation abb = new Abbreviation(n, "z", 4, 12, 0.01f, 32);
 
 
 
