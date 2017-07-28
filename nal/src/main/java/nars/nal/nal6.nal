@@ -91,23 +91,25 @@
 
 
     B, (A ==> C), belief(positive), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), belief(negative), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionPN, Goal:InductionPN)
     B, ((--,%A) ==> C), belief(positive), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionN, Goal:InductionN)
-        B, ((--,%A) ==> C), belief(negative), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:DeductionNN, Goal:InductionNN)
+        B, (A ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionPN, Goal:InductionPN)
+        B, ((--,%A) ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionNN, Goal:InductionNN)
 
     B, (C ==> A), belief(positive), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), belief(negative), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
-    B, ((--,%C) ==> A), belief(positive), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionN, Goal:DeductionN)
-        B, ((--,%C) ==> A), belief(negative), notImplEqui(B) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionNN, Goal:DeductionNN)
+    B, ((--,%C) ==> A), belief(positive), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionN, Goal:DeductionN)
+        B, (C ==> A), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionPN, Goal:DeductionPN)
+        B, ((--,%C) ==> A), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
+
+    // may only need 2 of these 4:
+    B, (A <=> C), neq(C, B), task(positive), belief(positive) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
+    B, (A <=> C), neq(C, B), task(positive), belief(negative) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:DeductionPN)
+    B, (A <=> C), neq(C, B), task(negative), belief(positive) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyN, Goal:DeductionN)
+    B, (A <=> C), neq(C, B), task(negative), belief(negative) |- subIfUnifiesAny(C,A,B), (Belief:AnalogyNN, Goal:DeductionNN)
 
     //variable elimination 4b:
     (X --> A), ((#W --> A)<->(#W --> C)),  neq(X,C), neq(X,#W) |- (X-->C), (Belief:Analogy, Goal:Deduction)
 
 
-    B, (A <=> C), neq(C, B), task(positive), belief(positive) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
-    B, (A <=> C), neq(C, B), task(positive), belief(negative) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AnalogyPN, Goal:DeductionPN)
-    B, (A <=> C), neq(C, B), task(negative), belief(positive) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AnalogyN, Goal:DeductionN)
-    B, (A <=> C), neq(C, B), task(negative), belief(negative) |- subIfUnifiesAny(C,A,B), (Belief:AnalogyNN, Goal:DeductionNN)
 
             ////desire spreading by equivalence
             //     S, (S<=>P), task(positive), belief(positive) |-      P,  (Goal:Strong)
@@ -116,14 +118,15 @@
             //     S, (S<=>P), task(negative), belief(negative) |- (--,%P), (Goal:Strong)
 
     //answering
-    Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Y), Y, Z), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Y), X, Z), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
-    Z, (X<=>Y), task("?") |- subIfUnifiesAny((X <=>+- Y), Y, Z), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
+    Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Y), Y, Z, strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Y), X, Z, strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+    Z, (X<=>Y), task("?") |- subIfUnifiesAny((X <=>+- Y), Y, Z, strict), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
     //strong unification
     (Y==>X),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Deduction)
     ((--,%Y)==>X),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:DeductionPN)
     (X==>Y),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Abduction)
+    ((--,%X)==>Y),Z,task(".") |- (--,subIfUnifiesAny(X,Y,Z)), (Belief:AbductionPN)
     (X<=>Y),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Comparison)
         //TODO check the truth here
 

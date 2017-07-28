@@ -1282,7 +1282,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
+                .mustDesire(cycles, "(out)", 0f, 0.81f, 14)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -1452,11 +1452,25 @@ public class NAL8Test extends AbstractNALTest {
     public void testNegativeSimliarityGoal() {
 
         test
-                .log()
                 .input("((me) <-> --(you))!") //i dont want to be like you
                 .input("((me) --> (you)).") //i am like you
                 //TODO repeat this for <->
                 .mustDesire(cycles, "((you) --> (me))", 0f, 0.81f)
         ;
+    }
+
+    @Test public void testStrongUnificationDeductionPN() {
+        //((--,%Y)==>X),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:DeductionPN)
+        test
+                .input("((--,Y) ==>+1 (X)).")
+                .input("(--,Y). :|:")
+                .mustBelieve(cycles, "(X)", 1f, 0.81f, 1);
+    }
+    @Test public void testStrongUnificationAbductionPN() {
+        //((--,%Y)==>X),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:DeductionPN)
+        test
+                .input("((--,X) ==>+1 (Y)).")
+                .input("(Y). :|:")
+                .mustBelieve(cycles, "X", 0f, 0.45f, -1);
     }
 }

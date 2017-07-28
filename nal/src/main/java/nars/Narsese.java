@@ -1247,6 +1247,12 @@ public class Narsese extends BaseParser<Object> {
                 t1 = m.truthDefault(punct);
             }
 
+            if (content.op()==NEG) {
+                content = content.unneg();
+                if (t1!=null)
+                    t1 = t1.negated();
+            }
+
             TaskBuilder ttt =
                     new TaskBuilder(content, punct, t1)
                             .time(
