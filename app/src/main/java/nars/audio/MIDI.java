@@ -2,7 +2,10 @@ package nars.audio;
 
 import jcog.Loop;
 import jcog.data.FloatParam;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NARS;
+import nars.Param;
 import nars.concept.Concept;
 import nars.concept.GoalActionConcept;
 import nars.gui.Vis;
@@ -17,7 +20,6 @@ import spacegraph.audio.synth.SineWave;
 
 import javax.sound.midi.*;
 import javax.sound.sampled.LineUnavailableException;
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.List;
 

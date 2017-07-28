@@ -55,7 +55,7 @@ public class PatrickTests extends AbstractNALTest {
 //.askAt(1250,"REPRESENT:((eats,cat),?what)")
                 .askAt(500, "REPRESENT:((cat,eats),(?x, ?y))")
 
-                .mustBelieve(1000, "REPRESENT((cat,eats),(ANIMAL,EATING))", 1f, 0.73f);
+                .mustBelieve(1000, "REPRESENT((eats,cat),(EATING,ANIMAL))", 1f, 0.73f);
         //.mustBelieve(2500, "REPRESENT:((eats, cat),(EATING,ANIMAL))", 1f, 0.73f);
 
     }

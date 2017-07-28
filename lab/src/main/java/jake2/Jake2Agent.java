@@ -10,7 +10,6 @@ import jake2.sys.IN;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.video.PixelAutoClassifier;
 import nars.video.PixelBag;
 import nars.video.Sensor2D;
 
@@ -18,7 +17,6 @@ import java.awt.*;
 import java.awt.color.ColorSpace;
 import java.awt.image.*;
 import java.nio.ByteBuffer;
-import java.util.Hashtable;
 import java.util.function.Supplier;
 
 import static jake2.Globals.*;

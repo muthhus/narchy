@@ -5,8 +5,6 @@ import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.term.atom.Atomic;
-import nars.video.BufferedImageBitmap2D;
-import nars.video.Scale;
 
 /**
  * Created by me on 4/30/17.
@@ -20,10 +18,10 @@ public class Gradius extends NAgentX {
 
         this.g = new Gradius4K();
 
-        g.updateMS = 16;
+        g.updateMS = 20;
 
-        BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
-        senseCamera(id, cc).resolution(0.2f);
+        //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
+        senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.04f);
 
 //        PixelBag cc = PixelBag.of(() -> g.image, 64, 64);
 //        cc.setClarity(0.5f, 0.9f);

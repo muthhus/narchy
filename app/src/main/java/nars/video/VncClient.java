@@ -25,7 +25,6 @@ import com.jogamp.opengl.util.texture.spi.LEDataInputStream;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelReader;
 import javafx.scene.image.WritableImage;
-import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.layout.BorderPane;
 import nars.FX;
 import org.slf4j.LoggerFactory;

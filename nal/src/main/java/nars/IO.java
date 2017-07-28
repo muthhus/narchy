@@ -1,7 +1,6 @@
 package nars;
 
 
-import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import jcog.byt.DynBytes;
 import jcog.data.string.Utf8Writer;
@@ -30,7 +29,6 @@ import java.util.stream.Stream;
 
 import static nars.IO.TaskSerialization.TermFirst;
 import static nars.Op.*;
-import static nars.term.Terms.compoundOrNull;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 

@@ -8,7 +8,6 @@ import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.term.Compound;
-import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.CameraSensor;

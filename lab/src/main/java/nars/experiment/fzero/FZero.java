@@ -3,7 +3,8 @@ package nars.experiment.fzero;
 import jcog.Util;
 import jcog.math.FloatNormalized;
 import nars.*;
-import nars.video.Scale;
+import nars.video.CameraSensor;
+import nars.video.PixelBag;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -45,7 +46,12 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", new Scale(() -> fz.image, 32, 24).blur())
+//        senseCamera("fz", new Scale(() -> fz.image, 32, 24).blur())
+//                .resolution(0.05f);
+
+        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
+        cc.addActions($.the("fz"), this, false, false, true);
+        CameraSensor<PixelBag> sc = senseCamera("fz" /*"(nario,local)"*/, cc)
                 .resolution(0.05f);
 
 
@@ -68,10 +74,10 @@ public class FZero extends NAgentX {
 //            }
 //        });
 
-        senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
-        senseNumberDifference($.inh(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
-        senseNumberDifference($.inh(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
-        senseNumberBi($.inh(the("ang"), id), new FloatNormalized(() ->
+        //senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
+        senseNumberDifference($.prop(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
+        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
+        senseNumberBi($.prop(the("ang"), id), new FloatNormalized(() ->
                 (float) MathUtils.normalizeAngle(fz.playerAngle, Math.PI) / (Math.PI*2))
         ).resolution(0.02f);
 

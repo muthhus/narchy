@@ -6,7 +6,6 @@ import nars.exe.FocusedExecutioner;
 import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
@@ -28,8 +27,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static nars.$.$;
 import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
@@ -441,6 +440,10 @@ abstract public class NAgentX extends NAgent {
     }
 
     protected CameraSensor<PixelBag> senseCameraRetina(String id, Supplier<BufferedImage> w, int pw, int ph) throws Narsese.NarseseException {
+        return senseCameraRetina($(id), w, pw, ph);
+    }
+
+    protected CameraSensor<PixelBag> senseCameraRetina(Term id, Supplier<BufferedImage> w, int pw, int ph)  {
         PixelBag pb = PixelBag.of(w, pw, ph);
         pb.addActions(id, this);
         return senseCamera(id, pb);
@@ -452,7 +455,7 @@ abstract public class NAgentX extends NAgent {
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, C bc) throws Narsese.NarseseException {
-        return senseCamera($.$(id), bc);
+        return senseCamera($(id), bc);
     }
 
     protected <C extends Bitmap2D> CameraSensor<C> senseCamera(Term id, C bc) {

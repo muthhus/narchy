@@ -35,9 +35,9 @@ public class FocusedExecutioner extends Executioner {
     int subCycleTasks = 16;
     int subCyclePremises = 6;
 
-    final int MAX_PREMISES = 24;
+    final int MAX_PREMISES = 64;
     final int MAX_TASKS = 64;
-    final int MAX_CONCEPTS = 32;
+    final int MAX_CONCEPTS = 64;
 
     final Random random = new XorShift128PlusRandom(1);
 

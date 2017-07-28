@@ -42,13 +42,14 @@ public class PrimitiveInfo {
 	 * lib object where the builtin is defined
 	 */
     private final IPrimitives source;
+    private final int arity;
     /**
 	 * for optimization purposes
 	 */
-    private final Object[] primitive_args;
+    //private final Object[] primitive_args;
     private String primitive_key;
-    
-    
+
+
     public PrimitiveInfo(int type, String key, Library lib, Method m, int arity) throws NoSuchMethodException {
         if (m==null) {
             throw new NoSuchMethodException();
@@ -57,10 +58,12 @@ public class PrimitiveInfo {
         primitive_key = key;
         source = lib;
         method = m;
-        primitive_args=new Term[arity];
+        this.arity = arity;
     }
-    
-    
+
+    Object[] newArgs() { return new Object[arity]; }
+
+
     /**
      * Method to invalidate primitives. It's called just mother library removed
      */
@@ -69,53 +72,55 @@ public class PrimitiveInfo {
         primitive_key = null;
         return key;
     }
-    
-    
+
+
     public String getKey() {
         return primitive_key;
     }
-    
+
     public boolean isDirective() {
         return (type == DIRECTIVE);
     }
-    
+
     public boolean isFunctor() {
         return (type == FUNCTOR);
     }
-    
+
     public boolean isPredicate() {
         return (type == PREDICATE);
     }
-    
-    
+
+
     public int getType() {
         return type;
     }
-    
+
     public IPrimitives getSource() {
         return source;
     }
-    
-    
+
+
     /**
      * evaluates the primitive as a directive
-     * @throws InvocationTargetException 
-     * @throws IllegalAccessException 
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
      * @throws Exception if invocation directive failure
      */
-    public synchronized void evalAsDirective(Struct g) throws IllegalAccessException, InvocationTargetException {
+    public void evalAsDirective(Struct g) throws IllegalAccessException, InvocationTargetException {
+        Object[] primitive_args = newArgs();
         for (int i=0; i<primitive_args.length; i++) {
             primitive_args[i] = g.getTerm(i);
         }
         method.invoke(source,primitive_args);
     }
-    
-    
+
+
     /**
      * evaluates the primitive as a predicate
      * @throws Exception if invocation primitive failure
      */
     public boolean evalAsPredicate(Struct g) throws Throwable {
+        Object[] primitive_args = newArgs();
         for (int i=0; i<primitive_args.length; i++) {
             primitive_args[i] = g.term(i);
         }
@@ -128,14 +133,15 @@ public class PrimitiveInfo {
                     (e.getCause());
         }
     }
-    
-    
+
+
     /**
      * evaluates the primitive as a functor
-     * @throws Throwable 
+     * @throws Throwable
      */
-    public synchronized Term evalAsFunctor(Struct g) throws Throwable {
+    public Term evalAsFunctor(Struct g) throws Throwable {
         try {
+        Object[] primitive_args = newArgs();
             for (int i=0; i<primitive_args.length; i++) {
                 primitive_args[i] = g.getTerm(i);
             }
@@ -144,11 +150,13 @@ public class PrimitiveInfo {
             throw ex.getCause();
         }
     }
-    
-    
-    
+
+
+
     public String toString() {
-        return "[ primitive: method "+method.getName()+" - "+primitive_args+" - N args: "+primitive_args.length+" - "+source.getClass().getName()+" ]\n";
+        return "[ primitive: method "+method.getName()+" - "
+                //+primitive_args+" - N args: "+primitive_args.length+" - "
+                +source.getClass().getName()+" ]\n";
     }
     
 }

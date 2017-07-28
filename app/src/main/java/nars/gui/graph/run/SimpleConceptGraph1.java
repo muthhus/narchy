@@ -19,7 +19,6 @@ import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.SpaceGraph;
 
-import java.io.FileNotFoundException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 

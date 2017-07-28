@@ -18,6 +18,7 @@
 package alice.tuprolog;
 
 import alice.tuprolog.interfaces.IPrimitiveManager;
+import jcog.list.FasterList;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 
 import java.lang.reflect.InvocationTargetException;
@@ -72,7 +73,10 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
             PrimitiveInfo p = it.next();
             functors.put(p.getKey(), p);
         }
-        List<PrimitiveInfo> primOfLib = new LinkedList<>(prims.get(PrimitiveInfo.DIRECTIVE));
+        List<PrimitiveInfo> primOfLib =
+                //new LinkedList<>(prims.get(PrimitiveInfo.DIRECTIVE));
+                new FasterList();
+        primOfLib.addAll(prims.get(PrimitiveInfo.DIRECTIVE));
         primOfLib.addAll(prims.get(PrimitiveInfo.PREDICATE));
         primOfLib.addAll(prims.get(PrimitiveInfo.FUNCTOR));
         libHashMap.put(src, primOfLib);

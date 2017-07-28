@@ -1,6 +1,7 @@
 package nars.experiment.minicraft;
 
 import jcog.Util;
+import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
@@ -50,7 +51,7 @@ public class SideCraft extends NAgentX {
 
         BufferedImage camBuffer = ((AwtGraphicsHandler) craft.gfx).buffer;
 
-        PixelBag cam = PixelBag.of(() -> camBuffer, 48, 32).addActions("cra", this);
+        PixelBag cam = PixelBag.of(() -> camBuffer, 48, 32).addActions($.$("cra"), this);
 
 
         //camAE = new PixelAutoClassifier("cra", cam.pixels, 8, 8, 32, this);

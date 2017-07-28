@@ -46,7 +46,7 @@ public abstract class PixelBag implements Bitmap2D {
     /**
      * increase >1 to allow zoom out beyond input size (ex: thumbnail size)
      */
-    float maxZoomOut = 1f;
+    float maxZoomOut = 2f;
 
     public boolean vflip;
     public List<ActionConcept> actions;
@@ -54,7 +54,7 @@ public abstract class PixelBag implements Bitmap2D {
     private float fg = 1f;
     private float fb = 1f;
     float minClarity = 0.15f, maxClarity = 1f;
-    private final boolean inBounds = true;
+    private final boolean inBounds = false;
 
 
     public static PixelBag of(Supplier<BufferedImage> bb, int px, int py) {
@@ -135,12 +135,11 @@ public abstract class PixelBag implements Bitmap2D {
             minY = (Y * mh);
             maxY = minY + eh;
         } else {
-            minX = (X * sw) - ew/2f;
-            maxX = (X * sw) + ew/2f;
-            minY = (Y * sh) - eh/2f;
-            maxY = (Y * sh) + eh/2f;
+            minX = (X * sw) - ew / 2f;
+            maxX = (X * sw) + ew / 2f;
+            minY = (Y * sh) - eh / 2f;
+            maxY = (Y * sh) + eh / 2f;
         }
-
 
 
 //        System.out.println(X + "," + Y + "," + Z + ": [" + (minX+maxX)/2f + "@" + minX + "," + maxX + "::"
@@ -160,8 +159,8 @@ public abstract class PixelBag implements Bitmap2D {
         float fr = this.fr, fg = this.fg, fb = this.fb;
         float fSum = fr + fg + fb;
 
-        float xRange = maxX-minX;
-        float yRange = maxY-minY;
+        float xRange = maxX - minX;
+        float yRange = maxY - minY;
 
         int supersampling = Math.min((int) Math.floor(xRange / px / 2f), (int) Math.floor(yRange / py / 2f));
 
@@ -199,11 +198,11 @@ public abstract class PixelBag implements Bitmap2D {
                 float R = 0, G = 0, B = 0;
                 for (int esx = Math.max(0, sx - supersampling); esx <= Math.min(sw - 1, sx + supersampling); esx++) {
 
-                    if (esx < 0 || esx >= sw )
+                    if (esx < 0 || esx >= sw)
                         continue;
 
                     for (int esy = Math.max(0, sy - supersampling); esy <= Math.min(sh - 1, sy + supersampling); esy++) {
-                        if (esy < 0 || esy >= sh )
+                        if (esy < 0 || esy >= sh)
                             continue;
 
                         int RGB = rgb(esx, esy);
@@ -290,13 +289,28 @@ public abstract class PixelBag implements Bitmap2D {
     }
 
 
-    public PixelBag addActions(String termRootStr, NAgent a) {
+    public PixelBag addActions(Term termRoot, NAgent a) {
+        return addActions(termRoot, a, true, true, true);
+    }
+
+    public PixelBag addActions(Term termRoot, NAgent a, boolean horizontal, boolean vertical, boolean zoom) {
         actions = $.newArrayList(3);
 
-        Term termRoot = Atomic.the(termRootStr);
-        actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("rx")), this::setXRelative));
-        actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("ry")), this::setYRelative));
-        actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("zoom")), this::setZoom));
+        if (horizontal)
+            actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("rx")), this::setXRelative));
+        else
+            X = 0.5f;
+
+        if (vertical)
+            actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("ry")), this::setYRelative));
+        else
+            Y = 0.5f;
+
+        if (zoom)
+            actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("zoom")), this::setZoom));
+        else
+            Z = 0.5f;
+
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fr)", this::setRedFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fg)", this::setGreenFilter) );
 //        actions.add( a.actionBipolar("see(" + termRoot + ",fb)", this::setBlueFilter) );

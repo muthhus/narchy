@@ -2,10 +2,7 @@ package nars.experiment.mario;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import nars.NAR;
-import nars.NAgentX;
-import nars.Narsese;
-import nars.Param;
+import nars.*;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;
@@ -51,7 +48,11 @@ public class NARio extends NAgentX {
 
 
         PixelBag cc = PixelBag.of(() -> mario.image, 36, 28);
+        cc.addActions($.the("nario"), this, false, false, true);
         cc.setClarity(0.8f, 0.95f);
+        CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
+        sc.resolution(0.02f);
+
 
 //        try {
 //            csvPriority(nar, "/tmp/x.csv");
@@ -73,13 +74,11 @@ public class NARio extends NAgentX {
                 float y = ( M.y - yCam) / 240f;
                 cc.setXRelative(x);
                 cc.setYRelative(y);
-                cc.setZoom(0.4f);
+                //cc.setZoom(0.4f);
             }
             //cc.setXRelative( mario.)
         });
 
-        CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
-        sc.resolution(0.04f);
         //sc.pri(0.1f);
 
 //        CameraSensor ccAe = senseCameraReduced($.the("narioAE"), cc, 16)

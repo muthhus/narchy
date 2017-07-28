@@ -13,7 +13,6 @@ import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.junit.Test;
 
 import java.util.Arrays;
-import java.util.List;
 
 import static nars.$.$;
 import static org.junit.Assert.assertEquals;

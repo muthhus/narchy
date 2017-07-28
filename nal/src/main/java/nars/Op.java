@@ -1651,7 +1651,7 @@ public enum Op implements $ {
     }
 
     @NotNull
-    public Term the(Term... u) {
+    public Term the(@NotNull Term... u) {
         return the(DTERNAL, u);
     }
 
