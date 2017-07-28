@@ -1,7 +1,6 @@
 package nars;
 
 import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.RateLimiter;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TextColor;
@@ -18,8 +17,11 @@ import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.MutableInteger;
 import jcog.event.On;
 import jcog.pri.PLink;
+import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
+import nars.control.Activate;
 import nars.op.Command;
+import nars.task.ITask;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -87,9 +89,11 @@ public class TelnetServer extends TelnetTerminalServer {
     private class TelnetSession extends Thread {
 
 
+        private static final long GUI_UPDATE_MS = 250;
+
         private final TelnetTerminal terminal;
         private TerminalScreen screen;
-        final RateLimiter guiUpdates = RateLimiter.create(4f);
+
 
         public TelnetSession(TelnetTerminal terminal) {
             this.terminal = terminal;
@@ -179,6 +183,26 @@ public class TelnetServer extends TelnetTerminalServer {
                 menu.addItem("Tasks", defaultMenu = () -> {
                     p.addComponent(new TaskListBox(64), CENTER);
                 });
+
+                menu.addItem("Concepts", () -> {
+                    p.addComponent(new BagListBox<Activate>(64) {
+                        @Override
+                        public void update() {
+                            nar.forEachConceptActive(this::add);
+                            super.update();
+                        }
+                    }, CENTER);
+                });
+                menu.addItem("Activity", () -> {
+                    p.addComponent(new BagListBox<ITask>(64) {
+                        @Override
+                        public void update() {
+                            nar.forEachProtoTask(this::add);
+                            super.update();
+                        }
+                    }, CENTER);
+                });
+
                 menu.addItem("Stats", () -> {
                     p.addComponent(new EmotionDashboard(), CENTER);
                 });
@@ -264,11 +288,8 @@ public class TelnetServer extends TelnetTerminalServer {
         }
 
 
-        On newUpdater(/* TODO AtomicBoolean busy, */Runnable r) {
-            return nar.eventCycleStart.on((n) -> {
-                if (guiUpdates.tryAcquire())
-                    r.run();
-            });
+        On newGUIUpdate(/* TODO AtomicBoolean busy, */Runnable r) {
+            return nar.eventCycleStart.on(GUI_UPDATE_MS, (n) -> r.run());
         }
 
         private class TaskListRenderer extends AbstractListBox.ListItemRenderer {
@@ -288,7 +309,7 @@ public class TelnetServer extends TelnetTerminalServer {
                 if (selected && focused) {
                     graphics.applyThemeStyle(themeDefinition.getSelected());
                 } else {
-                    graphics.applyThemeStyle(themeDefinition.getNormal());
+                    //graphics.applyThemeStyle(themeDefinition.getNormal());
                     int c = (int) (t.priElseZero() * 200 + 55);
                     int r, g, b;
                     if (t.isBelief()) {
@@ -338,7 +359,7 @@ public class TelnetServer extends TelnetTerminalServer {
 
                 addComponent(stats, CENTER);
 
-                on = newUpdater(this::update);
+                on = newGUIUpdate(this::update);
             }
 
             @Override
@@ -366,65 +387,74 @@ public class TelnetServer extends TelnetTerminalServer {
 
         }
 
-        private class TaskListBox extends AbstractListBox {
-
-            public final PLinkArrayBag<Task> tasks;
-
-
-            public final AtomicBoolean paused = new AtomicBoolean(false);
-            private final AtomicBoolean changed = new AtomicBoolean(false);
-            public final MutableInteger visible = new MutableInteger();
-            private final On onCycle, onTask;
-
-            float updateRate = 1f;
-
-            //final RateLimiter widgetUpdateRate = RateLimiter.create(0.25f);
+        class BagListBox<X extends Prioritized> extends AbstractListBox {
+            protected final PLinkArrayBag<X> bag;
 
 
-            @Override
-            public synchronized void onRemoved(Container container) {
-                onCycle.off();
-                onTask.off();
+            protected final AtomicBoolean paused = new AtomicBoolean(false);
+            protected final AtomicBoolean changed = new AtomicBoolean(false);
+            protected final MutableInteger visible = new MutableInteger();
+
+            protected final On onCycle;
+            float priInfluenceRate = 1f;
+            private boolean autoupdate = true;
+
+            public BagListBox(int capacity) {
+                this(capacity, true);
             }
 
-            public TaskListBox(int capacity) {
-                super();
+            public BagListBox(int capacity, boolean autoupdate) {
 
-                setListItemRenderer(new TaskListRenderer(this));
-
+                this.autoupdate = autoupdate;
                 visible.setValue(capacity);
 
-                tasks = new PLinkArrayBag(capacity * 2, PriMerge.avg, new ConcurrentHashMap());
+                bag = new PLinkArrayBag(capacity * 2, PriMerge.replace, new ConcurrentHashMap());
+                onCycle = newGUIUpdate(this::update);
 
-                onTask = nar.eventTaskProcess.on(t -> {
-                    tasks.put(new PLink<>(t, updateRate * t.priElseZero()));
-                    update();
-                });
-                onCycle = newUpdater(this::update);
+            }
 
+            public void add(X x) {
+                add(new PLink<>(x, priInfluenceRate * x.priElseZero()));
+            }
+            public void add(PLink<X> p) {
+                if (bag.put(p)!=null) {
+
+                }
+
+                changed.set(true); //update anyway since merges and forgetting may have shifted ordering
             }
 
             public void update() {
 
-                if (changed.compareAndSet(false, true)) {
+                if (autoupdate || changed.compareAndSet(true, false)) {
                     TextGUI gui = getTextGUI();
                     if (gui != null) {
                         TextGUIThread guiThread = gui.getGUIThread();
                         if (guiThread != null) {
+
+                            next.clear();
+                            bag.commit();
+                            bag.forEach(visible.intValue(), t -> next.add(t.get()) );
+
                             guiThread.invokeLater(this::render);
                         }
                     }
                 }
             }
 
+            @Override
+            public synchronized void onRemoved(Container container) {
+                super.onRemoved(container);
+                onCycle.off();
+            }
+
+            final List<X> next = $.newArrayList();
 
             protected void render() {
 
-                changed.set(false);
-                tasks.commit();
                 clearItems();
+                next.forEach(this::addItem);
 
-                tasks.forEach(visible.intValue(), t -> addItem(t.get()));
 
 
                 //                        model.addRow(
@@ -435,6 +465,32 @@ public class TelnetServer extends TelnetTerminalServer {
 
 
             }
+
+        }
+
+        class TaskListBox extends BagListBox<Task> {
+
+            private final On onTask;
+
+
+            @Override
+            public synchronized void onRemoved(Container container) {
+                super.onRemoved(container);
+                onTask.off();
+            }
+
+            public TaskListBox(int capacity) {
+                super(capacity, false);
+
+                setListItemRenderer(new TaskListRenderer(this));
+
+                onTask = nar.eventTaskProcess.on(t -> {
+                    add(t);
+                    changed.set(true);
+                });
+
+            }
+
 
         }
 

@@ -153,7 +153,7 @@ public class FocusedExecutioner extends Executioner {
     public void forEach(Consumer<ITask> each) {
         concepts.forEachKey(each);
         tasks.forEachKey(each);
-        //TODO premises as ITask's?
+        premises.forEachKey(each);
     }
 
     @Override

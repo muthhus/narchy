@@ -1282,13 +1282,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    @Deprecated public NAR forEachTaskActive(@NotNull Consumer<ITask> recip) {
+    @Deprecated public NAR forEachProtoTask(@NotNull Consumer<ITask> recip) {
         exe.forEach(recip);
         return this;
     }
 
     @Deprecated public NAR forEachConceptActive(@NotNull Consumer<Activate> recip) {
-        return forEachTaskActive(t -> {
+        return forEachProtoTask(t -> {
             if (t instanceof Activate) {
                 recip.accept(((Activate) t));
             }

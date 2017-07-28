@@ -6,8 +6,10 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.LongSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -82,6 +84,23 @@ public interface Topic<V> {
 
     /** TODO rename to 'out' to match Streams api */
     void emit(V arg);
+
+    default On on(long minUpdatePeriodMS, Consumer<V> o) {
+        if (minUpdatePeriodMS == 0)
+            return on(o);
+        return on(System::currentTimeMillis, ()->minUpdatePeriodMS, o);
+    }
+
+    default On on(LongSupplier time, LongSupplier minUpdatePeriod, Consumer<V> o) {
+        AtomicLong lastUpdate = new AtomicLong(time.getAsLong() - minUpdatePeriod.getAsLong() );
+        return on((v) -> {
+            long now = time.getAsLong();
+            if (now - lastUpdate.get() >= minUpdatePeriod.getAsLong()) {
+                lastUpdate.set(now);
+                o.accept(v);
+            }
+        });
+    }
 
     default On on(Consumer<V> o) {
         return new On.Strong<>(this, o);

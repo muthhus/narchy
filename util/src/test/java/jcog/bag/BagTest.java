@@ -389,8 +389,8 @@ public class BagTest {
         }
         bag.commit();
         assertEquals(c, bag.size());
-        assertEquals(0.5f / c, bag.priMin(), 0.001f);
-        assertEquals(1 - 1f/(c*2f), bag.priMax(), 0.001f); //no pressure should have been applied because capacity was only reached after the last put
+        assertEquals(0.5f / c, bag.priMin(), 0.03f);
+        assertEquals(1 - 1f/(c*2f), bag.priMax(), 0.03f); //no pressure should have been applied because capacity was only reached after the last put
     }
 
 
