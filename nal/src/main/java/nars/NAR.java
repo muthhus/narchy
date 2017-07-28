@@ -1455,8 +1455,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return inputBinary(new FileInputStream(input));
     }
 
-    @NotNull
-    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
+    @NotNull public NAR outputBinary(@NotNull File f, boolean append) throws IOException {
+        return outputBinary(f, append, t->t);
+    }
+
+    @NotNull public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
         FileOutputStream ff = new FileOutputStream(f, append);
         outputBinary(ff, each);
         ff.close();
@@ -1515,7 +1518,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             }
         });
 
-        logger.info("Saved {}/{} tasks ({} bytes)", wrote, total, oo.size());
+        logger.info("output {}/{} tasks ({} bytes)", wrote, total, oo.size());
 
         return this;
     }
@@ -1553,7 +1556,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             count++;
         }
 
-        logger.info("Loaded {} tasks from {}", count, i);
+        logger.info("input {} tasks from {}", count, i);
 
         ii.close();
 
@@ -1602,13 +1605,19 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return deriver;
     }
 
-    public SortedMap<String, Object> stats(PrintStream out) {
+    public SortedMap<String, Object> stats(Appendable out) {
 
         SortedMap<String, Object> stat = stats();
         stat.forEach((k, v) -> {
-            System.out.println(k.replace(" ", "/") + "\t" + v);
+            try {
+                out.append(k.replace(" ", "/")).append('\t').append(v.toString()).append('\n');
+            } catch (IOException e) {
+            }
         });
-        System.out.println("\n");
+        try {
+            out.append('\n');
+        } catch (IOException e) {
+        }
 
         return stat;
     }

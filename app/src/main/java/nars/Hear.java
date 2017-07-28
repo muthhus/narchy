@@ -1,10 +1,9 @@
-package nars.web;
+package nars;
 
 import com.google.common.collect.Lists;
 import jcog.Loop;
 import jcog.event.On;
 import jcog.io.Twokenize;
-import nars.*;
 import nars.concept.Concept;
 import nars.nlp.Twenglish;
 import nars.op.Command;

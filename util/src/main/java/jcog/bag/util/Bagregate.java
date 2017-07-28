@@ -9,6 +9,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -23,7 +24,7 @@ public class Bagregate<X extends Prioritized> extends PLinkArrayBag<X> {
     final AtomicBoolean busy = new AtomicBoolean();
 
     public Bagregate(@NotNull Iterable<X> src, int capacity, float scale) {
-        super(capacity, PriMerge.avg, new HashMap<>(capacity));
+        super(capacity, PriMerge.avg, new ConcurrentHashMap<>(capacity));
 
         this.src = src;
         this.scale = new FloatParam(scale);

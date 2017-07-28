@@ -19,7 +19,12 @@ import nars.time.RealTime;
 import nars.time.Time;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
 import java.util.Random;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -31,6 +36,7 @@ public class NARS {
     public NAR get() {
         NAR n = new NAR(index.get(), exe.get(), time, rng.get(), concepts.get(), deriver);
         init(n);
+        after.forEach(x -> x.accept(n));
         return n;
     }
 
@@ -52,6 +58,9 @@ public class NARS {
     protected Supplier<ConceptBuilder> concepts;
 
     protected Function<NAR,PrediTerm<Derivation>> deriver;
+
+    /** applied in sequence as final step before returning the NAR */
+    protected final List<Consumer<NAR>> after = $.newArrayList(0);
 
 
     public NARS index(@NotNull TermIndex concepts) {
@@ -148,8 +157,8 @@ public class NARS {
     }
 
     /** default: thread-safe, with centisecond (0.01) precision realtime clock */
-    public static NAR realtime() {
-        return new Default(8, true).time(new RealTime.CS()).get();
+    public static NARS realtime() {
+        return new Default(8, true).time(new RealTime.CS());
     }
 
     /** provides only low level functionality.
@@ -157,6 +166,39 @@ public class NARS {
      * */
     public static NAR shell() {
         return tmp(0).nal(8);
+    }
+
+    public NARS memory(String s) {
+        return then(n -> {
+            File f = new File(s);
+
+            try {
+                n.inputBinary(f);
+            } catch (FileNotFoundException ff) {
+                //ignore
+            } catch (IOException e) {
+                n.logger.error("input: {} {}", s, e);
+            }
+
+            Runnable save = () -> {
+                try {
+                    n.outputBinary(f, false);
+                } catch (IOException e) {
+                    n.logger.error("output: {} {}", s, e);
+                }
+            };
+            Runtime.getRuntime().addShutdownHook(new Thread(save));
+        });
+    }
+
+    /** adds a post-processing step before ready NAR is returned */
+    public NARS then(Consumer<NAR> n) {
+        after.add(n);
+        return this;
+    }
+
+    public @NotNull NARLoop startFPS(float framesPerSecond) {
+        return get().startFPS(framesPerSecond);
     }
 
 

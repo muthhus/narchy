@@ -1,4 +1,4 @@
-package nars;
+package nars.gui;
 
 import com.google.common.primitives.Shorts;
 import jcog.Util;
@@ -7,8 +7,7 @@ import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.bloom.BloomBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
-import nars.gui.HistogramChart;
-import nars.gui.Vis;
+import nars.$;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
 import spacegraph.math.Color3f;
