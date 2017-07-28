@@ -48,14 +48,21 @@ public class QueueLock<X> implements Consumer<X> {
 
         boolean responsible = busy.compareAndSet(false, true);
         if (responsible) {
+            int count = 0;
             try {
                 X next;
                 while ((next = queue.poll()) != null) {
                     proc.accept(next);
+                    count++;
                 }
             } finally {
                 busy.set(false);
+                batchFinished(count);
             }
         }
+    }
+
+    protected void batchFinished(int batchSize) {
+
     }
 }

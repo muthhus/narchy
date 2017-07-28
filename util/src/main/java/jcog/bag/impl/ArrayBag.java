@@ -37,7 +37,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     public float mass;
 
     protected float min, max;
-    private boolean mustSort;
+    protected boolean mustSort;
 
     protected ArrayBag(PriMerge mergeFunction, @NotNull Map<X, Y> map) {
         this(0, mergeFunction, map);
@@ -113,6 +113,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     private FasterList<Y> update(@Nullable Y toAdd, @Nullable Consumer<Y> update) {
 
         int s = size();
+        int c = capacity();
         if (s == 0 && toAdd==null) {
             this.min = this.max = this.mass = 0;
             return null;
@@ -130,7 +131,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
         boolean rejection = false;
         if (toAdd != null) {
-            if (s < capacity()) {
+            if (s < c) {
                 //room to add an item
                 items.add(toAdd, this); this.mass += toAdd.priElseZero();
                 s++;
@@ -140,6 +141,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 Y removed;
                 if (toAdd.priElseZero() > min) {
                     //remove lowest
+                    assert(size()==s);
+                    assert(s > 0): "size is " + s + " and capacity is " + c + " so why are we removing an item";
+
                     removed = items.removeLast(); this.mass -= removed.priElseZero();
                     //add this
                     items.add(toAdd, this); this.mass += toAdd.priElseZero();
@@ -152,12 +156,14 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             }
         }
 
-        if (s > 1 && toAdd != null || (!trash.isEmpty() && !rejection)) {
+        boolean trashEmpty = trash.isEmpty();
+
+        if (!mustSort && s > 1 && (toAdd != null || (!trashEmpty && !rejection))) {
             //bag has changed, update:
             mustSort = true;
         }
 
-        return trash;
+        return trashEmpty ? null : trash;
     }
 
 
@@ -170,9 +176,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         sort();
     }
 
-    private void sort() {
+    protected void sort() {
         int s = size();
-        assert (s > 0);
+        if (s == 0)
+            return;
         Object[] il = items.list;
         if (s > 1) { //test again
             int[] stack = new int[sortSize(s) /* estimate */];
@@ -192,7 +199,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         final Object[] l = items2.array();
         int removedFromMap = 0;
 
-        //iterate in reverse since null entries should be more likely to gather at the end
+        float above = Float.POSITIVE_INFINITY;
+        boolean mustSort = false;
         for (int i = 0; i < s; i++) {
             Y x = (Y) l[i];
             float p;
@@ -207,6 +215,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 min = Math.min(min, p);
                 max = Math.max(max, p);
                 mass += p;
+                if (p - above >= Pri.EPSILON)
+                    mustSort = true;
+
+                above = p;
             }
         }
 
@@ -215,20 +227,23 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         final int c = capacity;
         if (s > c) {
 
-            //second step: if still not enough, do a hardcore removal of the lowest ranked items until quota is met
-            int s1 = s;
+            //second step: if still not enough, do emergency removal of the lowest ranked items until quota is met
             SortedArray<Y> items1 = this.items;
-            while (s1 > 0 && ((s1 - c) + (toAdd ? 1 : 0)) > 0) {
+            while (s > 0 && ((s - c) + (toAdd ? 1 : 0)) > 0) {
                 Y w1 = items1.removeLast();
                 if (w1 != null) //skip over nulls ... does this even happen?
                     trash.add(w1);
-                s1--;
+                s--;
             }
         }
+
+//        if (!mustSort && !toAdd)
+//            System.out.println("elides sort");
 
         this.min = min;
         this.max = max;
         this.mass = mass;
+        this.mustSort |= mustSort;
         return s;
     }
 
@@ -445,6 +460,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     @Override
     public final Y put(@NotNull final Y incoming, @Nullable final MutableFloat overflow) {
 
+        if (capacity == 0)
+            return null;
+
         final float p = incoming.pri();
         if (p != p)
             return null; //already deleted
@@ -461,6 +479,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         Y inserted;
 
         synchronized (items) {
+
+            if (capacity == 0) //check again inside the synch
+                return null;
 
             inserted = map.compute(key, (kk, existing) -> {
                 if (existing != null) {
@@ -706,6 +727,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
     @Override
     public void clear() {
+        //TODO do onRemoved outside synch
         synchronized (items) {
             //map is possibly shared with another bag. only remove the items from it which are present in items
             items.forEach(x -> {
