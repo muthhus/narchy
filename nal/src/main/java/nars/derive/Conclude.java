@@ -22,14 +22,14 @@ public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion
 
     @NotNull public final PremiseRule rule;
 
-    private final boolean varIntro;
+    private final boolean varIntro, goalUrgent;
 
     @NotNull public final Term pattern;
 
 
-    public Conclude(@NotNull PremiseRule rule, @NotNull Term pattern) {
+    public Conclude(@NotNull PremiseRule rule, @NotNull Term pattern, boolean goalUrgent) {
 
-        super($.func("derive", pattern));
+        super(goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent")));
 
         this.rule = rule;
 
@@ -47,6 +47,7 @@ public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion
             varIntro = false;
         }
 
+        this.goalUrgent = goalUrgent;
         this.pattern = pp;
     }
 
@@ -55,7 +56,7 @@ public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion
     public Conclusion apply(@NotNull NAR nar) {
         CauseChannel<Task> input = nar.newChannel(term());
         Term id = $.func("derive", /*$.the(cid), */sub(0) /* prod args */);
-        return new Conclusion(id, pattern, varIntro, rule, input);
+        return new Conclusion(id, pattern, varIntro, goalUrgent, rule, input);
     }
 
 

@@ -95,10 +95,10 @@
         B, (A ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursivePN, Goal:InductionRecursivePN)
         B, ((--,%A) ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursiveNN, Goal:InductionRecursiveNN)
 
-    B, (C ==> A), belief(positive), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-    B, ((--,%C) ==> A), belief(positive), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:Abduction, Goal:Deduction)
-        B, (C ==> A), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionPN, Goal:DeductionPN)
-        B, ((--,%C) ==> A), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
+    B, (C ==> A), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
+    B, ((--,%C) ==> A), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:Abduction, Goal:Deduction)
+        B, (C ==> A), belief(negative), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionPN, Goal:DeductionPN)
+        B, ((--,%C) ==> A), belief(negative), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
     // may only need 2 of these 4:
     B, (A <=> C), neq(C, B), task(positive), belief(positive) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)

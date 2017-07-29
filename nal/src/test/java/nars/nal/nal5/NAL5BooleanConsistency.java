@@ -15,6 +15,8 @@ import static org.junit.Assert.assertTrue;
  */
 public class NAL5BooleanConsistency {
 
+    public static final double confThresh = 0.7f;
+
     @Test
     public void testSAT2() throws Narsese.NarseseException {
 
@@ -82,7 +84,7 @@ public class NAL5BooleanConsistency {
                     if (thisone && b!=null && b.isNegative() && b.conf() > 0)
                         assertTrue("wrong true case:\n" + t.proof(), false);
 
-                    if (!thisone && b!=null && b.isPositive() && b.conf() > 0)
+                    if (!thisone && b!=null && b.isPositive() && b.conf() > confThresh)
                         assertTrue("wrong false case:\n" + t.proof(), false);
 
                 }

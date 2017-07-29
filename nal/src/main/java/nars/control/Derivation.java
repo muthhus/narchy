@@ -205,9 +205,9 @@ public class Derivation extends Unify implements TermContext {
         long now = this.nar.time();
         if (now!=this.time) {
             this.time =now;
-            this.dur = this.nar.dur();
-            this.truthResolution = this.nar.truthResolution.floatValue();
-            this.confMin = Math.max(truthResolution, this.nar.confMin.floatValue());
+            this.dur = nar.dur();
+            this.truthResolution = nar.truthResolution.floatValue();
+            this.confMin = nar.confMin.floatValue();
             this.deriver = nar.deriver();
             //transformsCache.cleanUp();
         }

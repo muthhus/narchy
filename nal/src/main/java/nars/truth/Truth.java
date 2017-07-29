@@ -261,12 +261,15 @@ public interface Truth extends Truthed {
     }
 
     static float conf(float c, float epsilon) {
-        return clamp(round(c, epsilon), 0, 1f - epsilon);
+        return clamp(round(c, epsilon), epsilon, 1f - epsilon);
     }
 
 
     @Nullable default PreciseTruth ditherFreqConf(float resolution, float confMin, float eviGain) {
-        float c = conf(eviGain!=1 ? w2c(evi() * eviGain) : conf(), resolution);
+        float c0 = eviGain != 1 ? w2c(evi() * eviGain) : conf();
+        if (c0 < confMin)
+            return null;
+        float c = conf(c0, resolution); //dither confidence
         if (c < confMin)
             return null;
         return new PreciseTruth(freq(freq(), resolution), c);

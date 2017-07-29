@@ -118,8 +118,8 @@ abstract public class NAgentX extends NAgent {
                             ),THREADS, 2))
                     .time(clock)
                     .index(
-                        //new CaffeineIndex(128 * 1024 )
-                        new HijackTermIndex(128 * 1024,  4)
+                        new CaffeineIndex(128 * 1024 )
+                        //new HijackTermIndex(128 * 1024,  4)
                     )
                     .get();
 

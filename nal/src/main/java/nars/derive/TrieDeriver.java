@@ -498,9 +498,9 @@ public enum TrieDeriver {
         }
 
         @Override
-        public void put(@Nullable PremiseRule rule) {
+        public void put(@NotNull PremiseRule rule) {
 
-            assert (rule != null && rule.POST != null) : "Null rule:" + rule;
+            assert (rule.POST != null) : "null POSTconditions:" + rule;
 
             for (PostCondition p : rule.POST) {
 

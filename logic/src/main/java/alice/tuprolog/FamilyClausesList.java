@@ -83,25 +83,16 @@ public class FamilyClausesList extends
 		return true;
 	}
 
-	/**
-	 * @deprecated 
-	 */
 	@Override
 	public boolean addAll(int index, Collection<? extends ClauseInfo> c) {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
-	/**
-	 * @deprecated
-	 */
 	@Override
 	public void add(int index, ClauseInfo element) {
 		throw new UnsupportedOperationException("Not supported.");
 	}
 
-	/**
-	 * @deprecated
-	 */
 	@Override
 	public ClauseInfo set(int index, ClauseInfo element) {
 		throw new UnsupportedOperationException("Not supported.");

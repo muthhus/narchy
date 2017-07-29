@@ -78,6 +78,9 @@ public class PremiseRule extends GenericCompound {
      */
     private boolean beliefProjected = true;
 
+    /** when a rule with time(urgent) derives a goal, the occurrence time is forced to the present (or now + 1*duration) */
+    public boolean goalUrgent = false;
+
     /**
      * for printing complex terms as a recursive tree
      */
@@ -103,7 +106,6 @@ public class PremiseRule extends GenericCompound {
     /**
      * compiles the conditions which are necessary to activate this rule
      */
-    @NotNull
     public List<Term> conditions(@NotNull PostCondition post, NAR nar) {
 
         Set<Term> s = newHashSet(16); //for ensuring uniqueness / no duplicates
@@ -119,7 +121,7 @@ public class PremiseRule extends GenericCompound {
             throw new RuntimeException("unknown GoalFunction: " + post.goalTruth);
         }
 
-        Conclude conc = new Conclude(this, post.pattern);
+        Conclude conc = new Conclude(this, post.pattern, goalUrgent);
 
         String beliefLabel = belief != null ? belief.toString() : "_";
         String goalLabel = goal != null ? goal.toString() : "_";
@@ -137,7 +139,7 @@ public class PremiseRule extends GenericCompound {
 
 
 
-    Solve truth = puncOverride == 0 ?
+    Solve truth = (puncOverride == 0) ?
             new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
             new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
 
@@ -460,21 +462,23 @@ public class PremiseRule extends GenericCompound {
                         case "raw":
                             beliefProjected = false;
                             break;
+
+                        case "urgent":
+                            goalUrgent = true;
+                            break;
+
                         case "dtEvents":
                             pres.add(TaskBeliefOccurrence.bothEvents);
                             minNAL = 7;
                             break;
-                        case "dtEventsReverse":
-                            pres.add(TaskBeliefOccurrence.bothEvents);
-                            minNAL = 7;
-                            break;
+
                         //NOTE THIS SHOULD ACTUALLY BE CALLED dtBeforeAfterOrEternal or something
                         case "dtEventsOrEternals":
                             pres.add(TaskBeliefOccurrence.eventsOrEternals);
                             break;
-                        case "dtEventsOrEternalsReverse":
-                            pres.add(TaskBeliefOccurrence.eventsOrEternals);
-                            break;
+
+
+
 
                         default:
                             throw new UnsupportedOperationException("time(" + XString + ") unknown");

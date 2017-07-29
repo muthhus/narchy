@@ -44,14 +44,15 @@ public class Conclusion extends AbstractPred<Derivation> {
     public final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
     private final Term pattern;
     private final String rule;
-    private final boolean varIntro;
+    private final boolean varIntro, goalUrgent;
     private final int minNAL;
 
-    public Conclusion(@NotNull Term id, @NotNull Term pattern, boolean varIntro, @NotNull PremiseRule rule, CauseChannel<Task> input) {
+    public Conclusion(@NotNull Term id, @NotNull Term pattern, boolean varIntro, boolean goalUrgent, @NotNull PremiseRule rule, CauseChannel<Task> input) {
         super(id);
         this.channel = input;
         this.pattern = pattern;
         this.varIntro = varIntro;
+        this.goalUrgent = goalUrgent;
         this.rule = rule.toString(); //only store toString of the rule to avoid remaining attached to the RuleSet
         this.minNAL = rule.minNAL;
         //assert(this.minNAL!=0): "unknown min NAL level for rule: " + rule;
@@ -123,6 +124,14 @@ public class Conclusion extends AbstractPred<Derivation> {
             }
 
             if (occ[1] == ETERNAL) occ[1] = occ[0];
+
+            if (goalUrgent) {
+                long taskDur = occ[1] - occ[0];
+
+                occ[0] = d.time + d.dur; //immediate future
+                occ[1] = occ[0] + taskDur;
+            }
+
 
             c2 = t1;
 

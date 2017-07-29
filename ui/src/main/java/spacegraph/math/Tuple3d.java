@@ -546,12 +546,7 @@ public abstract class Tuple3d implements java.io.Serializable, Cloneable {
    }
 
  
-    /** 
-     * @deprecated Use clampMin(double) instead
-     */   
-    public final void clampMin(float min) {
-	clampMin((double)min);
-    }
+
 
 
     /**
