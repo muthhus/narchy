@@ -52,7 +52,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * if the szie is less than or equal to this value, all the entries will
      * be evaluated when matching a task or interpolating a truth.
      */
-    private final static int EVAL_ALL_LESS_THAN_TASKS = 4; /* 2*2 */
+    private final static int EVAL_ALL_LTE_TASKS = 1;
 
 
     private transient NAR nar = null;
@@ -282,7 +282,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             int enoughSampled = Math.min(s, Math.round(Math.max(1, enoughSamplesRate * capacity)));
 
             List<TaskRegion> tt;
-            if (s <= EVAL_ALL_LESS_THAN_TASKS) {
+            if (s <= EVAL_ALL_LTE_TASKS) {
                 tt = ordering(new UniqueRanker<>(strongestTask))
                         .greatestOf(tree.iterator(), maxSamplesTruthpolated);
             } else {
@@ -352,7 +352,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         FloatFunction<Task> ts = taskStrength(when, dur);
         FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task);
 
-        if (s <= EVAL_ALL_LESS_THAN_TASKS) {
+        if (s <= EVAL_ALL_LTE_TASKS) {
             return match(nar, when, new Top2<>(strongestTask).of(tree.iterator()).toList());
         } else {
 

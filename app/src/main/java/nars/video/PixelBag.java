@@ -46,15 +46,15 @@ public abstract class PixelBag implements Bitmap2D {
     /**
      * increase >1 to allow zoom out beyond input size (ex: thumbnail size)
      */
-    float maxZoomOut = 2f;
+    float maxZoomOut = 1.5f;
 
     public boolean vflip;
     public List<ActionConcept> actions;
     private float fr = 1f;
     private float fg = 1f;
     private float fb = 1f;
-    float minClarity = 0.15f, maxClarity = 1f;
-    private final boolean inBounds = false;
+    float minClarity = 1f, maxClarity = 1f;
+    private final boolean inBoundsOnly = false;
 
 
     public static PixelBag of(Supplier<BufferedImage> bb, int px, int py) {
@@ -112,12 +112,16 @@ public abstract class PixelBag implements Bitmap2D {
         int sh = sh();
 
         float ew, eh;
-        ew = max(Z * sw * maxZoomOut, sw * minZoomOut);
-        eh = max(Z * sh * maxZoomOut, sh * minZoomOut);
+//        ew = max(Z * sw * maxZoomOut, sw * minZoomOut);
+//        eh = max(Z * sh * maxZoomOut, sh * minZoomOut);
+        float z = lerp(Z, maxZoomOut, minZoomOut);
+        ew = z * sw;
+        eh = z * sh;
 
 
         float minX, maxX, minY, maxY;
-        if (inBounds) {
+        if (inBoundsOnly) {
+            //TODO check this
             //margin size
             float mw, mh;
             if (ew > sw) {
@@ -141,9 +145,7 @@ public abstract class PixelBag implements Bitmap2D {
             maxY = (Y * sh) + eh / 2f;
         }
 
-
-//        System.out.println(X + "," + Y + "," + Z + ": [" + (minX+maxX)/2f + "@" + minX + "," + maxX + "::"
-//                                                         + (minY+maxY)/2f + "@" + minY + "," + maxY + "] <- aspect=" + eh + "/" + ew);
+        //System.out.println(X + "," + Y + "," + Z + ": [" + minX + ".." + maxX + ", " + minY + ".." + maxY + "]");
 
         float cx = px / 2f;
         float cy = py / 2f;
@@ -184,12 +186,14 @@ public abstract class PixelBag implements Bitmap2D {
                 //project from the local retina plane
 //                int lx = round((px - 1) * x);
 //                int ly = round((py - 1) * y);
-                float dx = Math.abs(lx - cx);
-                float distFromCenterSq = dx * dx + yDistFromCenterSq; //manhattan distance from center
+                if (minClarity <1 ||maxClarity < 1) {
+                    float dx = Math.abs(lx - cx);
+                    float distFromCenterSq = dx * dx + yDistFromCenterSq; //manhattan distance from center
 
-                float clarity = (float) lerp(Math.sqrt(distFromCenterSq / maxCenterDistanceSq), maxClarity, minClarity);
-                if (rng.nextFloat() > clarity)
-                    continue;
+                    float clarity = (float) lerp(Math.sqrt(distFromCenterSq / maxCenterDistanceSq), maxClarity, minClarity);
+                    if (rng.nextFloat() > clarity)
+                        continue;
+                }
 
                 //project to the viewed image plane
                 int sx = Math.round(lerp(lx / pxf, minX, maxX));

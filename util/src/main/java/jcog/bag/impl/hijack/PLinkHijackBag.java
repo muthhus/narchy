@@ -24,7 +24,7 @@ public class PLinkHijackBag<X> extends HijackBag<X, PriReference<X>> {
 
     @NotNull
     @Override
-    public final X key(PriReference<X> value) {
+    public X key(PriReference<X> value) {
         return value.get();
     }
 

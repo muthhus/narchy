@@ -5,6 +5,7 @@ import jcog.pri.mix.control.MixContRL;
 import nars.exe.FocusedExecutioner;
 import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
@@ -117,8 +118,8 @@ abstract public class NAgentX extends NAgent {
                             ),THREADS, 2))
                     .time(clock)
                     .index(
-                        new CaffeineIndex(64 * 1024 )
-                        //    new HijackTermIndex(128 * 1024,  4)
+                        //new CaffeineIndex(128 * 1024 )
+                        new HijackTermIndex(128 * 1024,  4)
                     )
                     .get();
 

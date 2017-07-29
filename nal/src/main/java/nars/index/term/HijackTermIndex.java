@@ -45,6 +45,13 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
         updatePeriodMS = 100;
 
         this.table = new PLinkHijackBag<>(capacity, reprobes) {
+
+            @NotNull
+            @Override
+            public Termed key(PriReference<Termed> value) {
+                return value.get().term();
+            }
+
             @Override
             protected boolean replace(float incoming, PriReference<Termed> existing) {
 
@@ -96,9 +103,10 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
                 if (kc!=null) {
                     PriReference<Termed> inserted = table.put(new PLink<>(kc, initial));
                     if (inserted != null) {
-                        Termed ig = inserted.get();
-                        if (ig.term().equals(kc))
-                            return ig;
+                        return kc;
+//                        Termed ig = inserted.get();
+//                        if (ig.term().equals(kc.term()))
+//                            return ig;
                     } else {
                         return null;
                     }
