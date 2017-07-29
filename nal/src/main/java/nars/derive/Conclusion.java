@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static nars.Op.GOAL;
 import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
 
@@ -125,7 +126,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             if (occ[1] == ETERNAL) occ[1] = occ[0];
 
-            if (goalUrgent) {
+            if (goalUrgent && d.concPunc==GOAL && occ[0]!=ETERNAL) {
                 long taskDur = occ[1] - occ[0];
 
                 occ[0] = d.time + d.dur; //immediate future

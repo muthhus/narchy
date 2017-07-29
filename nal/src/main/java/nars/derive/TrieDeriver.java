@@ -485,17 +485,17 @@ public enum TrieDeriver {
             this.nar = nar;
         }
 
-        @Override
-        protected void onMatch(Term existing, Term incoming) {
-            if (existing instanceof UnificationPrototype) {
-                //merge the set of conclusions where overlapping
-
-
-                ((UnificationPrototype) existing).conclude.addAll(((UnificationPrototype) incoming).conclude);
-                //((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
-                //incomingConcs.clear();
-            }
-        }
+//        @Override
+//        protected void onMatch(Term existing, Term incoming) {
+//            if (existing instanceof UnificationPrototype) {
+//                //merge the set of conclusions where overlapping
+//
+//
+//                ((UnificationPrototype) existing).conclude.addAll(((UnificationPrototype) incoming).conclude);
+//                //((UnificationPrototype) incoming).conclude.addAll(((UnificationPrototype) existing).conclude);
+//                //incomingConcs.clear();
+//            }
+//        }
 
         @Override
         public void put(@NotNull PremiseRule rule) {

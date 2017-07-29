@@ -571,9 +571,9 @@ public enum Op implements $ {
     public static final char COMPOUND_TERM_CLOSER = ')';
 
     @Deprecated
-    public static final char STATEMENT_OPENER = '<';
+    public static final char OLD_STATEMENT_OPENER = '<';
     @Deprecated
-    public static final char STATEMENT_CLOSER = '>';
+    public static final char OLD_STATEMENT_CLOSER = '>';
 
     public static final char STAMP_OPENER = '{';
     public static final char STAMP_CLOSER = '}';

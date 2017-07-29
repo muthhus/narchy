@@ -533,8 +533,8 @@ public class Narsese extends BaseParser<Object> {
                         seq(NEG.str, s(), Term(), push($.neg( /*$.$(*/ (Term) pop()))),
 
                         //deprecated form: <a --> b>
-                        seq(STATEMENT_OPENER,
-                                MultiArgTerm(null, STATEMENT_CLOSER, false, true)
+                        seq(OLD_STATEMENT_OPENER,
+                                MultiArgTerm(null, OLD_STATEMENT_CLOSER, false, true)
                         )
                 ),
 
