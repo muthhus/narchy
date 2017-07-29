@@ -490,8 +490,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR believe(@NotNull String termString) throws NarseseException {
-        return believe(termString, true);
+    public NAR believe(@NotNull String... tt) throws NarseseException {
+
+        for (String b : tt)
+            believe(b, true);
+
+        return this;
     }
 
     @NotNull

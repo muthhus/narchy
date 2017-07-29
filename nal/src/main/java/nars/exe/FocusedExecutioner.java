@@ -56,6 +56,13 @@ public class FocusedExecutioner extends Executioner {
     /** temporary buffer for tasks about to be executed */
     private final FasterList<ITask> next = new FasterList(1024);
 
+    @Override protected void clear() {
+        next.clear();
+        premises.clear();
+        tasks.clear();
+        concepts.clear();
+    }
+
     @Override
     public void cycle() {
 
@@ -143,6 +150,7 @@ public class FocusedExecutioner extends Executioner {
             }
         }
     }
+
 
     @Override
     public int concurrency() {

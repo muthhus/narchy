@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
+import static jcog.Util.sqr;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -34,11 +35,11 @@ public enum TruthPolation { ;
 //        else return evi * (1f - scale*2f);
 
 
+        //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
+
         return evi / (1 + (((float) dt) / dur)); //inverse linear
 
         //return evi / ( 1f + sqr( ((float)dt)/dur) ); //inverse square
-
-        //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
 
         //return evi * 1f/( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
 

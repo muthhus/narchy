@@ -1,6 +1,7 @@
 package nars.exe;
 
 import jcog.Loop;
+import jcog.event.On;
 import nars.NAR;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
@@ -28,11 +29,22 @@ abstract public class Executioner implements Executor {
     @Nullable
     protected NAR nar;
 
-    public void start(NAR nar) {
+    protected On onClear = null;
+
+    public synchronized void start(NAR nar) {
         this.nar = nar;
+
+        assert(onClear == null);
+        onClear = nar.eventClear.on((n)->clear());
     }
 
-    public void stop() {
+    public synchronized void stop() {
+        assert(onClear!=null);
+        onClear.off();
+        onClear = null;
+    }
+
+    protected synchronized void clear() {
 
     }
 

@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
+import static nars.Op.VAR_PATTERN;
+import static nars.Op.VAR_QUERY;
 
 /**
  * concept firing, activation, etc
@@ -293,7 +295,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
             @Nullable Concept c =
                     //b instanceof Concept ? ((Concept) b) :
-                            (b = b.unneg()).op().conceptualizable ?
+                            (b = b.unneg()).op().conceptualizable && (!b.hasAny(VAR_QUERY.bit | VAR_PATTERN.bit)) ?
                                     nar.conceptualize(b) : null;
 
             TermContainer e = null;
@@ -301,6 +303,11 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 if (/*!c.equals(id) && */tc.add(c)) {
                     if (layersRemain > 0) {
                         e = c.templates();
+                        if (e.size() == 0) {
+                            //System.out.println(c);
+                            //HACK TODO determine if good
+//                            c.termlinks().sample(ctpl.size(), (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
+                        }
                     }
                 }
             } else /*if (!b.equals(id))*/ {
@@ -308,6 +315,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                     if (tc.add(b)) { //variable or other non-conceptualizable term
                         if (layersRemain > 0) {
                             e = b.subterms();
+                            if (e.size() == 0) {
+                                //System.out.println(" ? " + e);
+                                //e.termlinks().sample(10, (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
+                            }
                         }
                     }
 
