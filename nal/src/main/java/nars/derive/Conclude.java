@@ -29,7 +29,7 @@ public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion
 
     public Conclude(@NotNull PremiseRule rule, @NotNull Term pattern, boolean goalUrgent) {
 
-        super(goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent")));
+        super(!goalUrgent ? $.func("derive", pattern) : $.func("derive", pattern, $.the("urgent")));
 
         this.rule = rule;
 

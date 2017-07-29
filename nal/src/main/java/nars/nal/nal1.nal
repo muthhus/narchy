@@ -20,12 +20,12 @@
 
     // the second neqRCom() is to handle the Backward cases until a proper variable transform is implemented for those auto-generated rules
 
-    (A --> B), (B --> C), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
+    (A --> B), (B --> C), neqRCom(A,C),neqRCom(B,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
         //(B --> C), (A --> B), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
-        (A --> C), (B --> C), task("."), neqRCom(A,C), neq(A,B)  |- (A --> B), (Punctuation:Question)
-    (A --> B), (A --> C), neqRCom(B,C)      |- (C --> B), (Belief:Abduction, Goal:Weak)
-    (A --> C), (B --> C), neqRCom(A,B)      |- (A --> B), (Belief:Induction, Goal:Weak)
-    (A --> B), (B --> C), neqRCom(A,C)      |- (C --> A), (Belief:Exemplification, Goal:Weak)
+        (A --> C), (B --> C), task("."), neqRCom(A,C),neqRCom(A,B)  |- (A --> B), (Punctuation:Question)
+    (A --> B), (A --> C), neqRCom(B,C),neqRCom(A,C)      |- (C --> B), (Belief:Abduction, Goal:Weak)
+    (A --> C), (B --> C), neqRCom(A,B),neqRCom(B,C)      |- (A --> B), (Belief:Induction, Goal:Weak)
+    (A --> B), (B --> C), neqRCom(A,C),neqRCom(B,C)      |- (C --> A), (Belief:Exemplification, Goal:Weak)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
