@@ -90,10 +90,10 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), belief(positive), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Deduction, Goal:Induction)
-    B, ((--,%A) ==> C), belief(positive), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:Deduction, Goal:Induction)
-        B, (A ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionPN, Goal:InductionPN)
-        B, ((--,%A) ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionNN, Goal:InductionNN)
+    B, (A ==> C), belief(positive), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursive, Goal:InductionRecursive)
+    B, ((--,%A) ==> C), belief(positive), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursive, Goal:InductionRecursive)
+        B, (A ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursivePN, Goal:InductionRecursivePN)
+        B, ((--,%A) ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursiveNN, Goal:InductionRecursiveNN)
 
     B, (C ==> A), belief(positive), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
     B, ((--,%C) ==> A), belief(positive), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:Abduction, Goal:Deduction)

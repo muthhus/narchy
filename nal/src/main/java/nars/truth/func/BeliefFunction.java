@@ -47,7 +47,16 @@ public enum BeliefFunction implements TruthOperator {
         }
     },
 
+
     Deduction() {
+        @Nullable
+        @Override public Truth apply(@Nullable Truth T, @Nullable Truth B, NAR m, float minConf) {
+            return (T == null || B == null) ? null : TruthFunctions.deduction(T, B, minConf);
+        }
+    },
+
+    @AllowOverlap
+    DeductionRecursive() {
         @Nullable
         @Override public Truth apply(@Nullable Truth T, @Nullable Truth B, NAR m, float minConf) {
             return (T == null || B == null) ? null : TruthFunctions.deduction(T, B, minConf);

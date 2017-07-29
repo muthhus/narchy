@@ -68,6 +68,13 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
+    @AllowOverlap
+    InductionRecursive() {
+        @Nullable
+        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+            return (T == null || B == null) ? null : desireInd(T, B, minConf);
+        }
+    },
 
 
 //    //EXPERIMENTAL

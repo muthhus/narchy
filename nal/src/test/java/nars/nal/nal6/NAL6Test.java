@@ -650,11 +650,12 @@ public class NAL6Test extends AbstractNALTest {
 
 
         test
+                .log()
                 .believe("num(0)", 1.0f, 0.9f)
                 .believe("( num($1) ==> num(($1)) )", 1.0f, 0.9f)
                 .ask("num(((0)))")
-                .mustBelieve(cycles, "num((0))", 1.0f, 1.0f, 0.66f, 1.0f)
-                .mustBelieve(cycles, "num(((0)))", 1.0f, 1.0f, 0.21f /*0.66f*/, 1.0f)
+                .mustBelieve(cycles*4, "num((0))", 1.0f, 1.0f, 0.66f, 1.0f)
+                .mustBelieve(cycles*4, "num(((0)))", 1.0f, 1.0f, 0.21f /*0.66f*/, 1.0f)
         //.mustBelieve(time, "num:(((0)))", 1.0f, 1.0f, 0.66f, 1.0f)
         //.mustBelieve(time, "num:((((0))))", 1.0f, 1.0f, 0.81f, 1.0f)
         // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')
