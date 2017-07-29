@@ -71,11 +71,6 @@ public class TermVector1 implements TermContainer {
     }
 
     @Override
-    public boolean isTemporal() {
-        return sub.isTemporal();
-    }
-
-    @Override
     public boolean subIs(int i, Op o) {
         return i == 0 && sub.op() == o;
     }

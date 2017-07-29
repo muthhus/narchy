@@ -303,7 +303,7 @@ public class Derivation extends Unify implements TermContext {
         this.termSub1op = bOp.id;
         this.termSub1opBit = bOp.bit;
 
-        this.temporal = temporal(task, belief);
+        this.temporal = temporal(task) || temporal(belief);
 
         float premiseEvidence = task.isBeliefOrGoal() ? taskTruth.evi() : 0;
         if (beliefTruth != null)
@@ -385,14 +385,9 @@ public class Derivation extends Unify implements TermContext {
     }
 
 
-    private static boolean temporal(@NotNull Task task, @Nullable Task belief) {
-        if (!task.isEternal() || (task.op().temporal && task.dt() != DTERNAL))
-            return true;
-
-        return (belief != null) &&
-                (!belief.isEternal()
-                        ||
-                (belief.op().temporal && (belief.dt() != DTERNAL)));
+    private static boolean temporal(@Nullable Task task) {
+        return task!=null &&
+                (!task.isEternal() || task.term().isTemporal());
     }
 
 

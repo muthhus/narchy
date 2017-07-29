@@ -205,12 +205,6 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
         return term.contains(t);
     }
 
-    @Deprecated
-    @Override
-    public boolean isTemporal() {
-        return false; //term.isTemporal();
-    }
-
     @Override
     public <T extends Term> @Nullable T sub(int i, @Nullable T ifOutOfBounds) {
         return term.sub(i, ifOutOfBounds);

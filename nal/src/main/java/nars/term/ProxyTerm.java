@@ -224,11 +224,6 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public boolean isTemporal() {
-        return ref.isTemporal();
-    }
-
-    @Override
     public boolean impossibleSubTerm(@NotNull Termlike target) {
         return ref.impossibleSubTerm(target);
     }

@@ -688,84 +688,70 @@ public class Temporalize {
 
 
         Op o = target.op();
-        if (o.temporal) {
-            int dt = target.dt();
+        if (o.temporal && target.dt() == XTERNAL) {
+            TermContainer tt = target.subterms();
 
-            if (dt == XTERNAL) {
-                TermContainer tt = target.subterms();
+            if (tt.size() == 2) {
 
-                if (tt.size() == 2) {
+                Event ea, eb;
+                if (random.nextBoolean()) {
+                    //forward order: sub 0 first
+                    ea = solveSub(trail, tt, 0);
+                    if (ea == null)
+                        return null;
+                    eb = solveSub(trail, tt, 1);
+                    if (eb == null)
+                        return null;
+                } else {
+                    //reverse order: sub 1 first
+                    eb = solveSub(trail, tt, 1);
+                    if (eb == null)
+                        return null;
+                    ea = solveSub(trail, tt, 0);
+                    if (ea == null)
+                        return null;
+                }
 
-                    Event ea, eb;
-                    if (random.nextBoolean()) {
-                        //forward order: sub 0 first
-                        ea = solveSub(trail, tt, 0);
-                        if (ea == null)
-                            return null;
-                        eb = solveSub(trail, tt, 1);
-                        if (eb == null)
-                            return null;
-                    } else {
-                        //reverse order: sub 1 first
-                        eb = solveSub(trail, tt, 1);
-                        if (eb == null)
-                            return null;
-                        ea = solveSub(trail, tt, 0);
-                        if (ea == null)
-                            return null;
-                    }
+                Term a = ea.term;
+                Time at = ea.start(trail);
 
-                    Term a = ea.term;
-                    Time at = ea.start(trail);
+                if (at != null) {
 
-                    if (at != null) {
+                    Term b = eb.term;
+                    Time bt = eb.start(trail);
 
-                        Term b = eb.term;
-                        Time bt = eb.start(trail);
+                    if (bt != null) {
 
-                        if (bt != null) {
+                        try {
+                            if (o == CONJ && (a.op() == CONJ || b.op() == CONJ)) {
+                                //conjunction merge, since the results could overlap
+                                //either a or b, or both are conjunctions. and the result will be conjunction
 
-                            try {
-                                if (o == CONJ && (a.op() == CONJ || b.op() == CONJ)) {
-                                    //conjunction merge, since the results could overlap
-                                    //either a or b, or both are conjunctions. and the result will be conjunction
-
-                                    long ata = at.abs();
-                                    long bta = bt.abs();
-                                    if (ata == ETERNAL && bta == ETERNAL) {
-                                        ata = at.offset;
-                                        bta = bt.offset + a.dtRange();
-                                    } else if (ata == ETERNAL ^ bta == ETERNAL) {
-                                        return null; //one is eternal the other isn't
-                                    }
-                                    Term newTerm = $.negIf(Op.conjMerge(a, ata, b, bta), isNeg);
-                                    long start = Math.min(at.abs(), bt.abs());
-                                    Event e = new SolutionEvent(newTerm, start);
-                                    return e;
-                                } else {
-                                    int sd = dt(ea, eb, trail);
-//                                        if (o == CONJ && sd != DTERNAL && sd != XTERNAL) {
-//                                            sd -= a.dtRange(); sd -= b.dtRange();
-//                                        }
-                                    if (sd != XTERNAL) {
-
-                                        Term newTerm = $.negIf(o.the(sd, a, b), isNeg);
-
-                                        long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
-
-                                        Event e = new SolutionEvent(newTerm, start);
-                                        return e;
-                                    }
+                                long ata = at.abs();
+                                long bta = bt.abs();
+                                if (ata == ETERNAL && bta == ETERNAL) {
+                                    ata = at.offset;
+                                    bta = bt.offset + a.dtRange();
+                                } else if (ata == ETERNAL ^ bta == ETERNAL) {
+                                    return null; //one is eternal the other isn't
                                 }
-                            } catch (UnsupportedOperationException e) {
-                                logger.warn("temporalization solution: {}", e.getMessage());
-                                return null; //TODO
+                                Term newTerm = $.negIf(Op.conjMerge(a, ata, b, bta), isNeg);
+                                long start = Math.min(at.abs(), bt.abs());
+                                Event e = new SolutionEvent(newTerm, start);
+                                return e;
+                            } else {
+                                Event e = solveTemporal(trail, isNeg, o, ea, eb, a, b);
+                                if (e != null)
+                                    return e;
                             }
+                        } catch (UnsupportedOperationException e) {
+                            logger.warn("temporalization solution: {}", e.getMessage());
+                            return null; //TODO
                         }
                     }
-                } else {
-                    logger.warn("TODO unsupported xternal: " + target);
                 }
+            } else {
+                logger.warn("TODO unsupported xternal: " + target);
             }
         }
 
@@ -774,7 +760,19 @@ public class Temporalize {
          * create the solved term as-is (since it will not contain any XTERNAL) with the appropriate
          * temporal bounds. */
 
-        if (target.op().statement) {
+        if (o.temporal && target.size()==2) {
+            Term a = target.sub(0);
+            Term b = target.sub(1);
+
+            Event ra = solve(a);
+            if (ra!=null) {
+                Event rb = solve(b);
+                if (rb!=null) {
+                    return solveTemporal(trail, isNeg, o, ra, rb, a, b);
+                }
+            }
+
+        } else if (o.statement) {
             Term a = target.sub(0);
             Term b = target.sub(1);
 
@@ -833,42 +831,68 @@ public class Temporalize {
 
                 Event ra = relevant.get(0);
                 Event rb = relevant.get(1);
-                long[] ii = intersect(ra, rb, trail);
-                if (ii != null) {
-                    //overlap or adjacent
-                    return new SolutionEvent($.negIf(target, isNeg), ii[0], ii[1]);
-                } else {
-                    //not overlapping at all, compute point interpolation
-                    Time as = ra.start(trail);
-                    if (as != null) {
-                        Time bs = rb.start(trail);
-                        if (bs != null) {
-                            Time at = ra.end(trail);
-                            if (at != null) {
-                                Time bt = rb.end(trail);
-                                if (bt != null) {
-                                    long ta = as.abs();
-                                    long tz = at.abs();
-                                    if (tz == ETERNAL) tz = ta;
-                                    long ba = bs.abs();
-                                    long bz = bt.abs();
-                                    if (bz == ETERNAL) bz = ba;
-                                    long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
-                                    if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float) dist) / dur) {
-                                        long occ = ((ta + tz) / 2 + (ba + bz) / 2) / 2;
-                                        //occInterpolate(t, b);
-                                        return new SolutionEvent($.negIf(target, isNeg), occ);
-                                    }
-                                }
-                            }
-                        }
-                    }
 
-                }
-
+                Event ii = solveStatement(target, trail, isNeg, ra, rb);
+                if (ii != null)
+                    return ii;
             }
         }
 
+        return null;
+    }
+
+    private Event solveStatement(Term target, HashMap<Term, Time> trail, boolean isNeg, Event ra, Event rb) {
+        long[] ii = intersect(ra, rb, trail);
+        if (ii != null) {
+            //overlap or adjacent
+            return new SolutionEvent($.negIf(target, isNeg), ii[0], ii[1]);
+        } else {
+            //not overlapping at all, compute point interpolation
+            Time as = ra.start(trail);
+            if (as != null) {
+                Time bs = rb.start(trail);
+                if (bs != null) {
+                    Time at = ra.end(trail);
+                    if (at != null) {
+                        Time bt = rb.end(trail);
+                        if (bt != null) {
+                            long ta = as.abs();
+                            long tz = at.abs();
+                            if (tz == ETERNAL) tz = ta;
+                            long ba = bs.abs();
+                            long bz = bt.abs();
+                            if (bz == ETERNAL) bz = ba;
+                            long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
+                            if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float) dist) / dur) {
+                                long occ = ((ta + tz) / 2 + (ba + bz) / 2) / 2;
+                                //occInterpolate(t, b);
+                                return new SolutionEvent($.negIf(target, isNeg), occ);
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
+        return null;
+    }
+
+    private Event solveTemporal(HashMap<Term, Time> trail, boolean isNeg, Op o, Event ea, Event eb, Term a, Term b) {
+        int sd = dt(ea, eb, trail);
+//                                        if (o == CONJ && sd != DTERNAL && sd != XTERNAL) {
+//                                            sd -= a.dtRange(); sd -= b.dtRange();
+//                                        }
+        if (sd != XTERNAL) {
+
+            @Nullable Time at = ea.start(trail);
+            Term newTerm = $.negIf(o.the(sd, a, b), isNeg);
+
+            @Nullable Time bt = eb.start(trail);
+            long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
+
+            Event e = new SolutionEvent(newTerm, start);
+            return e;
+        }
         return null;
     }
 

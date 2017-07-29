@@ -90,10 +90,10 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), belief(positive), notImplEqui(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursive, Goal:InductionRecursive)
-    B, ((--,%A) ==> C), belief(positive), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursive, Goal:InductionRecursive)
-        B, (A ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursivePN, Goal:InductionRecursivePN)
-        B, ((--,%A) ==> C), belief(negative), notImplEqui(B) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursiveNN, Goal:InductionRecursiveNN)
+    B, (A ==> C), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursive, Goal:InductionRecursive)
+    B, ((--,%A) ==> C), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursive, Goal:InductionRecursive)
+        B, (A ==> C), belief(negative), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursivePN, Goal:InductionRecursivePN)
+        B, ((--,%A) ==> C), belief(negative), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursiveNN, Goal:InductionRecursiveNN)
 
     B, (C ==> A), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
     B, ((--,%C) ==> A), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:Abduction, Goal:Deduction)
@@ -101,13 +101,13 @@
         B, ((--,%C) ==> A), belief(negative), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
     // may only need 2 of these 4:
-    B, (A <=> C), neq(C, B), task(positive), belief(positive) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
-    B, (A <=> C), neq(C, B), task(positive), belief(negative) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:DeductionPN)
-    B, (A <=> C), neq(C, B), task(negative), belief(positive) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyN, Goal:DeductionN)
-    B, (A <=> C), neq(C, B), task(negative), belief(negative) |- subIfUnifiesAny(C,A,B), (Belief:AnalogyNN, Goal:DeductionNN)
+    B, (A <=> C), neq(C, B), task(positive), belief(positive), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:Analogy, Goal:Deduction)
+    B, (A <=> C), neq(C, B), task(positive), belief(negative), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyPN, Goal:DeductionPN)
+    B, (A <=> C), neq(C, B), task(negative), belief(positive), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AnalogyN, Goal:DeductionN)
+    B, (A <=> C), neq(C, B), task(negative), belief(negative), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:AnalogyNN, Goal:DeductionNN)
 
     //variable elimination 4b:
-    (X --> A), ((#W --> A)<->(#W --> C)),  neq(X,C), neq(X,#W) |- (X-->C), (Belief:Analogy, Goal:Deduction)
+    (X --> A), ((#W --> A)<->(#W --> C)),  neq(X,C), neq(X,#W), time(urgent) |- (X-->C), (Belief:Analogy, Goal:Deduction)
 
 
 
@@ -132,8 +132,8 @@
 
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
-    B, (C && A), task("!") |- subIfUnifiesAny(C,A,B), (Goal:Strong)
-    B, (C && (--,%A)), task("!") |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
+    B, (C && A), task("!"), time(urgent) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
+    B, (C && (--,%A)), task("!"), time(urgent) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
         //B, (C && A) |- (--,subIfUnifiesAny(C,A,B)), (Goal:StrongN)
         //B, (C && (--,%A)) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
 

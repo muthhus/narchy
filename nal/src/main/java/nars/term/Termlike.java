@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static nars.Op.*;
+import static nars.time.Tense.DTERNAL;
 
 /**
  * Features exhibited by, and which can classify terms
@@ -52,13 +53,7 @@ public interface Termlike extends Termed {
     }
 
 
-    /**
-     * whether any subterms (recursively) have
-     * non-DTernal temporal relation
-     */
-    default boolean isTemporal() {
-        return false;
-    }
+
 
     default boolean hasAll(int structuralVector) {
         return Op.hasAll(structure(), structuralVector);

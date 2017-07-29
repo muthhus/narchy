@@ -188,10 +188,6 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return Compound.super.isCommutative();
     }
 
-    @Override
-    public boolean isTemporal() {
-        return Compound.super.isTemporal();
-    }
 
 
     @Override

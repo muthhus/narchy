@@ -103,8 +103,8 @@ abstract public class NAgentX extends NAgent {
 
         RealTime clock =
                 durFPS >= 10 ?
-                        new RealTime.CS() :
-                        new RealTime.DSHalf();
+                        new RealTime.CS(true) :
+                        new RealTime.DSHalf(true);
 
         clock.durFPS(durFPS);
 

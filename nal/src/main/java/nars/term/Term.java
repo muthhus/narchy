@@ -129,6 +129,17 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     /**
+     * whether any subterms (recursively) have
+     * non-DTernal temporal relation
+     */
+    default boolean isTemporal() {
+        return hasAny(Op.TemporalBits) &&
+                (op().temporal && (dt() != DTERNAL))
+                ||
+                (subterms().isTemporal());
+    }
+
+    /**
      * returns an int[] path to the first occurrence of the specified subterm
      *
      * @return null if not a subterm, an empty int[] array if equal to this term, or a non-empty int[] array specifying subterm paths to reach it

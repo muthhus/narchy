@@ -78,7 +78,7 @@ public class PremiseRule extends GenericCompound {
      */
     private boolean beliefProjected = true;
 
-    /** when a rule with time(urgent) derives a goal, the occurrence time is forced to the present (or now + 1*duration) */
+    /** when a rule with time(urgent) derives a goal, the occurrence time is set to the task time */
     public boolean goalUrgent = false;
 
     /**

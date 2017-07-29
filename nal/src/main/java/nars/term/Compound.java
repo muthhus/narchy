@@ -109,6 +109,9 @@ public interface Compound extends Term, IPair, TermContainer {
         return subterms().hashCode();
     }
 
+    default boolean isTemporal() {
+        return Term.super.isTemporal();
+    }
 
     @Override
     default int opX() {
@@ -653,13 +656,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //        return false;
 //    }
 
-    @Override
-    default boolean isTemporal() {
-        return hasAny(Op.TemporalBits) &&
-                (op().temporal && (dt() != DTERNAL))
-                ||
-                (subterms().isTemporal());
-    }
 
 
 

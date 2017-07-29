@@ -5,6 +5,7 @@ import jcog.math.FloatNormalized;
 import nars.*;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
+import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -46,13 +47,13 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-//        senseCamera("fz", new Scale(() -> fz.image, 32, 24).blur())
-//                .resolution(0.05f);
-
-        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
-        cc.addActions($.the("fz"), this, false, false, true);
-        CameraSensor<PixelBag> sc = senseCamera("fz" /*"(nario,local)"*/, cc)
+        senseCamera("fz", new Scale(() -> fz.image, 32, 24).blur())
                 .resolution(0.05f);
+
+//        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
+//        cc.addActions($.the("fz"), this, false, false, true);
+//        CameraSensor<PixelBag> sc = senseCamera("fz" /*"(nario,local)"*/, cc)
+//                .resolution(0.05f);
 
 
         actionBipolar($.inh(the("fwd"), id), (f) -> {

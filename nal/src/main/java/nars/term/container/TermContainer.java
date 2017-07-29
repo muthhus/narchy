@@ -731,11 +731,9 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return num > 1 && op.commutative && (concurrent(dt));
     }
 
-    @Override
     default boolean isTemporal() {
         return OR(Term::isTemporal);
     }
-
 
     default boolean isSorted() {
         int s = size();

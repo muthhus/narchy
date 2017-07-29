@@ -16,6 +16,9 @@ public interface Termed /* TODO finish implementing: extends Termlike */ {
 
     default TermContainer subterms() { return term().subterms(); }
 
+
+    default int dt() { return term().dt(); }
+
     @NotNull
     default Op op() { return term().op(); }
 

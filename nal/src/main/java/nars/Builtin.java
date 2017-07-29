@@ -174,10 +174,9 @@ public class Builtin {
             } else {
                 //recursive event-based decomposition and recomposition
 
-                Compound c = (Compound) t;  //for use in deriver, fail if any variable parameters
 
                 List<ObjectLongPair<Term>> ee = $.newArrayList(2);
-                c.events(ee, 0);
+                t.events(ee, 0);
 
                 int toRemove = nar.random().nextInt(ee.size());
                 ee.remove(toRemove);
