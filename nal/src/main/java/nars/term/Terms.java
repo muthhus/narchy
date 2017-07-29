@@ -678,19 +678,23 @@ public enum Terms {
 
     @NotNull
     public static Term union(@NotNull Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
-        if (a.equals(b) && a instanceof Term)
+        boolean bothTerms = a instanceof Term && b instanceof Term;
+        if (bothTerms && a.equals(b))
             return (Term) a;
 
         TreeSet<Term> t = new TreeSet<>();
         a.copyInto(t);
         b.copyInto(t);
-        int as = a.size();
-        int bs = b.size();
-//        int maxSize = Math.max(as, bs);
-//        if (t.size() == maxSize) {
-//            //the smaller is contained by the larger other
-//            return as > bs ? a : b;
-//        }
+        if (bothTerms) {
+            int as = a.size();
+            int bs = b.size();
+            int maxSize = Math.max(as, bs);
+            if (t.size() == maxSize) {
+                //the smaller is contained by the larger other
+                //so return an input value rather than constructing a duplicate
+                return (Term) (as > bs ? a : b);
+            }
+        }
         return $.the(o, t);
     }
 

@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.SortedSet;
+import java.util.function.Predicate;
 
 /**
  * Holds results of an ellipsis match and
@@ -64,6 +65,15 @@ public class EllipsisMatch extends GenericCompound {
             case 1: return term.first();
             default: return new EllipsisMatch(term.toArray(new Term[term.size()]));
         }
+    }
+
+    public final boolean forEachWhile(@NotNull Predicate<? super Term> c) {
+        int s = size();
+        for (int i = 0; i < s; i++) {
+            if (!c.test(sub(i)))
+                return false;
+        }
+        return true;
     }
 
     public boolean linearMatch(TermContainer y, int from, @NotNull Unify subst) {

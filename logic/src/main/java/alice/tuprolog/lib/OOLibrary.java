@@ -343,7 +343,7 @@ public class OOLibrary extends Library {
 		Struct classPathes = (Struct) clPathes.term();
 		id = id.term();
 		try {
-            String fullClassName = alice.util.Tools.removeApices(className.toString());
+            String fullClassName = alice.util.Tools.removeApostrophes(className.toString());
 
             Iterator<? extends Term> it = classPathes.listIterator();
             String cp = "";
@@ -351,14 +351,14 @@ public class OOLibrary extends Library {
                 if (!cp.isEmpty()) {
                     cp += ";";
                 }
-                cp += alice.util.Tools.removeApices(it.next()
+                cp += alice.util.Tools.removeApostrophes(it.next()
                         .toString());
             }
             if (!cp.isEmpty()) {
                 cp = " -classpath " + cp;
             }
 
-            String text = alice.util.Tools.removeApices(classSource.toString());
+            String text = alice.util.Tools.removeApostrophes(classSource.toString());
             String fullClassPath = fullClassName.replace('.', '/');
             try {
                 FileWriter file = new FileWriter(fullClassPath + ".java");
@@ -454,7 +454,7 @@ public class OOLibrary extends Library {
 			if (args == null) {
 				throw new JavaException(new IllegalArgumentException());
 			}
-			String objName = alice.util.Tools.removeApices(objId.toString());
+			String objName = alice.util.Tools.removeApostrophes(objId.toString());
             Object obj = staticObjects.containsKey(objName) ? staticObjects.get(objName) : currentObjects.get(objName);
             Object res = null;
 
@@ -481,7 +481,7 @@ public class OOLibrary extends Library {
 					if (id.getArity() == 1 && id.name().equals("class")) {
 						try {
 							String clName = alice.util.Tools
-									.removeApices(id.term(0).toString());
+									.removeApostrophes(id.term(0).toString());
 							Class<?> cl = Class.forName(clName, true, dynamicLoader);
 							
 							Method m = InspectionUtils.searchForMethod(cl, methodName, args.getTypes());
@@ -622,7 +622,7 @@ public class OOLibrary extends Library {
             	String clName = null;
             	// Case: class(className)
             	if(((Struct) objId).getArity() == 1)         	
-            		 clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
+            		 clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
             	if(clName != null)
             	{
             		try {
@@ -636,7 +636,7 @@ public class OOLibrary extends Library {
                                         + fieldName
                                         + " not found in class "
                                         + alice.util.Tools
-                                                .removeApices(((Struct) objId)
+                                                .removeApostrophes(((Struct) objId)
                                                         .term(0).toString()));
                         return false;
                     }
@@ -644,7 +644,7 @@ public class OOLibrary extends Library {
             }
             else {
                 String objName = alice.util.Tools
-                        .removeApices(objId.toString());
+                        .removeApostrophes(objId.toString());
                 obj = currentObjects.get(objName);
                 if (obj != null) {
                     cl = obj.getClass();
@@ -669,7 +669,7 @@ public class OOLibrary extends Library {
                     return false;
                 }
             } else {
-                String what_name = alice.util.Tools.removeApices(what
+                String what_name = alice.util.Tools.removeApostrophes(what
                         .toString());
                 Object obj2 = currentObjects.get(what_name);
                 if (obj2 != null) {
@@ -704,7 +704,7 @@ public class OOLibrary extends Library {
             {
             	String clName = null;
             	if(((Struct) objId).getArity() == 1)         	
-            		 clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
+            		 clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
             	if(clName != null)
             	{
             		try {
@@ -718,14 +718,14 @@ public class OOLibrary extends Library {
                                         + fieldName
                                         + " not found in class "
                                         + alice.util.Tools
-                                                .removeApices(((Struct) objId)
+                                                .removeApostrophes(((Struct) objId)
                                                         .term(0).toString()));
                         return false;
                     }
             	}
             }
             else {
-                String objName = alice.util.Tools.removeApices(objId.toString());
+                String objName = alice.util.Tools.removeApostrophes(objId.toString());
                 obj = currentObjects.get(objName);
                 if (obj == null) {
                     return false;
@@ -774,7 +774,7 @@ public class OOLibrary extends Library {
                     .toString()));
         }
         try {
-            String objName = alice.util.Tools.removeApices(objId.toString());
+            String objName = alice.util.Tools.removeApostrophes(objId.toString());
             Object obj = currentObjects.get(objName);
             Class<?> cl = null;
             if (obj != null) {
@@ -888,7 +888,7 @@ public class OOLibrary extends Library {
             throw new JavaException(new IllegalArgumentException(index.toString()));
         }
         try {
-            String objName = alice.util.Tools.removeApices(objId.toString());
+            String objName = alice.util.Tools.removeApostrophes(objId.toString());
             Object obj = currentObjects.get(objName);
             Class<?> cl = null;
             if (obj != null) {
@@ -1065,7 +1065,7 @@ public class OOLibrary extends Library {
         Iterator<? extends Term> it = list.listIterator();
         int count = 0;
         while (it.hasNext()) {
-        	String path = alice.util.Tools.removeApices(it.next().toString());
+        	String path = alice.util.Tools.removeApostrophes(it.next().toString());
             args[count++] = path;
         }
         return args;
@@ -1101,7 +1101,7 @@ public class OOLibrary extends Library {
                 values[i] = null;
                 types[i] = null;
             } else if (term.isAtom()) {
-                String name = alice.util.Tools.removeApices(term.toString());
+                String name = alice.util.Tools.removeApostrophes(term.toString());
                 switch (name) {
                     case "true":
                         values[i] = Boolean.TRUE;
@@ -1140,9 +1140,9 @@ public class OOLibrary extends Library {
                             .getTerm(1));
                 } else {
                     Object obj = currentObjects.get(alice.util.Tools
-                            .removeApices(tc.toString()));
+                            .removeApostrophes(tc.toString()));
                     values[i] = obj == null ? alice.util.Tools
-                            .removeApices(tc.toString()) : obj;
+                            .removeApostrophes(tc.toString()) : obj;
                     types[i] = values[i].getClass();
                 }
             } else if (term instanceof Var && !((Var) term).isBound()) {
@@ -1168,8 +1168,8 @@ public class OOLibrary extends Library {
         try {
             if (!(castWhat instanceof Number)) {
                 String castTo_name = alice.util.Tools
-                        .removeApices(((Struct) castTo).name());
-                String castWhat_name = alice.util.Tools.removeApices(castWhat
+                        .removeApostrophes(((Struct) castTo).name());
+                String castWhat_name = alice.util.Tools.removeApostrophes(castWhat
                         .term().toString());
                 // System.out.println(castWhat_name+" "+castTo_name);
                 if (castTo_name.equals("java.lang.String")
@@ -1400,7 +1400,7 @@ public class OOLibrary extends Library {
                 // object already referenced
                 return false;
             } else {
-                String raw_name = alice.util.Tools.removeApices(id.term()
+                String raw_name = alice.util.Tools.removeApostrophes(id.term()
                         .toString());
                 staticObjects.put(raw_name, obj);
                 staticObjects_inverse.put(obj, id);
@@ -1502,7 +1502,7 @@ public class OOLibrary extends Library {
             throw new InvalidObjectIdException();
         }
         synchronized (staticObjects) {
-            return staticObjects.get(alice.util.Tools.removeApices(id
+            return staticObjects.get(alice.util.Tools.removeApostrophes(id
                     .toString()));
         }
     }
@@ -1522,7 +1522,7 @@ public class OOLibrary extends Library {
             throw new InvalidObjectIdException();
         }
         synchronized (staticObjects) {
-            String raw_name = alice.util.Tools.removeApices(id.toString());
+            String raw_name = alice.util.Tools.removeApostrophes(id.toString());
             Object obj = staticObjects.remove(raw_name);
             if (obj != null) {
                 staticObjects_inverse.remove(obj);
@@ -1543,7 +1543,7 @@ public class OOLibrary extends Library {
      */
     public void registerDynamic(Struct id, Object obj) {
         synchronized (currentObjects) {
-            String raw_name = alice.util.Tools.removeApices(id.toString());
+            String raw_name = alice.util.Tools.removeApostrophes(id.toString());
             currentObjects.put(raw_name, obj);
             currentObjects_inverse.put(obj, id);
         }
@@ -1588,7 +1588,7 @@ public class OOLibrary extends Library {
             throw new InvalidObjectIdException();
         }
         synchronized (currentObjects) {
-            return currentObjects.get(alice.util.Tools.removeApices(id
+            return currentObjects.get(alice.util.Tools.removeApostrophes(id
                     .toString()));
         }
     }
@@ -1602,7 +1602,7 @@ public class OOLibrary extends Library {
      */
     public boolean unregisterDynamic(Struct id) {
         synchronized (currentObjects) {
-            String raw_name = alice.util.Tools.removeApices(id.toString());
+            String raw_name = alice.util.Tools.removeApostrophes(id.toString());
             Object obj = currentObjects.remove(raw_name);
             if (obj != null) {
                 currentObjects_inverse.remove(obj);
@@ -1642,7 +1642,7 @@ public class OOLibrary extends Library {
                     return true;
                 } else {
                     // verify of the id is already used
-                    String raw_name = alice.util.Tools.removeApices(id
+                    String raw_name = alice.util.Tools.removeApostrophes(id
                             .term().toString());
                     Object linkedobj = currentObjects.get(raw_name);
                     if (linkedobj == null) {

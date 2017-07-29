@@ -167,8 +167,8 @@ public class TheoryManager {
         if (!pi.name().equals("/"))
             throw new IllegalArgumentException(pi + " has not the valid predicate name. Espected '/' but was " + pi.name());
 
-        String arg0 = Tools.removeApices(pi.term(0).toString());
-        String arg1 = Tools.removeApices(pi.term(1).toString());
+        String arg0 = Tools.removeApostrophes(pi.term(0).toString());
+        String arg1 = Tools.removeApostrophes(pi.term(1).toString());
         String key = arg0 + '/' + arg1;
         List<ClauseInfo> abolished = dynamicDBase.remove(key); /* Reviewed by Paolo Contessi: LinkedList -> List */
         if (abolished != null)

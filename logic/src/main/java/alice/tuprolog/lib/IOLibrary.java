@@ -377,10 +377,10 @@ public class IOLibrary extends Library {
             throw PrologError.instantiation_error(engine, 1);
         if (outputStreamName.equals(STDOUT_NAME)) { /* Changed from "stdout" to STDOUT_NAME */
             getEngine().stdOutput(
-                    alice.util.Tools.removeApices(arg0.toString()));
+                    alice.util.Tools.removeApostrophes(arg0.toString()));
         } else {
             try {
-                outputStream.write(alice.util.Tools.removeApices(
+                outputStream.write(alice.util.Tools.removeApostrophes(
                         arg0.toString()).getBytes());
             } catch (IOException e) {
                 throw PrologError.permission_error(engine.getEngineManager(),
@@ -424,7 +424,7 @@ public class IOLibrary extends Library {
             throw PrologError.type_error(engine.getEngineManager(), 1, "atom",
                     file_name);
         Struct fileName = (Struct) file_name.term();
-        String path = alice.util.Tools.removeApices(fileName.toString());
+        String path = alice.util.Tools.removeApostrophes(fileName.toString());
         if(! new File(path).isAbsolute()) {
             path = engine.getCurrentDirectory()  + File.separator + path;
         }

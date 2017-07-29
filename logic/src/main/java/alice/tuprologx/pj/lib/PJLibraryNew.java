@@ -389,14 +389,14 @@ public class PJLibraryNew extends OOLibrary {
             Object obj = null;
             if (objId.isCompound() &&
 					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
-				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
+				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {				
@@ -515,14 +515,14 @@ public class PJLibraryNew extends OOLibrary {
             Object obj = null;
             if (objId.isCompound() &&
 					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
-				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
+				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {
@@ -599,7 +599,7 @@ public class PJLibraryNew extends OOLibrary {
 				values[i] = null;
 				types[i] = null;
 			} else if (term.isAtom()) {
-				String name = alice.util.Tools.removeApices(term.toString());
+				String name = alice.util.Tools.removeApostrophes(term.toString());
                 switch (name) {
                     case "true":
                         values[i] = Boolean.TRUE;
@@ -637,7 +637,7 @@ public class PJLibraryNew extends OOLibrary {
 					return parse_as(values, types, i, tc.getTerm(0), tc.getTerm(1));
 				} else {
 					Object obj = getRegisteredDynamicObject((Struct)tc.term());
-                    values[i] = obj == null ? alice.util.Tools.removeApices(tc.toString()) : obj;
+                    values[i] = obj == null ? alice.util.Tools.removeApostrophes(tc.toString()) : obj;
 					types[i] = values[i].getClass();
 				}
 			} else if (term instanceof Var && !((Var) term).isBound()) {
@@ -692,8 +692,8 @@ public class PJLibraryNew extends OOLibrary {
     private boolean parse_as(Object[] values, Class<?>[] types, int i, Term castWhat, Term castTo) {
 		try {
 			if (!(castWhat instanceof Number)) {
-				String castTo_name = alice.util.Tools.removeApices(((Struct) castTo).name());
-				String castWhat_name = alice.util.Tools.removeApices(castWhat.term().toString());
+				String castTo_name = alice.util.Tools.removeApostrophes(((Struct) castTo).name());
+				String castWhat_name = alice.util.Tools.removeApostrophes(castWhat.term().toString());
 				//System.out.println(castWhat_name+" "+castTo_name);
 				if (castTo_name.equals("java.lang.String") &&
 						castWhat_name.equals("true")){

@@ -234,7 +234,7 @@ public class PJLibrary extends Library {
 		Struct classPathes = (Struct) clPathes.term();
 		id = id.term();
 		try {
-			String fullClassName = alice.util.Tools.removeApices(className.toString());
+			String fullClassName = alice.util.Tools.removeApostrophes(className.toString());
 
 			Iterator<? extends Term> it = classPathes.listIterator();
 			String cp = "";
@@ -242,13 +242,13 @@ public class PJLibrary extends Library {
 				if (!cp.isEmpty()) {
 					cp += ";";
 				}
-				cp += alice.util.Tools.removeApices(it.next().toString());
+				cp += alice.util.Tools.removeApostrophes(it.next().toString());
 			}
 			if (!cp.isEmpty()) {
 				cp = " -classpath " + cp;
 			}
 			
-			String text = alice.util.Tools.removeApices(classSource.toString());
+			String text = alice.util.Tools.removeApostrophes(classSource.toString());
 			
 			//System.out.println("class source: "+text+
 			//                   "\nid: "+id+
@@ -329,7 +329,7 @@ public class PJLibrary extends Library {
 				return false;			
             
 			//System.out.println(args);
-			String objName = alice.util.Tools.removeApices(objId.toString());
+			String objName = alice.util.Tools.removeApostrophes(objId.toString());
 			Object obj = currentObjects.get(objName);
 			Object res = null;
 			
@@ -373,7 +373,7 @@ public class PJLibrary extends Library {
 					Struct id = (Struct) objId;
 					if (id.getArity() == 1 && id.name().equals("class")) {
 						try {
-							Class<?> cl = Class.forName(alice.util.Tools.removeApices(id.term(0).toString()));
+							Class<?> cl = Class.forName(alice.util.Tools.removeApostrophes(id.term(0).toString()));
 							Method m = cl.getMethod(methodName, args.getTypes());
 							m.setAccessible(true);
 							res = m.invoke(null, args.getValues());
@@ -433,18 +433,18 @@ public class PJLibrary extends Library {
 			Object obj = null;
 			if (objId.isCompound() &&
 					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
-				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
+				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {
-				String objName = alice.util.Tools.removeApices(objId.toString());
+				String objName = alice.util.Tools.removeApostrophes(objId.toString());
 				obj = currentObjects.get(objName);
 				if (obj != null) {
 					cl = obj.getClass();
@@ -475,7 +475,7 @@ public class PJLibrary extends Library {
 				}
 			} 
             else {
-                    String what_name = alice.util.Tools.removeApices(what.toString());
+                    String what_name = alice.util.Tools.removeApostrophes(what.toString());
                     Object obj2 = currentObjects.get(what_name);
                     if (obj2 != null) {
                         field.set(obj, obj2);
@@ -509,18 +509,18 @@ public class PJLibrary extends Library {
 			Object obj = null;
 			if (objId.isCompound() &&
 					((Struct) objId).getArity() == 1 && ((Struct) objId).name().equals("class")) {
-				String clName = alice.util.Tools.removeApices(((Struct) objId).term(0).toString());
+				String clName = alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString());
 				try {
 					cl = Class.forName(clName);
 				} catch (ClassNotFoundException ex) {
 					Prolog.warn("Java class not found: " + clName);
 					return false;
 				} catch (Exception ex) {
-					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApices(((Struct) objId).term(0).toString()));
+					Prolog.warn("Static field " + fieldName + " not found in class " + alice.util.Tools.removeApostrophes(((Struct) objId).term(0).toString()));
 					return false;
 				}
 			} else {
-				String objName = alice.util.Tools.removeApices(objId.toString());
+				String objName = alice.util.Tools.removeApostrophes(objId.toString());
 				obj = currentObjects.get(objName);
 				if (obj == null) {
 					return false;
@@ -574,7 +574,7 @@ public class PJLibrary extends Library {
 			return false;
 		}
 		try {
-			String objName = alice.util.Tools.removeApices(objId.toString());
+			String objName = alice.util.Tools.removeApostrophes(objId.toString());
 			Object obj = currentObjects.get(objName);
 			Class<?> cl = null;
 			if (obj != null) {
@@ -672,7 +672,7 @@ public class PJLibrary extends Library {
 			return false;
 		}
 		try {
-			String objName = alice.util.Tools.removeApices(objId.toString());
+			String objName = alice.util.Tools.removeApostrophes(objId.toString());
 			Object obj = currentObjects.get(objName);
 			Class<?> cl = null;
 			if (obj != null) {
@@ -797,7 +797,7 @@ public class PJLibrary extends Library {
 				values[i] = null;
 				types[i] = null;
 			} else if (term.isAtom()) {
-				String name = alice.util.Tools.removeApices(term.toString());
+				String name = alice.util.Tools.removeApostrophes(term.toString());
                 switch (name) {
                     case "true":
                         values[i] = Boolean.TRUE;
@@ -834,8 +834,8 @@ public class PJLibrary extends Library {
 				if (tc.name().equals("as")) {
 					return parse_as(values, types, i, tc.getTerm(0), tc.getTerm(1));
 				} else {
-					Object obj = currentObjects.get(alice.util.Tools.removeApices(tc.toString()));
-					values[i] = obj == null ? alice.util.Tools.removeApices(tc.toString()) : obj;
+					Object obj = currentObjects.get(alice.util.Tools.removeApostrophes(tc.toString()));
+					values[i] = obj == null ? alice.util.Tools.removeApostrophes(tc.toString()) : obj;
 					types[i] = values[i].getClass();
 				}
 			} else if (term instanceof Var && !((Var) term).isBound()) {
@@ -859,8 +859,8 @@ public class PJLibrary extends Library {
 	private boolean parse_as(Object[] values, Class<?>[] types, int i, Term castWhat, Term castTo) {
 		try {
 			if (!(castWhat instanceof Number)) {
-				String castTo_name = alice.util.Tools.removeApices(((Struct) castTo).name());
-				String castWhat_name = alice.util.Tools.removeApices(castWhat.term().toString());
+				String castTo_name = alice.util.Tools.removeApostrophes(((Struct) castTo).name());
+				String castWhat_name = alice.util.Tools.removeApostrophes(castWhat.term().toString());
 				//System.out.println(castWhat_name+" "+castTo_name);
 				if (castTo_name.equals("java.lang.String") && 
 						castWhat_name.equals("true")){
@@ -1083,7 +1083,7 @@ public class PJLibrary extends Library {
 				// object already referenced
 				return false;
 			} else {
-				String raw_name = alice.util.Tools.removeApices(id.term().toString());
+				String raw_name = alice.util.Tools.removeApostrophes(id.term().toString());
 				staticObjects.put(raw_name, obj);
 				staticObjects_inverse.put(obj, id);
 				return true;
@@ -1132,7 +1132,7 @@ public class PJLibrary extends Library {
 			throw new InvalidObjectIdException();
 		}
 		synchronized (staticObjects){
-			return staticObjects.get(alice.util.Tools.removeApices(id.toString()));
+			return staticObjects.get(alice.util.Tools.removeApostrophes(id.toString()));
 		}
 	}
 	
@@ -1149,7 +1149,7 @@ public class PJLibrary extends Library {
 			throw new InvalidObjectIdException();
 		}
 		synchronized (staticObjects){
-			String raw_name = alice.util.Tools.removeApices(id.toString());
+			String raw_name = alice.util.Tools.removeApostrophes(id.toString());
 			Object obj = staticObjects.remove(raw_name);
 			if (obj != null) {
 				staticObjects_inverse.remove(obj);
@@ -1170,7 +1170,7 @@ public class PJLibrary extends Library {
 	 */
 	public void registerDynamic(Struct id, Object obj) {
 		synchronized (currentObjects){
-			String raw_name = alice.util.Tools.removeApices(id.toString());
+			String raw_name = alice.util.Tools.removeApostrophes(id.toString());
 			currentObjects.put(raw_name, obj);
 			currentObjects_inverse.put(obj, id);
 		}
@@ -1215,7 +1215,7 @@ public class PJLibrary extends Library {
 			throw new InvalidObjectIdException();
 		}
 		synchronized (currentObjects){
-			return currentObjects.get(alice.util.Tools.removeApices(id.toString()));
+			return currentObjects.get(alice.util.Tools.removeApostrophes(id.toString()));
 		}
 	}
 	
@@ -1227,7 +1227,7 @@ public class PJLibrary extends Library {
 	 */
 	public boolean unregisterDynamic(Struct id) {
 		synchronized (currentObjects){
-			String raw_name = alice.util.Tools.removeApices(id.toString());
+			String raw_name = alice.util.Tools.removeApostrophes(id.toString());
 			Object obj = currentObjects.remove(raw_name);
 			if (obj != null) {
 				currentObjects_inverse.remove(obj);
@@ -1271,7 +1271,7 @@ public class PJLibrary extends Library {
 					return true;
 				} else {
 					// verify of the id is already used
-					String raw_name = alice.util.Tools.removeApices(id.term().toString());
+					String raw_name = alice.util.Tools.removeApostrophes(id.term().toString());
 					Object linkedobj = currentObjects.get(raw_name);
 					if (linkedobj == null) {
 						registerDynamic((Struct)(id.term()), obj);

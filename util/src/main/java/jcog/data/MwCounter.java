@@ -18,7 +18,7 @@ public final class MwCounter  {
 
     private static final AtomicLongFieldUpdater<MwCounter> COUNTER = newUpdater(MwCounter.class, "value");
 
-    private final long value;
+    private volatile long value;
 
     public MwCounter() {
         this(0);

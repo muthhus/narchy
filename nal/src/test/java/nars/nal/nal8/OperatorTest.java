@@ -93,16 +93,7 @@ public class OperatorTest {
 //        Compound o = $.func($.the("x"), $.p("y"));
 //        assertEquals(Op.INH, o.op());
 //    }
-//
-//    @Test public void testInhIsOperation() {
-//        Compound o = $("<(a,b,c)-->x>");
-//        assertTrue(o.term(0).op() == Op.PROD);
-//        assertTrue(o.term(1) instanceof Atomic);
-//        assertTrue(o.term(1).op() == Op.ATOM);
-//        assertEquals("x(a,b,c)", o.toString());
-//        assertEquals(Op.INH, o.op());
-//    }
-//
+
 ////    @Test public void testTermReactionRegistration() {
 ////
 ////        AtomicBoolean executed = new AtomicBoolean(false);

@@ -7,7 +7,6 @@ package nars.op.data;
 import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,7 +86,7 @@ public class reflect  {
     
     @Nullable
     public static Term reflect(Term t) {
-        if (t instanceof Atomic) {
+        if (t.size() == 0) {
             return t;
         }
         switch (t.op()) {
@@ -95,7 +94,6 @@ public class reflect  {
             //case SIM:  return sop(t, "similarity");
             default: return sop(t.op().toString(), t.subterms());
         }
-        
     }
 
 

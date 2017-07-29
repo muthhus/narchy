@@ -7,7 +7,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termlike;
 import nars.term.Terms;
-import nars.term.atom.Atomic;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.block.function.primitive.IntObjectToIntFunction;
@@ -315,11 +314,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default boolean containsRecursively(@NotNull Term y) {
-        if (!impossibleSubTerm(y)) {
-            int s = size();
+        int s = size();
+        if (s > 0 && !impossibleSubTerm(y)) {
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
-                if (x.equals(y) || (!(x instanceof Atomic) && x.subterms().containsRecursively(y))) {
+                if (x.equals(y) || (x.containsRecursively(y))) {
                     return true;
                 }
             }
@@ -328,11 +327,11 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     default boolean containsRecursively(@NotNull Term y, Predicate<Term> subTermOf) {
-        if (!impossibleSubTerm(y)) {
-            int s = size();
+        int s = size();
+        if (s > 0 && !impossibleSubTerm(y)) {
             for (int i = 0; i < s; i++) {
                 Term x = sub(i);
-                if (x.equals(y) || (!(x instanceof Atomic) && x.subterms().containsRecursively(y, subTermOf)))
+                if (x.equals(y) || (x.containsRecursively(y, subTermOf)))
                     return true;
             }
         }
@@ -499,21 +498,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     default void forEach(Consumer<? super Term> action, int start, int stop) {
         for (int i = start; i < stop; i++)
             action.accept(sub(i));
-    }
-
-
-    default void forEachAtomic(@NotNull Consumer<? super Atomic> action) {
-        forEach(x -> {
-            if (x instanceof Atomic)
-                action.accept((Atomic) x);
-        });
-    }
-
-    default void forEachCompound(@NotNull Consumer<? super Compound> action) {
-        forEach(x -> {
-            if (x instanceof Compound)
-                action.accept((Compound) x);
-        });
     }
 
     @Override

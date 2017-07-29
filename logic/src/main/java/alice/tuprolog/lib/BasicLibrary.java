@@ -168,7 +168,7 @@ public class BasicLibrary extends Library {
                     th);
         Struct theory = (Struct) th;
         try {
-            new PrologAgent(alice.util.Tools.removeApices(theory.toString()), new MutableClauseIndex()).spawn();
+            new PrologAgent(alice.util.Tools.removeApostrophes(theory.toString()), new MutableClauseIndex()).spawn();
             return true;
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -197,7 +197,7 @@ public class BasicLibrary extends Library {
         Struct theory = (Struct) th;
         Struct goal = (Struct) g;
         try {
-            new PrologAgent(alice.util.Tools.removeApices(theory.toString()), goal
+            new PrologAgent(alice.util.Tools.removeApostrophes(theory.toString()), goal
                     .toString()
                     + '.').spawn();
             return true;
@@ -750,7 +750,7 @@ public class BasicLibrary extends Library {
             return unify(arg0, new Struct(arg1.toString()));
         } else {
             try {
-                String text = alice.util.Tools.removeApices(arg0.toString());
+                String text = alice.util.Tools.removeApostrophes(arg0.toString());
                 return unify(arg1, getEngine().toTerm(text));
             } catch (Exception ex) {
                 return false;

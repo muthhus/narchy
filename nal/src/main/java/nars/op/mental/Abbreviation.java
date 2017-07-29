@@ -113,8 +113,8 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
             //recursiely try subterms of a temporal or exceedingly large concept
             //budget with a proportion of this compound relative to their volume contribution
             float subScale = 1f / (1 + t.size());
-            t.forEachCompound(x -> {
-                if (x instanceof Compound)
+            t.forEach(x -> {
+                if (x.size() > 0)
                     input(b, each, ((Compound) x), subScale);
             });
         }

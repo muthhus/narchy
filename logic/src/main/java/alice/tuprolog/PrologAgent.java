@@ -36,7 +36,6 @@ import java.util.List;
 public class PrologAgent extends Prolog {
     
     private String theoryText;
-    private InputStream theoryInputStream;
     private String goalText;
     
   
@@ -48,8 +47,8 @@ public class PrologAgent extends Prolog {
      *
      * @param theory the text representing the theory
      */
-    public PrologAgent(String theory, ClauseIndex dynamics){
-        super(dynamics);
+    public PrologAgent(String theory, ClauseIndex dyn){
+        super(dyn);
         theoryText=theory;
         addOutputListener(defaultOutputListener);
     }
@@ -69,42 +68,35 @@ public class PrologAgent extends Prolog {
         addOutputListener(defaultOutputListener);
     }
     
-    /**
-     * Constructs the Agent with a theory provided
-     * by an input stream
-     */
-    public PrologAgent(InputStream is, ClauseIndex dynamics){
-        super(dynamics);
-        theoryInputStream=is;
-        addOutputListener(defaultOutputListener);
-    }
-    
-    /**
-     * Constructs the Agent with a theory provided
-     * by an input stream and a goal
-     */
-    public PrologAgent(InputStream is, String goal){
-        theoryInputStream=is;
-        goalText=goal;
-        addOutputListener(defaultOutputListener);
-    }
-    
+//    /**
+//     * Constructs the Agent with a theory provided
+//     * by an input stream
+//     */
+//    public PrologAgent(InputStream is, ClauseIndex dynamics){
+//        super(dynamics);
+//        theoryInputStream=is;
+//        addOutputListener(defaultOutputListener);
+//    }
+//
+//    /**
+//     * Constructs the Agent with a theory provided
+//     * by an input stream and a goal
+//     */
+//    public PrologAgent(InputStream is, String goal){
+//        theoryInputStream=is;
+//        goalText=goal;
+//        addOutputListener(defaultOutputListener);
+//    }
+//
     /**
      * Starts agent execution in another thread
      */
-    final public AgentThread spawn(){
-        AgentThread t = new AgentThread(this);
+    final public Thread spawn(){
+        Thread t = new Thread(this::run);
         t.start();
         return t;
     }
 
-
-    /**
-     * Starts agent execution in current thread
-     */
-    public Solution run() {
-        return body();
-    }
     public Solution run(String goal) {
         this.goalText = goal;
         return run();
@@ -166,20 +158,23 @@ public class PrologAgent extends Prolog {
 //    public synchronized void removeOutputListener(OutputListener l) {
 //        removeOutputListener(l);
 //    }
-    
+//
+//    /**
+//     * Removes all output event listeners
+//     */
+//    public void removeAllOutputListener(){
+//        removeAllOutputListeners();
+//    }
+//
+
     /**
-     * Removes all output event listeners
+     * if called directly, Starts agent execution in current thread
      */
-    public void removeAllOutputListener(){
-        removeAllOutputListeners();
-    }
-    
-    
-    protected Solution body(){
+    public Solution run(){
         try {
 
             setTheory( (theoryText==null) ?
-                new Theory(theoryInputStream) :
+                new Theory() :
                 new Theory(theoryText));
 
             if (goalText!=null){
@@ -191,19 +186,7 @@ public class PrologAgent extends Prolog {
         }
         return null;
     }
-    
-    
-    static final class AgentThread extends Thread {
-        final PrologAgent agent;
-        AgentThread(PrologAgent agent){
-            this.agent=agent;
-        }
-        @Override
-        final public void run(){
-            agent.body();
-        }
-    }
-    
+
 
 //    public static void main(String args[]){
 //        if (args.length==1 || args.length==2){

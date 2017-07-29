@@ -32,7 +32,7 @@ public abstract class AtomicToString implements Atomic {
         return  (this == u)
                 ||
                 (
-                        u instanceof Atomic &&
+                        u instanceof Term &&
                         hashCached == u.hashCode() &&
                         opX() == ((Term) u).opX()) &&
                         toString().equals(u.toString()

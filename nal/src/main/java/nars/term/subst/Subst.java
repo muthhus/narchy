@@ -3,9 +3,7 @@ package nars.term.subst;
 import jcog.list.FasterList;
 import nars.Op;
 import nars.derive.match.EllipsisMatch;
-import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
@@ -14,13 +12,17 @@ import org.jetbrains.annotations.Nullable;
 import static nars.Op.Null;
 
 
-public interface Subst  {
+public interface Subst {
 
-    /** can be used to determine if this subst will have any possible effect on any transforms to any possible term,
-     * used as a quick test to prevent transform initializations */
+    /**
+     * can be used to determine if this subst will have any possible effect on any transforms to any possible term,
+     * used as a quick test to prevent transform initializations
+     */
     boolean isEmpty();
 
-    /** the assigned value for x */
+    /**
+     * the assigned value for x
+     */
     @Nullable Term xy(Term t);
 
 
@@ -36,82 +38,39 @@ public interface Subst  {
 
     void clear();
 
-    /** copy in
+    /**
+     * copy in
+     *
      * @return whether all puts were successful
-     * */
+     */
     //boolean put(@NotNull Unify copied);
+    @NotNull
+    default Term transform(@NotNull Term x) {
 
-
-    @NotNull default Term transform(@NotNull Term x) {
-
-        assert(!(x instanceof Bool));
+        assert (!(x instanceof Bool));
 
         Term y = xy(x);
         if (y != null)
             return y; //an assigned substitution, whether a variable or other type of term
 
-        if (x instanceof Atomic)
-            return x;
-//        Op op = x.op();
-//        switch (op) {
-//            case ATOM:
-//            case INT:
-//            case VAR_DEP:
-//            case VAR_INDEP:
-//            case VAR_QUERY:
-//            case VAR_PATTERN:
-//                return x; //unassigned literal atom or non-pattern var
-//        }
-
-//        //shortcut for premise evaluation matching:
-//        //no variables that could be substituted, so return this constant
-//        if (this instanceof Derivation && (x.vars() + x.varPattern() == 0))
-//            return x;
-
-
-
-        Compound curr = (Compound) x;
-        TermContainer subs = curr.subterms();
-
+        TermContainer subs = x.subterms();
         int len = subs.size();
 
+        if (len == 0)
+            return x;
+
+        FasterList<Term> next = new FasterList<>(len);
 
         Op op = x.op();
 
-        FasterList<Term> next = new FasterList(len);
-
-        //early prefilter for True/False subterms
-        boolean filterTrueFalse = !op.allowsBool;
+        boolean filterTrueFalse = !op.allowsBool; //early prefilter for True/False subterms
 
         for (int i = 0; i < len; i++) {
             Term t = subs.sub(i);
             Term u = transform(t);
-
-            if (u instanceof EllipsisMatch) {
-
-                ((EllipsisMatch)u).forEach(next::add);
-
-//                for (; volAt < subAt; volAt++) {
-//                    Term st = next.sub(volAt);
-//                    if (filterTrueFalse && Op.isTrueOrFalse(st)) return null;
-//                }
-
-            } else {
-
-                if (Term.invalidBoolSubterms(u, filterTrueFalse)) {
-                    return Null;
-                }
-
-//                if (this instanceof Derivation && u.varPattern() > 0) {
-//                    //assert(false): "varPattern should have been filtered? " + u;
-//                    return null;
-//                }
-
-                next.add(u);
-            }
-
+            if (!addTransformed(u, next, filterTrueFalse))
+                return Null;
         }
-
 
 //        int ns = next.size();
 //        if (ns > op.maxSize)
@@ -123,11 +82,33 @@ public interface Subst  {
 //        }
 
         if (!subs.equalTerms(next))
-            return op.the(curr.dt(), next.array(Term[]::new));
+            return op.the(x.dt(), next.array(Term[]::new));
         else
-            return curr;
+            return x;
     }
 
+    static boolean addTransformed(Term u, FasterList<Term> next, boolean filterTrueFalse) {
+
+        if (u instanceof EllipsisMatch) {
+
+            if (!((EllipsisMatch) u).forEachWhile(x -> addTransformed(x, next, filterTrueFalse)))
+                return false;
+
+        } else {
+
+            if (Term.invalidBoolSubterms(u, filterTrueFalse))
+                return false;
+
+//                if (this instanceof Derivation && u.varPattern() > 0) {
+//                    //assert(false): "varPattern should have been filtered? " + u;
+//                    return null;
+//                }
+
+            next.add(u);
+        }
+
+        return true;
+    }
 
 
 //    void forEach(@NotNull BiConsumer<? super Term, ? super Term> each);
@@ -142,9 +123,6 @@ public interface Subst  {
 //        });
 //        return b[0];
 //    }
-
-
-
 
 
 //
@@ -162,9 +140,6 @@ public interface Subst  {
 //    void putXY(Term x, Term y);
 //    void putYX(Term x, Term y);
 //
-
-
-
 
 
 }

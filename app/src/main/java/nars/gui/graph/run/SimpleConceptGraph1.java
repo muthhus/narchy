@@ -60,7 +60,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
         NAR n = NARS.tmp();
         //n.DEFAULT_BELIEF_PRIORITY = 0.1f;
         //n.DEFAULT_QUESTION_PRIORITY = 0.1f;
-        float fps = 1f;
+        float fps = 50f;
 
         //csvPriority(n, "/tmp/x.csv");
 

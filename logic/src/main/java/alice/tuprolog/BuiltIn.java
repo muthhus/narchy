@@ -262,7 +262,7 @@ public final class BuiltIn extends Library {
 	        Iterator<? extends Term> it = list.listIterator();
 	        int count = 0;
 	        while (it.hasNext()) {
-	        	String path = alice.util.Tools.removeApices(it.next().toString());
+	        	String path = alice.util.Tools.removeApostrophes(it.next().toString());
 	            args[count++] = path;
 	        }
 	        return args;
@@ -608,7 +608,7 @@ public final class BuiltIn extends Library {
 	 public void include_1(Term theory) throws
 			 InvalidTheoryException, IOException {
 		 theory = theory.term();
-         String path = alice.util.Tools.removeApices(theory.toString());
+         String path = alice.util.Tools.removeApostrophes(theory.toString());
          if(! new File(path).isAbsolute()) {
             path = engine.getCurrentDirectory()  + File.separator + path;
          }

@@ -160,10 +160,10 @@ public interface Term extends Termlike, Comparable<Term> {
         if (ps < depth)
             throw new RuntimeException("path overflow");
 
-        if (src instanceof Atomic)
+        int n = src.size();
+        if (n == 0)
             return src; //path wont continue inside an atom
 
-        int n = src.size();
         Compound csrc = (Compound) src;
 
         Term[] target = new Term[n];
@@ -175,7 +175,7 @@ public interface Term extends Termlike, Comparable<Term> {
                 target[i] = x;
             else {
                 //replacement is in this subtree
-                target[i] = x instanceof Atomic ? replacement : x.transform(path, depth + 1, replacement);
+                target[i] = x.size() == 0 ? replacement : x.transform(path, depth + 1, replacement);
             }
 
         }

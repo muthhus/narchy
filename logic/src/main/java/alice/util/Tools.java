@@ -80,7 +80,7 @@ public class Tools {
         return false;
     }
     
-    public static String removeApices(String st){
+    public static String removeApostrophes(String st){
         return st.startsWith("'") && st.endsWith("'") ? st.substring(1, st.length() - 1) : st;
     }
 }

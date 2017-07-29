@@ -61,17 +61,17 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
         Iterator<PrimitiveInfo> it = prims.get(PrimitiveInfo.DIRECTIVE).iterator();
         while (it.hasNext()) {
             PrimitiveInfo p = it.next();
-            directives.put(p.getKey(), p);
+            directives.put(p.key, p);
         }
         it = prims.get(PrimitiveInfo.PREDICATE).iterator();
         while (it.hasNext()) {
             PrimitiveInfo p = it.next();
-            predicates.put(p.getKey(), p);
+            predicates.put(p.key, p);
         }
         it = prims.get(PrimitiveInfo.FUNCTOR).iterator();
         while (it.hasNext()) {
             PrimitiveInfo p = it.next();
-            functors.put(p.getKey(), p);
+            functors.put(p.key, p);
         }
         List<PrimitiveInfo> primOfLib =
                 //new LinkedList<>(prims.get(PrimitiveInfo.DIRECTIVE));
@@ -85,7 +85,7 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
 
     void deletePrimitiveInfo(IPrimitives src) {
         for (PrimitiveInfo primitiveInfo : libHashMap.remove(src)) {
-            String k = primitiveInfo.invalidate();
+            String k = primitiveInfo.key;
             directives.remove(k);
             predicates.remove(k);
             functors.remove(k);
@@ -174,7 +174,7 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
 
     Library getLibraryDirective(String name, int nArgs) {
         try {
-            return (Library) directives.get(name + '/' + nArgs).getSource();
+            return (Library) directives.get(name + '/' + nArgs).source;
         } catch (NullPointerException e) {
             return null;
         }
@@ -182,7 +182,7 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
 
     Library getLibraryPredicate(String name, int nArgs) {
         try {
-            return (Library) predicates.get(name + '/' + nArgs).getSource();
+            return (Library) predicates.get(name + '/' + nArgs).source;
         } catch (NullPointerException e) {
             return null;
         }
@@ -190,7 +190,7 @@ public class PrimitiveManager /*Castagna 06/2011*/ implements IPrimitiveManager/
 
     Library getLibraryFunctor(String name, int nArgs) {
         try {
-            return (Library) functors.get(name + '/' + nArgs).getSource();
+            return (Library) functors.get(name + '/' + nArgs).source;
         } catch (NullPointerException e) {
             return null;
         }

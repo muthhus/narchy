@@ -136,7 +136,7 @@ public abstract class Library implements Serializable, IPrimitives {
                 engine.identifyFunctor(t);
             } else if (primitive) {
                 PrimitiveInfo bt = t.getPrimitive();
-                if (bt.isFunctor()) // check for library functors
+                if ((bt.type == PrimitiveInfo.FUNCTOR)) // check for library functors
                     return bt.evalAsFunctor(t);
             }
         } else if (val instanceof Number) {

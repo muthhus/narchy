@@ -704,21 +704,7 @@ public class Int implements Intlike {
 //            //return newSubs;
 //        }
 //    }
-//
-//    @NotNull
-//    private static List<Term> atomSeq(Term x) {
-//        if (x instanceof Compound) {
-//            List<Term> s = $.newArrayList(0);
-//            x.recurseTerms(v -> {
-//                if ((v instanceof Atomic && v.op() != INT)) {
-//                    s.add(v);
-//                }
-//            });
-//            return s;
-//        } else {
-//            return Collections.emptyList();
-//        }
-//    }
+
 //
 //
 //    @Nullable

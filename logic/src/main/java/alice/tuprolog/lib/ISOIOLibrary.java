@@ -1587,7 +1587,7 @@ public class ISOIOLibrary extends Library{
                      if(quoted){ //per scrivere sull'output devo richiamare l'output dell'Engine nel caso di stdio,
                                                         //altrimenti utilizzando write() il risultato lo stampa sulla console Java.
                                                         //Nel caso in cui l'output e' un file write e' corretto.
-                         getEngine().stdOutput((alice.util.Tools.removeApices(out_term.toString())));
+                         getEngine().stdOutput((alice.util.Tools.removeApostrophes(out_term.toString())));
                      }
                      else{
                          getEngine().stdOutput((out_term.toString()));
@@ -1595,7 +1595,7 @@ public class ISOIOLibrary extends Library{
                  } 
                  else {
                          if(quoted){
-                         output.write((alice.util.Tools.removeApices(out_term.toString())).getBytes());
+                         output.write((alice.util.Tools.removeApostrophes(out_term.toString())).getBytes());
                      }
                      else{
                          output.write((out_term.toString()).getBytes());
@@ -1610,7 +1610,7 @@ public class ISOIOLibrary extends Library{
                 
                 if (output_name.equals("stdout")) {
                     if(quoted){
-                         getEngine().stdOutput((alice.util.Tools.removeApices(out_term.toString())+ ' '));
+                         getEngine().stdOutput((alice.util.Tools.removeApostrophes(out_term.toString())+ ' '));
                     }
                     else{
                          getEngine().stdOutput((out_term.toString()+ ' '));
@@ -1618,7 +1618,7 @@ public class ISOIOLibrary extends Library{
                 } 
                  else {
                          if(quoted){
-                        output.write((alice.util.Tools.removeApices(out_term.toString())+ ' ').getBytes());
+                        output.write((alice.util.Tools.removeApostrophes(out_term.toString())+ ' ').getBytes());
                     }
                     else{
                         output.write((out_term.toString()+ ' ').getBytes());
@@ -1701,7 +1701,7 @@ public class ISOIOLibrary extends Library{
                             return term.toString();
                         }
                         else{
-                            result += alice.util.Tools.removeApices(arg.toString()); 
+                            result += alice.util.Tools.removeApostrophes(arg.toString());
                         }
                     }
                 }
@@ -1759,13 +1759,13 @@ public class ISOIOLibrary extends Library{
                     
                 else{
                     if(!ignore_ops){
-                        result += alice.util.Tools.removeApices(arg.toString());
+                        result += alice.util.Tools.removeApostrophes(arg.toString());
                         if(i%2 == 0 && operator != ""){
                             result += ' ' +operator+ ' ';
                         }
                     }
                     else{
-                        result += alice.util.Tools.removeApices(arg.toString());
+                        result += alice.util.Tools.removeApostrophes(arg.toString());
                     }
                 }
             }

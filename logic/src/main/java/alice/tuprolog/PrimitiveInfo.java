@@ -33,7 +33,7 @@ public class PrimitiveInfo {
     public final static int PREDICATE  = 1;
     public final static int FUNCTOR    = 2;
     
-    private final int type;
+    public final int type;
     /**
 	 * method to be call when evaluating the built-in
 	 */
@@ -41,13 +41,13 @@ public class PrimitiveInfo {
     /**
 	 * lib object where the builtin is defined
 	 */
-    private final IPrimitives source;
-    private final int arity;
+    public final IPrimitives source;
+    public final int arity;
     /**
 	 * for optimization purposes
 	 */
     //private final Object[] primitive_args;
-    private String primitive_key;
+    public final String key;
 
 
     public PrimitiveInfo(int type, String key, Library lib, Method m, int arity) throws NoSuchMethodException {
@@ -55,49 +55,13 @@ public class PrimitiveInfo {
             throw new NoSuchMethodException();
         }
         this.type = type;
-        primitive_key = key;
+        this.key = key;
         source = lib;
         method = m;
         this.arity = arity;
     }
 
-    Object[] newArgs() { return new Object[arity]; }
-
-
-    /**
-     * Method to invalidate primitives. It's called just mother library removed
-     */
-    public synchronized String invalidate() {
-        String key = primitive_key;
-        primitive_key = null;
-        return key;
-    }
-
-
-    public String getKey() {
-        return primitive_key;
-    }
-
-    public boolean isDirective() {
-        return (type == DIRECTIVE);
-    }
-
-    public boolean isFunctor() {
-        return (type == FUNCTOR);
-    }
-
-    public boolean isPredicate() {
-        return (type == PREDICATE);
-    }
-
-
-    public int getType() {
-        return type;
-    }
-
-    public IPrimitives getSource() {
-        return source;
-    }
+    private Object[] newArgs() { return new Object[arity]; }
 
 
     /**

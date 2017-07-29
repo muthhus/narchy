@@ -12,7 +12,6 @@ import nars.task.util.AnswerBag;
 import nars.task.util.InvalidTaskException;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.atom.Atomic;
 import nars.term.atom.Bool;
 import nars.term.var.Variable;
 import nars.time.Tense;
@@ -208,7 +207,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             }
         }
 
-        return (t instanceof Atomic) || validTaskCompound(t, punc, safe);
+        return (t.size()==0) || validTaskCompound(t, punc, safe);
     }
 
 //    @Nullable
