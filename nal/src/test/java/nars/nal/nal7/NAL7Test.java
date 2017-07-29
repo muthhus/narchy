@@ -21,7 +21,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL7Test extends AbstractNALTest {
 
-    public int cycles = 30;
+    public int cycles = 200;
 
 
     public void cycles(int numCycles) {
@@ -665,6 +665,7 @@ public class NAL7Test extends AbstractNALTest {
 
         test
 
+                .log()
                 .inputAt(0, "(b). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
                 .mustNotOutput(cycles, "(a)", BELIEF, ETERNAL)

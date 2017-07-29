@@ -187,6 +187,9 @@ public class Temporalize {
         } else if (a.base != ETERNAL && b.base != ETERNAL) {
             return (int) (b.abs() - a.abs()); //TODO check for numeric precision loss
         } else {
+            if (a.offset == b.offset)
+                return a.offset;
+
             throw new UnsupportedOperationException(a + " .. " + b); //maybe just return DTERNAL
         }
     }
@@ -760,17 +763,21 @@ public class Temporalize {
          * create the solved term as-is (since it will not contain any XTERNAL) with the appropriate
          * temporal bounds. */
 
-        if (o.temporal && target.size()==2) {
-            Term a = target.sub(0);
-            Term b = target.sub(1);
+        if (o.temporal) {
+             if (target.size()==2) {
+                 Term a = target.sub(0);
+                 Term b = target.sub(1);
 
-            Event ra = solve(a);
-            if (ra!=null) {
-                Event rb = solve(b);
-                if (rb!=null) {
-                    return solveTemporal(trail, isNeg, o, ra, rb, a, b);
-                }
-            }
+                 Event ra = solve(a);
+                 if (ra != null) {
+                     Event rb = solve(b);
+                     if (rb != null) {
+                         return solveTemporal(trail, isNeg, o, ra, rb, a, b);
+                     }
+                 }
+             } else {
+                logger.warn("TODO unsupported 3-arity temporal target: " + target);
+             }
 
         } else if (o.statement) {
             Term a = target.sub(0);
@@ -878,14 +885,17 @@ public class Temporalize {
     }
 
     private Event solveTemporal(HashMap<Term, Time> trail, boolean isNeg, Op o, Event ea, Event eb, Term a, Term b) {
-        int sd = dt(ea, eb, trail);
+        int dt = dt(ea, eb, trail);
+        if (dt != 0 && Math.abs(dt) < dur)
+            dt = 0; //perceived as simultaneous within duration
+
 //                                        if (o == CONJ && sd != DTERNAL && sd != XTERNAL) {
 //                                            sd -= a.dtRange(); sd -= b.dtRange();
 //                                        }
-        if (sd != XTERNAL) {
+        if (dt != XTERNAL) {
 
             @Nullable Time at = ea.start(trail);
-            Term newTerm = $.negIf(o.the(sd, a, b), isNeg);
+            Term newTerm = $.negIf(o.the(dt, a, b), isNeg);
 
             @Nullable Time bt = eb.start(trail);
             long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();

@@ -188,11 +188,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 float before = e.priElseZero();
                 ((NALTask) e).merge(i);
                 float after = e.priMax(activation);
-                activation -= (after - before);
+                float activationApplied = (after - before);
 
 
-                if (activation >= Pri.EPSILON)
-                    Activate.activate(e, activation, nar);
+                if (activationApplied >= Pri.EPSILON)
+                    Activate.activate(e, activationApplied, nar);
             }
         };
 

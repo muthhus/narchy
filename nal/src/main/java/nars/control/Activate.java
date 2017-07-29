@@ -74,17 +74,17 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     }
 
-    public static void activate(@NotNull Task t, float activation, @NotNull NAR n) {
-        activate(t, activation, n, true);
+    public static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n) {
+        activate(t, activationApplied, n, true);
     }
 
-    public static void activate(@NotNull Task t, float activation, @NotNull NAR n, boolean process) {
+    public static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n, boolean process) {
         // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
         //if (activation >= EPSILON) {
         Concept cc = t.concept(n, true);
         if (cc != null) {
 
-            n.input(activate(t, activation, cc, n));
+            n.input(activate(t, activationApplied, cc, n));
 //                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
 //                n.input(a);
         }

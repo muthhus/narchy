@@ -561,13 +561,13 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         }
 
         CharSequence tenseString;
-        if (memory != null) {
-            tenseString = getTense(memory.time());
-        } else {
+//        if (memory != null) {
+//            tenseString = getTense(memory.time());
+//        } else {
             //TODO dont bother craeting new StringBuilder and calculating the entire length etc.. just append it to a reusable StringReader?
             appendOccurrenceTime(
                     (StringBuilder) (tenseString = new StringBuilder()));
-        }
+//        }
 
 
         CharSequence stampString = showStamp ? stampAsStringBuilder() : null;

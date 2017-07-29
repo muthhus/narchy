@@ -154,10 +154,10 @@ public class GoalActionConcept extends ActionConcept {
 
 //        //HACK insert shadow goal
         Task fg;
-        if (goal!=null)
+//        if (goal!=null)
             fg = action.set(term, goal, stamper, nar);
-        else
-            fg = action.get(); //latch previous goal
+//        else
+//            fg = action.get(); //latch previous goal
 
         //Task fg = null;
 
