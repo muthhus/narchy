@@ -154,18 +154,20 @@ public class GoalActionConcept extends ActionConcept {
         Task fb = feedback.set(term, beliefFeedback, stamper, nar);
 
         Task fg;
-        boolean latchGoal = false; //experimental
+        boolean latchGoal = true; //experimental
         if (latchGoal) {
             if (goal!=null)
-                fg = action.set(term, goal, stamper, nar, +1 * nar.dur() /* next moment */);
+                fg = action.set(term, goal, stamper, nar);
+                        //+1 * nar.dur() /* next moment */);
             else
                 fg = action.get(); //latch previous goal
         } else {
-            fg = action.set(term, goal, stamper, nar, +1 * nar.dur() /* next moment */);
+            fg = action.set(term, goal, stamper, nar);
+                    //+1 * nar.dur() /* next moment */);
         }
 
 
-        return Stream.of(fb, fg==null || goal!=fg.truth() ? fg : null).filter(Objects::nonNull);
+        return Stream.of(fb, curious ? fg : null).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);
     }
 

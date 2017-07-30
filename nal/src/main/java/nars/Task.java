@@ -88,7 +88,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                 //nearest endpoint of the interval
                 assert (dur > 0);
                 long dist = a != z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a - when);
-                assert(dist > 0);
+                assert(dist > 0): "what time is " + a + ".." + z + " supposed to mean relative to " + when;
 
                 cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
                 //cw = 0; //immediate cut-off
