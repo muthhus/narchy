@@ -1,8 +1,11 @@
 package nars.derive.match;
 
+import nars.$;
 import nars.term.Term;
 import nars.term.var.AbstractVariable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.VAR_PATTERN;
 
@@ -15,16 +18,11 @@ public class EllipsisOneOrMore extends Ellipsis {
         super(name, 1); //TODO decide if EllipsisTransform, a subclass, needs its own uniqueness hashmask
     }
 
-//    protected EllipsisOneOrMore(@NotNull AbstractVariable name, int id) {
-//        super(name, 1, id);
-//    }
-
-//    @Override
-//    public @NotNull Variable clone(@NotNull AbstractVariable newVar, VariableNormalization normalizer) {
-////        if (newVar.hashCode()==hash)
-////            return this;
-//        return new EllipsisOneOrMore(newVar);
-//    }
+    @Override
+    public @Nullable Variable normalize(int vid) {
+        if (vid == id) return this;
+        return new EllipsisOneOrMore($.v(op(), vid));
+    }
 
     final static int RANK = Term.opX(VAR_PATTERN, 2 /* different from normalized variables with a subOp of 0 */);
     @Override public int opX() { return RANK;    }
@@ -35,9 +33,6 @@ public class EllipsisOneOrMore extends Ellipsis {
     public String toString() {
         return super.toString() + "..+";
     }
-
-
-
 
 
 }

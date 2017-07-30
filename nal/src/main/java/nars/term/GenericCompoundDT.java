@@ -79,8 +79,8 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     }
 
     @Override
-    public @Nullable Term normalize() {
-        return Compound.super.normalize();
+    public @Nullable Term normalize(int offset) {
+        return Compound.super.normalize(offset);
     }
 
     @Override

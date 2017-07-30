@@ -5,7 +5,7 @@ import jcog.net.UDPeer;
 import jcog.pri.PriReference;
 import nars.bag.leak.LeakOut;
 import nars.control.CauseChannel;
-import nars.task.LambdaQuestionTask;
+import nars.task.ActiveQuestionTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +20,7 @@ import static jcog.net.UDPeer.Command.TELL;
 /**
  * InterNAR P2P Network Interface for a NAR
  */
-public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, Task> {
+public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, Task> {
 
     //public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
@@ -135,7 +135,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
         if (x!=null) {
             if (x.isQuestOrQuestion()) {
                 //reconstruct a question task with an onAnswered handler to reply with answers to the sender
-                x = new LambdaQuestionTask(x, 8, nar, this);
+                x = new ActiveQuestionTask(x, 8, nar, this);
                 x.meta(Msg.class, m);
             }
             x.budget(nar);
@@ -147,7 +147,7 @@ public class InterNAR extends UDPeer implements BiConsumer<LambdaQuestionTask, T
     }
 
     @Override
-    public void accept(LambdaQuestionTask question, Task answer) {
+    public void accept(ActiveQuestionTask question, Task answer) {
         Msg q = question.meta(Msg.class);
         if (q==null)
             return;

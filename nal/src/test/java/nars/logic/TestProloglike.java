@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.URL;
 
 import static nars.$.$;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 4/17/17.
@@ -23,6 +24,7 @@ public class TestProloglike {
 
     /** http://www.doc.gold.ac.uk/~mas02gw/prolog_tutorial/prologpages/rules.html */
     @Test public void testProloglike1() throws Narsese.NarseseException {
+        Param.DEBUG = true;
         NAR n = NARS.tmp();
         /*
         fun(X) :- red(X), car(X).
@@ -34,18 +36,23 @@ public class TestProloglike {
         red(ford_escort).
         blue(harley_davidson).
         */
-        Param.ANSWER_REPORTING = true;
+
+        n.truthResolution.setValue(0.1f);
         n.believe(
             "((red($x) && car($x))==>fun($x))",
             "((blue($x) && bike($x))==>fun($x))",
+            "(car($x) <=> (--,bike($x)))",
+            "(red($x) <=> (--,blue($x)))",
             "car(vw_beatle)", "car(ford_escort)", "bike(harley_davidson)", "red(vw_beatle)", "red(ford_escort)", "blue(harley_davidson)"
         );
-        n.run(1);
-        n.concept($("fun($x)")).print();
-        n.clear();
         n.log();
-        n.input("$0.99 fun(?x)?");
+        n.DEFAULT_QUESTION_PRIORITY = 0.99f;
+        n.question("fun(?x)", ETERNAL, (q,a)->{
+            System.out.println(a.term() + " " + a.truth());
+        });
         n.run(100);
+
+
 
     }
 

@@ -795,8 +795,13 @@ public interface Term extends Termlike, Comparable<Term> {
         return DTERNAL;
     }
 
-    default Term normalize() {
+    default Term normalize(int offset) {
         return this; //no change
+    }
+
+    @Nullable
+    default Term normalize() {
+        return normalize(0);
     }
 
 

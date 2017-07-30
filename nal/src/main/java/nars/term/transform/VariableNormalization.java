@@ -25,6 +25,9 @@ import java.util.function.Function;
  */
 public class VariableNormalization extends VariableTransform implements Function<Variable,Variable> {
 
+    /** indexing offset of assigned variable id's */
+    private final int offset;
+
     protected int count;
 
     @NotNull
@@ -36,7 +39,7 @@ public class VariableNormalization extends VariableTransform implements Function
         this(0);
     }*/
 
-    /** for use with compounds that have exactly one variable */
+    /** for use with compounds that have exactly one variable (when offset=0, default) */
     public static final VariableTransform singleVariableNormalization = new VariableTransform() {
 
         @Override
@@ -47,7 +50,7 @@ public class VariableNormalization extends VariableTransform implements Function
             //return null;
 
             if (t instanceof Variable)
-                return $.v(t.op(), 1);
+                return t.normalize(1);
             else
                 return t;
         }
@@ -75,24 +78,34 @@ public class VariableNormalization extends VariableTransform implements Function
 
     @NotNull
     protected Variable newVariable(@NotNull Variable x) {
-        Variable y;
-        if (x instanceof UnnormalizedVariable) {
-            y = ((UnnormalizedVariable) x).normalize(count); //HACK
-        } else {
-            y = $.v(x.op(), count);
-            //y = y.equals(x) ? x : y; //attempt to use the original if they are equal, this can help prevent unnecessary transforms etc
-        }
+        //Variable y;
 
-        return y ;
+        int vid = this.count + offset;
+
+        return x.normalize(vid);
+
+//        if (x instanceof UnnormalizedVariable) {
+//            y = ((UnnormalizedVariable) x).normalize(vid); //HACK
+//        } else {
+//
+//            //y = y.equals(x) ? x : y; //attempt to use the original if they are equal, this can help prevent unnecessary transforms etc
+//        }
+
+        //return y ;
 
     }
 
 
-    public VariableNormalization(int size /* estimate */) {
-        this(new HashMap<>(size));
+    public VariableNormalization(int size /* estimate */, int offset) {
+        this(new HashMap<>(size), offset);
     }
 
     public VariableNormalization(@NotNull Map<Variable, Variable> r) {
+        this(r, 0);
+    }
+
+    public VariableNormalization(@NotNull Map<Variable, Variable> r, int offset) {
+        this.offset = offset;
         map = r;
 
         //NOTE:

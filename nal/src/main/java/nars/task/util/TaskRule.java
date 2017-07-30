@@ -43,7 +43,7 @@ public class TaskRule extends TaskMatch {
         this.input = $.$(input);
         this.outputRaw = nar.terms.termRaw(output);
 
-        VariableNormalization varNorm = new VariableNormalization(outputRaw.size() /* est */);
+        VariableNormalization varNorm = new VariableNormalization(outputRaw.size() /* est */, 0);
 
         this.output = compoundOrNull(outputRaw.transform(varNorm));
         if (this.output == null)

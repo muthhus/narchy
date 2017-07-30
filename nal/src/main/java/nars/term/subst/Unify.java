@@ -237,6 +237,14 @@ public abstract class Unify extends Versioning implements Subst {
 
 
     public final boolean unify(@NotNull Term x, @NotNull Term y) {
+        //for debugging:
+//        if (use(TTL_UNIFY)) {
+//            boolean r = x.unify(y, this);
+//            System.out.println(xy + "\t" + x + " " + y + " ? "+ r);
+//            return r;
+//        }
+//        return false;
+
         return use(TTL_UNIFY) && x.unify(y, this);
     }
 
@@ -430,7 +438,7 @@ public abstract class Unify extends Versioning implements Subst {
                 int s = constraints.size();
                 for (int i = 0; i < s; i++) {
                     MatchConstraint cc = constraints.get(i);
-                    assert(cc!=null);
+                    //assert(cc!=null);
                     if (cc.invalid(x, Unify.this))
                         return false;
                 }

@@ -1,7 +1,7 @@
 package nars;
 
 import nars.task.ITask;
-import nars.task.LambdaQuestionTask;
+import nars.task.ActiveQuestionTask;
 import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
@@ -22,25 +22,25 @@ public interface NARIn {
     }
 
     @Nullable
-    default Task question(@NotNull String questionTerm, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) throws Narsese.NarseseException {
+    default Task question(@NotNull String questionTerm, long occ, @NotNull BiConsumer<ActiveQuestionTask,Task> eachAnswer) throws Narsese.NarseseException {
         return question(term(questionTerm), occ, eachAnswer);
     }
 
     @Nullable
-    default Task question(@NotNull Compound term, long occ, @NotNull BiConsumer<LambdaQuestionTask,Task> eachAnswer) {
+    default Task question(@NotNull Compound term, long occ, @NotNull BiConsumer<ActiveQuestionTask,Task> eachAnswer) {
         return question(term, occ, Op.QUESTION, eachAnswer);
     }
 
     @Nullable
-    default LambdaQuestionTask question(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull BiConsumer<LambdaQuestionTask, Task> eachAnswer) {
+    default ActiveQuestionTask question(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull BiConsumer<ActiveQuestionTask, Task> eachAnswer) {
         assert(punc == Op.QUESTION || punc == Op.QUEST);
-        return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
+        return inputAndGet( new ActiveQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
     }
 
     @Nullable
-    default LambdaQuestionTask ask(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
+    default ActiveQuestionTask ask(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
         assert(punc == Op.QUESTION || punc == Op.QUEST);
-        return inputAndGet( new LambdaQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
+        return inputAndGet( new ActiveQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
     }
 
 

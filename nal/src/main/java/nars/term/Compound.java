@@ -768,9 +768,9 @@ public interface Compound extends Term, IPair, TermContainer {
     final static Logger logger = LoggerFactory.getLogger(Compound.class);
 
     @Nullable
-    default Term normalize() {
-        if (this.isNormalized())
-            return this; //TODO try not to let this happen
+    default Term normalize(int varOffset) {
+        if (varOffset == 0 && this.isNormalized())
+            return this;
 
 
 
@@ -781,10 +781,10 @@ public interface Compound extends Term, IPair, TermContainer {
         Term y;
         if (totalVars > 0) {
             y = transform(
-                    ((vars == 1) && (pVars == 0)) ?
+                    ((vars == 1) && (pVars == 0) && varOffset==0) ?
                             VariableNormalization.singleVariableNormalization //special case for efficiency
                             :
-                            new VariableNormalization(totalVars /* estimate */)
+                            new VariableNormalization(totalVars /* estimate */, varOffset)
             );
 
 
@@ -792,7 +792,7 @@ public interface Compound extends Term, IPair, TermContainer {
             y = this;
         }
 
-        if (y != null && y instanceof Compound)
+        if (varOffset == 0 && y != null && y instanceof Compound)
             ((Compound)y).setNormalized();
 
         return y;

@@ -182,16 +182,19 @@ public class Temporalize {
         assert (a.base != XTERNAL);
         assert (b.base != XTERNAL);
 
-        if (a.base == ETERNAL && b.base == ETERNAL) {
-            return b.offset - a.offset; //relative offsets within an eternal context
-        } else if (a.base != ETERNAL && b.base != ETERNAL) {
+        if (a.base != ETERNAL && b.base != ETERNAL) {
             return (int) (b.abs() - a.abs()); //TODO check for numeric precision loss
-        } else {
-            if (a.offset == b.offset)
-                return a.offset;
-
-            throw new UnsupportedOperationException(a + " .. " + b); //maybe just return DTERNAL
+        } else if (a.offset!=XTERNAL && b.offset!=XTERNAL && a.offset!=DTERNAL && b.offset!=DTERNAL) {
+            //if (a.base == ETERNAL || b.base == ETERNAL) {
+            return b.offset - a.offset; //relative offsets within a complete or partial eternal context
+//            } else {
+//                if (a.offset == b.offset)
+//                    return a.offset;
+//
+//
+//            }
         }
+        throw new UnsupportedOperationException(a + " .. " + b); //maybe just return DTERNAL
     }
 
     static class AbsoluteEvent extends Event {

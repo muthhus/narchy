@@ -123,7 +123,7 @@ public class Derivation extends Unify implements TermContext {
     public PrediTerm<Derivation> deriver;
     public final ByteShuffler shuffler = new ByteShuffler(64);
 
-    private transient Term[][] currentMatch;
+//    private transient Term[][] currentMatch;
 
 //    public /*static*/ final Cache<Transformation, Term> transformsCache; //works in static mode too
 //    /*static*/ {
@@ -273,8 +273,15 @@ public class Derivation extends Unify implements TermContext {
 
         this.belief = belief;
 
+
         //assert(beliefTerm.op()!=NEG): beliefTerm + " is negated";
-        this.beliefTerm = beliefTerm.unneg();
+
+        Term bt = beliefTerm.unneg();
+//        int ttv = taskTerm.vars();
+//        if (ttv > 0 && bt.vars() > 0) {
+//            bt = bt.normalize(ttv); //shift variables up to be unique compared to taskTerm's
+//        }
+        this.beliefTerm = bt;
 
 
         if (belief == null) {
@@ -382,12 +389,12 @@ public class Derivation extends Unify implements TermContext {
     @Override
     public final void onMatch(Term[][] match) {
 
-        this.currentMatch = match;
+        //this.currentMatch = match;
 
         try {
             forEachMatch.test(this);
         } finally {
-            this.currentMatch = null;
+            //this.currentMatch = null;
         }
 
     }

@@ -1,8 +1,11 @@
 package nars.derive.match;
 
+import nars.$;
 import nars.term.Term;
 import nars.term.var.AbstractVariable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.VAR_PATTERN;
 
@@ -15,6 +18,11 @@ public class EllipsisZeroOrMore extends Ellipsis {
         super(name, 0);
     }
 
+    @Override
+    public @Nullable Variable normalize(int vid) {
+        if (vid == id) return this;
+        return new EllipsisZeroOrMore($.v(op(), vid));
+    }
 
 //    @Override
 //    public @NotNull Variable clone(@NotNull AbstractVariable newVar, VariableNormalization normalizer) {

@@ -261,7 +261,10 @@ public interface Truth extends Truthed {
     }
 
     static float conf(float c, float epsilon) {
-        return clamp(round(c, epsilon), epsilon, 1f - epsilon);
+        return clamp(
+                round(c, epsilon), //optimistic
+                //floor(c, epsilon), //conservative
+                epsilon, 1f - epsilon);
     }
 
 

@@ -38,6 +38,16 @@ public interface Variable extends Atomic {
 //        return 1;
 //    }
 
+
+    @Override
+    @Nullable
+    default Term normalize() {
+        return this; //override: only normalize if given explicit offset with normalize(int offset) as is done during normalization
+    }
+
+    @Override
+    Variable normalize(int offset);
+
     /**
      * The syntactic complexity of a variable is 0, because it does not refer to
      * any concept.

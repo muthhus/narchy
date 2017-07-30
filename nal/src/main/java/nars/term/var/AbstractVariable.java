@@ -22,12 +22,14 @@ package nars.term.var;
 
 
 import com.google.common.io.ByteArrayDataOutput;
+import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Normalized variable
@@ -62,7 +64,8 @@ public abstract class AbstractVariable implements Variable {
     @Override
     public final boolean equals(Object obj) {
         return obj==this ||
-                (obj instanceof AbstractVariable && ((AbstractVariable)obj).hash == hash); //hash first, it is more likely to differ
+                (obj instanceof AbstractVariable
+                        && ((AbstractVariable)obj).hash == hash); //hash first, it is more likely to differ
                 //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
 
@@ -99,6 +102,16 @@ public abstract class AbstractVariable implements Variable {
 //            return false;
 //        }
 //    }
+
+
+    @Override
+    public @Nullable Variable normalize(int vid) {
+        if (id == vid)
+            return this;
+        else
+            return $.v(op(), vid);
+    }
+
 
     @Override
     public final int hashCode() {

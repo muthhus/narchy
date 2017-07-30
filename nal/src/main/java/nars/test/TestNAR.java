@@ -449,7 +449,7 @@ public class TestNAR {
      */
     @NotNull
     public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, @NotNull long... occs) {
-        assertTrue(occs.length > 0);
+        assertTrue("no occurrence times specified", occs.length > 0);
         for (long occ : occs)
             mustNotOutput(withinCycles, term, punc, 0, 1, 0, 1, occ);
         return this;

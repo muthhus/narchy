@@ -52,7 +52,6 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
 
         }
 
-
         @Override
         public
         @Deprecated

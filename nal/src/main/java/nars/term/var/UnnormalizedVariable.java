@@ -90,7 +90,7 @@ public class UnnormalizedVariable extends AtomicToString implements Variable {
     }
 
     /** produce a normalized version of this identified by the serial integer */
-    public @NotNull Variable normalize(int serial) {
+    @Override public @NotNull Variable normalize(int serial) {
         return $.v(type, serial);
     }
 

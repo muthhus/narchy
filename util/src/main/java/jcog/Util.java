@@ -644,9 +644,11 @@ public enum Util {
      * discretizes values to nearest finite resolution real number determined by epsilon spacing
      */
     public static float round(float value, float epsilon) {
-
         return Math.round(value / epsilon) * epsilon;
+    }
 
+    public static float floor(float value, float epsilon) {
+        return (float) (Math.floor(value / epsilon) * epsilon);
     }
 
     public static float clampround(float value, float epsilon) {
