@@ -5,7 +5,6 @@ import jcog.bag.impl.ArrayBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.concept.Concept;
-import nars.index.term.TermIndex;
 import nars.op.Command;
 import nars.task.*;
 import nars.task.util.AnswerBag;
@@ -868,8 +867,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
         n.emotion.busy(priElseZero(), this.volume());
 
-        //elide if DerivedTask since it has already been evaluated
-        boolean evaluate = !(this instanceof DerivedTask) || isCommand();
+        boolean evaluate = !isCommand();
 
         if (evaluate) {
             Term x = term();
@@ -877,7 +875,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
 
             if (!x.equals(y)) {
-                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), n.terms, true);
+                @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), true);
                 if (yy != null) {
                     NALTask inputY = clone(this, $.negIf(yy.getOne(), yy.getTwo() /* HACK */));
                     assert (inputY != null);
@@ -973,8 +971,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return new PreciseTruth(freq(), e, false);
     }
 
-    @Nullable static Task tryTask(@NotNull Term t, byte punc, TermIndex index, Truth tr, BiFunction<Term, Truth, Task> res) {
-        ObjectBooleanPair<Term> x = tryContent(t, punc, index, true);
+    @Nullable static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, Task> res) {
+        ObjectBooleanPair<Term> x = tryContent(t, punc, true);
         if (x!=null) {
             return res.apply(x.getOne(), tr.negIf(x.getTwo()));
         }
@@ -988,14 +986,14 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
      * necessitating an inversion of truth when constructing a Task with the input term
      */
     @Nullable
-    static ObjectBooleanPair<Term> tryContent(@NotNull Term t, byte punc, TermIndex index, boolean safe) {
+    static ObjectBooleanPair<Term> tryContent(@NotNull Term t, byte punc, boolean safe) {
 
         if (t instanceof Variable || t instanceof Bool)
             return null;
 
         boolean negated = false;
 
-        if ((t = normalizedOrNull(t, index)) == null)
+        if ((t = normalizedOrNull(t)) == null)
             return null;
 
         if (t.op() == NEG) {

@@ -107,7 +107,7 @@ public class NARS {
 
     public static Function<NAR, PrediTerm<Derivation>> newDeriver(int nal) {
         if (nal == 0) {
-            return (n) -> Derivation.NullDeriver;
+            return (n) -> PrediTerm.NullDeriver;
         }
 
         return (nar) -> {

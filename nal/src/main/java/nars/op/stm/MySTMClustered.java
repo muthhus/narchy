@@ -234,7 +234,7 @@ public class MySTMClustered extends STMClustered {
                         if (conj == null)
                             return null;
 
-                        @Nullable ObjectBooleanPair<Term> cp = Task.tryContent(conj, punc, nar.terms, true);
+                        @Nullable ObjectBooleanPair<Term> cp = Task.tryContent(conj, punc, true);
                         if (cp != null) {
                             int uuLen = uu.length;
                             long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
@@ -308,14 +308,14 @@ public class MySTMClustered extends STMClustered {
 
 
             return normalizedOrNull(
-                    CONJ.the(dt, $.negIf(early.term(), negated), $.negIf(late.term(), negated)), index);
+                    CONJ.the(dt, $.negIf(early.term(), negated), $.negIf(late.term(), negated)));
 
         } else {
 
             Term[] u = Util.map((tx) -> $.negIf(tx.term(), negated), new Term[uu.length], uu);
 
             //just assume they occurr simultaneously
-            return normalizedOrNull(CONJ.the(0, u), index);
+            return normalizedOrNull(CONJ.the(0, u));
         }
     }
 }

@@ -211,8 +211,8 @@ public abstract class TermIndex implements TermContext {
 
 
 
-    @Nullable
-    public Term retemporalize(@NotNull Term x, Retemporalize r) {
+    /* TODO move to Term instance method */
+    @Nullable public static Term retemporalize(@NotNull Term x, Retemporalize r) {
 
 
         Term y = x.transform(r.dt(x), r);
@@ -237,8 +237,8 @@ public abstract class TermIndex implements TermContext {
     }
 
 
-    public final Retemporalize retemporalizeDTERNAL = new Retemporalize.RetemporalizeNonXternal(DTERNAL);
-    public final Retemporalize retemporalizeZero = new Retemporalize.RetemporalizeNonXternal(0);
+    public static final Retemporalize retemporalizeDTERNAL = new Retemporalize.RetemporalizeNonXternal(DTERNAL);
+    public static final Retemporalize retemporalizeZero = new Retemporalize.RetemporalizeNonXternal(0);
 
 
 

@@ -4,13 +4,11 @@ import jcog.Util;
 import jcog.version.VersionMap;
 import jcog.version.Versioned;
 import jcog.version.Versioning;
-import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.derive.constraint.MatchConstraint;
 import nars.derive.mutate.Termutator;
 import nars.index.term.NewCompound;
-import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
@@ -58,8 +56,8 @@ public abstract class Unify extends Versioning implements Subst {
             new HashSet();
     //new LinkedHashSet();
 
-    @NotNull
-    public final TermIndex terms;
+//    @NotNull
+//    public final TermIndex terms;
 
     @NotNull
     public final VersionMap<Term, Term> xy;
@@ -74,26 +72,17 @@ public abstract class Unify extends Versioning implements Subst {
      * free variables remaining unassigned, for counting
      */
     protected Versioned<Set<Term>> free;
-    //public Versioned<Integer> freeCount;
-
-    //protected final Set<NewCompound> matched = new HashSet();
-
-
-    protected Unify(@Nullable Op type, Random random, int stackMax, int ttl) {
-        this($.terms, type, random, stackMax, ttl);
-    }
 
 
     /**
-     * @param terms
      * @param type       if null, unifies any variable type.  if non-null, only unifies that type
      * @param random
      * @param versioning
      */
-    protected Unify(TermIndex terms, @Nullable Op type, Random random, int stackMax, int initialTTL) {
+    protected Unify(@Nullable Op type, Random random, int stackMax, int initialTTL) {
         super(stackMax, initialTTL);
 
-        this.terms = terms;
+//        this.terms = terms;
 
         this.random = random;
         this.type = type;

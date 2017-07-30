@@ -2,7 +2,6 @@ package nars.control;
 
 import jcog.math.ByteShuffler;
 import nars.*;
-import nars.derive.AbstractPred;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
@@ -16,14 +15,17 @@ import nars.term.subst.Unify;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.impl.factory.Maps;
+import org.eclipse.collections.api.map.ImmutableMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.HashMap;
 
 import static nars.Op.Null;
 import static nars.Op.VAR_PATTERN;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesDep;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 
@@ -32,14 +34,10 @@ import static nars.time.Tense.ETERNAL;
  */
 public class Derivation extends Unify implements TermContext {
 
-    public static final PrediTerm<Derivation> NullDeriver = new AbstractPred<Derivation>(Op.ZeroProduct) {
-        @Override
-        public boolean test(Derivation o) {
-            return true;
-        }
-    };
     @NotNull
     public final NAR nar;
+
+    private final ImmutableMap<Term, Termed> derivationFunctors;
 
     public float truthResolution;
     public float confMin;
@@ -119,9 +117,6 @@ public class Derivation extends Unify implements TermContext {
 
     public boolean cyclic, overlap;
 
-    /** deriver-local functors, which need to interact with the derivation directly */
-    private final Functor substituteIfUnifiesAny, substituteIfUnifiesDep, polarize, substitute;
-
     public float premisePri;
     public short[] parentCause;
 
@@ -140,7 +135,7 @@ public class Derivation extends Unify implements TermContext {
      * if using this, must set: nar, index, random, DerivationBudgeting
      */
     public Derivation(NAR nar) {
-        super(nar.terms, VAR_PATTERN, nar.random(), Param.UnificationStackMax, 0);
+        super(VAR_PATTERN, nar.random(), Param.UnificationStackMax, 0);
 
         this.nar = nar;
 
@@ -156,7 +151,7 @@ public class Derivation extends Unify implements TermContext {
 //
 //        transformsCache = cb.builder();
 
-
+        final Functor substituteIfUnifiesAny, substituteIfUnifiesDep, polarize, substitute;
         substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
         substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
         polarize = Functor.f2("polarize", (subterm, whichTask) -> {
@@ -176,24 +171,37 @@ public class Derivation extends Unify implements TermContext {
                 putXY(x, y); //TODO verify correct direction and whether reverse is also needed
             }
         };
+
+        derivationFunctors = functors(
+            substituteIfUnifiesAny,
+            substituteIfUnifiesDep,
+            polarize,
+            substitute,
+            nar.get($.the("dropAnyEvent")),
+            nar.get($.the("dropAnySet")),
+            nar.get($.the("union")),
+            nar.get($.the("differ")),
+            nar.get($.the("intersect"))
+        );
+    }
+
+    static ImmutableMap<Term,Termed> functors(Termed... t) {
+        java.util.Map m = new HashMap();
+        for (Termed x : t) {
+            m.put(x.term(), x);
+        }
+        return Maps.immutable.ofMap(m);
     }
 
 
-    @Override
-    public Termed get(Term x, boolean createIfAbsent) {
+    /** only returns derivation-specific functors.  other functors must be evaluated at task execution time */
+    @Override public Termed get(Term x, boolean createIfAbsent) {
         if (x instanceof Atom) {
-            switch (x.toString()) {
-                case "subIfUnifiesAny":
-                    return substituteIfUnifiesAny;
-                case "subIfUnifiesDep":
-                    return substituteIfUnifiesDep;
-                case "polarize":
-                    return polarize;
-                case "substitute":
-                    return substitute;
-            }
-            return terms.get(x, createIfAbsent);
+            Termed f = derivationFunctors.get(x);
+            if (f!=null)
+                return f;
         }
+
         return x;
     }
 

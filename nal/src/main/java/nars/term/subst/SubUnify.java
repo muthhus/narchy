@@ -20,7 +20,7 @@ public class SubUnify extends Unify {
 
 
     public SubUnify(@NotNull Unify parent, @Nullable Op type) {
-        super(parent.terms, type, parent.random, Param.UnificationStackMax, 0);
+        super(type, parent.random, Param.UnificationStackMax, 0);
         this.parent = parent;
     }
 

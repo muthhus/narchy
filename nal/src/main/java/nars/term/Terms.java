@@ -396,17 +396,17 @@ public enum Terms {
     }
 
     @Nullable
-    public static <T extends Term> T normalizedOrNull(@Nullable Term t, @NotNull TermIndex i) {
-        return (T) normalizedOrNull(t, i, i.retemporalizeDTERNAL);
+    public static <T extends Term> T normalizedOrNull(@Nullable Term t) {
+        return (T) normalizedOrNull(t, TermIndex.retemporalizeDTERNAL);
     }
 
     @Nullable
-    public static Term normalizedOrNull(@Nullable Term t, @NotNull TermIndex i, Retemporalize r) {
+    public static Term normalizedOrNull(@Nullable Term t, Retemporalize r) {
 
         if (t.isTemporal()) {
             //the compound indicated a potential dt, but the premise was actually atemporal;
             // this indicates a temporal placeholder (XTERNAL) in the rules which needs to be set to DTERNAL
-            return i.retemporalize(t, r); //retemporalize does normalize at the end
+            return TermIndex.retemporalize(t, r); //retemporalize does normalize at the end
         } else {
             return t.normalize();
         }

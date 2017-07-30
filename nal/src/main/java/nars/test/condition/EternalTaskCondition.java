@@ -99,7 +99,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         this.confMin = Math.max(0.0f, confMin);
         this.punc = punc;
         this.term =
-                normalizedOrNull($.terms.term(sentenceTerm).term(), $.terms);
+                normalizedOrNull($.terms.term(sentenceTerm).term());
     }
 
     @NotNull

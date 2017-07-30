@@ -156,7 +156,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         }
 
         byte punc = d.concPunc;
-        @Nullable ObjectBooleanPair<Term> c3n = Task.tryContent(c2, punc, d.terms, true);
+        @Nullable ObjectBooleanPair<Term> c3n = Task.tryContent(c2, punc, true);
         if (c3n != null) {
 
             boolean negating = c3n.getTwo();

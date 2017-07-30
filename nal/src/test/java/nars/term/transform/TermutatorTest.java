@@ -29,7 +29,7 @@ public class TermutatorTest {
 
     final int TTL = 128;
 
-    final Unify unifier = new Unify(terms, Op.VAR_PATTERN, new XorShift128PlusRandom(1),
+    final Unify unifier = new Unify(Op.VAR_PATTERN, new XorShift128PlusRandom(1),
             Param.UnificationStackMax, TTL) {
         @Override public void onMatch(Term[][] match) {
             stop();

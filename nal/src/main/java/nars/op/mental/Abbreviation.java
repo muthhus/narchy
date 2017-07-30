@@ -194,7 +194,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 
                 if (a.putIfAbsent(Abbreviation.class, id) == null) {
 
-                    Task abbreviationTask = Task.tryTask(abbreviation, BELIEF, nar.terms, $.t(1f, abbreviationConfidence.floatValue()),
+                    Task abbreviationTask = Task.tryTask(abbreviation, BELIEF, $.t(1f, abbreviationConfidence.floatValue()),
                             (te, tr) -> {
 
                         NALTask ta = new NALTask(

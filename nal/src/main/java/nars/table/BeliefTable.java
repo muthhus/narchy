@@ -229,7 +229,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             Truth aProj = answer.truth(when, dur, nar.confMin.floatValue());
             if (aProj != null) {
 
-                Term at = normalizedOrNull(answer.term(), nar.terms, nar.terms.retemporalizeZero);
+                Term at = normalizedOrNull(answer.term(), nar.terms.retemporalizeZero);
                 if (at==null)
                     return null;
 

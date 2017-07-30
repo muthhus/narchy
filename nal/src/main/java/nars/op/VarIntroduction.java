@@ -34,7 +34,7 @@ public abstract class VarIntroduction {
             return; //earliest failure test
 
         if (!(c.isNormalized())) {
-            Compound cc = compoundOrNull(normalizedOrNull(c, n.terms));
+            Compound cc = compoundOrNull(normalizedOrNull(c));
             if (cc == null)
                 return;
             c = cc;
