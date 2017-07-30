@@ -48,11 +48,13 @@ public class GoalActionConcept extends ActionConcept {
                 n);
 
         this.curiosity = curiosity;
-        this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priorityDefault(BELIEF));
-        //((SensorBeliefTable) beliefs).sensor = feedback;
 
         this.action = new Signal(GOAL, resolution).pri(() -> n.priorityDefault(GOAL));
         //((SensorBeliefTable) goals).sensor = action;
+
+        this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priorityDefault(BELIEF));
+        //((SensorBeliefTable) beliefs).sensor = feedback;
+
 
         this.motor = motor;
         //this.goals = newBeliefTable(nar, false); //pre-create
@@ -151,27 +153,19 @@ public class GoalActionConcept extends ActionConcept {
 
         Task fb = feedback.set(term, beliefFeedback, stamper, nar);
 
-
-//        //HACK insert shadow goal
         Task fg;
-//        if (goal!=null)
-            fg = action.set(term, goal, stamper, nar);
-//        else
-//            fg = action.get(); //latch previous goal
+        boolean latchGoal = false; //experimental
+        if (latchGoal) {
+            if (goal!=null)
+                fg = action.set(term, goal, stamper, nar, +1 * nar.dur() /* next moment */);
+            else
+                fg = action.get(); //latch previous goal
+        } else {
+            fg = action.set(term, goal, stamper, nar, +1 * nar.dur() /* next moment */);
+        }
 
-        //Task fg = null;
 
-        //apply additional forgetting for past goals and beliefs, to promote future predictions
-//        float decayFactor = 1f - 1f/Math.max(1 + beliefs().capacity(), goals().capacity());
-//        Consumer<Task> decay = x -> {
-//            if (x.end() < now) {
-//                x.priMult(decayFactor);
-//            }
-//        };
-//        beliefs().forEachTask(decay);
-//        goals().forEachTask(decay);
-
-        return Stream.of(fb, curious ? fg : null).filter(Objects::nonNull);
+        return Stream.of(fb, fg==null || goal!=fg.truth() ? fg : null).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);
     }
 

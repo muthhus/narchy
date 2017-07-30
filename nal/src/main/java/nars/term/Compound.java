@@ -701,22 +701,6 @@ public interface Compound extends Term, IPair, TermContainer {
 
         Op o = op();
 
-//        //unwrap negation before recursion, it should be more efficient
-//        if (o == NEG) {
-//            Term inner = unneg();
-//            if (inner == null)
-//                return this; //dont go further
-//            else {
-//                Term outer = $.neg(inner.evalSafe(index, remain));
-//                if (outer == null)
-//                    return this; //dont go further
-//                else
-//                    return outer;
-//            }
-//        }
-
-        //TermContainer tt = subterms();
-
         @NotNull final Term[] xy = toArray();
         //any contained evaluables
         boolean subsModified = false;

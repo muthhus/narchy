@@ -51,6 +51,10 @@ public class Signal extends AtomicReference<SignalTask> {
     }
 
     public Task set(@NotNull Term term, @Nullable Truthed nextTruth, LongSupplier stamper, NAR nar) {
+        return set(term, nextTruth, stamper, nar, 0);
+    }
+
+    public Task set(@NotNull Term term, @Nullable Truthed nextTruth, LongSupplier stamper, NAR nar, int dt) {
 
 
         //int halfDur = Math.max(1, nar.dur() / 2);
@@ -86,7 +90,7 @@ public class Signal extends AtomicReference<SignalTask> {
                     //TODO move the task construction out of this critical update section?
                     next = task(term, nextTruth.truth(),
                             last, now,
-                            stamper.getAsLong());
+                            stamper.getAsLong(), dt);
 
                 } else {
 
@@ -110,10 +114,10 @@ public class Signal extends AtomicReference<SignalTask> {
     }
 
     @Nullable
-    protected SignalTask task(Term term, Truth t, long start, long end, long stamp) {
+    protected SignalTask task(Term term, Truth t, long start, long end, long stamp, int dt) {
 
 
-        SignalTask s = new SignalTask(term, punc, t, start, end, stamp);
+        SignalTask s = new SignalTask(term, punc, t, start + dt, end + dt, stamp);
 
         return s;
     }
