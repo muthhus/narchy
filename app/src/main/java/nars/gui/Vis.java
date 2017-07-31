@@ -11,6 +11,7 @@ import nars.Task;
 import nars.bag.leak.LeakOut;
 import nars.control.Activate;
 import nars.exe.BufferedExecutioner;
+import nars.exe.FocusedExecutioner;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.term.Term;
@@ -219,11 +220,7 @@ public class Vis {
 
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                () -> (((BufferedExecutioner) (n.exe)).concepts)
-                        .stream()
-                        .map(x -> x instanceof Activate ? ((Activate) x) : null)
-                        .filter(Objects::nonNull)
-                        .iterator()
+                ((FocusedExecutioner)n.exe).concepts.keySet()
                 /* TODO */, 128, 256, 2, 7);
 
 

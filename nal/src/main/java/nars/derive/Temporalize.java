@@ -501,6 +501,8 @@ public class Temporalize {
                 occ[0] = e.start(times).abs();
                 occ[1] = e.end(times).abs();
             }
+
+            assert(occ[0]!=ETERNAL || (task.isEternal() || (belief==null && belief.isEternal()))): "eternal derived from non-eternal premise";
             return e.term;
         }
         return null;

@@ -154,7 +154,7 @@ public class GoalActionConcept extends ActionConcept {
         Task fb = feedback.set(term, beliefFeedback, stamper, nar);
 
         Task fg;
-        boolean latchGoal = true; //experimental
+        boolean latchGoal = false; //experimental
         if (latchGoal) {
             if (goal!=null)
                 fg = action.set(term, goal, stamper, nar);

@@ -487,8 +487,8 @@ public interface Term extends Termlike, Comparable<Term> {
         Op o = op();
         switch (o) {
 
-            case NEG:
-                return sub(0).dtRange();
+//            case NEG:
+//                return sub(0).dtRange();
 
 
             case CONJ:

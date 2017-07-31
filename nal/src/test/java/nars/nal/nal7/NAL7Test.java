@@ -5,11 +5,15 @@ import nars.Narsese;
 import nars.Param;
 import nars.nal.AbstractNALTest;
 import nars.task.NALTask;
+import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import java.util.List;
 
 import static nars.$.$;
 import static nars.Op.*;
@@ -1234,7 +1238,18 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Test
-    public void testInductionIntervalMerge3Neg() {
+    public void testInductionIntervalMerge3Neg() throws Narsese.NarseseException {
+
+        List m = $.newArrayList();
+        Term d = $("--((a) &&+3 --(c))");
+        assertEquals(0, d.dtRange());
+        d.events(m);
+        System.out.println(m);
+
+        List l = $.newArrayList();
+        $("(--((a) &&+3 --(c)) &&+4 (e))").events(l);
+        System.out.println(l);
+        System.out.println();
 
         test
                 .inputAt(1, "(--((a) &&+3 --(c)) &&+4 (e)). :|:")

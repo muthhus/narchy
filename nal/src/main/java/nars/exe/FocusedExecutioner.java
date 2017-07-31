@@ -47,7 +47,7 @@ public class FocusedExecutioner extends Executioner {
     final CurveBag<ITask> tasks = new ConcurrentCurveBag<ITask>(Param.taskMerge, new ConcurrentHashMap<>(),
             random, MAX_TASKS);
 
-    public final CurveBag<ITask> concepts = new ConcurrentCurveBag<ITask>(Param.conceptMerge, new ConcurrentHashMap<>(),
+    public final CurveBag<Activate> concepts = new ConcurrentCurveBag<>(Param.conceptMerge, new ConcurrentHashMap<>(),
             random, MAX_CONCEPTS);
 
 
@@ -185,7 +185,7 @@ public class FocusedExecutioner extends Executioner {
         } else if (x instanceof Premise) {
             premises.putAsync(x);
         } else if (x instanceof Activate) {
-            concepts.putAsync(x);
+            concepts.putAsync((Activate)x);
         } else
             throw new UnsupportedOperationException("what is " + x);
     }
