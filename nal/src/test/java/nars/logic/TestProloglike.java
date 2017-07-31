@@ -43,14 +43,15 @@ public class TestProloglike {
             "((blue($x) && bike($x))==>fun($x))",
             "(car($x) <=> (--,bike($x)))",
             "(red($x) <=> (--,blue($x)))",
-            "car(vw_beatle)", "car(ford_escort)", "bike(harley_davidson)", "red(vw_beatle)", "red(ford_escort)", "blue(harley_davidson)"
+            "car(vw_beatle)", "car(ford_escort)", "bike(harley_davidson)", "red(vw_beatle)", "blue(ford_escort)", "blue(harley_davidson)"
         );
-        n.log();
+        //n.log();
         n.DEFAULT_QUESTION_PRIORITY = 0.99f;
         n.question("fun(?x)", ETERNAL, (q,a)->{
-            System.out.println(a.term() + " " + a.truth());
+            //System.out.println(a.term() + " " + a.truth());
+            System.out.println(a.proof());
         });
-        n.run(100);
+        n.run(1000);
 
 
 
@@ -59,8 +60,7 @@ public class TestProloglike {
     @Test
     public void testRiddle1() throws IOException, Narsese.NarseseException {
         //Param.DEBUG = true;
-        NAR n = //new NARS().exe(new BufferedExecutioner(256, 256, 0.25f)).get();
-                NARS.tmp();
+        NAR n = NARS.tmp();
 
         n.termVolumeMax.setValue(1024);
         n.log();

@@ -417,11 +417,16 @@ public class Derivation extends Unify implements TermContext {
     @Nullable
     public long[] evidenceDouble() {
         if (evidenceDouble == null) {
-            Truth tt = task.truth();
-            float te = tt != null ?
-                    tt.conf() :  //for belief/goal use the task conf
-                    task.priElseZero(); //for question/quest, use the task priority
-            float be = belief.conf();
+            float te, be;
+            if (task.isBeliefOrGoal()) {
+                //for belief/goal use the relative conf
+                te = taskTruth.conf();
+                be = beliefTruth!=null ? beliefTruth.conf() : 0; //beliefTruth can be zero in temporal cases
+            } else {
+                //for question/quest, use the relative priority
+                te = task.priElseZero();
+                be = belief.priElseZero();
+            }
             evidenceDouble = Stamp.zip(task.stamp(), belief.stamp(), te / (te + be));
 //            if ((task.cyclic() || belief.cyclic()) && Stamp.isCyclic(evidenceDouble))
 //                throw new RuntimeException("cyclic should not be propagated");

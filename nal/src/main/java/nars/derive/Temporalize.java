@@ -80,15 +80,6 @@ public class Temporalize {
             return term.hashCode();
         }
 
-        /**
-         * return a new instance with the term negated
-         */
-        abstract public Event neg();
-
-        public Event neg(boolean isNeg) {
-            return isNeg ? neg() : this;
-        }
-
         @Override
         public int compareTo(@NotNull Temporalize.Event o) {
             if (this == o) return 0;
@@ -184,7 +175,7 @@ public class Temporalize {
 
         if (a.base != ETERNAL && b.base != ETERNAL) {
             return (int) (b.abs() - a.abs()); //TODO check for numeric precision loss
-        } else if (a.offset!=XTERNAL && b.offset!=XTERNAL && a.offset!=DTERNAL && b.offset!=DTERNAL) {
+        } else if (a.offset != XTERNAL && b.offset != XTERNAL && a.offset != DTERNAL && b.offset != DTERNAL) {
             //if (a.base == ETERNAL || b.base == ETERNAL) {
             return b.offset - a.offset; //relative offsets within a complete or partial eternal context
 //            } else {
@@ -222,11 +213,6 @@ public class Temporalize {
         @Override
         public void apply(HashMap<Term, Time> trail) {
             trail.put(term, Time.the(start, 0)); //direct set
-        }
-
-        @Override
-        public Event neg() {
-            return new AbsoluteEvent($.neg(term), start, end);
         }
 
         @Override
@@ -372,11 +358,6 @@ public class Temporalize {
             Time t = resolve(this.start, trail);
             if (t != null)
                 trail.putIfAbsent(term, t); //direct set
-        }
-
-        @Override
-        public Event neg() {
-            return new RelativeEvent($.neg(term), rel, start, end);
         }
 
         @Override
@@ -670,7 +651,6 @@ public class Temporalize {
 
 
     void add(Term term, Event event) {
-        term = term.unneg();
 
         FasterList<Event> l = constraints.computeIfAbsent(term, (t) -> new FasterList<>());
         l.add(event);
@@ -684,13 +664,10 @@ public class Temporalize {
     }
 
     Event solve(Term target, HashMap<Term, Time> trail) {
-        boolean isNeg = target.op() == NEG;
-        if (isNeg)
-            target = target.unneg();
 
         Event known = solveEvent(target, trail);
         if (known != null)
-            return known.neg(isNeg);
+            return known;
 
 
         Op o = target.op();
@@ -718,15 +695,16 @@ public class Temporalize {
                         return null;
                 }
 
-                Term a = ea.term;
                 Time at = ea.start(trail);
 
                 if (at != null) {
 
-                    Term b = eb.term;
                     Time bt = eb.start(trail);
 
                     if (bt != null) {
+
+                        Term a = ea.term;
+                        Term b = eb.term;
 
                         try {
                             if (o == CONJ && (a.op() == CONJ || b.op() == CONJ)) {
@@ -741,12 +719,12 @@ public class Temporalize {
                                 } else if (ata == ETERNAL ^ bta == ETERNAL) {
                                     return null; //one is eternal the other isn't
                                 }
-                                Term newTerm = $.negIf(Op.conjMerge(a, ata, b, bta), isNeg);
+                                Term newTerm = Op.conjMerge(a, ata, b, bta);
                                 long start = Math.min(at.abs(), bt.abs());
                                 Event e = new SolutionEvent(newTerm, start);
                                 return e;
                             } else {
-                                Event e = solveTemporal(trail, isNeg, o, ea, eb, a, b);
+                                Event e = solveTemporal(trail, o, ea, eb, a, b);
                                 if (e != null)
                                     return e;
                             }
@@ -767,20 +745,20 @@ public class Temporalize {
          * temporal bounds. */
 
         if (o.temporal) {
-             if (target.size()==2) {
-                 Term a = target.sub(0);
-                 Term b = target.sub(1);
+            if (target.size() == 2) {
+                Term a = target.sub(0);
+                Term b = target.sub(1);
 
-                 Event ra = solve(a);
-                 if (ra != null) {
-                     Event rb = solve(b);
-                     if (rb != null) {
-                         return solveTemporal(trail, isNeg, o, ra, rb, a, b);
-                     }
-                 }
-             } else {
+                Event ra = solve(a);
+                if (ra != null) {
+                    Event rb = solve(b);
+                    if (rb != null) {
+                        return solveTemporal(trail, o, ra, rb, a, b);
+                    }
+                }
+            } else {
                 logger.warn("TODO unsupported 3-arity temporal target: " + target);
-             }
+            }
 
         } else if (o.statement) {
             Term a = target.sub(0);
@@ -828,7 +806,7 @@ public class Temporalize {
                     return null; //can this happen?
                 case 1:
                     Event r = relevant.get(0);
-                    return new SolutionEvent($.negIf(target, isNeg), r.start(trail).abs(), r.end(trail).abs());
+                    return new SolutionEvent(target, r.start(trail).abs(), r.end(trail).abs());
 
             }
 
@@ -842,7 +820,7 @@ public class Temporalize {
                 Event ra = relevant.get(0);
                 Event rb = relevant.get(1);
 
-                Event ii = solveStatement(target, trail, isNeg, ra, rb);
+                Event ii = solveStatement(target, trail, ra, rb);
                 if (ii != null)
                     return ii;
             }
@@ -851,11 +829,11 @@ public class Temporalize {
         return null;
     }
 
-    private Event solveStatement(Term target, HashMap<Term, Time> trail, boolean isNeg, Event ra, Event rb) {
+    private Event solveStatement(Term target, HashMap<Term, Time> trail, Event ra, Event rb) {
         long[] ii = intersect(ra, rb, trail);
         if (ii != null) {
             //overlap or adjacent
-            return new SolutionEvent($.negIf(target, isNeg), ii[0], ii[1]);
+            return new SolutionEvent(target, ii[0], ii[1]);
         } else {
             //not overlapping at all, compute point interpolation
             Time as = ra.start(trail);
@@ -876,7 +854,7 @@ public class Temporalize {
                             if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float) dist) / dur) {
                                 long occ = ((ta + tz) / 2 + (ba + bz) / 2) / 2;
                                 //occInterpolate(t, b);
-                                return new SolutionEvent($.negIf(target, isNeg), occ);
+                                return new SolutionEvent(target, occ);
                             }
                         }
                     }
@@ -887,7 +865,7 @@ public class Temporalize {
         return null;
     }
 
-    private Event solveTemporal(HashMap<Term, Time> trail, boolean isNeg, Op o, Event ea, Event eb, Term a, Term b) {
+    private Event solveTemporal(HashMap<Term, Time> trail,  Op o, Event ea, Event eb, Term a, Term b) {
         int dt = dt(ea, eb, trail);
         if (dt != 0 && Math.abs(dt) < dur)
             dt = 0; //perceived as simultaneous within duration
@@ -898,7 +876,7 @@ public class Temporalize {
         if (dt != XTERNAL) {
 
             @Nullable Time at = ea.start(trail);
-            Term newTerm = $.negIf(o.the(dt, a, b), isNeg);
+            Term newTerm = o.the(dt, a, b);
 
             @Nullable Time bt = eb.start(trail);
             long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
@@ -916,7 +894,6 @@ public class Temporalize {
 
     @Nullable
     private Time solveTime(Term target, HashMap<Term, Time> trail) {
-
 
         Time existing = trail.get(target);
         if (existing != null) {
@@ -946,7 +923,6 @@ public class Temporalize {
 
     private Event solveEvent(Term target, HashMap<Term, Time> trail) {
 
-        target = target.unneg();
 
         List<Event> ea = constraints.get(target);
         if (ea == null)

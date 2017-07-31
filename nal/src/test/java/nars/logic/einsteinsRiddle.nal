@@ -1,5 +1,5 @@
 
-( einstein($Houses,$Fish_Owner) ==> {
+( (&&,
     equal( $Houses,
         ((house,norwegian,_,_,_,_),_,(house,_,_,_,milk,_),_,_)
     ),
@@ -18,8 +18,8 @@
     member((house,german,_,rothmans,_,_),$Houses),
     next_to( { (house,norwegian,_,_,_,_),(house,_,_,_,_,blue) } ,$Houses),
     member((house,$Fish_Owner,fish,_,_,_),$Houses)
-  }
-).
+
+) ==> einstein($Houses,$Fish_Owner) ).
 
 $0.9 einstein(?what, X)?
 
