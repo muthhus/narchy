@@ -12,6 +12,7 @@ import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
+import nars.derive.Temporalize;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.term.Compound;
@@ -204,12 +205,26 @@ public class Premise extends Pri implements ITask {
         }
 
 
-        if (belief != null) {
-            beliefTerm = belief.term(); //use the belief's actual possibly-temporalized term
+        if (belief!=null) {
+            if (belief.equals(task)) { //do not repeat the same task for belief
+                belief = null; //force structural transform; also prevents potential inductive feedback loop
+                beliefTerm = task.term(); //use the task's term, which may have temporal information
+            } else {
+                beliefTerm = belief.term(); //use the belief's actual possibly-temporalized term
+            }
+        }
+        if (belief == null) {
+            if (beliefTerm.isTemporal()) {
+                //try to temporalize the termlink to match what appears in the task
+                Temporalize.Event bs = new Temporalize().knowTerm(task.term(), ETERNAL).solve(beliefTerm);
+                if (bs != null) {
+                    beliefTerm = bs.term;
+                }
+            }
+
         }
 
-        if (belief != null && belief.equals(task)) //do not repeat the same task for belief
-            belief = null; //force structural transform; also prevents potential inductive feedback loop
+
 
         d.run(this, task, belief, beliefTerm, ttlMax);
 

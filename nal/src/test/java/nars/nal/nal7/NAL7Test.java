@@ -101,7 +101,7 @@ public class NAL7Test extends AbstractNALTest {
     public void temporal_analogy() {
 
         test
-                //.log()
+
                 .believe("( open($x, door) ==>+5 enter($x, room) )", 0.95f, 0.9f)
                 .believe("( enter($x, room) <=>+0 leave($x, corridor_100) )", 1.0f, 0.9f)
                 .mustBelieve(cycles * 2, "( open($1, door) ==>+5 leave($1, corridor_100) )", 0.95f, 0.81f)
@@ -173,7 +173,7 @@ public class NAL7Test extends AbstractNALTest {
         //  zx
 
         test
-                //.log()
+
                 .believe("(y ==>+3 x)")
                 .believe("(y ==>+2 z)")
                 .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
@@ -280,7 +280,7 @@ public class NAL7Test extends AbstractNALTest {
     public void inference_on_tense() {
 
         test
-                //.log()
+
                 .input("((($x, key) --> hold) ==>+3 (($x, room) --> enter)).")
                 .input("<(John, key) --> hold>. :|:")
                 .mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 3);
@@ -300,7 +300,7 @@ public class NAL7Test extends AbstractNALTest {
     public void inference_on_tense_reverse_novar() {
 
         test
-                //.log()
+
                 .input("(hold(John, key) ==>+7 enter(John, room)).")
                 .input("enter(John, room). :|:")
                 .mustBelieve(cycles, "hold(John,key)",
@@ -348,7 +348,7 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events_0_neg() {
 
         test
-                //.log()
+                .log()
                 .input("(--,open(John,door)). :|:")
                 .inputAt(4, "enter(John,room). :|:")
                 .mustBelieve(cycles, "( (--,open(John, door)) ==>+4 enter(John, room) )",
@@ -376,7 +376,7 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events3() {
 
         test
-                //.log()
+
                 .input("open(John,door). :|:")
                 .inputAt(4, "enter(John,room). :|:")
                 .mustBelieve(cycles, "(open(John, door) <=>+4 enter(John, room))",
@@ -722,7 +722,6 @@ public class NAL7Test extends AbstractNALTest {
         */
 
         test
-                .log()
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
                 .mustNotOutput(cycles, "(x)", BELIEF, 0f, 0.89f, 0f, 0.91f, 10)
@@ -1057,7 +1056,7 @@ public class NAL7Test extends AbstractNALTest {
     public void testReverseImpl() {
 
         test
-                .log()
+
                 .believe("((x) ==>+5 (y))")
                 .believe("((y) ==>-5 (x))")
                 .mustBelieve(cycles, "((x) <=>+5 (y))", 1f, 0.81f)
@@ -1144,7 +1143,7 @@ public class NAL7Test extends AbstractNALTest {
 
         //  b ==>+10 c ==>+20 e
         test
-                //.log()
+
                 .believe("(b ==>+10 c)")
                 .believe("(e ==>-20 c)")
                 .mustBelieve(cycles, "(e ==>-30 b)", 1f, 0.45f)
@@ -1179,7 +1178,7 @@ public class NAL7Test extends AbstractNALTest {
         */
 
         test
-                //.log()
+
                 .inputAt(1, "(a). :|:")
                 .inputAt(2, "((b) &&+3 (d)). :|:")
                 .mustBelieve(cycles, "(((a) &&+1 (b)) &&+3 (d))", 1f, 0.81f, 1, 5)
@@ -1345,7 +1344,6 @@ public class NAL7Test extends AbstractNALTest {
     public void testDecomposeImplPred() {
 
         test
-                .log()
                 .believe("( (a,#1) ==>+0 ( ( (x,#1) &| y) &| z ) )", Tense.Present, 1f, 0.9f)
                 .mustBelieve(cycles, "( (a,#1) =|> (x,#1) )", 1f, 0.73f, 0)
                 .mustBelieve(cycles, "( (a,#1) =|> y )", 1f, 0.73f, 0)
@@ -1381,11 +1379,11 @@ public class NAL7Test extends AbstractNALTest {
          */
 
         test
-//            .log()
                 .input(new NALTask($("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
                 .input(new NALTask($("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
                 .mustDesire(cycles, "(a-->c)", 1f, 0.4f, 10, 20)
         ;
 
     }
+
 }

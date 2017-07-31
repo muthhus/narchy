@@ -169,7 +169,7 @@ public class Builtin {
                         return t.sub(nar.random().nextInt(2)); //one of the two
 
                     default:
-                        return CONJ.the(DTERNAL, dropRandom(nar.random(), t.subterms()));
+                        return CONJ.the(t.dt(), dropRandom(nar.random(), t.subterms()));
                 }
             } else {
                 //recursive event-based decomposition and recomposition

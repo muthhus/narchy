@@ -43,7 +43,7 @@ public class Temporalize {
     /**
      * for testing
      */
-    protected Temporalize() {
+    public Temporalize() {
         this(new XorShift128PlusRandom(1));
     }
 
@@ -51,7 +51,7 @@ public class Temporalize {
         this.random = random;
     }
 
-    abstract static class Event implements Comparable<Event> {
+    public abstract static class Event implements Comparable<Event> {
 
         public final Term term;
 
@@ -78,6 +78,15 @@ public class Temporalize {
         @Override
         public int hashCode() {
             return term.hashCode();
+        }
+
+        /**
+         * return a new instance with the term negated
+         */
+        abstract public Event neg();
+
+        public Event neg(boolean isNeg) {
+            return isNeg ? neg() : this;
         }
 
         @Override
@@ -213,6 +222,11 @@ public class Temporalize {
         @Override
         public void apply(HashMap<Term, Time> trail) {
             trail.put(term, Time.the(start, 0)); //direct set
+        }
+
+        @Override
+        public Event neg() {
+            return new AbsoluteEvent($.neg(term), start, end);
         }
 
         @Override
@@ -358,6 +372,11 @@ public class Temporalize {
             Time t = resolve(this.start, trail);
             if (t != null)
                 trail.putIfAbsent(term, t); //direct set
+        }
+
+        @Override
+        public Event neg() {
+            return new RelativeEvent($.neg(term), rel, start, end);
         }
 
         @Override
@@ -524,7 +543,7 @@ public class Temporalize {
     /**
      * convenience method for testing: assumes start offset of zero, and dtRange taken from term
      */
-    Temporalize knowTerm(Term term, long when) {
+    public Temporalize knowTerm(Term term, long when) {
         return knowTerm(term, when, when != ETERNAL ? when + term.dtRange() : ETERNAL);
     }
 
@@ -661,7 +680,7 @@ public class Temporalize {
         }
     }
 
-    Event solve(Term target) {
+    public Event solve(Term target) {
         return solve(target, new HashMap<>(target.volume()));
     }
 
@@ -673,10 +692,18 @@ public class Temporalize {
 
 
         Op o = target.op();
-        if (o.temporal && target.dt() == XTERNAL) {
+        if (o == NEG) {
+            Event ss = solve(target.unneg(), trail);
+            if (ss != null)
+                return ss.neg();
+            else
+                return null;
+        } else if (o.temporal && target.dt() == XTERNAL) {
             TermContainer tt = target.subterms();
 
-            if (tt.size() == 2) {
+            int tts = tt.size();
+            assert(tts > 1);
+            if (tts == 2) {
 
                 Event ea, eb;
                 if (random.nextBoolean()) {
@@ -737,7 +764,10 @@ public class Temporalize {
                     }
                 }
             } else {
-                logger.warn("TODO unsupported xternal: " + target);
+                //TODO solve each
+                Event s0 = solveSub(trail, tt, 0);
+                //logger.warn("TODO unsupported xternal: " + target);
+                return new SolutionEvent(o.the(0, tt.toArray()), s0.start(trail).abs());
             }
         }
 
