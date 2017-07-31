@@ -234,8 +234,12 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             return false;
 
         Set<Term> scratch = new HashSet(/*a.size() + b.size()*/);
-        a.subterms().termsToSetRecurse(commonStructure, scratch, true);
-        return b.subterms().termsToSetRecurse(commonStructure, scratch, false);
+        a.subterms().recurseTermsToSet(commonStructure, scratch, true);
+        return b.subterms().recurseTermsToSet(commonStructure, scratch, false);
+    }
+
+    @NotNull default Set<Term> recurseTermsToSet() {
+        return recurseTermsToSet(null);
     }
 
     /**
@@ -243,15 +247,15 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * TODO generalize to a provided lambda predicate selector
      */
     @NotNull
-    default MutableSet<Term> recurseTermsToSet(@NotNull Op onlyType) {
-        if (!hasAny(onlyType))
+    default Set<Term> recurseTermsToSet(@Nullable Op onlyType) {
+        if (onlyType!=null && !hasAny(onlyType))
             return Sets.mutable.empty();
 
-        MutableSet<Term> t = new UnifiedSet(1);//$.newHashSet(volume() /* estimate */);
+        Set<Term> t = new HashSet(volume());//$.newHashSet(volume() /* estimate */);
 
         //TODO use an additional predicate to cull subterms which don't contain the target type
         recurseTerms((t1) -> {
-            if (t1.op() == onlyType) //TODO make recurseTerms by Op then it can navigate to subterms using structure hash
+            if (onlyType == null || t1.op() == onlyType) //TODO make recurseTerms by Op then it can navigate to subterms using structure hash
                 t.add(t1);
         });
         return t;
@@ -279,7 +283,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
     @NotNull
-    default boolean termsToSetRecurse(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
+    default boolean recurseTermsToSet(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
         final boolean[] r = {false};
         Predicate<Term> selector = (Predicate<Term>) (s) -> {
 

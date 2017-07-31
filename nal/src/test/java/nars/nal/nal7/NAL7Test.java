@@ -933,7 +933,7 @@ public class NAL7Test extends AbstractNALTest {
                 .dur(2)
                 .inputAt(0, "(x --> a). :|:")
                 .inputAt(1, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 1)
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 0)
         ;
     }
 
@@ -943,11 +943,12 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testIntersectionTemporalFar() {
 
+        int dependsOn = Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS;
         test
-                .dur(2)
+                .dur(1)
                 .inputAt(0, "(x --> a). :|:")
                 .inputAt(3, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.70f, 2)
+                .mustNotOutput(cycles, "((x&y)-->a)", BELIEF, 0, 1, 2, 3)
         ;
     }
 

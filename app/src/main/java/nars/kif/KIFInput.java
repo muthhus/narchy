@@ -344,9 +344,9 @@ public class KIFInput implements Runnable {
 
     public Compound impl(Term conditionTerm, Term actionTerm, boolean implOrEquiv) {
         MutableSet<Term> conditionVars = new UnifiedSet();
-        ((Compound)conditionTerm).termsToSetRecurse(Op.VariableBits, conditionVars, true);
+        ((Compound)conditionTerm).recurseTermsToSet(Op.VariableBits, conditionVars, true);
         MutableSet<Term> actionVars = new UnifiedSet();
-        ((Compound)actionTerm).termsToSetRecurse(Op.VariableBits, actionVars, true);
+        ((Compound)actionTerm).recurseTermsToSet(Op.VariableBits, actionVars, true);
 
         MutableSet<Term> common = conditionVars.intersect(actionVars);
         Map<Term,Term> remap = new HashMap();

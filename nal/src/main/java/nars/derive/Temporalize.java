@@ -11,7 +11,6 @@ import nars.control.Derivation;
 import nars.term.Term;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
-import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -521,7 +520,7 @@ public class Temporalize {
                 occ[1] = e.end(times).abs();
             }
 
-            assert(occ[0]!=ETERNAL || (task.isEternal() || (belief==null && belief.isEternal()))): "eternal derived from non-eternal premise";
+            assert (occ[0] != ETERNAL || (task.isEternal() || (belief == null && belief.isEternal()))) : "eternal derived from non-eternal premise";
             return e.term;
         }
         return null;
@@ -702,7 +701,7 @@ public class Temporalize {
             TermContainer tt = target.subterms();
 
             int tts = tt.size();
-            assert(tts > 1);
+            assert (tts > 1);
             if (tts == 2) {
 
                 Event ea, eb;
@@ -793,14 +792,14 @@ public class Temporalize {
             }
 
         } else if (o.statement) {
-            Term a = target.sub(0);
-            Term b = target.sub(1);
-
             //choose two absolute events which cover both 'a' and 'b' terms
             List<Event> relevant = $.newArrayList();
-            Set<Term> uncovered = Sets.mutable.of(a, b);
+            HashSet<Term> uncovered = new HashSet();
+            target.subterms().recurseTermsToSet(
+                    ~(Op.SECTi.bit | Op.SECTe.bit | Op.DIFFe.bit | Op.DIFFi.bit) /* everything but sect/diff; just their content */,
+                    uncovered, true);
+
             for (Term c : constraints.keySet()) {
-                boolean relevance = false;
 //                if (c.equals(target))
 //                    continue;
 
@@ -815,18 +814,15 @@ public class Temporalize {
                     trail.remove(c);
 
                 if (ce != null) {
-                    if (c.containsRecursively(a)) {
-                        uncovered.remove(a);
-                        relevance = true;
+                    if (uncovered.removeIf(x ->
+                        c.containsRecursively(x)
+                    )) {
+                        relevant.add(ce);
+                        if (uncovered.isEmpty())
+                            break; //got them all
                     }
-                    if (c.containsRecursively(b)) {
-                        uncovered.remove(b);
-                        relevance = true;
-                    }
-                    if (relevance) relevant.add(ce);
                 }
-                if (uncovered.isEmpty())
-                    break; //got them all
+
             }
             if (!uncovered.isEmpty())
                 return null; //insufficient information
@@ -897,7 +893,7 @@ public class Temporalize {
         return null;
     }
 
-    private Event solveTemporal(HashMap<Term, Time> trail,  Op o, Event ea, Event eb, Term a, Term b) {
+    private Event solveTemporal(HashMap<Term, Time> trail, Op o, Event ea, Event eb, Term a, Term b) {
         int dt = dt(ea, eb, trail);
         if (dt != 0 && Math.abs(dt) < dur)
             dt = 0; //perceived as simultaneous within duration
