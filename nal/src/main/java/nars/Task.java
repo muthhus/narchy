@@ -867,7 +867,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
         n.emotion.busy(priElseZero(), this.volume());
 
-        boolean evaluate = !isCommand();
+        boolean evaluate = true; //!isCommand();
 
         if (evaluate) {
             Term x = term();

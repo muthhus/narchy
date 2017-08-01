@@ -126,13 +126,11 @@ public class Premise extends Pri implements ITask {
         //Terms.equalAtemporally(task.term(), (beliefTerm));
 
         boolean reUnified = false;
-        if (beliefTerm.varQuery() > 0 && !beliefIsTask) {
+        if (task.term().varQuery() > 0 ) {
 
             int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
 
-            Term unified = unify(beliefTerm, task.term(), nar, matchTTL);
-            if (unified != null) {
-                beliefTerm = unified;
+            if (unify(task.term(), beliefTerm, nar, matchTTL)) {
                 reUnified = true;
             }
 
@@ -273,28 +271,31 @@ public class Premise extends Pri implements ITask {
      * ttl.  if zero, then no TTL was consumed
      */
     @Nullable
-    private static Compound unify(@NotNull Term q, @NotNull Term a, NAR nar, int[] ttl) {
+    private static boolean unify(@NotNull Term q, @NotNull Term a, NAR nar, int[] ttl) {
 
         final int startTTL = ttl[0];
         ttl[0] = 0;
 
         if (q.op() != a.op() /*|| q.size() != a.size()*/)
-            return null; //fast-fail: no chance
+            return false; //fast-fail: no chance
 
-        final Compound[] result = {null};
+        final boolean[] result = {false};
         UnifySubst u = new UnifySubst(Op.VAR_QUERY, nar, (aa) -> {
 
+            result[0] = true;
+            return false;
 
-            if (!aa.equals(a)) {
-
-                aa = aa.eval(nar.terms);
-
-                result[0] = ((Compound) aa);
-                return false; //only this match
-            }
-
-
-            return true; //keep trying
+//            if (!aa.equals(a)) {
+//
+//                aa = aa.eval(nar.terms);
+//                if (aa!=null) {
+//                    result[0] = ((Compound) aa);
+//                    return false; //only this match
+//                }
+//            }
+//
+//
+//            return true; //keep trying
 
         }, startTTL);
         u.unifyAll(q, a);

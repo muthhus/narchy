@@ -9,6 +9,7 @@ import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
 import nars.term.Term;
+import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
@@ -762,11 +763,6 @@ public class Temporalize {
                         }
                     }
                 }
-            } else {
-                //TODO solve each
-                Event s0 = solveSub(trail, tt, 0);
-                //logger.warn("TODO unsupported xternal: " + target);
-                return new SolutionEvent(o.the(0, tt.toArray()), s0.start(trail).abs());
             }
         }
 
@@ -776,7 +772,8 @@ public class Temporalize {
          * temporal bounds. */
 
         if (o.temporal) {
-            if (target.size() == 2) {
+            int tts = target.size();
+            if (tts == 2) {
                 Term a = target.sub(0);
                 Term b = target.sub(1);
 
@@ -788,7 +785,42 @@ public class Temporalize {
                     }
                 }
             } else {
-                logger.warn("TODO unsupported 3-arity temporal target: " + target);
+                assert(tts > 2);
+
+                /* HACK quick test for the exact appearance of temporalized form present in constraints */
+                if (target.dt() == XTERNAL) {
+                    Term[] a = target.subterms().toArray();
+                    {
+                        @NotNull Term d = target.op().the(DTERNAL, a);
+                        if (!(d instanceof Bool)) {
+                            Event ds = solve(d);
+                            if (ds != null)
+                                return ds;
+                        }
+                    }
+                    {
+                        @NotNull Term d = target.op().the(0, a);
+                        if (!(d instanceof Bool)) {
+                            Event ds = solve(d);
+                            if (ds != null)
+                                return ds;
+                        }
+                    }
+                }
+
+                TermContainer tt = target.subterms();
+                Event s0 = solveSub(trail, tt, 0);
+                if (s0!=null) {
+                    Event s1 = solveSub(trail, tt, 1);
+                    if (s1!=null) {
+                        Time s0s = s0.start(trail);
+                        Time s1s = s1.start(trail);
+                        int dt = dt(s0s, s1s);
+                        if (dt == 0 || dt == DTERNAL ) {
+                            return new SolutionEvent(o.the(dt, tt.toArray()), s0s.abs());
+                        }
+                    }
+                }
             }
 
         } else if (o.statement) {

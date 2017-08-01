@@ -306,7 +306,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                         if (e.size() == 0) {
                             //System.out.println(c);
                             //HACK TODO determine if good
-//                            c.termlinks().sample(ctpl.size(), (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
+                            //c.termlinks().sample(ctpl.size(), (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
                         }
                     }
                 }

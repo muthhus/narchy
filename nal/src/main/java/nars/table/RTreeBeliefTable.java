@@ -36,7 +36,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     /**
      * in fractions of the table's contained temporal range
      */
-    static final float[] sampleRadii = {0f, 0.1f /*, 0.25f, 0.5f, 1f*/};
+    static final float[] sampleRadii = {0f, 0.1f , 0.25f, 0.5f, 1f};
 
     final static int maxSamplesTruthpolated = 5;
 

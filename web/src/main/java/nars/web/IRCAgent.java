@@ -34,7 +34,7 @@ public class IRCAgent extends IRC {
     private final NAR nar;
     //private float ircMessagePri = 0.9f;
 
-    private final boolean hearTwenglish = true;
+    private final boolean hearTwenglish = false;
 
     final int wordDelayMS = 200; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
     private final Leak<Task,PriReference<Task>> out;
@@ -206,7 +206,7 @@ public class IRCAgent extends IRC {
 
         //Param.DEBUG = true;
 
-        @NotNull NAR n = new NARS().get(); //TODO
+        @NotNull NAR n = NARS.realtime().get();
                 //newRealtimeNAR(1024, 25, 2);
 
 
@@ -293,6 +293,7 @@ public class IRCAgent extends IRC {
         }
         */
 
+        n.startFPS(100f);
 
 
         //new NARWeb(n, 8080);

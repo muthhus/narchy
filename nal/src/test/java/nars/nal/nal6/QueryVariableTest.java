@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
@@ -71,7 +72,7 @@ public class QueryVariableTest {
 
         NAR nar = NARS.tmp();
 
-        Compound beliefTerm = compoundOrNull(nar.term(beliefString));
+        Term beliefTerm = nar.term(beliefString);
         assertNotNull(beliefTerm);
         nar.believe(beliefTerm, 1f, 0.9f);
         assertEquals(1, nar.tasks().count());

@@ -12,6 +12,7 @@ import nars.Task;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
@@ -116,6 +117,13 @@ public class ActiveQuestionTask extends NALTask implements Consumer<Task> {
         };
     }
 
+
+    @Override
+    public @Nullable Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
+        Task x = super.onAnswered(answer, nar);
+        onAnswer(answer);
+        return x;
+    }
 
     public Task onAnswer(Task answer) {
         //answer = super.onAnswered(answer, nar);

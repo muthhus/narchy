@@ -219,40 +219,42 @@ public class Builtin {
             n.clear();
             n.runLater(() -> Command.log(n, "Ready. (" + n.terms.size() + " subconcepts)"));
         });
-        nar.on("top", (op, args, n) -> {
+        nar.on("stat", (op, args, n) -> {
             Command.log(n, n.emotion.summary() + " " + n.exe);
         });
 
 
-//        nar.on("top", (Operator) (op, args, n) -> {
-//
-//
-//            int MAX_RESULT_LENGTH = 250;
-//            StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH + 8);
-//
-//            if (args.length > 0 && args[0] instanceof Atom) {
-//                String query = $.unquote(args[0]).toLowerCase();
-//                n.forEachTaskActive(bc -> {
-//                    String bs = bc.toString();
-//                    String cs = bs.toLowerCase();
-//                    if (cs.contains(query)) {
-//                        b.append(bs).append("  ");
-//                        if (b.length() > MAX_RESULT_LENGTH)
-//                            break;
-//                    }
-//                });
-//            } else {
+        nar.on("top",(op, args, n) -> {
+
+
+            int MAX_RESULT_LENGTH = 250;
+            StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH + 8);
+
+            String query;
+            if (args.length > 0 && args[0] instanceof Atom) {
+                query = $.unquote(args[0]).toLowerCase();
+            } else {
+                query = null;
+                n.forEachConceptActive(bc -> {
+                    String bs = bc.toString();
+                    String cs = bs.toLowerCase();
+                    if (b.length() < MAX_RESULT_LENGTH && (query == null || cs.contains(query))) {
+                        b.append(bs).append("  ");
+                    }
+                });
+            }
+//            else {
 //                for (PLink<Concept> bc : ii) {
 //                    b.append(bc.get()).append('=').append(Texts.n2(bc.pri())).append("  ");
 //                    if (b.length() > MAX_RESULT_LENGTH)
 //                        break;
 //                }
 //            }
-//
-//            Command.log(n, b.toString());
-//            //"core pri: " + cbag.active.priMin() + "<" + Texts.n4(cbag.active.priHistogram(new double[5])) + ">" + cbag.active.priMax());
-//
-//        });
+
+            Command.log(n, b.toString());
+            //"core pri: " + cbag.active.priMin() + "<" + Texts.n4(cbag.active.priHistogram(new double[5])) + ">" + cbag.active.priMax());
+
+        });
 //
 
 //            /** slice(<compound>,<selector>)
