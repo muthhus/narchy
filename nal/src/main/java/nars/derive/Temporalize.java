@@ -698,7 +698,12 @@ public class Temporalize {
         l.add(event);
         if (l.size() > 1) {
             l.sortThis();
-            //l.reverse(); //HACK
+        }
+
+        if (term.op() == NEG) {
+            Term u = term.unneg();
+            FasterList<Event> m = constraints.computeIfAbsent(u, (t) -> new FasterList<>());
+            m.add(new RelativeEvent(u, term, 0));
         }
     }
 

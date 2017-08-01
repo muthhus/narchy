@@ -178,7 +178,7 @@ public class NAL8Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.input("x:y! :|:");
         tester.input("(goto(z) ==>-5 x:y).");
-        tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f, 5);
+        tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f, 0);
     }
 
     @Test
@@ -1280,9 +1280,10 @@ public class NAL8Test extends AbstractNALTest {
     public void testPredictiveImplicationTemporalTemporalNeg() {
 
         test
+                .log()
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
-                .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, 14)
+                .inputAt(5, "(happy)! :|:")
+                .mustDesire(cycles, "(out)", 0f, 0.81f, 5)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
