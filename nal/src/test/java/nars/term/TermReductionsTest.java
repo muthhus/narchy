@@ -868,7 +868,7 @@ public class TermReductionsTest extends NarseseTest {
 
         assertEquals("((ball_right) &&+270 (--,(ball_left)))", c1.toString());
         assertEquals(
-                "(&|,(ball_left),(ball_right),((ball_right) &&+270 (--,(ball_left))))",
+                "(&|,((ball_right) &&+270 (--,(ball_left))),(ball_left),(ball_right))",
 
                 //HACK: this narsese parser isnt implemented yet:
                 //$("( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right)))")

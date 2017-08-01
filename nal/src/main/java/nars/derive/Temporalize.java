@@ -11,6 +11,7 @@ import nars.control.Derivation;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
+import nars.term.subst.Subst;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,10 +61,10 @@ public class Temporalize {
         }
 
         @Nullable
-        abstract public Time start(HashMap<Term, Time> trail);
+        abstract public Time start(Map<Term, Time> trail);
 
         @Nullable
-        abstract public Time end(HashMap<Term, Time> trail);
+        abstract public Time end(Map<Term, Time> trail);
 
         @Override
         public boolean equals(Object o) {
@@ -99,37 +100,43 @@ public class Temporalize {
                         Term x = ((RelativeEvent) this).rel.term();
                         Term y = ((RelativeEvent) o).rel.term();
                         int vc = Integer.compare(x.volume(), y.volume());
-                        if (vc == 0) {
-                            return x.compareTo(y);
-                        } else {
-                            return vc;
-                        }
+                        return vc == 0 ? x.compareTo(y) : vc;
                     }
                 }
 
-                if (this instanceof AbsoluteEvent)
-                    return -1;
-                else
-                    return +1;
+                return this instanceof AbsoluteEvent ? -1 : +1;
 
             }
         }
 
-        abstract public void apply(HashMap<Term, Time> trail);
+        abstract public void apply(Map<Term, Time> trail);
     }
 
-    static int dt(Event a, Event b, HashMap<Term, Time> trail) {
+    static int dt(Event a, Event b, Map<Term, Time> trail) {
 
         if (a instanceof AbsoluteEvent || b instanceof AbsoluteEvent) {
             //at least one or both are absolute, forming a valid temporal grounding
-            return dt(a.start(trail), b.start(trail));
+            Time as = a.start(trail);
+            Time ae = a.end(trail);
+            Time bs = b.start(trail);
+            Time be = b.end(trail);
+            if (bs.base >= ae.base)
+                return dt(ae, bs);
+            else
+                return dt(as, be);
+
             //return dt(a.start(times), b.end(times));
-        } else if (a instanceof RelativeEvent && b instanceof RelativeEvent) {
+        }
+
+        if (a instanceof RelativeEvent && b instanceof RelativeEvent) {
             RelativeEvent ra = (RelativeEvent) a;
             RelativeEvent rb = (RelativeEvent) b;
             if (ra.rel.equals(rb.rel)) {
                 //easy case
-                return rb.end - ra.start;
+                if (rb.end >= ra.start)
+                    return rb.end - ra.start;
+                else
+                    return rb.start - ra.end;
             }
             if (ra.rel.equals(rb.term) && rb.rel.equals(ra.term)) {
                 //circular dependency: choose either, or average if they are opposite polarity
@@ -144,7 +151,7 @@ public class Temporalize {
         return XTERNAL;
     }
 
-    static long[] intersect(Event a, Event b, HashMap<Term, Time> trail) {
+    static long[] intersect(Event a, Event b, Map<Term, Time> trail) {
         Time as = a.start(trail);
         if (as != null) {
             Time bs = b.start(trail);
@@ -222,8 +229,12 @@ public class Temporalize {
             }
         }
 
+        static String timeStr(long when) {
+            return when != ETERNAL ? Long.toString(when) : "ETE";
+        }
+
         @Override
-        public void apply(HashMap<Term, Time> trail) {
+        public void apply(Map<Term, Time> trail) {
             trail.put(term, Time.the(start, 0)); //direct set
         }
 
@@ -233,7 +244,7 @@ public class Temporalize {
         }
 
         @Override
-        public Time start(@Nullable HashMap<Term, Time> ignored) {
+        public Time start(@Nullable Map<Term, Time> ignored) {
 //            if(ignored!=null) {
 //                Time existingTime = ignored.get(term);
 //                if (existingTime != null) {
@@ -244,8 +255,8 @@ public class Temporalize {
         }
 
         @Override
-        public Time end(HashMap<Term, Time> ignored) {
-            return Time.the(end, XTERNAL);
+        public Time end(Map<Term, Time> ignored) {
+            return Time.the(end, term.dt());
         }
 
         @Override
@@ -354,15 +365,19 @@ public class Temporalize {
         }
     }
 
+    static String timeStr(int when) {
+        return when != DTERNAL ? (when != XTERNAL ? Integer.toString(when) : "?") : "DTE";
+    }
+
     class RelativeEvent extends Event {
         private final Term rel;
         private final int start, end;
 
-        public RelativeEvent(Term term, Term relativeTo, int start) {
+        RelativeEvent(Term term, Term relativeTo, int start) {
             this(term, relativeTo, start, start + term.dtRange());
         }
 
-        public RelativeEvent(Term term, Term relativeTo, int start, int end) {
+        RelativeEvent(Term term, Term relativeTo, int start, int end) {
             super(term);
             //assert (!term.equals(relativeTo));
             this.rel = relativeTo;
@@ -370,8 +385,9 @@ public class Temporalize {
             this.end = end;
         }
 
+
         @Override
-        public void apply(HashMap<Term, Time> trail) {
+        public void apply(Map<Term, Time> trail) {
             Time t = resolve(this.start, trail);
             if (t != null)
                 trail.putIfAbsent(term, t); //direct set
@@ -384,17 +400,17 @@ public class Temporalize {
 
         @Override
         @Nullable
-        public Time start(HashMap<Term, Time> trail) {
+        public Time start(Map<Term, Time> trail) {
             return resolve(this.start, trail);
         }
 
         @Override
-        public Time end(HashMap<Term, Time> trail) {
+        public Time end(Map<Term, Time> trail) {
             return resolve(this.end, trail);
         }
 
         @Nullable
-        protected Time resolve(int offset, HashMap<Term, Time> trail) {
+        protected Time resolve(int offset, Map<Term, Time> trail) {
 
             Time rt = solveTime(rel, trail);
             if (rt != null) {
@@ -512,7 +528,7 @@ public class Temporalize {
         if (belief != null)
             model.know(belief, d);
 
-        HashMap<Term, Temporalize.Time> times = new HashMap();
+        Map<Term, Temporalize.Time> times = new HashMap();
         Event e = model.solve(pattern, times);
         if (e != null) {
             if (e instanceof AbsoluteEvent) {
@@ -530,7 +546,7 @@ public class Temporalize {
         return null;
     }
 
-    public void know(Task task, Derivation d) {
+    public void know(Task task, Subst d) {
         //assert (task.end() == task.start() + task.dtRange());
         Term taskTerm = task.term();
         AbsoluteEvent root = new AbsoluteEvent(taskTerm, task.start(), task.end());
@@ -655,7 +671,7 @@ public class Temporalize {
     }
 
 
-    Event add(@NotNull Temporalize.Event root, Term term, int start, int end) {
+    void add(@NotNull Temporalize.Event root, Term term, int start, int end) {
         Event event;
 
         if (term.equals(root.term)) {
@@ -670,7 +686,6 @@ public class Temporalize {
         }
 
         add(term, event);
-        return event;
     }
 
 
@@ -680,6 +695,7 @@ public class Temporalize {
         l.add(event);
         if (l.size() > 1) {
             l.sortThis();
+            //l.reverse(); //HACK
         }
     }
 
@@ -687,7 +703,7 @@ public class Temporalize {
         return solve(target, new HashMap<>(target.volume()));
     }
 
-    Event solve(Term target, HashMap<Term, Time> trail) {
+    Event solve(Term target, Map<Term, Time> trail) {
 
         Event known = solveEvent(target, trail);
         if (known != null)
@@ -709,23 +725,23 @@ public class Temporalize {
             if (tts == 2) {
 
                 Event ea, eb;
-                if (random.nextBoolean()) {
-                    //forward order: sub 0 first
-                    ea = solveSub(trail, tt, 0);
-                    if (ea == null)
-                        return null;
-                    eb = solveSub(trail, tt, 1);
-                    if (eb == null)
-                        return null;
-                } else {
-                    //reverse order: sub 1 first
-                    eb = solveSub(trail, tt, 1);
-                    if (eb == null)
-                        return null;
-                    ea = solveSub(trail, tt, 0);
-                    if (ea == null)
-                        return null;
-                }
+//                if (random.nextBoolean()) {
+                //forward order: sub 0 first
+                ea = solveSub(trail, tt, 0);
+                if (ea == null)
+                    return null;
+                eb = solveSub(trail, tt, 1);
+                if (eb == null)
+                    return null;
+//                } else {
+//                    //reverse order: sub 1 first
+//                    eb = solveSub(trail, tt, 1);
+//                    if (eb == null)
+//                        return null;
+//                    ea = solveSub(trail, tt, 0);
+//                    if (ea == null)
+//                        return null;
+//                }
 
                 Time at = ea.start(trail);
 
@@ -747,14 +763,13 @@ public class Temporalize {
                                 long bta = bt.abs();
                                 if (ata == ETERNAL && bta == ETERNAL) {
                                     ata = at.offset;
-                                    bta = bt.offset + a.dtRange();
+                                    bta = bt.offset;// + a.dtRange();
                                 } else if (ata == ETERNAL ^ bta == ETERNAL) {
                                     return null; //one is eternal the other isn't
                                 }
                                 Term newTerm = Op.conjMerge(a, ata, b, bta);
                                 long start = Math.min(at.abs(), bt.abs());
-                                Event e = new SolutionEvent(newTerm, start);
-                                return e;
+                                return new SolutionEvent(newTerm, start);
                             } else {
                                 Event e = solveTemporal(trail, o, ea, eb, a, b);
                                 if (e != null)
@@ -788,7 +803,7 @@ public class Temporalize {
                     }
                 }
             } else {
-                assert(tts > 2);
+                assert (tts > 2);
 
                 /* HACK quick test for the exact appearance of temporalized form present in constraints */
                 if (target.dt() == XTERNAL) {
@@ -801,25 +816,23 @@ public class Temporalize {
                                 return ds;
                         }
                     }
-                    {
-                        @NotNull Term d = target.op().the(0, a);
-                        if (!(d instanceof Bool)) {
-                            Event ds = solve(d);
-                            if (ds != null)
-                                return ds;
-                        }
+                    @NotNull Term d = target.op().the(0, a);
+                    if (!(d instanceof Bool)) {
+                        Event ds = solve(d);
+                        if (ds != null)
+                            return ds;
                     }
                 }
 
                 TermContainer tt = target.subterms();
                 Event s0 = solveSub(trail, tt, 0);
-                if (s0!=null) {
+                if (s0 != null) {
                     Event s1 = solveSub(trail, tt, 1);
-                    if (s1!=null) {
+                    if (s1 != null) {
                         Time s0s = s0.start(trail);
                         Time s1s = s1.start(trail);
                         int dt = dt(s0s, s1s);
-                        if (dt == 0 || dt == DTERNAL ) {
+                        if (dt == 0 || dt == DTERNAL) {
                             return new SolutionEvent(o.the(dt, tt.toArray()), s0s.abs());
                         }
                     }
@@ -829,7 +842,7 @@ public class Temporalize {
         } else if (o.statement) {
             //choose two absolute events which cover both 'a' and 'b' terms
             List<Event> relevant = $.newArrayList();
-            HashSet<Term> uncovered = new HashSet();
+            Set<Term> uncovered = new HashSet();
             target.subterms().recurseTermsToSet(
                     ~(Op.SECTi.bit | Op.SECTe.bit | Op.DIFFe.bit | Op.DIFFi.bit) /* everything but sect/diff; just their content */,
                     uncovered, true);
@@ -850,7 +863,7 @@ public class Temporalize {
 
                 if (ce != null) {
                     if (uncovered.removeIf(x ->
-                        c.containsRecursively(x)
+                            c.containsRecursively(x)
                     )) {
                         relevant.add(ce);
                         if (uncovered.isEmpty())
@@ -892,7 +905,7 @@ public class Temporalize {
         return null;
     }
 
-    private Event solveStatement(Term target, HashMap<Term, Time> trail, Event ra, Event rb) {
+    private Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {
         long[] ii = intersect(ra, rb, trail);
         if (ii != null) {
             //overlap or adjacent
@@ -928,7 +941,7 @@ public class Temporalize {
         return null;
     }
 
-    private Event solveTemporal(HashMap<Term, Time> trail, Op o, Event ea, Event eb, Term a, Term b) {
+    private Event solveTemporal(Map<Term, Time> trail, Op o, Event ea, Event eb, Term a, Term b) {
         int dt = dt(ea, eb, trail);
         if (dt != 0 && Math.abs(dt) < dur)
             dt = 0; //perceived as simultaneous within duration
@@ -942,21 +955,20 @@ public class Temporalize {
             Term newTerm = o.the(dt, a, b);
 
             @Nullable Time bt = eb.start(trail);
-            long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
+            long start = /*o == CONJ ? */Math.min(at.abs(), bt.abs());// : at.abs();
 
-            Event e = new SolutionEvent(newTerm, start);
-            return e;
+            return new SolutionEvent(newTerm, start);
         }
         return null;
     }
 
-    private Event solveSub(HashMap<Term, Time> times, TermContainer tt, int subterm) {
+    private Event solveSub(Map<Term, Time> times, TermContainer tt, int subterm) {
         Term a = tt.sub(subterm);
         return solve(a, times);
     }
 
     @Nullable
-    private Time solveTime(Term target, HashMap<Term, Time> trail) {
+    private Time solveTime(Term target, Map<Term, Time> trail) {
 
         Time existing = trail.get(target);
         if (existing != null) {
@@ -984,7 +996,7 @@ public class Temporalize {
     }
 
 
-    private Event solveEvent(Term target, HashMap<Term, Time> trail) {
+    private Event solveEvent(Term target, Map<Term, Time> trail) {
 
 
         List<Event> ea = constraints.get(target);
@@ -1016,11 +1028,4 @@ public class Temporalize {
     }
 
 
-    static String timeStr(long when) {
-        return when != ETERNAL ? Long.toString(when) : "ETE";
-    }
-
-    static String timeStr(int when) {
-        return when != DTERNAL ? (when != XTERNAL ? Integer.toString(when) : "?") : "DTE";
-    }
 }

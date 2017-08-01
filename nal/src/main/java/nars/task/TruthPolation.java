@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-import static jcog.Util.sqr;
 import static nars.truth.TruthFunctions.w2c;
 
 /**

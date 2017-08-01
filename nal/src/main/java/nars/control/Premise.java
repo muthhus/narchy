@@ -15,7 +15,6 @@ import nars.concept.Concept;
 import nars.derive.Temporalize;
 import nars.table.BeliefTable;
 import nars.task.ITask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.UnifySubst;

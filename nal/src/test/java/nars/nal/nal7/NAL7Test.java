@@ -8,7 +8,6 @@ import nars.task.NALTask;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
-import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -1300,6 +1299,7 @@ public class NAL7Test extends AbstractNALTest {
          */
 
         test
+                .log()
                 .input("((reshape(I,$1) &&+0 ($1-->[pliable])) ==>+10 ($1-->[hardened])).")
                 .input("(($1-->[heated]) ==>+10 ($1-->[pliable])).")
 

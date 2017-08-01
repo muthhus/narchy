@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by me on 6/8/15.
@@ -59,7 +60,7 @@ public class TemporalInductionTest {
 
         BeliefTable b = c.beliefs();
         b.print();
-        assertEquals(3, b.size());
+        assertTrue(3 <= b.size());
 
         //when originality is considered:
         //assertEquals("(b-->a). 5+0 %0.0;.90%", c.beliefs().top(n.time()).toStringWithoutBudget());

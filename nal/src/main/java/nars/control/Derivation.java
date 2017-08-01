@@ -16,8 +16,8 @@ import nars.term.subst.Unify;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
-import org.eclipse.collections.impl.factory.Maps;
 import org.eclipse.collections.api.map.ImmutableMap;
+import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -8,7 +8,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import static nars.Op.*;
-import static nars.time.Tense.DTERNAL;
 
 /**
  * Features exhibited by, and which can classify terms

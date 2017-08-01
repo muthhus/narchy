@@ -1567,7 +1567,10 @@ public enum Op implements $ {
             args.add(term2);
         }
 
-        return compound(intersection, DTERNAL, Terms.sorted(args));
+        Term[] aa = Terms.sorted(args);
+        if (aa.length == 1)
+            return aa[0]; //intersection with itself is itself
+        return compound(intersection, DTERNAL, aa);
     }
 
     @NotNull

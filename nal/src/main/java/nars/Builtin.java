@@ -159,7 +159,8 @@ public class Builtin {
             if (!oo.in(CONJ.bit))
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
-            if (t.dt() == DTERNAL) {
+            int tdt = t.dt();
+            if (tdt == DTERNAL || tdt ==0) {
                 switch (t.size()) {
                     case 0:
                     case 1:
@@ -169,7 +170,7 @@ public class Builtin {
                         return t.sub(nar.random().nextInt(2)); //one of the two
 
                     default:
-                        return CONJ.the(t.dt(), dropRandom(nar.random(), t.subterms()));
+                        return CONJ.the(tdt, dropRandom(nar.random(), t.subterms()));
                 }
             } else {
                 //recursive event-based decomposition and recomposition
