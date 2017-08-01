@@ -11,6 +11,7 @@ import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
+import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -277,6 +278,8 @@ public class Derivation extends Unify implements TermContext {
         //assert(beliefTerm.op()!=NEG): beliefTerm + " is negated";
 
         Term bt = beliefTerm.unneg();
+        assert(!(bt instanceof Bool));
+
 //        int ttv = taskTerm.vars();
 //        if (ttv > 0 && bt.vars() > 0) {
 //            bt = bt.normalize(ttv); //shift variables up to be unique compared to taskTerm's

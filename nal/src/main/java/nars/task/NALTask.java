@@ -97,6 +97,7 @@ public class NALTask extends Pri implements Task {
             throw new RuntimeException("invalid task occurrence time: " + start + ".." + end);
         }
 
+        assert(((start == ETERNAL && end == ETERNAL) || (start != ETERNAL && end != ETERNAL && (start <= end))));
         this.start = start;
         this.end = end;
 

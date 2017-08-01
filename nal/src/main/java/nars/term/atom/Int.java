@@ -290,7 +290,7 @@ public class Int implements Intlike {
             }*/
         }
 
-        Set<Term> result = new HashSet();//new TreeSet();
+        Set<Term> result = new TreeSet();//new TreeSet();
         Set<Term> subsumed = new HashSet();
 
         for (Map.Entry<ByteList, Pair<ByteHashSet, List<Term>>> e : data.entrySet()) {
@@ -344,7 +344,6 @@ public class Int implements Intlike {
                             //if (!y.equals(x)) {
 
                             if (!x.equals(y)) {
-                                result.remove(x);
                                 subsumed.add(x);
                             }
                             result.add(y);
@@ -371,7 +370,13 @@ public class Int implements Intlike {
         if (result.isEmpty()) {
             return subs;
         } else {
-            return result.toArray(new Term[result.size()]); //recompressIfChanged(subs, result, depthRemain - 1);
+
+            Term[] rr = result.toArray(new Term[result.size()]);
+            if (Arrays.equals(rr, subs))
+                return rr;
+            else
+                return intersect(rr); //changed, recompress
+
         }
     }
 

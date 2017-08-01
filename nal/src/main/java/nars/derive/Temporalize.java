@@ -207,6 +207,9 @@ public class Temporalize {
             if (start != ETERNAL && end == ETERNAL)
                 end = start; //point-like
 
+            if (!(((start == ETERNAL && end == ETERNAL) || (start != ETERNAL && end != ETERNAL))))
+                throw new RuntimeException("invalid semi-eternalization: " + start + " " + end);
+
             assert ((start == ETERNAL && end == ETERNAL) || (start != ETERNAL && end != ETERNAL)) :
                     "invalid semi-eternalization: " + start + " " + end;
 

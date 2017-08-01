@@ -37,7 +37,7 @@ public interface Priority extends Prioritized {
     /**
      * default minimum difference necessary to indicate a significant modification in budget float number components
      */
-    float EPSILON = 0.001f;
+    float EPSILON = 0.0001f;
 
     /** ascending order */
     Comparator<Priority> COMPARATOR = (Priority a, Priority b) -> {

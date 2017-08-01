@@ -53,10 +53,13 @@ public class FocusedExecutioner extends Executioner {
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
 
-    /** temporary buffer for tasks about to be executed */
+    /**
+     * temporary buffer for tasks about to be executed
+     */
     private final FasterList<ITask> next = new FasterList(1024);
 
-    @Override protected void clear() {
+    @Override
+    protected void clear() {
         next.clear();
         premises.clear();
         tasks.clear();
@@ -66,9 +69,6 @@ public class FocusedExecutioner extends Executioner {
     @Override
     public void cycle() {
 
-        tasks.commit();
-        premises.commit();
-        concepts.commit();
 
         if (Param.TRACE) {
             System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());
@@ -81,11 +81,11 @@ public class FocusedExecutioner extends Executioner {
         }
 
 
-
-
-
-
         for (int i = 0; i < subCycles; i++) {
+
+            tasks.commit();
+            premises.commit();
+            concepts.commit();
 
             //if (tasks.capacity() <= tasks.size())
 
@@ -110,7 +110,7 @@ public class FocusedExecutioner extends Executioner {
             execute(next);
 
 
-            concepts.sample(subCycleConcepts, (Predicate<ITask>)(next::add));
+            concepts.sample(subCycleConcepts, (Predicate<ITask>) (next::add));
 
             execute(next);
 
@@ -137,7 +137,7 @@ public class FocusedExecutioner extends Executioner {
                 return;
 
             if (x instanceof Activate) {
-                ((Activate)x).hypothesize(nar).forEach(premises::putAsync);
+                ((Activate) x).hypothesize(nar).forEach(premises::putAsync);
             } else {
                 x.run(nar);
             }
@@ -185,7 +185,7 @@ public class FocusedExecutioner extends Executioner {
         } else if (x instanceof Premise) {
             premises.putAsync(x);
         } else if (x instanceof Activate) {
-            concepts.putAsync((Activate)x);
+            concepts.putAsync((Activate) x);
         } else
             throw new UnsupportedOperationException("what is " + x);
     }

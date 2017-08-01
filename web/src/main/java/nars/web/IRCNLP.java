@@ -291,7 +291,7 @@ public class IRCNLP extends IRC {
 
         //Param.DEBUG = true;
 
-        NAR n = null;
+        NAR n = NARS.realtime().get();
 
         n.termVolumeMax.setValue(32);
 
@@ -312,8 +312,8 @@ public class IRCNLP extends IRC {
 
                 "irc.freenode.net",
                 //"#123xyz"
-                "#netention"
-                //"#nars"
+                //"#netention"
+                "#nars"
                 //"#x"
         );
 

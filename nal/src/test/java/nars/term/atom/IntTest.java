@@ -50,13 +50,15 @@ public class IntTest {
         n.believe($.inh($.the(1), $.the("x")));
         n.run(10);
     }
+
     @Test
     public void testIntInProductIntersectionReduction() throws Narsese.NarseseException {
 
         //simple scalar agglomeration
         assertEquals(
                 //$.p(range(0,1), range(0, 2)),
-                "(|,(0,0..2),(0..1,1),(0..1,0..2))",
+                //"(|,(0,0..2),(0..1,1),(0..1,0..2))",
+                "(0..1,0..2)",
                 Op.SECTi.the($.p(0, 1), $.p(the(1), range(0,2))).toString()
         );
 

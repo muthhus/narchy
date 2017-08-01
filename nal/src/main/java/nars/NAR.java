@@ -440,18 +440,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public Task goal(@NotNull Term term, @NotNull Tense tense, float freq) {
-        return goal(term, tense, freq, confDefault(GOAL));
-    }
-
-
-    @Nullable
-    public Task believe(float priority, @NotNull Term term, @NotNull Tense tense, float freq, float conf) {
-        return believe(priority, term, time(tense), freq, conf);
-    }
-
-
-    @NotNull
     public NAR believe(@NotNull Term term, float freq, float conf) {
         return believe(term, Tense.Eternal, freq, conf);
     }

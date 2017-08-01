@@ -135,16 +135,15 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((S & P) --> M), (Belief:Union)
                         //(P --> M), (S --> M), notSet(S), notSet(P), neqCom(S,P) |- ((P ~ S) --> M), (Belief:Difference)
 
-                        Compound csubj = (Compound) subj;
 
-                        if (validUnwrappableSubterms(csubj.subterms())) {
-                            int s = csubj.size();
+                        if (validUnwrappableSubterms(subj.subterms())) {
+                            int s = subj.size();
                             FasterList<Term> lx = new FasterList(s);
                             boolean valid = true;
                             for (int i = 0; i < s; i++) {
-                                Term csi = csubj.sub(i);
+                                Term csi = subj.sub(i);
                                 if (csi instanceof Int.IntRange) {
-                                    Int.unroll(csubj).forEachRemaining(dsi -> {
+                                    Int.unroll(subj).forEachRemaining(dsi -> {
                                         lx.add(INH.the(dsi, pred));
                                     });
                                 } else {

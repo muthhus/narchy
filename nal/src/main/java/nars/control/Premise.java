@@ -17,10 +17,13 @@ import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.atom.Bool;
 import nars.term.subst.UnifySubst;
 import nars.util.BudgetFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
@@ -37,6 +40,8 @@ import static nars.time.Tense.ETERNAL;
  * to avoid GC loops, so it may need to be weakly referenced.
  */
 public class Premise extends Pri implements ITask {
+
+    static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
     public final Task taskLink;
     public final Term termLink;
@@ -215,16 +220,15 @@ public class Premise extends Pri implements ITask {
             if (beliefTerm.isTemporal()) {
                 //try to temporalize the termlink to match what appears in the task
                 Temporalize.Event bs = new Temporalize().knowTerm(task.term(), ETERNAL).solve(beliefTerm);
-                if (bs != null) {
+                if (bs != null && !(bs.term instanceof Bool)) {
                     beliefTerm = bs.term;
                 }
             }
 
         }
 
-
-
         d.run(this, task, belief, beliefTerm, ttlMax);
+
 
 //        long ds = d.transformsCache.estimatedSize();
 //        if (ds >0)
