@@ -521,7 +521,7 @@ public class Temporalize {
                 occ[1] = e.end(times).abs();
             }
 
-            assert (occ[0] != ETERNAL || (task.isEternal() || (belief == null && belief.isEternal()))) : "eternal derived from non-eternal premise";
+            assert (occ[0] != ETERNAL || (task.isEternal()) || (belief != null && belief.isEternal())) : "eternal derived from non-eternal premise:\n" + task + " " + belief + " -> " + occ[0];
             return e.term;
         }
         return null;

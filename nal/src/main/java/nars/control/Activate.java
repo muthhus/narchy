@@ -139,7 +139,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         if (localTemplates.length > 0) {
             float decayRate = 0.5f;
             float decayed = priElseZero() * (1f - decayRate);
-            priSub(decayed);
+//            priSub(decayed);
             float subDecay = decayed / localTemplates.length;
             float balance = Param.TERMLINK_BALANCE;
             float subDecayForward = subDecay * balance;
