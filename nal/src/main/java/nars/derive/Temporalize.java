@@ -256,7 +256,10 @@ public class Temporalize {
 
         @Override
         public Time end(Map<Term, Time> ignored) {
-            return Time.the(end, term.dt());
+            int dt = term.dt();
+            if (dt == DTERNAL)
+                dt = 0;
+            return Time.the(end, dt);
         }
 
         @Override
@@ -952,10 +955,11 @@ public class Temporalize {
         if (dt != XTERNAL) {
 
             @Nullable Time at = ea.start(trail);
+
             Term newTerm = o.the(dt, a, b);
 
             @Nullable Time bt = eb.start(trail);
-            long start = /*o == CONJ ? */Math.min(at.abs(), bt.abs());// : at.abs();
+            long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
 
             return new SolutionEvent(newTerm, start);
         }

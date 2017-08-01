@@ -1,10 +1,8 @@
 
 package nars.web;
 
-import jcog.bag.impl.ArrayBag;
-import jcog.bag.impl.PLinkArrayBag;
+import com.google.common.util.concurrent.RateLimiter;
 import jcog.pri.PriReference;
-import jcog.pri.op.PriMerge;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.term.Term;
@@ -21,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static nars.Op.PROD;
@@ -49,14 +46,14 @@ public class IRCNLP extends IRC {
 
     private final boolean hearTwenglish = true;
 
-    final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
+    //    final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
     private final String[] channels;
     private final MyLeakOut outleak;
 
     boolean trace;
 
-    final ArrayBag<String, PriReference<String>> out = new PLinkArrayBag<>(16, PriMerge.max, new ConcurrentHashMap());
-    final ArrayBag<String, PriReference<String>> prevOut = new PLinkArrayBag<>(512, PriMerge.max, new ConcurrentHashMap());
+//    final ArrayBag<String, PriReference<String>> out = new PLinkArrayBag<>(16, PriMerge.max, new ConcurrentHashMap());
+//    final ArrayBag<String, PriReference<String>> prevOut = new PLinkArrayBag<>(512, PriMerge.max, new ConcurrentHashMap());
 
     public IRCNLP(NAR nar, String nick, String server, String... channels) throws Exception {
         super(nick, server, channels);
@@ -131,37 +128,11 @@ public class IRCNLP extends IRC {
         public final String[] channels;
 
         public MyLeakOut(NAR nar, String... channels) {
-            super(nar, 8, 1f);
+            super(nar, 8, 0.05f);
             this.nar = nar;
             this.channels = channels;
         }
 
-
-        String s = "";
-        int minSendLength = 16;
-
-        protected float send(Object o) {
-            Runnable r = null;
-            synchronized (channels) {
-                String w = o.toString();
-                boolean punctuation = w.equals(".") || w.equals("!") || w.equals("?");
-                this.s += w;
-                if (!punctuation)
-                    s += " ";
-                if ((s.length() > 0 && punctuation) || this.s.length() > minSendLength) {
-                    r = IRCNLP.this.send(channels, this.s.trim());
-                    this.s = "";
-                }
-            }
-
-
-            if (r != null) {
-                r.run();
-                //nar.runLater(r);
-            }
-
-            return 1;
-        }
 
         @Override
         protected float send(Task task) {
@@ -291,7 +262,8 @@ public class IRCNLP extends IRC {
 
         //Param.DEBUG = true;
 
-        NAR n = NARS.realtime().get();
+        NAR n = NARS.realtime(1 / 20f).get();
+
 
         n.termVolumeMax.setValue(32);
 
@@ -303,7 +275,7 @@ public class IRCNLP extends IRC {
 //        n.addNAR(16, 0.25f);
         //n.addNAR(512, 0.25f);
 
-        n.startFPS(25f);
+        n.startFPS(200f);
         //n.logBudgetMin(System.out, 0.75f);
 
 
@@ -312,6 +284,7 @@ public class IRCNLP extends IRC {
 
                 "irc.freenode.net",
                 //"#123xyz"
+                //"#netention"
                 //"#netention"
                 "#nars"
                 //"#x"
@@ -571,33 +544,66 @@ public class IRCNLP extends IRC {
             "within\n" +
             "without").split("\\r?\\n"));
 
-    /** http://www.really-learn-english.com/list-of-pronouns.html */
+    /**
+     * http://www.really-learn-english.com/list-of-pronouns.html
+     */
     static final ImmutableSet<String> personalPronouns = Sets.immutable.of("i,you,he,she,it,we,they,me,him,her,us,them".split(","));
-
+    static final RateLimiter r = RateLimiter.create(0.5f);
 
     private static void speak(@Nullable Term word, long delay, IRCNLP bot) {
         if (word == null)
             return;
 
-        if (delay > 1) {
-            //TODO schedule for future
-            System.out.println("\t+" + delay + " " + word);
-            return;
-        }
-
-        //n.believe(tt, Tense.Present);
         String wordString = word instanceof Atom ? $.unquote(word) : word.toString();
-        System.out.println(wordString);
-        bot.outleak.send(wordString);
 
         if (prepositions.contains(wordString))
             bot.nar.believe($.instprop(word, $.the("preposition")), Tense.Eternal);
         if (personalPronouns.contains(wordString))
             bot.nar.believe($.instprop(word, $.the("pronoun")), Tense.Eternal);
 
+        if (delay > 1) {
+            //TODO schedule for future
+            System.out.println("\t+" + delay + " " + word);
+            bot.nar.at(bot.nar.time() + delay, () -> {
+                speak(word, 0, bot);
+            });
+            return;
+        }
 
+        r.acquire();
+        {
+            //n.believe(tt, Tense.Present);
+            //System.out.println(wordString);
+            bot.send(wordString);
 
+        }
     }
 
+    String s = "";
+    int minSendLength = 24;
+
+    protected float send(Object o) {
+        Runnable r = null;
+        synchronized (channels) {
+            String w = o.toString();
+            boolean punctuation = w.equals(".") || w.equals("!") || w.equals("?");
+            this.s += w;
+            if (!punctuation)
+                s += " ";
+            if ((s.length() > 0 && punctuation) || this.s.length() > minSendLength) {
+                //speak($.the(s), 0, IRCNLP.this);
+                r = IRCNLP.this.send(channels, this.s.trim());
+                this.s = "";
+            }
+        }
+
+
+        if (r != null) {
+            r.run();
+            //nar.runLater(r);
+        }
+
+        return 1;
+    }
 
 }

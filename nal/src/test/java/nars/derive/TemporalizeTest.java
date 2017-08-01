@@ -240,6 +240,23 @@ public class TemporalizeTest {
         assertEquals("(b ==>+30 e)@ETE", s.toString());
     }
 
+    @Test public void testImplDT() throws Narsese.NarseseException {
+        /*
+            $1.0 ((d-->c) ==>-3 (a-->b)). 2 %1.0;.45% {6: 1;2} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((%1 ==>+- %2),((Induction-->Belief))))
+              $.50 (d-->c). 5 %1.0;.90% {5: 2}
+              $.50 (a-->b). 2 %1.0;.90% {2: 1}
+        */
+
+
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("(d-->c)"), 5);
+        t.knowTerm($.$("(a-->b)"), 2);
+
+        Temporalize.Event solution = t.solve($.$("((d-->c) ==>+- (a-->b))"));
+        assertNotNull(solution);
+        assertEquals("((d-->c) ==>-3 (a-->b))@5", solution.toString());
+    }
+
     @Test
     public void testSolveConjSequenceMerge() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();

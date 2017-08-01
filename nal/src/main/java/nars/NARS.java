@@ -160,6 +160,9 @@ public class NARS {
     public static NARS realtime() {
         return new Default(8, true).time(new RealTime.CS());
     }
+    public static NARS realtime(float durFPS) {
+        return new Default(8, true).time(new RealTime.CS().durFPS(durFPS));
+    }
 
     /** provides only low level functionality.
      *  an empty deriver, but allows any kind of term

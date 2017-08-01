@@ -766,6 +766,14 @@ public class NAL7Test extends AbstractNALTest {
 //        //((X --> R) ==> Z), ((&&,(#Y --> B),(#Y --> R),A..*) ==> Z), time(dtTask) |- (X --> B), (Belief:Abduction)
 //    }
 
+//    @Test
+//    public void testDTTaskEndPartial() {
+//        test
+//            .log()
+//            .input("((d-->c) ==>-3 (a-->b)). :|:")
+//            .mustNotOutput(cycles, "<d-->c>", BELIEF, 2, 5);
+//    }
+
     @Test
     public void testDTTaskEnd() {
         /*
@@ -778,7 +786,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 .inputAt(2, "(a-->b). :|:")
                 .inputAt(5, "(d-->c). :|:")
-                .mustBelieve(cycles, "((d-->c) ==>-3 (a-->b))", 1f, 0.45f, 2, 5)
+                .mustBelieve(cycles, "((d-->c) ==>-3 (a-->b))", 1f, 0.45f, 5)
                 .mustNotOutput(cycles, "<a-->b>", BELIEF, -1)
                 .mustNotOutput(cycles, "<a-->b>", BELIEF, 5)
                 .mustNotOutput(cycles, "<d-->c>", BELIEF, 2)
