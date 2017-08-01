@@ -703,7 +703,7 @@ public class Temporalize {
         if (term.op() == NEG) {
             Term u = term.unneg();
             FasterList<Event> m = constraints.computeIfAbsent(u, (t) -> new FasterList<>());
-            m.add(new RelativeEvent(u, term, 0));
+            m.add(new RelativeEvent(u, term, 0, term.dtRange()));
         }
     }
 
@@ -994,7 +994,13 @@ public class Temporalize {
         trail.put(target, null); //placeholder to prevent infinite loop
 
         Event e = solveEvent(target, trail);
-        Time t = e.start(trail);
+        Time t;
+        if (e != null) {
+            t = e.start(trail);
+        } else {
+            t = null;
+        }
+
         if (t != null) {
             trail.put(target, t);
         } else {

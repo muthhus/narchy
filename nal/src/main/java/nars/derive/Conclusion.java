@@ -97,13 +97,6 @@ public class Conclusion extends AbstractPred<Derivation> {
         Term c1 = b1.eval(d);
         if (c1 instanceof Variable || c1 instanceof Bool) return true;
 
-        boolean polarity = true;
-        if (c1.op() == NEG) {
-            c1 = c1.unneg();
-            if (c1 instanceof Variable || c1 instanceof Bool) return true;
-            polarity = false;
-        }
-
 
         Truth truth = d.concTruth;
 
@@ -127,10 +120,14 @@ public class Conclusion extends AbstractPred<Derivation> {
             if (occ[1] == ETERNAL) occ[1] = occ[0];
 
             if (goalUrgent && d.concPunc==GOAL && occ[0]!=ETERNAL) {
-                long taskDur = occ[1] - occ[0];
+                long taskStart = d.task.start();
 
-                occ[0] = d.task.start();
-                occ[1] = occ[0] + taskDur;
+                if (taskStart!=ETERNAL) { //preserve any temporality, dont overwrite as eternal
+                    long taskDur = occ[1] - occ[0];
+
+                    occ[0] = taskStart;
+                    occ[1] = occ[0] + taskDur;
+                }
             }
 
 
@@ -175,9 +172,6 @@ public class Conclusion extends AbstractPred<Derivation> {
             if (truth != null) {
 
                 if (negating)
-                    polarity = !polarity;
-
-                if (!polarity)
                     truth = truth.negated();
             }
 

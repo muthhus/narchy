@@ -617,7 +617,8 @@ public interface Term extends Termlike, Comparable<Term> {
         //order first by volume. this is important for conjunctions which rely on volume-dependent ordering for balancing
         //left should be heavier
         //compareTo semantics state that a -1 value means left is less than right. we want the opposite
-        int diff2 = Integer.compare(y.volume(), volume());
+        int thisVol = volume();
+        int diff2 = Integer.compare(y.volume(), thisVol);
         if (diff2 != 0)
             return diff2;
 
@@ -627,7 +628,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
         if (this instanceof Atomic) {
 
-            assert (y instanceof Atomic) : "because volume should have been determined to be equal";
+            //assert (y instanceof Atomic) : "because volume should have been determined to be equal";
 
             if ((this instanceof AbstractVariable) /*&& (y instanceof AbstractVariable)*/) {
                 //hashcode serves as the ordering too
@@ -654,6 +655,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
 
         } else {
+
 
             int c = TermContainer.compare(subterms(), y.subterms());
             if (c != 0)
