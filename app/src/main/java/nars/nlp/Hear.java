@@ -156,7 +156,7 @@ public class Hear extends Loop {
 
                 //System.out.println(strippedText);
 
-                Hear.hear(nar, strippedText, page, 50, 0.1f);
+                Hear.hear(nar, strippedText, page, 250, 0.1f);
 
                 Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 

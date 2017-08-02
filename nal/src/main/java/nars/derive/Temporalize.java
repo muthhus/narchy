@@ -117,13 +117,12 @@ public class Temporalize {
         if (a instanceof AbsoluteEvent || b instanceof AbsoluteEvent) {
             //at least one or both are absolute, forming a valid temporal grounding
             Time as = a.start(trail);
-            Time ae = a.end(trail);
+            //Time ae = a.end(trail);
             Time bs = b.start(trail);
-            Time be = b.end(trail);
-            if (bs.base >= ae.base)
-                return dt(ae, bs);
-            else
-                return dt(as, be);
+            //Time be = b.end(trail);
+
+            return dt(as, bs);
+
 
             //return dt(a.start(times), b.end(times));
         }
@@ -214,10 +213,7 @@ public class Temporalize {
             if (start != ETERNAL && end == ETERNAL)
                 end = start; //point-like
 
-            if (!(((start == ETERNAL && end == ETERNAL) || (start != ETERNAL && end != ETERNAL))))
-                throw new RuntimeException("invalid semi-eternalization: " + start + " " + end);
-
-            assert ((start == ETERNAL && end == ETERNAL) || (start != ETERNAL && end != ETERNAL)) :
+            assert (!(start == ETERNAL ^ end == ETERNAL)) :
                     "invalid semi-eternalization: " + start + " " + end;
 
             if (start <= end) {
@@ -951,6 +947,12 @@ public class Temporalize {
 
     private Event solveTemporal(Map<Term, Time> trail, Op o, Event ea, Event eb, Term a, Term b) {
         int dt = dt(ea, eb, trail);
+
+//        int inner = a.dtRange();// + b.dtRange();
+//        assert(Math.abs(dt) >= inner);
+//        if (dt >= 0) dt -= inner;
+//        else dt += inner;
+
         if (dt != 0 && Math.abs(dt) < dur)
             dt = 0; //perceived as simultaneous within duration
 

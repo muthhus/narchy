@@ -51,12 +51,12 @@ public class Speech {
         if (word == null)
             return;
 
-        String wordString = word instanceof Atom ? $.unquote(word) : word.toString();
+        //String wordString = word instanceof Atom ? $.unquote(word) : word.toString();
 
-        if (Twenglish.prepositions.contains(wordString))
-            nar.believe($.instprop(word, PREPOSITION), Tense.Eternal);
-        if (Twenglish.personalPronouns.contains(wordString))
-            nar.believe($.instprop(word, PRONOUN), Tense.Eternal);
+//        if (Twenglish.prepositions.contains(wordString))
+//            nar.believe($.instprop(word, PREPOSITION), Tense.Eternal);
+//        if (Twenglish.personalPronouns.contains(wordString))
+//            nar.believe($.instprop(word, PRONOUN), Tense.Eternal);
 
         if (when < nar.time()) {
             return;
@@ -78,19 +78,22 @@ public class Speech {
     public boolean next() {
 
         //long start = nar.time();
-        long end = nar.time() + nar.dur();
+        float dur = 1f/cyclesPerWord;
+        long end = Math.round(nar.time() + dur);
 
 
-        FasterList<Pair<Term,Truth>> pending = new FasterList<>();
-        SortedSet<Long> tt = vocalize.rowKeySet().headSet(end);
-        tt.forEach(t -> {
-            vocalize.row(t).entrySet().forEach(e -> {
-               Truth x = e.getValue().commitSum();
-               if (x.expectation() > expectationThreshold)
-                   pending.add(Tuples.pair(e.getKey(), x));
+        FasterList<Pair<Term, Truth>> pending = new FasterList<>(0);
+        synchronized (vocalize) {
+            SortedSet<Long> tt = vocalize.rowKeySet().headSet(end);
+            tt.forEach(t -> {
+                vocalize.row(t).entrySet().forEach(e -> {
+                    Truth x = e.getValue().commitAverage();
+                    if (x.expectation() > expectationThreshold)
+                        pending.add(Tuples.pair(e.getKey(), x));
+                });
+                vocalize.row(t).clear();
             });
-            vocalize.row(t).clear();
-        });
+        }
         if (pending.isEmpty())
             return true;
 

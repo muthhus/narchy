@@ -1040,9 +1040,15 @@ public enum Op implements $ {
             right = left;
             left = t;
         }
-        return new GenericCompoundDT(new GenericCompound(CONJ,
+
+        GenericCompound g = new GenericCompound(CONJ,
                 TermVector.the(left, right)
-        ), dt);
+        );
+
+        if (dt == DTERNAL)
+            return g;
+        else
+            return new GenericCompoundDT(g, dt);
     }
 
 //    protected static Term conjMergeLeftAlign(List<ObjectLongPair<Term>> events, int from, int to) {

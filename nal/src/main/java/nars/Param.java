@@ -85,8 +85,10 @@ public abstract class Param  {
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */
     public static float valueAtInput(Task accepted, NAR nar) {
-        float volComplexityAvg = (accepted.volume() + accepted.complexity())/2f;
-        return -(volComplexityAvg)/nar.termVolumeMax.floatValue()/800f;
+        float v =
+                //(accepted.volume() + accepted.complexity())/2f;
+                (1 + accepted.volume());
+        return -(v)/nar.termVolumeMax.floatValue()/800f;
     }
 
 

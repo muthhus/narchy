@@ -215,7 +215,7 @@ public class IRCNLP extends IRC {
 
     void hear(String text, String src) throws Narsese.NarseseException {
         Hear.hear(nar, text, src, (t) -> {
-            return new Hear(nar, Hear.tokenize(t), src, 50);
+            return new Hear(nar, Hear.tokenize(t), src, 250);
 //            Compound f = $.func("SENTENCE", Hear.tokenize(t));
 //            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f);
 //            return null;
@@ -263,10 +263,12 @@ public class IRCNLP extends IRC {
 
         //Param.DEBUG = true;
 
-        NAR n = NARS.realtime(1 / 20f).get();
+        float durFPS = 20f;
+        NAR n = NARS.realtime(durFPS).get();
 
 
-        n.termVolumeMax.setValue(32);
+
+        n.termVolumeMax.setValue(12);
 
         /*@NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
             new RealTime.DS(true),
@@ -293,8 +295,6 @@ public class IRCNLP extends IRC {
 
                 "irc.freenode.net",
                 //"#123xyz"
-                //"#netention"
-                //"#netention"
                 "#netention"
                 //"#x"
         );
@@ -491,15 +491,15 @@ public class IRCNLP extends IRC {
     String s = "";
     int minSendLength = 24;
 
-    protected float send(Object o) {
+    protected float send(Term o) {
         Runnable r = null;
         synchronized (channels) {
-            String w = o.toString();
+            String w = $.unquote(o);
             boolean punctuation = w.equals(".") || w.equals("!") || w.equals("?");
             this.s += w;
             if (!punctuation)
                 s += " ";
-            if ((s.length() > 0 && punctuation) || this.s.length() > minSendLength) {
+            if ((!s.isEmpty() && punctuation) || this.s.length() > minSendLength) {
                 //speak($.the(s), 0, IRCNLP.this);
                 r = IRCNLP.this.send(channels, this.s.trim());
                 this.s = "";

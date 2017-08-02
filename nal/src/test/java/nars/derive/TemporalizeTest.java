@@ -298,14 +298,15 @@ public class TemporalizeTest {
         }
 
         //try for both impl and conj, they should produce similar results
-        for (String op : new String[]{"==>", "&&"}) {
+        for (String op : new String[]{"&&", "==>"}) {
             HashMap h = new HashMap();
             Temporalize.Event s = t.solve($.$("((x &&+- y) " + op + "+- z)"), h);
 
             System.out.println();
             System.out.println(Joiner.on('\n').join(h.entrySet()));
 
-            String pattern = "((x &&+2 y) " + op + "+3 z)@ETE";
+            int dt = op.equals("&&") ? 3 : 5;
+            String pattern = "((x &&+2 y) " + op + "+" + dt + " z)@ETE";
 
             assertNotNull(op + ":" + pattern, s);
             assertEquals(op + ":" + pattern, pattern, s.toString());
@@ -328,6 +329,23 @@ public class TemporalizeTest {
         //    }
 
     }
+
+    @Test
+    public void testConjLinked() throws Narsese.NarseseException {
+// WRONG:
+//        $.31 ((b &&+5 c) ==>+5 (a &&+5 b)). 6 %1.0;.45% {7: 1;2} ((%1,%2,time(raw),belief(positive),task("."),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((%2 ==>+- %1),((Abduction-->Belief))))
+//          $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
+//          $.50 (b &&+5 c). 6⋈11 %1.0;.90% {6: 2}
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("(a &&+5 b)"), 1);
+        t.knowTerm($.$("(b &&+5 c)"), 6);
+        assertEquals("(a &&+5 b)@[1..6]", t.solve($.$("(a &&+- b)")).toString());
+        assertEquals("((a &&+5 b) &&+5 c)@[1..11]", t.solve($.$("((a &&+- b) &&+- c)")).toString());
+        assertEquals("((a &&+5 b) ==>+5 (b &&+5 c))@1", t.solve($.$("((a &&+5 b) ==>+- (b &&+5 c))")).toString());
+        assertEquals("((b &&+5 c) ==>-5 (a &&+5 b))@6", t.solve($.$("((b &&+5 c) ==>+- (a &&+5 b))")).toString());
+
+    }
+
 
     @Test
     public void testPreconImplConjPreConflict() throws Narsese.NarseseException {
