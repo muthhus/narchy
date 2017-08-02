@@ -1390,7 +1390,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(6, "(--,(b))! :|:")
-                .mustDesire(cycles, "(a)", 1f, 81f, 6) //since b is not desired now, it should reverse predict the goal of (a)
+                .mustDesire(cycles, "(a)", 1f, 0.81f, 6) //since b is not desired now, it should reverse predict the goal of (a)
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
 
