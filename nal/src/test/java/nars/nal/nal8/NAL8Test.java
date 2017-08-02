@@ -86,9 +86,9 @@ public class NAL8Test extends AbstractNALTest {
 
                 .input("(open(t1) &&+5 opened(t1))! :|:")
                 .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //only temporal
-                .mustDesire(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal  // <-- the 2nd half should not be decomposed here
                 .mustNotOutput(cycles, "open(t1)", GOAL, ETERNAL, 5) //no eternal
-        //.mustNotOutput(cycles, "opened(t1)", GOAL,  ETERNAL, 5) //no eternal
+                .mustDesire(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal
+                .mustNotOutput(cycles, "opened(t1)", GOAL,  ETERNAL, 0) //no eternal
         ;
     }
 

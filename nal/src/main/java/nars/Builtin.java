@@ -185,7 +185,28 @@ public class Builtin {
                 return Op.conj(ee);
             }
         }));
-
+        nar.on(Functor.f2((Atom) $.the("conjEvent"), (Term c, Term when) -> {
+            if (c.op()!=CONJ || !(when instanceof Atom))
+                return null;
+            if (c.dt()==DTERNAL || c.dt()==0) {
+                return c.sub(nar.random().nextInt(c.size())); //choose a subterm at random
+            }
+            assert(c.size()==2);
+            int target;
+            switch (when.toString()) {
+                case "early":
+                    target = 0;
+                    break;
+                case "late":
+                    target = 1;
+                    break;
+                default:
+                    throw new UnsupportedOperationException();
+            }
+            if (c.dt() < 0)
+                target = 1 - target;
+            return c.sub(target);
+        }));
         nar.on("assertEquals", (op, args, nn) -> {
             //String msg = op + "(" + Joiner.on(',').join(args) + ')';
             assertEquals(/*msg,*/ 2, args.length);

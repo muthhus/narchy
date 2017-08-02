@@ -120,7 +120,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             if (occ[1] == ETERNAL) occ[1] = occ[0];
 
-            if (goalUrgent && d.concPunc==GOAL && occ[0]!=ETERNAL) {
+            if (goalUrgent && d.concPunc==GOAL/* && occ[0]!=ETERNAL*/) {
                 long taskStart = d.task.start();
 
                 if (taskStart!=ETERNAL) { //preserve any temporality, dont overwrite as eternal
