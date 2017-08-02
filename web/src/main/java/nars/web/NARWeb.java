@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import nars.*;
+import nars.nlp.Hear;
 import nars.op.Command;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;

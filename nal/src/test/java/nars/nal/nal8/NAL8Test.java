@@ -560,7 +560,6 @@ public class NAL8Test extends AbstractNALTest {
                 .input("(hold)! :|:")
                 .inputAt(2, "( (hold) &&+5 (eat) ).") //should not decomposed by the goal task
                 .mustDesire(cycles, "(eat)", 1f, 0.81f, 5)
-        //.mustNotOutput(cycles, "(eat)", GOAL, ETERNAL, 15, 5)
         ;
     }
 
@@ -1272,7 +1271,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "((happy) ==>-3 (out)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.26f /*0.45f*/, 13)
+                .mustDesire(cycles, "(out)", 1f, 0.45f, 13)
                 .mustNotOutput(cycles, "(out)", GOAL, 3, 16, 0);
     }
 
@@ -1340,7 +1339,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "(--(out) <=>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
+                .mustDesire(cycles, "(out)", 0f, 0.81f, 13)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 

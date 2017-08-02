@@ -97,12 +97,12 @@ public class NALTask extends Pri implements Task {
             throw new RuntimeException("invalid task occurrence time: " + start + ".." + end);
         }
 
-        assert(((start == ETERNAL && end == ETERNAL) || (start != ETERNAL && end != ETERNAL && (start <= end))));
+        assert (start == ETERNAL && end == ETERNAL) || (start != ETERNAL && start <= end): "start=" + start + ", end=" + end + " is invalid task occurrence time";
         this.start = start;
         this.end = end;
 
         //EVIDENCE STAMP
-        assert(punc == COMMAND || (stamp.length > 0) );
+        assert(punc == COMMAND || (stamp.length > 0) ): "non-command tasks must have non-empty stamp";
         this.stamp = stamp;
 
         //CALCULATE HASH

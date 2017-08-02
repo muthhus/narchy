@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import static nars.Op.GOAL;
 import static nars.Op.NEG;
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -124,6 +125,12 @@ public class Conclusion extends AbstractPred<Derivation> {
 
                 if (taskStart!=ETERNAL) { //preserve any temporality, dont overwrite as eternal
                     long taskDur = occ[1] - occ[0];
+
+
+                    int derInBelief = d.transform(d.beliefTerm).subtermTime(t1);
+                    if (derInBelief!=DTERNAL) {
+                        taskStart += derInBelief;
+                    }
 
                     occ[0] = taskStart;
                     occ[1] = occ[0] + taskDur;

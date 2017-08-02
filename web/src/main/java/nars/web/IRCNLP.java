@@ -1,15 +1,13 @@
 
 package nars.web;
 
-import com.google.common.util.concurrent.RateLimiter;
 import jcog.pri.PriReference;
 import nars.*;
 import nars.bag.leak.LeakOut;
+import nars.nlp.Hear;
+import nars.nlp.Speech;
 import nars.term.Term;
-import nars.term.atom.Atom;
-import nars.time.Tense;
-import org.eclipse.collections.api.set.ImmutableSet;
-import org.eclipse.collections.impl.factory.Sets;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -19,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 import static nars.Op.PROD;
@@ -49,6 +48,7 @@ public class IRCNLP extends IRC {
     //    final int wordDelayMS = 25; //for serializing tokens to events: the time in millisecond between each perceived (subvocalized) word, when the input is received simultaneously
     private final String[] channels;
     private final MyLeakOut outleak;
+    final Speech speech;
 
     boolean trace;
 
@@ -60,6 +60,7 @@ public class IRCNLP extends IRC {
 
         this.nar = nar;
         this.channels = channels;
+        this.speech = new Speech(nar, 1f, this::send);
 
 //        new Thread(()->{
 //            while (true) {
@@ -278,6 +279,14 @@ public class IRCNLP extends IRC {
         n.startFPS(200f);
         //n.logBudgetMin(System.out, 0.75f);
 
+        new Thread(() -> {
+            try {
+                new TelnetServer(n, 1024);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+
 
         IRCNLP bot = new IRCNLP(n,
                 "exp" + Math.round(10000 * Math.random()),
@@ -286,7 +295,7 @@ public class IRCNLP extends IRC {
                 //"#123xyz"
                 //"#netention"
                 //"#netention"
-                "#nars"
+                "#netention"
                 //"#x"
         );
 
@@ -305,7 +314,7 @@ public class IRCNLP extends IRC {
                     if (start >= now - dur) {
                         if (tt.subIs(Op.INH, 1, $.the("hear"))) {
                             if (tt.subIs(0, PROD) && tt.sub(0).subIs(0, Op.ATOM)) {
-                                speak(tt.sub(0).sub(0), start - now, bot);
+                                bot.speak(tt.sub(0).sub(0), start, t.truth());
                             }
                         }
                     }
@@ -473,111 +482,11 @@ public class IRCNLP extends IRC {
 
     }
 
-    static final ImmutableSet<String> prepositions = Sets.immutable.of(("aboard\n" +
-            "about\n" +
-            "above\n" +
-            "across\n" +
-            "after\n" +
-            "against\n" +
-            "along\n" +
-            "amid\n" +
-            "among\n" +
-            "anti\n" +
-            "around\n" +
-            "as\n" +
-            "at\n" +
-            "before\n" +
-            "behind\n" +
-            "below\n" +
-            "beneath\n" +
-            "beside\n" +
-            "besides\n" +
-            "between\n" +
-            "beyond\n" +
-            "but\n" +
-            "by\n" +
-            "concerning\n" +
-            "considering\n" +
-            "despite\n" +
-            "down\n" +
-            "during\n" +
-            "except\n" +
-            "excepting\n" +
-            "excluding\n" +
-            "following\n" +
-            "for\n" +
-            "from\n" +
-            "in\n" +
-            "inside\n" +
-            "into\n" +
-            "like\n" +
-            "minus\n" +
-            "near\n" +
-            "of\n" +
-            "off\n" +
-            "on\n" +
-            "onto\n" +
-            "opposite\n" +
-            "outside\n" +
-            "over\n" +
-            "past\n" +
-            "per\n" +
-            "plus\n" +
-            "regarding\n" +
-            "round\n" +
-            "save\n" +
-            "since\n" +
-            "than\n" +
-            "through\n" +
-            "to\n" +
-            "toward\n" +
-            "towards\n" +
-            "under\n" +
-            "underneath\n" +
-            "unlike\n" +
-            "until\n" +
-            "up\n" +
-            "upon\n" +
-            "versus\n" +
-            "via\n" +
-            "with\n" +
-            "within\n" +
-            "without").split("\\r?\\n"));
 
-    /**
-     * http://www.really-learn-english.com/list-of-pronouns.html
-     */
-    static final ImmutableSet<String> personalPronouns = Sets.immutable.of("i,you,he,she,it,we,they,me,him,her,us,them".split(","));
-    static final RateLimiter r = RateLimiter.create(0.5f);
-
-    private static void speak(@Nullable Term word, long delay, IRCNLP bot) {
-        if (word == null)
-            return;
-
-        String wordString = word instanceof Atom ? $.unquote(word) : word.toString();
-
-        if (prepositions.contains(wordString))
-            bot.nar.believe($.instprop(word, $.the("preposition")), Tense.Eternal);
-        if (personalPronouns.contains(wordString))
-            bot.nar.believe($.instprop(word, $.the("pronoun")), Tense.Eternal);
-
-        if (delay > 1) {
-            //TODO schedule for future
-            System.out.println("\t+" + delay + " " + word);
-            bot.nar.at(bot.nar.time() + delay, () -> {
-                speak(word, 0, bot);
-            });
-            return;
-        }
-
-        r.acquire();
-        {
-            //n.believe(tt, Tense.Present);
-            //System.out.println(wordString);
-            bot.send(wordString);
-
-        }
+    private void speak(Term word, long when, @Nullable Truth truth) {
+        speech.speak(word, when, truth);
     }
+
 
     String s = "";
     int minSendLength = 24;

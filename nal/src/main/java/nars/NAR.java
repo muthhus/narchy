@@ -1710,8 +1710,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             causeEternal = nar.newChannel("Eternal");
             causePresent = nar.newChannel("Present");
             causeFuture = nar.newChannel("Future");
-            causeConf = new ChannelRange("Conf", 8, nar::newChannel, 0f, 1f);
-            causeFreq = new ChannelRange("Freq", 8, nar::newChannel, 0f, 1f);
+            causeConf = new ChannelRange("Conf", 7 /* odd */, nar::newChannel, 0f, 1f);
+            causeFreq = new ChannelRange("Freq", 7 /* odd */, nar::newChannel, 0f, 1f);
         }
 
         /**

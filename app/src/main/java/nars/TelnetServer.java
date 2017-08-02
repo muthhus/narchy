@@ -20,6 +20,7 @@ import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import nars.control.Activate;
+import nars.nlp.Hear;
 import nars.op.Command;
 import nars.task.ITask;
 import org.slf4j.LoggerFactory;
@@ -43,7 +44,7 @@ public class TelnetServer extends TelnetTerminalServer {
     final static org.slf4j.Logger logger = LoggerFactory.getLogger(TelnetServer.class);
     private final NAR nar;
 
-    final Set<TelnetSession> sessions = Sets.newConcurrentHashSet(); //holds ref
+    final Set<TelnetSession> sessions = Sets.newConcurrentHashSet();
 
     public TelnetServer(NAR n, int port) throws IOException {
         super(port, Charset.forName("utf-8"));

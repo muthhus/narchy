@@ -15,6 +15,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static nars.time.Tense.ETERNAL;
+
 
 public class DynamicBeliefTable extends DefaultBeliefTable {
 
@@ -52,13 +54,23 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         if (ee == null || ee.isEmpty())
             return null;
 
+        boolean ete = false;
         for (int i = 0, e1Size = ee.size(); i < e1Size; i++) {
             Task x = ee.get(i);
             long s = x.start();
-            long e = x.end();
-            if (s < start) start = s;
-            if (e > end) end = e;
+            if (s!=ETERNAL) {
+                long e = x.end();
+                if (s < start) start = s;
+                if (e > end) end = e;
+            } else {
+                ete = true;
+            }
         }
+        if (end == Long.MIN_VALUE) {
+            assert(ete); //should be eternal in this case
+            start = end = ETERNAL;
+        }
+
 
         return yy.task(template, beliefOrGoal, nar.time(), start, end, b, nar);
     }

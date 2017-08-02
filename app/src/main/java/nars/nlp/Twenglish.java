@@ -24,6 +24,8 @@ import nars.Narsese;
 import nars.task.TaskBuilder;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import org.eclipse.collections.api.set.ImmutableSet;
+import org.eclipse.collections.impl.factory.Sets;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -36,6 +38,80 @@ import static nars.Op.BELIEF;
  * Twitter English - english with additional tags for twitter-like content
  */
 public class Twenglish {
+    public static final ImmutableSet<String> prepositions = Sets.immutable.of(("aboard\n" +
+        "about\n" +
+        "above\n" +
+        "across\n" +
+        "after\n" +
+        "against\n" +
+        "along\n" +
+        "amid\n" +
+        "among\n" +
+        "anti\n" +
+        "around\n" +
+        "as\n" +
+        "at\n" +
+        "before\n" +
+        "behind\n" +
+        "below\n" +
+        "beneath\n" +
+        "beside\n" +
+        "besides\n" +
+        "between\n" +
+        "beyond\n" +
+        "but\n" +
+        "by\n" +
+        "concerning\n" +
+        "considering\n" +
+        "despite\n" +
+        "down\n" +
+        "during\n" +
+        "except\n" +
+        "excepting\n" +
+        "excluding\n" +
+        "following\n" +
+        "for\n" +
+        "from\n" +
+        "in\n" +
+        "inside\n" +
+        "into\n" +
+        "like\n" +
+        "minus\n" +
+        "near\n" +
+        "of\n" +
+        "off\n" +
+        "on\n" +
+        "onto\n" +
+        "opposite\n" +
+        "outside\n" +
+        "over\n" +
+        "past\n" +
+        "per\n" +
+        "plus\n" +
+        "regarding\n" +
+        "round\n" +
+        "save\n" +
+        "since\n" +
+        "than\n" +
+        "through\n" +
+        "to\n" +
+        "toward\n" +
+        "towards\n" +
+        "under\n" +
+        "underneath\n" +
+        "unlike\n" +
+        "until\n" +
+        "up\n" +
+        "upon\n" +
+        "versus\n" +
+        "via\n" +
+        "with\n" +
+        "within\n" +
+        "without").split("\\r?\\n"));
+    /**
+     * http://www.really-learn-english.com/list-of-pronouns.html
+     */
+    public static final ImmutableSet<String> personalPronouns = Sets.immutable.of("i,you,he,she,it,we,they,me,him,her,us,them".split(","));
 //    public static final Atomic GOAL = $.the("exclaims");
 //    public static final Atomic QUESTION = $.the("asks");
 //    //public static final Atom QUEST = $.the("quest");

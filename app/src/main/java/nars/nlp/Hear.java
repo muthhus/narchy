@@ -1,15 +1,14 @@
-package nars;
+package nars.nlp;
 
 import com.google.common.collect.Lists;
 import jcog.Loop;
 import jcog.event.On;
 import jcog.io.Twokenize;
+import nars.*;
 import nars.concept.Concept;
-import nars.nlp.Twenglish;
 import nars.op.Command;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.time.Tense;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 

@@ -9,6 +9,7 @@ import jcog.Util;
 import jcog.byt.DynBytes;
 import nars.*;
 import nars.bag.leak.LeakOut;
+import nars.nlp.Hear;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.web.WebsocketService;
 
