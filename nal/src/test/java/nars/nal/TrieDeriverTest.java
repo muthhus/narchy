@@ -72,7 +72,7 @@ public class TrieDeriverTest {
 
         System.out.println(d);
 
-        assertTrue(d.toString().contains("((?2&|%1),") );
+        assertTrue(d.toString().contains("(?2&|%1)") );
         assertTrue(d.toString().contains("(?2 &&+- %1)") );
 
 
@@ -140,6 +140,7 @@ public class TrieDeriverTest {
         );
 
     }
+
     @Test public void testConclusionFold() throws Narsese.NarseseException {
 
         String[] rules = {
@@ -147,7 +148,7 @@ public class TrieDeriverTest {
                 "(A --> B), C |- (A ==> C), (Punctuation:Question)"
         };
 
-        Set<Task> t1 = testDerivation(rules, "(a-->b).", "b", 64);
+        Set<Task> t1 = testDerivation(rules, "(a-->b).", "b", 64, false);
         assertEquals(2, t1.size());
         Set<Task> t2 = testDerivation(rules, "(a<->b).", "b", 64);
         assertEquals(0, t2.size());
@@ -155,9 +156,13 @@ public class TrieDeriverTest {
     }
 
     public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
+        return testDerivation(rules, task, belief, ttlMax, false);
+    }
+
+    public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax, boolean debug) throws Narsese.NarseseException {
         NAR n = NARS.tmp();
 
-        PrediTerm<Derivation> d = testCompile(n, rules )
+        PrediTerm<Derivation> d = testCompile(n, debug, rules )
                 .transform(DebugDerivationPredicate::new);
 
         Derivation der = new Derivation(n).cycle();
