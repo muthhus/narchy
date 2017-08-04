@@ -48,14 +48,10 @@ public class LinkageTest extends AbstractNALTest {
         tester.run(runCycles, false);
 
         Concept ret = tester.nar.conceptualize(premise1);
-        boolean passed = false;
-        passed = isPassed2(premise2, ret, passed);
-        assertTrue(passed);
+        assertTrue(ret + " termlinks contains " + premise2, isPassed2(premise2, ret));
 
         Concept ret2 = tester.nar.conceptualize(premise2);
-        boolean passed2 = false;
-        passed2 = isPassed2(premise1, ret2, passed2);
-        assertTrue(passed2);
+        assertTrue(ret2 + " termlinks contains " + premise1, isPassed2(premise1, ret2));
 
 
 //        if(passed && passed2) { //dummy to pass the test:
@@ -66,16 +62,22 @@ public class LinkageTest extends AbstractNALTest {
 //        tester.mustBelieve(10,"<a --> b>",0.9f);
     }
 
-    public boolean isPassed2(String premise1, @Nullable Concept ret2, boolean passed2) {
+    public boolean isPassed2(String premise1Str, @Nullable Concept ret2) {
+        Term premise1 = null;
+        try {
+            premise1 = $.$(premise1Str).conceptual();
+        } catch (Narsese.NarseseException e) {
+            return false;
+        }
         if (ret2 != null) {// && ret2.getTermLinks()!=null) {
             for (PriReference<Term> entry : ret2.termlinks()) {
                 Term w = entry.get().term();
-                if (w.toString().equals(premise1)) {
-                    passed2 = true;
+                if (w.equals(premise1)) {
+                    return true;
                 }
             }
         }
-        return passed2;
+        return false;
     }
 
     public void ProperlyLinkedIndirectlyTest(@NotNull String spremise1, @NotNull String spremise2) throws Exception {

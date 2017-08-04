@@ -18,9 +18,9 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam;
+    static boolean cam = true;
 
-    public final FloatParam ballSpeed = new FloatParam(2f, 0.1f, 6f);
+    public final FloatParam ballSpeed = new FloatParam(1f, 0.1f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
@@ -62,7 +62,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 20);
+        }, 10);
 
 
 //        nar.forEachActiveConcept(c -> {
