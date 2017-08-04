@@ -24,7 +24,9 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
 
     //public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
-    /** tasks per second output */
+    /**
+     * tasks per second output
+     */
     private static final float DEFAULT_RATE = 8;
 
     public final NAR nar;
@@ -42,7 +44,6 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
     }
 
     /**
-     *
      * @param nar
      * @param outRate output rate in tasks per cycle, some value > 0, ammortize over multiple cycles with a fraction < 1
      * @param port
@@ -54,9 +55,8 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
     }
 
     /**
-     *
      * @param nar
-     * @param outRate output rate in tasks per cycle, some value > 0, ammortize over multiple cycles with a fraction < 1
+     * @param outRate  output rate in tasks per cycle, some value > 0, ammortize over multiple cycles with a fraction < 1
      * @param port
      * @param discover
      * @throws SocketException
@@ -69,18 +69,19 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
         this.recv = nar.newInputChannel(this);
 
         this.send = new LeakOut(nar, 256, outRate) {
-            @Override protected float send(Task x) {
+            @Override
+            protected float send(Task x) {
 
                 if (connected()) {
                     try {
                         x = nar.post(x);
                         //if (x!=null) {
-                            @Nullable byte[] msg = IO.taskToBytes(x);
-                            if (msg != null) {
-                                if (tellSome(msg, ttl(x), true) > 0) {
-                                    return 1;
-                                }
+                        @Nullable byte[] msg = IO.taskToBytes(x);
+                        if (msg != null) {
+                            if (tellSome(msg, ttl(x), true) > 0) {
+                                return 1;
                             }
+                        }
                         //}
                     } catch (RuntimeException e) {
                         e.printStackTrace();
@@ -101,7 +102,7 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
     }
 
     private static byte ttl(Task x) {
-        return (byte)(1 + Util.lerp(x.priElseZero() /* * (1f + x.qua())*/, 2, 5));
+        return (byte) (1 + Util.lerp(x.priElseZero() /* * (1f + x.qua())*/, 2, 5));
     }
 
     @Override
@@ -125,14 +126,9 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
 
         Task x;
 
-        try {
-            x = IO.taskFromBytes(m.data());
-        } catch (RuntimeException e) {
-            logger.warn("bad Task: {} len={}", m, m.dataLength() );
-            return;
-        }
 
-        if (x!=null) {
+        x = IO.taskFromBytes(m.data());
+        if (x != null) {
             if (x.isQuestOrQuestion()) {
                 //reconstruct a question task with an onAnswered handler to reply with answers to the sender
                 x = new ActiveQuestionTask(x, 8, nar, this);
@@ -149,22 +145,17 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
     @Override
     public void accept(ActiveQuestionTask question, Task answer) {
         Msg q = question.meta(Msg.class);
-        if (q==null)
+        if (q == null)
             return;
 
-        try {
-            answer = nar.post(answer);
-            if (answer!=null) {
-                @Nullable byte[] a = IO.taskToBytes(answer);
-                if (a != null) {
-                    Msg aa = new Msg(TELL.id, ttl(answer), me, null, a);
-                    if (!seen(aa, 1f))
-                        send(aa, q.origin());
-                }
-            }
-        } catch (RuntimeException e) {
-            e.printStackTrace();
+        answer = nar.post(answer);
+        @Nullable byte[] a = IO.taskToBytes(answer);
+        if (a != null) {
+            Msg aa = new Msg(TELL.id, ttl(answer), me, null, a);
+            if (!seen(aa, 1f))
+                send(aa, q.origin());
         }
+
 
     }
 }

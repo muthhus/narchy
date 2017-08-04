@@ -60,10 +60,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             //nothing
         }
 
-        @Override
-        public void forEach(int _maxPerConcept, @NotNull Consumer<? super Task> recip) {
-
-        }
 
 
         @Override

@@ -2,6 +2,7 @@ package jcog.pri;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {
@@ -17,9 +18,9 @@ public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {
 
         final X x = get();
         if (that instanceof Supplier)
-            return x.equals(((Supplier)that).get());
+            return Objects.equals(x, ((Supplier)that).get());
         else
-            return x.equals(that);
+            return Objects.equals(x, that);
 //        return
 //            (x!=null)
 //                &&

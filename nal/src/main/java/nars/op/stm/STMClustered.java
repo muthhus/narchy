@@ -317,10 +317,10 @@ public abstract class STMClustered extends STM {
 
                     @Override
                     public void onRemoved(@NotNull PriReference<Task> value) {
-                        TasksNode owner = ((TLink) value).node;
-                        if (owner != null)
-                            owner.remove((TLink) value);
-                        value.delete();
+//                        TasksNode owner = ((TLink) value).node;
+//                        if (owner != null)
+//                            owner.remove((TLink) value);
+//                        value.delete();
                     }
 
                 };

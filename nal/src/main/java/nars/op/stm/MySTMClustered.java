@@ -1,20 +1,20 @@
 package nars.op.stm;
 
-import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.list.ArrayIterator;
 import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
+import nars.Op;
 import nars.Task;
 import nars.control.CauseChannel;
-import nars.index.term.TermIndex;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.TruthFunctions;
 import nars.util.BudgetFunctions;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,9 +22,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
 
-import static nars.Op.CONJ;
-import static nars.term.Terms.normalizedOrNull;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Task Dimension Mapping:
@@ -54,7 +54,7 @@ public class MySTMClustered extends STMClustered {
         this(nar, size, punc, maxGroupSize, allowNonInput, (int) Math.ceil((float) size / maxGroupSize * drainRatePerDuration));
     }
 
-    public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, int inputsPerDuration) {
+    MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, int inputsPerDuration) {
         this(nar, size, punc, 2, maxGroupSize,
                 //Math.round(((float) nar.termVolumeMax.intValue()) / (2)) /* estimate */
                 allowNonInput,
@@ -86,7 +86,7 @@ public class MySTMClustered extends STMClustered {
         double[] c = new double[dims];
         c[0] = t.start();
         c[1] = t.end();
-        c[2] = t.freq(); //0..+1
+        c[2] = t.truth().isNegative() ? (1f - t.freq()) : t.freq(); //0..+1 //if negative, will be negated in subterms
         c[3] = t.conf(); //0..+1
         return c;
     }
@@ -178,13 +178,13 @@ public class MySTMClustered extends STMClustered {
 
                     float freq = (float) freqDim[0];
 
-                    boolean negated;
-                    if (freq < 0.5f) {
-                        freq = 1f - freq;
-                        negated = true;
-                    } else {
-                        negated = false;
-                    }
+//                    boolean negated = false;
+//                    if (freq < 0.5f) {
+//                        freq = 1f - freq;
+//                        negated = true;
+//                    } else {
+//                        negated = false;
+//                    }
 
                     float finalFreq = freq;
                     int maxVol = nar.termVolumeMax.intValue();
@@ -230,7 +230,7 @@ public class MySTMClustered extends STMClustered {
                             return null;
 
 
-                        @Nullable Term conj = group(negated, uu);
+                        @Nullable Term conj = conj(uu);
                         if (conj == null)
                             return null;
 
@@ -287,35 +287,15 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Nullable
-    private Term group(boolean negated, @NotNull Task[] uu) {
+    private Term conj(@NotNull Task[] uu) {
+
+        return
+                Op.conj(
+                        Stream.of(uu).map(t -> PrimitiveTuples.pair(
+                                (Term) $.negIf(t.term(), t.truth().isNegative()),
+                                t.start())).collect(toList())
+                );
 
 
-        TermIndex index = nar.terms;
-        if (uu.length == 2) {
-            //find the dt and construct a sequence
-            Task early, late;
-
-            Task u0 = uu[0];
-            Task u1 = uu[1];
-            if (u0.start() <= u1.start()) {
-                early = u0;
-                late = u1;
-            } else {
-                early = u1;
-                late = u0;
-            }
-            int dt = (int) (late.start() - early.start());
-
-
-            return normalizedOrNull(
-                    CONJ.the(dt, $.negIf(early.term(), negated), $.negIf(late.term(), negated)));
-
-        } else {
-
-            Term[] u = Util.map((tx) -> $.negIf(tx.term(), negated), new Term[uu.length], uu);
-
-            //just assume they occurr simultaneously
-            return normalizedOrNull(CONJ.the(0, u));
-        }
     }
 }

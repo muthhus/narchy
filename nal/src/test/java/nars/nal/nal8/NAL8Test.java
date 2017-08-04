@@ -603,7 +603,6 @@ public class NAL8Test extends AbstractNALTest {
     public void detaching_condition() {
 
         test
-                .log()
                 .input("( ( hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001}))) ==>+5 [opened]:{t001}).")
                 .inputAt(10, "hold(SELF,{t002}). :|:")
                 .mustBelieve(cycles, "((at(SELF,{t001}) &&+5 open({t001})) ==>+5 [opened]:{t001})", 1.0f, 0.81f, 15);

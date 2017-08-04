@@ -1,7 +1,9 @@
 package nars;
 
 
+import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import jcog.byt.DynBytes;
 import jcog.data.string.Utf8Writer;
 import jcog.pri.Prioritized;
@@ -427,8 +429,6 @@ public class IO {
         } catch (IOException e) {
             e.printStackTrace();
             return null;
-        } catch (InvalidTermException e) {
-            return null;
         }
     }
 
@@ -446,10 +446,11 @@ public class IO {
         }
     }
 
-    public static DataInput input(@NotNull byte[] b) {
+    public static ByteArrayDataInput input(@NotNull byte[] b) {
 
         //return ByteStreams.newDataInput(b);
-        return new DataInputStream(new ByteArrayInputStream(b));
+        return ByteStreams.newDataInput(b);
+        //return new DataInputStream(new ByteArrayInputStream(b));
     }
 
     public static DataInputStream input(@NotNull byte[] b, int offset) {

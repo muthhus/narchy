@@ -64,15 +64,7 @@ public interface TaskTable  {
 //        taskIterator().forEachRemaining(x);
 //    }
 
-    default void forEach(int _maxPerConcept, @NotNull Consumer<? super Task> recip) {
-        int s = size();
-        final int[] maxPerConcept = {Math.min(s, _maxPerConcept)};
-        forEachTask(t -> {
-            if ((maxPerConcept[0]--) >= 0)
-                recip.accept(t);
-            //if (--maxPerConcept == 0) break; //TODO use a forEachWhile w/ Predicate or something
-        });
-    }
+
 
     /** returns true if the task was removed */
     boolean removeTask(Task x);

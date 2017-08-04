@@ -29,6 +29,7 @@ import java.util.function.Supplier;
 
 import static nars.$.$;
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
@@ -126,7 +127,7 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.75f);
+        n.goalConfidence(0.9f);
 
 
         float priFactor = 0.1f;
@@ -138,9 +139,9 @@ abstract public class NAgentX extends NAgent {
 
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
-        MySTMClustered stm = new MySTMClustered(n, 32, BELIEF, 3, true, 8f);
-        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 3, true, 2);
-        Inperience inp = new Inperience(n, 0.05f, 8);
+        MySTMClustered stm = new MySTMClustered(n, 32, BELIEF, 4, false, 8f);
+        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 3, false, 2);
+        Inperience inp = new Inperience(n, 0.2f, 8);
         //Abbreviation abb = new Abbreviation(n, "z", 4, 12, 0.01f, 32);
 
 

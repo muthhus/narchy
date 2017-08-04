@@ -135,17 +135,6 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    public static boolean isPunctuation(char c) {
-        switch (c) {
-            case BELIEF:
-            case GOAL:
-            case QUEST:
-            case QUESTION:
-                return true;
-        }
-        return false;
-    }
-
 
     public Rule Input() {
         return sequence(
