@@ -250,7 +250,7 @@ public class NewCompound extends /*HashCached*/DynBytes implements ProtoCompound
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "<" +
+        return getClass().getSimpleName() + '<' +
                 (op!=null ? (op + "|") : "") +
                 Arrays.toString(Arrays.copyOfRange(subs, 0, size)) + //HACK use more efficient string method
                 '>';

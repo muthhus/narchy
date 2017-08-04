@@ -314,7 +314,7 @@ public interface Term extends Termlike, Comparable<Term> {
     default Term sub(int n, @NotNull byte... path) {
         Term ptr = this;
         for (int i = 0; i < n; i++) {
-            if ((ptr = ptr.sub((int) path[i])) == Null)
+            if ((ptr = ptr.sub(path[i])) == Null)
                 return Null;
         }
         return ptr;
@@ -650,7 +650,7 @@ public interface Term extends Termlike, Comparable<Term> {
                 return this.toString().compareTo((/*(Atomic)*/y).toString());
                 //return Hack.compare(toString(), y.toString());
             } else {
-                throw new UnsupportedOperationException("unimplemented comparison: " + this + " " + y);
+                throw new UnsupportedOperationException("unimplemented comparison: " + this + ' ' + y);
             }
 
 
@@ -793,6 +793,7 @@ public interface Term extends Termlike, Comparable<Term> {
         return this;
     }
 
+    @Override
     default int dt() {
         return DTERNAL;
     }

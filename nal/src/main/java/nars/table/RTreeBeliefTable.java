@@ -55,7 +55,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private final static int EVAL_ALL_LTE_TASKS = 1;
 
 
-    private transient NAR nar = null;
+    private transient NAR nar;
 
 
     public static class TaskRegion implements HyperRegion, Tasked {
@@ -196,7 +196,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
         };
 
-        this.tree = new ConcurrentRTree<TaskRegion>(
+        this.tree = new ConcurrentRTree<>(
                 new RTree<TaskRegion>(model) {
 
                     @Override

@@ -98,7 +98,7 @@ public class OptiUnit<T> extends RunListener {
         public Tweaks<X> call(String methodExpression, Object... param) {
             String paramStr = Joiner.on(",").join(param);
             try {
-                JS.eval("thiz." + methodExpression + "(" + paramStr + ")", ctx);
+                JS.eval("thiz." + methodExpression + '(' + paramStr + ')', ctx);
                 assert (put(methodExpression, paramStr) == null);
             } catch (ScriptException e) {
                 e.printStackTrace();
@@ -139,17 +139,15 @@ public class OptiUnit<T> extends RunListener {
 
     public OptiUnit<T> add(Iterator<? extends Function<T, SortedMap<String, Object>>> sets) {
 
-        sets.forEachRemaining(s -> {
-            pending.add(() -> {
-                try {
-                    Suite ss = new Suite(new BuildMyRunners(s), tests);
-                    logger.info("run: {}", s);
-                    ss.run(rn);
-                } catch (Throwable t) {
-                    logger.error(" {}", t);
-                }
-            });
-        });
+        sets.forEachRemaining(s -> pending.add(() -> {
+            try {
+                Suite ss = new Suite(new BuildMyRunners(s), tests);
+                logger.info("run: {}", s);
+                ss.run(rn);
+            } catch (Throwable t) {
+                logger.error(" {}", t);
+            }
+        }));
 
         return this;
     }
@@ -197,9 +195,7 @@ public class OptiUnit<T> extends RunListener {
 
         public void print(PrintStream p) {
             p.println(id);
-            BiConsumer<String, Object> printKeyValue = (k, v) -> {
-                p.append(k).append('\t').append(toString(v)).append('\n');
-            };
+            BiConsumer<String, Object> printKeyValue = (k, v) -> p.append(k).append('\t').append(toString(v)).append('\n');
             cause.forEach(printKeyValue);
             effect.forEach(printKeyValue);
             p.println();
@@ -314,7 +310,7 @@ public class OptiUnit<T> extends RunListener {
             try {
                 test = new ReflectiveCallable() {
                     @Override
-                    protected Object runReflectiveCall() throws Throwable {
+                    protected Object runReflectiveCall() throws Exception {
                         return createTest();
                     }
                 }.run();
@@ -341,7 +337,7 @@ public class OptiUnit<T> extends RunListener {
         }
 
         @Override
-        public Runner runnerForClass(Class<?> testClass) throws Throwable {
+        public Runner runnerForClass(Class<?> testClass) throws InitializationError {
             return new MyRunner(testClass, set);
         }
     }

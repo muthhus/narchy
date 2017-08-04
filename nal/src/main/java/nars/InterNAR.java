@@ -127,7 +127,7 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
 
         try {
             x = IO.taskFromBytes(m.data());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.warn("bad Task: {} len={}", m, m.dataLength() );
             return;
         }

@@ -5,7 +5,6 @@ import jcog.pri.mix.control.MixContRL;
 import nars.exe.FocusedExecutioner;
 import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;

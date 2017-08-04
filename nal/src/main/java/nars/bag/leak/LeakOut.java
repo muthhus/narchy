@@ -16,7 +16,7 @@ import java.util.function.Consumer;
  */
 abstract public class LeakOut extends TaskLeak<Task,PriReference<Task>> {
 
-    public LeakOut(NAR nar, int capacity, float rate) {
+    protected LeakOut(NAR nar, int capacity, float rate) {
         super(new PLinkArrayBag<>(capacity, PriMerge.max, new ConcurrentHashMap<>()), rate, nar);
     }
 

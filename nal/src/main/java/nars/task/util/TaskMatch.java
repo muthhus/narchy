@@ -50,7 +50,7 @@ abstract public class TaskMatch  implements Consumer<Task>, Predicate<Task> {
 //        }
 //    }
 
-    public TaskMatch(@NotNull NAR n) {
+    protected TaskMatch(@NotNull NAR n) {
         this.nar = n;
         this.on = n.onTask(this);
     }

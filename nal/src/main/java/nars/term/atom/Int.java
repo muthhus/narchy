@@ -209,7 +209,7 @@ public class Int implements Intlike {
             return hash;
         }
 
-        public long hash64() { return (max << 32) | min; }
+        public long hash64() { return (((long)max) << 32) | min; }
 
         @Override
         public int opX() {

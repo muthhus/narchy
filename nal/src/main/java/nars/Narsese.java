@@ -1207,7 +1207,7 @@ public class Narsese extends BaseParser<Object> {
      * returns null if the Task is invalid (ex: invalid term)
      */
     @NotNull
-    static Task decodeTask(NAR m, Object[] x) throws NarseseException {
+    static Task decodeTask(NAR m, Object[] x) {
         if (x.length == 1 && x[0] instanceof Task) {
             return (Task) x[0];
         }

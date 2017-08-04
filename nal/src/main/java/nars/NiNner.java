@@ -178,7 +178,7 @@ public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
                 if (f!=null)
                     monitors.addAll(f);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw Throwables.propagate(e);
         }
 
@@ -196,9 +196,9 @@ public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
         Class type = f.getType();
         if (BufferedFloatGuage.class.isAssignableFrom(type)) {
             if (f.trySetAccessible()) {
-                return singleton(new BasicGauge<Float>(
+                return singleton(new BasicGauge<>(
                         MonitorConfig.builder(f.toString()).build(),
-                        () -> ((BufferedFloatGuage)f.get(obj)).getMean()
+                        () -> ((BufferedFloatGuage) f.get(obj)).getMean()
                 ));
             }
         }

@@ -33,7 +33,7 @@ abstract public class TermTrie<K extends Term, V> extends Trie<List<K>, V> imple
     }
 
 
-    public TermTrie() {
+    protected TermTrie() {
         super(null);
     }
 

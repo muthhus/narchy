@@ -94,13 +94,12 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = () ->
-                new FocusedExecutioner();
+        exe = FocusedExecutioner::new;
                 //new BufferedExecutioner(64, 32, 0.2f);
 
         rng = () -> new XorShift128PlusRandom(1);
 
-        concepts = () -> new DefaultConceptBuilder();
+        concepts = DefaultConceptBuilder::new;
 
         deriver = newDeriver(8);
     }
@@ -180,14 +179,14 @@ public class NARS {
             } catch (FileNotFoundException ff) {
                 //ignore
             } catch (IOException e) {
-                n.logger.error("input: {} {}", s, e);
+                NAR.logger.error("input: {} {}", s, e);
             }
 
             Runnable save = () -> {
                 try {
                     n.outputBinary(f, false);
                 } catch (IOException e) {
-                    n.logger.error("output: {} {}", s, e);
+                    NAR.logger.error("output: {} {}", s, e);
                 }
             };
             Runtime.getRuntime().addShutdownHook(new Thread(save));

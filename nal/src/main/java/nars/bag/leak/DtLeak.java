@@ -27,7 +27,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
 
     protected long lastLeak = ETERNAL;
 
-    public DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate) {
+    protected DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate) {
         this(bag, rate, new FloatParam(1));
     }
 
@@ -38,7 +38,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
      * @param rate
      * @param minBudget
      */
-    public DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate, FloatParam minBudget) {
+    protected DtLeak(@NotNull Bag<X, Y> bag, @NotNull FloatParam rate, FloatParam minBudget) {
         super(bag);
         this.rate = rate;
         this.minBudget = minBudget;

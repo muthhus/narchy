@@ -20,7 +20,7 @@ import static nars.Op.*;
  */
 public class DepIndepVarIntroduction extends VarIntroduction {
 
-    public static final VarIntro the = new VarIntro();
+    static final VarIntro the = new VarIntro();
 
     public static Term varIntro(Term x, NAR n) {
         return the.introduce(x, n);

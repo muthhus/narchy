@@ -206,7 +206,7 @@ public class Revision {
                     ((choose(a, b, aProp, rng) == a) ? adt : bdt);
         }
 
-        Term a0, a1, b0, b1;
+        Term a0, a1;
         if ((adt >= 0) || (adt == DTERNAL)) {
             a0 = a.sub(0);
             a1 = a.sub(1);
@@ -214,6 +214,8 @@ public class Revision {
             a0 = a.sub(1);
             a1 = a.sub(0);
         }
+        Term b1;
+        Term b0;
         if ((bdt >= 0) || (bdt == DTERNAL)) {
             b0 = b.sub(0);
             b1 = b.sub(1);
@@ -287,10 +289,7 @@ public class Revision {
 
         Interval timeOverlap = ai.intersection(bi);
 
-        long start, end;
-        @Nullable Truth newTruth;
-
-//            float ae = a.evi();
+        //            float ae = a.evi();
 //            float aa = ae * (1 + ai.length());
 //            float be = b.evi();
         //float bb = be * (1 + bi.length());
@@ -336,8 +335,8 @@ public class Revision {
 //                return null;
 
 
-        start = mid - width / 2;
-        end = mid + width / 2;
+        long start = mid - width / 2;
+        long end = mid + width / 2;
 
         long u = ai.union(bi).length();
         long s = ai.length() + bi.length();
@@ -363,7 +362,7 @@ public class Revision {
             factor *= ((float) s) / (s + u);
         }
 
-        newTruth = revise(a, b, factor, c2w(confMin));
+        @Nullable Truth newTruth = revise(a, b, factor, c2w(confMin));
 
 
 //            float conf = w2c(expected.evi() * factor);

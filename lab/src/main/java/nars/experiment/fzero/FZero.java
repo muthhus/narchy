@@ -3,8 +3,6 @@ package nars.experiment.fzero;
 import jcog.Util;
 import jcog.math.FloatNormalized;
 import nars.*;
-import nars.video.CameraSensor;
-import nars.video.PixelBag;
 import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;

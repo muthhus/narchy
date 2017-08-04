@@ -58,7 +58,7 @@ public class DiscreteTruth implements Truth {
         return new DiscreteTruth(1f - freq(), conf());
     }
 
-    @Nullable
+    @NotNull
     public static Truth intToTruth(int h) {
         return new DiscreteTruth(
                 Util.unhashFloat((h >> 16) /* & 0xffff*/, hashDiscreteness16),

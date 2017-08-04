@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Budget functions for resources allocation
  */
-public final class BudgetFunctions extends UtilityFunctions {
+public final class BudgetFunctions  {
 
 	/* ----------------------- Belief evaluation ----------------------- */
 

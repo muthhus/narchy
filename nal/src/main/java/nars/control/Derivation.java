@@ -152,10 +152,9 @@ public class Derivation extends Unify implements TermContext {
 //
 //        transformsCache = cb.builder();
 
-        final Functor substituteIfUnifiesAny, substituteIfUnifiesDep, polarize, substitute;
-        substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
-        substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
-        polarize = Functor.f2("polarize", (subterm, whichTask) -> {
+        final Functor substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
+        final Functor substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
+        final Functor polarize = Functor.f2("polarize", (subterm, whichTask) -> {
             Truth compared;
             if (whichTask.equals(PremiseRule.Task)) {
                 compared = taskTruth;
@@ -167,8 +166,9 @@ public class Derivation extends Unify implements TermContext {
             else
                 return compared.isNegative() ? $.neg(subterm) : subterm;
         });
-        substitute = new substitute() {
-            @Override protected void onChange(Term from, Term x, Term y, Term to) {
+        final Functor substitute = new substitute() {
+            @Override
+            protected void onChange(Term from, Term x, Term y, Term to) {
                 putXY(x, y); //TODO verify correct direction and whether reverse is also needed
             }
         };
@@ -443,7 +443,7 @@ public class Derivation extends Unify implements TermContext {
     @Override
     public String toString() {
         return task + " " + (belief != null ? belief : beliefTerm)
-                + " " + super.toString();
+                + ' ' + super.toString();
     }
 
     public int ttl() {

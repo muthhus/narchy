@@ -31,9 +31,9 @@ import java.util.function.Predicate;
 public class FocusedExecutioner extends Executioner {
 
     public int subCycles = 2;
-    int subCycleConcepts = 4;
-    int subCycleTasks = 16;
-    int subCyclePremises = 6;
+    final int subCycleConcepts = 4;
+    final int subCycleTasks = 16;
+    final int subCyclePremises = 6;
 
     final int MAX_PREMISES = 64;
     final int MAX_TASKS = 64;
@@ -41,10 +41,10 @@ public class FocusedExecutioner extends Executioner {
 
     final Random random = new XorShift128PlusRandom(1);
 
-    final CurveBag<ITask> premises = new CurveBag<ITask>(Param.premiseMerge /* TODO make separate premise merge param */,
+    final CurveBag<ITask> premises = new CurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
             new ConcurrentHashMap<>(), random, MAX_PREMISES);
 
-    final CurveBag<ITask> tasks = new ConcurrentCurveBag<ITask>(Param.taskMerge, new ConcurrentHashMap<>(),
+    final CurveBag<ITask> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
             random, MAX_TASKS);
 
     public final CurveBag<Activate> concepts = new ConcurrentCurveBag<>(Param.conceptMerge, new ConcurrentHashMap<>(),
@@ -59,7 +59,7 @@ public class FocusedExecutioner extends Executioner {
     private final FasterList<ITask> next = new FasterList(1024);
 
     @Override
-    protected void clear() {
+    protected synchronized void clear() {
         next.clear();
         premises.clear();
         tasks.clear();

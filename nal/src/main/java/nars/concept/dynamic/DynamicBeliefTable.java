@@ -4,6 +4,7 @@ import jcog.list.FasterList;
 import jcog.pri.Priority;
 import nars.NAR;
 import nars.Task;
+import nars.index.term.TermIndex;
 import nars.table.DefaultBeliefTable;
 import nars.table.TemporalBeliefTable;
 import nars.task.NALTask;
@@ -48,13 +49,13 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
             return null;
 
         //compute the optimistic temporal union of the component's occurrences
-        long start = Long.MAX_VALUE;
-        long end = Long.MIN_VALUE;
         @Nullable FasterList<Task> ee = yy.e;
         if (ee == null || ee.isEmpty())
             return null;
 
         boolean ete = false;
+        long end = Long.MIN_VALUE;
+        long start = Long.MAX_VALUE;
         for (int i = 0, e1Size = ee.size(); i < e1Size; i++) {
             Task x = ee.get(i);
             long s = x.start();
@@ -112,8 +113,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         }
 
         Retemporalize tmp = target == null || target.isEternal() ?
-                nar.terms.retemporalizeDTERNAL : nar.terms.retemporalizeZero;
-        Term template2 = nar.terms.retemporalize(template, tmp);
+                TermIndex.retemporalizeDTERNAL : TermIndex.retemporalizeZero;
+        Term template2 = TermIndex.retemporalize(template, tmp);
 
         if (template2 == null) {
 //            if (tmp == nar.terms.retemporalizeZero) {

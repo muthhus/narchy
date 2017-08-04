@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static nars.Op.GOAL;
-import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 

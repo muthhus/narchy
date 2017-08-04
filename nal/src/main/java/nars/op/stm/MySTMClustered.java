@@ -197,10 +197,10 @@ public class MySTMClustered extends STMClustered {
                         //Task[] uu = Stream.of(tt).filter(t -> t!=null).toArray(Task[]::new);
 
                         //get only the maximum confidence task for each term
-                        final long[] start = {Long.MAX_VALUE};
-                        final long[] end = {Long.MIN_VALUE};
 
                         vv.clear();
+                        final long[] end = {Long.MIN_VALUE};
+                        final long[] start = {Long.MAX_VALUE};
                         tt.forEach(_z -> {
                             Task z = _z.get();
                             if (z == null)

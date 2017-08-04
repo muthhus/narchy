@@ -1,22 +1,16 @@
 package nars.nlp;
 
 import com.google.common.collect.TreeBasedTable;
-import jcog.Loop;
 import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
-import nars.nlp.Twenglish;
 import nars.term.Term;
-import nars.term.atom.Atom;
-import nars.time.Tense;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 import java.util.function.Consumer;
 

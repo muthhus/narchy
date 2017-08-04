@@ -8,6 +8,7 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.control.Cause;
+import nars.index.term.TermIndex;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
@@ -103,8 +104,8 @@ public final class DynTruth implements Truthed {
             priority = new Pri(p);
         }
 
-        if (null == (c = nar.terms.retemporalize(c,
-                start == ETERNAL ? nar.terms.retemporalizeDTERNAL : nar.terms.retemporalizeZero
+        if (null == (c = TermIndex.retemporalize(c,
+                start == ETERNAL ? TermIndex.retemporalizeDTERNAL : TermIndex.retemporalizeZero
         )))
             return null;
 

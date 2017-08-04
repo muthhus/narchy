@@ -54,8 +54,7 @@ public class PatternTermIndex extends MapTermIndex {
         for (int i = 0; i < ss; i++) {
             Term a = s.sub(i);
 
-            Termed b;
-//            Termed b;
+            //            Termed b;
 //            if (a instanceof Compound) {
 //
 //                if (!canBuildConcept(a) || a.isTemporal()) {
@@ -67,7 +66,7 @@ public class PatternTermIndex extends MapTermIndex {
 //                    b = get(a, true);
 //                }
 //            } else {
-            b = get(a, true);
+            Termed b = get(a, true);
 //            }
             if (a != b) {
                 changed = true;

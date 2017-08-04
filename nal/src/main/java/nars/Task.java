@@ -199,11 +199,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
 //        }
 
-        {
-            Term c = t.conceptual();
-            if (c instanceof Variable || c instanceof Bool) {
-                return fail(t, "no associated concept", safe);
-            }
+        Term c = t.conceptual();
+        if (c instanceof Variable || c instanceof Bool) {
+            return fail(t, "no associated concept", safe);
         }
 
         return (t.size()==0) || validTaskCompound(t, punc, safe);
@@ -218,7 +216,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
      * call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
      * these can all be tested prenormalization, because normalization will not affect the result
      */
-    @Nullable
     static boolean validTaskCompound(@NotNull Term t, byte punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
         Op op = t.op();
@@ -282,7 +279,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     }
 
 
-    @Nullable
     static boolean fail(@Nullable Term t, String reason, boolean safe) {
         if (safe)
             return false;
@@ -534,7 +530,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
     }
 
-    @Nullable
+    @NotNull
     @Deprecated
     default StringBuilder appendTo(StringBuilder buffer, /**@Nullable*/NAR memory, boolean showStamp) {
         boolean notCommand = punc() != Op.COMMAND;
@@ -544,7 +540,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         );
     }
 
-    @Nullable
+    @NotNull
     default StringBuilder appendTo(@Nullable StringBuilder buffer, /**@Nullable*/@Nullable NAR memory, boolean term, boolean showStamp, boolean showBudget, boolean showLog) {
 
         String contentName;
@@ -672,6 +668,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return Stamp.isCyclic(stamp());
     }
 
+    @Override
     default int dt() {
         return term().dt();
     }
@@ -991,11 +988,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         if (t instanceof Variable || t instanceof Bool)
             return null;
 
-        boolean negated = false;
-
         if ((t = normalizedOrNull(t)) == null)
             return null;
 
+        boolean negated = false;
         if (t.op() == NEG) {
             t = t.unneg();
             if (t instanceof Variable || t instanceof Bool) return null;

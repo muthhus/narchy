@@ -292,7 +292,7 @@ public abstract class STMClustered extends STM {
     abstract double[] getCoord(@NotNull Task t);
 
 
-    public STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, byte punc, int centroids) {
+    protected STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, byte punc, int centroids) {
         super(nar, capacity);
 
         this.dims = dims;

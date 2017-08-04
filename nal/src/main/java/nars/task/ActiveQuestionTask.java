@@ -82,9 +82,9 @@ public class ActiveQuestionTask extends NALTask implements Consumer<Task> {
             }
     }
 
-    private class MySubUnify extends Unify {
+    private static class MySubUnify extends Unify {
 
-        boolean match = false;
+        boolean match;
 
         public MySubUnify(Random r, int ttl) {
             super(null, r, Param.UnificationStackMax, ttl);

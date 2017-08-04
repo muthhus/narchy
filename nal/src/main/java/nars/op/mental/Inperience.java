@@ -325,7 +325,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
     }
 
     @Nullable
-    public Compound reify(@NotNull Task s, Term self) {
+    public static Compound reify(@NotNull Task s, Term self) {
 
         Truth tr = s.truth();
         Term[] arg = new Term[1 + 1];
@@ -343,7 +343,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
             Term ff = $.func(reify(s.punc()), arg);
             return Terms.compoundOrNull($.negIf(ff, false));
 
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             logger.error(" {}", e);
 
         }

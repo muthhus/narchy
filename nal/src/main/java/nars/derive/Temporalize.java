@@ -275,8 +275,8 @@ public class Temporalize {
             if (start != ETERNAL && end == ETERNAL)
                 end = start; //point-like
 
-            assert (!(start == ETERNAL ^ end == ETERNAL)) :
-                    "invalid semi-eternalization: " + start + " " + end;
+            assert ((start == ETERNAL) == (end == ETERNAL)) :
+                    "invalid semi-eternalization: " + start + ' ' + end;
 
             if (start <= end) {
                 this.start = start;
@@ -320,7 +320,7 @@ public class Temporalize {
         public String toString() {
             if (start != ETERNAL) {
                 if (start != end)
-                    return term + ("@[" + timeStr(start) + ".." + timeStr(end)) + "]";
+                    return term + ("@[" + timeStr(start) + ".." + timeStr(end)) + ']';
                 else
                     return term + "@" + timeStr(start);
             } else
@@ -359,7 +359,7 @@ public class Temporalize {
 
         @Override
         public String toString() {
-            return str(base) + "|" + str(offset);
+            return str(base) + '|' + str(offset);
         }
 
         static String str(int offset) {
@@ -609,7 +609,7 @@ public class Temporalize {
             assert (
                     (occ[0] != ETERNAL)
                             ||
-                            (task.isEternal()) && (belief == null || belief.isEternal())) : "eternal derived from non-eternal premise:\n" + task + " " + belief + " -> " + occ[0];
+                            (task.isEternal()) && (belief == null || belief.isEternal())) : "eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
             return e.term;
         }
         return null;
@@ -804,13 +804,12 @@ public class Temporalize {
             assert (tts > 1);
             if (tts == 2) {
 
-                Event ea, eb;
-//                if (random.nextBoolean()) {
+                //                if (random.nextBoolean()) {
                 //forward order: sub 0 first
-                ea = solveSub(trail, tt, 0);
+                Event ea = solveSub(trail, tt, 0);
                 if (ea == null)
                     return null;
-                eb = solveSub(trail, tt, 1);
+                Event eb = solveSub(trail, tt, 1);
                 if (eb == null)
                     return null;
 //                } else {
@@ -1006,7 +1005,7 @@ public class Temporalize {
                             if (bz == ETERNAL) bz = ba;
                             long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
                             if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float) dist) / dur) {
-                                long occ = ((ta + tz) / 2 + (ba + bz) / 2) / 2;
+                                long occ = ((ta + tz) / 2L + (ba + bz) / 2L) / 2L;
                                 //occInterpolate(t, b);
                                 return new SolutionEvent(target, occ);
                             }

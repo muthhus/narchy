@@ -22,7 +22,7 @@ abstract public class SubtermVisitorXY {
     @Nullable Compound cursorY;
     byte cursorX;
 
-    public SubtermVisitorXY(@NotNull Compound root) {
+    protected SubtermVisitorXY(@NotNull Compound root) {
         this.cursorY = this.root = root;
         this.cursorX = 0;
 

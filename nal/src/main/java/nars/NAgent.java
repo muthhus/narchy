@@ -91,7 +91,7 @@ abstract public class NAgent implements NSense, NAct {
      */
     public final List<Supplier<Task>> predictors = newArrayList();
 
-    public AtomicBoolean enabled = new AtomicBoolean(true);
+    public final AtomicBoolean enabled = new AtomicBoolean(true);
 
     public boolean trace = false;
 

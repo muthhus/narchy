@@ -9,8 +9,6 @@ import nars.NAR;
 import nars.NAgent;
 import nars.Task;
 import nars.bag.leak.LeakOut;
-import nars.control.Activate;
-import nars.exe.BufferedExecutioner;
 import nars.exe.FocusedExecutioner;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;

@@ -151,7 +151,7 @@ public abstract class Param  {
      * Evidential Horizon, the amount of future evidence to be considered (during revision).
      * Must be >=1.0, usually 1 .. 2
      */
-    public static float HORIZON = 1f;
+    public static final float HORIZON = 1f;
 
     public static final int MAX_VARIABLE_CACHED_PER_TYPE = 16;
     /**
@@ -178,7 +178,7 @@ public abstract class Param  {
     //public static boolean DEBUG_DERIVATION_STACKTRACES; //includes stack trace in task's derivation rule string
     //public static boolean DEBUG_INVALID_SENTENCES = true;
     //public static boolean DEBUG_NONETERNAL_QUESTIONS = false;
-    public static boolean DEBUG_TASK_LOG = true; //false disables task history completely
+    public static final boolean DEBUG_TASK_LOG = true; //false disables task history completely
 
 
 
@@ -193,7 +193,7 @@ public abstract class Param  {
     /**
      * how precise unit test results must match expected values to pass
      */
-    public static float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
+    public static final float TESTS_TRUTH_ERROR_TOLERANCE = TRUTH_EPSILON;
 
 
 

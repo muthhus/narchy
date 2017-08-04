@@ -362,7 +362,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public <T extends Term> T term(@NotNull byte[] code) throws NarseseException {
+    public <T extends Term> T term(@NotNull byte[] code) {
         return (T) IO.termFromBytes(code);
     }
 

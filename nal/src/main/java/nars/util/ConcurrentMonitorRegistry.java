@@ -87,7 +87,7 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
 //            super.register(monitor);
 //        }
 
-        private void register(ObjectName objectName, DynamicMBean mbean) throws Exception {
+        private void register(ObjectName objectName, DynamicMBean mbean) throws InstanceNotFoundException, MBeanRegistrationException, InstanceAlreadyExistsException, NotCompliantMBeanException {
             //synchronized (getLock(objectName)) {
             if (mBeanServer.isRegistered(objectName)) {
                 mBeanServer.unregisterMBean(objectName);
@@ -108,28 +108,6 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
             monitors.put(monitor.getConfig(), monitor);
             updatePending.set(true);
 
-        }
-
-        @Override
-        protected void onRemove(Monitor<?> monitor) {
-            //TODO
-//    try {
-//      List<com.netflix.servo.jmx.MonitorMBean> beans = com.netflix.servo.jmx.MonitorMBean.createMBeans(name, monitor, mapper);
-//      for (com.netflix.servo.jmx.MonitorMBean bean : beans) {
-//        try {
-//          mBeanServer.unregisterMBean(bean.getObjectName());
-//          locks.remove(bean.getObjectName());
-//        } catch (InstanceNotFoundException ignored) {
-//          // ignore errors attempting to unregister a non-registered monitor
-//          // a common error is to unregister twice
-//        }
-//      }
-//      monitors.remove(monitor.getConfig());
-//      updatePending.set(true);
-//    } catch (Exception e) {
-//      LOG.warn("Unable to un-register Monitor:" + monitor.getConfig(), e);
-//    }
-//  }
         }
 
         /**
@@ -297,7 +275,7 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
             if (monitors.add(monitor)) {
                 onAdd(monitor);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new IllegalArgumentException("invalid object", e);
         }
     }
@@ -321,7 +299,7 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
             if (monitors.remove(monitor)) {
                 onRemove(monitor);
             }
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             throw new IllegalArgumentException("invalid object", e);
         }
     }

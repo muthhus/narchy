@@ -4,7 +4,6 @@ import nars.concept.Concept;
 import nars.op.Command;
 import nars.op.Operator;
 import nars.op.data.*;
-import nars.op.data.intersect;
 import nars.op.substitute;
 import nars.term.Compound;
 import nars.term.Functor;
@@ -216,8 +215,8 @@ public class Builtin {
         nar.on(Functor.f0("self", nar::self));
 
 
-        nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(n.belief((Compound) c, n.time()))));
-        nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(n.goal((Compound) c, n.time()))));
+        nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(n.belief((Term) c, n.time()))));
+        nar.on(Functor.f1Concept("goal", nar, (c, n) -> $.quote(n.goal((Term) c, n.time()))));
 
 //        nar.on("concept", (Operator) (op, a, nn) -> {
 //            Concept c = nn.concept(a[0]);
@@ -241,9 +240,7 @@ public class Builtin {
             n.clear();
             n.runLater(() -> Command.log(n, "Ready. (" + n.terms.size() + " subconcepts)"));
         });
-        nar.on("stat", (op, args, n) -> {
-            Command.log(n, n.emotion.summary() + " " + n.exe);
-        });
+        nar.on("stat", (op, args, n) -> Command.log(n, n.emotion.summary() + ' ' + n.exe));
 
 
         nar.on("top",(op, args, n) -> {

@@ -79,7 +79,7 @@ public class UnifySubst extends Unify {
     }
 
 
-    @Nullable Term resolve(@NotNull Term t, @NotNull Map<Term,Term> subs) {
+    @Nullable static Term resolve(@NotNull Term t, @NotNull Map<Term,Term> subs) {
         //try {
 
             return /*subs.isEmpty() ?

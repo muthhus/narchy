@@ -734,8 +734,8 @@ public enum Op implements $ {
         }
 
         int s = subterms.length;
-        assert (o.maxSize >= s) : "subterm overflow: " + o + " " + Arrays.toString(subterms);
-        assert (o.minSize <= s || (firstEllipsis(subterms) != null)) : "subterm underflow: " + o + " " + Arrays.toString(subterms);
+        assert (o.maxSize >= s) : "subterm overflow: " + o + ' ' + Arrays.toString(subterms);
+        assert (o.minSize <= s || (firstEllipsis(subterms) != null)) : "subterm underflow: " + o + ' ' + Arrays.toString(subterms);
 
         switch (s) {
             case 1:

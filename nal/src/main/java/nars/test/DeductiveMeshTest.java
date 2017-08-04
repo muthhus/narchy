@@ -40,9 +40,8 @@ public class DeductiveMeshTest {
         if (dims.length!=2)
             throw new UnsupportedOperationException("2-D only implemented");
 
-        Set<Compound> edges = new HashSet();
-
         coords = $.newArrayList();
+        Set<Compound> edges = new HashSet();
         for (int x = 0; x < dims[0]; x++) {
             for (int y = 0; y < dims[1]; y++) {
                 //Compound c = c(x, y);

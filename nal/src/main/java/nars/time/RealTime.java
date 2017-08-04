@@ -16,7 +16,7 @@ public abstract class RealTime implements Time {
     long t0 = -1;
     private long start;
 
-    long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000; //???
+    final long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000; //???
 
     final AtomicLong nextStamp = new AtomicLong(seed);
 

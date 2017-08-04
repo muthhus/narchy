@@ -71,7 +71,7 @@ public abstract class Unify extends Versioning implements Subst {
     /**
      * free variables remaining unassigned, for counting
      */
-    protected Versioned<Set<Term>> free;
+    protected final Versioned<Set<Term>> free;
 
 
     /**

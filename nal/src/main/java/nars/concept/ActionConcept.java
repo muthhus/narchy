@@ -15,11 +15,11 @@ import java.util.stream.Stream;
 public abstract class ActionConcept extends WiredConcept implements Function<NAR,Stream<Task>> {
 
 
-    public ActionConcept(@NotNull Term term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
+    protected ActionConcept(@NotNull Term term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
         super(term, beliefs, goals, n);
     }
 
-    public ActionConcept(@NotNull Term term, @NotNull NAR n) {
+    protected ActionConcept(@NotNull Term term, @NotNull NAR n) {
         super(term, null, null, n);
     }
 

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
 
-import static java.lang.Math.max;
 import static jcog.Util.lerp;
 
 /**

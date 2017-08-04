@@ -24,7 +24,7 @@ public abstract class VarIntroduction {
 
     static final int maxSubstitutions = 1;
 
-    public VarIntroduction() {
+    protected VarIntroduction() {
 
     }
 

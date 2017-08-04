@@ -139,18 +139,16 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         if (validUnwrappableSubterms(subj.subterms())) {
                             int s = subj.size();
                             FasterList<Term> lx = new FasterList(s);
-                            boolean valid = true;
                             for (int i = 0; i < s; i++) {
                                 Term csi = subj.sub(i);
                                 if (csi instanceof Int.IntRange) {
-                                    Int.unroll(subj).forEachRemaining(dsi -> {
-                                        lx.add(INH.the(dsi, pred));
-                                    });
+                                    Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
                                 } else {
                                     lx.add(INH.the(csi, pred));
                                 }
                             }
 
+                            boolean valid = true;
                             if (valid) {
                                 Term[] x = lx.toArray(Term[]::new);
                                 switch (so) {

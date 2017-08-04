@@ -38,7 +38,7 @@ public abstract class TermVector implements TermContainer {
     public final byte varPatterns;
     public final byte varDeps;
 
-    public TermVector(Term... terms) {
+    protected TermVector(Term... terms) {
 
         assert(terms.length <= Param.COMPOUND_SUBTERMS_MAX);
 

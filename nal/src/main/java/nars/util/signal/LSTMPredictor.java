@@ -5,6 +5,7 @@ import jcog.learn.lstm.test.LiveSTM;
 import jcog.list.FasterList;
 import jcog.math.DelayedFloat;
 import jcog.math.FloatSupplier;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
@@ -164,7 +165,7 @@ public class LSTMPredictor {
                 5
         );
 
-        double[] lastPredict = new double[0];
+        double[] lastPredict = ArrayUtils.EMPTY_DOUBLE_ARRAY;
         for (int i= 0 ;i < 500; i++) {
             m.increment();
             System.out.println(n4(d(in)) + "\t\t" + n4(d(out)) + "\t=?=\t" + n4(lastPredict));

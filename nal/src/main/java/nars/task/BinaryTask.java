@@ -9,11 +9,11 @@ import org.jetbrains.annotations.NotNull;
  */
 abstract public class BinaryTask<X, Y> extends UnaryTask<Pair<X, Y>> {
 
-    public BinaryTask(X x, Y y, float pri) {
+    protected BinaryTask(X x, Y y, float pri) {
         this(Tuples.pair(x, y), pri);
     }
 
-    public BinaryTask(@NotNull Pair<X, Y> value, float pri) {
+    protected BinaryTask(@NotNull Pair<X, Y> value, float pri) {
         super(value, pri);
     }
 

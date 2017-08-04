@@ -8,6 +8,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +26,7 @@ abstract public class Command extends BaseConcept implements PermanentConcept {
 
     public static String LOG_FUNCTOR = String.valueOf(Character.valueOf((char) 8594)); //RIGHT ARROW
 
-    public Command(@NotNull Atom atom, NAR n) {
+    protected Command(@NotNull Atom atom, NAR n) {
         super(atom, n);
     }
 
@@ -54,7 +55,7 @@ abstract public class Command extends BaseConcept implements PermanentConcept {
 
 
     static Task task(Term content, long when) {
-        return new NALTask(content, Op.COMMAND, null, when, when, when, new long[] { });
+        return new NALTask(content, Op.COMMAND, null, when, when, when, ArrayUtils.EMPTY_LONG_ARRAY);
     }
 
     public static Task logTask(@NotNull Term content) {

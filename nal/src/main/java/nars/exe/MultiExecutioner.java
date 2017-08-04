@@ -50,7 +50,7 @@ public class MultiExecutioner extends Executioner {
     }
 
     @Override
-    public void start(NAR nar) {
+    public synchronized void start(NAR nar) {
         super.start(nar);
 
         for (Worker w : workers) {
@@ -87,7 +87,7 @@ public class MultiExecutioner extends Executioner {
 //        }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
 
         for (Worker w : workers) w.stop();
         this.working.shutdownNow();
@@ -193,7 +193,7 @@ public class MultiExecutioner extends Executioner {
 
 
         @Override
-        public void stop() {
+        public synchronized void stop() {
             loop.stop();
             model.stop();
             loop = null;

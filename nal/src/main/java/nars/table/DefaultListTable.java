@@ -13,7 +13,7 @@ public abstract class DefaultListTable<V,L> extends ArrayListTable<V,L> {
     @NotNull
     public final FasterList<L> list;
 
-    public DefaultListTable(@NotNull Map<V,L> map) {
+    protected DefaultListTable(@NotNull Map<V, L> map) {
         super(map);
         this.list = new FasterList<>(0);
     }

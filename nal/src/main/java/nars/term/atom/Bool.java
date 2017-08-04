@@ -39,6 +39,7 @@ abstract public class Bool extends AtomicToString {
         return id;
     }
 
+    @Override
     abstract public int opX();
 
 

@@ -13,7 +13,7 @@ abstract public class UnaryTask<X> extends PLink<X> implements ITask {
 
     private final int hash;
 
-    public UnaryTask(@NotNull X id, float pri) {
+    protected UnaryTask(@NotNull X id, float pri) {
         super(id, pri);
         this.hash = Util.hashCombine(getClass().hashCode(), id.hashCode());
     }
@@ -30,7 +30,7 @@ abstract public class UnaryTask<X> extends PLink<X> implements ITask {
 
     @Override
     public final @NotNull String toString() {
-        return '$' + Texts.n4(pri) + ' ' + getClass().getSimpleName() + "(" + id + ")";
+        return '$' + Texts.n4(pri) + ' ' + getClass().getSimpleName() + '(' + id + ')';
     }
 
     @Override

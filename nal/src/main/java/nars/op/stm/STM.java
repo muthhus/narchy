@@ -18,7 +18,7 @@ abstract public class STM /*extends BagBuffer<Task>*/ implements Consumer<Task> 
     public final MutableInteger capacity;
 
 
-    public STM(@NotNull NAR nar, MutableInteger capacity) {
+    protected STM(@NotNull NAR nar, MutableInteger capacity) {
         super();
         this.nar = nar;
         this.capacity = capacity;

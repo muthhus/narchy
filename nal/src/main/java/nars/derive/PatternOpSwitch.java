@@ -19,9 +19,7 @@ public final class PatternOpSwitch extends AbstractPred<Derivation> {
     public final int subterm;
 
     PatternOpSwitch(int subterm, @NotNull EnumMap<Op,PrediTerm<Derivation>> cases) {
-        super(/*$.impl*/ $.p($.the("op" + subterm), $.p(cases.entrySet().stream().map(e -> {
-            return $.p($.quote(e.getKey().toString()), e.getValue());
-        }).toArray(Term[]::new))));
+        super(/*$.impl*/ $.p($.the("op" + subterm), $.p(cases.entrySet().stream().map(e -> $.p($.quote(e.getKey().toString()), e.getValue())).toArray(Term[]::new))));
 
         swtch = new PrediTerm[24]; //check this range
         cases.forEach((k,v) -> swtch[k.ordinal()] = v);

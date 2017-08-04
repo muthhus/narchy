@@ -204,7 +204,7 @@ public class IO {
     }
 
     @NotNull
-    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o) throws IOException {
+    public static Atomic readAtomic(@NotNull DataInput in, @NotNull Op o) throws IOException, UnsupportedEncodingException {
 
         switch (o) {
 
@@ -255,9 +255,7 @@ public class IO {
             return readCompound(in, o);
     }
 
-    public
-    @Nullable
-    static Term readSpecialTerm(@NotNull DataInput in) throws IOException {
+    @NotNull public static Term readSpecialTerm(@NotNull DataInput in) throws IOException {
         try {
             return $.terms.termRaw(in.readUTF());
         } catch (Narsese.NarseseException e) {
@@ -265,11 +263,11 @@ public class IO {
         }
     }
 
-    public static void writeTerm(@NotNull Stream<? extends Term> term, @NotNull DataOutput out) throws IOException {
-        DynBytes d = new DynBytes(64 * 1024); //HACK make configurable size
-        term.forEach(x -> x.append((ByteArrayDataOutput) d));
-        d.appendTo(out);
-    }
+//    public static void writeTerm(@NotNull Stream<? extends Term> term, @NotNull DataOutput out) throws IOException {
+//        DynBytes d = new DynBytes(64 * 1024); //HACK make configurable size
+//        term.forEach(x -> x.append((ByteArrayDataOutput) d));
+//        d.appendTo(out);
+//    }
 
     public static void writeTermContainer(@NotNull ByteArrayDataOutput out, @NotNull TermContainer c) {
         int siz = c.size();
@@ -361,7 +359,7 @@ public class IO {
         return d.array(); //bs.toByteArray();
     }
 
-    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException {
+    public static void saveTasksToTemporaryTSVFile(NAR nar) throws IOException, FileNotFoundException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".tsv");
         System.out.println("saving tasks: " + f);
         FileOutputStream os = new FileOutputStream(f.toFile());
@@ -376,7 +374,7 @@ public class IO {
         });
     }
 
-    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException {
+    public static void saveTasksToTemporaryTextFile(NAR nar) throws IOException, FileNotFoundException {
         Path f = Files.createTempFile(Paths.get("/tmp"), "nar", ".nal");
         System.out.println("saving tasks: file://" + f);
         FileOutputStream os = new FileOutputStream(f.toFile());

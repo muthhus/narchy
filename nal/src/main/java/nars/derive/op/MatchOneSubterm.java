@@ -57,7 +57,7 @@ public final class MatchOneSubterm extends UnificationPrototype {
 
         @Override
         public final boolean test(@NotNull Derivation p) {
-            return p.unify(pattern, term(p) /* current term */, false).live();
+            return p.unify(super.pattern, term(p) /* current term */, false).live();
         }
 
         final @NotNull Term term(@NotNull Derivation p) {
@@ -78,7 +78,7 @@ public final class MatchOneSubterm extends UnificationPrototype {
 
         @Override
         public final boolean test(@NotNull Derivation p) {
-            return p.matchAll(pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch);
+            return p.matchAll(super.pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch);
         }
     }
 

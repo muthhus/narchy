@@ -60,7 +60,7 @@ public class BufferedExecutioner extends Executioner {
 
 
     public final Bag<Task, Task> tasks =
-            new PriorityHijackBag<Task, Task>(4) {
+            new PriorityHijackBag<>(4) {
                 @Override
                 protected Consumer<Task> forget(float rate) {
                     return null;
@@ -191,7 +191,7 @@ public class BufferedExecutioner extends Executioner {
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
 
         On c = this.onClear;
         if (c !=null) {
@@ -205,7 +205,7 @@ public class BufferedExecutioner extends Executioner {
 
 
     @Override
-    public void start(NAR nar) {
+    public synchronized void start(NAR nar) {
         super.start(nar);
 
         this.rng = nar.random();

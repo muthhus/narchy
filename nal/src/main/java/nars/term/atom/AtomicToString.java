@@ -16,7 +16,7 @@ public abstract class AtomicToString implements Atomic {
     private final transient byte[] bytesCached;
     protected final transient int hashCached;
 
-    public AtomicToString(Op op, @Nullable String s) {
+    protected AtomicToString(Op op, @Nullable String s) {
         if (s == null) s = toString(); //must be a constant method
         int slen = s.length();
 

@@ -10,7 +10,7 @@ public class CycleTime implements Time {
     private final AtomicLong nextStamp = new AtomicLong(0);
 
     long t;
-    int dt;
+    final int dt;
 
     int dur;
 

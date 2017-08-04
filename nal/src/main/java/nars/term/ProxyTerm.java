@@ -22,7 +22,7 @@ import java.util.function.Predicate;
 
 public class ProxyTerm<T extends Term> implements Term {
 
-    public /*HACK make unpublic */ T ref;
+    public final /*HACK make unpublic */ T ref;
 
     public ProxyTerm(T t) {
         this.ref = t;
@@ -38,11 +38,6 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.subterms();
     }
 
-
-    @Override
-    public Term term() {
-        return this;
-    }
 
     @NotNull
     @Override
@@ -235,7 +230,7 @@ public class ProxyTerm<T extends Term> implements Term {
 
     @Override
     @Nullable
-    public <T extends Term> T sub(int i, @Nullable T ifOutOfBounds) {
+    public <U extends Term> U sub(int i, @Nullable U ifOutOfBounds) {
         return ref.sub(i, ifOutOfBounds);
     }
 

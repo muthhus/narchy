@@ -120,7 +120,6 @@ public class Premise extends Pri implements ITask {
 
 
         Term beliefTerm = termLink;
-        Task belief = null;
 
 
         Concept _beliefConcept = nar.conceptualize(beliefTerm);
@@ -144,6 +143,7 @@ public class Premise extends Pri implements ITask {
 
 
         //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
+        Task belief = null;
         if (_beliefConcept instanceof BaseConcept) { //beliefs/goals will only be in TaskConcepts
 
             BaseConcept beliefConcept = (BaseConcept) _beliefConcept;

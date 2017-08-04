@@ -100,10 +100,6 @@ public interface NAct {
         //final int[] state = {0};
         GoalActionConcept m = new GoalActionConcept(cc, this, (b, d) -> {
             //radius of center dead zone; diameter = 2x this
-            float deadZoneFreqRadius =
-                    //1/7f;
-                    1f / 6;
-
 
 
             int s;
@@ -111,6 +107,7 @@ public interface NAct {
                 s = 0;
             } else {
                 float f = d.freq();
+                float deadZoneFreqRadius = 1f / 6;
                 if (f > 0.5f + deadZoneFreqRadius)
                     s = +1;
                 else if (f < 0.5f - deadZoneFreqRadius)
@@ -161,9 +158,6 @@ public interface NAct {
 
         GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             //radius of center dead zone; diameter = 2x this
-            float deadZoneFreqRadius =
-                    //1/7f;
-                    1f / 6;
             // 1f/4;
             //1f/3f;
 
@@ -173,6 +167,7 @@ public interface NAct {
                 ii = 0;
             } else {
                 float f = d.freq();
+                float deadZoneFreqRadius = 1f / 6;
                 if (f > 0.5f + deadZoneFreqRadius)
                     ii = +1;
                 else if (f < 0.5f - deadZoneFreqRadius)

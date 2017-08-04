@@ -134,8 +134,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         //      its termlinks to subterms
         //      and their reverse links back to this
 
-        float activationFactor = 1f; //priElseZero();
-
         if (localTemplates.length > 0) {
             float decayRate = 0.5f;
             float decayed = priElseZero() * (1f - decayRate);
@@ -145,6 +143,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             float subDecayForward = subDecay * balance;
             float subDecayReverse = subDecay * (1f - balance);
             Term thisTerm = id.term();
+            float activationFactor = 1f; //priElseZero();
             for (Termed localSub : localTemplates) {
                 float d;
                 if (localSub instanceof Concept) {
@@ -204,7 +203,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         return premises;
     }
 
-    public void activateSubterms(PriReference<Task> tasklink, Termed[] localTemplates, int localTemplateConcepts) {
+    public static void activateSubterms(PriReference<Task> tasklink, Termed[] localTemplates, int localTemplateConcepts) {
         Task task = tasklink.get();
         if (task == null)
             return;

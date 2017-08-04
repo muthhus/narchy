@@ -25,11 +25,11 @@ import static nars.term.atom.Atomic.the;
  */
 abstract public class Functor extends BaseConcept implements PermanentConcept, Function<TermContainer,Term> {
 
-    public Functor(@NotNull String atom) {
+    protected Functor(@NotNull String atom) {
         this(fName(atom));
     }
 
-    public Functor(@NotNull Atom atom) {
+    protected Functor(@NotNull Atom atom) {
         super(atom, ConceptBuilder.Null);
     }
 

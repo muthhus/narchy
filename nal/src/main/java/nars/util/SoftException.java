@@ -25,7 +25,7 @@ public class SoftException extends RuntimeException {
     }
 
     @Override
-    public final Throwable fillInStackTrace() {
+    public final synchronized Throwable fillInStackTrace() {
         if (!Param.DEBUG)
             return this; //omit stacktrace if not in debug mode for efficiency
         else {
@@ -40,7 +40,7 @@ public class SoftException extends RuntimeException {
     @Override
     public String toString() {
         String m = getMessage();
-        return (m!=null ? m + "\n" : "") + (stack!=null ? Joiner.on("\n").join(stack) : "");
+        return (m!=null ? m + '\n' : "") + (stack!=null ? Joiner.on("\n").join(stack) : "");
     }
 
     @Override

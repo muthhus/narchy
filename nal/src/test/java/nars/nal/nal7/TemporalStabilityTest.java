@@ -1,12 +1,10 @@
 package nars.nal.nal7;
 
-import nars.*;
-import nars.util.data.TimeMap;
+import nars.NAR;
+import nars.Narsese;
+import nars.Param;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Set;
-
-import static org.junit.Assert.assertTrue;
 
 
 abstract public class TemporalStabilityTest {
