@@ -8,7 +8,6 @@ import nars.NAR;
 import nars.NARS;
 import nars.concept.Concept;
 import nars.control.Activate;
-import nars.exe.BufferedExecutioner;
 import nars.exe.FocusedExecutioner;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
