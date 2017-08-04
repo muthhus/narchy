@@ -1464,8 +1464,11 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input("((--,Y) ==>+1 (X)).")
                 .input("(--,Y). :|:")
-                .mustBelieve(cycles, "(X)", 1f, 0.81f, 1);
+                .mustBelieve(cycles, "(X)", 1f, 0.81f, 1)
+                .mustNotOutput(cycles, "(X)", BELIEF, ETERNAL)
+        ;
     }
+
     @Test public void testStrongUnificationAbductionPN() {
         //((--,%Y)==>X),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:DeductionPN)
         test

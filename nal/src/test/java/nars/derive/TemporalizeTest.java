@@ -1,12 +1,14 @@
 package nars.derive;
 
 import com.google.common.base.Joiner;
+import jcog.list.FasterList;
 import nars.$;
 import nars.Narsese;
 import nars.term.Term;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeSet;
 
 import static nars.time.Tense.ETERNAL;
@@ -15,14 +17,64 @@ import static org.junit.Assert.*;
 public class TemporalizeTest {
 
     @Test
-    public void testEventize1() throws Narsese.NarseseException {
+    public void testAbsoluteRanking() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+
+        //eternal should be ranked lower than non-eternal
+        Term x = $.the("x");
+        Temporalize.AbsoluteEvent ete = t.newAbsolute(x, ETERNAL, ETERNAL);
+        Temporalize.AbsoluteEvent tmp = t.newAbsolute(x, 0, 0);
+        assertEquals(+1, ete.compareTo(tmp));
+        assertEquals(-1, tmp.compareTo(ete));
+        assertEquals(0, ete.compareTo(ete));
+        assertEquals(0, tmp.compareTo(tmp));
+        FasterList<Temporalize.AbsoluteEvent> l = new FasterList<>();
+        l.add(ete); l.add(tmp);
+        l.sortThis();
+        assertEquals("[x@0, x@ETE]", l.toString());
+    }
+
+    @Test
+    public void testRelativeRanking() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+
+        Term x = $.the("x");
+        Temporalize.AbsoluteEvent xa = t.newAbsolute(x, ETERNAL, ETERNAL);
+        t.constraints.put(x, new FasterList(List.of(xa)));
+
+        Term y = $.the("y");
+        Temporalize.AbsoluteEvent ya = t.newAbsolute(y, 0, 0);
+        t.constraints.put(y, new FasterList(List.of(ya)));
+
+        Term z = $.the("z");
+        Temporalize.RelativeEvent zx = t.newRelative(z, x, 0);
+        Temporalize.RelativeEvent zy = t.newRelative(z, y, 0);
+        assertEquals(0, zx.compareTo(zx));
+        assertEquals(0, zy.compareTo(zy));
+
+        assertEquals(+1, zx.compareTo(zy));
+        assertEquals(-zy.compareTo(zx), zx.compareTo(zy));
+
+
+        FasterList<Temporalize.RelativeEvent> l = new FasterList<>();
+        l.add(zx); l.add(zy);
+        l.sortThis();
+        assertEquals("[z@0->y, z@0->x]", l.toString()); //y first since it is non-eternal
+    }
+
+    @Test
+    public void testEventize1a() throws Narsese.NarseseException {
 
         assertEquals("b@0,b@0->a,a@0,a@0->b,(a&&b)@0", new Temporalize()
                 .knowTerm($.$("(a && b)"), 0).toString());
-
-        assertEquals("b@0->a,b@0->(a&&b),a@0->b,a@0->(a&&b),(a&&b)@ETE", new Temporalize()
+    }
+    @Test
+    public void testEventize1b() throws Narsese.NarseseException {
+        assertEquals("b@0->a,b@0->(a&&b),a@0->(a&&b),a@0->b,(a&&b)@ETE", new Temporalize()
                 .knowTerm($.$("(a && b)"), ETERNAL).toString());
-
+    }
+    @Test
+    public void testEventize1c() throws Narsese.NarseseException {
         assertEquals("b@0,b@0->a,a@0,a@0->b,(a&|b)@0", new Temporalize()
                 .knowTerm($.$("(a &| b)"), 0).toString());
     }
@@ -44,7 +96,7 @@ public class TemporalizeTest {
     @Test
     public void testEventize2b() throws Narsese.NarseseException {
 
-        assertEquals("b@5->a,b@5->(a &&+5 b),(a &&+5 b)@ETE,a@-5->b,a@0->(a &&+5 b)", new Temporalize()
+        assertEquals("b@5->a,b@5->(a &&+5 b),(a &&+5 b)@ETE,a@0->(a &&+5 b),a@-5->b", new Temporalize()
                 .knowTerm($.$("(a &&+5 b)"), ETERNAL).toString());
 
 
@@ -83,7 +135,7 @@ public class TemporalizeTest {
     }
     @Test
     public void testEventizeCrossDirETERNAL() throws Narsese.NarseseException {
-        assertEquals("b@2->a,b@2->((a &&+2 b) ==>-3 c),((a &&+2 b) ==>-3 c)@ETE,a@-2->b,a@0->((a &&+2 b) ==>-3 c),(a &&+2 b)@[3..5]->c,(a &&+2 b)@0->((a &&+2 b) ==>-3 c),c@-3->(a &&+2 b),c@-3->((a &&+2 b) ==>-3 c)",
+        assertEquals("b@2->a,b@2->((a &&+2 b) ==>-3 c),((a &&+2 b) ==>-3 c)@ETE,a@0->((a &&+2 b) ==>-3 c),a@-2->b,(a &&+2 b)@0->((a &&+2 b) ==>-3 c),(a &&+2 b)@[3..5]->c,c@-3->(a &&+2 b),c@-3->((a &&+2 b) ==>-3 c)",
                 new Temporalize().knowTerm($.$("((a &&+2 b) ==>-3 c)"), ETERNAL).toString());
     }
 

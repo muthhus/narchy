@@ -52,7 +52,32 @@ public class Temporalize {
         this.random = random;
     }
 
-    public abstract static class Event implements Comparable<Event> {
+    int score(Term x) {
+        FasterList<Event> l = constraints.get(x);
+        if (l == null) {
+            return Integer.MIN_VALUE;
+        } else {
+            int s = 0;
+            for (int i = 0, lSize = l.size(); i < lSize; i++) {
+                Event e = l.get(i);
+                if (e instanceof AbsoluteEvent) {
+                    if (((AbsoluteEvent) e).start != ETERNAL)
+                        s += 3; //prefer non-eternal as it is more specific
+                    else
+                        s += 2;
+                } else {
+                    s++;
+                }
+            }
+            return s;
+        }
+    }
+
+    AbsoluteEvent newAbsolute(Term x, long start, long end) {
+        return new AbsoluteEvent(x, start, end);
+    }
+
+    public abstract class Event implements Comparable<Event> {
 
         public final Term term;
 
@@ -91,16 +116,53 @@ public class Temporalize {
         }
 
         @Override
-        public int compareTo(@NotNull Temporalize.Event o) {
-            if (this == o) return 0;
+        public int compareTo(@NotNull Temporalize.Event that) {
+            if (this == that) return 0;
             else {
-                if (getClass() == o.getClass()) {
+                if (getClass() == that.getClass()) {
                     //same class, rank by term volume
                     if (this instanceof RelativeEvent) {
-                        Term x = ((RelativeEvent) this).rel.term();
-                        Term y = ((RelativeEvent) o).rel.term();
-                        int vc = Integer.compare(x.volume(), y.volume());
-                        return vc == 0 ? x.compareTo(y) : vc;
+                        RelativeEvent THIS = (RelativeEvent) this;
+                        Term x = THIS.rel.term();
+                        RelativeEvent THAT = (RelativeEvent) that;
+                        Term y = THAT.rel.term();
+                        if (x.equals(y)) {
+                            int c1 = Integer.compare(THIS.start, THAT.end);
+                            if (c1 != 0)
+                                return c1;
+                            return Integer.compare(THIS.end, THAT.end);
+                        }
+
+                        int xs = score(x);
+                        int ys = score(y);
+                        if (xs != ys) {
+                            return Integer.compare(ys, xs);
+                        } else {
+                            //prefer lower volume
+                            int xv = x.volume();
+                            int yv = y.volume();
+                            if (xv == yv)
+                                return x.compareTo(y);
+                            else
+                                return Integer.compare(xv, yv);
+                        }
+
+                    } else if (this instanceof AbsoluteEvent) {
+                        AbsoluteEvent THIS = (AbsoluteEvent) this;
+                        AbsoluteEvent THAT = (AbsoluteEvent) that;
+                        long sThis = THIS.start;
+                        long sThat = THAT.start;
+
+                        //eternal should be ranked lower
+                        if (sThis == ETERNAL) return +1;
+                        if (sThat == ETERNAL) return -1;
+
+                        int cs = Long.compare(sThis, sThat);
+
+                        if (cs != 0)
+                            return cs;
+                        return Long.compare(THIS.end, THAT.end);
+
                     }
                 }
 
@@ -203,7 +265,7 @@ public class Temporalize {
         throw new UnsupportedOperationException(a + " .. " + b); //maybe just return DTERNAL
     }
 
-    static class AbsoluteEvent extends Event {
+    class AbsoluteEvent extends Event {
 
         public final long start, end;
 
@@ -223,10 +285,6 @@ public class Temporalize {
                 this.start = end;
                 this.end = start;
             }
-        }
-
-        static String timeStr(long when) {
-            return when != ETERNAL ? Long.toString(when) : "ETE";
         }
 
         @Override
@@ -269,6 +327,10 @@ public class Temporalize {
                 return term + "@ETE";
         }
 
+    }
+
+    static String timeStr(long when) {
+        return when != ETERNAL ? Long.toString(when) : "ETE";
     }
 
     public class SolutionEvent extends AbsoluteEvent {
@@ -366,6 +428,10 @@ public class Temporalize {
 
     static String timeStr(int when) {
         return when != DTERNAL ? (when != XTERNAL ? Integer.toString(when) : "?") : "DTE";
+    }
+
+    RelativeEvent newRelative(Term term, Term relativeTo, int start) {
+        return new RelativeEvent(term, relativeTo, start);
     }
 
     class RelativeEvent extends Event {
@@ -540,7 +606,10 @@ public class Temporalize {
                 occ[1] = e.end(times).abs();
             }
 
-            assert (occ[0] != ETERNAL || (task.isEternal()) || (belief != null && belief.isEternal())) : "eternal derived from non-eternal premise:\n" + task + " " + belief + " -> " + occ[0];
+            assert (
+                    (occ[0] != ETERNAL)
+                            ||
+                            (task.isEternal()) && (belief == null || belief.isEternal())) : "eternal derived from non-eternal premise:\n" + task + " " + belief + " -> " + occ[0];
             return e.term;
         }
         return null;
@@ -698,14 +767,15 @@ public class Temporalize {
 
         FasterList<Event> l = constraints.computeIfAbsent(term, (t) -> new FasterList<>());
         l.add(event);
-        if (l.size() > 1) {
+        if (l.size() > 1)
             l.sortThis();
-        }
 
         if (term.op() == NEG) {
             Term u = term.unneg();
             FasterList<Event> m = constraints.computeIfAbsent(u, (t) -> new FasterList<>());
             m.add(new RelativeEvent(u, term, 0, term.dtRange()));
+            if (m.size() > 1)
+                m.sortThis();
         }
     }
 
@@ -1020,13 +1090,16 @@ public class Temporalize {
     private Event solveEvent(Term target, Map<Term, Time> trail) {
 
 
-        List<Event> ea = constraints.get(target);
+        FasterList<Event> ea = constraints.get(target);
         if (ea == null)
             return null; //no idea how to solve that term
+
 
         int eas = ea.size();
         assert (eas > 0);
 
+        if (eas > 1)
+            ea.sortThis();
 
         for (int i = 0, eaSize = eas; i < eaSize; i++) {
             Event x = ea.get(i);
