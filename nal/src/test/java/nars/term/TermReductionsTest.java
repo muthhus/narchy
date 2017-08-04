@@ -999,10 +999,16 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testConjImplReduction2() throws Narsese.NarseseException {
         //with some dt's
+        String ts = "(inside(bob,office) &&+1 (inside(john,playground) ==>+1 inside(bob,kitchen)))";
+        String u = "((inside(bob,office) &&+1 inside(john,playground)) ==>+1 inside(bob,kitchen))";
+
+        Term t = $(ts);
+
         assertEquals(
-                "((inside(bob,office) &&+1 inside(john,playground)) ==>+1 inside(bob,kitchen))",
-                $("(inside(bob,office) &&+1 (inside(john,playground) ==>+1 inside(bob,kitchen)))").toString()
+                u,
+                t.toString()
         );
+        assertEquals(0, t.dtRange());
     }
 
     @Test

@@ -402,7 +402,7 @@ public class NAL7Test extends AbstractNALTest {
         //TESTS COMMUTIVITY
 
         test
-                
+
                 .inputAt(0, "<room --> enter>. :|:")
                 .inputAt(4, "<door --> open>. :|:")
                 .mustBelieve(cycles, "(open:door <=>-4 enter:room)",
@@ -664,6 +664,18 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Test
+    public void testEternalImplicationDecompositionWithConj() {
+
+        test
+                .inputAt(1, "(a &&+1 b). :|:")
+                .inputAt(1, "((a &&+1 b) ==>+4 c). :|:")
+                .mustBelieve(cycles, "c", 1f, 0.81f, 5 /* occ */)
+                .mustNotOutput(cycles, "c", BELIEF, ETERNAL)
+                .mustNotOutput(cycles, "c", BELIEF, 6)
+        ;
+    }
+
+    @Test
     public void testImplicationDecompositionContradictionFairness() {
 
         test
@@ -807,9 +819,9 @@ public class NAL7Test extends AbstractNALTest {
 
         test
                 .input("(((x) &&+1 (y)) &&+1 (z)). :|:")
-                .mustBelieve(cycles*2, "((x) &&+1 (y))", 1f, 0.81f, 0, 1)
-                .mustBelieve(cycles*2, "((y) &&+1 (z))", 1f, 0.81f, 1, 2)
-                .mustBelieve(cycles*2, "((x) &&+2 (z))", 1f, 0.81f, 0, 2);
+                .mustBelieve(cycles * 2, "((x) &&+1 (y))", 1f, 0.81f, 0, 1)
+                .mustBelieve(cycles * 2, "((y) &&+1 (z))", 1f, 0.81f, 1, 2)
+                .mustBelieve(cycles * 2, "((x) &&+2 (z))", 1f, 0.81f, 0, 2);
     }
 
     @Test
@@ -850,7 +862,8 @@ public class NAL7Test extends AbstractNALTest {
 //                .mustNotOutput(cycles,"(y)",BELIEF,0,ETERNAL);
 //    }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void testDecomposeConjunctionQuestion() {
 
         test
@@ -861,7 +874,8 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void testDecomposeConjunctionQuest() {
 
         test
@@ -1086,10 +1100,10 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .believe("(x ==>+5 z)")
                 .believe("(y ==>+3 z)")
-                .mustBelieve(cycles, "( (x &&+2 y) ==>+3 z)", 1f, 0.81f)
                 .mustBelieve(cycles, "( x <=>+2 y)", 1f, 0.45f)
                 .mustNotOutput(cycles, "( y ==>+2 x )", BELIEF, ETERNAL)
                 .mustNotOutput(cycles, "( y ==>-2 z )", BELIEF, ETERNAL)
+                .mustBelieve(cycles, "( (x &&+2 y) ==>+3 z)", 1f, 0.81f)
                 .mustNotOutput(cycles, "( (x &&+2 y) ==>+5 z)", BELIEF, ETERNAL)
                 .mustNotOutput(cycles, "( (x &&+2 y) ==>+1 z)", BELIEF, ETERNAL)
         ;
@@ -1217,7 +1231,7 @@ public class NAL7Test extends AbstractNALTest {
 
         //1. test correct parse of the 3-ary parallel conj
         assertEquals("((a) &&+2 (&|,(b),(c),(d)))",
-                      $("((a) &&+2 (((b) &| (c)) &| (d)) )").toString());
+                $("((a) &&+2 (((b) &| (c)) &| (d)) )").toString());
 
 
         test

@@ -524,10 +524,11 @@ public class Temporalize {
         model.dur = d.dur;
 
         model.know(task, d);
-        if (belief != null)
+        if (belief != null) {
             model.know(belief, d);
+        }
 
-        Map<Term, Temporalize.Time> times = new HashMap();
+        Map<Term, Temporalize.Time> times = new HashMap<>();
         Event e = model.solve(pattern, times);
         if (e != null) {
             if (e instanceof AbsoluteEvent) {
@@ -545,14 +546,19 @@ public class Temporalize {
         return null;
     }
 
-    public void know(Task task, Subst d) {
+    void know(Task task, Subst d) {
         //assert (task.end() == task.start() + task.dtRange());
         Term taskTerm = task.term();
         AbsoluteEvent root = new AbsoluteEvent(taskTerm, task.start(), task.end());
-        know(root, taskTerm, 0, taskTerm.dtRange());
 
-        Term t2 = d.transform(taskTerm);
-        if (!t2.equals(taskTerm)) {
+        know(taskTerm, d, root);
+    }
+
+    void know(Term term, Subst d, @Nullable AbsoluteEvent root) {
+        know(root, term, 0, term.dtRange());
+
+        Term t2 = d.transform(term);
+        if (!t2.equals(term)) {
             know(root, t2, 0, t2.dtRange());
         }
     }
@@ -623,7 +629,7 @@ public class Temporalize {
                 for (int i = 0; (i < l); i++) {
 
                     Term st = tt.sub(i);
-                    int sdt = st.dtRange();
+                    int sdt = o == CONJ ? st.dtRange() : 0 /* dont count internal event dtRange if not in CONJ */;
 
                     int subStart = t;
                     int subEnd = t + sdt;
@@ -845,7 +851,7 @@ public class Temporalize {
 
         } else if (o.statement) {
             //choose two absolute events which cover both 'a' and 'b' terms
-            List<Event> relevant = $.newArrayList();
+            List<Event> relevant = $.newArrayList(); //maybe should be Set?
             Set<Term> uncovered = new HashSet();
             target.subterms().recurseTermsToSet(
                     ~(Op.SECTi.bit | Op.SECTe.bit | Op.DIFFe.bit | Op.DIFFi.bit) /* everything but sect/diff; just their content */,
@@ -866,9 +872,7 @@ public class Temporalize {
                     trail.remove(c);
 
                 if (ce != null) {
-                    if (uncovered.removeIf(x ->
-                            c.containsRecursively(x)
-                    )) {
+                    if (uncovered.removeIf(c::containsRecursively)) {
                         relevant.add(ce);
                         if (uncovered.isEmpty())
                             break; //got them all
