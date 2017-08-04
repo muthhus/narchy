@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 
+import static nars.derive.Temporalize.*;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.*;
 
@@ -60,6 +61,26 @@ public class TemporalizeTest {
         l.add(zx); l.add(zy);
         l.sortThis();
         assertEquals("[z@0->y, z@0->x]", l.toString()); //y first since it is non-eternal
+    }
+
+    @Test
+    public void testAbsoluteRelativeRanking() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+
+        //eternal should be ranked lower than non-eternal
+        Term x = $.the("x");
+        Term y = $.the("y");
+        Temporalize.Event yTmp0 = t.newAbsolute(y, 0, 0);
+        Temporalize.Event xEte = t.newAbsolute(x, ETERNAL, ETERNAL);
+        Temporalize.Event xRelY = t.newRelative(x, y, 0);
+        assertEquals(+1, xEte.compareTo(xRelY));
+//        assertEquals(-1, tmp.compareTo(ete));
+//        assertEquals(0, ete.compareTo(ete));
+//        assertEquals(0, tmp.compareTo(tmp));
+        FasterList<Temporalize.Event> l = new FasterList<>();
+        l.add(xEte); l.add(xRelY);
+        l.sortThis();
+        assertEquals("[x@0->y, x@ETE]", l.toString()); //ETE must be dead last
     }
 
     @Test

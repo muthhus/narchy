@@ -166,7 +166,23 @@ public class Temporalize {
                     }
                 }
 
-                return this instanceof AbsoluteEvent ? -1 : +1;
+                {
+                    //different types: absolute vs. relative or relative vs. absolute
+
+                    //absolute eternal is dead last, even compared to relative
+                    if (this instanceof AbsoluteEvent) {
+                        if (((AbsoluteEvent)this).start==ETERNAL)
+                            return +1;
+                    }
+                    if (that instanceof AbsoluteEvent) {
+                        if (((AbsoluteEvent)that).start==ETERNAL)
+                            return -1;
+                    }
+
+                    return this instanceof AbsoluteEvent ? -1 : +1;
+                }
+
+
 
             }
         }
