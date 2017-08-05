@@ -16,7 +16,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.IntSummaryStatistics;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -270,8 +273,9 @@ public abstract class STMClustered extends STM {
         @Override
         public boolean delete() {
             if (super.delete()) {
-                if (node != null)
+                if (node != null) {
                     node.remove(this);
+                }
                 return true;
             }
             return false;
@@ -368,13 +372,13 @@ public abstract class STMClustered extends STM {
             protected void removed(TasksNode furthest) {
                 //System.err.println("node removed: " + furthest);
                 //removed.add(furthest);
-                synchronized (net) {
-                    furthest.tasks.sample(t -> {
-                        //TODO either attempt re-insert or delete
-                        t.delete();
-                        return Bag.BagSample.Remove;
-                    });
-                }
+
+                furthest.tasks.sample(t -> {
+                    //TODO either attempt re-insert or delete
+                    t.delete();
+                    return Bag.BagSample.Remove;
+                });
+
 
             }
         };
@@ -426,8 +430,14 @@ public abstract class STMClustered extends STM {
         if (t.punc() == punc && !t.isEternal()) {
 
             TLink tt = new TLink(t);
+
+            TasksNode nearest;
             synchronized (net) {
-                tt.nearest().transfer(tt);
+                nearest = tt.nearest();
+            }
+
+            synchronized (net) {
+                nearest.transfer(tt);
             }
 
         }

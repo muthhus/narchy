@@ -167,11 +167,11 @@ public abstract class Param  {
     public static final int UnificationVariableCapInitial = 8;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(96);
+    public final MutableInteger matchTTL = new MutableInteger(128);
     @Deprecated public final int UnificationTTLMax = matchTTL.intValue();
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
-    public static final float BELIEF_MATCH_TTL_FRACTION = 0.33f;
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.4f;
 
 
 

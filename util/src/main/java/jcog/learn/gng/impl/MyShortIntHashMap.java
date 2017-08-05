@@ -25,6 +25,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.eclipse.collections.impl.map.mutable.primitive.AbstractMutableIntValuesMap;
 import org.eclipse.collections.impl.map.mutable.primitive.AbstractSentinelValues;
 import org.eclipse.collections.impl.map.mutable.primitive.MutableShortKeysMap;
+import org.eclipse.collections.impl.map.mutable.primitive.ShortIntHashMap;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 
 import java.io.Externalizable;
@@ -1021,36 +1022,35 @@ public class MyShortIntHashMap extends AbstractMutableIntValuesMap implements Mu
 
     }
 
-    int probe(short element) {
-        int index = this.mask(element);
-        short[] keys = this.keys;
+    int probe(short element)
+    {
+        int index = this.mask((int) element);
         short keyAtIndex = this.keys[index];
-        int kl = keys.length;
-        if (keyAtIndex != element && keyAtIndex != 0) {
-            int removedIndex = keyAtIndex == 1 ? index : -1;
 
-            for (int i = 1; i < 16; ++i) {
-
-
-                int nextIndex = index + i & kl - 1;
-                keyAtIndex = keys[nextIndex];
-                if (keyAtIndex == element) {
-                    return nextIndex;
-                }
-
-                if (keyAtIndex == 0) {
-                    return removedIndex == -1 ? nextIndex : removedIndex;
-                }
-
-                if (keyAtIndex == 1 && removedIndex == -1) {
-                    removedIndex = nextIndex;
-                }
-            }
-
-            return this.probeTwo(element, removedIndex);
-        } else {
+        if (keyAtIndex == element || keyAtIndex == EMPTY_KEY)
+        {
             return index;
         }
+
+        int removedIndex = keyAtIndex == REMOVED_KEY ? index : -1;
+        for (int i = 1; i < INITIAL_LINEAR_PROBE; i++)
+        {
+            int nextIndex = (index + i) & (this.keys.length - 1);
+            keyAtIndex = this.keys[nextIndex];
+            if (keyAtIndex == element)
+            {
+                return nextIndex;
+            }
+            if (keyAtIndex == EMPTY_KEY)
+            {
+                return removedIndex == -1 ? nextIndex : removedIndex;
+            }
+            if (keyAtIndex == REMOVED_KEY && removedIndex == -1)
+            {
+                removedIndex = nextIndex;
+            }
+        }
+        return this.probeTwo(element, removedIndex);
     }
 
     int probeTwo(short element, int removedIndex) {

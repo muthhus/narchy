@@ -18,7 +18,7 @@ public class FZero extends NAgentX {
 
     public static void main(String[] args) {
 
-        float fps = 15f;
+        float fps = 25f;
 
 
         NAgentX.runRT((n)->{
@@ -55,13 +55,13 @@ public class FZero extends NAgentX {
 
 
         actionBipolar($.inh(the("fwd"), id), (f) -> {
-            fz.vehicleMetrics[0][6] += (f) * 2f;
+            fz.vehicleMetrics[0][6] += (f) * 0.5f;
             return f;
-        }).resolution.setValue(0.05f);
-        actionBipolar($.inh(the("rot"), id), (r) -> {
-            fz.playerAngle += (r) * 0.25f;
-            return r;
         }).resolution.setValue(0.02f);
+        actionBipolar($.inh(the("rot"), id), (r) -> {
+            fz.playerAngle += (r) * 0.15f;
+            return r;
+        }).resolution.setValue(0.01f);
 
         //keyboard-ish controls:
 //actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );
@@ -78,7 +78,7 @@ public class FZero extends NAgentX {
         senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
         senseNumberBi($.prop(the("ang"), id), new FloatNormalized(() ->
                 (float) MathUtils.normalizeAngle(fz.playerAngle, Math.PI) / (Math.PI*2))
-        ).resolution(0.02f);
+        ).resolution(0.01f);
 
         //nar.mix.stream("Derive").setValue(1);
         //implAccelerator(nar, this);
