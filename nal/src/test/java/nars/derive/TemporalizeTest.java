@@ -145,18 +145,18 @@ public class TemporalizeTest {
 
     @Test
     public void testEventizeImplConj() throws Narsese.NarseseException {
-        assertEquals("((a &&+2 b) ==>+3 c)@0,b@2,b@2->a,a@0,a@-2->b,(a &&+2 b)@0,(a &&+2 b)@[-3..-1]->c,c@3,c@3->(a &&+2 b)",
+        assertEquals("((a &&+2 b) ==>+3 c)@0,b@2,b@2->a,a@0,a@-2->b,(a &&+2 b)@[0..2],(a &&+2 b)@[-5..-3]->c,c@5,c@5->(a &&+2 b)",
                 new Temporalize().knowTerm($.$("((a &&+2 b) ==>+3 c)"), 0).toString());
     }
 
     @Test
     public void testEventizeCrossDir1() throws Narsese.NarseseException {
-        assertEquals("b@2,b@2->a,((a &&+2 b) ==>-3 c)@0,a@0,a@-2->b,(a &&+2 b)@0,(a &&+2 b)@[3..5]->c,c@-3,c@-3->(a &&+2 b)",
+        assertEquals("b@2,b@2->a,((a &&+2 b) ==>-3 c)@0,a@0,a@-2->b,(a &&+2 b)@[0..2],(a &&+2 b)@[1..3]->c,c@-1,c@-1->(a &&+2 b)",
                 new Temporalize().knowTerm($.$("((a &&+2 b) ==>-3 c)"), 0).toString());
     }
     @Test
     public void testEventizeCrossDirETERNAL() throws Narsese.NarseseException {
-        assertEquals("b@2->a,b@2->((a &&+2 b) ==>-3 c),((a &&+2 b) ==>-3 c)@ETE,a@0->((a &&+2 b) ==>-3 c),a@-2->b,(a &&+2 b)@0->((a &&+2 b) ==>-3 c),(a &&+2 b)@[3..5]->c,c@-3->(a &&+2 b),c@-3->((a &&+2 b) ==>-3 c)",
+        assertEquals("b@2->a,b@2->((a &&+2 b) ==>-3 c),((a &&+2 b) ==>-3 c)@ETE,a@0->((a &&+2 b) ==>-3 c),a@-2->b,(a &&+2 b)@[0..2]->((a &&+2 b) ==>-3 c),(a &&+2 b)@[1..3]->c,c@-1->(a &&+2 b),c@-1->((a &&+2 b) ==>-3 c)",
                 new Temporalize().knowTerm($.$("((a &&+2 b) ==>-3 c)"), ETERNAL).toString());
     }
 
@@ -431,8 +431,40 @@ public class TemporalizeTest {
         t.knowTerm($.$("(c &&+5 d)"), 11);
         t.knowTerm($.$("((a &&+5 b) &&+5 c)"), 1);
         assertEquals("((a &&+5 b) &&+5 (c &&+5 d))@[1..16]", t.solve($.$("((a &&+- b) &&+- (c &&+- d))")).toString());
-
     }
+
+    @Test
+    public void testConjLinked3() throws Narsese.NarseseException {
+        /*
+          instability:
+$.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),notImplEqui(%1),time(urgent)),(subIfUnifiesAny(%3,%2,%1),((DeductionRecursive-->Belief),(InductionRecursive-->Goal))))
+    $.97 (b &&+5 c). 6⋈11 %1.0;.66% {14: 1;2;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
+      $1.0 ((a &&+5 b) &&+5 c). 1⋈11 %1.0;.73% {9: 1;2;;} ((%1,%2,task("."),time(raw),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
+        $.50 (b &&+5 c). 6⋈11 %1.0;.90% {6: 2}
+        $1.0 a. 1 %1.0;.81% {2: 1;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
+          $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
+      $1.0 ((a &&+5 b) &&+5 c). 1⋈11 %1.0;.82% {14: 1;2;;}
+    $.63 ((b &&+5 c) ==>-10 (a &&+5 b)). 6 %1.0;.45% {7: 1;2} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((%1 ==>+- %2),((Induction-->Belief))))
+      $.50 (b &&+5 c). 6⋈11 %1.0;.90% {6: 2}
+      $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
+         */
+        Temporalize t = new Temporalize();
+        Term A = nars.$.$("((b &&+5 c) ==>-10 (a &&+5 b))");
+        t.knowTerm(A, 6);
+        {
+            assertEquals(1, t.solve($.the("a")).start(new HashMap<>()).abs());
+        }
+
+        Term B = nars.$.$("(b &&+5 c)");
+        t.knowTerm(B, 6, 11);
+
+        {
+            Term p = nars.$.$("(a &&+- b)");
+            Temporalize.Event s = t.solve(p);
+            assertEquals("(a &&+5 b)@[1..6]", s.toString());
+        }
+    }
+
 
     @Test
     public void testPreconImplConjPreConflict() throws Narsese.NarseseException {

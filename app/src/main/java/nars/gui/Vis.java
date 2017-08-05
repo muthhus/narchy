@@ -218,7 +218,7 @@ public class Vis {
 
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                ((FocusedExecutioner)n.exe).concepts.keySet()
+                ((FocusedExecutioner)n.exe).concepts.keySet() //TODO generalize
                 /* TODO */, 128, 256, 2, 7);
 
 

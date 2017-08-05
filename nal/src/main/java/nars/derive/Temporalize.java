@@ -34,9 +34,9 @@ public class Temporalize {
     final static Logger logger = LoggerFactory.getLogger(Temporalize.class);
 
     /**
-     * constraint graph (lazily constructed)
+     * constraint graph
      */
-    final Map<Term, FasterList<Event>> constraints = new HashMap();
+    final Map<Term, FasterList<Event>> constraints = new HashMap<>();
     final Random random;
     public int dur = 1;
 
@@ -47,10 +47,11 @@ public class Temporalize {
         this(new XorShift128PlusRandom(1));
     }
 
-    public Temporalize(Random random) {
+    Temporalize(Random random) {
         this.random = random;
     }
 
+    /** heuristic for ranking temporalization strategies */
     int score(Term x) {
         FasterList<Event> l = constraints.get(x);
         if (l == null) {
@@ -532,67 +533,7 @@ public class Temporalize {
         System.out.println();
     }
 
-//    void add(Event v, MutableValueGraph<Event, Integer> g) {
-//
-////        if (g instanceof RelativeEvent) {
-////            add((((RelativeEvent) v).rel), g); //add relation first
-////        }
-//
-//        if (!g.addNode(v))
-//            return; //already added
-//
-//        Term vt = v.term;
-//        if (vt.op().temporal) {
-//            int d = vt.dt();
-//            if (d != XTERNAL) {
-//                int s = vt.size();
-//                if (s == 2) {
-//                    Term a = vt.sub(0);
-//                    Term b = vt.sub(1);
-//                    if (!a.equals(b)) {
-//                        Event ae = events.get(a);
-//                        if (ae != null) {
-//                            Event be = events.get(b);
-//                            if (be != null) {
-//                                int at = vt.subtermTime(a);
-//                                int bt = vt.subtermTime(b);
-//
-//                                Event from, to;
-//                                if (ae.term.compareTo(be.term) < 0) {
-//                                    from = ae; to = be;
-//                                } else {
-//                                    from = be; to = ae;
-//                                }
-//
-//                                if (null == g.edgeValueOrDefault(from, to, null)) {
-//                                    int delta;
-//                                    if (from == ae) {
-//                                        delta = bt - at;
-//                                    } else {
-//                                        delta = at - bt;
-//                                    }
-//                                    g.putEdgeValue(from, to, delta);
-//                                }
-//                            }
-//                        }
-//                    }
-//
-//                } else if (s > 2) {
-//                    //connect all the edges
-//                }
-//            }
-//        }
-//
-//
-//    }
-
-
-    @Nullable
-    public static Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
-
-
-
-        /*
+     /**
         unknowns to solve otherwise the result is impossible:
             - derived task start time
             - derived task end time
@@ -607,13 +548,16 @@ public class Temporalize {
                 if that fails, a heuristic could decide the match. in the worst case,
                 the derivation will not be temporalizable and this method returns null.
         */
+    @Nullable public static Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
+
+
+
+
         Task task = d.task;
         Task belief = d.belief;
 
         Temporalize model = new Temporalize(d.random);
-
         model.dur = d.dur;
-
 
         Op to = task.op();
         boolean taskRooted = !task.isEternal() && ((to != IMPL) && (to != EQUI)) || (belief == null || !belief.isEternal());
@@ -656,7 +600,7 @@ public class Temporalize {
 
         //Op o = task.op();
         AbsoluteEvent root =
-                (rooted /*|| ((o!=IMPL) && (o!=EQUI))*/) ?
+                (rooted) ?
                         new AbsoluteEvent(taskTerm, task.start(), task.end())
                         :
                         new AbsoluteEvent(taskTerm, ETERNAL, ETERNAL); //ambiently rooted if impl or equi
@@ -743,7 +687,7 @@ public class Temporalize {
                 for (int i = 0; (i < l); i++) {
 
                     Term st = tt.sub(i);
-                    int sdt = o == CONJ ? st.dtRange() : 0 /* dont count internal event dtRange if not in CONJ */;
+                    int sdt = /*o == CONJ ? */st.dtRange();/* : 0*/ /* dont count internal event dtRange if not in CONJ */;
 
                     int subStart = t;
                     int subEnd = t + sdt;
@@ -883,21 +827,16 @@ public class Temporalize {
                                 //conjunction merge, since the results could overlap
                                 //either a or b, or both are conjunctions. and the result will be conjunction
 
-                                long ata = at.abs();
-                                long bta = bt.abs();
-                                if (ata == ETERNAL && bta == ETERNAL) {
-                                    ata = at.offset;
-                                    bta = bt.offset;// + a.dtRange();
-                                } else if (ata == ETERNAL ^ bta == ETERNAL) {
-                                    return null; //one is eternal the other isn't
-                                }
-                                Term newTerm = Op.conjMerge(a, ata, b, bta);
-                                long start = Math.min(at.abs(), bt.abs());
-                                return new SolutionEvent(newTerm, start);
+                                Event e = solveConj(at, bt, a, b);
+                                if (e != null)
+                                    return e;
+
                             } else {
+
                                 Event e = solveTemporal(trail, o, ea, eb, a, b);
                                 if (e != null)
                                     return e;
+
                             }
                         } catch (UnsupportedOperationException e) {
                             logger.warn("temporalization solution: {}", e.getMessage());
@@ -1025,6 +964,20 @@ public class Temporalize {
         }
 
         return null;
+    }
+
+    private Event solveConj(Time at, Time bt, Term a, Term b) {
+        long ata = at.abs();
+        long bta = bt.abs();
+        if (ata == ETERNAL && bta == ETERNAL) {
+            ata = at.offset;
+            bta = bt.offset;// + a.dtRange();
+        } else if (ata == ETERNAL ^ bta == ETERNAL) {
+            return null; //one is eternal the other isn't
+        }
+        Term newTerm = Op.conjMerge(a, ata, b, bta);
+        long start = Math.min(at.abs(), bt.abs());
+        return new SolutionEvent(newTerm, start);
     }
 
     private Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {

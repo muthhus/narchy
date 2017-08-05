@@ -158,7 +158,7 @@ public abstract class Param  {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 12;
-    public static final int CAUSE_CAPACITY = 6;
+    public static final int CAUSE_CAPACITY = 10;
 
     public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
 
