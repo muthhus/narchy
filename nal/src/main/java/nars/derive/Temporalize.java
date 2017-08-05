@@ -21,8 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static nars.Op.CONJ;
-import static nars.Op.NEG;
+import static nars.Op.*;
 import static nars.time.Tense.*;
 
 /**
@@ -118,73 +117,72 @@ public class Temporalize {
         @Override
         public int compareTo(@NotNull Temporalize.Event that) {
             if (this == that) return 0;
-            else {
-                if (getClass() == that.getClass()) {
-                    //same class, rank by term volume
-                    if (this instanceof RelativeEvent) {
-                        RelativeEvent THIS = (RelativeEvent) this;
-                        Term x = THIS.rel.term();
-                        RelativeEvent THAT = (RelativeEvent) that;
-                        Term y = THAT.rel.term();
-                        if (x.equals(y)) {
-                            int c1 = Integer.compare(THIS.start, THAT.end);
-                            if (c1 != 0)
-                                return c1;
-                            return Integer.compare(THIS.end, THAT.end);
-                        }
 
-                        int xs = score(x);
-                        int ys = score(y);
-                        if (xs != ys) {
-                            return Integer.compare(ys, xs);
-                        } else {
-                            //prefer lower volume
-                            int xv = x.volume();
-                            int yv = y.volume();
-                            if (xv == yv)
-                                return x.compareTo(y);
-                            else
-                                return Integer.compare(xv, yv);
-                        }
-
-                    } else if (this instanceof AbsoluteEvent) {
-                        AbsoluteEvent THIS = (AbsoluteEvent) this;
-                        AbsoluteEvent THAT = (AbsoluteEvent) that;
-                        long sThis = THIS.start;
-                        long sThat = THAT.start;
-
-                        //eternal should be ranked lower
-                        if (sThis == ETERNAL) return +1;
-                        if (sThat == ETERNAL) return -1;
-
-                        int cs = Long.compare(sThis, sThat);
-
-                        if (cs != 0)
-                            return cs;
-                        return Long.compare(THIS.end, THAT.end);
-
+            if (getClass() == that.getClass()) {
+                //same class, rank by term volume
+                if (this instanceof RelativeEvent) {
+                    RelativeEvent THIS = (RelativeEvent) this;
+                    Term x = THIS.rel.term();
+                    RelativeEvent THAT = (RelativeEvent) that;
+                    Term y = THAT.rel.term();
+                    if (x.equals(y)) {
+                        int c1 = Integer.compare(THIS.start, THAT.end);
+                        if (c1 != 0)
+                            return c1;
+                        return Integer.compare(THIS.end, THAT.end);
                     }
+
+                    int xs = score(x);
+                    int ys = score(y);
+                    if (xs != ys) {
+                        return Integer.compare(ys, xs);
+                    } else {
+                        //prefer lower volume
+                        int xv = x.volume();
+                        int yv = y.volume();
+                        if (xv == yv)
+                            return x.compareTo(y);
+                        else
+                            return Integer.compare(xv, yv);
+                    }
+
+                } else if (this instanceof AbsoluteEvent) {
+                    AbsoluteEvent THIS = (AbsoluteEvent) this;
+                    AbsoluteEvent THAT = (AbsoluteEvent) that;
+                    long sThis = THIS.start;
+                    long sThat = THAT.start;
+
+                    //eternal should be ranked lower
+                    if (sThis == ETERNAL) return +1;
+                    if (sThat == ETERNAL) return -1;
+
+                    int cs = Long.compare(sThis, sThat);
+
+                    if (cs != 0)
+                        return cs;
+                    return Long.compare(THIS.end, THAT.end);
+
                 }
 
-                {
-                    //different types: absolute vs. relative or relative vs. absolute
+            } else {
+                //different types: absolute vs. relative or relative vs. absolute
 
-                    //absolute eternal is dead last, even compared to relative
-                    if (this instanceof AbsoluteEvent) {
-                        if (((AbsoluteEvent)this).start==ETERNAL)
-                            return +1;
-                    }
-                    if (that instanceof AbsoluteEvent) {
-                        if (((AbsoluteEvent)that).start==ETERNAL)
-                            return -1;
-                    }
-
-                    return this instanceof AbsoluteEvent ? -1 : +1;
+                //absolute eternal is dead last, even compared to relative
+                if (this instanceof AbsoluteEvent) {
+                    if (((AbsoluteEvent) this).start == ETERNAL)
+                        return +1;
+                }
+                if (that instanceof AbsoluteEvent) {
+                    if (((AbsoluteEvent) that).start == ETERNAL)
+                        return -1;
                 }
 
-
+                if (this instanceof AbsoluteEvent)
+                    return -1;
 
             }
+
+            return +1;
         }
 
         abstract public void apply(Map<Term, Time> trail);
@@ -288,18 +286,20 @@ public class Temporalize {
         AbsoluteEvent(Term term, long start, long end) {
             super(term);
 
-            if (start != ETERNAL && end == ETERNAL)
-                end = start; //point-like
-
-            assert ((start == ETERNAL) == (end == ETERNAL)) :
-                    "invalid semi-eternalization: " + start + ' ' + end;
-
-            if (start <= end) {
-                this.start = start;
-                this.end = end;
+            if (start == ETERNAL) {
+                this.start = this.end = ETERNAL;
             } else {
-                this.start = end;
-                this.end = start;
+
+                if (end == ETERNAL)
+                    end = start; //point-like
+
+                if (start <= end) {
+                    this.start = start;
+                    this.end = end;
+                } else {
+                    this.start = end;
+                    this.end = start;
+                }
             }
         }
 
@@ -605,9 +605,11 @@ public class Temporalize {
 
         model.dur = d.dur;
 
-        model.know(task, d);
+        model.know(task, d, true);
         if (belief != null) {
-            model.know(belief, d);
+            model.know(belief, d, true);
+        } else if (d.beliefTerm!=null) {
+            model.know(d.beliefTerm, d, null);
         }
 
         Map<Term, Temporalize.Time> times = new HashMap<>();
@@ -625,27 +627,41 @@ public class Temporalize {
             assert (
                     (occ[0] != ETERNAL)
                             ||
-                    (task.isEternal()) && (belief == null || belief.isEternal())) : "eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
+                            (task.isEternal()) && (belief == null || belief.isEternal())) : "eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
             return e.term;
         }
         return null;
     }
 
-    void know(Task task, Subst d) {
+    void know(Task task, Subst d, boolean rooted) {
         //assert (task.end() == task.start() + task.dtRange());
         Term taskTerm = task.term();
-        AbsoluteEvent root = new AbsoluteEvent(taskTerm, task.start(), task.end());
+
+        //Op o = task.op();
+        AbsoluteEvent root =
+                (rooted /*|| ((o!=IMPL) && (o!=EQUI))*/) ?
+                    new AbsoluteEvent(taskTerm, task.start(), task.end())
+                        :
+                    new AbsoluteEvent(taskTerm, ETERNAL, ETERNAL); //ambiently rooted if impl or equi
 
         know(taskTerm, d, root);
     }
 
     void know(Term term, Subst d, @Nullable AbsoluteEvent root) {
-        know(root, term, 0, term.dtRange());
+        know(term, root);
 
         Term t2 = d.transform(term);
         if (!t2.equals(term)) {
-            know(root, t2, 0, t2.dtRange());
+            know(t2, root);
         }
+    }
+
+    private void know(Term term) {
+        know(term, null);
+    }
+
+    private void know(Term term, @Nullable Temporalize.AbsoluteEvent root) {
+        know(root, term, 0, term.dtRange());
     }
 
 

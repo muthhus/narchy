@@ -1,6 +1,6 @@
 package nars.nal.nal6;
 
-import nars.nal.AbstractNALTest;
+import nars.util.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Before;
 import org.junit.Ignore;

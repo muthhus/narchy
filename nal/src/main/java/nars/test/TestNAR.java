@@ -50,17 +50,20 @@ public class TestNAR {
     /**
      * holds must (positive) conditions
      */
-    final List<NARCondition> requires = $.newArrayList();
+    public final List<NARCondition> succeedsIfAll = $.newArrayList();
     /**
      * holds mustNot (negative) conditions which are tested at the end
      */
-    final List<NARCondition> disqualifies = $.newArrayList();
+    public final List<NARCondition> failsIfAny = $.newArrayList();
     //TODO initialize this once in constructor
+
     @NotNull
-    final Topic<Tasked>[] outputEvents;
+    private final Topic<Tasked>[] outputEvents;
     //public final List<ExplainableTask> explanations = new ArrayList();
+
     @Nullable
     public Object result;
+
     boolean finished;
     private boolean exitOnAllSuccess = true;
     public boolean requireConditions = true;
@@ -111,17 +114,17 @@ public class TestNAR {
 
 
         if (requireConditions)
-            assertTrue("no conditions tested", !requires.isEmpty() || !disqualifies.isEmpty());
+            assertTrue("no conditions tested", !succeedsIfAll.isEmpty() || !failsIfAny.isEmpty());
 
 
         //TODO cache requires & logger, it wont change often
-        String id = requires.toString();
+        String id = succeedsIfAll.toString();
 
-        for (NARCondition oc : requires) {
+        for (NARCondition oc : succeedsIfAll) {
             long oce = oc.getFinalCycle();
             if (oce > finalCycle) finalCycle = oce + 1;
         }
-        for (NARCondition oc : disqualifies) {
+        for (NARCondition oc : failsIfAny) {
             long oce = oc.getFinalCycle();
             if (oce > finalCycle) finalCycle = oce + 1;
         }
@@ -143,13 +146,13 @@ public class TestNAR {
         runUntil(finalCycle);
 
         boolean success = true;
-        for (NARCondition t : requires) {
+        for (NARCondition t : succeedsIfAll) {
             if (!t.isTrue()) {
                 success = false;
                 break;
             }
         }
-        for (NARCondition t : disqualifies) {
+        for (NARCondition t : failsIfAny) {
             if (t.isTrue()) {
 
                 logger.error("mustNot: {}", t);
@@ -190,7 +193,7 @@ public class TestNAR {
                 logger.info(pattern, args);
             }
 
-            requires.forEach(c ->
+            succeedsIfAll.forEach(c ->
                     c.log(logger)
             );
 
@@ -304,7 +307,7 @@ public class TestNAR {
      * fails if anything non-input is processed
      */
     @NotNull
-    public TestNAR mustNotOutput() {
+    public TestNAR mustNotOutputAnything() {
         exitOnAllSuccess = false;
         requireConditions = false; //this is the condition
         nar.onTask(c -> {
@@ -343,10 +346,10 @@ public class TestNAR {
         }
     }
 
-    @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax) {
-        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, ETERNAL, ETERNAL);
-    }
+//    @NotNull
+//    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax) {
+//        return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, ETERNAL, ETERNAL);
+//    }
 
     @NotNull
     TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end) {
@@ -386,10 +389,10 @@ public class TestNAR {
         finished = false;
 
         if (must) {
-            requires.add(tc);
+            succeedsIfAll.add(tc);
         } else {
             exitOnAllSuccess = false; //require entire execution, not just finish early
-            disqualifies.add(tc);
+            failsIfAny.add(tc);
         }
 
         return this;
@@ -406,7 +409,7 @@ public class TestNAR {
     }
 
     @NotNull
-    public TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long withinCycles, @NotNull String task) throws Narsese.NarseseException {
+    private TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long withinCycles, @NotNull String task) throws Narsese.NarseseException {
         Task t = nar.task(task);
         //TODO avoid reparsing term from string
 
@@ -639,13 +642,13 @@ public class TestNAR {
         @Override
         public void accept(NAR nar) {
 
-            if (++cycle % checkResolution == 0 && !requires.isEmpty()) {
+            if (++cycle % checkResolution == 0 && !succeedsIfAll.isEmpty()) {
 
                 boolean finished = true;
 
 
-                for (int i = 0, requiresSize = requires.size(); i < requiresSize; i++) {
-                    if (!requires.get(i).isTrue()) {
+                for (int i = 0, requiresSize = succeedsIfAll.size(); i < requiresSize; i++) {
+                    if (!succeedsIfAll.get(i).isTrue()) {
                         finished = false;
                         break;
                     }

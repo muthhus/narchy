@@ -1,6 +1,6 @@
 package nars.nal.nal8;
 
-import nars.nal.AbstractNALTest;
+import nars.util.AbstractNALTest;
 import nars.test.TestNAR;
 import nars.time.Tense;
 import org.junit.Ignore;

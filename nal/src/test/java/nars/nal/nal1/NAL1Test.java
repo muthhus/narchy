@@ -3,7 +3,7 @@ package nars.nal.nal1;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
-import nars.nal.AbstractNALTest;
+import nars.util.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Test;
 

@@ -1,6 +1,6 @@
 package nars.nal.multistep;
 
-import nars.nal.AbstractNALTest;
+import nars.util.AbstractNALTest;
 import nars.test.TestNAR;
 import org.junit.Test;
 

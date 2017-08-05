@@ -432,6 +432,7 @@ public interface Term extends Termlike, Comparable<Term> {
 
     /**
      * matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt
+     * TODO make a 'subtermTimes' which returns all matching sub-event times
      *
      * @param dt the current offset in the search
      * @return DTERNAL if the subterm was not found
@@ -450,13 +451,10 @@ public interface Term extends Termlike, Comparable<Term> {
         //TODO do shuffled search to return different equivalent results wherever they may appear
 
         Op op = op();
-        boolean shift;
         if (!op.temporal || dt == DTERNAL || dt == XTERNAL || dt == 0) {
             idt = 0; //parallel or eternal, no dt increment
             reverse = false;
-            shift = false;
         } else {
-            shift = op == CONJ;
             idt = dt;
             if (idt < 0) {
                 idt = -idt;
@@ -474,7 +472,7 @@ public interface Term extends Termlike, Comparable<Term> {
             int sdt = yyy.subtermTime(x);
             if (sdt != DTERNAL)
                 return sdt + offset;
-            offset += idt + ((shift && yyy.op() == CONJ) ? yyy.dtRange() : 0);
+            offset += idt + yyy.dtRange();
         }
 
         return DTERNAL; //not found
@@ -485,13 +483,13 @@ public interface Term extends Termlike, Comparable<Term> {
      */
     default int dtRange() {
         Op o = op();
-        switch (o) {
-
-//            case NEG:
-//                return sub(0).dtRange();
-
-
-            case CONJ:
+//        switch (o) {
+//
+////            case NEG:
+////                return sub(0).dtRange();
+//
+//
+//            case CONJ:
 
                 if (size() == 2) {
                     int dt = dt();
@@ -522,9 +520,9 @@ public interface Term extends Termlike, Comparable<Term> {
                     return s;
                 }
 
-            default:
-                return 0;
-        }
+//            default:
+//                return 0;
+//        }
 
     }
 

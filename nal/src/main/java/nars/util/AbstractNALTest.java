@@ -1,4 +1,4 @@
-package nars.nal;
+package nars.util;
 
 import nars.NAR;
 import nars.NARS;
@@ -27,7 +27,9 @@ public abstract class AbstractNALTest  {
 
     @After
     public void end() {
+
         test.run();
+
         nar.stop();
         nar.clear();
     }

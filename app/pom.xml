@@ -23,19 +23,40 @@
         </license>
     </licenses>
     <dependencies>
+        <!--<dependency>-->
+        <!--<groupId>narchy</groupId>-->
+        <!--<artifactId>nal</artifactId>-->
+        <!--<version>1.0</version>-->
+        <!--<scope>compiled</scope>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>narchy</groupId>
             <artifactId>nal</artifactId>
             <version>1.0</version>
-            <scope>compile</scope>
+            <type>test-jar</type>
+            <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>narchy</groupId>
+            <artifactId>nal</artifactId>
+            <version>1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>narchy</groupId>
             <!--<artifactId>spacegraph</artifactId>-->
             <artifactId>ui</artifactId>
             <version>1.0</version>
         </dependency>
-
+        <!--<dependency>-->
+        <!--<groupId>narchy</groupId>-->
+        <!--&lt;!&ndash;<artifactId>spacegraph</artifactId>&ndash;&gt;-->
+        <!--<artifactId>nal</artifactId>-->
+        <!--<scope>test</scope>-->
+        <!--<version>1.0</version>-->
+        <!--</dependency>-->
 
         <!--<dependency>-->
         <!--<groupId>org.infinispan</groupId>-->

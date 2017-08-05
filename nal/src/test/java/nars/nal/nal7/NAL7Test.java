@@ -3,7 +3,7 @@ package nars.nal.nal7;
 import nars.$;
 import nars.Narsese;
 import nars.Param;
-import nars.nal.AbstractNALTest;
+import nars.util.AbstractNALTest;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.test.TestNAR;
@@ -1037,8 +1037,13 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Test
-    public void preconImplyConjPre() {
+    public void preconImplyConjPre() throws Narsese.NarseseException {
         //implication-based composition
+
+        assertEquals("((x &&+2 y) ==>+3 z)",
+                //$.$("((x ==>+2 y) ==>+3 z)")
+                $.$("(x ==>+2 (y ==>+3 z))").toString()
+        );
 
         test
                 .input("(x ==>+2 a). :|:")

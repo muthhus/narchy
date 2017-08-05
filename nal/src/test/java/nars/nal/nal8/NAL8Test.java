@@ -3,7 +3,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
-import nars.nal.AbstractNALTest;
+import nars.util.AbstractNALTest;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 30;
+    final int cycles = 430;
 
 
 
@@ -108,7 +108,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test
                 .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001})))! :|:")
-                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.81f, 0)
+                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
                 .mustNotOutput(cycles, "hold(SELF,{t002})", GOAL, ETERNAL);
     }
 
@@ -116,6 +116,7 @@ public class NAL8Test extends AbstractNALTest {
     public void subbelief_2() throws Narsese.NarseseException {
         Term t = $.$("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001})))");
         assertEquals(2, t.size());
+        assertEquals(10, t.dtRange());
 
         test
                 .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001}))). :|:")
