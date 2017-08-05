@@ -95,6 +95,15 @@
             </exclusions>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/tec.uom/uom-se -->
+        <!--https://github.com/unitsofmeasurement/uom-se-->
+        <dependency>
+            <groupId>tec.uom</groupId>
+            <artifactId>uom-se</artifactId>
+            <version>1.0.8</version>
+        </dependency>
+
+
         <!-- https://mvnrepository.com/artifact/org.hdrhistogram/HdrHistogram -->
         <dependency>
             <groupId>org.hdrhistogram</groupId>

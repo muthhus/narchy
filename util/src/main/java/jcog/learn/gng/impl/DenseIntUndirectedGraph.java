@@ -11,7 +11,7 @@ import java.util.Arrays;
  */
 public class DenseIntUndirectedGraph implements ShortUndirectedGraph {
 
-    public static final int CLEAR_VALUE = 0; //Integer.MIN_VALUE;
+    public static final int CLEAR_VALUE = Integer.MIN_VALUE;
     public final int[][] data;
 
     public DenseIntUndirectedGraph(short dim) {

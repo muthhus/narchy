@@ -123,10 +123,10 @@
     Z, (X<=>Y), task("?") |- subIfUnifiesAny((X <=>+- Y), Y, Z, strict), (Belief:BeliefStructuralAnalogy, Punctuation:Belief)
 
     //strong unification
-    (Y==>X),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Deduction)
-    ((--,%Y)==>X),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:DeductionPN)
-    (X==>Y),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Abduction)
-    ((--,%X)==>Y),Z,task(".") |- (--,subIfUnifiesAny(X,Y,Z)), (Belief:AbductionPN)
+    //(Y==>X),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Deduction)
+    //((--,%Y)==>X),Z,task(".") |- subIfUnifiesAny(X,Y,Z), (Belief:DeductionPN)
+    //(X==>Y),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Abduction)
+    //((--,%X)==>Y),Z,task(".") |- (--,subIfUnifiesAny(X,Y,Z)), (Belief:AbductionPN)
     (X<=>Y),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Comparison)
         //TODO check the truth here
 

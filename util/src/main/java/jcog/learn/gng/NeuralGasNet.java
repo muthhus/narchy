@@ -1,6 +1,7 @@
 package jcog.learn.gng;
 
 import com.google.common.base.Joiner;
+import jcog.learn.gng.impl.DenseIntUndirectedGraph;
 import jcog.learn.gng.impl.ShortUndirectedGraph;
 import jcog.learn.gng.impl.Node;
 import jcog.learn.gng.impl.SemiDenseShortUndirectedGraph;
@@ -74,8 +75,8 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         super();
 
         this.e =
-                new SemiDenseShortUndirectedGraph((short) maxNodes);
-                //new DenseIntUndirectedGraph(maxNodes);
+                //new SemiDenseShortUndirectedGraph((short) maxNodes);
+                new DenseIntUndirectedGraph((short)maxNodes);
         this.node = new Node[maxNodes];
         clear();
      /** nodes should begin with randomized coordinates */

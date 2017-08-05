@@ -427,6 +427,9 @@ public class Temporalize {
             if (offset == 0)
                 return this;
 
+            if (this.offset == DTERNAL && offset == DTERNAL)
+                return this; //no effect, adding dternal to dternal
+
             assert (this.offset != DTERNAL && offset != DTERNAL);
 
             if (this.offset == XTERNAL)
@@ -558,7 +561,7 @@ public class Temporalize {
         Task belief = d.belief;
 
         Temporalize model = new Temporalize(d.random);
-        model.dur = d.dur;
+        model.dur = Param.DITHER_DT ? d.dur : 1;
 
         Op to = task.op();
         boolean taskRooted = !task.isEternal() && ((to != IMPL) && (to != EQUI)) || (belief == null || !belief.isEternal());

@@ -45,8 +45,8 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", new Scale(() -> fz.image, 32, 24).blur())
-                .resolution(0.05f);
+        senseCamera("fz", new Scale(() -> fz.image, 32, 24)/*.blur()*/)
+                .resolution(0.01f);
 
 //        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
 //        cc.addActions($.the("fz"), this, false, false, true);
@@ -59,7 +59,7 @@ public class FZero extends NAgentX {
             return f;
         }).resolution.setValue(0.02f);
         actionBipolar($.inh(the("rot"), id), (r) -> {
-            fz.playerAngle += (r) * 0.15f;
+            fz.playerAngle += (r) * 0.05f;
             return r;
         }).resolution.setValue(0.01f);
 
@@ -74,8 +74,8 @@ public class FZero extends NAgentX {
 //        });
 
         //senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
-        senseNumberDifference($.prop(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
-        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
+//        senseNumberDifference($.prop(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
+//        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
         senseNumberBi($.prop(the("ang"), id), new FloatNormalized(() ->
                 (float) MathUtils.normalizeAngle(fz.playerAngle, Math.PI) / (Math.PI*2))
         ).resolution(0.01f);

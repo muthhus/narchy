@@ -37,7 +37,7 @@ public abstract class Param  {
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 2;
 
-    public static PriMerge termlinkMerge = PriMerge.plus;
+    public static PriMerge termlinkMerge = PriMerge.max;
     public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptMerge = PriMerge.plus;
@@ -77,7 +77,7 @@ public abstract class Param  {
      * when calculated, the total activation will sum to 1.0.
      * so 0.5 is equal amounts for both. */
     public static final float TERMLINK_BALANCE = 0.5f;
-
+    public static boolean DITHER_DT = false;
 
 
     public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
@@ -159,8 +159,8 @@ public abstract class Param  {
     /**
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
-    public static final int STAMP_CAPACITY = 12;
-    public static final int CAUSE_CAPACITY = 8;
+    public static final int STAMP_CAPACITY = 10;
+    public static final int CAUSE_CAPACITY = 16;
 
     public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
 
