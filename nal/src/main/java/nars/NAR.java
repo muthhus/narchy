@@ -618,6 +618,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             if (tp != tp || tp < Pri.EPSILON)
                 return; //TODO track what might cause this
 
+            t.pri(tp);
+
             value(t.cause(), Param.valueAtInput(t, this));
         }
 

@@ -39,11 +39,12 @@ public interface NAct {
      * its initial state will remain indetermined until the first feedback is generated.
      */
     @Nullable
-    default ActionConcept actionToggle(@NotNull Term s, @NotNull Runnable on, @NotNull Runnable off) {
-        ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
+    default GoalActionConcept actionToggle(@NotNull Term s, @NotNull Runnable on, @NotNull Runnable off) {
+        GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             boolean next = d != null && d.freq() > 0.5f;
             return toggle(on, off, next);
         });
+        m.resolution(0.5f);
         return addAction(m);
     }
 
@@ -142,7 +143,7 @@ public interface NAct {
 
             return null;
         });
-        //m.resolution.setValue(0.5f);
+        m.resolution(1f);
         return addAction(m);
     }
 

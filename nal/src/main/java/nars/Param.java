@@ -80,15 +80,15 @@ public abstract class Param  {
 
 
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.95f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.8f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.66f, 0, 1f);
+
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */
     public static float valueAtInput(Task accepted, NAR nar) {
-        float v =
-                //(accepted.volume() + accepted.complexity())/2f;
-                (1 + accepted.volume());
-        return -(v)/nar.termVolumeMax.floatValue()/800f;
+        //prefer simple and confident:
+        return -((1 + accepted.volume()))/nar.termVolumeMax.floatValue()/800f *
+                ((accepted.isBeliefOrGoal() ? (1f-accepted.conf()) : 0.5f)) * accepted.priElseZero();
     }
 
 

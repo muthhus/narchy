@@ -49,9 +49,11 @@ public class NARio extends NAgentX {
 
         PixelBag cc = PixelBag.of(() -> mario.image, 36, 28);
         cc.addActions($.the("nario"), this, false, false, true);
+        cc.actions.forEach(a -> a.resolution.setValue(0.2f));
         cc.setClarity(0.8f, 0.95f);
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
         sc.resolution(0.02f);
+
 
 
 //        try {
@@ -153,9 +155,9 @@ public class NARio extends NAgentX {
 
     int lastCoins;
 
-    public final FloatParam Depress = new FloatParam(0.05f, 0f, 1f);
-    public final FloatParam MoveRight = new FloatParam(0.75f, 0f, 1f);
-    public final FloatParam EarnCoin = new FloatParam(0.9f, 0f, 1f);
+    public final FloatParam Depress = new FloatParam(0.01f, 0f, 1f);
+    public final FloatParam MoveRight = new FloatParam(0.25f, 0f, 1f);
+    public final FloatParam EarnCoin = new FloatParam(0.95f, 0f, 1f);
 
     @Override
     protected float act() {

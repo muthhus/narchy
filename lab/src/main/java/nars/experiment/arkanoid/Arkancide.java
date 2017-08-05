@@ -24,8 +24,8 @@ public class Arkancide extends NAgentX {
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
-    final int visW = 48;
-    final int visH = 24;
+    final int visW = 64;
+    final int visH = 12;
 
     //final int afterlife = 60;
 
@@ -106,7 +106,7 @@ public class Arkancide extends NAgentX {
 
             BufferedImageBitmap2D sw = new Scale(new SwingBitmap2D(noid), visW, visH).blur();
             CameraSensor cc = senseCamera("noid", sw, visW, visH)
-                    .resolution(0.25f);
+                    .resolution(0.1f);
 //            CameraSensor ccAe = senseCameraReduced($.the("noidAE"), sw, 16)
 //                    .resolution(0.25f);
 
@@ -117,7 +117,7 @@ public class Arkancide extends NAgentX {
 
         if (numeric) {
             SensorConcept a = senseNumber("noid:px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            SensorConcept ab = senseNumber("noid:dx", (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth())));
+            SensorConcept ab = senseNumber("noid:dx", (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
             SensorConcept b = senseNumber("noid:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
             SensorConcept c = senseNumber("noid:by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
             //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX)).resolution(0.25f);

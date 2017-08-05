@@ -33,6 +33,7 @@ public class GoalActionConcept extends ActionConcept {
     private final FloatParam curiosity;
 
 
+
     @NotNull
     private MotorFunction motor;
 
@@ -49,7 +50,7 @@ public class GoalActionConcept extends ActionConcept {
 
         this.curiosity = curiosity;
 
-        this.action = new Signal(GOAL, resolution).pri(() -> n.priorityDefault(GOAL));
+        this.action = new Signal(GOAL, n.truthResolution).pri(() -> n.priorityDefault(GOAL));
         //((SensorBeliefTable) goals).sensor = action;
 
         this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priorityDefault(BELIEF));
