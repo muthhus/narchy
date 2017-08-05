@@ -72,8 +72,9 @@ public class QueryVariableTest {
 
         Term beliefTerm = nar.term(beliefString);
         assertNotNull(beliefTerm);
-        nar.believe(beliefTerm, 1f, 0.9f);
-        assertEquals(1, nar.tasks().count());
+
+//        nar.believe(beliefTerm, 1f, 0.9f);
+//        assertEquals(1, nar.tasks().count());
 
         //nar.log();
         nar.question(question, Tense.ETERNAL, (q, a) -> {
@@ -82,6 +83,9 @@ public class QueryVariableTest {
             q.delete();
             //}
         });
+
+        nar.believe(beliefTerm, 1f, 0.9f);
+
         nar.run(time);
         assertTrue(2 <= nar.tasks().count());
         assertTrue(valid.get());

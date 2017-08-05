@@ -679,13 +679,12 @@ public class NAL7Test extends AbstractNALTest {
     public void testImplicationDecompositionContradictionFairness() {
 
         test
-
                 .log()
                 .inputAt(0, "(b). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
-                .mustNotOutput(cycles, "(a)", BELIEF, ETERNAL)
                 .mustBelieve(cycles, "(a)", 1f, 0.45f, -1)
-                .mustBelieve(cycles, "(a)", 1f, 0.45f, 0)
+                .mustNotOutput(cycles, "(a)", BELIEF, ETERNAL)
+                .mustNotOutput(cycles, "(a)", BELIEF, 0)
         ;
         //.mustBelieve(cycles, "(a)", 1f, 0.45f, 0 /* occ */);
         //        /** because the two temporal events create a contradiction when evaluating the

@@ -21,8 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static nars.Op.CONJ;
-import static nars.Op.NEG;
+import static nars.Op.*;
 import static nars.time.Tense.*;
 
 /**
@@ -200,11 +199,13 @@ public class Temporalize {
 
             int dt = dt(A, B);
 
-            int shrink = dt(A, ae) + dt(bs, B);
-            if (dt < 0)
-                dt += shrink;
-            else //if (dt >= 0)
-                dt -= shrink;
+            if (dt != DTERNAL) {
+                int shrink = dt(A, ae) + dt(bs, B);
+                if (dt < 0)
+                    dt += shrink;
+                else //if (dt >= 0)
+                    dt -= shrink;
+            }
 
             return dt;
 
@@ -613,9 +614,14 @@ public class Temporalize {
 
         model.dur = d.dur;
 
-        model.know(task, d, true);
+
+        Op to = task.op();
+        boolean taskRooted = !task.isEternal() && ((to != IMPL) && (to != EQUI)) || (belief == null || !belief.isEternal());
+        model.know(task, d, taskRooted);
+
         if (belief != null) {
-            model.know(belief, d, true);
+            Op bo = belief.op();
+            model.know(belief, d, !taskRooted || ((bo != IMPL) && (bo != EQUI)));
         } else if (d.beliefTerm != null) {
             model.know(d.beliefTerm, d, null);
         }
@@ -632,10 +638,13 @@ public class Temporalize {
                 occ[1] = e.end(times).abs();
             }
 
-            assert (
+            if (!(
                     (occ[0] != ETERNAL)
                             ||
-                            (task.isEternal()) && (belief == null || belief.isEternal())) : "eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
+                    (task.isEternal()) && (belief == null || belief.isEternal()))) {
+                //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
+                return null;
+            }
             return e.term;
         }
         return null;
@@ -662,10 +671,6 @@ public class Temporalize {
         if (!t2.equals(term)) {
             know(t2, root);
         }
-    }
-
-    private void know(Term term) {
-        know(term, null);
     }
 
     private void know(Term term, @Nullable Temporalize.AbsoluteEvent root) {
