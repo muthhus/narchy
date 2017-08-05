@@ -88,7 +88,9 @@ public abstract class Param  {
     public static float valueAtInput(Task accepted, NAR nar) {
         //prefer simple and confident:
         return -((1 + accepted.volume()))/nar.termVolumeMax.floatValue()/800f *
-                ((accepted.isBeliefOrGoal() ? (1f-accepted.conf()) : 0.5f)) * accepted.priElseZero();
+                ((accepted.isBeliefOrGoal() ? (1f-accepted.conf()) : 0.5f))
+                ;
+                //* accepted.priElseZero();
     }
 
 

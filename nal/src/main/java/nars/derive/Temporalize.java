@@ -198,15 +198,16 @@ public class Temporalize {
             Time B = b.end(trail);
             Time bs = b.start(trail);
 
-            int dt = dt(A, B);
+            int dt = dt(ae, bs);
+            //int dt = dt(A, B);
 
-            if (dt != DTERNAL) {
-                int shrink = dt(A, ae) + dt(bs, B);
-                if (dt < 0)
-                    dt += shrink;
-                else //if (dt >= 0)
-                    dt -= shrink;
-            }
+//            if (dt != DTERNAL) {
+//                int shrink = dt(A, ae) + dt(bs, B);
+//                if (dt < 0)
+//                    dt += shrink;
+//                else //if (dt >= 0)
+//                    dt -= shrink;
+//            }
 
             return dt;
 

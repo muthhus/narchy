@@ -434,6 +434,22 @@ public class TemporalizeTest {
     }
 
     @Test
+    public void testImplFromConj() throws Narsese.NarseseException {
+        //WRONG:    $.40 ((c) ==>-2 ((a) &&+1 (b))). 5 %1.0;.42% {9: 1;2;3} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((%1 ==>+- %2),((Induction-->Belief))))
+        //               $.50 (c). 5 %1.0;.90% {5: 3}
+        //               $1.0 ((a) &&+1 (b)). 1⋈2 %1.0;.81% {3: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
+
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("c"), 5);
+        t.knowTerm($.$("(a &&+1 b)"), 1, 2);
+
+        Term P = nars.$.$("(c ==>+- (a &&+- b))");
+
+        Temporalize.Event s = t.solve(P);
+        assertEquals("(c ==>-4 (a &&+1 b))@5", s.toString());
+    }
+
+    @Test
     public void testConjLinked3() throws Narsese.NarseseException {
         /*
           instability:
