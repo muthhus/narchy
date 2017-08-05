@@ -7,6 +7,7 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import spacegraph.SpaceGraph;
 
+import javax.swing.plaf.TextUI;
 import java.io.IOException;
 
 
@@ -25,7 +26,9 @@ public class TerminalUI extends DefaultVirtualTerminal implements Runnable {
     }
 
     public static void main(String[] args) {
-        SpaceGraph.window(new ConsoleTerminal(new TerminalUI(40, 20)), 1000, 600);
+        SpaceGraph.window(new ConsoleTerminal(
+                new TerminalUI(40, 20)
+        ), 1000, 600);
     }
 
     public void commit() {

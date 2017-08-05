@@ -6,7 +6,9 @@ import com.googlecode.lanterna.TerminalTextUtils;
 import com.googlecode.lanterna.TextCharacter;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import com.googlecode.lanterna.terminal.Terminal;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
+import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.newt.event.KeyEvent;
 
 import java.io.IOException;
@@ -18,14 +20,14 @@ import java.io.OutputStream;
 public class ConsoleTerminal extends ConsoleSurface {
 
 
-    public final DefaultVirtualTerminal term;
+    public final VirtualTerminal term;
     private final int[] cursorPos = new int[2];
 
     public ConsoleTerminal(int cols, int rows) {
         this(new DefaultVirtualTerminal(new TerminalSize(cols, rows)));
     }
 
-    public ConsoleTerminal(DefaultVirtualTerminal t) {
+    public ConsoleTerminal(VirtualTerminal t)  {
         super(t.getTerminalSize().getColumns(), t.getTerminalSize().getRows());
         this.term = t;
     }
@@ -92,7 +94,7 @@ public class ConsoleTerminal extends ConsoleSurface {
     public boolean onKey(KeyEvent e, boolean pressed) {
 
         //return super.onKey(e, pressed);
-        DefaultVirtualTerminal eterm = this.term;
+        VirtualTerminal eterm = this.term;
 
         int cc = e.getKeyCode();
         if (pressed && cc == 13) {

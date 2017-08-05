@@ -283,7 +283,7 @@ public class IRCNLP extends IRC {
 
         new Thread(() -> {
             try {
-                new TelnetServer(n, 1024);
+                new TextUI(n, 1024);
             } catch (IOException e) {
                 e.printStackTrace();
             }

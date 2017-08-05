@@ -11,8 +11,11 @@ import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.MouseCaptureMode;
+import com.googlecode.lanterna.terminal.Terminal;
+import com.googlecode.lanterna.terminal.ansi.ANSITerminal;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminal;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminalServer;
+import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.data.MutableInteger;
 import jcog.event.On;
@@ -39,20 +42,31 @@ import static com.googlecode.lanterna.gui2.Window.Hint.NO_POST_RENDERING;
  * https://github.com/mabe02/lanterna/blob/master/src/test/java/com/googlecode/lanterna/terminal/TelnetTerminalTest.java
  * https://github.com/mabe02/lanterna/blob/master/src/test/java/com/googlecode/lanterna/gui2/GUIOverTelnet.java
  */
-public class TelnetServer extends TelnetTerminalServer {
+public class TextUI {
 
-    final static org.slf4j.Logger logger = LoggerFactory.getLogger(TelnetServer.class);
+    final static org.slf4j.Logger logger = LoggerFactory.getLogger(TextUI.class);
     private final NAR nar;
 
     final Set<TelnetSession> sessions = Sets.newConcurrentHashSet();
 
-    public TelnetServer(NAR n, int port) throws IOException {
-        super(port, Charset.forName("utf-8"));
+    public TextUI(NAR n) {
         this.nar = n;
+    }
 
+    public DefaultVirtualTerminal session() {
+        DefaultVirtualTerminal vt = new DefaultVirtualTerminal(new TerminalSize(80, 25));
+        TelnetSession session = new TelnetSession(vt);
+        sessions.add(session);
+        session.start();
+        return vt;
+    }
+
+    public TextUI(NAR n, int port) throws IOException {
+        this(n);
+        TelnetTerminalServer server = new TelnetTerminalServer(port, Charset.forName("utf-8"));
         logger.info("listen port={}", port);
         while (true) {
-            TelnetTerminal conn = acceptConnection();
+            TelnetTerminal conn = server.acceptConnection();
             if (conn != null) {
                 logger.info("connect from {}", conn.getRemoteSocketAddress());
                 TelnetSession session = new TelnetSession(conn);
@@ -81,7 +95,7 @@ public class TelnetServer extends TelnetTerminalServer {
             e.printStackTrace();
         }
 
-        new TelnetServer(nar, 1024);
+        new TextUI(nar, 1024);
 
 
     }
@@ -92,11 +106,11 @@ public class TelnetServer extends TelnetTerminalServer {
 
         private static final long GUI_UPDATE_MS = 250;
 
-        private final TelnetTerminal terminal;
+        private final Terminal terminal;
         private TerminalScreen screen;
 
 
-        public TelnetSession(TelnetTerminal terminal) {
+        public TelnetSession(Terminal terminal) {
             this.terminal = terminal;
         }
 
@@ -105,7 +119,8 @@ public class TelnetServer extends TelnetTerminalServer {
 
 
             try {
-                terminal.setMouseCaptureMode(MouseCaptureMode.CLICK);
+                if (terminal instanceof ANSITerminal)
+                    ((ANSITerminal)terminal).setMouseCaptureMode(MouseCaptureMode.CLICK);
 
                 screen = new TerminalScreen(terminal);
                 screen.startScreen();
@@ -113,7 +128,7 @@ public class TelnetServer extends TelnetTerminalServer {
 
                 final MultiWindowTextGUI textGUI = new MultiWindowTextGUI(screen);
                 textGUI.setBlockingIO(false);
-                textGUI.setEOFWhenNoWindows(true);
+                //textGUI.setEOFWhenNoWindows(true);
 
 
                 TextColor.Indexed limegreen = TextColor.ANSI.Indexed.fromRGB(127, 255, 0);

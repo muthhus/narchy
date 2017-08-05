@@ -17,10 +17,12 @@ import nars.video.*;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
+import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.MatrixView;
 import spacegraph.widget.meter.Plot2D;
 
+import javax.swing.plaf.TextUI;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
@@ -111,18 +113,18 @@ abstract public class NAgentX extends NAgent {
 
         int THREADS = 3;
         NAR n = new NARS()
-                    .exe(
+                .exe(
                         new MultiExecutioner((i) ->
-                            new MultiExecutioner.Worker(
-                                    //new BufferedExecutioner(96, 32, 0.05f)
-                                    new FocusedExecutioner()
-                            ),THREADS, 2))
-                    .time(clock)
-                    .index(
-                        new CaffeineIndex(128 * 1024 )
+                                new MultiExecutioner.Worker(
+                                        //new BufferedExecutioner(96, 32, 0.05f)
+                                        new FocusedExecutioner()
+                                ), THREADS, 2))
+                .time(clock)
+                .index(
+                        new CaffeineIndex(128 * 1024)
                         //new HijackTermIndex(128 * 1024,  4)
-                    )
-                    .get();
+                )
+                .get();
 
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
@@ -131,7 +133,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.5f);
 
 
-        float priFactor = 0.5f;
+        float priFactor = 0.05f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
@@ -143,9 +145,7 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 4f);
         MySTMClustered stmGoal = new MySTMClustered(n, 64, GOAL, 3, true, 4f);
         Inperience inp = new Inperience(n, 8, 0.5f);
-        Abbreviation abb = new Abbreviation(n, "z", 3, 8, 0.5f, 32);
-
-
+        Abbreviation abb = new Abbreviation(n, "z", 3, 8, 0.05f, 32);
 
 
         NAgent a = init.apply(n);
@@ -204,7 +204,7 @@ abstract public class NAgentX extends NAgent {
 ////                                new MatrixView(((MultiHaiQMixAgent) m.agent).agent[3].q)
 ////                        ),
 
-                        // //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
+                // //new MatrixView(((MultiHaiQMixAgent)m.agent).agent[0].et),
 
 //                        MatrixView.get(m.mixControl, 4, (x, gl) -> {
 //                            Draw.colorBipolar(gl, (x - 0.5f) * 2f);
@@ -225,7 +225,7 @@ abstract public class NAgentX extends NAgent {
         int s = nar.values.size();
         return new MatrixView((i) ->
                 nar.values.get(i).value(),
-                s,  Math.max(1, (int)Math.round(Math.sqrt(s)) ), bipolar1);
+                s, Math.max(1, (int) Math.round(Math.sqrt(s))), bipolar1);
     }
 
     private static void chart(NAR n, NAgent a) {
@@ -320,6 +320,7 @@ abstract public class NAgentX extends NAgent {
 
                     grid(
                             new WindowButton("log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f))),
+                            new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session()))),
                             new WindowButton("prompt", () -> Vis.newInputEditor(), 300, 60)
                     ),
 
@@ -445,7 +446,7 @@ abstract public class NAgentX extends NAgent {
         return senseCameraRetina($(id), w, pw, ph);
     }
 
-    protected CameraSensor<PixelBag> senseCameraRetina(Term id, Supplier<BufferedImage> w, int pw, int ph)  {
+    protected CameraSensor<PixelBag> senseCameraRetina(Term id, Supplier<BufferedImage> w, int pw, int ph) {
         PixelBag pb = PixelBag.of(w, pw, ph);
         pb.addActions(id, this);
         return senseCamera(id, pb);
