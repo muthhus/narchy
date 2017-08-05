@@ -527,7 +527,9 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void testPosPosImplicationConc() {
 
+        // ((%1,(%2==>%3),belief(positive),notImplEqui(%1),time(urgent)),(subIfUnifiesAny(%3,%2,%1),((DeductionRecursive-->Belief),(InductionRecursive-->Goal))))
         test
+                .log()
                 .input("(x). %1.0;0.90%")
                 .input("((x) ==> (y)).")
                 .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
@@ -561,22 +563,22 @@ public class NAL5Test extends AbstractNALTest {
 
         test
                 //.log()
-                .input("(x). %0.0;0.90%")
-                .input("((--,(x)) ==> (--,(y))).")
-                .mustBelieve(cycles * 2, "(y)", 0.0f, 0.81f)
-                .mustNotOutput(cycles * 2, "(y)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
+                .input("x. %0.0;0.90%")
+                .input("((--,x) ==> (--,y)).")
+                .mustBelieve(cycles * 2, "y", 0.0f, 0.81f)
+                .mustNotOutput(cycles * 2, "y", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
         ;
     }
 
     @Test
     public void testDeductionNegPosImplicationPred() {
 
+        //nothing hsould be derived
         test
-                //.log()
                 .input("(y). %1.0;0.90%")
                 .input("((--,(y)) ==> (x)).")
-                .mustBelieve(cycles, "(x)", 0.0f, 0.81f)
-                .mustNotOutput(cycles, "(x)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)
+//                .mustBelieve(cycles, "(x)", 0.0f, 0.81f)
+                .mustNotOutput(cycles, "(x)", BELIEF, 0f, 1f, 0, 1, ETERNAL)
         ;
     }
     @Test
