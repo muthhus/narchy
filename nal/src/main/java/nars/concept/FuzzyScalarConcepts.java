@@ -77,11 +77,11 @@ public class FuzzyScalarConcepts extends ProxyTerm {
     };
 
 
-    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull Compound... states) {
+    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull Term... states) {
         this(input, nar, FuzzyTriangle, states);
     }
 
-    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, FuzzyModel truther,  @NotNull Compound... states) {
+    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, FuzzyModel truther,  @NotNull Term... states) {
         this(input::floatValue, nar, truther, states);
     }
 
@@ -99,7 +99,7 @@ public class FuzzyScalarConcepts extends ProxyTerm {
         Truth truth(float valueNormalized, int conceptIndex, int maxConcepts, NAR nar);
     }
 
-    public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, FuzzyModel truther, @NotNull Compound... states) {
+    public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, FuzzyModel truther, @NotNull Term... states) {
         super($.func("FuzzyScalarConcepts", states));
 
         this.conf = nar.confDefault(Op.BELIEF);
@@ -112,7 +112,7 @@ public class FuzzyScalarConcepts extends ProxyTerm {
 
         if (num > 1) {
             int i = 0;
-            for (Compound s : states) {
+            for (Term  s : states) {
                 final int ii = i++;
                 sensors.add( new SensorConcept(s, nar, this.input,
                         (x) -> truther.truth(x, ii, num, nar)

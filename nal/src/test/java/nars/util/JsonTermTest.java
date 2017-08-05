@@ -6,11 +6,11 @@ import nars.NARS;
 import nars.Narsese;
 import nars.task.util.TaskRule;
 import nars.term.atom.Atomic;
-import nars.term.obj.JsonCompound;
+import nars.term.obj.JsonTerm;
 import nars.time.Tense;
 import org.junit.Test;
 
-public class JsonCompoundTest {
+public class JsonTermTest {
 
     @Test public void testJsonArray() throws Narsese.NarseseException {
         NAR d = new NARS().get();
@@ -21,7 +21,7 @@ public class JsonCompoundTest {
         //d.believe( $.inh( JsonCompound.the("['a', 1, ['b', 'c']]"), $.the("(json,1)")  ) );
         //TaskProcess: $.50;.95$ (("a"),(1),(("b"),("c"))). %1.0;.90% {0: 1}
 
-        d.believe( $.inh( JsonCompound.the("{ x: 3, y: [\"a\",4] }"), $.$("(json,2)") ) );
+        d.believe( $.inh( JsonTerm.the("{ x: 3, y: [\"a\",4] }"), $.$("(json,2)") ) );
         //d.believe( $.inh( JsonCompound.the("{ x: 3 }"), $.$("(json,2)") ) );
         //               $.15;.86$ X(3,2). %1.0;.81% {1: 1;;}
 
@@ -40,7 +40,7 @@ public class JsonCompoundTest {
                 "{\"coord\":{\"lon\":139.01,\"lat\":35.02},\"weather\":[{\"id\":800,\"main\":\"Clear\",\"description\":\"clear sky\",\"icon\":\"01n\"}],\"base\":\"stations\",\"main\":{\"temp\":285.514,\"pressure\":1013.75,\"humidity\":100,\"temp_min\":285.514,\"temp_max\":285.514,\"sea_level\":1023.22,\"grnd_level\":1013.75},\"wind\":{\"speed\":5.52,\"deg\":311},\"clouds\":{\"all\":0},\"dt\":1485792967,\"sys\":{\"message\":0.0025,\"country\":\"JP\",\"sunrise\":1485726240,\"sunset\":1485763863},\"id\":1907296,\"name\":\"Tawarano\",\"cod\":200}"
         }) {
             Atomic id = Atomic.the("WEATHER_" + (n++));
-            d.believe($.inh(JsonCompound.the(json), id), Tense.Eternal);
+            d.believe($.inh(JsonTerm.the(json), id), Tense.Eternal);
             d.believe($.inst(id, Atomic.the("now")), Tense.Present);
         }
         d.run(256);

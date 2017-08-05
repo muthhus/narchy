@@ -859,12 +859,15 @@ public class Temporalize {
         if (o.temporal) {
             int tts = target.size();
             if (tts == 2) {
-                Term a = target.sub(0);
-                Term b = target.sub(1);
 
+                Term a = target.sub(0);
                 Event ra = solve(a);
+
                 if (ra != null) {
+
+                    Term b = target.sub(1);
                     Event rb = solve(b);
+
                     if (rb != null) {
                         return solveTemporal(trail, o, ra, rb, a, b);
                     }

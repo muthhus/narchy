@@ -9,7 +9,7 @@ import nars.term.atom.Atomic;
 /**
  * Created by me on 4/2/17.
  */
-public enum JsonCompound  { ;
+public enum JsonTerm { ;
 
 
     public static Term the(JsonNode j) {

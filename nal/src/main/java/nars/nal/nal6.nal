@@ -189,18 +189,18 @@
 
 // conditional deduction "An inverse inference has been implemented as a form of deduction" https://code.google.com/p/open-nars/issues/detail?id=40&can=1
 
-    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U,strict), (Belief:Deduction)
-        (U --> L), ((&&,--(#X --> L),(#X --> R),A..*) ==> Z) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U,strict), (Belief:DeductionN)
+    (U --> L), ((&&,(#X --> L),(#X --> R),A..*) ==> Z) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U), (Belief:Deduction)
+        (U --> L), ((&&,--(#X --> L),(#X --> R),A..*) ==> Z) |- substitute(((&&,A..*,(U --> R)) ==>+- Z),#X,U), (Belief:DeductionN)
 
 
 
 //// second level variable handling rules ////////////////////////////////////////////////////////////////////////////////////
 //second level variable elimination (termlink level2 growth needed in order for these rules to work)
 
-    (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)) |- substitute((&&, (#X --> L), A), $Y, B, strict), (Belief:Deduction)
-        (B --> K), (&&,(#X --> L),((--,($Y --> K)) ==> A)) |- substitute((&&, (#X --> L), A), $Y, B, strict), (Belief:DeductionN)
-    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B, strict), (Belief:AnonymousAnalogy)
-        (B --> K), (($X --> L) ==> (&&,--(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B, strict), (Belief:AnonymousAnalogyN)
+    (B --> K), (&&,(#X --> L),(($Y --> K) ==> A)) |- substitute((&&, (#X --> L), A), $Y, B), (Belief:Deduction)
+        (B --> K), (&&,(#X --> L),((--,($Y --> K)) ==> A)) |- substitute((&&, (#X --> L), A), $Y, B), (Belief:DeductionN)
+    (B --> K), (($X --> L) ==> (&&,(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogy)
+        (B --> K), (($X --> L) ==> (&&,--(#Y --> K),A..+)) |- substitute((($X --> L) ==>+- (&&,A..+)),#Y,B), (Belief:AnonymousAnalogyN)
 
 
 //precondition combiner inference rule (variable_unification6):

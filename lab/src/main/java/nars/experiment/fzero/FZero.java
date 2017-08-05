@@ -76,9 +76,10 @@ public class FZero extends NAgentX {
         //senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
-        senseNumberBi($.prop(the("ang"), id), new FloatNormalized(() ->
-                (float) MathUtils.normalizeAngle(fz.playerAngle, Math.PI) / (Math.PI*2))
-        ).resolution(0.01f);
+        senseNumber($.prop(the("ang"), id), new FloatNormalized(() ->
+                (float) MathUtils.normalizeAngle(fz.playerAngle, Math.PI) / (Math.PI*2)),
+                8
+        ).resolution(0.05f);
 
         //nar.mix.stream("Derive").setValue(1);
         //implAccelerator(nar, this);

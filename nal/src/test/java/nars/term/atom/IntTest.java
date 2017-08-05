@@ -51,6 +51,13 @@ public class IntTest {
         n.run(10);
     }
 
+
+
+//    @Test
+//    public void testIntersectionAndSim() throws Narsese.NarseseException {
+//        assertEquals("((18..19,16)<->zlj)", $.$("(((18,16)&(19,16))<->zlj)").toString());
+//    }
+
     @Test
     public void testIntInProductIntersectionReduction() throws Narsese.NarseseException {
 

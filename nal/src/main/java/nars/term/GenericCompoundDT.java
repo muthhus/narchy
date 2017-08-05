@@ -34,6 +34,9 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
 
         if (Param.DEBUG) {
 
+            final int SAFETY_DT = 1000000;
+            assert(dt==DTERNAL || dt==XTERNAL || Math.abs(dt) <= SAFETY_DT): "possibly invalid dt=" + dt;
+
             Op op = base.op();
 
             @NotNull TermContainer subterms = base.subterms();

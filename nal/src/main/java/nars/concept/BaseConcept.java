@@ -12,7 +12,9 @@ import nars.table.QuestionTable;
 import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termlike;
+import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,6 +67,7 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
                 beliefs!=null ? beliefs : conceptBuilder.newBeliefTable(term, true),
                 goals!=null ? goals : conceptBuilder.newBeliefTable(term, false),
                 conceptBuilder.newQuestionTable(), conceptBuilder.newQuestionTable(), conceptBuilder.newLinkBags(term));
+        assert(!(term instanceof Bool) && !(term instanceof Variable));
     }
 
 

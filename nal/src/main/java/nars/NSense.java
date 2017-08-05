@@ -189,7 +189,7 @@ public interface NSense {
     }
 
     @NotNull
-    default FuzzyScalarConcepts senseNumber(FloatSupplier v, Compound... states) {
+    default FuzzyScalarConcepts senseNumber(FloatSupplier v, Term... states) {
 
         assert(states.length > 1);
 
@@ -210,6 +210,13 @@ public interface NSense {
     }
 
     @NotNull
+    default FuzzyScalarConcepts senseNumber(Term id, FloatSupplier v, int precision)  {
+        return senseNumber(v, Util.map(0, precision,
+                (int x) -> ($.inh($.the(x), id)),
+                Term[]::new));
+    }
+
+    @NotNull
     default FuzzyScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
         return senseNumber(v, prop(id, LOW), prop(id, HIH));
     }
@@ -219,7 +226,7 @@ public interface NSense {
     }
 
     default SensorConcept senseNumber(String id, FloatSupplier v) throws Narsese.NarseseException {
-        return senseNumber(compoundOrNull($(id)), v);
+        return senseNumber($(id), v);
     }
 
     /**

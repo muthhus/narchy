@@ -40,10 +40,10 @@ public class Line1DSimplest extends NAgent {
 //        in = senseNumber( $.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
 //                this.i
 //        );
-        in = senseNumberBi(
+        in = senseNumber(
                 //$.inh($.the("i"), id),
                 $.the("i"),
-                this.i);
+                this.i, 4);
 
 //        action( new GoalActionConcept($.p($.the("o"), id), nar, (b,d) -> {
 //            if (d!=null) {

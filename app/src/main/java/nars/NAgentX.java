@@ -6,6 +6,7 @@ import nars.exe.FocusedExecutioner;
 import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
+import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
@@ -127,7 +128,7 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.75f);
+        n.goalConfidence(0.5f);
 
 
         float priFactor = 0.5f;
@@ -142,7 +143,7 @@ abstract public class NAgentX extends NAgent {
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 4f);
         MySTMClustered stmGoal = new MySTMClustered(n, 64, GOAL, 3, true, 4f);
         Inperience inp = new Inperience(n, 8, 0.5f);
-        //Abbreviation abb = new Abbreviation(n, "z", 8, 16, 0.01f, 32);
+        Abbreviation abb = new Abbreviation(n, "z", 3, 8, 0.5f, 32);
 
 
 
