@@ -583,7 +583,7 @@ public class Gradius4K extends GamePanel {
                         if (playerShootDelay > 0) {
                             playerShootDelay--; // prevent player from shooting continuously
                         } else if (keys[VK_SHOOT]) {
-                            playerShootDelay = 10;
+                            playerShootDelay = 5;
 
                             // player shoots
                             for (k = 0; k < 2; k++) {
