@@ -43,8 +43,8 @@ public interface Priority extends Prioritized {
     Comparator<Priority> COMPARATOR = (Priority a, Priority b) -> {
         if (a == b) return 0;
 
-        float ap = a.priSafe(-1);
-        float bp = b.priSafe(-1);
+        float ap = a.priElseNeg1();
+        float bp = b.priElseNeg1();
 //        if (a.equals(b)) {
 //            a.priMax(bp);
 //            b.priMax(ap); //max merge budgets
@@ -86,7 +86,7 @@ public interface Priority extends Prioritized {
 
     @NotNull
     static Ansi.Color budgetSummaryColor(@NotNull Prioritized tv) {
-        int s = (int) Math.floor(tv.priSafe(0) * 5);
+        int s = (int) Math.floor(tv.priElseZero() * 5);
         switch (s) {
             default:
                 return Ansi.Color.DEFAULT;
@@ -104,10 +104,10 @@ public interface Priority extends Prioritized {
     }
 
     default float priMax(float max) {
-        return setPri(Math.max(priSafe(0), max));
+        return setPri(Math.max(priElseZero(), max));
     }
     default void priMin(float min) {
-        setPri(Math.min(priSafe(0), min));
+        setPri(Math.min(priElseZero(), min));
     }
 
     default float priAdd(float toAdd) {
@@ -125,17 +125,17 @@ public interface Priority extends Prioritized {
 
 //    default float priAddAndGetDelta(float toAdd) {
 //
-//        float before = priSafe(0);
+//        float before = priElseZero();
 //        return setPri(before + notNaN(toAdd)) - before;
 //    }
 
     default float priSub(float toSubtract) {
-        //setPri(priSafe(0) - toSubtract);
+        //setPri(priElseZero() - toSubtract);
         return priAdd(-toSubtract);
     }
 
     default void priSub(float maxToSubtract, float minFractionRetained) {
-        float p = priSafe(0);
+        float p = priElseZero();
         if (p > 0) {
             float pMin = minFractionRetained * p;
             float pNext = Math.max((p - maxToSubtract), pMin);
@@ -150,7 +150,7 @@ public interface Priority extends Prioritized {
     }
 
 //    default void priAvg(float pOther, float rate) {
-//        float cu = priSafe(0);
+//        float cu = priElseZero();
 //        setPriority(Util.lerp(rate, (cu + pOther)/2f, cu));
 //    }
 
@@ -163,7 +163,7 @@ public interface Priority extends Prioritized {
             return 0; //no change
         }
 
-        float before = priSafe(0);
+        float before = priElseZero();
         float next = priAdd(toAdd);
         float delta = next - before;
         float excess = toAdd - delta;
@@ -180,7 +180,7 @@ public interface Priority extends Prioritized {
             return 0; //no change
         }
 
-        float before = priSafe(0);
+        float before = priElseZero();
         float next = priAdd(toAdd);
         float delta = next - before;
 
@@ -232,7 +232,7 @@ public interface Priority extends Prioritized {
 
 //    default void absorb(@Nullable MutableFloat overflow) {
 //        if (overflow!=null) {
-//            float taken = Math.min(overflow.floatValue(), 1f - priSafe(0));
+//            float taken = Math.min(overflow.floatValue(), 1f - priElseZero());
 //            if (taken > EPSILON_DEFAULT) {
 //                overflow.subtract(taken);
 //                priAdd(taken);
@@ -279,7 +279,7 @@ public interface Priority extends Prioritized {
      * normalizes the current value to within: min..(range+min), (range=max-min)
      */
     default void normalizePri(float min, float range, float lerp) {
-        float p = priSafe(-1);
+        float p = priElseNeg1();
         if (p < 0) return; //dont normalize if deleted
 
         priLerp((p - min) / range, lerp);

@@ -1,5 +1,6 @@
 package nars.bag.leak;
 
+import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
@@ -17,7 +18,10 @@ import java.util.function.Consumer;
 abstract public class LeakOut extends TaskLeak<Task,PriReference<Task>> {
 
     protected LeakOut(NAR nar, int capacity, float rate) {
-        super(new PLinkArrayBag<>(capacity, PriMerge.max, new ConcurrentHashMap<>()), rate, nar);
+        super(
+                //new PLinkArrayBag<>(capacity, PriMerge.max, new ConcurrentHashMap<>())
+                new ConcurrentCurveBag<>(PriMerge.max, new ConcurrentHashMap(capacity), nar.random(), capacity)
+                , rate, nar);
     }
 
     @Override protected float onOut(@NotNull PriReference<Task> t) {

@@ -32,15 +32,15 @@ import static java.util.Collections.singleton;
 /**
  * inner sense: low-level internal experience
  */
-public class NiNner extends ConcurrentMonitorRegistry.WithJMX {
+public class NInner extends ConcurrentMonitorRegistry.WithJMX {
 
-    static final Logger logger = LoggerFactory.getLogger(NiNner.class);
+    static final Logger logger = LoggerFactory.getLogger(NInner.class);
 
     private final NAR nar;
     //private final MetricPoller poller;
     private On onCycle;
 
-    public NiNner(NAR n) {
+    public NInner(NAR n) {
         super("NAR." + n.self());
         this.nar = n;
 

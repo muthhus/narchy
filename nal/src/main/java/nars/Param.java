@@ -160,14 +160,14 @@ public abstract class Param  {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 12;
-    public static final int CAUSE_CAPACITY = 10;
+    public static final int CAUSE_CAPACITY = 8;
 
     public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
 
     public static final int UnificationVariableCapInitial = 8;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(256);
+    public final MutableInteger matchTTL = new MutableInteger(96);
     @Deprecated public final int UnificationTTLMax = matchTTL.intValue();
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */

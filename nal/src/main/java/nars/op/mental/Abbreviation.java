@@ -1,5 +1,6 @@
 package nars.op.mental;
 
+import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
 import jcog.data.MutableIntRange;
 import jcog.pri.PLink;
@@ -66,8 +67,8 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
         super(
-                new CurveBag(PriMerge.plus, new ConcurrentHashMap<>(capacity), n.random(), capacity
-                ), selectionRate, n);
+                new ConcurrentCurveBag(PriMerge.plus, new ConcurrentHashMap<>(capacity), n.random(), capacity)
+            , selectionRate, n);
 
         this.nar = n;
         this.termPrefix = termPrefix;

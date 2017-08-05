@@ -1041,6 +1041,10 @@ public enum Op implements $ {
             left = t;
         }
 
+        if (dt == 0 || dt == DTERNAL) {
+            return CONJ.the(dt, left, right); //send through again
+        }
+
         GenericCompound g = new GenericCompound(CONJ,
                 TermVector.the(left, right)
         );

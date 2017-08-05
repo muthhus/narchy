@@ -16,9 +16,10 @@ public interface Prioritized extends Deleteable {
      * a value in range 0..1.0 inclusive.
      * if the value is NaN, then it means this has been deleted
      */
-    default float pri() {
+    /*default float pri() {
         return priority().pri();
-    }
+    }*/
+    float pri();
 
     default float priSafe(float valueIfDeleted) {
         float p = pri();
@@ -26,7 +27,14 @@ public interface Prioritized extends Deleteable {
     }
 
     default float priElseZero() {
-        return priSafe(0);
+        float p = pri();
+        return p == p ? p : 0;
+        //return priSafe(0);
+    }
+    default float priElseNeg1() {
+        float p = pri();
+        return p == p ? p : -1;
+        //return priSafe(-1);
     }
 
 
@@ -47,20 +55,13 @@ public interface Prioritized extends Deleteable {
     static float priSum(@NotNull Iterable<? extends Prioritized> c) {
         float totalPriority = 0;
         for (Prioritized i : c)
-            totalPriority += i.priSafe(0);
+            totalPriority += i.priElseZero();
         return totalPriority;
     }
 
     default boolean equalsBudget(@NotNull Prioritized t, float epsilon) {
-        return Util.equals(priSafe(-1), t.priSafe(-1), epsilon);
+        return Util.equals(priElseNeg1(), t.priElseNeg1(), epsilon);
     }
-
-    /** useful for sorting */
-    static float oneMinusPri(Prioritized p) {
-        return 1f - p.pri();
-    }
-
-
 
 
 //    static void normalizePriSum(@NotNull Iterable<? extends Prioritized> l, float total) {

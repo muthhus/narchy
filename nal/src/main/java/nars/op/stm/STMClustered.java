@@ -2,36 +2,34 @@ package nars.op.stm;
 
 import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.impl.hijack.DefaultHijackBag;
+import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Node;
-import jcog.pri.PriReference;
-import jcog.pri.Prioritized;
 import jcog.pri.WeakPLinkUntilDeleted;
-import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Task;
 import nars.truth.Truth;
 import nars.truth.Truthed;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 /**
  * clusterjunctioning
+ * TODO abstract into general purpose "Cluster of Bags" class
  */
 public abstract class STMClustered extends STM {
 
 
-    final @Nullable Bag<Task, PriReference<Task>> input;
+    //final @Nullable Bag<Task, PriReference<Task>> input;
 
     final short clusters;
     public final int dims;
@@ -47,23 +45,53 @@ public abstract class STMClustered extends STM {
 
     public final byte punc;
 
-    final Deque<TasksNode> removed =
-            new ArrayDeque<>();
+//    final Deque<TasksNode> removed =
+//            new ArrayDeque<>();
     //new ConcurrentLinkedDeque<>();
 
     final static double[] noCoherence = {0, 0};
 
     public final class TasksNode extends Node {
 
+        private final Bag<TLink, TLink> tasks;
+
         /**
          * current members
          */
-        public final Set<TLink> tasks = nar.exe.concurrent() ?
-                Collections.newSetFromMap(new ConcurrentHashMap<>()) : new LinkedHashSet<>();
 
 
         public TasksNode(int id) {
+
             super(id, dims);
+            tasks = new PriorityHijackBag<TLink, TLink>(capacity.intValue(), 3) {
+
+                @Override
+                protected TLink merge(@NotNull STMClustered.TLink existing, @NotNull STMClustered.TLink incoming, @Nullable MutableFloat overflowing) {
+                    existing.priMax(incoming.priElseZero());
+                    return existing;
+//                    float overflow =
+//                    if (overflow > 0) {
+//                        //pressurize(-overflow);
+//                        if (overflowing != null) overflowing.add(overflow);
+//                    }
+//                    return existing; //default to the original instance
+                }
+
+                @Override
+                protected Consumer<TLink> forget(float rate) {
+                    return null;
+                }
+
+                @Override
+                public void onAdded(@NotNull TLink x) {
+                    x.node = TasksNode.this;
+                }
+
+                @Override
+                public TLink key(TLink value) {
+                    return value;
+                }
+            };
         }
 
         @Override
@@ -103,9 +131,9 @@ public abstract class STMClustered extends STM {
             insert(x);
         }
 
-        protected boolean remove(@NotNull TLink x) {
+        protected void remove(@NotNull TLink x) {
             x.node = null;
-            return tasks.remove(x);
+            tasks.remove(x);
         }
 
         public int size() {
@@ -115,17 +143,11 @@ public abstract class STMClustered extends STM {
         public void insert(@NotNull TLink x) {
 
             if (x.node != this) {
-                tasks.add(x);
-                x.node = this;
+                tasks.putAsync(x);
             }
 
 
         }
-
-        public void delete() {
-            tasks.clear();
-        }
-
 
         /**
          * inverse of variance measured from the items for a given vector dimension
@@ -184,7 +206,9 @@ public abstract class STMClustered extends STM {
 
         }
 
-        /** returns the range of values seen for the given dimension */
+        /**
+         * returns the range of values seen for the given dimension
+         */
         public double range(int dim) {
             final double[] min = {Double.POSITIVE_INFINITY};
             final double[] max = {Double.NEGATIVE_INFINITY};
@@ -253,9 +277,6 @@ public abstract class STMClustered extends STM {
             return false;
         }
 
-        public void migrate() {
-            nearest().insert(this);
-        }
 
 //        @Override
 //        public int compareTo(TLink o) {
@@ -272,8 +293,10 @@ public abstract class STMClustered extends STM {
     }
 
 
-    /** allows transparent filtering of a task's coord vector just prior to gasnet learning.
-     * ex: for normalization or shifting of time etc */
+    /**
+     * allows transparent filtering of a task's coord vector just prior to gasnet learning.
+     * ex: for normalization or shifting of time etc
+     */
     protected double[] filter(@NotNull double[] coord) {
         return coord;
     }
@@ -302,9 +325,9 @@ public abstract class STMClustered extends STM {
         this.punc = punc;
 
 
-        this.input =
-                //new ArrayBag<>(capacity.intValue(), PriMerge.max, new ConcurrentHashMap<>(capacity.intValue())) {
-                new DefaultHijackBag<>(PriMerge.max, capacity.intValue(), 3) {
+//        this.input =
+//                //new ArrayBag<>(capacity.intValue(), PriMerge.max, new ConcurrentHashMap<>(capacity.intValue())) {
+//                new DefaultHijackBag<>(PriMerge.max, capacity.intValue(), 3) {
 
 //            @NotNull
 //            @Override
@@ -315,15 +338,15 @@ public abstract class STMClustered extends STM {
 //            }
 
 
-                    @Override
-                    public void onRemoved(@NotNull PriReference<Task> value) {
-//                        TasksNode owner = ((TLink) value).node;
-//                        if (owner != null)
-//                            owner.remove((TLink) value);
-//                        value.delete();
-                    }
-
-                };
+//                    @Override
+//                    public void onRemoved(@NotNull PriReference<Task> value) {
+////                        TasksNode owner = ((TLink) value).node;
+////                        if (owner != null)
+////                            owner.remove((TLink) value);
+////                        value.delete();
+//                    }
+//
+//                };
 
         this.net = new NeuralGasNet<>(dims, clusters) {
             @NotNull
@@ -334,10 +357,25 @@ public abstract class STMClustered extends STM {
                 return c;
             }
 
+//                    public void onRemoved(@NotNull TLink value) {
+//                        TasksNode owner = ((TLink) value).node;
+//                        if (owner != null)
+//                            owner.remove((TLink) value);
+//                        value.delete();
+//                    }
+
             @Override
             protected void removed(TasksNode furthest) {
                 //System.err.println("node removed: " + furthest);
-                removed.add(furthest);
+                //removed.add(furthest);
+                synchronized (net) {
+                    furthest.tasks.sample(t -> {
+                        //TODO either attempt re-insert or delete
+                        t.delete();
+                        return Bag.BagSample.Remove;
+                    });
+                }
+
             }
         };
 
@@ -356,26 +394,17 @@ public abstract class STMClustered extends STM {
 
             now = nar.time();
 
-            int rr = removed.size();
-            for (int i = 0; i < rr; i++) {
-                TasksNode t = removed.pollFirst();
-                t.tasks.forEach(TLink::migrate);
-                t.delete();
-            }
+//            int rr = removed.size();
+//            for (int i = 0; i < rr; i++) {
+//                TasksNode t = removed.pollFirst();
+//                t.tasks.forEach(TLink::migrate);
+//                t.delete();
+//            }
 
-            input.setCapacity(capacity.intValue());
-            input.commit();
+//            input.setCapacity(capacity.intValue());
+//            input.commit();
 
             net.compact();
-
-
-            input.forEach(t -> {
-
-                TLink tt = (TLink) t;
-                tt.nearest().transfer(tt);
-
-            });
-            input.clear();
 
             busy.set(false);
             return true;
@@ -387,7 +416,6 @@ public abstract class STMClustered extends STM {
 
     @Override
     public void clear() {
-        input.clear();
         net.clear();
     }
 
@@ -395,24 +423,27 @@ public abstract class STMClustered extends STM {
     public void accept(@NotNull Task t) {
 
 
-        if (t.punc() == punc) {
-            if (t.isEternal())
-                return;
+        if (t.punc() == punc && !t.isEternal()) {
 
-            input.put(new TLink(t));
+            TLink tt = new TLink(t);
+            synchronized (net) {
+                tt.nearest().transfer(tt);
+            }
+
         }
 
     }
 
     public int size() {
-        return input.size();
+        int sum[] = new int[1];
+        net.forEachNode(x -> sum[0] += x.tasks.size());
+        return sum[0];
     }
 
     public void print(@NotNull PrintStream out) {
         out.println(this + " @" + now + ", x " + size() + " tasks");
-        out.println("\tNode Sizes: " + nodeStatistics() + "\t+" + removed.size() + " nodes pending migration ("
-                + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
-        out.println("\tBag Priority: " + bagStatistics());
+//        out.println("\tNode Sizes: " + nodeStatistics() + "\t+" + removed.size() + " nodes pending migration ("
+//                + removed.stream().mapToInt(TasksNode::size).sum() + " tasks)");
         net.forEachNode(v -> {
             out.println(v);
             out.println("\t[Avg,Coherence]: Temporal=" + Arrays.toString(v.coherence(0)) +
@@ -429,10 +460,6 @@ public abstract class STMClustered extends STM {
 
     public IntSummaryStatistics nodeStatistics() {
         return net.nodeStream().mapToInt(TasksNode::size).summaryStatistics();
-    }
-
-    public DoubleSummaryStatistics bagStatistics() {
-        return StreamSupport.stream(input.spliterator(), false).mapToDouble(Prioritized::pri).summaryStatistics();
     }
 
 

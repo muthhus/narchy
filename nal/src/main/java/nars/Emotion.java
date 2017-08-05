@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.SortedMap;
 
 import static jcog.Texts.n4;
-import static nars.NiNner.id;
+import static nars.NInner.id;
 
 /**
  * emotion state: self-felt internal mental states; variables used to record emotional values

@@ -7,7 +7,7 @@ import org.eclipse.collections.api.block.procedure.primitive.ShortProcedure;
 /**
  * Created by me on 5/25/16.
  */
-public class SemiDenseIntUndirectedGraph implements IntUndirectedGraph {
+public class SemiDenseShortUndirectedGraph implements ShortUndirectedGraph {
 
 
     protected final int V; //# of vertices
@@ -15,7 +15,7 @@ public class SemiDenseIntUndirectedGraph implements IntUndirectedGraph {
 
 
     //Constructor with a pre-supplied number of vertices
-    public SemiDenseIntUndirectedGraph(short V) {
+    public SemiDenseShortUndirectedGraph(short V) {
         this.V = V;
         
         adj = new MyShortIntHashMap[V];

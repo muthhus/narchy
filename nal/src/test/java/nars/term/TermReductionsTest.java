@@ -459,6 +459,13 @@ public class TermReductionsTest extends NarseseTest {
 
     }
 
+    @Test public void testConjunctionParallelWithConjunctionParallel() throws Narsese.NarseseException {
+        assertEquals(
+            "(&|,nario(13,27),nario(21,27),nario(24,27))",
+                $("((nario(21,27)&|nario(24,27))&|nario(13,27))").toString()
+        );
+    }
+
     @Test
     public void testTemporalConjunctionReduction2() throws Narsese.NarseseException {
         assertEquals("((b &&+1 c)&|a)", $("(a &&+0 (b &&+1 c))").toString());

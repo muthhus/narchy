@@ -23,7 +23,7 @@ abstract public class PriorityHijackBag<K,V extends Priority> extends HijackBag<
 
     @Override
     protected V merge(@NotNull V existing, @NotNull V incoming, @Nullable MutableFloat overflowing) {
-        float overflow = existing.priAddOverflow(incoming.priSafe(0));
+        float overflow = existing.priAddOverflow(incoming.priElseZero());
         if (overflow > 0) {
             //pressurize(-overflow);
             if (overflowing!=null) overflowing.add(overflow);

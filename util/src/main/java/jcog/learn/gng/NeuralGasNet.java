@@ -1,9 +1,9 @@
 package jcog.learn.gng;
 
 import com.google.common.base.Joiner;
-import jcog.learn.gng.impl.IntUndirectedGraph;
+import jcog.learn.gng.impl.ShortUndirectedGraph;
 import jcog.learn.gng.impl.Node;
-import jcog.learn.gng.impl.SemiDenseIntUndirectedGraph;
+import jcog.learn.gng.impl.SemiDenseShortUndirectedGraph;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -19,7 +19,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
     private final int dimension;
 
 
-    private final IntUndirectedGraph e;
+    private final ShortUndirectedGraph e;
     public final Node[] node;
 
     private int iteration;
@@ -74,7 +74,7 @@ abstract public class NeuralGasNet<N extends Node>  /*extends SimpleGraph<N, Con
         super();
 
         this.e =
-                new SemiDenseIntUndirectedGraph((short) maxNodes);
+                new SemiDenseShortUndirectedGraph((short) maxNodes);
                 //new DenseIntUndirectedGraph(maxNodes);
         this.node = new Node[maxNodes];
         clear();

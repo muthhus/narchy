@@ -41,7 +41,7 @@ public class FocusedExecutioner extends Executioner {
 
     final Random random = new XorShift128PlusRandom(1);
 
-    final CurveBag<ITask> premises = new CurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
+    final CurveBag<ITask> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
             new ConcurrentHashMap<>(), random, MAX_PREMISES);
 
     final CurveBag<ITask> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),

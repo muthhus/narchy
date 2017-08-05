@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL7Test extends AbstractNALTest {
 
-    public int cycles = 200;
+    public int cycles = 400;
 
 
     public void cycles(int numCycles) {

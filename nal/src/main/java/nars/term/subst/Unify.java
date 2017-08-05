@@ -306,7 +306,7 @@ public abstract class Unify extends Versioning implements Subst {
 
             if (x instanceof Variable && x.op() == y.op()) {
 
-                assert(!(y instanceof UnnormalizedVariable)):
+                assert(!(y instanceof UnnormalizedVariable) || (y instanceof CommonVariable)):
                         y + " (" + y.getClass() + ") is unnormalized: " + this + " unifying terms containing an unnormalized variable";
 
                 //TODO check if this is already a common variable containing y

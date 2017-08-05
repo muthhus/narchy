@@ -4,7 +4,7 @@ import org.eclipse.collections.api.block.predicate.primitive.IntPredicate;
 import org.eclipse.collections.api.block.procedure.primitive.ShortIntProcedure;
 import org.eclipse.collections.api.block.procedure.primitive.ShortProcedure;
 
-public interface IntUndirectedGraph {
+public interface ShortUndirectedGraph {
 
     void clear();
 

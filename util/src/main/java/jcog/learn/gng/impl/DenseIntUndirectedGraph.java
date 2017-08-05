@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * WARNING not finished yet, doesnt seem to work the same as SemiDense which was the original implementation
  */
-public class DenseIntUndirectedGraph implements IntUndirectedGraph {
+public class DenseIntUndirectedGraph implements ShortUndirectedGraph {
 
     public static final int CLEAR_VALUE = 0; //Integer.MIN_VALUE;
     public final int[][] data;

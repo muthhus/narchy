@@ -308,7 +308,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      * essentially the same as b.priIfFiniteElseNeg1 except it also includes a null test. otherwise they are interchangeable
      */
     static float pCmp(@Nullable Prioritized b) {
-        return (b == null) ? -2f : b.priSafe(-1); //sort nulls beneath
+        return (b == null) ? -2f : b.priElseNeg1(); //sort nulls beneath
 
 //        float p = b.pri();
 //        return p == p ? p : -1f;

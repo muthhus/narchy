@@ -283,7 +283,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
     @Override
     public TemporalBeliefTable newTemporalBeliefTable(Term c) {
-        if (c.complexity() < 16) {
+        if (c.complexity() < 12) {
             return new RTreeBeliefTable();
         } else {
             return new HijackTemporalBeliefTable();

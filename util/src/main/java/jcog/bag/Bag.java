@@ -532,7 +532,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         final double[] total = {0};
 
         pp.forEach(y -> {
-            float p = y.priSafe(0);
+            float p = y.priElseZero();
             if (p > 1f) p = 1f; //just to be safe
             int b = Util.bin(p, bins);
             x[b]++;

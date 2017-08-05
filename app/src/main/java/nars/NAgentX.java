@@ -6,7 +6,6 @@ import nars.exe.FocusedExecutioner;
 import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
@@ -140,10 +139,10 @@ abstract public class NAgentX extends NAgent {
 
 
         STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
-        MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 4, false, 4f);
-        MySTMClustered stmGoal = new MySTMClustered(n, 64, GOAL, 3, false, 4);
-        Inperience inp = new Inperience(n, 0.5f, 8);
-        Abbreviation abb = new Abbreviation(n, "z", 8, 16, 0.01f, 32);
+        MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 4f);
+        MySTMClustered stmGoal = new MySTMClustered(n, 64, GOAL, 3, true, 4f);
+        Inperience inp = new Inperience(n, 8, 0.5f);
+        //Abbreviation abb = new Abbreviation(n, "z", 8, 16, 0.01f, 32);
 
 
 
@@ -160,7 +159,7 @@ abstract public class NAgentX extends NAgent {
         chart(a);
         chart(n, a);
 
-        NiNner nin = new NiNner(n);
+        NInner nin = new NInner(n);
         nin.start();
 
         window(/*row*/(

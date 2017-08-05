@@ -39,7 +39,7 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
     }
 
     static void max(Priority existing, Prioritized incoming) {
-        float p = incoming.priSafe(0);
+        float p = incoming.priElseZero();
         if (p > 0)
             existing.priMax(p);
     }
@@ -61,8 +61,8 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
      * */
     static float blend(@NotNull Priority exi, @NotNull Prioritized inc, @NotNull PriMerge.PriMergeOp priMerge) {
 
-        float ePri = exi.priSafe(0);
-        float iPri = inc.priSafe(0);
+        float ePri = exi.priElseZero();
+        float iPri = inc.priElseZero();
 
         float nextPri;
         switch (priMerge) {

@@ -9,6 +9,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
+import nars.bag.leak.LeakOut;
 import nars.bag.leak.TaskLeak;
 import nars.control.CauseChannel;
 import nars.task.NALTask;
@@ -42,7 +43,7 @@ import static nars.time.Tense.ETERNAL;
  * <p>
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
  */
-public class Inperience extends TaskLeak<Task, PriReference<Task>> {
+public class Inperience extends LeakOut {
 
     public static final Logger logger = LoggerFactory.getLogger(Inperience.class);
 
@@ -134,10 +135,11 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
 
 //
 
-    public Inperience(@NotNull NAR n, float rate, int capacity) {
-        super(
-            new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), n.random(), capacity), rate, n
-        );
+    public Inperience(@NotNull NAR n, int capacity, float rate) {
+        super(n, capacity, rate);
+//        super(
+//            new CurveBag(PriMerge.max, new ConcurrentHashMap<>(capacity), n.random(), capacity), rate, n
+//        );
         this.nar = n;
 
         in = nar.newInputChannel(this);
@@ -221,9 +223,7 @@ public class Inperience extends TaskLeak<Task, PriReference<Task>> {
     }
 
     @Override
-    protected float onOut(@NotNull PriReference<Task> b) {
-
-        Task task = b.get();
+    protected float send(Task task) {
 
         //try {
         //        if (r == null)
