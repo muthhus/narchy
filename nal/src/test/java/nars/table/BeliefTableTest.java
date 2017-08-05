@@ -75,7 +75,10 @@ public class BeliefTableTest  {
         n.cycle();
         b.print();
 
-        assertEquals(0.86f, n.beliefTruth(b, n.time()).expectation(), 0.1f);
+        long when = n.time();
+        Truth bt = n.beliefTruth(b, when);
+        assertNotNull("belief truth " + b.term + " at " + when, bt);
+        assertEquals(0.86f, bt.expectation(), 0.1f);
 
         n.input("b:a. %0.2|0.7%");
         n.input("b:a. %0.1|0.8%"); //highest negative

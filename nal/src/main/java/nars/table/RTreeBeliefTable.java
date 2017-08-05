@@ -31,12 +31,12 @@ import static nars.table.TemporalBeliefTable.temporalTaskPriority;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
-    static final int minSampleRadiusInCycles = 0; //prevents sampling with 0 radius, if >0. used to provide precision in sub-duration ranges
+    static final int minSampleRadiusInCycles = 0; //value > 0 prevents sampling with 0 radius, if >0. used to provide precision in sub-duration ranges
 
     /**
      * in fractions of the table's contained temporal range
      */
-    static final float[] sampleRadii = {0f, 0.1f , 0.25f, 0.5f, 1f};
+    static final float[] sampleRadii = {0f, 0.1f , 0.25f, 0.5f, 1f + (1f)};
 
     final static int maxSamplesTruthpolated = 5;
 
@@ -52,7 +52,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * if the szie is less than or equal to this value, all the entries will
      * be evaluated when matching a task or interpolating a truth.
      */
-    private final static int EVAL_ALL_LTE_TASKS = 1;
+    private final static int EVAL_ALL_LTE_TASKS = 2;
 
 
     private transient NAR nar;
