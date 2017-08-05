@@ -415,10 +415,11 @@ public class TemporalizeTest {
         t.knowTerm($.$("(b &&+5 c)"), 6);
         assertEquals("(a &&+5 b)@[1..6]", t.solve($.$("(a &&+- b)")).toString());
         assertEquals("((a &&+5 b) &&+5 c)@[1..11]", t.solve($.$("((a &&+- b) &&+- c)")).toString());
-        assertEquals("((a &&+5 b) ==>+5 (b &&+5 c))@1", t.solve($.$("((a &&+5 b) ==>+- (b &&+5 c))")).toString());
-        assertEquals("((b &&+5 c) ==>-5 (a &&+5 b))@6", t.solve($.$("((b &&+5 c) ==>+- (a &&+5 b))")).toString());
+        assertEquals("((a &&+5 b)=|>(b &&+5 c))@1", t.solve($.$("((a &&+5 b) ==>+- (b &&+5 c))")).toString());
+        assertEquals("((b &&+5 c) ==>-10 (a &&+5 b))@6", t.solve($.$("((b &&+5 c) ==>+- (a &&+5 b))")).toString());
 
     }
+
     @Test
     public void testConjLinked2() throws Narsese.NarseseException {
 // WRONG:
@@ -441,7 +442,7 @@ public class TemporalizeTest {
         for (int i = 0; i < 10; i++) {
             Temporalize t = new Temporalize();
             t.knowTerm($.$("(y ==>+1 z)"), 0);
-            t.knowTerm($.$("(x ==>+2 z)"), 0);
+            t.knowTerm($.$("(x ==>+2 z)"), ETERNAL);
             Temporalize.Event s = t.solve($.$("((x &&+- y) ==>+- z)"));
             if (s != null) {
                 assertNotNull(s);

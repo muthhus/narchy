@@ -1,5 +1,6 @@
 package nars.derive;
 
+import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -48,14 +49,14 @@ public class Conclusion extends AbstractPred<Derivation> {
     private final boolean varIntro, goalUrgent;
     private final int minNAL;
 
-    public Conclusion(@NotNull Term id, @NotNull Term pattern, boolean varIntro, boolean goalUrgent, @NotNull PremiseRule rule, CauseChannel<Task> input) {
-        super(id);
+    public Conclusion(@NotNull Conclude id, CauseChannel<Task> input) {
+        super($.func("derive", /*$.the(cid), */id.sub(0) /* prod args */));
         this.channel = input;
-        this.pattern = pattern;
-        this.varIntro = varIntro;
-        this.goalUrgent = goalUrgent;
-        this.rule = rule.toString(); //only store toString of the rule to avoid remaining attached to the RuleSet
-        this.minNAL = rule.minNAL;
+        this.pattern = id.pattern;
+        this.varIntro = id.varIntro;
+        this.goalUrgent = id.goalUrgent;
+        this.rule = id.rule.toString(); //only store toString of the rule to avoid remaining attached to the RuleSet
+        this.minNAL = id.rule.minNAL;
         //assert(this.minNAL!=0): "unknown min NAL level for rule: " + rule;
     }
 
@@ -106,7 +107,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         Term c2;
         if (d.temporal) {
 
-            Term t1 = Temporalize.solve(d, c1, occ = new long[] { ETERNAL, ETERNAL });
+            Term t1 = Temporalize.solve(d, c1, occ = new long[] { ETERNAL, ETERNAL } );
 
             //invalid or impossible temporalization; could not determine temporal attributes. seems this can happen normally
             if (t1 == null || t1 instanceof Variable || t1 instanceof Bool /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {

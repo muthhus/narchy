@@ -21,7 +21,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static nars.Op.*;
+import static nars.Op.CONJ;
+import static nars.Op.NEG;
 import static nars.time.Tense.*;
 
 /**
@@ -192,13 +193,20 @@ public class Temporalize {
 
         if (a instanceof AbsoluteEvent || b instanceof AbsoluteEvent) {
             //at least one or both are absolute, forming a valid temporal grounding
-            Time as = a.start(trail);
-            //Time ae = a.end(trail);
+            Time ae = a.end(trail);
+            Time A = a.start(trail);
+            Time B = b.end(trail);
             Time bs = b.start(trail);
-            //Time be = b.end(trail);
 
-            return dt(as, bs);
+            int dt = dt(A, B);
 
+            int shrink = dt(A, ae) + dt(bs, B);
+            if (dt < 0)
+                dt += shrink;
+            else //if (dt >= 0)
+                dt -= shrink;
+
+            return dt;
 
             //return dt(a.start(times), b.end(times));
         }
@@ -259,7 +267,7 @@ public class Temporalize {
         return null;
     }
 
-    static int dt(Time a, Time b) {
+    static int dt(Time a /* from */, Time b /* to */) {
 
         assert (a.base != XTERNAL);
         assert (b.base != XTERNAL);
@@ -326,10 +334,10 @@ public class Temporalize {
 
         @Override
         public Time end(Map<Term, Time> ignored) {
-            int dt = term.dt();
-            if (dt == DTERNAL)
-                dt = 0;
-            return Time.the(end, dt);
+//            int dt = term.dt();
+//            if (dt == DTERNAL)
+//                dt = 0;
+            return Time.the(end, 0);
         }
 
         @Override
@@ -608,7 +616,7 @@ public class Temporalize {
         model.know(task, d, true);
         if (belief != null) {
             model.know(belief, d, true);
-        } else if (d.beliefTerm!=null) {
+        } else if (d.beliefTerm != null) {
             model.know(d.beliefTerm, d, null);
         }
 
@@ -640,9 +648,9 @@ public class Temporalize {
         //Op o = task.op();
         AbsoluteEvent root =
                 (rooted /*|| ((o!=IMPL) && (o!=EQUI))*/) ?
-                    new AbsoluteEvent(taskTerm, task.start(), task.end())
+                        new AbsoluteEvent(taskTerm, task.start(), task.end())
                         :
-                    new AbsoluteEvent(taskTerm, ETERNAL, ETERNAL); //ambiently rooted if impl or equi
+                        new AbsoluteEvent(taskTerm, ETERNAL, ETERNAL); //ambiently rooted if impl or equi
 
         know(taskTerm, d, root);
     }

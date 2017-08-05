@@ -483,13 +483,13 @@ public interface Term extends Termlike, Comparable<Term> {
      */
     default int dtRange() {
         Op o = op();
-//        switch (o) {
+        switch (o) {
 //
 ////            case NEG:
 ////                return sub(0).dtRange();
 //
 //
-//            case CONJ:
+            case CONJ:
 
                 if (size() == 2) {
                     int dt = dt();
@@ -522,7 +522,9 @@ public interface Term extends Termlike, Comparable<Term> {
 
 //            default:
 //                return 0;
-//        }
+        }
+
+        return 0;
 
     }
 
