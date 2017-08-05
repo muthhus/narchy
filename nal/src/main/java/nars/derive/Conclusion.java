@@ -1,9 +1,6 @@
 package nars.derive;
 
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
 import nars.derive.rule.PremiseRule;
@@ -149,6 +146,8 @@ public class Conclusion extends AbstractPred<Derivation> {
             Term cu = DepIndepVarIntroduction.varIntro(c2, nar);
             if (cu instanceof Variable || cu instanceof Bool || (cu.equals(c2) /* keep only if it differs */))
                 return true;
+            if (!cu.hasAny(Op.ATOM))
+                return true; //filter any terms that have been completely variable introduced
 
 //            Term Cv = normalizedOrNull(cu, d.terms,
 //                    d.temporal ? d.terms.retemporalizeZero : d.terms.retemporalizeDTERNAL //select between eternal and parallel depending on the premises's temporality
