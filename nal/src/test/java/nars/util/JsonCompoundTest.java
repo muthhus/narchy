@@ -6,6 +6,7 @@ import nars.NARS;
 import nars.Narsese;
 import nars.task.util.TaskRule;
 import nars.term.atom.Atomic;
+import nars.term.obj.JsonCompound;
 import nars.time.Tense;
 import org.junit.Test;
 

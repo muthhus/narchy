@@ -27,7 +27,7 @@ import nars.term.var.VarPattern;
 import nars.term.var.Variable;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import nars.util.JsonCompound;
+import nars.term.obj.JsonCompound;
 import org.eclipse.collections.api.block.function.primitive.CharToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

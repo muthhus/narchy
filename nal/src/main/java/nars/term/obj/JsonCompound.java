@@ -1,4 +1,4 @@
-package nars.util;
+package nars.term.obj;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import jcog.Util;
