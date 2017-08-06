@@ -2,12 +2,10 @@ package nars.bag.leak;
 
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
-import jcog.event.On;
 import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
-import nars.op.stm.TaskService;
+import nars.control.TaskService;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

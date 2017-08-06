@@ -38,6 +38,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Preconditions.*;
 import static com.google.common.base.Predicates.instanceOf;
@@ -106,6 +107,10 @@ public class Services<X> {
         services.forEach((k,s) -> {
            out.println(k + " " + s.service + "(" + s.service.getClass() + "): " + s.state);
         });
+    }
+
+    public Stream<ServiceState> stream() {
+        return services.values().stream();
     }
 
     static final class ListenerCallQueue<L> {
@@ -548,7 +553,7 @@ public class Services<X> {
     }
 
     public static class ServiceState {
-        final Service service;
+        public final Service service;
         State state = NEW;
         //final Stopwatch startupTime;
 

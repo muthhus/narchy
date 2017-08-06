@@ -69,9 +69,11 @@ public class GoalActionConcept extends ActionConcept {
 
         if (t.isGoal() && !t.isInput()) {
 
-            //allow the boost to apply to 1 duration ahead, to promote goal prediction
-            v = Math.max(v,
-                    super.value(t, activation, n.time() + n.dur(), n ));
+            //allow the boost to apply to D durations ahead, to promote goal prediction
+            for (int d = 1; d < 5; d++) {
+                v = Math.max(v,
+                        super.value(t, activation, n.time() + d * n.dur(), n));
+            }
 
             assert(v >= 0);
             v *= 2; //boost goal derivations in general

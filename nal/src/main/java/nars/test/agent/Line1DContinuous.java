@@ -197,7 +197,7 @@ public class Line1DContinuous extends NAgent {
 
         l.print = true;
         //l.runRT(25, 15000).join();
-        l.runCycles(2000);
+//        l.runCycles(2000);
 
         System.out.println("AVG SCORE=" + l.rewardSum()/ nar.time());
 

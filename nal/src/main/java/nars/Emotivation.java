@@ -10,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * value-reinforceing emotion implementation
+ * use:         n.setEmotion(new Emotivation(n));
+
  */
 public class Emotivation extends Emotion {
 

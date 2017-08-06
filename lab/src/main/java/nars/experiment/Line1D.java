@@ -128,7 +128,6 @@ public class Line1D {
 
             };
 
-            a.init();
 
             onStart(a);
 
@@ -168,7 +167,7 @@ public class Line1D {
             });
 
 
-            a.runCycles(runtime);
+//            a.runCycles(runtime);
 
             return a.rewardSum / runtime;
 

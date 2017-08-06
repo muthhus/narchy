@@ -9,6 +9,7 @@ import jcog.learn.gng.impl.Node;
 import jcog.pri.WeakPLinkUntilDeleted;
 import nars.NAR;
 import nars.Task;
+import nars.control.TaskService;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -249,7 +250,7 @@ public abstract class STMClustered extends TaskService {
 
         public TLink(@NotNull Task t) {
             super(t, t.priElseZero());
-            this.coord = getCoord(t);
+            this.coord = coord(t);
         }
 
         @Override
@@ -317,7 +318,7 @@ public abstract class STMClustered extends TaskService {
 //        return baseForgetRate + forgetRate * (1f - id.conf() * id.originality());
 //    }
 
-    abstract double[] getCoord(@NotNull Task t);
+    abstract double[] coord(@NotNull Task t);
 
 
     protected STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, byte punc, int centroids) {
@@ -429,23 +430,18 @@ public abstract class STMClustered extends TaskService {
     @Override
     public void accept(@NotNull Task t) {
 
-        if (!STMLinkage.stmLinkable(t, allowNonInput))
-            return;
 
-        if (t.punc() == punc && !t.isEternal()) {
+        TLink tt = new TLink(t);
 
-            TLink tt = new TLink(t);
-
-            TasksNode nearest;
-            synchronized (net) {
-                nearest = tt.nearest();
-            }
-
-            synchronized (net) {
-                nearest.transfer(tt);
-            }
-
+        TasksNode nearest;
+        synchronized (net) {
+            nearest = tt.nearest();
         }
+
+        synchronized (net) {
+            nearest.transfer(tt);
+        }
+
 
     }
 

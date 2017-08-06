@@ -1,7 +1,6 @@
 package nars.op.mental;
 
 import jcog.bag.impl.ArrayBag;
-import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.pri.PLink;
@@ -12,10 +11,9 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.bag.leak.DtLeak;
-import nars.bag.leak.TaskLeak;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
-import nars.op.stm.TaskService;
+import nars.control.TaskService;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;

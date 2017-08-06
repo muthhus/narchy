@@ -7,6 +7,7 @@ import jcog.pri.Pri;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.control.TaskService;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -21,7 +22,7 @@ public final class STMLinkage extends TaskService {
     public final DisruptorBlockingQueue<Task> stm;
 
     final FloatParam strength = new FloatParam(1f, 0f, 1f);
-
+    private final boolean allowNonInput;
 
     public STMLinkage(@NotNull NAR nar, int capacity) {
         this(nar, capacity, false);

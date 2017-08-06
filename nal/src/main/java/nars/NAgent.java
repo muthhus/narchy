@@ -12,6 +12,7 @@ import nars.concept.ActionConcept;
 import nars.concept.Concept;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
+import nars.control.DurService;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
@@ -44,7 +45,7 @@ import static nars.truth.TruthFunctions.w2c;
 /**
  * explicit management of sensor concepts and motor functions
  */
-abstract public class NAgent implements NSense, NAct {
+abstract public class NAgent extends DurService implements NSense, NAct {
 
     public static final Logger logger = LoggerFactory.getLogger(NAgent.class);
 
@@ -52,9 +53,6 @@ abstract public class NAgent implements NSense, NAct {
      * identifies this environment instance
      **/
     public final Term id;
-
-    public final NAR nar;
-
 
     public final Map<SensorConcept,CauseChannel<Task>> sensors = new LinkedHashMap();
 
@@ -77,7 +75,6 @@ abstract public class NAgent implements NSense, NAct {
     private final CauseChannel<Task> predict;
 
 
-    private boolean initialized;
 
 
     /**
@@ -116,10 +113,8 @@ abstract public class NAgent implements NSense, NAct {
     }
 
     public NAgent(@Nullable Term id, @NotNull NAR nar) {
-
+        super(nar);
         this.id = id;
-        this.nar = nar;
-
         this.now = ETERNAL; //not started
 
         this.happy = new SensorConcept(
@@ -293,17 +288,14 @@ abstract public class NAgent implements NSense, NAct {
                 nar.emotion.summary();
     }
 
-
     /**
      * registers sensor, action, and reward concepts with the NAR
      * TODO call this in the constructor
      */
-    public synchronized void init() {
+    @Override
+    protected void startUp() throws Exception {
 
-        if (initialized)
-            return;
-
-        initialized = true;
+        super.startUp();
 
         now = nar.time();
 
@@ -339,8 +331,8 @@ abstract public class NAgent implements NSense, NAct {
 
                     question(impl(action, happiness)),
                     question(impl(neg(action), happiness)),
-                    question(impl(action, varQuery(1))),
-                    question(impl(neg(action), varQuery(1))),
+                    question(impl(action, $.varQuery(1))),
+                    question(impl(neg(action), $.varQuery(1))),
 
                     //question(seq(action, dur, happiness), now),
                     //question(seq(neg(action), dur, happiness), now),
@@ -354,7 +346,7 @@ abstract public class NAgent implements NSense, NAct {
 //                            //ETERNAL)
 
                     //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
-                    quest($.parallel(varQuery(1), action.term()))
+                    quest($.parallel($.varQuery(1), action.term()))
 
                     //quest((Compound)$.parallel(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
@@ -459,48 +451,43 @@ abstract public class NAgent implements NSense, NAct {
 //    }
 
 
-    public NAgent runCycles(final int totalCycles) {
-        return runCycles(nar.dur(), totalCycles);
-    }
-
-    /**
-     * for synchronous control
-     */
-    protected void next() {
-        next(0);
-    }
-
-    /**
-     * synchronous execution
-     */
-    public synchronized NAgent runCycles(final int cyclesPerFrame, final int totalFrames) {
-
-        init();
-
-        @NotNull On active = nar.onCycle((n) -> {
-            if (enabled.get()) {
-                next(cyclesPerFrame);
-            }
-        });
-
-        nar.run(totalFrames);
-
-        active.off();
-
-        return this;
-    }
+//    public NAgent runCycles(final int totalCycles) {
+//        return runCycles(nar.dur(), totalCycles);
+//    }
 
 
-    public void next(int minCyclesPerFrame) {
-        long lastNow = this.now;
-        long now = nar.time();
-        if (lastNow == ETERNAL || now - lastNow >= minCyclesPerFrame) {
+
+    @Override
+    protected void runDur() {
+        if (enabled.get()) {
             this.now = now;
             //only execute at most one agent frame per duration
             senseAndMotor();
             predict();
         }
     }
+
+//    /**
+//     * synchronous execution
+//     */
+//    public synchronized NAgent runCycles(final int cyclesPerFrame, final int totalFrames) {
+//
+//        //init();
+//
+//        @NotNull On active = nar.onCycle((n) -> {
+//            if (enabled.get()) {
+//                next(cyclesPerFrame);
+//            }
+//        });
+//
+//        nar.run(totalFrames);
+//
+//        active.off();
+//
+//        return this;
+//    }
+
+
 
     public NARLoop startRT(float fps) {
         return startRT(fps, -1);
@@ -511,17 +498,18 @@ abstract public class NAgent implements NSense, NAct {
      * synchronous execution which runs a NAR directly at a given framerate
      */
     public NARLoop startRT(float fps, long stopTime) {
-        init();
+
+        //init();
 
         NARLoop loop = nar.startFPS(fps);
 
-        this.loop = nar.exe.loop(fps, () -> {
-            if (enabled.get()) {
-                this.now = nar.time();
-                senseAndMotor();
-                predict();
-            }
-        });
+//        this.loop = nar.exe.loop(fps, () -> {
+//            if (enabled.get()) {
+//                this.now = nar.time();
+//                senseAndMotor();
+//                predict();
+//            }
+//        });
 
         return loop;
     }

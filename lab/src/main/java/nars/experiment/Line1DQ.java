@@ -54,7 +54,7 @@ public class Line1DQ {
         float grandTotal = 0;
         for (int i = 0; i < 100; i++) {
             int period = 1000;
-            a.runCycles(period);
+            //a.runCycles(period);
             float nextReward = a.rewardSum;
             System.out.println(nextReward + " total reward, " + nextReward / period + " avg per cycle");
             grandTotal += nextReward;

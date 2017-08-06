@@ -41,6 +41,7 @@ public class MySTMClustered extends STMClustered {
     private final int minGroupSize;
     private final int inputsPerDur;
     private final CauseChannel<Task> in;
+    private final boolean allowNonInput;
 
     float freqCoherenceThresh = 0.9f;
     float confCoherenceThresh = 0.5f;
@@ -81,8 +82,14 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Override
+    public void accept(@NotNull Task t) {
+        if (STMLinkage.stmLinkable(t, allowNonInput) && (t.punc() == punc && !t.isEternal()))
+            super.accept(t);
+    }
+
+    @Override
     @NotNull
-    public double[] getCoord(@NotNull Task t) {
+    public double[] coord(@NotNull Task t) {
         double[] c = new double[dims];
         c[0] = t.start();
         c[1] = t.end();
@@ -102,8 +109,8 @@ public class MySTMClustered extends STMClustered {
     @Override
     protected TasksNode newCentroid(int id) {
         TasksNode t = new TasksNode(id);
-        t.randomizeUniform(0, -dur * 2, +dur * 2);
-        t.randomizeUniform(1, -dur * 2, +dur * 2);
+        t.randomizeUniform(0, dur * -2, dur * +2);
+        t.randomizeUniform(1, dur * -2, dur * +2);
         t.randomizeUniform(2, 0f, 1f);
         t.randomizeUniform(3, 0f, 1f);
         return t;
@@ -239,44 +246,18 @@ public class MySTMClustered extends STMClustered {
                             int uuLen = uu.length;
                             long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
 
-                            Task m = new NALTask(cp.getOne(), punc,
+                            NALTask m = new NALTask(cp.getOne(), punc,
                                     $.t(finalFreq, conf).negIf(cp.getTwo()), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
                             float maxPri = new FasterList<>(uuLen, uu)
                                     .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
 
-                            m.priority().setPri(BudgetFunctions.fund(maxPri, false, uu));
+                            m.setPri(BudgetFunctions.fund(maxPri, false, uu));
                             return m;
 
                         }
 
                         return null;
-
-//                        float priTotal = (float)(uu.stream().mapToDouble(x -> x.pri()).sum());
-//                        float priAvg = ((float)(priTotal / uu.size()));
-//
-
-//        if (srcCopy == null) {
-//            delete();
-//        } else {
-//            float p = srcCopy.priSafe(-1);
-//            if (p < 0) {
-//                delete();
-//            } else {
-//                setPriority(p);
-//            }
-//        }
-//
-//        return this;
-                        //m.log("STMCluster CoOccurr");
-
-
-                        //logger.debug("{}", m);
-                        //generate.emit(m);
-
-                        //System.err.println(m + " " + Arrays.toString(m.evidence()));
-
-                        //node.tasks.removeAll(tt);
 
 
                     }).filter(Objects::nonNull);

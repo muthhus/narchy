@@ -4,7 +4,7 @@ import jcog.Util;
 import jcog.net.UDPeer;
 import nars.bag.leak.LeakOut;
 import nars.control.CauseChannel;
-import nars.op.stm.TaskService;
+import nars.control.TaskService;
 import nars.task.ActiveQuestionTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

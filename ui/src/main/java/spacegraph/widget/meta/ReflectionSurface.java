@@ -1,5 +1,7 @@
 package spacegraph.widget.meta;
 
+import com.google.common.util.concurrent.Service;
+import jcog.Services;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -28,6 +30,25 @@ public class ReflectionSurface<X> extends Grid {
         List<Surface> l = new FasterList();
 
 
+        collectFields(x, l);
+
+        if (x instanceof Services) {
+            collectServices((Services) x, l);
+        }
+
+        set(l);
+    }
+
+    private void collectServices(Services<?> x, List<Surface> l) {
+        x.stream().forEach((Services.ServiceState ss) -> {
+            Service s = ss.service;
+            l.add(new WindowButton(s.toString(), () -> {
+                return new ReflectionSurface(s);
+            }));
+        });
+    }
+
+    public void collectFields(@NotNull X x, List<Surface> l) {
         Class cc = x.getClass();
         for (Field f : cc.getFields()) {
             //SuperReflect.fields(x, (String k, Class c, SuperReflect v) -> {
@@ -38,7 +59,7 @@ public class ReflectionSurface<X> extends Grid {
 
                 if (y instanceof Surface) {
                     //l.add(col(new Label(k), (Surface)y));
-                    l.add((Surface)y);
+                    l.add((Surface) y);
                 } else {
                     String k = f.getName();
 
@@ -51,7 +72,7 @@ public class ReflectionSurface<X> extends Grid {
                     } else if (y instanceof MutableBoolean) {
                         l.add(new CheckBox(k, (MutableBoolean) y));
                     } else if (y instanceof Runnable) {
-                        l.add(new PushButton(k, (Runnable)y));
+                        l.add(new PushButton(k, (Runnable) y));
                     }
                 }
 
@@ -59,7 +80,6 @@ public class ReflectionSurface<X> extends Grid {
                 t.printStackTrace();
             }
         }
-        set(l);
     }
 
     private static class MyFloatSlider extends FloatSlider {
