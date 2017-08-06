@@ -48,12 +48,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //            return null;
 //        }
 
-        short[] x = t.cause();
-        int xl = x.length;
-        if (xl > 0) {
-            float taskValue = origin.valueIfProcessed(t, activation, n);
-            n.value(x, taskValue);
-        }
+        n.emotion.onActivate(t, activation, origin, n);
 
         origin.tasklinks().putAsync(
                 //new PLinkUntilDeleted<>(t, activation)
@@ -68,7 +63,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //            } else {
 //                //atomic activation)
 
-        n.emotion.conceptActivations.increment();
         return new Activate(origin, activation); /*, () -> {
 
             }*/

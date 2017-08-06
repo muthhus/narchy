@@ -2,6 +2,7 @@ package nars.concept;
 
 import jcog.bag.Bag;
 import jcog.pri.PriReference;
+import nars.Emotivation;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
@@ -71,9 +72,6 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
     }
 
 
-    public static float valueIfProcessedAt(@NotNull Task t, float activation, long when, NAR n) {
-        return 0.001f * activation * (t.isBeliefOrGoal() ? t.conf(when, n.dur()) : 0.5f);
-    }
 
 
 //    @Override
@@ -326,9 +324,10 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
         table(t.punc()).add(t, this, n);
     }
 
-    public float valueIfProcessed(@NotNull Task t, float activation, NAR n) {
+    public float value(@NotNull Task t, float activation, long when, NAR n) {
+        return Emotivation.preferConfidentAndRelevant(t, activation, when, n);
         //positive value based on the conf but also multiplied by the activation in case it already was known
-        return valueIfProcessedAt(t, activation, n.time(), n);
+        //return valueIfProcessedAt(t, activation, n.time(), n);
 
 //            @Override
 //    public float value(@NotNull Task t, NAR n) {

@@ -2,6 +2,9 @@ package nars;
 
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
+import nars.control.Derivation;
+import nars.derive.Deriver;
+import nars.derive.PrediTerm;
 import nars.exe.FocusedExecutioner;
 import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
@@ -109,20 +112,23 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        int THREADS = 4;
+        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8, "motivation.nal");
+
+        int THREADS = 3;
         NAR n = new NARS()
                 .exe(
                         new MultiExecutioner((i) ->
                                 new MultiExecutioner.Worker(
-                                        //new BufferedExecutioner(96, 32, 0.05f)
-                                        new FocusedExecutioner(deriver)
-                                ), THREADS, 2))
+                                    new FocusedExecutioner(deriver)
+                        ), THREADS, 2))
                 .time(clock)
                 .index(
                         new CaffeineIndex(128 * 1024)
                         //new HijackTermIndex(128 * 1024,  4)
                 )
                 .get();
+
+        n.setEmotion(new Emotivation(n));
 
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
@@ -220,9 +226,9 @@ abstract public class NAgentX extends NAgent {
     }
 
     private static Surface causePlot(NAR nar) {
-        int s = nar.values.size();
+        int s = nar.causes.size();
         return new MatrixView((i) ->
-                nar.values.get(i).value(),
+                nar.causes.get(i).value(),
                 s, Math.max(1, (int) Math.round(Math.sqrt(s))), bipolar1);
     }
 

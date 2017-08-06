@@ -112,10 +112,10 @@ public class TrieDeriverTest {
             System.out.println("terms by equality: " + byEquality.size());
             System.out.println("terms by identity: " + byIdentity.size());
 
-            System.out.println("  values: " + n.values.size());
-            n.values.forEach(System.out::println);
+            System.out.println("  values: " + n.causes.size());
+            n.causes.forEach(System.out::println);
         }
-        assertTrue(n.values.size() > 0);
+        assertTrue(n.causes.size() > 0);
 
         if (debug) {
             System.out.println();

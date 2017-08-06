@@ -110,7 +110,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     @NotNull
-    public final Emotion emotion;
+    public Emotion emotion;
 
     @NotNull
     public final Time time;
@@ -213,8 +213,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         DoubleSummaryStatistics pos = new DoubleSummaryStatistics();
         DoubleSummaryStatistics neg = new DoubleSummaryStatistics();
-        values.forEach(c -> pos.accept(c.pos()));
-        values.forEach(c -> neg.accept(c.neg()));
+        causes.forEach(c -> pos.accept(c.pos()));
+        causes.forEach(c -> neg.accept(c.neg()));
         x.put("value count", pos.getCount());
         x.put("value pos mean", pos.getAverage());
         x.put("value pos min", pos.getMin());
@@ -270,6 +270,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         exe.start(this);
     }
 
+
+    public void setEmotion(Emotion emotion) {
+        synchronized(self) { //lol
+            this.emotion = emotion;
+        }
+    }
 
     /**
      * Reset the system with an empty memory and reset clock.  Event handlers
@@ -602,21 +608,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             if (x != null) input(x);
     }
 
-    public void input(@NotNull ITask x) {
+    public final void input(@NotNull ITask x) {
 
 
-        if (x instanceof Task && !((Task) x).isCommand()) {
-            Task t = (Task) x;
-            float tp = evaluate(t);
-            if (tp != tp || tp < Pri.EPSILON)
-                return; //TODO track what might cause this
-
-            t.pri(tp);
-
-            value(t.cause(), Param.valueAtInput(t, this));
-        }
-
-        exe.run(x);
+        ITask y = emotion.onInput(x);
+        if (y!=null)
+            exe.run(y);
     }
 
 
@@ -1583,52 +1580,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * table of values influencing reasoner heuristics
      */
-    public final FasterList<Cause> values = new FasterList(512);
+    public final FasterList<Cause> causes = new FasterList(512);
 
-    /**
-     * set the value of a cause trace
-     */
-    public void value(short[] causes, float value) {
-        int numCauses = causes.length;
-
-        //float sum = 0.5f * numCauses * (numCauses + 1);
-        float vPer = value / numCauses; //flat
-
-        for (int i = 0; i < numCauses; i++) {
-            short c = causes[i];
-            Cause cc = this.values.get(c);
-            if (cc == null)
-                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
-                    /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
-
-            //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
-            if (vPer != 0) {
-                cc.apply(vPer);
-            }
-        }
-    }
-
-    /**
-     * returns a "value" adjusted priority
-     * which is also applied to the given task.
-     * returns NaN possibly
-     */
-    public float evaluate(Task x) {
-
-        float gain = evaluate(x, x.cause(), taskCauses.get(x));
-        assert (gain == gain);
-        if (gain != 0) {
-
-            float amp = Util.tanhFast(gain) + 1f; //[0..+2]
-
-//            amp *= amp; //sharpen, psuedo-logarithmic x^4
-//            amp *= amp;
-
-            return x.priMult(amp);
-        } else {
-            return x.pri();
-        }
-    }
 
 
     public Derivation derivation(PrediTerm<Derivation> deriver) {
@@ -1657,7 +1610,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
-    private final ImplicitTaskCauses taskCauses = new ImplicitTaskCauses(this);
+    public final ImplicitTaskCauses taskCauses = new ImplicitTaskCauses(this);
 
     static class ImplicitTaskCauses {
 
@@ -1742,7 +1695,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         for (short[] cc : causes) {
             numCauses += cc.length;
             for (short c : cc) {
-                Cause cause = this.values.getSafe(c);
+                Cause cause = this.causes.getSafe(c);
                 if (cause == null) {
                     logger.error("cause id={} missing", c);
                     continue;
@@ -1756,10 +1709,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     public Cause newCause(Object x) {
-        synchronized (values) {
-            short next = (short) (values.size());
+        synchronized (causes) {
+            short next = (short) (causes.size());
             Cause c = new Cause(next, x);
-            values.add(c);
+            causes.add(c);
             return c;
         }
     }
@@ -1773,9 +1726,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     public CauseChannel<Task> newInputChannel(Object id) {
 
-        synchronized (values) {
+        synchronized (causes) {
 
-            final short ci = (short) (values.size());
+            final short ci = (short) (causes.size());
             CauseChannel c = new CauseChannel<ITask>(ci, id, (x) -> {
                 if (x instanceof NALTask) {
                     NALTask t = (NALTask) x;
@@ -1790,16 +1743,16 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 }
                 input(x);
             });
-            values.add(c);
+            causes.add(c);
             return c;
         }
     }
 
     public CauseChannel<Task> newChannel(Object x, Consumer<ITask> target) {
-        synchronized (values) {
-            short next = (short) (values.size());
+        synchronized (causes) {
+            short next = (short) (causes.size());
             CauseChannel c = new CauseChannel(next, x, target);
-            values.add(c);
+            causes.add(c);
             return c;
         }
     }
@@ -1808,7 +1761,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public void valueUpdate() {
         float p = valuePositiveDecay.floatValue();
         float n = valueNegativeDecay.floatValue();
-        values.forEach(c -> c.commit(p, n));
+        causes.forEach(c -> c.commit(p, n));
     }
 
 }

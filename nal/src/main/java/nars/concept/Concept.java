@@ -297,7 +297,7 @@ public interface Concept extends Termed {
 
     void process(Task task, @NotNull NAR n);
 
-    float valueIfProcessed(@NotNull Task t, float activation, NAR n);
+    float value(@NotNull Task t, float activation, long when, NAR n);
 
     Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests);
 

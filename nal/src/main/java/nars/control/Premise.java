@@ -177,13 +177,8 @@ public class Premise extends Pri implements ITask {
 
                         float effectiveConf = answered.conf(answered.nearestTimeTo(task.mid()), dur);
 
-                        //transfer budget from question to answer
-                        //float qBefore = taskBudget.priSafe(0);
-                        //float aBefore = answered.priSafe(0);
-                        BudgetFunctions.fund(taskLink, answered,
-                                /*Util.sqr*/effectiveConf, false);
+                        nar.emotion.onAnswer(taskLink, answered, effectiveConf);
 
-                        nar.value(answered.cause(), effectiveConf);
                     }
                 }
             } else {

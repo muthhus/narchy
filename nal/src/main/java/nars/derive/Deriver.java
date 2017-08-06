@@ -1,10 +1,16 @@
 package nars.derive;
 
+import nars.NAR;
+import nars.Param;
+import nars.control.Derivation;
+import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRuleSet;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 /**
  * Implements a strategy for managing submitted derivation processes
@@ -17,7 +23,7 @@ import java.util.TreeSet;
 public interface Deriver {
 
 
-    static PremiseRuleSet DEFAULT(int level) {
+    static PremiseRuleSet DEFAULT(int level, String... otherFiles) {
         Set<String> files = new TreeSet();
         switch (level) {
             case 8:
@@ -43,8 +49,29 @@ public interface Deriver {
                 throw new UnsupportedOperationException();
         }
 
+        Collections.addAll(files, otherFiles);
+
         @NotNull PremiseRuleSet RULES = PremiseRuleSet.rules(true, files.toArray(new String[files.size()])       );
         return RULES;
+    }
+
+    static Function<NAR, PrediTerm<Derivation>> newDeriver(int nal, String... otherFiles) {
+        if (nal == 0) {
+            return (n) -> PrediTerm.NullDeriver;
+        }
+
+        return (nar) -> {
+            PrediTerm<Derivation> x = TrieDeriver.the(DEFAULT(nal, otherFiles), nar, (PrediTerm<Derivation> d) -> {
+                if (Param.TRACE)
+                    return new DebugDerivationPredicate(d);
+                else
+                    return d;
+            });
+            if (Param.TRACE) {
+                TrieDeriver.print(x, System.out);
+            }
+            return x;
+        };
     }
 
 //    /**

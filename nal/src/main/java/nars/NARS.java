@@ -6,8 +6,6 @@ import nars.concept.builder.DefaultConceptBuilder;
 import nars.control.Derivation;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
-import nars.derive.TrieDeriver;
-import nars.derive.instrument.DebugDerivationPredicate;
 import nars.exe.Executioner;
 import nars.exe.FocusedExecutioner;
 import nars.index.term.BasicTermIndex;
@@ -101,26 +99,7 @@ public class NARS {
 
         concepts = DefaultConceptBuilder::new;
 
-        deriver = newDeriver(8);
-    }
-
-    public static Function<NAR, PrediTerm<Derivation>> newDeriver(int nal) {
-        if (nal == 0) {
-            return (n) -> PrediTerm.NullDeriver;
-        }
-
-        return (nar) -> {
-            PrediTerm<Derivation> x = TrieDeriver.the(Deriver.DEFAULT(nal), nar, (PrediTerm<Derivation> d) -> {
-                if (Param.TRACE)
-                    return new DebugDerivationPredicate(d);
-                else
-                    return d;
-            });
-            if (Param.TRACE) {
-                TrieDeriver.print(x, System.out);
-            }
-            return x;
-        };
+        deriver = Deriver.newDeriver(8);
     }
 
     /**
@@ -212,7 +191,7 @@ public class NARS {
         public Default(int nal, boolean threadSafe) {
 
             this.nal = nal;
-            this.deriver = newDeriver(nal);
+            this.deriver = Deriver.newDeriver(nal);
 
 
             if (threadSafe)

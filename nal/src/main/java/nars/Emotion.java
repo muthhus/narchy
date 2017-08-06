@@ -5,10 +5,14 @@ import com.netflix.servo.monitor.Counter;
 import com.netflix.servo.monitor.StepCounter;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.meter.event.BufferedFloatGuage;
+import nars.concept.Concept;
+import nars.task.ITask;
 import nars.term.Compound;
+import nars.util.BudgetFunctions;
 import nars.util.ConcurrentMonitorRegistry;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.SortedMap;
 
@@ -19,9 +23,10 @@ import static nars.NInner.id;
  * emotion state: self-felt internal mental states; variables used to record emotional values
  * <p>
  * https://prometheus.io/docs/practices/instrumentation/
+ * <p>
+ * default impl
  */
-public final class Emotion extends ConcurrentMonitorRegistry {
-
+public class Emotion extends ConcurrentMonitorRegistry {
 
     /**
      * priority rate of Task processing attempted
@@ -33,16 +38,19 @@ public final class Emotion extends ConcurrentMonitorRegistry {
     public final Counter conceptFirePremises = new BasicCounter(id("concept fire premises"));
     public final Counter taskDerivations = new BasicCounter(id("derivation task"));
 
-    /** setup stage, where substitution is applied to generate a conclusion term from the pattern */
+    /**
+     * setup stage, where substitution is applied to generate a conclusion term from the pattern
+     */
     public final Counter derivationTry = new BasicCounter(id("derivation try"));
 
-    /** a successful conclusion term gets evaluated and temporalized and formed into a Task */
+    /**
+     * a successful conclusion term gets evaluated and temporalized and formed into a Task
+     */
     public final Counter derivationEval = new BasicCounter(id("derivation eval"));
 
 //    /** count of times that deriver reached ttl=0. if this is high it means more TTL should
 //     * be budgeted for each derivation */
 //    public final Counter derivationDeath = new BasicCounter(id("derivation death"));
-
 
 
     @NotNull
@@ -291,7 +299,33 @@ public final class Emotion extends ConcurrentMonitorRegistry {
         x.put("emotion", summary());
     }
 
-//    public void count(String id) {
+    /**
+     * sensory prefilter
+     */
+    @Nullable
+    public ITask onInput(@NotNull ITask x) {
+        return x; //no change by default
+    }
+
+    public void onActivate(@NotNull Task t, float activation, Concept origin, NAR n) {
+        n.emotion.conceptActivations.increment();
+    }
+
+    public void value(short[] x, float taskValue) {
+        //default impl: do nothing
+    }
+
+    public void onAnswer(Task question, @Nullable Task answer, float effectiveConf) {
+        //transfer budget from question to answer
+        //float qBefore = taskBudget.priSafe(0);
+        //float aBefore = answered.priSafe(0);
+        BudgetFunctions.fund(question, answer,
+                                /*Util.sqr*/effectiveConf, false);
+
+    }
+
+
+    //    public void count(String id) {
 //        AtomicInteger c = counts.get(id);
 //        if (c == null) {
 //            c = new AtomicInteger(1);

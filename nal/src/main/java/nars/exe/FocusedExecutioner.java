@@ -143,22 +143,6 @@ public class FocusedExecutioner extends Executioner {
         }
     }
 
-
-    public static class Deriver extends ProxyTerm implements Supplier<PrediTerm<Derivation>> {
-
-        private final PrediTerm<Derivation> deriver;
-
-        public Deriver(Term id, PrediTerm<Derivation> deriver) {
-            super(id);
-            this.deriver = deriver;
-        }
-
-        @Override
-        public PrediTerm<Derivation> get() {
-            return deriver;
-        }
-    }
-
     protected void execute(Premise p) {
         p.run(nar.derivation(deriver), Math.round(nar.matchTTL.intValue() * (0.5f + 0.5f * p.priElseZero())));
     }
