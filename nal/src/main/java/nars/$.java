@@ -19,6 +19,7 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
+import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.obj.JsonTerm;
@@ -736,6 +737,10 @@ public interface $ {
             x[j] = the(i[j]);
         }
         return x;
+    }
+
+    public static Term the(boolean b) {
+        return b ? Op.True : Op.False;
     }
 
     public static Term the(Object o) {

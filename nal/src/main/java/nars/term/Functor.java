@@ -1,11 +1,13 @@
 package nars.term;
 
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.builder.ConceptBuilder;
+import nars.derive.AbstractPred;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
@@ -70,10 +72,24 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         return f0(fName(termAtom), ff);
     }
 
-    public static LambdaFunctor f0(@NotNull String termAtom, @NotNull Runnable ff) {
-        return f0(fName(termAtom), ()-> {
-            ff.run();
-            return null;
+    public static LambdaFunctor r0(@NotNull String termAtom, @NotNull Supplier<Runnable> ff) {
+        Atom fName = fName(termAtom);
+        return f0(fName, ()-> {
+
+            return new AbstractPred<Object>($.inst( $.quote(Util.uuid64()), fName )) {
+
+                @Override
+                public boolean test(Object o) {
+                    try {
+                        Runnable r = ff.get();
+                        r.run();
+                        return true;
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                        return false;
+                    }
+                }
+            };
         });
     }
 

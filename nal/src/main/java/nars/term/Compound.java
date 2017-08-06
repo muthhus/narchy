@@ -23,8 +23,10 @@ package nars.term;
 import jcog.Util;
 import jcog.data.sexpression.IPair;
 import jcog.data.sexpression.Pair;
+import nars.$;
 import nars.IO;
 import nars.Op;
+import nars.derive.AbstractPred;
 import nars.index.term.NewCompound;
 import nars.index.term.TermContext;
 import nars.op.mental.AliasConcept;
@@ -739,8 +741,12 @@ public interface Compound extends Term, IPair, TermContainer {
                     Termed ff = index.getIfPresentElse(possibleFunc);
                     if (ff instanceof Functor) {
                         u = ((Functor) ff).apply(((Compound) possibleArgs).subterms());
-                        if (u == null)
+                        if (u instanceof AbstractPred) {
+                            u = $.the(((AbstractPred)u).test(null));
+                        }
+                        else if (u == null)
                             u = this; //null means to keep the same
+
                     }
                 }
             }
