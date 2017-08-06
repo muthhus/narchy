@@ -1,10 +1,9 @@
-package nars.web;
+package nars.nlp;
 
 import jcog.pri.PriReference;
 import nars.*;
 import nars.bag.leak.Leak;
 import nars.bag.leak.LeakOut;
-import nars.nlp.Hear;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
 import org.pircbotx.hooks.events.PrivateMessageEvent;

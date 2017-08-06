@@ -1,11 +1,9 @@
 
-package nars.web;
+package nars.nlp;
 
 import jcog.pri.PriReference;
 import nars.*;
 import nars.bag.leak.LeakOut;
-import nars.nlp.Hear;
-import nars.nlp.Speech;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;

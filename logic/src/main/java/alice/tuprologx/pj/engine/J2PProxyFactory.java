@@ -170,6 +170,7 @@ public class J2PProxyFactory extends ProxyFactory {
         public int hashCode() { return hash; }
 
         public boolean equals(Object obj) {
+            if (this == obj) return true;
             if (obj instanceof CacheKey) {
                 CacheKey target = (CacheKey)obj;
                 return target.filter == filter && target.handler == handler
@@ -386,7 +387,7 @@ public class J2PProxyFactory extends ProxyFactory {
 	 * A provider used by <code>createClass()</code> for obtaining a class loader. <code>get()</code> on this <code>ClassLoaderProvider</code> object is called to obtain a class loader. <p>The value of this field can be updated for changing the default implementation. <p>Example: <ul><pre> ProxyFactory.classLoaderProvider = new ProxyFactory.ClassLoaderProvider() { public ClassLoader get(ProxyFactory pf) { return Thread.currentThread().getContextClassLoader(); } }; </pre></ul>
 	 * @since   3.4
 	 */
-    public final ClassLoaderProvider classLoaderProvider
+    final ClassLoaderProvider classLoaderProvider
         = pf -> ((J2PProxyFactory)pf).getClassLoader0();
 
     @Override
