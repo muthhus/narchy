@@ -105,13 +105,13 @@ abstract public class NAgentX extends NAgent {
         //fps * 2f; //nyquist
 
         RealTime clock =
-                durFPS >= 10 ?
+                durFPS >= 10/2f ?
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
 
         clock.durFPS(durFPS);
 
-        int THREADS = 3;
+        int THREADS = 4;
         NAR n = new NARS()
                 .exe(
                         new MultiExecutioner((i) ->
@@ -130,10 +130,10 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.5f);
+        n.goalConfidence(0.8f);
 
 
-        float priFactor = 0.05f;
+        float priFactor = 0.5f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;

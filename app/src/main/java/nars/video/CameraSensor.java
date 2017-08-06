@@ -11,6 +11,7 @@ import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +52,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         numPixels = w * h;
 
         this.in = nar.newInputChannel(this);
-        this.in.set(0f, 1f/(w*h)); //shared amongst all pixels
+        this.in.amplitude(1f/(w*h)); //shared amongst all pixels
 
         pixels = encode(RadixProduct(root, src.width(), src.height(), RADIX));
 
@@ -237,7 +238,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
             //this.templates = new PixelNeighborsXYRandom(x, y, w, h, 1);
         }
 
-//        @Override
+
+        //        @Override
 //        public TermContainer templates() {
 //            return templates;
 //        }

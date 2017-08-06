@@ -907,7 +907,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * Exits an iteration loop if running
      */
-    public void stop() {
+    public NAR stop() {
 
         loop.stop();
 
@@ -918,6 +918,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         derivation.forEach(c -> c.reset());
         //derivation.forEach(c -> c.transformsCache.invalidateAll());
 
+        return this;
     }
 
     /**

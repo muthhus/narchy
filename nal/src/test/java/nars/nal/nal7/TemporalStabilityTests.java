@@ -15,9 +15,11 @@ import org.junit.Test;
  */
 public class TemporalStabilityTests {
 
-    static {
-        Param.DEBUG = false;
-    }
+    static final int CYCLES = 500;
+
+//    static {
+//        Param.DEBUG = true;
+//    }
 
     static class T1 extends TemporalStabilityTest {
 
@@ -105,40 +107,40 @@ public class TemporalStabilityTests {
     };
 
     @Test public void testTemporalStabilityInh3() throws Narsese.NarseseException {
-        new T1(inheritencer, 1, 2, 5).test(200, NARS.tmp());
+        new T1(inheritencer, 1, 2, 5).test(CYCLES, NARS.tmp());
     }
 
     @Test public void testTemporalStabilityImpl() throws Narsese.NarseseException {
-        new T1(implicator, 1, 2, 5).test(200, NARS.tmp());
+        new T1(implicator, 1, 2, 5).test(CYCLES, NARS.tmp());
     }
     @Test public void testTemporalStabilityProd() throws Narsese.NarseseException {
-        new T1(productor, 1, 2, 5).test(200, NARS.tmp());
+        new T1(productor, 1, 2, 5).test(CYCLES, NARS.tmp());
     }
     @Test public void testTemporalStabilityBiProd() throws Narsese.NarseseException {
-        new T1(biproductor, 1, 2, 5).test(200, NARS.tmp());
+        new T1(biproductor, 1, 2, 5).test(CYCLES, NARS.tmp());
     }
     @Test public void testTemporalStabilityLinkedProd() throws Narsese.NarseseException {
-        new T1(linkedproductor, 1, 2, 5).test(200, NARS.tmp());
+        new T1(linkedproductor, 1, 2, 5).test(CYCLES, NARS.tmp());
     }
 
     @Test public void testTemporalStabilityLinkedInh() throws Narsese.NarseseException {
-        new T1(linkedinh, new int[] { 1, 2, 5 }).test(200, NARS.tmp());
+        new T1(linkedinh, new int[] { 1, 2, 5 }).test(CYCLES, NARS.tmp());
     }
     @Test public void testTemporalStabilityLinkedImpl() throws Narsese.NarseseException {
-        new T1(linkedimpl, 1, 2, 5).test(200, NARS.tmp());
+        new T1(linkedimpl, 1, 2, 5).test(CYCLES, NARS.tmp());
     }
     @Test public void testTemporalStabilityLinkedTemporalConj() throws Narsese.NarseseException {
-        new T1(linkedTempConj5, new int[] { 1, 6, 11 }, 1, 16).test(200, NARS.tmp());
+        new T1(linkedTempConj5, new int[] { 1, 6, 11 }, 1, 16).test(CYCLES, NARS.tmp());
     }
     @Test public void testTemporalStabilityLinkedImplExt() throws Narsese.NarseseException {
-        new T1(linkedimpl, 1, 2, 5).test(200, NARS.tmp());
+        new T1(linkedimpl, 1, 2, 5).test(CYCLES, NARS.tmp());
     }
     @Test public void testTemporalStabilityLinkedImplExt2() throws Narsese.NarseseException {
 
         //Param.DEBUG = true;
 
         @NotNull NAR n = NARS.tmp();
-        int time = 80;
+        int time = CYCLES;
         T1 a = new T1(linkedimpl, 1, 2, 5, 10);
         T1 b = new T1(linkedinh, 1, 2, 5, 10);
 

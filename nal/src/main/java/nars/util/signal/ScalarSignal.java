@@ -66,8 +66,8 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 //        this.lastInputTime = nar.time() - minTimeBetweenUpdates;
 //    }
 
-    @Override
-    public Task apply(@NotNull NAR nar) {
+    /** does not input the task, only generates it */
+    @Override public Task apply(@NotNull NAR nar) {
 
         //long now = nar.time();
 
