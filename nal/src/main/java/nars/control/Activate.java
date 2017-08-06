@@ -367,7 +367,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 return 3;
 
             case CONJ:
-                return 2;
+                return 1;
 
 //                int s = host.size();
 //                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {
