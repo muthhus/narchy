@@ -1,7 +1,8 @@
 package nars.op.mental;
 
+import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.ConcurrentCurveBag;
-import jcog.bag.impl.CurveBag;
+import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
@@ -10,9 +11,11 @@ import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.Task;
+import nars.bag.leak.DtLeak;
 import nars.bag.leak.TaskLeak;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
+import nars.op.stm.TaskService;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.Term;
@@ -37,7 +40,7 @@ import static nars.time.Tense.ETERNAL;
  *
  * @param S serial term type
  */
-public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriReference<Compound>> {
+public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
 
     /**
@@ -45,6 +48,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
      */
     @NotNull
     public final MutableFloat abbreviationConfidence;
+    private final DtLeak<Compound, PLink<Compound>> bag;
 
     /**
      * whether to use a (strong, proxying) alias atom concept
@@ -66,13 +70,22 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
 
 
     public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
-        super(
-                new ConcurrentCurveBag(PriMerge.plus, new ConcurrentHashMap<>(capacity), n.random(), capacity)
-            , selectionRate, n);
+        super(n);
+        bag = new DtLeak<Compound, PLink<Compound>>(new ArrayBag<Compound, PLink<Compound>>(PriMerge.plus, new ConcurrentHashMap<>(capacity)) {
+            @Nullable @Override public Compound key(@NotNull PLink<Compound> l) {
+                return l.get();
+            }
+        }, new FloatParam(selectionRate)) {
+
+            @Override
+            protected float onOut(@NotNull PLink<Compound> b) {
+                return 0;
+            }
+        };
+        bag.setCapacity(capacity);
 
         this.nar = n;
         this.termPrefix = termPrefix;
-        this.setCapacity(capacity);
         this.abbreviationConfidence =
                 new MutableFloat(nar.confDefault(BELIEF));
         //new MutableFloat(1f - nar.truthResolution.floatValue());
@@ -80,9 +93,19 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
         volume = new MutableIntRange(volMin, volMax);
     }
 
-    @Nullable
     @Override
-    protected void in(@NotNull Task task, @NotNull Consumer<PriReference<Compound>> each) {
+    protected void startUp() throws Exception {
+        super.startUp();
+        ons.add(nar.onCycle(nn -> bag.commit(nn.time(), nn.dur())));
+    }
+
+    @Override
+    public void clear() {
+        bag.clear();
+    }
+
+    @Override
+    public void accept(@NotNull Task task) {
 
         Term taskTerm = task.term();
         if ((!(taskTerm instanceof Compound)) || task.meta(Abbreviation.class) != null)
@@ -91,11 +114,11 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
         Priority b = task;
         if (b != null) {
 
-            input(b, each, (Compound) taskTerm, 1f);
+            input(b, bag.bag::put, (Compound) taskTerm, 1f);
         }
     }
 
-    private void input(@NotNull Priority b, @NotNull Consumer<PriReference<Compound>> each, @NotNull Compound t, float scale) {
+    private void input(@NotNull Priority b, @NotNull Consumer<PLink<Compound>> each, @NotNull Compound t, float scale) {
         int vol = t.volume();
         if (vol < volume.lo())
             return;
@@ -122,7 +145,6 @@ public class Abbreviation/*<S extends Term>*/ extends TaskLeak<Compound, PriRefe
     }
 
 
-    @Override
     protected float onOut(PriReference<Compound> b) {
 
         abbreviate(b.get(), b);

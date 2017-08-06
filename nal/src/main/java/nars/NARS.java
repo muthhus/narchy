@@ -11,7 +11,7 @@ import nars.exe.FocusedExecutioner;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.stm.STMTemporalLinkage;
+import nars.op.stm.STMLinkage;
 import nars.time.CycleTime;
 import nars.time.RealTime;
 import nars.time.Time;
@@ -212,7 +212,7 @@ public class NARS {
             nar.DEFAULT_QUEST_PRIORITY = 0.35f;
 
             if (nal >= 7)
-                new STMTemporalLinkage(nar, 1, false);
+                new STMLinkage(nar, 1, false);
 
         }
     }

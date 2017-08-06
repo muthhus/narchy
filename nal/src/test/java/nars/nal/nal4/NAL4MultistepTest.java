@@ -1,8 +1,8 @@
 package nars.nal.nal4;
 
 import nars.Narsese;
-import nars.util.AbstractNALTest;
 import nars.test.TestNAR;
+import nars.util.AbstractNALTest;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;

@@ -3,10 +3,10 @@ package nars.nal.nal8;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
-import nars.util.AbstractNALTest;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
+import nars.util.AbstractNALTest;
 import org.junit.Ignore;
 import org.junit.Test;
 

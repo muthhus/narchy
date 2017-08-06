@@ -1,16 +1,13 @@
 package nars.op.mental;
 
-import jcog.bag.impl.CurveBag;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
-import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
 import nars.bag.leak.LeakOut;
-import nars.bag.leak.TaskLeak;
 import nars.control.CauseChannel;
 import nars.task.NALTask;
 import nars.term.Compound;
@@ -28,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
 import static nars.Op.*;
@@ -164,14 +160,14 @@ public class Inperience extends LeakOut {
     }
 
     @Override
-    protected void in(Task task, @NotNull Consumer<PriReference<Task>> each) {
+    public void accept(Task task) {
 
 
         if (task.isCommand() || task.isInput()
             /*|| task instanceof InperienceTask*/) //for disabling recursive inperience
             return;
 
-        boolean full = bag.isFull();
+        boolean full = leak.bag.isFull();
 
 
         if (task.isBeliefOrGoal()) {
@@ -189,9 +185,7 @@ public class Inperience extends LeakOut {
             //belief = false;
         }
 
-        float p = task.priSafe(-1);
-        if (p >= 0)
-            each.accept(new PLink<>(task, p));
+        super.accept(task);
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {

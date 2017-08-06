@@ -6,7 +6,6 @@ import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.Op;
-import nars.term.Compound;
 import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.truth.Truth;

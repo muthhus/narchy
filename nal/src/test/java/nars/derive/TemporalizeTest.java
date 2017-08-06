@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TreeSet;
 
-import static nars.derive.Temporalize.*;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.*;
 

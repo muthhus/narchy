@@ -7,7 +7,6 @@ import com.googlecode.lanterna.screen.TerminalScreen;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import spacegraph.SpaceGraph;
 
-import javax.swing.plaf.TextUI;
 import java.io.IOException;
 
 

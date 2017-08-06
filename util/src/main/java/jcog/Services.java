@@ -15,33 +15,35 @@ package jcog;
 
 import com.google.common.annotations.Beta;
 import com.google.common.annotations.GwtIncompatible;
-import com.google.common.base.Function;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Stopwatch;
-import com.google.common.collect.*;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Queues;
 import com.google.common.util.concurrent.AbstractService;
 import com.google.common.util.concurrent.Monitor;
 import com.google.common.util.concurrent.Service;
 import com.google.common.util.concurrent.Service.State;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.j2objc.annotations.WeakOuter;
 import jcog.list.FasterList;
 
 import javax.annotation.concurrent.GuardedBy;
 import java.io.PrintStream;
 import java.lang.ref.WeakReference;
-import java.util.*;
-import java.util.Map.Entry;
-import java.util.concurrent.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import static com.google.common.base.Preconditions.*;
-import static com.google.common.base.Predicates.*;
+import static com.google.common.base.Predicates.instanceOf;
+import static com.google.common.base.Predicates.not;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static com.google.common.util.concurrent.Service.State.*;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Modifications to guava's ServiceManager
@@ -392,6 +394,9 @@ public class Services<X> {
             removed.service.stopAsync();
         }
         s.addListener(new ServiceListener(ss), directExecutor());
+
+        //if (autostart)
+        s.startAsync();
     }
 
     /**

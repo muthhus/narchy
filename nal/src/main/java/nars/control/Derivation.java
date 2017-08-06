@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
-import java.util.function.Supplier;
 
 import static nars.Op.Null;
 import static nars.Op.VAR_PATTERN;

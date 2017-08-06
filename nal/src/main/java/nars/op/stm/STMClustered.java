@@ -29,10 +29,11 @@ import java.util.stream.Stream;
  * clusterjunctioning
  * TODO abstract into general purpose "Cluster of Bags" class
  */
-public abstract class STMClustered extends STM {
+public abstract class STMClustered extends TaskService {
 
 
     //final @Nullable Bag<Task, PriReference<Task>> input;
+    public final MutableInteger capacity;
 
     final short clusters;
     public final int dims;
@@ -320,7 +321,9 @@ public abstract class STMClustered extends STM {
 
 
     protected STMClustered(int dims, @NotNull NAR nar, @NotNull MutableInteger capacity, byte punc, int centroids) {
-        super(nar, capacity);
+        super(nar);
+
+        this.capacity = capacity;
 
         this.dims = dims;
 
@@ -426,6 +429,8 @@ public abstract class STMClustered extends STM {
     @Override
     public void accept(@NotNull Task t) {
 
+        if (!STMLinkage.stmLinkable(t, allowNonInput))
+            return;
 
         if (t.punc() == punc && !t.isEternal()) {
 

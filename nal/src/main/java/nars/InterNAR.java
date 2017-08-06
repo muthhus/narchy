@@ -2,45 +2,53 @@ package nars;
 
 import jcog.Util;
 import jcog.net.UDPeer;
-import jcog.pri.PriReference;
 import nars.bag.leak.LeakOut;
 import nars.control.CauseChannel;
+import nars.op.stm.TaskService;
 import nars.task.ActiveQuestionTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static jcog.net.UDPeer.Command.TELL;
 
 /**
  * InterNAR P2P Network Interface for a NAR
  */
-public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, Task> {
+public class InterNAR extends TaskService implements BiConsumer<ActiveQuestionTask, Task> {
 
     //public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
-    /**
-     * tasks per second output
-     */
-    private static final float DEFAULT_RATE = 8;
-
-    public final NAR nar;
-    public final LeakOut send;
-    public final CauseChannel<Task> recv;
+    public final LeakOut buffer;
+    final CauseChannel<Task> recv;
+    public MyUDPeer peer;
 
 
-    public InterNAR(NAR nar) throws IOException {
-        this(nar, DEFAULT_RATE, 0);
+    @Override
+    public void accept(@NotNull Task t) {
+        buffer.accept(t);
     }
+
+    @Override
+    protected void startUp() throws Exception {
+        peer = new MyUDPeer(0, true);
+    }
+
+    @Override
+    protected void shutDown() throws Exception {
+        peer.stop();
+        peer = null;
+    }
+
 
     InterNAR pri(float priFactor) {
         recv.amplitude = priFactor;
-        return this;
+        return InterNAR.this;
     }
 
     /**
@@ -63,22 +71,23 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
      * @throws UnknownHostException
      */
     public InterNAR(NAR nar, float outRate, int port, boolean discover) throws IOException {
-        super(port, discover);
-        this.nar = nar;
+        super(nar);
 
-        this.recv = nar.newInputChannel(this);
+        peer = new MyUDPeer(port, discover);
 
-        this.send = new LeakOut(nar, 256, outRate) {
+        recv = nar.newInputChannel(this);
+
+        buffer = new LeakOut(nar, 256, outRate) {
             @Override
             protected float send(Task x) {
 
-                if (connected()) {
+                if (peer.connected()) {
                     try {
                         x = nar.post(x);
                         //if (x!=null) {
                         @Nullable byte[] msg = IO.taskToBytes(x);
                         if (msg != null) {
-                            if (tellSome(msg, ttl(x), true) > 0) {
+                            if (peer.tellSome(msg, ttl(x), true) > 0) {
                                 return 1;
                             }
                         }
@@ -92,23 +101,21 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
             }
 
             @Override
-            protected void in(@NotNull Task t, Consumer<PriReference<Task>> each) {
-                if (t.isCommand() || !connected())
+            public void accept(@NotNull Task t) {
+                if (t.isCommand() || !peer.connected())
                     return;
 
-                super.in(t, each);
+                super.accept(t);
             }
         };
     }
 
-    private static byte ttl(Task x) {
-        return (byte) (1 + Util.lerp(x.priElseZero() /* * (1f + x.qua())*/, 2, 5));
+    public void ping(InetSocketAddress x) {
+        peer.ping(x);
     }
 
-    @Override
-    public void stop() {
-        super.stop();
-        send.stop();
+    private static byte ttl(Task x) {
+        return (byte) (1 + Util.lerp(x.priElseZero() /* * (1f + x.qua())*/, 2, 5));
     }
 
     //        @Override
@@ -122,40 +129,60 @@ public class InterNAR extends UDPeer implements BiConsumer<ActiveQuestionTask, T
 //        }
 
     @Override
-    protected void onTell(UDPeer.UDProfile connected, Msg m) {
-
-        Task x;
-
-
-        x = IO.taskFromBytes(m.data());
-        if (x != null) {
-            if (x.isQuestOrQuestion()) {
-                //reconstruct a question task with an onAnswered handler to reply with answers to the sender
-                x = new ActiveQuestionTask(x, 8, nar, this);
-                x.meta(Msg.class, m);
-            }
-            x.budget(nar);
-
-            //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
-            logger.debug("recv {} from {}", x, m.origin());
-            recv.input(x);
-        }
-    }
-
-    @Override
     public void accept(ActiveQuestionTask question, Task answer) {
-        Msg q = question.meta(Msg.class);
+        UDPeer.Msg q = question.meta(UDPeer.Msg.class);
         if (q == null)
             return;
 
         answer = nar.post(answer);
         @Nullable byte[] a = IO.taskToBytes(answer);
         if (a != null) {
-            Msg aa = new Msg(TELL.id, ttl(answer), me, null, a);
-            if (!seen(aa, 1f))
-                send(aa, q.origin());
+            UDPeer.Msg aa = new UDPeer.Msg(TELL.id, ttl(answer), peer.me, null, a);
+            if (!peer.seen(aa, 1f))
+                peer.send(aa, q.origin());
         }
 
 
+    }
+
+    public void runFPS(float fps) {
+        peer.runFPS(fps);
+    }
+
+    public InetSocketAddress addr() {
+        return peer.addr;
+    }
+
+    private class MyUDPeer extends UDPeer {
+
+        public MyUDPeer(int port, boolean discovery) throws IOException {
+            super(port, discovery);
+        }
+
+        @Override
+        public void stop() {
+            super.stop();
+        }
+
+        @Override
+        protected void onTell(UDProfile connected, Msg m) {
+
+            Task x;
+
+
+            x = IO.taskFromBytes(m.data());
+            if (x != null) {
+                if (x.isQuestOrQuestion()) {
+                    //reconstruct a question task with an onAnswered handler to reply with answers to the sender
+                    x = new ActiveQuestionTask(x, 8, nar, InterNAR.this);
+                    x.meta(Msg.class, m);
+                }
+                x.budget(nar);
+
+                //System.out.println(me + " RECV " + x + " " + Arrays.toString(x.stamp()) + " from " + m.origin());
+                logger.debug("recv {} from {}", x, m.origin());
+                recv.input(x);
+            }
+        }
     }
 }

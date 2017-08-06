@@ -194,7 +194,10 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 
         //n.onCycle(nn->{System.out.println(nn.time() + "\n" + n.exe.stats() + "\n\n");});
 
+        n.print(System.out);
+
         n.startFPS(fps).join();
+
         //n.run(600);
 
 

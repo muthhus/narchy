@@ -287,7 +287,7 @@ public class UDPeer extends UDP {
     /**
      * send to a specific known recipient
      */
-    protected void send(@NotNull Msg o, @NotNull InetSocketAddress to) {
+    public void send(@NotNull Msg o, @NotNull InetSocketAddress to) {
 //        InetSocketAddress a = o.origin();
 //        if (a != null && a.equals(to))
 //            return;

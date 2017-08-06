@@ -3,8 +3,8 @@ package nars.nal.nal1;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
-import nars.util.AbstractNALTest;
 import nars.test.TestNAR;
+import nars.util.AbstractNALTest;
 import org.junit.Test;
 
 public class NAL1Test extends AbstractNALTest {

@@ -1,12 +1,12 @@
 package com.github.disc99.injector;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.junit.Test;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 public class InjectorTest {
 

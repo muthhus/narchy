@@ -2,7 +2,6 @@ package nars.op.stm;
 
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.data.FloatParam;
-import jcog.data.MutableInteger;
 import jcog.pri.PLink;
 import jcog.pri.Pri;
 import nars.NAR;
@@ -16,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * Creates links between sequences of perceived events
  * Empties task buffer when plugin is (re)started.
  */
-public final class STMTemporalLinkage extends STM {
+public final class STMLinkage extends TaskService {
 
     @NotNull
     public final DisruptorBlockingQueue<Task> stm;
@@ -24,12 +23,12 @@ public final class STMTemporalLinkage extends STM {
     final FloatParam strength = new FloatParam(1f, 0f, 1f);
 
 
-    public STMTemporalLinkage(@NotNull NAR nar, int capacity) {
+    public STMLinkage(@NotNull NAR nar, int capacity) {
         this(nar, capacity, false);
     }
 
-    public STMTemporalLinkage(@NotNull NAR nar, int capacity, boolean allowNonInput) {
-        super(nar, new MutableInteger(capacity));
+    public STMLinkage(@NotNull NAR nar, int capacity, boolean allowNonInput) {
+        super(nar);
 
         this.allowNonInput = allowNonInput;
         strength.setValue(1f / capacity);
@@ -41,6 +40,10 @@ public final class STMTemporalLinkage extends STM {
 
     }
 
+    static boolean stmLinkable(@NotNull Task newEvent, boolean allowNonInput) {
+        return ( !newEvent.isEternal() && (allowNonInput || newEvent.isInput()));
+    }
+
     @Override
     public void clear() {
         stm.clear();
@@ -50,6 +53,8 @@ public final class STMTemporalLinkage extends STM {
     public final void accept(@NotNull Task t) {
 
         if (!t.isBeliefOrGoal())
+            return;
+        if (!STMLinkage.stmLinkable(t, allowNonInput))
             return;
 
         float strength = this.strength.floatValue();

@@ -88,7 +88,7 @@ public class TextUI {
         nar.startFPS(2f);
 
         try {
-            InterNAR i = new InterNAR(nar);
+            InterNAR i = new InterNAR(nar, 8, 0);
             i.recv.amplitude(0.1f);
             i.runFPS(2);
         } catch (Exception e) {

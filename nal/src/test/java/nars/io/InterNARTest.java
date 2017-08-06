@@ -1,10 +1,13 @@
 package nars.io;
 
+import com.google.common.util.concurrent.Service;
 import jcog.Util;
 import nars.*;
 import nars.time.Tense;
 import org.junit.Test;
 
+import java.net.InetSocketAddress;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 
@@ -40,29 +43,41 @@ public class InterNARTest {
             InterNAR ai = new InterNAR(a, 10, 0, false);
             InterNAR bi = new InterNAR(b, 10, 0, false);
 
-            ai.runFPS(20f);
-            bi.runFPS(20f);
+            ai.addListener(new Service.Listener() {
+                @Override
+                public void starting() {
+                    ai.runFPS(5f);
+                    Util.sleep(CONNECTION_TIME);
 
-            Util.sleep(CONNECTION_TIME);
+                    afterConnect.accept(ai, bi);
 
-            bi.ping(ai.addr);
+                    a.run(postCycles);
 
-            Util.sleep(CONNECTION_TIME);
+                    ai.stopAsync();
 
-            afterConnect.accept(ai, bi);
+                    a.stop();
+                }
+            }, ForkJoinPool.commonPool());
 
-            Util.sleep(CONNECTION_TIME);
+            bi.addListener(new Service.Listener() {
+                @Override
+                public void starting() {
+                    bi.runFPS(5f);
 
-            for (int i = 0; i < postCycles; i++) {
-                a.run(1); b.run(1);
-            }
+                    Util.sleep(CONNECTION_TIME);
 
-            Util.sleep(CONNECTION_TIME);
+                    bi.ping(ai.addr());
 
-            ai.stop();
-            bi.stop();
-            a.stop();
-            b.stop();
+                    b.run(postCycles);
+
+                    bi.stopAsync();
+
+                    b.stop();
+                }
+            }, ForkJoinPool.commonPool());
+
+
+            Util.sleep(CONNECTION_TIME*4);
 
         } catch (Exception e) {
             e.printStackTrace();

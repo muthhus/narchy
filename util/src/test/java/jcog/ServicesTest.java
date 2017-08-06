@@ -3,8 +3,6 @@ package jcog;
 import com.google.common.util.concurrent.AbstractIdleService;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class ServicesTest {
 
     @Test

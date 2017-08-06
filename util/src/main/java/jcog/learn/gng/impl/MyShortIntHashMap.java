@@ -25,7 +25,6 @@ import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
 import org.eclipse.collections.impl.map.mutable.primitive.AbstractMutableIntValuesMap;
 import org.eclipse.collections.impl.map.mutable.primitive.AbstractSentinelValues;
 import org.eclipse.collections.impl.map.mutable.primitive.MutableShortKeysMap;
-import org.eclipse.collections.impl.map.mutable.primitive.ShortIntHashMap;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 
 import java.io.Externalizable;

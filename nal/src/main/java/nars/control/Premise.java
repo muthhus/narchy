@@ -12,21 +12,16 @@ import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.derive.PrediTerm;
 import nars.derive.Temporalize;
 import nars.table.BeliefTable;
 import nars.task.ITask;
-import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.UnifySubst;
-import nars.util.BudgetFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.function.Supplier;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;

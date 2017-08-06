@@ -2,9 +2,8 @@ package jcog.learn.gng;
 
 import com.google.common.base.Joiner;
 import jcog.learn.gng.impl.DenseIntUndirectedGraph;
-import jcog.learn.gng.impl.ShortUndirectedGraph;
 import jcog.learn.gng.impl.Node;
-import jcog.learn.gng.impl.SemiDenseShortUndirectedGraph;
+import jcog.learn.gng.impl.ShortUndirectedGraph;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;

@@ -11,7 +11,7 @@ import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
-import nars.op.stm.STMTemporalLinkage;
+import nars.op.stm.STMLinkage;
 import nars.term.Term;
 import nars.time.RealTime;
 import nars.truth.Truth;
@@ -145,7 +145,7 @@ abstract public class NAgentX extends NAgent {
         n.termVolumeMax.setValue(24);
 
 
-        STMTemporalLinkage stmLink = new STMTemporalLinkage(n, 1, false);
+        STMLinkage stmLink = new STMLinkage(n, 1, false);
         MySTMClustered stm = new MySTMClustered(n, 64, BELIEF, 3, true, 4f);
         MySTMClustered stmGoal = new MySTMClustered(n, 64, GOAL, 3, true, 4f);
         Inperience inp = new Inperience(n, 8, 0.5f);

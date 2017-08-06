@@ -3,7 +3,6 @@ package nars.derive;
 import nars.*;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
-import nars.derive.rule.PremiseRule;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;

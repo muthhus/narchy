@@ -25,7 +25,6 @@ import java.util.function.Supplier;
 
 import static nars.$.$;
 import static nars.$.*;
-import static nars.term.Terms.compoundOrNull;
 
 /**
  * agent sensor builder

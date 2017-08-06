@@ -152,9 +152,9 @@ public class IRCNLP extends IRC {
         }
 
         @Override
-        protected void in(@NotNull Task t, Consumer<PriReference<Task>> each) {
+        public void accept(@NotNull Task t) {
             if (trace || t.isCommand())
-                super.in(t, each);
+                super.accept(t);
         }
     }
 

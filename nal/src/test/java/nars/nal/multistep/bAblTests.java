@@ -1,7 +1,7 @@
 package nars.nal.multistep;
 
-import nars.util.AbstractNALTest;
 import nars.test.TestNAR;
+import nars.util.AbstractNALTest;
 import org.junit.Test;
 
 import static nars.Op.BELIEF;

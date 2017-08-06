@@ -323,9 +323,9 @@ public class Vis {
         new LeakOut(nar, 4, 0.25f) {
 
             @Override
-            protected void in(@NotNull Task t, Consumer<PriReference<Task>> each) {
+            public void accept(@NotNull Task t) {
                 if (t.pri() >= priMin.floatValue()) {
-                    super.in(t, each);
+                    super.accept(t);
                 }
             }
 

@@ -2,6 +2,8 @@ package nars.bag.leak;
 
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
+import jcog.pri.PLink;
+import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -99,4 +101,7 @@ public abstract class DtLeak<X, Y> extends Leak<X, Y> {
      */
     abstract protected float onOut(@NotNull Y b);
 
+    public void put(Y x) {
+        bag.put(x);
+    }
 }

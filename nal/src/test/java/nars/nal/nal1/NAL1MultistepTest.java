@@ -1,7 +1,7 @@
 package nars.nal.nal1;
 
-import nars.util.AbstractNALTest;
 import nars.test.DeductiveChainTest;
+import nars.util.AbstractNALTest;
 import org.junit.Test;
 
 import static nars.test.DeductiveChainTest.*;

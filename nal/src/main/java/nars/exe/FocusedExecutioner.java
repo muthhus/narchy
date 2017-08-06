@@ -14,8 +14,6 @@ import nars.control.Premise;
 import nars.derive.PrediTerm;
 import nars.task.ITask;
 import nars.task.NALTask;
-import nars.term.ProxyTerm;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * uses 3 bags/priority queues for a controlled, deterministic
