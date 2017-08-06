@@ -951,7 +951,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         }
 
         /*if (isCommand)*/
-        nar.eventTaskProcess.emit(cmd);
+        nar.eventTask.emit(cmd);
         return null;
 
     }

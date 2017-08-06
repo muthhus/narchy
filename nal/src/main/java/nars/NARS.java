@@ -94,7 +94,7 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = FocusedExecutioner::new;
+        exe = () -> new FocusedExecutioner(deriver);
                 //new BufferedExecutioner(64, 32, 0.2f);
 
         rng = () -> new XorShift128PlusRandom(1);

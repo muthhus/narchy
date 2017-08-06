@@ -95,7 +95,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //            if (n.exe.concurrent())
 //                n.eventTaskProcess.emitAsync(/*post*/t, n.exe);
 //            else
-                n.eventTaskProcess.emit(t);
+                n.eventTask.emit(t);
         }
         //}
     }

@@ -14,7 +14,7 @@ public final class DynamicConcept extends BaseConcept {
     @Deprecated final NAR nar;
 
     public DynamicConcept(@NotNull Term term, BeliefTable beliefs, BeliefTable goals, NAR nar) {
-        super(term, beliefs, goals, nar.conceptBuilder);
+        super(term, beliefs, goals, nar.terms.conceptBuilder);
         this.nar = nar;
     }
 

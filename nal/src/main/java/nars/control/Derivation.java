@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 import static nars.Op.Null;
 import static nars.Op.VAR_PATTERN;
@@ -209,18 +210,18 @@ public class Derivation extends Unify implements TermContext {
 
     /**
      * concept-scope
+     * @param deriver
      */
-    @NotNull
-    public Derivation cycle() {
+    public Derivation cycle(PrediTerm<Derivation> deriver) {
         long now = this.nar.time();
         if (now!=this.time) {
-            this.time =now;
+            this.time = now;
             this.dur = nar.dur();
             this.truthResolution = nar.truthResolution.floatValue();
             this.confMin = nar.confMin.floatValue();
-            this.deriver = nar.deriver();
             //transformsCache.cleanUp();
         }
+        this.deriver = deriver;
         return this;
     }
 

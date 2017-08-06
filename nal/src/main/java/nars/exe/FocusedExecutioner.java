@@ -5,12 +5,17 @@ import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
 import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
+import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.control.Activate;
+import nars.control.Derivation;
 import nars.control.Premise;
+import nars.derive.PrediTerm;
 import nars.task.ITask;
 import nars.task.NALTask;
+import nars.term.ProxyTerm;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +24,9 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * uses 3 bags/priority queues for a controlled, deterministic
@@ -29,6 +36,9 @@ import java.util.function.Predicate;
  * activations
  */
 public class FocusedExecutioner extends Executioner {
+
+    private PrediTerm<Derivation> deriver;
+    private final Function<NAR, PrediTerm<Derivation>> deriverBuilder;
 
     public int subCycles = 2;
     final int subCycleConcepts = 3;
@@ -58,12 +68,22 @@ public class FocusedExecutioner extends Executioner {
      */
     private final FasterList<ITask> next = new FasterList(1024);
 
+    public FocusedExecutioner(Function<NAR,PrediTerm<Derivation>> deriverBuilder) {
+        this.deriverBuilder = deriverBuilder;
+    }
+
     @Override
     protected synchronized void clear() {
         next.clear();
         premises.clear();
         tasks.clear();
         concepts.clear();
+    }
+
+    @Override
+    public synchronized void start(NAR nar) {
+        super.start(nar);
+        deriver = deriverBuilder.apply(nar);
     }
 
     @Override
@@ -114,14 +134,33 @@ public class FocusedExecutioner extends Executioner {
 
             execute(next);
 
-            premises.pop(subCyclePremises, next::add);
+            premises.pop(subCyclePremises, this::execute);
 
 //            System.out.println("PREMISES");
 //            next.forEach(System.out::println);
 //            System.out.println("/PREMISES");
 
-            execute(next);
         }
+    }
+
+
+    public static class Deriver extends ProxyTerm implements Supplier<PrediTerm<Derivation>> {
+
+        private final PrediTerm<Derivation> deriver;
+
+        public Deriver(Term id, PrediTerm<Derivation> deriver) {
+            super(id);
+            this.deriver = deriver;
+        }
+
+        @Override
+        public PrediTerm<Derivation> get() {
+            return deriver;
+        }
+    }
+
+    protected void execute(Premise p) {
+        p.run(nar.derivation(deriver), Math.round(nar.matchTTL.intValue() * (0.5f + 0.5f * p.priElseZero())));
     }
 
     public void execute(List<ITask> next) {
@@ -136,7 +175,9 @@ public class FocusedExecutioner extends Executioner {
             if (x.isDeleted())
                 return;
 
-            if (x instanceof Activate) {
+            if (x instanceof Premise) {
+                execute((Premise) x);
+            } else if (x instanceof Activate) {
                 ((Activate) x).hypothesize(nar).forEach(premises::putAsync);
             } else {
                 x.run(nar);

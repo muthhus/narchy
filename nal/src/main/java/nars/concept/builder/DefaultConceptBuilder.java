@@ -315,7 +315,11 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return term;
         }
 
-        return newConcept(term);
+        Concept c = newConcept(term);
+        if (c!=null) {
+            c.state(awake);
+        }
+        return c;
     }
 
     @NotNull

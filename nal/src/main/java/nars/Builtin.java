@@ -89,7 +89,8 @@ public class Builtin {
      * generate all NAR-contextualized functors
      */
     public static void load(NAR nar) {
-
+        for (Concept t : Builtin.statik)
+            nar.terms.set(t);
 
         /** subterm, but specifically inside an ellipsis. otherwise pass through */
         nar.on(Functor.f("esubterm", (TermContainer c) -> {

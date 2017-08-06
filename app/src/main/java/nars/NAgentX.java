@@ -6,7 +6,6 @@ import nars.exe.FocusedExecutioner;
 import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMTemporalLinkage;
@@ -22,7 +21,6 @@ import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.MatrixView;
 import spacegraph.widget.meter.Plot2D;
 
-import javax.swing.plaf.TextUI;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
@@ -117,7 +115,7 @@ abstract public class NAgentX extends NAgent {
                         new MultiExecutioner((i) ->
                                 new MultiExecutioner.Worker(
                                         //new BufferedExecutioner(96, 32, 0.05f)
-                                        new FocusedExecutioner()
+                                        new FocusedExecutioner(deriver)
                                 ), THREADS, 2))
                 .time(clock)
                 .index(

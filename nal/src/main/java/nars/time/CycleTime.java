@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.atomic.AtomicLong;
 
 /** increments time on each frame */
-public class CycleTime implements Time {
+public class CycleTime extends Time {
 
     private final AtomicLong nextStamp = new AtomicLong(0);
 
@@ -47,7 +47,7 @@ public class CycleTime implements Time {
 
 
     @Override
-    public final void cycle() {
+    public final void update() {
         t+=dt;
     }
 

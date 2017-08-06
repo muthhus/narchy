@@ -97,9 +97,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * @author Luke Sandberg
  * @since 14.0
  */
-@Beta
 @GwtIncompatible
-public final class Services<X> {
+public class Services<X> {
 
     public void print(PrintStream out) {
         services.forEach((k,s) -> {

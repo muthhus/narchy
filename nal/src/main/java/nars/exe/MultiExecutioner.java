@@ -138,7 +138,7 @@ public class MultiExecutioner extends Executioner {
      * dont call directly
      */
     void run() {
-        nar.eventCycleStart.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
+        nar.eventCycle.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
     }
 
     @Override

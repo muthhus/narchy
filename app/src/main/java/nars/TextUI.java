@@ -305,7 +305,7 @@ public class TextUI {
 
 
         On newGUIUpdate(/* TODO AtomicBoolean busy, */Runnable r) {
-            return nar.eventCycleStart.on(GUI_UPDATE_MS, (n) -> r.run());
+            return nar.eventCycle.on(GUI_UPDATE_MS, (n) -> r.run());
         }
 
         private class TaskListRenderer extends AbstractListBox.ListItemRenderer {
@@ -500,7 +500,7 @@ public class TextUI {
 
                 setListItemRenderer(new TaskListRenderer(this));
 
-                onTask = nar.eventTaskProcess.on(t -> {
+                onTask = nar.eventTask.on(t -> {
                     add(t);
                     changed.set(true);
                 });

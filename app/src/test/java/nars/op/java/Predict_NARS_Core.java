@@ -39,7 +39,7 @@ public class Predict_NARS_Core {
         //n.param.noiseLevel.set(0);
         //n.param.conceptForgetDurations.set(16);
 
-        n.eventTaskProcess.on(t -> {
+        n.eventTask.on(t -> {
             if (!t.isDeleted() && t.isBelief() && t.op()== Op.PROD && t.term().volume()==2 &&  !t.isEternal() && t.start() > n.time() && t.expectation()>0.5) {
 
                 long time = (int) t.start();

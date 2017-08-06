@@ -28,7 +28,7 @@ public class WiredConcept extends BaseConcept implements PermanentConcept {
     public final FloatParam resolution = new FloatParam(Param.TRUTH_EPSILON);
 
     protected WiredConcept(@NotNull Term term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
-        super(term, beliefs, goals, n.conceptBuilder);
+        super(term, beliefs, goals, n.terms.conceptBuilder);
         resolution.setValue(n.truthResolution);
     }
 

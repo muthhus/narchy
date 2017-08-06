@@ -6,6 +6,7 @@ import nars.Narsese;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
 import nars.concept.builder.ConceptBuilder;
+import nars.concept.builder.DefaultConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
@@ -33,7 +34,8 @@ public abstract class TermIndex implements TermContext {
 
     private static final Logger logger = LoggerFactory.getLogger(TermIndex.class);
     public NAR nar;
-    protected ConceptBuilder conceptBuilder;
+
+    public final ConceptBuilder conceptBuilder = new DefaultConceptBuilder();
 
 
     /**
@@ -67,15 +69,11 @@ public abstract class TermIndex implements TermContext {
     }
 
     public void start(NAR nar) {
-
         this.nar = nar;
-        this.conceptBuilder = nar.conceptBuilder;
 
-        for (Concept t : Builtin.statik)
-            set(t);
+        conceptBuilder.start(nar);
 
         Builtin.load(nar);
-
     }
 
     /**

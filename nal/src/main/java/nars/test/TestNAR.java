@@ -78,7 +78,7 @@ public class TestNAR {
         this.outputEvents = new Topic[]{
                 //nar.memory.eventDerived,
                 //nar.memory.eventInput,
-                nar.eventTaskProcess,
+                nar.eventTask,
                 //nar.eventTaskRemoved,
                 //nar.memory.eventRevision,
         };

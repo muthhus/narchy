@@ -421,7 +421,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                             activation = input.priSafe(0);
                         } else {
                             //revised will be activated, but at least emit a taskProcess for the input task
-                            nar.eventTaskProcess.emit(input);
+                            nar.eventTask.emit(input);
                         }
                     } else {
                         activated = null;

@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * Created by me on 7/2/15.
  */
-public abstract class RealTime implements Time {
+public abstract class RealTime extends Time {
 
 
     private final int unitsPerSecod;
@@ -40,7 +40,7 @@ public abstract class RealTime implements Time {
 
     @Override
     public void clear() {
-        cycle();
+        update();
 
         if (start!=0)
             start = getRealTime();
@@ -50,7 +50,7 @@ public abstract class RealTime implements Time {
 
 
     @Override
-    public final void cycle() {
+    public final void update() {
         long now = (getRealTime()-start);
 
         t0 = t;

@@ -12,9 +12,11 @@ import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
+import nars.derive.PrediTerm;
 import nars.derive.Temporalize;
 import nars.table.BeliefTable;
 import nars.task.ITask;
+import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.UnifySubst;
@@ -23,6 +25,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.function.Supplier;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
@@ -45,6 +49,7 @@ public class Premise extends Pri implements ITask {
     public final Task taskLink;
     public final Term termLink;
     private final int hash;
+
 
     public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri) {
         super(pri);
@@ -316,7 +321,6 @@ public class Premise extends Pri implements ITask {
     @Nullable
     @Override
     public ITask[] run(@NotNull NAR n) {
-        run(n.derivation(), Math.round(n.matchTTL.intValue() * (1f + priElseZero())));
-        return null;
+        throw new UnsupportedOperationException();
     }
 }

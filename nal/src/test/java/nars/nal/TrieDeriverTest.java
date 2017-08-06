@@ -165,8 +165,7 @@ public class TrieDeriverTest {
         PrediTerm<Derivation> d = testCompile(n, debug, rules )
                 .transform(DebugDerivationPredicate::new);
 
-        Derivation der = new Derivation(n).cycle();
-        der.deriver = d;
+        Derivation der = new Derivation(n).cycle(d);
 
         Set<Task> tasks = new LinkedHashSet();
         n.onTask(tasks::add);

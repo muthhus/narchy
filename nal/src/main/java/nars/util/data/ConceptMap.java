@@ -31,7 +31,7 @@ public abstract class ConceptMap {
             frame = 0;
             reset();
         }),
-        nar.eventCycleStart.on(n -> {
+        nar.eventCycle.on(n -> {
             frame++;
             onFrame();
             cycleInFrame = 0;

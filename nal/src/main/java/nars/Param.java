@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Services;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
@@ -16,7 +17,7 @@ import static nars.Op.*;
 /**
  * NAR Parameters
  */
-public abstract class Param  {
+public abstract class Param extends Services {
 
 
     /** must be big enough to support as many layers of compound terms as exist in an eval */
@@ -167,7 +168,7 @@ public abstract class Param  {
     public static final int UnificationVariableCapInitial = 8;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(128);
+    public final MutableInteger matchTTL = new MutableInteger(256);
     @Deprecated public final int UnificationTTLMax = matchTTL.intValue();
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */

@@ -19,7 +19,7 @@ import java.util.function.Function;
 public class Fork extends AbstractPred<Derivation> {
 
     @NotNull
-    public final PrediTerm<Derivation>[] cache;
+    public final PrediTerm[] cache;
 
     protected Fork(@NotNull PrediTerm[] actions) {
         super($.sete((Term[]) actions) /* maybe should be a set but prod is faster */);
@@ -29,12 +29,12 @@ public class Fork extends AbstractPred<Derivation> {
     }
 
     @Override
-    public PrediTerm transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
+    public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
         return fork(Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache));
     }
 
     @Override
-    public boolean test(@NotNull Derivation m) {
+    public final boolean test(@NotNull Derivation m) {
 
         int branches = cache.length;
         ByteShuffler b = m.shuffler;
@@ -46,8 +46,7 @@ public class Fork extends AbstractPred<Derivation> {
             if (!m.revertAndContinue(before))
                 return false;
         }
-
-        return true;
+        return m.live();
     }
 
     @Nullable

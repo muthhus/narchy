@@ -133,7 +133,7 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
     public BaseConcept(@NotNull T term, @NotNull NAR n) {
-        this(term,  n.conceptBuilder);
+        this(term,  n.terms.conceptBuilder);
     }
 
 

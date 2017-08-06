@@ -1,9 +1,7 @@
 package nars;
 
 
-import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Sets;
-import com.google.common.primitives.Longs;
 import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
@@ -50,9 +48,7 @@ import org.HdrHistogram.Histogram;
 import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
-import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -61,10 +57,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
-import java.util.function.BooleanSupplier;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 import static nars.$.$;
@@ -99,17 +93,15 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
     static final String VERSION = "NARchy v?.?";
 
-    public final Executioner exe;
-    protected final @NotNull Random random;
-
-    public final ConceptBuilder conceptBuilder;
-
+    @NotNull public final Executioner exe;
+    @NotNull protected final Random random;
 
     public final transient Topic<NAR> eventClear = new ArrayTopic<>();
 
-    public final transient ArrayTopic<NAR> eventCycleStart = new ArrayTopic<>();
+    public final transient ArrayTopic<NAR> eventCycle = new ArrayTopic<>();
 
-    public final transient Topic<Task> eventTaskProcess = new ArrayTopic<>();
+    /** a task has been processed or re-processed (priority changed) */
+    public final transient Topic<Task> eventTask = new ArrayTopic<>();
 
     /** scoped to this NAR so it can be reset by it */
     final IterableThreadLocal<Derivation> derivation =
@@ -118,7 +110,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     @NotNull
-    public final transient Emotion emotion;
+    public final Emotion emotion;
+
     @NotNull
     public final Time time;
 
@@ -127,7 +120,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     @NotNull
-    private Term self;
+    private final AtomicReference<Term> self;
 
 
     /**
@@ -138,11 +131,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     protected final NARLoop loop = new NARLoop(this);
 
 
-    private final PrediTerm<Derivation> deriver;
+    //private final PrediTerm<Derivation> deriver;
 
 
     /**
      * creates a snapshot statistics object
+     * TODO extract a Method Object holding the snapshot stats with the instances created below as its fields
      */
     public synchronized SortedMap<String, Object> stats() {
 
@@ -256,23 +250,22 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         this.exe = exe;
 
-        this.self = Param.randomSelf();
-
         this.time = time;
-
-        (this.conceptBuilder = conceptBuilder).start(this);
+        time.clear();
 
         this.nal = 8;
 
-        time.clear();
+        self = new AtomicReference<>(null);
+        setSelf(Param.randomSelf());
 
         this.emotion = new Emotion(this);
-
 
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);
 
-        this.deriver = deriver.apply(this);
+//        (this.conceptBuilder = conceptBuilder).start(this);
+//
+//        this.deriver = deriver.apply(this);
 
         exe.start(this);
     }
@@ -327,7 +320,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     public void setSelf(Term self) {
-        this.self = self;
+        this.self.set(self);
     }
 
     @NotNull
@@ -927,13 +920,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @NotNull
     public final void cycle() {
 
-        time.cycle();
-
-        eventCycleStart.emit(this);
+        time.cycle(this);
 
         exe.cycle();
 
-        exeScheduled();
+        eventCycle.emit(this);
 
         valueUpdate();
 
@@ -941,20 +932,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     }
 
-    void exeScheduled() {
-        if (!scheduled.isEmpty()) {
-            LongObjectPair<Runnable> next;
-            long now = time();
-            while ((next = scheduled.peek()) != null) {
-                if (next.getOne() <= now) {
-                    scheduled.poll();
-                    exe.runLater(next.getTwo());
-                } else {
-                    break; //wait till another time
-                }
-            }
-        }
-    }
+
 
 
     /**
@@ -1206,24 +1184,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         }
     }
 
-    final MinMaxPriorityQueue<LongObjectPair<Runnable>> scheduled =
-            MinMaxPriorityQueue.orderedBy((LongObjectPair<Runnable> a, LongObjectPair<Runnable> b) -> {
-                int c = Longs.compare(a.getOne(), b.getOne());
-                if (c == 0)
-                    return -1; //maintains uniqueness in case they occupy the same time
-                else
-                    return c;
-            }).create();
 
     /**
      * schedule a task to be executed no sooner than a given NAR time
      */
-    public void at(long when, Runnable then) {
-        if (when == time()) {
-            then.run();
-        } else {
-            scheduled.add(PrimitiveTuples.pair(when, then));
-        }
+    public final void at(long whenOrAfter, Runnable then) {
+        time.at(whenOrAfter, then);
     }
 
     /** tasks in concepts */
@@ -1343,7 +1309,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     @NotNull
     public final On onCycle(@NotNull Consumer<NAR> each) {
-        return eventCycleStart.on(each);
+        return eventCycle.on(each);
     }
 
     /**
@@ -1351,7 +1317,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     @NotNull
     public final On onCycleWeak(@NotNull Consumer<NAR> each) {
-        return eventCycleStart.onWeak(each);
+        return eventCycle.onWeak(each);
     }
 
     @NotNull
@@ -1394,7 +1360,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public On onTask(@NotNull Consumer<Task> o) {
-        return eventTaskProcess.on(o);
+        return eventTask.on(o);
     }
 
     public @NotNull NAR believe(@NotNull Compound c, @NotNull Tense tense) {
@@ -1412,7 +1378,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         if ((existing != null) && (existing != c))
             throw new RuntimeException("concept already indexed for term: " + c.term());
 
-        c.state(conceptBuilder.awake());
+        //c.state(terms.conceptBuilder.awake());
         terms.set(c);
 
         return c;
@@ -1563,7 +1529,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * The id/name of the reasoner
      */
     public final Term self() {
-        return self;
+        return self.get();
     }
 
     @Override
@@ -1596,9 +1562,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return ((BeliefTable) ((BaseConcept) concept).table(punc)).match(when, null, null, false, this);
     }
 
-    public PrediTerm<Derivation> deriver() {
-        return deriver;
-    }
 
     public SortedMap<String, Object> stats(Appendable out) {
 
@@ -1668,8 +1631,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public Derivation derivation() {
-        return derivation.get().cycle();
+    public Derivation derivation(PrediTerm<Derivation> deriver) {
+        return derivation.get().cycle(deriver);
     }
 
     /**
