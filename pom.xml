@@ -165,10 +165,8 @@
         <module>logic</module>
         <module>gp</module>
 
-
         <module>nal</module>
         <module>app</module>
         <module>lab</module>
-        <module>web</module>
     </modules>
 </project>
