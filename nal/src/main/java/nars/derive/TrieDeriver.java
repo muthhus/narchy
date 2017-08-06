@@ -333,7 +333,7 @@ public enum TrieDeriver {
     }
 
     @Nullable
-    public static PrediTerm ifThen(@NotNull Stream<PrediTerm> cond, @Nullable PrediTerm conseq) {
+    public static PrediTerm<Derivation> ifThen(@NotNull Stream<PrediTerm<Derivation>> cond, @Nullable PrediTerm<Derivation> conseq) {
         return AndCondition.the(AndCondition.compile(
                 (conseq != null ? Stream.concat(cond, Stream.of(conseq)) : cond).collect(toList())
         ));
@@ -364,9 +364,9 @@ public enum TrieDeriver {
 
             int nStart = n.start();
             int nEnd = n.end();
-            PrediTerm branch = ifThen(
+            PrediTerm<Derivation> branch = ifThen(
                     conditions(n.seq().stream().skip(nStart).limit(nEnd - nStart)),
-                    !conseq.isEmpty() ? (PrediTerm<?>) Fork.fork(conseq.toArray(new PrediTerm[conseq.size()])) : null
+                    !conseq.isEmpty() ? (PrediTerm<Derivation>) Fork.fork(conseq.toArray(new PrediTerm[conseq.size()])) : null
             );
 
             if (branch != null)
@@ -430,7 +430,7 @@ public enum TrieDeriver {
 //    }
 
     @NotNull
-    static Stream<PrediTerm> conditions(@NotNull Stream<Term> t) {
+    static Stream<PrediTerm<Derivation>> conditions(@NotNull Stream<Term> t) {
 //
 //            final AtomicReference<UnificationPrototype> unificationParent = new AtomicReference<>(null);
 //
@@ -453,7 +453,7 @@ public enum TrieDeriver {
 //                    }
 //                }
 //                return true;
-        return t./*filter(x -> !(x instanceof Conclude)).*/map(x -> (PrediTerm) x);
+        return t./*filter(x -> !(x instanceof Conclude)).*/map(x -> (PrediTerm<Derivation>) x);
     }
 
 

@@ -17,13 +17,13 @@ import java.util.function.Function;
 /**
  * TODO generify beyond only Derivation
  */
-public final class AndCondition extends AbstractPred<Derivation> {
+public final class AndCondition<D> extends AbstractPred<D> {
 
     //private static final Term AND_ATOM = $.quote("&&");
 
     @Override
-    public final boolean test(@NotNull Derivation m) {
-        for (PrediTerm<Derivation> x : cache) {
+    public final boolean test(@NotNull Object m) {
+        for (PrediTerm x : cache) {
             boolean b = x.test(m);
 
 //            if (m.now() > 0)
@@ -39,12 +39,12 @@ public final class AndCondition extends AbstractPred<Derivation> {
     }
 
     @Override
-    public PrediTerm transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
+    public PrediTerm<D> transform(Function<PrediTerm<D>, PrediTerm<D>> f) {
         return new AndCondition( Util.map(x -> x.transform(f), new PrediTerm[cache.length], cache));
     }
 
 
-    public static @Nullable PrediTerm the(@NotNull List<PrediTerm> cond) {
+    public static @Nullable <D> PrediTerm<D> the(@NotNull List<PrediTerm<D>> cond) {
 
         int s = cond.size();
         if (s == 0)
@@ -57,19 +57,19 @@ public final class AndCondition extends AbstractPred<Derivation> {
 
 
     @NotNull
-    public final PrediTerm<Derivation>[] cache;
+    public final PrediTerm<D>[] cache;
 
     /*public AndCondition(@NotNull BooleanCondition<C>[] p) {
         this(TermVector.the((Term[])p));
     }*/
 
-    AndCondition(@NotNull PrediTerm[] p) {
+    AndCondition(@NotNull PrediTerm<D>[] p) {
         super($.p((Term[]) p));
         assert(p.length >= 2): "unnecessary use of AndCondition";
         this.cache = p;
     }
 
-    AndCondition(@NotNull Collection<PrediTerm> p) {
+    AndCondition(@NotNull Collection<PrediTerm<D>> p) {
         this(p.toArray(new PrediTerm[p.size()]));
     }
 
@@ -77,12 +77,12 @@ public final class AndCondition extends AbstractPred<Derivation> {
     /**
      * combine certain types of items in an AND expression
      */
-    public static List<PrediTerm> compile(List<PrediTerm> p) {
+    public static List<PrediTerm<Derivation>> compile(List<PrediTerm<Derivation>> p) {
         if (p.size() == 1)
             return p;
 
         SortedSet<MatchConstraint> constraints = new TreeSet<>(MatchConstraint.costComparator);
-        Iterator<PrediTerm> il = p.iterator();
+        Iterator<PrediTerm<Derivation>> il = p.iterator();
         while (il.hasNext()) {
             PrediTerm c = il.next();
             if (c instanceof MatchConstraint) {
@@ -124,7 +124,7 @@ public final class AndCondition extends AbstractPred<Derivation> {
 //    }
 
 
-    public @Nullable PrediTerm<Derivation> without(PrediTerm<Derivation> condition) {
+    public @Nullable PrediTerm<D> without(PrediTerm<D> condition) {
         //TODO returns a new AndCondition with condition removed, or null if it was the only item
         PrediTerm[] x = ArrayUtils.removeElement(cache, condition);
         if (x.length == cache.length)
