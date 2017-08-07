@@ -396,6 +396,7 @@ public class Services<X> {
         add(key, s, true);
     }
 
+
     public void add(X key, Service s, boolean start) {
         Service removed = services.put(key, s);
         if (removed!=null) {

@@ -25,7 +25,7 @@ public class CommandTest {
             invoked.set(true);
             return null;
         });
-        Task t = n.task("c(x);");
+        Task t = Narsese.parse().task("c(x);", n);
         assertNotNull(t);
         assertEquals(COMMAND, t.punc());
         assertTrue(t.isCommand());

@@ -17,10 +17,7 @@ import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
-import nars.control.Activate;
-import nars.control.Cause;
-import nars.control.CauseChannel;
-import nars.control.Derivation;
+import nars.control.*;
 import nars.derive.PrediTerm;
 import nars.exe.Executioner;
 import nars.index.term.TermContext;
@@ -56,6 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URL;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BooleanSupplier;
@@ -332,26 +330,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public Task inputAndGet(@NotNull String taskText) throws Narsese.NarseseException {
-        return inputAndGet(Narsese.the().task(taskText, this));
-    }
-
-    /**
-     * parses and forms a Task from a string but doesnt input it
-     */
-    @NotNull
-    public Task task(@NotNull String taskText) throws NarseseException {
-        return Narsese.the().task(taskText, this);
-    }
-
-    @NotNull
-    public List<Task> tasks(@NotNull String text) throws NarseseException {
-        return Narsese.the().tasks(text, this);
+        return inputAndGet(Narsese.parse().task(taskText, this));
     }
 
 
     @NotNull
     public List<Task> input(@NotNull String text) throws NarseseException, InvalidTaskException {
-        List<Task> l = tasks(text);
+        List<Task> l = Narsese.parse().tasks(text, this);
         input(l);
         return l;
     }
@@ -805,6 +790,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
+    /** asynchronously adds the service */
+    public void on(NARService s) {
+        runLater(()-> add(s.term(), s));
+    }
+
     @Deprecated
     public final void on(@NotNull String atom, @NotNull Operator o) {
         on((Atom) Atomic.the(atom), o);
@@ -1091,34 +1081,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * after the end of the current frame before the next frame.
      */
     public final void runLater(@NotNull Runnable t) {
-        exe.runLater(t);
-    }
-
-    /**
-     * run a procedure for each item in chunked stripes
-     */
-    public final <X> void runLater(@NotNull List<X> items, @NotNull Consumer<X> each, int maxChunkSize) {
-
-        int conc = exe.concurrency();
-        if (conc == 1) {
-            //special single-thread case: just execute all
-            items.forEach(each);
-        } else {
-            int s = items.size();
-            int chunkSize = Math.max(1, Math.min(maxChunkSize, (int) Math.floor(s / conc)));
-            for (int i = 0; i < s; ) {
-                int start = i;
-                int end = Math.min(i + chunkSize, s);
-                runLater(() -> {
-                    for (int j = start; j < end; j++) {
-                        X x = items.get(j);
-                        if (x != null)
-                            each.accept(x);
-                    }
-                });
-                i += chunkSize;
-            }
-        }
+        time.at(time(), t);
     }
 
 
@@ -1136,9 +1099,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return this;
     }
 
+    public NAR inputNarsese(@NotNull URL url) throws IOException, NarseseException {
+        return inputNarsese(url.openStream());
+    }
+
     public NAR inputNarsese(@NotNull InputStream inputStream) throws IOException, NarseseException {
         String x = new String(inputStream.readAllBytes());
-        /*List<Task> y = */
         input(x);
         return this;
     }
@@ -1155,7 +1121,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             List<Task> yy = newArrayList(tt.length);
             for (String s : tt) {
                 try {
-                    yy.addAll(tasks(s));
+                    yy.addAll(Narsese.parse().tasks(s, this));
                 } catch (NarseseException e) {
                     logger.error("{} for: {}", e, s);
                     e.printStackTrace();

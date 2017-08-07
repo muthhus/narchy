@@ -170,7 +170,7 @@ public class TrieDeriverTest {
         Set<Task> tasks = new LinkedHashSet();
         n.onTask(tasks::add);
 
-        new Premise( n.task(task), n.term(belief), 0.5f ).run(der, ttlMax);
+        new Premise(Narsese.parse().task(task, n), n.term(belief), 0.5f ).run(der, ttlMax);
 
         n.run(1);  //to allow input tasks to get processed
 

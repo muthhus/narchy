@@ -53,7 +53,7 @@ public class UnifyTest {
         //NAR nar = NARS.shell();
         try {
 
-            Compound t2 = (Compound)Narsese.the().term(s2, true);
+            Compound t2 = (Compound)Narsese.parse().term(s2, true);
             assertNotNull(t2);
 
             Compound t1;
@@ -61,7 +61,7 @@ public class UnifyTest {
                 t1 = new PatternTermIndex().pattern( s1 ); //special handling for ellipsis
                 assertNotNull(t1);
             } else {
-                t1 = (Compound)Narsese.the().term(s1, true);
+                t1 = (Compound)Narsese.parse().term(s1, true);
             }
 
 

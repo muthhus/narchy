@@ -46,8 +46,6 @@ public class ScalarConcepts extends NARService {
     @Deprecated
     public final List<SensorConcept> sensors;
 
-    @NotNull
-    public final NAR nar;
 
     float conf;
 
@@ -139,7 +137,6 @@ public class ScalarConcepts extends NARService {
 
         this.conf = nar.confDefault(Op.BELIEF);
         this.input = input;
-        this.nar = nar;
 
         int num = states.length;
         int numStates = num;

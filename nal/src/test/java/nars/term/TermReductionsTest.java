@@ -244,7 +244,7 @@ public class TermReductionsTest extends NarseseTest {
         //the repeats in the conjunction term can be replaced with a single event with equivalent start/stop time
         assertEquals(
                 "$.50 (x). 0⋈10 %1.0;.90%",
-                NARS.shell().task("((x) &&+10 (x)). :|:").toString());
+                Narsese.parse().task("((x) &&+10 (x)). :|:", NARS.shell()).toString());
     }
 
     @Test public void testEmbeddedConjNormalizationN2() throws Narsese.NarseseException {

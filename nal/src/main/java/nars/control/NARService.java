@@ -15,7 +15,7 @@ public class NARService extends AbstractIdleService implements Termed {
 
     protected NARService(NAR nar) {
         this.nar = nar;
-        nar.runLater(()-> nar.add(term(), this));
+        nar.on(this);
     }
 
     @Override

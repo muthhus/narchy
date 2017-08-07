@@ -145,7 +145,7 @@ public class PatternTermIndex extends MapTermIndex {
     }
 
     public @NotNull Compound pattern(@NotNull String s) throws Narsese.NarseseException {
-        return pattern( (Compound) Narsese.the().term(s, false) );
+        return pattern( (Compound) Narsese.parse().term(s, false) );
     }
 
     public static final class PremiseRuleVariableNormalization extends VariableNormalization {

@@ -130,7 +130,7 @@ public class Narsese extends BaseParser<Object> {
 
 
     @NotNull
-    public static Narsese the() {
+    public static Narsese parse() {
         return parsers.get();
     }
 
@@ -1136,7 +1136,7 @@ public class Narsese extends BaseParser<Object> {
      * ondemand
      */
     public static void tasks(String input, Consumer<Task> c, NAR m) throws NarseseException {
-        @NotNull Narsese p = the();
+        @NotNull Narsese p = parse();
 
         int parsedTasks = 0;
 
@@ -1179,6 +1179,8 @@ public class Narsese extends BaseParser<Object> {
 //                throw new RuntimeException("Unknown parse result: " + x + " (" + x.getClass() + ')');
 //            }
 //        });
+
+
 
 
     /**

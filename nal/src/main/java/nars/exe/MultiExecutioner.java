@@ -64,10 +64,6 @@ public class MultiExecutioner extends Executioner {
         passive.execute(r);
     }
 
-    @Override
-    public void runLater(Runnable cmd) {
-        passive.execute(cmd);
-    }
 
     @Override
     public void run(@NotNull ITask x) {
@@ -216,11 +212,6 @@ public class MultiExecutioner extends Executioner {
         @Override
         public void forEach(Consumer<ITask> each) {
             model.forEach(each);
-        }
-
-        @Override
-        public void runLater(@NotNull Runnable r) {
-            passive.execute(r); //use the common threadpool
         }
 
         @Override

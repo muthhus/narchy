@@ -66,7 +66,7 @@ public class FocusedExecutioner extends Executioner {
     private final FasterList<ITask> next = new FasterList(1024);
     private long now;
 
-    public FocusedExecutioner(Function<NAR,PrediTerm<Derivation>> deriverBuilder) {
+    public FocusedExecutioner(Function<NAR, PrediTerm<Derivation>> deriverBuilder) {
         this.deriverBuilder = deriverBuilder;
     }
 
@@ -190,25 +190,15 @@ public class FocusedExecutioner extends Executioner {
     }
 
     @Override
-    public void runLater(Runnable cmd) {
-        if (concurrent()) {
-            execute(cmd);
-        } else { //schedule for after this current cycle
-            nar.time.at(now, cmd);
-        }
-    }
-
-
-    @Override
     public void run(@NotNull ITask x) {
         if (x instanceof Task) {
             if (x.isInput())
                 execute(x); //execute immediately
             else
-                tasks.putAsync((Task)x); //buffer
+                tasks.putAsync((Task) x); //buffer
 
         } else if (x instanceof Premise) {
-            premises.putAsync((Premise)x);
+            premises.putAsync((Premise) x);
         } else if (x instanceof Activate) {
             concepts.putAsync((Activate) x);
         } else

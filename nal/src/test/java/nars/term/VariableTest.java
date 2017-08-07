@@ -206,7 +206,7 @@ public class VariableTest {
         String t = "<<($1, $2) --> bigger> ==> <($2, $1) --> smaller>>";
 
         Termed term = n.term(t);
-        Task task = n.task(t + '.');
+        Task task = Narsese.parse().task(t + '.', n);
 
         System.out.println(t);
         assertEquals("(bigger($1,$2)==>smaller($2,$1))", task.term().toString());

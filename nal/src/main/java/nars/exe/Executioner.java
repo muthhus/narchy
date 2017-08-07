@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -81,7 +82,6 @@ abstract public class Executioner implements Executor {
 //        }
 
 
-    public abstract void runLater(Runnable cmd);
 
 
 
@@ -332,3 +332,30 @@ abstract public class Executioner implements Executor {
 //
 //
 //}
+
+//    /**
+//     * run a procedure for each item in chunked stripes
+//     */
+//    public final <X> void runLater(@NotNull List<X> items, @NotNull Consumer<X> each, int maxChunkSize) {
+//
+//        int conc = exe.concurrency();
+//        if (conc == 1) {
+//            //special single-thread case: just execute all
+//            items.forEach(each);
+//        } else {
+//            int s = items.size();
+//            int chunkSize = Math.max(1, Math.min(maxChunkSize, (int) Math.floor(s / conc)));
+//            for (int i = 0; i < s; ) {
+//                int start = i;
+//                int end = Math.min(i + chunkSize, s);
+//                runLater(() -> {
+//                    for (int j = start; j < end; j++) {
+//                        X x = items.get(j);
+//                        if (x != null)
+//                            each.accept(x);
+//                    }
+//                });
+//                i += chunkSize;
+//            }
+//        }
+//    }

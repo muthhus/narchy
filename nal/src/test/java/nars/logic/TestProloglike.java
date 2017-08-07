@@ -62,9 +62,8 @@ public class TestProloglike {
 
         n.termVolumeMax.setValue(1024);
         n.log();
-        URL resource = TestProloglike.class.getResource("einsteinsRiddle.nal");
         n.inputNarsese(
-            resource.openStream()
+            TestProloglike.class.getResource("einsteinsRiddle.nal")
         );
         n.run(128);
 

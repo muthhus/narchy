@@ -12,7 +12,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TaskBeliefPairTest {
 
-    final Narsese parse = Narsese.the();
+    final Narsese parse = Narsese.parse();
 
     @Test
     public void testNoNormalization() throws Exception {
