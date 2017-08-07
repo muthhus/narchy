@@ -106,7 +106,7 @@ abstract public class NAgentX extends NAgent {
         //fps * 2f; //nyquist
 
         RealTime clock =
-                durFPS >= 10/2f ?
+                durFPS >= 10 ?
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
 
@@ -170,7 +170,7 @@ abstract public class NAgentX extends NAgent {
 
         window(/*row*/(
 
-                causePlot(a.nar)
+                causePlot(n)
 
                 //mixPlot(a, m, HISTORY),
 

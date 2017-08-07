@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.TriConsumer;
 import jcog.Util;
 import jcog.net.UDPeer;
 import nars.bag.leak.LeakOut;
@@ -20,7 +21,7 @@ import static jcog.net.UDPeer.Command.TELL;
 /**
  * InterNAR P2P Network Interface for a NAR
  */
-public class InterNAR extends TaskService implements BiConsumer<ActiveQuestionTask, Task> {
+public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQuestionTask, Task> {
 
     //public static final Logger logger = LoggerFactory.getLogger(InterNAR.class);
 
@@ -30,17 +31,23 @@ public class InterNAR extends TaskService implements BiConsumer<ActiveQuestionTa
 
 
     @Override
-    public void accept(@NotNull Task t) {
-        buffer.accept(t);
+    public void accept(NAR nar, @NotNull Task t) {
+        buffer.accept(nar, t);
     }
 
     @Override
-    protected void startUp() throws Exception {
-        peer = new MyUDPeer(0, true);
+    protected void start(NAR nar)  {
+        super.start(nar);
+        try {
+            peer = new MyUDPeer(nar, 0, true);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    protected void shutDown() throws Exception {
+    protected void stop(NAR nar)  {
+        super.stop(nar);
         peer.stop();
         peer = null;
     }
@@ -73,13 +80,13 @@ public class InterNAR extends TaskService implements BiConsumer<ActiveQuestionTa
     public InterNAR(NAR nar, float outRate, int port, boolean discover) throws IOException {
         super(nar);
 
-        peer = new MyUDPeer(port, discover);
+        peer = new MyUDPeer(nar, port, discover);
 
         recv = nar.newInputChannel(this);
 
         buffer = new LeakOut(nar, 256, outRate) {
             @Override
-            protected float send(Task x) {
+            protected float leak(Task x) {
 
                 if (peer.connected()) {
                     try {
@@ -101,11 +108,11 @@ public class InterNAR extends TaskService implements BiConsumer<ActiveQuestionTa
             }
 
             @Override
-            public void accept(@NotNull Task t) {
+            public boolean preFilter(@NotNull Task t) {
                 if (t.isCommand() || !peer.connected())
-                    return;
+                    return false;
 
-                super.accept(t);
+                return super.preFilter(t);
             }
         };
     }
@@ -129,7 +136,7 @@ public class InterNAR extends TaskService implements BiConsumer<ActiveQuestionTa
 //        }
 
     @Override
-    public void accept(ActiveQuestionTask question, Task answer) {
+    public void accept(NAR nar, ActiveQuestionTask question, Task answer) {
         UDPeer.Msg q = question.meta(UDPeer.Msg.class);
         if (q == null)
             return;
@@ -155,8 +162,11 @@ public class InterNAR extends TaskService implements BiConsumer<ActiveQuestionTa
 
     private class MyUDPeer extends UDPeer {
 
-        public MyUDPeer(int port, boolean discovery) throws IOException {
+        private final NAR nar;
+
+        public MyUDPeer(NAR nar, int port, boolean discovery) throws IOException {
             super(port, discovery);
+            this.nar = nar;
         }
 
         @Override
@@ -174,7 +184,7 @@ public class InterNAR extends TaskService implements BiConsumer<ActiveQuestionTa
             if (x != null) {
                 if (x.isQuestOrQuestion()) {
                     //reconstruct a question task with an onAnswered handler to reply with answers to the sender
-                    x = new ActiveQuestionTask(x, 8, nar, InterNAR.this);
+                    x = new ActiveQuestionTask(x, 8, nar, (q,a)->accept(nar, q, a));
                     x.meta(Msg.class, m);
                 }
                 x.budget(nar);

@@ -101,6 +101,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
      */
     public float reward;
     private Loop loop;
+    public NAR nar;
     //final private ConceptFire fireHappy;
 
 
@@ -114,6 +115,9 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     public NAgent(@Nullable Term id, @NotNull NAR nar) {
         super(nar);
+
+        this.nar = nar;
+
         this.id = id;
         this.now = ETERNAL; //not started
 
@@ -167,7 +171,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         return nar;
     }
 
-    public void stop() {
+    public void stop(NAR nar) {
         nar.stop();
         loop = null;
     }
@@ -293,9 +297,11 @@ abstract public class NAgent extends DurService implements NSense, NAct {
      * TODO call this in the constructor
      */
     @Override
-    protected void startUp() throws Exception {
+    protected void start(NAR nar) {
 
-        super.startUp();
+        this.nar = nar;
+
+        super.start(nar);
 
         now = nar.time();
 
@@ -458,7 +464,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
 
     @Override
-    protected void runDur() {
+    protected void runDur(NAR nar) {
         if (enabled.get()) {
             this.now = now;
             //only execute at most one agent frame per duration

@@ -12,6 +12,8 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.concurrent.Executor;
+
 import static nars.Op.*;
 
 /**
@@ -320,7 +322,8 @@ public abstract class Param extends Services {
     }
 
 
-    Param() {
+    Param(Executor exe) {
+        super(null, exe);
         beliefConfidence(0.9f);
         goalConfidence(0.9f);
     }

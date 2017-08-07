@@ -128,9 +128,7 @@ public class Jake2Agent extends NAgentX implements Runnable {
     }
 
     @Override
-    protected void startUp() throws Exception {
-
-        super.startUp();
+    public void run()  {
 
         //http://aq2maps.quadaver.org/
         //https://www.quaddicted.com/reviews/

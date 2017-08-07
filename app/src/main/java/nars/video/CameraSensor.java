@@ -7,14 +7,12 @@ import nars.control.CauseChannel;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atomic;
-import nars.term.container.TermContainer;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Random;
 import java.util.function.Consumer;
 
 /**
@@ -25,8 +23,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
 
     public static final int RADIX = 1;
-
-    private final NAR nar;
 
     public final List<PixelConcept> pixels;
     private final CauseChannel<Task> in;
@@ -41,23 +37,21 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     transient float conf;
 
 
-    public CameraSensor(Term root, P src, NAgent agent) {
-        super(src, src.width(), src.height());
-
-        this.nar = agent.nar;
+    public CameraSensor(Term root, P src, NAgent a) {
+        super(src, src.width(), src.height(), a.nar);
 
         this.w = src.width();
         this.h = src.height();
         numPixels = w * h;
 
-        this.in = nar.newInputChannel(this);
+        this.in = a.nar.newInputChannel(this);
         this.in.amplitude(1f/(w*h)); //shared amongst all pixels
 
-        pixels = encode(RadixProduct(root, src.width(), src.height(), RADIX));
+        pixels = encode(RadixProduct(root, src.width(), src.height(), RADIX), a.nar);
 
-        agent.onFrame(this);
+        a.onFrame(this);
+
         this.id = root;
-
     }
 
 
@@ -141,7 +135,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     }
 
 
-    public List<PixelConcept> encode(Int2Function<Compound> cellTerm) {
+    public List<PixelConcept> encode(Int2Function<Compound> cellTerm, NAR nar) {
         List<PixelConcept> l = $.newArrayList();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
@@ -150,7 +144,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                 Compound cell = cellTerm.get(x, y);
 
 
-                PixelConcept sss = new PixelConcept(cell, x, y);
+                PixelConcept sss = new PixelConcept(cell, x, y, nar);
                 nar.on(sss);
 
 
@@ -193,7 +187,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         //frameStamp();
 
         src.update(1);
-        this.conf = nar.confDefault(Op.BELIEF);
+        this.conf = a.nar.confDefault(Op.BELIEF);
 
         NAR nar = a.nar;
 
@@ -212,12 +206,12 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //    }
 
 
-    public class PixelConcept extends SensorConcept {
+    class PixelConcept extends SensorConcept {
 
 //        //private final int x, y;
         //private final TermContainer templates;
 
-        public PixelConcept(Compound cell, int x, int y) {
+        PixelConcept(Compound cell, int x, int y, NAR nar) {
             super(cell, nar, null, brightnessTruth);
             setSignal(() -> Util.unitize(src.brightness(x, y)));
 
@@ -253,46 +247,46 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
 
 
-    /** links only to the 'id' of the image, and N random neighboring pixels */
-    private class PixelNeighborsXYRandom implements TermContainer {
-
-        private final int x;
-        private final int y;
-        private final int w;
-        private final int h;
-        private final int extra;
-
-        public PixelNeighborsXYRandom(int x, int y, int w, int h, int extra) {
-            this.extra = extra;
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
-        }
-
-        @Override
-        public int size() {
-            return extra + 1;
-        }
-
-        @Override
-        public @NotNull Term sub(int i) {
-
-            if (i == 0) {
-                return id;
-            } else {
-                //extra
-                Random rng = nar.random();
-                return concept(
-                        x + (rng.nextBoolean() ? -1 : +1),
-                        y + (rng.nextBoolean() ? -1 : +1)
-                ).term();
-            }
-
-
-
-        }
-    }
+//    /** links only to the 'id' of the image, and N random neighboring pixels */
+//    private class PixelNeighborsXYRandom implements TermContainer {
+//
+//        private final int x;
+//        private final int y;
+//        private final int w;
+//        private final int h;
+//        private final int extra;
+//
+//        public PixelNeighborsXYRandom(int x, int y, int w, int h, int extra) {
+//            this.extra = extra;
+//            this.x = x;
+//            this.y = y;
+//            this.w = w;
+//            this.h = h;
+//        }
+//
+//        @Override
+//        public int size() {
+//            return extra + 1;
+//        }
+//
+//        @Override
+//        public @NotNull Term sub(int i) {
+//
+//            if (i == 0) {
+//                return id;
+//            } else {
+//                //extra
+//                Random rng = nar.random();
+//                return concept(
+//                        x + (rng.nextBoolean() ? -1 : +1),
+//                        y + (rng.nextBoolean() ? -1 : +1)
+//                ).term();
+//            }
+//
+//
+//
+//        }
+//    }
 
 //    private class PixelNeighborsManhattan implements TermContainer {
 //

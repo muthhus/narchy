@@ -8,14 +8,12 @@ import nars.Task;
 import nars.control.TaskService;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
-
 
 /**
  * interface for controlled draining of a bag
  * "leaky bucket" model
  */
-public abstract class TaskLeak extends TaskService implements Consumer<Task> {
+public abstract class TaskLeak extends TaskService  {
 
     protected final DtLeak<Task, PLink<Task>> leak;
 
@@ -28,7 +26,7 @@ public abstract class TaskLeak extends TaskService implements Consumer<Task> {
         this.leak = new DtLeak<>(bag, rate) {
             @Override
             protected float onOut(@NotNull PLink<Task> b) {
-                return TaskLeak.this.onOut(b.get());
+                return TaskLeak.this.leak(b.get());
             }
         };
     }
@@ -39,16 +37,21 @@ public abstract class TaskLeak extends TaskService implements Consumer<Task> {
     }
 
     @Override
-    protected void startUp() throws Exception {
-        super.startUp();
+    protected final void start(NAR nar) {
+        super.start(nar);
         ons.add(nar.onCycle((nn) -> leak.commit(nn.time(), nn.dur())));
     }
 
     @Override
-    public void accept(Task t) {
-        leak.put(new PLink<>(t, t.pri()));
+    public final void accept(NAR nar, Task t) {
+        if (preFilter(t))
+            leak.put(new PLink<>(t, t.priElseZero()));
+    }
+
+    protected boolean preFilter(Task x) {
+        return true;
     }
 
     /** returns how much of the input was consumed; 0 means nothing, 1 means 100% */
-    abstract protected float onOut(Task out);
+    abstract protected float leak(Task out);
 }

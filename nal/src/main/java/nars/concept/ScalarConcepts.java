@@ -218,19 +218,19 @@ public class ScalarConcepts extends NARService {
     }
 
 
-    @NotNull
-    public String summary() {
-        return Joiner.on("\t").join(Iterators.transform(
-                sensors.iterator(), s -> {
-                    if (s == null)
-                        return "?";
-                    else {
-                        long when = nar.time();
-                        return s.term() + " " + s.beliefs().truth(when, nar);
-                    }
-                }
-        ));
-    }
+//    @NotNull
+//    public String summary() {
+//        return Joiner.on("\t").join(Iterators.transform(
+//                sensors.iterator(), s -> {
+//                    if (s == null)
+//                        return "?";
+//                    else {
+//                        long when = nar.time();
+//                        return s.term() + " " + s.beliefs().truth(when, nar);
+//                    }
+//                }
+//        ));
+//    }
 
 //    /** clear all sensor's belief state */
 //    public void clear() {

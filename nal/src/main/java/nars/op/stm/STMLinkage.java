@@ -51,7 +51,7 @@ public final class STMLinkage extends TaskService {
     }
 
     @Override
-    public final void accept(@NotNull Task t) {
+    public final void accept(NAR nar, @NotNull Task t) {
 
         if (!t.isBeliefOrGoal())
             return;
@@ -65,7 +65,7 @@ public final class STMLinkage extends TaskService {
 
         for (Task u : stm) {
             if (u == null) continue; //skip null's and dummy's
-            link(t, strength, tPri, u);
+            link(t, strength, tPri, u, nar);
         }
 
         stm.poll();
@@ -73,7 +73,7 @@ public final class STMLinkage extends TaskService {
     }
 
 
-    protected void link(@NotNull Task ta, float strength, float tPri, Task tb) {
+    protected void link(@NotNull Task ta, float strength, float tPri, Task tb, NAR nar) {
 
 
         /** current task's... */

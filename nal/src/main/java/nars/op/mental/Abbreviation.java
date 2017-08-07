@@ -57,8 +57,6 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
     private static final AtomicInteger currentTermSerial = new AtomicInteger(0);
 
-    @NotNull
-    protected final NAR nar;
     private final String termPrefix;
 
     /**
@@ -67,8 +65,8 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     public final MutableIntRange volume;
 
 
-    public Abbreviation(@NotNull NAR n, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
-        super(n);
+    public Abbreviation(@NotNull NAR nar, String termPrefix, int volMin, int volMax, float selectionRate, int capacity) {
+        super(nar);
         bag = new DtLeak<Compound, PLink<Compound>>(new ArrayBag<Compound, PLink<Compound>>(PriMerge.plus, new ConcurrentHashMap<>(capacity)) {
             @Nullable @Override public Compound key(@NotNull PLink<Compound> l) {
                 return l.get();
@@ -77,12 +75,14 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
             @Override
             protected float onOut(@NotNull PLink<Compound> b) {
-                return 0;
+                if (abbreviate(b.get(), b, nar))
+                    return 1f;
+                else
+                    return 0f;
             }
         };
         bag.setCapacity(capacity);
 
-        this.nar = n;
         this.termPrefix = termPrefix;
         this.abbreviationConfidence =
                 new MutableFloat(nar.confDefault(BELIEF));
@@ -92,8 +92,8 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     }
 
     @Override
-    protected void startUp() throws Exception {
-        super.startUp();
+    protected void start(NAR nar) {
+        super.start(nar);
         ons.add(nar.onCycle(nn -> bag.commit(nn.time(), nn.dur())));
     }
 
@@ -103,7 +103,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     }
 
     @Override
-    public void accept(@NotNull Task task) {
+    public void accept(NAR nar, @NotNull Task task) {
 
         Term taskTerm = task.term();
         if ((!(taskTerm instanceof Compound)) || task.meta(Abbreviation.class) != null)
@@ -112,11 +112,11 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
         Priority b = task;
         if (b != null) {
 
-            input(b, bag.bag::put, (Compound) taskTerm, 1f);
+            input(b, bag.bag::put, (Compound) taskTerm, 1f, nar);
         }
     }
 
-    private void input(@NotNull Priority b, @NotNull Consumer<PLink<Compound>> each, @NotNull Compound t, float scale) {
+    private void input(@NotNull Priority b, @NotNull Consumer<PLink<Compound>> each, @NotNull Compound t, float scale, NAR nar) {
         int vol = t.volume();
         if (vol < volume.lo())
             return;
@@ -137,18 +137,12 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
             float subScale = 1f / (1 + t.size());
             t.forEach(x -> {
                 if (x.size() > 0)
-                    input(b, each, ((Compound) x), subScale);
+                    input(b, each, ((Compound) x), subScale, nar);
             });
         }
     }
 
 
-    protected float onOut(PriReference<Compound> b) {
-
-        abbreviate(b.get(), b);
-        return 1f;
-
-    }
 
 
     @NotNull
@@ -195,7 +189,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     //private boolean createRelation = false;
 
 
-    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Priority b) {
+    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Priority b, NAR nar) {
 
         String id;
 //            id = newCanonicalTerm(abbreviated);

@@ -1,6 +1,7 @@
 package nars.control;
 
 import com.google.common.util.concurrent.AbstractIdleService;
+import jcog.Services;
 import jcog.event.Ons;
 import nars.$;
 import nars.NAR;
@@ -8,18 +9,16 @@ import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
 
-public class NARService extends AbstractIdleService implements Termed {
+public class NARService extends Services.AbstractService<NAR> implements Termed {
 
-    public final NAR nar;
+
     protected Ons ons;
 
     protected NARService(NAR nar) {
-        this.nar = nar;
         nar.on(this);
     }
 
-    @Override
-    protected void startUp() throws Exception {
+    protected void start(NAR nar) {
         ons = new Ons();
         ons.add(nar.eventClear.on(n -> clear()));
     }
@@ -28,8 +27,9 @@ public class NARService extends AbstractIdleService implements Termed {
         //default: nothing
     }
 
+
     @Override
-    protected void shutDown() throws Exception {
+    protected void stop(NAR nar) {
         ons.off();
         ons = null;
     }

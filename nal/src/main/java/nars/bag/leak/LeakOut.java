@@ -24,22 +24,14 @@ abstract public class LeakOut extends TaskLeak {
     }
 
 
-
-    @Override protected float onOut(@NotNull Task t) {
-        return send(t);
-    }
-
-    abstract protected float send(Task task);
-
     @Override
-    public void accept(Task t) {
+    public boolean preFilter(Task t) {
         if (t.isCommand()) {
-            send(t); //immediate
+            leak(t); //immediate
         } else {
             float p = t.pri();
-            if (p == p) {
-                super.accept(t);
-            }
+            return p==p;
         }
+        return false;
     }
 }

@@ -82,9 +82,9 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Override
-    public void accept(@NotNull Task t) {
+    public void accept(NAR nar, @NotNull Task t) {
         if (STMLinkage.stmLinkable(t, allowNonInput) && (t.punc() == punc && !t.isEternal()))
-            super.accept(t);
+            super.accept(nar, t);
     }
 
     @Override
@@ -117,9 +117,9 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Override
-    protected boolean iterate() {
+    protected boolean iterate(NAR nar) {
 
-        if (super.iterate()) {
+        if (super.iterate(nar)) {
 
             confMin = nar.confMin.floatValue();
             dur = nar.dur();
@@ -135,7 +135,7 @@ public class MySTMClustered extends STMClustered {
 
             int inputs = Math.round(inputsPerDur * deltaT / dur);
             if (inputs > 0) {
-                cluster(inputs, minGroupSize, maxGroupSize);
+                cluster(inputs, minGroupSize, maxGroupSize, nar);
             }
 
             //clusters where dt is allowed, but these must be of length 2. process any of these pairs which remain
@@ -148,7 +148,7 @@ public class MySTMClustered extends STMClustered {
         return false;
     }
 
-    private void cluster(int limit, int minGroupSize, int maxGroupSize) {
+    private void cluster(int limit, int minGroupSize, int maxGroupSize, NAR nar) {
 
         Map<Term, Task> vv = new HashMap();
 

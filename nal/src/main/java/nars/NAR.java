@@ -244,6 +244,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     public NAR(@NotNull TermIndex terms, @NotNull Executioner exe, @NotNull Time time, @NotNull Random rng, @NotNull ConceptBuilder conceptBuilder, Function<NAR, PrediTerm<Derivation>> deriver) {
+        super(exe);
 
         this.random = rng;
 
@@ -791,7 +792,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     /** asynchronously adds the service */
-    public void on(NARService s) {
+    public void on(@NotNull NARService s) {
         runLater(()-> add(s.term(), s));
     }
 
@@ -892,12 +893,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         loop.stop();
 
-        clear();
-
-        exe.stop();
+        //clear();
+        super.stop();
 
         derivation.forEach(c -> c.reset());
         //derivation.forEach(c -> c.transformsCache.invalidateAll());
+
+        exe.stop();
 
         return this;
     }

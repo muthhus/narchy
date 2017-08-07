@@ -32,8 +32,8 @@ public class EventCount extends NARService {
     }
 
     @Override
-    protected void startUp() throws Exception {
-        super.startUp();
+    protected void start(NAR nar)  {
+        super.start(nar);
         ons.addAll(Topic.all(nar, (event, value) -> eventMeters.get(event).hit()));
     }
 

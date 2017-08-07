@@ -389,14 +389,14 @@ public abstract class STMClustered extends TaskService {
 
         now = nar.time();
 
-        nar.onCycle((nn) -> iterate());
+        nar.onCycle((nn) -> iterate(nn));
     }
 
     abstract protected TasksNode newCentroid(int id);
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
-    protected boolean iterate() {
+    protected boolean iterate(NAR nar) {
 
         if (busy.compareAndSet(false, true)) {
 
@@ -428,7 +428,7 @@ public abstract class STMClustered extends TaskService {
     }
 
     @Override
-    public void accept(@NotNull Task t) {
+    public void accept(NAR nar, @NotNull Task t) {
 
 
         TLink tt = new TLink(t);

@@ -132,9 +132,8 @@ public class IRCNLP extends IRC {
             this.channels = channels;
         }
 
-
         @Override
-        protected float send(Task task) {
+        protected float leak(Task task) {
             boolean cmd = task.isCommand();
             if (cmd || (trace && !task.isDeleted())) {
                 String s = (!cmd) ? task.toString() : task.term().toString();
@@ -152,9 +151,10 @@ public class IRCNLP extends IRC {
         }
 
         @Override
-        public void accept(@NotNull Task t) {
+        public boolean preFilter(@NotNull Task t) {
             if (trace || t.isCommand())
-                super.accept(t);
+                return super.preFilter(t);
+            return false;
         }
     }
 

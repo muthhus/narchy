@@ -1,6 +1,5 @@
 package spacegraph.widget.meta;
 
-import com.google.common.util.concurrent.Service;
 import jcog.Services;
 import jcog.data.FloatParam;
 import jcog.list.FasterList;
@@ -39,8 +38,8 @@ public class ReflectionSurface<X> extends Grid {
         set(l);
     }
 
-    private void collectServices(Services<?> x, List<Surface> l) {
-        x.stream().forEach((Service s) -> {
+    private void collectServices(Services x, List<Surface> l) {
+        x.stream().forEach((s) -> {
             l.add(new WindowButton(s.toString(), () -> {
                 return new ReflectionSurface(s);
             }));

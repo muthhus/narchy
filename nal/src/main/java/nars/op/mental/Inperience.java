@@ -160,12 +160,12 @@ public class Inperience extends LeakOut {
     }
 
     @Override
-    public void accept(Task task) {
+    public boolean preFilter(Task task) {
 
 
         if (task.isCommand() || task.isInput()
             /*|| task instanceof InperienceTask*/) //for disabling recursive inperience
-            return;
+            return false;
 
         boolean full = leak.bag.isFull();
 
@@ -173,19 +173,19 @@ public class Inperience extends LeakOut {
         if (task.isBeliefOrGoal()) {
             //check for sufficient truth polarization
             if (full && task.conf() <= confMin.floatValue())
-                return; //too low confidence
+                return false; //too low confidence
 
             float f = task.freq();
             float fm = freqMax.floatValue();
             if (!(f <= fm) && !(f >= (1f - fm)))
-                return;
+                return false;
 
             //belief = true;
         } else {
             //belief = false;
         }
 
-        super.accept(task);
+        return true;
 
         // if(OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY ||
         //         (!OLD_BELIEVE_WANT_EVALUATE_WONDER_STRATEGY && (task.sentence.punctuation==Symbols.QUESTION || task.sentence.punctuation==Symbols.QUEST))) {
@@ -217,7 +217,7 @@ public class Inperience extends LeakOut {
     }
 
     @Override
-    protected float send(Task task) {
+    protected float leak(Task task) {
 
         //try {
         //        if (r == null)

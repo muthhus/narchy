@@ -323,14 +323,15 @@ public class Vis {
         new LeakOut(nar, 4, 0.25f) {
 
             @Override
-            public void accept(@NotNull Task t) {
+            public boolean preFilter(@NotNull Task t) {
                 if (t.pri() >= priMin.floatValue()) {
-                    super.accept(t);
+                    return super.preFilter(t);
                 }
+                return false;
             }
 
             @Override
-            protected float send(Task t) {
+            protected float leak(Task t) {
                 if (t.pri() >= priMin.floatValue()) {
                     try {
                         t.appendTo(term);

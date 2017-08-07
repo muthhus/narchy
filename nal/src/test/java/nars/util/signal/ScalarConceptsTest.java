@@ -42,12 +42,12 @@ public class ScalarConceptsTest {
     @Ignore
     @Test
     public void testRewardConceptsFuzzification3() {
-        NAR d = NARS.shell();
+        NAR n = NARS.shell();
         MutableFloat m = new MutableFloat(0f);
 
         FloatPolarNormalized range = new FloatPolarNormalized(() -> m.floatValue());
         range.radius(1f);
-        ScalarConcepts f = new ScalarConcepts(range, d, ScalarConcepts.FuzzyTriangle,
+        ScalarConcepts f = new ScalarConcepts(range, n, ScalarConcepts.FuzzyTriangle,
                 $.p("low"), $.p("mid"), $.p("hih"));
 
 
@@ -76,11 +76,11 @@ public class ScalarConceptsTest {
         testSteadyFreqCondition(m, f, (freqSum) -> {
             System.out.println(freqSum + " " + tolerance);
             return Util.equals(freqSum, 1f, tolerance);
-        });
+        }, n);
     }
 
-    public void testSteadyFreqCondition(MutableFloat m, ScalarConcepts f, FloatPredicate withFreqSum) {
-        NAR n = f.nar;
+    public void testSteadyFreqCondition(MutableFloat m, ScalarConcepts f, FloatPredicate withFreqSum, NAR n) {
+
         //run a few oscillations
         for (int i = 0; i < 5; i++) {
             m.setValue(Math.sin(i / 2f));
@@ -108,15 +108,15 @@ public class ScalarConceptsTest {
 
     @Test
     public void testRewardConceptsFuzzification2() {
-        NAR d = NARS.tmp();
+        NAR n = NARS.tmp();
         MutableFloat x = new MutableFloat(0f);
 
         testSteadyFreqCondition(x,
                 new ScalarConcepts(
                         new FloatNormalized(x::floatValue).updateRange(-1).updateRange(1),
-                        d, ScalarConcepts.FuzzyBinary, $.p("x0"), $.p("x1"), $.p("x2")),
+                        n, ScalarConcepts.FuzzyBinary, $.p("x0"), $.p("x1"), $.p("x2")),
                 (f) -> true /*Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)*/
-        );
+        , n);
     }
 
     @Test

@@ -23,14 +23,14 @@ abstract public class DurService extends CycleService {
     }
 
 
-    @Override public final void run() {
+    @Override public final void accept(NAR nar) {
         long lastNow = this.now;
         long now = nar.time();
         if (now - lastNow >= durations.floatValue() * nar.dur()) {
             this.now = now;
-            runDur();
+            runDur(nar);
         }
     }
 
-    abstract protected void runDur();
+    abstract protected void runDur(NAR nar);
 }

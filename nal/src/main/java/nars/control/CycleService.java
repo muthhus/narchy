@@ -2,18 +2,18 @@ package nars.control;
 
 import nars.NAR;
 
-abstract public class CycleService extends NARService implements Runnable {
+import java.util.function.Consumer;
+
+abstract public class CycleService extends NARService implements Consumer<NAR> {
 
     public CycleService(NAR nar) {
         super(nar);
     }
 
     @Override
-    protected void startUp() throws Exception {
-        super.startUp();
+    protected void start(NAR nar)  {
+        super.start(nar);
         ons.add(nar.onCycle(this));
     }
-
-
 
 }
