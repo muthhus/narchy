@@ -13,8 +13,6 @@ public class ServicesTest {
         s.add("x", new DummyIdleService(sb));
         s.add("y", new DummyIdleService(sb));
 
-        s.startAsync();
-
         s.print(System.out);
 
         s.stopAsync();

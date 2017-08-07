@@ -393,6 +393,10 @@ public class Services<X> {
     }
 
     public void add(X key, Service s) {
+        add(key, s, true);
+    }
+
+    public void add(X key, Service s, boolean start) {
         ServiceState ss = new ServiceState(s);
         ServiceState removed = services.put(key, ss);
         if (removed!=null) {
@@ -400,9 +404,10 @@ public class Services<X> {
         }
         s.addListener(new ServiceListener(ss), directExecutor());
 
-        //if (autostart)
-        s.startAsync();
+        if (start)
+            s.startAsync();
     }
+
 
     /**
      * Registers a {@link Listener} to be {@linkplain Executor#execute executed} on the given
@@ -451,25 +456,25 @@ public class Services<X> {
         state.addListener(listener, directExecutor());
     }
 
-    /**
-     * Initiates service {@linkplain Service#startAsync startup} on all the services being managed. It
-     * is only valid to call this method if all of the services are {@linkplain State#NEW new}.
-     *
-     * @return this
-     * @throws IllegalStateException if any of the Services are not {@link State#NEW new} when the
-     *                               method is called.
-     */
-    @CanIgnoreReturnValue
-    public Services startAsync() {
-        for (ServiceState service : services.values()) {
-            State state = service.state;
-            if (state != RUNNING) {
-                service.service.startAsync();
-            }
-            //checkState(state == NEW, "Service %s is %s, cannot start it.", service, state);
-        }
-        return this;
-    }
+//    /**
+//     * Initiates service {@linkplain Service#startAsync startup} on all the services being managed. It
+//     * is only valid to call this method if all of the services are {@linkplain State#NEW new}.
+//     *
+//     * @return this
+//     * @throws IllegalStateException if any of the Services are not {@link State#NEW new} when the
+//     *                               method is called.
+//     */
+//    @CanIgnoreReturnValue
+//    public Services startAsync() {
+//        for (ServiceState service : services.values()) {
+//            State state = service.state;
+//            if (state == NEW) {
+//                service.service.startAsync();
+//            }
+//            //checkState(state == NEW, "Service %s is %s, cannot start it.", service, state);
+//        }
+//        return this;
+//    }
 
 
 

@@ -301,16 +301,27 @@ public class Temporalize {
                 this.start = this.end = ETERNAL;
             } else {
 
-                if (end == ETERNAL)
-                    end = start; //point-like
+                int tdt = term.dtRange();
 
+                if (end == ETERNAL) {
+                    end = start;
+                }
+
+                long te;
                 if (start <= end) {
                     this.start = start;
-                    this.end = end;
+                    te = end;
                 } else {
                     this.start = end;
-                    this.end = start;
+                    te = start;
                 }
+
+                long sdt = te - this.start;
+                if (sdt < tdt) {
+                    te = start + tdt; //keeps left align
+                }
+
+                this.end = te;
             }
         }
 

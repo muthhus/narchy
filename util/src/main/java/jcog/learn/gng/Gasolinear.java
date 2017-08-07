@@ -10,10 +10,9 @@ import org.jetbrains.annotations.NotNull;
  * */
 public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DNode> {
 
-    private final double min;
-    private final double max;
 
     boolean needsSort = true;
+    private double min, max;
 
     public static class Sorted1DNode extends Node {
         public int order = -1;
@@ -29,8 +28,13 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DNode> {
 
     public Gasolinear(int nodes, double min, double max) {
         super(1, nodes);
+        randomUniform(min, max);
+    }
+
+    public void randomUniform(double min, double max) {
         this.min = min;
         this.max = max;
+        nodeStream().forEach(x -> x.randomizeUniform(min, max));
     }
 
     public static Gasolinear of(int nodes, double... points) {
@@ -39,7 +43,8 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DNode> {
         Gasolinear g = new Gasolinear(nodes, min, max);
         g.setWinnerUpdateRate(4f/points.length, 0.05f/points.length);
         for (double x : points)
-            g.put(x);
+            g.put(x /* 1D */);
+
         return g;
     }
 

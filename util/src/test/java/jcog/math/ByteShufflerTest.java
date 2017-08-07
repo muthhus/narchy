@@ -14,7 +14,7 @@ public class ByteShufflerTest {
     public void testByteShuffler() {
         ByteShuffler b = new ByteShuffler(16);
         Random rng = new Random();
-        for (int i = 2; i < 5; i ++)
+        for (int i = 2; i < 4; i ++)
             testPermutes(b, rng, i);
     }
 

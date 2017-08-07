@@ -14,7 +14,7 @@ import org.junit.Test;
  */
 public class TemporalStabilityTests {
 
-    static final int CYCLES = 500;
+    static final int CYCLES = 1500;
 
 //    static {
 //        Param.DEBUG = true;
@@ -99,11 +99,16 @@ public class TemporalStabilityTests {
         char d = (char) ('a' + (j+1)); //next
         return "(" + c + "==>" + d + ")";
     };
-    static final IntToObjectFunction<String> linkedTempConj5 = (j) -> {
+    static final IntToObjectFunction<String> conjSeq2 = (j) -> {
         char c = (char) ('a' + j);
         char d = (char) ('a' + (j+1)); //next
         return "(" + c + " &&+5 " + d + ")";
     };
+    static final IntToObjectFunction<String> conjInvertor = (j) -> {
+        char c = (char) ('a' + j);
+        return "(" + c + " &&+5 (--," + c + "))";
+    };
+
 
     @Test public void testTemporalStabilityInh3() throws Narsese.NarseseException {
         new T1(inheritencer, 1, 2, 5).test(CYCLES, NARS.tmp());
@@ -129,7 +134,10 @@ public class TemporalStabilityTests {
         new T1(linkedimpl, 1, 2, 5).test(CYCLES, NARS.tmp());
     }
     @Test public void testTemporalStabilityLinkedTemporalConj() throws Narsese.NarseseException {
-        new T1(linkedTempConj5, new int[] { 1, 6, 11 }, 1, 16).test(CYCLES, NARS.tmp());
+        new T1(conjSeq2, new int[] { 1, 6, 11 }, 1, 16).test(CYCLES, NARS.tmp());
+    }
+    @Test public void testTemporalStabilityConjInvertor() throws Narsese.NarseseException {
+        new T1(conjInvertor, new int[] { 1, 6, 11 }, 1, 16).test(CYCLES, NARS.tmp());
     }
     @Test public void testTemporalStabilityLinkedImplExt() throws Narsese.NarseseException {
         new T1(linkedimpl, 1, 2, 5).test(CYCLES, NARS.tmp());
