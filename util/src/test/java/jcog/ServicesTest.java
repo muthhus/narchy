@@ -13,11 +13,11 @@ public class ServicesTest {
         s.add("x", new DummyIdleService(sb));
         s.add("y", new DummyIdleService(sb));
 
-        s.print(System.out);
+        s.printServices(System.out);
 
         s.stopAsync();
 
-        s.print(System.out);
+        s.printServices(System.out);
     }
 
     private static class DummyIdleService extends AbstractIdleService {

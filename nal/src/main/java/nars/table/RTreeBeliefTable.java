@@ -35,10 +35,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     /**
      * in fractions of the table's contained temporal range
+     *
      */
     static final float[] sampleRadii = {0f, 0.1f , 0.25f, 0.5f, 1f + (1f)};
 
-    final static int maxSamplesTruthpolated = 5;
+    final static int maxSamplesTruthpolated = 8;
 
     /**
      * proportional to capacity (not size).
@@ -46,7 +47,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * values greater than 0 cause the table to report with a moving average
      * effect which could reduce temporal precision.
      */
-    final static float enoughSamplesRate = 0f;
+    final static float enoughSamplesRate = 0.01f;
 
     /**
      * if the szie is less than or equal to this value, all the entries will

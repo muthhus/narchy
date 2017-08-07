@@ -4,7 +4,7 @@ import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.concept.FuzzyScalarConcepts;
+import nars.concept.ScalarConcepts;
 import nars.concept.GoalActionConcept;
 import nars.term.Compound;
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +31,7 @@ public class Line1DSimplest extends NAgent {
      * the current value
      */
     public final FloatParam o = new FloatParam(0.5f, 0, 1f);
-    public final FuzzyScalarConcepts in;
+    public final ScalarConcepts in;
 
 
     public Line1DSimplest(NAR n) {

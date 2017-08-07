@@ -2,12 +2,13 @@ package nars.util.signal;
 
 import jcog.Texts;
 import jcog.Util;
+import jcog.data.FloatParam;
 import jcog.math.FloatNormalized;
 import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;
 import nars.NARS;
-import nars.concept.FuzzyScalarConcepts;
+import nars.concept.ScalarConcepts;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.junit.Ignore;
@@ -20,7 +21,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by me on 7/2/16.
  */
-public class FuzzyScalarConceptsTest {
+public class ScalarConceptsTest {
 
     //HACK TODO make sure this is smaller
     final static float tolerance = 0.2f;
@@ -46,9 +47,8 @@ public class FuzzyScalarConceptsTest {
 
         FloatPolarNormalized range = new FloatPolarNormalized(() -> m.floatValue());
         range.radius(1f);
-        FuzzyScalarConcepts f = new FuzzyScalarConcepts(range, d, FuzzyScalarConcepts.FuzzyTriangle,
+        ScalarConcepts f = new ScalarConcepts(range, d, ScalarConcepts.FuzzyTriangle,
                 $.p("low"), $.p("mid"), $.p("hih"));
-
 
 
 //        {
@@ -79,18 +79,18 @@ public class FuzzyScalarConceptsTest {
         });
     }
 
-    public void testSteadyFreqCondition(MutableFloat m, FuzzyScalarConcepts f, FloatPredicate withFreqSum) {
+    public void testSteadyFreqCondition(MutableFloat m, ScalarConcepts f, FloatPredicate withFreqSum) {
         NAR n = f.nar;
         //run a few oscillations
         for (int i = 0; i < 5; i++) {
-            m.setValue(Math.sin(i/2f));
+            m.setValue(Math.sin(i / 2f));
             n.cycle();
 
 
             double freqSum = StreamSupport.stream(f.sensors.spliterator(), false)
                     .peek(x -> n.input(x.apply(n)))
                     .map(x -> n.beliefTruth(x, n.time()))
-                    .mapToDouble(x -> x!=null ? x.freq() : 0f).sum();
+                    .mapToDouble(x -> x != null ? x.freq() : 0f).sum();
 
             System.out.println(
                     Texts.n4(m.floatValue()) + "\t" +
@@ -100,7 +100,7 @@ public class FuzzyScalarConceptsTest {
                     //confWeightSum(beliefs)
             );
 
-            assertTrue(withFreqSum.accept((float)freqSum));
+            assertTrue(withFreqSum.accept((float) freqSum));
 
 
         }
@@ -108,14 +108,30 @@ public class FuzzyScalarConceptsTest {
 
     @Test
     public void testRewardConceptsFuzzification2() {
-        NAR d = new NARS().get();
-        MutableFloat m = new MutableFloat(0f);
+        NAR d = NARS.tmp();
+        MutableFloat x = new MutableFloat(0f);
 
-        testSteadyFreqCondition(m,
-                new FuzzyScalarConcepts(
-                        new FloatNormalized(() -> m.floatValue()).updateRange(-1).updateRange(1),
-                        d, FuzzyScalarConcepts.FuzzyBinary, $.p("x0"), $.p("x1"), $.p("x2")),
+        testSteadyFreqCondition(x,
+                new ScalarConcepts(
+                        new FloatNormalized(x::floatValue).updateRange(-1).updateRange(1),
+                        d, ScalarConcepts.FuzzyBinary, $.p("x0"), $.p("x1"), $.p("x2")),
                 (f) -> true /*Util.equals(f, 0.5f + 0.5f * m.floatValue(), tolerance)*/
         );
+    }
+
+    @Test
+    public void testServiceAndHardEncoder() {
+        NAR n = NARS.tmp();
+
+        FloatParam x = new FloatParam(0f, 0f, 1f);
+
+        new ScalarConcepts(x, n,
+                ScalarConcepts.Hard,
+            $.p("x0"), $.p("x1")/*, $.p("x2")*/
+        );
+
+        n.run(1); //load the
+
+        n.printServices(System.out);
     }
 }

@@ -27,6 +27,7 @@ import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import jcog.io.BinTxt;
+import jcog.math.FloatSupplier;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
 import jcog.pri.Priority;
@@ -1755,6 +1756,11 @@ public enum Util {
         if (x >= 3f) return +1f;
         return x * ( 27 + x * x ) / ( 27 + 9 * x * x );
     }
+
+    public static Object toString(Object x) {
+        return x.getClass() + "@" + System.identityHashCode(x);
+    }
+
 
 //    public static <T>  Collector<T, ?, List<T>> toListOrNullIfEmpty() {
 //        return new Collectors.CollectorImpl<>((Supplier<List<T>>) ArrayList::new, List::add,

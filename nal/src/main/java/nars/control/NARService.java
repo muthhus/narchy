@@ -13,7 +13,7 @@ public class NARService extends AbstractIdleService implements Termed {
     public final NAR nar;
     protected Ons ons;
 
-    NARService(NAR nar) {
+    protected NARService(NAR nar) {
         this.nar = nar;
         nar.runLater(()-> nar.add(term(), this));
     }

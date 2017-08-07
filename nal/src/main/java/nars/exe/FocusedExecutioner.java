@@ -64,6 +64,7 @@ public class FocusedExecutioner extends Executioner {
      * temporary buffer for tasks about to be executed
      */
     private final FasterList<ITask> next = new FasterList(1024);
+    private long now;
 
     public FocusedExecutioner(Function<NAR,PrediTerm<Derivation>> deriverBuilder) {
         this.deriverBuilder = deriverBuilder;
@@ -79,6 +80,7 @@ public class FocusedExecutioner extends Executioner {
 
     @Override
     public synchronized void start(NAR nar) {
+        this.now = nar.time();
         super.start(nar);
         deriver = deriverBuilder.apply(nar);
     }
@@ -86,6 +88,7 @@ public class FocusedExecutioner extends Executioner {
     @Override
     public void cycle() {
 
+        now = nar.time();
 
         if (Param.TRACE) {
             System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());
@@ -188,7 +191,8 @@ public class FocusedExecutioner extends Executioner {
 
     @Override
     public void runLater(Runnable cmd) {
-        cmd.run();
+        nar.time.at(now, cmd);
+        //cmd.run();
     }
 
     @Override

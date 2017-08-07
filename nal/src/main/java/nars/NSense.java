@@ -4,7 +4,7 @@ import jcog.Util;
 import jcog.math.FirstOrderDifferenceFloat;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
-import nars.concept.FuzzyScalarConcepts;
+import nars.concept.ScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.control.CauseChannel;
 import nars.term.Compound;
@@ -188,14 +188,14 @@ public interface NSense {
     }
 
     @NotNull
-    default FuzzyScalarConcepts senseNumber(FloatSupplier v, Term... states) {
+    default ScalarConcepts senseNumber(FloatSupplier v, Term... states) {
 
         assert(states.length > 1);
 
-        FuzzyScalarConcepts fs = new FuzzyScalarConcepts(
+        ScalarConcepts fs = new ScalarConcepts(
                v, nar(),
                 //FuzzyScalarConcepts.FuzzyTriangle,
-                FuzzyScalarConcepts.Hard,
+                ScalarConcepts.Hard,
                 states
         );
         List<SensorConcept> x = fs.sensors;
@@ -209,18 +209,18 @@ public interface NSense {
     }
 
     @NotNull
-    default FuzzyScalarConcepts senseNumber(Term id, FloatSupplier v, int precision)  {
+    default ScalarConcepts senseNumber(Term id, FloatSupplier v, int precision)  {
         return senseNumber(v, Util.map(0, precision,
                 (int x) -> ($.inh($.the(x), id)),
                 Term[]::new));
     }
 
     @NotNull
-    default FuzzyScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
+    default ScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
         return senseNumber(v, prop(id, LOW), prop(id, HIH));
     }
     @NotNull
-    default FuzzyScalarConcepts senseNumberTri(Term id, FloatSupplier v)  {
+    default ScalarConcepts senseNumberTri(Term id, FloatSupplier v)  {
         return senseNumber(v,  inh(id, LOW), inh(id, MID), inh(id, HIH));
     }
 

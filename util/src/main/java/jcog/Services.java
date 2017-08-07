@@ -103,13 +103,13 @@ import static com.google.common.util.concurrent.Service.State.*;
 @GwtIncompatible
 public class Services<X> {
 
-    public void print(PrintStream out) {
+    public void printServices(PrintStream out) {
         services.forEach((k,s) -> {
-           out.println(k + " " + s.service + "(" + s.service.getClass() + "): " + s.state);
+           out.println(s);
         });
     }
 
-    public Stream<ServiceState> stream() {
+    public Stream<Service> stream() {
         return services.values().stream();
     }
 
@@ -363,7 +363,7 @@ public class Services<X> {
      */
     private final ServiceManagerState state;
     private final WeakReference<ServiceManagerState> stateRef;
-    private final ConcurrentMap<X,ServiceState> services;
+    private final ConcurrentMap<X,Service> services;
 
     /**
      * Constructs a new instance for managing the given services.
@@ -397,12 +397,11 @@ public class Services<X> {
     }
 
     public void add(X key, Service s, boolean start) {
-        ServiceState ss = new ServiceState(s);
-        ServiceState removed = services.put(key, ss);
+        Service removed = services.put(key, s);
         if (removed!=null) {
-            removed.service.stopAsync();
+            removed.stopAsync();
         }
-        s.addListener(new ServiceListener(ss), directExecutor());
+        s.addListener(new ServiceListener(s), directExecutor());
 
         if (start)
             s.startAsync();
@@ -466,7 +465,7 @@ public class Services<X> {
 //     */
 //    @CanIgnoreReturnValue
 //    public Services startAsync() {
-//        for (ServiceState service : services.values()) {
+//        for (Service service : services.values()) {
 //            State state = service.state;
 //            if (state == NEW) {
 //                service.service.startAsync();
@@ -486,8 +485,8 @@ public class Services<X> {
      */
     @CanIgnoreReturnValue
     public Services stopAsync() {
-        for (ServiceState service : services.values()) {
-            service.service.stopAsync();
+        for (Service service : services.values()) {
+            service.stopAsync();
         }
         return this;
     }
@@ -557,21 +556,7 @@ public class Services<X> {
                 .toString();
     }
 
-    public static class ServiceState {
-        public final Service service;
-        State state = NEW;
-        //final Stopwatch startupTime;
 
-        public ServiceState(Service service) {
-            this.service = service;
-            //this.startupTime = new Stopwatch();
-        }
-
-        @Override
-        public String toString() {
-            return service + ": " + state;
-        }
-    }
 
     /**
      * An encapsulation of all the mutable state of the {@link Services} that needs to be
@@ -693,9 +678,9 @@ public class Services<X> {
                 } else {
                     // This should be an extremely rare race condition.
                     List<Service> servicesInBadStates = Lists.newArrayList();
-                    for (ServiceState service : services.values()) {
-                        if (service.state != NEW) {
-                            servicesInBadStates.add(service.service);
+                    for (Service service : services.values()) {
+                        if (service.state() != NEW) {
+                            servicesInBadStates.add(service);
                         }
                     }
                     throw new IllegalArgumentException(
@@ -803,7 +788,7 @@ public class Services<X> {
          * <li>Run the listeners (outside of the lock)
          * </ol>
          */
-        void transitionService(final ServiceState service, State from, State to) {
+        void transitionService(final Service service, State from, State to) {
             checkNotNull(service);
             checkArgument(from != to);
             monitor.enter();
@@ -812,11 +797,12 @@ public class Services<X> {
                 if (!ready) {
                     return;
                 }
-                // Update state.
-                if (service.state != from) {
-                    throw new IllegalStateException("Service %s not at the expected location in the state map %s " +  service + " " +  from);
-                }
-                service.state = to;
+//                // Update state.
+//                if (service.state() != from) {
+//                    throw new IllegalStateException("Service %s not at the expected location in the state map %s " +  service + " " +  from);
+//                }
+
+                //service.state = to;
 
 //                // Update the timer
 //                Stopwatch stopwatch = startupTimers.computeIfAbsent(service, k -> Stopwatch.createStarted());
@@ -832,7 +818,7 @@ public class Services<X> {
 
                 // Did a service fail?
                 if (to == FAILED) {
-                    enqueueFailedEvent(service.service);
+                    enqueueFailedEvent(service);
                 }
 
 //                if (states.count(RUNNING) == numberOfServices) {
@@ -849,13 +835,13 @@ public class Services<X> {
             }
         }
 
-        void enqueueStoppedEvent() {
-            listeners.enqueue(STOPPED_EVENT);
-        }
-
-        void enqueueHealthyEvent() {
-            listeners.enqueue(HEALTHY_EVENT);
-        }
+//        void enqueueStoppedEvent() {
+//            listeners.enqueue(STOPPED_EVENT);
+//        }
+//
+//        void enqueueHealthyEvent() {
+//            listeners.enqueue(HEALTHY_EVENT);
+//        }
 
         void enqueueFailedEvent(final Service service) {
             listeners.enqueue(
@@ -903,12 +889,12 @@ public class Services<X> {
      * the state transitions.
      */
     private final class ServiceListener extends Service.Listener {
-        final ServiceState service;
+        final Service service;
 //        // We store the state in a weak reference to ensure that if something went wrong while
 //        // constructing the ServiceManager we don't pointlessly keep updating the state.
 //        final WeakReference<ServiceManagerState> state;
 
-        ServiceListener(ServiceState service) {
+        ServiceListener(Service service) {
             this.service = service;
 //            this.state = state;
         }

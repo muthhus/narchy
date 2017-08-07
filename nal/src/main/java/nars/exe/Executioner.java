@@ -9,6 +9,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
@@ -99,8 +100,8 @@ abstract public class Executioner implements Executor {
 
 
     @Override
-    public final void execute(Runnable whenIGetAroundToIt) {
-        runLater(whenIGetAroundToIt);
+    public final void execute(Runnable r) {
+        ForkJoinPool.commonPool().execute(r);
     }
 
 

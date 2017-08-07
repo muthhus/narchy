@@ -2,28 +2,49 @@ package nars.concept;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
+import jcog.Util;
 import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.Op;
+import nars.control.NARService;
 import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.truth.Truth;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
 /**
- * manages a set of concepts whose beliefs represent components of an
- * N-ary (N>=1) discretization of a varying scalar (32-bit floating point) signal.
- * expects values which have been normalized to 0..1.0 range (ex: use NormalizedFloat) */
-public class FuzzyScalarConcepts extends ProxyTerm {
+ * manages a set of N 'digit' concepts whose beliefs represent components of an
+ * N-ary (N>=1) discretization of a varying scalar (ie: 32-bit floating point) signal.
+ * <p>
+ * 'digit' here does not necessarily represent radix arithmetic. instead their
+ * value are determined by a ScalarEncoder impl
+ * <p>
+ * expects values which have been normalized to 0..1.0 range (ex: use NormalizedFloat)
+ */
+public class ScalarConcepts extends NARService {
+
+    private final Term id;
+
+    /**
+     * decides the truth value of a 'digit'
+     *
+     * @param conceptIndex the 'digit' concept
+     * @param x            the value being input
+     * @maxDigits the total size of the set of digits being calculated
+     */
+    @FunctionalInterface
+    public interface ScalarEncoder {
+        Truth truth(float x, int digit, int maxDigits, NAR nar);
+    }
 
     private final FloatSupplier input;
 
     @NotNull
-    @Deprecated public final List<SensorConcept> sensors;
+    @Deprecated
+    public final List<SensorConcept> sensors;
 
     @NotNull
     public final NAR nar;
@@ -31,75 +52,90 @@ public class FuzzyScalarConcepts extends ProxyTerm {
     float conf;
 
 
-    public final static FuzzyModel Hard = (v, i, indices, n) -> {
+    /**
+     * "HARD" - analogous to a filled volume of liquid
+     * <p>
+     * [ ] [ ] [ ] [ ] 0.00
+     * [x] [ ] [ ] [ ] 0.25
+     * [x] [x] [ ] [ ] 0.50
+     * [x] [x] [x] [ ] 0.75
+     * [x] [x] [x] [x] 1.00
+     * <p>
+     * key:
+     * [ ] = freq 0
+     * [x] = freq 1,
+     */
+    public final static ScalarEncoder Hard = (v, i, indices, n) -> {
 
         float vv = v * indices;
 
-        int which = (int)Math.floor(vv);
+        int which = (int) Math.floor(vv);
         float f;
         if (i < which) {
             f = 1f;
-        } else if ( i > which) {
+        } else if (i > which) {
             f = 0f;
         } else {
             f = vv - which;
         }
 
-        return $.t( f, n.confDefault(Op.BELIEF) );
+        return $.t(f, n.confDefault(Op.BELIEF));
 
     };
 
-    /** TODO need to analyze the interaction of the produced frequency values being reported by all concepts. */
-    public final static FuzzyModel FuzzyTriangle = (v, i, indices, n) -> {
+    /**
+     * analogous to a needle on a guage, the needle being the triangle spanning several of the 'digits'
+     * /      |       \
+     * /       / \        \
+     * /        /   \         \
+     * + + +    + + +     + + +
+     * TODO need to analyze the interaction of the produced frequency values being reported by all concepts.
+     */
+    public final static ScalarEncoder FuzzyTriangle = (v, i, indices, n) -> {
 
         float dr = 1f / (indices - 1);
 
-        return $.t( Math.max(0, (1f - Math.abs((i * dr) - v) / dr)), n.confDefault(Op.BELIEF) ) ;
+        return $.t(Math.max(0, (1f - Math.abs((i * dr) - v) / dr)), n.confDefault(Op.BELIEF));
     };
 
-    /** TODO not quite working yet. it is supposed to recursively subdivide like a binary number, and each concept represents the balance corresponding to each radix's progressively increasing sensitivity */
-    public final static FuzzyModel FuzzyBinary = (v, i, indices, n) -> {
+    /**
+     * TODO not quite working yet. it is supposed to recursively subdivide like a binary number, and each concept represents the balance corresponding to each radix's progressively increasing sensitivity
+     */
+    public final static ScalarEncoder FuzzyBinary = (v, i, indices, n) -> {
 
         //float nearness[] = new float[n];
 
         float b = v;
         float dv = 1f;
-        for (int j =  0; j < i; j++) {
+        for (int j = 0; j < i; j++) {
             dv /= 2f;
             b = Math.max(0, b - dv);
         }
 
         //System.out.println(v + " " + b + "/" + dv + " = " + (b/dv));
 
-        Truth tt = $.t( b/(dv), n.confDefault(Op.BELIEF) ) ;
+        Truth tt = $.t(b / (dv), n.confDefault(Op.BELIEF));
         return tt;
     };
-
-
-    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, @NotNull Term... states) {
-        this(input, nar, FuzzyTriangle, states);
-    }
-
-    public FuzzyScalarConcepts(@NotNull MutableFloat input, @NotNull NAR nar, FuzzyModel truther,  @NotNull Term... states) {
-        this(input::floatValue, nar, truther, states);
-    }
 
     public Term get(int i) {
         return sensors.get(i).term();
     }
 
-    public FuzzyScalarConcepts resolution(float r) {
-        for (SensorConcept s: sensors)
+    public ScalarConcepts resolution(float r) {
+        for (SensorConcept s : sensors)
             s.resolution(r);
         return this;
     }
 
-    @FunctionalInterface  public interface FuzzyModel {
-        Truth truth(float valueNormalized, int conceptIndex, int maxConcepts, NAR nar);
-    }
 
-    public FuzzyScalarConcepts(FloatSupplier input, @NotNull NAR nar, FuzzyModel truther, @NotNull Term... states) {
-        super($.func("FuzzyScalarConcepts", states));
+    public ScalarConcepts(FloatSupplier input, @NotNull NAR nar, ScalarEncoder truther, @NotNull Term... states) {
+        super(nar);
+
+        this.id = $.func(getClass().getSimpleName(),
+                $.sete(states),
+                $.quote(Util.toString(input)), $.the(truther.toString())
+        );
 
         this.conf = nar.confDefault(Op.BELIEF);
         this.input = input;
@@ -111,21 +147,26 @@ public class FuzzyScalarConcepts extends ProxyTerm {
 
         if (num > 1) {
             int i = 0;
-            for (Term  s : states) {
+            for (Term s : states) {
                 final int ii = i++;
-                sensors.add( new SensorConcept(s, nar, this.input,
+                sensors.add(new SensorConcept(s, nar, this.input,
                         (x) -> truther.truth(x, ii, num, nar)
                 ));
             }
         } else {
-           throw new RuntimeException("should be >1 states");
+            throw new RuntimeException("should be >1 states");
         }
-
 
 
     }
 
-//		private Truth biangular(float v) {
+    @Override
+    public @NotNull Term term() {
+        return id;
+    }
+
+
+    //		private Truth biangular(float v) {
 //			if (v < 0.5f) return t(0, conf);
 //			else {
 //				//return t(1f, conf * Math.min(1f,(v-0.5f)*2f));
@@ -166,7 +207,7 @@ public class FuzzyScalarConcepts extends ProxyTerm {
 //    }
 
     @NotNull
-    public FuzzyScalarConcepts resolution() {
+    public ScalarConcepts resolution() {
         for (int i = 0, sensorsSize = sensors.size(); i < sensorsSize; i++) {
             sensors.get(i);
         }
@@ -174,7 +215,7 @@ public class FuzzyScalarConcepts extends ProxyTerm {
     }
 
     @NotNull
-    public FuzzyScalarConcepts conf(float c) {
+    public ScalarConcepts conf(float c) {
         this.conf = c;
         return this;
     }

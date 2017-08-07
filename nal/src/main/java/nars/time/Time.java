@@ -69,11 +69,7 @@ public abstract class Time implements Clock, Serializable {
 
 
     public void at(long whenOrAfter, Runnable then) {
-        if (whenOrAfter == now()) {
-            then.run();
-        } else {
-            scheduled.add(PrimitiveTuples.pair(whenOrAfter, then));
-        }
+        scheduled.add(PrimitiveTuples.pair(whenOrAfter, then));
     }
 
     protected void exeScheduled(Executor exe) {

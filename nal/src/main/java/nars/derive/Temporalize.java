@@ -441,7 +441,8 @@ public class Temporalize {
             if (this.offset == DTERNAL && offset == DTERNAL)
                 return this; //no effect, adding dternal to dternal
 
-            assert (this.offset != DTERNAL && offset != DTERNAL);
+            assert (this.offset != DTERNAL && offset != DTERNAL):
+                    "this.base=" + this.base + ", this.offset=" + this.offset + " + " + offset + " = ?";
 
             if (this.offset == XTERNAL)
                 return Time.the(base, offset); //set initial dt
