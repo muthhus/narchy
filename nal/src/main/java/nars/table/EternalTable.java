@@ -61,7 +61,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         }
 
 
-
         @Override
         public void setCapacity(int c) {
 
@@ -271,23 +270,26 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                 false
         ));
 
-        if (t == null)
-            return null;
 
-        NALTask r = new NALTask(t,
-                y.punc(),
-                conclusion,
-                nar.time(),
-                ETERNAL, ETERNAL,
-                Stamp.zip(oldBelief.stamp(), y.stamp(), 0.5f /* TODO proportionalize */)
-        );
-        r.setPri(BudgetFunctions.fund(1f, false, oldBelief, y));
-        r.cause = Cause.zip(y, oldBelief);
+        Truth revisionTruth = conclusion;
+        Task prevBelief = oldBelief;
+        return Task.tryTask(t, y.punc(), conclusion, (term, truth) -> {
+            NALTask r = new NALTask(t,
+                    y.punc(),
+                    revisionTruth,
+                    nar.time(),
+                    ETERNAL, ETERNAL,
+                    Stamp.zip(prevBelief.stamp(), y.stamp(), 0.5f /* TODO proportionalize */)
+            );
 
-        if (Param.DEBUG)
-            r.log("Insertion Revision");
 
-        return r;
+            r.setPri(BudgetFunctions.fund(1f, false, prevBelief, y));
+            r.cause = Cause.zip(y, prevBelief);
+
+            if (Param.DEBUG)
+                r.log("Insertion Revision");
+            return r;
+        });
     }
 
     @Nullable
@@ -316,7 +318,6 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         Task s = strongest();
         return s != null ? s.truth() : null;
     }
-
 
 
 //    @Override

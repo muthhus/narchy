@@ -187,10 +187,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         //frameStamp();
 
         src.update(1);
-        this.conf = a.nar.confDefault(Op.BELIEF);
 
         NAR nar = a.nar;
 
+        this.conf = nar.confDefault(Op.BELIEF);
         in.input(pixels.stream() /*filter(PixelConcept::update).*/
                         .map(c -> c.apply(nar)));
     }

@@ -968,7 +968,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return new PreciseTruth(freq(), e, false);
     }
 
-    @Nullable static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, Task> res) {
+    @Nullable static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
         ObjectBooleanPair<Term> x = tryContent(t, punc, true);
         if (x!=null) {
             return res.apply(x.getOne(), tr.negIf(x.getTwo()));

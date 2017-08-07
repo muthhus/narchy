@@ -46,7 +46,8 @@ public class FZero extends NAgentX {
         this.fz = new FZeroGame();
 
         senseCamera("fz", new Scale(() -> fz.image, 32, 24)/*.blur()*/)
-                .resolution(0.01f);
+                //.resolution(0.01f)
+        ;
 
 //        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
 //        cc.addActions($.the("fz"), this, false, false, true);
@@ -57,11 +58,11 @@ public class FZero extends NAgentX {
         actionBipolar($.inh(the("fwd"), id), (f) -> {
             fz.vehicleMetrics[0][6] += (f) * 0.5f;
             return f;
-        }).resolution.setValue(0.02f);
+        });//.resolution.setValue(0.02f);
         actionBipolar($.inh(the("rot"), id), (r) -> {
             fz.playerAngle += (r) * 0.05f;
             return r;
-        }).resolution.setValue(0.01f);
+        });//.resolution.setValue(0.01f);
 
         //keyboard-ish controls:
 //actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );
@@ -79,7 +80,7 @@ public class FZero extends NAgentX {
         senseNumber($.prop(the("ang"), id), new FloatNormalized(() ->
                 (float) MathUtils.normalizeAngle(fz.playerAngle, Math.PI) / (Math.PI*2)),
                 8
-        ).resolution(0.05f);
+        );//.resolution(0.05f);
 
         //nar.mix.stream("Derive").setValue(1);
         //implAccelerator(nar, this);
