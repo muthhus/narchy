@@ -151,7 +151,7 @@ abstract public class NAgentX extends NAgent {
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         MySTMClustered stmGoal = new MySTMClustered(n, 64, GOAL, 3, true, 4f);
         Inperience inp = new Inperience(n, 8, 0.1f);
-        Abbreviation abb = new Abbreviation(n, "z", 3, 8, 0.1f, 32);
+        Abbreviation abb = new Abbreviation(n, "z", 8, 16, 0.1f, 32);
 
 
         NAgent a = init.apply(n);

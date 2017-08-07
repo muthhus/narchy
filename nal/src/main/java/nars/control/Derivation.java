@@ -174,20 +174,20 @@ public class Derivation extends Unify implements TermContext {
         };
 
         derivationFunctors = functors(
-            substituteIfUnifiesAny,
-            substituteIfUnifiesDep,
-            polarize,
-            substitute,
-            nar.get($.the("dropAnyEvent")),
-            nar.get($.the("dropAnySet")),
-            nar.get($.the("union")),
-            nar.get($.the("differ")),
-            nar.get($.the("intersect")),
-            nar.get($.the("conjEvent"))
+                substituteIfUnifiesAny,
+                substituteIfUnifiesDep,
+                polarize,
+                substitute,
+                nar.get($.the("dropAnyEvent")),
+                nar.get($.the("dropAnySet")),
+                nar.get($.the("union")),
+                nar.get($.the("differ")),
+                nar.get($.the("intersect")),
+                nar.get($.the("conjEvent"))
         );
     }
 
-    static ImmutableMap<Term,Termed> functors(Termed... t) {
+    static ImmutableMap<Term, Termed> functors(Termed... t) {
         java.util.Map m = new HashMap();
         for (Termed x : t) {
             m.put(x.term(), x);
@@ -196,11 +196,14 @@ public class Derivation extends Unify implements TermContext {
     }
 
 
-    /** only returns derivation-specific functors.  other functors must be evaluated at task execution time */
-    @Override public Termed get(Term x, boolean createIfAbsent) {
+    /**
+     * only returns derivation-specific functors.  other functors must be evaluated at task execution time
+     */
+    @Override
+    public Termed get(Term x, boolean createIfAbsent) {
         if (x instanceof Atom) {
             Termed f = derivationFunctors.get(x);
-            if (f!=null)
+            if (f != null)
                 return f;
         }
 
@@ -209,11 +212,12 @@ public class Derivation extends Unify implements TermContext {
 
     /**
      * concept-scope
+     *
      * @param deriver
      */
     public Derivation cycle(PrediTerm<Derivation> deriver) {
         long now = this.nar.time();
-        if (now!=this.time) {
+        if (now != this.time) {
             this.time = now;
             this.dur = nar.dur();
             this.truthResolution = nar.truthResolution.floatValue();
@@ -279,7 +283,7 @@ public class Derivation extends Unify implements TermContext {
         //assert(beliefTerm.op()!=NEG): beliefTerm + " is negated";
 
         Term bt = beliefTerm.unneg();
-        assert(!(bt instanceof Bool));
+        assert (!(bt instanceof Bool));
 
 //        int ttv = taskTerm.vars();
 //        if (ttv > 0 && bt.vars() > 0) {
@@ -296,15 +300,16 @@ public class Derivation extends Unify implements TermContext {
             /** to compute the time-discounted truth, find the minimum distance
              *  of the tasks considering their dtRange
              */
-            long tstart = task.start();
-            if ((tstart != ETERNAL)) {
-                long bstart = belief.start();
-                if (bstart != ETERNAL) {
+            if (!task.isEternal() && !belief.isEternal()) {
 
-                    long beliefTruthTime = belief.nearestStartOrEnd(tstart, task.end());
-                    beliefTruth = belief.truth(beliefTruthTime, dur, nar.confMin.floatValue() /* confMin */); //project belief truth to task's time
-                }
+                long beliefTruthTime = belief.nearestStartOrEnd(task.start(), task.end());
+                assert(beliefTruthTime != ETERNAL);
+
+                beliefTruth = belief.truth(beliefTruthTime, dur, nar.confMin.floatValue() /* confMin */); //project belief truth to task's time
+
+
             }
+
             this.beliefTruth = beliefTruth;
         }
 
@@ -405,7 +410,7 @@ public class Derivation extends Unify implements TermContext {
 
 
     private static boolean temporal(@Nullable Task task) {
-        return task!=null &&
+        return task != null &&
                 (!task.isEternal() || task.term().isTemporal());
     }
 
@@ -425,7 +430,7 @@ public class Derivation extends Unify implements TermContext {
             if (task.isBeliefOrGoal()) {
                 //for belief/goal use the relative conf
                 te = taskTruth.conf();
-                be = beliefTruth!=null ? beliefTruth.conf() : 0; //beliefTruth can be zero in temporal cases
+                be = beliefTruth != null ? beliefTruth.conf() : 0; //beliefTruth can be zero in temporal cases
             } else {
                 //for question/quest, use the relative priority
                 te = task.priElseZero();

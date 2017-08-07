@@ -1,19 +1,23 @@
 package nars.gui;
 
 import com.google.common.collect.Lists;
+import com.jogamp.opengl.GL2;
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.pri.PriReference;
+import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.Task;
 import nars.bag.leak.LeakOut;
+import nars.concept.Concept;
 import nars.exe.FocusedExecutioner;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.AbstractSpace;
 import spacegraph.Ortho;
@@ -146,43 +150,52 @@ public class Vis {
 //        return grid;
 //    }
 
-//    public static Grid conceptLinePlot(NAR nar, Iterable<? extends Termed> concepts, int plotHistory) {
-//
-//        //TODO make a lambda Grid constructor
-//        Grid grid = new Grid();
-//        List<Plot2D> plots = $.newArrayList();
-//        for (Termed t : concepts) {
-//            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/) {
-//
-//                @Override
-//                protected void paint(GL2 gl) {
-//                    Concept concept = nar.concept(t);
-//
-//                    float b = 2f * (concept.beliefFreq(nar.time(), 0.5f) - 0.5f);
-//                    backgroundColor[0] = b < 0 ? -b : 0;
-//                    backgroundColor[1] = b >= 0 ? b : 0;
-//                    backgroundColor[3] = 0.75f;
-//
-//
-//                    super.paint(gl);
-//                }
-//
-//            };
-//            p.setTitle(t.toString());
-//            p.add("P", () -> nar.pri(t, Float.NaN), 0f, 1f);
-//            p.add("B", () -> nar.concept(t).beliefFreq(nar.time(), nar.dur()), 0f, 1f);
-//            p.add("G", () -> nar.concept(t).goalFreq(nar.time(), nar.dur()), 0f, 1f);
-//            grid.children.add(p);
-//            plots.add(p);
-//        }
-//        grid.layout();
-//
-//        nar.onCycle(f -> {
-//            plots.forEach(Plot2D::update);
-//        });
-//
-//        return grid;
-//    }
+    public static Grid conceptBeliefPlots(NAgent a, Iterable<? extends Termed> concepts, int plotHistory) {
+
+        //TODO make a lambda Grid constructor
+        Grid grid = new Grid();
+        List<Plot2D> plots = $.newArrayList();
+        for (Termed t : concepts) {
+            Plot2D p = new Plot2D(plotHistory, Plot2D.Line /*BarWave*/) {
+
+                @Override
+                protected void paint(GL2 gl) {
+                    Concept concept = a.nar.concept(t);
+
+                    Truth t = a.nar.beliefTruth(concept, a.nar.time());
+                    float b;
+                    if (t == null)
+                        b = 0f;
+                    else
+                         b = 2f * (t.freq()) -1f;
+
+                    backgroundColor[0] = b < 0 ? -b : 0;
+                    backgroundColor[1] = 0;
+                    backgroundColor[2] = b >= 0 ? b : 0;
+                    backgroundColor[3] = 0.9f;
+
+                    super.paint(gl);
+                }
+
+            };
+            p.setTitle(t.toString());
+//            p.add("P", () -> a.nar.pri(t, Float.NaN), 0f, 1f);
+            p.add("B", () -> {
+                Truth b = a.nar.beliefTruth(t, a.nar.time());
+                return b!=null ? b.freq() : Float.NaN;
+            }, 0f, 1f);
+//            p.add("G", () -> a.nar.concept(t).goalFreq(nar.time(), nar.dur()), 0f, 1f);
+            grid.children.add(p);
+            plots.add(p);
+        }
+        grid.layout();
+
+        a.onFrame(f -> {
+            plots.forEach(Plot2D::update);
+        });
+
+        return grid;
+    }
 
 
 //    public static Grid agentBudgetPlot(NAgent t, int history) {
@@ -407,7 +420,7 @@ public class Vis {
         }
     }
 
-    private static class BeliefChartsGrid extends Grid implements Consumer<NAR> {
+    public static class BeliefChartsGrid extends Grid implements Consumer<NAR> {
 
         private final int window;
         private final On on;

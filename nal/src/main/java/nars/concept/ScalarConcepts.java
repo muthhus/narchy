@@ -19,6 +19,8 @@ import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * manages a set of N 'digit' concepts whose beliefs represent components of an
@@ -38,6 +40,10 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
     @Override
     public float asFloat() {
         return (float)value.get();
+    }
+
+    public Stream<SensorConcept> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 
 

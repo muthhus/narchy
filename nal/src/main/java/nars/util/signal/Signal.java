@@ -40,8 +40,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
     final byte punc;
 
-    long lastUpdated = ETERNAL;
-
+    
 
     public Signal(byte punc, FloatSupplier resolution) {
         super(null);
@@ -62,19 +61,26 @@ public class Signal extends AtomicReference<SignalTask> {
         return updateAndGet((current) -> {
 
             long now = nar.time();
-            long last = this.lastUpdated;
-            if (last == ETERNAL) {
-                last = now;
+            //long last = this.lastUpdated;
+//            if (last == ETERNAL) {
+//                last = now;
+//            }
+
+            if (current != null) {
+                current.setEnd(now);
+                if (current.stretchKey == null) {
+                    current.stretchKey = ((DefaultBeliefTable) ((BaseConcept) nar.concept(current)).table(current.punc)).temporal.stretch(current);
+                }
             }
+
+
+            SignalTask next;
 
             if (nextTruth == null) {
 
-                this.lastUpdated = ETERNAL;
-                return null;             //no signal
+                next = null;             //no signal
 
             } else {
-
-                SignalTask next ;
 
                 if (current == null ||
                         current.isDeleted() ||
@@ -82,10 +88,6 @@ public class Signal extends AtomicReference<SignalTask> {
                                 (Param.SIGNAL_LATCH_TIME != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME)
                         )) {
 
-
-                    if (current != null) {
-                        current.setEnd(now);
-                    }
 
                     //TODO move the task construction out of this critical update section?
                     next = task(term, nextTruth.truth(),
@@ -95,22 +97,26 @@ public class Signal extends AtomicReference<SignalTask> {
                     //System.out.println(current + " " + next );
                 } else {
 
-                    current.setEnd(now); //stretch existing
                     next = current;
 
                 }
 
-                this.lastUpdated = now;
-
-                next.priMax(pri.asFloat()); // * deltaFactor(prev, current.truth()));
-
-                if (next.stretchKey != null) {
-                    next.stretchKey = ((DefaultBeliefTable) ((BaseConcept) nar.concept(next)).table(next.punc)).temporal.stretch(next);
-                }
-
-                return next; //nothing, keep as-is
             }
 
+
+
+            float p = pri.asFloat();
+
+            if (next != null) {
+                next.priMax(p);
+            }
+
+            if (current != next && current != null && !current.isDeleted()) {
+                current.priMax(p);
+                current.setEnd(now);
+            }
+
+            return next; //nothing, keep as-is
 
         });
 

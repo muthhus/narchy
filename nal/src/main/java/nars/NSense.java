@@ -1,6 +1,5 @@
 package nars;
 
-import jcog.Services;
 import jcog.Util;
 import jcog.event.On;
 import jcog.math.FirstOrderDifferenceFloat;
@@ -187,14 +186,13 @@ public interface NSense {
     }
 
     @NotNull
-    default ScalarConcepts senseNumber(FloatSupplier v, Term... states) {
+    default ScalarConcepts senseNumber(FloatSupplier v, ScalarConcepts.ScalarEncoder model, Term... states) {
 
         assert(states.length > 1);
 
         ScalarConcepts fs = new ScalarConcepts(
                v, nar(),
-                //FuzzyScalarConcepts.FuzzyTriangle,
-                ScalarConcepts.Hard,
+                model,
                 states
         );
 
@@ -205,19 +203,19 @@ public interface NSense {
     On onFrame(Consumer r);
 
     @NotNull
-    default ScalarConcepts senseNumber(Term id, FloatSupplier v, int precision)  {
-        return senseNumber(v, Util.map(0, precision,
+    default ScalarConcepts senseNumber(Term id, FloatSupplier v, int precision, ScalarConcepts.ScalarEncoder model)  {
+        return senseNumber(v, model, Util.map(0, precision,
                 (int x) -> ($.inh($.p($.the(x)), id)), //operator syntax: id(n)
                 Term[]::new));
     }
 
     @NotNull
     default ScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
-        return senseNumber(v, prop(id, LOW), prop(id, HIH));
+        return senseNumber(v, ScalarConcepts.Hard, prop(id, LOW), prop(id, HIH));
     }
     @NotNull
     default ScalarConcepts senseNumberTri(Term id, FloatSupplier v)  {
-        return senseNumber(v,  inh(id, LOW), inh(id, MID), inh(id, HIH));
+        return senseNumber(v, ScalarConcepts.Hard,  inh(id, LOW), inh(id, MID), inh(id, HIH));
     }
 
     default SensorConcept senseNumber(String id, FloatSupplier v) throws Narsese.NarseseException {

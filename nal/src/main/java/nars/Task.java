@@ -79,6 +79,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             return t.eviEternalized();
         else {
             long z = end();
+            assert(z >= a): this + " has mismatched start/end times";
 
             if ((when >= a) && (when <= z)) {
 
@@ -86,10 +87,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
             } else {
                 //nearest endpoint of the interval
-                assert (dur > 0);
-                long dist = a != z ? Math.min(Math.abs(a - when), Math.abs(z - when)) : Math.abs(a - when);
+                long dist = Math.min(Math.abs(a - when), Math.abs(z - when));
                 assert(dist > 0): "what time is " + a + ".." + z + " supposed to mean relative to " + when;
 
+                assert (dur > 0);
                 cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
                 //cw = 0; //immediate cut-off
 
@@ -173,26 +174,28 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     @Nullable
     static boolean taskContentValid(@NotNull Term t, byte punc, @Nullable NAR nar, boolean safe) {
 
-        if (t.op() == NEG) {
+        if (t.op() == NEG)
             //must be applied before instantiating Task
-            return fail(t, "negation operator invalid for term", safe);
-        }
+            return fail(t, "negation operator invalid for task term", safe);
+
+        if (!t.hasAny(Op.ATOM))
+            return fail(t, "filter terms which have been completely variable-ized", safe); //filter any terms that have been completely variable introduced
 
         if (!t.isNormalized())
-            return fail(t, "Task Term not a normalized Compound", safe);
+            return fail(t, "task term not a normalized Compound", safe);
 
         if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
-            return fail(t, "Belief or goal with query variable", safe);
+            return fail(t, "belief or goal with query variable", safe);
         }
 
         if (nar != null) {
             int maxVol = nar.termVolumeMax.intValue();
             if (t.volume() > maxVol)
-                return fail(t, "Term exceeds maximum volume", safe);
+                return fail(t, "task term exceeds maximum volume", safe);
 
             int nalLevel = nar.nal();
             if (!t.levelValid(nalLevel))
-                return fail(t, "Term exceeds maximum NAL level", safe);
+                return fail(t, "task term exceeds maximum NAL level", safe);
         }
 
 //        if (t.op().temporal && t.dt() == XTERNAL) {

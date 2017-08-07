@@ -93,19 +93,24 @@ public class NALTask extends Pri implements Task {
 
         this.punc = punc;
 
-        if (!((start==ETERNAL && end==ETERNAL) || (start <= end) )) {
-            throw new RuntimeException("invalid task occurrence time: " + start + ".." + end);
-        }
+
 
         assert (start == ETERNAL && end == ETERNAL) || (start != ETERNAL && start <= end):
                 "start=" + start + ", end=" + end + " is invalid task occurrence time";
 
         //ensure that a temporal task is at least as long as the contained dt.
         //bugs and rounding off-by-N errors may produce inexact results, this corrects it.
-        int tdt = term.dtRange();
-        if (start!=ETERNAL && tdt > (start + end)) {
-            end = start + tdt; //keeps start (left)-aligned, end is stretched if necessary
+        if (start!=ETERNAL && term.op() == CONJ) {
+            int tdt = term.dtRange();
+            if (tdt > 0) {
+                if (tdt > (start + end)) {
+                    end = start + tdt; //keeps start (left)-aligned, end is stretched if necessary
+                }
+            }  else if (tdt < 0) {
+                System.out.println("...");
+            }
         }
+
         this.start = start;
         this.end = end;
 

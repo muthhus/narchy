@@ -1,13 +1,18 @@
 package nars.experiment.fzero;
 
 import jcog.Util;
-import jcog.math.FloatNormalized;
 import nars.*;
+import nars.concept.ScalarConcepts;
+import nars.gui.BeliefTableChart;
+import nars.gui.Vis;
 import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
+import spacegraph.layout.Grid;
 
+import static java.util.stream.Collectors.toList;
 import static nars.term.atom.Atomic.the;
+import static spacegraph.SpaceGraph.window;
 
 /**
  * Created by me on 3/21/17.
@@ -77,10 +82,13 @@ public class FZero extends NAgentX {
         //senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
-        senseNumber($.prop(the("ang"), id), new FloatNormalized(() ->
-                (float) MathUtils.normalizeAngle(fz.playerAngle, Math.PI) / (Math.PI*2)),
-                8
-        );//.resolution(0.05f);
+        @NotNull ScalarConcepts ang = senseNumber($.inh(the("ang"), id), () ->
+                        (float) (0.5f + 0.5f * MathUtils.normalizeAngle(fz.playerAngle, 0) / (Math.PI * 2)),
+                16,
+                //ScalarConcepts.Hard
+                ScalarConcepts.FuzzyTriangle
+        ).resolution(1f);
+        window(new Vis.BeliefChartsGrid(ang ,nar, 100), 500, 500);
 
         //nar.mix.stream("Derive").setValue(1);
         //implAccelerator(nar, this);

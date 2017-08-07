@@ -43,7 +43,7 @@ public class Line1DSimplest extends NAgent {
         in = senseNumber(
                 //$.inh($.the("i"), id),
                 $.the("i"),
-                this.i, 4);
+                this.i, 4, ScalarConcepts.Hard);
 
 //        action( new GoalActionConcept($.p($.the("o"), id), nar, (b,d) -> {
 //            if (d!=null) {

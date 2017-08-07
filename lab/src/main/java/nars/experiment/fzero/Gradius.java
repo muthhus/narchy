@@ -1,10 +1,18 @@
 package nars.experiment.fzero;
 
 import java4k.gradius4k.Gradius4K;
+import jcog.math.FloatNormalized;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
+import nars.concept.ScalarConcepts;
+import nars.gui.Vis;
 import nars.term.atom.Atomic;
+import org.apache.commons.math3.util.MathUtils;
+import org.jetbrains.annotations.NotNull;
+
+import static nars.term.atom.Atomic.the;
+import static spacegraph.SpaceGraph.window;
 
 /**
  * Created by me on 4/30/17.
@@ -22,6 +30,17 @@ public class Gradius extends NAgentX {
 
         //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
         senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.02f);
+
+        float height = g.getHeight();
+        @NotNull ScalarConcepts yPos = senseNumber($.inh(the("yPos"), id),
+                ()->g.player[Gradius4K.OBJ_Y] / height,
+                8,
+                //ScalarConcepts.Hard
+                ScalarConcepts.FuzzyTriangle
+        ).resolution(0.1f);
+        window(Vis.conceptBeliefPlots(this, yPos, 4),
+                500, 500);
+
 
 //        PixelBag cc = PixelBag.of(() -> g.image, 64, 64);
 //        cc.setClarity(0.5f, 0.9f);
