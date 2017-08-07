@@ -8,6 +8,8 @@ import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.Executor;
 
 /**
@@ -69,22 +71,30 @@ public abstract class Time implements Clock, Serializable {
 
 
     public void at(long whenOrAfter, Runnable then) {
-        scheduled.add(PrimitiveTuples.pair(whenOrAfter, then));
+        synchronized (scheduled) {
+            scheduled.add(PrimitiveTuples.pair(whenOrAfter, then));
+        }
     }
 
     protected void exeScheduled(Executor exe) {
-        if (!scheduled.isEmpty()) {
+
+        List<Runnable> pending = new LinkedList();
+
+        synchronized (scheduled) {
             LongObjectPair<Runnable> next;
             long now = now();
             while ((next = scheduled.peek()) != null) {
                 if (next.getOne() <= now) {
                     scheduled.poll();
-                    exe.execute(next.getTwo());
+                    pending.add(next.getTwo());
                 } else {
                     break; //wait till another time
                 }
             }
         }
+
+        //incase execution is synchronous, do it outside the synchronized block here to prevent deadlock.
+        pending.forEach(exe::execute);
     }
 
     public void cycle(NAR n) {

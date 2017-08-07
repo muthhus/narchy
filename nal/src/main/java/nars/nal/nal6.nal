@@ -57,10 +57,10 @@
     //otherwise it will remain DTERNAL. using XTERNAL (&&+-) here is more trouble than its worth
 
     (P ==> M), (S ==> M), neqRCom(S,P) |- ((P &&+- S) ==>+- M), (Belief:Intersection)
-        //(P ==> M), (S ==> M), neqCom(P,S) |- ((%P || %S) ==>+- M), (Belief:Intersection)
+        (P ==> M), (S ==> M), neqCom(P,S) |- ((%P || %S) ==>+- M), (Belief:Intersection)
 
     (M ==> P), (M ==> S), neqRCom(S,P) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
-        //(M ==> P), (M ==> S), neqCom(P,S) |- (M ==>+- (%P || %S)), (Belief:Union)
+        (M ==> P), (M ==> S), neqCom(P,S) |- (M ==>+- (%P || %S)), (Belief:Union)
 
 
 //// implication-based decomposition ////////////////////////////////////////////////////////////////////////////////////

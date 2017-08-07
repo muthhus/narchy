@@ -305,9 +305,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * this does not indicate the NAR has stopped or reset itself.
      */
     public void clear() {
-        exe.runLaterAndWait(() -> {
-            eventClear.emit(this);
-        });
+        eventClear.emit(this);
     }
 
     /**

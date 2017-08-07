@@ -55,18 +55,18 @@ public class MultiExecutioner extends Executioner {
 
         for (Worker w : workers) {
             w.start(nar);
-            working.execute(w.start(0 ));
+            working.execute(w.start(0));
         }
+    }
+
+    @Override
+    public void execute(Runnable r) {
+        passive.execute(r);
     }
 
     @Override
     public void runLater(Runnable cmd) {
         passive.execute(cmd);
-    }
-
-    @Override
-    public void runLaterAndWait(Runnable cmd) {
-        passive.submit(cmd).join();
     }
 
     @Override
@@ -182,7 +182,8 @@ public class MultiExecutioner extends Executioner {
             };
         }
 
-//        @Override
+
+        //        @Override
 //        protected void actuallyRun(CLink<? extends ITask> x) {
 //
 //            super.actuallyRun(x);
@@ -190,7 +191,10 @@ public class MultiExecutioner extends Executioner {
 //            ((RootExecutioner) exe).apply(x); //apply gain after running
 //
 //        }
-
+        @Override
+        public void execute(Runnable r) {
+            passive.execute(r);
+        }
 
         @Override
         public synchronized void stop() {
@@ -217,11 +221,6 @@ public class MultiExecutioner extends Executioner {
         @Override
         public void runLater(@NotNull Runnable r) {
             passive.execute(r); //use the common threadpool
-        }
-
-        @Override
-        public void runLaterAndWait(Runnable cmd) {
-            throw new UnsupportedOperationException();
         }
 
         @Override

@@ -18,6 +18,7 @@ public class CycleTime extends Time {
     CycleTime(int dt, int dur) {
         this.dt = dt;
         this.dur = dur;
+        clear();
     }
 
     public CycleTime() {

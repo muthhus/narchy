@@ -48,10 +48,10 @@ public class FocusedExecutioner extends Executioner {
 
     final Random random = new XorShift128PlusRandom(1);
 
-    final CurveBag<ITask> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
+    final CurveBag<Premise> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
             new ConcurrentHashMap<>(), random, MAX_PREMISES);
 
-    final CurveBag<ITask> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
+    final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
             random, MAX_TASKS);
 
     public final CurveBag<Activate> concepts = new ConcurrentCurveBag<>(Param.conceptMerge, new ConcurrentHashMap<>(),
@@ -156,11 +156,11 @@ public class FocusedExecutioner extends Executioner {
 
     protected void execute(ITask x) {
         try {
-            if (x.isDeleted())
-                return;
+//            if (x.isDeleted())
+//                return;
 
             if (x instanceof Premise) {
-                execute((Premise) x);
+                throw new UnsupportedOperationException("use execute(Premise)");
             } else if (x instanceof Activate) {
                 ((Activate) x).hypothesize(nar).forEach(premises::putAsync);
             } else {
@@ -191,14 +191,13 @@ public class FocusedExecutioner extends Executioner {
 
     @Override
     public void runLater(Runnable cmd) {
-        nar.time.at(now, cmd);
-        //cmd.run();
+        if (concurrent()) {
+            execute(cmd);
+        } else { //schedule for after this current cycle
+            nar.time.at(now, cmd);
+        }
     }
 
-    @Override
-    public void runLaterAndWait(Runnable cmd) {
-        cmd.run();
-    }
 
     @Override
     public void run(@NotNull ITask x) {
@@ -206,10 +205,10 @@ public class FocusedExecutioner extends Executioner {
             if (x.isInput())
                 execute(x); //execute immediately
             else
-                tasks.putAsync(x); //buffer
+                tasks.putAsync((Task)x); //buffer
 
         } else if (x instanceof Premise) {
-            premises.putAsync(x);
+            premises.putAsync((Premise)x);
         } else if (x instanceof Activate) {
             concepts.putAsync((Activate) x);
         } else

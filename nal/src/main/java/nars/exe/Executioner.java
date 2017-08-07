@@ -83,7 +83,6 @@ abstract public class Executioner implements Executor {
 
     public abstract void runLater(Runnable cmd);
 
-    public abstract void runLaterAndWait(Runnable cmd);
 
 
     /** a positive or negative value indicating the percentage difference from the
@@ -100,8 +99,12 @@ abstract public class Executioner implements Executor {
 
 
     @Override
-    public final void execute(Runnable r) {
-        ForkJoinPool.commonPool().execute(r);
+    public void execute(Runnable r) {
+        if (concurrent()) {
+            ForkJoinPool.commonPool().execute(r);
+        } else {
+            r.run();
+        }
     }
 
 

@@ -40,6 +40,7 @@ public class NAL7DurationTest {
     public void testDurationDithering() throws Narsese.NarseseException {
         NAR n = NARS.shell();
         n.time.dur(5);
+
         assertEquals( $.$("((x) &| (y))"), n.term("((x) &&+1 (y))"));
         assertEquals( $.$("((x) &| (y))"), n.term("((x) &&-1 (y))"));
         assertEquals( "(&|,(x),(y),(z))", n.term("(((x) &&+1 (y)) &&+1 (z))").toString());

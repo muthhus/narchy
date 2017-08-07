@@ -79,9 +79,9 @@ public final class STMLinkage extends TaskService {
         /** current task's... */
         float interStrength = tPri * tb.priSafe(0) * strength;
         if (interStrength >= Pri.EPSILON) {
-            Concept ca = ta.concept(nar, false);
+            Concept ca = ta.concept(nar, true);
             if (ca != null) {
-                Concept cb = tb.concept(nar, false);
+                Concept cb = tb.concept(nar, true);
                 if (cb != null && !cb.equals(ca)) { //null or same concept?
 
                     //TODO handle overflow?
