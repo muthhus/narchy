@@ -111,9 +111,6 @@ public class Temporalize {
          */
         abstract public Event neg();
 
-        public Event neg(boolean isNeg) {
-            return isNeg ? neg() : this;
-        }
 
         @Override
         public int compareTo(@NotNull Temporalize.Event that) {
@@ -314,11 +311,6 @@ public class Temporalize {
                 } else {
                     this.start = end;
                     te = start;
-                }
-
-                long sdt = te - this.start;
-                if (sdt < tdt) {
-                    te = start + tdt; //keeps left align
                 }
 
                 this.end = te;
@@ -772,8 +764,6 @@ public class Temporalize {
 
         FasterList<Event> l = constraints.computeIfAbsent(term, (t) -> new FasterList<>());
         l.add(event);
-        if (l.size() > 1)
-            l.sortThis();
 
         if (term.op() == NEG) {
             Term u = term.unneg();
@@ -782,6 +772,9 @@ public class Temporalize {
             if (m.size() > 1)
                 m.sortThis();
         }
+
+        if (l.size() > 1)
+            l.sortThis();
     }
 
     public Event solve(Term target) {
@@ -794,15 +787,15 @@ public class Temporalize {
         if (known != null)
             return known;
 
-
         Op o = target.op();
+        /*;
         if (o == NEG) {
             Event ss = solve(target.unneg(), trail);
             if (ss != null)
                 return ss.neg();
             else
                 return null;
-        } else if (o.temporal && target.dt() == XTERNAL) {
+        } else*/ if (o.temporal && target.dt() == XTERNAL) {
             TermContainer tt = target.subterms();
 
             int tts = tt.size();

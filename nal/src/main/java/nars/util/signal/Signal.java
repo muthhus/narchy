@@ -74,36 +74,39 @@ public class Signal extends AtomicReference<SignalTask> {
 
             } else {
 
-                SignalTask next = current;
+                SignalTask next ;
 
                 if (current == null ||
                         current.isDeleted() ||
                         (!current.truth.equals(nextTruth, resolution.asFloat()) ||
-                        (Param.SIGNAL_LATCH_TIME != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME)
-                    )) {
+                                (Param.SIGNAL_LATCH_TIME != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME)
+                        )) {
 
 
-
-                    if (current!=null)
-                        current.stretchKey = null;
+                    if (current != null) {
+                        current.setEnd(now);
+                    }
 
                     //TODO move the task construction out of this critical update section?
                     next = task(term, nextTruth.truth(),
-                            last, now,
+                            now, now,
                             stamper.getAsLong(), dt);
 
+                    //System.out.println(current + " " + next );
                 } else {
 
                     current.setEnd(now); //stretch existing
+                    next = current;
 
-                    if (current.stretchKey!=null) {
-                        current.stretchKey = ((DefaultBeliefTable)((BaseConcept)nar.concept(current)).table(current.punc)).temporal.stretch(current);
-                    }
                 }
 
                 this.lastUpdated = now;
 
                 next.priMax(pri.asFloat()); // * deltaFactor(prev, current.truth()));
+
+                if (next.stretchKey != null) {
+                    next.stretchKey = ((DefaultBeliefTable) ((BaseConcept) nar.concept(next)).table(next.punc)).temporal.stretch(next);
+                }
 
                 return next; //nothing, keep as-is
             }

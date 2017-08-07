@@ -69,6 +69,10 @@ public enum TruthPolation { ;
             Task task = t.task();
             float tw = task.evi(when, dur);
             if (tw > 0) {
+
+                if (!task.isEternal())
+                    tw = tw/(1f + ((float)task.range())/dur); //dilute the long task in proportion to how many durations it consumes beyond point-like (=0)
+
                 eviSum += tw;
 
                 float f = task.freq();
@@ -206,13 +210,17 @@ public enum TruthPolation { ;
 
         @Override
         public void accept(Tasked tt) {
-            Task t = tt.task();
-            float tw = t.evi(when, dur);
+            Task task = tt.task();
+            float tw = task.evi(when, dur);
 
             if (tw > 0) {
+
+                if (!task.isEternal())
+                    tw = tw/(1f + ((float)task.range())/dur); //dilute the long task in proportion to how many durations it consumes beyond point-like (=0)
+
                 eviSum += tw;
 
-                float f = t.freq();
+                float f = task.freq();
                 wFreqSum += tw * f;
 
                 //        double delta = value - tmpMean;

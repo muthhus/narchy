@@ -480,6 +480,25 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         }
     }
 
+    @Test
+    public void testConjInvert() throws Narsese.NarseseException {
+        //WRONG:    $.66 (((--,a)&|b) &&+5 a). 1⋈6 %1.0;.73% {10: 1;2;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
+        //              $.63 ((a &&+5 ((--,a)&|b)) &&+5 (--,b)). 1⋈11 %1.0;.81% {6: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
+        Temporalize t = new Temporalize();
+
+        Term x = nars.$.$("((a &&+5 ((--,a)&|b)) &&+5 (--,b))");
+        assertEquals(10, x.dtRange());
+        t.knowTerm(x, 1, 11);
+
+        Term a = nars.$.$("(((--,a)&|b) &&+- a)");
+        Term b = nars.$.$("(a &&+- ((--,a)&|b))"); //check mirror
+        String r = "(a &&+5 ((--,a)&|b))@[1..6]";
+
+        assertEquals(r, t.solve(a).toString());
+
+        assertEquals(r, t.solve(b).toString());
+
+    }
 
     @Test
     public void testPreconImplConjPreConflict() throws Narsese.NarseseException {

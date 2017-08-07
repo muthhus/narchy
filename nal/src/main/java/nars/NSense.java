@@ -1,6 +1,8 @@
 package nars;
 
+import jcog.Services;
 import jcog.Util;
+import jcog.event.On;
 import jcog.math.FirstOrderDifferenceFloat;
 import jcog.math.FloatPolarNormalized;
 import jcog.math.FloatSupplier;
@@ -18,10 +20,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BooleanSupplier;
-import java.util.function.IntFunction;
-import java.util.function.IntSupplier;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import static nars.$.$;
 import static nars.$.*;
@@ -198,20 +197,17 @@ public interface NSense {
                 ScalarConcepts.Hard,
                 states
         );
-        List<SensorConcept> x = fs.sensors;
 
-        CauseChannel ch = nar().newInputChannel(fs);
-        int xs = x.size();
-        for (int i = 0, xSize = xs; i < xSize; i++)
-            sensors().put(x.get(i), ch);
-        ch.set(0f, 1f/ xs);
+        onFrame(fs);
         return fs;
     }
+
+    On onFrame(Consumer r);
 
     @NotNull
     default ScalarConcepts senseNumber(Term id, FloatSupplier v, int precision)  {
         return senseNumber(v, Util.map(0, precision,
-                (int x) -> ($.inh($.the(x), id)),
+                (int x) -> ($.inh($.p($.the(x)), id)), //operator syntax: id(n)
                 Term[]::new));
     }
 

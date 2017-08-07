@@ -2,10 +2,12 @@ package nars.concept;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterators;
+import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
+import nars.NAgent;
 import nars.Op;
 import nars.control.NARService;
 import nars.term.ProxyTerm;
@@ -13,7 +15,10 @@ import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.PrintStream;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * manages a set of N 'digit' concepts whose beliefs represent components of an
@@ -24,9 +29,17 @@ import java.util.List;
  * <p>
  * expects values which have been normalized to 0..1.0 range (ex: use NormalizedFloat)
  */
-public class ScalarConcepts extends NARService {
+public class ScalarConcepts extends NARService implements Iterable<SensorConcept>, Consumer<NAgent>, FloatSupplier {
 
     private final Term id;
+
+    final AtomicDouble value = new AtomicDouble();
+
+    @Override
+    public float asFloat() {
+        return (float)value.get();
+    }
+
 
     /**
      * decides the truth value of a 'digit'
@@ -43,12 +56,17 @@ public class ScalarConcepts extends NARService {
     private final FloatSupplier input;
 
     @NotNull
-    @Deprecated
     public final List<SensorConcept> sensors;
 
 
     float conf;
 
+
+    @NotNull
+    @Override
+    public Iterator<SensorConcept> iterator() {
+        return sensors.iterator();
+    }
 
     /**
      * "HARD" - analogous to a filled volume of liquid
@@ -80,6 +98,8 @@ public class ScalarConcepts extends NARService {
         return $.t(f, n.confDefault(Op.BELIEF));
 
     };
+
+
 
     /**
      * analogous to a needle on a guage, the needle being the triangle spanning several of the 'digits'
@@ -116,6 +136,14 @@ public class ScalarConcepts extends NARService {
         return tt;
     };
 
+    /** returns snapshot of the belief state of the concepts */
+    public Truth[] belief(long when, NAR n) {
+        Truth[] f = new Truth[sensors.size()];
+        for (int i = 0; i < sensors.size(); i++)
+            f[i] = n.beliefTruth(sensors.get(i), when);
+        return f;
+    }
+
     public Term get(int i) {
         return sensors.get(i).term();
     }
@@ -146,7 +174,7 @@ public class ScalarConcepts extends NARService {
             int i = 0;
             for (Term s : states) {
                 final int ii = i++;
-                sensors.add(new SensorConcept(s, nar, this.input,
+                sensors.add(new SensorConcept(s, nar, this,
                         (x) -> truther.truth(x, ii, num, nar)
                 ));
             }
@@ -156,6 +184,22 @@ public class ScalarConcepts extends NARService {
 
 
     }
+
+    @Override
+    public void accept(NAgent a) {
+        NAR n = a.nar;
+        accept(n);
+    }
+
+    public void accept(NAR n) {
+
+        value.set(input.asFloat());
+
+        n.input(sensors.stream().map(x -> {
+            return x.apply(n);
+        }));
+    }
+
 
     @Override
     public @NotNull Term term() {

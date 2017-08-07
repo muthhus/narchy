@@ -203,7 +203,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      * non-null: revised task
      */
     @Nullable
-    private /*Revision*/Task tryRevision(@NotNull Task newBelief /* input */, @NotNull BaseConcept concept, @NotNull NAR nar) {
+    private /*Revision*/Task tryRevision(@NotNull Task y /* input */, @NotNull BaseConcept concept, @NotNull NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -215,9 +215,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         Task oldBelief = null;
         Truth conclusion = null;
 
-        Truth newBeliefTruth = newBelief.truth();
-
-        //int dur = nar.dur();
+        Truth newBeliefTruth = y.truth();
 
         for (int i = 0; i < bsize; i++) {
             Task x = (Task) list[i];
@@ -225,11 +223,11 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             if (x == null) //the array has trailing nulls from having extra capacity
                 break;
 
-            if (x.equals(newBelief)) {
+            if (x.equals(y)) {
                 return x;
             }
 
-            if (!Revision.isRevisible(newBelief, x))
+            if (!Revision.isRevisible(y, x))
                 continue;
 
 
@@ -245,46 +243,46 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             //            float minValidRank = BeliefTable.rankEternalByOriginality(minValidConf, totalEvidence);
             //            if (minValidRank < bestRank) continue;
 
-            Truth oldBeliefTruth = x.truth();
+            Truth xt = x.truth();
 
-            Truth c = Revision.revise(newBeliefTruth, oldBeliefTruth, 1f, conclusion == null ? 0 : conclusion.evi());
+            Truth yt = Revision.revise(newBeliefTruth, xt, 1f, conclusion == null ? 0 : conclusion.evi());
 
             //avoid a weak or duplicate truth
-            if (c == null || c.equals(oldBeliefTruth) || c.equals(newBeliefTruth))
+            if (yt == null || yt.equals(xt) || yt.equals(newBeliefTruth))
                 continue;
 
             oldBelief = x;
-            conclusion = c;
+            conclusion = yt;
 
         }
 
         if (oldBelief == null)
             return null;
 
-        final float newBeliefWeight = newBelief.evi();
+        final float newBeliefWeight = y.evi();
 
         //TODO use Task.tryContent in building the task:
 
         float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
         Term t = normalizedOrNull(Revision.intermpolate(
-                newBelief.term(), oldBelief.term(),
+                y.term(), oldBelief.term(),
                 aProp,
                 nar.random(),
-                true
+                false
         ));
 
         if (t == null)
             return null;
 
         NALTask r = new NALTask(t,
-                newBelief.punc(),
+                y.punc(),
                 conclusion,
                 nar.time(),
                 ETERNAL, ETERNAL,
-                Stamp.zip(oldBelief.stamp(), newBelief.stamp(), 0.5f /* TODO proportionalize */)
+                Stamp.zip(oldBelief.stamp(), y.stamp(), 0.5f /* TODO proportionalize */)
         );
-        r.setPri(BudgetFunctions.fund(1f, false, oldBelief, newBelief));
-        r.cause = Cause.zip(newBelief, oldBelief);
+        r.setPri(BudgetFunctions.fund(1f, false, oldBelief, y));
+        r.cause = Cause.zip(y, oldBelief);
 
         if (Param.DEBUG)
             r.log("Insertion Revision");

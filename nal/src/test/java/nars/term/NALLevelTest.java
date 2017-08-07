@@ -31,17 +31,17 @@ public class NALLevelTest {
         n8.nal(8);
         EventCount n8Count = new EventCount(n8);
 
-        String productSentence = "<(a,b) --> c>.\n<c <-> a>?\n";
+        String s = "<(a==>b) --> c>.\n<c <-> a>?\n";
 
         assertEquals(0, n1.time());
 
 
-        n8.input(productSentence);
+        n8.input(s);
         n8.run(5);
 
 
-        assertEquals("NAL1 will NOT process sentence containing a Product", 0, n1Count.numTaskProcesses());
-        assertTrue("NAL8 will process sentence containing a Product", n8Count.numTaskProcesses() >= 1);
+        assertEquals("NAL1 should NOT process", 0, n1Count.numTaskProcesses());
+        assertTrue("NAL8 will process", n8Count.numTaskProcesses() >= 1);
 
 
 

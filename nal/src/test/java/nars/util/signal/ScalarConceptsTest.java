@@ -8,7 +8,9 @@ import jcog.math.FloatPolarNormalized;
 import nars.$;
 import nars.NAR;
 import nars.NARS;
+import nars.Narsese;
 import nars.concept.ScalarConcepts;
+import nars.truth.Truth;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.predicate.primitive.FloatPredicate;
 import org.junit.Ignore;
@@ -16,6 +18,7 @@ import org.junit.Test;
 
 import java.util.stream.StreamSupport;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -120,18 +123,47 @@ public class ScalarConceptsTest {
     }
 
     @Test
-    public void testServiceAndHardEncoder() {
+    public void testServiceAndHardEncoder2() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
 
         FloatParam x = new FloatParam(0f, 0f, 1f);
-
-        new ScalarConcepts(x, n,
-                ScalarConcepts.Hard,
-            $.p("x0"), $.p("x1")/*, $.p("x2")*/
+        ScalarConcepts xc = new ScalarConcepts(x, n, ScalarConcepts.Hard,
+                $.$("x(0)"), $.$("x(1)")
         );
 
-        n.run(1); //load the
+        int dt = 20;
 
-        n.printServices(System.out);
+        for (float v : new float[] { 0f, 0.5f, 1f }) {
+
+
+            x.setValue(v);
+            xc.accept(n);
+            n.run(1);
+
+            System.out.println("\n" + n.time() + " x=" + x);
+            xc.forEach(d -> {
+                Truth bt = n.beliefTruth(d, n.time());
+                System.out.println(d + "\t" + bt);
+            });
+
+            int m = (dt - 1)/2;
+            n.run(m);
+
+            Truth[] f = xc.belief(n.time(), n);
+            float tolerance = 0.1f;
+            if (v == 0) {
+                assertEquals(0.0f, f[0].freq(), tolerance);
+                assertEquals(0.0f, f[1].freq(), tolerance);
+            } else if (v == 0.5f) {
+                assertEquals(1.0f, f[0].freq(), tolerance);
+                assertEquals(0.0f, f[1].freq(), tolerance);
+            } else if (v == 1f) {
+                assertEquals(1.0f, f[0].freq(), tolerance);
+                assertEquals(1.0f, f[1].freq(), tolerance);
+            }
+
+            n.run(dt-1-m);
+
+        }
     }
 }

@@ -641,7 +641,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     private final Topic<NAgent> eventFrame = new ArrayTopic();
 
-    public On<NAgent> onFrame(Consumer<NAgent> each) {
+    public On onFrame(Consumer each) {
         return eventFrame.on(each);
     }
 

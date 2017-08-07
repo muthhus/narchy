@@ -46,29 +46,29 @@ public class Revision {
                 );
     }
 
-    @Nullable
-    public static Truth revise(@NotNull Iterable<? extends Truthed> aa, float minConf) {
-        float f = 0;
-        float w = 0;
-        for (Truthed x : aa) {
-            float e = x.evi();
-            w += e;
-            f += x.freq() * e;
-        }
-        if (w <= 0)
-            return null;
+//    @Nullable
+//    public static Truth revise(@NotNull Iterable<? extends Truthed> aa, float minConf) {
+//        float f = 0;
+//        float w = 0;
+//        for (Truthed x : aa) {
+//            float e = x.evi();
+//            w += e;
+//            f += x.freq() * e;
+//        }
+//        if (w <= 0)
+//            return null;
+//
+//        float c = w2c(w);
+//        return c < minConf ? null :
+//                $.t(
+//                        (f) / w,
+//                        c
+//                );
+//    }
 
-        float c = w2c(w);
-        return c < minConf ? null :
-                $.t(
-                        (f) / w,
-                        c
-                );
-    }
-
-    public static Truth merge(@NotNull Truth newTruth, @NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float minConf, float confMax) {
-        float w1 = a.evi();
-        float w2 = b.evi();
+//    public static Truth merge(@NotNull Truth newTruth, @NotNull Truthed a, float aFrequencyBalance, @NotNull Truthed b, float minConf, float confMax) {
+//        float w1 = a.evi();
+//        float w2 = b.evi();
 //        float w = (w1 + w2) * evidenceFactor;
 
 ////        if (w2c(w) >= minConf) {
@@ -93,10 +93,10 @@ public class Revision {
 //                return $.t(f, Math.min(confMax, c));
 //            }
 
-//        }
-
-        return null;
-    }
+////        }
+//
+//        return null;
+//    }
 
 
     public static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {
@@ -147,7 +147,8 @@ public class Revision {
         );
         t.setPri(a.priElseZero() + b.priElseZero());
         t.cause = Cause.zip(a, b);
-        //t.log("Revection Merge");
+        if (Param.DEBUG)
+            t.log("Revection Merge");
         return t;
     }
 

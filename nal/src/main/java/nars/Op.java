@@ -932,7 +932,7 @@ public enum Op implements $ {
         a.events(events, aStart);
         b.events(events, bStart);
 
-        events.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
+        events.sort(Comparator.comparingLong(ObjectLongPair<Term>::getTwo).thenComparing(ObjectLongPair<Term>::getOne));
 
         int ee = events.size();
         assert (ee > 1);

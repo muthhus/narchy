@@ -47,7 +47,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * values greater than 0 cause the table to report with a moving average
      * effect which could reduce temporal precision.
      */
-    final static float enoughSamplesRate = 0.01f;
+    final static float enoughSamplesRate = 0.0f;
 
     /**
      * if the szie is less than or equal to this value, all the entries will

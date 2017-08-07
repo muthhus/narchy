@@ -18,7 +18,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
 
     static float temporalTaskPriority(Task t, long now, int dur) {
-        return /*t.originality() * */ t.conf(now, dur) * (1f + t.dtRange()/((float)dur))/(1+Math.abs(now - t.nearestTimeTo(now)/dur));
+        return /*t.originality() * */ t.conf(now, dur) * (1f + t.range()/((float)dur))/(1+Math.abs(now - t.nearestTimeTo(now)/dur));
     }
 
     /** finds or generates the strongest match to the specified parameters.
