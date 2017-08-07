@@ -76,7 +76,7 @@ public abstract class Time implements Clock, Serializable {
         }
     }
 
-    protected void exeScheduled(Executor exe) {
+    public void exeScheduled(Executor exe) {
 
         List<Runnable> pending = new LinkedList();
 

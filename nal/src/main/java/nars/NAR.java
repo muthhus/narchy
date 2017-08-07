@@ -1156,7 +1156,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * schedule a task to be executed no sooner than a given NAR time
      */
     public final void at(long whenOrAfter, Runnable then) {
-        time.at(whenOrAfter, then);
+
+        if (whenOrAfter <= time())
+            runLater(then);
+        else
+            time.at(whenOrAfter, then);
     }
 
     /** tasks in concepts */

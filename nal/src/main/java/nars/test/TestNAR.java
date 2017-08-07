@@ -1,5 +1,6 @@
 package nars.test;
 
+import com.google.common.util.concurrent.MoreExecutors;
 import jcog.event.Topic;
 import nars.*;
 import nars.task.ITask;
@@ -218,6 +219,9 @@ public class TestNAR {
 //        if (showOutput)
 //            nar.trace();
 
+
+        //preinit
+        nar.time.exeScheduled(MoreExecutors.directExecutor());
 
         //try {
         int frames = Math.max(0,(int) (finalCycle - time()));

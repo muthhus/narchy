@@ -37,12 +37,12 @@ public class EventCount extends NARService {
         ons.addAll(Topic.all(nar, (event, value) -> eventMeters.get(event).hit()));
     }
 
-    public long numTaskProcesses() { return eventMeters.get("eventTaskProcess").count(); }
-    public long numOutputs() { return eventMeters.get("eventDerived").count(); }
-    public long numInputs() { return eventMeters.get("eventInput").count(); }
-    public long numExecutions() { return eventMeters.get("eventExecute").count(); }
-    public long numErrors() { return eventMeters.get("eventError").count(); }
-    public long numAnswers() { return eventMeters.get("eventAnswer").count(); }
+    public long numTaskProcesses() { return eventMeters.get("eventTask").count(); }
+//    public long numOutputs() { return eventMeters.get("eventDerived").count(); }
+//    public long numInputs() { return eventMeters.get("eventInput").count(); }
+//    public long numExecutions() { return eventMeters.get("eventExecute").count(); }
+//    public long numErrors() { return eventMeters.get("eventError").count(); }
+//    public long numAnswers() { return eventMeters.get("eventAnswer").count(); }
 
 
     public void reset() {
