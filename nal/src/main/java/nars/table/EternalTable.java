@@ -244,10 +244,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             Truth xt = x.truth();
 
-            Truth yt = Revision.revise(newBeliefTruth, xt, 1f, conclusion == null ? 0 : conclusion.evi()).ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+            Truth yt = Revision.revise(newBeliefTruth, xt, 1f, conclusion == null ? 0 : conclusion.evi());
+            if (yt==null)
+                continue;
 
-            //avoid a weak or duplicate truth
-            if (yt == null || yt.equals(xt) || yt.equals(newBeliefTruth))
+            yt = yt.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+            if (yt == null || yt.equals(xt) || yt.equals(newBeliefTruth)) ////avoid a weak or duplicate truth
                 continue;
 
             oldBelief = x;
