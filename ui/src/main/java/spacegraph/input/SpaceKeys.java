@@ -32,20 +32,24 @@ public abstract class SpaceKeys extends KeyAdapter implements Consumer<SpaceGrap
 
     @Override public void accept(SpaceGraph j) {
         float dt = j.getLastFrameTime();
-        keyState.forEachKeyValue((k, s) -> {
-            FloatProcedure f = (s) ? keyPressed.get(k) : keyReleased.get(k);
-            if (f != null) {
-                f.value(dt);
-            }
-        });
+        synchronized (keyState) {
+            keyState.forEachKeyValue((k, s) -> {
+                FloatProcedure f = (s) ? keyPressed.get(k) : keyReleased.get(k);
+                if (f != null) {
+                    f.value(dt);
+                }
+            });
+        }
     }
 
     protected void watch(int keyCode, @Nullable FloatProcedure ifPressed, @Nullable FloatProcedure ifReleased) {
-        keyState.put(keyCode, false); //initialized
-        if (ifPressed != null)
-            keyPressed.put(keyCode, ifPressed);
-        if (ifReleased != null)
-            keyReleased.put(keyCode, ifReleased);
+        synchronized (keyState) {
+            keyState.put(keyCode, false); //initialized
+            if (ifPressed != null)
+                keyPressed.put(keyCode, ifPressed);
+            if (ifReleased != null)
+                keyReleased.put(keyCode, ifReleased);
+        }
     }
 
     //TODO unwatch
@@ -62,8 +66,10 @@ public abstract class SpaceKeys extends KeyAdapter implements Consumer<SpaceGrap
 
     protected void setKey(int c, boolean state) {
         //TODO use a compute-like lambda to avoid duplicating lookup
-        if (keyState.containsKey(c)) {
-            keyState.put(c, state);
+        synchronized (keyState) {
+            if (keyState.containsKey(c)) {
+                keyState.put(c, state);
+            }
         }
     }
 }
