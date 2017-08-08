@@ -84,8 +84,8 @@ public abstract class Param extends Services<Term,NAR> {
     public static boolean DITHER_DT = false;
 
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
-    public static int DT_ABS_LIMIT = Integer.MAX_VALUE/4;
-    public static int DT_ABS_SAFETY_LIMIT = Integer.MAX_VALUE/256;
+    public static int DT_ABS_LIMIT = Integer.MAX_VALUE/8192;
+    public static int DT_ABS_SAFETY_LIMIT = Integer.MAX_VALUE/8192;
 
     public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
     public final FloatParam valueNegativeDecay = new FloatParam(0.66f, 0, 1f);

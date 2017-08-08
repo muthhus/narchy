@@ -661,8 +661,8 @@ public class Temporalize {
      */
     void know(@Nullable Event parent, Term term, int start, int end) {
 
-        if (term instanceof Variable)
-            return; //ignore variable temporality because it can conflict
+        if (term instanceof Variable || (!term.hasAny(ATOM.bit | INT.bit)))
+            return; //ignore variable's and completely-variablized's temporalities because it can conflict
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
         if (parent == null || parent.term != term) {
@@ -818,7 +818,7 @@ public class Temporalize {
                 Term t0 = tt.sub(0);
 
                 //decide subterm solution order intelligently: allow reverse if the 2nd subterm can more readily and absolutely temporalize
-                if (score(t1) > score(t0) || t1.volume() < t0.volume()) {
+                if (score(t1) > score(t0) || t1.volume() > t0.volume()) {
                     dir = false; //reverse: solve simpler subterm first
                 }
 

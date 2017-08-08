@@ -13,6 +13,7 @@ import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.var.UnnormalizedVariable;
+import nars.term.var.Variable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.primitive.ObjectByteMap;
@@ -1182,7 +1183,7 @@ public enum Op implements $ {
     /** last stage constructor: use with caution */
     public static Term compound(Term c, int dt) {
         if ((c instanceof Compound) && (dt != DTERNAL)) {
-            if (dt != XTERNAL && Math.abs(dt) > Param.DT_ABS_SAFETY_LIMIT) {
+            if (dt != XTERNAL ) {
 //                switch (c.sub(0).op()) {
 //                    case VAR_PATTERN:
 //                    case VAR_QUERY:
@@ -1192,7 +1193,10 @@ public enum Op implements $ {
 //
 //                }
 
-                if (c.sub(1).equals(c.sub(0)))
+                //&& Math.abs(dt) > Param.DT_ABS_SAFETY_LIMIT
+
+                Term c1 = c.sub(1);
+                if (c1 instanceof Variable && c1.equals(c.sub(0)))
                     return c.sub(0);
 
             }

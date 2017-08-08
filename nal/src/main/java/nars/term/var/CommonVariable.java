@@ -17,6 +17,7 @@ public final class CommonVariable extends GenericNormalizedVariable {
         return Term.opX(op(), 1 /* different from normalized variables with a subOp of 0 */);
     }
 
+
     public static @NotNull Variable common(@NotNull Variable A, @NotNull Variable B) {
 
 
