@@ -50,6 +50,7 @@ public class Builtin {
 
             Functor.r0("shutdown", () -> () -> System.exit(0)),
 
+
             new flat.flatProduct(),
             new similaritree(),
 
@@ -91,6 +92,10 @@ public class Builtin {
     public static void load(NAR nar) {
         for (Concept t : Builtin.statik)
             nar.terms.set(t);
+
+        nar.on(Functor.f("service", (TermContainer c) -> {
+            return $.sete(nar.services.keySet());
+        }));
 
         /** subterm, but specifically inside an ellipsis. otherwise pass through */
         nar.on(Functor.f("esubterm", (TermContainer c) -> {

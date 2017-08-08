@@ -51,7 +51,9 @@ public class Temporalize {
         this.random = random;
     }
 
-    /** heuristic for ranking temporalization strategies */
+    /**
+     * heuristic for ranking temporalization strategies
+     */
     int score(Term x) {
         FasterList<Event> l = constraints.get(x);
         if (l == null) {
@@ -62,7 +64,7 @@ public class Temporalize {
                 Event e = l.get(i);
                 if (e instanceof AbsoluteEvent) {
                     if (((AbsoluteEvent) e).start != ETERNAL)
-                        s += 3; //prefer non-eternal as it is more specific
+                        s += 10; //prefer non-eternal as it is more specific
                     else
                         s += 2;
                 } else {
@@ -117,31 +119,33 @@ public class Temporalize {
             if (this == that) return 0;
 
             if (getClass() == that.getClass()) {
-                //same class, rank by term volume
+                //same class
+
                 if (this instanceof RelativeEvent) {
                     RelativeEvent THIS = (RelativeEvent) this;
                     Term x = THIS.rel.term();
                     RelativeEvent THAT = (RelativeEvent) that;
                     Term y = THAT.rel.term();
                     if (x.equals(y)) {
-                        int c1 = Integer.compare(THIS.start, THAT.end);
+                        int c1 = Integer.compare(THIS.start, THAT.start);
                         if (c1 != 0)
                             return c1;
                         return Integer.compare(THIS.end, THAT.end);
-                    }
-
-                    int xs = score(x);
-                    int ys = score(y);
-                    if (xs != ys) {
-                        return Integer.compare(ys, xs);
                     } else {
-                        //prefer lower volume
-                        int xv = x.volume();
-                        int yv = y.volume();
-                        if (xv == yv)
-                            return x.compareTo(y);
-                        else
-                            return Integer.compare(xv, yv);
+
+                        int xs = score(x);
+                        int ys = score(y);
+                        if (xs != ys) {
+                            return Integer.compare(ys, xs);
+                        } else {
+                            //prefer lower volume
+                            int xv = x.volume();
+                            int yv = y.volume();
+                            if (xv == yv)
+                                return x.compareTo(y);
+                            else
+                                return Integer.compare(xv, yv);
+                        }
                     }
 
                 } else if (this instanceof AbsoluteEvent) {
@@ -433,7 +437,7 @@ public class Temporalize {
             if (this.offset == DTERNAL && offset == DTERNAL)
                 return this; //no effect, adding dternal to dternal
 
-            assert (this.offset != DTERNAL && offset != DTERNAL):
+            assert (this.offset != DTERNAL && offset != DTERNAL) :
                     "this.base=" + this.base + ", this.offset=" + this.offset + " + " + offset + " = ?";
 
             if (this.offset == XTERNAL)
@@ -541,24 +545,23 @@ public class Temporalize {
         System.out.println();
     }
 
-     /**
-        unknowns to solve otherwise the result is impossible:
-            - derived task start time
-            - derived task end time
-            - dt intervals for any XTERNAL appearing in the input term
-        knowns:
-            - for each task and optional belief in the derived premise:
-                - start/end time of the task
-                - start/end time of any contained events
-            - possible relations between events referred to in the conclusion that
-                appear in the premise.  this may be partial due to variable introduction
-                and other reductions. an attempt can be made to back-solve the result.
-                if that fails, a heuristic could decide the match. in the worst case,
-                the derivation will not be temporalizable and this method returns null.
-        */
-    @Nullable public static Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
-
-
+    /**
+     * unknowns to solve otherwise the result is impossible:
+     * - derived task start time
+     * - derived task end time
+     * - dt intervals for any XTERNAL appearing in the input term
+     * knowns:
+     * - for each task and optional belief in the derived premise:
+     * - start/end time of the task
+     * - start/end time of any contained events
+     * - possible relations between events referred to in the conclusion that
+     * appear in the premise.  this may be partial due to variable introduction
+     * and other reductions. an attempt can be made to back-solve the result.
+     * if that fails, a heuristic could decide the match. in the worst case,
+     * the derivation will not be temporalizable and this method returns null.
+     */
+    @Nullable
+    public static Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
 
 
         Task task = d.task;
@@ -593,7 +596,7 @@ public class Temporalize {
             if (!(
                     (occ[0] != ETERNAL)
                             ||
-                    (task.isEternal()) && (belief == null || belief.isEternal()))) {
+                            (task.isEternal()) && (belief == null || belief.isEternal()))) {
                 //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
                 return null;
             }
@@ -642,8 +645,9 @@ public class Temporalize {
      */
     Temporalize knowTerm(Term term, long from, long to) {
         know(new AbsoluteEvent(term, from, to), term,
-                0, from != ETERNAL ? (int) (to - from) : term.dtRange()
+                0, (int) (to - from)
         );
+
         return this;
     }
 
@@ -695,7 +699,8 @@ public class Temporalize {
                 for (int i = 0; (i < l); i++) {
 
                     Term st = tt.sub(i);
-                    int sdt = /*o == CONJ ? */st.dtRange();/* : 0*/ /* dont count internal event dtRange if not in CONJ */;
+                    int sdt = /*o == CONJ ? */st.dtRange();/* : 0*/ /* dont count internal event dtRange if not in CONJ */
+                    ;
 
                     int subStart = t;
                     int subEnd = t + sdt;
@@ -765,13 +770,13 @@ public class Temporalize {
         FasterList<Event> l = constraints.computeIfAbsent(term, (t) -> new FasterList<>());
         l.add(event);
 
-//        if (term.op() == NEG) {
-//            Term u = term.unneg();
-//            FasterList<Event> m = constraints.computeIfAbsent(u, (t) -> new FasterList<>());
-//            m.add(new RelativeEvent(u, term, 0, term.dtRange()));
-//            if (m.size() > 1)
-//                m.sortThis();
-//        }
+        if (term.op() == NEG) {
+            Term u = term.unneg();
+            FasterList<Event> m = constraints.computeIfAbsent(u, (t) -> new FasterList<>());
+            m.add(new RelativeEvent(u, term, 0, term.dtRange()));
+            if (m.size() > 1)
+                m.sortThis();
+        }
 
         if (l.size() > 1)
             l.sortThis();
@@ -795,30 +800,39 @@ public class Temporalize {
                 return ss.neg();
             else
                 return null;
-        } else*/ if (o.temporal && target.dt() == XTERNAL) {
+        } else*/
+        if (o.temporal && target.dt() == XTERNAL) {
             TermContainer tt = target.subterms();
 
             int tts = tt.size();
             assert (tts > 1);
             if (tts == 2) {
 
-                //                if (random.nextBoolean()) {
-                //forward order: sub 0 first
-                Event ea = solveSub(trail, tt, 0);
-                if (ea == null)
-                    return null;
-                Event eb = solveSub(trail, tt, 1);
-                if (eb == null)
-                    return null;
-//                } else {
-//                    //reverse order: sub 1 first
-//                    eb = solveSub(trail, tt, 1);
-//                    if (eb == null)
-//                        return null;
-//                    ea = solveSub(trail, tt, 0);
-//                    if (ea == null)
-//                        return null;
-//                }
+
+                boolean dir = true; //forward
+                Term t1 = tt.sub(1);
+                Term t0 = tt.sub(0);
+
+                //decide subterm solution order intelligently: allow reverse if the 2nd subterm can more readily and absolutely temporalize
+                if (score(t1) > score(t0) || t1.volume() < t0.volume()) {
+                    dir = false; //reverse: solve simpler subterm first
+                }
+
+                Event ea, eb;
+                if (dir) {
+                    //forward
+                    if ((ea = solve(t0, trail)) == null)
+                        return null;
+                    if ((eb = solve(t1, trail)) == null)
+                        return null;
+                } else {
+                    //reverse
+                    if ((eb = solve(t1, trail)) == null)
+                        return null;
+                    if ((ea = solve(t0, trail)) == null)
+                        return null;
+                }
+
 
                 Time at = ea.start(trail);
 
@@ -862,15 +876,16 @@ public class Temporalize {
          * temporal bounds. */
 
         if (o.temporal) {
-            int tts = target.size();
+            TermContainer tt = target.subterms();
+            int tts = tt.size();
             if (tts == 2) {
 
-                Term a = target.sub(0);
+                Term a = tt.sub(0);
                 Event ra = solve(a);
 
                 if (ra != null) {
 
-                    Term b = target.sub(1);
+                    Term b = tt.sub(1);
                     Event rb = solve(b);
 
                     if (rb != null) {
@@ -899,10 +914,9 @@ public class Temporalize {
                     }
                 }
 
-                TermContainer tt = target.subterms();
-                Event s0 = solveSub(trail, tt, 0);
+                Event s0 = solve(tt.sub(0), trail);
                 if (s0 != null) {
-                    Event s1 = solveSub(trail, tt, 1);
+                    Event s1 = solve(tt.sub(1), trail);
                     if (s1 != null) {
                         Time s0s = s0.start(trail);
                         Time s1s = s1.start(trail);
@@ -1054,11 +1068,6 @@ public class Temporalize {
             return new SolutionEvent(newTerm, start);
         }
         return null;
-    }
-
-    private Event solveSub(Map<Term, Time> times, TermContainer tt, int subterm) {
-        Term a = tt.sub(subterm);
-        return solve(a, times);
     }
 
     @Nullable

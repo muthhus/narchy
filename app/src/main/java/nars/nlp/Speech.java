@@ -24,16 +24,16 @@ public class Speech {
     final TreeBasedTable<Long, Term, TruthAccumulator> vocalize = TreeBasedTable.create();
     private final NAR nar;
     private final Consumer<Term> speak;
-    private float cyclesPerWord, energy;
+    private float durationsPerWord, energy;
     private float expectationThreshold = 0.75f;
 
-    public Speech(NAR nar, float cyclesPerWord, Consumer<Term> speak) {
-        this.cyclesPerWord = cyclesPerWord;
+    public Speech(NAR nar, float durationsPerWord, Consumer<Term> speak) {
+        this.durationsPerWord = durationsPerWord;
         this.nar = nar;
         this.speak = speak;
         this.energy = 0;
         nar.onCycle((n) ->{
-            energy = Math.min(1f, energy + 1f/(this.cyclesPerWord));
+            energy = Math.min(1f, energy + 1f/(this.durationsPerWord*nar.dur()));
             if (energy >= 1f) {
                 energy = 0;
                 next();
@@ -52,7 +52,7 @@ public class Speech {
 //        if (Twenglish.personalPronouns.contains(wordString))
 //            nar.believe($.instprop(word, PRONOUN), Tense.Eternal);
 
-        if (when < nar.time()) {
+        if (when < nar.time() - nar.dur() * durationsPerWord) {
             return;
         }
 
@@ -72,21 +72,28 @@ public class Speech {
     public boolean next() {
 
         //long start = nar.time();
-        float dur = 1f/cyclesPerWord;
-        long end = Math.round(nar.time() + dur);
+        float dur = nar.dur() * durationsPerWord;
+        long now = nar.time();
+        long startOfNow = now - (int) Math.ceil(dur);
+        long endOfNow = now + (int)Math.floor(dur);
 
 
         FasterList<Pair<Term, Truth>> pending = new FasterList<>(0);
         synchronized (vocalize) {
-            SortedSet<Long> tt = vocalize.rowKeySet().headSet(end);
-            tt.forEach(t -> {
-                vocalize.row(t).entrySet().forEach(e -> {
-                    Truth x = e.getValue().commitAverage();
-                    if (x.expectation() > expectationThreshold)
-                        pending.add(Tuples.pair(e.getKey(), x));
+            //vocalize.rowKeySet().tailSet(startOfNow-1).clear();
+            SortedSet<Long> tt = vocalize.rowKeySet().headSet(endOfNow);
+            if (!tt.isEmpty()) {
+                tt.forEach(t -> {
+                    if (t >= startOfNow) {
+                        vocalize.row(t).entrySet().forEach(e -> {
+                            Truth x = e.getValue().commitAverage();
+                            if (x.expectation() > expectationThreshold)
+                                pending.add(Tuples.pair(e.getKey(), x));
+                        });
+                    }
+                    vocalize.row(t).clear();
                 });
-                vocalize.row(t).clear();
-            });
+            }
         }
         if (pending.isEmpty())
             return true;

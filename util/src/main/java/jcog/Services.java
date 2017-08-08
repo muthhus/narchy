@@ -185,7 +185,7 @@ public class Services<C, X>  {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Services.class);
 
-    private final ConcurrentMap<X, Service> services;
+    public final ConcurrentMap<X, Service> services;
 
     public Services(C id) {
         this(id, ForkJoinPool.commonPool());

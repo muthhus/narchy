@@ -1,5 +1,6 @@
 package nars.op.stm;
 
+import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.list.ArrayIterator;
 import jcog.list.FasterList;
@@ -50,6 +51,7 @@ public class MySTMClustered extends STMClustered {
 
     long lastIteration;
     private int dur;
+    private float truthRes;
 
     public MySTMClustered(@NotNull NAR nar, int size, byte punc, int maxGroupSize, boolean allowNonInput, float drainRatePerDuration) {
         this(nar, size, punc, maxGroupSize, allowNonInput, (int) Math.ceil((float) size / maxGroupSize * drainRatePerDuration));
@@ -122,6 +124,7 @@ public class MySTMClustered extends STMClustered {
         if (super.iterate(nar)) {
 
             confMin = nar.confMin.floatValue();
+            truthRes = nar.truthResolution.floatValue();
             dur = nar.dur();
 
             //LongObjectHashMap<ObjectFloatPair<TasksNode>> selected = new LongObjectHashMap<>();
@@ -233,6 +236,7 @@ public class MySTMClustered extends STMClustered {
 
                         //float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
                         float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
+                        conf = Util.round(conf, truthRes);
                         if (conf < confMin)
                             return null;
 

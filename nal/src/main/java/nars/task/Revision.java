@@ -2,6 +2,7 @@ package nars.task;
 
 import jcog.math.Interval;
 import nars.$;
+import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.control.Cause;
@@ -104,7 +105,7 @@ public class Revision {
     }
 
 
-    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, Truth newTruth, boolean mergeOrChoose, Random rng) {
+    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, Truth newTruth, boolean mergeOrChoose, NAR nar) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
@@ -117,7 +118,7 @@ public class Revision {
 
         for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
             ObjectBooleanPair<Term> ccp = Task.tryContent(
-                    intermpolate(a.term(), b.term(), aProp, new MutableFloat(0), 1f, rng, mergeOrChoose),
+                    intermpolate(a.term(), b.term(), aProp, new MutableFloat(0), 1f, nar.random(), mergeOrChoose),
                     a.punc(), true);
 
 
@@ -282,7 +283,7 @@ public class Revision {
     /**
      * t is the target time of the new merged task
      */
-    public static Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, Random rng) {
+    public static Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, NAR nar) {
 
 
         Interval ai = new Interval(a.start(), a.end());
@@ -363,7 +364,11 @@ public class Revision {
             factor *= ((float) s) / (s + u);
         }
 
-        @Nullable Truth newTruth = revise(a, b, factor, c2w(confMin));
+        Truth newTruthRaw = revise(a, b, factor, c2w(confMin));
+        if (newTruthRaw == null)
+            return null;
+
+        @Nullable Truth newTruth = newTruthRaw.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);;
 
 
 //            float conf = w2c(expected.evi() * factor);
@@ -374,7 +379,7 @@ public class Revision {
 
 
         if (newTruth != null) {
-            return mergeInterpolate(a, b, start, end, now, newTruth, true, rng);
+            return mergeInterpolate(a, b, start, end, now, newTruth, true, nar);
         }
 
         return null;

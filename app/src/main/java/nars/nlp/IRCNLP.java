@@ -58,7 +58,7 @@ public class IRCNLP extends IRC {
 
         this.nar = nar;
         this.channels = channels;
-        this.speech = new Speech(nar, 1f, this::send);
+        this.speech = new Speech(nar, 2f, this::send);
 
 //        new Thread(()->{
 //            while (true) {
@@ -213,7 +213,7 @@ public class IRCNLP extends IRC {
 
     void hear(String text, String src) throws Narsese.NarseseException {
         Hear.hear(nar, text, src, (t) -> {
-            return new Hear(nar, Hear.tokenize(t), src, 250);
+            return new Hear(nar, Hear.tokenize(t), src, 100);
 //            Compound f = $.func("SENTENCE", Hear.tokenize(t));
 //            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f);
 //            return null;
@@ -264,9 +264,9 @@ public class IRCNLP extends IRC {
         float durFPS = 20f;
         NAR n = NARS.realtime(durFPS).get();
 
+        n.truthResolution.setValue(0.1f);
 
-
-        n.termVolumeMax.setValue(12);
+        n.termVolumeMax.setValue(24);
 
         /*@NotNull Default n = new Default(new Default.DefaultTermIndex(4096),
             new RealTime.DS(true),
@@ -276,7 +276,7 @@ public class IRCNLP extends IRC {
 //        n.addNAR(16, 0.25f);
         //n.addNAR(512, 0.25f);
 
-        n.startFPS(200f);
+        n.start();
         //n.logBudgetMin(System.out, 0.75f);
 
         new Thread(() -> {
@@ -298,6 +298,7 @@ public class IRCNLP extends IRC {
         );
 
 
+        Term HEAR = $.the("hear");
         //Param.DEBUG = true;
 
         n.onTask(t -> {
@@ -306,11 +307,11 @@ public class IRCNLP extends IRC {
             Term tt = t.term();
             long start = t.start();
             if (start != ETERNAL) {
-                if (t.isBelief() && t.expectation() > 0.75f) {
+                if (t.isBeliefOrGoal() /* BOTH */) {
                     long now = n.time();
                     int dur = n.dur();
                     if (start >= now - dur) {
-                        if (tt.subIs(Op.INH, 1, $.the("hear"))) {
+                        if (tt.subIs(Op.INH, 1, HEAR)) {
                             if (tt.subIs(0, PROD) && tt.sub(0).subIs(0, Op.ATOM)) {
                                 bot.speak(tt.sub(0).sub(0), start, t.truth());
                             }

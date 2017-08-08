@@ -58,7 +58,7 @@ public abstract class Param extends Services {
     public final static int SIGNAL_LATCH_TIME_MAX =
                     //0;
                     //Integer.MAX_VALUE;
-                    64;
+                    8;
 
     /** cost of a termutate call */
     public static final int TTL_MUTATE = 1;

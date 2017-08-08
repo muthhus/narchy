@@ -1678,16 +1678,9 @@ public enum Op implements $ {
     }
 
     public boolean commute(int dt) {
-        if (commutative) {
-            if (temporal) {
-                /*if (dt == XTERNAL) {
-
-                }*/
-                if (!Op.concurrent(dt))
-                    return false;
-            }
+        if (commutative && temporal &&
+            (Op.concurrent(dt) || dt == XTERNAL))
             return true;
-        }
         return false;
     }
 

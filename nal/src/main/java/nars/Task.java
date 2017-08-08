@@ -114,8 +114,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
         //return true;
         //return false;
-        return term().varIndep() > 0;
-        //return term().varIndep() > 0 || term().isAny(Op.IMPL.bit | Op.EQUI.bit);
+        //return term().varIndep() > 0;
+        return term().varIndep() > 0 || term().isAny(Op.IMPL.bit | Op.EQUI.bit);
         //return true;
         //return op().temporal;
 
@@ -179,7 +179,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             //must be applied before instantiating Task
             return fail(t, "negation operator invalid for task term", safe);
 
-        if (!t.hasAny(Op.ATOM))
+        if (!t.hasAny(Op.ATOM.bit | Op.INT.bit | Op.VAR_PATTERN.bit))
             return fail(t, "filter terms which have been completely variable-ized", safe); //filter any terms that have been completely variable introduced
 
         if (!t.isNormalized())

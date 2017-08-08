@@ -407,6 +407,22 @@ public class TemporalizeTest {
     }
 
     @Test
+    public void testImplConjWTF() throws Narsese.NarseseException {
+    /*
+( $,TestNAR ): "Must not:
+$.28 ((x &&+2 y) ==>+5 z). %1.0;.81% {3: 1;2} (((%1==>%2),(%3==>%2),neqRCom(%3,%1)),(((%1 &&+- %3) ==>+- %2),((Intersection-->Belief))))
+    $.50 (y ==>+3 z). %1.0;.90% {0: 2}
+    $.50 (x ==>+5 z). %1.0;.90% {0: 1}
+    */
+
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("(y ==>+3 z)"), ETERNAL);
+        t.knowTerm($.$("(x ==>+5 z)"), ETERNAL);
+        Temporalize.Event s = t.solve($.$("((x &&+- y) ==>+- z)"));
+        assertEquals("((x &&+2 y) ==>+3 z)@ETE", s.toString());
+
+    }
+    @Test
     public void testConjLinked() throws Narsese.NarseseException {
 // WRONG:
 //        $.31 ((b &&+5 c) ==>+5 (a &&+5 b)). 6 %1.0;.45% {7: 1;2} ((%1,%2,time(raw),belief(positive),task("."),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((%2 ==>+- %1),((Abduction-->Belief))))

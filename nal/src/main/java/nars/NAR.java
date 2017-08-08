@@ -809,7 +809,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             @Override
             public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
                 Term c = t.term();
-                o.run((Atomic) (c.sub(1)), ((Compound) (t.term().sub(0))).toArray(), nar);
+                Atomic op = (Atomic) (c.sub(1));
+                @NotNull Term[] args = ((Compound) (t.term().sub(0))).toArray();
+                nar.runLater(()->{                o.run(op, args, nar); });
                 return t;
             }
 

@@ -85,12 +85,6 @@ public class Conclusion extends AbstractPred<Derivation> {
         }
         assert (b1.varPattern() == 0);
 
-        if (!b1.hasAny(Op.ATOM)) /* dont derive purely variable, even if they are temporal */
-            return true;
-
-
-
-
         /// 2. EVAL ----
 
         d.use(Param.TTL_DERIVE_TASK_ATTEMPT);
@@ -99,7 +93,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         //TODO cache eval terms
         Term c1 = b1.eval(d);
 
-        if (c1!=null && (c1 instanceof Variable || c1 instanceof Bool || !c1.hasAny(Op.ATOM)))
+        if (c1!=null && (c1 instanceof Variable || c1 instanceof Bool))
             return true;
 
 

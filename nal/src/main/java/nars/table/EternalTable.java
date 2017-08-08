@@ -244,7 +244,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
             Truth xt = x.truth();
 
-            Truth yt = Revision.revise(newBeliefTruth, xt, 1f, conclusion == null ? 0 : conclusion.evi());
+            Truth yt = Revision.revise(newBeliefTruth, xt, 1f, conclusion == null ? 0 : conclusion.evi()).ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
 
             //avoid a weak or duplicate truth
             if (yt == null || yt.equals(xt) || yt.equals(newBeliefTruth))
@@ -263,7 +263,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         //TODO use Task.tryContent in building the task:
 
         float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
-        Term t = normalizedOrNull(Revision.intermpolate(
+        Term t = normalizedOrNull(
+                Revision.intermpolate(
                 y.term(), oldBelief.term(),
                 aProp,
                 nar.random(),

@@ -8,6 +8,7 @@ import nars.*;
 import nars.concept.Concept;
 import nars.op.Command;
 import nars.term.Term;
+import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
@@ -136,7 +137,7 @@ public class Hear extends Loop {
     }
 
     static public void wiki(NAR nar) {
-        nar.on("readWiki",  (op, args, n) -> {
+        nar.on( (Atom)Atomic.the("readWiki"),  (op, args, n) -> {
 
             try {
                 String base = "simple.wikipedia.org";

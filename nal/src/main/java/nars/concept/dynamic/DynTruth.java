@@ -89,7 +89,7 @@ public final class DynTruth implements Truthed {
 
     public NALTask task(@NotNull Term c, boolean beliefOrGoal, long cre, long start, long end, @Nullable Priority b, NAR nar) {
 
-        Truth tr = truth();
+        Truth tr = truth().ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
         if (tr == null)
             return null;
 
