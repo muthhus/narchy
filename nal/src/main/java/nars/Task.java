@@ -79,7 +79,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             return t.eviEternalized();
         else {
             long z = end();
-            assert(z >= a): this + " has mismatched start/end times";
+            assert (z >= a) : this + " has mismatched start/end times";
 
             if ((when >= a) && (when <= z)) {
 
@@ -88,7 +88,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             } else {
                 //nearest endpoint of the interval
                 long dist = Math.min(Math.abs(a - when), Math.abs(z - when));
-                assert(dist > 0): "what time is " + a + ".." + z + " supposed to mean relative to " + when;
+                assert (dist > 0) : "what time is " + a + ".." + z + " supposed to mean relative to " + when;
 
                 assert (dur > 0);
                 cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
@@ -182,7 +182,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         if (!t.hasAny(Op.ATOM.bit | Op.INT.bit | Op.VAR_PATTERN.bit))
             return fail(t, "filter terms which have been completely variable-ized", safe); //filter any terms that have been completely variable introduced
 
-        if (!t.isNormalized())
+        if (punc!=COMMAND && !t.isNormalized())
             return fail(t, "task term not a normalized Compound", safe);
 
         if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
@@ -208,7 +208,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             return fail(t, "no associated concept", safe);
         }
 
-        return (t.size()==0) || validTaskCompound(t, punc, safe);
+        return (t.size() == 0) || validTaskCompound(t, punc, safe);
     }
 
 //    @Nullable
@@ -334,7 +334,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     default Concept concept(@NotNull NAR n, boolean conceptualize) {
         Term t = term();
         Concept c = conceptualize ? n.conceptualize(t) : n.concept(t);
-        if (c!=null) {
+        if (c != null) {
             return c;
         }
 
@@ -563,9 +563,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //        if (memory != null) {
 //            tenseString = getTense(memory.time());
 //        } else {
-            //TODO dont bother craeting new StringBuilder and calculating the entire length etc.. just append it to a reusable StringReader?
-            appendOccurrenceTime(
-                    (StringBuilder) (tenseString = new StringBuilder()));
+        //TODO dont bother craeting new StringBuilder and calculating the entire length etc.. just append it to a reusable StringReader?
+        appendOccurrenceTime(
+                (StringBuilder) (tenseString = new StringBuilder()));
 //        }
 
 
@@ -871,22 +871,27 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         boolean evaluate = true; //!isCommand();
 
         if (evaluate) {
-            Term x = term();
-            Term y = x.eval(n.terms);
 
+            Term x = term();
+
+            Term y = x.eval(n.terms);
 
             if (!x.equals(y)) {
                 @Nullable ObjectBooleanPair<Term> yy = tryContent(y, punc(), true);
                 if (yy != null) {
-                    NALTask inputY = clone(this, $.negIf(yy.getOne(), yy.getTwo() /* HACK */));
-                    assert (inputY != null);
 
-                    delete(); //transfer control to transformation result
-
-                    return inputY.run(n);
-                } else {
-                    return null; //eval to invalid
+                    /* the evaluated result here acts as a memoization of possibly many results
+                       depending on whether the functor is purely static in which case
+                       it would be the only one.
+                     */
+                    NALTask evaluated = clone(this, $.negIf(yy.getOne(), yy.getTwo() /* HACK */));
+                    if (evaluated != null) {
+                        return evaluated.run(n);
+                    }
                 }
+
+
+                return new Task[]{Command.logTask(n.time(), $.p(x, y))};
             }
         }
 
@@ -915,9 +920,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         Term inputTerm = cmd.term();
         if (inputTerm.hasAll(Op.EvalBits) && inputTerm.op() == INH) {
             Term func = inputTerm.sub(1);
-            if (func!=Null && func.op() == ATOM) {
+            if (func != Null && func.op() == ATOM) {
                 Term args = inputTerm.sub(0);
-                if (args!=Null && args.op() == PROD) {
+                if (args != Null && args.op() == PROD) {
                     Concept funcConcept = nar.concept(func);
                     if (funcConcept instanceof Command) {
                         Command o = (Command) funcConcept;
@@ -972,13 +977,15 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return new PreciseTruth(freq(), e, false);
     }
 
-    @Nullable static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
+    @Nullable
+    static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
         ObjectBooleanPair<Term> x = tryContent(t, punc, true);
-        if (x!=null) {
+        if (x != null) {
             return res.apply(x.getOne(), tr.negIf(x.getTwo()));
         }
         return null;
     }
+
     /**
      * attempts to prepare a term for use as a Task content.
      *
@@ -1038,7 +1045,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return x == ETERNAL || Math.abs(x - when) <= dur;
     }
 
-    /** TODO cause should be merged if possible when merging tasks in belief table or otherwise */
+    /**
+     * TODO cause should be merged if possible when merging tasks in belief table or otherwise
+     */
     short[] cause();
 
 }

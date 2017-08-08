@@ -36,7 +36,7 @@ public class NARService extends Services.AbstractService<NAR> implements Termed 
 
     @Override
     public @NotNull Term term() {
-        return $.quote(getClass() + "@" + System.identityHashCode(this));
+        return $.p($.quote(getClass().getName()), $.the(System.identityHashCode(this)) );
     }
 
 }

@@ -138,12 +138,12 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.5f;
+        float priFactor = 0.05f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
-        n.termVolumeMax.setValue(32);
+        n.termVolumeMax.setValue(24);
 
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);

@@ -4,17 +4,21 @@ import com.google.common.collect.TreeBasedTable;
 import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
+import nars.control.NARService;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
 import org.eclipse.collections.api.tuple.Pair;
+import org.eclipse.collections.impl.list.mutable.primitive.LongArrayList;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Consumer;
 
-public class Speech {
+public class Speech extends NARService {
 
     public static final Term PREPOSITION = $.the("preposition");
     public static final Term PRONOUN = $.the("pronoun");
@@ -22,22 +26,30 @@ public class Speech {
      * when, word, truth
      */
     final TreeBasedTable<Long, Term, TruthAccumulator> vocalize = TreeBasedTable.create();
-    private final NAR nar;
     private final Consumer<Term> speak;
     private float durationsPerWord, energy;
-    private float expectationThreshold = 0.75f;
+    private float expectationThreshold = 0.5f;
+    private NAR nar;
 
     public Speech(NAR nar, float durationsPerWord, Consumer<Term> speak) {
+        super(nar);
         this.durationsPerWord = durationsPerWord;
-        this.nar = nar;
         this.speak = speak;
         this.energy = 0;
-        nar.onCycle((n) ->{
-            energy = Math.min(1f, energy + 1f/(this.durationsPerWord*nar.dur()));
-            if (energy >= 1f) {
-                energy = 0;
-                next();
-            }
+    }
+
+    @Override
+    protected void start(NAR nar) {
+        super.start(nar);
+        this.nar = nar;
+        nar.runLater(()->{
+            ons.add(nar.onCycle((n) ->{
+                energy = Math.min(1f, energy + 1f/(this.durationsPerWord*nar.dur()));
+                if (energy >= 1f) {
+                    energy = 0;
+                    next();
+                }
+            }));
         });
     }
 
@@ -68,6 +80,12 @@ public class Speech {
         ta.add(truth);
     }
 
+    @Override
+    public void clear() {
+        synchronized (vocalize) {
+            vocalize.clear();
+        }
+    }
 
     public boolean next() {
 
@@ -81,17 +99,23 @@ public class Speech {
         FasterList<Pair<Term, Truth>> pending = new FasterList<>(0);
         synchronized (vocalize) {
             //vocalize.rowKeySet().tailSet(startOfNow-1).clear();
+
             SortedSet<Long> tt = vocalize.rowKeySet().headSet(endOfNow);
+
             if (!tt.isEmpty()) {
-                tt.forEach(t -> {
+                LongArrayList ll = new LongArrayList(tt.size());
+                tt.forEach(ll::add); //copy to array so we can modify the vocalize rows
+
+                ll.forEach(t -> {
+                    Set<Map.Entry<Term, TruthAccumulator>> entries = vocalize.row(t).entrySet();
                     if (t >= startOfNow) {
-                        vocalize.row(t).entrySet().forEach(e -> {
-                            Truth x = e.getValue().commitAverage();
+                        entries.forEach(e -> {
+                            Truth x = e.getValue().commitSum();
                             if (x.expectation() > expectationThreshold)
                                 pending.add(Tuples.pair(e.getKey(), x));
                         });
                     }
-                    vocalize.row(t).clear();
+                    entries.clear();
                 });
             }
         }

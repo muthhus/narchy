@@ -27,21 +27,21 @@ public class Gradius extends NAgentX {
 
         this.g = new Gradius4K();
 
-        g.updateMS = 30;
+        g.updateMS = 50;
 
         //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
-        senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.02f);
+        senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.01f);
 
         float width = g.getWidth();
         float height = g.getHeight();
         @NotNull ScalarConcepts yPos = senseNumber($.p(id, the("Y")),
                 ()->g.player[Gradius4K.OBJ_Y] / height,
-                3, ScalarConcepts.FuzzyTriangle
-        ).resolution(0.1f);
+                8, ScalarConcepts.FuzzyTriangle
+        ).resolution(0.2f);
         @NotNull ScalarConcepts xPos = senseNumber($.p(id, the("X")),
                 ()->g.player[Gradius4K.OBJ_X] / width,
-                3, ScalarConcepts.FuzzyTriangle
-        ).resolution(0.1f);
+                8, ScalarConcepts.FuzzyTriangle
+        ).resolution(0.2f);
         window(
                 col(
                         Vis.conceptBeliefPlots(this, xPos, 4),

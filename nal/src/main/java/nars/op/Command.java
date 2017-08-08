@@ -58,12 +58,12 @@ abstract public class Command extends BaseConcept implements PermanentConcept {
         return new NALTask(content, Op.COMMAND, null, when, when, when, ArrayUtils.EMPTY_LONG_ARRAY);
     }
 
-    public static Task logTask(@NotNull Term content) {
-        return logTask(ETERNAL, content);
+    public static Task logTask(long when, @NotNull Object content) {
+        return Command.task(LOG_FUNCTOR, when, $.the(content) );
     }
 
-    static Task logTask(long when, @NotNull Term... content) {
-        return Command.task(LOG_FUNCTOR, when, content );
+    public static Task logTask(@NotNull Term content) {
+        return logTask(ETERNAL, content);
     }
 
     static Task task(String func, long now, @NotNull Term... args) {
@@ -74,7 +74,7 @@ abstract public class Command extends BaseConcept implements PermanentConcept {
         nar.input( Command.logTask(nar.time(), $.the(msg)) );
     }
     public static void log(NAR nar, @NotNull Object x) {
-        nar.input( Command.logTask(nar.time(), $.the(x.toString())) );
+        nar.input( Command.logTask(nar.time(), x) );
     }
 
 

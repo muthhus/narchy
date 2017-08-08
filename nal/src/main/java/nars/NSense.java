@@ -205,17 +205,17 @@ public interface NSense {
     @NotNull
     default ScalarConcepts senseNumber(Term id, FloatSupplier v, int precision, ScalarConcepts.ScalarEncoder model)  {
         return senseNumber(v, model, Util.map(0, precision,
-                (int x) -> ($.inh(id, /*$.p*/$.the(x))),
+                (int x) -> ($.inh($.the(x), id)),
                 Term[]::new));
     }
 
     @NotNull
     default ScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
-        return senseNumber(v, ScalarConcepts.Hard, inh(id, LOW), inh(id, HIH));
+        return senseNumber(v, ScalarConcepts.Hard, inh(LOW, id), inh(HIH, id));
     }
     @NotNull
     default ScalarConcepts senseNumberTri(Term id, FloatSupplier v)  {
-        return senseNumber(v, ScalarConcepts.Hard,  inh(id, LOW), inh(id, MID), inh(id, HIH));
+        return senseNumber(v, ScalarConcepts.Hard,  inh(LOW, id), inh(MID, id), inh(HIH, id));
     }
 
     default SensorConcept senseNumber(String id, FloatSupplier v) throws Narsese.NarseseException {

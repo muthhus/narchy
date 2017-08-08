@@ -2,6 +2,7 @@ package nars.control;
 
 import jcog.bag.Bag;
 import jcog.pri.PLink;
+import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
@@ -30,7 +31,7 @@ import static nars.Op.VAR_QUERY;
  */
 public class Activate extends UnaryTask<Concept> implements Termed {
 
-    static final int TASKLINKS_SAMPLED = 2;
+    static final int TASKLINKS_SAMPLED = 1;
     static final int TERMLINKS_SAMPLED = 2;
 
 
@@ -128,12 +129,12 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         //      its termlinks to subterms
         //      and their reverse links back to this
 
+        float cPri = priElseZero();
+        float decayRate = 1f - nar.momentum.floatValue();
+        float decayed = cPri * decayRate;
+        priSub(decayed); //for balanced budgeting: important
+
         if (localTemplates.length > 0) {
-            float decayRate = 0.5f;
-            float decayed = priElseZero() * (1f - decayRate);
-
-            priSub(decayed); //for balanced budgeting: important
-
             float subDecay = decayed / localTemplates.length;
             float balance = Param.TERMLINK_BALANCE;
             float subDecayForward = subDecay * balance;
@@ -183,7 +184,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             PriReference<Task> tasklink = taskl.get(i);
 
             if (localTemplateConcepts > 0) {
-                activateSubterms(tasklink, localTemplates, localTemplateConcepts);
+                activateSubterms(tasklink, localTemplates, localTemplateConcepts, decayed);
             }
 
             for (int j = 0; j < termlSize; j++) {
@@ -199,16 +200,14 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         return premises;
     }
 
-    public static void activateSubterms(PriReference<Task> tasklink, Termed[] localTemplates, int localTemplateConcepts) {
+    public static void activateSubterms(PriReference<Task> tasklink, Termed[] localTemplates, int localTemplateConcepts, float cPri) {
         Task task = tasklink.get();
         if (task == null)
             return;
 
-        float tfa = tasklink.priElseZero();
-        //Term taskTerm = task.term();
-
-        //tasklink activates local subterms and their reverse termlinks to this
+        float tfa =  cPri * tasklink.priElseZero();
         float tfaEach = tfa / localTemplateConcepts;
+
 
         for (Termed localSub : localTemplates) {
 

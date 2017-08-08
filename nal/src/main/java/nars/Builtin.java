@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Texts;
 import nars.concept.Concept;
 import nars.op.Command;
 import nars.op.Operator;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 import static nars.Op.*;
+import static nars.term.Functor.f0;
 import static nars.time.Tense.DTERNAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -145,7 +147,7 @@ public class Builtin {
             int size = t.size();
             switch (size) {
                 case 0:
-                    assert(false): "empty set impossible here";
+                    assert (false) : "empty set impossible here";
                     return Null;
                 case 1:
                     return Null; /* can't shrink below one element */
@@ -165,7 +167,7 @@ public class Builtin {
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
             int tdt = t.dt();
-            if (tdt == DTERNAL || tdt ==0) {
+            if (tdt == DTERNAL || tdt == 0) {
                 switch (t.size()) {
                     case 0:
                     case 1:
@@ -191,12 +193,12 @@ public class Builtin {
             }
         }));
         nar.on(Functor.f2((Atom) $.the("conjEvent"), (Term c, Term when) -> {
-            if (c.op()!=CONJ || !(when instanceof Atom))
+            if (c.op() != CONJ || !(when instanceof Atom))
                 return null;
-            if (c.dt()==DTERNAL || c.dt()==0) {
+            if (c.dt() == DTERNAL || c.dt() == 0) {
                 return c.sub(nar.random().nextInt(c.size())); //choose a subterm at random
             }
-            assert(c.size()==2);
+            assert (c.size() == 2);
             int target;
             switch (when.toString()) {
                 case "early":
@@ -218,7 +220,7 @@ public class Builtin {
             assertEquals(/*msg,*/ args[0], args[1]);
         });
 
-        nar.on(Functor.f0("self", nar::self));
+        nar.on(f0("self", nar::self));
 
 
         nar.on(Functor.f1Concept("belief", nar, (c, n) -> $.quote(n.belief((Term) c, n.time()))));
@@ -249,26 +251,31 @@ public class Builtin {
         nar.on("stat", (op, args, n) -> Command.log(n, n.emotion.summary() + ' ' + n.exe));
 
 
-        nar.on("top",(op, args, n) -> {
+        nar.on(Functor.f("top", (args) -> {
 
-
-            int MAX_RESULT_LENGTH = 250;
-            StringBuilder b = new StringBuilder(MAX_RESULT_LENGTH + 8);
+            int MAX_RESULT_LENGTH = 10;
 
             String query;
-            if (args.length > 0 && args[0] instanceof Atom) {
-                query = $.unquote(args[0]).toLowerCase();
+            if (args.size() > 0 && args.sub(0) instanceof Atom) {
+                query = $.unquote(args.sub(0)).toLowerCase();
             } else {
                 query = null;
-                n.forEachConceptActive(bc -> {
-                    String bs = bc.toString();
-                    String cs = bs.toLowerCase();
-                    if (b.length() < MAX_RESULT_LENGTH && (query == null || cs.contains(query))) {
-                        b.append(bs).append("  ");
-                    }
-                });
+
             }
-//            else {
+
+            List<Term> rows = $.newArrayList(MAX_RESULT_LENGTH);
+            //TODO use Exe stream() methods
+            nar.forEachConceptActive(bc -> {
+                if (rows.size() < MAX_RESULT_LENGTH && (query == null || bc.toString().toLowerCase().contains(query))) {
+                    rows.add($.p(
+                        bc.get().term(),
+                        $.the("$" + Texts.n4(bc.pri())) )
+                    );
+                }
+            });
+            return $.p(rows);
+
+//            else
 //                for (PLink<Concept> bc : ii) {
 //                    b.append(bc.get()).append('=').append(Texts.n2(bc.pri())).append("  ");
 //                    if (b.length() > MAX_RESULT_LENGTH)
@@ -276,10 +283,10 @@ public class Builtin {
 //                }
 //            }
 
-            Command.log(n, b.toString());
+            //Command.log(n, b.toString());
             //"core pri: " + cbag.active.priMin() + "<" + Texts.n4(cbag.active.priHistogram(new double[5])) + ">" + cbag.active.priMax());
 
-        });
+        }));
 //
 
 //            /** slice(<compound>,<selector>)
@@ -400,7 +407,7 @@ public class Builtin {
 
     static Term[] dropRandom(Random random, TermContainer t) {
         int size = t.size();
-        assert(size > 1);
+        assert (size > 1);
         Term[] y = new Term[size - 1];
         int except = random.nextInt(size);
         for (int i = 0, j = 0; i < size; i++) {

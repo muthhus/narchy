@@ -422,7 +422,7 @@ $.28 ((x &&+2 y) ==>+5 z). %1.0;.81% {3: 1;2} (((%1==>%2),(%3==>%2),neqRCom(%3,%
         assertEquals("((x &&+2 y) ==>+3 z)@ETE", s.toString());
 
     }
-    
+
     @Test
     public void testConjLinked() throws Narsese.NarseseException {
 // WRONG:

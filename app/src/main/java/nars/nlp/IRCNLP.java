@@ -212,8 +212,9 @@ public class IRCNLP extends IRC {
 //    }
 
     void hear(String text, String src) throws Narsese.NarseseException {
+        text = text.toLowerCase();
         Hear.hear(nar, text, src, (t) -> {
-            return new Hear(nar, Hear.tokenize(t), src, 100);
+            return new Hear(nar, Hear.tokenize(t), src, 200);
 //            Compound f = $.func("SENTENCE", Hear.tokenize(t));
 //            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f);
 //            return null;
@@ -261,10 +262,10 @@ public class IRCNLP extends IRC {
 
         //Param.DEBUG = true;
 
-        float durFPS = 20f;
+        float durFPS = 25f;
         NAR n = NARS.realtime(durFPS).get();
 
-        n.truthResolution.setValue(0.1f);
+        n.truthResolution.setValue(0.2f);
 
         n.termVolumeMax.setValue(24);
 
