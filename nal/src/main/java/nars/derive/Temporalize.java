@@ -765,13 +765,13 @@ public class Temporalize {
         FasterList<Event> l = constraints.computeIfAbsent(term, (t) -> new FasterList<>());
         l.add(event);
 
-        if (term.op() == NEG) {
-            Term u = term.unneg();
-            FasterList<Event> m = constraints.computeIfAbsent(u, (t) -> new FasterList<>());
-            m.add(new RelativeEvent(u, term, 0, term.dtRange()));
-            if (m.size() > 1)
-                m.sortThis();
-        }
+//        if (term.op() == NEG) {
+//            Term u = term.unneg();
+//            FasterList<Event> m = constraints.computeIfAbsent(u, (t) -> new FasterList<>());
+//            m.add(new RelativeEvent(u, term, 0, term.dtRange()));
+//            if (m.size() > 1)
+//                m.sortThis();
+//        }
 
         if (l.size() > 1)
             l.sortThis();

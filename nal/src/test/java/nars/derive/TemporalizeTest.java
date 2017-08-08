@@ -3,12 +3,15 @@ package nars.derive;
 import com.google.common.base.Joiner;
 import jcog.list.FasterList;
 import nars.$;
+import nars.NARS;
 import nars.Narsese;
+import nars.index.term.TermContext;
 import nars.term.Term;
 import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import static nars.time.Tense.ETERNAL;
@@ -500,6 +503,56 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
     }
 
+    @Test public void testConjComplex() throws Narsese.NarseseException {
+        String src = "((a &&+5 ((--,a)&|b)) &&+5 ((--,b) &&+5 (--,c)))";
+        Term x = $.$(src);
+        assertEquals(15, x.dtRange());
+
+        TermContext n = NARS.shell();
+
+        Set<String> result = new TreeSet();
+        for (int i = 0; i < 100; i++) {
+
+            Temporalize t = new Temporalize();
+
+            t.knowTerm(x, 1, 16);
+            if (i == 0) {
+                //CHECK THE KNOWN PATTERN
+
+                for (String subterm : new String[] { "a", "b", "((--,b) &&+5 (--,c))" }) {
+                    FasterList<Temporalize.Event> cc = t.constraints.get($.$(subterm)); /// ? @[11..16]
+                    assertEquals(subterm + " has non-unique temporalizations: " + cc, 1, cc.count(y -> y instanceof Temporalize.AbsoluteEvent));
+                }
+
+                System.out.println(t);
+                System.out.println();
+            }
+
+
+            Term a = $.$( $.$("dropAnyEvent(" + src + ")").eval(n).toString()
+                    .replace("&&+5", "&&+-")
+                    .replace("&&+10", "&&+-")
+            );
+
+            Temporalize.Event r = t.solve(a);
+            assertNotNull(r);
+            {
+
+                String xy = a + "\t" + r;
+
+                Temporalize.AbsoluteEvent ae = (Temporalize.AbsoluteEvent)r;
+                assertTrue(xy, ae.start >= 1 );
+                assertTrue(xy, ae.end <= 16 );
+
+
+                result.add(xy);
+
+            }
+
+        }
+
+        result.forEach(System.out::println);
+    }
     @Test
     public void testPreconImplConjPreConflict() throws Narsese.NarseseException {
 
