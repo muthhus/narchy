@@ -52,11 +52,6 @@ public class CycleTime extends Time {
         t+=dt;
     }
 
-    @Override
-    public long elapsed() {
-        return 1;
-    }
-
     @NotNull
     @Override
     public String toString() {

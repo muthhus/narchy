@@ -55,10 +55,10 @@ public abstract class Param extends Services {
             //Math::max;
 
     /** maximum time (in durations) that a signal task can latch its last value before it becomes unknown */
-    public final static int SIGNAL_LATCH_TIME =
+    public final static int SIGNAL_LATCH_TIME_MAX =
                     //0;
                     //Integer.MAX_VALUE;
-                    16;
+                    64;
 
     /** cost of a termutate call */
     public static final int TTL_MUTATE = 1;
@@ -82,6 +82,9 @@ public abstract class Param extends Services {
     public static final float TERMLINK_BALANCE = 0.5f;
     public static boolean DITHER_DT = false;
 
+    /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
+    public static int DT_ABS_LIMIT = Integer.MAX_VALUE/4;
+    public static int DT_ABS_SAFETY_LIMIT = Integer.MAX_VALUE/1024;
 
     public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
     public final FloatParam valueNegativeDecay = new FloatParam(0.66f, 0, 1f);

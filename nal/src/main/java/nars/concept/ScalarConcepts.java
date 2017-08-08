@@ -1,21 +1,15 @@
 package nars.concept;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Iterators;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.math.FloatSupplier;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
-import nars.Op;
+import nars.*;
+import nars.control.CauseChannel;
 import nars.control.NARService;
-import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -36,10 +30,11 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
     private final Term id;
 
     final AtomicDouble value = new AtomicDouble();
+    private final CauseChannel<Task> output;
 
     @Override
     public float asFloat() {
-        return (float)value.get();
+        return (float) value.get();
     }
 
     public Stream<SensorConcept> stream() {
@@ -106,7 +101,6 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
     };
 
 
-
     /**
      * analogous to a needle on a guage, the needle being the triangle spanning several of the 'digits'
      * /      |       \
@@ -142,7 +136,9 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
         return tt;
     };
 
-    /** returns snapshot of the belief state of the concepts */
+    /**
+     * returns snapshot of the belief state of the concepts
+     */
     public Truth[] belief(long when, NAR n) {
         Truth[] f = new Truth[sensors.size()];
         for (int i = 0; i < sensors.size(); i++)
@@ -169,23 +165,23 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
                 $.quote(Util.toString(input)), $.the(truther.toString())
         );
 
+        int numStates = states.length;
+
+        assert (numStates > 1);
+
         this.conf = nar.confDefault(Op.BELIEF);
         this.input = input;
+        this.output = nar.newCauseChannel(this);
+        output.amplitude(1f / numStates);
 
-        int num = states.length;
-        int numStates = num;
         this.sensors = $.newArrayList(numStates);
 
-        if (num > 1) {
-            int i = 0;
-            for (Term s : states) {
-                final int ii = i++;
-                sensors.add(new SensorConcept(s, nar, this,
-                        (x) -> truther.truth(x, ii, num, nar)
-                ));
-            }
-        } else {
-            throw new RuntimeException("should be >1 states");
+        int i = 0;
+        for (Term s : states) {
+            final int ii = i++;
+            sensors.add(new SensorConcept(s, nar, this,
+                    (x) -> truther.truth(x, ii, numStates, nar)
+            ));
         }
 
 
@@ -201,7 +197,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
 
         value.set(input.asFloat());
 
-        n.input(sensors.stream().map(x -> {
+        output.input(sensors.stream().map(x -> {
             return x.apply(n);
         }));
     }

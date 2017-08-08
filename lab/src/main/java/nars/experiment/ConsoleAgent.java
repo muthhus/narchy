@@ -89,7 +89,7 @@ public abstract class ConsoleAgent extends NAgentX {
 
         senseNumberDifference($.func((Atomic) id, Atomic.the("joy")), happy);
 
-        CauseChannel<Task> s = nar.newInputChannel(this + "_HumanKeys");
+        CauseChannel<Task> s = nar.newCauseChannel(this + "_HumanKeys");
         onFrame(() -> {
             //batch collected keyboard inputs since last frame
             List<Task> q = $.newArrayList(queue.size());

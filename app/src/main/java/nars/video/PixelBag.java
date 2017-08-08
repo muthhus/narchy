@@ -1,5 +1,6 @@
 package nars.video;
 
+import jcog.Util;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.NAgent;
@@ -256,7 +257,8 @@ public abstract class PixelBag implements Bitmap2D {
     }
 
     public float setZoom(float f) {
-        Z = f;
+        Z = (float)Math.sqrt(Util.unitize(f)); //linear to square
+        //Z = f;
         return f;
     }
 

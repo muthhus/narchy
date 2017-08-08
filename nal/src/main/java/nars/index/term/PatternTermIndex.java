@@ -80,7 +80,7 @@ public class PatternTermIndex extends MapTermIndex {
         Ellipsis e = Ellipsis.firstEllipsis(v);
         return e != null ?
                 ellipsis(x, v, e) :
-                new PatternCompound.PatternCompoundSimple(x, v);
+                new PatternCompound.PatternCompoundSimple(x.op(), x.dt(), v);
     }
 
 //    static boolean canBuildConcept(@NotNull Term y) {
@@ -116,7 +116,7 @@ public class PatternTermIndex extends MapTermIndex {
 //            if (ellipsisTransform)
 //                throw new RuntimeException("commutative is mutually exclusive with ellipsisTransform");
 
-            return new PatternCompound.PatternCompoundWithEllipsisCommutive(seed, e, v);
+            return new PatternCompound.PatternCompoundWithEllipsisCommutive(seed.op(), seed.dt(), e, v);
         } else {
 //            if (ellipsisTransform) {
 //                if (op != Op.PROD)
@@ -125,7 +125,7 @@ public class PatternTermIndex extends MapTermIndex {
 //                return new PatternCompound.PatternCompoundWithEllipsisLinearImageTransform(
 //                        seed, (EllipsisTransform)e, v);
 //            } else {
-            return new PatternCompound.PatternCompoundWithEllipsisLinear(seed, e, v);
+            return new PatternCompound.PatternCompoundWithEllipsisLinear(seed.op(), seed.dt(), e, v);
 //            }
         }
 

@@ -1,6 +1,7 @@
 package nars.task;
 
 import jcog.Util;
+import jcog.math.NumberException;
 import jcog.pri.Pri;
 import nars.Param;
 import nars.Task;
@@ -107,7 +108,7 @@ public class NALTask extends Pri implements Task {
                     end = start + tdt; //keeps start (left)-aligned, end is stretched if necessary
                 }
             }  else if (tdt < 0) {
-                System.out.println("...");
+                throw new RuntimeException("dt overflow");
             }
         }
 

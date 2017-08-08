@@ -50,7 +50,6 @@ public abstract class Time implements Clock, Serializable {
     protected abstract void update();
 
 
-    public abstract long elapsed();
 
     /**
      * the default duration applied to input tasks that do not specify one

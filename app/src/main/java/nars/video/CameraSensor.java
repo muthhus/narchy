@@ -44,7 +44,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         this.h = src.height();
         numPixels = w * h;
 
-        this.in = a.nar.newInputChannel(this);
+        this.in = a.nar.newCauseChannel(this);
         this.in.amplitude(1f/(w*h)); //shared amongst all pixels
 
         pixels = encode(RadixProduct(root, src.width(), src.height(), RADIX), a.nar);

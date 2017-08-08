@@ -57,7 +57,7 @@ public interface NSense {
     }
 
     default void addSensor(SensorConcept c) {
-        CauseChannel existing = sensors().put(c, nar().newInputChannel(c));
+        CauseChannel existing = sensors().put(c, nar().newCauseChannel(c));
         assert(existing == null);
         nar().on(c);
     }
@@ -205,13 +205,13 @@ public interface NSense {
     @NotNull
     default ScalarConcepts senseNumber(Term id, FloatSupplier v, int precision, ScalarConcepts.ScalarEncoder model)  {
         return senseNumber(v, model, Util.map(0, precision,
-                (int x) -> ($.inh($.p($.the(x)), id)), //operator syntax: id(n)
+                (int x) -> ($.inh(id, /*$.p*/$.the(x))),
                 Term[]::new));
     }
 
     @NotNull
     default ScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
-        return senseNumber(v, ScalarConcepts.Hard, prop(id, LOW), prop(id, HIH));
+        return senseNumber(v, ScalarConcepts.Hard, inh(id, LOW), inh(id, HIH));
     }
     @NotNull
     default ScalarConcepts senseNumberTri(Term id, FloatSupplier v)  {

@@ -1,8 +1,6 @@
 package nars.op.mental;
 
 import jcog.data.FloatParam;
-import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
 import nars.Op;
@@ -25,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
-import java.util.function.Consumer;
 
 import static nars.Op.*;
 import static nars.term.Terms.compoundOrNull;
@@ -138,7 +135,7 @@ public class Inperience extends LeakOut {
 //        );
         this.nar = n;
 
-        in = nar.newInputChannel(this);
+        in = nar.newCauseChannel(this);
 
 //        n.eventConceptProcess.on(p -> {
 //            Task belief = p.belief();

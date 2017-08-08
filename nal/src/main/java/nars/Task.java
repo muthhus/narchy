@@ -111,10 +111,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
     default boolean eternalizable() {
 
+
         //return true;
         //return false;
-        //return term.varIndep() > 0;
-        return term().varIndep() > 0 || term().isAny(Op.IMPL.bit | Op.EQUI.bit);
+        return term().varIndep() > 0;
+        //return term().varIndep() > 0 || term().isAny(Op.IMPL.bit | Op.EQUI.bit);
         //return true;
         //return op().temporal;
 

@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
-import java.util.function.BiConsumer;
 
 import static jcog.net.UDPeer.Command.TELL;
 
@@ -82,7 +81,7 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
 
         peer = new MyUDPeer(nar, port, discover);
 
-        recv = nar.newInputChannel(this);
+        recv = nar.newCauseChannel(this);
 
         buffer = new LeakOut(nar, 256, outRate) {
             @Override

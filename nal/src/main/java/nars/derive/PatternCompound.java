@@ -22,7 +22,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- *
+ * HACK this should extend ProxyTerm or something
  */
 abstract public class PatternCompound extends GenericCompoundDT  {
 
@@ -33,18 +33,18 @@ abstract public class PatternCompound extends GenericCompoundDT  {
     private final int minVolumeNecessary;
     private final int size;
 
-    PatternCompound(@NotNull Compound seed, @NotNull TermContainer subterms) {
-        super(new GenericCompound(seed.op(), subterms), seed.dt());
+    PatternCompound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
+        super(new GenericCompound(op, subterms), dt);
 
-        sizeCached = seed.size();
+        this.op = op;
+        sizeCached = subterms.size();
         structureNecessary =
                 //seed.structure() & ~(Op.VariableBits);
-                seed.structure() &
+                structure() &
                         ~(Op.VAR_PATTERN.bit
                             | Op.INH.bit | Op.PROD.bit //? exclude: pattern var, inh and prod (for any functors)
                 );
         commutative = super.isCommutative();
-        op = op();
         minVolumeNecessary = volume();
         size = size();
     }
@@ -102,8 +102,8 @@ abstract public class PatternCompound extends GenericCompoundDT  {
         @NotNull
         protected final Ellipsis ellipsis;
 
-        PatternCompoundWithEllipsis(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
-            super(seed, subterms);
+        PatternCompoundWithEllipsis(@NotNull Op seed, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+            super(seed, dt, subterms);
 
             this.ellipsis = ellipsis;
 
@@ -123,8 +123,8 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 
     public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis  {
 
-        public PatternCompoundWithEllipsisLinear(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
-            super(seed, ellipsis, subterms);
+        public PatternCompoundWithEllipsisLinear(@NotNull Op op, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+            super(op, dt, ellipsis, subterms);
         }
 
         @Override
@@ -324,8 +324,8 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 
     public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis  {
 
-        public PatternCompoundWithEllipsisCommutive(@NotNull Compound seed, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
-            super(seed, ellipsis, subterms);
+        public PatternCompoundWithEllipsisCommutive(Op op, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
+            super(op, dt, ellipsis, subterms);
         }
 
         /**
@@ -482,8 +482,8 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 //        private final int subStructureCached;
 //        private final boolean commutative;
 
-        public PatternCompoundSimple(@NotNull Compound seed, @NotNull TermContainer subterms) {
-            super(seed, subterms);
+        public PatternCompoundSimple(Op op, int dt, @NotNull TermContainer subterms) {
+            super(op, dt, subterms);
 //            this.commutative = Compound.commutative(op(), size());
 //            this.subStructureCached = subterms().structure();
         }

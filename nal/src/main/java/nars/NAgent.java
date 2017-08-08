@@ -147,7 +147,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
 
         if (id==null) id = $.quote(getClass().toString());
-        this.predict = nar.newInputChannel(id + " predict");
+        this.predict = nar.newCauseChannel(id + " predict");
     }
 
     @Override

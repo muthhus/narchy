@@ -13,7 +13,6 @@ public abstract class RealTime extends Time {
 
     private final int unitsPerSecod;
     long t;
-    long t0 = -1;
     private long start;
 
     final long seed = Math.abs(UUID.randomUUID().getLeastSignificantBits() ) & 0xffff0000; //???
@@ -42,18 +41,18 @@ public abstract class RealTime extends Time {
     public void clear() {
         update();
 
-        if (start!=0)
-            start = getRealTime();
+        long rt = getRealTime();
 
-        t = t0 = (getRealTime()-start);
+        if (start!=0)
+            start = rt;
+
+        t = (rt - start);
     }
 
 
     @Override
     public final void update() {
         long now = (getRealTime()-start);
-
-        t0 = t;
 
         t = now;
     }
@@ -64,10 +63,6 @@ public abstract class RealTime extends Time {
         return t;
     }
 
-    @Override
-    public long elapsed() {
-        return t0 - t;
-    }
 
     protected abstract long getRealTime();
 

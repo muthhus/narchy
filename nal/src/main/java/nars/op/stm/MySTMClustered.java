@@ -75,7 +75,7 @@ public class MySTMClustered extends STMClustered {
 
         lastIteration = nar.time();
 
-        this.in = nar.newInputChannel(this);
+        this.in = nar.newCauseChannel(this);
         net.setAlpha(0.05f);
         //net.setBeta(0.05f);
         net.setWinnerUpdateRate(0.03f, 0.01f);

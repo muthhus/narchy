@@ -16,8 +16,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.LongSupplier;
 
-import static nars.time.Tense.ETERNAL;
-
 /**
  * Manages the creation of a stream of tasks for a changing Truth value
  * input signal
@@ -40,7 +38,6 @@ public class Signal extends AtomicReference<SignalTask> {
 
     final byte punc;
 
-    
 
     public Signal(byte punc, FloatSupplier resolution) {
         super(null);
@@ -61,13 +58,15 @@ public class Signal extends AtomicReference<SignalTask> {
         return updateAndGet((current) -> {
 
             long now = nar.time();
-            //long last = this.lastUpdated;
-//            if (last == ETERNAL) {
-//                last = now;
-//            }
+            float p = pri.asFloat();
 
             if (current != null) {
                 current.setEnd(now);
+
+
+                current.priMax(p);
+
+
                 if (current.stretchKey == null) {
                     current.stretchKey = ((DefaultBeliefTable) ((BaseConcept) nar.concept(current)).table(current.punc)).temporal.stretch(current);
                 }
@@ -85,7 +84,7 @@ public class Signal extends AtomicReference<SignalTask> {
                 if (current == null ||
                         current.isDeleted() ||
                         (!current.truth.equals(nextTruth, resolution.asFloat()) ||
-                                (Param.SIGNAL_LATCH_TIME != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME)
+                                (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME_MAX)
                         )) {
 
 
@@ -93,6 +92,8 @@ public class Signal extends AtomicReference<SignalTask> {
                     next = task(term, nextTruth.truth(),
                             now, now,
                             stamper.getAsLong(), dt);
+
+                    next.setEnd(now);
 
                     //System.out.println(current + " " + next );
                 } else {
@@ -104,17 +105,10 @@ public class Signal extends AtomicReference<SignalTask> {
             }
 
 
-
-            float p = pri.asFloat();
-
             if (next != null) {
                 next.priMax(p);
             }
 
-            if (current != next && current != null && !current.isDeleted()) {
-                current.priMax(p);
-                current.setEnd(now);
-            }
 
             return next; //nothing, keep as-is
 

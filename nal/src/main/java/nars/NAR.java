@@ -1700,7 +1700,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * automatically adds the cause id to each input
      */
-    public CauseChannel<Task> newInputChannel(Object id) {
+    public CauseChannel<Task> newCauseChannel(Object id) {
 
         synchronized (causes) {
 

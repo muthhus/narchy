@@ -568,7 +568,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 return Null; //tried to temporalize what can only be commutive
 
             if (nextDT == XTERNAL) {
-                return new GenericCompoundDT(b, nextDT);
+                return Op.compound(b, nextDT);
             }
 
             if (o.commutative && sub(0).compareTo(sub(1)) > 0) {

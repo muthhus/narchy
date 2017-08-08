@@ -53,7 +53,7 @@ public enum Op implements $ {
 
     NEG("--", 5, Args.One) {
         private Term neg(Term x) {
-            if (x instanceof Bool || x.op()==NEG)
+            if (x instanceof Bool || x.op() == NEG)
                 return x.unneg();
             else
                 return new UnitCompound1(NEG, x);
@@ -241,7 +241,9 @@ public enum Op implements $ {
                     if (imbalanced) {
                         if (dt < 0) {
                             dt = -dt;
-                            Term x = a; a = b; b = x;
+                            Term x = a;
+                            a = b;
+                            b = x;
                         }
                         return nullIfNull(conjMerge(a, 0, b, dt + a.dtRange()));
                     }
@@ -1052,7 +1054,7 @@ public enum Op implements $ {
         if (dt == DTERNAL)
             return g;
         else
-            return new GenericCompoundDT(g, dt);
+            return compound(g, dt);
     }
 
 //    protected static Term conjMergeLeftAlign(List<ObjectLongPair<Term>> events, int from, int to) {
@@ -1125,7 +1127,7 @@ public enum Op implements $ {
 
         int retained = terms.size();
         if (retained == size && a instanceof Term) { //same as 'a', quick re-use of instance
-            return (Term)a;
+            return (Term) a;
         } else if (retained == 0) {
             return Null; //empty set
         } else {
@@ -1162,18 +1164,43 @@ public enum Op implements $ {
     }
 
 
-    @NotNull
-    private static Term compound(Op op, int dt, Term... subterms) {
+    /** last stage constructor: use with caution */
+    @NotNull public static Term compound(Op op, int dt, Term... subterms) {
 
         //if (!subterms.internable())
         Term c = compound(op, subterms);
-        return ((c instanceof Compound) && (dt != DTERNAL)) ?
-                new GenericCompoundDT((Compound) c, dt) : c;
+
+        //allow temporalization:
+        return compound(c, dt);
+    }
+
 
 //        else
 //            return compound(new NewCompound(op, subterms), dt);
-    }
 
+
+    /** last stage constructor: use with caution */
+    public static Term compound(Term c, int dt) {
+        if ((c instanceof Compound) && (dt != DTERNAL)) {
+            if (dt != XTERNAL && Math.abs(dt) > Param.DT_ABS_SAFETY_LIMIT) {
+//                switch (c.sub(0).op()) {
+//                    case VAR_PATTERN:
+//                    case VAR_QUERY:
+//                    case VAR_INDEP:
+//                    case VAR_DEP:
+//                    case NEG:
+//
+//                }
+
+                if (c.sub(1).equals(c.sub(0)))
+                    return c.sub(0);
+
+            }
+
+            return new GenericCompoundDT((Compound)c, dt);
+        }
+        return c;
+    }
 
     static boolean in(int needle, int haystack) {
         return (needle & haystack) == needle;
@@ -1577,9 +1604,10 @@ public enum Op implements $ {
             args.add(term2);
         }
 
-        Term[] aa = Terms.sorted(args);
+        Term[] aa = args.toArray(new Term[args.size()]);
         if (aa.length == 1)
-            return aa[0]; //intersection with itself is itself
+            return aa[0]; //reduction to one element
+
         return compound(intersection, DTERNAL, aa);
     }
 
@@ -1729,9 +1757,11 @@ public enum Op implements $ {
         }
 
         final static int rankBoolNull = Term.opX(ATOM, 0);
-        @Override public final int opX() {
-        return rankBoolNull;
-    }
+
+        @Override
+        public final int opX() {
+            return rankBoolNull;
+        }
 
         @Override
         public @NotNull Term unneg() {
@@ -1745,9 +1775,11 @@ public enum Op implements $ {
         }
 
         final static int rankBoolFalse = Term.opX(ATOM, 1);
-        @Override public final int opX() {
-        return rankBoolFalse;
-    }
+
+        @Override
+        public final int opX() {
+            return rankBoolFalse;
+        }
 
         @NotNull
         @Override
@@ -1762,9 +1794,11 @@ public enum Op implements $ {
         }
 
         final static int rankBoolTrue = Term.opX(ATOM, 2);
-        @Override public final int opX() {
-        return rankBoolTrue;
-    }
+
+        @Override
+        public final int opX() {
+            return rankBoolTrue;
+        }
 
         @NotNull
         @Override

@@ -73,6 +73,9 @@ public class Conclusion extends AbstractPred<Derivation> {
         //TODO make a variation of transform which can terminate early if exceeds a minimum budget threshold
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
+
+
+        // 1. SUBSTITUTE
         Term b1  = d.transform(this.pattern);
         if (b1.vars(null) > 0) {
             Term b2 = d.transform(b1);
@@ -80,20 +83,28 @@ public class Conclusion extends AbstractPred<Derivation> {
             //                System.out.println("second transform");
             b1 = b2;
         }
-
-
         assert (b1.varPattern() == 0);
 
-        /// ----
+        if (!b1.hasAny(Op.ATOM)) /* dont derive purely variable, even if they are temporal */
+            return true;
+
+
+
+
+        /// 2. EVAL ----
 
         d.use(Param.TTL_DERIVE_TASK_ATTEMPT);
         nar.emotion.derivationEval.increment();
 
-
         //TODO cache eval terms
         Term c1 = b1.eval(d);
-        if (c1 instanceof Variable || c1 instanceof Bool) return true;
 
+        if (c1!=null && (c1 instanceof Variable || c1 instanceof Bool || !c1.hasAny(Op.ATOM)))
+            return true;
+
+
+
+        // 3. TEMPORALIZE --
 
         Truth truth = d.concTruth;
 

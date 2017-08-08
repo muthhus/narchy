@@ -148,7 +148,7 @@ public interface NAct {
     }
 
     default <A extends ActionConcept> A addAction(A c) {
-        CauseChannel existing = actions().put(c, nar().newInputChannel(c));
+        CauseChannel existing = actions().put(c, nar().newCauseChannel(c));
         assert(existing == null);
         nar().on(c);
         return c;

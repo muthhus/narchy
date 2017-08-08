@@ -31,6 +31,9 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     public GenericCompoundDT(Compound base, int dt) {
         super(base);
 
+        if (dt!=XTERNAL && dt!=DTERNAL && Math.abs(dt) > Integer.MAX_VALUE/512) {
+            System.err.println("suspicious dt " + dt);
+        }
 
         if (Param.DEBUG) {
 
@@ -53,6 +56,10 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         this.dt = dt;
 
         assert dt != DTERNAL || this instanceof PatternCompound : "use GenericCompound if dt==DTERNAL";
+
+        if (dt!=DTERNAL && dt!=XTERNAL)
+            assert(Math.abs(dt) < Param.DT_ABS_LIMIT): "abs(dt) limit reached: " + dt;
+
         int baseHash = base.hashCode();
         this.hashDT = dt != DTERNAL ? Util.hashCombine(baseHash, dt) : baseHash;
     }

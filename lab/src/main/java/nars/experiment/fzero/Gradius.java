@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import static nars.term.atom.Atomic.the;
 import static spacegraph.SpaceGraph.window;
+import static spacegraph.layout.Grid.col;
 
 /**
  * Created by me on 4/30/17.
@@ -31,14 +32,21 @@ public class Gradius extends NAgentX {
         //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
         senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.02f);
 
+        float width = g.getWidth();
         float height = g.getHeight();
-        @NotNull ScalarConcepts yPos = senseNumber($.inh(the("yPos"), id),
+        @NotNull ScalarConcepts yPos = senseNumber($.p(id, the("Y")),
                 ()->g.player[Gradius4K.OBJ_Y] / height,
-                8,
-                //ScalarConcepts.Hard
-                ScalarConcepts.FuzzyTriangle
+                3, ScalarConcepts.FuzzyTriangle
         ).resolution(0.1f);
-        window(Vis.conceptBeliefPlots(this, yPos, 4),
+        @NotNull ScalarConcepts xPos = senseNumber($.p(id, the("X")),
+                ()->g.player[Gradius4K.OBJ_X] / width,
+                3, ScalarConcepts.FuzzyTriangle
+        ).resolution(0.1f);
+        window(
+                col(
+                        Vis.conceptBeliefPlots(this, xPos, 4),
+                        Vis.conceptBeliefPlots(this, yPos, 4)
+                ),
                 500, 500);
 
 
@@ -141,7 +149,7 @@ public class Gradius extends NAgentX {
 
             return a;
 
-        }, 15f);
+        }, 25f);
 
     }
 
