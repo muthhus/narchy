@@ -12,6 +12,7 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Subst;
+import nars.term.var.Variable;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -660,6 +661,9 @@ public class Temporalize {
      */
     void know(@Nullable Event parent, Term term, int start, int end) {
 
+        if (term instanceof Variable)
+            return; //ignore variable temporality because it can conflict
+
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
         if (parent == null || parent.term != term) {
             List<Event> exist = constraints.get(term);
@@ -800,7 +804,8 @@ public class Temporalize {
                 return ss.neg();
             else
                 return null;
-        } else if (o.temporal && target.dt() == XTERNAL) {
+        } else
+        if (o.temporal && target.dt() == XTERNAL) {
             TermContainer tt = target.subterms();
 
             int tts = tt.size();

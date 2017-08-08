@@ -17,12 +17,14 @@ import com.googlecode.lanterna.terminal.ansi.TelnetTerminal;
 import com.googlecode.lanterna.terminal.ansi.TelnetTerminalServer;
 import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import jcog.bag.impl.PLinkArrayBag;
+import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.event.On;
 import jcog.pri.PLink;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import nars.control.Activate;
+import nars.control.NARService;
 import nars.nlp.Hear;
 import nars.op.Command;
 import nars.task.ITask;
@@ -47,17 +49,16 @@ public class TextUI {
     final static org.slf4j.Logger logger = LoggerFactory.getLogger(TextUI.class);
     private final NAR nar;
 
-    final Set<TelnetSession> sessions = Sets.newConcurrentHashSet();
+    final Set<TextGUI> sessions = Sets.newConcurrentHashSet();
 
     public TextUI(NAR n) {
         this.nar = n;
     }
 
-    public DefaultVirtualTerminal session() {
+    public DefaultVirtualTerminal session(float fps) {
         DefaultVirtualTerminal vt = new DefaultVirtualTerminal(new TerminalSize(80, 25));
-        TelnetSession session = new TelnetSession(vt);
+        TextGUI session = new TextGUI(nar, vt, fps);
         sessions.add(session);
-        session.start();
         return vt;
     }
 
@@ -69,10 +70,9 @@ public class TextUI {
             TelnetTerminal conn = server.acceptConnection();
             if (conn != null) {
                 logger.info("connect from {}", conn.getRemoteSocketAddress());
-                TelnetSession session = new TelnetSession(conn);
-                session.setUncaughtExceptionHandler((t, e) -> session.end());
+                TextGUI session = new TextGUI(n, conn, 10f);
+                //session.setUncaughtExceptionHandler((t, e) -> session.end());
                 sessions.add(session);
-                session.start();
             }
         }
     }
@@ -101,17 +101,40 @@ public class TextUI {
     }
 
 
-    private class TelnetSession extends Thread {
+    private class TextGUI extends NARService implements Runnable {
 
 
-        private static final long GUI_UPDATE_MS = 250;
-
+        public final FloatParam guiUpdateFPS;
         private final Terminal terminal;
         private TerminalScreen screen;
+        private Thread thread = null;
 
-
-        public TelnetSession(Terminal terminal) {
+        public TextGUI(NAR nar, Terminal terminal, float fps) {
+            super(nar);
             this.terminal = terminal;
+            this.guiUpdateFPS = new FloatParam(fps, 0.01f, 20f);
+            sessions.add(this);
+        }
+
+        @Override
+        protected void start(NAR nar) {
+            super.start(nar);
+            synchronized (terminal) {
+                thread = new Thread(this);
+                thread.setUncaughtExceptionHandler((t, e) -> {
+                    end();
+                });
+                thread.start();
+            }
+        }
+
+        @Override
+        protected void stop(NAR nar) {
+            synchronized (terminal) {
+                thread.interrupt();
+                thread = null;
+            }
+            super.stop(nar);
         }
 
         @Override
@@ -120,53 +143,58 @@ public class TextUI {
 
             try {
                 if (terminal instanceof ANSITerminal)
-                    ((ANSITerminal)terminal).setMouseCaptureMode(MouseCaptureMode.CLICK);
+                    ((ANSITerminal) terminal).setMouseCaptureMode(MouseCaptureMode.CLICK);
 
                 screen = new TerminalScreen(terminal);
                 screen.startScreen();
+            } catch (IOException e) {
+                logger.warn("{} {}", this, e.getMessage());
+                end();
+                return;
+            }
 
 
-                final MultiWindowTextGUI textGUI = new MultiWindowTextGUI(screen);
-                textGUI.setBlockingIO(false);
-                //textGUI.setEOFWhenNoWindows(true);
+            final MultiWindowTextGUI textGUI = new MultiWindowTextGUI(screen);
+            textGUI.setBlockingIO(false);
+            //textGUI.setEOFWhenNoWindows(true);
 
 
-                TextColor.Indexed limegreen = TextColor.ANSI.Indexed.fromRGB(127, 255, 0);
-                TextColor.Indexed orange = TextColor.ANSI.Indexed.fromRGB(255, 127, 0);
-                TextColor.Indexed darkblue = TextColor.ANSI.Indexed.fromRGB(5, 5, 80);
-                TextColor.Indexed darkgreen = TextColor.ANSI.Indexed.fromRGB(5, 80, 5);
+            TextColor.Indexed limegreen = TextColor.ANSI.Indexed.fromRGB(127, 255, 0);
+            TextColor.Indexed orange = TextColor.ANSI.Indexed.fromRGB(255, 127, 0);
+            TextColor.Indexed darkblue = TextColor.ANSI.Indexed.fromRGB(5, 5, 80);
+            TextColor.Indexed darkgreen = TextColor.ANSI.Indexed.fromRGB(5, 80, 5);
 
-                TextColor.Indexed white = TextColor.ANSI.Indexed.fromRGB(255, 255, 255);
-                SimpleTheme st = SimpleTheme.makeTheme(
+            TextColor.Indexed white = TextColor.ANSI.Indexed.fromRGB(255, 255, 255);
+            SimpleTheme st = SimpleTheme.makeTheme(
                                 /*SimpleTheme makeTheme(
                                     boolean activeIsBold,
                                      TextColor baseForeground,            TextColor baseBackground,
                                             TextColor editableForeground,            TextColor editableBackground,
                                                        TextColor selectedForeground,            TextColor selectedBackground,
                                                                TextColor guiBackground) {*/
-                        true,
-                        white, TextColor.ANSI.BLACK,
-                        orange, darkgreen,
-                        white, darkblue,
-                        TextColor.ANSI.BLACK
-                );
+                    true,
+                    white, TextColor.ANSI.BLACK,
+                    orange, darkgreen,
+                    white, darkblue,
+                    TextColor.ANSI.BLACK
+            );
 
 
-                st.setWindowPostRenderer(null);
+            st.setWindowPostRenderer(null);
 
-                textGUI.setTheme(st);
+            textGUI.setTheme(st);
 
-                final BasicWindow window = new BasicWindow();
-                window.setHints(List.of(Window.Hint.FULL_SCREEN, NO_POST_RENDERING));
-                window.setEnableDirectionBasedMovements(true);
+            final BasicWindow window = new BasicWindow();
+            window.setHints(List.of(Window.Hint.FULL_SCREEN, NO_POST_RENDERING));
+            window.setEnableDirectionBasedMovements(true);
 
 
-                //p.setSize(new TerminalSize(screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows())); //TODO update with resize
+            //p.setSize(new TerminalSize(screen.getTerminalSize().getColumns(), screen.getTerminalSize().getRows())); //TODO update with resize
 
-                //final Table<String> table2 = new Table<String>("Pri", "Term", "Truth");
-                //table.setCellSelection(true);
+            //final Table<String> table2 = new Table<String>("Pri", "Term", "Truth");
+            //table.setCellSelection(true);
 
-                //final TableModel<String> model = table.getTableModel();
+            //final TableModel<String> model = table.getTableModel();
 //                model.addRow("Row1", "Row1", "Row1");
 //                model.addRow("Row2", "Row2", "Row2");
 //                model.addRow("Row3", "Row3", "Row3");
@@ -182,64 +210,58 @@ public class TextUI {
 //                }).withBorder(Borders.singleLine("This is a button")));
 
 
-                Panel p = new Panel(new BorderLayout());
+            Panel p = new Panel(new BorderLayout());
 
-                Component options = Panels.horizontal(
-                        new CheckBox("Pause"),
-                        new ComboBox<>("Log", "Concepts")
-                );
+            Component options = Panels.horizontal(
+                    new CheckBox("Pause"),
+                    new ComboBox<>("Log", "Concepts")
+            );
 
-                p.addComponent(Panels.vertical(
-                        options
-                ), TOP);
-
-
-                ActionListBox menu = new ActionListBox();
-                Runnable defaultMenu;
-                menu.addItem("Tasks", defaultMenu = () -> {
-                    p.addComponent(new TaskListBox(64), CENTER);
-                });
-
-                menu.addItem("Concepts", () -> {
-                    p.addComponent(new BagListBox<Activate>(64) {
-                        @Override
-                        public void update() {
-                            nar.forEachConceptActive(this::add);
-                            super.update();
-                        }
-                    }, CENTER);
-                });
-                menu.addItem("Activity", () -> {
-                    p.addComponent(new BagListBox<ITask>(64) {
-                        @Override
-                        public void update() {
-                            nar.forEachProtoTask(this::add);
-                            super.update();
-                        }
-                    }, CENTER);
-                });
-
-                menu.addItem("Stats", () -> {
-                    p.addComponent(new EmotionDashboard(), CENTER);
-                });
+            p.addComponent(Panels.vertical(
+                    options
+            ), TOP);
 
 
-                final InputTextBox input = new InputTextBox();
-                p.addComponent(menu, LEFT);
-                p.addComponent(input, BOTTOM);
-                window.setComponent(p);
+            ActionListBox menu = new ActionListBox();
+            Runnable defaultMenu;
+            menu.addItem("Tasks", defaultMenu = () -> {
+                p.addComponent(new TaskListBox(64), CENTER);
+            });
 
-                textGUI.getGUIThread().invokeLater(defaultMenu);
-                textGUI.getGUIThread().invokeLater(input::takeFocus);
+            menu.addItem("Concepts", () -> {
+                p.addComponent(new BagListBox<Activate>(64) {
+                    @Override
+                    public void update() {
+                        nar.forEachConceptActive(this::add);
+                        super.update();
+                    }
+                }, CENTER);
+            });
+            menu.addItem("Activity", () -> {
+                p.addComponent(new BagListBox<ITask>(64) {
+                    @Override
+                    public void update() {
+                        nar.forEachProtoTask(this::add);
+                        super.update();
+                    }
+                }, CENTER);
+            });
 
-                textGUI.addWindowAndWait(window);
+            menu.addItem("Stats", () -> {
+                p.addComponent(new EmotionDashboard(), CENTER);
+            });
 
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
 
-                end();
-            }
+            final InputTextBox input = new InputTextBox();
+            p.addComponent(menu, LEFT);
+            p.addComponent(input, BOTTOM);
+            window.setComponent(p);
+
+            textGUI.getGUIThread().invokeLater(defaultMenu);
+            textGUI.getGUIThread().invokeLater(input::takeFocus);
+
+            textGUI.addWindowAndWait(window);
+
         }
 
         final void end() {
@@ -305,7 +327,10 @@ public class TextUI {
 
 
         On newGUIUpdate(/* TODO AtomicBoolean busy, */Runnable r) {
-            return nar.eventCycle.on(GUI_UPDATE_MS, (n) -> r.run());
+            return nar.eventCycle.on(
+                    System::currentTimeMillis,
+                    () -> Math.round(1000f / guiUpdateFPS.asFloat()),
+                    (n) -> r.run());
         }
 
         private class TaskListRenderer extends AbstractListBox.ListItemRenderer {
@@ -432,8 +457,9 @@ public class TextUI {
             public void add(X x) {
                 add(new PLink<>(x, priInfluenceRate * x.priElseZero()));
             }
+
             public void add(PLink<X> p) {
-                if (bag.put(p)!=null) {
+                if (bag.put(p) != null) {
 
                 }
 
@@ -443,14 +469,14 @@ public class TextUI {
             public void update() {
 
                 if (autoupdate || changed.compareAndSet(true, false)) {
-                    TextGUI gui = getTextGUI();
+                    com.googlecode.lanterna.gui2.TextGUI gui = getTextGUI();
                     if (gui != null) {
                         TextGUIThread guiThread = gui.getGUIThread();
                         if (guiThread != null) {
 
                             next.clear();
                             bag.commit();
-                            bag.forEach(visible.intValue(), t -> next.add(t.get()) );
+                            bag.forEach(visible.intValue(), t -> next.add(t.get()));
 
                             guiThread.invokeLater(this::render);
                         }
@@ -470,7 +496,6 @@ public class TextUI {
 
                 clearItems();
                 next.forEach(this::addItem);
-
 
 
                 //                        model.addRow(

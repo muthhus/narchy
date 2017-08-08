@@ -6,6 +6,7 @@ import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.pri.op.PriMerge;
 import jcog.util.FloatFloatToFloatFunction;
+import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
@@ -19,7 +20,7 @@ import static nars.Op.*;
 /**
  * NAR Parameters
  */
-public abstract class Param extends Services {
+public abstract class Param extends Services<Term,NAR> {
 
 
     /** must be big enough to support as many layers of compound terms as exist in an eval */

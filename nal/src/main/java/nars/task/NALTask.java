@@ -104,7 +104,7 @@ public class NALTask extends Pri implements Task {
         if (start!=ETERNAL && term.op() == CONJ) {
             int tdt = term.dtRange();
             if (tdt > 0) {
-                if (tdt > (start + end)) {
+                if (tdt > (end - start)) {
                     end = start + tdt; //keeps start (left)-aligned, end is stretched if necessary
                 }
             }  else if (tdt < 0) {

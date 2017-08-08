@@ -79,18 +79,27 @@ import java.util.stream.Stream;
  * @since 14.0
  */
 @GwtIncompatible
-public class Services<C, X>  {
+public class Services<X, C>  {
 
     private final C id;
     private final Executor exe;
 
-//    abstract public static class SubService<P,C,X> extends Services<C,X> implements Service<P> {
-//        private final P parent;
+//    abstract public static class SubService<C,X> extends Services<C,X> implements Service<C> {
 //
-//        public SubService(C id, P parent) {
+//        private final Services<?,C> parent;
+//
+//        public SubService(C id, Services<?,C> parent) {
 //            super(id);
 //            this.parent = parent;
+//            parent.add(id, this);
 //        }
+//
+//
+//        @Override
+//        public void stop(P x, Executor exe, @Nullable Runnable afterDelete) {
+//            super.stop();
+//        }
+//
 //    }
 
     enum ServiceState {
@@ -185,7 +194,7 @@ public class Services<C, X>  {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(Services.class);
 
-    public final ConcurrentMap<X, Service> services;
+    public final ConcurrentMap<X, Service<C>> services;
 
     public Services(C id) {
         this(id, ForkJoinPool.commonPool());
@@ -209,17 +218,17 @@ public class Services<C, X>  {
         this.services = new ConcurrentHashMap<>();
     }
 
-    public Stream<Service> stream() {
+    public Stream<Service<C>> stream() {
         return services.values().stream();
     }
 
-    public void add(X key, Service s) {
+    public void add(X key, Service<C> s) {
         add(key, s, true);
     }
 
 
-    public void add(X key, Service s, boolean start) {
-        Service removed = services.put(key, s);
+    public void add(X key, Service<C> s, boolean start) {
+        Service<C> removed = services.put(key, s);
 
         if (removed == s)
             return; //no change
@@ -245,8 +254,8 @@ public class Services<C, X>  {
      * @return this
      */
     @CanIgnoreReturnValue
-    public Services stop() {
-        for (Service service : services.values()) {
+    public Services<X,C> stop() {
+        for (Service<C> service : services.values()) {
             service.stop(id, exe, null);
         }
         return this;

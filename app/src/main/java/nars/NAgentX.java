@@ -326,7 +326,7 @@ abstract public class NAgentX extends NAgent {
 
                     grid(
                             new WindowButton("log", () -> Vis.logConsole(nar, 80, 25, new FloatParam(0f))),
-                            new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session()))),
+                            new WindowButton("top", () -> (new ConsoleTerminal(new nars.TextUI(nar).session(20f)))),
                             new WindowButton("prompt", () -> Vis.newInputEditor(), 300, 60)
                     ),
 

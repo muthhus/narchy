@@ -212,9 +212,9 @@ public class IRCNLP extends IRC {
 //    }
 
     void hear(String text, String src) throws Narsese.NarseseException {
-        text = text.toLowerCase();
+
         Hear.hear(nar, text, src, (t) -> {
-            return new Hear(nar, Hear.tokenize(t), src, 200);
+            return new Hear(nar, Hear.tokenize(t.toLowerCase()), src, 200);
 //            Compound f = $.func("SENTENCE", Hear.tokenize(t));
 //            nar.believe(0.5f, f, Tense.Present, 1f, 0.9f);
 //            return null;
@@ -277,7 +277,7 @@ public class IRCNLP extends IRC {
 //        n.addNAR(16, 0.25f);
         //n.addNAR(512, 0.25f);
 
-        n.start();
+
         //n.logBudgetMin(System.out, 0.75f);
 
         new Thread(() -> {
@@ -322,6 +322,8 @@ public class IRCNLP extends IRC {
             }
         });
 
+
+
         //n.log();
 
 //        for (int i = 0; i < 2; i++) {
@@ -359,6 +361,8 @@ public class IRCNLP extends IRC {
 
         Hear.wiki(n);
         //n.log();
+
+        n.start();
 
         bot.start();
 

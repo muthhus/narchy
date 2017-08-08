@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Services;
 import jcog.Texts;
 import nars.concept.Concept;
 import nars.op.Command;
@@ -16,6 +17,7 @@ import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static nars.Op.*;
@@ -95,9 +97,14 @@ public class Builtin {
         for (Concept t : Builtin.statik)
             nar.terms.set(t);
 
-        nar.on(Functor.f("service", (TermContainer c) -> {
-            return $.sete(nar.services.keySet());
-        }));
+        nar.on(Functor.f("service", (TermContainer c) ->
+            $.sete(
+                nar.services.entrySet().stream().map(
+                        (e) ->
+                            $.p(e.getKey(), $.the(e.getValue().state())))
+                            .toArray(Term[]::new)
+            )
+        ));
 
         /** subterm, but specifically inside an ellipsis. otherwise pass through */
         nar.on(Functor.f("esubterm", (TermContainer c) -> {
@@ -167,6 +174,7 @@ public class Builtin {
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
             int tdt = t.dt();
+            Term r;
             if (tdt == DTERNAL || tdt == 0) {
                 switch (t.size()) {
                     case 0:
@@ -174,10 +182,10 @@ public class Builtin {
                         throw new RuntimeException("degenerate conjunction cases");
 
                     case 2:
-                        return t.sub(nar.random().nextInt(2)); //one of the two
+                        r = t.sub(nar.random().nextInt(2)); //one of the two
 
                     default:
-                        return CONJ.the(tdt, dropRandom(nar.random(), t.subterms()));
+                        r = CONJ.the(tdt, dropRandom(nar.random(), t.subterms()));
                 }
             } else {
                 //recursive event-based decomposition and recomposition
@@ -189,8 +197,13 @@ public class Builtin {
                 int toRemove = nar.random().nextInt(ee.size());
                 ee.remove(toRemove);
 
-                return Op.conj(ee);
+                r = Op.conj(ee);
             }
+
+            if (r instanceof Variable)
+                return Null; //dont allow returning a variable as an event during decomposition
+
+            return r;
         }));
         nar.on(Functor.f2((Atom) $.the("conjEvent"), (Term c, Term when) -> {
             if (c.op() != CONJ || !(when instanceof Atom))
@@ -245,11 +258,20 @@ public class Builtin {
         );
 
         nar.on("clear", (op, args, n) -> {
-            n.clear();
-            n.runLater(() -> Command.log(n, "Ready. (" + n.terms.size() + " subconcepts)"));
+            n.runLater(() -> {
+                n.clear();
+                Command.log(n, "ready");
+            });
         });
-        nar.on("stat", (op, args, n) -> Command.log(n, n.emotion.summary() + ' ' + n.exe));
 
+        nar.on("stat", (op, args, n) -> Command.log(n,
+            $.p(
+                $.quote(n.emotion.summary()),
+                $.quote(n.terms.summary()),
+                $.quote(n.emotion.summary()),
+                $.quote(n.exe.toString())
+            )
+        ));
 
         nar.on(Functor.f("top", (args) -> {
 
@@ -268,8 +290,8 @@ public class Builtin {
             nar.forEachConceptActive(bc -> {
                 if (rows.size() < MAX_RESULT_LENGTH && (query == null || bc.toString().toLowerCase().contains(query))) {
                     rows.add($.p(
-                        bc.get().term(),
-                        $.the("$" + Texts.n4(bc.pri())) )
+                            bc.get().term(),
+                            $.the("$" + Texts.n4(bc.pri())))
                     );
                 }
             });
