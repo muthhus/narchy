@@ -6,6 +6,7 @@ import nars.control.Derivation;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
+import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.var.Variable;
@@ -108,7 +109,15 @@ public class Conclusion extends AbstractPred<Derivation> {
         Term c2;
         if (d.temporal) {
 
-            Term t1 = Temporalize.solve(d, c1, occ = new long[] { ETERNAL, ETERNAL } );
+            Term t1;
+            try {
+                t1 = Temporalize.solve(d, c1, occ = new long[]{ETERNAL, ETERNAL});
+            } catch (InvalidTermException t) {
+                if (Param.DEBUG) {
+                    logger.error("temporalize error: {} {} {}", d, c1, t.getMessage());
+                }
+                return true;
+            }
 
             //invalid or impossible temporalization; could not determine temporal attributes. seems this can happen normally
             if (t1 == null || t1 instanceof Variable || t1 instanceof Bool /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {

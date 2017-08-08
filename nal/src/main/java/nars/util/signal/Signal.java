@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
+import nars.concept.Concept;
 import nars.table.DefaultBeliefTable;
 import nars.task.SignalTask;
 import nars.term.Term;
@@ -68,7 +69,11 @@ public class Signal extends AtomicReference<SignalTask> {
 
 
                 if (current.stretchKey == null) {
-                    current.stretchKey = ((DefaultBeliefTable) ((BaseConcept) nar.concept(current)).table(current.punc)).temporal.stretch(current);
+                    Concept c = nar.concept(current);
+                    if (c!=null) {
+                        DefaultBeliefTable bt = (DefaultBeliefTable) ((BaseConcept) c).table(current.punc);
+                        current.stretchKey = bt.temporal.stretch(current);
+                    }
                 }
             }
 

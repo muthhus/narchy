@@ -31,9 +31,8 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     public GenericCompoundDT(Compound base, int dt) {
         super(base);
 
-        if (dt!=XTERNAL && dt!=DTERNAL && Math.abs(dt) > Integer.MAX_VALUE/512) {
-            System.err.println("suspicious dt " + dt);
-        }
+        if (!(dt==XTERNAL || dt==DTERNAL || Math.abs(dt) <  Param.DT_ABS_LIMIT))
+            throw new InvalidTermException(base.op(), dt, base.subterms(), "exceeded DT limit");
 
         if (Param.DEBUG) {
 

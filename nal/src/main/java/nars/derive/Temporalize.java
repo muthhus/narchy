@@ -793,15 +793,14 @@ public class Temporalize {
             return known;
 
         Op o = target.op();
-        /*;
+
         if (o == NEG) {
             Event ss = solve(target.unneg(), trail);
             if (ss != null)
                 return ss.neg();
             else
                 return null;
-        } else*/
-        if (o.temporal && target.dt() == XTERNAL) {
+        } else if (o.temporal && target.dt() == XTERNAL) {
             TermContainer tt = target.subterms();
 
             int tts = tt.size();
