@@ -97,6 +97,20 @@ public class Conclusion extends AbstractPred<Derivation> {
         if (c1!=null && (c1 instanceof Variable || c1 instanceof Bool))
             return true;
 
+        if (varIntro) {
+            //var intro before temporalizing.  otherwise any calculated temporal data may not applied to the changed term (ex: occ shift)
+            Term cu = DepIndepVarIntroduction.varIntro(c1, nar);
+            if (cu instanceof Variable || cu instanceof Bool || (cu.equals(c1) /* keep only if it differs */))
+                return true;
+
+//            Term Cv = normalizedOrNull(cu, d.terms,
+//                    d.temporal ? d.terms.retemporalizeZero : d.terms.retemporalizeDTERNAL //select between eternal and parallel depending on the premises's temporality
+//            );
+//            if (Cv == null)
+//                return true;
+
+            c1 = cu;
+        }
 
 
         // 3. TEMPORALIZE --
@@ -155,19 +169,6 @@ public class Conclusion extends AbstractPred<Derivation> {
             c2 = c1;
         }
 
-        if (varIntro) {
-            Term cu = DepIndepVarIntroduction.varIntro(c2, nar);
-            if (cu instanceof Variable || cu instanceof Bool || (cu.equals(c2) /* keep only if it differs */))
-                return true;
-
-//            Term Cv = normalizedOrNull(cu, d.terms,
-//                    d.temporal ? d.terms.retemporalizeZero : d.terms.retemporalizeDTERNAL //select between eternal and parallel depending on the premises's temporality
-//            );
-//            if (Cv == null)
-//                return true;
-
-            c2 = cu;
-        }
 
         byte punc = d.concPunc;
         @Nullable ObjectBooleanPair<Term> c3n = Task.tryContent(c2, punc, true);

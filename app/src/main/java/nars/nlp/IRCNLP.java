@@ -22,6 +22,9 @@ import static nars.Op.PROD;
 import static nars.time.Tense.ETERNAL;
 
 /**
+ *
+ * http://englishlearning.webgarden.es/menu/1st-and-2nd-eso-year/easy-reading-texts
+ *
  * $0.9;0.9;0.99$
  * <p>
  * $0.9;0.9;0.99$ (hear(?someone, $something) ==>+1 hear(I,$something)).
