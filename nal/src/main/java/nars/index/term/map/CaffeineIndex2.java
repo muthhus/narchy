@@ -1,20 +1,26 @@
 package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
+import nars.Op;
 import nars.Param;
 import nars.concept.PermanentConcept;
+import nars.index.util.TermContainerToOpMap;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.container.TermContainer;
+import nars.term.container.TermVector;
 import nars.term.var.Variable;
+import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.Nonnull;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 
-public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<Term,Termed> {
+public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<TermContainer, TermContainerToOpMap<Termed>> {
 
 
 //    @NotNull
@@ -23,11 +29,11 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 //    private final Map<Termed,Termed> atomics;
 
 
-    /** holds compounds and subterm vectors */
-    @NotNull public final Cache<Term, Termed> concepts;
-
-
-
+    /**
+     * holds compounds and subterm vectors
+     */
+    @NotNull
+    public final Cache<TermContainer, TermContainerToOpMap<Termed>> vectors;
 
 
 //    private static final Weigher<Term, Termed> weigher = (k, v) -> {
@@ -48,28 +54,28 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 //    };
 
 
-    final static Weigher<? super Term, ? super Termed> w = (k,v) -> {
-        if (v instanceof PermanentConcept) return 0;
-        else return
-                (v.complexity() + v.volume())/2;
-                //v.complexity();
-                //v.volume();
+
+    final static Weigher<TermContainer, TermContainerToOpMap> w = (k, v) -> {
+        return k.volume();
+        //return (k.complexity() + k.volume());
     };
 
-    public CaffeineIndex(long capacity) {
+    public CaffeineIndex2(long capacity) {
         this(capacity, null /*MoreExecutors.directExecutor()*/);
     }
 
-    /** use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms */
-    public CaffeineIndex(long capacity, @Nullable Executor exe) {
+    /**
+     * use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms
+     */
+    public CaffeineIndex2(long capacity, @Nullable Executor exe) {
         super();
 
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
-        Caffeine<Term, Termed> builder = Caffeine.newBuilder().removalListener(this);
+        Caffeine builder = Caffeine.newBuilder().removalListener(this);
         if (capacity > 0) {
             //builder.maximumSize(capacity);
-            builder.maximumWeight(capacity*10);
+            builder.maximumWeight(capacity * 10);
             builder.weigher(w);
         } else
             builder.softValues();
@@ -78,22 +84,21 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
             builder.recordStats();
 
 
-        if (exe!=null) {
+        if (exe != null) {
             builder.executor(exe);
         }
 
 
-
-        this.concepts = builder.build();
+        this.vectors = builder.build();
 
         //else
-          //  this.subterms = null;
+        //  this.subterms = null;
 
     }
 
     @Override
     public Stream<Termed> stream() {
-        return concepts.asMap().values().stream();
+        return vectors.asMap().values().stream().flatMap(x -> IntStream.range(0, TermContainerToOpMap.CAPACITY).mapToObj(x::get));
     }
 
     //    @Override
@@ -144,42 +149,74 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
 
     @Override
     public void remove(@NotNull Term x) {
-        concepts.invalidate(x);
+
+        TermContainerToOpMap<Termed> v = vectors.getIfPresent(vector(x));
+        if (v != null) {
+            v.set(x.op().id, null);
+
+//            if (v.getAndSet(x.op().id, null) != null) {
+//                if (v.isEmpty()) {
+//                    vectors.invalidate(v);
+//                }
+//            }
+        }
+
     }
 
+    static TermContainer vector(Term x) {
+        TermContainer xs = x.subterms();
+        return TermVector.the(ArrayUtils.add(xs.theArray() /* SAFE COPY */, x));
+    }
 
     @Override
     public void set(@NotNull Term src, @NotNull Termed target) {
-        concepts.asMap().merge(src, target, setOrReplaceNonPermanent);
+        vectorOrCreate(src).set(src.op().id, target);
+    }
+
+    private TermContainerToOpMap<Termed> vectorOrCreate(@NotNull Term x) {
+        return vectors.get(vector(x), TermContainerToOpMap::new);
     }
 
 
     @Override
     public void clear() {
-        concepts.invalidateAll();
+        vectors.invalidateAll();
     }
 
-    @Override
-    public void forEach(@NotNull Consumer<? super Termed> c) {
-        concepts.asMap().values().forEach(c::accept);
-    }
 
     @Override
     public int size() {
-        return (int) concepts.estimatedSize();
+        return (int) vectors.estimatedSize(); /* warning: underestimate */
     }
 
 
     @Override
     public Termed get(Term x, boolean createIfMissing) {
 
-        assert(!(x instanceof Variable)): "variables should not be stored in index";
 
+        assert (!(x instanceof Variable)) : "variables should not be stored in index";
+
+        Op op = x.op();
+        TermContainerToOpMap<Termed> v;
         if (createIfMissing) {
-            return concepts.get(x, conceptBuilder);
+            v = vectors.get(vector(x), k -> {
+
+                TermContainerToOpMap<Termed> t = new TermContainerToOpMap<>(k);
+
+                Termed p = conceptBuilder.apply(x);
+
+                if (p != null)
+                    t.compareAndSet(op.id, null, p);
+                //else: ?
+
+                return t;
+            });
         } else {
-            return concepts.getIfPresent(x);
+            v = vectors.getIfPresent(vector(x));
         }
+
+        return v != null ? v.get(op.id) : null;
+
     }
 
 //    @Override
@@ -205,23 +242,17 @@ public class CaffeineIndex extends MaplikeTermIndex implements RemovalListener<T
     @Override
     public @NotNull String summary() {
         //CacheStats s = cache.stats();
-        String s = concepts.estimatedSize() + " concepts, ";
-
-        if (Param.DEBUG)
-            s += ' ' + concepts.stats().toString();
+        String s = vectors.estimatedSize() + " vectors, ";
 
         return s + ' ' + super.summary();
         //(" + n2(s.hitRate()) + " hitrate, " +
-                //s.requestCount() + " reqs)";
+        //s.requestCount() + " reqs)";
 
     }
 
-    /** this will be called from within a worker task */
-    @Override public final void onRemoval(Term key, Termed value, @NotNull RemovalCause cause) {
 
-        if (value!=null)
-            onRemove(value);
+    @Override
+    public void onRemoval(TermContainer key, TermContainerToOpMap<Termed> value, RemovalCause cause) {
+        value.forEach(this::onRemove);
     }
-
-
 }

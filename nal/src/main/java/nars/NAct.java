@@ -44,7 +44,7 @@ public interface NAct {
             boolean next = d != null && d.freq() > 0.5f;
             return toggle(on, off, next);
         });
-        m.resolution(0.5f);
+        //m.resolution(0.5f);
         return addAction(m);
     }
 
@@ -143,7 +143,7 @@ public interface NAct {
 
             return null;
         });
-        m.resolution(1f);
+        //m.resolution(1f);
         return addAction(m);
     }
 

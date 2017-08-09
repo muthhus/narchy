@@ -58,7 +58,7 @@ public abstract class TermIndex implements TermContext {
 
     abstract public void clear();
 
-    abstract public void forEach(Consumer<? super Termed> c);
+
 
 
     /**
@@ -140,6 +140,10 @@ public abstract class TermIndex implements TermContext {
 
     abstract public Stream<Termed> stream();
 
+    /** default impl */
+    public void forEach(@NotNull Consumer<? super Termed> c) {
+        stream().forEach(c);
+    }
 
     /** un-normalized */
     @NotNull public <T extends Term> T termRaw(@NotNull String termToParse) throws Narsese.NarseseException {

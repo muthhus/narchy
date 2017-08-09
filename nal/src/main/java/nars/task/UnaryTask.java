@@ -15,7 +15,7 @@ abstract public class UnaryTask<X> extends PLink<X> implements ITask {
 
     protected UnaryTask(@NotNull X id, float pri) {
         super(id, pri);
-        this.hash = Util.hashCombine(getClass().hashCode(), id.hashCode());
+        this.hash = id.hashCode();
     }
 
 
