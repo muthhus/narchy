@@ -133,17 +133,17 @@ public class TemporalizeTest {
                 new Temporalize().knowTerm($.$("(a ==>-2 b)"), 0).toString());
     }
 
-    @Test
-    public void testEventizeEqui() throws Narsese.NarseseException {
-        assertEquals("b@2,b@2->a,a@0,a@-2->b,(a <=>+2 b)@0",
-                new Temporalize().knowTerm($.$("(a <=>+2 b)"), 0).toString());
-    }
-
-    @Test
-    public void testEventizeEquiReverse() throws Narsese.NarseseException {
-        assertEquals("b@0,b@-2->a,(b <=>+2 a)@0,a@2,a@2->b",
-                new Temporalize().knowTerm($.$("(a <=>-2 b)"), 0).toString());
-    }
+//    @Test
+//    public void testEventizeEqui() throws Narsese.NarseseException {
+//        assertEquals("b@2,b@2->a,a@0,a@-2->b,(a <=>+2 b)@0",
+//                new Temporalize().knowTerm($.$("(a <=>+2 b)"), 0).toString());
+//    }
+//
+//    @Test
+//    public void testEventizeEquiReverse() throws Narsese.NarseseException {
+//        assertEquals("b@0,b@-2->a,(b <=>+2 a)@0,a@2,a@2->b",
+//                new Temporalize().knowTerm($.$("(a <=>-2 b)"), 0).toString());
+//    }
 
     @Test
     public void testEventizeImplConj() throws Narsese.NarseseException {
@@ -390,21 +390,21 @@ public class TemporalizeTest {
 
     }
 
-    @Test
-    public void testImplToEquiCircularity() throws Narsese.NarseseException {
-        Temporalize t = new Temporalize();
-        t.knowTerm($.$("(x ==>+5 y)"), ETERNAL);
-        t.knowTerm($.$("(y ==>-5 x)"), ETERNAL);
-        assertEquals("(x <=>+5 y)@ETE", t.solve($.$("(x <=>+- y)")).toString());
-
-        //    @Test public void testImplToEquiCircularityAvg() throws Narsese.NarseseException {
-        //        Temporalize t = new Temporalize();
-        //        t.knowTerm($.$("(x ==>+6 y)"), ETERNAL);
-        //        t.knowTerm($.$("(y ==>-4 x)"), ETERNAL);
-        //        assertEquals("(x <=>+5 y)@ETE", t.solve($.$("(x <=>+- y)")).toString());
-        //    }
-
-    }
+//    @Test
+//    public void testImplToEquiCircularity() throws Narsese.NarseseException {
+//        Temporalize t = new Temporalize();
+//        t.knowTerm($.$("(x ==>+5 y)"), ETERNAL);
+//        t.knowTerm($.$("(y ==>-5 x)"), ETERNAL);
+//        assertEquals("(x <=>+5 y)@ETE", t.solve($.$("(x <=>+- y)")).toString());
+//
+//        //    @Test public void testImplToEquiCircularityAvg() throws Narsese.NarseseException {
+//        //        Temporalize t = new Temporalize();
+//        //        t.knowTerm($.$("(x ==>+6 y)"), ETERNAL);
+//        //        t.knowTerm($.$("(y ==>-4 x)"), ETERNAL);
+//        //        assertEquals("(x <=>+5 y)@ETE", t.solve($.$("(x <=>+- y)")).toString());
+//        //    }
+//
+//    }
 
     @Test
     public void testImplConjWTF() throws Narsese.NarseseException {

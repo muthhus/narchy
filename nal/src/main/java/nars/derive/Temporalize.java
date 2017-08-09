@@ -12,7 +12,6 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Subst;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -188,7 +187,7 @@ public class Temporalize {
             return +1;
         }
 
-        abstract public void apply(Map<Term, Time> trail);
+//        abstract public void apply(Map<Term, Time> trail);
     }
 
     static int dt(Event a, Event b, Map<Term, Time> trail) {
@@ -322,10 +321,10 @@ public class Temporalize {
             }
         }
 
-        @Override
-        public void apply(Map<Term, Time> trail) {
-            trail.put(term, Time.the(start, 0)); //direct set
-        }
+//        @Override
+//        public void apply(Map<Term, Time> trail) {
+//            trail.put(term, Time.the(start, 0)); //direct set
+//        }
 
         @Override
         public Event neg() {
@@ -368,7 +367,17 @@ public class Temporalize {
         return when != ETERNAL ? Long.toString(when) : "ETE";
     }
 
+    public SolutionEvent solution(Term term, Time start) {
+        long st = start.abs();
+        long et;
+        if (st == ETERNAL) et = ETERNAL;
+        else et = term.op() == CONJ ? st + term.dtRange() : st;
+
+        return new SolutionEvent(term, st, et);
+    }
+
     public class SolutionEvent extends AbsoluteEvent {
+
 
         SolutionEvent(Term term, long start) {
             this(term, start, start != ETERNAL ? start + term.dtRange() : ETERNAL);
@@ -490,12 +499,12 @@ public class Temporalize {
         }
 
 
-        @Override
-        public void apply(Map<Term, Time> trail) {
-            Time t = resolve(this.start, trail);
-            if (t != null)
-                trail.putIfAbsent(term, t); //direct set
-        }
+//        @Override
+//        public void apply(Map<Term, Time> trail) {
+//            Time t = resolve(this.start, trail);
+//            if (t != null)
+//                trail.putIfAbsent(term, t); //direct set
+//        }
 
         @Override
         public Event neg() {
@@ -582,16 +591,24 @@ public class Temporalize {
             model.know(d.beliefTerm, d, null);
         }
 
-        Map<Term, Temporalize.Time> times = new HashMap<>();
-        Event e = model.solve(pattern, times);
+        Map<Term, Temporalize.Time> trail = new HashMap<>();
+        Event e;
+        try {
+            e = model.solve(pattern, trail);
+        } catch (StackOverflowError er) {
+            logger.error("temporalize stack overflow: {} {}\n{} {}", d, pattern, model, trail);
+//            trail.clear();
+//            model.solve(pattern, trail);
+            return null;
+        }
         if (e != null) {
             if (e instanceof AbsoluteEvent) {
                 AbsoluteEvent a = (AbsoluteEvent) e; //faster, preferred since pre-calculated
                 occ[0] = a.start;
                 occ[1] = a.end;
             } else {
-                occ[0] = e.start(times).abs();
-                occ[1] = e.end(times).abs();
+                occ[0] = e.start(trail).abs();
+                occ[1] = e.end(trail).abs();
             }
 
             if (!(
@@ -790,6 +807,7 @@ public class Temporalize {
         return solve(target, new HashMap<>(target.volume()));
     }
 
+
     Event solve(Term target, Map<Term, Time> trail) {
 
         Event known = solveEvent(target, trail);
@@ -804,8 +822,7 @@ public class Temporalize {
                 return ss.neg();
             else
                 return null;
-        } else
-        if (o.temporal && target.dt() == XTERNAL) {
+        } else if (o.temporal && target.dt() == XTERNAL) {
             TermContainer tt = target.subterms();
 
             int tts = tt.size();
@@ -818,7 +835,7 @@ public class Temporalize {
                 Term t0 = tt.sub(0);
 
                 //decide subterm solution order intelligently: allow reverse if the 2nd subterm can more readily and absolutely temporalize
-                if (score(t1) > score(t0) || t1.volume() > t0.volume()) {
+                if (score(t1) > score(t0) /*|| t1.volume() > t0.volume()*/) {
                     dir = false; //reverse: solve simpler subterm first
                 }
 
@@ -941,18 +958,8 @@ public class Temporalize {
                     uncovered, true);
 
             for (Term c : constraints.keySet()) {
-//                if (c.equals(target))
-//                    continue;
-
-                if (trail.containsKey(c))
-                    continue;
-
-                trail.put(c, null);
 
                 Event ce = solve(c, trail);
-
-                if (trail.get(c) == null)
-                    trail.remove(c);
 
                 if (ce != null) {
                     if (uncovered.removeIf(c::containsRecursively)) {
@@ -1075,65 +1082,60 @@ public class Temporalize {
     }
 
     @Nullable
-    private Time solveTime(Term target, Map<Term, Time> trail) {
+    private Time solveTime(Term x, Map<Term, Time> trail) {
 
-        Time existing = trail.get(target);
-        if (existing != null) {
-//            if (existing == Unknown)
-//                return null;
-//            else
-            return existing;
+        if (trail.containsKey(x)) {
+            return trail.get(x);
         }
-        if (trail.containsKey(target))
-            return null; //being procesed beneath in the stack
 
 //        System.out.println(target + " ? " + trail);
 
-        trail.put(target, null); //placeholder to prevent infinite loop
 
-        Event e = solveEvent(target, trail);
+        Event e = solveEvent(x, trail);
         Time t;
         if (e != null) {
-            t = e.start(trail);
+            t = trail.get(x);
+            //t = e.start(trail);
         } else {
             t = null;
-        }
-
-        if (t != null) {
-            trail.put(target, t);
-        } else {
-            trail.remove(target); //remove the null plaeholder
         }
 
         return t;
     }
 
 
-    private Event solveEvent(Term target, Map<Term, Time> trail) {
+    private Event solveEvent(Term x, Map<Term, Time> trail) {
 
+        if (trail.containsKey(x)) {
+            Time xt = trail.get(x);
+            if (xt != null)
+                return solution(x, xt);
+            else
+                return null;
+        }
 
-        FasterList<Event> ea = constraints.get(target);
+        FasterList<Event> ea = constraints.get(x);
         if (ea == null)
             return null; //no idea how to solve that term
 
-
         int eas = ea.size();
         assert (eas > 0);
-
         if (eas > 1)
             ea.sortThis();
 
+
+        trail.put(x, null);
+
         for (int i = 0, eaSize = eas; i < eaSize; i++) {
-            Event x = ea.get(i);
-            Time xs = x.start(trail);
+            Event e = ea.get(i);
+            Time xs = e.start(trail);
             if (xs != null) {
-                return x;
+                trail.put(x, xs); //assign
+                return e; //solution(x, xs);
             }
-//                if (xs != Unknown) {
-            //System.out.println(target + " @ " + xs + " " + trail);
-//                    return x;
-//                }
         }
+
+        trail.remove(x); //remove placeholder
 
         return null;
     }
