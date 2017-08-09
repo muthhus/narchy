@@ -661,8 +661,8 @@ public class Temporalize {
      */
     void know(@Nullable Event parent, Term term, int start, int end) {
 
-        if (term instanceof Variable || (!term.hasAny(ATOM.bit | INT.bit)))
-            return; //ignore variable's and completely-variablized's temporalities because it can conflict
+//        if (term instanceof Variable || (!term.hasAny(ATOM.bit | INT.bit)))
+//            return; //ignore variable's and completely-variablized's temporalities because it can conflict
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
         if (parent == null || parent.term != term) {
