@@ -108,7 +108,7 @@ abstract public class NAgentX extends NAgent {
         //fps * 2f; //nyquist
 
         RealTime clock =
-                durFPS >= 10 ?
+                durFPS >= 10/2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
 
@@ -140,20 +140,20 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.9f);
 
 
-        float priFactor = 0.05f;
+        float priFactor = 0.25f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
-        n.termVolumeMax.setValue(24);
+        n.termVolumeMax.setValue(28);
 
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 64, BELIEF, 4, true, 4f);
+        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, false, 4f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
-        MySTMClustered stmGoal = new MySTMClustered(n, 64, GOAL, 3, true, 4f);
+        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, false, 4f);
         Inperience inp = new Inperience(n, 8, 0.02f);
-        //Abbreviation abb = new Abbreviation(n, "z", 7, 16, 0.1f, 32);
+        //Abbreviation abb = new Abbreviation(n, "z", 5, 16, 0.1f, 32);
 
 
         NAgent a = init.apply(n);

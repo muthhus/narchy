@@ -78,7 +78,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
         Caffeine builder = Caffeine.newBuilder().removalListener(this);
         if (capacity > 0) {
             //builder.maximumSize(capacity);
-            builder.maximumWeight(capacity * 10);
+            builder.maximumWeight(capacity * 4);
             builder.weigher(w);
         } else
             builder.softValues();
@@ -98,6 +98,8 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
         //  this.subterms = null;
 
     }
+
+
 
     @Override
     public Stream<Termed> stream() {

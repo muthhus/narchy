@@ -37,8 +37,10 @@
     (C --> X), X, set(X) |- (C --> dropAnySet(X)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
     (X --> C), X, set(X) |- (dropAnySet(X) --> C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
+//Set Un-recurser
+    ({ (V-->K), A..* }-->M), M |- ({V} --> (M,K)), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
-//NAL2:
+//Set Questions
 
     ([A] <-> [B]), (A <-> B), task("?") |- ([A] <-> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
     ({A} <-> {B}), (A <-> B), task("?") |- ({A} <-> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
@@ -46,5 +48,4 @@
     ([A] --> [B]), (A <-> B), task("?") |- ([A] --> [B]), (Belief:BeliefIdentity, Punctuation:Belief)
     ({A} --> {B}), (A <-> B), task("?") |- ({A} --> {B}), (Belief:BeliefIdentity, Punctuation:Belief)
 
-//set un-recurser
-    ({ (V-->K), A..* }-->M), M |- ({V} --> (M,K)), (Belief:StructuralDeduction)
+

@@ -249,8 +249,8 @@ public class Premise extends Pri implements ITask {
         if (now == ETERNAL)
             return ETERNAL;
 
-        //return now;
-        return now + dur;
+        return now;
+        //return now + dur;
         //return task.nearestTimeTo(now);
 
 //        if (task.isEternal()) {

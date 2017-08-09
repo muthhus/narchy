@@ -141,7 +141,7 @@
             <!-- https://vimeo.com/12165742 -->
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>23.0-rc1</version>
+            <version>23.0</version>
         </dependency>
 
 
