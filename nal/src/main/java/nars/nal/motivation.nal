@@ -14,7 +14,6 @@
 
     X, (Y==>X), task("!") |-          Y, (Punctuation:Quest)
     X, (X==>Y), task("!") |-          Y, (Punctuation:Quest)
-    X, (Y<=>X), task("!") |-          Y, (Punctuation:Quest)
     X,  (X&&Y), task("!") |-          Y, (Punctuation:Quest)
 
     //question the precondition state

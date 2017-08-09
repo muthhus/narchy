@@ -47,8 +47,8 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0, 10)
 
                 //equivalent:
-                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)
-                .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)
+//                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)
+//                .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)
 
                 //equivalent:
                 .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
@@ -65,7 +65,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(10, "x:after. :|:")
                 .mustBelieve(cycles, "(--x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0, 10)
                 .mustBelieve(cycles, "(x:after ==>-10 x:before)", 0.00f, 0.45f /*inductionConf*/, 0, 10)
-                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0, 10)
+//                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0, 10)
                 .mustBelieve(cycles, "(--x:before &&+10 x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
         ;
     }
@@ -78,7 +78,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(10, "--x:after. :|:")
                 .mustBelieve(cycles, "(x:before ==>+10 x:after)", 0.00f, 0.45f /*abductionConf*/, 0, 10)
                 .mustBelieve(cycles, "(--x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0, 10)
-                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0, 10)
+//                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0, 10)
                 .mustBelieve(cycles, "(x:before &&+10 --x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
                 .mustNotOutput(cycles, "(x:before &&-10 --x:after)", BELIEF, 0, 10)
         ;
@@ -102,8 +102,10 @@ public class NAL7Test extends AbstractNALTest {
         test
 
                 .believe("( open($x, door) ==>+5 enter($x, room) )", 0.95f, 0.9f)
-                .believe("( enter($x, room) <=>+0 leave($x, corridor_100) )", 1.0f, 0.9f)
-                .mustBelieve(cycles * 2, "( open($1, door) ==>+5 leave($1, corridor_100) )", 0.95f, 0.81f)
+                //.believe("( enter($x, room) <=>+0 leave($x, corridor_100) )", 1.0f, 0.9f)
+                .believe("( enter($x, room) =|> leave($x, corridor_100) )", 1.0f, 0.9f)
+                .believe("( leave($x, corridor_100) =|> enter($x, room) )", 1.0f, 0.9f)
+                .mustBelieve(cycles * 2, "( open($1, door) ==>+5 leave($1, corridor_100) )", 0.95f, 0.77f /*0.81f*/)
                 .mustNotOutput(cycles * 2, "( open($1, door) ==>-5 leave($1, corridor_100) )", BELIEF, ETERNAL); //test correct dt polarity
 
     }
@@ -179,8 +181,8 @@ public class NAL7Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(z ==>-1 x)", BELIEF, ETERNAL)
                 .mustBelieve(cycles, "(x ==>-1 z)", 1.00f, 0.45f)
                 .mustNotOutput(cycles, "(x ==>+1 z)", BELIEF, ETERNAL)
-                .mustBelieve(cycles, "(z <=>+1 x)", 1.00f, 0.45f)
-                .mustNotOutput(cycles, "(z <=>-1 x)", BELIEF, ETERNAL)
+//                .mustBelieve(cycles, "(z <=>+1 x)", 1.00f, 0.45f)
+//                .mustNotOutput(cycles, "(z <=>-1 x)", BELIEF, ETERNAL)
         ;
 
     }
@@ -269,9 +271,9 @@ public class NAL7Test extends AbstractNALTest {
 
 
                 .mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f)
-                .mustBelieve(cycles, "(enter($1,room) ==>-9 hold($1,key) )", 0.8f, 0.42f)
-                .mustBelieve(cycles, "(hold($1,key) <=>+9 enter($1,room) )", 0.73f, 0.44f)
-                .mustNotOutput(cycles, "(hold($1,key) <=>-9 enter($1,room))", BELIEF, ETERNAL); //test correct dt polarity
+                .mustBelieve(cycles, "(enter($1,room) ==>-9 hold($1,key) )", 0.8f, 0.42f);
+//                .mustBelieve(cycles, "(hold($1,key) <=>+9 enter($1,room) )", 0.73f, 0.44f)
+//                .mustNotOutput(cycles, "(hold($1,key) <=>-9 enter($1,room))", BELIEF, ETERNAL); //test correct dt polarity
 
     }
 
@@ -392,7 +394,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.inputAt(1, "<door --> open>. :|:");
         tester.inputAt(2, "<room --> enter>. :|:");
 
-        tester.mustBelieve(cycles, "(<door --> open> <=>+1 <room --> enter>)",
+        tester.mustBelieve(cycles, "(<door --> open> ==>+1 <room --> enter>)",
                 1.00f, 0.45f,
                 1, 2);
     }
@@ -448,7 +450,7 @@ public class NAL7Test extends AbstractNALTest {
 
         //note: this result is reversed (pred equiv direction AND the occurrence time) from the original NAL7 test but its semantics are equivalent
         tester.mustBelieve(cycles,
-                "(enter($1,room) <=>-2 open($1,door))",
+                "(enter($1,room) ==>-2 open($1,door))",
                 1.00f, 0.45f,
                 0, 2
         );
@@ -593,13 +595,13 @@ public class NAL7Test extends AbstractNALTest {
                         "(b:x ==>-10 a:x)",
                         0.1f, 0.37f,
                         0, 10)
-                .mustBelieve(cycles,
-                        "(a:x <=>+10 b:x)", 0.27f, 0.41f, // and here, as a result of the comparison truth function's asymmetry
-                        0, 10)
-                .mustBelieve(cycles,
-                        "(($1 --> a) <=>+10 ($1 -->b))",
-                        0.27f, 0.41f,
-                        0, 10)
+//                .mustBelieve(cycles,
+//                        "(a:x <=>+10 b:x)", 0.27f, 0.41f, // and here, as a result of the comparison truth function's asymmetry
+//                        0, 10)
+//                .mustBelieve(cycles,
+//                        "(($1 --> a) <=>+10 ($1 -->b))",
+//                        0.27f, 0.41f,
+//                        0, 10)
         ;
 
     }
@@ -746,7 +748,7 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .input("(p ==>+1 m).")
                 .input("(s ==>+4 m).")
-                .mustBelieve(cycles, "(s <=>+3 p).", 1f, 0.45f);
+                .mustBelieve(cycles, "(s ==>+3 p).", 1f, 0.45f);
     }
 
     @Test
@@ -768,7 +770,7 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .input("(m ==>+1 p).")
                 .input("(m ==>+4 s).")
-                .mustBelieve(cycles, "(p <=>+3 s).", 1f, 0.45f);
+                .mustBelieve(cycles, "(p ==>+3 s).", 1f, 0.45f);
     }
 
 //    @Test public void testConditionalAbductionByDepVar() {
@@ -1104,7 +1106,7 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .believe("(x ==>+5 z)")
                 .believe("(y ==>+3 z)")
-                .mustBelieve(cycles, "( x <=>+2 y)", 1f, 0.45f)
+//                .mustBelieve(cycles, "( x <=>+2 y)", 1f, 0.45f)
                 .mustNotOutput(cycles, "( y ==>+2 x )", BELIEF, ETERNAL)
                 .mustNotOutput(cycles, "( y ==>-2 z )", BELIEF, ETERNAL)
                 .mustBelieve(cycles, "( (x &&+2 y) ==>+3 z)", 1f, 0.81f)
@@ -1174,9 +1176,9 @@ public class NAL7Test extends AbstractNALTest {
                 .believe("(e ==>-20 c)")
                 .mustBelieve(cycles, "(e ==>-30 b)", 1f, 0.45f)
                 .mustBelieve(cycles, "(b ==>+30 e)", 1f, 0.45f)
-                .mustBelieve(cycles, "(b <=>+30 e)", 1f, 0.45f)
-                .mustNotOutput(cycles, "(b ==>+20 e)", BELIEF, ETERNAL)
-                .mustNotOutput(cycles, "(b <=>-30 e)", BELIEF, ETERNAL);
+//                .mustBelieve(cycles, "(b <=>+30 e)", 1f, 0.45f)
+                .mustNotOutput(cycles, "(b ==>+20 e)", BELIEF, ETERNAL);
+//                .mustNotOutput(cycles, "(b <=>-30 e)", BELIEF, ETERNAL);
     }
 
     @Test
