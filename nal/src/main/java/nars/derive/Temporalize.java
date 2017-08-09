@@ -68,7 +68,12 @@ public class Temporalize {
                     else
                         s += 2;
                 } else {
-                    s+= (1f / (1 + ((RelativeEvent)e).rel.size()));  //decrease according to the related term's size
+                    Term tr = ((RelativeEvent) e).rel;
+
+                    if (tr.op() == NEG) //NEG relations are not trustable
+                        s += 0.1;
+                    else
+                        s += (1f / (1 + tr.size()));  //decrease according to the related term's size
                 }
             }
             return s;
@@ -187,55 +192,58 @@ public class Temporalize {
             return +1;
         }
 
-//        abstract public void apply(Map<Term, Time> trail);
     }
 
     static int dt(Event a, Event b, Map<Term, Time> trail) {
 
-        if (a instanceof AbsoluteEvent || b instanceof AbsoluteEvent) {
-            //at least one or both are absolute, forming a valid temporal grounding
-            Time ae = a.end(trail);
-            Time A = a.start(trail);
-            Time B = b.end(trail);
-            Time bs = b.start(trail);
-
-            int dt = dt(ae, bs);
-            //int dt = dt(A, B);
-
-//            if (dt != DTERNAL) {
-//                int shrink = dt(A, ae) + dt(bs, B);
-//                if (dt < 0)
-//                    dt += shrink;
-//                else //if (dt >= 0)
-//                    dt -= shrink;
-//            }
-
-            return dt;
-
-            //return dt(a.start(times), b.end(times));
-        }
+//        if (a instanceof AbsoluteEvent || b instanceof AbsoluteEvent) {
+//            //at least one or both are absolute, forming a valid temporal grounding
+//            Time ae = a.end(trail);
+////            Time A = a.start(trail);
+////            Time B = b.end(trail);
+//            Time bs = b.start(trail);
+//
+//            int dt = dt(ae, bs);
+//            //int dt = dt(A, B);
+//
+////            if (dt != DTERNAL) {
+////                int shrink = dt(A, ae) + dt(bs, B);
+////                if (dt < 0)
+////                    dt += shrink;
+////                else //if (dt >= 0)
+////                    dt -= shrink;
+////            }
+//
+//            return dt;
+//
+//            //return dt(a.start(times), b.end(times));
+//        }
 
         if (a instanceof RelativeEvent && b instanceof RelativeEvent) {
             RelativeEvent ra = (RelativeEvent) a;
             RelativeEvent rb = (RelativeEvent) b;
-            if (ra.rel.equals(rb.rel)) {
-                //easy case
-                if (rb.end >= ra.start)
-                    return rb.end - ra.start;
-                else
-                    return rb.start - ra.end;
+
+            if (ra.rel.equals(rb.rel)) { //easy case
+//                if (rb.end >= ra.start)
+//                    return rb.end - ra.start;
+//                else
+
+                return rb.start - ra.end;
+
             }
             if (ra.rel.equals(rb.term) && rb.rel.equals(ra.term)) {
                 //circular dependency: choose either, or average if they are opposite polarity
-                int forward = -ra.start;
+                int forward = -ra.end;
                 int reverse = rb.start;
                 if (Math.signum(forward) == Math.signum(reverse)) {
                     return (forward + reverse) / 2;
                 }
             }
-        }
 
-        return XTERNAL;
+        }
+        return dt(a.end(trail), b.start(trail));
+
+        //return XTERNAL;
     }
 
     static long[] intersect(Event a, Event b, Map<Term, Time> trail) {
@@ -581,7 +589,7 @@ public class Temporalize {
         model.dur = Param.DITHER_DT ? d.dur : 1;
 
         Op to = task.op();
-        boolean taskRooted = !task.isEternal() && (to != IMPL) || (belief == null || !belief.isEternal());
+        boolean taskRooted = (belief == null) || (!task.isEternal() && (to != IMPL));
         model.know(task, d, taskRooted);
 
         if (belief != null) {
@@ -632,7 +640,8 @@ public class Temporalize {
                 (rooted) ?
                         new AbsoluteEvent(taskTerm, task.start(), task.end())
                         :
-                        new AbsoluteEvent(taskTerm, ETERNAL, ETERNAL); //ambiently rooted if impl or equi
+                        null;
+                        //new AbsoluteEvent(taskTerm, ETERNAL, ETERNAL); //ambiently rooted if impl or equi
 
         know(taskTerm, d, root);
     }
@@ -939,11 +948,9 @@ public class Temporalize {
                 if (s0 != null) {
                     Event s1 = solve(tt.sub(1), trail);
                     if (s1 != null) {
-                        Time s0s = s0.start(trail);
-                        Time s1s = s1.start(trail);
-                        int dt = dt(s0s, s1s);
+                        int dt = dt(s0, s1, trail);
                         if (dt == 0 || dt == DTERNAL) {
-                            return new SolutionEvent(o.the(dt, tt.toArray()), s0s.abs());
+                            return new SolutionEvent(o.the(dt, tt.toArray()), s0.start(trail).abs());
                         }
                     }
                 }
@@ -1074,11 +1081,11 @@ public class Temporalize {
             Term newTerm = o.the(dt, a, b);
 
             long start = at.abs();
-            if (o == CONJ && start!=ETERNAL && dt!=DTERNAL) {
+            if (o == CONJ && start != ETERNAL && dt != DTERNAL) {
                 Time bt = eb.start(trail);
-                if (bt!=null) {
+                if (bt != null) {
                     long bStart = bt.abs();
-                    if (bStart!=ETERNAL) {
+                    if (bStart != ETERNAL) {
                         if (bStart < start)
                             start = bStart;
                     }

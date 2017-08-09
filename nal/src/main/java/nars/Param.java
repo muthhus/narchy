@@ -68,7 +68,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int TTL_UNIFY = 0;
 
     /** cost of attempting a derivation */
-    public static final int TTL_DERIVE_TASK_ATTEMPT = 1;
+    public static final int TTL_DERIVE_EVAL = 1;
 
     /** cost of a successful task derivation */
     public static final int TTL_DERIVE_TASK_SUCCESS = 1;

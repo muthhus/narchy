@@ -91,11 +91,10 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         /// 2. EVAL ----
 
-        d.use(Param.TTL_DERIVE_TASK_ATTEMPT);
+        d.use(Param.TTL_DERIVE_EVAL);
         nar.emotion.derivationEval.increment();
 
-        //TODO cache eval terms
-        Term c1 = b1.eval(d);
+        Term c1 = b1.eval(d); //TODO cache pure eval terms
 
         if (c1!=null && (c1 instanceof Variable || c1 instanceof Bool))
             return true;

@@ -687,7 +687,7 @@ public interface Term extends Termlike, Comparable<Term> {
     default Term unneg() {
         if (op() == NEG) {
             Term x = sub(0);
-            if (x instanceof Compound && isNormalized()) { //the unnegated content will also be normalized if this is
+            if (!x.isNormalized() && this.isNormalized()) { //the unnegated content will also be normalized if this is
                 ((Compound) x).setNormalized();
             }
             return x;
