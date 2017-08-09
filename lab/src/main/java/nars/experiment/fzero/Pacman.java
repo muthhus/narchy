@@ -18,23 +18,33 @@ public class Pacman extends NAgentX {
 
     private final PacMan g;
 
-    public Pacman(NAR nar) throws Narsese.NarseseException {
+    public Pacman(NAR nar)  {
         super("G", nar);
 
         this.g = new PacMan();
 
-//        senseCamera("G", g.view, 64, 64, (v) -> t(v, alpha()))
-//                .setResolution(0.01f);
-         Scale camScale = new Scale( new SwingBitmap2D(g.view), 64, 64);
+
+//        try {
+//            senseCamera("G", g.view, 64, 64)
+//                    .resolution(0.1f);
+//        } catch (Narsese.NarseseException e) {
+//            e.printStackTrace();
+//        }
+         Scale camScale = new Scale( new SwingBitmap2D(g.view), 24, 24);
             for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[] {
                     BufferedImageBitmap2D.ColorMode.R,
                     BufferedImageBitmap2D.ColorMode.G,
                     BufferedImageBitmap2D.ColorMode.B
             }) {
-                senseCamera("(G,c" + cm.name() + ")",
-                        camScale.filter(cm)
-                )
-                        .resolution(0.5f);
+                try {
+                    senseCamera("(G,c" + cm.name() + ")",
+                            camScale.filter(cm)//.blur()
+                    )
+                            .resolution(0.04f);
+
+                } catch (Narsese.NarseseException e) {
+                    e.printStackTrace();
+                }
             }
 
         actionTriState($.inh(Atomic.the("x"), id), (dh) -> {
@@ -84,18 +94,13 @@ public class Pacman extends NAgentX {
             return 2f * (Util.sigmoid(r) - 0.5f);
     }
 
-//    public static void main(String[] args) throws Narsese.NarseseException {
-//        Default n = NARBuilder.newMultiThreadNAR(
-//                2,
-//                new RealTime.DSHalf(true)
-//                        .durFPS(5f));
-//
-//        Pacman a = new Pacman(n);
-//        a.startRT(5f);
-//
-//
-//        NAgentX.chart(a);
-//
-//    }
+    public static void main(String[] args) {
+        NAgentX.runRT((n) -> {
+
+            Pacman a = new Pacman(n);
+            return a;
+
+        }, 5);
+    }
 
 }
