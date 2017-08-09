@@ -79,10 +79,10 @@ public interface Compound extends Term, IPair, TermContainer {
 
         return
                 (a.opX() == bb.opX())
-                &&
-                (a.subterms().equals(bb.subterms()))
-                &&
-                (a.dt() == bb.dt())
+                        &&
+                        (a.subterms().equals(bb.subterms()))
+                        &&
+                        (a.dt() == bb.dt())
                 ;
 
         //subterm sharing:
@@ -124,8 +124,6 @@ public interface Compound extends Term, IPair, TermContainer {
      * if the compound tracks normalization state, this will set the flag internally
      */
     void setNormalized();
-
-
 
 
     //    @NotNull
@@ -280,48 +278,49 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
 
+        if (equals(ty))
+            return true;
 
-        if (ty instanceof Compound) {
-            if (equals(ty))
-                return true;
-
-//            if (vars(subst.type) == 0)
-//                return false; //no free vars, the only way unification can proceed is if equal
-
-            Op op = op();
-            if (op != ty.op())
-                return false;
-
-            int xs;
-            if ((xs = size()) != ty.size())
-                return false;
-
-            Compound y = (Compound) ty;
-            if (op.temporal) {
-                int sdur = subst.dur;
-                if (sdur >= 0) {
-                    if (!matchTemporalDT(this, y, sdur))
-                        return false;
-                }
-            }
-
-            TermContainer xsubs = subterms();
-            TermContainer ysubs = y.subterms();
-
-
-            //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
-            if (isCommutative() || y.isCommutative() /* in case one is XTERNAL and the other isn't; to be sure use this */) {
-                return xsubs.unifyCommute(ysubs, subst);
-            } else {
-                return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
-            }
-
-        } else if (ty instanceof AliasConcept.AliasAtom) {
+        if (ty instanceof AliasConcept.AliasAtom) {
             Term abbreviated = ((AliasConcept.AliasAtom) ty).target;
             return abbreviated.equals(this) || unify(abbreviated, subst);
         }
 
-        return false;
+        int xs;
+        if ((xs = size()) != ty.size())
+            return false;
+
+//            if (vars(subst.type) == 0)
+//                return false; //no free vars, the only way unification can proceed is if equal
+
+        Op op = op();
+        if (op != ty.op())
+            return false;
+
+
+        Compound y = (Compound) ty;
+        if (op.temporal) {
+            int sdur = subst.dur;
+            if (sdur >= 0) {
+                if (!matchTemporalDT(this, y, sdur))
+                    return false;
+            }
+        }
+
+        TermContainer xsubs = subterms();
+        TermContainer ysubs = y.subterms();
+
+
+        //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
+        if (isCommutative() || y.isCommutative() /* in case one is XTERNAL and the other isn't; to be sure use this */) {
+            return xsubs.unifyCommute(ysubs, subst);
+        } else {
+            return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
+        }
+
+
+        /*} else */
+
 
     }
 
@@ -355,7 +354,6 @@ public interface Compound extends Term, IPair, TermContainer {
 //        }
 //        return ptr;
 //    }
-
 
 
     default Term sub(int i, @Nullable Term ifOutOfBounds) {
@@ -659,10 +657,9 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
-
-
     /* collects any contained events within a conjunction*/
-    @Override default void events(List<ObjectLongPair<Term>> events, long offset) {
+    @Override
+    default void events(List<ObjectLongPair<Term>> events, long offset) {
         Op o = op();
         if (o == CONJ) {
             int dt = dt();
@@ -726,7 +723,7 @@ public interface Compound extends Term, IPair, TermContainer {
         Term u;
         if (subsModified) {
             u = o.the(dt(), xy);
-            if (!(u instanceof Compound))
+            if (u.size() == 0)
                 return u; //atomic, including Bool short-circuits on invalid term
         } else {
             u = this;
@@ -742,9 +739,8 @@ public interface Compound extends Term, IPair, TermContainer {
                     if (ff instanceof Functor) {
                         u = ((Functor) ff).apply(((Compound) possibleArgs).subterms());
                         if (u instanceof AbstractPred) {
-                            u = $.the(((AbstractPred)u).test(null));
-                        }
-                        else if (u == null)
+                            u = $.the(((AbstractPred) u).test(null));
+                        } else if (u == null)
                             u = this; //null means to keep the same
 
                     }
@@ -759,7 +755,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
             //it has been changed, so eval recursively until stable
             try {
-                assert(u!=this): "equality tested previously should have included identity check";
+                assert (u != this) : "equality tested previously should have included identity check";
                 return u.evalSafe(index, remain);
             } catch (StackOverflowError e) {
                 logger.error("eval stack overflow: {} -> {}", this, u);
@@ -779,7 +775,6 @@ public interface Compound extends Term, IPair, TermContainer {
             return this;
 
 
-
         int vars = this.vars();
         int pVars = this.varPattern();
         int totalVars = vars + pVars;
@@ -787,7 +782,7 @@ public interface Compound extends Term, IPair, TermContainer {
         Term y;
         if (totalVars > 0) {
             y = transform(
-                    ((vars == 1) && (pVars == 0) && varOffset==0) ?
+                    ((vars == 1) && (pVars == 0) && varOffset == 0) ?
                             VariableNormalization.singleVariableNormalization //special case for efficiency
                             :
                             new VariableNormalization(totalVars /* estimate */, varOffset)
@@ -799,7 +794,7 @@ public interface Compound extends Term, IPair, TermContainer {
         }
 
         if (varOffset == 0 && y != null && y instanceof Compound)
-            ((Compound)y).setNormalized();
+            ((Compound) y).setNormalized();
 
         return y;
     }
@@ -844,7 +839,7 @@ public interface Compound extends Term, IPair, TermContainer {
             if (y == null)
                 return null;
 
-            if (y instanceof Compound) {
+            if (y.size() > 0) {
                 y = ((Compound) y).transform(t); //recurse
             }
 
@@ -943,8 +938,7 @@ public interface Compound extends Term, IPair, TermContainer {
         }
 
         Term y =
-                subsChanged ? o.the(nextDT, s) : this.dt(nextDT)
-        ;
+                subsChanged ? o.the(nextDT, s) : this.dt(nextDT);
         if (y == null)
             return Null;
 
@@ -961,7 +955,8 @@ public interface Compound extends Term, IPair, TermContainer {
         //atemporalizing can reset normalization state of the result instance
         //since a manual normalization isnt invoked. until here, which depends if the original input was normalized:
 
-        term = term.normalize(); if (term == null) return Null;
+        term = term.normalize();
+        if (term == null) return Null;
 
         return term.unneg();
     }
