@@ -89,8 +89,8 @@
 
 
     //answering
-    Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Y), Y, Z, strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
-    Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Y), X, Z, strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
+    Z, (X==>Y), task("?") |- subIfUnifiesAny((X ==>+- Z), Y, Z, strict), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+    Z, (X==>Y), task("?") |- subIfUnifiesAny((Z ==>+- Y), X, Z, strict), (Belief:BeliefStructuralAbduction, Punctuation:Belief)
 
     //strong unification
     //(Y==>X),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Deduction)

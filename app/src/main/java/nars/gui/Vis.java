@@ -169,9 +169,9 @@ public class Vis {
                     else
                          b = 2f * (t.freq()) -1f;
 
-                    backgroundColor[0] = b < 0 ? -b : 0;
+                    backgroundColor[0] = b < 0 ? -b/4f : 0;
                     backgroundColor[1] = 0;
-                    backgroundColor[2] = b >= 0 ? b : 0;
+                    backgroundColor[2] = b >= 0 ? b/4f : 0;
                     backgroundColor[3] = 0.9f;
 
                     super.paint(gl);
@@ -180,11 +180,16 @@ public class Vis {
             };
             p.setTitle(t.toString());
 //            p.add("P", () -> a.nar.pri(t, Float.NaN), 0f, 1f);
+//            p.add("G", () -> a.nar.concept(t).goalFreq(nar.time(), nar.dur()), 0f, 1f);
             p.add("B", () -> {
                 Truth b = a.nar.beliefTruth(t, a.nar.time());
                 return b!=null ? b.freq() : Float.NaN;
             }, 0f, 1f);
-//            p.add("G", () -> a.nar.concept(t).goalFreq(nar.time(), nar.dur()), 0f, 1f);
+            p.add("G", () -> {
+                Truth b = a.nar.goalTruth(t, a.nar.time());
+                return b!=null ? b.freq() : Float.NaN;
+            }, 0f, 1f);
+
             grid.children.add(p);
             plots.add(p);
         }

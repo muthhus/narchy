@@ -1,9 +1,9 @@
 package nars;
 
-import jcog.Services;
 import jcog.Texts;
 import nars.concept.Concept;
 import nars.op.Command;
+import nars.op.DepIndepVarIntroduction;
 import nars.op.Operator;
 import nars.op.data.*;
 import nars.op.data.intersect;
@@ -17,8 +17,8 @@ import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static nars.Op.*;
 import static nars.term.Functor.f0;
@@ -39,7 +39,14 @@ public class Builtin {
             new differ(),
             new union(),
             new substitute(),
-//            DepIndepVarIntroduction.the,
+
+            Functor.f1("varIntro", (x) -> {
+                Term y = DepIndepVarIntroduction.varIntro(x, ThreadLocalRandom.current());
+                if (y == null)
+                    return x; //no variables introduced, fall-through
+                else
+                    return y;
+            }),
 
             //Functor.f0("date", () -> quote(new Date().toString())),
 
@@ -98,12 +105,12 @@ public class Builtin {
             nar.terms.set(t);
 
         nar.on(Functor.f("service", (TermContainer c) ->
-            $.sete(
-                nar.services.entrySet().stream().map(
-                        (e) ->
-                            $.p(e.getKey(), $.the(e.getValue().state())))
-                            .toArray(Term[]::new)
-            )
+                $.sete(
+                        nar.services.entrySet().stream().map(
+                                (e) ->
+                                        $.p(e.getKey(), $.the(e.getValue().state())))
+                                .toArray(Term[]::new)
+                )
         ));
 
         /** subterm, but specifically inside an ellipsis. otherwise pass through */
@@ -265,12 +272,12 @@ public class Builtin {
         });
 
         nar.on("stat", (op, args, n) -> Command.log(n,
-            $.p(
-                $.quote(n.emotion.summary()),
-                $.quote(n.terms.summary()),
-                $.quote(n.emotion.summary()),
-                $.quote(n.exe.toString())
-            )
+                $.p(
+                        $.quote(n.emotion.summary()),
+                        $.quote(n.terms.summary()),
+                        $.quote(n.emotion.summary()),
+                        $.quote(n.exe.toString())
+                )
         ));
 
         nar.on(Functor.f("top", (args) -> {

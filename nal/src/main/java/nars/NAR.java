@@ -91,7 +91,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles<NAR>, TermContext {
 
     public static final Logger logger = LoggerFactory.getLogger(NAR.class);
-    static final Set<String> logEvents = Sets.newHashSet("eventTaskProcess", "eventAnswer", "eventExecute");
+    static final Set<String> logEvents = Sets.newHashSet("eventTask");
     static final String VERSION = "NARchy v?.?";
 
     @NotNull public final Executioner exe;

@@ -380,9 +380,13 @@ public class NAL7Test extends AbstractNALTest {
 
                 .input("open(John,door). :|:")
                 .inputAt(4, "enter(John,room). :|:")
-                .mustBelieve(cycles, "(open(John, door) <=>+4 enter(John, room))",
+                .mustBelieve(cycles, "(open(John, door) ==>+4 enter(John, room))",
                         1.00f, 0.45f,
-                        0, 4);
+                        0)
+                .mustBelieve(cycles, "(enter(John, room) ==>-4 open(John, door))",
+                        1.00f, 0.45f,
+                        4);
+        ;
 
     }
 
@@ -399,46 +403,6 @@ public class NAL7Test extends AbstractNALTest {
                 1, 2);
     }
 
-    @Test
-    public void induction_on_events3_simple_reversed() {
-        //TESTS COMMUTIVITY
-
-        test
-
-                .inputAt(0, "<room --> enter>. :|:")
-                .inputAt(4, "<door --> open>. :|:")
-                .mustBelieve(cycles, "(open:door <=>-4 enter:room)",
-                        1.00f, 0.45f,
-                        0, 4)
-                .mustBelieve(cycles, "(enter:room <=>+4 open:door)", //same as other condition
-                        1.00f, 0.45f,
-                        0, 4)
-
-        ;
-//        t.nar.onFrame(z -> {
-//            System.out.println("----" + z.time());
-//            t.nar.forEachConcept(dc -> System.out.println(dc));
-//        }
-    }
-
-//    @Test public void testInductGoalBelief() {
-//        test()
-//                
-//                .input("<room --> enter>! :|:")
-//                .inputAt(4, "<door --> open>. :|:")
-//                .mustNotOutput(16, "(open:door <=>-4 enter:room)", '!', 4)
-//                .mustNotOutput(16, "(open:door <=>-4 enter:room)", BELIEF, 4);
-//    }
-//    @Test public void testInductBeliefGoal() {
-//        test()
-//                
-//                .input("<room --> enter>. :|:")
-//                .inputAt(4, "<door --> open>! :|:")
-//                .mustDesire(cycles, "((door-->open) &&-4 (room-->enter))", 1f, 0.81f, 0)
-//                //.mustNotOutput(16, "(open:door <=>-4 enter:room)", '!', 4)
-//                //.mustNotOutput(16, "(open:door <=>-4 enter:room)", BELIEF, 4)
-//        ;
-//    }
 
     @Test
     public void induction_on_events_with_variable_introduction() {
@@ -452,7 +416,7 @@ public class NAL7Test extends AbstractNALTest {
         tester.mustBelieve(cycles,
                 "(enter($1,room) ==>-2 open($1,door))",
                 1.00f, 0.45f,
-                0, 2
+                2
         );
 
     }
@@ -696,15 +660,15 @@ public class NAL7Test extends AbstractNALTest {
         //         */
     }
 
-    @Test
-    public void temporalOrder() {
-
-        test
-
-                .input("(<m --> M> ==>+5 <p --> P>).")
-                .inputAt(10, "(<s --> S> <=>+0 <m --> M>). %0.9;0.9%")
-                .mustBelieve(cycles, "(<s --> S> ==>+5 <p --> P>)", 0.90f, 0.73f);
-    }
+//    @Test
+//    public void temporalOrder() {
+//
+//        test
+//
+//                .input("(<m --> M> ==>+5 <p --> P>).")
+//                .inputAt(10, "(<s --> S> <=>+0 <m --> M>). %0.9;0.9%")
+//                .mustBelieve(cycles, "(<s --> S> ==>+5 <p --> P>)", 0.90f, 0.73f);
+//    }
 
     @Test
     public void testTemporalConjunctionWithDepVarIntroduction() {
@@ -715,6 +679,7 @@ public class NAL7Test extends AbstractNALTest {
         */
 
         test
+                .log()
                 .inputAt(2, "a:x. :|: %1.0;0.45%")
                 .inputAt(5, "b:x. :|: %1.0;0.90%")
                 .mustBelieve(cycles, "(a:#1 &&+3 b:#1)", 1f, 0.40f, 2, 5)
@@ -1080,16 +1045,16 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
-    @Test
-    public void testReverseImpl() {
-
-        test
-
-                .believe("((x) ==>+5 (y))")
-                .believe("((y) ==>-5 (x))")
-                .mustBelieve(cycles, "((x) <=>+5 (y))", 1f, 0.81f)
-                .mustNotOutput(cycles, "((y) <=>+5 (x))", BELIEF, ETERNAL);
-    }
+//    @Test
+//    public void testReverseImpl() {
+//
+//        test
+//
+//                .believe("((x) ==>+5 (y))")
+//                .believe("((y) ==>-5 (x))")
+//                .mustBelieve(cycles, "((x) <=>+5 (y))", 1f, 0.81f)
+//                .mustNotOutput(cycles, "((y) <=>+5 (x))", BELIEF, ETERNAL);
+//    }
 
     @Test
     public void testPreconditionCombine() {

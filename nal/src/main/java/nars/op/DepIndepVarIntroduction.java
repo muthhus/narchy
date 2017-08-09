@@ -2,15 +2,17 @@ package nars.op;
 
 import jcog.list.FasterList;
 import nars.$;
-import nars.NAR;
 import nars.Op;
 import nars.term.Term;
 import nars.term.Terms;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectByteHashMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.function.ToIntFunction;
 
 import static nars.Op.*;
@@ -22,8 +24,17 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     static final VarIntro the = new VarIntro();
 
-    public static Term varIntro(Term x, NAR n) {
-        return the.introduce(x, n);
+    @Nullable public static Pair<Term, Map<Term, Term>> varIntroX(Term x, Random rng) {
+        return the.accept(x, rng);
+    }
+
+    @Nullable public static Term varIntro(Term x, Random rng) {
+        Pair<Term, Map<Term, Term>> result = varIntroX(x, rng);
+        if (result!=null) {
+            return result.getOne();
+        } else {
+            return null;
+        }
     }
 
     final static int ConjOrStatementBits = Op.IMPL.bit | Op.CONJ.bit; //NOT including similarity or inheritance because variables acorss these would be loopy
@@ -141,19 +152,6 @@ public class DepIndepVarIntroduction extends VarIntroduction {
 
     public static final class VarIntro extends DepIndepVarIntroduction {
 
-        @NotNull
-        public Term introduce(Term x, NAR n) {
-            Term[] only = { Null };
-
-            //temporarily unwrap negation
-            boolean negated = x.op() == NEG;
-            Term xx = negated ? x.unneg() : x;
-
-            accept(xx, y -> only[0] = y, n);
-
-            Term o = only[0];
-            return (o == Null) ? Null : $.negIf(o, negated);
-        }
     }
 
 }

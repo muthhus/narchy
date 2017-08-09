@@ -17,8 +17,7 @@ public class MapSubst1 implements Subst {
      * creates a substitution of one variable; more efficient than supplying a Map
      */
     public MapSubst1(@NotNull Term from, @NotNull Term to) {
-        if (Param.DEBUG && from.equals(to))
-            throw new RuntimeException("pointless substitution");
+        assert(!from.equals(to)): "pointless substitution";
 
         this.from = from;
         this.to = to;

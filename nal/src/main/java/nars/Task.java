@@ -114,8 +114,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
         //return true;
         //return false;
-        //return term().varIndep() > 0;
-        return term().varIndep() > 0 || term().op() == IMPL; //isAny(Op.IMPL.bit | Op.EQUI.bit);
+        return term().varIndep() > 0;
+        //return term().varIndep() > 0 || term().op() == IMPL; //isAny(Op.IMPL.bit | Op.EQUI.bit);
         //return true;
         //return op().temporal;
 

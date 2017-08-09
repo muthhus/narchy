@@ -181,18 +181,6 @@ public abstract class TermIndex implements TermContext {
         return cc;
     }
 
-
-    @Nullable
-    public final Term replace(@NotNull Term src, @NotNull Map<Term, Term> m) {
-        return new MapSubst(m).transform(src);
-    }
-
-    @Nullable
-    public final Term replace(@NotNull Term src, @NotNull Term from, @NotNull Term to) {
-        return new MapSubst1(from, to).transform(src);
-    }
-
-
     protected final void onRemove(Termed value) {
         if (value instanceof Concept) {
             if (value instanceof PermanentConcept) {

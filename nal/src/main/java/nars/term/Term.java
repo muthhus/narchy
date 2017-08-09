@@ -34,6 +34,9 @@ import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
+import nars.term.subst.MapSubst;
+import nars.term.subst.MapSubst1;
+import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.var.AbstractVariable;
@@ -50,6 +53,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
@@ -635,9 +639,9 @@ public interface Term extends Termlike, Comparable<Term> {
                 //hashcode serves as the ordering too
                 return Integer.compare(hashCode(), y.hashCode());
             } else if (this instanceof Int) {
-                return Integer.compare(((Int)this).id, ((Int)y).id);
+                return Integer.compare(((Int) this).id, ((Int) y).id);
             } else if (this instanceof Int.IntRange) {
-                return Long.compareUnsigned(((Int.IntRange)this).hash64(), ((Int.IntRange)y).hash64());
+                return Long.compareUnsigned(((Int.IntRange) this).hash64(), ((Int.IntRange) y).hash64());
             } else if (this instanceof AtomicToString) {
 //                boolean gx = this instanceof UnnormalizedVariable;
 //                boolean gy = y instanceof UnnormalizedVariable;
@@ -808,6 +812,31 @@ public interface Term extends Termlike, Comparable<Term> {
         return normalize(0);
     }
 
+
+    default Term replace(@NotNull Map<Term, Term> m) {
+        if (size() == 0) {
+            Term y = m.get(this); //atom substitutions
+            return y != null ? y : this;
+        } else {
+            Subst s;
+
+            if (m.size() == 1) {
+                Map.Entry<Term, Term> e = m.entrySet().iterator().next();
+                s = new MapSubst1(e.getKey(), e.getValue());
+            } else
+                s = new MapSubst(m);
+
+            return s.transform(this);
+        }
+    }
+
+    default Term replace(Term from, Term to) {
+        if (size() == 0) {
+            return equals(from) ? to : this; //atom substitution
+        } else {
+            return new MapSubst1(from, to).transform(this);
+        }
+    }
 
 }
 

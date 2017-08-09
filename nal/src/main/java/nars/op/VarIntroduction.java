@@ -2,15 +2,17 @@ package nars.op;
 
 import jcog.list.FasterList;
 import nars.$;
-import nars.NAR;
 import nars.term.Compound;
 import nars.term.Term;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.map.mutable.UnifiedMap;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Consumer;
 
 import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
@@ -28,22 +30,22 @@ public abstract class VarIntroduction {
 
     }
 
-    public void accept(@NotNull Term c, @NotNull Consumer<Term> each, NAR n) {
+    public Pair<Term, Map<Term, Term>> accept(@NotNull Term x, Random r) {
 
-        if (c.volume() < 2 || !c.hasAny(ConjOrStatementBits))
-            return; //earliest failure test
+        if (x.volume() < 2 || !x.hasAny(ConjOrStatementBits))
+            return null;
 
-        if (!(c.isNormalized())) {
-            Compound cc = compoundOrNull(normalizedOrNull(c));
+        if (!(x.isNormalized())) {
+            Compound cc = compoundOrNull(normalizedOrNull(x));
             if (cc == null)
-                return;
-            c = cc;
+                return null;
+            x = cc;
         }
 
-        List<Term> selections = select(c);
-        if (selections == null) return;
+        List<Term> selections = select(x);
+        if (selections == null) return null;
         int sels = selections.size();
-        if (sels == 0) return;
+        if (sels == 0) return null;
 
 
 
@@ -53,31 +55,32 @@ public abstract class VarIntroduction {
             //choose randomly
             //assert(maxSubstitutions==1); //only 1 and all (above) at implemented right now
             selections = $.newArrayList(
-                    selections.get(n.random().nextInt(sels))
+                    selections.get(r.nextInt(sels))
             );
         }
 
 
-        Map<Term,Term> substs = new UnifiedMap<>(0 /* pessimistic */);
+        Map<Term,Term> substs = new UnifiedMap<>(1, 1f);
 
-        int varOffset = c.vars(); //ensure the variables dont collide with existing variables
+        int varOffset = x.vars(); //ensure the variables dont collide with existing variables
         boolean found = false;
         for (int i = 0, selectionsSize = selections.size(); i < selectionsSize; i++) {
             Term u = selections.get(i);
-            Term v = next(c, u, ++varOffset);
+            Term v = next(x, u, ++varOffset);
             if (v != null) {
                 substs.put(u, v);
                 found = true;
             }
         }
         if (!found)
-            return; //nothing found to introduce a variable for
+            return null;
 
 
-        Term newContent = n.terms.replace(c, substs);
-
-        if (!newContent.equals(c)) {
-            each.accept(newContent);
+        Term y = x.replace(substs);
+        if (!y.equals(x)) {
+            return Tuples.pair(y, substs);
+        } else {
+            return null;
         }
 
 //        while (selections.hasNext()) {

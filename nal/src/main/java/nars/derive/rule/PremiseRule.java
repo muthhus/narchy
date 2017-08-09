@@ -772,7 +772,7 @@ public class PremiseRule extends GenericCompound {
         m.put(getConclusionTermPattern(), newR);
 
 
-        Compound remapped = (Compound) index.replace(this, m);
+        Compound remapped = (Compound) replace(m);
 
         //Append taskQuestion
         Compound pc = (Compound) remapped.sub(0);

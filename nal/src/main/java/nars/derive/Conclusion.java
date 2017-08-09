@@ -13,11 +13,14 @@ import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
+import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 import static nars.Op.GOAL;
 import static nars.time.Tense.DTERNAL;
@@ -97,26 +100,28 @@ public class Conclusion extends AbstractPred<Derivation> {
         if (c1!=null && (c1 instanceof Variable || c1 instanceof Bool))
             return true;
 
+        // 3. VAR INTRO
         if (varIntro) {
             //var intro before temporalizing.  otherwise any calculated temporal data may not applied to the changed term (ex: occ shift)
-            Term cu = DepIndepVarIntroduction.varIntro(c1, nar);
-            if (cu instanceof Variable || cu instanceof Bool || (cu.equals(c1) /* keep only if it differs */))
+            @Nullable Pair<Term, Map<Term, Term>> vc = DepIndepVarIntroduction.varIntroX(c1, d.random);
+            if (vc == null) return true;
+
+            Term v = vc.getOne();
+            if (v instanceof Bool || (v.equals(c1) /* keep only if it differs */))
                 return true;
 
-//            Term Cv = normalizedOrNull(cu, d.terms,
-//                    d.temporal ? d.terms.retemporalizeZero : d.terms.retemporalizeDTERNAL //select between eternal and parallel depending on the premises's temporality
-//            );
-//            if (Cv == null)
-//                return true;
+            if (d.temporal) {
+                Map<Term, Term> m = vc.getTwo();
+                m.forEach(d::putXY); //store the mapping so that temporalization can resolve with it
+            }
 
-            c1 = cu;
+            c1 = v;
         }
 
 
-        // 3. TEMPORALIZE --
+        // 4. TEMPORALIZE --
 
         Truth truth = d.concTruth;
-
 
         @NotNull final long[] occ;
 
@@ -170,6 +175,8 @@ public class Conclusion extends AbstractPred<Derivation> {
         }
 
 
+        //5. VALIDATE FOR TASK TERM
+
         byte punc = d.concPunc;
         @Nullable ObjectBooleanPair<Term> c3n = Task.tryContent(c2, punc, true);
         if (c3n != null) {
@@ -200,6 +207,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
 
+            //CONSTRUCT TASK
             DerivedTask t =
                     Param.DEBUG ?
                             new DebugDerivedTask(C, punc, truth, d, start, end, cause) :
@@ -211,7 +219,6 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             t.setPri(priority);
 
-
             if (Param.DEBUG)
                 t.log(rule);
 
@@ -219,11 +226,6 @@ public class Conclusion extends AbstractPred<Derivation> {
             d.use(Param.TTL_DERIVE_TASK_SUCCESS);
             return true;
         }
-
-        //        } catch (InvalidTermException | InvalidTaskException e) {
-//            if (Param.DEBUG_EXTRA)
-//                logger.warn("{} {}", m, e.getMessage());
-//        }
 
         d.use(Param.TTL_DERIVE_TASK_FAIL);
         return true;
