@@ -554,15 +554,6 @@ public interface $ {
     }
 
 
-    @Nullable
-    public static Term equi(Term subject, Term pred) {
-        return the(EQUI, subject, pred);
-    }
-
-    @Nullable
-    public static Term equi(Term subject, int dt, Term pred) {
-        return the(EQUI, dt, subject, pred);
-    }
 
     @Nullable
     public static Term diffi(Term a, Term b) {

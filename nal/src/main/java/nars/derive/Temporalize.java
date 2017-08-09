@@ -572,12 +572,12 @@ public class Temporalize {
         model.dur = Param.DITHER_DT ? d.dur : 1;
 
         Op to = task.op();
-        boolean taskRooted = !task.isEternal() && ((to != IMPL) && (to != EQUI)) || (belief == null || !belief.isEternal());
+        boolean taskRooted = !task.isEternal() && (to != IMPL) || (belief == null || !belief.isEternal());
         model.know(task, d, taskRooted);
 
         if (belief != null) {
             Op bo = belief.op();
-            model.know(belief, d, !taskRooted || ((bo != IMPL) && (bo != EQUI)));
+            model.know(belief, d, !taskRooted || (bo != IMPL));
         } else if (d.beliefTerm != null) {
             model.know(d.beliefTerm, d, null);
         }

@@ -488,10 +488,6 @@ public enum Op implements $ {
      */
     IMPL("==>", 5, OpType.Statement, Args.Two),
 
-    /**
-     * equivalence
-     */
-    EQUI("<=>", true, 5, OpType.Statement, Args.Two),
 
 
     // keep all items which are invlved in the lower 32 bit structuralHash above this line
@@ -544,7 +540,7 @@ public enum Op implements $ {
     @NotNull
     public static final Compound ZeroProduct = new GenericCompound(Op.PROD, TermContainer.NoSubterms);
 
-    public static final int StatementBits = Op.or(Op.INH, Op.SIM, Op.IMPL, Op.EQUI);
+    public static final int StatementBits = Op.or(Op.INH, Op.SIM, Op.IMPL);
 
     public static final int opBits = Op.or(Op.ATOM, Op.INH, Op.PROD);
     public static final int EvalBits = opBits; //just an alias for code readabiliy
@@ -626,8 +622,8 @@ public enum Op implements $ {
      */
     private static final int ANY_LEVEL = 0;
     public static final int SetBits = or(Op.SETe, Op.SETi);
-    public static final int ImplicationOrEquivalenceBits = or(Op.EQUI, Op.IMPL);
-    public static final int TemporalBits = or(Op.CONJ, Op.EQUI, Op.IMPL);
+    public static final int ImplicationOrEquivalenceBits = Op.IMPL.bit;
+    public static final int TemporalBits = or(Op.CONJ, Op.IMPL);
     public static final int VariableBits = or(Op.VAR_PATTERN, Op.VAR_INDEP, Op.VAR_DEP, Op.VAR_QUERY);
     public static final int[] NALLevelEqualAndAbove = new int[8 + 1]; //indexed from 0..7, meaning index 7 is NAL8, index 0 is NAL1
 
@@ -1195,9 +1191,9 @@ public enum Op implements $ {
 
                 //&& Math.abs(dt) > Param.DT_ABS_SAFETY_LIMIT
 
-                Term c1 = c.sub(1);
-                if (c1 instanceof Variable && c1.equals(c.sub(0)))
-                    return c.sub(0);
+//                Term c1 = c.sub(1);
+//                if (c1 instanceof Variable && c1.equals(c.sub(0)))
+//                    return c.sub(0);
 
             }
 
@@ -1218,9 +1214,8 @@ public enum Op implements $ {
     }
 
     public static final Predicate<Term> nonProduct = c -> c.op() != PROD;
-    private static final int InvalidEquivalenceTerm = or(IMPL, EQUI);
-    private static final int InvalidImplicationSubj = or(EQUI, IMPL);
-    private static final int InvalidImplicationPred = or(EQUI);
+    private static final int InvalidImplicationSubj = or(IMPL);
+    //private static final int InvalidImplicationPred = or(EQUI);
 
     @NotNull
     static Term statement(@NotNull Op op, int dt, @NotNull Term subject, @NotNull Term predicate) {
@@ -1265,85 +1260,6 @@ public enum Op implements $ {
                 break;
 
 
-            case EQUI:
-
-                if (concurrent(dt)) {
-                    if (subject == True) return predicate;
-                    if (subject == False) return NEG.the(predicate);
-                    if (predicate == True) return subject;
-                    if (predicate == False) return NEG.the(subject);
-                } else {
-                    if (subject == True || subject == False || predicate == True || predicate == False)
-                        return Null; //no temporal basis
-                }
-
-
-                boolean sn = subject.op() == NEG;
-                boolean pn = predicate.op() == NEG;
-                if (sn && pn) {
-                    subject = subject.unneg();
-                    predicate = predicate.unneg();
-                } else if (sn && !pn) {
-                    subject = subject.unneg();
-                    polarity = !polarity;
-                } else if (!sn && pn) {
-                    predicate = predicate.unneg();
-                    polarity = !polarity;
-                }
-
-                if (concurrent(dt) && subject.equals(predicate))
-                    return polarity ? True : False;
-                //else not concurrent and equivalent, allow
-
-
-                //return !t.opUnneg().in(InvalidEquivalenceTerm);
-                //        if ( instanceof Implication) || (subject instanceof Equivalence)
-//                || (predicate instanceof Implication) || (predicate instanceof Equivalence) ||
-//                (subject instanceof CyclesInterval) || (predicate instanceof CyclesInterval)) {
-//            return null;
-//        }
-                if (subject.hasAny(InvalidEquivalenceTerm))
-                    //throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
-                    return Null;
-
-                if (predicate.hasAny(InvalidEquivalenceTerm))
-                    //throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
-                    return Null;
-
-//                boolean subjNeg = subject.op() == NEG;
-//                boolean predNeg = predicate.op() == NEG;
-//                if (subjNeg && predNeg) {
-//                    subject = subject.unneg();
-//                    predicate = predicate.unneg();
-//                } else if (!subjNeg && predNeg) {
-//                    //factor out (--, ...)
-//                    return NEG.the(op.the(dt, subject, predicate.unneg()));
-//                } else if (subjNeg && !predNeg) {
-//                    //factor out (--, ...)
-//                    return NEG.the(op.the(dt, subject.unneg(), predicate));
-//                }
-                if (dt == XTERNAL) {
-                    return compound(op, XTERNAL, //op != EQUI || subject.compareTo(predicate) <= 0 ?
-                            subject, predicate);
-                    //subterms(predicate,subject));
-                }
-
-                boolean equal = subject.equals(predicate);
-                if (!concurrent(dt)) {
-//                    if (!equal && subject.compareTo(predicate) > 0) {
-//                        //swap
-//                        Term x = subject;
-//                        subject = predicate;
-//                        predicate = x;
-//                        dt = -dt;
-//                    }
-
-                    if (equal && dt < 0) {
-                        dt = -dt; //use only the forward direction on a repeat
-                    }
-                }
-
-                break;
 
             case IMPL:
 
@@ -1360,8 +1276,8 @@ public enum Op implements $ {
 
                 if (subject.hasAny(InvalidImplicationSubj))
                     return Null; //throw new InvalidTermException(op, dt, "Invalid equivalence subject", subject, predicate);
-                if (predicate.hasAny(InvalidImplicationPred))
-                    return Null; //throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
+//                if (predicate.hasAny(InvalidImplicationPred))
+//                    return Null; //throw new InvalidTermException(op, dt, "Invalid equivalence predicate", subject, predicate);
 
 
                 if (predicate.op() == NEG) {
@@ -1411,7 +1327,7 @@ public enum Op implements $ {
 //                    (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
 //                return False; //cyclic
 
-            if ((op == IMPL || op == EQUI)) { //TODO verify this works as it should
+            if (op == IMPL) { //TODO verify this works as it should
 
 
                 boolean subjConj = subject.op() == CONJ && concurrent(subject.dt());
@@ -1644,9 +1560,9 @@ public enum Op implements $ {
                 case IMPL:
                     s = ("=|>");
                     break;
-                case EQUI:
-                    s = ("<|>");
-                    break;
+//                case EQUI:
+//                    s = ("<|>");
+//                    break;
                 default:
                     throw new UnsupportedOperationException();
             }

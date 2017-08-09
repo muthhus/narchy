@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static nars.Op.VAR_INDEP;
+import static nars.rdfowl.NQuadsRDF.equi;
 import static nars.term.Terms.compoundOrNull;
 
 /**
@@ -271,7 +272,7 @@ public class KIFInput implements Runnable {
                     Term a = args.get(0);
                     Term b = args.get(1);
                     Variable v0 = nextVar(VAR_INDEP);
-                    y = $.equi($.prop(v0, a), $.neg($.prop(v0, b)));
+                    y = equi($.prop(v0, a), $.neg($.prop(v0, b)));
                 }
                 break;
             case "documentation":
@@ -376,7 +377,7 @@ public class KIFInput implements Runnable {
             return
                     implOrEquiv ?
                             $.impl(conditionTerm, actionTerm) :
-                            (Compound) $.equi(conditionTerm, actionTerm)
+                            (Compound) equi(conditionTerm, actionTerm)
                     ;
         } catch (Exception ignore) {
             ignore.printStackTrace();

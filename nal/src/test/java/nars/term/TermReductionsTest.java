@@ -14,7 +14,6 @@ import static nars.$.conj;
 import static nars.$.diffe;
 import static nars.$.diffi;
 import static nars.$.disj;
-import static nars.$.equi;
 import static nars.$.impl;
 import static nars.$.inh;
 import static nars.$.neg;
@@ -131,14 +130,14 @@ public class TermReductionsTest extends NarseseTest {
         assertTrue($("task((polarize(%1,task) <=>+- polarize(%2,belief)))") instanceof Compound);
     }
 
-    @Test
-    public void testInvalidEquivalences() throws Narsese.NarseseException {
-        assertEquals("(P<=>Q)", equi(p, q).toString());
-
-        assertInvalid(() -> equi(impl(p, q), r));
-        assertInvalid(() -> equi(equi(p, q), r));
-        assertInvalidTerms("<<a <=> b> <=> c>");
-    }
+//    @Test
+//    public void testInvalidEquivalences() throws Narsese.NarseseException {
+//        assertEquals("(P<=>Q)", equi(p, q).toString());
+//
+//        assertInvalid(() -> equi(impl(p, q), r));
+//        assertInvalid(() -> equi(equi(p, q), r));
+//        assertInvalidTerms("<<a <=> b> <=> c>");
+//    }
 
 
     @Test

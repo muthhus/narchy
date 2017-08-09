@@ -178,11 +178,11 @@ public class Premise extends Pri implements ITask {
                     }
                 }
             } else {
-                long when = whenMatch(task, now);
+                long when = focus(task, now, dur);
 
                 boolean tryMatch = true;
                 if (beliefIsTask && task.punc()==BELIEF && task.during(when)) {
-                    if (Math.abs(when-now) >= dur) {
+                    if (Math.abs(when-now) > 0 /*= dur*/) {
                         //try projecting to now (maybe also a future time) because it will be a different time
                         when = now;
                     } else {
@@ -245,11 +245,19 @@ public class Premise extends Pri implements ITask {
     /**
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
-    static long whenMatch(Task task, long now) {
-        if (task.isEternal()) {
+    static long focus(Task task, long now, int dur) {
+        if (now == ETERNAL)
             return ETERNAL;
-        } else //if (task.isInput()) {
-            return task.nearestTimeTo(now);
+
+        //return now;
+        return now + dur;
+        //return task.nearestTimeTo(now);
+
+//        if (task.isEternal()) {
+//            return ETERNAL;
+//        } else //if (task.isInput()) {
+//            return task.nearestTimeTo(now);
+
 //        } else {
 //            if (task.isBelief()) {
 //                return now +

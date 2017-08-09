@@ -25,7 +25,7 @@ import static nars.Op.GOAL;
 public class GoalActionConcept extends ActionConcept {
 
 
-    public static final float CURIOSITY_CONF_FACTOR = 0.5f;
+    public static final float CURIOSITY_CONF_FACTOR = 0f;
 
     public final Signal feedback;
     public final Signal action;
@@ -104,7 +104,7 @@ public class GoalActionConcept extends ActionConcept {
 
             float curiConf =
                     //nar.confDefault(GOAL);
-                    Math.max(goal!=null ? Math.min(nar.confDefault(GOAL),goal.conf()) * CURIOSITY_CONF_FACTOR : 0, nar.confMin.floatValue());
+                    Math.max(goal!=null ? nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR : 0, nar.confMin.floatValue());
 
                     //nar.confMin.floatValue()*2f;
 

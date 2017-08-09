@@ -115,7 +115,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         //return true;
         //return false;
         //return term().varIndep() > 0;
-        return term().varIndep() > 0 || term().isAny(Op.IMPL.bit | Op.EQUI.bit);
+        return term().varIndep() > 0 || term().op() == IMPL; //isAny(Op.IMPL.bit | Op.EQUI.bit);
         //return true;
         //return op().temporal;
 
@@ -245,7 +245,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         }
 
 
-        if ((punc == Op.GOAL || punc == Op.QUEST) && (op == Op.IMPL || op == Op.EQUI))
+        if ((op == Op.IMPL) && (punc == Op.GOAL || punc == Op.QUEST))
             return fail(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
         return true;

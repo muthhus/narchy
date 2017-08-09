@@ -131,7 +131,7 @@ abstract public class Loop implements Runnable {
                     break;
 
             } catch (Throwable e) {
-                logger.error("{}", e);
+                logger.error(" {}", e);
                 /*nar.eventError.emit(e);
                 if (Param.DEBUG) {
                     stop();

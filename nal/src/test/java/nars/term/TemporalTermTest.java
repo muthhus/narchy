@@ -338,7 +338,7 @@ public class TemporalTermTest {
     public void testCommutiveTemporalityConcepts2() throws Narsese.NarseseException {
         NAR n = NARS.shell();
 
-        for (String op : new String[]{"&&", "<=>"}) {
+        for (String op : new String[]{"&&"}) {
             Concept a = n.conceptualize($("(x " + op + "   y)"));
             Concept b = n.conceptualize($("(x " + op + "+1 y)"));
 
@@ -371,9 +371,7 @@ public class TemporalTermTest {
 
             //co-negation
             Concept h = n.conceptualize($("(x " + op + "+- (--,x))"));
-            assertEquals( (g.op() != Op.EQUI)?
-                    "((--,x) " + op + "+- x)" :
-                    "(x " + op + "+- x)", h.toString());
+            assertEquals("((--,x) " + op + "+- x)" , h.toString());
 
 
 

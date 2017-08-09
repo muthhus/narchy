@@ -433,29 +433,15 @@ public class PremiseRule extends GenericCompound {
                     isOp(pres, taskTermPattern, beliefTermPattern, constraints, X, Op.SECTi);
                     break;
 
-
-                case "notEqui":
-                    opNotContaining(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.EQUI.bit);
-                    break;
+//
+//                case "notEqui":
+//                    opNotContaining(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.EQUI.bit);
+//                    break;
 
                 case "notImplEqui":
                     opNotContaining(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits);
                     break;
 
-//                case "events":
-//                    throw new RuntimeException("depr");
-
-//                case "contains":
-//                    pres.add(new ContainedBy(withinNonCommutive(taskTermPattern, beliefTermPattern, X, Y)));
-//                    break;
-
-//                case "component":
-//                    if (XString.equals("task") && Y.toString().equals("belief")) {
-//                        pres.add(new ComposedBy(0,1));
-//                    } else {
-//                        throw new UnsupportedOperationException();
-//                    }
-//                    break;
 
                 case "time":
                     switch (XString) {

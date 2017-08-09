@@ -846,8 +846,6 @@ public class Narsese extends BaseParser<Object> {
 
                         IMPL.str,
 
-                        EQUI.str,
-
                         CONJ.str,
 
                         //TODO make these special case macros
@@ -866,7 +864,6 @@ public class Narsese extends BaseParser<Object> {
         return sequence(
                 trie(
                         IMPL.str,
-                        EQUI.str,
                         CONJ.str
                 ),
                 push(Op.fromString(match()))
@@ -875,7 +872,7 @@ public class Narsese extends BaseParser<Object> {
 
     Rule OpTemporalParallel() {
         return firstOf(
-                seq("<|>", push(EQUI)),
+//                seq("<|>", push(EQUI)),
                 seq("=|>", push(IMPL)),
                 seq("&|", push(CONJ))
         );

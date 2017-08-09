@@ -26,7 +26,7 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         return the.introduce(x, n);
     }
 
-    final static int ConjOrStatementBits = Op.IMPL.bit | Op.EQUI.bit | Op.CONJ.bit; //NOT including similarity or inheritance because variables acorss these would be loopy
+    final static int ConjOrStatementBits = Op.IMPL.bit | Op.CONJ.bit; //NOT including similarity or inheritance because variables acorss these would be loopy
 
     private final static int DepOrIndepBits = Op.VAR_INDEP.bit | Op.VAR_DEP.bit | Op.VAR_PATTERN.bit;
 
@@ -90,7 +90,6 @@ public class DepIndepVarIntroduction extends VarIntroduction {
                 depOrIndep = true;
                 break;
             case IMPL:
-            case EQUI:
                 depOrIndep = false;
                 break;
             default:

@@ -3,6 +3,7 @@ package nars.nal.nal7;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
+import nars.Param;
 import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 import org.jetbrains.annotations.NotNull;

@@ -443,6 +443,9 @@ public abstract class NQuadsRDF {
         return null;
     }
 
+    public static Term equi(@Nullable Term subj, @Nullable Term pred) {
+        return $.conj(new Term[] { impl(subj,pred), impl(pred,subj) });
+    }
 
 
     // ======== String manipulation methods ========

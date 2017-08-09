@@ -359,9 +359,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             case INH:
                 return 3;
 
-            case EQUI:
-                return 3;
-
             case IMPL:
                 return 3;
 

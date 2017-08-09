@@ -73,9 +73,9 @@ public class NarseseBaseTest extends NarseseTest {
 
     @Test
     public void testNoBudget() throws Narsese.NarseseException {
-        Task t = task("<a <=> b>. %0.00;0.93");
+        Task t = task("<a ==> b>. %0.00;0.93");
         assertNotNull(t);
-        assertEquals(Op.EQUI, t.op());
+        assertEquals(Op.IMPL, t.op());
 
         assertEquals('.', t.punc());
         //assertEquals(Global.DEFAULT_JUDGMENT_PRIORITY, t.getPriority(), 0.001);

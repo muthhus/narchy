@@ -33,8 +33,8 @@ public class DeductiveChainTest  {
     public static final IndexedStatementBuilder impl = (int x, int y) ->
             (Compound)$.impl(a(x), a(y));
     @Nullable
-    public static final IndexedStatementBuilder equiv = (int x, int y) ->
-            (Compound)$.equi(a(x), a(y));
+//    public static final IndexedStatementBuilder equiv = (int x, int y) ->
+//            (Compound)$.equi(a(x), a(y));
 
     public DeductiveChainTest(@NotNull NAR n, int length, int timeLimit, @NotNull IndexedStatementBuilder b) {
         this(new TestNAR(n), length, timeLimit, b);

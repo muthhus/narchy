@@ -5,21 +5,11 @@
     //TODO these need special predicates to safely decompose the conjunctions without losing temporal information
      (&&,X,A..+), (X<->Y)  |- (&&,Y,A..+), (Belief:Intersection, Goal:Strong)
         (&&,(--,%X),A..+), (X<->Y)  |- (&&,(--,%Y),A..+), (Belief:Intersection, Goal:Strong)
-     (&&,X,A..+), (X<=>Y)  |- (&&,Y,A..+), (Belief:Intersection, Goal:Strong)
-        (&&,(--,%X),A..+), (X<=>Y)  |- (&&,(--,%Y),A..+), (Belief:Intersection, Goal:Strong)
 
      (X ==> Z), (X<->Y) |- (Y ==>+- Z), (Belief:Intersection)
         ((--,%X) ==> Z), (X<->Y) |- ((--,%Y) ==>+- Z), (Belief:Intersection)
-     (X ==> Z), (X<=>Y) |- (Y ==>+- Z), (Belief:Intersection)
-        ((--,%X) ==> Z), (X<=>Y) |- ((--,%Y) ==>+- Z), (Belief:Intersection)
      (Z ==> X), (X<->Y) |- (Z ==>+- Y), (Belief:Intersection)
         (Z ==> (--,%X)), (X<->Y) |- (Z ==>+- (--,%Y)), (Belief:Intersection)
-     (Z ==> X), (X<=>Y) |- (Z ==>+- Y), (Belief:Intersection)
-        (Z ==> (--,%X)), (X<=>Y) |- (Z ==>+- (--,%Y)), (Belief:Intersection)
-
-//needs special temporal handling to shift occurrence time of result if the <=> has a non-zero non-eternal dt
-     X, (B<=>C), task(positive), neqCom(X,C) |- subIfUnifiesAny(C,B,X), (Belief:Intersection, Goal:Strong)
-     X, (B<=>C), task(negative), neqCom(X,C) |- subIfUnifiesAny((--,%C),B,X), (Belief:IntersectionN, Goal:StrongN)
 
 
 
@@ -55,7 +45,6 @@
 
     (S --> P), (S <-> P),                   task("?") |- (S --> P),   (Belief:StructuralIntersection, Punctuation:Belief)
     (S --> P), (S <-> P),                   task("@") |- (S --> P),   (Goal:StructuralIntersection, Punctuation:Goal)
-    (S ==> P), (S <=> P),                   task("?") |- (S ==>+- P), (Belief:StructuralIntersection, Punctuation:Belief)
 
 
 //experimental:
