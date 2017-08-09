@@ -159,10 +159,11 @@ public class NAL7Test extends AbstractNALTest {
         //(P ==> M), (S ==> M), neq(S,P), dt(bmint) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
 
         test
-
-                .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
-                .believe("(x ==>+2 y)")
-                .believe("(z ==>+3 y)");
+            .believe("(x ==>+2 y)")
+            .believe("(z ==>+3 y)")
+            .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
+            .mustNotOutput(cycles, "(z ==>-2 x)", BELIEF, ETERNAL)
+        ;
     }
 
     @Test

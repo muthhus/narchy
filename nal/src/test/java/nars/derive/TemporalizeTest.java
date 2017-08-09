@@ -451,6 +451,21 @@ $.28 ((x &&+2 y) ==>+5 z). %1.0;.81% {3: 1;2} (((%1==>%2),(%3==>%2),neqRCom(%3,%
         assertEquals("((x &&+2 y) ==>+3 z)@ETE", s.toString());
 
     }
+    @Test
+    public void testImplLinked() throws Narsese.NarseseException {
+        /*
+        ( $,TestNAR ): "ERR	(z ==>+1 x). %(1.0,1.0);(.45,.46)%  creation: (0,400)".
+        ( $,TestNAR ): "SIM
+        $1.0 (z ==>-2 x). %1.0;.45% {9: 1;2} (((%1==>%2),(%3==>%2),neqCom(%1,%3),notImplEqui(%3)),((%3 ==>+- %1),((Induction-->Belief))))
+            $.50 (x ==>+2 y). %1.0;.90% {0: 1}
+            $.50 (z ==>+3 y). %1.0;.90% {0: 2}
+         */
+        Temporalize t = new Temporalize();
+        t.knowTerm($.$("(x ==>+2 y)"), ETERNAL);
+        t.knowTerm($.$("(z ==>+3 y)"), ETERNAL);
+        Temporalize.Event s = t.solve($.$("(z ==>+- x)"));
+        assertEquals("(z ==>+1 x)@ETE", s.toString());
+    }
 
     @Test
     public void testConjLinked() throws Narsese.NarseseException {
@@ -599,6 +614,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
         result.forEach(System.out::println);
     }
+
     @Test
     public void testPreconImplConjPreConflict() throws Narsese.NarseseException {
 

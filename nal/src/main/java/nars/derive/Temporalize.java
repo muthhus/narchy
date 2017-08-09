@@ -70,10 +70,10 @@ public class Temporalize {
                 } else {
                     Term tr = ((RelativeEvent) e).rel;
 
-                    if (tr.op() == NEG) //NEG relations are not trustable
-                        s += 0.1;
-                    else
-                        s += (1f / (1 + tr.size()));  //decrease according to the related term's size
+//                    if (tr.op() == NEG) //NEG relations are not trustable
+//                        s += 0.1;
+//                    else
+                    s += (1f / (1 + tr.size()));  //decrease according to the related term's size
                 }
             }
             return s;
@@ -531,14 +531,16 @@ public class Temporalize {
         }
 
         @Nullable
-        protected Time resolve(int offset, Map<Term, Time> trail) {
+        private Time resolve(int offset, Map<Term, Time> trail) {
 
-            Time rt = solveTime(rel, trail);
-            if (rt != null) {
-                return rt.add(offset);
-            } else {
-                return null;
+            Event e = solve(rel, trail);
+            if (e != null) {
+                @Nullable Time rt = e.start(trail);
+                if (rt != null)
+                    return rt.add(offset);
             }
+
+            return null;
         }
 
         @Override
@@ -589,12 +591,12 @@ public class Temporalize {
         model.dur = Param.DITHER_DT ? d.dur : 1;
 
         Op to = task.op();
-        boolean taskRooted = (belief == null) || (!task.isEternal() && (to != IMPL));
+        boolean taskRooted = true; //(belief == null) || (!task.isEternal() && (to != IMPL));
         model.know(task, d, taskRooted);
 
         if (belief != null) {
-            Op bo = belief.op();
-            model.know(belief, d, !taskRooted || (bo != IMPL));
+            //Op bo = belief.op();
+            model.know(belief, d, true); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
         } else if (d.beliefTerm != null) {
             model.know(d.beliefTerm, d, null);
         }
@@ -604,7 +606,7 @@ public class Temporalize {
         try {
             e = model.solve(pattern, trail);
         } catch (StackOverflowError er) {
-            logger.error("temporalize stack overflow: {} {}\n{} {}", d, pattern, model, trail);
+            logger.error("temporalize stack overflow:\n{} {}\n\t{}\n\t{}", pattern, d, model, trail);
 //            trail.clear();
 //            model.solve(pattern, trail);
             return null;
@@ -641,7 +643,7 @@ public class Temporalize {
                         new AbsoluteEvent(taskTerm, task.start(), task.end())
                         :
                         null;
-                        //new AbsoluteEvent(taskTerm, ETERNAL, ETERNAL); //ambiently rooted if impl or equi
+        //new AbsoluteEvent(taskTerm, ETERNAL, ETERNAL); //ambiently rooted if impl or equi
 
         know(taskTerm, d, root);
     }
@@ -817,11 +819,56 @@ public class Temporalize {
     }
 
 
-    Event solve(Term target, Map<Term, Time> trail) {
+    Event solve(Term x, Map<Term, Time> trail) {
 
-        Event known = solveEvent(target, trail);
-        if (known != null)
-            return known;
+        //System.out.println("solve " + target + "\t" + trail);
+
+        if (trail.containsKey(x)) {
+            Time xs = trail.get(x);
+            if (xs != null)
+                return solution(x, xs);
+            else
+                return null; //cyclic
+        }
+
+        trail.put(x, null); //placeholder
+
+        FasterList<Event> cc = constraints.get(x);
+        if (cc != null) {
+
+            int ccc = cc.size();
+            assert (ccc > 0);
+            if (ccc > 1)
+                cc.sortThis();
+
+            for (int i = 0, eaSize = ccc; i < eaSize; i++) {
+                Event e = cc.get(i);
+
+                //System.out.println(x + " " + i + "\t" + trail + "\t" + e);
+
+                Time xs = e.start(trail);
+                if (xs != null) {
+                    trail.put(x, xs);
+                    return e; //solution(x, xs);
+                }
+            }
+        }
+
+        Event e = solveComponents(x, trail);
+
+        if (e != null) {
+            Time xs = e.start(trail);
+            if (xs != null) {
+                trail.put(x, xs); //assign
+                return e;
+            }
+        }
+
+        trail.remove(x); //remove placeholder
+        return null;
+    }
+
+    private Event solveComponents(Term target, Map<Term, Time> trail) {
 
         Op o = target.op();
 
@@ -898,6 +945,7 @@ public class Temporalize {
                     }
                 }
             }
+            return null;
         }
 
 
@@ -965,6 +1013,8 @@ public class Temporalize {
                     uncovered, true);
 
             for (Term c : constraints.keySet()) {
+
+                if (c.equals(target)) continue; //cyclic
 
                 Event ce = solve(c, trail);
 
@@ -1097,64 +1147,28 @@ public class Temporalize {
         return null;
     }
 
-    @Nullable
-    private Time solveTime(Term x, Map<Term, Time> trail) {
+//    @Nullable
+//    private Time solveTime(Term x, Map<Term, Time> trail) {
+//
+//        if (trail.containsKey(x)) {
+//            Time t = trail.get(x);
+//            if (t != null)
+//                return t;
+//            else
+//                return null; //cyclic
+//        }
+//
+//        Event e = solve(x, trail);
+//        if (e != null) {
+//            Time t2 = e.start(trail);
+//            trail.put(x, t2);
+//            return t2;
+//        } else {
+//            return null;
+//        }
+//
+//    }
 
-        if (trail.containsKey(x)) {
-            return trail.get(x);
-        }
-
-//        System.out.println(target + " ? " + trail);
-
-
-        Event e = solveEvent(x, trail);
-        Time t;
-        if (e != null) {
-            t = trail.get(x);
-            //t = e.start(trail);
-        } else {
-            t = null;
-        }
-
-        return t;
-    }
-
-
-    private Event solveEvent(Term x, Map<Term, Time> trail) {
-
-        if (trail.containsKey(x)) {
-            Time xt = trail.get(x);
-            if (xt != null)
-                return solution(x, xt);
-            else
-                return null;
-        }
-
-        FasterList<Event> ea = constraints.get(x);
-        if (ea == null)
-            return null; //no idea how to solve that term
-
-        int eas = ea.size();
-        assert (eas > 0);
-        if (eas > 1)
-            ea.sortThis();
-
-
-        trail.put(x, null);
-
-        for (int i = 0, eaSize = eas; i < eaSize; i++) {
-            Event e = ea.get(i);
-            Time xs = e.start(trail);
-            if (xs != null) {
-                trail.put(x, xs); //assign
-                return e; //solution(x, xs);
-            }
-        }
-
-        trail.remove(x); //remove placeholder
-
-        return null;
-    }
 
     @Override
     public String toString() {
