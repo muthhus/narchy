@@ -15,9 +15,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+
+import static nars.Op.True;
 
 
 public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<TermContainer, TermContainerToOpMap<Termed>> {
@@ -56,8 +59,8 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
 
 
     final static Weigher<TermContainer, TermContainerToOpMap> w = (k, v) -> {
-        return k.volume();
-        //return (k.complexity() + k.volume());
+        //return k.volume();
+        return (k.complexity() + k.volume())/2;
     };
 
     public CaffeineIndex2(long capacity) {
@@ -98,7 +101,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
 
     @Override
     public Stream<Termed> stream() {
-        return vectors.asMap().values().stream().flatMap(x -> IntStream.range(0, TermContainerToOpMap.CAPACITY).mapToObj(x::get));
+        return vectors.asMap().values().stream().flatMap(x -> IntStream.range(0, TermContainerToOpMap.CAPACITY).mapToObj(x::get).filter(Objects::nonNull));
     }
 
     //    @Override
@@ -165,7 +168,13 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
 
     static TermContainer vector(Term x) {
         TermContainer xs = x.subterms();
-        return TermVector.the(ArrayUtils.add(xs.theArray() /* SAFE COPY */, x));
+        if (xs.size() == 0) {
+            //atomic
+            return TermVector.the(x, True); //to distinguish from: (x)
+        } else {
+            return xs;
+        }
+        //return TermVector.the(ArrayUtils.add(xs.theArray() /* SAFE COPY */, x));
     }
 
     @Override
@@ -174,7 +183,9 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
     }
 
     private TermContainerToOpMap<Termed> vectorOrCreate(@NotNull Term x) {
-        return vectors.get(vector(x), TermContainerToOpMap::new);
+        return vectors.get(vector(x), (v) -> {
+            return new TermContainerToOpMap<>(v);
+        });
     }
 
 
