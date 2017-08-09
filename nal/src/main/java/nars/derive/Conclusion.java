@@ -81,12 +81,12 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         // 1. SUBSTITUTE
         Term b1  = d.transform(this.pattern);
-        if (b1.vars(null) > 0) {
-            Term b2 = d.transform(b1);
-            //            if (!b1.equals(b2))
-            //                System.out.println("second transform");
-            b1 = b2;
-        }
+//        if (b1.vars(null) > 0) {
+//            Term b2 = d.transform(b1);
+//                        if (!b1.equals(b2))
+//                            System.out.println("second transform");
+//            b1 = b2;
+//        }
         assert (b1.varPattern() == 0);
 
         /// 2. EVAL ----

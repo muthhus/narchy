@@ -120,8 +120,14 @@ public abstract class Unify extends Versioning implements Subst {
 
     @Nullable
     @Override
-    public Term xy(@NotNull Term t) {
-        return xy.get(t);
+    public Term xy(@NotNull Term x0) {
+        Term xy = x0, x = null;
+        while ((xy = this.xy.get(xy))!=null) { //completely dereference
+            x = xy;
+        }
+        return x;
+
+        //return xy.get(t);
     }
 
 
@@ -299,6 +305,7 @@ public abstract class Unify extends Versioning implements Subst {
      */
     public final boolean putXY(@NotNull Term x0, @NotNull Term y) {
         Term x = xy(x0);
+
         if (x != null) {
             return unify(x, y);
         } else {

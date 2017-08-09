@@ -32,7 +32,7 @@ public class JsonTermTest {
 
     @Test public void testBigJSON() {
         NAR d = new NARS().get();
-        d.log();
+        //d.log();
 
         int n = 0;
         for (String json : new String[] {

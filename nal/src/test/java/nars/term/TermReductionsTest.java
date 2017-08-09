@@ -127,7 +127,7 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testFunctionRecursion() throws Narsese.NarseseException {
         //that this is valid, though self referential
-        assertTrue($("task((polarize(%1,task) <=>+- polarize(%2,belief)))") instanceof Compound);
+        assertTrue($("task((polarize(%1,task) ==>+- polarize(%2,belief)))").size()>0);
     }
 
 //    @Test
@@ -155,13 +155,13 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals("((--,(P))<->(Q))", $("((--,(P))<->(Q))").toString()); //NO change
     }
 
-    @Test
-    public void testEquivalenceNegatedSubterms() throws Narsese.NarseseException {
-        assertEquals(("(--,((P)<=>(Q)))"), $("((P)<=>(--,(Q)))").toString());
-        assertEquals(("(--,((P)<=>(Q)))"), $("((--,(P))<=>(Q))").toString());
-        assertEquals(("((P) <=>+1 (Q))"), $("((--,(P)) <=>+1 (--,(Q)))").toString());
-        assertEquals(("((P)<=>(Q))"), $("((--,(P))<=>(--,(Q)))").toString());
-    }
+//    @Test
+//    public void testEquivalenceNegatedSubterms() throws Narsese.NarseseException {
+//        assertEquals(("(--,((P)<=>(Q)))"), $("((P)<=>(--,(Q)))").toString());
+//        assertEquals(("(--,((P)<=>(Q)))"), $("((--,(P))<=>(Q))").toString());
+//        assertEquals(("((P) <=>+1 (Q))"), $("((--,(P)) <=>+1 (--,(Q)))").toString());
+//        assertEquals(("((P)<=>(Q))"), $("((--,(P))<=>(--,(Q)))").toString());
+//    }
 
     @Test
     public void testImplicationNegatedPredicate() throws Narsese.NarseseException {
@@ -733,26 +733,26 @@ public class TermReductionsTest extends NarseseTest {
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) <=>+- (a))"));
     }
 
+//    @Test
+//    public void testCoNegatedEqui() throws Narsese.NarseseException {
+//
+//        assertEquals(False, $("((--,(a)) <=> (a))"));
+//
+//        assertEquals(False, $("((--,(a)) <=>+0 (a))"));
+//
+//        String e = "(--,((a) <=>+1 (a)))";
+//        assertEquals(e, $(e).toString());
+//
+//        //due to the unpaired $3
+//        assertInvalidTasks("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(--,isIn($3,xyz)))).");
+//    }
+
     @Test
-    public void testCoNegatedEqui() throws Narsese.NarseseException {
-
-        assertEquals(False, $("((--,(a)) <=> (a))"));
-
-        assertEquals(False, $("((--,(a)) <=>+0 (a))"));
-
-        String e = "(--,((a) <=>+1 (a)))";
-        assertEquals(e, $(e).toString());
-
-        //due to the unpaired $3
-        assertInvalidTasks("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(--,isIn($3,xyz)))).");
-    }
-
-    @Test
-    public void testEquivCommonSubterms() throws Narsese.NarseseException {
+    public void testImplCommonSubterms() throws Narsese.NarseseException {
         //factor out the common sub-term
         assertEquals(
-                "(--,(isIn($1,xyz)<=>((y-->x))))", //involves an additional negation factoring out to top level
-                $("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))<=>((--,(($1,xyz)-->$2))&&(x:y)))").toString());
+                "((--,isIn($1,xyz))==>((y-->x)))", //involves an additional negation factoring out to top level
+                $("(((--,isIn($1,xyz))&&(--,(($1,xyz)-->$2)))==>((--,(($1,xyz)-->$2))&&(x:y)))").toString());
 
 
     }
@@ -763,11 +763,11 @@ public class TermReductionsTest extends NarseseTest {
         assertValid($("((--,a) ==>+1 a)"));
     }
 
-    @Test
-    public void testCoNegatedEquiOK() throws Narsese.NarseseException {
-        assertEquals("(--,((a) <=>+1 (a)))", $("((--,(a)) <=>+1 (a))").toString());
-        assertEquals("(--,(a <=>+1 a))", $("((--,a) <=>+1 a)").toString());
-    }
+//    @Test
+//    public void testCoNegatedEquiOK() throws Narsese.NarseseException {
+//        assertEquals("(--,((a) <=>+1 (a)))", $("((--,(a)) <=>+1 (a))").toString());
+//        assertEquals("(--,(a <=>+1 a))", $("((--,a) <=>+1 a)").toString());
+//    }
 
     @Test
     public void testRepeatEvent() throws Narsese.NarseseException {
@@ -775,7 +775,7 @@ public class TermReductionsTest extends NarseseTest {
 
         for (String x : new String[]{
                 "((a) ==>+1 (a))",
-                "((a) <=>+1 (a))",
+                "((a) &&+1 (a))",
 
             /*"((a) &&+1 (a))",*/ //<-- conjunction case is special, see repeating conjunction simplification test
         }) {
@@ -835,7 +835,7 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testSingularStatementsInConjunction() throws Narsese.NarseseException {
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<->a),c:d,e:f)"));
-        assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<=>a),c:d,e:f)"));
+//        assertEquals($("(&&,c:d,e:f)"), $("(&&,(a<=>a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a-->a),c:d,e:f)"));
         assertEquals($("(&&,c:d,e:f)"), $("(&&,(a==>a),c:d,e:f)"));
         assertEquals(False, $("(&&,(--,(a==>a)),c:d,e:f)"));

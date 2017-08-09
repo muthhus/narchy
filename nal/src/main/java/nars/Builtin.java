@@ -190,9 +190,11 @@ public class Builtin {
 
                     case 2:
                         r = t.sub(nar.random().nextInt(2)); //one of the two
+                        break;
 
                     default:
                         r = CONJ.the(tdt, dropRandom(nar.random(), t.subterms()));
+                        break;
                 }
             } else {
                 //recursive event-based decomposition and recomposition
@@ -207,8 +209,8 @@ public class Builtin {
                 r = Op.conj(ee);
             }
 
-            if (r instanceof Variable)
-                return Null; //dont allow returning a variable as an event during decomposition
+//            if (r instanceof Variable)
+//                return Null; //dont allow returning a variable as an event during decomposition
 
             return r;
         }));
