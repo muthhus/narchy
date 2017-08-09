@@ -17,7 +17,7 @@ abstract public class TemporalStabilityTest {
 
         Param.DEBUG = true;
 
-        n.log();
+        //n.log();
         n.onTask(this::validate);
 //        n.onCycle(f -> {
 //

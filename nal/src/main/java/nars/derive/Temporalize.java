@@ -54,21 +54,21 @@ public class Temporalize {
     /**
      * heuristic for ranking temporalization strategies
      */
-    int score(Term x) {
+    float score(Term x) {
         FasterList<Event> l = constraints.get(x);
         if (l == null) {
-            return Integer.MIN_VALUE;
+            return Float.NEGATIVE_INFINITY;
         } else {
-            int s = 0;
+            float s = 0;
             for (int i = 0, lSize = l.size(); i < lSize; i++) {
                 Event e = l.get(i);
                 if (e instanceof AbsoluteEvent) {
                     if (((AbsoluteEvent) e).start != ETERNAL)
-                        s += 10; //prefer non-eternal as it is more specific
+                        s += 3 * (1 + x.size()); //prefer non-eternal as it is more specific
                     else
                         s += 2;
                 } else {
-                    s++;
+                    s+= (1f / (1 + ((RelativeEvent)e).rel.size()));  //decrease according to the related term's size
                 }
             }
             return s;
@@ -133,10 +133,10 @@ public class Temporalize {
                         return Integer.compare(THIS.end, THAT.end);
                     } else {
 
-                        int xs = score(x);
-                        int ys = score(y);
+                        float xs = score(x);
+                        float ys = score(y);
                         if (xs != ys) {
-                            return Integer.compare(ys, xs);
+                            return Float.compare(ys, xs);
                         } else {
                             //prefer lower volume
                             int xv = x.volume();
@@ -835,7 +835,7 @@ public class Temporalize {
                 Term t0 = tt.sub(0);
 
                 //decide subterm solution order intelligently: allow reverse if the 2nd subterm can more readily and absolutely temporalize
-                if (score(t1) > score(t0) /*|| t1.volume() > t0.volume()*/) {
+                if (score(t1) > score(t0)  /* || t1.volume() > t0.volume()*/) {
                     dir = false; //reverse: solve simpler subterm first
                 }
 
@@ -1073,8 +1073,17 @@ public class Temporalize {
 
             Term newTerm = o.the(dt, a, b);
 
-            @Nullable Time bt = eb.start(trail);
-            long start = o == CONJ ? Math.min(at.abs(), bt.abs()) : at.abs();
+            long start = at.abs();
+            if (o == CONJ && start!=ETERNAL && dt!=DTERNAL) {
+                Time bt = eb.start(trail);
+                if (bt!=null) {
+                    long bStart = bt.abs();
+                    if (bStart!=ETERNAL) {
+                        if (bStart < start)
+                            start = bStart;
+                    }
+                }
+            }
 
             return new SolutionEvent(newTerm, start);
         }
