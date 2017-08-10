@@ -97,8 +97,6 @@ public class TermIOTest {
         assertEqualSerialize(("(a &&+1 b)") /* term, not the concept */);
         assertEqualSerialize("(a &&+1 (a &&+1 a))" /* term, not the concept */);
         assertEqualSerialize("(a ==>+1 b)" /* term, not the concept */);
-        assertEqualSerialize("(a <=>+1 b)" /* term, not the concept */);
-        assertEqualSerialize("(a <=>+1 a)" /* term, not the concept */);
         assertEqualSerialize(("(b ==>+1 b)") /* term, not the concept */);
 
 
