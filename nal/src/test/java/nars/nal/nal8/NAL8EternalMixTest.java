@@ -15,7 +15,7 @@ import static nars.time.Tense.ETERNAL;
  */
 public class NAL8EternalMixTest extends AbstractNALTest {
 
-    final int cycles = 30;
+    final int cycles = 150;
 
 
     @Test
@@ -485,10 +485,13 @@ public class NAL8EternalMixTest extends AbstractNALTest {
 
         TestNAR tester = test;
 
+        int when = 4;
+        tester.log();
         tester.input("( ( hold:t2 &&+5 (att1 &&+5 open:t1)) ==>+5 opened:t1).");
-        tester.inputAt(10, "hold:t2. :|:");
+        tester.inputAt(when, "hold:t2. :|:");
 
-        tester.mustBelieve(cycles, "((att1 &&+5 open:t1) ==>+5 opened:t1)", 1.0f, 0.81f, 15);
+        String result = "((att1 &&+5 open:t1) ==>+5 opened:t1)";
+        tester.mustBelieve(cycles, result, 1.0f, 0.81f, when+5);
 
     }
 

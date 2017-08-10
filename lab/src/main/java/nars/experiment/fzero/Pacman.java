@@ -40,7 +40,7 @@ public class Pacman extends NAgentX {
                     senseCamera("(G,c" + cm.name() + ")",
                             camScale.filter(cm)//.blur()
                     )
-                            .resolution(0.04f);
+                            .resolution(0.01f);
 
                 } catch (Narsese.NarseseException e) {
                     e.printStackTrace();
@@ -100,7 +100,7 @@ public class Pacman extends NAgentX {
             Pacman a = new Pacman(n);
             return a;
 
-        }, 5);
+        }, 10);
     }
 
 }

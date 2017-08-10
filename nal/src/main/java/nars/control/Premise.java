@@ -103,13 +103,13 @@ public class Premise extends Pri implements ITask {
         Concept taskConcept = task.concept(nar, true);
         if (taskConcept == null) {
             if (Param.DEBUG) {
-                assert (false) : task + " could not be conceptualized"; //WHY was task even created
-            } else {
-                taskLink.delete();
-                task.delete();
-                delete();
-                return 0;
+                logger.warn("{} unconceptualizable", task); //WHY was task even created
+                //assert (false) : task + " could not be conceptualized"; //WHY was task even created
             }
+            taskLink.delete();
+            task.delete();
+            delete();
+            return 0;
         }
 
 
@@ -130,7 +130,7 @@ public class Premise extends Pri implements ITask {
         //Terms.equalAtemporally(task.term(), (beliefTerm));
 
         boolean reUnified = false;
-        if (task.term().varQuery() > 0 ) {
+        if (task.term().varQuery() > 0) {
 
             int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
 
@@ -150,7 +150,6 @@ public class Premise extends Pri implements ITask {
             BaseConcept beliefConcept = (BaseConcept) _beliefConcept;
 
 
-
             Task match;
 
             if (task.isQuestOrQuestion() && (reUnified || beliefIsTask)) {
@@ -166,7 +165,7 @@ public class Premise extends Pri implements ITask {
 //
 //                            }
                 long when = whenAnswer(task, now);
-                match = answerTable.answer(when, now, dur, task,  beliefTerm, beliefConcept, nar);
+                match = answerTable.answer(when, now, dur, task, beliefTerm, beliefConcept, nar);
                 if (match != null) {
                     @Nullable Task answered = task.onAnswered(match, nar);
                     if (answered != null) {
@@ -181,8 +180,8 @@ public class Premise extends Pri implements ITask {
                 long when = focus(task, now, dur);
 
                 boolean tryMatch = true;
-                if (beliefIsTask && task.punc()==BELIEF && task.during(when)) {
-                    if (Math.abs(when-now) > 0 /*= dur*/) {
+                if (beliefIsTask && task.punc() == BELIEF && task.during(when)) {
+                    if (Math.abs(when - now) > 0 /*= dur*/) {
                         //try projecting to now (maybe also a future time) because it will be a different time
                         when = now;
                     } else {
@@ -203,7 +202,7 @@ public class Premise extends Pri implements ITask {
         }
 
 
-        if (belief!=null) {
+        if (belief != null) {
             if (belief.equals(task)) { //do not repeat the same task for belief
                 belief = null; //force structural transform; also prevents potential inductive feedback loop
                 beliefTerm = task.term(); //use the task's term, which may have temporal information

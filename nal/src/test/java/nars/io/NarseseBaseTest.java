@@ -64,10 +64,10 @@ public class NarseseBaseTest extends NarseseTest {
 
     @Test
     public void testBudget() throws Narsese.NarseseException {
-        Task t = task("$0.70 <a <=> b>. %0.00;0.93");
+        Task t = task("$0.70 <a ==> b>. %0.00;0.93");
         assertEquals(0.7f, t.pri(), 0.01f);
 
-        Task u = task("$0.9 <a <=> b>. %0.00;0.93");
+        Task u = task("$0.9 <a ==> b>. %0.00;0.93");
         assertEquals(0.9f, u.pri(), 0.01f);
     }
 
@@ -86,7 +86,7 @@ public class NarseseBaseTest extends NarseseTest {
 
     @Test
     public void testMultiCompound() throws Narsese.NarseseException {
-        String tt = "((a<=>b)-->(c==>d))";
+        String tt = "((a==>b)-->(c==>d))";
         Task t = task(tt + '?');
         assertNotNull(t);
         assertEquals(Op.INH, t.op());

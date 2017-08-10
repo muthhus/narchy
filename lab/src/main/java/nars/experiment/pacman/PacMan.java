@@ -13,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PacMan {
 
-	int periodMS = 5;
+	int periodMS = 10;
 
 	static final boolean running = true;
 	public final PacComponent view;
