@@ -46,7 +46,7 @@ public class NAL7DurationTest {
         assertEquals( "(&|,(x),(y),(z))", n.term("(((x) &&+1 (y)) &&+1 (z))").toString());
         assertEquals( $.$("((x) &&+6 (y))"), n.term("((x) &&+6 (y))"));
         assertEquals( $.$("((x) =|> (y))"), n.term("((x) ==>+1 (y))"));
-        assertEquals( $.$("((x) <|> (y))"), n.term("((x) <=>+1 (y))"));
+//        assertEquals( $.$("((x) <|> (y))"), n.term("((x) <=>+1 (y))"));
 
     }
 

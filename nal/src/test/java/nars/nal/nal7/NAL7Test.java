@@ -288,8 +288,8 @@ public class NAL7Test extends AbstractNALTest {
                 .believe("((( $y, door) --> open) ==>-4 (( $y, key) --> hold))", 0.8f, 0.9f)
 
 
-                .mustBelieve(cycles, "((($1,key) --> hold) ==>+9 (($1,room) --> enter))", 0.9f, 0.39f)
-                .mustBelieve(cycles, "(enter($1,room) ==>-9 hold($1,key) )", 0.8f, 0.42f);
+                .mustBelieve(cycles, "( hold($1,key) ==>+9 enter($1,room) )", 0.9f, 0.39f)
+                .mustBelieve(cycles, "( enter($1,room) ==>-9 hold($1,key) )", 0.8f, 0.42f);
 //                .mustBelieve(cycles, "(hold($1,key) <=>+9 enter($1,room) )", 0.73f, 0.44f)
 //                .mustNotOutput(cycles, "(hold($1,key) <=>-9 enter($1,room))", BELIEF, ETERNAL); //test correct dt polarity
 
