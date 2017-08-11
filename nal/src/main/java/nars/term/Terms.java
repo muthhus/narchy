@@ -564,6 +564,13 @@ public enum Terms {
         return uniques;
     }
 
+   public static Term[] sorted(Collection<Term> s) {
+        if (s instanceof SortedSet)
+            return sorted((Set)s);
+        else {
+            return sorted(s.toArray(new Term[s.size()]));
+        }
+   }
 
     /**
      * a Set is already duplicate free, so just sort it

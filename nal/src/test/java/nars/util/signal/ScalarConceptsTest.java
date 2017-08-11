@@ -150,7 +150,7 @@ public class ScalarConceptsTest {
             n.run(m);
 
             Truth[] f = xc.belief(n.time(), n);
-            float tolerance = 0.1f;
+            float tolerance = 0.18f;
             if (v == 0) {
                 assertEquals(0.0f, f[0].freq(), tolerance);
                 assertEquals(0.0f, f[1].freq(), tolerance);

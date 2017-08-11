@@ -350,7 +350,6 @@ public class NAL7Test extends AbstractNALTest {
     public void induction_on_events_0_neg() {
 
         test
-                .log()
                 .input("(--,open(John,door)). :|:")
                 .inputAt(4, "enter(John,room). :|:")
                 .mustBelieve(cycles, "( (--,open(John, door)) ==>+4 enter(John, room) )",

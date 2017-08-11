@@ -13,7 +13,6 @@ import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.var.UnnormalizedVariable;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.api.map.primitive.ObjectByteMap;
@@ -61,13 +60,7 @@ public enum Op implements $ {
         }
 
         @Override
-        public Term the(Term... u) {
-            assert (u.length == 1);
-            return neg(u[0]);
-        }
-
-        @Override
-        public Term the(int dt, Term[] u) {
+        public Term _the(int dt, Term[] u) {
             assert (u.length == 1);
             //assert (dt == DTERNAL || dt == XTERNAL);
             return neg(u[0]);
@@ -82,7 +75,7 @@ public enum Op implements $ {
      */
     SECTe("&", true, 3, Args.GTETwo) {
         @Override
-        public Term the(int dt, Term[] u) {
+        public Term _the(int dt, Term[] u) {
             return intersect(u,
                     SECTe,
                     SETe,
@@ -95,7 +88,7 @@ public enum Op implements $ {
      */
     SECTi("|", true, 3, Args.GTETwo) {
         @Override
-        public Term the(int dt, Term[] u) {
+        public Term _the(int dt, Term[] u) {
             u = Int.intersect(u);
             return intersect(u,
                     SECTi,
@@ -109,7 +102,7 @@ public enum Op implements $ {
      */
     DIFFe("-", false, 3, Args.Two) {
         @Override
-        public Term the(int dt, Term[] u) {
+        public Term _the(int dt, Term[] u) {
             return newDiff(this, u);
         }
     },
@@ -119,7 +112,7 @@ public enum Op implements $ {
      */
     DIFFi("~", false, 3, Args.Two) {
         @Override
-        public Term the(int dt, Term[] u) {
+        public Term _the(int dt, Term[] u) {
             return newDiff(this, u);
         }
     },
@@ -139,7 +132,7 @@ public enum Op implements $ {
      */
     CONJ("&&", true, 5, Args.GTETwo) {
         @Override
-        public Term the(int dt, Term... tt) {
+        public Term _the(int dt, Term... tt) {
             //Term[] u = uu.length > 1 ? conjTrueFalseFilter(uu) : uu /* avoid true false filter if fall-through only-term anyway */;
 
 
@@ -489,7 +482,6 @@ public enum Op implements $ {
     IMPL("==>", 5, OpType.Statement, Args.Two),
 
 
-
     // keep all items which are invlved in the lower 32 bit structuralHash above this line
     // so that any of their ordinal values will not exceed 31
     //-------------
@@ -514,13 +506,14 @@ public enum Op implements $ {
 
     @Deprecated
     DISJ("||", true, 5, Args.GTETwo) {
+
         @Override
-        public Term the(int dt, Term... u) {
+        @NotNull Term _the(int dt, Term... u) {
             assert (dt == DTERNAL);
-            assert (u.length > 1 || u[0].op() == VAR_PATTERN);
+            if (u.length == 1 && u[0].op() != VAR_PATTERN)
+                return u[0];
             return NEG.the(CONJ.the(Terms.neg(u)));
         }
-
     },
 //    /**
 //     * extensional image
@@ -734,7 +727,8 @@ public enum Op implements $ {
 
         int s = subterms.length;
         assert (o.maxSize >= s) : "subterm overflow: " + o + ' ' + Arrays.toString(subterms);
-        assert (o.minSize <= s || (firstEllipsis(subterms) != null)) : "subterm underflow: " + o + ' ' + Arrays.toString(subterms);
+
+        assert (o.minSize <= s || (firstEllipsis(subterms)!=null)) : "subterm underflow: " + o + ' ' + Arrays.toString(subterms);
 
         switch (s) {
             case 1:
@@ -1161,8 +1155,11 @@ public enum Op implements $ {
     }
 
 
-    /** last stage constructor: use with caution */
-    @NotNull public static Term compound(Op op, int dt, Term... subterms) {
+    /**
+     * last stage constructor: use with caution
+     */
+    @NotNull
+    public static Term compound(Op op, int dt, Term... subterms) {
 
         //if (!subterms.internable())
         Term c = compound(op, subterms);
@@ -1176,28 +1173,30 @@ public enum Op implements $ {
 //            return compound(new NewCompound(op, subterms), dt);
 
 
-    /** last stage constructor: use with caution */
+    /**
+     * last stage constructor: use with caution
+     */
     public static Term compound(Term c, int dt) {
-        if ((c instanceof Compound) && (dt != DTERNAL)) {
-            if (dt != XTERNAL ) {
-//                switch (c.sub(0).op()) {
-//                    case VAR_PATTERN:
-//                    case VAR_QUERY:
-//                    case VAR_INDEP:
-//                    case VAR_DEP:
-//                    case NEG:
+        if (dt!=DTERNAL && (c instanceof Compound)) {
+//            if (dt != XTERNAL) {
+////                switch (c.sub(0).op()) {
+////                    case VAR_PATTERN:
+////                    case VAR_QUERY:
+////                    case VAR_INDEP:
+////                    case VAR_DEP:
+////                    case NEG:
+////
+////                }
 //
-//                }
+//                //&& Math.abs(dt) > Param.DT_ABS_SAFETY_LIMIT
+//
+////                Term c1 = c.sub(1);
+////                if (c1 instanceof Variable && c1.equals(c.sub(0)))
+////                    return c.sub(0);
+//
+//            }
 
-                //&& Math.abs(dt) > Param.DT_ABS_SAFETY_LIMIT
-
-//                Term c1 = c.sub(1);
-//                if (c1 instanceof Variable && c1.equals(c.sub(0)))
-//                    return c.sub(0);
-
-            }
-
-            return new GenericCompoundDT((Compound)c, dt);
+            return new GenericCompoundDT((Compound) c, dt);
         }
         return c;
     }
@@ -1258,7 +1257,6 @@ public enum Op implements $ {
                 }
 
                 break;
-
 
 
             case IMPL:
@@ -1597,11 +1595,10 @@ public enum Op implements $ {
         }
     }
 
-    public boolean commute(int dt) {
-        if (commutative && temporal &&
-            (Op.concurrent(dt) || dt == XTERNAL))
-            return true;
-        return false;
+    boolean commute(int dt, int size) {
+        return size > 1 &&
+                ( commutative && Op.concurrent(dt) )
+        ;
     }
 
     @NotNull
@@ -1609,18 +1606,24 @@ public enum Op implements $ {
         return the(DTERNAL, u);
     }
 
-    public Term the(int dt, @NotNull Collection<Term> sub) {
-        int ss = sub.size();
-        @NotNull Term[] u = sub.toArray(new Term[ss]);
-        return the(dt, u);
+    public final Term the(int dt, @NotNull Collection<Term> sub) {
+        int s = sub.size();
+        return _the(dt, commute(dt, s) ? Terms.sorted(sub) : sub.toArray(new Term[s]));
     }
 
     @NotNull
-    public Term the(int dt, @NotNull Term... u) {
+    public final Term the(int dt, @NotNull Term... u) {
+        return _the(dt, commute(dt, u.length) ? Terms.sorted(u) : u);
+    }
+
+    @NotNull Term _the(int dt, Term[] uu) {
         if (statement) {
-            return statement(this, dt, u[0], u[1]);
+            if (uu.length == 1) { //similarity has been reduced
+                assert(this == SIM);
+                return uu[0] == Null ? Null : True;
+            }
+            return statement(this, dt, uu[0], uu[1]);
         } else {
-            Term[] uu = commute(dt) ? Terms.sorted(u) : u;
             return compound(this, dt, uu);
         }
     }

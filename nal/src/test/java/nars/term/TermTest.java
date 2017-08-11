@@ -51,7 +51,7 @@ public class TermTest {
             Termed term1 = n.term(term1String);
             Termed term2 = n.term(term2String);
 
-            assertNotEquals(term1String, term2String);
+            //assertNotEquals(term1String, term2String);
 
             assertEquivalentTerm(term1.term(), term2.term());
 
@@ -61,16 +61,14 @@ public class TermTest {
     }
 
     public void assertEquivalentTerm(Term term1, Term term2) {
-        assertTrue(term1 instanceof Compound);
-        assertTrue(term2 instanceof Compound);
 
         assertEquals(term1, term2);
         assertEquals(term2, term1);
         assertEquals(term1.hashCode(), term2.hashCode());
         assertEquals(term1.dt(), term2.dt());
         assertEquals(0, term1.compareTo(term2));
-        assertEquals(0, term2.compareTo(term1));
         assertEquals(0, term1.compareTo(term1));
+        assertEquals(0, term2.compareTo(term1));
         assertEquals(0, term2.compareTo(term2));
     }
 
@@ -80,17 +78,37 @@ public class TermTest {
     }
 
     @Test
-    public void testCommutativeCompoundTerm() throws Exception {
+    public void testConjCommutivity() throws Exception {
 
         assertEquivalentTerm("(&&,a,b)", "(&&,b,a)");
         assertEquivalentTerm("(&&,(||,(b),(c)),(a))", "(&&,(a),(||,(b),(c)))");
         assertEquivalentTerm("(&&,(||,(c),(b)),(a))", "(&&,(a),(||,(b),(c)))");
         assertEquivalentTerm("(&&,(||,(c),(b)),(a))", "(&&,(a),(||,(c),(b)))");
+    }
 
-        assertEquivalentTerm("(&,a,b)", "(&,b,a)");
-        assertEquivalentTerm("{a,c,b}", "{b,a,c}");
-        assertEquivalentTerm("{a,c,b}", "{b,c,a}");
+    @Test
+    public void testSetCommutivity() throws Exception {
+
+        assertEquals("{a,b}", $("{b,a}").toString());
+        assertEquals("{a,b}", $("{a,b}").toString());
+        assertEquals("{a,b}", $.sete($.the("a"), $.the("b")).toString());
+        assertEquals("{a,b}", $.sete($.the("b"), $.the("a")).toString());
+
+        assertEquivalentTerm("{b,a}", "{b,a}");
+        assertEquivalentTerm("{a,b}", "{b,a}");
+
+
+        assertEquivalentTerm("{b,a,c}", "{b,a,c}");
+        assertEquivalentTerm("{b,a,c}", "{a,c,b}");
+        assertEquivalentTerm("{b,a,c}", "{b,c,a}");
+
         assertEquivalentTerm("[a,c,b]", "[b,a,c]");
+    }
+
+    @Test
+    public void testOtherCommutivity() throws Exception {
+        assertEquivalentTerm("(&,a,b)", "(&,b,a)");
+        assertEquivalentTerm("(|,a,b)", "(|,b,a)");
 
         assertEquivalentTerm("<{Birdie}<->{Tweety}>", "<{Tweety}<->{Birdie}>");
         assertEquivalentTerm($("<{Birdie}<->{Tweety}>"),
@@ -135,12 +153,21 @@ public class TermTest {
 
     }
 
+//    @Test public void testDisjunctionEllipsis() throws Narsese.NarseseException {
+//         assertEquals("(||,%A..+)", $.$("(||,%A..+)"));
+//    }
     @Test
     public void testConjunction1Term() throws Narsese.NarseseException {
 
         assertEquals("a", n.term("(&&,a)").toString());
         assertEquals("x(a)", n.term("(&&,x(a))").toString());
         assertEquals("a", n.term("(&&,a, a)").toString());
+
+        assertEquals("((before-->x) &&+10 (after-->x))",
+                $.$("(x:after &&-10 x:before)").toString());
+        assertEquals("((before-->x) &&+10 (after-->x))",
+                $.$("(x:before &&+10 x:after)").toString());
+
         //assertEquals("a", n.term("(&&+0,a)").toString());
         //assertEquals("a", n.term("(&&+3,a)").toString());
     }

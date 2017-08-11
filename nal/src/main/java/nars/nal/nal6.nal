@@ -52,11 +52,11 @@
 
     (S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositive)
         (S ==> M), ((&&,(--,%S),A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositiveN)
-        (S ==> M), ((||,S,A..+) ==> M) |- ((||,A..+) ==>+- M), (Belief:DecomposePositiveNegativeNegative)
+        //(S ==> M), ((||,S,A..+) ==> M) |- ((||,A..+) ==>+- M), (Belief:DecomposePositiveNegativeNegative)
 
     (M ==> S), (M ==> (&&,S,A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
         (M ==> S), (M ==> (&&,(--,%S),A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
-        (M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
+        //(M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
     (M ==> C), C, belief("&&") |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
         ((--,%M) ==> C), C, belief("&&") |- ((--,%M) ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)

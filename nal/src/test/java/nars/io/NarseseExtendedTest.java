@@ -229,7 +229,7 @@ public class NarseseExtendedTest extends NarseseTest {
 
     @Test public void testParallelTemporals() throws Narsese.NarseseException {
 
-        assertEquals("(a<|>b)", term("(a <|> b)").toString());
+        //assertEquals("(a<|>b)", term("(a <|> b)").toString());
         assertEquals("(a=|>b)", term("(a =|> b)").toString());
         assertEquals("(a&|b)", term("(a &| b)").toString());
         assertEquals("(&|,a,b,c)", term("(&|, a, b, c)").toString());
@@ -239,6 +239,12 @@ public class NarseseExtendedTest extends NarseseTest {
 
     @Test public void testParallelTemporals2() throws Narsese.NarseseException {
         assertEquals("(x &&+2 y)", term("(x &&+2 y)").toString());
+    }
+    @Test public void testParallelTemporals3() throws Narsese.NarseseException {
+        assertEquals("(x &&+2 ((a)&|(b)))", term("(x &&+2 ((a) &| (b)))").toString());
+        assertEquals("(x &&+2 (&|,(a),(b),(c)))", term("(x &&+2 ( ((a) &| (b)) &| (c)))").toString());
+
+        //THIS IS A PARSER PROBLEM:
         assertEquals("(x &&+2 (&|,(a),(b),(c)))", term("(x &&+2 (&|,(a), (b), (c)))").toString());
     }
 
