@@ -629,11 +629,17 @@ public class Temporalize {
         boolean taskRooted = true; //(belief == null) || ( !task.isEternal() );
         boolean beliefRooted = true; //belief!=null && (!taskRooted || !belief.isEternal());
 
+
         model.know(task, d, taskRooted);
 
         if (belief != null) {
-            if (!belief.equals(task))
+            if (!belief.equals(task)) {
+
+                if (task.isEternal() && belief.isEternal() /*&& some interesction of terms is prsent */)
+                    beliefRooted = false; //avoid confusing with multiple eternal roots; force relative calculation
+
                 model.know(belief, d, beliefRooted); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+            }
         } else if (d.beliefTerm != null) {
             if (!task.term().equals(d.beliefTerm)) //dont re-know the term
                 model.know(d.beliefTerm, d, null);

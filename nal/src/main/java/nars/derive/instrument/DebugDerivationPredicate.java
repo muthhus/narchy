@@ -21,9 +21,7 @@ public class DebugDerivationPredicate extends InstrumentedDerivationPredicate {
 
     @Override
     protected void onExit(PrediTerm<Derivation> p, Derivation d, boolean returnValue, Throwable thrown, long nanos) {
-        if (p instanceof Fork) {
-
-        } else if (p instanceof AndCondition) {
+        if (p instanceof Fork || p instanceof AndCondition) {
 
         } else {
 

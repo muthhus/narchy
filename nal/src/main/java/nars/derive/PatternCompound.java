@@ -26,9 +26,9 @@ import java.util.TreeSet;
  */
 abstract public class PatternCompound extends GenericCompoundDT  {
 
-    public final int sizeCached;
-    public final int structureNecessary;
-    public final boolean commutative; //cached
+    final int sizeCached;
+    final int structureNecessary;
+    private final boolean commutative; //cached
     transient final private Op op; //cached
     private final int minVolumeNecessary;
     private final int size;
@@ -100,7 +100,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
     abstract protected static class PatternCompoundWithEllipsis extends PatternCompound  {
 
         @NotNull
-        protected final Ellipsis ellipsis;
+        final Ellipsis ellipsis;
 
         PatternCompoundWithEllipsis(@NotNull Op seed, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(seed, dt, subterms);
@@ -141,7 +141,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
          * WARNING this implementation only works if there is one ellipse in the subterms
          * this is not tested for either
          */
-        protected final boolean matchEllipsedLinear(@NotNull TermContainer Y, @NotNull Unify subst) {
+        final boolean matchEllipsedLinear(@NotNull TermContainer Y, @NotNull Unify subst) {
 
             int i = 0, j = 0;
             int xsize = sizeCached;

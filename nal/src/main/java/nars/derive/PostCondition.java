@@ -35,7 +35,7 @@ public class PostCondition implements Serializable //since there can be multiple
      */
     public final int minNAL;
 
-    public PostCondition(@NotNull Term pattern, @Nullable Term beliefTruth, @Nullable Term goalTruth, byte puncOverride) {
+    private PostCondition(@NotNull Term pattern, @Nullable Term beliefTruth, @Nullable Term goalTruth, byte puncOverride) {
         this.pattern = pattern;
         this.beliefTruth = beliefTruth;
         this.goalTruth = goalTruth;
@@ -56,9 +56,9 @@ public class PostCondition implements Serializable //since there can be multiple
     );
 
 
-    static final Atomic
-            swap = the("Swap"),
-            backward = the("Backward");
+    private static final Atomic
+            swap = the("Swap");
+    private static final Atomic backward = the("Backward");
 
 
     /**
@@ -185,7 +185,7 @@ public class PostCondition implements Serializable //since there can be multiple
     }
 
 
-    final boolean modifiesPunctuation() {
+    private boolean modifiesPunctuation() {
         return puncOverride > 0;
     }
 

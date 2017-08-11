@@ -14,11 +14,11 @@ import static nars.Op.*;
  */
 abstract public class Solve extends AbstractPred<Derivation> {
 
-    public final TruthOperator belief;
-    public final TruthOperator goal;
-    final boolean beliefProjected;
+    private final TruthOperator belief;
+    private final TruthOperator goal;
+    private final boolean beliefProjected;
 
-    protected Solve(Compound id, TruthOperator belief, TruthOperator goal, boolean beliefProjected) {
+    Solve(Compound id, TruthOperator belief, TruthOperator goal, boolean beliefProjected) {
         super(id);
         this.belief = belief;
         this.goal = goal;

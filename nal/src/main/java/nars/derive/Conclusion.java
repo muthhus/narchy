@@ -46,7 +46,7 @@ public class Conclusion extends AbstractPred<Derivation> {
      */
     private final CauseChannel<Task> channel;
 
-    public final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
+    private final static Logger logger = LoggerFactory.getLogger(Conclusion.class);
     private final Term pattern;
     private final String rule;
     private final boolean varIntro, goalUrgent;
