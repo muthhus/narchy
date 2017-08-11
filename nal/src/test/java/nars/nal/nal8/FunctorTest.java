@@ -85,10 +85,10 @@ public class FunctorTest {
     public void testExecutionResultIsCondition() throws Narsese.NarseseException {
         NAR d = NARS.tmp();
         d.log();
-        d.input("(add($x,1) <=> inc($x)).");
-        d.input("(inc(1) <=> two).");
+        d.input("(add($x,1) ==> inc($x))."); //was <=>
+        d.input("(inc(1) ==> two).");//was <=>
         d.run(128);
-        d.input("(inc(two) <=> ?x)?");
+        d.input("(inc(two) ==> ?x)?");
     }
 
 //    @Test

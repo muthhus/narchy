@@ -4,9 +4,10 @@ import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.concept.ScalarConcepts;
 import nars.concept.GoalActionConcept;
+import nars.concept.ScalarConcepts;
 import nars.term.Compound;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import static jcog.Util.round;
@@ -52,7 +53,7 @@ public class Line1DSimplest extends NAgent {
 //        }));
 
         //out = null;
-        Compound O = //$.inh(Atomic.the("o"), id);
+        Term O = //$.inh(Atomic.the("o"), id);
                 $.p("o");
         out = actionTriState(O, (d) -> {
             switch (d) {

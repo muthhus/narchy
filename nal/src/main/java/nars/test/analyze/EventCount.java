@@ -1,13 +1,10 @@
 package nars.test.analyze;
 
-import jcog.event.Ons;
 import jcog.event.Topic;
 import jcog.meter.event.HitMeter;
-import nars.$;
 import nars.NAR;
 import nars.control.NARService;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

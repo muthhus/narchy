@@ -155,7 +155,7 @@ public interface NAct {
     }
 
     @Nullable
-    default GoalActionConcept actionTriStateContinuous(@NotNull Compound s, @NotNull IntPredicate i) {
+    default GoalActionConcept actionTriStateContinuous(@NotNull Term s, @NotNull IntPredicate i) {
 
         GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             //radius of center dead zone; diameter = 2x this
@@ -204,7 +204,7 @@ public interface NAct {
     }
 
     @Nullable
-    default ActionConcept actionTriStatePWM(@NotNull Compound s, @NotNull IntConsumer i) {
+    default ActionConcept actionTriStatePWM(@NotNull Term s, @NotNull IntConsumer i) {
         ActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
 
 
@@ -347,7 +347,7 @@ public interface NAct {
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
     @NotNull
-    default GoalActionConcept actionBipolar(@NotNull Compound s, @NotNull FloatToFloatFunction update) {
+    default GoalActionConcept actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         return actionUnipolar(s, (f) -> {
             if (f != f)
                 return Float.NaN;

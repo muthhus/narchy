@@ -27,18 +27,18 @@ public interface NARIn {
     }
 
     @Nullable
-    default Task question(@NotNull Compound term, long occ, @NotNull BiConsumer<ActiveQuestionTask,Task> eachAnswer) {
+    default Task question(@NotNull Term term, long occ, @NotNull BiConsumer<ActiveQuestionTask,Task> eachAnswer) {
         return question(term, occ, Op.QUESTION, eachAnswer);
     }
 
     @Nullable
-    default ActiveQuestionTask question(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull BiConsumer<ActiveQuestionTask, Task> eachAnswer) {
+    default ActiveQuestionTask question(@NotNull Term term, long occ, byte punc /* question or quest */, @NotNull BiConsumer<ActiveQuestionTask, Task> eachAnswer) {
         assert(punc == Op.QUESTION || punc == Op.QUEST);
         return inputAndGet( new ActiveQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
     }
 
     @Nullable
-    default ActiveQuestionTask ask(@NotNull Compound term, long occ, byte punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
+    default ActiveQuestionTask ask(@NotNull Term term, long occ, byte punc /* question or quest */, @NotNull Consumer<Task> eachAnswer) {
         assert(punc == Op.QUESTION || punc == Op.QUEST);
         return inputAndGet( new ActiveQuestionTask(term, punc, occ, 16, (NAR)this, eachAnswer) );
     }

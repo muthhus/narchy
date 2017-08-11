@@ -4,7 +4,6 @@ import jcog.bag.impl.ArrayBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import nars.$;

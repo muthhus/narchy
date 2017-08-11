@@ -19,7 +19,6 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
-import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.obj.JsonTerm;
@@ -156,7 +155,6 @@ public interface $ {
     }
 
 
-
     public static @NotNull Term func(@NotNull String opTerm, @NotNull String... arg) throws Narsese.NarseseException {
         return func(Atomic.the(opTerm), $.array(arg));
     }
@@ -164,13 +162,14 @@ public interface $ {
     /**
      * function ((a,b)==>c) aka: c(a,b)
      */
-    @NotNull public static Term func(@NotNull Atomic opTerm, @NotNull Term... arg) {
-        return INH.the( $.p(arg), opTerm );
+    @NotNull
+    public static Term func(@NotNull Atomic opTerm, @NotNull Term... arg) {
+        return INH.the($.p(arg), opTerm);
     }
 
     @NotNull
     public static Term func(@NotNull Atomic opTerm, @NotNull Collection<Term> arg) {
-        return INH.the( $.p(arg), opTerm );
+        return INH.the($.p(arg), opTerm);
     }
 
 
@@ -195,17 +194,17 @@ public interface $ {
     }
 
     @NotNull
-    public static Compound p(@NotNull Collection<? super Term> t) {
+    public static Term p(@NotNull Collection<? super Term> t) {
         return $.p(t.toArray(new Term[t.size()]));
     }
 
     @NotNull
-    public static Compound p(@NotNull Term... t) {
-        return (t.length == 0) ? ZeroProduct : (Compound) the(PROD, t);
+    public static Term p(@NotNull Term... t) {
+        return (t.length == 0) ? ZeroProduct : the(PROD, t);
     }
 
     @NotNull
-    public static Compound p(@NotNull TermContainer t) {
+    public static Term p(@NotNull TermContainer t) {
         return p((Term[]) t.toArray());
     }
 
@@ -213,7 +212,7 @@ public interface $ {
      * creates from a sublist of a list
      */
     @NotNull
-    static Compound p(@NotNull List<Term> l, int from, int to) {
+    static Term p(@NotNull List<Term> l, int from, int to) {
         Term[] x = new Term[to - from];
 
         for (int j = 0, i = from; i < to; i++)
@@ -223,12 +222,12 @@ public interface $ {
     }
 
     @NotNull
-    public static Compound p(@NotNull String... t) {
+    public static Term p(@NotNull String... t) {
         return $.p((Term[]) $.the(t));
     }
 
     @NotNull
-    public static Compound p(@NotNull int... t) {
+    public static Term p(@NotNull int... t) {
         return $.p((Term[]) $.the(t));
     }
 
@@ -321,7 +320,7 @@ public interface $ {
     }
 
     @NotNull
-    public static TaskBuilder goal(@NotNull Term  term, float freq, float conf) {
+    public static TaskBuilder goal(@NotNull Term term, float freq, float conf) {
         return task(term, GOAL, freq, conf);
     }
 
@@ -341,15 +340,15 @@ public interface $ {
     }
 
     @NotNull
-    public static Compound sete(@NotNull Collection<? extends Term> t) {
-        return (Compound) the(SETe, (Collection) t);
+    public static Term sete(@NotNull Collection<? extends Term> t) {
+        return the(SETe, (Collection) t);
     }
 
     /**
      * construct set_ext of key,value pairs from a Map
      */
     @NotNull
-    public static Compound seteMap(@NotNull Map<Term, Term> map) {
+    public static Term seteMap(@NotNull Map<Term, Term> map) {
         return $.sete(
                 map.entrySet().stream().map(
                         e -> $.p(e.getKey(), e.getValue()))
@@ -358,7 +357,7 @@ public interface $ {
     }
 
     @NotNull
-    public static Compound p(@NotNull char[] c, @NotNull CharToObjectFunction<Term> f) {
+    public static Term p(@NotNull char[] c, @NotNull CharToObjectFunction<Term> f) {
         Term[] x = new Term[c.length];
         for (int i = 0; i < c.length; i++) {
             x[i] = f.valueOf(c[i]);
@@ -367,7 +366,7 @@ public interface $ {
     }
 
     @NotNull
-    public static <X> Compound p(@NotNull X[] x, @NotNull Function<X, Term> toTerm) {
+    public static <X> Term p(@NotNull X[] x, @NotNull Function<X, Term> toTerm) {
         return $.p((Term[]) terms(x, toTerm));
     }
 
@@ -376,7 +375,7 @@ public interface $ {
     }
 
     @NotNull
-    public static <X> Compound seteMap(@NotNull Map<Term, ? extends X> map, @NotNull Function<X, Term> toTerm) {
+    public static <X> Term seteMap(@NotNull Map<Term, ? extends X> map, @NotNull Function<X, Term> toTerm) {
         return $.sete(
                 map.entrySet().stream().map(
                         e -> $.p(e.getKey(), toTerm.apply(e.getValue())))
@@ -398,13 +397,13 @@ public interface $ {
     }
 
     @NotNull
-    public static Compound seti(@NotNull Collection<Term> t) {
+    public static Term seti(@NotNull Collection<Term> t) {
         return $.seti(array(t));
     }
 
     @NotNull
-    public static Compound sete(Term... t) {
-        return (Compound) the(SETe, t);
+    public static Term sete(Term... t) {
+        return the(SETe, t);
 
     }
 
@@ -412,13 +411,13 @@ public interface $ {
      * shorthand for extensional set
      */
     @NotNull
-    public static Compound s(Term... t) {
+    public static Term s(Term... t) {
         return sete(t);
     }
 
     @NotNull
-    public static Compound seti(Term... t) {
-        return (Compound) the(SETi, t);
+    public static Term seti(Term... t) {
+        return the(SETi, t);
     }
 
 //    /**
@@ -552,7 +551,6 @@ public interface $ {
         }
 
     }
-
 
 
     @Nullable
@@ -740,7 +738,7 @@ public interface $ {
 
         if (o instanceof Number) {
             if (o instanceof Integer)
-                return Int.the(((Integer)o).intValue());
+                return Int.the(((Integer) o).intValue());
         }
 
         return Atomic.the(o.toString());
@@ -852,7 +850,7 @@ public interface $ {
 //        return l;
     }
 
-    public static Compound pRadix(int x, int radix, int maxX) {
+    public static Term pRadix(int x, int radix, int maxX) {
         Term[] tt = radixArray(x, radix, maxX);
         return $.p(tt);
     }
@@ -882,16 +880,16 @@ public interface $ {
     }
 
 
-    public static @NotNull Compound pRecurseIntersect(char prefix, @NotNull Term... t) {
+    public static @NotNull Term pRecurseIntersect(char prefix, @NotNull Term... t) {
         final int[] index = {0};
-        return (Compound) $.secte($.terms(t, x -> {
+        return $.secte($.terms(t, x -> {
             return Atomic.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + ((Atomic) x).toString());
         }));
     }
 
-    public static @NotNull Compound pRecurse(@NotNull Term... t) {
+    public static @NotNull Term pRecurse(@NotNull Term... t) {
         int tl = t.length;
-        Compound nextInner = $.p(t[--tl]); //wrap innermost item in product too, for fairness
+        Term nextInner = $.p(t[--tl]); //wrap innermost item in product too, for fairness
         while (tl > 0) {
             nextInner = $.p(t[--tl], nextInner);
         }
@@ -953,18 +951,18 @@ public interface $ {
         return term != null ? term : Null;
     }
 
-    public static <X> PrediTerm<X> IF(Compound t, Predicate<X> test) {
+    public static <X> PrediTerm<X> IF(Term t, Predicate<X> test) {
         return new LambdaPred<X>(t, test);
     }
 
     public static <X> PrediTerm<X> AND(PrediTerm<X> a, PrediTerm<X> b) {
-        return new LambdaPred<X>((Compound) $.conj(a, b), (X x) -> {
+        return new LambdaPred<X>($.conj(a, b), (X x) -> {
             return a.test(x) && b.test(x);
         });
     }
 
     public static <X> PrediTerm<X> OR(PrediTerm<X> a, PrediTerm<X> b) {
-        return new LambdaPred<X>((Compound) $.disj(a, b), (X x) -> {
+        return new LambdaPred<X>($.disj(a, b), (X x) -> {
             return a.test(x) || b.test(x);
         });
     }

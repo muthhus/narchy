@@ -1,7 +1,6 @@
 
 package nars.nlp;
 
-import jcog.pri.PriReference;
 import nars.*;
 import nars.bag.leak.LeakOut;
 import nars.term.Term;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
 
 import java.io.IOException;
-import java.util.function.Consumer;
 
 import static nars.Op.PROD;
 import static nars.time.Tense.ETERNAL;

@@ -2,10 +2,8 @@ package nars.index.util;
 
 import nars.Op;
 import nars.term.container.TermContainer;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Consumer;
 

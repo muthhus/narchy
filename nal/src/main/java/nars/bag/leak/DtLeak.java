@@ -2,8 +2,6 @@ package nars.bag.leak;
 
 import jcog.bag.Bag;
 import jcog.data.FloatParam;
-import jcog.pri.PLink;
-import nars.Task;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicBoolean;

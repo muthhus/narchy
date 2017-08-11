@@ -1,7 +1,7 @@
 package nars.derive;
 
 import nars.$;
-import nars.term.Compound;
+import nars.term.Term;
 
 import java.util.function.Predicate;
 
@@ -14,7 +14,7 @@ public final class LambdaPred<X> extends AbstractPred<X> {
         this($.p($.the(p.toString())), p);
     }
 
-    public LambdaPred(Compound term, Predicate<X> p) {
+    public LambdaPred(Term term, Predicate<X> p) {
         super(term);
         this.test = p;
     }

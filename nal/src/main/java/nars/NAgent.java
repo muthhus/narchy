@@ -37,7 +37,6 @@ import static nars.$.neg;
 import static nars.$.newArrayList;
 import static nars.$.p;
 import static nars.$.t;
-import static nars.$.varQuery;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;
 import static nars.truth.TruthFunctions.w2c;

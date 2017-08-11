@@ -4,8 +4,6 @@ import nars.NAR;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.time.Tense.ETERNAL;
-
 /** executes approximately once every N durations */
 abstract public class DurService extends CycleService {
 

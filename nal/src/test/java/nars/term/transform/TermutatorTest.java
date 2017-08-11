@@ -10,6 +10,7 @@ import nars.derive.mutate.Choose1;
 import nars.derive.mutate.Choose2;
 import nars.derive.mutate.CommutivePermutations;
 import nars.derive.mutate.Termutator;
+import nars.term.Compound;
 import nars.term.Term;
 import nars.term.subst.Unify;
 import nars.term.var.Variable;
@@ -41,7 +42,7 @@ public class TermutatorTest {
 
         assertTermutatorProducesUniqueResults(
                 new Choose1(e1, p2,
-                        p("a", "b").toSortedSet()), 2);
+                        ((Compound)p("a", "b")).toSortedSet()), 2);
 
     }
 
@@ -50,7 +51,7 @@ public class TermutatorTest {
 
         assertTermutatorProducesUniqueResults(
                 new Choose1(e1, p2,
-                        p("a", "b", "c").toSortedSet()), 3);
+                        ((Compound)p("a", "b", "c")).toSortedSet()), 3);
     }
 
     @Test
@@ -58,7 +59,7 @@ public class TermutatorTest {
 
         assertTermutatorProducesUniqueResults(
                 new Choose1(e1, p2,
-                        p("a", "b", "c", "d").toSortedSet()), 4);
+                        ((Compound)p("a", "b", "c", "d")).toSortedSet()), 4);
     }
 
 
@@ -79,7 +80,7 @@ public class TermutatorTest {
 
 
     static final Variable p2= v(Op.VAR_PATTERN, 2);
-    static final SortedSet<Term> p2p3 = $.p( p2, v(Op.VAR_PATTERN, 3) ).toSortedSet();
+    static final SortedSet<Term> p2p3 = ((Compound)$.p( p2, v(Op.VAR_PATTERN, 3) )).toSortedSet();
 
     @Test public void testChoose2_2() {
 
@@ -88,14 +89,14 @@ public class TermutatorTest {
         assertTermutatorProducesUniqueResults(
                 new Choose2(e1, unifier,
                         p2p3,
-                        p("a", "b").toSortedSet()), 2);
+                        ((Compound)p("a", "b")).toSortedSet()), 2);
     }
 
     @Test public void testChoose2_3() {
 
         assertTermutatorProducesUniqueResults(
                 new Choose2(e1, unifier, p2p3,
-                        p("a", "b", "c").toSortedSet()), 6);
+                        ((Compound)p("a", "b", "c")).toSortedSet()), 6);
     }
     @Test public void testChoose2_4() {
 
@@ -105,7 +106,7 @@ public class TermutatorTest {
                     assertTermutatorProducesUniqueResults(
                             new Choose2(e1, unifier,
                                     p2p3,
-                                    p("a", "b", "c", "d").toSortedSet()), 12)
+                                    ((Compound)p("a", "b", "c", "d")).toSortedSet()), 12)
             );
         }
 

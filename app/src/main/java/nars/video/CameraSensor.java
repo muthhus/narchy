@@ -121,10 +121,10 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     }
 
     @NotNull
-    public static Compound coord(char prefix, int n, int max) {
+    public static Term coord(char prefix, int n, int max) {
         //return $.pRecurseIntersect(prefix, $.radixArray(n, radix, max));
         //return $.pRecurse($.radixArray(n, radix, max));
-        return $.p($.radixArray(n, 2, max));
+        return $.p($.the(prefix), $.p($.radixArray(n, 2, max)));
     }
 
     @NotNull

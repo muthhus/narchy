@@ -1,12 +1,14 @@
 package nars.derive;
 
 import com.google.common.base.Joiner;
+import nars.$;
 import nars.Narsese;
 import nars.Op;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
 import nars.term.Compound;
+import nars.term.Term;
 import org.junit.Test;
 
 import java.util.Set;
@@ -21,6 +23,24 @@ public class PremiseRuleTest {
 
 
 
+    @Test
+    public void testNoNormalization() throws Exception {
+
+        String a = "<x --> #1>";
+        String b = "<y --> #1>";
+        Term p = $.p(
+            Narsese.term(a),
+            Narsese.term(b)
+        );
+        String expect = "((x-->#1),(y-->#1))";
+        assertEquals(expect, p.toString());
+
+//        Term pn = p.normalized();
+//        assertEquals(expect, pn.toString());
+//
+//        p.set((Term)parse.term(a), parse.term(b));
+//        assertEquals(expect, p.toString());
+    }
 
 
     @Test

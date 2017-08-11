@@ -10,8 +10,6 @@ import nars.concept.builder.DefaultConceptBuilder;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.subst.MapSubst;
-import nars.term.subst.MapSubst1;
 import nars.term.transform.Retemporalize;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.PrintStream;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 

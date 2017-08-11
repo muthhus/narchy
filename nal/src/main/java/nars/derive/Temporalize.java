@@ -246,9 +246,18 @@ public class Temporalize {
                 return DTERNAL;
             else {
                 assert(d!=XTERNAL);
+
+                int ar = ra.rel.subtermTime(ra.term);
+                if (ar == DTERNAL)  ar = 0; //promote to dt=0
+                if (ar == XTERNAL)  return XTERNAL;
+
+                int br = rb.rel.subtermTime(rb.term);
+                if (br == DTERNAL)  br = 0; //promote to dt=0
+                if (br == XTERNAL)  return XTERNAL;
+
                 return d
-                        + rb.rel.subtermTime(rb.term)
-                        - ra.rel.subtermTime(ra.term)
+                        + br
+                        - ar
                         ;
             }
 
@@ -1009,11 +1018,13 @@ public class Temporalize {
                                 return ds;
                         }
                     }
-                    @NotNull Term d = target.op().the(0, a);
-                    if (!(d instanceof Bool)) {
-                        Event ds = solve(d);
-                        if (ds != null)
-                            return ds;
+                    {
+                        @NotNull Term d = target.op().the(0, a);
+                        if (!(d instanceof Bool)) {
+                            Event ds = solve(d);
+                            if (ds != null)
+                                return ds;
+                        }
                     }
                 }
 
@@ -1024,6 +1035,8 @@ public class Temporalize {
                         int dt = dt(s0, s1, trail);
                         if (dt == 0 || dt == DTERNAL) {
                             return new SolutionEvent(o.the(dt, tt.toArray()), s0.start(trail).abs());
+                        } else {
+                            return null; //invalid
                         }
                     }
                 }

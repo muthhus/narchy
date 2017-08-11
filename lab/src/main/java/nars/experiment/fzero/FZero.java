@@ -3,14 +3,11 @@ package nars.experiment.fzero;
 import jcog.Util;
 import nars.*;
 import nars.concept.ScalarConcepts;
-import nars.gui.BeliefTableChart;
 import nars.gui.Vis;
 import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
-import spacegraph.layout.Grid;
 
-import static java.util.stream.Collectors.toList;
 import static nars.term.atom.Atomic.the;
 import static spacegraph.SpaceGraph.window;
 

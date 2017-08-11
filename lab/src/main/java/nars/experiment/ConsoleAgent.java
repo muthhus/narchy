@@ -153,7 +153,7 @@ public abstract class ConsoleAgent extends NAgentX {
     private class TestConsole extends ConsoleSurface {
 
         final char[][] chars;
-        final Compound terms[][];
+        final Term terms[][];
         private final boolean read;
         private final Signal[][] beliefs;
         int c[] = new int[2];

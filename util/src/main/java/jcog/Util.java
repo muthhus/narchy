@@ -27,7 +27,6 @@ import com.google.common.io.Closeables;
 import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import jcog.io.BinTxt;
-import jcog.math.FloatSupplier;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
 import jcog.pri.Priority;

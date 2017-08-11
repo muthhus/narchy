@@ -38,7 +38,7 @@ public class UnitCompound1Test {
     @Test
     public void testUnitCompound2() {
         Atomic x = Atomic.the("x");
-        Compound c = $.p(x);
+        Term c = $.p(x);
         System.out.println(c);
         System.out.println(c.sub(0));
 

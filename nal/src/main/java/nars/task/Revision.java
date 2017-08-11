@@ -1,7 +1,6 @@
 package nars.task;
 
 import jcog.math.Interval;
-import nars.$;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -24,7 +23,6 @@ import java.util.Random;
 import static jcog.Util.lerp;
 import static nars.time.Tense.DTERNAL;
 import static nars.truth.TruthFunctions.c2w;
-import static nars.truth.TruthFunctions.w2c;
 
 /**
  * Revision / Projection / Revection Utilities

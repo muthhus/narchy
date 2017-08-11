@@ -1,7 +1,6 @@
 package nars.task;
 
 import jcog.Util;
-import jcog.math.NumberException;
 import jcog.pri.Pri;
 import nars.Param;
 import nars.Task;

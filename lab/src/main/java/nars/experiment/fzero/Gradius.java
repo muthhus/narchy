@@ -1,14 +1,12 @@
 package nars.experiment.fzero;
 
 import java4k.gradius4k.Gradius4K;
-import jcog.math.FloatNormalized;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
 import nars.term.atom.Atomic;
-import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.term.atom.Atomic.the;

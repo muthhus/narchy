@@ -1,6 +1,5 @@
 package nars.control;
 
-import com.google.common.util.concurrent.AbstractIdleService;
 import jcog.Services;
 import jcog.event.Ons;
 import nars.$;

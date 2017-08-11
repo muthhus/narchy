@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Param;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +20,7 @@ import static nars.time.Tense.ETERNAL;
 public class DeductiveMeshTest {
 
     @NotNull
-    public final Compound q;
+    public final Term q;
     @NotNull
     public final List<Compound> coords;
 
@@ -41,7 +42,7 @@ public class DeductiveMeshTest {
             throw new UnsupportedOperationException("2-D only implemented");
 
         coords = $.newArrayList();
-        Set<Compound> edges = new HashSet();
+        Set<Term> edges = new HashSet();
         for (int x = 0; x < dims[0]; x++) {
             for (int y = 0; y < dims[1]; y++) {
                 //Compound c = c(x, y);
@@ -61,7 +62,7 @@ public class DeductiveMeshTest {
 
         edges.forEach(n.nar::believe);
 
-        Compound term = q = link(0, 0, dims[0] - 1, dims[1] - 1);
+        Term term = q = link(0, 0, dims[0] - 1, dims[1] - 1);
         ask(n, term);
 
         if (timeLimit>0)
@@ -69,17 +70,16 @@ public class DeductiveMeshTest {
 
     }
 
-    public void ask(@NotNull TestNAR n, Compound term) {
+    public void ask(@NotNull TestNAR n, Term term) {
         n.nar.question(term, ETERNAL, (q, a) -> System.out.println(a.proof()));
     }
 
-    @Nullable
-    private Compound link(int x1, int y1, int x2, int y2) {
+    @Nullable private Term link(int x1, int y1, int x2, int y2) {
         //return $.prop($.p(a, b), $.the("X"));
         return $.sim( $.p($.the(x1), $.the(y1)), $.p($.the(x2), $.the(y2)) );
     }
 
-    public @NotNull Compound c(int x, int y) {
+    public @NotNull Term c(int x, int y) {
         return $.p($.the(x), $.the(y));
     }
 

@@ -18,9 +18,9 @@ public class differ extends Functor.BinaryFunctor {
     @Override
     public Term apply(@NotNull Term a, @NotNull Term b) {
 
-        Term y = Op.difference(a.op(), a.subterms(), b.subterms());
-        if (y.equals(a))
-            return Null; //prevent identical fall-through
+        Term y = Op.difference(a.op(), a, b);
+//        if (y.equals(a))
+//            return Null; //prevent identical fall-through
         return y;
 
     }

@@ -159,7 +159,7 @@ public class QuestionTest {
                 case 1:
                     new DeductiveMeshTest(t, dims, timelimit) {
                         @Override
-                        public void ask(@NotNull TestNAR n, Compound term) {
+                        public void ask(@NotNull TestNAR n, Term term) {
                             //disabled
                         }
                     };

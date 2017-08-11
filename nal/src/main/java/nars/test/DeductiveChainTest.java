@@ -5,6 +5,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.Param;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,28 +14,28 @@ import org.jetbrains.annotations.Nullable;
 public class DeductiveChainTest  {
 
     @NotNull
-    public final Compound q;
+    public final Term q;
     @NotNull
-    public final Compound[] beliefs;
+    public final Term[] beliefs;
 
     @FunctionalInterface
     public interface IndexedStatementBuilder {
         @NotNull
-        Compound apply(int x, int y);
+        Term apply(int x, int y);
     }
 
     @Nullable
     public static final IndexedStatementBuilder inh = (int x, int y) ->
-            (Compound)$.inh(a(x), a(y));
+            $.inh(a(x), a(y));
     @Nullable
     public static final IndexedStatementBuilder sim = (int x, int y) ->
-            (Compound)$.sim(a(x), a(y));
+            $.sim(a(x), a(y));
     @Nullable
     public static final IndexedStatementBuilder impl = (int x, int y) ->
-            (Compound)$.impl(a(x), a(y));
+            $.impl(a(x), a(y));
     @Nullable
 //    public static final IndexedStatementBuilder equiv = (int x, int y) ->
-//            (Compound)$.equi(a(x), a(y));
+//            $.equi(a(x), a(y));
 
     public DeductiveChainTest(@NotNull NAR n, int length, int timeLimit, @NotNull IndexedStatementBuilder b) {
         this(new TestNAR(n), length, timeLimit, b);
@@ -49,7 +50,7 @@ public class DeductiveChainTest  {
 
         q = b.apply(0, length);
 
-        for (Compound belief : beliefs) {
+        for (Term belief : beliefs) {
             n.nar.believe(belief);
         }
         n.nar.question( q );

@@ -13,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.function.Consumer;
 
 import static nars.op.DepIndepVarIntroduction.ConjOrStatementBits;
 import static nars.term.Terms.compoundOrNull;

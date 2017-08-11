@@ -59,7 +59,7 @@ public class RTreeBeliefTableTest {
 
         int end = 50;
 
-        Compound term = $.p("x");
+        Term term = $.p("x");
         LongToFloatFunction func = (t) -> (float)(Math.sin(t/5f)/2f+0.5f);
 
         //1. populate

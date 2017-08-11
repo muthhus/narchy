@@ -1,6 +1,5 @@
 package nars.term.subst;
 
-import nars.Param;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

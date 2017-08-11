@@ -925,7 +925,7 @@ public enum Op implements $ {
         a.events(events, aStart);
         b.events(events, bStart);
 
-        events.sort(Comparator.comparingLong(ObjectLongPair<Term>::getTwo).thenComparing(ObjectLongPair<Term>::getOne));
+        events.sort(Comparator.comparingLong(ObjectLongPair<Term>::getTwo).thenComparing(ObjectLongPair::getOne));
 
         int ee = events.size();
         assert (ee > 1);
@@ -1084,7 +1084,7 @@ public enum Op implements $ {
                 if (et0.equals(et1) || et0.containsRecursively(et1, nonProduct) || et1.containsRecursively(et0, nonProduct))
                     return Null;
                 else if ((et0.op() == set && et1.op() == set))
-                    return difference(set, et0.subterms(), et1.subterms());
+                    return difference(set, et0, et1);
                 else
                     return compound(op, DTERNAL, t);
 
@@ -1096,7 +1096,7 @@ public enum Op implements $ {
     }
 
     @NotNull
-    public static Term difference(@NotNull Op o, @NotNull TermContainer a, @NotNull TermContainer b) {
+    public static Term difference(@NotNull Op o, @NotNull Term a, @NotNull Term b) {
 
         if (a.equals(b))
             return Null; //empty set
@@ -1118,7 +1118,7 @@ public enum Op implements $ {
 
         int retained = terms.size();
         if (retained == size && a instanceof Term) { //same as 'a', quick re-use of instance
-            return (Term) a;
+            return a;
         } else if (retained == 0) {
             return Null; //empty set
         } else {
@@ -1380,7 +1380,7 @@ public enum Op implements $ {
                         }
 
 
-                        return $.negIf(op.the(dt, subject, predicate), !polarity);
+                        return $.negIf(IMPL.the(dt, subject, predicate), !polarity);
                     }
                 }
             }

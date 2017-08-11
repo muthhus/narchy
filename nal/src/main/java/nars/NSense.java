@@ -75,18 +75,18 @@ public interface NSense {
     default <E extends Enum> void senseSwitch(String term, @NotNull Supplier<E> value) throws Narsese.NarseseException {
         E[] values = ((Class<? extends E>) value.get().getClass()).getEnumConstants();
         for (E e : values) {
-            Compound t = switchTerm(term, e.toString());
+            Term t = switchTerm(term, e.toString());
             sense(t, () -> value.get() == e);
         }
     }
 
     @NotNull
-    static Compound switchTerm(String a, String b) throws Narsese.NarseseException {
+    static Term switchTerm(String a, String b) throws Narsese.NarseseException {
         return switchTerm($(a), $(b));
     }
 
     @NotNull
-    static Compound switchTerm(Term a, Term b) {
+    static Term switchTerm(Term a, Term b) {
         //return "(" + e + " --> " + term + ")";
         return p(a, b);//"(" + term + " , " + e + ")";
     }
@@ -100,7 +100,7 @@ public interface NSense {
      */
     default void senseSwitch(Term term, @NotNull IntSupplier value, @NotNull int[] values) {
         for (int e : values) {
-            Compound t = switchTerm(term, the(e));
+            Term t = switchTerm(term, the(e));
             sense(t, () -> value.getAsInt() == e);
         }
     }
@@ -110,7 +110,7 @@ public interface NSense {
      */
     default <O> void senseSwitch(String term, @NotNull Supplier<O> value, @NotNull O... values) throws Narsese.NarseseException {
         for (O e : values) {
-            Compound t = switchTerm(term, '"' + e.toString() + '"');
+            Term t = switchTerm(term, '"' + e.toString() + '"');
             sense(t, () -> value.get().equals(e));
         }
     }

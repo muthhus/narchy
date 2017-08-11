@@ -14,7 +14,6 @@ import static nars.$.conj;
 import static nars.$.diffe;
 import static nars.$.diffi;
 import static nars.$.disj;
-import static nars.$.impl;
 import static nars.$.inh;
 import static nars.$.neg;
 import static nars.$.p;
@@ -28,7 +27,8 @@ import static nars.$.t;
 import static nars.$.task;
 import static nars.$.varDep;
 import static nars.Op.*;
-import static nars.term.TermTest.*;
+import static nars.term.TermTest.assertValid;
+import static nars.term.TermTest.assertValidTermValidConceptInvalidTaskContent;
 import static nars.time.Tense.DTERNAL;
 import static org.junit.Assert.*;
 
@@ -233,7 +233,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testDisjunctEqual() throws Narsese.NarseseException {
-        @NotNull Compound pp = p(this.p);
+        @NotNull Term pp = p(this.p);
         assertEquals(pp, disj(pp, pp));
     }
 
@@ -436,8 +436,8 @@ public class TermReductionsTest extends NarseseTest {
     public void testDifferenceImmediate2() throws Narsese.NarseseException {
 
 
-        Compound a = sete($("a"), $("b"), $("c"));
-        Compound b = sete($("d"), $("b"));
+        Term a = sete($("a"), $("b"), $("c"));
+        Term b = sete($("d"), $("b"));
         Term d = diffe(a, b);
         assertEquals(Op.SETe, d.op());
         assertEquals(d.toString(), 2, d.size());

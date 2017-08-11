@@ -2,7 +2,6 @@ package nars.control;
 
 import jcog.bag.Bag;
 import jcog.pri.PLink;
-import jcog.pri.Pri;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;

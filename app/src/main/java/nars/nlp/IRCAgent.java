@@ -1,8 +1,6 @@
 package nars.nlp;
 
-import jcog.pri.PriReference;
 import nars.*;
-import nars.bag.leak.Leak;
 import nars.bag.leak.LeakOut;
 import org.jetbrains.annotations.NotNull;
 import org.pircbotx.hooks.events.MessageEvent;
@@ -11,8 +9,6 @@ import org.pircbotx.hooks.types.GenericMessageEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.net.IRC;
-
-import java.util.function.Consumer;
 
 /**
  * $0.9;0.9;0.99$

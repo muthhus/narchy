@@ -1,6 +1,9 @@
 package nars.derive;
 
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
 import nars.op.DepIndepVarIntroduction;

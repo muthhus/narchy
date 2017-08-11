@@ -69,8 +69,7 @@ public class MIDI {
             Term key =
                     channelKey(9, i);
 
-            Compound keyTerm =
-                    $.p(key);
+            Term keyTerm = $.p(key);
 
             int finalI = i;
 //            SensorConcept c = new SensorConcept(keyTerm, nar, () -> {
@@ -129,7 +128,7 @@ public class MIDI {
         //metronome
         new Loop(2f) {
 
-            final Compound now = $.p("now");
+            final Term now = $.p("now");
 
             @Override
             public boolean next() {

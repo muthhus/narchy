@@ -17,11 +17,11 @@ public class TermNormalizationTest {
     @Test
     public void reuseVariableTermsDuringNormalization2() throws Narsese.NarseseException {
         for (String v : new String[] { "?a", "?b", "#a", "#c" }) {
-            Compound eq = $("<<" + v +" --> b> <=> <" + v + " --> c>>");
-            Term a = eq.sub((byte)0, (byte)0);
-            Term b = eq.sub((byte)1, (byte)0);
-            assertNotEquals(a, eq.sub((byte)0, (byte)1));
-            assertEquals(eq + " subterms (0,0)==(1,0)", a, b);
+            Compound x = $("<<" + v +" --> b> ==> <" + v + " --> c>>");
+            Term a = x.sub((byte)0, (byte)0);
+            Term b = x.sub((byte)1, (byte)0);
+            assertNotEquals(a, x.sub((byte)0, (byte)1));
+            assertEquals(x + " subterms (0,0)==(1,0)", a, b);
             assertTrue(a == b);
         }
     }

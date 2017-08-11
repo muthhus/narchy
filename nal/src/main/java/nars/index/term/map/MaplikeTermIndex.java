@@ -3,10 +3,8 @@ package nars.index.term.map;
 import nars.concept.PermanentConcept;
 import nars.index.term.StaticTermIndex;
 import nars.term.Termed;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 /**
  * Index which is supported by Map/Cache-like operations

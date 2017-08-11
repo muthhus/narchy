@@ -247,7 +247,7 @@ public class DefaultTermizer implements Termizer {
 
         String varPrefix = m.getName() + '_';
         int n = m.getParameterCount();
-        Compound args = $.p(getArgVariables(varPrefix, n));
+        Term args = $.p(getArgVariables(varPrefix, n));
 
         return m.getReturnType() == void.class ? new Term[]{
                 INSTANCE_VAR,

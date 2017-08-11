@@ -2,8 +2,6 @@ package jcog;
 
 import org.junit.Test;
 
-import java.util.concurrent.ForkJoinPool;
-
 public class ServicesTest {
 
     @Test

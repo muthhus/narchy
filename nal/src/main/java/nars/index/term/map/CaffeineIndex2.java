@@ -3,18 +3,15 @@ package nars.index.term.map;
 import com.github.benmanes.caffeine.cache.*;
 import nars.Op;
 import nars.Param;
-import nars.concept.PermanentConcept;
 import nars.index.util.TermContainerToOpMap;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.var.Variable;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.stream.IntStream;

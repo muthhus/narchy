@@ -2,7 +2,6 @@ package nars.derive;
 
 import com.google.common.base.Joiner;
 import jcog.list.FasterList;
-import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -16,7 +15,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static nars.$.*;
+import static nars.$.$;
+import static nars.$.the;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.*;
 

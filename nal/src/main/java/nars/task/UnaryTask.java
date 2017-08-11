@@ -1,7 +1,6 @@
 package nars.task;
 
 import jcog.Texts;
-import jcog.Util;
 import jcog.pri.PLink;
 import org.jetbrains.annotations.NotNull;
 

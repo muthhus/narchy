@@ -1338,7 +1338,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return eventTask.on(o);
     }
 
-    public @NotNull NAR believe(@NotNull Compound c, @NotNull Tense tense) {
+    public @NotNull NAR believe(@NotNull Term c, @NotNull Tense tense) {
         return believe(c, tense, 1f);
     }
 
