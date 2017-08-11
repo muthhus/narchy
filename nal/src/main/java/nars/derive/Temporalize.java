@@ -195,7 +195,7 @@ public class Temporalize {
 
     }
 
-    static int dt(Event a, Event b, Map<Term, Time> trail) {
+    int dt(Event a, Event b, Map<Term, Time> trail) {
 
 //        if (a instanceof AbsoluteEvent || b instanceof AbsoluteEvent) {
 //            //at least one or both are absolute, forming a valid temporal grounding
@@ -241,7 +241,33 @@ public class Temporalize {
                 }
             }
 
+            int d = dt(a.end(trail), b.start(trail));
+            if (d == DTERNAL)
+                return DTERNAL;
+            else {
+                assert(d!=XTERNAL);
+                return d
+                        + rb.rel.subtermTime(rb.term)
+                        - ra.rel.subtermTime(ra.term)
+                        ;
+            }
+
+
+//            Event rea = solve(ra.rel, trail);
+//            if (rea!=null) {
+//                Event reb = solve(rb.rel, trail);
+//                if (reb!=null) {
+//
+//                    @Nullable Time s = rea.end(trail);
+//                    @Nullable Time e = reb.start(trail);
+//                    return dt(s, e)
+//                            + rb.rel.subtermTime(rb.term)
+//                            - ra.rel.subtermTime(ra.term)
+//                            ; //TODO include offsets in ra and rb
+//                }
+//            }
         }
+
         return dt(a.end(trail), b.start(trail));
 
         //return XTERNAL;
@@ -945,7 +971,6 @@ public class Temporalize {
                     }
                 }
             }
-            return null;
         }
 
 

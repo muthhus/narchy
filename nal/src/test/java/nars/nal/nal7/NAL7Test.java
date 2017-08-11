@@ -235,17 +235,16 @@ public class NAL7Test extends AbstractNALTest {
 
     @Test
     public void intervalPreserve_and_shift_occurence() {
-        int time = cycles;
 
         test
 
                 //.input("X:x.") //shouldnt be necessary
                 .inputAt(1, "(X:x &&+1 (Y:y &&+2 Z:z)). :|:")
-                .mustBelieve(time, "X:x.", 1.00f, 0.73f, 1)
-                .mustBelieve(time, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2, 4)
-                .mustNotOutput(time, "(Y:y &&+2 Z:z)", BELIEF, 1.00f, 1f, 0.43f, 0.43f, 2) //avoid the substitutionIfUnifies result
-                .mustBelieve(time, "Y:y.", 1.00f, 0.73f, 2)
-                .mustBelieve(time, "Z:z.", 1.00f, 0.73f, 4)
+                .mustBelieve(cycles, "X:x.", 1.00f, 0.73f, 1)
+                .mustBelieve(cycles, "(Y:y &&+2 Z:z).", 1.00f, 0.81f, 2, 4)
+                .mustNotOutput(cycles, "(Y:y &&+2 Z:z)", BELIEF, 1.00f, 1f, 0.43f, 0.43f, 2) //avoid the substitutionIfUnifies result
+                .mustBelieve(cycles, "Y:y.", 1.00f, 0.73f, 2)
+                .mustBelieve(cycles, "Z:z.", 1.00f, 0.73f, 4)
         ;
 
     }
@@ -258,6 +257,7 @@ public class NAL7Test extends AbstractNALTest {
                 .believe("(enter($x, room) ==>-3 open($x, door))", 0.9f, 0.9f)
                 .believe("(open($y, door) ==>-4 hold($y, key))", 0.8f, 0.9f)
                 .mustBelieve(cycles, "(enter($1,room) ==>-7 hold($1,key))", 0.72f, 0.58f)
+                .mustNotOutput(cycles, "(enter($1,room) ==>-4 hold($1,key))", BELIEF, ETERNAL) //avoid the substitutionIfUnifies result
                 .mustBelieve(cycles, "(hold($1,key) ==>+7 enter($1,room))", 1f, 0.37f);
     }
 

@@ -35,11 +35,11 @@ public class NAL6Test extends AbstractNALTest {
     public void variable_unification2() {
 
         test
-            .log()
-            .believe("<<$x --> bird> ==> <$x --> animal>>") //en("If something is a bird, then it is a animal.");
-            .believe("<<$y --> robin> ==> <$y --> bird>>") //en("If something is a robin, then it is a bird.");
-            .mustBelieve(cycles, "<<$1 --> robin> ==> <$1 --> animal>>", 1.00f, 0.81f) //en("If something is a robin, then it is a animal.")
-            .mustBelieve(cycles, "<<$1 --> animal> ==> <$1 --> robin>>", 1.00f, 0.45f); //en(" I guess that if something is a animal, then it is a robin.");
+                .log()
+                .believe("<<$x --> bird> ==> <$x --> animal>>") //en("If something is a bird, then it is a animal.");
+                .believe("<<$y --> robin> ==> <$y --> bird>>") //en("If something is a robin, then it is a bird.");
+                .mustBelieve(cycles, "<<$1 --> robin> ==> <$1 --> animal>>", 1.00f, 0.81f) //en("If something is a robin, then it is a animal.")
+                .mustBelieve(cycles, "<<$1 --> animal> ==> <$1 --> robin>>", 1.00f, 0.45f); //en(" I guess that if something is a animal, then it is a robin.");
 
     }
 
@@ -582,7 +582,7 @@ public class NAL6Test extends AbstractNALTest {
 //        tester.mustBelieve(cycles, "(y,x)", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
 //    }
 
-//    @Test public void recursionSmall2() throws nars.Narsese.NarseseException {
+    //    @Test public void recursionSmall2() throws nars.Narsese.NarseseException {
 //
 //        test()
 //        .believe("<0 --> n>", 1.0f, 0.9f)
@@ -595,8 +595,45 @@ public class NAL6Test extends AbstractNALTest {
 //    }
 
     @Test
-    public void testDecomposeImplPred() {
+    public void testDecomposeImplSubj1() {
+        test
+                .believe("( (y && z) ==> x )")
+                .mustBelieve(cycles, "( y ==> x )", 1f, 0.81f)
+                .mustBelieve(cycles, "( z ==> x )", 1f, 0.81f)
+        ;
+    }
 
+    @Test
+    public void testDecomposeImplPred1() {
+        test
+                .believe("( x ==> (y && z) )")
+                .mustBelieve(cycles, "( x ==> y )", 1f, 0.81f)
+                .mustBelieve(cycles, "( x ==> z )", 1f, 0.81f)
+        ;
+    }
+
+    @Test
+    public void testDecomposeImplSubj1b() {
+        test
+                .believe("( (&&, y, z, w) ==> x )")
+                .mustBelieve(cycles, "( y ==> x )", 1f, 0.73f)
+                .mustBelieve(cycles, "( z ==> x )", 1f, 0.73f)
+                .mustBelieve(cycles, "( w ==> x )", 1f, 0.73f)
+        ;
+    }
+
+    @Test
+    public void testDecomposeImplPred1b() {
+        test
+                .believe("( x ==> (&&, y, z, w) )")
+                .mustBelieve(cycles, "( x ==> y )", 1f, 0.73f)
+                .mustBelieve(cycles, "( x ==> z )", 1f, 0.73f)
+                .mustBelieve(cycles, "( x ==> w )", 1f, 0.73f)
+        ;
+    }
+
+    @Test
+    public void testDecomposeImplPred2() {
         test
                 .believe("( (a,#b) ==> (&&, (x,#b), y, z ) )")
                 .mustBelieve(cycles, "( (a,#b) ==> (x,#b) )", 1f, 0.73f)
