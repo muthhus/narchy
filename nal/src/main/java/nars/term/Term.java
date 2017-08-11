@@ -714,6 +714,12 @@ public interface Term extends Termlike, Comparable<Term> {
         events(events, 0);
     }
 
+    default List<ObjectLongPair<Term>> events() {
+        List<ObjectLongPair<Term>> events = $.newArrayList();
+        events(events);
+        return events;
+    }
+
     default void events(List<ObjectLongPair<Term>> events, long dt) {
         events.add(PrimitiveTuples.pair(this, dt));
     }

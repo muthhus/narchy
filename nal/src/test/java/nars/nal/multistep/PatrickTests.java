@@ -126,7 +126,8 @@ public class PatrickTests extends AbstractNALTest {
                 "made_of(toothbrush,plastic).",
                 "( ( made_of($1, plastic) &| lighter(I, $1) ) ==>+10 <$1 --> [heated]>).",
                 "(<$1 --> [heated]> ==>+10 <$1 --> [melted]>).",
-                "(<$1 --> [melted]> <|> <$1 --> [pliable]>).",
+                "(<$1 --> [melted]> =|> <$1 --> [pliable]>).",
+                "(<$1 --> [pliable]> =|> <$1 --> [melted]>).",
                 "(( <$1 --> [pliable]> &| reshape(I,$1)) ==>+10 <$1 --> [hardened]>).",
                 "(<$1 --> [hardened]> =|> <$1 --> [unscrews]>).",
 

@@ -591,14 +591,17 @@ public class Temporalize {
         Temporalize model = new Temporalize(d.random);
         model.dur = Param.DITHER_DT ? d.dur : 1;
 
-        boolean taskRooted = (belief == null) || ( !task.isEternal() );
-        boolean beliefRooted = belief!=null && (!taskRooted || !belief.isEternal());
+        boolean taskRooted = true; //(belief == null) || ( !task.isEternal() );
+        boolean beliefRooted = true; //belief!=null && (!taskRooted || !belief.isEternal());
+
         model.know(task, d, taskRooted);
 
         if (belief != null) {
-            model.know(belief, d, beliefRooted); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+            if (!belief.equals(task))
+                model.know(belief, d, beliefRooted); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
         } else if (d.beliefTerm != null) {
-            model.know(d.beliefTerm, d, null);
+            if (!task.term().equals(d.beliefTerm)) //dont re-know the term
+                model.know(d.beliefTerm, d, null);
         }
 
         Map<Term, Temporalize.Time> trail = new HashMap<>();
@@ -634,16 +637,13 @@ public class Temporalize {
     }
 
     void know(Task task, Subst d, boolean rooted) {
-        //assert (task.end() == task.start() + task.dtRange());
         Term taskTerm = task.term();
 
-        //Op o = task.op();
         AbsoluteEvent root =
                 (rooted) ?
                         new AbsoluteEvent(taskTerm, task.start(), task.end())
                         :
                         null;
-        //new AbsoluteEvent(taskTerm, ETERNAL, ETERNAL); //ambiently rooted if impl or equi
 
         know(taskTerm, d, root);
     }

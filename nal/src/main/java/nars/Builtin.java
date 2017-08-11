@@ -209,8 +209,8 @@ public class Builtin {
                 r = Op.conj(ee);
             }
 
-            if (r instanceof Variable && r.op()!=VAR_DEP)
-                return Null; //dont allow returning a variable as an event during decomposition HACK TODO make more careful and return the only result if one subterm is a non-returnable variable
+//            if (r instanceof Variable && r.op()!=VAR_DEP)
+//                return Null; //dont allow returning a variable as an event during decomposition HACK TODO make more careful and return the only result if one subterm is a non-returnable variable
 
             return r;
         }));
