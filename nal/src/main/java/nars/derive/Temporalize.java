@@ -346,7 +346,7 @@ public class Temporalize {
                 this.start = this.end = ETERNAL;
             } else {
 
-                int tdt = term.dtRange();
+                //int tdt = term.dtRange();
 
                 if (end == ETERNAL) {
                     end = start;
@@ -635,8 +635,8 @@ public class Temporalize {
         if (belief != null) {
             if (!belief.equals(task)) {
 
-                if (task.isEternal() && belief.isEternal() /*&& some interesction of terms is prsent */)
-                    beliefRooted = false; //avoid confusing with multiple eternal roots; force relative calculation
+//                if (task.isEternal() && belief.isEternal() /*&& some interesction of terms is prsent */)
+//                    beliefRooted = false; //avoid confusing with multiple eternal roots; force relative calculation
 
                 model.know(belief, d, beliefRooted); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
             }
@@ -655,26 +655,26 @@ public class Temporalize {
 //            model.solve(pattern, trail);
             return null;
         }
-        if (e != null) {
-            if (e instanceof AbsoluteEvent) {
-                AbsoluteEvent a = (AbsoluteEvent) e; //faster, preferred since pre-calculated
-                occ[0] = a.start;
-                occ[1] = a.end;
-            } else {
-                occ[0] = e.start(trail).abs();
-                occ[1] = e.end(trail).abs();
-            }
+        if (e == null)
+            return null;
 
-            if (!(
-                    (occ[0] != ETERNAL)
-                            ||
-                            (task.isEternal()) && (belief == null || belief.isEternal()))) {
-                //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
-                return null;
-            }
-            return e.term;
+        if (e instanceof AbsoluteEvent) {
+            AbsoluteEvent a = (AbsoluteEvent) e; //faster, preferred since pre-calculated
+            occ[0] = a.start;
+            occ[1] = a.end;
+        } else {
+            occ[0] = e.start(trail).abs();
+            occ[1] = e.end(trail).abs();
         }
-        return null;
+
+        if (!(
+                (occ[0] != ETERNAL)
+                        ||
+                        (task.isEternal()) && (belief == null || belief.isEternal()))) {
+            //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
+            return null;
+        }
+        return e.term;
     }
 
     void know(Task task, Subst d, boolean rooted) {
@@ -694,12 +694,15 @@ public class Temporalize {
 
         Term t2 = d.transform(term);
         if (!t2.equals(term)) {
-            know(t2, root);
+           know(t2, root);
         }
     }
 
     private void know(Term term, @Nullable Temporalize.AbsoluteEvent root) {
-        know(root, term, 0, term.dtRange());
+        int d = term.dtRange();
+        if (root!=null && (term.op() == CONJ && (root.end - root.start!= d)))
+            return; //as a result of variables etc, the conjunction has been resized; the numbers may not be compareable so to be safe, cancel
+        know(root, term, 0, d);
     }
 
 
@@ -730,7 +733,7 @@ public class Temporalize {
      */
     void know(@Nullable Event parent, Term term, int start, int end) {
 
-        if (term instanceof Variable || (!term.hasAny(ATOM.bit | INT.bit)))
+        if (term instanceof Variable) // || (!term.hasAny(ATOM.bit | INT.bit)))
             return; //ignore variable's and completely-variablized's temporalities because it can conflict
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
@@ -757,10 +760,14 @@ public class Temporalize {
                 if (dt == DTERNAL)
                     dt = 0;
 
+                boolean reverse;
                 TermContainer tt = term.subterms();
-                if (dt < 0 && o.commutative) {
+                if (dt!=DTERNAL && dt < 0 && o.commutative) {
                     dt = -dt;
                     tt = tt.reverse();
+                    reverse = true;
+                } else {
+                    reverse = false;
                 }
 
                 int t = start;
@@ -773,12 +780,15 @@ public class Temporalize {
 
                     Term st = tt.sub(i);
                     int sdt = /*o == CONJ ? */st.dtRange();/* : 0*/ /* dont count internal event dtRange if not in CONJ */
-                    ;
 
                     int subStart = t;
                     int subEnd = t + sdt;
-                    //System.out.println("\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
+
+
+//                  System.out.println(parent + "\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
                     know(parent, st, subStart, subEnd);
+
+
 
                     t = subEnd; //the duration of the event
 

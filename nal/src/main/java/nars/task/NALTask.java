@@ -69,15 +69,11 @@ public class NALTask extends Pri implements Task {
 //            }
 //        }
 
-
-
-
-
-        if (Param.DEBUG) {
-            term.recurseTerms(t -> {
-                assert (!(t instanceof UnnormalizedVariable));
-            });
-        }
+//        if (Param.DEBUG) {
+//            term.recurseTerms(t -> {
+//                assert (!(t instanceof UnnormalizedVariable));
+//            });
+//        }
 
         Task.taskContentValid(term, punc, null, false);
 

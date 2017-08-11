@@ -182,33 +182,39 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         if (!t.hasAny(Op.ATOM.bit | Op.INT.bit | Op.VAR_PATTERN.bit))
             return fail(t, "filter terms which have been completely variable-ized", safe); //filter any terms that have been completely variable introduced
 
-        if (punc!=COMMAND && !t.isNormalized())
-            return fail(t, "task term not a normalized Compound", safe);
+        if (punc != COMMAND) {
+            if (!t.isNormalized())
+                return fail(t, "task term not a normalized Compound", safe);
 
-        if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
-            return fail(t, "belief or goal with query variable", safe);
-        }
 
-        if (nar != null) {
-            int maxVol = nar.termVolumeMax.intValue();
-            if (t.volume() > maxVol)
-                return fail(t, "task term exceeds maximum volume", safe);
+            if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
+                return fail(t, "belief or goal with query variable", safe);
+            }
 
-            int nalLevel = nar.nal();
-            if (!t.levelValid(nalLevel))
-                return fail(t, "task term exceeds maximum NAL level", safe);
-        }
+            if (nar != null) {
+                int maxVol = nar.termVolumeMax.intValue();
+                if (t.volume() > maxVol)
+                    return fail(t, "task term exceeds maximum volume", safe);
+
+                int nalLevel = nar.nal();
+                if (!t.levelValid(nalLevel))
+                    return fail(t, "task term exceeds maximum NAL level", safe);
+            }
 
 //        if (t.op().temporal && t.dt() == XTERNAL) {
 //            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
 //        }
 
-        Term c = t.conceptual();
-        if (c instanceof Variable || c instanceof Bool) {
-            return fail(t, "no associated concept", safe);
+            Term c = t.conceptual();
+            if (c instanceof Variable || c instanceof Bool) {
+                return fail(t, "no associated concept", safe);
+            }
+
+            return (t.size() == 0) || validTaskCompound(t, punc, safe);
+
         }
 
-        return (t.size() == 0) || validTaskCompound(t, punc, safe);
+        return true;
     }
 
 //    @Nullable

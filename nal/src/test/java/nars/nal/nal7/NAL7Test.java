@@ -112,6 +112,23 @@ public class NAL7Test extends AbstractNALTest {
 
 
     @Test
+    public void testConjDecomposeShift() {
+        /*
+        WRONG:
+            $.02 (b &&+5 #1). 16⋈21 %1.0;.59% {410: 1;2;3;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
+                $.08 ((a &&+5 b) &&+5 #1). 1⋈11 %1.0;.66% {64: 1;2;3;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
+        */
+
+        test
+            .log()
+            .inputAt(1, "((a &&+5 b) &&+5 #1). :|:")
+            .mustBelieve(cycles, "(b &&+5 #1)", 1.00f, 0.81f, 6, 11)
+            .mustNotOutput(cycles, "(b &&+5 #1)", BELIEF, ETERNAL)
+            .mustNotOutput(cycles, "(b &&+5 #1)", BELIEF, 16) //<- not caught here TODO fix this mustNotEmit stuff
+        ;
+    }
+
+    @Test
     public void updating_and_revision() {
         testTemporalRevision(10, 0.50f, 0.7f, "<(John,key) --> hold>");
     }
@@ -159,10 +176,10 @@ public class NAL7Test extends AbstractNALTest {
         //(P ==> M), (S ==> M), neq(S,P), dt(bmint) |- (S ==> P), (Belief:Induction, Derive:AllowBackward)
 
         test
-            .believe("(x ==>+2 y)")
-            .believe("(z ==>+3 y)")
-            .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
-            .mustNotOutput(cycles, "(z ==>-2 x)", BELIEF, ETERNAL)
+                .believe("(x ==>+2 y)")
+                .believe("(z ==>+3 y)")
+                .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)
+                .mustNotOutput(cycles, "(z ==>-2 x)", BELIEF, ETERNAL)
         ;
     }
 
@@ -637,7 +654,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(1, "((a &&+1 b) ==>+4 c). :|:")
                 .mustBelieve(cycles, "c", 1f, 0.81f, 6 /* occ */)
                 .mustNotOutput(cycles, "c", BELIEF, ETERNAL)
-                //.mustNotOutput(cycles, "c", BELIEF, 6)
+        //.mustNotOutput(cycles, "c", BELIEF, 6)
         ;
     }
 

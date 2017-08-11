@@ -176,7 +176,7 @@ public class BeliefTableTest  {
         for (int i = 0; i < maxBeliefs; i++) {
             b.believe(0.5f, i/((float)maxBeliefs-1), conf, i * spacing).run(spacing);
 
-            assertEquals(i+1, b.size(true));
+            assertTrue(i+1 <= b.size(true));
         }
 
         b.print();

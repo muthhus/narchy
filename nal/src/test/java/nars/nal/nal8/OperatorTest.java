@@ -31,8 +31,6 @@ public class OperatorTest {
         n.input("assertEquals(c, slice((a,b,c),2));");
         n.input("assertEquals(quote(slice((a,b,c),#x)), slice((a,b,c),#x));");
         n.run(5);
-
-
     }
 
 ////    @Test public void testOperatorEquality() {

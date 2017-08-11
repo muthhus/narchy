@@ -464,11 +464,15 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     @Override
     protected void runDur(NAR nar) {
-        if (enabled.get()) {
+        if (enabled.get() && busy.compareAndSet(false, true)) {
             this.now = now;
-            //only execute at most one agent frame per duration
-            senseAndMotor();
-            predict();
+            try {
+                //only execute at most one agent frame per duration
+                senseAndMotor();
+                predict();
+            } finally {
+                busy.set(false);
+            }
         }
     }
 

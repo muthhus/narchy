@@ -157,7 +157,7 @@ public class RevectionTest {
         b.believe(0.5f, 1.0f, 0.85f, 15);
         b.run(1);
 
-        assertEquals(3, b.size(true));
+        assertTrue(3 <= b.size(true));
 
         int period = 1;
         int loops = 20;

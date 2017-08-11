@@ -183,7 +183,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             PriReference<Task> tasklink = taskl.get(i);
 
             if (localTemplateConcepts > 0) {
-                activateSubterms(tasklink, localTemplates, localTemplateConcepts, 1f /* decayed ? */);
+                activateSubterms(tasklink, localTemplates, localTemplateConcepts,
+                        //1f
+                        decayed);
             }
 
             for (int j = 0; j < termlSize; j++) {

@@ -121,11 +121,14 @@ public abstract class Unify extends Versioning implements Subst {
     @Nullable
     @Override
     public Term xy(@NotNull Term x0) {
-        Term xy = x0, x = null;
+        Term xy = x0, y0 = null, y = null;
         while ((xy = this.xy.get(xy))!=null) { //completely dereference
-            x = xy;
+            if (y0!=null && xy.equals(y0))
+                return y0;
+            y0 = y;
+            y = xy;
         }
-        return x;
+        return y;
 
         //return xy.get(t);
     }
@@ -308,7 +311,7 @@ public abstract class Unify extends Versioning implements Subst {
 
         if (x != null) {
             return unify(x, y);
-        } else {
+        } else /*if (matchType(x0))*/ {
             x = x0;
 
             if (x instanceof Variable && x.op() == y.op()) {
@@ -323,18 +326,18 @@ public abstract class Unify extends Versioning implements Subst {
             }*/
 
 
-            if (xy.tryPut(x, (y))) {
-                if (!matchType(x)) {
-                    //add to free variables to be included in transformation
-                    Set<Term> knownFree = free.get();
-                    if (!knownFree.contains(x))
-                        free.set(concat(knownFree, Set.of(x)));
-                }
+            if (xy.tryPut(x, y)) {
+//                if (!matchType(x)) {
+//                    //add to free variables to be included in transformation
+//                    Set<Term> knownFree = free.get();
+//                    if (!knownFree.contains(x))
+//                        free.set(concat(knownFree, Set.of(x)));
+//                }
                 return true;
-            } else {
-                return false;
             }
         }
+
+        return false;
     }
 
     public final int now() {
