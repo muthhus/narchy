@@ -22,7 +22,7 @@ public class NarseseExtendedTest extends NarseseTest {
     }
 
     @Test public void testRuleComonent1() throws Narsese.NarseseException {
-        String s = "((P ==> S), (S ==> P), neqCom(S,P), time(dtCombine), notImplEqui(P), notEqui(S), task(\"?\"))";
+        String s = "((P ==> S), (S ==> P), neqCom(S,P), time(dtCombine), notImpl(P), notEqui(S), task(\"?\"))";
         assertNotNull($.$(s));
     }
 

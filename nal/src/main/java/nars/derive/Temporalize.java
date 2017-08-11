@@ -855,12 +855,13 @@ public class Temporalize {
             l.sortThis();
     }
 
+    /** warning: for external use only; all internal calls should use solve(target, trail) to prevent stack overflow */
     public Event solve(Term target) {
         return solve(target, new HashMap<>(target.volume()));
     }
 
 
-    Event solve(Term x, Map<Term, Time> trail) {
+    Event solve(final Term x, Map<Term, Time> trail) {
 
         //System.out.println("solve " + target + "\t" + trail);
 
@@ -999,12 +1000,12 @@ public class Temporalize {
             if (tts == 2) {
 
                 Term a = tt.sub(0);
-                Event ra = solve(a);
+                Event ra = solve(a, trail);
 
                 if (ra != null) {
 
                     Term b = tt.sub(1);
-                    Event rb = solve(b);
+                    Event rb = solve(b, trail);
 
                     if (rb != null) {
                         return solveTemporal(trail, o, ra, rb, a, b);
@@ -1019,7 +1020,7 @@ public class Temporalize {
                     {
                         @NotNull Term d = target.op().the(DTERNAL, a);
                         if (!(d instanceof Bool)) {
-                            Event ds = solve(d);
+                            Event ds = solve(d, trail);
                             if (ds != null)
                                 return ds;
                         }
@@ -1027,7 +1028,7 @@ public class Temporalize {
                     {
                         @NotNull Term d = target.op().the(0, a);
                         if (!(d instanceof Bool)) {
-                            Event ds = solve(d);
+                            Event ds = solve(d, trail);
                             if (ds != null)
                                 return ds;
                         }
@@ -1058,7 +1059,7 @@ public class Temporalize {
 
             for (Term c : constraints.keySet()) {
 
-                if (c.equals(target)) continue; //cyclic
+                if (c.equals(target)) continue; //cyclic; already tried above
 
                 Event ce = solve(c, trail);
 

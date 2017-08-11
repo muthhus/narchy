@@ -238,7 +238,7 @@ public class TemporalizeTest {
         /*
         RIGHT: (z ==>+1 x).
         WRONG:
-        $1.0 (z ==>-2 x). %1.0;.45% {18: 1;2} (((%1==>%2),(%1==>%3),neqCom(%2,%3),notImplEqui(%3)),((%3 ==>+- %2),((Abduction-->Belief))))
+        $1.0 (z ==>-2 x). %1.0;.45% {18: 1;2} (((%1==>%2),(%1==>%3),neqCom(%2,%3),notImpl(%3)),((%3 ==>+- %2),((Abduction-->Belief))))
             $.50 (y ==>+3 x). %1.0;.90% {0: 1}
             $.50 (y ==>+2 z). %1.0;.90% {0: 2}
          */
@@ -360,7 +360,7 @@ public class TemporalizeTest {
     @Test
     public void testImplDT() throws Narsese.NarseseException {
         /*
-            $1.0 ((d-->c) ==>-3 (a-->b)). 2 %1.0;.45% {6: 1;2} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((%1 ==>+- %2),((Induction-->Belief))))
+            $1.0 ((d-->c) ==>-3 (a-->b)). 2 %1.0;.45% {6: 1;2} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImpl(%1),notImpl(%2)),((%1 ==>+- %2),((Induction-->Belief))))
               $.50 (d-->c). 5 %1.0;.90% {5: 2}
               $.50 (a-->b). 2 %1.0;.90% {2: 1}
         */
@@ -470,7 +470,7 @@ $.28 ((x &&+2 y) ==>+5 z). %1.0;.81% {3: 1;2} (((%1==>%2),(%3==>%2),neqRCom(%3,%
         /*
         ( $,TestNAR ): "ERR	(z ==>+1 x). %(1.0,1.0);(.45,.46)%  creation: (0,400)".
         ( $,TestNAR ): "SIM
-        $1.0 (z ==>-2 x). %1.0;.45% {9: 1;2} (((%1==>%2),(%3==>%2),neqCom(%1,%3),notImplEqui(%3)),((%3 ==>+- %1),((Induction-->Belief))))
+        $1.0 (z ==>-2 x). %1.0;.45% {9: 1;2} (((%1==>%2),(%3==>%2),neqCom(%1,%3),notImpl(%3)),((%3 ==>+- %1),((Induction-->Belief))))
             $.50 (x ==>+2 y). %1.0;.90% {0: 1}
             $.50 (z ==>+3 y). %1.0;.90% {0: 2}
          */
@@ -484,7 +484,7 @@ $.28 ((x &&+2 y) ==>+5 z). %1.0;.81% {3: 1;2} (((%1==>%2),(%3==>%2),neqRCom(%3,%
     @Test
     public void testConjLinked() throws Narsese.NarseseException {
 // WRONG:
-//        $.31 ((b &&+5 c) ==>+5 (a &&+5 b)). 6 %1.0;.45% {7: 1;2} ((%1,%2,time(raw),belief(positive),task("."),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((%2 ==>+- %1),((Abduction-->Belief))))
+//        $.31 ((b &&+5 c) ==>+5 (a &&+5 b)). 6 %1.0;.45% {7: 1;2} ((%1,%2,time(raw),belief(positive),task("."),time(dtEvents),notImpl(%1),notImpl(%2)),((%2 ==>+- %1),((Abduction-->Belief))))
 //          $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
 //          $.50 (b &&+5 c). 6⋈11 %1.0;.90% {6: 2}
         Temporalize t = new Temporalize();
@@ -500,9 +500,9 @@ $.28 ((x &&+2 y) ==>+5 z). %1.0;.81% {3: 1;2} (((%1==>%2),(%3==>%2),neqRCom(%3,%
     @Test
     public void testConjLinked2() throws Narsese.NarseseException {
 // WRONG:
-//    $.27 ((a &&+5 b) &&+5 (c &&+5 (c&|d))). 1⋈16 %1.0;.73% {20: 1;2;3} ((%1,%2,task("."),time(raw),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
+//    $.27 ((a &&+5 b) &&+5 (c &&+5 (c&|d))). 1⋈16 %1.0;.73% {20: 1;2;3} ((%1,%2,task("."),time(raw),time(dtEvents),notImpl(%1),notImpl(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
 //      $.50 (c &&+5 d). 11⋈16 %1.0;.90% {11: 3}
-//      $.31 ((a &&+5 b) &&+5 c). 1⋈11 %1.0;.81% {7: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
+//      $.31 ((a &&+5 b) &&+5 c). 1⋈11 %1.0;.81% {7: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImpl(%1),notImpl(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
 
         Temporalize t = new Temporalize();
         t.knowTerm($("(c &&+5 d)"), 11);
@@ -512,9 +512,9 @@ $.28 ((x &&+2 y) ==>+5 z). %1.0;.81% {3: 1;2} (((%1==>%2),(%3==>%2),neqRCom(%3,%
 
     @Test
     public void testImplFromConj() throws Narsese.NarseseException {
-        //WRONG:    $.40 ((c) ==>-2 ((a) &&+1 (b))). 5 %1.0;.42% {9: 1;2;3} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((%1 ==>+- %2),((Induction-->Belief))))
+        //WRONG:    $.40 ((c) ==>-2 ((a) &&+1 (b))). 5 %1.0;.42% {9: 1;2;3} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImpl(%1),notImpl(%2)),((%1 ==>+- %2),((Induction-->Belief))))
         //               $.50 (c). 5 %1.0;.90% {5: 3}
-        //               $1.0 ((a) &&+1 (b)). 1⋈2 %1.0;.81% {3: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
+        //               $1.0 ((a) &&+1 (b)). 1⋈2 %1.0;.81% {3: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImpl(%1),notImpl(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
 
         Temporalize t = new Temporalize();
         t.knowTerm($("c"), 5);
@@ -530,14 +530,14 @@ $.28 ((x &&+2 y) ==>+5 z). %1.0;.81% {3: 1;2} (((%1==>%2),(%3==>%2),neqRCom(%3,%
     public void testConjLinked3() throws Narsese.NarseseException {
         /*
           instability:
-$.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),notImplEqui(%1),time(urgent)),(subIfUnifiesAny(%3,%2,%1),((DeductionRecursive-->Belief),(InductionRecursive-->Goal))))
+$.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),notImpl(%1),time(urgent)),(subIfUnifiesAny(%3,%2,%1),((DeductionRecursive-->Belief),(InductionRecursive-->Goal))))
     $.97 (b &&+5 c). 6⋈11 %1.0;.66% {14: 1;2;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
-      $1.0 ((a &&+5 b) &&+5 c). 1⋈11 %1.0;.73% {9: 1;2;;} ((%1,%2,task("."),time(raw),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
+      $1.0 ((a &&+5 b) &&+5 c). 1⋈11 %1.0;.73% {9: 1;2;;} ((%1,%2,task("."),time(raw),time(dtEvents),notImpl(%1),notImpl(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
         $.50 (b &&+5 c). 6⋈11 %1.0;.90% {6: 2}
         $1.0 a. 1 %1.0;.81% {2: 1;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
           $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
       $1.0 ((a &&+5 b) &&+5 c). 1⋈11 %1.0;.82% {14: 1;2;;}
-    $.63 ((b &&+5 c) ==>-10 (a &&+5 b)). 6 %1.0;.45% {7: 1;2} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((%1 ==>+- %2),((Induction-->Belief))))
+    $.63 ((b &&+5 c) ==>-10 (a &&+5 b)). 6 %1.0;.45% {7: 1;2} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImpl(%1),notImpl(%2)),((%1 ==>+- %2),((Induction-->Belief))))
       $.50 (b &&+5 c). 6⋈11 %1.0;.90% {6: 2}
       $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
          */
@@ -561,7 +561,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
     @Test
     public void testConjInvert() throws Narsese.NarseseException {
         //WRONG:    $.66 (((--,a)&|b) &&+5 a). 1⋈6 %1.0;.73% {10: 1;2;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
-        //              $.63 ((a &&+5 ((--,a)&|b)) &&+5 (--,b)). 1⋈11 %1.0;.81% {6: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImplEqui(%1),notImplEqui(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
+        //              $.63 ((a &&+5 ((--,a)&|b)) &&+5 (--,b)). 1⋈11 %1.0;.81% {6: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImpl(%1),notImpl(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
         Temporalize t = new Temporalize();
 
         Term x = $("((a &&+5 ((--,a)&|b)) &&+5 (--,b))");
@@ -638,9 +638,9 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 //    in: $.50 (b &&+5 c). 6⋈11 %1.0;.90%
 //    in: $.50 (c &&+5 d). 11⋈16 %1.0;.90%
 //      instability:
-//        $.33 ((b &&+5 b) &&+5 #1). 11⋈21 %1.0;.37% {18: 1;2;3;;} ((%1,(%2==>%3),belief(positive),notImplEqui(%1),time(urgent)),(subIfUnifiesAny(%3,%2,%1),((DeductionRecursive-->Belief),(InductionRecursive-->Goal))))
-//            $.63 ((b &&+5 #1) &&+5 d). 6⋈16 %1.0;.82% {13: 1;2;3;;} ((%1,%2,task("."),time(raw),time(dtEventsOrEternals),neqAndCom(%1,%2),notImplEqui(%1),notImplEqui(%2)),(varIntro((polarize(%1,task) &&+- polarize(%2,belief))),((IntersectionDepolarized-->Belief))))
-//            $.63 (($1 &&+5 d) ==>-10 (b &&+5 $1)). 11 %1.0;.45% {13: 1;2;3;;} ((%1,%2,time(raw),task(positive),task("."),time(dtEventsOrEternals),neqAndCom(%1,%2),notImplEqui(%1),notImplEqui(%2)),(varIntro((%1 ==>+- %2)),((Induction-->Belief))))
+//        $.33 ((b &&+5 b) &&+5 #1). 11⋈21 %1.0;.37% {18: 1;2;3;;} ((%1,(%2==>%3),belief(positive),notImpl(%1),time(urgent)),(subIfUnifiesAny(%3,%2,%1),((DeductionRecursive-->Belief),(InductionRecursive-->Goal))))
+//            $.63 ((b &&+5 #1) &&+5 d). 6⋈16 %1.0;.82% {13: 1;2;3;;} ((%1,%2,task("."),time(raw),time(dtEventsOrEternals),neqAndCom(%1,%2),notImpl(%1),notImpl(%2)),(varIntro((polarize(%1,task) &&+- polarize(%2,belief))),((IntersectionDepolarized-->Belief))))
+//            $.63 (($1 &&+5 d) ==>-10 (b &&+5 $1)). 11 %1.0;.45% {13: 1;2;3;;} ((%1,%2,time(raw),task(positive),task("."),time(dtEventsOrEternals),neqAndCom(%1,%2),notImpl(%1),notImpl(%2)),(varIntro((%1 ==>+- %2)),((Induction-->Belief))))
 //     */
 //
 //        Temporalize t = new Temporalize();

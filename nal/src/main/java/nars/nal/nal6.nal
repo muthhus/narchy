@@ -11,16 +11,16 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (M ==> P), (S ==> M), neqCom(P,S), notImplEqui(S) |- (S ==>+- P), (Belief:Deduction)
-        //(S ==> M), (M ==> P), neqCom(P,S), notImplEqui(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
+    (M ==> P), (S ==> M), neqCom(P,S), notImpl(S) |- (S ==>+- P), (Belief:Deduction)
+        //(S ==> M), (M ==> P), neqCom(P,S), notImpl(S), notEqui(P) |- (S ==>+- P), (Belief:Deduction)
 
-    (P ==> M), (S ==> M), neqCom(P,S), notImplEqui(S) |- (S ==>+- P), (Belief:Induction)
+    (P ==> M), (S ==> M), neqCom(P,S), notImpl(S) |- (S ==>+- P), (Belief:Induction)
         //TODO unit test:
-        //(S ==> P), (S ==> M), task("."), neqCom(P,S), notImplEqui(S), notEqui(P) |- (P ==>+- M), (Punctuation:Question)
+        //(S ==> P), (S ==> M), task("."), neqCom(P,S), notImpl(S), notEqui(P) |- (P ==>+- M), (Punctuation:Question)
 
-    (M ==> P), (M ==> S), neqCom(P,S), notImplEqui(S) |- (S ==>+- P), (Belief:Abduction)
+    (M ==> P), (M ==> S), neqCom(P,S), notImpl(S) |- (S ==>+- P), (Belief:Abduction)
 
-    (P ==> M), (M ==> S), neqCom(P,S), notImplEqui(S) |- (S ==>+- P), (Belief:Exemplification)
+    (P ==> M), (M ==> S), neqCom(P,S), notImpl(S) |- (S ==>+- P), (Belief:Exemplification)
 
 
 
@@ -73,15 +73,15 @@
 //      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursive, Goal:InductionRecursive)
-    B, ((--,%A) ==> C), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)
-        B, (A ==> C), belief(negative), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursivePN, Goal:InductionRecursivePN)
-        B, ((--,%A) ==> C), belief(negative), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursiveNN, Goal:InductionRecursiveNN)
+    B, (A ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursive, Goal:InductionRecursive)
+    B, ((--,%A) ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)
+        B, (A ==> C), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursivePN, Goal:InductionRecursivePN)
+        B, ((--,%A) ==> C), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursiveNN, Goal:InductionRecursiveNN)
 
-    B, (C ==> A), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-    B, ((--,%C) ==> A), belief(positive), notImplEqui(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:AbductionN, Goal:DeductionN)
-        B, (C ==> A), belief(negative), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionPN, Goal:DeductionPN)
-        B, ((--,%C) ==> A), belief(negative), notImplEqui(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
+    B, (C ==> A), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
+    B, ((--,%C) ==> A), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:AbductionN, Goal:DeductionN)
+        B, (C ==> A), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionPN, Goal:DeductionPN)
+        B, ((--,%C) ==> A), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
 
     //variable elimination 4b:
@@ -147,7 +147,7 @@
 
     ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (B ==>+- M), (Belief:Induction)
 
-    ////((&&,A..+) ==> C), M, neqRCom(C,M), notImplEqui(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
+    ////((&&,A..+) ==> C), M, neqRCom(C,M), notImpl(M) |- ((&&,M,A..+) ==>+- C), (Belief:Induction)
 
 
 //conditional abduction by dependent variable
@@ -210,8 +210,8 @@
      //A, ((--,%A)==>B),          task("?@") |- B, ()
 
      //quest to 'how' question
-     //B, X, neqRCom(B,X), task("@"), notImplEqui(B), notEqui(X) |- (B ==>+- X), (Punctuation:Question)
-     //B, X, neqRCom(B,X), task("@"), notImplEqui(B), notEqui(X) |- ((--,%B) ==>+- X), (Punctuation:Question)
+     //B, X, neqRCom(B,X), task("@"), notImpl(B), notEqui(X) |- (B ==>+- X), (Punctuation:Question)
+     //B, X, neqRCom(B,X), task("@"), notImpl(B), notEqui(X) |- ((--,%B) ==>+- X), (Punctuation:Question)
 
      //(&&,X,A..+), X, task("?@") |- (&&,A..+), ()
      //   (&&,(--,%X),A..+), X, task("?@") |- (&&,A..+), ()

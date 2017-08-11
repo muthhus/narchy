@@ -555,7 +555,7 @@ public class NAL5Test extends AbstractNALTest {
     @Test
     public void testPosPosImplicationConc() {
 
-        // ((%1,(%2==>%3),belief(positive),notImplEqui(%1),time(urgent)),(subIfUnifiesAny(%3,%2,%1),((DeductionRecursive-->Belief),(InductionRecursive-->Goal))))
+        // ((%1,(%2==>%3),belief(positive),notImpl(%1),time(urgent)),(subIfUnifiesAny(%3,%2,%1),((DeductionRecursive-->Belief),(InductionRecursive-->Goal))))
         test
                 .log()
                 .input("(x). %1.0;0.90%")

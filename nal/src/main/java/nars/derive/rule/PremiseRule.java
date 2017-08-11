@@ -438,8 +438,8 @@ public class PremiseRule extends GenericCompound {
 //                    opNotContaining(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.EQUI.bit);
 //                    break;
 
-                case "notImplEqui":
-                    opNotContaining(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.ImplicationOrEquivalenceBits);
+                case "notImpl":
+                    opNotContaining(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.IMPL.bit);
                     break;
 
 
