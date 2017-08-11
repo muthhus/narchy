@@ -105,7 +105,7 @@ public class NAL7Test extends AbstractNALTest {
                 //.believe("( enter($x, room) <=>+0 leave($x, corridor_100) )", 1.0f, 0.9f)
                 .believe("( enter($x, room) =|> leave($x, corridor_100) )", 1.0f, 0.9f)
                 .believe("( leave($x, corridor_100) =|> enter($x, room) )", 1.0f, 0.9f)
-                .mustBelieve(cycles * 2, "( open($1, door) ==>+5 leave($1, corridor_100) )", 0.95f, 0.77f /*0.81f*/)
+                .mustBelieve(cycles * 2, "( open($1, door) ==>+5 leave($1, corridor_100) )", 0.95f, 0.69f /*0.81f*/)
                 .mustNotOutput(cycles * 2, "( open($1, door) ==>-5 leave($1, corridor_100) )", BELIEF, ETERNAL); //test correct dt polarity
 
     }

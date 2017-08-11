@@ -10,6 +10,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
+import nars.util.UtilityFunctions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,8 +50,8 @@ public abstract class Param extends Services<Term,NAR> {
 
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
-            Util::or;
-            //UtilityFunctions::aveAri;
+            UtilityFunctions::aveAri;
+            //Util::or; //potentially explosive
             //Util::and;
             //Math::min;
             //Math::max;

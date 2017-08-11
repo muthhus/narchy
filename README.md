@@ -22,12 +22,13 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 ```
                <term> ::=
                         | <atom>                             // an atomic constant term; Unicode string in an arbitrary alphabet
+                        | <integer>                          // integer number
                         | <variable>                         // an atomic variable term
                         | <compound>                         // a term with internal structure
 
            <compound> ::=
                         | "(--," <term> ")"                  // negation
-                        | "--" <term>                           // negation shorthand
+                        | "--" <term>                          // negation shorthand
 
                         | "(" <term> {","<term>} ")"         // product (ie. un-ordered vector or list, length >= 0)
                         | "{" <term> {","<term>} "}"         // extensional set (ordered, all unique, length >= 1)
@@ -42,24 +43,17 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
                         | "("<term> "==>"<dt> <term>")"      // implication sequence
                         | "("<term> "=|>" <term>")"          // implication parallel (commutive, dt=0)
 
-                        | "("<term> "<=>" <term>")"          // equivalence (commutive)
-                        | "("<term> "<=>"<dt> <term>")"      // equivalence sequence (commutive, but preserves relative time direction)
-                        | "("<term> "<|>" <term>")"          // equivalence parallel (commutive, dt=0)
-
                         | "(&&," <term> {","<term>} ")"      // conjunction eternal (commutive)
                         |   "("<term> "&&" <term>")"           // conjunction eternal (commutive, shorthand for size=2)
                         |   "("<term> "&&"<dt> <term>")"       // conjunction sequence (size=2 only, preserving time direction)                        
                         |   "(&|," <term> {","<term>} ")"      // conjunction parallel (shorthand for &&+0), also: (x &| y)
-                        |   "(&/," <term> {","<term>} ")"      // conjunction sequence, internally converted to recursive 2-ary sequence conjunctions, with integer intervals embedded TODO
+                        |   "(&/," <term> {","<term>} ")"      // conjunction sequence, internally converted to balanced binary recursive (left-heavy) sequence conjunctions, with integer intervals embedded TODO
 
                         | "(||," <term> {","<term>} ")"      // disjunction, internally converts to negated conjunction of negations, also: (x || y)
 
                         | "("<term> "-{-" <term>")"          // instance, expanded on input to: {x} --> y
                         | "("<term> "-]-" <term>")"          // property, expanded on input to: x --> [y]
                         | "("<term> "{-]" <term>")"          // instance-property, expanded on input to: {x} --> [y]
-
-                        | "(/," <term> {","<term>} ")"       // extensional image
-                        | "(\," <term> {","<term>} ")"       // intensional image
 
                         | "(&," <term> {","<term>} ")"       // extensional intersection, also: (x & y)
                         | "(|," <term> {","<term>} ")"       // intensional intersection, also: (x | y)
@@ -317,6 +311,8 @@ See VarIntroduction.java and subclasses, and which rules apply them.
 
 [![](https://images.microbadger.com/badges/image/automenta/narchy.svg)](http://microbadger.com/images/automenta/narchy "image badge from microbadger.com")
 
-̶̳̺͐᷀̊N̲̠̥̻A̙ͨ͋ͪR̳̖̯̲̞̪߮߯ͫ̈́́ͮc̙͎̑ͮ߬͟͏h̨͍߳y͈߭߳᷉͘͜
-̼߲᷆̋N゙̺҄߰͋Ả̀R߲̞͈̜ͧ͌ͤc̸͉᷄̀ẖ̈̊y゚̡̤͎᷁
+̳̺̊N̲̠̥̻A̙ͨ͋ͪR̳̖̯̲̞̪߮߯ͫ̈́́ͮc̙͎̑ͮ߬͟͏h̨͍߳y͈߭߳᷉͘͜
 ̶N̛̫͈ͤ͟͠͏͉Ȧ̲᷅ͩR҆̑߬c゚̰͂҇҇͡h͇᷈ͥ̓̀y̸̗̕
+̼߲᷆̋N゙̺҄߰͋Ả̀R߲̞͈̜ͧ͌ͤc̸͉᷄̀ẖ̈̊y゚̡̤͎᷁
+㛨
+Ⓐ
