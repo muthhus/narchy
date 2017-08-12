@@ -704,7 +704,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
             result.add(t);
         }
-        //System.out.println(Joiner.on('\n').join(result));
+        System.out.println(Joiner.on('\n').join(result));
         assertEquals(events.size(), result.size());
     }
 

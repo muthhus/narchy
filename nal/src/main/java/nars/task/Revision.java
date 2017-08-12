@@ -1,5 +1,6 @@
 package nars.task;
 
+import jcog.Util;
 import jcog.math.Interval;
 import nars.NAR;
 import nars.Op;
@@ -22,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 
 import static jcog.Util.lerp;
+import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
@@ -104,63 +106,6 @@ public class Revision {
     }
 
 
-    static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, Truth newTruth, boolean mergeOrChoose, NAR nar) {
-        assert (a.punc() == b.punc());
-
-        float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
-        float bw = b.evi();
-
-        float aProp = aw / (aw + bw);
-
-        boolean negated = false;
-        Term cc = null;
-
-        for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
-            Term at = a.term();
-            Term bt = b.term();
-            Term t;
-            if (at.equals(bt)) {
-                t = at;
-                i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
-            } else {
-                t = intermpolate(at, bt, aProp, new MutableFloat(0), 1f, nar.random(), mergeOrChoose);
-            }
-
-            ObjectBooleanPair<Term> ccp = Task.tryContent(t, a.punc(), true);
-
-
-            if (ccp != null) {
-
-                cc = ccp.getOne();
-                assert (cc.isNormalized());
-
-                negated = ccp.getTwo();
-                break;
-            }
-        }
-
-        if (cc == null)
-            return null;
-
-
-        if (negated) {
-            newTruth = newTruth.negated();
-        }
-
-
-        NALTask t = new NALTask(cc, a.punc(),
-                newTruth,
-                now, start, end,
-                Stamp.zip(a.stamp(), b.stamp(), aProp) //get a stamp collecting all evidence from the table, since it all contributes to the result
-        );
-        t.setPri(a.priElseZero() + b.priElseZero());
-        t.cause = Cause.zip(a, b);
-        if (Param.DEBUG)
-            t.log("Revection Merge");
-        return t;
-    }
-
-
     @NotNull
     public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float curDepth, @NotNull Random rng, boolean mergeOrChoose) {
         if (a.equals(b)) {
@@ -218,6 +163,26 @@ public class Revision {
 
         depth /= 2f;
 
+        Term a0, a1;
+//        if (forwardSubterms(a, adt)) {
+            a0 = a.sub(0);
+            a1 = a.sub(1);
+//        } else {
+//            a0 = a.sub(1);
+//            a1 = a.sub(0);
+//            adt = -bdt;
+//        }
+        Term b1;
+        Term b0;
+//        if (forwardSubterms(b, bdt)) {
+            b0 = b.sub(0);
+            b1 = b.sub(1);
+//        } else {
+//            b0 = b.sub(1);
+//            b1 = b.sub(0);
+//            bdt = -bdt;
+//        }
+
         int dt;
         if (adt == DTERNAL)
             dt = bdt;
@@ -225,27 +190,11 @@ public class Revision {
             dt = adt;
         else {
             dt = mergeOrChoose ?
-                    (lerp(aProp, bdt, adt)) :
+                    lerp(aProp, bdt, adt) :
                     ((choose(a, b, aProp, rng) == a) ? adt : bdt);
         }
 
-        Term a0, a1;
-//        if ((adt >= 0) || (adt == DTERNAL)) {
-            a0 = a.sub(0);
-            a1 = a.sub(1);
-//        } else {
-//            a0 = a.sub(1);
-//            a1 = a.sub(0);
-//        }
-        Term b1;
-        Term b0;
-//        if ((bdt >= 0) || (bdt == DTERNAL)) {
-            b0 = b.sub(0);
-            b1 = b.sub(1);
-//        } else {
-//            b0 = b.sub(1);
-//            b1 = b.sub(0);
-//        }
+
         if (a0.equals(b0) && a1.equals(b1)) {
             return a.dt(dt);
         } else {
@@ -255,6 +204,10 @@ public class Revision {
         }
 
     }
+
+//    private static boolean forwardSubterms(@NotNull Term a, int adt) {
+//        return a.op()!=CONJ || (adt >= 0) || (adt == DTERNAL);
+//    }
 
     public static Term choose(Term a, Term b, float aBalance, @NotNull Random rng) {
         return (rng.nextFloat() < aBalance) ? a : b;
@@ -358,18 +311,15 @@ public class Revision {
 
 
         //width will be the average width
-        long width = (ai.length() + bi.length()) / 2; //TODO weight
-        long mid = (ai.mid() + bi.mid()) / 2;  //TODO weight
+//        long width = (ai.length() + bi.length()) / 2; //TODO weight
+//        long mid = (ai.mid() + bi.mid()) / 2;  //TODO weight
 
 //            Truth expected = table.truth(mid, now, dur);
 //            if (expected == null)
 //                return null;
 
-
-        long start = mid - width / 2;
-        long end = mid + width / 2;
-
-        long u = ai.union(bi).length();
+        Interval uu = ai.union(bi);
+        long u = uu.length();
         long s = ai.length() + bi.length();
 
 //            Truth startTruth = table.truth(start, now, dur);
@@ -389,8 +339,8 @@ public class Revision {
 //                factor *= (1f - diff);
 
 
-        if (timeOverlap == null) {
-            factor *= ((float) s) / (s + u);
+        if (timeOverlap == null && u > 0) {
+            factor *= (1f + s) / (1f + u);
         }
 
         @Nullable Truth rawTruth = revise(a, b, factor, 0);
@@ -408,7 +358,74 @@ public class Revision {
 //                newTruth = null;
 
 
-        return mergeInterpolate(a, b, start, end, now, newTruth, Param.REVECTION_MERGE_OR_CHOOSE, nar);
+        Truth newTruth1 = newTruth;
+        assert (a.punc() == b.punc());
+
+        float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
+        float bw = b.evi();
+
+        float aProp = aw / (aw + bw);
+
+        boolean negated = false;
+        Term cc = null;
+
+        for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
+            Term at = a.term();
+            Term bt = b.term();
+            Term t;
+            if (at.equals(bt)) {
+                t = at;
+                i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
+            } else {
+                t = intermpolate(at, bt, aProp, new MutableFloat(0), 1f, nar.random(), Param.REVECTION_MERGE_OR_CHOOSE);
+            }
+
+            ObjectBooleanPair<Term> ccp = Task.tryContent(t, a.punc(), true);
+
+
+            if (ccp != null) {
+
+                cc = ccp.getOne();
+                assert (cc.isNormalized());
+
+                negated = ccp.getTwo();
+                break;
+            }
+        }
+
+        if (cc == null)
+            return null;
+
+
+        if (negated) {
+            newTruth1 = newTruth1.negated();
+        }
+
+
+        long start, end;
+        if (cc.op() == CONJ) {
+            long mid = Util.lerp(aProp, b.mid(), a.mid());
+            long range = cc.op() == CONJ ?
+                    cc.dtRange() :
+                    (Util.lerp(aProp, b.range(), a.range()));
+            start = mid - range / 2;
+            end = start + range;
+        } else {
+            start = uu.a;
+            end = uu.b;
+        }
+        NALTask t = new NALTask(cc, a.punc(),
+                newTruth1,
+                now, start, end,
+                Stamp.zip(a.stamp(), b.stamp(), aProp) //get a stamp collecting all evidence from the table, since it all contributes to the result
+        );
+        t.setPri(Util.lerp(aProp, b.priElseZero(), a.priElseZero()));
+
+        //t.setPri(a.priElseZero() + b.priElseZero());
+        t.cause = Cause.zip(a, b);
+        if (Param.DEBUG)
+            t.log("Revection Merge");
+        return t;
     }
 }
 

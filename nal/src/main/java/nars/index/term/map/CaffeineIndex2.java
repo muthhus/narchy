@@ -20,6 +20,13 @@ import java.util.stream.Stream;
 import static nars.Op.True;
 
 
+/**
+ * TODO
+ *      --stored Atoms do not need a TermContainerToOpMap any larger than 1
+ *      --rearrange the ordering of Ops so that variables are at the end just before the virtual operators,
+ *          so that the lower subset starting at 0 are the kinds of operators being stored. this will
+ *          slightly reduce the size that TermContainerToOpMap's need to be.
+ */
 public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<TermContainer, TermContainerToOpMap<Termed>> {
 
 
@@ -252,9 +259,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
     @Override
     public @NotNull String summary() {
         //CacheStats s = cache.stats();
-        String s = vectors.estimatedSize() + " vectors, ";
-
-        return s + ' ' + super.summary();
+        return (vectors.estimatedSize() + " TermVectors, ") + ' ' + super.summary();
         //(" + n2(s.hitRate()) + " hitrate, " +
         //s.requestCount() + " reqs)";
 
