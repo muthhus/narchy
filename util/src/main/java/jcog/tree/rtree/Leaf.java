@@ -69,7 +69,7 @@ public class Leaf<T> implements Node<T, T> {
 
 
     @Override
-    public Node<T, ?> add(final T t, Nodelike<T> parent, Spatialization<T> model) {
+    public Node<T, ?> add(/*@NotNull*/ final T t, Nodelike<T> parent, /*@NotNull*/ Spatialization<T> model) {
 
         if (parent != null && !contains(t, model)) {
             Node<T, ?> next;
@@ -207,7 +207,7 @@ public class Leaf<T> implements Node<T, T> {
     }
 
     @Override
-    public void intersectingNodes(@NotNull HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
+    public void intersectingNodes(/*@NotNull */HyperRegion rect, Predicate<Node<T, ?>> t, Spatialization<T> model) {
         if (size > 0 && (region.contains(rect) || region.intersects(rect)))
             t.test(this);
     }

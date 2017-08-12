@@ -507,6 +507,7 @@ public enum Op implements $ {
     @Deprecated
     DISJ("||", true, 5, Args.GTETwo) {
 
+
         @Override
         @NotNull Term _the(int dt, Term... u) {
             assert (dt == DTERNAL);

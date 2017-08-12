@@ -1,0 +1,23 @@
+//jar {
+//   from('src/main/java') {
+//       include 'nars/nal/*.nal'
+//   }
+//}
+processResources {
+    from('src/main/java') {
+        include '**/*.nal'
+    }
+}
+
+description = ''
+dependencies {
+  compile project(':util')
+    compile group: 'com.netflix.servo', name: 'servo-core', version:'0.12.17'
+    compile(group: 'com.github.fge', name: 'grappa', version:'2.1.0-beta.3') {
+exclude(module: 'guava')
+    }
+    compile(group: 'me.qmx.jitescript', name: 'jitescript', version:'0.4.1')
+    compile group: 'net.byteseek', name: 'byteseek', version:'2.0.3'
+    testCompile group: 'org.openjdk.jmh', name: 'jmh-core', version:'1.19'
+    testCompile group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version:'1.19'
+}

@@ -155,7 +155,8 @@ public interface HyperRegion<X> {
 
 
     /**
-     * Calculate the "cost" of this HyperRect - usually the area/volume/hypervolume across all dimensions
+     * Calculate the "cost" of this HyperRect -
+     * generally this is computed as the area/volume/hypervolume of this region
      *
      * @return - cost
      */

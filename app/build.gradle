@@ -1,0 +1,7 @@
+
+description = ''
+dependencies {
+  compile project(':nal')
+  compile project(':ui')
+  testCompile project(':nal')
+}

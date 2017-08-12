@@ -256,11 +256,11 @@ public class Builtin {
 //            );
 //        });
 
-        Operator log = (a, t, n) -> NAR.logger.info("{}", t);
+        Operator log = (a, t, n) -> NAR.logger.info(" {}", t);
         nar.on("log", log);
         nar.on(Command.LOG_FUNCTOR, log);
 
-        nar.on("error", (a, t, n) -> NAR.logger.error("{}", t));
+        nar.on("error", (a, t, n) -> NAR.logger.error(" {}", t));
 
         nar.on("reset", (op, args1, nn) ->
                 nn.runLater(nn::reset)

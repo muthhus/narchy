@@ -2,7 +2,6 @@ package nars.table;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
-import jcog.Util;
 import jcog.pri.Pri;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
@@ -35,9 +34,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     /**
      * in fractions of the table's contained temporal range
-     *
      */
-    static final float[] sampleRadii = {0f, 0.1f , 0.25f, 0.5f, 1f + (1f)};
+    static final float[] sampleRadii = {0f, 0.1f, 0.25f, 0.5f, 1f + (1f)};
 
     final static int maxSamplesTruthpolated = 8;
 
@@ -47,7 +45,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * values greater than 0 cause the table to report with a moving average
      * effect which could reduce temporal precision.
      */
-    final static float enoughSamplesRate = 0.01f;
+    final static float enoughSamplesRate = 0.0f;
 
     /**
      * if the szie is less than or equal to this value, all the entries will
@@ -55,11 +53,29 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      */
     private final static int EVAL_ALL_LTE_TASKS = 2;
 
+    public static final int MIN_TASKS_PER_LEAF = 2;
+    public static final int MAX_TASKS_PER_LEAF = 4;
+
 
     private transient NAR nar;
 
 
+    /**
+     * dimensions:
+     * 0: long time start..end
+     * 1: float freq min..max
+     * 2: float conf min..max
+     */
     public static class TaskRegion implements HyperRegion, Tasked {
+
+        /**
+         * relative to time sameness (1)
+         */
+        static final float FREQ_SAMENESS_IMPORTANCE = 0.25f;
+        /**
+         * relative to time sameness (1)
+         */
+        static final float CONF_SAMENESS_IMPORTANCE = 0.05f;
 
         public final long start;
         long end; //allow end to stretch for ongoing tasks
@@ -69,9 +85,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         @Nullable
         public final Task task;
 
-        public TaskRegion(long start, long end, float freqMin, float freqMax, float confMin, float confMax) {
-            this(start, end, freqMin, freqMax, confMin, confMax, null);
-        }
 
         @Override
         public boolean equals(Object obj) {
@@ -83,11 +96,28 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             return task.hashCode();
         }
 
+        public float timeCost() {
+            return 1 + Math.abs(end - start);
+        }
+
+        public float freqCost() {
+            float d = 1 + Math.abs(freqMax - freqMin);
+            return d * timeCost() * FREQ_SAMENESS_IMPORTANCE;
+        }
+
+        public float confCost() {
+            float d = 1 + Math.abs(confMax - confMin);
+            return d * timeCost() * CONF_SAMENESS_IMPORTANCE;
+        }
+
         @Override
         public double cost() {
-            return (1f + 0.5f * Util.sigmoid(range(0))) *
-                    Util.sqr(1f + (float) range(1)) *
-                    (1f + 0.5f * range(2));
+            return timeCost() * freqCost() * confCost();
+        }
+
+        @Override
+        public double perimeter() {
+            return timeCost() + freqCost() + confCost();
         }
 
         @Override
@@ -95,7 +125,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             return task != null ? task.toString() : Arrays.toString(new double[]{start, end, freqMin, freqMax, confMin, confMax});
         }
 
-        public TaskRegion(long start, long end, float freqMin, float freqMax, float confMin, float confMax, Supplier<Task> task) {
+        public TaskRegion(long start, long end, float freqMin, float freqMax, float confMin, float confMax) {
             this.start = start;
             this.end = end;
             this.freqMin = freqMin;
@@ -116,7 +146,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         /**
          * all inclusive time region
          */
-        public TaskRegion(long a, long b) {
+        TaskRegion(long a, long b) {
             this(a, b, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
         }
 
@@ -124,7 +154,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         /**
          * computes a mbr of the given regions
          */
-        public static TaskRegion mbr(TaskRegion x, TaskRegion y) {
+        static TaskRegion mbr(TaskRegion x, TaskRegion y) {
             if (x == y) return x;
             return new TaskRegion(
                     Math.min(x.start, y.start), Math.max(x.end, y.end),
@@ -165,6 +195,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         public final @Nullable Task task() {
             return task;
         }
+
     }
 
     final Space<TaskRegion> tree;
@@ -172,7 +203,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     //private final AtomicBoolean compressing = new AtomicBoolean(false);
 
     public RTreeBeliefTable() {
-        Spatialization<TaskRegion> model = new Spatialization<TaskRegion>((t -> t), Spatialization.DefaultSplits.AXIAL, 3, 4) {
+        Spatialization<TaskRegion> model = new Spatialization<TaskRegion>((t -> t), Spatialization.DefaultSplits.AXIAL, MIN_TASKS_PER_LEAF, MAX_TASKS_PER_LEAF) {
 
             @Override
             public void merge(TaskRegion existing, TaskRegion incoming) {
@@ -417,8 +448,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         this.nar = n;
 
         TaskRegion tr = x instanceof SignalTask && ((SignalTask) x).stretchKey != null ?
-                            ((TaskRegion)((SignalTask) x).stretchKey) :
-                            new TaskRegion(x);
+                ((TaskRegion) ((SignalTask) x).stretchKey) :
+                new TaskRegion(x);
 
         if (tree.add(tr)) {
 
@@ -426,10 +457,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 ((SignalTask) x).stretchKey = tr;
 
             //check capacity overage
-            int over = size() + 1 - capacity;
+            int over = size() - capacity;
             if (over > 0) {
                 addAfterCompressing(tr, n).forEach(ii ->
-                    n.input(Activate.activate(ii, ii.priElseZero(), c, n))
+                        n.input(Activate.activate(ii, ii.priElseZero(), c, n))
                 );
             }
         }
@@ -457,7 +488,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             FloatFunction<Task> ts = taskStrength(now, dur);
             FloatFunction<TaskRegion> weakestTask = (t -> -ts.floatValueOf(t.task));
             FloatFunction<TaskRegion> rs = regionStrength(now, dur);
-            FloatFunction<Leaf<TaskRegion>> weakestRegion = (l) -> l.size * -rs.floatValueOf((TaskRegion) l.region);
+            FloatFunction<Leaf<TaskRegion>> mergeableRegion = (l) -> -rs.floatValueOf((TaskRegion) l.region);
 
             ConcurrentRTree<TaskRegion> lt = ((ConcurrentRTree) tree);
 
@@ -466,21 +497,24 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
                 Top<TaskRegion> deleteVictim = new Top<>(weakestTask);
-                Top<Leaf<TaskRegion>> mergeVictim = new Top<>(weakestRegion);
+                Top<Leaf<TaskRegion>> mergeVictim = new Top<>(mergeableRegion);
 
                 compressNext(tree.root(), deleteVictim, mergeVictim, inputConf, now, dur);
 
                 //decide to remove or merge:
                 @Nullable TaskRegion toRemove = deleteVictim.the;
                 @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
-                if (toRemove == null && toMerge == null)
-                    return; //failed to compress
 
-                Task activation = null;
 
-                if (toMerge != null && (activation = compressMerge(toMerge, now, dur, nar)) != null) {
-                    toActivate.add(activation);
-                } else if (toRemove != null) {
+                boolean merged = false;
+                if (toMerge != null) {
+                    Task activation = null;
+                    if ((activation = compressMerge(toMerge, now, dur, nar)) != null) {
+                        toActivate.add(activation);
+                        merged = true;
+                    }
+                }
+                if (!merged && toRemove != null) {
                     compressEvict(toRemove);
                 }
 
@@ -613,21 +647,27 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         return (TaskRegion cb) -> {
 
-            float awayFromNow = (float) (Math.max(Math.abs(cb.start - when), Math.abs(cb.end - when))) / dur; //0..1.0
+            long awayFromNow = //Math.abs(when - ((cb.start + cb.end)/2)); //now to its midpoint
+                                (Math.min(Math.abs(cb.start - when), Math.abs(cb.end - when)));
 
-            long timeSpan = cb.end - cb.start;
-            float timeSpanFactor = awayFromNow == 0 ? 0f : (timeSpan / (timeSpan + awayFromNow));
+            //maximize confidence, minimize frequency variability, minimize distance to now
+            return (1f + cb.confMax) /  ((1 + (cb.freqMax - cb.freqMin)) * (1 + awayFromNow/((float)dur)));
 
-            return (
-                    1f / (1f + awayFromNow)) //min
-                    * //AND
-                    (1f + 0.5f * Util.clamp(
-                            (-1.0f * (cb.freqMax - cb.freqMin)) +  //max
-                                    (-0.5f * (cb.confMax - cb.confMin)) +  //max
-                                    (-1.0f * cb.confMax) + //max
-                                    (-1.0f * timeSpanFactor),  //max: prefer smaller time spans
-                            -1f, +1f))
-                    ;
+            //float timeSpan = (cb.end - cb.start) / fdur;
+            //float timeSpanFactor = awayFromNow == 0 ? 0f : (timeSpan / ((timeSpan + awayFromNow)));
+
+//            return
+//                    (
+//                    -1.0f * awayFromNow  //minimize distance to now
+//                    //-0.5f * cb.temporalVariabilityAvg() //minimize temporalVariability
+//                    )
+//                        *
+
+//
+//                            (1f / (1f + (
+//                        //2.0f * (cb.freqMax - cb.freqMin) +  //minimize frequency variation
+//                        //0.25f * (cb.confMax - cb.confMin) +  //minimize confidence variation
+//                    )));
         };
     }
 

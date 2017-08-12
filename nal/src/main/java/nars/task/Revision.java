@@ -369,20 +369,25 @@ public class Revision {
         boolean negated = false;
         Term cc = null;
 
+        Term at = a.term();
+        Term bt = b.term();
+
+        Term conceptTerm = at.conceptual();
+        //assert(conceptTerm.equals(bt.conceptual()));
+
         for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
-            Term at = a.term();
-            Term bt = b.term();
             Term t;
             if (at.equals(bt)) {
                 t = at;
                 i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
             } else {
                 t = intermpolate(at, bt, aProp, new MutableFloat(0), 1f, nar.random(), Param.REVECTION_MERGE_OR_CHOOSE);
+                if (!t.conceptual().equals(conceptTerm))
+                    continue;
             }
 
+
             ObjectBooleanPair<Term> ccp = Task.tryContent(t, a.punc(), true);
-
-
             if (ccp != null) {
 
                 cc = ccp.getOne();
@@ -414,6 +419,9 @@ public class Revision {
             start = uu.a;
             end = uu.b;
         }
+
+        //System.out.println(a.term() + " " + b.term() + " " + cc);
+
         NALTask t = new NALTask(cc, a.punc(),
                 newTruth1,
                 now, start, end,

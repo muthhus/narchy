@@ -305,6 +305,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             super();
 
             setIgnoreExceptions(true);
+            setPrintExceptions(true);
 
             final boolean isARM = Platform.CPUFamily.ARM == Platform.getCPUFamily();
             fpsCounter = new FPSCounterImpl();
@@ -358,7 +359,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
                                 display(); // propagate exclusive context -> off!
                             } catch (final UncaughtAnimatorException dre) {
                                 dre.printStackTrace();
-                                quitIssued = true;
+                                //quitIssued = true;
 //                                    stopIssued = true;
                             }
                         }
@@ -430,9 +431,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 //                        return true;
 
 
-            setIgnoreExceptions(false);
 
-            setPrintExceptions(true);
 
             animThread = loop.thread();
             loop.runFPS(initialFPS);

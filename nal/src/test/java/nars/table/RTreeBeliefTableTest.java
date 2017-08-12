@@ -13,6 +13,7 @@ import org.junit.Test;
 import static jcog.Texts.n2;
 import static nars.Op.BELIEF;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RTreeBeliefTableTest {
 
@@ -20,46 +21,58 @@ public class RTreeBeliefTableTest {
     public void testBasicOperations() throws Narsese.NarseseException {
         NAR n = NARS.shell();
         BaseConcept X = (BaseConcept) n.conceptualize($.$("a:b"));
-        RTreeBeliefTable t = new RTreeBeliefTable(4);
+        RTreeBeliefTable r = new RTreeBeliefTable(4);
 
-        assertEquals(0, t.size());
+        assertEquals(0, r.size());
 
         Term x = X.term();
         Task a = $.belief(x, 1f, 0.9f).time(1).apply(n); a.pri(0.5f);
-        t.add(a, X, n);
-        assertEquals(1, t.size());
+        r.add(a, X, n);
+        assertEquals(1, r.size());
 
-        t.add(a, X, n);
-        assertEquals(1, t.size()); //no change for inserted duplicate
+        r.add(a, X, n);
+        assertEquals(1, r.size()); //no change for inserted duplicate
 
         Task b = $.belief(x, 0f, 0.9f).time(3).apply(n); b.pri(0.5f);
-        t.add(b, X, n);
-        assertEquals(2, t.size());
+        r.add(b, X, n);
+        assertEquals(2, r.size());
 
         Task c = $.belief(x, 0.1f, 0.9f).time(3).apply(n); c.pri(0.5f);
-        t.add(c, X, n);
-        assertEquals(3, t.size());
+        r.add(c, X, n);
+        assertEquals(3, r.size());
 
         Task d = $.belief(x, 0.1f, 0.9f).time(0,3, 4).apply(n); d.pri(0.5f);
-        t.add(d, X, n);
-        assertEquals(4, t.size()); //no change for inserted duplicate
+        r.add(d, X, n);
+        r.print(System.out);
+        assertEquals(4, r.size()); //no change for inserted duplicate
 
-        t.print(System.out);
+        r.print(System.out);
     }
 
 
-    @Test
-    public void testAccuracy() throws Narsese.NarseseException {
+    @Test public void testAccuracyFlat() throws Narsese.NarseseException {
+        testAccuracy(1, 1,20, (t) -> 0.5f); //flat
+    }
+    @Test public void testAccuracySineDur1() throws Narsese.NarseseException {
+        testAccuracy(1, 1,20, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
+    }
+    @Test public void testAccuracySineDur1Ext() throws Narsese.NarseseException {
+        testAccuracy(1, 1,50, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
+    }
+    @Test public void testAccuracySineDur() throws Narsese.NarseseException {
+        testAccuracy(2, 4,50, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
+    }
+    @Test public void testAccuracySqrWave() throws Narsese.NarseseException {
+        testAccuracy(1, 3, 20, (t) -> (Math.sin(t)/2f+0.5f) >= 0.5 ? 1f : 0f);
+    }
+
+    static void testAccuracy(int dur, int period, int end, LongToFloatFunction func) {
+
         NAR n = NARS.shell();
 
-
-        int period = 3;
-        n.time.dur(period);
-
-        int end = 50;
+        n.time.dur(dur);
 
         Term term = $.p("x");
-        LongToFloatFunction func = (t) -> (float)(Math.sin(t/5f)/2f+0.5f);
 
         //1. populate
 
@@ -70,8 +83,9 @@ public class RTreeBeliefTableTest {
         //int numTasks = 0;
         long time=0;
         while (time < end) {
-            cb.add($.task(term, BELIEF, func.valueOf(time), 0.9f).time(time).setPriThen(0.5f).apply(n), c, n);
+            n.input($.task(term, BELIEF, func.valueOf(time), 0.9f).time(time).setPriThen(0.5f).apply(n));
             time += period;
+            n.run(period);
             //numTasks++;
         }
 
@@ -91,6 +105,7 @@ public class RTreeBeliefTableTest {
         m.print();
 
 
+        System.out.println();
 
         //2. validate and calculate error
         double errSum = 0;
@@ -99,10 +114,12 @@ public class RTreeBeliefTableTest {
             Truth actualTruth = n.beliefTruth(term, i);
             float actual = actualTruth != null ? actualTruth.freq() : 0.5f;
             float err = Math.abs(actual - expected);
-            System.out.println(n2(i) + "\t" + n2(err) + "\t" + n2(expected) + "\t" + n2(actual));
+            System.out.println(n2(i) + "\t" + /*n2(err) + "\t" + */ n2(expected) + "\t" + n2(actual));
             errSum += err;
         }
-        System.err.println(errSum / end + " avg point error");
+        double avgErr = errSum / end;
+        System.err.println(avgErr + " avg point error");
+        assertTrue(avgErr < 0.1f);
     }
 
 }

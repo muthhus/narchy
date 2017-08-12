@@ -16,10 +16,10 @@ import static junit.framework.TestCase.assertTrue;
  * Created by me on 9/13/16.
  */
 public class NQuadsRDFTest {
+    final NAR n = NARS.tmp();
 
     @Test
     public void test1() throws Exception {
-        NAR n = new NARS().get();
         n.log();
         NQuadsRDF.input(n, "<http://example.org/#spiderman> <http://xmlns.com/foaf/0.1/name> \"Человек-паук\"@ru .");
         n.run(1);
@@ -30,15 +30,8 @@ public class NQuadsRDFTest {
     @Test
     public void testSchema1() throws Exception {
 
-        //Multi nar = new Multi(3,512,
-        NAR n = new NARS().get();
-//                new CaffeineIndex(new DefaultConceptBuilder(), 128*1024, e),
-//                //new TreeTermIndex.L1TreeIndex(new DefaultConceptBuilder(), 1000000, 32768, 3),
-//                new CycleTime(), e
-//        );
-
         File output = new File("/tmp/onto.nal");
-        PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512*1024));
+        PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512 * 1024));
 
         n.input(
                 NQuadsRDF.stream(n, new File(
@@ -48,7 +41,7 @@ public class NQuadsRDFTest {
                     pout.println(t.term().toString() + t.punc());
                     //t.budget(0, 0.5f);
                     return t;
-                } )
+                })
         );
 
         pout.close();
