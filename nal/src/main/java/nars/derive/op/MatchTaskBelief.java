@@ -36,6 +36,7 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
 
         List<PrediTerm> post = $.newArrayList();
 
+
         compile(taskPattern, beliefPattern, pre, post);
 
         this.pre = pre;

@@ -94,6 +94,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         /// 2. EVAL ----
 
+
         d.use(Param.TTL_DERIVE_EVAL);
         nar.emotion.derivationEval.increment();
 

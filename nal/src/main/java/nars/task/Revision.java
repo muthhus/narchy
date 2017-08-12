@@ -416,8 +416,12 @@ public class Revision {
             start = mid - range / 2;
             end = start + range;
         } else {
-            start = uu.a;
-            end = uu.b;
+            if (timeOverlap == null) {
+                start = end = Util.lerp(aProp, b.mid(), a.mid());
+            } else {
+                start = uu.a;
+                end = uu.b;
+            }
         }
 
         //System.out.println(a.term() + " " + b.term() + " " + cc);

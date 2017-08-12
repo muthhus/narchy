@@ -416,7 +416,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             default:
                 Task a = tt.get(0).task;
                 Task b = tt.get(1).task;
+                if (a.during(when) && !b.during(when))
+                    return a; //specifically 'a' for that time
 
+                //otherwise interpolate
                 Task c = Revision.merge(a, b, when, nar);
                 return c != null ? c : a;
         }

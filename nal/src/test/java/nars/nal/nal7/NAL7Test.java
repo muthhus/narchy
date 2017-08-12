@@ -1309,7 +1309,6 @@ public class NAL7Test extends AbstractNALTest {
          */
 
         test
-                .log()
                 .input("((reshape(I,$1) &&+0 ($1-->[pliable])) ==>+10 ($1-->[hardened])).")
                 .input("(($1-->[heated]) ==>+10 ($1-->[pliable])).")
 
@@ -1321,6 +1320,17 @@ public class NAL7Test extends AbstractNALTest {
 
         ;
     }
+
+//    @Test public void testContrapositionWierdness() {
+//        test
+//                .log()
+//                .inputAt(2, "(c ==>-1 a). :|:")
+//                .inputAt(5, "(c==>d). :|:")
+//                //.mustBelieve(cycles, "", 1f, 0.45f /*0.73f*/, 10 /* 10? */)
+//                .mustNotOutput(cycles, "((--,b) ==>+4 ((--,a) &&+4 (--,d)))", BELIEF, -3, ETERNAL);
+//
+//    }
+
 //    @Test public void inductNegativesConjunction() {
 //        test()
 //                .log()

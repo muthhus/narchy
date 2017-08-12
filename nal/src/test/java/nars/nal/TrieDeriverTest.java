@@ -35,21 +35,22 @@ public class TrieDeriverTest {
 //            //(TrieDeriver) DefaultDeriver.the;
 //            new TrieDeriver(DefaultDeriver.rules);
 
-    @Test public void printCompiledRuleTree() {
+    @Test
+    public void printCompiledRuleTree() {
 
         TrieDeriver.print(TrieDeriver.the(Deriver.DEFAULT(8), NARS.tmp()), System.out);
 
     }
 
 
-
-    @Test public void testConclusionWithXTERNAL() throws Narsese.NarseseException {
+    @Test
+    public void testConclusionWithXTERNAL() throws Narsese.NarseseException {
         PatternTermIndex idx = new PatternTermIndex() {
             @Override
             public @Nullable Termed get(@NotNull Term x, boolean create) {
                 Termed u = super.get(x, create);
                 assertNotNull(u);
-                if (u!= x) {
+                if (u != x) {
                     System.out.println(x + " (" + x.getClass() + ")" + " -> " + u + " (" + u.getClass() + ")");
                     if (u.equals(x) && u.getClass().equals(x)) {
                         fail("\t ^ same class, wasteful duplicate");
@@ -62,8 +63,8 @@ public class TrieDeriverTest {
         System.out.println();
 
         PrediTerm d = TrieDeriver.the(new PremiseRuleSet(idx,
-        "Y, Y |- (?1 &&+0 Y), ()",
-              "X, X |- (?1 &&+- X), ()"
+                "Y, Y |- (?1 &&+0 Y), ()",
+                "X, X |- (?1 &&+- X), ()"
         ), NARS.tmp());
 
         System.out.println();
@@ -72,8 +73,8 @@ public class TrieDeriverTest {
 
         System.out.println(d);
 
-        assertTrue(d.toString().contains("(?2&|%1)") );
-        assertTrue(d.toString().contains("(?2 &&+- %1)") );
+        assertTrue(d.toString().contains("(?2&|%1)"));
+        assertTrue(d.toString().contains("(?2 &&+- %1)"));
 
 
         //assertTrue("something at least got stored in the index", idx.size() > 16);
@@ -81,7 +82,6 @@ public class TrieDeriverTest {
         //test that A..+ survives as an ellipsis
         //assertTrue(d.trie.getSummary().contains("..+"));
     }
-
 
 
     public static PrediTerm<Derivation> testCompile(String... rules) {
@@ -94,7 +94,7 @@ public class TrieDeriverTest {
 
     public static PrediTerm<Derivation> testCompile(NAR n, boolean debug, String... rules) {
 
-        PremiseRuleSet src = new PremiseRuleSet( rules );
+        PremiseRuleSet src = new PremiseRuleSet(rules);
         PrediTerm d = TrieDeriver.the(src, n);
 
         if (debug) d.printRecursive();
@@ -127,21 +127,25 @@ public class TrieDeriverTest {
         //PrediTerm e = src.compile(NARS.single());
     }
 
-    @Test public void testCompile() {
+    @Test
+    public void testCompile() {
         testCompile(
-    "(A --> B), (B --> C), neqRCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)"
-        );
-
-    }
-    @Test public void testCompilePatternOpSwitch() {
-        testCompile(
-    "(A --> B), C |- (A --> C), (Punctuation:Question)",
-          "(A ==> B), C |- (A ==> C), (Punctuation:Question)"
+                "(A --> B), (B --> C), neqRCom(A,C) |- (A --> C), (Belief:Deduction, Goal:Strong)"
         );
 
     }
 
-    @Test public void testConclusionFold() throws Narsese.NarseseException {
+    @Test
+    public void testCompilePatternOpSwitch() {
+        testCompile(
+                "(A --> B), C |- (A --> C), (Punctuation:Question)",
+                "(A ==> B), C |- (A ==> C), (Punctuation:Question)"
+        );
+
+    }
+
+    @Test
+    public void testConclusionFold() throws Narsese.NarseseException {
 
         String[] rules = {
                 "(A --> B), C |- (A --> C), (Punctuation:Question)",
@@ -162,21 +166,31 @@ public class TrieDeriverTest {
     public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax, boolean debug) throws Narsese.NarseseException {
         NAR n = NARS.tmp();
 
-        PrediTerm<Derivation> d = testCompile(n, debug, rules )
-                .transform(DebugDerivationPredicate::new);
+        PrediTerm<Derivation> d = testCompile(n, debug, rules);
+                //.transform(DebugDerivationPredicate::new);
 
         Derivation der = new Derivation(n).cycle(d);
 
         Set<Task> tasks = new LinkedHashSet();
         n.onTask(tasks::add);
 
-        new Premise(Narsese.parse().task(task, n), n.term(belief), 0.5f ).run(der, ttlMax);
+        new Premise(Narsese.parse().task(task, n), n.term(belief), 0.5f).run(der, ttlMax);
 
         n.run(1);  //to allow input tasks to get processed
 
         return tasks;
     }
 
+    @Test
+    public void testContrapositionWierdness() {
+
+        String s = "( (--,%S) ==> P), ( (--,%S) ==> P) |- ( (--,%P) ==>+- S),       (Belief:Contraposition)";
+
+        NAR n = NARS.tmp();
+        PrediTerm<Derivation> d = testCompile(n, false, s);
+        TrieDeriver.print(d, System.out);
+
+    }
 //    @Test public void printRuleSet() {
 //
 ////        List<PremiseRule> rr = d.rules.rules;

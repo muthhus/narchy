@@ -305,14 +305,16 @@ public abstract class Unify extends Versioning implements Subst {
 
     /**
      * returns true if the assignment was allowed, false otherwise
+     * args should be non-null. the annotations are removed for perf reasons
      */
-    public final boolean putXY(@NotNull Term x0, @NotNull Term y) {
-        Term x = xy(x0);
+    public final boolean putXY(final /*@NotNull*/ Term x, final /*@NotNull*/ Term y) {
+//        assert(!x0.equals(y)): "attempted to explicitly create a cycle";
 
-        if (x != null) {
-            return unify(x, y);
+        Term y0 = xy(x);
+
+        if (y0 != null) {
+            return unify(y0, y);
         } else /*if (matchType(x0))*/ {
-            x = x0;
 
             if (x instanceof Variable && x.op() == y.op()) {
 
@@ -324,6 +326,7 @@ public abstract class Unify extends Versioning implements Subst {
             } /*else {
                 //TODO to prevent certain variables from being assigned to other ones?
             }*/
+
 
 
             if (xy.tryPut(x, y)) {

@@ -64,18 +64,18 @@ abstract public class Solve extends AbstractPred<Derivation> {
             case QUEST:
             case QUESTION:
                 //a truth function so check cyclicity
-                if (m.cyclic || m.overlap)
+                if (m.cyclic)
                     return false;
 
-                switch (m.taskPunct) {
-                    case BELIEF:
-                    case QUESTION:
-                        break;
-                    case GOAL:
-                    case QUEST:
-                        punc = QUEST; //apply similar behavior for Question to Quests
-                        break;
-                }
+//                switch (m.taskPunct) {
+//                    case BELIEF:
+//                    case QUESTION:
+//                        break;
+//                    case GOAL:
+//                    case QUEST:
+//                        punc = QUEST; //apply similar behavior for Question to Quests
+//                        break;
+//                }
 
                 single = true;
                 t = null;
@@ -85,7 +85,6 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 throw new InvalidPunctuationException(punc);
         }
 
-        @Nullable long[] ev = single ? m.evidenceSingle() : m.evidenceDouble();
 //        if (punct==GOAL && m.taskPunct!=GOAL && Stamp.isCyclic(ev)) {
 //            //when deriving a goal from a belief, reset any cyclic stamp state
 //            ev = Stamp.uncyclic(ev);
@@ -94,7 +93,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
         m.truth(
             t,
                 punc,
-            ev
+            single
         );
         return true;
     }

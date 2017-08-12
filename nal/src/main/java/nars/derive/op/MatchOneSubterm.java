@@ -78,7 +78,14 @@ public final class MatchOneSubterm extends UnificationPrototype {
 
         @Override
         public final boolean test(@NotNull Derivation p) {
-            return p.matchAll(super.pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch);
+            int now = p.now();
+            boolean b = p.matchAll(super.pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch);
+            if (b) {
+                p.revert(now);
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 

@@ -81,7 +81,9 @@ public final class TruthFunctions  {
      * @return Truth value of the conclusion
      */
     public static Truth contraposition(@NotNull Truth t, float minConf) {
-        float c = w2c(and(1 - t.freq(), t.conf()));
+        float f = t.freq();
+        if (f == 1f) return null; //quick test
+        float c = w2c(and(1 - f, t.conf()));
         return (c < minConf) ? null : t(0, c);
     }
 

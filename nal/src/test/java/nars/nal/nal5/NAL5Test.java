@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 //@RunWith(Parameterized.class)
 public class NAL5Test extends AbstractNALTest {
 
-    final int cycles = 50;
+    final int cycles = 150;
 
     @Before
     public void nal() {
@@ -125,26 +125,7 @@ public class NAL5Test extends AbstractNALTest {
     }
 
 
-    @Test
-    public void comparisonImpl() {
 
-        TestNAR tester = test;
-        tester.log();
-        tester.believe("<x ==> y>", 1f, 0.9f); //.en("If robin is a type of bird then robin is a type of animal.");
-        tester.believe("<x ==> z>", 0.8f, 0.9f); //.en("If robin is a type of bird then robin can fly.");
-        tester.mustBelieve(cycles, "<y ==> z>", 0.80f, 0.45f); //.en("I guess robin is a type of animal if and only if robin can fly.");
-        tester.mustBelieve(cycles, "<z ==> y>", 0.80f, 0.45f); //.en("I guess robin is a type of animal if and only if robin can fly.");
-    }
-
-    @Test
-    public void comparisonOppositeImpl() {
-
-        TestNAR t = test;
-        t.believe("<x ==> z>", 0.1f, 0.9f);
-        t.believe("<y ==> z>", 1.0f, 0.9f);
-        t.mustBelieve(cycles, "<x ==> y>", 0.10f, 0.45f);
-        t.mustBelieve(cycles, "<y ==> x>", 0.10f, 0.45f);
-    }
 
 //    @Test
 //    public void comparisonNegNeg(){
@@ -171,24 +152,6 @@ public class NAL5Test extends AbstractNALTest {
         tester.believe("(&&, (--,x), y, z)");
         tester.believe("x", 0.20f, 0.9f);
         tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f);
-    }
-
-    @Test
-    public void resemblance() {
-
-        TestNAR tester = test;
-
-        //tester.believe("<<robin --> animal> <=> <robin --> bird>>"); //.en("Robin is a type of animal if and only if robin is a type of bird.");
-        tester.believe("<<robin --> animal> ==> <robin --> bird>>"); //.en("Robin is a type of animal if and only if robin is a type of bird.");
-        tester.believe("<<robin --> bird> ==> <robin --> animal>>"); //.en("Robin is a type of animal if and only if robin is a type of bird.");
-
-        //tester.believe("<<robin --> bird> <=> <robin --> [flying]>>", 0.9f, 0.9f); //.en("Robin is a type of bird if and only if robin can fly.");
-        tester.believe("<<robin --> bird> ==> <robin --> [flying]>>", 0.9f, 0.9f); //.en("Robin is a type of bird if and only if robin can fly.");
-        tester.believe("<<robin --> [flying]> ==> <robin --> bird>>", 0.9f, 0.9f); //.en("Robin is a type of bird if and only if robin can fly.");
-
-        //tester.mustBelieve(cycles, " <<robin --> animal> <=> <robin --> [flying]>>", 0.90f, 0.81f); //.en("Robin is a type of animal if and only if robin can fly.");
-        tester.mustBelieve(cycles, " <<robin --> animal> ==> <robin --> [flying]>>", 0.90f, 0.73f /*0.81f*/); //.en("Robin is a type of animal if and only if robin can fly.");
-        tester.mustBelieve(cycles, " <<robin --> [flying]> ==> <robin --> animal>>", 0.90f, 0.73f /*0.81f*/); //.en("Robin is a type of animal if and only if robin can fly.");
     }
 
 

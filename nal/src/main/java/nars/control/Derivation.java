@@ -46,8 +46,7 @@ public class Derivation extends Unify implements TermContext {
     @Nullable
     public Truth concTruth;
     public byte concPunc;
-    @Nullable
-    public long[] concEvidence;
+
 
 
     /**
@@ -123,6 +122,7 @@ public class Derivation extends Unify implements TermContext {
 
     public PrediTerm<Derivation> deriver;
     public final ByteShuffler shuffler = new ByteShuffler(64);
+    public boolean single;
 
 //    private transient Term[][] currentMatch;
 
@@ -266,9 +266,8 @@ public class Derivation extends Unify implements TermContext {
 
         this.concTruth = null;
         this.concPunc = 0;
-        this.concEvidence = null;
 
-
+        this.single = false;
         evidenceDouble = evidenceSingle = null;
         temporal = cyclic = overlap = false;
 
@@ -359,10 +358,11 @@ public class Derivation extends Unify implements TermContext {
     /**
      * set in Solve once these (3) conclusion parameters have been determined
      */
-    public void truth(Truth truth, byte punc, long[] evidence) {
+    public void truth(Truth truth, byte punc, boolean single) {
         this.concTruth = truth;
         this.concPunc = punc;
-        this.concEvidence = evidence;
+        this.single = single;
+        //this.concEvidence = evidence;
     }
 
     /**
@@ -400,10 +400,11 @@ public class Derivation extends Unify implements TermContext {
 
         //this.currentMatch = match;
 
+        int now = now();
         try {
             forEachMatch.test(this);
         } finally {
-            //this.currentMatch = null;
+            revert(now); //undo any changes applied in conclusion
         }
 
     }

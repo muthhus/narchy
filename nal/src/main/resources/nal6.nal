@@ -11,19 +11,15 @@
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
-    (S ==> M), (M ==> P), neq(P,S) |- (S ==>+- P), (Belief:Deduction)
-        //(M ==> P), (S ==> M), neqCom(P,S), notImpl(S) |- (S ==>+- P), (Belief:Deduction)
+    (M ==> P), (S ==> M), neq(S,P) |- (S ==>+- P), (Belief:Deduction)
 
-    (S ==> M), (P ==> M), neq(P,S) |- (S ==>+- P), (Belief:Induction)
-        //(P ==> M), (S ==> M), neq(P,S) |- (S ==>+- P), (Belief:Induction)
-            //TODO unit test:
-            //(S ==> P), (S ==> M), task("."), neqCom(P,S), notImpl(S), |- (P ==>+- M), (Punctuation:Question)
+    (P ==> M), (S ==> M), neq(S,P) |- (S ==>+- P), (Belief:Induction)
 
-    (M ==> S), (M ==> P), neq(P,S) |- (S ==>+- P), (Belief:Abduction)
-        //(M ==> P), (M ==> S), neq(P,S) |- (S ==>+- P), (Belief:Abduction)
+    (M ==> P), (M ==> S), neq(S,P) |- (S ==>+- P), (Belief:Abduction)
 
-    (M ==> S), (P ==> M), neq(P,S) |- (S ==>+- P), (Belief:Exemplification)
-        //(P ==> M), (M ==> S), neq(P,S) |- (S ==>+- P), (Belief:Exemplification)
+    (P ==> M), (M ==> S), neq(S,P) |- (S ==>+- P), (Belief:Exemplification)
+
+
 
 
 
@@ -34,7 +30,7 @@
 // original:	    ( --S ==> P),   P |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 // original:	    ( --S ==> P), --S |- ( --P ==> S), (Truth:Contraposition, Derive:AllowBackward)
 
-    ( (--,%S) ==> P), ( (--,%S) ==> P) |- ( (--,%P) ==>+- S),       (Belief:Contraposition)
+    ( (--,%S) ==> P), P |- ( (--,%P) ==>+- S),       (Belief:Contraposition)
 
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
@@ -133,10 +129,11 @@
         //S, (||,(--,%S),A..+) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
-//conditional abduction TODO this needs to be 'dt' sensitive
+//conditional abduction
 
     ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
     ((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
+    (M ==> C), C, task(".") |- M, (Belief:Abduction)
 
         //TODO modify ellipsis to allow these two rules to be expressed as one:
         // ((&&,M,A..+) ==> C), (A..+ ==> C) |- M, (Belief:Abduction)
@@ -193,6 +190,8 @@
 
      //structural decompose any component of a conjunction.
      C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+     (&&,X,A..+), X, task("!") |- X, (Goal:Strong)
+    //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)
 
      (&&,X,A..+), Y, task(".") |- subIfUnifiesAny((&&,A..+),X,Y), (Belief:AnonymousAnalogy)
      (&&,(--,%X),A..+), Y, task(".") |- (--,subIfUnifiesAny((&&,A..+),X,Y)), (Belief:AnonymousAnalogy)

@@ -16,7 +16,7 @@ public class DebugDerivedTask extends DerivedTask {
     public DebugDerivedTask(@NotNull Term tc, byte punct, @Nullable Truth truth, @NotNull Derivation d, long start, long end, @NotNull short[] rule) {
         super(tc, punct, truth, d, start, end, rule);
         this.parentTask = d.task;
-        this.parentBelief = d.belief;
+        this.parentBelief = !d.single ? d.belief : null;
     }
 
     @Override
