@@ -28,6 +28,13 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int MAX_EVAL_RECURSION = 16;
 
     /**
+     * controls interpolation policy:
+     * true: dt values will be interpolated
+     * false: dt values will be chosen by weighted random decision
+     * */
+    public static final boolean REVECTION_MERGE_OR_CHOOSE = false;
+
+    /**
      * use this for advanced error checking, at the expense of lower performance.
      * it is enabled for unit tests automatically regardless of the value here.
      */

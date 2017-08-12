@@ -318,7 +318,7 @@ public interface Stamp {
      *
      * assumes the arrays are sorted and contain no duplicates
      */
-    @Deprecated static float overlapFraction(@NotNull long[] a, @NotNull long[] b) {
+    static float overlapFraction(@NotNull long[] a, @NotNull long[] b) {
         return overlapFraction(LongSets.immutable.of(a), a.length, b);
     }
 

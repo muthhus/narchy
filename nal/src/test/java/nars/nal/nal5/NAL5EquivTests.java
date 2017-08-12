@@ -9,8 +9,8 @@ import org.junit.Test;
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
-@Ignore
-public class NAL5EquivTests extends AbstractNALTest {
+/** original nal5 tests involving the equivalence operator */
+@Ignore public class NAL5EquivTests extends AbstractNALTest {
     final int cycles = 50;
 
     @Before

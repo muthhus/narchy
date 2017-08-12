@@ -2,6 +2,7 @@ package nars.task;
 
 import jcog.math.Interval;
 import nars.NAR;
+import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.control.Cause;
@@ -22,7 +23,7 @@ import java.util.Random;
 
 import static jcog.Util.lerp;
 import static nars.time.Tense.DTERNAL;
-import static nars.truth.TruthFunctions.c2w;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Revision / Projection / Revection Utilities
@@ -98,12 +99,12 @@ public class Revision {
 //    }
 
 
-    public static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {
+    static Truth revise(@NotNull Truthed a, @NotNull Truthed b) {
         return revise(a, b, 1f, 0f);
     }
 
 
-    public static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, Truth newTruth, boolean mergeOrChoose, NAR nar) {
+    static Task mergeInterpolate(@NotNull Task a, @NotNull Task b, long start, long end, long now, Truth newTruth, boolean mergeOrChoose, NAR nar) {
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
@@ -115,9 +116,17 @@ public class Revision {
         Term cc = null;
 
         for (int i = 0; i < Param.MAX_TERMPOLATE_RETRIES; i++) {
-            ObjectBooleanPair<Term> ccp = Task.tryContent(
-                    intermpolate(a.term(), b.term(), aProp, new MutableFloat(0), 1f, nar.random(), mergeOrChoose),
-                    a.punc(), true);
+            Term at = a.term();
+            Term bt = b.term();
+            Term t;
+            if (at.equals(bt)) {
+                t = at;
+                i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
+            } else {
+                t = intermpolate(at, bt, aProp, new MutableFloat(0), 1f, nar.random(), mergeOrChoose);
+            }
+
+            ObjectBooleanPair<Term> ccp = Task.tryContent(t, a.punc(), true);
 
 
             if (ccp != null) {
@@ -159,12 +168,15 @@ public class Revision {
         }
         int len = a.size();
         if (len > 0) {
-            boolean sameOp = a.op() == b.op();
 
+            Op ao = a.op();
+            Op bo = b.op();
+            boolean sameOp = ao == bo;
             boolean sameSize = (len == b.size());
+
             if (sameSize && sameOp) {
 
-                if (a.op().temporal && len == 2) {
+                if (ao.temporal && len == 2) {
                     return dtMergeTemporal(a, b, aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
                 } else {
                     //assert(ca.dt()== cb.dt());
@@ -172,11 +184,22 @@ public class Revision {
                     //Term[] x = choose(ca.terms(), cb.terms(), aProp, rng)
 
                     Term[] x = new Term[len];
+                    boolean change = false;
                     for (int i = 0; i < len; i++) {
-                        x[i] = intermpolate(a.sub(i), b.sub(i), aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
+                        Term as = a.sub(i);
+                        Term bs = b.sub(i);
+                        if (!as.equals(bs)) {
+                            Term y = intermpolate(as, bs, aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
+                            if (!as.equals(y)) {
+                                change = true;
+                                x[i] = y;
+                                continue;
+                            }
+                        }
+                        x[i] = as;
                     }
 
-                    return a.op().the( a.dt(), x );
+                    return !change ? a : ao.the(a.dt(), x);
                 }
             }
         }
@@ -207,25 +230,29 @@ public class Revision {
         }
 
         Term a0, a1;
-        if ((adt >= 0) || (adt == DTERNAL)) {
+//        if ((adt >= 0) || (adt == DTERNAL)) {
             a0 = a.sub(0);
             a1 = a.sub(1);
-        } else {
-            a0 = a.sub(1);
-            a1 = a.sub(0);
-        }
+//        } else {
+//            a0 = a.sub(1);
+//            a1 = a.sub(0);
+//        }
         Term b1;
         Term b0;
-        if ((bdt >= 0) || (bdt == DTERNAL)) {
+//        if ((bdt >= 0) || (bdt == DTERNAL)) {
             b0 = b.sub(0);
             b1 = b.sub(1);
+//        } else {
+//            b0 = b.sub(1);
+//            b1 = b.sub(0);
+//        }
+        if (a0.equals(b0) && a1.equals(b1)) {
+            return a.dt(dt);
         } else {
-            b0 = b.sub(1);
-            b1 = b.sub(0);
+            return a.op().the(dt,
+                    intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose),
+                    intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng, mergeOrChoose));
         }
-        return a.op().the(dt,
-                intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose),
-                intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng, mergeOrChoose));
 
     }
 
@@ -281,11 +308,15 @@ public class Revision {
     /**
      * t is the target time of the new merged task
      */
-    public static Task merge(@NotNull Task a, @NotNull Task b, long now, float confMin, NAR nar) {
+    public static Task merge(@NotNull Task a, @NotNull Task b, long now, NAR nar) {
 
 
-        Interval ai = new Interval(a.start(), a.end());
-        Interval bi = new Interval(b.start(), b.end());
+        long as = a.start();
+        assert (as != ETERNAL);
+        Interval ai = new Interval(as, a.end());
+        long bs = b.start();
+        assert (bs != ETERNAL);
+        Interval bi = new Interval(bs, b.end());
 
         Interval timeOverlap = ai.intersection(bi);
 
@@ -299,10 +330,10 @@ public class Revision {
 //            float freqDiscount =
 //                    (1f - 0.5f * Math.abs(a.freq() - b.freq()));
 //
-            float stampDiscount =
+        float stampDiscount =
 //                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
 //                //TODO weight the contributed overlap amount by the relative confidence provided by each task
-                    1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
+                1f - Stamp.overlapFraction(a.stamp(), b.stamp()) / 2f;
 //
 ////            //relate to loss of stamp when its capacity to contain the two incoming is reached
 ////            float stampCapacityDiscount =
@@ -362,12 +393,13 @@ public class Revision {
             factor *= ((float) s) / (s + u);
         }
 
-        Truth newTruthRaw = revise(a, b, factor, c2w(confMin));
-        if (newTruthRaw == null)
+        @Nullable Truth rawTruth = revise(a, b, factor, 0);
+        if (rawTruth == null)
             return null;
-
-        @Nullable Truth newTruth = newTruthRaw.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);;
-
+        @Nullable Truth newTruth = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+        ;
+        if (newTruth == null)
+            return null;
 
 //            float conf = w2c(expected.evi() * factor);
 //            if (conf >= Param.TRUTH_EPSILON)
@@ -376,11 +408,7 @@ public class Revision {
 //                newTruth = null;
 
 
-        if (newTruth != null) {
-            return mergeInterpolate(a, b, start, end, now, newTruth, true, nar);
-        }
-
-        return null;
+        return mergeInterpolate(a, b, start, end, now, newTruth, Param.REVECTION_MERGE_OR_CHOOSE, nar);
     }
 }
 

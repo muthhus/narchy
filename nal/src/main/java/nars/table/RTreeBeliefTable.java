@@ -386,7 +386,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 Task a = tt.get(0).task;
                 Task b = tt.get(1).task;
 
-                Task c = Revision.merge(a, b, when, nar.confMin.floatValue(), nar);
+                Task c = Revision.merge(a, b, when, nar);
                 return c != null ? c : a;
         }
     }
@@ -517,7 +517,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
 
         if (a != null && b != null) {
-            Task c = Revision.merge(a.task, b.task, now, nar.confMin.floatValue(), nar);
+            Task c = Revision.merge(a.task, b.task, now, nar);
             if (c != null) {
                 //already has write lock so just use non-async methods
                 remove(a);

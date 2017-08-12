@@ -477,7 +477,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
         Task a = s.a;
         if (s.b == null)
             return a;
-        Task c = Revision.merge(a, s.b, now, Param.TRUTH_EPSILON, nar);
+        Task c = Revision.merge(a, s.b, now, nar);
         return c != null ? c : a;
     }
 
