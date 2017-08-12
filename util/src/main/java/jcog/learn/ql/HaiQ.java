@@ -217,7 +217,6 @@ public class HaiQ extends Agent {
     }
 
     protected int perceive(float[] input) {
-        //default:
         return decideInput.decide(input, -1);
     }
 

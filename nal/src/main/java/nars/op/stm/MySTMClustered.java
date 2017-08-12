@@ -236,7 +236,6 @@ public class MySTMClustered extends STMClustered {
 
                         //float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
                         float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
-                        conf = Util.round(conf, truthRes);
                         if (conf < confMin)
                             return null;
 
@@ -251,7 +250,7 @@ public class MySTMClustered extends STMClustered {
                             long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
 
                             NALTask m = new NALTask(cp.getOne(), punc,
-                                    $.t(finalFreq, conf).negIf(cp.getTwo()), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+                                    $.t(finalFreq, conf).negIf(cp.getTwo()).ditherFreqConf(truthRes, truthRes, 1f), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
                             float maxPri = new FasterList<>(uuLen, uu)
                                     .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List

@@ -1,7 +1,9 @@
 package nars;
 
 import jcog.data.FloatParam;
+import jcog.learn.ql.HaiQAgent;
 import jcog.pri.mix.control.MixContRL;
+import nars.control.AgentService;
 import nars.control.Derivation;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
@@ -16,6 +18,7 @@ import nars.term.Term;
 import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.video.*;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
@@ -97,6 +100,7 @@ abstract public class NAgentX extends NAgent {
         return runRT(init, fps, -1);
     }
 
+
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
 
 
@@ -155,6 +159,34 @@ abstract public class NAgentX extends NAgent {
 
         NAgent a = init.apply(n);
         //a.trace = true;
+
+        new AgentService(
+                HaiQAgent::new,
+                ()->{
+                    return new float[] { a.dexterity(), a.reward };
+                },
+                ()->{
+                    return a.dexterity() + Math.max(0, a.reward);
+                },
+            3,
+                (aa)->{
+                    //System.out.println(aa);
+                    switch (aa) {
+                        case 0:
+                            n.truthResolution.setValue(
+                                    Math.max(Param.TRUTH_EPSILON, n.truthResolution.floatValue() * 0.8f ) );
+                            break;
+                        case 1:
+                            break; //nothing
+                        case 2:
+                            n.truthResolution.setValue(
+                                    Math.min(0.5f, n.truthResolution.floatValue() * 1.2f ) );
+                            break;
+                    }
+                },
+                new MutableFloat(1f),
+                n
+        );
 
 
 //        n.onTask(t -> {
