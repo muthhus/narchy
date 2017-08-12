@@ -2,7 +2,6 @@ package nars;
 
 import nars.task.ActiveQuestionTask;
 import nars.task.ITask;
-import nars.term.Compound;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

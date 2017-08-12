@@ -12,7 +12,6 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Subst;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +21,8 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static nars.Op.*;
+import static nars.Op.CONJ;
+import static nars.Op.NEG;
 import static nars.time.Tense.*;
 
 /**

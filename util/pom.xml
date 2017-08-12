@@ -62,17 +62,20 @@
             <version>15.0</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.eclipse.collections/eclipse-collections-api -->
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections-api</artifactId>
-            <version>8.2.0</version>
+            <version>9.0.0.M1</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.eclipse.collections/eclipse-collections -->
         <dependency>
             <groupId>org.eclipse.collections</groupId>
             <artifactId>eclipse-collections</artifactId>
-            <version>8.2.0</version>
+            <version>9.0.0.M1</version>
         </dependency>
+
 
         <!-- https://mvnrepository.com/artifact/com.conversantmedia/disruptor -->
         <dependency>
@@ -107,7 +110,6 @@
             <artifactId>uom-se</artifactId>
             <version>1.0.8</version>
         </dependency>
-
 
 
         <!-- https://mvnrepository.com/artifact/org.hdrhistogram/HdrHistogram -->
@@ -392,6 +394,16 @@
             <groupId>org.iq80.snappy</groupId>
             <artifactId>snappy</artifactId>
             <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.collections</groupId>
+            <artifactId>eclipse-collections</artifactId>
+            <version>8.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.collections</groupId>
+            <artifactId>eclipse-collections-api</artifactId>
+            <version>8.1.0</version>
         </dependency>
 
 

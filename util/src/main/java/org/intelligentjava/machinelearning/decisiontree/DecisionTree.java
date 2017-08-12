@@ -335,7 +335,7 @@ public class DecisionTree<K, V> {
         }
 
         public static <V> Node<V> feature(Predicate feature) {
-            return new Node<V>(feature);
+            return new Node<>(feature);
         }
 
         public static <V> Node<V> leaf(V label) {

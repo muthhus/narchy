@@ -28,7 +28,7 @@ public class GasolinearTest {
         assertEquals(0, g.which(0.1));
         assertEquals(0, g.which(0.2));
 
-        assertEquals(1, g.which(0.5));
+        assertEquals(1, g.which(0.4));
         assertEquals(1, g.which(0.6));
 
         assertEquals(2, g.which(0.9));

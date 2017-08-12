@@ -4,7 +4,6 @@ import jcog.math.MultiStatistics;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.task.DerivedTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.LongToFloatFunction;

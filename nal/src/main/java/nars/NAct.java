@@ -4,7 +4,6 @@ import jcog.data.FloatParam;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;

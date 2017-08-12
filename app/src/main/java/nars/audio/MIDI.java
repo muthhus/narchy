@@ -11,7 +11,6 @@ import nars.concept.GoalActionConcept;
 import nars.gui.Vis;
 import nars.task.DerivedTask;
 import nars.task.NALTask;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;

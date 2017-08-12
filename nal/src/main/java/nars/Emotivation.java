@@ -84,13 +84,13 @@ public class Emotivation extends Emotion {
 
         if (x instanceof Task && !((Task) x).isCommand()) {
             Task t = (Task) x;
-            float tp = evaluate(t);
-            if (tp != tp || tp < Pri.EPSILON)
-                return null; //TODO track what might cause this
-
-            t.pri(tp);
 
             value(t.cause(), Param.valueAtInput(t, nar));
+
+            evaluate(t);
+//            if (tp != tp || tp < Pri.EPSILON)
+//                return null; //TODO track what might cause this
+
         }
 
         return x;
