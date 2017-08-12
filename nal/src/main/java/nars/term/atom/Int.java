@@ -46,7 +46,7 @@ public class Int implements Intlike {
 
     public final int id;
 
-    final static int MAX_CACHED_INTS = 16;
+    final static int MAX_CACHED_INTS = 128;
     private static final Int[] digits = new Int[MAX_CACHED_INTS];
 
     static {

@@ -70,7 +70,7 @@ Non-Axiomatic Reasoning System ([NARS](https://sites.google.com/site/narswang/ho
 ```
 
 Note:
- - Additional restrictions and reductions may be applied to input.  See TermBuilder.java.
+ - Additional restrictions and reductions may be applied to input.  See Op.java.
  - Built-in 'Functors' are executed inline during the term building process. See BuiltIn.java.
    - Functors evaluated inner-most first, from left to right.
    - Results and their reductions may cascade when outer levels are evaluated.
@@ -160,9 +160,18 @@ its form into separate eternal and temporal belief tables which can not compete 
 yet support each other when evaluating truth value.
 
 NARchy avoids separate Parallel and Sequential term operator variations of Conjunctions,
- Equivalences, and Implications by using unified continuous-time Conjunction, Implication and 
- Equivalence operators, sharing all derivation rules with their eternal-time root types.  This reduces the number of derivation rules necessary and smooths some discontinuities and 
- edge cases that multiple temporal and non-temporal operator types necessitated.
+ Equivalences, and Implications by using unified ONLY continuous-time Conjunction and Implication operators,
+ sharing derivation rules where possibly with their eternal-time analogs.
+ Equivalence, having been removed, forces reliance on the existence of bidirectional
+ pairs of implication beliefs that would have constructed them -- however they, by themselves,
+ more accurately reflect an input temporal model without the obscuration, distortion, and possible contradiction
+ caused by the involvement and maintenance of partially redundant, and separate Equivalence beliefs.
+ These simplifications are also expected to reduce the overall computation necessarily applied in
+ derivation (ie. less rules) and generally 'smooths' certain discontinuities and edge cases caused by
+ different temporal and non-temporal operator types, with or without negation and variable
+ introduction or substitution.
+
+ Please create an Issue with any contradictory evidence against these claims.
  
 ### Temporal Belief Tables w/ Microsphere Revection 
 In order to fully utilize this added temporal expressiveness, temporal belief tables were
@@ -176,26 +185,24 @@ tasks (as data points in truth-time space) can be merged to empty room for incom
   temporal beliefs shine their frequency "color" to the evaluated time point.
 
 ### Multithreaded Execution
-As an alternative to the original streamlined Single-thread execution mode, a multi-threaded "Executioner"
-implementation offers scalable and safe parallelism when an application of a NAR demands more throughput.
-It utilizes LMAX Disruptor (https://lmax-exchange.github.io/disruptor/) ring-buffer to dispatch tasks from multiple producers to a number of worker
-threads.  Use this in combination with a concurrent index such as CaffeineIndex, powered by Caffeine Cache (https://github.com/ben-manes/caffeine).
-Tasks and Runnable's are submitted to the Executioner from the various reasoner processes and plugins.
-By default, all activity is synchronized each frame, meaning all tasks and runnables will have been processed
-by the end of a frame.  A completely asynchronous frame-less mode is possible and will have more support in the future.
+In a NAR, its Executioner implementation schedules the various types of Tasks input to and generated
+by the system.  As an alternative to the original streamlined Single-thread execution mode, a multi-threaded Executioner
+implementation offers scalable, asynchronous, and safe parallelism.  Thread-safe versions of
+Bags and Task Tables are constructed as appropriate.
 
 ### Full-spectrum Negation
-In keeping with a design preference for unity and balanced spectral continuity, negations are 
- also handled
- differently through the elimination of all Negation concepts.  Instead, a concept stores
+In keeping with a design preference for unity and balanced spectral continuity, there
+ are no Negation concepts.  Instead, each concept stores
  its complete frequency spectrum within itself and Negation is handled automaticaly and
- transparently during derivation and user-input/output.  Subterms may be negated, and this
+ transparently during derivation and input/output.  Subterms may be negated, and this
  results in unique compounds, but the top-level term of a task is always stored un-negated.
  This ultimately can result in less concepts (since a negation of a concept doesn't exist separately)
  and eliminates the possibility of a concept contradicting the beliefs of its negation which
  otheriwse would be stored in separate belief tables.  It also
  supports smooth and balanced revection across the 0.5 "maybe" midpoint of the frequency range,
- in both temporal and eternal modes.
+ in both temporal and eternal modes.  Note: Certain Meta-NAL rules have been adapted to compensate
+ for missing negations in premise task and belief terms, which are otherwise
+ apparent by examination of the task's frequency (< 0.5).
  
 ### Enhanced Deriver
  NARchy's deriver follows a continued evolution from its beginnings in the OpenNARS 1.6..1.7 versions
@@ -216,7 +223,7 @@ In keeping with a design preference for unity and balanced spectral continuity, 
  High performance, lock-free concurrent unsorted bag based on linear hash probing.  See HijackBag.java
 
 ### CurveBag
- Concurrent sorted bag; fuses a Map and Array.  See CurveBag.java
+ Concurrent sorted bag; essentially a fusion of a Map and Sorted List.  See CurveBag.java
 
 ### Pressurized Auto-balanced Forgetting
  Auto-forgetting removes the need for specifying arbitrary forgetting rates.  Instead, a forgetting rate is
@@ -264,9 +271,12 @@ In keeping with a design preference for unity and balanced spectral continuity, 
   classical multi-agent communication protocols like FIPA and ACL, but perhaps in a more
   natural way, and enhanced with the added expressiveness of shades of NAL truth and budget. 
 
-
 ### Deep Variable Introduction
 See VarIntroduction.java and subclasses, and which rules apply them.
+
+### Images (extensional and intensional) Removed
+Deep variable introduction, in and among Product terms, implement equivalent or 'better' results
+than what both types of Images were designed to generate. Please create an Issue with any contradictory evidence.
 
 ### _Many other changes remain to be documented._
  

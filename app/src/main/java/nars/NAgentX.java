@@ -162,8 +162,10 @@ abstract public class NAgentX extends NAgent {
 
         new AgentService(
                 HaiQAgent::new,
-                ()->{
-                    return new float[] { a.dexterity(), a.reward };
+                2,
+                (f)->{
+                    f[0] = a.dexterity();
+                    f[1] = a.reward;
                 },
                 ()->{
                     return a.dexterity() + Math.max(0, a.reward);

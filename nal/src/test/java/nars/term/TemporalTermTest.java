@@ -504,6 +504,7 @@ public class TemporalTermTest {
 
 
         //INTERMPOLATION APPLIED DURING REVISION:
+        //TODO should be either 2 or 6, not 4
         assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(ETERNAL, null, null, true, null).term().toString());
     }
 

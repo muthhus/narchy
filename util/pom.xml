@@ -395,16 +395,6 @@
             <artifactId>snappy</artifactId>
             <version>0.4</version>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.collections</groupId>
-            <artifactId>eclipse-collections</artifactId>
-            <version>8.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.collections</groupId>
-            <artifactId>eclipse-collections-api</artifactId>
-            <version>8.1.0</version>
-        </dependency>
 
 
         <!--<dependency>-->
