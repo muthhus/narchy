@@ -1,13 +1,3 @@
-//jar {
-//   from('src/main/java') {
-//       include 'nars/nal/*.nal'
-//   }
-//}
-processResources {
-    from('src/main/java') {
-        include '**/*.nal'
-    }
-}
 
 description = ''
 dependencies {

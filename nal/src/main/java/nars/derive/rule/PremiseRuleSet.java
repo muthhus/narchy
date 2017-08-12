@@ -54,7 +54,16 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     public static Stream<Pair<PremiseRule, String>> parsedRules(PatternTermIndex p, String... name) {
         return Stream.of(name)./*parallel().*/flatMap(n -> {
 
-                    InputStream nn = NAR.class.getResourceAsStream("nal/" + n);
+                    InputStream nn = null;
+                    try {
+                        nn = ClassLoader.getSystemResource(n).openStream();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+//                    InputStream nn = NAR.class.getResourceAsStream(
+//                            //"nal/" + n
+//                            n
+//                    );
                     byte[] bb;
                     try {
                         bb = nn.readAllBytes();
