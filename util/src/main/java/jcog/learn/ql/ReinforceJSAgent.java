@@ -12,16 +12,11 @@ import java.io.InputStreamReader;
 /**
  * Created by me on 5/27/16.
  */
-public abstract class ReinforceJSAgent implements Agent {
+public abstract class ReinforceJSAgent extends Agent {
     private Invocable js;
 
-    public ReinforceJSAgent() {
-
-    }
-
-    abstract String getAgentInitCode(int inputs, int actions);
-
-    @Override public void start(int inputs, int actions)  {
+    ReinforceJSAgent(int inputs, int actions) {
+        super(inputs, actions);
         try {
 
             System.out.println(ReinforceJSAgent.class.getResource("."));
@@ -64,10 +59,7 @@ public abstract class ReinforceJSAgent implements Agent {
             e.printStackTrace();
             System.exit(1);
         }
-
-
-
-        /*
+       /*
         var env = {};
         env.getNumStates = function() { return 8; }
         env.getMaxNumActions = function() { return 4; }
@@ -90,8 +82,9 @@ public abstract class ReinforceJSAgent implements Agent {
 //        System.out.println(a);
 //        Object b = js.invokeFunction("act", new double[] { 0,0,0,0,0,1,0,1 }, 0.14);
 //        System.out.println(b);
-
     }
+
+    abstract String getAgentInitCode(int inputs, int actions);
 
     @Override public int act(float prevReward, float... nextInputs) {
         try {

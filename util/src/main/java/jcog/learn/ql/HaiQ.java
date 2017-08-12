@@ -13,7 +13,7 @@ import java.util.Random;
 /**
  * q-learning + SOM agent, cognitive prosthetic. designed by patham9
  */
-abstract public class HaiQ implements Agent {
+public class HaiQ extends Agent {
 
     @NotNull
     public final Random rng;
@@ -26,7 +26,7 @@ abstract public class HaiQ implements Agent {
     @NotNull
     public float[][] et;
 
-    int actions;
+
     int lastState, lastDecidedAction;
 
     /*
@@ -65,7 +65,8 @@ abstract public class HaiQ implements Agent {
     @Range(min = 0, max = 1f)
     public final MutableFloat Alpha = new MutableFloat();
 
-    private int inputs;
+    /** input selection; HaiQAgent will not use this in its override of perceive */
+    private final Deciding decideInput;
 
     /**
      * "horizontal" state selection
@@ -77,8 +78,21 @@ abstract public class HaiQ implements Agent {
      */
     protected final Deciding decideAction;
 
-    public HaiQ() {
+    public HaiQ(int inputs, int actions) {
+        super(inputs, actions);
+
+        //som = new Hsom(inputs, states);
+
+        q = new float[inputs][actions];
+        et = new float[inputs][actions];
+
+        setQ(0.5f, 0.5f, 0.5f); // 0.1 0.5 0.9
         rng = new XorShift128PlusRandom();
+
+        decideInput =
+                //DecideEpsilonGreedy.ArgMax;
+                new DecideSoftmax(0.25f, rng);
+
         decideState =
                 //DecideEpsilonGreedy.ArgMax;
                 new DecideSoftmax(0.25f, rng);
@@ -100,7 +114,7 @@ abstract public class HaiQ implements Agent {
         int action = decide ? nextAction(state) : -1;
 
         // 2. learn
-        int lastAction = lastAction();
+        int lastAction = lastDecidedAction;
         final int lastState = this.lastState;
         if (lastAction != -1) {
 
@@ -186,19 +200,6 @@ abstract public class HaiQ implements Agent {
 //		return maxk != -1 ? maxk : randomAction();
     }
 
-    @Override
-    public void start(int inputs, int outputs) {
-
-        this.actions = outputs;
-        this.inputs = inputs;
-
-        //som = new Hsom(inputs, states);
-
-        q = new float[inputs][outputs];
-        et = new float[inputs][outputs];
-
-        setQ(0.5f, 0.5f, 0.5f); // 0.1 0.5 0.9
-    }
 
     public void setQ(float alpha, float gamma, float lambda) {
         Alpha.setValue(alpha);
@@ -215,7 +216,11 @@ abstract public class HaiQ implements Agent {
         return learn(perceive(input), reward);
     }
 
-    abstract protected int perceive(float[] input);
+    protected int perceive(float[] input) {
+        //default:
+        return decideInput.decide(input, -1);
+    }
+
 
     /**
      * TODO make abstract
@@ -224,17 +229,7 @@ abstract public class HaiQ implements Agent {
         som.learn(input);
 		return som.winnerx + (som.winnery * som.SomSize);
 	}*/
-    protected int lastAction() {
-        return lastDecidedAction;
-    }
 
-    public int actions() {
-        return actions;
-    }
-
-    public int inputs() {
-        return inputs;
-    }
 
     // void hsom_DrawSOM(Hsom somobj,int RenderSize,int x,int y,boolean
     // bSpecial,int specialIndex)

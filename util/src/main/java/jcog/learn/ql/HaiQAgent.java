@@ -18,7 +18,6 @@ public class HaiQAgent extends HaiQ {
 
 
     public @NotNull Autoencoder ae;
-    final BiFunction<Integer,Integer,Integer> numStates;
     float perceptionAlpha;
     float perceptionNoise;
     float perceptionCorruption = 0.05f;
@@ -29,36 +28,24 @@ public class HaiQAgent extends HaiQ {
 
     //float aeForget = 1f;
 
-    public HaiQAgent() {
-        this((inputs, outputs) ->
-                (int) Math.ceil(/*Math.sqrt*/((1+inputs)*(1+outputs))));
+
+    public HaiQAgent(int inputs, int outputs) {
+        this(inputs, (i,o)->(int) Math.ceil(/*Math.sqrt*/(1 + (i)*(o))), outputs);
     }
 
-    public HaiQAgent(BiFunction<Integer,Integer,Integer> numStates) {
-        super();
-        this.numStates = numStates;
+    public HaiQAgent(int inputs, BiFunction<Integer,Integer,Integer> states, int outputs) {
+        this(inputs, states.apply(inputs, outputs).intValue(), outputs);
     }
 
-    public HaiQAgent(int in, int hidden, int out) {
-        this();
-        start(in, hidden, out);
-    }
-
-    @Override
-    public void start(int inputs, int outputs) {
-        int states = numStates.apply(inputs, outputs);
-        start(inputs, states, outputs);
-    }
-
-    protected void start(int inputs, int states, int outputs) {
+    public HaiQAgent(int inputs, int states, int outputs) {
+        super(states, outputs);
+        this.states = states;
         //logger.info("start {} -> {} -> {}", inputs, states, outputs);
         this.perceptionAlpha =
                 //1f/(inputs);
                 0.1f;
         this.perceptionError = FloatAveraged.averaged(()->lastPerceptionError, inputs/2);
-        ae = perception(inputs, states);
-        this.states = states;
-        super.start(states, outputs);
+        this.ae = perception(inputs, states);
     }
 
     protected Autoencoder perception(int inputs, int states) {

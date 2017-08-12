@@ -1,5 +1,9 @@
 package jcog.learn.ql;
 
+import org.eclipse.collections.impl.bag.mutable.HashBag;
+import org.eclipse.collections.impl.bag.sorted.mutable.TreeBag;
+import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
+
 import static java.lang.System.out;
 
 /**
@@ -11,7 +15,7 @@ public class DQN extends ReinforceJSAgent {
     @Deprecated private final float epsilon = 0.01f;
 
     public DQN(int inputs, int actions) {
-        start(inputs, actions);
+        super(inputs, actions);
     }
 
     @Override
@@ -22,10 +26,5 @@ public class DQN extends ReinforceJSAgent {
     }
 
 
-    public static void main(String[] args) throws Exception {
-        DQN d = new DQN(2, 3);
-        out.println( d.act(0, 0.5f, 0.5f) );
-        out.println( d.act(-0.2f, 0.5f, 0.7f) );
-        out.println( d.act(0.2f, 0.1f, 0.7f) );
-    }
+
 }

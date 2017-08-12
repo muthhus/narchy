@@ -43,11 +43,11 @@ public class DecideSoftmax implements Deciding {
     }
 
     @Override
-    public int decide(float[] motivation, int lastAction) {
+    public int decide(float[] vector, int lastAction) {
 
         temperature = Math.max(minTemperature,temperature * temperatureDecay);
 
-        int actions = motivation.length;
+        int actions = vector.length;
         if (mot == null) {
             mot = new float[actions];
             motProb = new float[actions];
@@ -55,25 +55,25 @@ public class DecideSoftmax implements Deciding {
 
         //TODO generalize to a function which can select ranges or distort values via curves
         if (onlyPositive) {
-            for (int i = 0; i < motivation.length; i++)
-                motivation[i] = Math.max(0, motivation[i]);
+            for (int i = 0; i < vector.length; i++)
+                vector[i] = Math.max(0, vector[i]);
         }
 
-        float sumMotivation = Util.sum(motivation);
+        float sumMotivation = Util.sum(vector);
         if (sumMotivation < Float.MIN_VALUE) {
             decisiveness = 0;
-            return random.nextInt(motivation.length);
+            return random.nextInt(vector.length);
         }
 
         if (normalize) {
-            float[] minmax = Util.minmax(motivation);
+            float[] minmax = Util.minmax(vector);
             float min = minmax[0];
             float max = minmax[1];
             for (int i = 0; i < actions; i++) {
-                mot[i] = Util.normalize(motivation[i], min, max);
+                mot[i] = Util.normalize(vector[i], min, max);
             }
         } else {
-            System.arraycopy(motivation, 0, mot, 0, actions);
+            System.arraycopy(vector, 0, mot, 0, actions);
         }
 
         /* http://www.cse.unsw.edu.au/~cs9417ml/RL1/source/RLearner.java */
@@ -93,7 +93,7 @@ public class DecideSoftmax implements Deciding {
             }
         }
 
-        decisiveness = motivation[i] / sumMotivation;
+        decisiveness = vector[i] / sumMotivation;
         //System.out.println("decisiveness: " + decisiveness );
 
         return i;

@@ -32,8 +32,8 @@ public class DecideEpsilonGreedy implements Deciding {
     int motivationOrder[];
 
     @Override
-    public int decide(float[] motivation, int lastAction) {
-        int actions = motivation.length;
+    public int decide(float[] vector, int lastAction) {
+        int actions = vector.length;
 
         if (motivationOrder == null) {
             motivationOrder = new int[actions];
@@ -53,13 +53,13 @@ public class DecideEpsilonGreedy implements Deciding {
 
         for (int j = 0; j < actions; j++) {
             int i = motivationOrder[j];
-            float m = motivation[i];
+            float m = vector[i];
 
             if (m > nextMotivation) {
                 nextAction = i;
                 nextMotivation = m;
             }
-            if (equalToPreviousAction && j > 0 && !Util.equals(m, motivation[motivationOrder[j - 1]])) {
+            if (equalToPreviousAction && j > 0 && !Util.equals(m, vector[motivationOrder[j - 1]])) {
                 equalToPreviousAction = false; //there is some variation
             }
 

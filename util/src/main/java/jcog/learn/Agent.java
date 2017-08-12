@@ -1,17 +1,23 @@
 package jcog.learn;
 
 /**
- * lowest common denominator reinforcement learning agent interface
+ * lowest common denominator markov decision process / reinforcement learning agent interface
  */
-public interface Agent {
+public abstract class Agent {
 
-    void start(int inputs, int actions);
+    public final int inputs;
+    public final int actions;
+
+    protected Agent(int inputs, int actions) {
+        this.inputs = inputs;
+        this.actions = actions;
+    }
 
     //default int act(float reward, TensorF input) {
         //TODO
     //}
 
-    int act(float reward, float[] nextObservation);
+    public abstract int act(float reward, float[] nextObservation);
 
 //    default int act(double reward, double... nextObservation) {
 //        float[] f = Util.toFloat(nextObservation);
@@ -19,7 +25,13 @@ public interface Agent {
 //        return act((float)reward, f);
 //    }
 
-    default String summary() {
-        return "";
+
+    @Override
+    public String toString() {
+        return summary();
+    }
+
+    public String summary() {
+        return getClass() + "<ins=" + inputs + ", acts=" + actions + ">";
     }
 }
