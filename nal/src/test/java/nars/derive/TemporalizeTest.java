@@ -1,6 +1,5 @@
 package nars.derive;
 
-import com.google.common.base.Joiner;
 import jcog.list.FasterList;
 import nars.NAR;
 import nars.NARS;
@@ -361,7 +360,7 @@ public class TemporalizeTest {
             int dt = 3;
             String pattern = "((x &&+2 y) " + op + "+" + dt + " z)@ETE";
 
-            assertNotNull(op + ":" + pattern, s);
+            assertNotNull(s);
             assertTrue(s.toString().startsWith(pattern));
         }
 
@@ -469,7 +468,8 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
             Map<Term, Time> h = new HashMap();
             Event s = t.solve(the("a"), h);
-            assertNull(s); //no way to solve for 'a'
+            //assertNull(s); //no way to solve for 'a' except relatively:
+            assertEquals("a@-5->b", s.toString());
 
         }
 
@@ -550,8 +550,8 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
             );
 
             Event r = t.solve(a);
-            if (r!=null) {
-            
+            if (r != null) {
+
                 String xy = a + "\t" + r;
 
                 assertTrue(xy, r.start(null).abs() >= 1);
@@ -609,6 +609,22 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         assertEquals("[((x &&+1 y) ==>+1 z)@-1]", solutions.toString());
     }
 
+    @Test
+    public void testDropAnyEvent0() throws Narsese.NarseseException {
+        //instability:
+        //$.05 ((a-->b) ==>+4 (c-->d)). -3 %1.0;.38% {160: 1;2;3;;} (((%1==>%2),%1,belief("&&")),((dropAnyEvent(%1) ==>+- %2),((StructuralDeduction-->Belief))))
+        //    $.13 (((a-->b) &&+1 (b-->c)) ==>+3 (c-->d)). 1 %1.0;.42% {7: 1;2;3} ((%1,%2,time(raw),task("."),time(dtEvents),notImpl(%1),notImpl(%2)),((%2 ==>+- %1),((Abduction-->Belief))))
+        Temporalize t = new Temporalize();
+        t.knowTerm($("(((a-->b) &&+1 (b-->c)) ==>+3 (c-->d))"), 1);
+        Term p = $("((a-->b) ==>+- (c-->d))");
+        Event s = t.solve(p);
+        assertNotNull(s);
+        assertEquals(
+                //only the eternal nature can be inferred. but during derivation this will typically be un-eternalized if the premise has temporality
+                "((a-->b) ==>+4 (c-->d))@ETE",
+                s.toString());
+
+    }
 
     @Test
     public void testDropAnyEvent1() throws Narsese.NarseseException {

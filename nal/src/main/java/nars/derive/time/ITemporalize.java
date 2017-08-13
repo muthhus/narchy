@@ -36,6 +36,7 @@ public interface ITemporalize {
         return when != ETERNAL ? Long.toString(when) : "ETE";
     }
 
+
         /**
      * unknowns to solve otherwise the result is impossible:
      * - derived task start time
@@ -51,70 +52,7 @@ public interface ITemporalize {
      * if that fails, a heuristic could decide the match. in the worst case,
      * the derivation will not be temporalizable and this method returns null.
      */
-    @Nullable
-    default Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
-
-
-        Task task = d.task;
-        Task belief = d.belief;
-
-        ITemporalize model = this;
-        //model.dur = Param.DITHER_DT ? d.dur : 1;
-
-        boolean taskRooted = true; //(belief == null) || ( !task.isEternal() );
-        boolean beliefRooted = true; //belief!=null && (!taskRooted || !belief.isEternal());
-
-
-        model.know(task, d, taskRooted);
-
-        if (belief != null) {
-            if (!belief.equals(task)) {
-
-//                if (task.isEternal() && belief.isEternal() /*&& some interesction of terms is prsent */)
-//                    beliefRooted = false; //avoid confusing with multiple eternal roots; force relative calculation
-
-                model.know(belief, d, beliefRooted); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
-            }
-        } else if (d.beliefTerm != null) {
-            if (!task.term().equals(d.beliefTerm)) //dont re-know the term
-                model.know(d.beliefTerm, d, null);
-        }
-
-        Map<Term, Time> trail = new HashMap<>();
-        Event e;
-        try {
-            e = model.solve(pattern, trail);
-        } catch (StackOverflowError er) {
-            System.err.println(
-                    Arrays.toString(new Object[] { "temporalize stack overflow:\n{} {}\n\t{}\n\t{}", pattern, d, model, trail } )
-            //logger.error(
-                    );
-//            trail.clear();
-//            model.solve(pattern, trail);
-            return null;
-        }
-        if (e == null)
-            return null;
-
-        if (e instanceof AbsoluteEvent) {
-            AbsoluteEvent a = (AbsoluteEvent) e; //faster, preferred since pre-calculated
-            occ[0] = a.start;
-            occ[1] = a.end;
-        } else {
-            occ[0] = e.start(trail).abs();
-            occ[1] = e.end(trail).abs();
-        }
-
-        if (!(
-                (occ[0] != ETERNAL)
-                        ||
-                        (task.isEternal()) && (belief == null || belief.isEternal()))) {
-            //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
-            return null;
-        }
-        return e.term;
-    }
-
+    @Nullable Term solve(@NotNull Derivation d, Term pattern, long[] occ);
 
 
 }

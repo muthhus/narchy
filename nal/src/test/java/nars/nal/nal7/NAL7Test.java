@@ -733,18 +733,7 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(s ==>+3 p).", 1f, 0.45f);
     }
 
-    @Test
-    public void testComparison1_Temporal() {
-        /* (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
-           (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward) */
 
-        test
-
-                .input("(p ==>+1 m).")
-                .inputAt(5, "(s ==>+4 m). :|:")
-                .mustBelieve(cycles, "(s <=>+3 p)", 1f, 0.45f, 5)
-                .mustNotOutput(cycles, "(s <=>-3 p).", BELIEF, ETERNAL); //test correct dt polarity
-    }
 
     @Test
     public void testComparison2() {
@@ -881,8 +870,8 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(0, "(I-->sad). :|: %0.0;0.90%")
 
                 //must be true, not false:
-                .mustNotOutput(cycles, "((--,(I-->sad)) <=>+0 ((I-->happy) &&+0 (I-->neutral)))", BELIEF, 0.5f, 1f, 0, 1f, 0)
-                .mustNotOutput(cycles, "((--,(I-->sad)) <=>+0 ((I-->happy) &&+0 (I-->neutral)))", BELIEF, 0.5f, 1f, 0, 1f, ETERNAL)
+//                .mustNotOutput(cycles, "((--,(I-->sad)) <=>+0 ((I-->happy) &&+0 (I-->neutral)))", BELIEF, 0.5f, 1f, 0, 1f, 0)
+//                .mustNotOutput(cycles, "((--,(I-->sad)) <=>+0 ((I-->happy) &&+0 (I-->neutral)))", BELIEF, 0.5f, 1f, 0, 1f, ETERNAL)
                 //<A, B, task("."), time(dtAfter), neq(A,B), notImplicationOrEquivalence(A), notImplicationOrEquivalence(B) |- (A <=> B), (Belief:Comparison)>
 
                 .mustNotOutput(cycles, "(I-->sad)", BELIEF, 0.5f, 1f, 0.1f, 1f, 0)
@@ -893,21 +882,33 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
-    @Test
-    public void testWTFDontDecomposeConjunction2() {
-        /*((--,(I-->sad)) <=>+0 ((I-->happy) &&+0 (I-->neutral))). 1-1 %.06;.45%
-                ((I-->happy) &&+0 (I-->neutral)). 0+0 %.06;.90% {0+0: 1} Narsese
-                NOT: (I-->sad). 5-5 %.94;.02%*/
-
-        test
-
-                .inputAt(0, "((--,(I-->sad)) <=>+0 (x)). :|: %0.06;0.90%")
-                .inputAt(0, "(x). :|: %0.06;0.90%")
-
-                //must be true, not false:
-                .mustNotOutput(cycles, "(I-->sad)", BELIEF, 0.5f, 1f, 0.1f, 1f, 0);
-
-    }
+//    @Test
+//    public void testWTFDontDecomposeConjunction2() {
+//        /*((--,(I-->sad)) <=>+0 ((I-->happy) &&+0 (I-->neutral))). 1-1 %.06;.45%
+//                ((I-->happy) &&+0 (I-->neutral)). 0+0 %.06;.90% {0+0: 1} Narsese
+//                NOT: (I-->sad). 5-5 %.94;.02%*/
+//
+//        test
+//
+//                .inputAt(0, "((--,(I-->sad)) <=>+0 (x)). :|: %0.06;0.90%")
+//                .inputAt(0, "(x). :|: %0.06;0.90%")
+//
+//                //must be true, not false:
+//                .mustNotOutput(cycles, "(I-->sad)", BELIEF, 0.5f, 1f, 0.1f, 1f, 0);
+//
+//    }
+//   @Test
+//    public void testComparison1_Temporal() {
+//        /* (P ==> M), (S ==> M), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward)
+//           (M ==> P), (M ==> S), neq(S,P) |- (S <=> P), (Belief:Comparison, Derive:AllowBackward) */
+//
+//        test
+//
+//                .input("(p ==>+1 m).")
+//                .inputAt(5, "(s ==>+4 m). :|:")
+//                .mustBelieve(cycles, "(s <=>+3 p)", 1f, 0.45f, 5)
+//                .mustNotOutput(cycles, "(s <=>-3 p).", BELIEF, ETERNAL); //test correct dt polarity
+//    }
 
     /**
      * conj subset decomposition

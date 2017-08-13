@@ -6,6 +6,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
+
 public class RelativeEvent extends Event {
     public final Term rel;
     public final int start;
@@ -17,6 +20,7 @@ public class RelativeEvent extends Event {
 
     public RelativeEvent(ITemporalize t, Term term, Term relativeTo, int start, int end) {
         super(t, term);
+        assert(start!=DTERNAL && start!=XTERNAL && end!=DTERNAL && end != XTERNAL);
         //assert (!term.equals(relativeTo));
         this.rel = relativeTo;
         this.start = start;
@@ -49,6 +53,8 @@ public class RelativeEvent extends Event {
 
     @Nullable
     private Time resolve(int offset, Map<Term, Time> trail) {
+
+        assert(offset!=DTERNAL);
 
         Event e = t.solve(rel, trail);
         if (e != null) {

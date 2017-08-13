@@ -47,24 +47,27 @@ public class Time {
 
     private Time(long base, int offset) {
         this.base = base;
+        assert(offset!=DTERNAL && offset!=XTERNAL);
         this.offset = offset;
     }
 
 
     public Time add(int offset) {
 
+        assert(offset!=DTERNAL && offset!=XTERNAL);
+
         if (offset == 0)
             return this;
 
-        if (this.offset == DTERNAL && offset == DTERNAL)
-            return this; //no effect, adding dternal to dternal
+//        if (this.offset == DTERNAL && offset == DTERNAL)
+//            return this; //no effect, adding dternal to dternal
+//
+//        assert (this.offset != DTERNAL && offset != DTERNAL) :
+//                "this.base=" + this.base + ", this.offset=" + this.offset + " + " + offset + " = ?";
 
-        assert (this.offset != DTERNAL && offset != DTERNAL) :
-                "this.base=" + this.base + ", this.offset=" + this.offset + " + " + offset + " = ?";
-
-        if (this.offset == XTERNAL)
-            return Time.the(base, offset); //set initial dt
-        else
+//        if (this.offset == XTERNAL)
+//            return Time.the(base, offset); //set initial dt
+//        else
             return Time.the(base, this.offset + offset);
     }
 

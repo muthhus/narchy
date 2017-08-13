@@ -1,5 +1,6 @@
 package nars.derive.time;
 
+import jcog.Util;
 import jcog.math.Interval;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
@@ -11,7 +12,6 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Subst;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,10 +53,88 @@ public class Temporalize implements ITemporalize {
     }
 
     @Override
-    public @Nullable Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
+    @Nullable
+    public Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
+
+        Task task = d.task;
+        Task belief = d.belief;
         dur = Param.DITHER_DT ? d.dur : 1;
-        return ITemporalize.super.solve(d, pattern, occ);
+
+        ITemporalize model = this;
+
+        boolean taskRooted = true; //(belief == null) || ( !task.isEternal() );
+        boolean beliefRooted = true; //belief!=null && (!taskRooted || !belief.isEternal());
+
+
+        model.know(task, d, taskRooted);
+
+        if (belief != null) {
+            if (!belief.equals(task)) {
+
+//                if (task.isEternal() && belief.isEternal() /*&& some interesction of terms is prsent */)
+//                    beliefRooted = false; //avoid confusing with multiple eternal roots; force relative calculation
+
+                model.know(belief, d, beliefRooted); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+            }
+        } else if (d.beliefTerm != null) {
+            if (!task.term().equals(d.beliefTerm)) //dont re-know the term
+                model.know(d.beliefTerm, d, null);
+        }
+
+        Map<Term, Time> trail = new HashMap<>();
+        Event e;
+        try {
+            e = model.solve(pattern, trail);
+        } catch (StackOverflowError er) {
+            System.err.println(
+                    Arrays.toString(new Object[]{"temporalize stack overflow:\n{} {}\n\t{}\n\t{}", pattern, d, model, trail})
+                    //logger.error(
+            );
+//            trail.clear();
+//            model.solve(pattern, trail);
+            return null;
+        }
+        if (e == null)
+            return null;
+
+        if (e instanceof AbsoluteEvent) {
+            AbsoluteEvent a = (AbsoluteEvent) e; //faster, preferred since pre-calculated
+            occ[0] = a.start;
+            occ[1] = a.end;
+        } else {
+            occ[0] = e.start(trail).abs();
+            occ[1] = e.end(trail).abs();
+        }
+
+        boolean te = task.isEternal();
+        if (occ[0] == ETERNAL && (!te || (belief != null && !belief.isEternal()))) {
+            //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
+            //uneternalize/retemporalize:
+
+            long ts = task.start();
+            long k;
+            if (!te && (belief!=null && !belief.isEternal())) {
+                //interpolate
+                long bs = belief.start();
+                if (ts != bs) {
+                    float taskEvi = d.task.conf();
+                    float beliefEvi = d.belief.conf();
+                    float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
+                    k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
+                } else {
+                    k = ts;
+                }
+            } else if (te) {
+                k = belief.start(); //TODO any duration?
+            } else /*if (be)*/ {
+                k = ts; //TODO any duration?
+            }
+            occ[0] = occ[1] = k;
+        }
+
+        return e.term;
     }
+
 
     /**
      * heuristic for ranking temporalization strategies
@@ -150,13 +228,11 @@ public class Temporalize implements ITemporalize {
             else {
                 assert (d != XTERNAL);
 
-                int ar = ra.rel.subtermTime(ra.term);
-                if (ar == DTERNAL) ar = 0; //promote to dt=0
-                if (ar == XTERNAL) return XTERNAL;
+                int ar = ra.rel.subtermTimeSafe(ra.term);
+                if ((ar == DTERNAL) || (ar == XTERNAL)) return XTERNAL;
 
-                int br = rb.rel.subtermTime(rb.term);
-                if (br == DTERNAL) br = 0; //promote to dt=0
-                if (br == XTERNAL) return XTERNAL;
+                int br = rb.rel.subtermTimeSafe(rb.term);
+                if ((br == DTERNAL) || (br == XTERNAL)) return XTERNAL;
 
                 return d
                         + br
@@ -164,20 +240,6 @@ public class Temporalize implements ITemporalize {
                         ;
             }
 
-
-//            Event rea = solve(ra.rel, trail);
-//            if (rea!=null) {
-//                Event reb = solve(rb.rel, trail);
-//                if (reb!=null) {
-//
-//                    @Nullable Time s = rea.end(trail);
-//                    @Nullable Time e = reb.start(trail);
-//                    return dt(s, e)
-//                            + rb.rel.subtermTime(rb.term)
-//                            - ra.rel.subtermTime(ra.term)
-//                            ; //TODO include offsets in ra and rb
-//                }
-//            }
         }
 
         return dt(a.end(trail), b.start(trail));
@@ -298,9 +360,9 @@ public class Temporalize implements ITemporalize {
 
     private void know(Term term, @Nullable AbsoluteEvent root) {
         int d = term.dtRange();
-        if (root != null && (term.op() == CONJ && (root.end - root.start != d)))
-            return; //as a result of variables etc, the conjunction has been resized; the numbers may not be compareable so to be safe, cancel
-        know(root, term, 0, d);
+//        if (root != null && (term.op() == CONJ && (root.end - root.start != d)))
+//            return; //as a result of variables etc, the conjunction has been resized; the numbers may not be compareable so to be safe, cancel
+        know(term, root, 0, d); //this is early aligned but maybe middle aligned is best here
     }
 
 
@@ -316,7 +378,7 @@ public class Temporalize implements ITemporalize {
      */
     public void knowTerm(Term term, long from, long to) {
         AbsoluteEvent basis = absolute(term, from, to);
-        know(basis, term,
+        know(term, basis,
                 0, (int) (to - from)
         );
     }
@@ -328,9 +390,9 @@ public class Temporalize implements ITemporalize {
      * @param occ    superterm occurrence, may be ETERNAL
      * @param start, end - term-local temporal bounds
      */
-    void know(@Nullable Event parent, Term x, int start, int end) {
+    void know(Term x, @Nullable Event parent, int start, int end) {
 
-        if (x instanceof Variable) // || (!term.hasAny(ATOM.bit | INT.bit)))
+        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
             return; //ignore variable's and completely-variablized's temporalities because it can conflict
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
@@ -361,7 +423,7 @@ public class Temporalize implements ITemporalize {
 
 
         Op o = x.op();
-        if (o.temporal) {
+        if (o == IMPL) { //CONJ already handled in a call from the above know
             int dt = x.dt();
 
             if (dt == XTERNAL) {
@@ -369,23 +431,23 @@ public class Temporalize implements ITemporalize {
                 //TODO UNKNOWN TO SOLVE FOR
                 //throw new RuntimeException("no unknowns may be added during this phase");
 
+            } else if (dt == DTERNAL) {
+                //do not infer any specific temporal relation between the subterms, but at least
+                // know them individually
+                x.subterms().forEach(st -> this.know(st, (Event) null));
             } else {
-
                 TermContainer tt = x.subterms();
-
-                boolean reverse;
-                if (dt == DTERNAL) {
-                    dt = 0;
-                    reverse = false;
-                } else if (dt >= 0) {
-                    reverse = false;
-                } else {
-                    reverse = true;
-                    if (o == CONJ) {
-                        tt = tt.reverse();
-                        dt = -dt;
-                    }
-                }
+//                boolean reverse;
+//                    reverse = false;
+//                } else if (dt >= 0) {
+//                    reverse = false;
+//                } else {
+//                    reverse = true;
+//                    if (o == CONJ) {
+//                        tt = tt.reverse();
+//                        dt = -dt;
+//                    }
+//                }
 
 
                 int l = tt.size();
@@ -408,19 +470,26 @@ public class Temporalize implements ITemporalize {
                     //                  System.out.println(parent + "\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
 
                     //the event is atomic, so forget the parent in computing the subterm relations (which is in IMPL only)
-                    know(
-                            (o != IMPL) ? parent : null, //(!term.op().statement) ? parent : null,
-                            //parent,
-                            st, subStart, subEnd); //parent = null;
+//                    if (parent!=null) {
+//                        know(
+//                                parent,
+//                                //null,
+//                                //i == 0 ? parent : null,
+//                                //(o != IMPL) ? parent : null, //(!term.op().statement) ? parent : null,
+//                                //parent,
+//                                st, subStart, subEnd); //parent = null;
+//                    }
+
 
                     t = subEnd; //the duration of the event
 
 
-                    if (o == IMPL && i > 0) {
+                    if (i > 0) {
                         //IMPL: crosslink adjacent subterms.  conjunction is already temporalized in another method
                         int rel = last - subStart;
-                        know(tt.sub(i - 1), newRelative(tt.sub(i - 1), tt.sub(i), rel));
-                        know(tt.sub(i), newRelative(tt.sub(i), tt.sub(i - 1), -rel));
+                        Term rt = tt.sub(i - 1);
+                        know(rt, newRelative(rt, st, rel));
+                        know(tt.sub(i), newRelative(st, rt, -rel));
                     }
                     last = subStart;
 
@@ -453,10 +522,21 @@ public class Temporalize implements ITemporalize {
                     //add the known timing of the conj's events
                     TermContainer ss = term.subterms();
                     int sss = ss.size();
-                    for (int i = 0; i < sss; i++) {
-                        Term sub = ss.sub(i);
-                        int w = term.subtermTime(sub);
-                        know(sub, relative(sub, term, w, w + sub.dtRange()));
+
+                    for (int i = 0; i < sss - 1; i++) {
+                        Term a = ss.sub(i);
+                        int at = term.subtermTime(a);
+                        //relative to the root of the compound
+                        know(a, relative(a, term, at, at + a.dtRange()));
+
+                        if (i < sss - 1) {
+                            //relative to sibling subterm
+                            Term b = ss.sub(i + 1);
+                            int bt = term.subtermTime(b);
+                            int ba = bt - at;
+                            know(b, relative(b, a, ba, ba + b.dtRange()));
+                            know(a, relative(a, b, -ba, -ba + a.dtRange()));
+                        }
                     }
                 }
                 break;
@@ -465,7 +545,7 @@ public class Temporalize implements ITemporalize {
     }
 
     public boolean fullyEternal() {
-        return !events().anyMatch(x -> x instanceof AbsoluteEvent && ((AbsoluteEvent) x).start != ETERNAL);
+        return !events().anyMatch(x -> x.term.op() != IMPL && x instanceof AbsoluteEvent && ((AbsoluteEvent) x).start != ETERNAL);
     }
 
     public Stream<? extends Event> events() {
@@ -484,15 +564,13 @@ public class Temporalize implements ITemporalize {
                 return null; //cyclic
         }
 
-
-        Time ph;
         if (fullyEternal() && empty(trail) && x.op() != IMPL && x.dt() != XTERNAL) {
-            ph = Time.the(ETERNAL, 0); //glue
+            //HACK
+            trail.put(x, Time.the(ETERNAL, 0)); //glue
             knowTerm(x, ETERNAL); //everything will be relative to this, in eternity
         } else {
-            ph = null;
+            trail.putIfAbsent(x, null); //placeholder
         }
-        trail.put(x, ph); //placeholder
 
 
         SortedSet<Event> cc = constraints.get(x);
@@ -522,7 +600,7 @@ public class Temporalize implements ITemporalize {
             }
         }
 
-        trail.remove(x); //remove placeholder
+        trail.remove(x, null); //remove null placeholder
 
 //        //update constraints, in case they were changed above
 //        cc = constraints(x);
@@ -536,28 +614,28 @@ public class Temporalize implements ITemporalize {
         return trail.isEmpty() || !trail.values().stream().anyMatch(Objects::nonNull);
     }
 
-    private Event solveComponents(Term target, Map<Term, Time> trail) {
+    private Event solveComponents(Term x, Map<Term, Time> trail) {
 
-        Op o = target.op();
+        Op o = x.op();
 
         if (o == NEG) {
-            Event ss = solve(target.unneg(), trail);
+            Event ss = solve(x.unneg(), trail);
             if (ss != null)
                 return ss.neg();
             else
                 return null;
         } else if (o.temporal) {
-            if (target.dt() != XTERNAL) {
+            if (x.dt() != XTERNAL) {
                 //TODO verify that the provided subterm timing is correct.
                 // if so, return the input as-is
                 // if not, return null
-                if (target.op() == CONJ && target.size() == 2) {
-                    Term a = target.sub(0);
+                if (x.op() == CONJ && x.size() == 2) {
+                    Term a = x.sub(0);
                     Event ae = solve(a, trail);
-                    if (ae != null) {
-                        Term b = target.sub(1);
-                        Event be = solve(b, trail);
-                        if (be != null) {
+                    Term b = x.sub(1);
+                    Event be = solve(b, trail);
+                    if ((ae != null) && (be != null)) {
+                        {
                             Time at = ae.start(trail);
                             if (at != null) {
                                 Time bt = be.start(trail);
@@ -569,7 +647,7 @@ public class Temporalize implements ITemporalize {
                     }
                 }
             } else /*if (target.dt() == XTERNAL)*/ {
-                TermContainer tt = target.subterms();
+                TermContainer tt = x.subterms();
 
                 int tts = tt.size();
                 assert (tts > 1);
@@ -640,9 +718,9 @@ public class Temporalize implements ITemporalize {
 
                 /* HACK quick test for the exact appearance of temporalized form present in constraints */
 
-                    Term[] a = target.subterms().toArray();
+                    Term[] a = x.subterms().toArray();
                     {
-                        @NotNull Term d = target.op().the(DTERNAL, a);
+                        @NotNull Term d = x.op().the(DTERNAL, a);
                         if (!(d instanceof Bool)) {
                             Event ds = solve(d, trail);
                             if (ds != null)
@@ -650,7 +728,7 @@ public class Temporalize implements ITemporalize {
                         }
                     }
                     {
-                        @NotNull Term d = target.op().the(0, a);
+                        @NotNull Term d = x.op().the(0, a);
                         if (!(d instanceof Bool)) {
                             Event ds = solve(d, trail);
                             if (ds != null)
@@ -677,22 +755,23 @@ public class Temporalize implements ITemporalize {
         }
 
 
-        /** compute the temporal intersection of all involved terms. if they are coherent, then
-         * create the solved term as-is (since it will not contain any XTERNAL) with the appropriate
+        /**
+         * for novel compounds, (ex. which might be created by syllogistic rules
+         * we wont be able to find them in the constraints.
+         * this heuristic computes the temporal intersection of all involved subterms.
+         * if they are coherent, then create the solved term as-is (since it will not contain any XTERNAL) with the appropriate
          * temporal bounds. */
-        if (o.statement)
-
-        {
+        if (o.statement && constraints.get(x) == null) {
             //choose two absolute events which cover both 'a' and 'b' terms
             List<Event> relevant = $.newArrayList(); //maybe should be Set?
             Set<Term> uncovered = new HashSet();
-            target.subterms().recurseTermsToSet(
+            x.subterms().recurseTermsToSet(
                     ~(Op.SECTi.bit | Op.SECTe.bit | Op.DIFFe.bit | Op.DIFFi.bit) /* everything but sect/diff; just their content */,
                     uncovered, true);
 
             for (Term c : constraints.keySet()) {
 
-                if (c.equals(target)) continue; //cyclic; already tried above
+                if (c.equals(x)) continue; //cyclic; already tried above
 
                 Event ce = solve(c, trail);
 
@@ -715,7 +794,7 @@ public class Temporalize implements ITemporalize {
                     return null; //can this happen?
                 case 1:
                     Event r = relevant.get(0);
-                    return new SolutionEvent(this, target, r.start(trail).abs(), r.end(trail).abs());
+                    return new SolutionEvent(this, x, r.start(trail).abs(), r.end(trail).abs());
 
             }
 
@@ -729,7 +808,7 @@ public class Temporalize implements ITemporalize {
                 Event ra = relevant.get(0);
                 Event rb = relevant.get(1);
 
-                Event ii = solveStatement(target, trail, ra, rb);
+                Event ii = solveStatement(x, trail, ra, rb);
                 if (ii != null)
                     return ii;
             }
