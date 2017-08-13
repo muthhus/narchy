@@ -1,26 +1,27 @@
 //General Induction and Temporal Induction
 //  When P and then S happened according to an observation, by induction (weak) it may be that alyways after P, usually S happens.
+//      According to reductions: For implications, the predicate may be allowed an implication, but not subject
 
 //TODO maybe allow equality in neqAndCom cases but only if the events differ in time
 
 //==>
-    A, B, time(raw), task(positive), task("."), time(dtEvents),                             notImpl(A), notImpl(B) |- (A ==>+- B), (Belief:Induction)
-    A, B, time(raw), task(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B),     notImpl(A), notImpl(B) |- varIntro((A ==>+- B)), (Belief:Induction)
-        A, B, time(raw), task(negative), task("."), time(dtEvents),                          notImpl(A), notImpl(B) |- ((--,%A) ==>+- B), (Belief:InductionN)
-        A, B, time(raw), task(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B), notImpl(A), notImpl(B) |- varIntro(((--,%A) ==>+- B)), (Belief:InductionN)
+    A, B, time(raw), task(positive), task("."), time(dtEvents),                             notImpl(A) |- (A ==>+- B), (Belief:Induction)
+    A, B, time(raw), task(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B),     notImpl(A) |- varIntro((A ==>+- B)), (Belief:Induction)
+        A, B, time(raw), task(negative), task("."), time(dtEvents),                          notImpl(A) |- ((--,%A) ==>+- B), (Belief:InductionN)
+        A, B, time(raw), task(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B), notImpl(A) |- varIntro(((--,%A) ==>+- B)), (Belief:InductionN)
 
-    A, B, time(raw), task("."), time(dtEvents),                                notImpl(A), notImpl(B) |- (B ==>+- A), (Belief:Abduction)
-    A, B, time(raw), task("."), time(dtEventsOrEternals), neqAndCom(A,B),      notImpl(A), notImpl(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
-//    A, B, time(raw), belief(positive), task("."), time(dtEvents),                                notImpl(A), notImpl(B) |- (B ==>+- A), (Belief:Abduction)
-//    A, B, time(raw), belief(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B),       notImpl(A), notImpl(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
-//        A, B, time(raw), belief(negative), task("."), time(dtEvents),                            notImpl(A), notImpl(B) |- ((--,%B) ==>+- A), (Belief:AbductionPN)
-//        A, B, time(raw), belief(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B),   notImpl(A), notImpl(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
+//    A, B, time(raw), task("."), time(dtEvents),                                notImpl(A), notImpl(B) |- (B ==>+- A), (Belief:Abduction)
+//    A, B, time(raw), task("."), time(dtEventsOrEternals), neqAndCom(A,B),      notImpl(A), notImpl(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
+    A, B, time(raw), belief(positive), task("."), time(dtEvents),                                notImpl(B) |- (B ==>+- A), (Belief:Abduction)
+    A, B, time(raw), belief(positive), task("."), time(dtEventsOrEternals), neqAndCom(A,B),       notImpl(B) |- varIntro((B ==>+- A)), (Belief:Abduction)
+        A, B, time(raw), belief(negative), task("."), time(dtEvents),                            notImpl(B) |- ((--,%B) ==>+- A), (Belief:AbductionPN)
+        A, B, time(raw), belief(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B),   notImpl(B) |- varIntro(((--,%B) ==>+- A)), (Belief:AbductionPN)
 
 
 
 //&&
-    A, B, task("."), time(raw), time(dtEvents), notImpl(A), notImpl(B)                      |- (polarize(A,task) &&+- polarize(B,belief)), (Belief:IntersectionDepolarized)
-    A, B, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B), notImpl(A), notImpl(B)   |- varIntro((polarize(A,task) &&+- polarize(B,belief))), (Belief:IntersectionDepolarized)
+    A, B, task("."), time(raw), time(dtEvents), notImpl(A), notImpl(B)     |- (polarize(A,task) &&+- polarize(B,belief)), (Belief:IntersectionDepolarized)
+    A, B, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B)   |- varIntro((polarize(A,task) &&+- polarize(B,belief))), (Belief:IntersectionDepolarized)
 
 
 

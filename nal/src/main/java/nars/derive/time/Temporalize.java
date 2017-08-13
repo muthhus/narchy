@@ -117,10 +117,15 @@ public class Temporalize implements ITemporalize {
                 //interpolate
                 long bs = belief.start();
                 if (ts != bs) {
-                    float taskEvi = d.task.conf();
-                    float beliefEvi = d.belief.conf();
-                    float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
-                    k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
+                    //TODO add confidence decay in proportion to lack of coherence
+                    if (task.isBeliefOrGoal()) {
+                        float taskEvi = task.conf();
+                        float beliefEvi = belief.conf();
+                        float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
+                        k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
+                    } else {
+                        k = bs;
+                    }
                 } else {
                     k = ts;
                 }
@@ -532,10 +537,12 @@ public class Temporalize implements ITemporalize {
                         if (i < sss - 1) {
                             //relative to sibling subterm
                             Term b = ss.sub(i + 1);
-                            int bt = term.subtermTime(b);
-                            int ba = bt - at;
-                            know(b, relative(b, a, ba, ba + b.dtRange()));
-                            know(a, relative(a, b, -ba, -ba + a.dtRange()));
+                            if (!a.containsRecursively(b) && !b.containsRecursively(a)) {
+                                int bt = term.subtermTime(b);
+                                int ba = bt - at;
+                                know(b, relative(b, a, ba, ba + b.dtRange()));
+                                know(a, relative(a, b, -ba, -ba + a.dtRange()));
+                            }
                         }
                     }
                 }

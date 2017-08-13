@@ -177,7 +177,7 @@ public class RevectionTest {
 
         }
 
-        assertEquals("all beliefs covered", 3, tops.size());
+        assertEquals("all beliefs covered", 3 <= tops.size());
 
         b.print();
 

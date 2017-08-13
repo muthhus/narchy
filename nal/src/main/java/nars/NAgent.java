@@ -497,32 +497,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 //    }
 
 
-
-    public NARLoop startRT(float fps) {
-        return startRT(fps, -1);
-    }
-
-
-    /**
-     * synchronous execution which runs a NAR directly at a given framerate
-     */
-    public NARLoop startRT(float fps, long stopTime) {
-
-        //init();
-
-        NARLoop loop = nar.startFPS(fps);
-
-//        this.loop = nar.exe.loop(fps, () -> {
-//            if (enabled.get()) {
-//                this.now = nar.time();
-//                senseAndMotor();
-//                predict();
-//            }
-//        });
-
-        return loop;
-    }
-
     public Loop running() {
         return loop;
     }

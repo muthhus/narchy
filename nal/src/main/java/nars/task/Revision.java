@@ -346,8 +346,8 @@ public class Revision {
         @Nullable Truth rawTruth = revise(a, b, factor, 0);
         if (rawTruth == null)
             return null;
+        //TODO maybe delay dithering until after the negation has been determined below
         @Nullable Truth newTruth = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
-        ;
         if (newTruth == null)
             return null;
 

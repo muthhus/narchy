@@ -3,10 +3,7 @@ package nars.audio;
 import jcog.Util;
 import jcog.learn.Autoencoder;
 import jcog.random.XorShift128PlusRandom;
-import nars.$;
-import nars.NAR;
-import nars.NAgent;
-import nars.Narsese;
+import nars.*;
 import nars.concept.SensorConcept;
 import spacegraph.SpaceGraph;
 import spacegraph.audio.AudioSource;
@@ -26,7 +23,19 @@ import static spacegraph.layout.Grid.row;
 public class NARHear extends NAgent {
 
     public static void main(String[] args) {
-        new NARHear(null).startRT(20);
+
+        //init();
+
+        NARLoop loop = new NARHear(null).nar.startFPS((float) 20);
+
+//        this.loop = nar.exe.loop(fps, () -> {
+//            if (enabled.get()) {
+//                this.now = nar.time();
+//                senseAndMotor();
+//                predict();
+//            }
+//        });
+
     }
 
     public NARHear(NAR nar) {

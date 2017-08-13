@@ -169,24 +169,26 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals(("((--,(P))==>(Q))"), $("((--,(P))==>(Q))").toString()); //SAME should not change
     }
 
-    @Test
-    public void testReducedAndInvalidImplications1() throws Narsese.NarseseException {
-        assertInvalidTerms("<<P<=>Q> ==> R>");
-    }
+//    @Test
+//    public void testReducedAndInvalidImplications1() throws Narsese.NarseseException {
+//        assertInvalidTerms("<<P<=>Q> ==> R>");
+//    }
 
     @Test
     public void testReducedAndInvalidImplications5() throws Narsese.NarseseException {
         assertInvalidTerms("<<P==>Q> ==> R>");
     }
 
-    @Test
-    public void testReducedAndInvalidImplications6() throws Narsese.NarseseException {
-        assertInvalidTerms("<R ==> <P<=>Q>>");
-    }
+//    @Test
+//    public void testReducedAndInvalidImplications6() throws Narsese.NarseseException {
+//        assertInvalidTerms("<R ==> <P<=>Q>>");
+//    }
 
     @Test
     public void testReducedAndInvalidImplications2() throws Narsese.NarseseException {
         assertEquals("((P&&R)==>Q)", $("<R==><P==>Q>>").toString());
+        assertEquals("((R &&+2 P) ==>+1 Q)", $("(R ==>+2 (P ==>+1 Q))").toString());
+        assertEquals("(((S &&+1 R) &&+2 P) ==>+1 Q)", $("((S &&+1 R) ==>+2 (P ==>+1 Q))").toString());
     }
 
     @Test

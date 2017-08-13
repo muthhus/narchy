@@ -20,6 +20,8 @@ import nars.truth.Truth;
 import nars.video.*;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
+import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
+import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.widget.console.ConsoleTerminal;
@@ -32,6 +34,7 @@ import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 import static nars.$.$;
@@ -109,7 +112,7 @@ abstract public class NAgentX extends NAgent {
         //fps * 2f; //nyquist
 
         RealTime clock =
-                durFPS >= 10/2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
+                durFPS >= 10 / 2f ? /* nyquist threshold between decisecond (0.1) and centisecond (0.01) clock resolution */
                         new RealTime.CS(true) :
                         new RealTime.DSHalf(true);
 
@@ -122,8 +125,8 @@ abstract public class NAgentX extends NAgent {
                 .exe(
                         new MultiExecutioner((i) ->
                                 new MultiExecutioner.Worker(
-                                    new FocusedExecutioner(deriver)
-                        ), THREADS, 2))
+                                        new FocusedExecutioner(deriver)
+                                ), THREADS, 2))
                 .time(clock)
                 .index(
                         //new CaffeineIndex(128 * 1024)
@@ -160,32 +163,19 @@ abstract public class NAgentX extends NAgent {
         NAgent a = init.apply(n);
         //a.trace = true;
 
+
         new AgentService(
                 HaiQAgent::new,
                 2,
-                (f)->{
+                (f) -> {
                     f[0] = a.dexterity();
                     f[1] = a.reward;
                 },
-                ()->{
+                () -> {
                     return a.dexterity() + Math.max(0, a.reward);
                 },
-            3,
-                (aa)->{
-                    //System.out.println(aa);
-                    switch (aa) {
-                        case 0:
-                            n.truthResolution.setValue(
-                                    Math.max(Param.TRUTH_EPSILON, n.truthResolution.floatValue() * 0.8f ) );
-                            break;
-                        case 1:
-                            break; //nothing
-                        case 2:
-                            n.truthResolution.setValue(
-                                    Math.min(0.5f, n.truthResolution.floatValue() * 1.2f ) );
-                            break;
-                    }
-                },
+                3,
+                new HarmonicController(n.truthResolution::setValue, 0.01f, 0.16f),
                 new MutableFloat(1f),
                 n
         );
@@ -251,7 +241,19 @@ abstract public class NAgentX extends NAgent {
 //                        })
         ), 600, 600);
 
-        NARLoop narLoop = a.startRT(fps, endTime);
+        //init();
+
+        NARLoop loop = a.nar.startFPS(fps);
+
+//        this.loop = nar.exe.loop(fps, () -> {
+//            if (enabled.get()) {
+//                this.now = nar.time();
+//                senseAndMotor();
+//                predict();
+//            }
+//        });
+
+        NARLoop narLoop = loop;
 //        n.onCycle(nn -> {
 //            float lag = narLoop.lagSumThenClear() + a.running().lagSumThenClear();
 //            //n.emotion.happy(-lag);
@@ -259,6 +261,56 @@ abstract public class NAgentX extends NAgent {
 //        });
         return n;
     }
+
+    /**
+     * increments/decrements within a finite set of powers-of-two so that harmonics
+     * wont interfere as the resolution changes
+     */
+    public static class HarmonicController implements IntConsumer {
+
+        private final FloatProcedure update;
+        final float[] v;
+        int x;
+
+        public HarmonicController(FloatProcedure update, float min, float max) {
+            this.update = update;
+
+            FloatArrayList f = new FloatArrayList();
+            float x = min;
+            while (x < max) {
+                f.add(x);
+                x *= 2;
+            }
+            assert (f.size() > 1);
+            v = f.toArray();
+            set(0);
+        }
+
+        private void set(int i) {
+            if (i < 0) i = 0;
+            if (i >= v.length) i = v.length-1;
+            if (this.x != i) {
+                update.value(v[x = i]);
+            }
+        }
+
+        @Override
+        public void accept(int aa) {
+            //System.out.println(aa);
+
+            switch (aa) {
+                case 0:
+                    set(x-1);
+                    break;
+                case 1:
+                    break; //nothing
+                case 2:
+                    set(x+1);
+                    break;
+            }
+        }
+    }
+
 
     private static Surface causePlot(NAR nar) {
         int s = nar.causes.size();

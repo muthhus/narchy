@@ -123,7 +123,7 @@ public class NAL3Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("(planetX --> {Mars,Pluto,Venus})",0.9f,0.9f); //.en("PlanetX is Mars, Pluto, or Venus.");
         tester.believe("(planetX --> {Pluto,Saturn})", 0.1f, 0.9f); //.en("PlanetX is probably neither Pluto nor Saturn.");
-        tester.mustBelieve(cycles*2, "(planetX --> {Mars,Venus})", 0.81f ,0.81f); //.en("PlanetX is either Mars or Venus.");
+        tester.mustBelieve(cycles*2, "(planetX --> {Mars,Venus})", 0.9f, 0.73f /*0.81f ,0.81f*/); //.en("PlanetX is either Mars or Venus.");
 
     }
 
@@ -313,7 +313,7 @@ public class NAL3Test extends AbstractNALTest {
             .believe("<{x,z}-->c>")
             .mustBelieve(cycles, "<{x,y,z}-->c>", 1f, 0.81f) //union
             .mustBelieve(cycles, "<{x}-->c>", 1f, 0.81f) //intersect
-            .mustBelieve(cycles, "<{y}-->c>", 1f, 0.73f) //difference
+            .mustBelieve(cycles, "<{y}-->c>", 1f, 0.81f) //difference
             .mustBelieve(cycles, "<{z}-->c>", 1f, 0.81f) //difference
             //.mustBelieve(cycles, "<{y}-->c>", 0f, 0.81f) //difference
         //these are probably ok:

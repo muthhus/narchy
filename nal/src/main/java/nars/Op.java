@@ -209,7 +209,8 @@ public enum Op implements $ {
                 //NON-COMMUTIVE
 
 
-                assert (n == 2) : "invalid non-commutive conjunction arity!=2, arity=" + n;
+                if (n > 2)
+                    return Null; //"invalid non-commutive conjunction arity!=2, arity=" + n;
 
                 Term a = tt[0];
                 Term b = tt[1];
