@@ -10,9 +10,9 @@ public class GasolinearTest {
     @Test
     public void testSimpleDiscretization3() {
 
-        Gasolinear g = Gasolinear.of(3,
+        Gasolinear g = Gasolinear.of(3, 0, 0.5f, 1f
 
-0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 //even
+//0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0 //even
 
 
 //     0.1, 0.2, 0.3, 0.25, 0.14, 0.14,
@@ -21,16 +21,22 @@ public class GasolinearTest {
 //
 //            1f, 0.8f, 0.95f, 0.83f
         );
-        g.sort();
+
+        //warmup
+        for (int i = 0; i < 20; i++)
+            g.which(Math.random());
+
+
         out.println(g);
 
         assertEquals(0, g.which(-0.1));
         assertEquals(0, g.which(0.1));
-        assertEquals(0, g.which(0.2));
 
+        out.println(g);
         assertEquals(1, g.which(0.4));
-        assertEquals(1, g.which(0.6));
+        assertEquals(1, g.which(0.5));
 
+        out.println(g);
         assertEquals(2, g.which(0.9));
         assertEquals(2, g.which(1.1));
     }

@@ -28,6 +28,7 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DNode> {
 
     public Gasolinear(int nodes, double min, double max) {
         super(1, nodes);
+        setAlpha(2f/nodes);
         randomUniform(min, max);
     }
 
@@ -41,9 +42,10 @@ public class Gasolinear extends NeuralGasNet<Gasolinear.Sorted1DNode> {
         double min = Doubles.min(points);
         double max = Doubles.max(points);
         Gasolinear g = new Gasolinear(nodes, min, max);
-        g.setWinnerUpdateRate(4f/points.length, 0.05f/points.length);
+        g.setWinnerUpdateRate(2f/points.length, 0.05f/points.length);
         for (double x : points)
             g.put(x /* 1D */);
+
 
         return g;
     }

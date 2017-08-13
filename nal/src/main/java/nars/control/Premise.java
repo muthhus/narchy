@@ -12,7 +12,8 @@ import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.derive.Temporalize;
+import nars.derive.time.Event;
+import nars.derive.time.Temporalize;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.term.InvalidTermException;
@@ -214,7 +215,9 @@ public class Premise extends Pri implements ITask {
             if (beliefTerm.isTemporal()) {
                 //try to temporalize the termlink to match what appears in the task
                 try {
-                    Temporalize.Event bs = new Temporalize().knowTerm(task.term(), ETERNAL).solve(beliefTerm);
+                    Temporalize t = new Temporalize();
+                    t.knowTerm(task.term(), ETERNAL);
+                    Event bs = t.solve(beliefTerm);
                     if (bs != null && !(bs.term instanceof Bool)) {
                         beliefTerm = bs.term;
                     }

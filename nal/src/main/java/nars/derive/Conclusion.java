@@ -6,6 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
+import nars.derive.time.Temporalize;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
@@ -134,7 +135,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             Term t1;
             try {
-                t1 = Temporalize.solve(d, c1, occ = new long[]{ETERNAL, ETERNAL});
+                t1 = new Temporalize(d.random).solve(d, c1, occ = new long[]{ETERNAL, ETERNAL});
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {
                     logger.error("temporalize error: {} {} {}", d, c1, t.getMessage());

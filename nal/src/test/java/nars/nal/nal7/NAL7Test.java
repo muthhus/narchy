@@ -1089,9 +1089,9 @@ public class NAL7Test extends AbstractNALTest {
                 .believe("(x ==>+5 z)")
                 .believe("(y ==>+3 z)")
 //                .mustBelieve(cycles, "( x <=>+2 y)", 1f, 0.45f)
+                .mustBelieve(cycles, "( (x &&+2 y) ==>+3 z)", 1f, 0.81f)
                 .mustNotOutput(cycles, "( y ==>+2 x )", BELIEF, ETERNAL)
                 .mustNotOutput(cycles, "( y ==>-2 z )", BELIEF, ETERNAL)
-                .mustBelieve(cycles, "( (x &&+2 y) ==>+3 z)", 1f, 0.81f)
                 .mustNotOutput(cycles, "( (x &&+2 y) ==>+5 z)", BELIEF, ETERNAL)
                 .mustNotOutput(cycles, "( (x &&+2 y) ==>+1 z)", BELIEF, ETERNAL)
         ;
