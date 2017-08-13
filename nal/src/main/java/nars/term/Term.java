@@ -435,6 +435,15 @@ public interface Term extends Termlike, Comparable<Term> {
         return true;
     }
 
+
+    default int subtermTime(@NotNull Term x) {
+        int d = subtermTimeSafe(x);
+        if (d != DTERNAL)
+            return d;
+
+        throw new RuntimeException(x + " not contained by " + this);
+    }
+
     /**
      * matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt
      * TODO make a 'subtermTimes' which returns all matching sub-event times
@@ -442,45 +451,45 @@ public interface Term extends Termlike, Comparable<Term> {
      * @param dt the current offset in the search
      * @return DTERNAL if the subterm was not found
      */
-    default int subtermTime(@NotNull Term x) {
+    default int subtermTimeSafe(@NotNull Term x) {
         if (equals(x))
             return 0;
 
-        if (impossibleSubTerm(x))
-            return DTERNAL;
+        if (!impossibleSubTerm(x)) {
 
-        int dt = dt();
-        int idt;
-        boolean reverse;
+            int dt = dt();
+            int idt;
+            boolean reverse;
 
-        //TODO do shuffled search to return different equivalent results wherever they may appear
+            //TODO do shuffled search to return different equivalent results wherever they may appear
 
-        Op op = op();
-        if (!op.temporal || dt == DTERNAL || dt == XTERNAL || dt == 0) {
-            idt = 0; //parallel or eternal, no dt increment
-            reverse = false;
-        } else {
-            idt = dt;
-            if (idt < 0) {
-                idt = -idt;
-                reverse = true;
-            } else {
+            Op op = op();
+            if (!op.temporal || dt == DTERNAL || dt == XTERNAL || dt == 0) {
+                idt = 0; //parallel or eternal, no dt increment
                 reverse = false;
+            } else {
+                idt = dt;
+                if (idt < 0) {
+                    idt = -idt;
+                    reverse = true;
+                } else {
+                    reverse = false;
+                }
+            }
+
+            @NotNull TermContainer yy = subterms();
+            int ys = yy.size();
+            int offset = 0;
+            for (int yi = 0; yi < ys; yi++) {
+                Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
+                int sdt = yyy.subtermTimeSafe(x);
+                if (sdt != DTERNAL)
+                    return sdt + offset;
+                offset += idt + yyy.dtRange();
             }
         }
 
-        @NotNull TermContainer yy = subterms();
-        int ys = yy.size();
-        int offset = 0;
-        for (int yi = 0; yi < ys; yi++) {
-            Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
-            int sdt = yyy.subtermTime(x);
-            if (sdt != DTERNAL)
-                return sdt + offset;
-            offset += idt + yyy.dtRange();
-        }
-
-        return DTERNAL; //not found
+        return DTERNAL;
     }
 
     /**

@@ -47,11 +47,11 @@ public class TemporalizeTest {
 
         Term x = the("x");
         AbsoluteEvent xa = t.absolute(x, ETERNAL, ETERNAL);
-        t.constraints.put(x, new FasterList(List.of(xa)));
+        t.constraints.put(x, new TreeSet(List.of(xa)));
 
         Term y = the("y");
         AbsoluteEvent ya = t.absolute(y, 0, 0);
-        t.constraints.put(y, new FasterList(List.of(ya)));
+        t.constraints.put(y, new TreeSet(List.of(ya)));
 
         Term z = the("z");
         RelativeEvent zx = t.newRelative(z, x, 0);
@@ -171,6 +171,16 @@ public class TemporalizeTest {
         h.clear(); assertEquals(0, t.solve($("x"), h).start(h).abs());
         h.clear(); assertEquals(1, t.solve($("y"), h).start(h).abs());
         h.clear(); assertEquals(2, t.solve($("z"), h).start(h).abs());
+    }
+
+    @Test
+    public void testSolveRecursiveConjDecomposition2() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowTerm($("((x &&+1 y) &&+1 z)"), 0);
+
+        System.out.println(t);
+        System.out.println("x: " + t.constraints.get($("x")));
+        System.out.println("z: " + t.constraints.get($("z")));
 
         assertEquals("(x &&+2 z)@[0..2]", t.solve($("(x &&+- z)")).toString());
         assertEquals("(x &&+1 y)@[0..1]", t.solve($("(x &&+- y)")).toString());
@@ -369,23 +379,7 @@ public class TemporalizeTest {
 //
 //    }
 
-    @Test
-    public void testImplConjWTF() throws Narsese.NarseseException {
-    /*
-( $,TestNAR ): "Must not:
-$.28 ((x &&+2 y) ==>+5 z). %1.0;.81% {3: 1;2} (((%1==>%2),(%3==>%2),neqRCom(%3,%1)),(((%1 &&+- %3) ==>+- %2),((Intersection-->Belief))))
-    $.50 (y ==>+3 z). %1.0;.90% {0: 2}
-    $.50 (x ==>+5 z). %1.0;.90% {0: 1}
-    */
 
-        Temporalize t = new Temporalize();
-        t.knowTerm($("(y ==>+3 z)"), ETERNAL);
-        t.knowTerm($("(x ==>+5 z)"), ETERNAL);
-        Event s = t.solve($("((x &&+- y) ==>+- z)"));
-        assertNotNull(s);
-        assertEquals("((x &&+2 y) ==>+3 z)@ETE", s.toString());
-
-    }
 
     @Test
     public void testImplLinked() throws Narsese.NarseseException {
@@ -505,7 +499,9 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         t.knowTerm(x, 1, 11);
 
         Term a = $("(((--,a)&|b) &&+- a)");
+        System.out.println(a);
         Term b = $("(a &&+- ((--,a)&|b))"); //check mirror
+        System.out.println(b);
         String r = "(a &&+5 ((--,a)&|b))@[1..6]";
 
         assertEquals(r, t.solve(a).toString());

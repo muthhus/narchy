@@ -1,6 +1,5 @@
 package nars.derive.time;
 
-import jcog.list.FasterList;
 import jcog.math.Interval;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
@@ -36,7 +35,7 @@ public class Temporalize implements ITemporalize {
     /**
      * constraint graph
      */
-    public final Map<Term, FasterList<Event>> constraints = new HashMap<>();
+    public final Map<Term, SortedSet<Event>> constraints = new HashMap<>();
     final Random random;
     public int dur = 1;
 
@@ -56,13 +55,12 @@ public class Temporalize implements ITemporalize {
      */
     @Override
     public float score(Term x) {
-        FasterList<Event> l = constraints.get(x);
-        if (l == null) {
+        SortedSet<Event> cc = constraints.get(x);
+        if (cc == null) {
             return Float.NEGATIVE_INFINITY;
         } else {
             float s = 0;
-            for (int i = 0, lSize = l.size(); i < lSize; i++) {
-                Event e = l.get(i);
+            for (Event e : cc) {
                 float t;
                 if (e instanceof AbsoluteEvent) {
                     if (((AbsoluteEvent) e).start != ETERNAL)
@@ -324,7 +322,7 @@ public class Temporalize implements ITemporalize {
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
         if (parent == null || parent.term != x) {
-            List<Event> exist = constraints.get(x);
+            SortedSet<Event> exist = constraints.get(x);
             if (exist != null)
                 return;
         }
@@ -344,6 +342,8 @@ public class Temporalize implements ITemporalize {
             }
 
             know(x, event);
+        } else {
+            know(x, (Event) null);
         }
 
 
@@ -396,15 +396,15 @@ public class Temporalize implements ITemporalize {
 
                     //the event is atomic, so forget the parent in computing the subterm relations (which is in IMPL only)
                     know(
-                            (x.op() != IMPL) ? parent : null, //(!term.op().statement) ? parent : null,
+                            (o != IMPL) ? parent : null, //(!term.op().statement) ? parent : null,
                             //parent,
                             st, subStart, subEnd); //parent = null;
 
                     t = subEnd; //the duration of the event
 
 
-                    if (i > 0) {
-                        //crosslink adjacent subterms
+                    if (o == IMPL && i > 0) {
+                        //IMPL: crosslink adjacent subterms.  conjunction is already temporalized in another method
                         int rel = last - subStart;
                         know(tt.sub(i - 1), newRelative(tt.sub(i - 1), tt.sub(i), rel));
                         know(tt.sub(i), newRelative(tt.sub(i), tt.sub(i - 1), -rel));
@@ -421,41 +421,41 @@ public class Temporalize implements ITemporalize {
     }
 
 
-    void know(Term term, Event event) {
+    void know(Term term, @Nullable Event event) {
 
-        FasterList<Event> l = constraints.computeIfAbsent(term, (t) -> new FasterList<>());
-        l.add(event);
+        if (event != null) {
+            SortedSet<Event> l = constraints.computeIfAbsent(term, (t) -> new TreeSet<>());
+            l.add(event);
+        }
 
         switch (term.op()) {
             case NEG:
                 Term u = term.unneg();
-                FasterList<Event> m = constraints.computeIfAbsent(u, (t) -> new FasterList<>());
+                SortedSet<Event> m = constraints.computeIfAbsent(u, (t) -> new TreeSet<>());
                 m.add(relative(u, term, 0, term.dtRange()));
-                if (m.size() > 1)
-                    m.sortThis();
                 break;
             case CONJ:
                 int tdt = term.dt();
-                if (tdt != XTERNAL && tdt !=DTERNAL) {
+                if (tdt != XTERNAL) {
                     //add the known timing of the conj's events
-                    term.events().forEach(e -> {
-                        int w = (int)e.getTwo();
-                        Term sub = e.getOne();
+                    TermContainer ss = term.subterms();
+                    int sss = ss.size();
+                    for (int i = 0; i < sss; i++) {
+                        Term sub = ss.sub(i);
+                        int w = term.subtermTime(sub);
                         know(sub, relative(sub, term, w, w + sub.dtRange()));
-                    });
+                    }
                 }
                 break;
         }
 
-        if (l.size() > 1)
-            l.sortThis();
     }
 
     public boolean fullyEternal() {
         return !events().anyMatch(x -> x instanceof AbsoluteEvent && ((AbsoluteEvent) x).start != ETERNAL);
     }
 
-    public Stream<Event> events() {
+    public Stream<? extends Event> events() {
         return constraints.values().stream().flatMap(Collection::stream);
     }
 
@@ -481,47 +481,41 @@ public class Temporalize implements ITemporalize {
         }
         trail.put(x, ph); //placeholder
 
-        FasterList<Event> cc = constraints.get(x);
+        SortedSet<Event> cc1 = constraints.get(x);
+        SortedSet<Event> cc = cc1;
         if (cc != null) {
-
-            int ccc = cc.size();
-            assert (ccc > 0);
-            if (ccc > 1)
-                cc.sortThis();
-
-            Time bestTime = null;
-            Event bestEvent = null;
-            for (int i = 0, eaSize = ccc; i < eaSize; i++) {
-                Event e = cc.get(i);
+            for (Event e : cc) {
 
                 //System.out.println(x + " " + i + "\t" + trail + "\t" + e);
 
                 Time xt = e.start(trail);
-                if (xt != null && (bestTime == null || (xt.abs() != ETERNAL && bestTime.abs() == ETERNAL))) {
-                    //the first, or a non-eternal which replaces a previous eternal (for temporal specificity)
-                    if (bestTime != null)
-                        System.out.println("replaced " + bestTime + " with " + xt);
-                    bestTime = xt;
-                    bestEvent = e;
+                if (xt != null) {
+                    trail.put(x, xt);
+                    return e;
                 }
             }
-            if (bestTime != null) {
-                trail.put(x, bestTime);
-                return bestEvent;
-            }
+
         }
 
-        Event e = solveComponents(x, trail);
+        if (x.size() > 0) {
+            Event e = solveComponents(x, trail);
 
-        if (e != null) {
-            Time xs = e.start(trail);
-            if (xs != null) {
-                trail.put(x, xs); //assign
-                return e;
+            if (e != null) {
+                Time xs = e.start(trail);
+                if (xs != null) {
+                    trail.put(x, xs); //assign
+                    return e;
+                }
             }
         }
 
         trail.remove(x); //remove placeholder
+
+//        //update constraints, in case they were changed above
+//        cc = constraints(x);
+//        if (cc!=null)
+//            return cc.get(0);
+//        else
         return null;
     }
 
@@ -553,7 +547,7 @@ public class Temporalize implements ITemporalize {
 
                 //decide subterm solution order intelligently: allow reverse if the 2nd subterm can more readily and absolutely temporalize
                 if (score(t1) > score(t0)  /* || t1.volume() > t0.volume()*/) {
-                    dir = false; //reverse: solve simpler subterm first
+                    dir = true; //reverse: solve simpler subterm first
                 }
 
                 Event ea, eb;
@@ -584,7 +578,7 @@ public class Temporalize implements ITemporalize {
                         Term b = eb.term;
 
                         try {
-                            if (o == CONJ && (a.op() == CONJ || b.op() == CONJ)) {
+                            if (o == CONJ /*&& (a.op() == CONJ || b.op() == CONJ)*/) {
                                 //conjunction merge, since the results could overlap
                                 //either a or b, or both are conjunctions. and the result will be conjunction
 
@@ -594,7 +588,7 @@ public class Temporalize implements ITemporalize {
 
                             } else {
 
-                                Event e = solveTemporal(trail, o, ea, eb, a, b);
+                                Event e = solveTemporal(o, at, bt, a, b);
                                 if (e != null)
                                     return e;
 
@@ -724,6 +718,7 @@ public class Temporalize implements ITemporalize {
         return null;
     }
 
+
     private Event solveConj(Time at, Time bt, Term a, Term b) {
         long ata = at.abs();
         long bta = bt.abs();
@@ -774,21 +769,18 @@ public class Temporalize implements ITemporalize {
         return null;
     }
 
+    @Deprecated
     private Event solveTemporal(Map<Term, Time> trail, Op o, Event ea, Event eb, Term a, Term b) {
         int dt = dt(ea, eb, trail);
+        return solveTemporal(trail, o, ea, eb, a, b, dt);
+    }
 
-//        int inner = a.dtRange();// + b.dtRange();
-//        assert(Math.abs(dt) >= inner);
-//        if (dt >= 0) dt -= inner;
-//        else dt += inner;
+    @Deprecated
+    private Event solveTemporal(Map<Term, Time> trail, Op o, Event ea, Event eb, Term a, Term b, int dt) {
 
-        if (dt != 0 && Math.abs(dt) < dur)
-            dt = 0; //perceived as simultaneous within duration
-
-//                                        if (o == CONJ && sd != DTERNAL && sd != XTERNAL) {
-//                                            sd -= a.dtRange(); sd -= b.dtRange();
-//                                        }
         if (dt != XTERNAL) {
+            if (dt != 0 && Math.abs(dt) < dur)
+                dt = 0; //perceived as simultaneous within duration
 
             @Nullable Time at = ea.start(trail);
 
@@ -809,6 +801,42 @@ public class Temporalize implements ITemporalize {
             return new TimeEvent(this, newTerm, start);
         }
         return null;
+    }
+
+    private Event solveTemporal(Op o, Time at, Time bt, Term a, Term b) {
+
+        assert(o!=CONJ && o.temporal);
+
+        int dt = dt(at, bt);
+        if (dt != XTERNAL) {
+
+            int innerRange = a.dtRange(); //only A, not B (because the end of A points to the start of B)
+//            if (dt > 0) {
+                dt -= innerRange;
+//            } else if (dt < 0) {
+//                dt += innerRange;
+//            }
+
+            if (dt != 0 && Math.abs(dt) < dur)
+                dt = 0; //perceived as simultaneous within duration
+
+
+            Term newTerm = o.the(dt, a, b);
+
+            Time start = at;
+            if (o == CONJ && start.abs() != ETERNAL && dt != DTERNAL) {
+                long bStart = bt.abs();
+                if (bStart != ETERNAL) {
+                    if (bStart < start.abs())
+                        start = bt;
+                }
+
+            }
+
+            return new TimeEvent(this, newTerm, start);
+        }
+        return null;
+
     }
 
 

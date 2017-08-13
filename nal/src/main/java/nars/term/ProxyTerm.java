@@ -218,15 +218,15 @@ public class ProxyTerm<T extends Term> implements Term {
         return ref.contains(t);
     }
 
-    @Override
-    public boolean impossibleSubTerm(@NotNull Termlike target) {
-        return ref.impossibleSubTerm(target);
-    }
-
-    @Override
-    public boolean impossibleSubTermOrEqualityVolume(int otherTermsVolume) {
-        return ref.impossibleSubTermOrEqualityVolume(otherTermsVolume);
-    }
+//    @Override
+//    public boolean impossibleSubTerm(@NotNull Termlike target) {
+//        return ref.impossibleSubTerm(target);
+//    }
+//
+//    @Override
+//    public boolean impossibleSubTermOrEqualityVolume(int otherTermsVolume) {
+//        return ref.impossibleSubTermOrEqualityVolume(otherTermsVolume);
+//    }
 
     @Override
     @Nullable
