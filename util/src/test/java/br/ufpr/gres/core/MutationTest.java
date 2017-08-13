@@ -26,6 +26,7 @@ import br.ufpr.gres.core.premutation.PremutationClassInfo;
 import br.ufpr.gres.core.visitors.methods.MutatingClassVisitor;
 import br.ufpr.gres.core.visitors.methods.empty.NullVisitor;
 import br.ufpr.gres.example.Cal;
+import org.eclipse.collections.api.tuple.Pair;
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -34,6 +35,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  *
@@ -148,7 +152,7 @@ public class MutationTest {
             ArrayList<MutationDetails> details = new ArrayList(context.getCollectedMutations());
 
             for (IMutationOperator operator : mutators) {
-                for (MutationDetails detail : details.stream().filter(p -> p.getMutator().equals(operator.getName())).collect(Collectors.toList())) {
+                for (MutationDetails detail : details.stream().filter(p -> p.getMutator().equals(operator.getName())).collect(toList())) {
                     Mutant mutant = Mutant.get("", detail.getId(), classToMutate);
                     System.out.println(mutant.getDetails());
 //                    try (DataOutputStream dout = new DataOutputStream(new FileOutputStream(new File(directory + File.separator + "mutants", mutant.getDetails().get(0).getMutator() + "_" + i + ".class")))) {
@@ -161,7 +165,7 @@ public class MutationTest {
 
         }
 
-        ArrayList<MutationIdentifier> details = new ArrayList(context.getCollectedMutations().subList(0, 5).stream().map(MutationDetails::getId).collect(Collectors.toList()));
+        ArrayList<MutationIdentifier> details = new ArrayList(context.getCollectedMutations().subList(0, 5).stream().map(MutationDetails::getId).collect(toList()));
         System.out.println("Creating a mutant with order " + details.size());
 
         Mutant mutant = Mutant.get(details, classToMutate);
@@ -172,13 +176,17 @@ public class MutationTest {
         DynamicClassLoader d = new DynamicClassLoader();
 
         //"Mutant" + (int)(Math.random()*10000) /* HACK */
-        Class m = mutant.compile(context.getJavaClassName(), d);
-        System.out.println(m + " " + m.getName());
-        Object c = m.newInstance();
-        System.out.println(m.getMethods());
+        Stream<Pair<Mutant, Object>> s = Mutant.mutate(Cal.class);
+        List<Pair<Mutant, Object>> mutants = s.collect(toList());
+        System.out.println(mutants);
 
-        System.out.println(m.getMethods()[0].invoke(c, 1, 1, 2, 1, 1983));
-        System.out.println(Cal.cal(1, 1, 2, 1, 1983));
+//        Class m = mutant.compile(context.getJavaClassName(), d);
+//        System.out.println(m + " " + m.getName());
+//        Object c = m.newInstance();
+//        System.out.println(m.getMethods());
+//
+//        System.out.println(m.getMethods()[0].invoke(c, 1, 1, 2, 1, 1983));
+//        System.out.println(Cal.cal(1, 1, 2, 1, 1983));
 
 //        try (DataOutputStream dout = new DataOutputStream(new FileOutputStream(new File(directory + File.separator + "mutants", "HOM.class")))) {
 //            dout.write(mutant.getBytes());

@@ -13,7 +13,8 @@ public class DynamicClassDetails extends ClassDetails {
     private final byte[] bytes;
 
     public static DynamicClassDetails get(Class c) {
-        String path = c.getName().replace('.', '/') + ".class";
+
+        String path = path(c);
         System.err.println(path);
         return get(path);
     }

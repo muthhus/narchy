@@ -40,6 +40,10 @@ abstract public class ClassDetails {
         this.className = new ClassName(classInfo.getName());
     }
 
+    public static String path(Class c) {
+        return c.getName().replace('.', '/') + ".class";
+    }
+
     abstract public byte[] getBytes();
 
 

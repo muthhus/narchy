@@ -6,6 +6,7 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.Task;
+import nars.control.Derivation;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
@@ -50,6 +51,12 @@ public class Temporalize implements ITemporalize {
         this.random = random;
     }
 
+    @Override
+    public @Nullable Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
+        dur = d.dur;
+        return ITemporalize.super.solve(d, pattern, occ);
+    }
+
     /**
      * heuristic for ranking temporalization strategies
      */
@@ -65,11 +72,6 @@ public class Temporalize implements ITemporalize {
                 if (e instanceof AbsoluteEvent) {
                     if (((AbsoluteEvent) e).start != ETERNAL)
                         t = 4; // * (1 + x.size()); //prefer non-eternal as it is more specific
-                    else
-                        t = 2;
-                } else if (e instanceof SolutionEvent) {
-                    if (((SolutionEvent) e).start != ETERNAL)
-                        t = 4;
                     else
                         t = 2;
                 } else if (e instanceof TimeEvent) {
@@ -763,40 +765,6 @@ public class Temporalize implements ITemporalize {
                 }
             }
 
-        }
-        return null;
-    }
-
-    @Deprecated
-    private Event solveTemporal(Map<Term, Time> trail, Op o, Event ea, Event eb, Term a, Term b) {
-        int dt = dt(ea, eb, trail);
-        return solveTemporal(trail, o, ea, eb, a, b, dt);
-    }
-
-    @Deprecated
-    private Event solveTemporal(Map<Term, Time> trail, Op o, Event ea, Event eb, Term a, Term b, int dt) {
-
-        if (dt != XTERNAL) {
-            if (dt != 0 && Math.abs(dt) < dur)
-                dt = 0; //perceived as simultaneous within duration
-
-            @Nullable Time at = ea.start(trail);
-
-            Term newTerm = o.the(dt, a, b);
-
-            Time start = at;
-            if (o == CONJ && start.abs() != ETERNAL && dt != DTERNAL) {
-                Time bt = eb.start(trail);
-                if (bt != null) {
-                    long bStart = bt.abs();
-                    if (bStart != ETERNAL) {
-                        if (bStart < start.abs())
-                            start = bt;
-                    }
-                }
-            }
-
-            return new TimeEvent(this, newTerm, start);
         }
         return null;
     }

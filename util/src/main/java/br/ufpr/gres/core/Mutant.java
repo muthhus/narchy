@@ -71,6 +71,10 @@ public final class Mutant {
         this.bytes = bytes;
     }
 
+    public static Stream<Pair<Mutant, Object>> mutate(Class x) {
+        return mutate(ClassDetails.path(x));
+    }
+
     public static Stream<Pair<Mutant, Object>> mutate(String path) {
         ClassDetails classes = DynamicClassDetails.get(path);
 
@@ -195,7 +199,7 @@ public final class Mutant {
         return description.toString();
     }
 
-    public Class compile(String name, DynamicClassLoader cl) {
+    private Class compile(String name, DynamicClassLoader cl) {
         //public Class<?> loadClassFromFile (String fileName, String directory) throws ClassNotFoundException {
         try {
 
