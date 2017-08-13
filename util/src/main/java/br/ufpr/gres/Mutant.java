@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.ufpr.gres.core;
+package br.ufpr.gres;
 
-import br.ufpr.gres.ClassContext;
+import br.ufpr.gres.core.DynamicClassLoader;
+import br.ufpr.gres.core.MutationIdentifier;
+import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.core.classpath.ClassDetails;
 import br.ufpr.gres.core.classpath.DynamicClassDetails;
 import br.ufpr.gres.core.operators.IMutationOperator;
@@ -24,8 +26,6 @@ import br.ufpr.gres.core.operators.method_level.ROR;
 import br.ufpr.gres.core.visitors.methods.MutatingClassVisitor;
 import br.ufpr.gres.core.visitors.methods.empty.NullVisitor;
 import jcog.list.FasterList;
-import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.tuple.Tuples;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.slf4j.Logger;
@@ -53,29 +53,40 @@ public final class Mutant {
         add(AOR2.AOR2);
         add(ROR.ROR);
     }};
-    ;
-    private final List<MutationDetails> details;
+
+    private final List<MutationInfo> details;
     private final byte[] bytes;
+
+    /**
+     * input class name
+     */
+    public final String className;
+
+    /**
+     * mutant unique id
+     */
     public final String id;
 
-    public Mutant(String uuid, final MutationDetails details, final byte[] bytes) {
+    public Mutant(String className, String uuid, final MutationInfo details, final byte[] bytes) {
+        this.className = className;
         this.id = uuid;
         this.details = new ArrayList<>();
         this.details.add(details);
         this.bytes = bytes;
     }
 
-    public Mutant(String uuid, final List<MutationDetails> details, final byte[] bytes) {
+    public Mutant(String className, String uuid, final List<MutationInfo> details, final byte[] bytes) {
+        this.className = className;
         this.id = uuid;
         this.details = details;
         this.bytes = bytes;
     }
 
-    public static Stream<Pair<Mutant, Object>> mutate(Class x) {
+    public static Stream<Mutant> mutate(Class x) {
         return mutate(ClassDetails.path(x));
     }
 
-    public static Stream<Pair<Mutant, Object>> mutate(String path) {
+    public static Stream<Mutant> mutate(String path) {
         ClassDetails classes = DynamicClassDetails.get(path);
 
         final byte[] classToMutate = classes.getBytes();
@@ -101,64 +112,70 @@ public final class Mutant {
         first.accept(mca, ClassReader.EXPAND_FRAMES);
 
         List<Mutant> mutants = new FasterList();
-        if (!context.getTargetMutation().isEmpty()) {
-            final List<MutationDetails> details = context.getMutationDetails(context.getTargetMutation().get(0));
-            //System.out.println(details);
-        } else {
-            ArrayList<MutationDetails> details = new ArrayList(context.getCollectedMutations());
+//        if (!context.getTargetMutation().isEmpty()) {
+//            final List<MutationInfo> details = context.getMutationDetails(context.getTargetMutation().get(0));
+//            //System.out.println(details);
+//        } else {
+        ArrayList<MutationInfo> details = new ArrayList(context.getCollectedMutations());
 
-            for (IMutationOperator operator : mutators) {
-                for (MutationDetails detail : details.stream().filter(p -> p.getMutator().equals(operator.getName())).collect(Collectors.toList())) {
-                    String uuid = UUID.randomUUID().toString().replace("-", "");
-                    Mutant mutant = get(uuid, detail.getId(), classToMutate);
-                    //System.out.println(mutant.getDetails());
-                    mutants.add(mutant);
-                }
-            }
 
+        for (MutationInfo detail : details) {
+            String uuid = UUID.randomUUID().toString().replace("-", "");
+            Mutant mutant = mutate(uuid, detail.getId(), classToMutate);
+            //System.out.println(mutant.getDetails());
+            mutants.add(mutant);
         }
 
-        return mutants.stream().map((Mutant mutant) -> {
-//        ArrayList<MutationIdentifier> details = new ArrayList(context.getCollectedMutations().subList(0, 5).stream().map(MutationDetails::getId).collect(Collectors.toList()));
-//        System.out.println("Creating a mutant with order " + details.size());
+
+        DynamicClassLoader d = new DynamicClassLoader();
+
+        return mutants.stream(); //.map((Mutant mutant) -> {
+////        ArrayList<MutationIdentifier> details = new ArrayList(context.getCollectedMutations().subList(0, 5).stream().map(MutationDetails::getId).collect(Collectors.toList()));
+////        System.out.println("Creating a mutant with order " + details.size());
+////
+////        Mutant mutant = Mutant.get(details, classToMutate);
+//            //System.out.println("The new mutant");
+//            //System.out.println(mutant);
 //
-//        Mutant mutant = Mutant.get(details, classToMutate);
-            //System.out.println("The new mutant");
-            //System.out.println(mutant);
-
-
-            DynamicClassLoader d = new DynamicClassLoader();
-
-            //"Mutant" + (int)(Math.random()*10000) /* HACK */
-
-            Class m = mutant.compile(context.getJavaClassName(), d);
-
-            //System.out.println(Joiner.on("\n").join(m.getMethods()));
-
-            //System.out.println(m + " " + m.getName());
-            Object x;
-            try {
-                x = m.newInstance();
-                return Tuples.pair(mutant, x);
-            } catch (Exception e) {
-                Mutant.logger.warn("new instance: {}", e);
-                return null;
-            }
-
-//        NashornScriptEngine JS = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
-//        Bindings b = JS.createBindings();
-//        b.put("x", x);
 //
-//        Object result = null;
-//        try {
-//            result = JS.eval(js, b);
-//            return (X) result;
-//        } catch (ScriptException e) {
-//            logger.warn("eval: {}", e.getMessage());
-//            return null;
-//        }
+//
+//            //"Mutant" + (int)(Math.random()*10000) /* HACK */
+//
+//
+//            //System.out.println(Joiner.on("\n").join(m.getMethods()));
+//
+//            //System.out.println(m + " " + m.getName());
+//            Object x;
+//            try {
+//                return Tuples.pair(mutant, x);
+//            } catch (Exception e) {
+//                Mutant.logger.warn("new instance: {}", e);
+//                return null;
+//            }
+//
+////        NashornScriptEngine JS = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
+////        Bindings b = JS.createBindings();
+////        b.put("x", x);
+////
+////        Object result = null;
+////        try {
+////            result = JS.eval(js, b);
+////            return (X) result;
+////        } catch (ScriptException e) {
+////            logger.warn("eval: {}", e.getMessage());
+////            return null;
+////        }
+//
+//        });
+    }
 
-        });
+    public Object instance() throws IllegalAccessException, InstantiationException {
+        return instance(new DynamicClassLoader());
+    }
+
+    public Object instance(DynamicClassLoader d) throws IllegalAccessException, InstantiationException {
+        Class m = compile(d);
+        return m.newInstance();
     }
 
     /**
@@ -166,7 +183,7 @@ public final class Mutant {
      *
      * @return A MutationDetails object
      */
-    public List<MutationDetails> getDetails() {
+    public List<MutationInfo> getDetails() {
         return this.details;
     }
 
@@ -190,21 +207,15 @@ public final class Mutant {
 
     @Override
     public String toString() {
-        StringBuilder description = new StringBuilder();
-
-        for (int i = 0; i < details.size(); i++) {
-            description.append(i).append(1).append(") ").append(details.get(i)).append('\n');
-        }
-
-        return description.toString();
+        return id + details;
     }
 
-    private Class compile(String name, DynamicClassLoader cl) {
+    public Class compile(DynamicClassLoader cl) {
         //public Class<?> loadClassFromFile (String fileName, String directory) throws ClassNotFoundException {
         try {
 
             byte[] byteBuffer = getBytes();
-            return cl.load(name + id, byteBuffer);
+            return cl.load(className + id, byteBuffer);
         } catch (Exception e) {
             //logger.error("Error while loading class " + fileName);
             e.printStackTrace();
@@ -213,7 +224,7 @@ public final class Mutant {
 
     }
 
-    public static Mutant get(String uuid, final MutationIdentifier id, byte[] classToMutate) {
+    public static Mutant mutate(String uuid, final MutationIdentifier id, byte[] classToMutate) {
         Collection<IMutationOperator> mutators = new ArrayList<>(DEFAULT_MUTATORS);
         Collection<IMutationOperator> mutatorsFiltered = mutators.stream().filter(p -> id.getMutator().equals(p.getName())).collect(Collectors.toList());
 
@@ -240,9 +251,9 @@ public final class Mutant {
         reader.accept(mca, ClassReader.EXPAND_FRAMES);
 
 
-        final List<MutationDetails> details = context.getCollectedMutations();
+        final List<MutationInfo> details = context.getCollectedMutations();
 
-        return new Mutant(uuid, details.stream().filter(p -> p.getId().equals(id)).findFirst().get(), w.toByteArray());
+        return new Mutant(context.getJavaClassName(), uuid, details.stream().filter(p -> p.getId().equals(id)).findFirst().get(), w.toByteArray());
     }
 
 
@@ -267,15 +278,15 @@ public final class Mutant {
 
         reader.accept(mca, ClassReader.EXPAND_FRAMES);
 
-        List<MutationDetails> details = new ArrayList<>();
+        List<MutationInfo> details = new ArrayList<>();
 
-        for (MutationDetails detail : context.getCollectedMutations()) {
+        for (MutationInfo detail : context.getCollectedMutations()) {
             if (ids.stream().anyMatch(p -> p.equals(detail.getId()))) {
                 details.add(detail);
             }
         }
 
-        return new Mutant(UUID.randomUUID().toString().replace("-", ""), details, w.toByteArray());
+        return new Mutant(context.getJavaClassName(), UUID.randomUUID().toString().replace("-", ""), details, w.toByteArray());
     }
 
 }

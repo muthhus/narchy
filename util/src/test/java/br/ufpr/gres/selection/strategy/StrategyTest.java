@@ -16,7 +16,7 @@
 package br.ufpr.gres.selection.strategy;
 
 import br.ufpr.gres.ClassContext;
-import br.ufpr.gres.core.MutationDetails;
+import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.core.classpath.DynamicClassDetails;
 import br.ufpr.gres.core.operators.IMutationOperator;
 import br.ufpr.gres.core.operators.method_level.AOR;
@@ -38,7 +38,7 @@ import java.util.List;
  */
 public class StrategyTest {
 
-    public static List<MutationDetails> getMutations() throws IOException {
+    public static List<MutationInfo> getMutations() throws IOException {
         ArrayList<IMutationOperator> MUTATORS = new ArrayList<>();
         MUTATORS.add(AOR.AOR);
         MUTATORS.add(ROR.ROR);
@@ -51,7 +51,7 @@ public class StrategyTest {
         return doMutation(MUTATORS, classToMutate);
     }
 
-    public static List<MutationDetails> doMutation(Collection<IMutationOperator> mutators, byte[] classToMutate) {
+    public static List<MutationInfo> doMutation(Collection<IMutationOperator> mutators, byte[] classToMutate) {
         final ClassContext context = new ClassContext();
         final ClassReader first = new ClassReader(classToMutate);
         final NullVisitor nv = new NullVisitor();

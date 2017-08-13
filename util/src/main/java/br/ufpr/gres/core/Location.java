@@ -104,8 +104,8 @@ public final class Location implements Comparable<Location> {
 
     @Override
     public String toString() {
-        return "Location [clazz=" + this.clazz + ", method=" + this.method
-                + ", methodDesc=" + this.methodDesc + ']';
+        return this.clazz + "/" + this.method
+                + this.methodDesc;
     }
 
     public String describe() {

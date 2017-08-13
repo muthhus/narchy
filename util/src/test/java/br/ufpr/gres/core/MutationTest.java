@@ -16,25 +16,21 @@
 package br.ufpr.gres.core;
 
 import br.ufpr.gres.ClassContext;
+import br.ufpr.gres.Mutant;
 import br.ufpr.gres.core.classpath.ClassDetails;
 import br.ufpr.gres.core.classpath.DynamicClassDetails;
 import br.ufpr.gres.core.operators.IMutationOperator;
-import br.ufpr.gres.core.operators.method_level.AOR2;
-import br.ufpr.gres.core.operators.method_level.ROR;
 import br.ufpr.gres.core.premutation.PreMutationAnalyser;
 import br.ufpr.gres.core.premutation.PremutationClassInfo;
 import br.ufpr.gres.core.visitors.methods.MutatingClassVisitor;
 import br.ufpr.gres.core.visitors.methods.empty.NullVisitor;
 import br.ufpr.gres.example.Cal;
-import org.eclipse.collections.api.tuple.Pair;
 import org.junit.Test;
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -145,15 +141,15 @@ public class MutationTest {
 
         first.accept(mca, ClassReader.EXPAND_FRAMES);
 
-        if (!context.getTargetMutation().isEmpty()) {
-            final List<MutationDetails> details = context.getMutationDetails(context.getTargetMutation().get(0));
+        if (!context.target.isEmpty()) {
+            final List<MutationInfo> details = context.getMutationDetails(context.target.get(0));
             System.out.println(details);
         } else {
-            ArrayList<MutationDetails> details = new ArrayList(context.getCollectedMutations());
+            ArrayList<MutationInfo> details = new ArrayList(context.getCollectedMutations());
 
             for (IMutationOperator operator : mutators) {
-                for (MutationDetails detail : details.stream().filter(p -> p.getMutator().equals(operator.getName())).collect(toList())) {
-                    Mutant mutant = Mutant.get("", detail.getId(), classToMutate);
+                for (MutationInfo detail : details.stream().filter(p -> p.getMutator().equals(operator.getName())).collect(toList())) {
+                    Mutant mutant = Mutant.mutate("", detail.getId(), classToMutate);
                     System.out.println(mutant.getDetails());
 //                    try (DataOutputStream dout = new DataOutputStream(new FileOutputStream(new File(directory + File.separator + "mutants", mutant.getDetails().get(0).getMutator() + "_" + i + ".class")))) {
 //                        dout.write(mutant.getBytes());
@@ -165,7 +161,7 @@ public class MutationTest {
 
         }
 
-        ArrayList<MutationIdentifier> details = new ArrayList(context.getCollectedMutations().subList(0, 5).stream().map(MutationDetails::getId).collect(toList()));
+        ArrayList<MutationIdentifier> details = new ArrayList(context.getCollectedMutations().subList(0, 5).stream().map(MutationInfo::getId).collect(toList()));
         System.out.println("Creating a mutant with order " + details.size());
 
         Mutant mutant = Mutant.get(details, classToMutate);
@@ -176,8 +172,8 @@ public class MutationTest {
         DynamicClassLoader d = new DynamicClassLoader();
 
         //"Mutant" + (int)(Math.random()*10000) /* HACK */
-        Stream<Pair<Mutant, Object>> s = Mutant.mutate(Cal.class);
-        List<Pair<Mutant, Object>> mutants = s.collect(toList());
+        Stream<Mutant> s = Mutant.mutate(Cal.class);
+        List<Mutant> mutants = s.collect(toList());
         System.out.println(mutants);
 
 //        Class m = mutant.compile(context.getJavaClassName(), d);

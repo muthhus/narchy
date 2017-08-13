@@ -26,6 +26,7 @@ public class TemporalizeTest {
     public void testAbsoluteRanking() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
 
+
         //eternal should be ranked lower than non-eternal
         Term x = the("x");
         AbsoluteEvent ete = t.absolute(x, ETERNAL, ETERNAL);

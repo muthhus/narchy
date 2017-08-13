@@ -6,8 +6,6 @@ import br.ufpr.gres.core.visitors.methods.RegisterInformationsClassVisitor;
 import br.ufpr.gres.core.visitors.methods.empty.NullVisitor;
 import org.objectweb.asm.ClassReader;
 
-import java.io.IOException;
-
 public class DynamicClassDetails extends ClassDetails {
 
     private final byte[] bytes;
@@ -19,16 +17,10 @@ public class DynamicClassDetails extends ClassDetails {
         return get(path);
     }
 
-    public static DynamicClassDetails get(String path)  {
+    public static DynamicClassDetails get(String path) {
         final ClassContext context = new ClassContext();
 
-
-        byte[] bytes = null;
-        try {
-            bytes = ClassLoader.getSystemResourceAsStream(path).readAllBytes();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        byte[] bytes = bytes(path);
 
         final ClassReader first = new ClassReader(bytes);
         final NullVisitor nv = new NullVisitor();

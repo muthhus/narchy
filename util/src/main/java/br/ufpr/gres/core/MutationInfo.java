@@ -24,7 +24,7 @@ import br.ufpr.gres.util.StringUtils;
  * @author Jackson Antonio do Prado Lima <jacksonpradolima at gmail.com>
  * @version 1.0
  */
-public final class MutationDetails {
+public final class MutationInfo {
 
     private final MutationIdentifier id;
     private final String filename;
@@ -35,11 +35,11 @@ public final class MutationDetails {
     private final boolean isInFinallyBlock;
     private final boolean poison;
 
-    public MutationDetails(final MutationIdentifier id, final String filename, final String description, final int lineNumber, final int block) {
+    public MutationInfo(final MutationIdentifier id, final String filename, final String description, final int lineNumber, final int block) {
         this(id, filename, description, lineNumber, block, false, false);
     }
 
-    public MutationDetails(final MutationIdentifier id, final String filename, final String description, final int lineNumber, final int block, final boolean isInFinallyBlock, final boolean poison) {
+    public MutationInfo(final MutationIdentifier id, final String filename, final String description, final int lineNumber, final int block, final boolean isInFinallyBlock, final boolean poison) {
         this.id = id;
         this.description = description;
         this.filename = filename;
@@ -57,10 +57,13 @@ public final class MutationDetails {
 
     @Override
     public String toString() {
-        return "MutationDetails [id=" + this.id + ", filename=" + this.filename
-                + ", block=" + this.block + ", lineNumber=" + this.lineNumber
-                + ", description=" + this.description + ", testsInOrder="
-                /*+ this.testsInOrder*/ + ']';
+        return this.id.location.getClassName() + "/" + id.location.getMethodName() + id.location.getMethodDesc()
+                //+ ", " + this.filename
+                + "@" + lineNumber + "|" + id.indexes
+                //+ ", block=" + this.block
+                + ":" + this.description;
+//                + ", testsInOrder="
+//                /*+ this.testsInOrder*/ + ']';
     }
 
     /**
@@ -252,7 +255,7 @@ public final class MutationDetails {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final MutationDetails other = (MutationDetails) obj;
+        final MutationInfo other = (MutationInfo) obj;
         if (this.id == null) {
             if (other.id != null) {
                 return false;

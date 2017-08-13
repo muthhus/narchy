@@ -46,7 +46,7 @@ public class MethodMutationContext {
 
         final MutationIdentifier newId = getNextMutationIdentifer(mutationOperator, this.classContext.getJavaClassName());
 
-        final MutationDetails details = new MutationDetails(newId,
+        final MutationInfo details = new MutationInfo(newId,
                 this.classContext.getFileName(), description, this.lastLineNumber,
                 this.classContext.getCurrentBlock(),
                 this.classContext.isWithinFinallyBlock(), false);
@@ -60,9 +60,9 @@ public class MethodMutationContext {
         return new MutationIdentifier(this.location, this.instructionIndex, mutationOperator.getName());
     }
 
-    private void registerMutation(final MutationDetails details) {
+    private void registerMutation(final MutationInfo details) {
         if (!isMutationFindingDisabled()) {            
-            this.classContext.addMutation(details);
+            this.classContext.add(details);
         }
     }
 

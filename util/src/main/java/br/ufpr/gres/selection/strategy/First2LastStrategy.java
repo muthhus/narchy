@@ -15,7 +15,7 @@
  */
 package br.ufpr.gres.selection.strategy;
 
-import br.ufpr.gres.core.MutationDetails;
+import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.selection.AbstractStrategy;
 
 import java.util.ArrayList;
@@ -29,17 +29,17 @@ import java.util.List;
  */
 public class First2LastStrategy extends AbstractStrategy {
 
-    public First2LastStrategy(ArrayList<MutationDetails> list) {
+    public First2LastStrategy(ArrayList<MutationInfo> list) {
         super(list);
     }
 
     @Override
-    public List<MutationDetails> get() {
-        ArrayList<MutationDetails> result = new ArrayList<>();
+    public List<MutationInfo> get() {
+        ArrayList<MutationInfo> result = new ArrayList<>();
 
         int numSelection = selection();
 
-        ArrayList<MutationDetails> itemsAvailable = new ArrayList(this.listStrategy);
+        ArrayList<MutationInfo> itemsAvailable = new ArrayList(this.listStrategy);
 
         for (int i = 0; i < numSelection; i++) {
 
@@ -49,12 +49,12 @@ public class First2LastStrategy extends AbstractStrategy {
                 itemsAvailable.removeAll(result);
             }
 
-            MutationDetails mutationDetails = null;
-            mutationDetails = (i % 2) == 0 ? itemsAvailable.get(0) : itemsAvailable.get(itemsAvailable.size() - 1);
+            MutationInfo mutationInfo = null;
+            mutationInfo = (i % 2) == 0 ? itemsAvailable.get(0) : itemsAvailable.get(itemsAvailable.size() - 1);
 
-            itemsAvailable.remove(mutationDetails);
+            itemsAvailable.remove(mutationInfo);
 
-            result.add(mutationDetails);
+            result.add(mutationInfo);
         }
 
         updateListStrategy(result);

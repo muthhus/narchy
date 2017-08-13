@@ -20,8 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
 
 /**
  * @author Jackson Antonio do Prado Lima <jacksonpradolima at gmail.com>
@@ -42,6 +40,20 @@ abstract public class ClassDetails {
 
     public static String path(Class c) {
         return c.getName().replace('.', '/') + ".class";
+    }
+
+    public static byte[] bytes(Class c) {
+        return bytes(path(c));
+    }
+
+    public static byte[] bytes(String path) {
+        byte[] bytes = null;
+        try {
+            bytes = ClassLoader.getSystemResourceAsStream(path).readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return bytes;
     }
 
     abstract public byte[] getBytes();

@@ -1,15 +1,17 @@
 package nars.derive;
 
-import br.ufpr.gres.core.Mutant;
+import br.ufpr.gres.Mutant;
+import br.ufpr.gres.testcase.MutantUnit;
 import nars.$;
 import nars.Narsese;
+import nars.derive.time.Temporalize;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 @Ignore
@@ -18,12 +20,22 @@ public class TemporalizeMutatedTest {
     static final Logger logger = LoggerFactory.getLogger(TemporalizeMutatedTest.class);
 
     @Test
-    public void testMutationDynamic() {
-        Mutant.mutate("nars/derive/time/Temporalize.class" /*Temporalize.class*/).forEach(mm -> {
-            try {
-                Mutant d = mm.getOne();
-                Object m = mm.getTwo();
+    public void testTestCase() {
+        Mutant.mutate(Temporalize.class).forEach(d -> {
 
+            MutantUnit t = new MutantUnit(TemporalizeTest.class, d);
+            t.run();
+
+            System.out.println(d + "\n" + t.results);
+        });
+    }
+
+    @Test
+    public void testMutationDynamic() {
+        Mutant.mutate(Temporalize.class).forEach(d -> {
+            try {
+                System.out.println(d);
+                Object m = d.instance();
 
 
                 invoke(m, "knowTerm", $.$("(a)"), 0L);
@@ -33,11 +45,11 @@ public class TemporalizeMutatedTest {
                 Object r = invoke(m, "solve", $.$("(a)"));
 
                 System.out.println(d.getDetails());
-                System.out.println("\t"+os + " " + r);
+                System.out.println("\t" + os + " " + r);
                 System.out.println();
 
 
-            } catch (Narsese.NarseseException e) {
+            } catch (Narsese.NarseseException | IllegalAccessException | InstantiationException e) {
                 e.printStackTrace();
             }
         });

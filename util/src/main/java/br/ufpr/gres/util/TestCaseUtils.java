@@ -15,15 +15,6 @@
  */
 package br.ufpr.gres.util;
 
-import junit.framework.TestCase;
-import org.junit.Test;
-import org.junit.runners.model.FrameworkMethod;
-import org.junit.runners.model.TestClass;
-
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author Jackson Antonio do Prado Lima <jacksonpradolima at gmail.com>

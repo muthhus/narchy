@@ -16,7 +16,7 @@
 
 package br.ufpr.gres.selection;
 
-import br.ufpr.gres.core.MutationDetails;
+import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.core.MutationIdentifier;
 
 import java.util.List;
@@ -33,17 +33,17 @@ public interface ISelectionStrategy {
     
     void reset();
     
-    void update(MutationDetails t);
-    void updateIgnoreItem(MutationDetails t);
-    void updateListStrategy(MutationDetails t);
-    void updateListStrategy(List<MutationDetails> t);
+    void update(MutationInfo t);
+    void updateIgnoreItem(MutationInfo t);
+    void updateListStrategy(MutationInfo t);
+    void updateListStrategy(List<MutationInfo> t);
     
     void setMaxSelection(int num);
     void setMinSelection(int num);
     
-    List<MutationDetails> get();
-    MutationDetails get(MutationIdentifier id);
-    List<MutationDetails> getItemsIgnored();
+    List<MutationInfo> get();
+    MutationInfo get(MutationIdentifier id);
+    List<MutationInfo> getItemsIgnored();
     
     boolean allItemsSelected();
 }

@@ -15,8 +15,6 @@
  */
 package br.ufpr.gres.testcase;
 
-import br.ufpr.gres.testcase.execution.ResultCollector;
-
 /**
  *
  * @author Jackson Antonio do Prado Lima <jacksonpradolima at gmail.com>

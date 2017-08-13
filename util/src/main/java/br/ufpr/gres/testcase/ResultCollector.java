@@ -13,31 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.ufpr.gres.testcase.execution;
+package br.ufpr.gres.testcase;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import br.ufpr.gres.testcase.Description;
 
 /**
  *
  * @author Jackson Antonio do Prado Lima <jacksonpradolima at gmail.com>
- * @version 1.0
  */
-public class MutationTestMinion {
+public interface ResultCollector {
 
-    private static final Logger logger = LoggerFactory.getLogger(MutationTestMinion.class);
+    void notifyEnd(Description description, Throwable t);
 
-    public static void main(String[] args) {
-            
-        logger.info("minion started");
+    void notifyEnd(Description description);
 
-       
-        
-        
-        // Get Mutants
-        
-        //Find test cases
-        
-        // Run tests
-    }
+    void notifyStart(Description description);
+
+    void notifySkipped(Description description);
+
+    boolean shouldExit();
 }

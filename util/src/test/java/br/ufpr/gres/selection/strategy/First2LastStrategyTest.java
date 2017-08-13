@@ -15,7 +15,7 @@
  */
 package br.ufpr.gres.selection.strategy;
 
-import br.ufpr.gres.core.MutationDetails;
+import br.ufpr.gres.core.MutationInfo;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -30,11 +30,11 @@ public class First2LastStrategyTest {
 
     @Test
     public void testSomeMethod() throws IOException, ClassNotFoundException {
-        List<MutationDetails> mutations = StrategyTest.getMutations();
+        List<MutationInfo> mutations = StrategyTest.getMutations();
         
         System.out.println("All mutations");
-        for (MutationDetails mutationDetails : mutations) {
-            System.out.println(mutationDetails);
+        for (MutationInfo mutationInfo : mutations) {
+            System.out.println(mutationInfo);
         }
 
         First2LastStrategy strategy = new First2LastStrategy(new ArrayList<>(mutations));
@@ -44,11 +44,11 @@ public class First2LastStrategyTest {
         while (strategy.allItemsSelected()) {
             i++;
 
-            List<MutationDetails> selection = strategy.get();
+            List<MutationInfo> selection = strategy.get();
 
             System.out.println("===Selection " + i + "===");
-            for (MutationDetails mutationDetails : selection) {
-                System.out.println(mutationDetails);
+            for (MutationInfo mutationInfo : selection) {
+                System.out.println(mutationInfo);
             }
         }
     }

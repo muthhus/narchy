@@ -16,7 +16,7 @@
 package br.ufpr.gres;
 
 import br.ufpr.gres.core.ConcreteBlockCounter;
-import br.ufpr.gres.core.MutationDetails;
+import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.core.MutationIdentifier;
 
 import java.util.ArrayList;
@@ -33,14 +33,10 @@ public class ClassContext {
     private ClassInfo classInfo;
     private String sourceFile;
 
-    private final List<MutationIdentifier> target = new ArrayList<>();
-    private final List<MutationDetails> mutations = new ArrayList<>();
+    public final List<MutationIdentifier> target = new ArrayList<>();
+    public final List<MutationInfo> mutations = new ArrayList<>();
 
     private final ConcreteBlockCounter blockCounter = new ConcreteBlockCounter();
-
-    public List<MutationIdentifier> getTargetMutation() {
-        return this.target;
-    }
 
     public ClassInfo getClassInfo() {
         return this.classInfo;
@@ -62,7 +58,7 @@ public class ClassContext {
         this.target.addAll(target);
     }
 
-    public List<MutationDetails> getMutationDetails(final MutationIdentifier id) {
+    public List<MutationInfo> getMutationDetails(final MutationIdentifier id) {
         return this.mutations.stream().filter(p -> p.matchesId(id)).collect(Collectors.toList());
     }
 
@@ -75,14 +71,14 @@ public class ClassContext {
     }
 
     public boolean shouldMutate(final MutationIdentifier newId) {
-        return getTargetMutation().isEmpty() || getTargetMutation().stream().anyMatch(p -> p.matches(newId));
+        return this.target.isEmpty() || this.target.stream().anyMatch(p -> p.matches(newId));
     }
 
-    public List<MutationDetails> getCollectedMutations() {
+    public List<MutationInfo> getCollectedMutations() {
         return this.mutations;
     }
 
-    public void addMutation(final MutationDetails details) {        
+    public void add(final MutationInfo details) {
         this.mutations.add(details);
     }
 

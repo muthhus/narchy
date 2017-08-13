@@ -15,7 +15,7 @@
  */
 package br.ufpr.gres.selection;
 
-import br.ufpr.gres.core.MutationDetails;
+import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.core.MutationIdentifier;
 import br.ufpr.gres.util.comparator.AlphanumComparator;
 
@@ -49,24 +49,24 @@ public class AbstractStrategy implements ISelectionStrategy {
     /**
      * The original list
      */
-    protected ArrayList<MutationDetails> originalList;
+    protected ArrayList<MutationInfo> originalList;
 
     /**
      * The items from which the strategy can choose from and remove
      */
-    protected final ArrayList<MutationDetails> listStrategy;
+    protected final ArrayList<MutationInfo> listStrategy;
 
     /**
      * The items were selected by the strategy
      */
-    protected Map<MutationIdentifier, MutationDetails> selectedItems;
+    protected Map<MutationIdentifier, MutationInfo> selectedItems;
 
     /**
      * Items ignored by the strategy
      */
-    protected Map<MutationIdentifier, MutationDetails> ignoredItems;
+    protected Map<MutationIdentifier, MutationInfo> ignoredItems;
 
-    public AbstractStrategy(ArrayList<MutationDetails> list) {
+    public AbstractStrategy(ArrayList<MutationInfo> list) {
         this.comparatorAlphanum = new AlphanumComparator();
         this.originalList = new ArrayList<>(list);
         this.listStrategy = new ArrayList<>(list);
@@ -88,12 +88,12 @@ public class AbstractStrategy implements ISelectionStrategy {
     }
 
     @Override
-    public MutationDetails get(MutationIdentifier id) {
+    public MutationInfo get(MutationIdentifier id) {
         return this.selectedItems.get(id);
     }
 
     @Override
-    public List<MutationDetails> get() {
+    public List<MutationInfo> get() {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -107,7 +107,7 @@ public class AbstractStrategy implements ISelectionStrategy {
     }
 
     @Override
-    public List<MutationDetails> getItemsIgnored() {
+    public List<MutationInfo> getItemsIgnored() {
         return new ArrayList<>(this.ignoredItems.values());
     }
 
@@ -153,24 +153,24 @@ public class AbstractStrategy implements ISelectionStrategy {
     }
 
     @Override
-    public void update(MutationDetails t) {
+    public void update(MutationInfo t) {
         this.selectedItems.put(t.getId(), t);
     }
 
     @Override
-    public void updateIgnoreItem(MutationDetails t) {
+    public void updateIgnoreItem(MutationInfo t) {
         this.ignoredItems.put(t.getId(), t);
     }
 
     @Override
-    public void updateListStrategy(MutationDetails t) {
+    public void updateListStrategy(MutationInfo t) {
         this.listStrategy.remove(t);
     }
     
      @Override
-    public void updateListStrategy(List<MutationDetails> t) {
-         for (MutationDetails mutationDetails : t) {
-             updateListStrategy(mutationDetails);
+    public void updateListStrategy(List<MutationInfo> t) {
+         for (MutationInfo mutationInfo : t) {
+             updateListStrategy(mutationInfo);
          }
     }
 }

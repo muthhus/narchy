@@ -15,7 +15,7 @@
  */
 package br.ufpr.gres.selection.strategy;
 
-import br.ufpr.gres.core.MutationDetails;
+import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.selection.AbstractStrategy;
 
 import java.util.ArrayList;
@@ -30,38 +30,38 @@ import java.util.List;
  */
 public class DiffOperatorStrategy extends AbstractStrategy {
 
-    public DiffOperatorStrategy(ArrayList<MutationDetails> list) {
+    public DiffOperatorStrategy(ArrayList<MutationInfo> list) {
         super(list);
     }
 
     @Override
-    public List<MutationDetails> get() {
-        ArrayList<MutationDetails> result = new ArrayList<>();
+    public List<MutationInfo> get() {
+        ArrayList<MutationInfo> result = new ArrayList<>();
 
         int numSelection = selection();
 
-        Iterator<MutationDetails> it = new ArrayList(this.listStrategy).iterator();
+        Iterator<MutationInfo> it = new ArrayList(this.listStrategy).iterator();
 
         while (result.size() != numSelection) {
             if (!it.hasNext()) {
-                ArrayList<MutationDetails> itemsAvailable = new ArrayList(this.originalList);
+                ArrayList<MutationInfo> itemsAvailable = new ArrayList(this.originalList);
 
                 itemsAvailable.removeAll(result);
 
                 it = itemsAvailable.iterator();
             }
             
-            MutationDetails mutationDetails = it.next();
+            MutationInfo mutationInfo = it.next();
 
             if (result.isEmpty()) {
-                updateListStrategy(mutationDetails);
-                result.add(mutationDetails);
+                updateListStrategy(mutationInfo);
+                result.add(mutationInfo);
                 continue;
             }
 
-            if (result.stream().map(MutationDetails::getMutator).noneMatch(mutationDetails.getMutator()::equals)) {
-                updateListStrategy(mutationDetails);
-                result.add(mutationDetails);
+            if (result.stream().map(MutationInfo::getMutator).noneMatch(mutationInfo.getMutator()::equals)) {
+                updateListStrategy(mutationInfo);
+                result.add(mutationInfo);
                 break;
             }
         }

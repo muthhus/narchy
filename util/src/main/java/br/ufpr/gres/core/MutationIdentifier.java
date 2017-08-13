@@ -16,6 +16,7 @@
 package br.ufpr.gres.core;
 
 import br.ufpr.gres.core.classpath.ClassName;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,7 @@ public final class MutationIdentifier implements Comparable<MutationIdentifier> 
     /**
      * The location at which the mutation occurs
      */
-    private final Location location;
+    public final Location location;
 
     /**
      * The indexes to the instructions within the method at which the mutation occurs.
@@ -38,7 +39,7 @@ public final class MutationIdentifier implements Comparable<MutationIdentifier> 
      * Usually this will be a single instruction, but may be multiple if the mutation has been
      * inlined by the compiler to implement a finally block
      */
-    private final List<Integer> indexes;
+    public final IntArrayList indexes;
 
     /**
      * Name of the mutation operator that created this mutation
@@ -48,13 +49,13 @@ public final class MutationIdentifier implements Comparable<MutationIdentifier> 
 
     public MutationIdentifier(final Location location, final int index,
             final String mutatorUniqueId) {
-        this(location, Collections.singleton(index), mutatorUniqueId);
+        this(location, mutatorUniqueId, index);
     }
 
     public MutationIdentifier(final Location location,
-            final Collection<Integer> indexes, final String mutatorUniqueId) {
+            final String mutatorUniqueId, int... indices) {
         this.location = location;
-        this.indexes = new ArrayList<>(indexes);
+        this.indexes = new IntArrayList(indices);
         this.mutator = mutatorUniqueId;
     }
 
@@ -83,13 +84,12 @@ public final class MutationIdentifier implements Comparable<MutationIdentifier> 
      * @return the zero based index to the instruction
      */
     public int getFirstIndex() {
-        return this.indexes.iterator().next();
+        return this.indexes.get(0);
     }
 
     @Override
     public String toString() {
-        return "MutationIdentifier [location=" + this.location + ", indexes="
-                + this.indexes + ", mutator=" + this.mutator + ']';
+        return this.location + ", idx=" + this.indexes + ", mutator=" + this.mutator;
     }
 
     /**
@@ -163,14 +163,27 @@ public final class MutationIdentifier implements Comparable<MutationIdentifier> 
 
     @Override
     public int compareTo(final MutationIdentifier other) {
+
         int comp = this.location.compareTo(other.getLocation());
+
         if (comp != 0) {
             return comp;
         }
+
         comp = this.mutator.compareTo(other.getMutator());
         if (comp != 0) {
             return comp;
         }
-        return this.indexes.get(0).compareTo(other.indexes.get(0));
+
+        int ss = this.indexes.size();
+        int s1 = Integer.compare(ss, other.indexes.size());
+        if (s1 == 0) {
+            for (int i = 0; i < ss; i++) {
+                int d = Integer.compare(this.indexes.get(i), other.indexes.get(i));
+                if (d!=0)
+                    return d;
+            }
+        }
+        return s1;
     }
 }
