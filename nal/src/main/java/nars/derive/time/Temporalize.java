@@ -7,7 +7,6 @@ import nars.$;
 import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.control.Derivation;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
@@ -55,7 +54,8 @@ public class Temporalize implements ITemporalize {
     /**
      * heuristic for ranking temporalization strategies
      */
-    @Override public float score(Term x) {
+    @Override
+    public float score(Term x) {
         FasterList<Event> l = constraints.get(x);
         if (l == null) {
             return Float.NEGATIVE_INFINITY;
@@ -240,10 +240,11 @@ public class Temporalize implements ITemporalize {
     }
 
     public RelativeEvent newRelative(Term term, Term relativeTo, int start) {
-        return new RelativeEvent(this,  term, relativeTo, start);
+        return new RelativeEvent(this, term, relativeTo, start);
     }
+
     RelativeEvent relative(Term term, Term relativeTo, int start, int end) {
-        return new RelativeEvent(this,  term, relativeTo, start, end);
+        return new RelativeEvent(this, term, relativeTo, start, end);
     }
 
 
@@ -258,7 +259,8 @@ public class Temporalize implements ITemporalize {
     }
 
 
-    @Override public void know(Task task, Subst d, boolean rooted) {
+    @Override
+    public void know(Task task, Subst d, boolean rooted) {
         Term taskTerm = task.term();
 
         AbsoluteEvent root =
@@ -270,7 +272,8 @@ public class Temporalize implements ITemporalize {
         know(taskTerm, d, root);
     }
 
-    @Override public void know(Term term, Subst d, @Nullable AbsoluteEvent root) {
+    @Override
+    public void know(Term term, Subst d, @Nullable AbsoluteEvent root) {
         know(term, root);
 
         Term t2 = d.transform(term);
@@ -337,6 +340,9 @@ public class Temporalize implements ITemporalize {
                 //throw new RuntimeException("no unknowns may be added during this phase");
 
             } else {
+
+                TermContainer tt = term.subterms();
+
                 boolean reverse;
                 if (dt == DTERNAL) {
                     dt = 0;
@@ -345,94 +351,51 @@ public class Temporalize implements ITemporalize {
                     reverse = false;
                 } else {
                     reverse = true;
+                    if (o == CONJ) {
+                        tt = tt.reverse();
+                        dt = -dt;
+                    }
                 }
 
-                TermContainer tt = term.subterms();
 
                 int l = tt.size();
 
-                if (!reverse) {
 
-                    int t = start;
-                    int last = DTERNAL;
+                int t = start;
+                int last = DTERNAL;
 
-                    //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
-                    for (int i = 0; (i < l); i++) {
+                //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
+                for (int i = 0; (i < l); i++) {
 
-                        Term st = tt.sub(i);
+                    Term st = tt.sub(i);
 
-                        if (i > 0)
-                            t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
+                    if (i > 0)
+                        t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
 
-                        int sdt = st.dtRange();
-                        int subStart = t, subEnd = t + sdt;
+                    int sdt = st.dtRange();
+                    int subStart = t, subEnd = t + sdt;
 
-                        //                  System.out.println(parent + "\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
+                    //                  System.out.println(parent + "\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
 
-                        //the event is atomic, so forget the parent in computing the subterm relations (which is in IMPL only)
-                        know((!term.op().statement) ? parent : null, st, subStart, subEnd); //parent = null;
+                    //the event is atomic, so forget the parent in computing the subterm relations (which is in IMPL only)
+                    know(
+                            parent, //(!term.op().statement) ? parent : null,
+                            st, subStart, subEnd); //parent = null;
 
-                        t = subEnd; //the duration of the event
-
-
-                        if (i > 0) {
-                            //crosslink adjacent subterms
-                            int rel = subStart - last;
-                            add(tt.sub(i - 1), newRelative(tt.sub(i - 1), tt.sub(i), rel));
-                            add(tt.sub(i), newRelative(tt.sub(i), tt.sub(i - 1), -rel));
-                        }
-                        last = subStart;
+                    t = subEnd; //the duration of the event
 
 
+                    if (i > 0) {
+                        //crosslink adjacent subterms
+                        int rel = last - subStart;
+                        add(tt.sub(i - 1), newRelative(tt.sub(i - 1), tt.sub(i), rel));
+                        add(tt.sub(i), newRelative(tt.sub(i), tt.sub(i - 1), -rel));
                     }
-                } else {
-
-                    int t = end;
-                    int last = DTERNAL;
-
-                    //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
-                    for (int i = l - 1; (i >= 0); i--) {
-
-                        Term st = tt.sub(i);
-
-                        if (i < l - 1)
-                            t -= dt;
-
-                        int sdt = st.dtRange();
-                        int subEnd = t, subStart = t - sdt;
-
-                        //                  System.out.println(parent + "\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
-
-                        //the event is atomic, so forget the parent in computing the subterm relations (which is in IMPL only)
-                        know(/*(!term.op().statement) ?*/ parent /*: null*/, st, subStart, subEnd); //parent = null;
+                    last = subStart;
 
 
-                        t = subStart; //the duration of the event
-
-
-                        if (i < l - 1) {
-                            //crosslink adjacent subterms
-                            int rel = last - subEnd;
-                            add(tt.sub(i), newRelative(tt.sub(i), tt.sub(i + 1), -rel));
-                            add(tt.sub(i + 1), newRelative(tt.sub(i + 1), tt.sub(i), +rel));
-                        }
-                        last = subStart;
-
-
-                    }
                 }
 
-
-//                    //for conjunctions: by the end of the iteration we should be at the exact end of the interval
-//                    if (o == CONJ) {
-//                        int expectedEnd = end;
-////                        if (t!=expectedEnd) {
-////                            throw new RuntimeException(term + " with dtRange=" + term.dtRange() + " mis-aligned: " + start + "," + end + " but t=" + t);
-////                        }
-//                        assert (t == expectedEnd) : term + " with dtRange=" + term.dtRange() + " mis-aligned: " + start + "," + end + " but t=" + t;
-//                    }
-
-                //for others: they are "pointers" which relate time points but do not define durations
 
             }
 
@@ -483,7 +446,6 @@ public class Temporalize implements ITemporalize {
         if (l.size() > 1)
             l.sortThis();
     }
-
 
 
     public Event solve(final Term x, Map<Term, Time> trail) {

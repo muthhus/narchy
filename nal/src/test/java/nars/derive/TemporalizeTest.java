@@ -125,10 +125,17 @@ public class TemporalizeTest {
     }
 
     @Test
-    public void testEventize2() throws Narsese.NarseseException {
+    public void testEventizeConjFwd() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         t.knowTerm($("(a &&+5 b)"), 0);
         assertEquals("b@5,b@5->a,(a &&+5 b)@[0..5],a@0,a@-5->b",
+                t.toString());
+    }
+    @Test
+    public void testEventizeConjRev() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowTerm($("(a &&-5 b)"), 0);
+        assertEquals("(b &&+5 a)@[0..5],b@0,b@-5->a,a@5,a@5->b",
                 t.toString());
     }
 
