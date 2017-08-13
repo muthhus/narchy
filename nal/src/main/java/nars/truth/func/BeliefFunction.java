@@ -363,9 +363,8 @@ public enum BeliefFunction implements TruthOperator {
         return atomToTruthModifier.get(a);
     }
 
-
-    private final boolean single;
-    private final boolean overlap;
+    public final boolean single;
+    public final boolean overlap;
 
     BeliefFunction() {
 

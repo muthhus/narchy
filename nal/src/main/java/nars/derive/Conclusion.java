@@ -161,7 +161,7 @@ public class Conclusion extends AbstractPred<Derivation> {
                     long taskDur = occ[1] - occ[0];
 
 
-                    int derInBelief = d.transform(d.beliefTerm).subtermTime(t1);
+                    int derInBelief = d.transform(d.beliefTerm).subtermTimeSafe(t1);
                     if (derInBelief!=DTERNAL) {
                         taskStart += derInBelief;
                     }

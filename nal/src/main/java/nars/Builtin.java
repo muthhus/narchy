@@ -23,6 +23,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import static nars.Op.*;
 import static nars.term.Functor.f0;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -182,7 +183,7 @@ public class Builtin {
 
             int tdt = t.dt();
             Term r;
-            if (tdt == DTERNAL || tdt == 0) {
+            if (tdt == DTERNAL || tdt == 0 || tdt == XTERNAL) {
                 switch (t.size()) {
                     case 0:
                     case 1:

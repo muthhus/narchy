@@ -92,7 +92,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
         m.truth(
             t,
-                punc,
+            punc,
             single
         );
         return true;
