@@ -3,6 +3,7 @@ package nars.derive;
 import br.ufpr.gres.core.Mutant;
 import nars.$;
 import nars.Narsese;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.stream.Stream;
 
+@Ignore
 public class TemporalizeMutatedTest {
 
     static final Logger logger = LoggerFactory.getLogger(TemporalizeMutatedTest.class);
