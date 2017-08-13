@@ -69,13 +69,7 @@ public class AbsoluteEvent extends Event {
 
     @Override
     public String toString() {
-        if (start != ETERNAL) {
-            if (start != end)
-                return term + ("@[" + ITemporalize.timeStr(start) + ".." + ITemporalize.timeStr(end)) + ']';
-            else
-                return term + "@" + ITemporalize.timeStr(start);
-        } else
-            return term + "@ETE";
+        return Event.str(term, start, end);
     }
 
 }

@@ -11,7 +11,7 @@ import static nars.time.Tense.ETERNAL;
 public abstract class Event implements Comparable<Event> {
 
     public final Term term;
-    public final ITemporalize t;
+    protected final ITemporalize t;
 
     Event(ITemporalize t, Term term) {
         this.t = t;
@@ -26,12 +26,13 @@ public abstract class Event implements Comparable<Event> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Event)) return false;
-
-        Event event = (Event) o;
-
-        return term.equals(event.term);
+        return o instanceof Event && compareTo((Event) o) == 0;
+//        if (this == o) return true;
+//        if (!(o instanceof Event)) return false;
+//
+//        Event event = (Event) o;
+//
+//        return term.equals(event.term);
     }
 
     @Override
@@ -118,4 +119,13 @@ public abstract class Event implements Comparable<Event> {
         return +1;
     }
 
+    public static String str(Term term, long start, long end) {
+        if (start != ETERNAL) {
+            if (start != end)
+                return term + ("@[" + ITemporalize.timeStr(start) + ".." + ITemporalize.timeStr(end)) + ']';
+            else
+                return term + "@" + ITemporalize.timeStr(start);
+        } else
+            return term + "@ETE";
+    }
 }
