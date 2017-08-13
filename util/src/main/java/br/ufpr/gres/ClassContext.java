@@ -74,10 +74,6 @@ public class ClassContext {
         return this.target.isEmpty() || this.target.stream().anyMatch(p -> p.matches(newId));
     }
 
-    public List<MutationInfo> getCollectedMutations() {
-        return this.mutations;
-    }
-
     public void add(final MutationInfo details) {
         this.mutations.add(details);
     }

@@ -11,6 +11,7 @@ import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Subst;
+import nars.term.var.Variable;
 import nars.time.Tense;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +54,7 @@ public class Temporalize implements ITemporalize {
 
     @Override
     public @Nullable Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
-        dur = d.dur;
+        dur = Param.DITHER_DT ? d.dur : 1;
         return ITemporalize.super.solve(d, pattern, occ);
     }
 
@@ -71,19 +72,20 @@ public class Temporalize implements ITemporalize {
                 float t;
                 if (e instanceof AbsoluteEvent) {
                     if (((AbsoluteEvent) e).start != ETERNAL)
-                        t = 4; // * (1 + x.size()); //prefer non-eternal as it is more specific
+                        t = 2; // * (1 + x.size()); //prefer non-eternal as it is more specific
                     else
-                        t = 2;
+                        t = 0;
                 } else if (e instanceof TimeEvent) {
                     //if (((TimeEvent)e).
                     t = 2;
                 } else {
                     Term tr = ((RelativeEvent) e).rel;
 
-//                    if (tr.op() == NEG) //NEG relations are not trustable
-//                        s += 0.1;
-//                    else
-                    t = (1f / (1 + tr.size()));  //decrease according to the related term's size
+                    if (tr.op() == NEG) //NEG relations are not that valuable
+                        t = 0.1f;
+                    else
+                        t = 1;
+                    //  (1f / (1 + tr.size()));  //decrease according to the related term's size
 
                 }
                 s = Math.max(s, t);
@@ -328,8 +330,8 @@ public class Temporalize implements ITemporalize {
      */
     void know(@Nullable Event parent, Term x, int start, int end) {
 
-//        if (term instanceof Variable) // || (!term.hasAny(ATOM.bit | INT.bit)))
-//            return; //ignore variable's and completely-variablized's temporalities because it can conflict
+        if (x instanceof Variable) // || (!term.hasAny(ATOM.bit | INT.bit)))
+            return; //ignore variable's and completely-variablized's temporalities because it can conflict
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
         if (parent == null || parent.term != x) {
@@ -440,11 +442,11 @@ public class Temporalize implements ITemporalize {
         }
 
         switch (term.op()) {
-            case NEG:
-                Term u = term.unneg();
-                SortedSet<Event> m = constraints.computeIfAbsent(u, (t) -> new TreeSet<>());
-                m.add(relative(u, term, 0, term.dtRange()));
-                break;
+//            case NEG:
+//                Term u = term.unneg();
+//                SortedSet<Event> m = constraints.computeIfAbsent(u, (t) -> new TreeSet<>());
+//                m.add(relative(u, term, 0, term.dtRange()));
+//                break;
             case CONJ:
                 int tdt = term.dt();
                 if (tdt != XTERNAL) {
@@ -484,7 +486,7 @@ public class Temporalize implements ITemporalize {
 
 
         Time ph;
-        if (fullyEternal() && empty(trail) && x.op()!=IMPL && x.dt() != XTERNAL) {
+        if (fullyEternal() && empty(trail) && x.op() != IMPL && x.dt() != XTERNAL) {
             ph = Time.the(ETERNAL, 0); //glue
             knowTerm(x, ETERNAL); //everything will be relative to this, in eternity
         } else {
@@ -544,110 +546,133 @@ public class Temporalize implements ITemporalize {
                 return ss.neg();
             else
                 return null;
-        } else if (o.temporal && target.dt() == XTERNAL) {
-            TermContainer tt = target.subterms();
-
-            int tts = tt.size();
-            assert (tts > 1);
-
-            if (tts == 2) {
-
-
-                boolean dir = true; //forward
-                Term t0 = tt.sub(0);
-                Term t1 = tt.sub(1);
-
-                //decide subterm solution order intelligently: allow reverse if the 2nd subterm can more readily and absolutely temporalize
-                if (score(t1) > score(t0)  /* || t1.volume() > t0.volume()*/) {
-                    dir = false; //reverse: solve simpler subterm first
-                }
-
-                Event ea, eb;
-                if (dir) {
-                    //forward
-                    if ((ea = solve(t0, trail)) == null)
-                        return null;
-                    if ((eb = solve(t1, trail)) == null)
-                        return null;
-                } else {
-                    //reverse
-                    if ((eb = solve(t1, trail)) == null)
-                        return null;
-                    if ((ea = solve(t0, trail)) == null)
-                        return null;
-                }
-
-
-                Time at = ea.start(trail);
-
-                if (at != null) {
-
-                    Time bt = eb.start(trail);
-
-                    if (bt != null) {
-
-                        Term a = ea.term;
-                        Term b = eb.term;
-
-                        try {
-                            if (o == CONJ /*&& (a.op() == CONJ || b.op() == CONJ)*/) {
-                                //conjunction merge, since the results could overlap
-                                //either a or b, or both are conjunctions. and the result will be conjunction
-
-                                Event e = solveConj(a, at, b, bt);
-                                if (e != null)
-                                    return e;
-
-                            } else {
-
-                                Event e = solveTemporal(o, a, at, b, bt);
-                                if (e != null)
-                                    return e;
-
+        } else if (o.temporal) {
+            if (target.dt() != XTERNAL) {
+                //TODO verify that the provided subterm timing is correct.
+                // if so, return the input as-is
+                // if not, return null
+                if (target.op() == CONJ && target.size() == 2) {
+                    Term a = target.sub(0);
+                    Event ae = solve(a, trail);
+                    if (ae != null) {
+                        Term b = target.sub(1);
+                        Event be = solve(b, trail);
+                        if (be != null) {
+                            Time at = ae.start(trail);
+                            if (at != null) {
+                                Time bt = be.start(trail);
+                                if (bt != null) {
+                                    return solveConj(a, at, b, bt);
+                                }
                             }
-                        } catch (UnsupportedOperationException e) {
-                            logger.warn("temporalization solution: {}", e.getMessage());
-                            return null; //TODO
                         }
                     }
                 }
-            } else /* 3 or more, so dt=DTERNAL or dt=0 */ {
-                assert (tts > 2);
+            } else /*if (target.dt() == XTERNAL)*/ {
+                TermContainer tt = target.subterms();
+
+                int tts = tt.size();
+                assert (tts > 1);
+
+                if (tts == 2) {
+
+
+                    boolean dir = true; //forward
+                    Term t0 = tt.sub(0);
+                    Term t1 = tt.sub(1);
+
+                    //decide subterm solution order intelligently: allow reverse if the 2nd subterm can more readily and absolutely temporalize
+                    if (score(t1) > score(t0)  /* || t1.volume() > t0.volume()*/) {
+                        dir = false; //reverse: solve simpler subterm first
+                    }
+
+                    Event ea, eb;
+                    if (dir) {
+                        //forward
+                        if ((ea = solve(t0, trail)) == null)
+                            return null;
+                        if ((eb = solve(t1, trail)) == null)
+                            return null;
+                    } else {
+                        //reverse
+                        if ((eb = solve(t1, trail)) == null)
+                            return null;
+                        if ((ea = solve(t0, trail)) == null)
+                            return null;
+                    }
+
+
+                    Time at = ea.start(trail);
+
+                    if (at != null) {
+
+                        Time bt = eb.start(trail);
+
+                        if (bt != null) {
+
+                            Term a = ea.term;
+                            Term b = eb.term;
+
+                            try {
+                                if (o == CONJ /*&& (a.op() == CONJ || b.op() == CONJ)*/) {
+                                    //conjunction merge, since the results could overlap
+                                    //either a or b, or both are conjunctions. and the result will be conjunction
+
+                                    Event e = solveConj(a, at, b, bt);
+                                    if (e != null)
+                                        return e;
+
+                                } else {
+
+                                    Event e = solveTemporal(o, a, at, b, bt);
+                                    if (e != null)
+                                        return e;
+
+                                }
+                            } catch (UnsupportedOperationException e) {
+                                logger.warn("temporalization solution: {}", e.getMessage());
+                                return null; //TODO
+                            }
+                        }
+                    }
+                } else /* 3 or more, so dt=DTERNAL or dt=0 */ {
+                    assert (tts > 2);
 
                 /* HACK quick test for the exact appearance of temporalized form present in constraints */
 
-                Term[] a = target.subterms().toArray();
-                {
-                    @NotNull Term d = target.op().the(DTERNAL, a);
-                    if (!(d instanceof Bool)) {
-                        Event ds = solve(d, trail);
-                        if (ds != null)
-                            return ds;
-                    }
-                }
-                {
-                    @NotNull Term d = target.op().the(0, a);
-                    if (!(d instanceof Bool)) {
-                        Event ds = solve(d, trail);
-                        if (ds != null)
-                            return ds;
-                    }
-                }
-
-
-                Event s0 = solve(tt.sub(0), trail);
-                if (s0 != null) {
-                    Event s1 = solve(tt.sub(1), trail);
-                    if (s1 != null) {
-                        int dt = dt(s0, s1, trail);
-                        if (dt == 0 || dt == DTERNAL) {
-                            return new TimeEvent(this, o.the(dt, tt.toArray()), s0.start(trail));
-                        } else {
-                            return null; //invalid
+                    Term[] a = target.subterms().toArray();
+                    {
+                        @NotNull Term d = target.op().the(DTERNAL, a);
+                        if (!(d instanceof Bool)) {
+                            Event ds = solve(d, trail);
+                            if (ds != null)
+                                return ds;
                         }
                     }
-                }
+                    {
+                        @NotNull Term d = target.op().the(0, a);
+                        if (!(d instanceof Bool)) {
+                            Event ds = solve(d, trail);
+                            if (ds != null)
+                                return ds;
+                        }
+                    }
 
+
+                    Event s0 = solve(tt.sub(0), trail);
+                    if (s0 != null) {
+                        Event s1 = solve(tt.sub(1), trail);
+                        if (s1 != null) {
+                            int dt = dt(s0, s1, trail);
+                            if (dt == 0 || dt == DTERNAL) {
+                                return new TimeEvent(this, o.the(dt, tt.toArray()), s0.start(trail));
+                            } else {
+                                return null; //invalid
+                            }
+                        }
+                    }
+
+                }
             }
         }
 
@@ -655,7 +680,9 @@ public class Temporalize implements ITemporalize {
         /** compute the temporal intersection of all involved terms. if they are coherent, then
          * create the solved term as-is (since it will not contain any XTERNAL) with the appropriate
          * temporal bounds. */
-        if (o.statement) {
+        if (o.statement)
+
+        {
             //choose two absolute events which cover both 'a' and 'b' terms
             List<Event> relevant = $.newArrayList(); //maybe should be Set?
             Set<Term> uncovered = new HashSet();
@@ -722,7 +749,6 @@ public class Temporalize implements ITemporalize {
         } else if (ata == ETERNAL ^ bta == ETERNAL) {
             return null; //one is eternal the other isn't
         }
-
 
 
         Term newTerm = Op.conjMerge(a, ata, b, bta);

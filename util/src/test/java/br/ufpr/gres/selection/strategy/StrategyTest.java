@@ -59,6 +59,6 @@ public class StrategyTest {
 
         first.accept(mca, ClassReader.EXPAND_FRAMES);
 
-        return context.getCollectedMutations();
+        return context.mutations;
     }
 }

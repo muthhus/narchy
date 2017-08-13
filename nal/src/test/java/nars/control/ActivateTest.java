@@ -108,7 +108,7 @@ public class ActivateTest {
     @Test public void testTemplates3() throws Narsese.NarseseException {
         //layer 3:
         testTemplates("(open(John,door) ==> #x)",
-                "[#1, door, (John,door), open, (open(John,door) ==>+- #1), open(John,door), John]");
+                "[door, (John,door), (open(John,door) ==>+- #1), open, #1, open(John,door), John]");
     }
     @Test public void testTemplates4() throws Narsese.NarseseException {
         //dont descend past layer 3:

@@ -116,7 +116,7 @@ public final class Mutant {
 //            final List<MutationInfo> details = context.getMutationDetails(context.getTargetMutation().get(0));
 //            //System.out.println(details);
 //        } else {
-        ArrayList<MutationInfo> details = new ArrayList(context.getCollectedMutations());
+        ArrayList<MutationInfo> details = new ArrayList(context.mutations);
 
 
         for (MutationInfo detail : details) {
@@ -251,7 +251,7 @@ public final class Mutant {
         reader.accept(mca, ClassReader.EXPAND_FRAMES);
 
 
-        final List<MutationInfo> details = context.getCollectedMutations();
+        final List<MutationInfo> details = context.mutations;
 
         return new Mutant(context.getJavaClassName(), uuid, details.stream().filter(p -> p.getId().equals(id)).findFirst().get(), w.toByteArray());
     }
@@ -280,7 +280,7 @@ public final class Mutant {
 
         List<MutationInfo> details = new ArrayList<>();
 
-        for (MutationInfo detail : context.getCollectedMutations()) {
+        for (MutationInfo detail : context.mutations) {
             if (ids.stream().anyMatch(p -> p.equals(detail.getId()))) {
                 details.add(detail);
             }

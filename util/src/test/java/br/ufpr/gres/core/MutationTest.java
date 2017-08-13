@@ -145,7 +145,7 @@ public class MutationTest {
             final List<MutationInfo> details = context.getMutationDetails(context.target.get(0));
             System.out.println(details);
         } else {
-            ArrayList<MutationInfo> details = new ArrayList(context.getCollectedMutations());
+            ArrayList<MutationInfo> details = new ArrayList(context.mutations);
 
             for (IMutationOperator operator : mutators) {
                 for (MutationInfo detail : details.stream().filter(p -> p.getMutator().equals(operator.getName())).collect(toList())) {
@@ -161,7 +161,7 @@ public class MutationTest {
 
         }
 
-        ArrayList<MutationIdentifier> details = new ArrayList(context.getCollectedMutations().subList(0, 5).stream().map(MutationInfo::getId).collect(toList()));
+        ArrayList<MutationIdentifier> details = new ArrayList(context.mutations.subList(0, 5).stream().map(MutationInfo::getId).collect(toList()));
         System.out.println("Creating a mutant with order " + details.size());
 
         Mutant mutant = Mutant.get(details, classToMutate);

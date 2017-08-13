@@ -749,7 +749,7 @@ public interface Compound extends Term, IPair, TermContainer {
         }
 
         //atomic, including Bool short-circuits on invalid term
-        if (u instanceof Bool || u instanceof Variable || u.equals(this)) {
+        if (!(u.op().conceptualizable) || u.equals(this)) {
             return u; //return u and not this
         } else {
 

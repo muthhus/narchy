@@ -144,10 +144,14 @@ public class Conclusion extends AbstractPred<Derivation> {
             }
 
             //invalid or impossible temporalization; could not determine temporal attributes. seems this can happen normally
-            if (t1 == null || t1 instanceof Variable || t1 instanceof Bool /*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
+            if (t1 == null || !t1.op().conceptualizable/*|| (Math.abs(occReturn[0]) > 2047483628)*/ /* long cast here due to integer wraparound */) {
 //                            throw new InvalidTermException(c1.op(), c1.dt(), "temporalization failure"
 //                                    //+ (Param.DEBUG ? rule : ""), c1.toArray()
 //                            );
+
+                //FOR DEBUGGING
+//                if (t1==null)
+//                    new Temporalize(d.random).solve(d, c1, new long[]{ETERNAL, ETERNAL});
 
                 return true;
             }
