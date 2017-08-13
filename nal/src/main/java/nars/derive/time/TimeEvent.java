@@ -25,7 +25,7 @@ public class TimeEvent extends Event {
     }
 
     @Override
-    public @Nullable Time end(Map<Term, Time> trail) {
+    public @Nullable Time end(Map<Term, Time> ignored) {
         return time.add(dur);
     }
 
@@ -36,6 +36,13 @@ public class TimeEvent extends Event {
 
     @Override
     public String toString() {
-        return Event.str(term, start(null).abs(), end(null).abs());
+       if (dur == 0) {
+           if (time.offset==0)
+               return term +"@" + ITemporalize.timeStr(time.base);
+           else
+               return term + "@" + time;
+       } else {
+           return Event.str(term, start(null).abs(), end(null).abs());
+       }
     }
 }

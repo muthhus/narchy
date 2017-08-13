@@ -50,7 +50,7 @@ abstract public class DynamicTruthModel {
             else if (!(subConcept instanceof BaseConcept))
                 throw new RuntimeException("dynamically evaluated term should have only believable subterms");
 
-            int dt = superterm.subtermTime(subterm);
+            int dt = superterm.subtermTimeSafe(subterm);
             if (dt == DTERNAL)
                 dt = 0; //TODO maybe this should never happen, and if it does there is an error
 
