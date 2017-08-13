@@ -1,37 +1,32 @@
-
 description = ''
 dependencies {
-    compile group: 'javax.inject', name: 'javax.inject', version:'1'
-    compile group: 'org.jetbrains', name: 'annotations', version:'15.0'
-    compile group: 'org.eclipse.collections', name: 'eclipse-collections', version:'8.2.0'
-    compile group: 'com.conversantmedia', name: 'disruptor', version:'1.2.10'
-    compile group: 'org.fusesource.jansi', name: 'jansi', version:'1.16'
-    compile(group: 'io.thekraken', name: 'grok', version:'0.1.5') {
-exclude(module: 'gson')
+    compile group: 'javax.inject', name: 'javax.inject', version: '1'
+    compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
+    compile group: 'org.eclipse.collections', name: 'eclipse-collections', version: '8.2.0'
+    compile group: 'com.conversantmedia', name: 'disruptor', version: '1.2.10'
+    compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.16'
+    compile(group: 'io.thekraken', name: 'grok', version: '0.1.5') {
+        exclude(module: 'gson')
     }
-    compile group: 'tec.uom', name: 'uom-se', version:'1.0.8'
-    compile group: 'org.hdrhistogram', name: 'HdrHistogram', version:'2.1.9'
-    compile group: 'org.msgpack', name: 'jackson-dataformat-msgpack', version:'0.8.13'
-    compile group: 'org.roaringbitmap', name: 'RoaringBitmap', version:'0.6.47'
-    compile group: 'com.google.guava', name: 'guava', version:'23.0'
-    compile group: 'org.ow2.asm', name: 'asm-debug-all', version:'6.0_BETA'
-    compile group: 'net.bytebuddy', name: 'byte-buddy', version:'1.7.2'
-    compile group: 'org.apache.commons', name: 'commons-math3', version:'3.6.1'
-    compile group: 'org.slf4j', name: 'slf4j-api', version:'1.7.25'
-    compile(group: 'ch.qos.logback', name: 'logback-classic', version:'1.2.3') {
-exclude(module: 'slf4j-api')
+    compile group: 'tec.uom', name: 'uom-se', version: '1.0.8'
+    compile group: 'org.hdrhistogram', name: 'HdrHistogram', version: '2.1.9'
+    compile group: 'org.msgpack', name: 'jackson-dataformat-msgpack', version: '0.8.13'
+    compile group: 'org.roaringbitmap', name: 'RoaringBitmap', version: '0.6.47'
+    compile group: 'com.google.guava', name: 'guava', version: '23.0'
+    compile group: 'org.ow2.asm', name: 'asm-debug-all', version: '6.0_BETA'
+    compile group: 'net.bytebuddy', name: 'byte-buddy', version: '1.7.2'
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+    compile(group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3') {
+        exclude(module: 'slf4j-api')
     }
-    compile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version:'5.0.0-RC2'
-    compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version:'5.0.0-RC2'
-    compile group: 'org.junit.vintage', name: 'junit-vintage-engine', version:'4.12.0-RC2'
-    compile group: 'org.junit.platform', name: 'junit-platform-runner', version:'1.0.0-RC2'
-    compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version:'2.5.4'
-    compile(group: 'net.openhft', name: 'affinity', version:'3.1.0') {
-exclude(module: 'slf4j-api')
+    compile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.0-RC2'
+    compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.0.0-RC2'
+    compile group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '4.12.0-RC2'
+    compile group: 'org.junit.platform', name: 'junit-platform-runner', version: '1.0.0-RC2'
+    compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.5.4'
+    compile(group: 'net.openhft', name: 'affinity', version: '3.1.0') {
+        exclude(module: 'slf4j-api')
     }
-    compile group: 'org.iq80.snappy', name: 'snappy', version:'0.4'
-    testCompile(group: 'org.mockito', name: 'mockito-core', version:'2.8.47') {
-exclude(module: 'byte-buddy')
-exclude(module: 'objenesis')
-    }
+    compile group: 'org.iq80.snappy', name: 'snappy', version: '0.4'
 }

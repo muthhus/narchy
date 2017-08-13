@@ -115,8 +115,8 @@ public class TemporalizeTest {
     @Test
     public void testEventize3() throws Narsese.NarseseException {
 
-        assertEquals("(x)@0,(x)@-1->(y),((x) &&+1 (y))@[0..1],((x) &&+1 (y))@[-2..-1]->(z),(((x) &&+1 (y)) &&+1 (z))@[0..2],(z)@2,(z)@2->((x) &&+1 (y)),(y)@1,(y)@1->(x)", new Temporalize()
-                .knowTerm($("(((x) &&+1 (y)) &&+1 (z))"), 0).toString());
+        assertEquals("(z)@2,(z)@2->((x) &&+1 (y)),(y)@1,(y)@1->(x),((x) &&+1 (y))@[0..1],((x) &&+1 (y))@[-2..-1]->(z),(((x) &&+1 (y)) &&+1 (z))@[0..2],(x)@0,(x)@-1->(y)",
+                new Temporalize().knowTerm($("(((x) &&+1 (y)) &&+1 (z))"), 0).toString());
     }
 
     @Test
@@ -137,7 +137,7 @@ public class TemporalizeTest {
     public void testEventize2c() throws Narsese.NarseseException {
 
         Temporalize t = new Temporalize().knowTerm($("(a &&+2 (b &&+2 c))"), 0);
-        assertEquals("((a &&+2 b) &&+2 c)@[0..4],b@2,b@2->a,a@0,a@-2->b,(a &&+2 b)@[0..2],(a &&+2 b)@[-4..-2]->c,c@4,c@4->(a &&+2 b)", t.toString());
+        assertEquals("((a &&+2 b) &&+2 c)@[0..4],b@2,b@2->a,a@0,a@-2->b,c@4,c@4->(a &&+2 b),(a &&+2 b)@[0..2],(a &&+2 b)@[-4..-2]->c", t.toString());
     }
 
     @Test
@@ -150,7 +150,7 @@ public class TemporalizeTest {
     @Test
     public void testEventize2e() throws Narsese.NarseseException {
 
-        assertEquals("b@-2,b@-2->a,(a ==>-2 b)@0,a@0,a@2->b",
+        assertEquals("(a ==>-2 b)@0,b@-2,b@-2->a,a@0,a@2->b",
                 new Temporalize().knowTerm($("(a ==>-2 b)"), 0).toString());
     }
 
@@ -168,19 +168,19 @@ public class TemporalizeTest {
 
     @Test
     public void testEventizeImplConj() throws Narsese.NarseseException {
-        assertEquals("((a &&+2 b) ==>+3 c)@0,b@2,b@2->a,a@0,a@-2->b,(a &&+2 b)@[0..2],(a &&+2 b)@[-5..-3]->c,c@5,c@5->(a &&+2 b)",
+        assertEquals("((a &&+2 b) ==>+3 c)@0,b@2,b@2->a,a@0,a@-2->b,c@5,c@5->(a &&+2 b),(a &&+2 b)@[0..2],(a &&+2 b)@[-5..-3]->c",
                 new Temporalize().knowTerm($("((a &&+2 b) ==>+3 c)"), 0).toString());
     }
 
     @Test
     public void testEventizeCrossDir1() throws Narsese.NarseseException {
-        assertEquals("b@2,b@2->a,((a &&+2 b) ==>-3 c)@0,a@0,a@-2->b,(a &&+2 b)@[0..2],(a &&+2 b)@[1..3]->c,c@-1,c@-1->(a &&+2 b)",
+        assertEquals("((a &&+2 b) ==>-3 c)@0,b@2,b@2->a,a@0,a@-2->b,c@-1,c@-1->(a &&+2 b),(a &&+2 b)@[0..2],(a &&+2 b)@[1..3]->c",
                 new Temporalize().knowTerm($("((a &&+2 b) ==>-3 c)"), 0).toString());
     }
 
     @Test
     public void testEventizeCrossDirETERNAL() throws Narsese.NarseseException {
-        assertEquals("b@2->((a &&+2 b) ==>-3 c),b@2->a,((a &&+2 b) ==>-3 c)@ETE,a@0->((a &&+2 b) ==>-3 c),a@-2->b,(a &&+2 b)@[0..2]->((a &&+2 b) ==>-3 c),(a &&+2 b)@[1..3]->c,c@-1->((a &&+2 b) ==>-3 c),c@-1->(a &&+2 b)",
+        assertEquals("((a &&+2 b) ==>-3 c)@ETE,b@2->((a &&+2 b) ==>-3 c),b@2->a,a@0->((a &&+2 b) ==>-3 c),a@-2->b,c@-1->((a &&+2 b) ==>-3 c),c@-1->(a &&+2 b),(a &&+2 b)@[0..2]->((a &&+2 b) ==>-3 c),(a &&+2 b)@[1..3]->c",
                 new Temporalize().knowTerm($("((a &&+2 b) ==>-3 c)"), ETERNAL).toString());
     }
 

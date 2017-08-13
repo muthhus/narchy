@@ -34,6 +34,10 @@ public abstract class Param extends Services<Term,NAR> {
      * */
     public static final boolean REVECTION_MERGE_OR_CHOOSE = false;
 
+    /** how many INT terms are canonically interned/cached. [0..n) */
+    public final static int MAX_CACHED_INTS = 64;
+
+
     /**
      * use this for advanced error checking, at the expense of lower performance.
      * it is enabled for unit tests automatically regardless of the value here.

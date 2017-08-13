@@ -91,6 +91,8 @@ public class Conclusion extends AbstractPred<Derivation> {
 //            b1 = b2;
 //        }
         assert (b1.varPattern() == 0);
+        if (!b1.op().conceptualizable)
+            return true;
 
         /// 2. EVAL ----
 
@@ -99,8 +101,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         nar.emotion.derivationEval.increment();
 
         Term c1 = b1.eval(d); //TODO cache pure eval terms
-
-        if (c1!=null && (c1 instanceof Variable || c1 instanceof Bool))
+        if (!c1.op().conceptualizable)
             return true;
 
         // 3. VAR INTRO

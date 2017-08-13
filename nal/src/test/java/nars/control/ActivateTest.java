@@ -98,12 +98,12 @@ public class ActivateTest {
 
         //layer 1:
         testTemplates("open:door",
-                "[door, open, (door-->open)]");
+                "[door, (door-->open), open]");
     }
     @Test public void testTemplates2() throws Narsese.NarseseException {
         //layer 2:
         testTemplates("open(John,door)",
-                "[(John,door), open, door, open(John,door), John]");
+                "[open, door, John, open(John,door), (John,door)]");
     }
     @Test public void testTemplates3() throws Narsese.NarseseException {
         //layer 3:
@@ -113,7 +113,7 @@ public class ActivateTest {
     @Test public void testTemplates4() throws Narsese.NarseseException {
         //dont descend past layer 3:
         testTemplates("(open(John,portal:interdimensional) ==> #x)",
-                "[open(John,(interdimensional-->portal)), #1, (John,(interdimensional-->portal)), (interdimensional-->portal), open, John, (open(John,(interdimensional-->portal)) ==>+- #1)]");
+                "[(John,(interdimensional-->portal)), open(John,(interdimensional-->portal)), open, (open(John,(interdimensional-->portal)) ==>+- #1), (interdimensional-->portal), #1, John]");
     }
 
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {

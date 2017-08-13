@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 public class NAL8Test extends AbstractNALTest {
 
-    final int cycles = 430;
+    public static final int cycles = 430;
 
 
 
@@ -418,23 +418,6 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric
     }
 
-    @Test
-    public void testPosGoalEquivalenceSpreading() {
-
-        test
-                .input("(R)!")
-                .input("((G) <=> (R)).")
-                .mustDesire(cycles, "(G)", 1.0f, 0.81f);
-    }
-
-    @Test
-    public void testNegatedGoalEquivalenceSpreading() {
-
-        test
-                .input("--(R)!")
-                .input("((G) <=> (R)).")
-                .mustDesire(cycles, "(G)", 0.0f, 0.81f);
-    }
 
 
 //    @Test public void testInheritanceCompositionTemporal() {
@@ -552,24 +535,7 @@ public class NAL8Test extends AbstractNALTest {
                 .mustDesire(cycles, "(b)", 0f, 0.81f);
     }
 
-    @Test
-    public void testGoalEquivComponent() {
 
-        test
-                .input("(happy)!")
-                .input("((happy) <=>+0 ((--,(x)) &| (--,(out)))).")
-                .mustDesire(cycles, "((--,(x)) &| (--,(out)))", 1f, 0.81f);
-    }
-
-    @Test
-    public void testGoalEquivComponentNeg() {
-
-        test
-                .log()
-                .input("(happy)!")
-                .input("(--(happy) <=>+0 ((--,(x))&&(--,(out)))).")
-                .mustDesire(cycles, "((--,(x))&&(--,(out)))", 0f, 0.81f);
-    }
 
     @Test
     public void testGoalImplComponentEternal() {
@@ -626,15 +592,7 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-    @Test
-    public void testPredictiveEquivalenceTemporalTemporal() {
 
-        test
-                .inputAt(0, "((out) <=>-3 (happy)). :|:")
-                .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
-                .mustNotOutput(cycles, "(out)", GOAL, 3);
-    }
 
 
     @Test

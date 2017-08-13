@@ -1,14 +1,13 @@
-
 description = ''
 dependencies {
-  compile project(':util')
-  compile project(':gp')
-  compile project(':app')
-    compile(group: 'org.reflections', name: 'reflections', version:'0.9.11') {
-exclude(module: 'guava')
-exclude(module: 'javassist')
+    compile project(':util')
+    compile project(':gp')
+    compile project(':app')
+    compile(group: 'org.reflections', name: 'reflections', version: '0.9.11') {
+        exclude(module: 'guava')
+        exclude(module: 'javassist')
     }
-    compile group: 'net.java.jinput', name: 'jinput', version:'2.0.7'
-    compile group: 'org.jogamp.joal', name: 'joal-main', version:'2.3.2'
-    testCompile group: 'junit', name: 'junit', version:'4.12'
+    compile group: 'net.java.jinput', name: 'jinput', version: '2.0.7'
+    compile group: 'org.jogamp.joal', name: 'joal-main', version: '2.3.2'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }

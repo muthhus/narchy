@@ -46,11 +46,6 @@ public enum Op implements $ {
 
     ATOM(".", Op.ANY_LEVEL, OpType.Other),
 
-    VAR_INDEP('$', 6 /*NAL6 for Indep Vars */, OpType.Variable),
-    VAR_DEP('#', Op.ANY_LEVEL, OpType.Variable),
-    VAR_QUERY('?', Op.ANY_LEVEL, OpType.Variable),
-
-
     NEG("--", 5, Args.One) {
         private Term neg(Term x) {
             if (x instanceof Bool || x.op() == NEG)
@@ -137,8 +132,10 @@ public enum Op implements $ {
 
 
             final int n = tt.length;
-            assert (n > 0);
             switch (n) {
+
+                case 0:
+                    return True;
 
                 case 1:
                     Term only = tt[0];
@@ -453,7 +450,6 @@ public enum Op implements $ {
     },
 
 
-    //SPACE("+", true, 7, Args.GTEOne),
 
     /**
      * intensional set
@@ -482,16 +478,18 @@ public enum Op implements $ {
     IMPL("==>", 5, OpType.Statement, Args.Two),
 
 
-    // keep all items which are invlved in the lower 32 bit structuralHash above this line
-    // so that any of their ordinal values will not exceed 31
-    //-------------
-    //NONE('\u2205', Op.ANY, null),
+    ///-----------------------------------------------------
+
+
+    VAR_DEP('#', Op.ANY_LEVEL, OpType.Variable),
+    VAR_INDEP('$', 6 /*NAL6 for Indep Vars */, OpType.Variable),
+    VAR_QUERY('?', Op.ANY_LEVEL, OpType.Variable),
+    VAR_PATTERN('%', Op.ANY_LEVEL, OpType.Variable),
 
     INT("+", Op.ANY_LEVEL, OpType.Other) {
 
     },
-
-    VAR_PATTERN('%', Op.ANY_LEVEL, OpType.Variable),
+    //SPACE("+", true, 7, Args.GTEOne),
 
 
     //VIRTUAL TERMS
@@ -895,6 +893,7 @@ public enum Op implements $ {
                 allowsBool = false;
                 break;
         }
+
         conceptualizable = !(var || virtual || str.equals("+") /* INT */);
     }
 

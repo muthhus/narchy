@@ -6,6 +6,7 @@ import jcog.Util;
 import jcog.math.Interval;
 import nars.$;
 import nars.Op;
+import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.api.list.primitive.ByteList;
@@ -29,7 +30,7 @@ public class Int implements Intlike {
 
 
     public static Int the(int i) {
-        if (i >= 0 && i < MAX_CACHED_INTS) {
+        if (i >= 0 && i < Param.MAX_CACHED_INTS) {
             return digits[i];
         } else {
             return new Int(i);
@@ -46,11 +47,10 @@ public class Int implements Intlike {
 
     public final int id;
 
-    final static int MAX_CACHED_INTS = 128;
-    private static final Int[] digits = new Int[MAX_CACHED_INTS];
+    private static final Int[] digits = new Int[Param.MAX_CACHED_INTS];
 
     static {
-        for (int i = 0; i < MAX_CACHED_INTS; i++) {
+        for (int i = 0; i < Param.MAX_CACHED_INTS; i++) {
             digits[i] = new Int(i);
         }
     }

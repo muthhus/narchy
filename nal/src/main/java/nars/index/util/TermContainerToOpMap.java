@@ -15,7 +15,7 @@ public class TermContainerToOpMap<X>
 
     public final TermContainer id;
 
-    public final static int CAPACITY = Op.values().length - (4);
+    public final static int CAPACITY = Op.VAR_DEP.id; //everything below VAR_DEP
 
     public TermContainerToOpMap(TermContainer id) {
         super(CAPACITY);

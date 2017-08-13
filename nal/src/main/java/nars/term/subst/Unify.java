@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static jcog.data.UnenforcedConcatSet.concat;
-import static nars.Op.Null;
+import static nars.Op.*;
 import static nars.Param.TTL_UNIFY;
 
 
@@ -121,14 +121,22 @@ public abstract class Unify extends Versioning implements Subst {
     @Nullable
     @Override
     public Term xy(@NotNull Term x0) {
-        Term xy = x0, y0 = null, y = null;
-        while ((xy = this.xy.get(xy))!=null) { //completely dereference
-            if (y0!=null && xy.equals(y0))
-                return y0;
-            y0 = y;
+
+        Term xy = x0, y = null;
+        while ((xy = this.xy.get(xy)) != null) { //completely dereference
             y = xy;
         }
         return y;
+
+        //SAFE VERSION:
+//        Term xy = x0, y0 = null, y = null;
+//        while ((xy = this.xy.get(xy))!=null) { //completely dereference
+//            if (y0!=null && xy.equals(y0))
+//                return y0;
+//            y0 = y;
+//            y = xy;
+//        }
+//        return y;
 
         //return xy.get(t);
     }
@@ -281,12 +289,12 @@ public abstract class Unify extends Versioning implements Subst {
             if (y instanceof CommonVariable)
                 return false; //TODO support merging common variables
 
-            if (((CommonVariable) x).common((AbstractVariable)y))
+            if (((CommonVariable) x).common((AbstractVariable) y))
                 return true;
         }
 
         if (y instanceof CommonVariable) {
-            if (((CommonVariable) y).common((AbstractVariable)x))
+            if (((CommonVariable) y).common((AbstractVariable) x))
                 return true;
         }
 
@@ -316,17 +324,23 @@ public abstract class Unify extends Versioning implements Subst {
             return unify(y0, y);
         } else /*if (matchType(x0))*/ {
 
-            if (x instanceof Variable && x.op() == y.op()) {
+            if (x instanceof Variable) {
+                if (x.op() == y.op()) {
 
-                assert(!(y instanceof UnnormalizedVariable) || (y instanceof CommonVariable)):
-                        y + " (" + y.getClass() + ") is unnormalized: " + this + " unifying terms containing an unnormalized variable";
+                    assert (!(y instanceof UnnormalizedVariable) || (y instanceof CommonVariable)) :
+                            y + " (" + y.getClass() + ") is unnormalized: " + this + " unifying terms containing an unnormalized variable";
 
-                //TODO check if this is already a common variable containing y
-                return putCommon((Variable) x, (Variable) y);
-            } /*else {
-                //TODO to prevent certain variables from being assigned to other ones?
-            }*/
+                    //TODO check if this is already a common variable containing y
+                    return putCommon((Variable) x, (Variable) y);
+                } else if (y instanceof Variable) {
 
+                    //break any circular dependency between variables that common variable wouldnt solve
+                    //relies on a specific ordering of the variable enum values
+                    if (x.op().id < y.op().id)
+                        return false;
+
+                }
+            }
 
 
             if (xy.tryPut(x, y)) {
