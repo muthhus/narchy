@@ -301,6 +301,10 @@ public interface Concept extends Termed {
 
     Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests);
 
+    default Stream<Task> tasks() {
+        return tasks(true,true,true,true);
+    }
+
 
     /**
      * Created by me on 9/13/16.

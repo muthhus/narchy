@@ -1,11 +1,9 @@
 package nars.experiment.tetris;
 
 import jcog.data.FloatParam;
-import nars.InterNAR;
-import nars.NAR;
-import nars.NAgentX;
-import nars.Narsese;
+import nars.*;
 import nars.experiment.tetris.impl.TetrisState;
+import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
@@ -766,6 +764,28 @@ public class Tetris extends NAgentX implements Bitmap2D {
         }
     }
 
+    public static class OfflineTetris {
+        public static void main(String[] args) throws Narsese.NarseseException {
+            Param.DEBUG = true;
+
+            NAR n = NARS.tmp();
+            n.time.dur(4);
+            n.truthResolution.setValue(0.1f);
+            //new Abbreviation(n, "z", 3, 8, 0.1f, 32);
+
+            new MyTetris(n);
+            n.run(200);
+
+            n.concepts().forEach(c -> {
+                System.out.println(c);
+                c.tasks().forEach(t -> {
+                    System.out.println("\t" + t.toString(n, true));
+                });
+                System.out.println();
+            });
+            n.stats(System.out);
+        }
+    }
 
     //    public static class NARController extends NAgent {
 //

@@ -1,5 +1,6 @@
 package nars.derive;
 
+import jcog.Util;
 import nars.$;
 import nars.NAR;
 import nars.Param;
@@ -10,6 +11,7 @@ import nars.derive.time.Temporalize;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
+import nars.task.NALTask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.atom.Bool;
@@ -27,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Map;
 
 import static nars.Op.GOAL;
+import static nars.Param.FILTER_SIMILAR_DERIVATIONS;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
@@ -230,11 +233,13 @@ public class Conclusion extends AbstractPred<Derivation> {
                             new DebugDerivedTask(C, punc, truth, d, start, end, cause) :
                             new DerivedTask(C, punc, truth, d, start, end, cause);
 
-            if (t.equals(d.task) || (d.belief!=null && t.equals(d.belief))) {
+            t.setPri(priority);
+
+            if (same(t, d.task, d.truthResolution) || (d.belief!=null && same(t, d.belief, d.truthResolution))) {
+                d.use(Param.TTL_DERIVE_TASK_SAME);
                 return true; //created a duplicate of the task
             }
 
-            t.setPri(priority);
 
             if (Param.DEBUG)
                 t.log(rule);
@@ -246,6 +251,28 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         d.use(Param.TTL_DERIVE_TASK_FAIL);
         return true;
+    }
+
+    private boolean same(Task derived, @Nullable Task parent, float truthResolution) {
+        if (derived.equals(parent)) return true;
+
+        if (FILTER_SIMILAR_DERIVATIONS) {
+            //test for same punc, term, start/end, freq, but different conf
+            if (parent.term().equals(derived.term()) && parent.punc() == derived.punc() && parent.start() == derived.start() && parent.end() == derived.end()) {
+                if (parent.isQuestOrQuestion() ||
+                        (Util.equals(parent.freq(), derived.freq(), truthResolution) &&
+                                parent.evi() >= derived.evi() )
+                        ) {
+                    if (Param.DEBUG_SIMILAR_DERIVATIONS)
+                        logger.warn("similar derivation to parent:\n\t{} {}\n\t{}", derived, parent, rule);
+
+                    //((NALTask)parent).merge(derived);
+                    parent.priMax(derived.priElseZero());
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 

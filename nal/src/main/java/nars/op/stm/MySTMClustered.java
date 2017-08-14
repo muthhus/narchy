@@ -11,6 +11,7 @@ import nars.Task;
 import nars.control.CauseChannel;
 import nars.task.NALTask;
 import nars.term.Term;
+import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.TruthFunctions;
 import nars.util.BudgetFunctions;
@@ -234,29 +235,30 @@ public class MySTMClustered extends STMClustered {
 
                         Task[] uu = vv.values().toArray(new Task[vs]);
 
-                        //float confMin = (float) Stream.of(uu).mapToDouble(Task::conf).min().getAsDouble();
-                        float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
-                        if (conf < confMin)
-                            return null;
-
-
                         @Nullable Term conj = conj(uu);
                         if (conj == null)
                             return null;
 
                         @Nullable ObjectBooleanPair<Term> cp = Task.tryContent(conj, punc, true);
                         if (cp != null) {
-                            int uuLen = uu.length;
-                            long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
 
-                            NALTask m = new NALTask(cp.getOne(), punc,
-                                    $.t(finalFreq, conf).negIf(cp.getTwo()).ditherFreqConf(truthRes, truthRes, 1f), now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
-                            float maxPri = new FasterList<>(uuLen, uu)
-                                    .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
 
-                            m.setPri(BudgetFunctions.fund(maxPri, false, uu));
-                            return m;
+                            float conf = TruthFunctions.confAnd(uu); //used for emulation of 'intersection' truth function
+                            PreciseTruth t = $.t(finalFreq, conf).negIf(cp.getTwo()).ditherFreqConf(truthRes, confMin, 1f);
+                            if (t!=null) {
+
+                                int uuLen = uu.length;
+                                long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
+                                NALTask m = new NALTask(cp.getOne(), punc,
+                                        t, now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+
+                                float maxPri = new FasterList<>(uuLen, uu)
+                                        .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
+
+                                m.setPri(BudgetFunctions.fund(maxPri, false, uu));
+                                return m;
+                            }
 
                         }
 

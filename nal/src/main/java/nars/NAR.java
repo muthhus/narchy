@@ -1245,15 +1245,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return this;
     }
 
-    @NotNull
-    public NAR forEachTaskConcept(@NotNull Consumer<BaseConcept> recip) {
-        forEachConcept(c -> {
-            if (c instanceof BaseConcept)
-                recip.accept((BaseConcept) c);
-        });
-        return this;
-    }
-
 
 //    /**
 //     * activate the concept and other features (termlinks, etc)

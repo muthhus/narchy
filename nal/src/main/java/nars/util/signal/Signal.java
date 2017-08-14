@@ -89,7 +89,7 @@ public class Signal extends AtomicReference<SignalTask> {
                 if (current == null ||
                         current.isDeleted() ||
                         (!current.truth.equals(nextTruth, nar.truthResolution.floatValue()) ||
-                                (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - current.start() > nar.dur() * Param.SIGNAL_LATCH_TIME_MAX)
+                                (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - current.start() >= nar.dur() * Param.SIGNAL_LATCH_TIME_MAX)
                         )) {
 
 

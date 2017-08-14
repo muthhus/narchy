@@ -30,6 +30,7 @@ import java.util.Set;
 import static nars.$.$;
 import static nars.Op.*;
 import static nars.derive.match.Ellipsis.firstEllipsis;
+import static nars.time.Tense.DTERNAL;
 import static org.junit.Assert.*;
 
 /**
@@ -495,14 +496,14 @@ public class EllipsisTest {
             if (o.statement) continue;
 
             if (o!=DIFFe && o!=DIFFi) {
-                assertEquals(o + " with normal term", a, $.the(o, a));
+                assertEquals(o + " with normal term", a, o.the(DTERNAL, a));
             } else {
-                assertEquals(Null, $.the(o, a));
+                assertEquals(Null, o.the(DTERNAL, a));
             }
 
             assertEquals(o + " with ellipsis not reduced",
                     o.statement ? VAR_PATTERN : o,
-                    $.the(o,b).op());
+                    o.the(DTERNAL, b).op());
         }
     }
 

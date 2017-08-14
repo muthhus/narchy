@@ -4,7 +4,6 @@ import jcog.Texts;
 import jcog.Util;
 import jcog.data.sorted.SortedList;
 import jcog.list.FasterList;
-import nars.$;
 import nars.Op;
 import nars.index.term.TermIndex;
 import nars.term.atom.Atom;
@@ -703,7 +702,7 @@ public enum Terms {
                 return (Term) (as > bs ? a : b);
             }
         }
-        return $.the(o, t);
+        return o.the(DTERNAL, t);
     }
 
     public static boolean reflex(@NotNull Term sub0, @NotNull Term sub1) {

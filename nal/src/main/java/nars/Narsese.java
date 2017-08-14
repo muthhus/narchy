@@ -484,7 +484,7 @@ public class Narsese extends BaseParser<Object> {
                                         MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false)
                                 ),
 
-                                push($.the(INH, (Term) pop(), (Term) $.the(pop())))
+                                push(INH.the(DTERNAL, (Term) pop(), (Term) $.the(pop())))
 
                         ),
 

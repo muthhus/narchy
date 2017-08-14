@@ -38,6 +38,10 @@ public abstract class Param extends Services<Term,NAR> {
     public final static int MAX_CACHED_INTS = 64;
 
 
+    public static final boolean FILTER_SIMILAR_DERIVATIONS = true;
+    public static final boolean DEBUG_SIMILAR_DERIVATIONS = false;
+
+
     /**
      * use this for advanced error checking, at the expense of lower performance.
      * it is enabled for unit tests automatically regardless of the value here.
@@ -85,6 +89,9 @@ public abstract class Param extends Services<Term,NAR> {
 
     /** cost of a successful task derivation */
     public static final int TTL_DERIVE_TASK_SUCCESS = 1;
+
+    /** cost of a task derived, but too similar to one of its parents */
+    public static final int TTL_DERIVE_TASK_SAME = 1;
 
     /** cost of a failed/aborted task derivation */
     public static final int TTL_DERIVE_TASK_FAIL = 1;

@@ -130,7 +130,7 @@ public interface $ {
      */
     @Nullable
     public static <T extends Term> T inh(Term subj, Term pred) {
-        return (T) the(INH, subj, pred);
+        return (T) INH.the(DTERNAL, subj, pred);
     }
 
     public static <T extends Term> T inh(Term subj, String pred) {
@@ -146,7 +146,7 @@ public interface $ {
 
     @NotNull
     public static <T extends Term> T sim(@NotNull Term subj, @NotNull Term pred) {
-        return (T) the(SIM, subj, pred);
+        return (T) SIM.the(DTERNAL, subj, pred);
     }
 
 
@@ -175,12 +175,12 @@ public interface $ {
 
     @NotNull
     public static <T extends Term> T impl(@NotNull Term a, @NotNull Term b) {
-        return (T) the(IMPL, a, b);
+        return (T) IMPL.the(DTERNAL, a, b);
     }
 
     @NotNull
     public static <T extends Term> T impl(@NotNull Term a, int dt, @NotNull Term b) {
-        return (T) the(IMPL, dt, a, b);
+        return (T) IMPL.the(dt, a, b);
     }
 
     @NotNull
@@ -200,7 +200,7 @@ public interface $ {
 
     @NotNull
     public static Term p(@NotNull Term... t) {
-        return (t.length == 0) ? ZeroProduct : the(PROD, t);
+        return (t.length == 0) ? ZeroProduct : PROD.the(DTERNAL, t);
     }
 
     @NotNull
@@ -341,7 +341,7 @@ public interface $ {
 
     @NotNull
     public static Term sete(@NotNull Collection<? extends Term> t) {
-        return the(SETe, (Collection) t);
+        return SETe.the(DTERNAL, (Collection) t);
     }
 
     /**
@@ -403,7 +403,7 @@ public interface $ {
 
     @NotNull
     public static Term sete(Term... t) {
-        return the(SETe, t);
+        return SETe.the(DTERNAL, t);
 
     }
 
@@ -417,7 +417,7 @@ public interface $ {
 
     @NotNull
     public static Term seti(Term... t) {
-        return the(SETi, t);
+        return SETi.the(DTERNAL, t);
     }
 
 //    /**
@@ -449,7 +449,7 @@ public interface $ {
 
     @Nullable
     public static <T extends Term> T conj(Term... a) {
-        return (T) the(CONJ, a);
+        return (T) CONJ.the(DTERNAL, a);
     }
 
     @Nullable
@@ -463,7 +463,7 @@ public interface $ {
         for (Term t : append) {
             ca[i++] = t;
         }
-        return the(CONJ, ca);
+        return CONJ.the(DTERNAL, ca);
     }
 
 
@@ -472,12 +472,12 @@ public interface $ {
      */
     @Nullable
     public static <T extends Term> T parallel(Term... s) {
-        return (T) the(CONJ, 0, s);
+        return (T) CONJ.the(0, s);
     }
 
     @Nullable
     public static Term parallel(@NotNull Collection<Term> s) {
-        return the(CONJ, 0, s);
+        return CONJ.the(0, s);
     }
 
     @Nullable
@@ -555,49 +555,24 @@ public interface $ {
 
     @Nullable
     public static Term diffi(Term a, Term b) {
-        return the(DIFFi, a, b);
+        return DIFFi.the(DTERNAL, a, b);
     }
 
     @Nullable
     public static Term diffe(Term a, Term b) {
-        return the(DIFFe, a, b);
+        return DIFFe.the(DTERNAL, a, b);
     }
 
 
     @Nullable
     public static Term secte(Term... x) {
-        return the(SECTe, x);
+        return SECTe.the(DTERNAL, x);
     }
 
 
     @Nullable
     public static Term secti(Term... x) {
-        return the(SECTi, x);
-    }
-
-
-    @NotNull
-    public static Term the(@NotNull Op op, Term... subterms) {
-        return the(op, DTERNAL, subterms);
-    }
-
-    @NotNull
-    public static Term the(@NotNull Op op, int dt, @NotNull Term... subterms) {
-        return op.the(dt, subterms);
-    }
-
-    @Nullable
-    public static Term the(@NotNull Op op, @NotNull Collection<Term> subterms) {
-        return the(op, DTERNAL, subterms);
-    }
-
-    //    @Nullable
-//    public static Term compound(@NotNull Op op, int dt, @NotNull TermContainer subterms) {
-//        return terms.the(op, dt, subterms);
-//    }
-    @Nullable
-    public static Term the(@NotNull Op op, int dt, @NotNull Collection<Term> subterms) {
-        return the(op, dt, subterms.toArray(new Term[subterms.size()]));
+        return SECTi.the(DTERNAL, x);
     }
 
 
