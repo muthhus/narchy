@@ -135,7 +135,7 @@ abstract public class NAgentX extends NAgent {
                 .time(clock)
                 .index(
                         //new CaffeineIndex(128 * 1024)
-                        new CaffeineIndex2(128 * 1024)
+                        new CaffeineIndex2(256 * 1024)
                         //new HijackTermIndex(128 * 1024,  4)
                 )
                 .get();
@@ -146,7 +146,7 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.5f);
+        n.goalConfidence(0.7f);
 
 
         float priFactor = 0.25f;
@@ -154,15 +154,15 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
-        n.termVolumeMax.setValue(28);
+        n.termVolumeMax.setValue(24);
 
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
         MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, false, 4f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
-        MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, false, 4f);
+        MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 2f);
         Inperience inp = new Inperience(n, 8, 0.02f);
-        Abbreviation abb = new Abbreviation(n, "z", 3, 9, 0.1f, 32);
+        Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
 
 
         NAgent a = init.apply(n);
