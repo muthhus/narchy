@@ -403,10 +403,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     /**
      * to the interval [x,y]
      */
-    default long nearestStartOrEnd(long x, long y) {
+    default long nearestTimeBetween(final long x, final long y) {
         long a = this.start();
         if (a == ETERNAL)
-            return ETERNAL;
+            throw new UnsupportedOperationException();
+
         long b = this.end();
         if (x == y) {
             return nearestStartOrEnd(a, b, x);
@@ -415,15 +416,28 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                 return nearestStartOrEnd(x, y, a);
             } else {
                 //HACK there is probably a better way
-                long u = nearestStartOrEnd(a, b, x);
-                long v = nearestStartOrEnd(a, b, y);
-                if (Math.min(Math.abs(u - a), Math.abs(u - b)) <
-                        Math.min(Math.abs(v - a), Math.abs(v - b))) {
-                    return u;
+
+                if ((x > a) && (y < b)) {
+                    return (x+y)/2; //midpoint of the contained range
+                } else if (x <= a && y >= b) {
+                    return mid(); //midpoint of this within the range
                 } else {
-                    return v;
+                    //overlap or no overlap
+                    return nearestStartOrEnd(a, b, x, y);
                 }
+
             }
+        }
+    }
+
+    static long nearestStartOrEnd(long a, long b, long x, long y) {
+        long u = nearestStartOrEnd(a, b, x);
+        long v = nearestStartOrEnd(a, b, y);
+        if (Math.min(Math.abs(u - a), Math.abs(u - b)) <
+                Math.min(Math.abs(v - a), Math.abs(v - b))) {
+            return u;
+        } else {
+            return v;
         }
     }
 

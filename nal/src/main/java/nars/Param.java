@@ -94,7 +94,11 @@ public abstract class Param extends Services<Term,NAR> {
      * when calculated, the total activation will sum to 1.0.
      * so 0.5 is equal amounts for both. */
     public static final float TERMLINK_BALANCE = 0.5f;
-    public static boolean DITHER_DT = false;
+
+    /** how many durations above which to dither dt relations to dt=0 (parallel)
+     *  set to zero to disable dithering.  typically the value will be 0..~1.0.
+     */
+    public static float DITHER_DT = 1f;
 
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
     public static int DT_ABS_LIMIT = Integer.MAX_VALUE/8192;

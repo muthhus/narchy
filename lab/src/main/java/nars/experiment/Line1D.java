@@ -44,10 +44,10 @@ public class Line1D {
             NAR n = new NARS().get();
 
             //new STMTemporalLinkage(n, 2, false);
-            n.time.dur(1);
-            n.termVolumeMax.set(16);
-            n.beliefConfidence(0.9f);
-            n.goalConfidence(0.5f);
+            n.time.dur(5);
+            n.termVolumeMax.set(24);
+            //n.beliefConfidence(0.9f);
+            //n.goalConfidence(0.5f);
             n.onCycle((nn) -> {
                 nn.stats(System.out);
             });
@@ -83,7 +83,7 @@ public class Line1D {
                 }
             }.floatValueOf(n);
 
-
+            n.start();
 
 
         }

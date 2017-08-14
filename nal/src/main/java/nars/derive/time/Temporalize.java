@@ -8,6 +8,7 @@ import nars.Op;
 import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
+import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
@@ -54,11 +55,11 @@ public class Temporalize implements ITemporalize {
 
     @Override
     @Nullable
-    public Term solve(@NotNull Derivation d, Term pattern, long[] occ) {
+    public Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] eviGain) {
 
         Task task = d.task;
         Task belief = d.belief;
-        dur = Param.DITHER_DT ? d.dur : 1;
+        dur = Math.max(1, Math.round(Param.DITHER_DT * d.dur));
 
         ITemporalize model = this;
 
@@ -113,9 +114,10 @@ public class Temporalize implements ITemporalize {
 
             long ts = task.start();
             long k;
-            if (!te && (belief!=null && !belief.isEternal())) {
+            if (!te && (belief != null && !belief.isEternal())) {
                 //interpolate
-                long bs = belief.start();
+                ts = task.nearestTimeBetween(belief.start(), belief.end());
+                long bs = belief.nearestTimeBetween(ts, task.end());
                 if (ts != bs) {
                     //TODO add confidence decay in proportion to lack of coherence
                     if (task.isBeliefOrGoal()) {
@@ -123,6 +125,13 @@ public class Temporalize implements ITemporalize {
                         float beliefEvi = belief.conf();
                         float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
                         k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
+                        long distSum =
+                            Math.abs( task.nearestTimeTo(k) - k ) +
+                            Math.abs( belief.nearestTimeTo(k) - k )
+                        ;
+                        if (distSum > 0) {
+                            eviGain[0] *= TruthPolation.evidenceDecay(1, d.dur, distSum);
+                        }
                     } else {
                         k = bs;
                     }
@@ -162,12 +171,19 @@ public class Temporalize implements ITemporalize {
                     //if (((TimeEvent)e).
                     t = 2;
                 } else {
-                    Term tr = ((RelativeEvent) e).rel;
+                    RelativeEvent re = (RelativeEvent) e;
+                    Term tr = re.rel;
 
-                    if (tr.op() == NEG) //NEG relations are not that valuable
+                    //simultaneous NEG relations are not that valuable. usually the pos/neg occurring in a term represent different events, so this relationship is weak
+                    if (re.start == 0 &&
+                            ((tr.op() == NEG && re.term.equals(tr.unneg()))
+                                    ||
+                                    (re.term.op() == NEG && tr.equals(re.term.unneg()))
+                            )) {
                         t = 0.1f;
-                    else
+                    } else {
                         t = 1;
+                    }
                     //  (1f / (1 + tr.size()));  //decrease according to the related term's size
 
                 }

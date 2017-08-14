@@ -25,9 +25,6 @@ public abstract class VarIntroduction {
 
     static final int maxSubstitutions = 1;
 
-    protected VarIntroduction() {
-
-    }
 
     public Pair<Term, Map<Term, Term>> accept(@NotNull Term x, Random r) {
 

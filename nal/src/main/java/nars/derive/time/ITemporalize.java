@@ -51,8 +51,11 @@ public interface ITemporalize {
      * and other reductions. an attempt can be made to back-solve the result.
      * if that fails, a heuristic could decide the match. in the worst case,
      * the derivation will not be temporalizable and this method returns null.
+     *
+     * @param eviGain length-1 float array. the value will be set to 1f by default
+     *
      */
-    @Nullable Term solve(@NotNull Derivation d, Term pattern, long[] occ);
+    @Nullable Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] eviGain);
 
 
 }

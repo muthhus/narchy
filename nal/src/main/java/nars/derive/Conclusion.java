@@ -112,7 +112,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             if (vc == null) return true;
 
             Term v = vc.getOne();
-            if (v instanceof Bool || (v.equals(c1) /* keep only if it differs */))
+            if (!(v.op().conceptualizable) || (v.equals(c1) /* keep only if it differs */))
                 return true;
 
             if (d.temporal) {
@@ -129,13 +129,14 @@ public class Conclusion extends AbstractPred<Derivation> {
         Truth truth = d.concTruth;
 
         @NotNull final long[] occ;
+        final float[] eviGain = new float[] { 1f }; //flat by default
 
         Term c2;
         if (d.temporal) {
 
             Term t1;
             try {
-                t1 = new Temporalize(d.random).solve(d, c1, occ = new long[]{ETERNAL, ETERNAL});
+                t1 = new Temporalize(d.random).solve(d, c1, occ = new long[]{ETERNAL, ETERNAL}, eviGain);
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {
                     logger.error("temporalize error: {} {} {}", d, c1, t.getMessage());
@@ -190,11 +191,22 @@ public class Conclusion extends AbstractPred<Derivation> {
         @Nullable ObjectBooleanPair<Term> c3n = Task.tryContent(c2, punc, true);
         if (c3n != null) {
 
-            boolean negating = c3n.getTwo();
+
 
             final Term C = c3n.getOne();
-            if (C instanceof Variable || C instanceof Bool)
+            if (!C.op().conceptualizable)
                 return true;
+
+            if (truth != null) {
+
+                boolean negating = c3n.getTwo();
+                if (negating)
+                    truth = truth.negated();
+
+                truth = truth.ditherFreqConf(d.truthResolution, d.confMin, eviGain[0]);
+                if (truth == null)
+                    return true;
+            }
 
             long start = occ[0];
             long end = occ[1];
@@ -208,11 +220,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             float priority = d.premisePri; //d.budgeting.budget(d, C, truth, punc, start, end);
             assert (priority == priority);
 
-            if (truth != null) {
 
-                if (negating)
-                    truth = truth.negated();
-            }
 
             short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
 
@@ -222,7 +230,7 @@ public class Conclusion extends AbstractPred<Derivation> {
                             new DebugDerivedTask(C, punc, truth, d, start, end, cause) :
                             new DerivedTask(C, punc, truth, d, start, end, cause);
 
-            if (t.equals(d.task) || t.equals(d.belief)) {
+            if (t.equals(d.task) || (d.belief!=null && t.equals(d.belief))) {
                 return true; //created a duplicate of the task
             }
 

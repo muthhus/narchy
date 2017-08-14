@@ -183,4 +183,23 @@ public class TaskTest {
         assertNotNull(c);
     }
 
+    @Test public void testTaskNearestTimePoint() throws Narsese.NarseseException {
+        NAR tt = NARS.shell();
+        Task t = $.task("x", BELIEF, 1f, 0.9f).time(0, 10, 20).apply(tt);
+
+        assertEquals(10, t.start());
+        assertEquals(20, t.end());
+
+        assertEquals(20, t.nearestTimeTo(30));
+        assertEquals(18, t.nearestTimeTo(18)); //mid
+        assertEquals(15, t.nearestTimeTo(15)); //mid
+        assertEquals(12, t.nearestTimeTo(12)); //mid
+        assertEquals(10, t.nearestTimeTo(0));
+
+        assertEquals(15, t.nearestTimeBetween(9, 21)); //midpoint
+        assertEquals(10, t.nearestTimeBetween(0, 1));
+        assertEquals(10, t.nearestTimeBetween(0, 15));
+        assertEquals(15, t.nearestTimeBetween(15, 15));
+        assertEquals(20, t.nearestTimeBetween(30, 40));
+    }
 }
