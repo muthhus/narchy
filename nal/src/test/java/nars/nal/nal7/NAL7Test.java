@@ -121,10 +121,10 @@ public class NAL7Test extends AbstractNALTest {
 
         test
             .log()
-            .inputAt(1, "((a &&+5 b) &&+5 #1). :|:")
-            .mustBelieve(cycles, "(b &&+5 #1)", 1.00f, 0.81f, 6, 11)
-            .mustNotOutput(cycles, "(b &&+5 #1)", BELIEF, ETERNAL)
-            .mustNotOutput(cycles, "(b &&+5 #1)", BELIEF, 16) //<- not caught here TODO fix this mustNotEmit stuff
+            .inputAt(1, "((a &&+5 b) &&+5 c). :|:")
+            .mustBelieve(cycles, "(b &&+5 c)", 1.00f, 0.81f, 6, 11)
+            .mustNotOutput(cycles, "(b &&+5 c)", BELIEF, ETERNAL)
+            .mustNotOutput(cycles, "(b &&+5 c)", BELIEF, 16) //<- not caught here TODO fix this mustNotEmit stuff
         ;
     }
 

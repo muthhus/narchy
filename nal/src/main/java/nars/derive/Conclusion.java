@@ -91,11 +91,14 @@ public class Conclusion extends AbstractPred<Derivation> {
 //                            System.out.println("second transform");
 //            b1 = b2;
 //        }
-        assert (b1.varPattern() == 0);
+
+        assert (b1.varPattern() == 0): b1 + " has pattern variables";
         if (!b1.op().conceptualizable)
             return true;
 
         /// 2. EVAL ----
+
+
 
 
         d.use(Param.TTL_DERIVE_EVAL);

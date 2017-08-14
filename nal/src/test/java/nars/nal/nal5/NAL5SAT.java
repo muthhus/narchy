@@ -45,6 +45,7 @@ public class NAL5SAT {
 //        for (int i = 0; i < 2; i++) {
 //            for (int j = 0; j < 2; j++) {
         NAR d = new NARS().get();
+        d.log();
         d.nal(6);
         d.termVolumeMax.setValue(24);
 

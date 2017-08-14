@@ -30,11 +30,11 @@ public class SubUnify extends Unify {
 //    }
 
     @Override
-    public Unify unify(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
         this.ttl = parent.ttl; //load
-        super.unify(x, y, finish);
+        boolean result = super.unify(x, y, finish);
         parent.ttl = ttl; //restore
-        return this;
+        return result;
     }
 
     //    @Override

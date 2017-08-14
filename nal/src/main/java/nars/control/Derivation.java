@@ -167,8 +167,8 @@ public class Derivation extends Unify implements TermContext {
         });
         final Functor substitute = new substitute() {
             @Override
-            protected void onChange(Term from, Term x, Term y, Term to) {
-                putXY(x, y); //TODO verify correct direction and whether reverse is also needed
+            protected boolean onChange(Term from, Term x, Term y, Term to) {
+                return putXY(x, y); //TODO verify correct direction and whether reverse is also needed
             }
         };
 
@@ -312,9 +312,7 @@ public class Derivation extends Unify implements TermContext {
 
             this.beliefTruth = beliefTruth;
 
-            cyclic |= belief.cyclic();
-            //if (!overlap)
-            overlap = Stamp.overlapping(task, belief);
+            overlap = (cyclic |= belief.cyclic()) | Stamp.overlapping(task, belief);
 
         } else {
             this.beliefTruth = this.beliefTruthRaw = null;
@@ -370,7 +368,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * only one thread should be in here at a time
      */
-    public final boolean matchAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm<Derivation> eachMatch) {
+    public final boolean unifyAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm<Derivation> eachMatch) {
 
         boolean finish = (this.forEachMatch = eachMatch) != null;
 //        if (!finish) {
@@ -386,15 +384,13 @@ public class Derivation extends Unify implements TermContext {
 //                assert (!(t instanceof UnnormalizedVariable));
 //            });
 
-            unify(x, y, finish);
+            return unify(x, y, finish) && live();
         } finally {
             this.forEachMatch = null;
         }
 //        if (finish) {
 //            //after the end
 //        }
-
-        return live();
     }
 
     @Override

@@ -88,7 +88,7 @@ public abstract class Unify extends Versioning implements Subst {
         this.type = type;
 
         xy = new ConstrainedVersionMap(this, Param.UnificationVariableCapInitial);
-        this.free = new Versioned<>(this, 1);
+        this.free = new Versioned<>(this, 4); //task, belief, subIfUnifies + ?
         //this.freeCount = new Versioned<>(versioning, 8);
 
     }
@@ -142,7 +142,7 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
 
-    public final Unify unifyAll(@NotNull Term x, @NotNull Term y) {
+    public final boolean unifyAll(@NotNull Term x, @NotNull Term y) {
         return unify(x, y, true);
     }
 
@@ -152,10 +152,11 @@ public abstract class Unify extends Versioning implements Subst {
      * <p>
      * setting finish=false allows matching in pieces before finishing
      */
-    public Unify unify(@NotNull Term x, @NotNull Term y, boolean finish) {
+    public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
         //accumulate any new free variables in this next matched term
-        free.set(freeVariables(x)); //plus and not equals because this may continue from another unification!!!!!
+        if (null == free.set(freeVariables(x))) //plus and not equals because this may continue from another unification!!!!!
+            return false;
 
         //assert (unassigned.isEmpty() ) : "non-purposeful unification";
         //this.freeCount.add( newFree.size() );
@@ -164,9 +165,10 @@ public abstract class Unify extends Versioning implements Subst {
             if (finish) {
                 tryMatches();
             }
+            return true;
         }
 
-        return this;
+        return false;
     }
 
     /**
@@ -324,7 +326,7 @@ public abstract class Unify extends Versioning implements Subst {
             return unify(y0, y);
         } else /*if (matchType(x0))*/ {
 
-            if (x instanceof Variable) {
+            if (y instanceof Variable) {
                 if (x.op() == y.op()) {
 
                     assert (!(y instanceof UnnormalizedVariable) || (y instanceof CommonVariable)) :
@@ -343,18 +345,20 @@ public abstract class Unify extends Versioning implements Subst {
             }
 
 
-            if (xy.tryPut(x, y)) {
-//                if (!matchType(x)) {
-//                    //add to free variables to be included in transformation
-//                    Set<Term> knownFree = free.get();
-//                    if (!knownFree.contains(x))
-//                        free.set(concat(knownFree, Set.of(x)));
-//                }
-                return true;
-            }
+            return xy.tryPut(x, y);
+
+//            if (xy.tryPut(x, y)) {
+////                if (!matchType(x)) {
+////                    //add to free variables to be included in transformation
+////                    Set<Term> knownFree = free.get();
+////                    if (!knownFree.contains(x))
+////                        free.set(concat(knownFree, Set.of(x)));
+////                }
+//                return true;
+//            }
         }
 
-        return false;
+        //return false;
     }
 
     public final int now() {

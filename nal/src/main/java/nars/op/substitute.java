@@ -44,15 +44,16 @@ public class substitute extends Functor {
 
         if (!(result instanceof Bool && !result.equals(input))) {
             //add mapping in parent
-            onChange(input, x, y, result);
+            if (!onChange(input, x, y, result))
+                return Null;
         }
 
         return result;
     }
 
     /** called if substitution was successful */
-    protected void onChange(Term from, Term x, Term y, Term to) {
-
+    protected boolean onChange(Term from, Term x, Term y, Term to) {
+        return true;
     }
 
 }

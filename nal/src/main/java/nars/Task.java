@@ -229,9 +229,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     static boolean validTaskCompound(@NotNull Term t, byte punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
 
-        if (t.varDep()==1) {
-            return fail(t, "singular dependent variable", safe);
-        }
+//        if (t.varDep()==1) {
+//            return fail(t, "singular dependent variable", safe);
+//        }
 
         switch (t.varIndep()) {
             case 0:

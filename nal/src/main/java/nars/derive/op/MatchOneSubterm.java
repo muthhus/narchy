@@ -57,13 +57,18 @@ public final class MatchOneSubterm extends UnificationPrototype {
 
         @Override
         public final boolean test(@NotNull Derivation p) {
-            return p.unify(super.pattern, term(p) /* current term */, false).live();
+            if (!p.unify(super.pattern, term(p) /* current term */, false)) {
+                return false;
+            } else {
+                return p.live();
+            }
         }
 
         final @NotNull Term term(@NotNull Derivation p) {
             return subterm == 0 ? p.taskTerm : p.beliefTerm;
         }
     }
+
     public static final class UnifySubtermThenConclude extends MatchTerm {
 
         /** which premise component, 0 (task) or 1 (belief) */
@@ -79,13 +84,8 @@ public final class MatchOneSubterm extends UnificationPrototype {
         @Override
         public final boolean test(@NotNull Derivation p) {
             int now = p.now();
-            boolean b = p.matchAll(super.pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch);
-            if (b) {
-                p.revert(now);
-                return true;
-            } else {
-                return false;
-            }
+            p.unifyAll(super.pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch);
+            return p.revertAndContinue(now);
         }
     }
 
