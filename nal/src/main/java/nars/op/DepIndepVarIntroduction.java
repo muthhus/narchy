@@ -22,7 +22,7 @@ import static nars.Op.*;
  */
 public class DepIndepVarIntroduction extends VarIntroduction {
 
-    static final VarIntro the = new VarIntro();
+    static final DepIndepVarIntroduction the = new DepIndepVarIntroduction();
 
     @Nullable public static Pair<Term, Map<Term, Term>> varIntroX(Term x, Random rng) {
         return the.accept(x, rng);
@@ -150,9 +150,6 @@ public class DepIndepVarIntroduction extends VarIntroduction {
         //return o == IMPL || o == EQUI;
     }
 
-    public static final class VarIntro extends DepIndepVarIntroduction {
-
-    }
 
 }
 

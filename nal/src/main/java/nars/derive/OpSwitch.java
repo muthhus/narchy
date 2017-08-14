@@ -10,41 +10,38 @@ import java.util.EnumMap;
 import java.util.function.Function;
 
 /**
- * Created by me on 5/21/16.
+ * TODO generify key/value
  */
-public final class PatternOpSwitch extends AbstractPred<Derivation> {
+public final class OpSwitch extends AbstractPred<Derivation> {
 
     public final EnumMap<Op,PrediTerm<Derivation>> cases;
     public final PrediTerm[] swtch;
     public final int subterm;
 
-    PatternOpSwitch(int subterm, @NotNull EnumMap<Op,PrediTerm<Derivation>> cases) {
+    OpSwitch(int subterm, @NotNull EnumMap<Op,PrediTerm<Derivation>> cases) {
         super(/*$.impl*/ $.p($.the("op" + subterm), $.p(cases.entrySet().stream().map(e -> $.p($.quote(e.getKey().toString()), e.getValue())).toArray(Term[]::new))));
 
         swtch = new PrediTerm[24]; //check this range
-        cases.forEach((k,v) -> swtch[k.ordinal()] = v);
+        cases.forEach((k,v) -> swtch[k.id] = v);
         this.subterm = subterm;
         this.cases = cases;
     }
 
     @Override
-    public PrediTerm transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
+    public PrediTerm<Derivation> transform(Function<PrediTerm<Derivation>, PrediTerm<Derivation>> f) {
         EnumMap<Op, PrediTerm<Derivation>> e2 = cases.clone();
         e2.replaceAll( ((k, v)-> v.transform(f) ));
-        return new PatternOpSwitch(subterm, e2);
+        return new OpSwitch(subterm, e2);
     }
 
 
     @Override
     public boolean test(@NotNull Derivation m) {
-        int i = (subterm == 0) ? m.termSub0op : m.termSub1op;
 
-        PrediTerm p =
-                swtch[i];
-                //cases.get(Op.values()[i]); //HACK use something better?
-        if (p!=null) {
-            return p.test(m);
-        }
-        return true; //N/A
+        PrediTerm p = swtch[((subterm == 0) ? m.termSub0op : m.termSub1op)];
+        if (p!=null)
+            p.test(m);
+
+        return true;
     }
 }

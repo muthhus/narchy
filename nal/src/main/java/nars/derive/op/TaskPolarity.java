@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class TaskPolarity {
 
-    public static final PrediTerm<Derivation> pos = new AbstractPred<Derivation>("(TaskPos)") {
+    public static final PrediTerm<Derivation> taskPos = new AbstractPred<Derivation>("(TaskPos)") {
         @Override
         public boolean test(@NotNull Derivation m) {
             Truth t = m.taskTruth;
@@ -19,7 +19,7 @@ public class TaskPolarity {
         }
 
     };
-    public static final PrediTerm<Derivation> neg = new AbstractPred<Derivation>("(TaskNeg)") {
+    public static final PrediTerm<Derivation> taskNeg = new AbstractPred<Derivation>("(TaskNeg)") {
         @Override
         public boolean test(@NotNull Derivation m) {
             Truth t = m.taskTruth;

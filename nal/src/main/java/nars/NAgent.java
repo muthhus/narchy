@@ -33,7 +33,6 @@ import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
 import static nars.$.impl;
-import static nars.$.neg;
 import static nars.$.newArrayList;
 import static nars.$.p;
 import static nars.$.t;
@@ -335,9 +334,9 @@ abstract public class NAgent extends DurService implements NSense, NAct {
             ((FasterList) predictors).addAll(
 
                     question(impl(action, happiness)),
-                    question(impl(neg(action), happiness)),
+                    question(impl(action.neg(), happiness)),
                     question(impl(action, $.varQuery(1))),
-                    question(impl(neg(action), $.varQuery(1))),
+                    question(impl(action.neg(), $.varQuery(1))),
 
                     //question(seq(action, dur, happiness), now),
                     //question(seq(neg(action), dur, happiness), now),

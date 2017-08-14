@@ -25,7 +25,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
     }
 
 
-    final boolean measure(@NotNull Derivation m, byte punc) {
+    final boolean test(@NotNull Derivation m, byte punc) {
 
         boolean single;
         Truth t;
@@ -38,8 +38,13 @@ abstract public class Solve extends AbstractPred<Derivation> {
                     return false; //there isnt a truth function for this punctuation
 
                 single = f.single();
-                if (!single && m.belief == null) {  //double premise requiring a belief, but belief is null
-                    return false;
+
+                Truth bt;
+                if (single) {
+                    bt = null;
+                } else {
+                    if ((bt = (beliefProjected ? m.beliefTruth : m.beliefTruthRaw))==null)
+                        return false; //double premise requiring a belief, but belief is null
                 }
 
                 if (!f.allowOverlap() && (single ? m.cyclic : m.overlap))
@@ -50,7 +55,7 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
                 if ((t = f.apply(
                         m.taskTruth, //task truth is not involved in the outcome of this; set task truth to be null to prevent any negations below:
-                        (single) ? null : (beliefProjected ? m.beliefTruth : m.beliefTruthRaw),
+                        bt,
                         m.nar, confMin
                 ))==null)
                     return false;

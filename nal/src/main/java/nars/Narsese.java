@@ -519,7 +519,7 @@ public class Narsese extends BaseParser<Object> {
 
 
                         //negation shorthand
-                        seq(NEG.str, s(), Term(), push($.neg( /*$.$(*/ (Term) pop()))),
+                        seq(NEG.str, s(), Term(), push(((Term) pop()).neg())),
 
                         //deprecated form: <a --> b>
                         seq(OLD_STATEMENT_OPENER,
@@ -856,7 +856,7 @@ public class Narsese extends BaseParser<Object> {
 
                 ),
 
-                push(Op.fromString(match()))
+                push(Op.the(match()))
         );
     }
 
@@ -866,7 +866,7 @@ public class Narsese extends BaseParser<Object> {
                         IMPL.str,
                         CONJ.str
                 ),
-                push(Op.fromString(match()))
+                push(Op.the(match()))
         );
     }
 

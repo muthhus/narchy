@@ -19,6 +19,6 @@ public final class SolvePuncOverride extends Solve {
 
     @Override
     public boolean test(@NotNull Derivation m) {
-        return measure(m, puncOverride);
+        return test(m, puncOverride);
     }
 }

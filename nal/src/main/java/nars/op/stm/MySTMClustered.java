@@ -17,7 +17,6 @@ import nars.truth.TruthFunctions;
 import nars.util.BudgetFunctions;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,9 +24,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
@@ -280,7 +277,7 @@ public class MySTMClustered extends STMClustered {
         return
                 Op.conj(
                         new FasterList<>(Util.map(t -> pair(
-                                $.negIf(t.term(), t.truth().isNegative()),
+                                t.term().negIf(t.truth().isNegative()),
                                 t.start()), new ObjectLongPair[uu.length], uu))
                 );
 

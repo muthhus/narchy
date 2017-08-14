@@ -272,7 +272,7 @@ public class KIFInput implements Runnable {
                     Term a = args.get(0);
                     Term b = args.get(1);
                     Variable v0 = nextVar(VAR_INDEP);
-                    y = equi($.prop(v0, a), $.neg($.prop(v0, b)));
+                    y = equi($.prop(v0, a), $.prop(v0, b).neg());
                 }
                 break;
             case "documentation":
@@ -314,7 +314,7 @@ public class KIFInput implements Runnable {
                             y = $.disj(args.toArray(new Term[args.size()]));
                             break;
                         case "not":
-                            y = $.neg(args.get(0));
+                            y = args.get(0).neg();
                             break;
                         default:
                             y = $.inh($.p(args), z); //HACK

@@ -15,7 +15,6 @@ import static nars.$.diffe;
 import static nars.$.diffi;
 import static nars.$.disj;
 import static nars.$.inh;
-import static nars.$.neg;
 import static nars.$.p;
 import static nars.$.parallel;
 import static nars.$.secte;
@@ -120,8 +119,8 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testInheritNegative() throws Narsese.NarseseException {
-        assertEquals("(--,(x-->y))", inh(neg($("x")), $("y")).toString());
-        assertEquals("(x-->y)", inh(neg($("x")), neg($("y"))).toString());
+        assertEquals("(--,(x-->y))", inh($("x").neg(), $("y")).toString());
+        assertEquals("(x-->y)", inh($("x").neg(), $("y").neg()).toString());
     }
 
     @Test
@@ -168,6 +167,15 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals("(--,((P)==>(Q)))", $("((P)==>(--,(Q)))").toString());
         assertEquals(("((--,(P))==>(Q))"), $("((--,(P))==>(Q))").toString()); //SAME should not change
     }
+    @Test
+    public void testImplicationNegatedPredicateImplicated() throws Narsese.NarseseException {
+
+        //((--,(x==>y)) ==> z)
+        //  ((x==>(--,y)) ==> z)
+        //((x && (--,y)) ==> z)
+        assertEquals("((x&&(--,y))==>z)", $("((--,(x==>y)) ==> z)").toString());
+    }
+
 
 //    @Test
 //    public void testReducedAndInvalidImplications1() throws Narsese.NarseseException {
@@ -604,7 +612,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testConegatedConjunctionTerms01() throws Narsese.NarseseException {
-        assertEquals(False, parallel(varDep(1), neg(varDep(1))));
+        assertEquals(False, parallel(varDep(1), varDep(1).neg()));
     }
 
     @Test
@@ -690,7 +698,7 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals(True,
                 $("(||,x,y,a:b,(--,a:b))"));
 
-        assertEquals(False, parallel(varDep(0), neg(varDep(0)), Atomic.the("x")));
+        assertEquals(False, parallel(varDep(0), varDep(0).neg(), Atomic.the("x")));
     }
 
     @Test
@@ -823,9 +831,9 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testSimEquivOfAbsoluteTrueNull4() throws Narsese.NarseseException {
-        assertEquals(Null, sim(neg(True), Null));
+        assertEquals(Null, sim(True.neg(), Null));
         assertEquals(False, sim(True, False));
-        assertEquals(True, sim(neg(True), False));
+        assertEquals(True, sim(True.neg(), False));
     }
 
     /**

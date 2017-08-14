@@ -35,15 +35,14 @@
 
 //// implication-based composition ////////////////////////////////////////////////////////////////////////////////////
 //Same as for inheritance
-    //Note: the P && S subterm of the conclusion may get rewritten with appropraite 'dt' as per dtCombinePre/dtCombinePost.
-    //otherwise it will remain DTERNAL. using XTERNAL (&&+-) here is more trouble than its worth
+
 
     (P ==> M), (S ==> M), neqRCom(S,P) |- ((P &&+- S) ==>+- M), (Belief:Intersection)
-        (P ==> M), (S ==> M), neqCom(P,S) |- (--((--,%P) &&+- (--,%S)) ==>+- M), (Belief:Union)
+        //(P ==> M), (S ==> M), neqCom(P,S) |- (--((--,%P) &&+- (--,%S)) ==>+- M), (Belief:Union)
                 //(P || S) ==>+-M
 
     (M ==> P), (M ==> S), neqRCom(S,P) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
-        (M ==> P), (M ==> S), neqCom(P,S) |- (M ==>+- --((--,%P) &&+- (--,%S))), (Belief:Union)
+        //(M ==> P), (M ==> S), neqCom(P,S) |- (M ==>+- --((--,%P) &&+- (--,%S))), (Belief:Union)
                 //M ==>+- (P || S)
 
 
@@ -66,23 +65,30 @@
         (C ==> (--,%M)), C, belief("&&") |- (dropAnyEvent(C) ==>+- (--,%M)), (Belief:StructuralDeduction)
         //((&&,(--,%S),A..+) ==> M), M |- ((&&,A..+) ==>+- M), (Belief:StructuralDeduction)
 
-//// conditional syllogism ////////////////////////////////////////////////////////////////////////////////////
-//      + Indep variable elimination
-//If after M, P usually happens, and M happens, it means P is expected to happen
-
-// NAL7 specific inference ////////////////////////////////////////////////////////////////////////////////////
-//      Reasoning about temporal statements. those are using the ==> relation because relation in time is a relation of the truth between statements.
 
 
-    B, (A ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursive, Goal:InductionRecursive)
-    B, ((--,%A) ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)
-        B, (A ==> C), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursivePN, Goal:InductionRecursivePN)
-        B, ((--,%A) ==> C), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursiveNN, Goal:InductionRecursiveNN)
+// Conditional syllogism && Independent Variable Elimination
+//      If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (C ==> A), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
-    B, ((--,%C) ==> A), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:AbductionN, Goal:DeductionN)
-        B, (C ==> A), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionPN, Goal:DeductionPN)
-        B, ((--,%C) ==> A), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
+    B, (A ==> C), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionRecursivePB)
+        A, (A ==> C), time(urgent), notImpl(A) |- C, (Belief:DeductionPB, Goal:InductionPB)
+    B, ((--,%A) ==> C), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionRecursivePBN)
+        A, ((--,%A) ==> C), time(urgent), notImpl(A) |- C, (Belief:DeductionPBN, Goal:InductionPBN)
+
+
+    B, (C ==> A), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:AbductionRecursive)
+        A, (C ==> A), time(urgent), notImpl(A) |- C, (Belief:Abduction, Goal:Deduction)
+        //TODO maybe the belief(negative) cases are actually necessary to derive --C
+
+        //has(A,"$"),
+    //B, ((--,%A) ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)
+    //    B, (A ==> C), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursivePN, Goal:InductionRecursivePN)
+    //    B, ((--,%A) ==> C), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:DeductionRecursiveNN, Goal:InductionRecursiveNN)
+
+    //B, (C ==> A), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:Abduction, Goal:Deduction)
+    //B, ((--,%C) ==> A), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:AbductionN, Goal:DeductionN)
+        //B, (C ==> A), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionPN, Goal:DeductionPN)
+        //B, ((--,%C) ==> A), belief(negative), notImpl(B), time(urgent) |- subIfUnifiesAny((--,%C),A,B), (Belief:AbductionNN, Goal:DeductionNN)
 
 
     //variable elimination 4b:
@@ -102,8 +108,8 @@
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
 
-    B, C, belief("&&"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
-    B, C, belief("&&"), task("!"), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),(--,%B)), (Goal:StrongN)
+    B, C, belief("&&"), task("!"), task(positive), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
+    B, C, belief("&&"), task("!"), task(negative), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),(--,%B)), (Goal:StrongN)
     //B, (C && A), task("!"), time(urgent) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
     //B, (C && (--,%A)), task("!"), time(urgent) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
         //B, (C && A) |- (--,subIfUnifiesAny(C,A,B)), (Goal:StrongN)

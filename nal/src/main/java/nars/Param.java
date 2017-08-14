@@ -192,7 +192,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int STAMP_CAPACITY = 10;
     public static final int CAUSE_CAPACITY = 16;
 
-    public final static int UnificationStackMax = 64; //how many assignments can be stored in the 'versioning' maps
+    public final static int UnificationStackMax = 72; //how many assignments can be stored in the 'versioning' maps
 
     public static final int UnificationVariableCapInitial = 8;
 

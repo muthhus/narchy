@@ -853,5 +853,11 @@ public interface Term extends Termlike, Comparable<Term> {
         }
     }
 
+    default Term neg() {
+        return NEG.the(this);
+    }
+    default Term negIf(boolean negate) {
+        return negate ? NEG.the(this) : this;
+    }
 }
 

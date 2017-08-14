@@ -385,7 +385,7 @@ public enum Op implements $ {
 
             for (ObjectBytePair<Term> xn : s.keyValuesView()) {
                 Term x = xn.getOne();
-                outer.add($.negIf(x, xn.getTwo() < 0));
+                outer.add(x.negIf(xn.getTwo() < 0));
             }
             return outer;
 
@@ -1263,8 +1263,10 @@ public enum Op implements $ {
 
                 //special case for implications: reduce to --predicate if the subject is False
                 if (isTrueOrFalse(subject /* antecedent */)) {
-                    if (concurrent(dt))
-                        return $.negIf(predicate, polarity ? (subject == False) : (subject != False));
+                    if (concurrent(dt)) {
+                        boolean negate = polarity ? (subject == False) : (subject != False);
+                        return predicate.negIf(negate);
+                    }
                     else {
                         return Null; //no temporal basis
                     }
@@ -1300,7 +1302,8 @@ public enum Op implements $ {
 
                     subject = CONJ.the(dt, subject, a);
                     predicate = cpr.sub(1);
-                    return $.negIf(IMPL.the(cprDT, subject, predicate), !polarity);
+                    boolean negate = !polarity;
+                    return IMPL.the(cprDT, subject, predicate).negIf(negate);
                     //}
                 }
 
@@ -1380,7 +1383,8 @@ public enum Op implements $ {
                         }
 
 
-                        return $.negIf(IMPL.the(dt, subject, predicate), !polarity);
+                        boolean negate = !polarity;
+                        return IMPL.the(dt, subject, predicate).negIf(negate);
                     }
                 }
             }
@@ -1414,10 +1418,11 @@ public enum Op implements $ {
 
 
         Term x = compound(op, dt, subject, predicate); //use the calculated ordering, not the TermContainer default for commutives
-        return $.negIf(x, !polarity);
+        boolean negate = !polarity;
+        return x.negIf(negate);
     }
 
-    public static Op fromString(String s) {
+    @Nullable public static Op the(String s) {
         return stringToOperator.get(s);
     }
 

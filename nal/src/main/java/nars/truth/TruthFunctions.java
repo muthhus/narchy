@@ -46,10 +46,10 @@ public final class TruthFunctions  {
      * @param t Truth value of the premise
      * @return Truth value of the conclusion
      */
-    public static Truth conversion(@NotNull Truth t, float minConf) {
+    public static Truth conversion(/*@NotNull*/ Truth t, float minConf) {
         float w = and(t.freq(), t.conf());
         float c = w2c(w);
-        return c >= minConf ? t(1, c, minConf) : null;
+        return c >= minConf ? t(1, c) : null;
     }
 
     /* ----- Single argument functions, called in StructuralRules ----- */
@@ -80,14 +80,10 @@ public final class TruthFunctions  {
      * @param t Truth value of the premise
      * @return Truth value of the conclusion
      */
-    public static Truth contraposition(@NotNull Truth t, float minConf) {
-        float f = t.freq();
-        if (f == 1f) return null; //quick test
-        float c = w2c(and(1 - f, t.conf()));
+    public static Truth contraposition(/*@NotNull*/ Truth t, float minConf) {
+        float c = w2c(and(1 - t.freq(), t.conf()));
         return (c < minConf) ? null : t(0, c);
     }
-
-    /* ----- double argument functions, called in MatchingRules ----- */
 
     //    public static float temporalIntersection(long now, long at, long bt) {
 //        //return BeliefTable.relevance(Math.abs(now-at) + Math.abs(now-bt), Math.abs(at-bt));
@@ -102,7 +98,7 @@ public final class TruthFunctions  {
      * @return AnalyticTruth value of the conclusion, because it is structural
      */
     @Nullable
-    public static Truth deductionR(@NotNull Truth a, float reliance, float minConf) {
+    public static Truth deductionR(/*@NotNull*/ Truth a, float reliance, float minConf) {
         float f = a.freq();
         float c = and(f, a.conf(), reliance);
         return (c >= minConf) ? t(f, c) : null;
@@ -111,17 +107,17 @@ public final class TruthFunctions  {
 
     /** assumes belief freq=1f */
     @Nullable
-    public static Truth deduction1(@NotNull Truth a, float bC, float minConf) {
+    public static Truth deduction1(/*@NotNull*/ Truth a, float bC, float minConf) {
         return deductionB(a, 1f, bC, minConf);
     }
 
     @Nullable
-    public static Truth deduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth deduction(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         return deductionB(a, b.freq(), b.conf(), minConf);
     }
 
     @Nullable
-    public static Truth deductionB(@NotNull Truth a, float bF, float bC, float minConf) {
+    public static Truth deductionB(/*@NotNull*/ Truth a, float bF, float bC, float minConf) {
 
         float f = and(a.freq(), bF);
 
@@ -138,12 +134,12 @@ public final class TruthFunctions  {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth analogy(@NotNull Truth a, float bf, float bc, float minConf) {
+    public static Truth analogy(/*@NotNull*/ Truth a, float bf, float bc, float minConf) {
         float c = and(a.conf(), bc, bf);
         return c < minConf ? null : t(and(a.freq(), bf), c);
     }
     @Nullable
-    public static Truth analogy(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth analogy(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         return analogy(a, b.freq(), b.conf(), minConf);
     }
 
@@ -154,7 +150,7 @@ public final class TruthFunctions  {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth resemblance(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth resemblance(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float f1 = a.freq();
         float f2 = b.freq();
         float c = and(a.conf(), b.conf(), or(f1, f2));
@@ -167,7 +163,7 @@ public final class TruthFunctions  {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion, or null if either truth is analytic already
      */
-    public static Truth abduction(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth abduction(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float c = w2c(and(b.freq(), a.conf(), b.conf()));
         return (c < minConf) ? null : t(a.freq(), c);
     }
@@ -178,8 +174,8 @@ public final class TruthFunctions  {
 //     * @param reliance Confidence of the second (analytical) premise
 //     * @return Truth value of the conclusion
 //     */
-//    @NotNull
-//    public static Truth abduction(@NotNull Truth t, float reliance) {
+//    /*@NotNull*/
+//    public static Truth abduction(/*@NotNull*/ Truth t, float reliance) {
 //        float f1 = t.freq();
 //        float c1 = t.conf();
 //        float w = and(c1, reliance);
@@ -193,7 +189,7 @@ public final class TruthFunctions  {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth induction(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+    public static Truth induction(/*@NotNull*/ Truth v1, /*@NotNull*/ Truth v2, float minConf) {
         return abduction(v2, v1, minConf);
     }
 
@@ -203,14 +199,14 @@ public final class TruthFunctions  {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth exemplification(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth exemplification(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float c = w2c(and(a.freq(), b.freq(), a.conf(), b.conf()));
         return c < minConf ? null : t(1, c);
     }
 
 
     @Nullable
-    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth comparison(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         return comparison(a, b, false, minConf);
     }
 
@@ -221,7 +217,7 @@ public final class TruthFunctions  {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth comparison(@NotNull Truth a, @NotNull Truth b, boolean invertA, float minConf) {
+    public static Truth comparison(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, boolean invertA, float minConf) {
         float f1 = a.freq();
         if (invertA) f1 = 1 - f1;
 
@@ -247,7 +243,7 @@ public final class TruthFunctions  {
     /**
      * A function specially designed for desire value [To be refined]
      */
-    @Nullable public static Truth desireStrongNew(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    @Nullable public static Truth desireStrongNew(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float aFreq = a.freq();
         float bFreq = b.freq();
         float c = and(a.conf(), b.conf(), freqSimilarity(aFreq, bFreq));
@@ -257,7 +253,7 @@ public final class TruthFunctions  {
     /**
      * A function specially designed for desire value [To be refined]
      */
-    @Nullable public static Truth desireStrongOriginal(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    @Nullable public static Truth desireStrongOriginal(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float bFreq = b.freq();
         float c = and(a.conf(), b.conf(), bFreq);
         return c < minConf ? null : desire(a.freq(), bFreq, c);
@@ -265,7 +261,7 @@ public final class TruthFunctions  {
 //    /**
 //     * A function specially designed for desire value [To be refined]
 //     */
-//    @Nullable public static Truth desireWeakNew(@NotNull Truth a, @NotNull Truth b, float minConf) {
+//    @Nullable public static Truth desireWeakNew(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
 //        float aFreq = a.freq();
 //        float bFreq = b.freq();
 //        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq,bFreq), w2c(1.0f));
@@ -274,12 +270,12 @@ public final class TruthFunctions  {
     /**
      * A function specially designed for desire value [To be refined]
      */
-    public static Truth desireWeakOriginal(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth desireWeakOriginal(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float bFreq = b.freq();
         float c = and(a.conf(), b.conf(), bFreq, w2c(1.0f));
         return c < minConf ? null : desire(a.freq(), bFreq, c);
     }
-    @NotNull static Truth desire(float f1, float f2, float c) {
+    /*@NotNull*/ static Truth desire(float f1, float f2, float c) {
         return t(and(f1, f2), c);
     }
 
@@ -292,7 +288,7 @@ public final class TruthFunctions  {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth desireDed(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth desireDed(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float abConf = and(a.conf(), b.conf());
         return abConf < minConf ? null : t(and(a.freq(), b.freq()), abConf);
     }
@@ -303,7 +299,7 @@ public final class TruthFunctions  {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth desireInd(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+    public static Truth desireInd(/*@NotNull*/ Truth v1, /*@NotNull*/ Truth v2, float minConf) {
         float c = w2c(and(v2.freq(), v1.conf(), v2.conf()));
         return c < minConf ? null : t(v1.freq(), c);
     }
@@ -316,7 +312,7 @@ public final class TruthFunctions  {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth union(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth union(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float abConf = and(a.conf(), b.conf());
         return (abConf < minConf) ?
                 null :
@@ -330,13 +326,9 @@ public final class TruthFunctions  {
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth intersection(@Nullable Truth v1, @NotNull Truth v2, float minConf) {
+    public static Truth intersection(@Nullable Truth v1, /*@NotNull*/ Truth v2, float minConf) {
         if (v1 == null) return null;
-
-        float c1 = v1.conf();
-        float c2 = v2.conf();
-
-        float c = and(c1, c2);
+        float c = and(v1.conf(), v2.conf());
         return (c < minConf) ?
                 null :
                 t(and(v1.freq(), v2.freq()), c);
@@ -360,28 +352,28 @@ public final class TruthFunctions  {
 //        return lerp(f2, f1, w1/(w1+w2));
 //    }
 
-    /**
-     * {(||, A, B), (--, B)} |- A
-     * @param a Truth value of the first premise
-     * @param b Truth value of the second premise
-     * @return Truth value of the conclusion
-     */
-    @Nullable
-    public static Truth reduceDisjunction(@NotNull Truth a, @NotNull Truth b, float minConf) {
-        Truth nn = negation(b, minConf);
-        if (nn == null) return null;
-
-        Truth ii = intersection(a, nn, minConf);
-        if (ii == null) return null;
-        return deductionR(ii, 1.0f, minConf);
-    }
+//    /**
+//     * {(||, A, B), (--, B)} |- A
+//     * @param a Truth value of the first premise
+//     * @param b Truth value of the second premise
+//     * @return Truth value of the conclusion
+//     */
+//    @Nullable
+//    public static Truth reduceDisjunction(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
+//        Truth nn = negation(b, minConf);
+//        if (nn == null) return null;
+//
+//        Truth ii = intersection(a, nn, minConf);
+//        if (ii == null) return null;
+//        return deductionR(ii, 1.0f, minConf);
+//    }
 
     /**
      * {(--, (&&, A, B)), B} |- (--, A)
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth reduceConjunction(@NotNull Truth v1, @NotNull Truth v2, float minConf) {
+    public static Truth reduceConjunction(/*@NotNull*/ Truth v1, /*@NotNull*/ Truth v2, float minConf) {
 
         Truth n1 = negation(v1, minConf);
         if (n1 == null) return null;
@@ -392,7 +384,7 @@ public final class TruthFunctions  {
         Truth v11 = deductionR(i12, 1.0f, minConf);
         if (v11 == null) return null;
 
-        return negation(v11, minConf);
+        return v11.negated(); //negation(v11, minConf);
 
 
 //        AnalyticTruth x = deduction(
@@ -412,7 +404,7 @@ public final class TruthFunctions  {
 //     * @return Truth value of the conclusion
 //     */
 //    @Nullable
-//    public static Truth reduceConjunctionNeg(@NotNull Truth a, @NotNull Truth b,float minConf) {
+//    public static Truth reduceConjunctionNeg(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b,float minConf) {
 //        return reduceConjunction(a, negation(b, minConf), minConf);
 //    }
 
@@ -422,7 +414,7 @@ public final class TruthFunctions  {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth anonymousAnalogy(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth anonymousAnalogy(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float v0c = w2c(a.conf());
         //since in analogy it will be and() with it, if it's already below then stop
         return v0c < minConf ? null : analogy(b, a.freq(), v0c, minConf);
@@ -433,14 +425,16 @@ public final class TruthFunctions  {
     public static Truth decompose(@Nullable Truth a, @Nullable Truth b, boolean x, boolean y, boolean z, float minConf) {
         if (a == null || b == null) return null;
 
-        float f1 = a.freq(), c1 = a.conf(), f2 = b.freq(), c2 = b.conf();
+        float c12 = and(a.conf(), b.conf());
+        if (c12 < minConf) return null;
+        float f1 = a.freq(), f2 = b.freq();
         float f = and(x ? f1 : 1-f1, y ? f2 : 1-f2);
-        float c = and(f, c1, c2);
+        float c = and(f, c12);
         return c < minConf ? null : t(z ? f : 1 - f, c);
     }
 
     @Nullable
-    public static Truth difference(@NotNull Truth a, @NotNull Truth b, float minConf) {
+    public static Truth difference(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         return intersection(a, b.negated(), minConf);
 
 //        float f1 = a.freq();
@@ -531,8 +525,8 @@ public final class TruthFunctions  {
 //        }
 //    }
 
-//    @NotNull
-//    public static ProjectedTruth eternalize(@NotNull Truth t) {
+//    /*@NotNull*/
+//    public static ProjectedTruth eternalize(/*@NotNull*/ Truth t) {
 //        return new ProjectedTruth(
 //                t.freq(),
 //                eternalize(t.conf()),

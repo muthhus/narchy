@@ -23,10 +23,10 @@ public enum BeliefPolarity {
             return B != null && B.freq() < 0.5f;
         }
     };
-    public static final PrediTerm<Derivation> beliefExist = new AbstractPred<Derivation>("(BeliefExist)") {
-        @Override public boolean test(Derivation d) {
-            return d.belief!=null;
-        }
-    };
+//    public static final PrediTerm<Derivation> beliefExist = new AbstractPred<Derivation>("(BeliefExist)") {
+//        @Override public boolean test(Derivation d) {
+//            return d.belief!=null;
+//        }
+//    };
 
 }

@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 500;
+    final int cycles = 1500;
 
     @Before
     public void nal() {
@@ -360,14 +360,19 @@ public class NAL6Test extends AbstractNALTest {
     public void multiple_variables_introduction() {
 
         TestNAR tester = test;
-        //
+
         tester.believe("<<$x --> key> ==> open($x,{lock1})>"); //en("Lock-1 can be opened by every key.");
         tester.believe("<{lock1} --> lock>"); //en("Lock-1 is a lock.");
-        tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> open($2,#1)>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
-        //tester.mustBelieve(cycles, "(&&,<$1 --> lock>,<<$2 --> key> ==> open($2,$1)>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
+
+        //the difference here is subtle
+        tester.mustBelieve(cycles, "(<#1 --> lock> && (<$2 --> key> ==> open($2,#1)))",
+                1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
+        tester.mustBelieve(cycles, "((<$1 --> key> && <$2 --> lock>) ==> open($1,$2))",
+                1.00f, 0.45f); //en("I guess every lock can be opened by every key.");
+
         //tester.mustBelieve(cycles, "(&&,<#1 --> lock>,<<$2 --> key> ==> <#1 --> (/,open,$2,_)>>)", 1.00f, 0.81f); //en("There is a lock that can be opened by every key.");
         //tester.mustBelieve(cycles, "<(&&,<$1 --> key>,<$2 --> lock>) ==> <$2 --> (/,open,$1,_)>>", 1.00f, 0.45f); //en("I guess every lock can be opened by every key.");
-        //tester.mustBelieve(cycles, "<(&&,<$1 --> key>,<$2 --> lock>) ==> open($1,$2)>", 1.00f, 0.45f); //en("I guess every lock can be opened by every key.");
+
     }
 
 
@@ -540,7 +545,7 @@ public class NAL6Test extends AbstractNALTest {
     public void strong_unification_neg() {
 
         TestNAR tester = test;
-        tester.believe("<(--,sentence($a,is,$b)) ==> <$a --> $b>>", 1.00f, 0.90f);
+        tester.believe("( --sentence($a,is,$b) ==> <$a --> $b> )", 1.00f, 0.90f);
         tester.believe("sentence(bmw,is,car)", 0.00f, 0.90f);
         tester.mustBelieve(cycles, "<bmw --> car>", 1.00f, 0.81f); //en("there is a lock which is opened by key1");
 
@@ -670,18 +675,6 @@ public class NAL6Test extends AbstractNALTest {
 //                .mustBelieve(cycles, "(y,y)", 1f, 0.81f); //B, (A <=> C), ...
 //    }
 
-    @Test
-    public void testImplSpecificNeg() {
-        // B, (C ==> A), belief(negative), time(decomposeBeliefLate) |- (--,subIfUnifiesAny(C,A,B)), (Belief:AbductionPN, Goal:DeductionPN)
-
-        test
-
-                .believe("--(($x) ==> ($x,y))")
-                .believe("(y)")
-                .mustBelieve(cycles, "(y,y)", 0f, 0.81f)
-        ;
-    }
-
 
     @Test
     public void recursionSmall() throws nars.Narsese.NarseseException {
@@ -709,12 +702,13 @@ public class NAL6Test extends AbstractNALTest {
         //B (A ==> C) |- C :post (:t/deduction :order-for-all-same) :pre ((:substitute-if-unifies "$" A B) (:shift-occurrence-forward ==>))
 
 
+        test.nar.truthResolution.setValue(0.1f);
         test
                 .believe("num(0)", 1.0f, 0.9f)
                 .believe("( num($1) ==> num(($1)) )", 1.0f, 0.9f)
                 .ask("num(((0)))")
-                .mustBelieve(cycles * 4, "num((0))", 1.0f, 1.0f, 0.66f, 1.0f)
-                .mustBelieve(cycles * 4, "num(((0)))", 1.0f, 1.0f, 0.21f /*0.66f*/, 1.0f)
+                .mustBelieve(cycles * 4, "num((0))", 1.0f, 1.0f, 0.6f, 1.0f)
+                .mustBelieve(cycles * 4, "num(((0)))", 1.0f, 1.0f, 0.1f /*0.66f*/, 1.0f)
         //.mustBelieve(time, "num:(((0)))", 1.0f, 1.0f, 0.66f, 1.0f)
         //.mustBelieve(time, "num:((((0))))", 1.0f, 1.0f, 0.81f, 1.0f)
         // ''outputMustContain('<(((0))) --> num>. %1.00;0.26%')

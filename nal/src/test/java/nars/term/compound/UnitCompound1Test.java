@@ -60,7 +60,7 @@ public class UnitCompound1Test {
     public void testUnitCompoundNeg() {
         Atomic x = Atomic.the("x");
 
-        Compound u = $.neg(x);
+        Term u = x.neg();
 //        System.out.println(u);
 //        System.out.println(u.sub(0));
         assertEquals(UnitCompound1.class, u.getClass());
@@ -76,7 +76,7 @@ public class UnitCompound1Test {
         assertEquals(u.subterms(), g.subterms());
         assertEquals(g.subterms(), u.subterms()); //reverse
         assertEquals(u.hashCode(), g.hashCode());
-        assertEquals(u.hashCodeSubTerms(), g.hashCodeSubTerms());
+        assertEquals(((Compound)u).hashCodeSubTerms(), g.hashCodeSubTerms());
         assertEquals(u.toString(), g.toString());
         assertEquals(0, u.compareTo(g));
         assertEquals(0, g.compareTo(u));

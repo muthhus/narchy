@@ -182,6 +182,17 @@ public class TrieDeriverTest {
     }
 
     @Test
+    public void testDeductionRecrusveWeirdness() {
+
+        String s = "B, (A ==> C), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionRecursive)";
+
+        NAR n = NARS.tmp();
+        PrediTerm<Derivation> d = testCompile(n, false, s);
+        TrieDeriver.print(d, System.out);
+
+    }
+
+    @Test
     public void testContrapositionWierdness() {
 
         String s = "( (--,%S) ==> P), ( (--,%S) ==> P) |- ( (--,%P) ==>+- S),       (Belief:Contraposition)";

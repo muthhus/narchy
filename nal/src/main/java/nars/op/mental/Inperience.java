@@ -325,14 +325,14 @@ public class Inperience extends LeakOut {
 
         arg[k++] = self;
         arg[k/*++*/] =
-            ((Compound)$.negIf(s.term(), tr != null && tr.isNegative()))
+            ((Compound) s.term().negIf(tr != null && tr.isNegative()))
                     .transform(CompoundTransform.queryToDepVar); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
 
 
         try {
             Term ff = $.func(reify(s.punc()), arg);
-            return Terms.compoundOrNull($.negIf(ff, false));
+            return Terms.compoundOrNull(ff.negIf(false));
 
         } catch (RuntimeException e) {
             logger.error(" {}", e);

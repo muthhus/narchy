@@ -101,12 +101,12 @@ public enum TrieDeriver {
             TermTrie.indent(indent);
             out.println("}");
 
-        } else if (p instanceof PatternOpSwitch) {
-            PatternOpSwitch sw = (PatternOpSwitch) p;
+        } else if (p instanceof OpSwitch) {
+            OpSwitch sw = (OpSwitch) p;
             TermTrie.indent(indent);
-            out.println("SubTermOp" + sw.subterm + " {");
+            out.println("switch(op(" + (sw.subterm==0 ? "task" : "belief") + ")) {");
             int i = -1;
-            for (PrediTerm b : sw.cases.values()) {
+            for (PrediTerm b : sw.swtch) {
                 i++;
                 if (b == null) continue;
 
@@ -126,7 +126,6 @@ public enum TrieDeriver {
 
             TermTrie.indent(indent);
             out.print( /*Util.className(p) + ": " +*/ p);
-
 
 
             out.println();
@@ -181,13 +180,11 @@ public enum TrieDeriver {
 //            TermTrie.indent(indent);
 //            out.println("}");
 
-        } else if (p instanceof PatternOpSwitch) {
-            PatternOpSwitch sw = (PatternOpSwitch) p;
+        } else if (p instanceof OpSwitch) {
+            OpSwitch sw = (OpSwitch) p;
             //TermTrie.indent(indent);
             //out.println("SubTermOp" + sw.subterm + " {");
-            int i = -1;
             for (PrediTerm b : sw.cases.values()) {
-                i++;
                 if (b == null) continue;
 
                 //TermTrie.indent(indent + 2);
@@ -299,7 +296,7 @@ public enum TrieDeriver {
                     if (ac.OR(x -> {
                         if (x instanceof PatternOp) {
                             PatternOp so = (PatternOp) x;
-                            if (so.subterm == subterm) {
+                            if (so.taskOrBelief == subterm) {
                                 if (null == cases.putIfAbsent(so, ac.without(so))) {
                                     removed.add(p);
                                     return true;
@@ -321,9 +318,9 @@ public enum TrieDeriver {
                     throw new RuntimeException("switch fault");
                 }
 
-                EnumMap<Op,PrediTerm<Derivation>> caseMap = new EnumMap(Op.class);
-                cases.forEach((c,p) -> caseMap.put(Op.values()[c.opOrdinal], p));
-                bb.add(new PatternOpSwitch(subterm, caseMap));
+                EnumMap<Op, PrediTerm<Derivation>> caseMap = new EnumMap(Op.class);
+                cases.forEach((c, p) -> caseMap.put(Op.values()[c.opOrdinal], p));
+                bb.add(new OpSwitch(subterm, caseMap));
             } else {
                 bb.addAll(removed); //undo
             }

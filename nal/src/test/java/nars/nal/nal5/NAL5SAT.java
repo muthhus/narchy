@@ -3,6 +3,7 @@ package nars.nal.nal5;
 import nars.*;
 import nars.concept.Concept;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
@@ -59,8 +60,8 @@ public class NAL5SAT {
         d.believe("( ((x-->i) && --(x-->j)) ==> " + outcomes[2] + ")");
         d.believe("( ((x-->i) && (x-->j)) ==> " + outcomes[3] + ")");
 
-        Compound I = $.negIf($.$("(x-->i)"), i == 0);
-        Compound J = $.negIf($.$("(x-->j)"), j == 0);
+        Term I = $.$("(x-->i)").negIf(i == 0);
+        Term J = $.$("(x-->j)").negIf(j == 0);
 
 //                d.believe(I);
 //                d.believe(J);

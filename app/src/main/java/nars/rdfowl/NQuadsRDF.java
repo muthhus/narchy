@@ -379,7 +379,7 @@ public abstract class NQuadsRDF {
             belief = sim(subject, object);
         }
         else if (predicate.equals(differentFrom)) {
-            belief = neg(sim(subject, object));
+            belief = sim(subject, object).neg();
         }
         else if (predicate.equals(domain)) {
             // PROPERTY domain CLASS
@@ -420,7 +420,7 @@ public abstract class NQuadsRDF {
             //disjoint classes have no common instances:
             // (--, (&&, {#x} --> subject, {#x} --> object ) ).
             Term x = varDep(1);
-            belief = neg(conj(new Term[] { inh(x, subject), inh(x,object) } ));
+            belief = conj(new Term[]{inh(x, subject), inh(x, object)}).neg();
         } else {
             if (subject!=null && object!=null && predicate!=null) {
                 belief =

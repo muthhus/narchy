@@ -228,29 +228,33 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
      */
     static boolean validTaskCompound(@NotNull Term t, byte punc, boolean safe) {
         /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
-        Op op = t.op();
+
+        if (t.varDep()==1) {
+            return fail(t, "singular dependent variable", safe);
+        }
 
         switch (t.varIndep()) {
             case 0:
                 break;  //OK
             case 1:
-                return fail(t, "singular independent variable must be balanced elsewhere", safe);
+                return fail(t, "singular independent variable", safe);
             default:
                 if (!t.hasAny(Op.StatementBits)) {
-                    return fail(t, "Independent variables require statements super-terms", safe);
+                    return fail(t, "InDep variables must be subterms of statements", safe);
                 } else {
                     //TODO use a byte[] path thing to reduce duplicate work performed in indepValid findPaths
                     if (t.hasAny(Op.VAR_INDEP)) {
                         UnifiedSet unique = new UnifiedSet(1); //likely only one var indep repeated twice
                         if (!t.ANDrecurse(
                                 v -> (v.op() != VAR_INDEP) || !unique.add(v) || indepValid(t, v))) {
-                            return fail(t, "Mismatched cross-statement pairing of InDep variables", safe);
+                            return fail(t, "unbalanced InDep variable pairing", safe);
                         }
                     }
                 }
         }
 
 
+        Op op = t.op();
         if ((op == Op.IMPL) && (punc == Op.GOAL || punc == Op.QUEST))
             return fail(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
@@ -904,7 +908,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                        depending on whether the functor is purely static in which case
                        it would be the only one.
                      */
-                    NALTask evaluated = clone(this, $.negIf(yy.getOne(), yy.getTwo() /* HACK */));
+                    NALTask evaluated = clone(this, yy.getOne().negIf(yy.getTwo()));
                     if (evaluated != null) {
                         return evaluated.run(n);
                     }

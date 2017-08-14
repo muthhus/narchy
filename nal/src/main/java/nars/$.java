@@ -184,16 +184,6 @@ public interface $ {
     }
 
     @NotNull
-    public static <T extends Term> T neg(@NotNull Term x) {
-        return (T) NEG.the(x);
-    }
-
-    @NotNull
-    public static <T extends Term> T negIf(@NotNull Term x, boolean negate) {
-        return (T) (negate ? Op.NEG.the(x) : x);
-    }
-
-    @NotNull
     public static Term p(@NotNull Collection<? super Term> t) {
         return $.p(t.toArray(new Term[t.size()]));
     }
@@ -670,7 +660,7 @@ public interface $ {
      * negates each entry in the array
      */
     public static void neg(@NotNull Term[] array) {
-        Util.map($::neg, array, array);
+        Util.map(x -> x.neg(), array, array);
 //        int l = array.length;
 //        for (int i = 0; i < l; i++) {
 //            array[i] = $.neg(array[i]);

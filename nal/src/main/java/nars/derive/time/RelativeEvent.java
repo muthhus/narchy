@@ -1,6 +1,5 @@
 package nars.derive.time;
 
-import nars.$;
 import nars.term.Term;
 import org.jetbrains.annotations.Nullable;
 
@@ -37,7 +36,7 @@ public class RelativeEvent extends Event {
 
     @Override
     public Event neg() {
-        return new RelativeEvent(t, $.neg(term), rel, start, end);
+        return new RelativeEvent(t, term.neg(), rel, start, end);
     }
 
     @Override

@@ -48,7 +48,6 @@ public class Derivation extends Unify implements TermContext {
     public byte concPunc;
 
 
-
     /**
      * the current premise being evaluated in this context TODO make private again
      */
@@ -164,7 +163,7 @@ public class Derivation extends Unify implements TermContext {
             if (compared == null)
                 return Null;
             else
-                return compared.isNegative() ? $.neg(subterm) : subterm;
+                return compared.isNegative() ? subterm.neg() : subterm;
         });
         final Functor substitute = new substitute() {
             @Override
@@ -291,34 +290,37 @@ public class Derivation extends Unify implements TermContext {
         this.beliefTerm = bt;
 
 
-        if (belief == null) {
-            this.beliefTruth = this.beliefTruthRaw = null;
-        } else {
+        this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
+
+        if (belief != null) {
             Truth beliefTruth = this.beliefTruthRaw = belief.truth();
 
             /** to compute the time-discounted truth, find the minimum distance
              *  of the tasks considering their dtRange
              */
-            if (!task.isEternal() && !belief.isEternal()) {
+            if (!belief.isEternal()) {
 
-                long beliefTruthTime = belief.nearestTimeBetween(task.start(), task.end());
-                assert(beliefTruthTime != ETERNAL);
+                long beliefTruthTime;
+                if (task.isEternal()) {
+                    beliefTruthTime = ETERNAL;
+                } else {
+                    beliefTruthTime = belief.nearestTimeBetween(task.start(), task.end());
+                }
 
-                beliefTruth = belief.truth(beliefTruthTime, dur, nar.confMin.floatValue() /* confMin */); //project belief truth to task's time
-
-
+                beliefTruth = belief.truth(beliefTruthTime, dur, 0); //project belief truth to task's time
             }
 
             this.beliefTruth = beliefTruth;
-        }
 
-
-        this.overlap = this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
-        if (belief != null) {
             cyclic |= belief.cyclic();
-            if (!overlap)
-                overlap |= Stamp.overlapping(task, belief);
+            //if (!overlap)
+            overlap = Stamp.overlapping(task, belief);
+
+        } else {
+            this.beliefTruth = this.beliefTruthRaw = null;
+            this.overlap = false;
         }
+
 
         this.termSub1Struct = beliefTerm.structure();
 

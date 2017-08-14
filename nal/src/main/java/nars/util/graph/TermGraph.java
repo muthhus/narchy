@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import com.google.common.graph.MutableValueGraph;
 import com.google.common.graph.ValueGraphBuilder;
 import jcog.pri.Priority;
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
@@ -156,8 +155,8 @@ public enum TermGraph {
                 return;
 
             boolean reverse = dt != DTERNAL && (dt < 0);
-            Term S = reverse ? $.negIf(pred, neg) : subj;
-            Term P = reverse ? subj : $.negIf(pred, neg);
+            Term S = reverse ? pred.negIf(neg) : subj;
+            Term P = reverse ? subj : pred.negIf(neg);
             g.putEdgeValue(S, P, val + g.edgeValueOrDefault(S, P, 0f));
 
         }

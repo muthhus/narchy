@@ -42,6 +42,7 @@ import static nars.term.Terms.maxLevel;
  */
 public class PremiseRule extends GenericCompound {
 
+    static final Term UNPROJ = $.the("unproj");
     public static final Atomic Task = Atomic.the("task");
     static final Atomic Belief = Atomic.the("belief");
     private static final Term TaskAny = $.func("task", Atomic.the("any"));
@@ -78,7 +79,9 @@ public class PremiseRule extends GenericCompound {
      */
     private boolean beliefProjected = true;
 
-    /** when a rule with time(urgent) derives a goal, the occurrence time is set to the task time */
+    /**
+     * when a rule with time(urgent) derives a goal, the occurrence time is set to the task time
+     */
     public boolean goalUrgent = false;
 
     /**
@@ -132,41 +135,41 @@ public class PremiseRule extends GenericCompound {
         if (puncOverride != 0)
             args.add($.quote(((char) puncOverride)));
 
-        if (!beliefProjected)
-            args.add($.the("unproj"));
+        if (!beliefProjected) {
+            args.add(UNPROJ);
+        }
 
         Compound ii = (Compound) $.func("truth", args.toArray(Term[]::new));
 
 
+        Solve truth = (puncOverride == 0) ?
+                new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
+                new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
 
-    Solve truth = (puncOverride == 0) ?
-            new SolvePuncFromTask(ii, belief, goal, beliefProjected) :
-            new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
+        //PREFIX
+        {
+            addAll(s, PRE);
 
-    //PREFIX
-    {
-        addAll(s, PRE);
+            s.add(truth);
 
-        s.add(truth);
+            s.addAll(match.pre);
 
-        s.addAll(match.pre);
+        }
 
-    }
-
-    List<Term> l = sort(new FasterList(s));
+        List<Term> l = sort(new FasterList(s));
 
         l.addAll(match.constraints);
 
-    //SUFFIX (order already determined for matching)
-    {
+        //SUFFIX (order already determined for matching)
+        {
 
-        l.addAll(match.post);
+            l.addAll(match.post);
 
-        ((UnificationPrototype) match.post.get(match.post.size() - 1)).conclude.add(conc.apply(nar));
-    }
+            ((UnificationPrototype) match.post.get(match.post.size() - 1)).conclude.add(conc.apply(nar));
+        }
 
         return l;
-}
+    }
 
     /**
      * higher is earlier
@@ -178,34 +181,32 @@ public class PremiseRule extends GenericCompound {
         put("PatternOp1", rank--);
         put("PatternOp0", rank--);
 
-        put("BeliefExist", rank--);
-
-        put(TaskBeliefOp.class, rank--);
 
         put(TaskPunctuation.class, rank--);
 
-        put(TaskBeliefOccurrence.class, rank--);
+        put(TaskBeliefOp.class, rank--);
+        put(SubTermStructure.class, rank--);
 
         put(TaskBeliefHas.class, rank--);
 
-        put(SubTermStructure.class, rank--);
+
+        put(TaskBeliefOccurrence.class, rank--);
 
         put(TaskPolarity.class, rank--); //includes both positive or negative
         put(BeliefPolarity.class, rank--);
 
-
         put(Solve.class, rank--);
+
 
     }};
 
     private static Object classify(Term b) {
         if (b instanceof AbstractPatternOp.PatternOp)
-            return "PatternOp" + (((AbstractPatternOp.PatternOp) b).subterm == 0 ? "0" : "1"); //split
+            return "PatternOp" + (((AbstractPatternOp.PatternOp) b).taskOrBelief == 0 ? "0" : "1"); //split
 
-        if ((b == TaskPolarity.pos) || (b == TaskPolarity.neg)) return TaskPolarity.class;
-
-        if (b == BeliefPolarity.beliefExist) return "BeliefExist";
+        if ((b == TaskPolarity.taskPos) || (b == TaskPolarity.taskNeg)) return TaskPolarity.class;
         if ((b == BeliefPolarity.beliefPos) || (b == BeliefPolarity.beliefNeg)) return BeliefPolarity.class;
+        //if (b == BeliefPolarity.beliefExist) return "BeliefExist";
 
         if (b.getClass() == TaskBeliefHas.class) return TaskBeliefHas.class;
 
@@ -338,11 +339,11 @@ public class PremiseRule extends GenericCompound {
                 new TreeSet(); //for consistent ordering to maximize folding
 
 
-        Term taskTermPattern = getTask();
-        Term beliefTermPattern = getBelief();
+        Term taskPattern = getTask();
+        Term beliefPattern = getBelief();
 
-        if (beliefTermPattern.op() == Op.ATOM) {
-            throw new RuntimeException("belief term must contain no atoms: " + beliefTermPattern);
+        if (beliefPattern.op() == Op.ATOM) {
+            throw new RuntimeException("belief term must contain no atoms: " + beliefPattern);
         }
 
         //if it contains an atom term, this means it is a modifier,
@@ -411,26 +412,27 @@ public class PremiseRule extends GenericCompound {
                     break;
 
                 case "notSet":
-                    opNot(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.SetBits);
+                    opIsNot(taskPattern, beliefPattern, pres, constraints, X, Op.SetBits);
                     break;
 
                 case "set":
-                    pres.add(new TaskBeliefHas(Op.SetBits, taskTermPattern.contains(X), beliefTermPattern.contains(X)));
+                    if (taskPattern.equals(X) || beliefPattern.equals(X))
+                        pres.add(new TaskBeliefHas(Op.SetBits, taskPattern.equals(X), beliefPattern.equals(X)));
                     constraints.add(new OpInConstraint(X, Op.SETi, Op.SETe));
                     break;
 
                 case "setext": //TODO rename: opSETe
-                    isOp(pres, taskTermPattern, beliefTermPattern, constraints, X, Op.SETe);
+                    isOp(pres, taskPattern, beliefPattern, constraints, X, Op.SETe);
                     break;
 
                 case "setint": //TODO rename: opSETi
-                    isOp(pres, taskTermPattern, beliefTermPattern, constraints, X, Op.SETi);
+                    isOp(pres, taskPattern, beliefPattern, constraints, X, Op.SETi);
                     break;
                 case "opSECTe":
-                    isOp(pres, taskTermPattern, beliefTermPattern, constraints, X, Op.SECTe);
+                    isOp(pres, taskPattern, beliefPattern, constraints, X, Op.SECTe);
                     break;
                 case "opSECTi":
-                    isOp(pres, taskTermPattern, beliefTermPattern, constraints, X, Op.SECTi);
+                    isOp(pres, taskPattern, beliefPattern, constraints, X, Op.SECTi);
                     break;
 
 //
@@ -439,9 +441,15 @@ public class PremiseRule extends GenericCompound {
 //                    break;
 
                 case "notImpl":
-                    opNotContaining(taskTermPattern, beliefTermPattern, pres, constraints, X, Op.IMPL.bit);
+                    opIsNot(taskPattern, beliefPattern, pres, constraints, X, Op.IMPL.bit);
                     break;
 
+                case "has":
+                    //TODO make var arg version of this
+                    Op o = Op.the($.unquote(Y));
+                    assert (o != null);
+                    termHas(taskPattern, beliefPattern, pres, constraints, X, o.bit);
+                    break;
 
                 case "time":
                     switch (XString) {
@@ -462,8 +470,6 @@ public class PremiseRule extends GenericCompound {
                         case "dtEventsOrEternals":
                             pres.add(TaskBeliefOccurrence.eventsOrEternals);
                             break;
-
-
 
 
                         default:
@@ -547,10 +553,10 @@ public class PremiseRule extends GenericCompound {
                 case "task":
                     switch (XString) {
                         case "negative":
-                            pres.add(TaskPolarity.neg);
+                            pres.add(TaskPolarity.taskNeg);
                             break;
                         case "positive":
-                            pres.add(TaskPolarity.pos);
+                            pres.add(TaskPolarity.taskPos);
                             break;
                         case "\"?\"":
                             pres.add(TaskPunctuation.Question);
@@ -669,19 +675,22 @@ public class PremiseRule extends GenericCompound {
         return this;
     }
 
-    private static void isOp(Set<PrediTerm> pres, Term taskTermPattern, Term beliefTermPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
-        pres.add(new TaskBeliefHas(v.bit, taskTermPattern.contains(x), beliefTermPattern.contains(x)));
+    private static void isOp(Set<PrediTerm> pres, Term taskPattern, Term beliefPattern, SortedSet<MatchConstraint> constraints, Term x, Op v) {
+        if (taskPattern.equals(x) || beliefPattern.equals(x))
+            pres.add(new TaskBeliefHas(v.bit, taskPattern.equals(x), beliefPattern.equals(x)));
         constraints.add(new OpConstraint(x, v));
     }
 
 
-    private static void opNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
-
+    private static void opIsNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
         constraints.add(new OpExclusionConstraint(t, structure));
     }
 
+    private static void termHas(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
+        constraints.add(new StructureInclusionConstraint(t, structure));
+    }
 
-    private static void opNotContaining(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
+    private static void termHasNot(Term task, Term belief, @NotNull Set<PrediTerm> pres, @NotNull SortedSet<MatchConstraint> constraints, @NotNull Term t, int structure) {
         constraints.add(new StructureExclusionConstraint(t, structure));
     }
 

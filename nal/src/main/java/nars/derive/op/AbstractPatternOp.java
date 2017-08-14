@@ -21,20 +21,20 @@ public enum AbstractPatternOp  {
 
     public static final class PatternOp extends AbstractPred<Derivation> {
 
-        public final int subterm;
+        public final int taskOrBelief;
         public final int opOrdinal;
 
 
-        public PatternOp(int subterm, @NotNull Op op) {
-            super(name(PatternOp.class, subterm, op.str));
-            this.subterm = subterm;
+        public PatternOp(int taskOrBelief, @NotNull Op op) {
+            super(name(PatternOp.class, taskOrBelief, op.str));
+            this.taskOrBelief = taskOrBelief;
             this.opOrdinal = op.id;
         }
 
 
         @Override
         public boolean test(@NotNull Derivation ff) {
-            return (subterm == 0 ? ff.termSub0op : ff.termSub1op) == opOrdinal;
+            return (taskOrBelief == 0 ? ff.termSub0op : ff.termSub1op) == opOrdinal;
         }
 
     }

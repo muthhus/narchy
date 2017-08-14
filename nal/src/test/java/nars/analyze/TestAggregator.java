@@ -69,7 +69,7 @@ public class TestAggregator extends RunListener {
     }
 
     protected void describe(@NotNull Description d, boolean success) throws Narsese.NarseseException {
-        Term x = $.negIf($.func("ok", getDescriptionTerm(d)), success);
+        Term x = $.func("ok", getDescriptionTerm(d)).negIf(success);
         System.out.println(x);
         nar.believe(x);
     }

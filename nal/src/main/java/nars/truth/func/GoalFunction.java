@@ -9,7 +9,6 @@ import nars.truth.TruthFunctions;
 import nars.truth.func.annotation.AllowOverlap;
 import nars.truth.func.annotation.SinglePremise;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -19,110 +18,127 @@ import static nars.truth.TruthFunctions.*;
 public enum GoalFunction implements TruthOperator {
 
     Strong() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireStrongOriginal(T, B, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return desireStrongOriginal(T, B, minConf);
         }
     },
 
     Weak() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireWeakOriginal(T, B, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return desireWeakOriginal(T, B, minConf);
         }
     },
 
     Deduction() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireDed(T, B, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return desireDed(T, B, minConf);
         }
     },
 
 //    Goduction() {
-//        @Nullable
-//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-//            return (T == null || B == null) ? null : TruthFunctions.desireStrongOriginal(T, B, minConf);
+//        
+//        @Override public Truth apply( final Truth T,  final Truth B, NAR m, float minConf) {
+//            return TruthFunctions.desireStrongOriginal(T, B, minConf);
 //        }
 //    },
 
 //    @SinglePremise StructuralGoduction() {
-//        @Nullable
-//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-//            return (T == null) ? null : TruthFunctions.desireStrongOriginal(T, defaultTruth(m), minConf);
+//        
+//        @Override public Truth apply( final Truth T,  final Truth B, NAR m, float minConf) {
+//            return TruthFunctions.desireStrongOriginal(T, defaultTruth(m), minConf);
 //        }
 //    },
 
 
     @SinglePremise
     Negation() {
-        @Override public @Nullable Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return negation(T, minConf);
         }
     },
 
     Induction() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireInd(T, B, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return desireInd(T, B, minConf);
         }
     },
 
+    InductionPB() {
+        @Override public Truth apply( final Truth T,  final Truth B, NAR m, float minConf) {
+           if (B.isNegative()) {
+                Truth x = Induction.apply(T, B.negated(), m, minConf);
+                return x!=null ? x.negated() : null;
+            } else {
+                return Induction.apply(T, B, m, minConf);
+            }
+        }
+    },
+
+
     @AllowOverlap
     InductionRecursive() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return (T == null || B == null) ? null : desireInd(T, B, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return desireInd(T, B, minConf);
         }
     },
 
 
 //    //EXPERIMENTAL
 //    Abduction() {
-//        @Nullable
-//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
-//            return ((B == null) || (T == null)) ? null : TruthFunctions.abduction(T, B, minConf);
+//        
+//        @Override public Truth apply( final Truth T,  final Truth B, Memory m, float minConf) {
+//            return TruthFunctions.abduction(T, B, minConf);
 //        }
 //    },
 
 
     DecomposePositiveNegativeNegative() {
-        @Nullable @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return decompose(T, B, true, false, false, minConf);
         }
     },
     DecomposePositiveNegativePositive() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return TruthFunctions.decompose(T,B, true, false, true, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return TruthFunctions.decompose(T, B, true, false, true, minConf);
         }
     },
     DecomposeNegativeNegativeNegative() {
-        @Nullable @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return decompose(T, B, false, false, false, minConf);
         }
     },
     DecomposeNegativePositivePositive() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return TruthFunctions.decompose(T,B, false, true, true, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return TruthFunctions.decompose(T, B, false, true, true, minConf);
         }
     },
 
     @SinglePremise
     Identity() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return TruthOperator.identity(T, minConf);
         }
     },
 
-    /** same as identity but allows overlap */
+    /**
+     * same as identity but allows overlap
+     */
     @SinglePremise
     //@AllowOverlap
     IdentityTransform() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return TruthOperator.identity(T, minConf);
         }
     },
@@ -131,18 +147,17 @@ public enum GoalFunction implements TruthOperator {
     @SinglePremise
     @AllowOverlap
     StructuralDeduction() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, final Truth B, @NotNull NAR m, float minConf) {
-            return T != null ? deduction1(T, defaultTruth(m).conf(), minConf) : null;
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return deduction1(T, defaultTruth(m).conf(), minConf);
         }
     },
 
     @SinglePremise
     @AllowOverlap
     BeliefStructuralDeduction() {
-        @Nullable
-        @Override public Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
-            if (B == null) return null;
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return deduction1(B, defaultConfidence(m), minConf);
         }
     },
@@ -150,46 +165,44 @@ public enum GoalFunction implements TruthOperator {
 
 //    @AllowOverlap @SinglePremise
 //    StructuralStrongNeg() {
-//        @Nullable
-//        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, @NotNull Memory m, float minConf) {
+//        
+//        @Override public Truth apply( final Truth T,  final Truth B, Memory m, float minConf) {
 //            return TruthFunctions.desireStrong(T, defaultTruth(m).negated(), minConf);
 //        }
 //    },
 
 
     Union() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return ((B == null) || (T == null)) ? null : union(T, B, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return union(T, B, minConf);
         }
     },
 
     StructuralIntersection() {
-        @Override public @Nullable Truth apply(final Truth T, @Nullable final Truth B, @NotNull NAR m, float minConf) {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return B != null ? TruthFunctions.intersection(B, defaultTruth(m), minConf) : null;
         }
     },
 
 
     Intersection() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return ((B == null) || (T == null)) ? null : intersection(T, B, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return intersection(T, B, minConf);
         }
     },
 
     Difference() {
-        @Nullable
-        @Override public Truth apply(@Nullable final Truth T, @Nullable final Truth B, NAR m, float minConf) {
-            return ((B == null) || (T == null)) ? null : difference(T, B, minConf);
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return difference(T, B, minConf);
         }
-    },
-
-
-    ;
+    },;
 
     @NotNull
-    private static Truth defaultTruth(@NotNull NAR m) {
+    private static Truth defaultTruth(NAR m) {
         return m.truthDefault(Op.GOAL /* goal? */);
     }
 
@@ -231,7 +244,7 @@ public enum GoalFunction implements TruthOperator {
         return overlap;
     }
 
-    private static float defaultConfidence(@NotNull NAR m) {
+    private static float defaultConfidence(NAR m) {
         return m.confDefault(Op.GOAL);
     }
 }

@@ -1,5 +1,6 @@
 package nars.nal.nal5;
 
+import nars.Param;
 import nars.test.TestNAR;
 import nars.util.AbstractNALTest;
 import org.junit.Before;
@@ -12,7 +13,7 @@ import static nars.time.Tense.ETERNAL;
 //@RunWith(Parameterized.class)
 public class NAL5Test extends AbstractNALTest {
 
-    final int cycles = 150;
+    final int cycles = 550;
 
     @Before
     public void nal() {
@@ -346,7 +347,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("([flying]:robin ==> bird:robin)"); //.en("If robin can fly then robin is a bird.");
         tester.believe("((swimmer:robin && [flying]:robin) ==> bird:robin)"); //.en("If robin both swims and flys then robin is a bird.");
-        tester.mustBelieve(cycles * 4, "swimmer:robin", 1.00f, 0.45f /*0.4f*/); //.en("I guess robin swims.");
+        tester.mustBelieve(cycles * 4, "swimmer:robin", 1.00f, 0.42f /*0.4f*/); //.en("I guess robin swims.");
 
     }
 
@@ -360,7 +361,7 @@ public class NAL5Test extends AbstractNALTest {
                 .believe("<(&&,<robin --> [withWings]>,<robin --> [chirping]>) ==> <robin --> bird>>") //.en("If robin is has wings and chirps, then robin is a bird")
                 .believe("<(&&,<robin --> [flying]>,<robin --> [withWings]>,<robin --> [chirping]>) ==> <robin --> bird>>") //.en("If robin can fly, has wings, and chirps, then robin is a bird");
                 .mustBelieve(cycles * 2, "<robin --> [flying]>",
-                        1.00f, 0.45f
+                        1.00f, 0.40f
                 ) //.en("I guess that robin can fly.");
                 .mustNotOutput(cycles, "<robin --> [flying]>", BELIEF, 0f, 0.5f, 0, 1, ETERNAL);
     }
@@ -478,11 +479,14 @@ public class NAL5Test extends AbstractNALTest {
 //                .mustNotOutput(cycles, "(y)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL);
 //    }
 
-
+//    static {
+//        Param.TRACE = true;
+//    }
     @Test
     public void testImplNegPos() {
 
         test
+                .log()
                 .input("(x). %0.0;0.90%")
                 .input("((--,(x)) ==> (y)).")
                 .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
@@ -491,12 +495,13 @@ public class NAL5Test extends AbstractNALTest {
         ;
     }
 
+
     @Test
     public void testImplNegNeg() {
 
         test
-                //.log()
-                .input("x. %0.0;0.90%")
+                .log()
+                .input("(--,x).")
                 .input("((--,x) ==> (--,y)).")
                 .mustBelieve(cycles * 2, "y", 0.0f, 0.81f)
                 .mustNotOutput(cycles * 2, "y", BELIEF, 0.5f, 1f, 0, 1, ETERNAL)

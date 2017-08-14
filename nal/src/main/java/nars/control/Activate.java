@@ -41,6 +41,35 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     }
 
 
+
+    public static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n) {
+        if (n.exe.concurrent()) {
+            n.exe.execute(()->activate(t, activationApplied, n, true));
+        } else {
+            activate(t, activationApplied, n, true);
+        }
+    }
+
+    static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n, boolean process) {
+        // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
+        //if (activation >= EPSILON) {
+        Concept cc = t.concept(n, true);
+        if (cc != null) {
+
+            n.input(activate(t, activationApplied, cc, n));
+//                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
+//                n.input(a);
+        }
+
+        if (process) {
+//            if (n.exe.concurrent())
+//                n.eventTaskProcess.emitAsync(/*post*/t, n.exe);
+//            else
+                n.eventTask.emit(t);
+        }
+        //}
+    }
+
     public static Activate activate(@NotNull Task t, float activation, Concept origin, NAR n) {
 
 
@@ -68,34 +97,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             }*/
 //            }
 
-    }
-
-    public static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n) {
-        if (n.exe.concurrent()) {
-            n.exe.execute(()->activate(t, activationApplied, n, true));
-        } else {
-            activate(t, activationApplied, n, true);
-        }
-    }
-
-    public static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n, boolean process) {
-        // if (Util.equals(activation, t.priElseZero(), Pri.EPSILON))  //suppress emitting re-activations
-        //if (activation >= EPSILON) {
-        Concept cc = t.concept(n, true);
-        if (cc != null) {
-
-            n.input(activate(t, activationApplied, cc, n));
-//                        a = (BiConsumer<ConceptFire,NAR>) new Activate.ActivateSubterms(t, activation);
-//                n.input(a);
-        }
-
-        if (process) {
-//            if (n.exe.concurrent())
-//                n.eventTaskProcess.emitAsync(/*post*/t, n.exe);
-//            else
-                n.eventTask.emit(t);
-        }
-        //}
     }
 
     @Override

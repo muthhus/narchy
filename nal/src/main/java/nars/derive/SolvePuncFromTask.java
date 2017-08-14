@@ -16,6 +16,6 @@ public final class SolvePuncFromTask extends Solve {
 
     @Override
     public boolean test(@NotNull Derivation m) {
-        return measure(m, m.taskPunct);
+        return test(m, m.taskPunct);
     }
 }
