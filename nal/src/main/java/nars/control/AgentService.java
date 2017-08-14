@@ -2,13 +2,17 @@ package nars.control;
 
 import jcog.learn.Agent;
 import jcog.math.FloatSupplier;
+import jcog.tensor.ScalarTensor;
+import jcog.tensor.Tensor;
 import jcog.util.IntIntToObjectFunc;
+import nars.$;
 import nars.NAR;
 import org.apache.commons.lang3.mutable.MutableFloat;
+import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
 
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-import java.util.function.Supplier;
 
 public class AgentService extends DurService {
 
@@ -33,4 +37,70 @@ public class AgentService extends DurService {
         int a = agent.act(reward.asFloat(), in);
         act.accept(a);
     }
+
+    public static class AgentBuilder {
+        final List<Tensor> sensors = $.newArrayList();
+        final List<IntObjectPair<? extends IntConsumer>> actions = $.newArrayList();
+        final FloatSupplier reward;
+        private final IntIntToObjectFunc<Agent> a;
+        float durations = 1f;
+
+        public AgentBuilder(IntIntToObjectFunc<Agent> a, FloatSupplier reward) {
+            this.a = a;
+            this.reward = reward;
+        }
+
+        public AgentBuilder durations(float runEveryDurations) {
+            this.durations = runEveryDurations;
+            return this;
+        }
+
+        public AgentService get(NAR nar) {
+
+            final int inputs = sensors.stream().mapToInt(Tensor::volume).sum();
+            final int outputs = actions.stream().mapToInt(IntObjectPair::getOne).sum();
+
+            Consumer<float[]> inputter = (f) -> {
+                int s = sensors.size();
+                int j = 0;
+                for (int i = 0; i < s; i++) {
+                    Tensor x = sensors.get(i);
+                    x.writeTo(f, j);
+                    j += x.volume();
+                }
+                assert(j == f.length);
+            };
+            IntConsumer act = (c) -> {
+                int s = actions.size();
+                for (int i = 0; i < s; i++) {
+                    IntObjectPair<? extends IntConsumer> aa = actions.get(i);
+                    int bb = aa.getOne();
+                    if (c > bb) {
+                        c -= bb;
+                    } else {
+                        aa.getTwo().accept(c);
+                        return;
+                    }
+                }
+            };
+            return new AgentService(a, inputs, inputter, reward, outputs, act, new MutableFloat(durations), nar);
+        }
+
+        public AgentBuilder in(FloatSupplier f) {
+            sensors.add(new ScalarTensor(f));
+            return this;
+        }
+
+        public AgentBuilder in(Tensor t) {
+            sensors.add(t);
+            return this;
+        }
+
+        public AgentBuilder out(IntObjectPair<? extends IntConsumer> action) {
+            actions.add(action);
+            return this;
+        }
+
+    }
+
 }

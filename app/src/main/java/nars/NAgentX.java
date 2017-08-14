@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.learn.ql.HaiQAgent;
 import jcog.pri.mix.control.MixContRL;
@@ -21,7 +22,9 @@ import nars.video.*;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
+import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
+import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.widget.console.ConsoleTerminal;
@@ -164,21 +167,27 @@ abstract public class NAgentX extends NAgent {
         //a.trace = true;
 
 
-        new AgentService(
-                HaiQAgent::new,
-                2,
-                (f) -> {
-                    f[0] = a.dexterity();
-                    f[1] = a.reward;
-                },
-                () -> {
-                    return a.dexterity() + Math.max(0, a.reward);
-                },
-                3,
-                new HarmonicController(n.truthResolution::setValue, 0.01f, 0.16f),
-                new MutableFloat(1f),
-                n
-        );
+        new AgentService.AgentBuilder(HaiQAgent::new,
+            () -> Util.tanhFast(a.dexterity() +  Util.tanhFast( a.reward) ) ) //reward function
+            .in(a::dexterity)
+            .in(()->a.reward)
+            .out(
+                new HarmonicController(n.truthResolution::setValue, 0.01f, 0.16f)
+            ).get(n);
+
+//        new AgentService(
+//                HaiQAgent::new,
+//                2,
+//                (f) -> {
+//                    f[0] = a.dexterity();
+//                    f[1] = a.reward;
+//                },
+//                ,
+//                3,
+//                new HarmonicController(n.truthResolution::setValue, 0.01f, 0.16f),
+//                new MutableFloat(1f),
+//                n
+//        );
 
 
 //        n.onTask(t -> {
@@ -266,7 +275,7 @@ abstract public class NAgentX extends NAgent {
      * increments/decrements within a finite set of powers-of-two so that harmonics
      * wont interfere as the resolution changes
      */
-    public static class HarmonicController implements IntConsumer {
+    public static class HarmonicController implements IntConsumer, IntObjectPair<HarmonicController> {
 
         private final FloatProcedure update;
         final float[] v;
@@ -308,6 +317,21 @@ abstract public class NAgentX extends NAgent {
                     set(x+1);
                     break;
             }
+        }
+
+        /** number actions */
+        @Override public int getOne() {
+            return 3;
+        }
+
+        @Override
+        public HarmonicController getTwo() {
+            return this;
+        }
+
+        @Override
+        public int compareTo(@NotNull IntObjectPair<HarmonicController> o) {
+            throw new UnsupportedOperationException();
         }
     }
 
