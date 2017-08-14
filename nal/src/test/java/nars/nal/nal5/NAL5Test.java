@@ -486,7 +486,6 @@ public class NAL5Test extends AbstractNALTest {
     public void testImplNegPos() {
 
         test
-                .log()
                 .input("(x). %0.0;0.90%")
                 .input("((--,(x)) ==> (y)).")
                 .mustBelieve(cycles, "(y)", 1.0f, 0.81f)
@@ -500,7 +499,6 @@ public class NAL5Test extends AbstractNALTest {
     public void testImplNegNeg() {
 
         test
-                .log()
                 .input("(--,x).")
                 .input("((--,x) ==> (--,y)).")
                 .mustBelieve(cycles * 2, "y", 0.0f, 0.81f)
