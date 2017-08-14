@@ -1,6 +1,7 @@
 package nars.index.term.map;
 
 import com.github.benmanes.caffeine.cache.*;
+import nars.NAR;
 import nars.Op;
 import nars.Param;
 import nars.index.util.TermContainerToOpMap;
@@ -28,6 +29,7 @@ import static nars.Op.True;
  *          slightly reduce the size that TermContainerToOpMap's need to be.
  */
 public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<TermContainer, TermContainerToOpMap<Termed>> {
+    private final long capacity;
 
 
 //    @NotNull
@@ -40,7 +42,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
      * holds compounds and subterm vectors
      */
     @NotNull
-    public final Cache<TermContainer, TermContainerToOpMap<Termed>> vectors;
+    public Cache<TermContainer, TermContainerToOpMap<Termed>> vectors;
 
 
 //    private static final Weigher<Term, Termed> weigher = (k, v) -> {
@@ -67,18 +69,21 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
         return (k.complexity() + k.volume())/2;
     };
 
-    public CaffeineIndex2(long capacity) {
-        this(capacity, null /*MoreExecutors.directExecutor()*/);
-    }
 
     /**
      * use the soft/weak option with CAUTION you may experience unexpected data loss and other weird symptoms
      */
-    public CaffeineIndex2(long capacity, @Nullable Executor exe) {
+    public CaffeineIndex2(long capacity) {
         super();
 
         //long maxSubtermWeight = maxWeight * 3; //estimate considering re-use of subterms in compounds and also caching of non-compound subterms
 
+        this.capacity = capacity;
+
+    }
+
+    @Override
+    public void start(NAR nar) {
         Caffeine builder = Caffeine.newBuilder().removalListener(this);
         if (capacity > 0) {
             //builder.maximumSize(capacity);
@@ -90,20 +95,12 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
         if (Param.DEBUG)
             builder.recordStats();
 
-
-        if (exe != null) {
-            builder.executor(exe);
-        }
-
+        builder.executor(nar.exe);
 
         this.vectors = builder.build();
 
-        //else
-        //  this.subterms = null;
-
+        super.start(nar);
     }
-
-
 
     @Override
     public Stream<Termed> stream() {
@@ -257,7 +254,8 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
     @Override
     public @NotNull String summary() {
         //CacheStats s = cache.stats();
-        return (vectors.estimatedSize() + " TermVectors, ") + ' ' + super.summary();
+        return (vectors.estimatedSize() + " TermVectors, ") + ' ' + super.summary() +
+                (Param.DEBUG ? (" " + vectors.stats()) : "");
         //(" + n2(s.hitRate()) + " hitrate, " +
         //s.requestCount() + " reqs)";
 

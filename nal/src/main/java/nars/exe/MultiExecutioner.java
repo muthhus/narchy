@@ -23,10 +23,6 @@ public class MultiExecutioner extends Executioner {
     private final Worker[] workers;
     private final int num;
 
-    /**
-     * foreground: the independent, preallocated, high frequency worker threads ; a fixed threadpool
-     */
-    private final ExecutorService working;
 
 
     public MultiExecutioner(IntFunction<Worker> workers, int numWorkers, int passive) {
@@ -42,7 +38,7 @@ public class MultiExecutioner extends Executioner {
         assert (num > 0);
         this.workers = workers;
         this.passive = passive;
-        this.working = Executors.newFixedThreadPool(num);
+        //this.working = Executors.newFixedThreadPool(num);
 
         for (Worker s : workers) {
             s.passive = passive;
@@ -54,8 +50,7 @@ public class MultiExecutioner extends Executioner {
         super.start(nar);
 
         for (Worker w : workers) {
-            w.start(nar);
-            working.execute(w.start(0));
+            w.start(nar,0);
         }
     }
 
@@ -85,8 +80,8 @@ public class MultiExecutioner extends Executioner {
     @Override
     public synchronized void stop() {
 
-        for (Worker w : workers) w.stop();
-        this.working.shutdownNow();
+        for (Worker w : workers)
+            w.stop();
 
         super.stop();
 
@@ -166,12 +161,14 @@ public class MultiExecutioner extends Executioner {
             this.model = delegate;
         }
 
-        Loop start(int periodMS) {
+        Loop start(NAR nar, int periodMS) {
+            this.start(nar);
             model.start(nar);
 
             return this.loop = new Loop(periodMS) {
                 @Override
                 public boolean next() {
+                    //System.out.println(Thread.currentThread() + " " + model);
                     model.cycle();
                     return true;
                 }
@@ -194,9 +191,11 @@ public class MultiExecutioner extends Executioner {
 
         @Override
         public synchronized void stop() {
-            loop.stop();
-            model.stop();
-            loop = null;
+            if (loop!=null) {
+                loop.stop();
+                model.stop();
+                loop = null;
+            }
         }
 
         @Override
