@@ -127,11 +127,12 @@ public enum BeliefFunction implements TruthOperator {
             }
         }
     },
+
     @AllowOverlap
-    AbductionRecursive() {
+    AbductionRecursivePB() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return TruthFunctions.abduction(T, B, minConf);
+            return AbductionPB.apply(T,B,m,minConf);
         }
     },
 

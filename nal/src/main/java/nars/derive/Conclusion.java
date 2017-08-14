@@ -120,7 +120,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             if (d.temporal) {
                 Map<Term, Term> m = vc.getTwo();
-                m.forEach(d::putXY); //store the mapping so that temporalization can resolve with it
+                m.forEach(d.xy::tryPut); //store the mapping so that temporalization can resolve with it
             }
 
             c1 = v;

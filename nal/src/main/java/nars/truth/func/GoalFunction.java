@@ -9,6 +9,7 @@ import nars.truth.TruthFunctions;
 import nars.truth.func.annotation.AllowOverlap;
 import nars.truth.func.annotation.SinglePremise;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -35,6 +36,18 @@ public enum GoalFunction implements TruthOperator {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return desireDed(T, B, minConf);
+        }
+    },
+
+    @AllowOverlap  DeductionRecursivePB() {
+        @Override
+        public Truth apply(Truth T, Truth B, NAR m, float minConf) {
+              if (B.isNegative()) {
+                Truth x = Deduction.apply(T, B.negated(), m, minConf);
+                return x != null ? x.negated() : null;
+            } else {
+                return Deduction.apply(T, B, m, minConf);
+            }
         }
     },
 
@@ -68,7 +81,7 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    InductionPB() {
+    @AllowOverlap  InductionRecursivePB() {
         @Override public Truth apply( final Truth T,  final Truth B, NAR m, float minConf) {
            if (B.isNegative()) {
                 Truth x = Induction.apply(T, B.negated(), m, minConf);
@@ -80,13 +93,6 @@ public enum GoalFunction implements TruthOperator {
     },
 
 
-    @AllowOverlap
-    InductionRecursive() {
-        @Override
-        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return desireInd(T, B, minConf);
-        }
-    },
 
 
 //    //EXPERIMENTAL

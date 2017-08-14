@@ -168,7 +168,8 @@ public class Derivation extends Unify implements TermContext {
         final Functor substitute = new substitute() {
             @Override
             protected boolean onChange(Term from, Term x, Term y, Term to) {
-                return putXY(x, y); //TODO verify correct direction and whether reverse is also needed
+                assert(Derivation.this.xy.tryPut(x, y));
+                return true;
             }
         };
 

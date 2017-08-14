@@ -71,13 +71,14 @@
 //      If after M, P usually happens, and M happens, it means P is expected to happen
 
     B, (A ==> C), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionRecursivePB)
-        A, (A ==> C), time(urgent), notImpl(A) |- C, (Belief:DeductionPB, Goal:InductionPB)
+        A, (A ==> C), time(urgent), notImpl(A) |- C, (Belief:DeductionRecursivePB, Goal:InductionRecursivePB)
     B, ((--,%A) ==> C), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionRecursivePBN)
-        A, ((--,%A) ==> C), time(urgent), notImpl(A) |- C, (Belief:DeductionPBN, Goal:InductionPBN)
+        A, ((--,%A) ==> C), time(urgent), notImpl(A) |- C, (Belief:DeductionRecursivePBN, Goal:InductionRecursivePBN)
 
 
-    B, (C ==> A), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:AbductionRecursive)
-        A, (C ==> A), time(urgent), notImpl(A) |- C, (Belief:Abduction, Goal:Deduction)
+    B, (C ==> A), neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:AbductionRecursivePB)
+        A, (C ==> A), time(urgent), notImpl(A) |- C, (Belief:AbductionRecursivePB, Goal:DeductionRecursivePB)
+
         //TODO maybe the belief(negative) cases are actually necessary to derive --C
 
         //has(A,"$"),

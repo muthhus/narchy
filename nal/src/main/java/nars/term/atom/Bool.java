@@ -7,6 +7,7 @@ import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.ATOM;
+import static nars.Op.BOOL;
 import static nars.Op.Null;
 
 
@@ -23,13 +24,13 @@ abstract public class Bool extends AtomicToString {
     private final String id;
 
     protected Bool(@NotNull String id) {
-        super(ATOM, id);
+        super(BOOL, id);
         this.id = id;
     }
 
     @Override
     public @NotNull Op op() {
-        return ATOM;
+        return BOOL;
     }
 
 

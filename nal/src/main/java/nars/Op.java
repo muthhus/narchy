@@ -490,6 +490,10 @@ public enum Op implements $ {
     INT("+", Op.ANY_LEVEL, OpType.Other) {
 
     },
+
+    BOOL("B", Op.ANY_LEVEL, OpType.Other) {
+
+    },
     //SPACE("+", true, 7, Args.GTEOne),
 
 
@@ -895,7 +899,7 @@ public enum Op implements $ {
                 break;
         }
 
-        conceptualizable = !(var || virtual || str.equals("+") /* INT */);
+        conceptualizable = !(var || virtual || str.equals("+") /* INT */ || str.equals("B") /* Bool */);
     }
 
     public static boolean hasAll(int existing, int possiblyIncluded) {
@@ -1677,7 +1681,7 @@ public enum Op implements $ {
             super(String.valueOf(Op.NullSym));
         }
 
-        final static int rankBoolNull = Term.opX(ATOM, 0);
+        final static int rankBoolNull = Term.opX(BOOL, 0);
 
         @Override
         public final int opX() {
@@ -1695,7 +1699,7 @@ public enum Op implements $ {
             super(String.valueOf(Op.FalseSym));
         }
 
-        final static int rankBoolFalse = Term.opX(ATOM, 1);
+        final static int rankBoolFalse = Term.opX(BOOL, 1);
 
         @Override
         public final int opX() {
@@ -1714,7 +1718,7 @@ public enum Op implements $ {
             super(String.valueOf(Op.TrueSym));
         }
 
-        final static int rankBoolTrue = Term.opX(ATOM, 2);
+        final static int rankBoolTrue = Term.opX(BOOL, 2);
 
         @Override
         public final int opX() {

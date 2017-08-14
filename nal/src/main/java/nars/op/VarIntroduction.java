@@ -5,11 +5,11 @@ import nars.$;
 import nars.term.Compound;
 import nars.term.Term;
 import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -56,7 +56,7 @@ public abstract class VarIntroduction {
         }
 
 
-        Map<Term,Term> substs = new UnifiedMap<>(1, 1f);
+        Map<Term,Term> substs = new HashMap<>(1, 1f);
 
         int varOffset = x.vars(); //ensure the variables dont collide with existing variables
         boolean found = false;

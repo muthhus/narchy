@@ -95,7 +95,7 @@ public class Temporalize implements ITemporalize {
 //            model.solve(pattern, trail);
             return null;
         }
-        if (e == null)
+        if (e == null || !e.term.op().conceptualizable)
             return null;
 
         if (e instanceof AbsoluteEvent) {
@@ -111,6 +111,12 @@ public class Temporalize implements ITemporalize {
         if (occ[0] == ETERNAL && (!te || (belief != null && !belief.isEternal()))) {
             //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
             //uneternalize/retemporalize:
+
+            if ((e.term.op() != IMPL) && (task.op() == IMPL) && ((belief == null) || (belief.op() == IMPL))) {
+                //dont retemporalize a non-implication derived from two implications
+                //it means that the timing is unknown
+                return null;
+            }
 
             long ts = task.start();
             long k;
