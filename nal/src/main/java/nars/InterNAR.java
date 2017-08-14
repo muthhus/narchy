@@ -169,17 +169,10 @@ public class InterNAR extends TaskService implements TriConsumer<NAR, ActiveQues
         }
 
         @Override
-        public void stop() {
-            super.stop();
-        }
-
-        @Override
         protected void onTell(UDProfile connected, Msg m) {
 
-            Task x;
 
-
-            x = IO.taskFromBytes(m.data());
+            Task x = IO.taskFromBytes(m.data());
             if (x != null) {
                 if (x.isQuestOrQuestion()) {
                     //reconstruct a question task with an onAnswered handler to reply with answers to the sender

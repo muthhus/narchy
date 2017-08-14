@@ -11,11 +11,8 @@ import nars.derive.time.Temporalize;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
-import nars.task.NALTask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
-import nars.term.atom.Bool;
-import nars.term.var.Variable;
 import nars.time.Tense;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
@@ -132,7 +129,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         Truth truth = d.concTruth;
 
         @NotNull final long[] occ;
-        final float[] eviGain = new float[] { 1f }; //flat by default
+        final float[] eviGain = { 1f }; //flat by default
 
         Term c2;
         if (d.temporal) {

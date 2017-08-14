@@ -35,7 +35,6 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
-import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;

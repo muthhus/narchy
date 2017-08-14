@@ -223,7 +223,7 @@ public class Premise extends Pri implements ITask {
                     }
                 } catch (InvalidTermException t) {
                     if (Param.DEBUG) {
-                        logger.error("temporalize failure: {} {}", task.term(), beliefTerm, t.getMessage());
+                        logger.error("temporalize failure: {} {} {}", task.term(), beliefTerm, t.getMessage());
                         //return 0;
                     }
                 }

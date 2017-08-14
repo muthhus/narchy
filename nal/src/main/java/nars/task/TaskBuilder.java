@@ -42,7 +42,7 @@ import static nars.time.Tense.*;
     @NotNull
     private Term term;
 
-    protected byte punc;
+    protected final byte punc;
 
     @Nullable
     private Truth truth;

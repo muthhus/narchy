@@ -68,7 +68,7 @@ public abstract class STMClustered extends TaskService {
         public TasksNode(int id) {
 
             super(id, dims);
-            tasks = new PriorityHijackBag<TLink, TLink>(capacity.intValue(), 3) {
+            tasks = new PriorityHijackBag<>(capacity.intValue(), 3) {
 
                 @Override
                 protected TLink merge(@NotNull STMClustered.TLink existing, @NotNull STMClustered.TLink incoming, @Nullable MutableFloat overflowing) {
@@ -389,7 +389,7 @@ public abstract class STMClustered extends TaskService {
 
         now = nar.time();
 
-        nar.onCycle((nn) -> iterate(nn));
+        nar.onCycle(this::iterate);
     }
 
     abstract protected TasksNode newCentroid(int id);
@@ -445,6 +445,7 @@ public abstract class STMClustered extends TaskService {
 
     }
 
+    @Override
     public int size() {
         int sum[] = new int[1];
         net.forEachNode(x -> sum[0] += x.tasks.size());

@@ -30,7 +30,7 @@ abstract public class Executioner implements Executor {
     @Nullable
     protected NAR nar;
 
-    protected On onClear;
+    private On onClear;
 
     public synchronized void start(NAR nar) {
         this.nar = nar;

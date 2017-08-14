@@ -1,6 +1,5 @@
 package nars.derive.time;
 
-import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
 import nars.term.Term;
@@ -8,7 +7,6 @@ import nars.term.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 

@@ -155,7 +155,7 @@ public class NARS {
 
             try {
                 n.inputBinary(f);
-            } catch (FileNotFoundException ff) {
+            } catch (FileNotFoundException ignored) {
                 //ignore
             } catch (IOException e) {
                 NAR.logger.error("input: {} {}", s, e);

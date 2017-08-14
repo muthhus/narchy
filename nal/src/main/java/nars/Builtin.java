@@ -6,7 +6,6 @@ import nars.op.Command;
 import nars.op.DepIndepVarIntroduction;
 import nars.op.Operator;
 import nars.op.data.*;
-import nars.op.data.intersect;
 import nars.op.substitute;
 import nars.term.Functor;
 import nars.term.Term;
@@ -285,8 +284,6 @@ public class Builtin {
 
         nar.on(Functor.f("top", (args) -> {
 
-            int MAX_RESULT_LENGTH = 10;
-
             String query;
             if (args.size() > 0 && args.sub(0) instanceof Atom) {
                 query = $.unquote(args.sub(0)).toLowerCase();
@@ -295,13 +292,14 @@ public class Builtin {
 
             }
 
+            int MAX_RESULT_LENGTH = 10;
             List<Term> rows = $.newArrayList(MAX_RESULT_LENGTH);
             //TODO use Exe stream() methods
             nar.forEachConceptActive(bc -> {
                 if (rows.size() < MAX_RESULT_LENGTH && (query == null || bc.toString().toLowerCase().contains(query))) {
                     rows.add($.p(
                             bc.get().term(),
-                            $.the("$" + Texts.n4(bc.pri())))
+                            $.the('$' + Texts.n4(bc.pri())))
                     );
                 }
             });

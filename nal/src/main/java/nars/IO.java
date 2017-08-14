@@ -441,7 +441,7 @@ public class IO {
             return IO.readTerm(input(b));
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } catch (InvalidTermException f) {
+        } catch (InvalidTermException ignored) {
             return null;
         }
     }

@@ -16,6 +16,7 @@ import nars.truth.Stamp;
 import nars.truth.TruthFunctions;
 import nars.util.BudgetFunctions;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +28,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * Task Dimension Mapping:
@@ -273,13 +275,13 @@ public class MySTMClustered extends STMClustered {
     }
 
     @Nullable
-    private Term conj(@NotNull Task[] uu) {
+    private static Term conj(@NotNull Task[] uu) {
 
         return
                 Op.conj(
-                        Stream.of(uu).map(t -> PrimitiveTuples.pair(
-                                (Term) $.negIf(t.term(), t.truth().isNegative()),
-                                t.start())).collect(toList())
+                        new FasterList<>(Util.map(t -> pair(
+                                $.negIf(t.term(), t.truth().isNegative()),
+                                t.start()), new ObjectLongPair[uu.length], uu))
                 );
 
 

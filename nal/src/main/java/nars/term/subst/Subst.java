@@ -40,12 +40,11 @@ public interface Subst {
 
     /**
      * copy in
-     *
+     * @NotNull commented out for performance
      * @return whether all puts were successful
      */
-    //boolean put(@NotNull Unify copied);
     @NotNull
-    default Term transform(@NotNull Term x) {
+    default Term transform(/*@NotNull*/ Term x) {
 
         assert (!(x instanceof Bool));
 
@@ -91,23 +90,12 @@ public interface Subst {
 
         if (u instanceof EllipsisMatch) {
 
-            if (!((EllipsisMatch) u).forEachWhile(x -> addTransformed(x, next, filterTrueFalse)))
-                return false;
+            return (!((EllipsisMatch) u).forEachWhile(x -> addTransformed(x, next, filterTrueFalse)));
 
         } else {
 
-            if (Term.invalidBoolSubterms(u, filterTrueFalse))
-                return false;
-
-//                if (this instanceof Derivation && u.varPattern() > 0) {
-//                    //assert(false): "varPattern should have been filtered? " + u;
-//                    return null;
-//                }
-
-            next.add(u);
+            return !Term.invalidBoolSubterms(u, filterTrueFalse) && next.add(u);
         }
-
-        return true;
     }
 
 

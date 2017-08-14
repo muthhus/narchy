@@ -368,8 +368,6 @@ public class TestNAR {
     TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end, boolean must) throws Narsese.NarseseException {
 
 
-        float h = Param.TESTS_TRUTH_ERROR_TOLERANCE / 2.0f;
-
         if (freqMin == -1)
             freqMin = freqMax;
 
@@ -377,6 +375,7 @@ public class TestNAR {
         cycleStart -= tt;
         cycleEnd += tt;
 
+        float h = Param.TESTS_TRUTH_ERROR_TOLERANCE / 2.0f;
         EternalTaskCondition tc = start == ETERNAL ?
                 new EternalTaskCondition(nar,
                         cycleStart, cycleEnd,

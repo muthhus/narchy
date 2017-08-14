@@ -73,7 +73,7 @@ public final class STMLinkage extends TaskService {
     }
 
 
-    protected void link(@NotNull Task ta, float strength, float tPri, Task tb, NAR nar) {
+    protected static void link(@NotNull Task ta, float strength, float tPri, Task tb, NAR nar) {
 
 
         /** current task's... */

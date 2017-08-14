@@ -189,9 +189,7 @@ public class CaffeineIndex2 extends MaplikeTermIndex implements RemovalListener<
     }
 
     private TermContainerToOpMap<Termed> vectorOrCreate(@NotNull Term x) {
-        return vectors.get(vector(x), (v) -> {
-            return new TermContainerToOpMap<>(v);
-        });
+        return vectors.get(vector(x), TermContainerToOpMap::new);
     }
 
 

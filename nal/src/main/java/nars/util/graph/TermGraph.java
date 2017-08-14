@@ -139,7 +139,6 @@ public enum TermGraph {
                 return;
 
             int dt = t.dt();
-            boolean reverse = dt != DTERNAL && (dt < 0);
             float evi =
                     t.evi(when, dur);
             //dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
@@ -156,6 +155,7 @@ public enum TermGraph {
             if (val < Priority.EPSILON)
                 return;
 
+            boolean reverse = dt != DTERNAL && (dt < 0);
             Term S = reverse ? $.negIf(pred, neg) : subj;
             Term P = reverse ? subj : $.negIf(pred, neg);
             g.putEdgeValue(S, P, val + g.edgeValueOrDefault(S, P, 0f));

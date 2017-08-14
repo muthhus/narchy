@@ -106,7 +106,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
                 try {
                     Task first = iterator().next();
                     template = first.term();
-                } catch (NullPointerException e) {
+                } catch (NullPointerException ignored) {
                     return null;
                 }
             }

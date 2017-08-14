@@ -17,6 +17,7 @@ public class NARService extends Services.AbstractService<NAR> implements Termed 
         nar.on(this);
     }
 
+    @Override
     protected void start(NAR nar) {
         ons = new Ons();
         ons.add(nar.eventClear.on(n -> clear()));

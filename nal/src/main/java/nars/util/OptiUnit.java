@@ -144,6 +144,8 @@ public class OptiUnit<T> extends RunListener {
                 Suite ss = new Suite(new BuildMyRunners(s), tests);
                 logger.info("run: {}", s);
                 ss.run(rn);
+            } catch (InitializationError e) {
+                e.printStackTrace();
             } catch (Throwable t) {
                 logger.error(" {}", t);
             }
@@ -267,7 +269,7 @@ public class OptiUnit<T> extends RunListener {
             //last resort try to parse as a string
             try {
                 return Texts.f(value.toString());
-            } catch (NumberFormatException e) {
+            } catch (NumberFormatException ignored) {
 
             }
         }

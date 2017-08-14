@@ -22,7 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import java.io.PrintStream;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static jcog.tree.rtree.RTreeCursor.ordering;

@@ -145,7 +145,7 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
         return f2(fName(termAtom), (xt, yt) -> {
             try {
                 return $.the(ff.apply($.intValue(xt), $.intValue(yt)));
-            } catch(NumberFormatException e) {
+            } catch(NumberFormatException ignored) {
                 return null;
             }
         });

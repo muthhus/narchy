@@ -163,20 +163,17 @@ public class Revision {
 
         depth /= 2f;
 
-        Term a0, a1;
-//        if (forwardSubterms(a, adt)) {
-            a0 = a.sub(0);
-            a1 = a.sub(1);
+        //        if (forwardSubterms(a, adt)) {
+        Term a0 = a.sub(0);
+        Term a1 = a.sub(1);
 //        } else {
 //            a0 = a.sub(1);
 //            a1 = a.sub(0);
 //            adt = -bdt;
 //        }
-        Term b1;
-        Term b0;
-//        if (forwardSubterms(b, bdt)) {
-            b0 = b.sub(0);
-            b1 = b.sub(1);
+        //        if (forwardSubterms(b, bdt)) {
+        Term b0 = b.sub(0);
+        Term b1 = b.sub(1);
 //        } else {
 //            b0 = b.sub(1);
 //            b1 = b.sub(0);

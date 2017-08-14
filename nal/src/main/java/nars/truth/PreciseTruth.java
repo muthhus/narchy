@@ -27,7 +27,7 @@ public class PreciseTruth implements Truth {
                 "invalid evidence/conf";
         float e;
         if (xIsConfOrEvidence) {
-            assert(x <= TruthFunctions.MAX_CONF): x + " is gte max (" + TruthFunctions.MAX_CONF + ")";
+            assert(x <= TruthFunctions.MAX_CONF): x + " is gte max (" + TruthFunctions.MAX_CONF + ')';
             e = c2wSafe(x, Param.HORIZON);
         } else {
             e = x;

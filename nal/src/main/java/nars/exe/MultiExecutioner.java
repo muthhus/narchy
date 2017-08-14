@@ -18,7 +18,7 @@ import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFacto
  */
 public class MultiExecutioner extends Executioner {
 
-    public ForkJoinTask lastCycle;
+    private ForkJoinTask lastCycle;
     private final ForkJoinPool passive;
     private final Worker[] workers;
     private final int num;

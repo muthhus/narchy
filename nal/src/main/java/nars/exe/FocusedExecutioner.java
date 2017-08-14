@@ -169,6 +169,8 @@ public class FocusedExecutioner extends Executioner {
             } else {
                 x.run(nar);
             }
+        } catch (UnsupportedOperationException e) {
+            e.printStackTrace();
         } catch (Throwable e) {
             if (Param.DEBUG) {
                 throw e;
@@ -203,7 +205,7 @@ public class FocusedExecutioner extends Executioner {
         } else if (x instanceof Premise) {
             premises.putAsync((Premise) x);
         } else if (x instanceof Activate) {
-            concepts.putAsync((Activate) x);
+            concepts.putAsync(x);
         } else
             throw new UnsupportedOperationException("what is " + x);
     }

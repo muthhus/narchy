@@ -1,8 +1,6 @@
 package nars.derive.time;
 
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
+import static nars.time.Tense.*;
 
 /**
  * used for preserving an offset within an eternal context

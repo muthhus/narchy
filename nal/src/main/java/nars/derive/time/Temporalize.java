@@ -64,7 +64,6 @@ public class Temporalize implements ITemporalize {
         ITemporalize model = this;
 
         boolean taskRooted = true; //(belief == null) || ( !task.isEternal() );
-        boolean beliefRooted = true; //belief!=null && (!taskRooted || !belief.isEternal());
 
 
         model.know(task, d, taskRooted);
@@ -75,6 +74,7 @@ public class Temporalize implements ITemporalize {
 //                if (task.isEternal() && belief.isEternal() /*&& some interesction of terms is prsent */)
 //                    beliefRooted = false; //avoid confusing with multiple eternal roots; force relative calculation
 
+                boolean beliefRooted = true; //belief!=null && (!taskRooted || !belief.isEternal());
                 model.know(belief, d, beliefRooted); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
             }
         } else if (d.beliefTerm != null) {
@@ -86,7 +86,7 @@ public class Temporalize implements ITemporalize {
         Event e;
         try {
             e = model.solve(pattern, trail);
-        } catch (StackOverflowError er) {
+        } catch (StackOverflowError ignored) {
             System.err.println(
                     Arrays.toString(new Object[]{"temporalize stack overflow:\n{} {}\n\t{}\n\t{}", pattern, d, model, trail})
                     //logger.error(
@@ -197,7 +197,7 @@ public class Temporalize implements ITemporalize {
         return new AbsoluteEvent(this, x, start, end);
     }
 
-    int dt(Event a, Event b, Map<Term, Time> trail) {
+    static int dt(Event a, Event b, Map<Term, Time> trail) {
 
 //        if (a instanceof AbsoluteEvent || b instanceof AbsoluteEvent) {
 //            //at least one or both are absolute, forming a valid temporal grounding
@@ -567,14 +567,15 @@ public class Temporalize implements ITemporalize {
 
     }
 
-    public boolean fullyEternal() {
-        return !events().anyMatch(x -> x.term.op() != IMPL && x instanceof AbsoluteEvent && ((AbsoluteEvent) x).start != ETERNAL);
+    boolean fullyEternal() {
+        return events().noneMatch(x -> x.term.op() != IMPL && x instanceof AbsoluteEvent && ((AbsoluteEvent) x).start != ETERNAL);
     }
 
     public Stream<? extends Event> events() {
         return constraints.values().stream().flatMap(Collection::stream);
     }
 
+    @Override
     public Event solve(final Term x, Map<Term, Time> trail) {
 
         //System.out.println("solve " + target + "\t" + trail);
@@ -634,7 +635,7 @@ public class Temporalize implements ITemporalize {
     }
 
     static boolean empty(Map<Term, Time> trail) {
-        return trail.isEmpty() || !trail.values().stream().anyMatch(Objects::nonNull);
+        return trail.isEmpty() || trail.values().stream().noneMatch(Objects::nonNull);
     }
 
     private Event solveComponents(Term x, Map<Term, Time> trail) {
@@ -658,13 +659,11 @@ public class Temporalize implements ITemporalize {
                     Term b = x.sub(1);
                     Event be = solve(b, trail);
                     if ((ae != null) && (be != null)) {
-                        {
-                            Time at = ae.start(trail);
-                            if (at != null) {
-                                Time bt = be.start(trail);
-                                if (bt != null) {
-                                    return solveConj(a, at, b, bt);
-                                }
+                        Time at = ae.start(trail);
+                        if (at != null) {
+                            Time bt = be.start(trail);
+                            if (bt != null) {
+                                return solveConj(a, at, b, bt);
                             }
                         }
                     }
@@ -687,12 +686,13 @@ public class Temporalize implements ITemporalize {
 //                        dir = false; //reverse: solve simpler subterm first
 //                    }
 
-                    Event ea, eb;
+                    Event ea;
 //                    if (dir) {
 //                        //forward
                         if ((ea = solve(t0, trail)) == null)
                             return null;
-                        if ((eb = solve(t1, trail)) == null)
+                    Event eb;
+                    if ((eb = solve(t1, trail)) == null)
                             return null;
 //                    } else {
 //                        //reverse
@@ -750,13 +750,11 @@ public class Temporalize implements ITemporalize {
                                 return ds;
                         }
                     }
-                    {
-                        @NotNull Term d = x.op().the(0, a);
-                        if (!(d instanceof Bool)) {
-                            Event ds = solve(d, trail);
-                            if (ds != null)
-                                return ds;
-                        }
+                    @NotNull Term d = x.op().the(0, a);
+                    if (!(d instanceof Bool)) {
+                        Event ds = solve(d, trail);
+                        if (ds != null)
+                            return ds;
                     }
 
 

@@ -101,6 +101,8 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
             createMBeans(name, monitor, mapper).forEach(bean -> {
                 try {
                     register(bean.getObjectName(), bean);
+                } catch (InstanceNotFoundException e) {
+                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

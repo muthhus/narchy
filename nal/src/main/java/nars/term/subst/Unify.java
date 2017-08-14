@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static jcog.data.UnenforcedConcatSet.concat;
-import static nars.Op.*;
+import static nars.Op.Null;
 import static nars.Param.TTL_UNIFY;
 
 
