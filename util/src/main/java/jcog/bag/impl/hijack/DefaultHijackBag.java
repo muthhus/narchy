@@ -36,10 +36,7 @@ public class DefaultHijackBag<K> extends PriorityHijackBag<K, PriReference<K>> {
         super(reprobes);
         this.merge = merge;
     }
-    public DefaultHijackBag(int cap, PriMerge merge, int reprobes) {
-        this(merge, reprobes);
-        setCapacity(cap);
-    }
+
 
     @Override
     protected Consumer<PriReference<K>> forget(float avgToBeRemoved) {

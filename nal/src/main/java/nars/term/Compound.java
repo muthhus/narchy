@@ -730,7 +730,7 @@ public interface Compound extends Term, IPair, TermContainer {
         }
 
         //recursively compute contained subterm functors
-        if (u.op() == INH && u.size() == 2) {
+        if (u.op() == INH /*&& u.size() == 2*/) {
             Term possibleArgs = u.sub(0);
             if (possibleArgs.op() == PROD) {
                 Term possibleFunc = u.sub(1);

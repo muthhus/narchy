@@ -253,7 +253,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         return true;
     }
 
-    private boolean same(Task derived, @Nullable Task parent, float truthResolution) {
+    boolean same(Task derived, Task parent, float truthResolution) {
         if (derived.equals(parent)) return true;
 
         if (FILTER_SIMILAR_DERIVATIONS) {

@@ -201,12 +201,14 @@ public abstract class TermIndex implements TermContext {
     /* TODO move to Term instance method */
     @Nullable public static Term retemporalize(@NotNull Term x, Retemporalize r) {
 
+//        if (x.size() == 0)
+//            return x;
 
         Term y = x.transform(r.dt(x), r);
-        if (!(y instanceof Compound)) {
+        if (y == null || y.size() == 0) {
             return y;
         } else {
-            Compound yy = (Compound)y;
+
 
 
             //            int ydt = yy.dt();
@@ -218,7 +220,7 @@ public abstract class TermIndex implements TermContext {
 //            }
 //            if (yy == null)
 //                return null;
-            return yy.normalize();
+            return y.normalize();
         }
 
     }

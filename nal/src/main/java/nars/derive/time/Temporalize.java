@@ -682,25 +682,25 @@ public class Temporalize implements ITemporalize {
                     Term t0 = tt.sub(0);
                     Term t1 = tt.sub(1);
 
-                    //decide subterm solution order intelligently: allow reverse if the 2nd subterm can more readily and absolutely temporalize
-                    if (score(t1) > score(t0)  /* || t1.volume() > t0.volume()*/) {
-                        dir = false; //reverse: solve simpler subterm first
-                    }
+//                    //decide subterm solution order intelligently: allow reverse if the 2nd subterm can more readily and absolutely temporalize
+//                    if (score(t1) > score(t0)  /* || t1.volume() > t0.volume()*/) {
+//                        dir = false; //reverse: solve simpler subterm first
+//                    }
 
                     Event ea, eb;
-                    if (dir) {
-                        //forward
+//                    if (dir) {
+//                        //forward
                         if ((ea = solve(t0, trail)) == null)
                             return null;
                         if ((eb = solve(t1, trail)) == null)
                             return null;
-                    } else {
-                        //reverse
-                        if ((eb = solve(t1, trail)) == null)
-                            return null;
-                        if ((ea = solve(t0, trail)) == null)
-                            return null;
-                    }
+//                    } else {
+//                        //reverse
+//                        if ((eb = solve(t1, trail)) == null)
+//                            return null;
+//                        if ((ea = solve(t0, trail)) == null)
+//                            return null;
+//                    }
 
 
                     Time at = ea.start(trail);

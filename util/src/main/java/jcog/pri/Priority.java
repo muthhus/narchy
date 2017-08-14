@@ -114,13 +114,16 @@ public interface Priority extends Prioritized {
         notNaN(toAdd);
         float e = pri();
         if (e != e) {
-            if (toAdd > 0)
-                return setPri(toAdd);  //adding to deleted resurrects it to pri=0 before adding
-            else
+            if (toAdd <= 0) {
                 return Float.NaN; //subtracting from deleted has no effect
+            } /*else {
+                e = 0; //adding to deleted resurrects it to pri=0 before adding
+            }*/
         } else {
-            return setPri(e + toAdd);
+            toAdd += e;
         }
+
+        return setPri(toAdd);
     }
 
 //    default float priAddAndGetDelta(float toAdd) {

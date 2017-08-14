@@ -3,6 +3,7 @@ package nars.exe;
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
+import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
@@ -54,8 +55,10 @@ public class FocusedExecutioner extends Executioner {
     final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
             random, MAX_TASKS);
 
-    public final CurveBag<Activate> concepts = new ConcurrentCurveBag<>(Param.conceptMerge, new ConcurrentHashMap<>(),
-            random, MAX_CONCEPTS);
+    public final Bag concepts =
+//            new ConcurrentCurveBag<>(Param.conceptMerge, new ConcurrentHashMap<>(),
+//                random, MAX_CONCEPTS);
+            new DefaultHijackBag(Param.conceptMerge, MAX_CONCEPTS, 3);
 
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
@@ -184,9 +187,9 @@ public class FocusedExecutioner extends Executioner {
 
     @Override
     public void forEach(Consumer<ITask> each) {
-        concepts.forEachKey(each);
-        tasks.forEachKey(each);
-        premises.forEachKey(each);
+        concepts.forEach(each);
+        tasks.forEach(each);
+        premises.forEach(each);
     }
 
     @Override
