@@ -3,7 +3,7 @@ description = ''
 dependencies {
   compile project(':util')
     compile group: 'jline', name: 'jline', version:'3.0.0.M1'
-    compile group: 'com.googlecode.lanterna', name: 'lanterna', version:'3.0.0-rc1'
+    compile group: 'com.googlecode.lanterna', name: 'lanterna', version:'3.0.0'
     compile group: 'com.jcraft', name: 'jsch', version:'0.1.54'
     compile group: 'com.github.drapostolos', name: 'type-parser', version:'0.6.0'
     compile group: 'org.semanticweb.yars', name: 'nxparser-parsers', version:'2.3.3'
