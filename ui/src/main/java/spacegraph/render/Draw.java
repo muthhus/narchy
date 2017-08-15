@@ -30,6 +30,7 @@ import com.jogamp.opengl.util.ImmModeSink;
 import com.jogamp.opengl.util.texture.Texture;
 import jcog.Util;
 import jcog.list.FasterList;
+import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,11 +46,7 @@ import spacegraph.phys.util.BulletStack;
 import spacegraph.space.EDraw;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static spacegraph.math.v3.v;
@@ -473,9 +470,9 @@ public enum Draw {
     public static void rectStroke(GL2 gl, float x1, float y1, float w, float h) {
         gl.glBegin(GL2.GL_LINE_STRIP);
         gl.glVertex2f(x1, y1);
-        gl.glVertex2f(x1+w, y1);
-        gl.glVertex2f(x1+w, y1+h);
-        gl.glVertex2f(x1, y1+h);
+        gl.glVertex2f(x1 + w, y1);
+        gl.glVertex2f(x1 + w, y1 + h);
+        gl.glVertex2f(x1, y1 + h);
         gl.glVertex2f(x1, y1);
         gl.glEnd();
 //        line(gl, x1, y1, x1 + w, y1);
@@ -487,7 +484,7 @@ public enum Draw {
 
     public static void rect(GL2 gl, float x1, float y1, float w, float h) {
 
-        gl.glRectf(x1, y1, x1+w, y1+h);
+        gl.glRectf(x1, y1, x1 + w, y1 + h);
 //        gl.glBegin(GL2.GL_QUADS);
 //        gl.glVertex3f(x1, y1, 0);
 //        gl.glVertex3f(x1 + w, y1, 0);
@@ -497,14 +494,13 @@ public enum Draw {
     }
 
 
-
     public static void rect(GL2 gl, float x1, float y1, float w, float h, float z) {
         if (z == 0) {
             rect(gl, x1, y1, w, h);
         } else {
             //TODO maybe translate z then call above method?
             gl.glBegin(GL2.GL_QUADS);
-            gl.glNormal3f(0,0,1);
+            gl.glNormal3f(0, 0, 1);
             gl.glVertex3f(x1, y1, z);
             gl.glVertex3f(x1 + w, y1, z);
             gl.glVertex3f(x1 + w, y1 + h, z);
@@ -512,12 +508,11 @@ public enum Draw {
             gl.glEnd();
         }
     }
+
     public static void rectTex(GL2 gl, Texture tt, float x1, float y1, float w, float h, float z) {
 
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 //        gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
-
-
 
 
         //tt.bind(gl);
@@ -532,7 +527,7 @@ public enum Draw {
 
         gl.glBegin(GL2.GL_QUADS);
 
-        gl.glNormal3f(0,0,1);
+        gl.glNormal3f(0, 0, 1);
         gl.glTexCoord2f(0.0f, 0.0f);
         gl.glVertex3f(x1, y1, z);
         gl.glTexCoord2f(1.0f, 0.0f);
@@ -728,6 +723,7 @@ public enum Draw {
         }
         gl.glColor3f(r, g, b);
     }
+
     public static void colorUnipolarHue(GL2 gl, float v, float hueMin, float hueMax) {
         float hue = Util.lerp(v, hueMin, hueMax);
         hsb(gl, hue, 0.7f, 0.7f, 1f);
@@ -738,8 +734,9 @@ public enum Draw {
     }
 
     public static void colorHash(int hash, float[] color, float sat, float bri, float alpha) {
-        Draw.hsb((Math.abs(hash)%500) / 500f * 360.0f, sat, bri, alpha, color);
+        Draw.hsb((Math.abs(hash) % 500) / 500f * 360.0f, sat, bri, alpha, color);
     }
+
     public static void colorHash(int hash, float[] color, float alpha) {
         colorHash(hash, color, 0.5f, 0.5f, alpha);
     }
@@ -757,12 +754,13 @@ public enum Draw {
     public static void colorHash(GL2 gl, Object o, float alpha) {
         colorHash(gl, o.hashCode(), alpha);
     }
+
     public static void colorHash(GL2 gl, Object o) {
         colorHash(gl, o, 1f);
     }
 
     public static void colorGrays(GL2 gl, float x) {
-        gl.glColor3f(x,x,x);
+        gl.glColor3f(x, x, x);
     }
 
 
@@ -985,9 +983,9 @@ public enum Draw {
                 }
 
                 curX = (int) (spec.charAt(i)) - offsetR; //0..20
-                currentSeg.add((byte)curX);
+                currentSeg.add((byte) curX);
                 curY = (int) (spec.charAt(i + 1)) - offsetR; //0..20
-                currentSeg.add((byte)(10 - curY)); //half above zero half below zero
+                currentSeg.add((byte) (10 - curY)); //half above zero half below zero
             }
             if (!currentSeg.isEmpty())
                 segments.add(currentSeg.toArray());
@@ -1004,12 +1002,12 @@ public enum Draw {
 //            GLint countA[4] = {250, 250, 250, 250};
 //            glMultiDrawArrays(GL_LINE_STRIP, firstA, countA, 4);
 
-            if (x!=0)
+            if (x != 0)
                 gl.glTranslatef(x, 0, 0);
 
             gl.glCallList(id);
 
-            if (x!=0)
+            if (x != 0)
                 gl.glTranslatef(-x, 0, 0); //HACK un-translate, cheaper than pushMatrix
         }
 
@@ -1131,18 +1129,20 @@ public enum Draw {
         gl.glPopMatrix();
     }
 
-    /** call glPush before this, and after all textNext's. returns the character width to translate by to display the next character (left to right direction) */
+    /**
+     * call glPush before this, and after all textNext's. returns the character width to translate by to display the next character (left to right direction)
+     */
     public static void textStart(GL2 gl, float scaleX, float scaleY, float x, float y, float z) {
 
         gl.glTranslatef(x, y, z);
-        gl.glScalef(scaleX/20f, scaleY/20f, 1f);
+        gl.glScalef(scaleX / 20f, scaleY / 20f, 1f);
     }
 
     public static void textNext(GL2 gl, char c, float x) {
 
         int ci = c - 32; //ASCII to index
         if (ci >= 0 && (ci < fontMono.length)) {
-            fontMono[ci].draw(gl, x*20);
+            fontMono[ci].draw(gl, x * 20);
         }
 
     }
@@ -1152,44 +1152,43 @@ public enum Draw {
     static {
 
         List<HGlyph> glyphs = new FasterList();
-        List<String> lines;
+        String[] lines;
         try {
             String font =
                     //"meteorology";
                     "rowmans";
-            try {
-                lines = Files.readAllLines(
-                    Paths.get(Draw.class.getClassLoader().getResource("spacegraph/font/hershey/" + font + ".jhf").toURI())
-                );
-            } catch (URISyntaxException e) {
-                e.printStackTrace();
-                lines = Collections.emptyList();
-            }
+//                lines = Files.readAllLines(
+//                    Paths.get(
+//                        Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf").toURI()
+//                        //Draw.class.getClassLoader().getResource("spacegraph/font/hershey/" + font + ".jhf").toURI()
+//                    )
+//                );
+            lines = new String(Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf").readAllBytes()).split("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+            lines = ArrayUtils.EMPTY_STRING_ARRAY;
+        }
 
-            String scratch = "";
-            HGlyph nextGlyph;
-            for (int i = 0; i < lines.size(); i++) {
-                String c = lines.get(i);
-                if (c.endsWith("\n"))
-                    c = c.substring(0, c.length() - 1);
+        String scratch = "";
+        HGlyph nextGlyph;
+        for (int i = 0; i < lines.length; i++) {
+            String c = lines[i];
+            if (c.endsWith("\n"))
+                c = c.substring(0, c.length() - 1);
 //                if (c.length() < 5) {
 //                    continue;
 //                }
-                //    if (lines[i].charAt(0) == ' ') {
-                if (Character.isDigit(c.charAt(4))) {
-                    nextGlyph = new HGlyph(c + scratch);
-                    //      println("Instantiated glyph " + nextGlyph.idx);
-                    glyphs.add(nextGlyph);
-                    scratch = "";
-                } else {
-                    scratch += c;
-                }
+            //    if (lines[i].charAt(0) == ' ') {
+            if (Character.isDigit(c.charAt(4))) {
+                nextGlyph = new HGlyph(c + scratch);
+                //      println("Instantiated glyph " + nextGlyph.idx);
+                glyphs.add(nextGlyph);
+                scratch = "";
+            } else {
+                scratch += c;
             }
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(1);
         }
+
 
         fontMono = glyphs.toArray(new HGlyph[glyphs.size()]);
     }
@@ -1291,12 +1290,11 @@ public enum Draw {
      */
 
 
-
-
-    /** https://github.com/sojamo/controlp5/blob/master/src/controlP5/BitFont.java
-     *  TODO render Glyphs, this currently only decodes the base64 font present in the strings
-     * */
-    static class BitFont  {
+    /**
+     * https://github.com/sojamo/controlp5/blob/master/src/controlP5/BitFont.java
+     * TODO render Glyphs, this currently only decodes the base64 font present in the strings
+     */
+    static class BitFont {
 
         static public final String standard58base64 = "AakACQBgACAEAgQGBggGAgMDBAYDBAIGBQMFBQUFBQUFBQICBAUEBQgFBQUFBQUFBQIFBQQGBQUFBQUFBAUGCAUGBQMFAwYGAwQEBAQEBAQEAgQEAgYEBAQEAwQEBAQGBAQEBAIEBQKgUgghIaUAAIiRMeiZZwwAAANgjjnvmRRKESVzzDGXoqQUvYURQCCAQCCSCAAAAAgAAABEqECleCVFkRAAiLSUWEgoJQAAiSOllEJIKVRiSymllCRFSSlCEVIAQQBBQAARAAAAEAAAACQpgeALJASiIwAQSQipE1BKRS+QSEohhRBSqES1UkopSIqSkkIiFAGwEZOwSaplZGx2VVXVSQIAgeIgSETy4RCSCEnoEONAgJCkd0I6p73QiKilk46RpCQZQoQIAFBVVVOVVFVVVUKqqiqKCACCDyKpiIoAICQJ9FAiCUE8ElUphRRCSqESUUohJSRJSUpECBEAoCrqoiqZqqqqiFRVUiIJAADKI5UQASEgSAoJpSRSCgECUlJKKYSUSiWilEJKSRKRlIgQJABAVVVEVVJVVVUhqaqqQhIACBQixEIBQFBg9AwyRhhDBEIIpGPOCyZl0kXJBJOMGMImEW9owAcbMQmrpKpKxjJiopQdFQAAAAAAAABAAAAAAAAAAIAAAOAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAQIAAAEAQAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAgAAAgCAAAAAgAA";
         static public final String standard56base64 = "AeYACQBgACAEAgQGBggHAgMDBgYDBQIFBgMGBgYGBgYGBgIDBAYEBggGBgYGBgYGBgIGBgUIBgYGBgYGBgYGCAYGBgMFAwYHAwUFBQUFAwUFAgMFAggFBQUFBAQEBQUIBQUFBAMEBQKgUgghRwoBAIAcOQ7yOZ/jAADAAXAe5/k+JwqKQlDkPM7jfFGUFEXfwghAQAAICIQUAgAAAAABAAAAQAkVqBSvJFJUEQCQaFHEBBEURQAAiDiiKIqCIIqCkjAWRVEURUQUJUURFCEFIBAAAgEBhAAAAABAAAAAAEikBIIvkFAQOQQAJBIEKU8ARVGiLyCRKAqiIAiioCJUTVEURQERRUmKgkQoAsAd40zcSambY447u5SSUnoSAYBAcRBMRNWHh4iEMAn0II4HBBAk6XuC6HmyL2gISVX0RI9DREoSQRAhAgBIKaW0lFIpKaWUIiSlpJRQhAAg+CCSFBFBACAiEdAHRUgEgfiIqIqiIAqCKAoqQlAWBVEBEZGSpBBCiAAAUgrpJaU0SkoppRBJKckkIxEAAJRHKkIEEACESEKERBERRUEAAVKiKIqCIIqKkhAURUGUREREJEVEECQAgJRSCkkplZJSSilIUkpKKUgEAAKFCHGhAIBAwdHnII5DOA4iIAiB6HGeL3CinOgFRU7gRA7hEDYR8QUJ+MEd40xcSqmkZI6LEWdsknsSAQAAAAAAAAAgAAAAAAAAAACAAACAAwAAAAAAAAAAAAAAQAAAAAAAAAADAwAAAAAABBAAAICAAAAAAIAAJQAAAAAAAAAABAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAACAAAgIAAAAAAYAAA=";
@@ -1310,7 +1308,7 @@ public enum Draw {
         private final boolean lazy;
         private final Glyph[] glyphs;
         protected int characters;
-        protected final int[] charWidth = new int[ 255 ];
+        protected final int[] charWidth = new int[255];
         protected int charHeight;
         protected int[][] chars;
         protected int lineHeight = 10;
@@ -1336,21 +1334,21 @@ public enum Draw {
             }
         }
 
-        public BitFont( byte[] theBytes ) {
-            super( );
+        public BitFont(byte[] theBytes) {
+            super();
 
-            texture = decodeBitFont( theBytes );
-            make( );
+            texture = decodeBitFont(theBytes);
+            make();
 
             size = lineHeight;
-            glyphs = new Glyph[ 256 ];
-            ascii = new int[ 128 ];
-            Arrays.fill( ascii , -1 );
+            glyphs = new Glyph[256];
+            ascii = new int[128];
+            Arrays.fill(ascii, -1);
             lazy = false;
             ascent = 4;
             descent = 4;
             glyphCount = 128;
-            for ( int i = 0 ; i < 128 ; i++ ) {
+            for (int i = 0; i < 128; i++) {
 
                 // unfortunately the PFont.Glyph constructor in
                 // the android source code is for whatever
@@ -1382,72 +1380,72 @@ public enum Draw {
                 glyphs[i] = new Glyph();
 
 
-                glyphs[ i ].value = i;
+                glyphs[i].value = i;
 
-                if ( glyphs[ i ].value < 128 ) {
-                    ascii[ glyphs[ i ].value ] = i;
+                if (glyphs[i].value < 128) {
+                    ascii[glyphs[i].value] = i;
                 }
 
-                glyphs[ i ].index = i;
+                glyphs[i].index = i;
                 int id = i - 32;
-                if ( id >= 0 ) {
-                    glyphs[ i ].image = new float[ charWidth[ id ] * 9];
-                    for ( int n = 0 ; n < chars[ id ].length ; n++ ) {
-                        glyphs[ i ].image[ n ] = ( chars[ id ][ n ] == 1 ) ? 0xffffffff : 0x00000000;
+                if (id >= 0) {
+                    glyphs[i].image = new float[charWidth[id] * 9];
+                    for (int n = 0; n < chars[id].length; n++) {
+                        glyphs[i].image[n] = (chars[id][n] == 1) ? 0xffffffff : 0x00000000;
                     }
-                    glyphs[ i ].height = 9;
-                    glyphs[ i ].width = charWidth[ id ];
-                    glyphs[ i ].index = i;
-                    glyphs[ i ].value = i;
-                    glyphs[ i ].setWidth = charWidth[ id ];
-                    glyphs[ i ].topExtent = 4;
-                    glyphs[ i ].leftExtent = 0;
+                    glyphs[i].height = 9;
+                    glyphs[i].width = charWidth[id];
+                    glyphs[i].index = i;
+                    glyphs[i].value = i;
+                    glyphs[i].setWidth = charWidth[id];
+                    glyphs[i].topExtent = 4;
+                    glyphs[i].leftExtent = 0;
                 } else {
-                    glyphs[ i ].image = new float[1];
+                    glyphs[i].image = new float[1];
                 }
             }
         }
 
-        public Glyph getGlyph( char c ) {
-            int n = ( int ) c;
-		/* if c is out of the BitFont-glyph bounds, return
+        public Glyph getGlyph(char c) {
+            int n = (int) c;
+        /* if c is out of the BitFont-glyph bounds, return
 		 * the defaultChar glyph (the space char by
 		 * default). */
-            n = ( n >= 128 ) ? defaultChar : n;
-            return glyphs[ n ];
+            n = (n >= 128) ? defaultChar : n;
+            return glyphs[n];
         }
 
 
-        static public int byteArrayToInt( byte[] b ) {
+        static public int byteArrayToInt(byte[] b) {
             int value = 0;
-            for ( int i = 0 ; i < 2 ; i++ ) {
-                int shift = ( 2 - 1 - i ) * 8;
-                value += ( b[ i ] & 0x00FF ) << shift;
+            for (int i = 0; i < 2; i++) {
+                int shift = (2 - 1 - i) * 8;
+                value += (b[i] & 0x00FF) << shift;
             }
             return value;
         }
 
 
-        static public int getBit( int theByte , int theIndex ) {
+        static public int getBit(int theByte, int theIndex) {
             int bitmask = 1 << theIndex;
-            return ( ( theByte & bitmask ) > 0 ) ? 1 : 0;
+            return ((theByte & bitmask) > 0) ? 1 : 0;
         }
 
-        float[] decodeBitFont( byte[] bytes ) {
+        float[] decodeBitFont(byte[] bytes) {
 
             float[] tex;
 
             // read width
-            int w = byteArrayToInt( new byte[] { bytes[ 0 ] , bytes[ 1 ] } );
+            int w = byteArrayToInt(new byte[]{bytes[0], bytes[1]});
 
             // read height
-            int h = byteArrayToInt( new byte[] { bytes[ 2 ] , bytes[ 3 ] } );
+            int h = byteArrayToInt(new byte[]{bytes[2], bytes[3]});
 
             // read size of chars
-            int s = byteArrayToInt( new byte[] { bytes[ 4 ] , bytes[ 5 ] } );
+            int s = byteArrayToInt(new byte[]{bytes[4], bytes[5]});
 
             // read first ascii char
-            int c = byteArrayToInt( new byte[] { bytes[ 6 ] , bytes[ 7 ] } );
+            int c = byteArrayToInt(new byte[]{bytes[6], bytes[7]});
 
             tex = new float[w * h];
             textureWidth = w;
@@ -1455,31 +1453,31 @@ public enum Draw {
 
             // read bytes and write pixels into image
             int off = 8 + s;
-            for ( int i = off ; i < bytes.length ; i++ ) {
-                for ( int j = 0 ; j < 8 ; j++ ) {
-                    tex[ ( i - off ) * 8 + j ] = getBit( bytes[ i ] , j ) == 1 ? 0xff000000 : 0xffffffff;
+            for (int i = off; i < bytes.length; i++) {
+                for (int j = 0; j < 8; j++) {
+                    tex[(i - off) * 8 + j] = getBit(bytes[i], j) == 1 ? 0xff000000 : 0xffffffff;
                 }
             }
 
-            int cnt = 0 , n = 0 , i = 0;
+            int cnt = 0, n = 0, i = 0;
 
             // add character seperators on top of the texture
-            for ( i = 0 ; i < s ; i++ ) {
-                while ( ++cnt != bytes[ i + 8 ] ) {
+            for (i = 0; i < s; i++) {
+                while (++cnt != bytes[i + 8]) {
                 }
                 n += cnt;
-                tex[ n ] = 0xffff0000;
+                tex[n] = 0xffff0000;
                 cnt = 0;
             }
 
             return tex;
         }
 
-        int getHeight( ) {
+        int getHeight() {
             return textureHeight;
         }
 
-        BitFont make( ) {
+        BitFont make() {
 
             charHeight = textureHeight;
 
@@ -1487,24 +1485,24 @@ public enum Draw {
 
             int currWidth = 0;
 
-            for ( int i = 0 ; i < textureWidth ; i++ ) {
+            for (int i = 0; i < textureWidth; i++) {
                 currWidth++;
-                if ( texture[ i ] == 0xffff0000 ) {
-                    charWidth[ characters++ ] = currWidth;
+                if (texture[i] == 0xffff0000) {
+                    charWidth[characters++] = currWidth;
                     currWidth = 0;
                 }
             }
 
-            chars = new int[ characters ][];
+            chars = new int[characters][];
 
             int indent = 0;
 
-            for ( int i = 0 ; i < characters ; i++ ) {
-                chars[ i ] = new int[ charWidth[ i ] * charHeight ];
-                for ( int u = 0 ; u < charWidth[ i ] * charHeight ; u++ ) {
-                    chars[ i ][ u ] = texture[ indent + ( u / charWidth[ i ] ) * textureWidth + ( u % charWidth[ i ] ) ] == 0xff000000 ? 1 : 0;
+            for (int i = 0; i < characters; i++) {
+                chars[i] = new int[charWidth[i] * charHeight];
+                for (int u = 0; u < charWidth[i] * charHeight; u++) {
+                    chars[i][u] = texture[indent + (u / charWidth[i]) * textureWidth + (u % charWidth[i])] == 0xff000000 ? 1 : 0;
                 }
-                indent += charWidth[ i ];
+                indent += charWidth[i];
             }
             return this;
         }
