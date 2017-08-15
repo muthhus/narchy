@@ -237,8 +237,8 @@ public abstract class Param extends Services<Term,NAR> {
 
 
 
-    /** derivation confidence (by evidence) multiplier.  normal=1.0, <1.0= under-confident, >1.0=over-confident */
-    @NotNull public final FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 4f);
+//    /** derivation confidence (by evidence) multiplier.  normal=1.0, <1.0= under-confident, >1.0=over-confident */
+//    @NotNull public final FloatParam derivedEvidenceGain = new FloatParam(1f, 0f, 4f);
 
 
 

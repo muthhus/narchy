@@ -2,7 +2,12 @@ package nars;
 
 import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.learn.ql.DQN;
+import jcog.learn.ql.HaiQ;
 import jcog.learn.ql.HaiQAgent;
+import jcog.math.FirstOrderDifferenceFloat;
+import jcog.math.FloatNormalized;
+import jcog.math.FloatPolarNormalized;
 import jcog.pri.mix.control.MixContRL;
 import nars.control.AgentService;
 import nars.control.Derivation;
@@ -12,7 +17,6 @@ import nars.exe.FocusedExecutioner;
 import nars.exe.MultiExecutioner;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -20,7 +24,6 @@ import nars.term.Term;
 import nars.time.RealTime;
 import nars.truth.Truth;
 import nars.video.*;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
@@ -28,6 +31,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
+import spacegraph.render.Draw;
 import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.MatrixView;
@@ -125,7 +129,7 @@ abstract public class NAgentX extends NAgent {
 
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8, "motivation.nal");
 
-        int THREADS = 3;
+        int THREADS = 2;
         NAR n = new NARS()
                 .exe(
                         new MultiExecutioner((i) ->
@@ -135,7 +139,7 @@ abstract public class NAgentX extends NAgent {
                 .time(clock)
                 .index(
                         //new CaffeineIndex(128 * 1024)
-                        new CaffeineIndex2(256 * 1024)
+                        new CaffeineIndex2(128 * 1024)
                         //new HijackTermIndex(128 * 1024,  4)
                 )
                 .get();
@@ -146,7 +150,7 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.7f);
+        n.goalConfidence(0.8f);
 
 
         float priFactor = 0.25f;
@@ -158,38 +162,15 @@ abstract public class NAgentX extends NAgent {
 
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, false, 4f);
+        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, false, 8f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
-        MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, true, 2f);
+        MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, false, 2f);
         Inperience inp = new Inperience(n, 8, 0.02f);
-        Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
+        //Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
 
 
         NAgent a = init.apply(n);
         //a.trace = true;
-
-
-        new AgentService.AgentBuilder(HaiQAgent::new,
-            () -> Util.tanhFast(a.dexterity() +  Util.tanhFast( a.reward) ) ) //reward function
-            .in(a::dexterity)
-            .in(()->a.reward)
-            .out(
-                new HarmonicController(n.truthResolution::setValue, 0.01f, 0.16f)
-            ).get(n);
-
-//        new AgentService(
-//                HaiQAgent::new,
-//                2,
-//                (f) -> {
-//                    f[0] = a.dexterity();
-//                    f[1] = a.reward;
-//                },
-//                ,
-//                3,
-//                new HarmonicController(n.truthResolution::setValue, 0.01f, 0.16f),
-//                new MutableFloat(1f),
-//                n
-//        );
 
 
 //        n.onTask(t -> {
@@ -264,18 +245,72 @@ abstract public class NAgentX extends NAgent {
 //            }
 //        });
 
-        NARLoop narLoop = loop;
+
 //        n.onCycle(nn -> {
 //            float lag = narLoop.lagSumThenClear() + a.running().lagSumThenClear();
 //            //n.emotion.happy(-lag);
 //            //n.emotion.happy(n.emotion.busyPri.getSum()/50000f);
 //        });
+
+        AgentService p = new AgentService.AgentBuilder(
+                //DQN::new,
+                HaiQAgent::new,
+                //() -> Util.tanhFast(a.dexterity())) //reward function
+                () -> a.dexterity() * Util.tanhFast( a.reward) /* - lag */ ) //reward function
+
+                .in(a::dexterity)
+                .in(new FloatNormalized(()->a.reward).decay(0.98f))
+                .in(new FloatNormalized(
+                        ((Emotivation) n.emotion).cycleDTRealMean::getValue)
+                            .decay(0.99f)
+                )
+                .in(new FloatNormalized(
+                        //TODO use a Long-specific impl of this:
+                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.taskDerivations.getValue().longValue())
+                ).decay(0.99f))
+                .in(new FloatNormalized(
+                        //TODO use a Long-specific impl of this:
+                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.conceptFirePremises.getValue().longValue())
+                    ).decay(0.99f)
+                ).in(new FloatNormalized(
+                        () -> n.emotion.busyVol.getSum()
+                    ).decay(0.99f)
+                ).out(
+                        new HarmonicController(n.confMin::setValue, 0.01f, 0.08f)
+                ).out(
+                        new HarmonicController(n.truthResolution::setValue, 0.01f, 0.08f)
+                ).out(
+                        new HarmonicController(a.curiosity::setValue, 0.01f, 0.16f)
+                ).get(n);
+
+        window(new MatrixView(p.in, (x, gl) -> {
+            Draw.colorBipolar(gl, x);
+            return 0;
+        }), 100, 100);
+
+//        new AgentService(
+//                HaiQAgent::new,
+//                2,
+//                (f) -> {
+//                    f[0] = a.dexterity();
+//                    f[1] = a.reward;
+//                },
+//                ,
+//                3,
+//                new HarmonicController(n.truthResolution::setValue, 0.01f, 0.16f),
+//                new MutableFloat(1f),
+//                n
+//        );
+
+
         return n;
     }
 
     /**
      * increments/decrements within a finite set of powers-of-two so that harmonics
      * wont interfere as the resolution changes
+     * <p>
+     * TODO allow powers other than 2, ex: 1.618
      */
     public static class HarmonicController implements IntConsumer, IntObjectPair<HarmonicController> {
 
@@ -288,21 +323,21 @@ abstract public class NAgentX extends NAgent {
 
             FloatArrayList f = new FloatArrayList();
             float x = min;
-            while (x < max) {
+            while (x <= max) {
                 f.add(x);
                 x *= 2;
             }
             assert (f.size() > 1);
             v = f.toArray();
-            set(0);
+            //set(0);
         }
 
         private void set(int i) {
             if (i < 0) i = 0;
-            if (i >= v.length) i = v.length-1;
-            if (this.x != i) {
+            if (i >= v.length) i = v.length - 1;
+            //if (this.x != i) {
                 update.value(v[x = i]);
-            }
+            //}
         }
 
         @Override
@@ -311,19 +346,24 @@ abstract public class NAgentX extends NAgent {
 
             switch (aa) {
                 case 0:
-                    set(x-1);
+                    set(x - 1);
                     break;
                 case 1:
-                    break; //nothing
-                case 2:
-                    set(x+1);
+                    set(x + 1);
                     break;
+                default:
+                    throw new RuntimeException("OOB");
+//                case 1:
+//                    break; //nothing
             }
         }
 
-        /** number actions */
-        @Override public int getOne() {
-            return 3;
+        /**
+         * number actions
+         */
+        @Override
+        public int getOne() {
+            return 2;
         }
 
         @Override

@@ -14,7 +14,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * NAL5 Boolean / Boolean Satisfiability Sanity
  */
-public class NAL5SAT {
+public class NAL5SATTest {
 
 
     @Test
@@ -45,7 +45,7 @@ public class NAL5SAT {
 //        for (int i = 0; i < 2; i++) {
 //            for (int j = 0; j < 2; j++) {
         NAR d = new NARS().get();
-        d.log();
+        //d.log();
         d.nal(6);
         d.termVolumeMax.setValue(24);
 

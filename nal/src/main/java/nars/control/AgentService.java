@@ -17,10 +17,15 @@ import java.util.function.IntConsumer;
 public class AgentService extends DurService {
 
     private final Consumer<float[]> input;
+
     private final Agent agent;
+
     private final IntConsumer act;
+
     private final FloatSupplier reward;
-    private final float[] in;
+
+    /** buffer where inputs to the agent are stored */
+    public final float[] in;
 
     public AgentService(IntIntToObjectFunc<Agent> a, int inputs, Consumer<float[]> input, FloatSupplier reward, int outputs, IntConsumer act, MutableFloat durations, NAR n) {
         super(n, durations);
@@ -45,6 +50,9 @@ public class AgentService extends DurService {
         private final IntIntToObjectFunc<Agent> a;
         float durations = 1f;
 
+        /** whether to add an extra NOP action */
+        private final static boolean NOP_ACTION = true;
+
         public AgentBuilder(IntIntToObjectFunc<Agent> a, FloatSupplier reward) {
             this.a = a;
             this.reward = reward;
@@ -58,7 +66,7 @@ public class AgentService extends DurService {
         public AgentService get(NAR nar) {
 
             final int inputs = sensors.stream().mapToInt(Tensor::volume).sum();
-            final int outputs = actions.stream().mapToInt(IntObjectPair::getOne).sum();
+            final int outputs = actions.stream().mapToInt(IntObjectPair::getOne).sum() + (NOP_ACTION ? 1 : 0);
 
             Consumer<float[]> inputter = (f) -> {
                 int s = sensors.size();
@@ -71,11 +79,12 @@ public class AgentService extends DurService {
                 assert(j == f.length);
             };
             IntConsumer act = (c) -> {
+
                 int s = actions.size();
                 for (int i = 0; i < s; i++) {
                     IntObjectPair<? extends IntConsumer> aa = actions.get(i);
                     int bb = aa.getOne();
-                    if (c > bb) {
+                    if (c >= bb) {
                         c -= bb;
                     } else {
                         aa.getTwo().accept(c);

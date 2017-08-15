@@ -305,7 +305,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
             super();
 
             setIgnoreExceptions(true);
-            setPrintExceptions(true);
+            setPrintExceptions(false);
 
             final boolean isARM = Platform.CPUFamily.ARM == Platform.getCPUFamily();
             fpsCounter = new FPSCounterImpl();

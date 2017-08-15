@@ -2,7 +2,8 @@ package jcog.math;
 
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 
-public class FloatAveraged implements FloatSupplier {
+/** TODO use a ring buffer, not just push/pop the float array list */
+public class FloatAveragedAsync implements FloatSupplier {
     private final FloatSupplier src;
     public int history;
 
@@ -12,10 +13,10 @@ public class FloatAveraged implements FloatSupplier {
     public static FloatSupplier averaged(FloatSupplier src, int history) {
         if (history <= 1)
             return src;
-        return new FloatAveraged(src, history);
+        return new FloatAveragedAsync(src, history);
     }
 
-    FloatAveraged(FloatSupplier src, int history) {
+    FloatAveragedAsync(FloatSupplier src, int history) {
         assert(history > 1);
         data = new FloatArrayList(history);
         this.src = src;

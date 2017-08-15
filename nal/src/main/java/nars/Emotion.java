@@ -1,8 +1,6 @@
 package nars;
 
-import com.netflix.servo.monitor.BasicCounter;
-import com.netflix.servo.monitor.Counter;
-import com.netflix.servo.monitor.StepCounter;
+import com.netflix.servo.monitor.*;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.meter.event.BufferedFloatGuage;
 import nars.concept.Concept;
@@ -37,6 +35,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
     public final Counter conceptActivations = new BasicCounter(id("concept fire activations"));
     public final Counter conceptFirePremises = new BasicCounter(id("concept fire premises"));
     public final Counter taskDerivations = new BasicCounter(id("derivation task"));
+
 
     /**
      * setup stage, where substitution is applied to generate a conclusion term from the pattern
@@ -97,12 +96,13 @@ public class Emotion extends ConcurrentMonitorRegistry {
 //    public final FloatGuage alert;
 
 
+
     //final ResourceMeter resourceMeter = new ResourceMeter();
 
     public Emotion(NAR n) {
         super();
 
-        registerFields(this);
+
 
         //logger = LoggerFactory.getLogger(class);
 
@@ -119,6 +119,8 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
         this.errrVol = new BufferedFloatGuage("error");
 
+        if (getClass()==Emotion.class) //HACK
+            registerFields(this);
 
     }
 
@@ -126,7 +128,8 @@ public class Emotion extends ConcurrentMonitorRegistry {
     /**
      * new frame started
      */
-    public void cycle() {
+    public synchronized void cycle() {
+
 
         _happy = (float) happy.getSum();
         happy.clear();

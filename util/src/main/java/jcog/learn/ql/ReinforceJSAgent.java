@@ -19,11 +19,11 @@ public abstract class ReinforceJSAgent extends Agent {
         super(inputs, actions);
         try {
 
-            System.out.println(ReinforceJSAgent.class.getResource("."));
+            //System.out.println(ReinforceJSAgent.class.getResource("."));
 
             NashornScriptEngine JS = (NashornScriptEngine) new ScriptEngineManager().getEngineByName("nashorn");
             JS.eval(
-                new InputStreamReader(ReinforceJSAgent.class.getResourceAsStream("rl.js"))
+                new InputStreamReader(ClassLoader.getSystemResourceAsStream("/rl.js")) //TODO Gradle Resource config
             );
 
 

@@ -566,7 +566,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "((out) ==>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
+                .mustDesire(cycles, "(out)", 1f, 0.81f, 13)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -576,7 +576,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "((happy) ==>-3 (out)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.45f, 13)
+                .mustDesire(cycles, "(out)", 1f, 0.45f, 10)
                 .mustNotOutput(cycles, "(out)", GOAL, 3, 16, 0);
     }
 
@@ -587,7 +587,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(5, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, /*~*/8)
+                .mustDesire(cycles, "(out)", 0f, 0.81f, /*~*/5)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -602,7 +602,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(0, "((happy) ==>+3 --(out)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
+                .mustDesire(cycles, "(out)", 0f, 0.81f, 13)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 

@@ -14,8 +14,8 @@ public class FirstOrderDifferenceFloat implements FloatSupplier {
     public FirstOrderDifferenceFloat(LongSupplier clock, FloatSupplier in) {
         this.in = in;
         this.clock = clock;
-
         this.lastUpdate = clock.getAsLong();
+        this.lastValue = in.asFloat();
     }
 
     @Override
@@ -24,12 +24,8 @@ public class FirstOrderDifferenceFloat implements FloatSupplier {
         long now = clock.getAsLong();
         float currentValue = in.asFloat();
 
-        float result;
-        if (lastValue==lastValue) {
-            result = currentValue - lastValue;
-        } else {
-            result = 0;
-        }
+        float result = currentValue - lastValue;
+
 
         if (now!=lastUpdate) {
             lastUpdate = now;

@@ -27,7 +27,7 @@ public class FloatParam extends MutableFloat implements FloatSupplier {
     }
 
     @Override
-    public float asFloat() {
+    public final float asFloat() {
         return floatValue();
     }
 }

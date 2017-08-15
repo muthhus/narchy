@@ -15,6 +15,7 @@ public class FloatNormalized implements FloatSupplier {
 
     /** precision threshold */
     static final float epsilon = 0.01f;
+    private float decay = 1f;
 
 
     public FloatNormalized(DoubleSupplier in) {
@@ -71,11 +72,28 @@ public class FloatNormalized implements FloatSupplier {
             return (raw - min) / (max - min);
     }
 
+    /**
+     * decay rate = 1 means unaffected.  values less than 1 constantly
+     * try to shrink the range to zero.
+     * @param decayRate
+     * @return
+     */
+    public FloatNormalized decay(float decayRate) {
+        this.decay = decayRate;
+        return this;
+    }
+
     public FloatNormalized updateRange(float raw) {
         if (min > raw)
             min = raw;
+        else
+            min *= decay;
+
         if (max < raw)
             max = raw;
+        else
+            max *= decay;
+
         return this;
     }
 

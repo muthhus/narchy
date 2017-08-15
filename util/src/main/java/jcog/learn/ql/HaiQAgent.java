@@ -1,7 +1,7 @@
 package jcog.learn.ql;
 
 import jcog.learn.Autoencoder;
-import jcog.math.FloatAveraged;
+import jcog.math.FloatAveragedAsync;
 import jcog.math.FloatSupplier;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -44,7 +44,7 @@ public class HaiQAgent extends HaiQ {
         this.perceptionAlpha =
                 //1f/(inputs);
                 0.1f;
-        this.perceptionError = FloatAveraged.averaged(()->lastPerceptionError, inputs/2);
+        this.perceptionError = FloatAveragedAsync.averaged(()->lastPerceptionError, inputs/2);
         this.ae = perception(inputs, states);
     }
 

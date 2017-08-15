@@ -141,7 +141,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         //fireHappy = Activation.get(happy, 1f, new ConceptFire(happy, 1f);
 
-        curiosity = new FloatParam(0.10f);
+        curiosity = new FloatParam(0.10f, 0f, 1f);
 
 
         if (id==null) id = $.quote(getClass().toString());

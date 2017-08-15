@@ -36,8 +36,8 @@ public class FloatSlider extends BaseSlider {
 
     public FloatSlider(FloatParam f) {
         this(f.floatValue(), f.min, f.max);
-        on((s,v)-> f.setValue(v));
         input = f;
+        on((s,v)-> f.setValue(v));
     }
 
     public FloatSlider label(String label) {
@@ -48,7 +48,6 @@ public class FloatSlider extends BaseSlider {
     @Override
     protected void paint(GL2 gl) {
 
-        super.paint(gl);
 
         if (input!=null)
             value(input.asFloat());
@@ -57,6 +56,9 @@ public class FloatSlider extends BaseSlider {
 //        gl.glColor3f(1, 1, 1);
         this.label.set(labelText());
 //        Draw.text(gl, label, 0.5f / label.length(), 0.5f, 0.5f, 0);
+
+
+        super.paint(gl);
 
     }
 
