@@ -59,8 +59,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import static nars.Op.NEG;
-import static nars.Op.Null;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
@@ -436,6 +435,12 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
 
+    /**
+     * computes the first occuring event's time relative to the start of the
+     * temporal term
+     *
+     * @param x subterm which must be present
+     */
     default int subtermTime(@NotNull Term x) {
         int d = subtermTimeSafe(x);
         if (d != DTERNAL)
@@ -445,7 +450,9 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     /**
-     * matches the first occuring event's time relative to this temporal relation, with parameter for a hypothetical dt
+     * computes the first occuring event's time relative to the start of the
+     * temporal term
+     * <p>
      * TODO make a 'subtermTimes' which returns all matching sub-event times
      *
      * @param dt the current offset in the search
@@ -455,38 +462,73 @@ public interface Term extends Termlike, Comparable<Term> {
         if (equals(x))
             return 0;
 
+        Op op = op();
+        if (!op.temporal) {
+            return DTERNAL;
+        }
+
         if (!impossibleSubTerm(x)) {
 
-            int dt = dt();
-            int idt;
-            boolean reverse;
 
             //TODO do shuffled search to return different equivalent results wherever they may appear
 
-            Op op = op();
-            if (!op.temporal || dt == DTERNAL || dt == XTERNAL || dt == 0) {
-                idt = 0; //parallel or eternal, no dt increment
-                reverse = false;
-            } else {
-                idt = dt;
-                if (idt < 0) {
-                    idt = -idt;
-                    reverse = true;
-                } else {
+
+            int dt = dt();
+            if (dt == XTERNAL) //unknown
+                return DTERNAL;
+
+            int idt;
+            boolean reverse;
+
+            @NotNull TermContainer yy = subterms();
+
+            if (op == IMPL) {
+                //only two options
+                Term s0 = yy.sub(0);
+                if (s0.equals(x)) {
+                    return 0;
+                }
+                int s1offset = s0.dtRange() + (dt == DTERNAL ? 0 : dt);
+                Term s1 = yy.sub(1);
+                if (s1.equals(x)) {
+                    return s1offset; //the subject's dtrange + the dt between points to the start of the predicate
+                }
+                if (s0.op() == CONJ) {
+                    int s0d = s0.subtermTimeSafe(x);
+                    if (s0d != DTERNAL)
+                        return s0d;
+                }
+                if (s1.op() == CONJ) {
+                    int s1d = s1.subtermTimeSafe(x);
+                    if (s1d != DTERNAL)
+                        return s1d + s1offset;
+                }
+
+            } else if (op == CONJ) {
+                if (dt == DTERNAL || dt == 0) {
+                    idt = 0; //parallel or eternal, no dt increment
                     reverse = false;
+                } else {
+                    idt = dt;
+                    if (idt < 0) {
+                        idt = -idt;
+                        reverse = true;
+                    } else {
+                        reverse = false;
+                    }
+                }
+
+                int ys = yy.size();
+                int offset = 0;
+                for (int yi = 0; yi < ys; yi++) {
+                    Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
+                    int sdt = yyy.subtermTimeSafe(x);
+                    if (sdt != DTERNAL)
+                        return sdt + offset;
+                    offset += idt + yyy.dtRange();
                 }
             }
 
-            @NotNull TermContainer yy = subterms();
-            int ys = yy.size();
-            int offset = 0;
-            for (int yi = 0; yi < ys; yi++) {
-                Term yyy = yy.sub(reverse ? ((ys - 1) - yi) : yi);
-                int sdt = yyy.subtermTimeSafe(x);
-                if (sdt != DTERNAL)
-                    return sdt + offset;
-                offset += idt + yyy.dtRange();
-            }
         }
 
         return DTERNAL;
@@ -856,6 +898,7 @@ public interface Term extends Termlike, Comparable<Term> {
     default Term neg() {
         return NEG.the(this);
     }
+
     default Term negIf(boolean negate) {
         return negate ? NEG.the(this) : this;
     }

@@ -47,18 +47,17 @@ public enum Op implements $ {
     ATOM(".", Op.ANY_LEVEL, OpType.Other),
 
     NEG("--", 5, Args.One) {
-        private Term neg(Term x) {
-            if (x instanceof Bool || x.op() == NEG)
-                return x.unneg();
-            else
-                return new UnitCompound1(NEG, x);
-        }
-
         @Override
         public Term _the(int dt, Term[] u) {
-            assert (u.length == 1);
-            //assert (dt == DTERNAL || dt == XTERNAL);
-            return neg(u[0]);
+            assert (u.length == 1); //assert (dt == DTERNAL || dt == XTERNAL);
+            Term x = u[0];
+            switch (x.op()) {
+                case BOOL:
+                case NEG:
+                    return x.unneg();
+                default:
+                    return new UnitCompound1(NEG, x);
+            }
         }
     },
 
@@ -451,7 +450,6 @@ public enum Op implements $ {
     },
 
 
-
     /**
      * intensional set
      */
@@ -499,18 +497,34 @@ public enum Op implements $ {
 
     //VIRTUAL TERMS
     @Deprecated
-    INSTANCE("-{-", 2, OpType.Statement, Args.Two),
+    INSTANCE("-{-", 2, OpType.Statement, Args.Two) {
+        @Override
+        @NotNull Term _the(int dt, Term[] uu) {
+            assert (uu.length == 2);
+            return INH.the(SETe.the(uu[0]), uu[1]);
+        }
+    },
 
     @Deprecated
-    PROPERTY("-]-", 2, OpType.Statement, Args.Two),
+    PROPERTY("-]-", 2, OpType.Statement, Args.Two) {
+        @Override
+        @NotNull Term _the(int dt, Term[] uu) {
+            assert (uu.length == 2);
+            return INH.the(uu[0], SETi.the(uu[1]));
+        }
+    },
 
     @Deprecated
-    INSTANCE_PROPERTY("{-]", 2, OpType.Statement, Args.Two),
+    INSTANCE_PROPERTY("{-]", 2, OpType.Statement, Args.Two) {
+        @Override
+        @NotNull Term _the(int dt, Term[] uu) {
+            assert (uu.length == 2);
+            return INH.the(SETe.the(uu[0]), SETi.the(uu[1]));
+        }
+    },
 
     @Deprecated
     DISJ("||", true, 5, Args.GTETwo) {
-
-
         @Override
         @NotNull Term _the(int dt, Term... u) {
             assert (dt == DTERNAL);
@@ -731,7 +745,7 @@ public enum Op implements $ {
         int s = subterms.length;
         assert (o.maxSize >= s) : "subterm overflow: " + o + ' ' + Arrays.toString(subterms);
 
-        assert (o.minSize <= s || (firstEllipsis(subterms)!=null)) : "subterm underflow: " + o + ' ' + Arrays.toString(subterms);
+        assert (o.minSize <= s || (firstEllipsis(subterms) != null)) : "subterm underflow: " + o + ' ' + Arrays.toString(subterms);
 
         switch (s) {
             case 1:
@@ -1181,7 +1195,7 @@ public enum Op implements $ {
      * last stage constructor: use with caution
      */
     public static Term compound(Term c, int dt) {
-        if (dt!=DTERNAL && (c instanceof Compound)) {
+        if (dt != DTERNAL && (c instanceof Compound)) {
 //            if (dt != XTERNAL) {
 ////                switch (c.sub(0).op()) {
 ////                    case VAR_PATTERN:
@@ -1270,8 +1284,7 @@ public enum Op implements $ {
                     if (concurrent(dt)) {
                         boolean negate = polarity ? (subject == False) : (subject != False);
                         return predicate.negIf(negate);
-                    }
-                    else {
+                    } else {
                         return Null; //no temporal basis
                     }
                 }
@@ -1426,7 +1439,8 @@ public enum Op implements $ {
         return x.negIf(negate);
     }
 
-    @Nullable public static Op the(String s) {
+    @Nullable
+    public static Op the(String s) {
         return stringToOperator.get(s);
     }
 
@@ -1606,8 +1620,8 @@ public enum Op implements $ {
 
     boolean commute(int dt, int size) {
         return size > 1 &&
-                ( commutative && Op.concurrent(dt) )
-        ;
+                (commutative && Op.concurrent(dt))
+                ;
     }
 
     @NotNull
@@ -1628,7 +1642,7 @@ public enum Op implements $ {
     @NotNull Term _the(int dt, Term[] uu) {
         if (statement) {
             if (uu.length == 1) { //similarity has been reduced
-                assert(this == SIM);
+                assert (this == SIM);
                 return uu[0] == Null ? Null : True;
             }
             return statement(this, dt, uu[0], uu[1]);

@@ -222,42 +222,42 @@ public interface NSense {
         return senseNumber($(id), v);
     }
 
-    /**
-     * generic lowest common denominator numeric input
-     */
-    @NotNull
-    default Object senseNumber(String id, Object o, @NotNull String _expr) {
-        return null;
-
-        //TODO use Nashorn to evaluate expressions
-
-//        Object expr;
-//        try {
-//            expr = Ognl.parseExpression(_expr);
-//        } catch (OgnlException e) {
-//            throw new RuntimeException(e);
-//        }
-//        FuzzyScalarConcepts fs = new FuzzyScalarConcepts(
+//    /**
+//     * generic lowest common denominator numeric input
+//     */
+//    @NotNull
+//    default Object senseNumber(String id, Object o, @NotNull String _expr) {
+//        return null;
 //
-//                new FloatNormalized(() -> {
-//                    try {
-//                        Object v = Ognl.getValue(expr, o, Object.class);
-//                        if (v instanceof Boolean) {
-//                            return (Boolean) v ? 1f : 0f;
-//                        } else if (v instanceof Number) {
-//                            return ((Number) v).floatValue();
-//                        } else {
-//                            return Float.NaN; //unknown
-//                        }
-//                    } catch (OgnlException e) {
-//                        e.printStackTrace();
-//                        return Float.NaN;
-//                    }
-//                }), nar(), id + ":(" + term(expr) + ')'
-//        );//.resolution(0.05f);
-//        sensors().addAll(fs.sensors);
-//        return fs;
-    }
+//        //TODO use Nashorn to evaluate expressions
+//
+////        Object expr;
+////        try {
+////            expr = Ognl.parseExpression(_expr);
+////        } catch (OgnlException e) {
+////            throw new RuntimeException(e);
+////        }
+////        FuzzyScalarConcepts fs = new FuzzyScalarConcepts(
+////
+////                new FloatNormalized(() -> {
+////                    try {
+////                        Object v = Ognl.getValue(expr, o, Object.class);
+////                        if (v instanceof Boolean) {
+////                            return (Boolean) v ? 1f : 0f;
+////                        } else if (v instanceof Number) {
+////                            return ((Number) v).floatValue();
+////                        } else {
+////                            return Float.NaN; //unknown
+////                        }
+////                    } catch (OgnlException e) {
+////                        e.printStackTrace();
+////                        return Float.NaN;
+////                    }
+////                }), nar(), id + ":(" + term(expr) + ')'
+////        );//.resolution(0.05f);
+////        sensors().addAll(fs.sensors);
+////        return fs;
+//    }
 //
 //    @NotNull
 //    private static String term(Object expr) {

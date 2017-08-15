@@ -121,7 +121,7 @@ public class PatrickTests extends AbstractNALTest {
 //        tt.nar.onCycle(()->{
 //            System.err.println(tt.nar.time());
 //        });
-        //tt.log();
+        tt.log();
         tt.input(
                 "made_of(toothbrush,plastic).",
                 "( ( made_of($1, plastic) &| lighter(I, $1) ) ==>+10 <$1 --> [heated]>).",
@@ -138,9 +138,8 @@ public class PatrickTests extends AbstractNALTest {
                 "<toothbrush --> [unscrews]>! :|:" //make something that is here a screwdriver
                 //"<toothbrush --> here>. :|:" //there is a toothbrush here NOW
         );
-        //tt.log();
 
-        tt.mustDesire(1500, "lighter(I, toothbrush)", 1f,
+        tt.mustDesire(15, "lighter(I, toothbrush)", 1f,
                 0.19f,
 /*@*/ 0L);  //is this correct time? might be off by +/-10 , will check
 

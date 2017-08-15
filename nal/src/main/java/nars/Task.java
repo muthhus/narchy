@@ -205,13 +205,14 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
 //        }
 
-            Term c = t.conceptual();
-            if (c instanceof Variable || c instanceof Bool) {
-                return fail(t, "no associated concept", safe);
+            if (!(t.op().conceptualizable)) {
+                return fail(t, "op not conceptualizable", safe);
+            }
+            if (Param.DEBUG && !t.conceptual().op().conceptualizable) {
+                return fail(t, "term not conceptualizable", safe);
             }
 
             return (t.size() == 0) || validTaskCompound(t, punc, safe);
-
         }
 
         return true;
@@ -776,10 +777,14 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     @Nullable
     static NALTask clone(@NotNull Task x, @NotNull Term newContent) {
 
+
         boolean negated = (newContent.op() == NEG);
         if (negated) {
             newContent = newContent.unneg();
-            if (newContent instanceof Variable || newContent instanceof Bool) return null;
+        }
+
+        if (!Task.taskContentValid(newContent, x.punc(), null, true)) {
+            return null;
         }
 
         NALTask y = new NALTask(newContent, x.punc(),
@@ -1020,19 +1025,20 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     @Nullable
     static ObjectBooleanPair<Term> tryContent(@NotNull Term t, byte punc, boolean safe) {
 
-        if (t instanceof Variable || t instanceof Bool)
+        Op o = t.op();
+
+        boolean negated = false;
+        if (o == NEG) {
+            t = t.unneg();
+            o = t.op();
+            negated = !negated;
+        }
+
+        if (!o.conceptualizable)
             return null;
 
         if ((t = normalizedOrNull(t)) == null)
             return null;
-
-        boolean negated = false;
-        if (t.op() == NEG) {
-            t = t.unneg();
-            if (t instanceof Variable || t instanceof Bool) return null;
-
-            negated = !negated;
-        }
 
         if (Task.taskContentValid(t, punc, null, safe))
             return PrimitiveTuples.pair(t, negated);

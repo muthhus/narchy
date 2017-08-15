@@ -1193,8 +1193,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @Nullable
-    public Concept concept(@NotNull Termed x, boolean createIfMissing) {
-        assert(!(x instanceof Bool));
+    public Concept concept(/*@NotNull */Termed x, boolean createIfMissing) {
 
         Term xt;
         if (x instanceof Concept) {

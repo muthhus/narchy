@@ -35,7 +35,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
 
     public NALTask generate( @NotNull Term template, long when, NAR nar) {
-        if (template instanceof Variable || template instanceof Bool)
+        if (!template.op().conceptualizable)
             return null;
         return generate(template, when, null, nar);
     }
@@ -95,42 +95,43 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     public Task match(long when, @Nullable Task target, Term template, boolean noOverlap, NAR nar) {
 //        if (isEmpty())
 //            return null;
+        Task x = super.match(when, target, template, noOverlap, nar);
 
         if (template == null) {
-            if (target!=null) {
-                template = target.term();
-
-            }
-            if (template == null) {
-                //HACK use the first held task
-                try {
-                    Task first = iterator().next();
-                    template = first.term();
-                } catch (NullPointerException ignored) {
-                    return null;
-                }
-            }
-        }
-
-        Retemporalize tmp = target == null || target.isEternal() ?
-                TermIndex.retemporalizeDTERNAL : TermIndex.retemporalizeZero;
-        Term template2 = TermIndex.retemporalize(template, tmp);
-
-        if (template2 == null) {
-//            if (tmp == nar.terms.retemporalizeZero) {
-//                //try again with DTERNAL
-//                template2 = nar.terms.retemporalize(template, nar.terms.retemporalizeDTERNAL);
-//                if (template2 == null)
-//                    return null;
+            return x;
+//            if (target!=null) {
+//                template = target.term();
+//
 //            }
-            return null;
+//            if (template == null) {
+//                //HACK use the first held task
+//                try {
+//                    Task first = iterator().next();
+//                    template = first.term();
+//                } catch (NullPointerException ignored) {
+//                    return null;
+//                }
+//            }
         }
 
-        template = template2;
+//        Retemporalize tmp = target == null || target.isEternal() ?
+//                TermIndex.retemporalizeDTERNAL : TermIndex.retemporalizeZero;
+//        Term template2 = TermIndex.retemporalize(template, tmp);
+//
+//        if (template2 == null) {
+////            if (tmp == nar.terms.retemporalizeZero) {
+////                //try again with DTERNAL
+////                template2 = nar.terms.retemporalize(template, nar.terms.retemporalizeDTERNAL);
+////                if (template2 == null)
+////                    return null;
+////            }
+//            return null;
+//        }
+//
+//        template = template2;
 
         Task y = generate(template, when, nar);
 
-        Task x = super.match(when, target, template, noOverlap, nar);
 
         if (x == null) return y;
         if (y == null || x.equals(y)) return x;

@@ -68,7 +68,7 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
                 beliefs!=null ? beliefs : conceptBuilder.newBeliefTable(term, true),
                 goals!=null ? goals : conceptBuilder.newBeliefTable(term, false),
                 conceptBuilder.newQuestionTable(), conceptBuilder.newQuestionTable(), conceptBuilder.newLinkBags(term));
-        assert(!(term instanceof Bool) && !(term instanceof Variable));
+        assert(term.op().conceptualizable);
     }
 
 

@@ -77,7 +77,7 @@ public class SubUnify extends Unify {
 
                 //copy mappings to parent if succeeded
                 //this is needed to resolve task/belief to any transformations appearing in the conclusion
-                xy.forEachVersioned(parent::putXY);
+                xy.forEachVersioned(parent.xy::tryPut);
 
                 stop(); //done
             }

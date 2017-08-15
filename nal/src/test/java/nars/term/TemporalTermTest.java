@@ -555,6 +555,24 @@ public class TemporalTermTest {
         assertEquals(9, c.dtRange());
     }
 
+  @Test
+    public void testSubtermNonCommutivePosNeg() throws Narsese.NarseseException {
+        Term x = $("((d-->c) ==>-3 (a-->b))");
+        assertEquals(0, x.subtermTime($("(d-->c)")));
+        assertEquals(-3, x.subtermTime($("(a-->b)")));
+        assertEquals(DTERNAL, x.subtermTimeSafe($("a"))); //a is not an event within x
+    }
+
+    @Test
+    public void subtermTimeWithConjInImpl() throws Narsese.NarseseException {
+        @NotNull Term t = $("((b &&+5 c) ==>-10 (a &&+5 b))");
+        assertEquals(0, t.subtermTime($("(b &&+5 c)")));
+        assertEquals(-5, t.subtermTime($("(a &&+5 b)")));
+        assertEquals(-5, t.subtermTime($("a")));
+        assertEquals(0, t.subtermTime($("b")));
+        assertEquals(5, t.subtermTime($("c")));
+        assertEquals(DTERNAL, t.subtermTimeSafe($("x")));
+    }
 
     @Test
     public void testSubtermTimeRecursiveWithNegativeCommutive() throws Narsese.NarseseException {
@@ -625,12 +643,6 @@ public class TemporalTermTest {
     }
 
 
-    @Test
-    public void testSubtermNonCommutivePosNeg() throws Narsese.NarseseException {
-        Term ct = $("((d-->c) ==>-3 (a-->b))");
-        assertEquals(0, ct.subtermTime($("(a-->b)")));
-        assertEquals(3, ct.subtermTime($("(d-->c)")));
-    }
 
     @Test
     public void testNonCommutivityImplConcept() throws Narsese.NarseseException {

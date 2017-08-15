@@ -4,7 +4,13 @@ import nars.NAR;
 import nars.Narsese;
 import nars.Param;
 import nars.Task;
+import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.Op.CONJ;
+import static nars.Op.IMPL;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 
 abstract public class TemporalStabilityTest {
@@ -49,7 +55,7 @@ abstract public class TemporalStabilityTest {
             return;
         }
 
-        if (!validOccurrence(t.start()) || !validOccurrence(t.end()))  {
+        if (!validOccurrence(t.start()) || !validOccurrence(t.end()) || refersToOOBEvents(t))  {
             //if (irregular.add(t)) { //already detected?
                 System.err.println("  instability: " + "\n" + t.proof() + "\n");
                 unstable = true;
@@ -57,6 +63,28 @@ abstract public class TemporalStabilityTest {
 //                    n.stop();
             //}
         }
+    }
+
+    private boolean refersToOOBEvents(Task t) {
+        return t.term().events().stream().anyMatch(x -> {
+            long s = t.start();
+            if (s == ETERNAL)
+                return false;
+
+            Term xt = x.getOne();
+
+            if (!validOccurrence(s + x.getTwo()))
+                return true;
+            if (xt.op() == CONJ) {
+               if (!validOccurrence(s + x.getTwo() + xt.dtRange()))
+                   return true;
+            }
+            if (xt.op()==IMPL && xt.dt()!=DTERNAL) {
+                if (!validOccurrence(s + xt.sub(0).dtRange() + x.getTwo() + xt.dt()))
+                    return true;
+            }
+            return false;
+        });
     }
 
     private void run(int cycles, NAR n) {

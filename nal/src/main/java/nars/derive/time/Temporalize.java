@@ -112,11 +112,12 @@ public class Temporalize implements ITemporalize {
             //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
             //uneternalize/retemporalize:
 
-            if ((e.term.op() != IMPL) && (task.op() == IMPL) && ((belief == null) || (belief.op() == IMPL))) {
-                //dont retemporalize a non-implication derived from two implications
-                //it means that the timing is unknown
-                return null;
-            }
+//            if (/*(e.term.op() != IMPL) && */
+//                    (task.op() == IMPL) && (belief == null || d.beliefTerm.op()==IMPL)) {
+//                //dont retemporalize a non-implication derived from two implications
+//                //it means that the timing is unknown
+//                return null;
+//            }
 
             long ts = task.start();
             long k;
@@ -756,11 +757,13 @@ public class Temporalize implements ITemporalize {
                                 return ds;
                         }
                     }
-                    @NotNull Term d = x.op().the(0, a);
-                    if (!(d instanceof Bool)) {
-                        Event ds = solve(d, trail);
-                        if (ds != null)
-                            return ds;
+                    {
+                        @NotNull Term d = x.op().the(0, a);
+                        if (!(d instanceof Bool)) {
+                            Event ds = solve(d, trail);
+                            if (ds != null)
+                                return ds;
+                        }
                     }
 
 
@@ -858,7 +861,7 @@ public class Temporalize implements ITemporalize {
 
 
         Term newTerm = Op.conjMerge(a, ata, b, bta);
-        if (newTerm instanceof Bool) //failed to create conj
+        if (!newTerm.op().conceptualizable) //failed to create conj
             return null;
 
         Time early = ata < bta ? at : bt;

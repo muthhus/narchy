@@ -122,9 +122,26 @@ public class Premise extends Pri implements ITask {
 
 
         Term beliefTerm = termLink;
+        Term rawBeliefTerm = beliefTerm;
 
+        if (beliefTerm.isTemporal()) {
+            //try to temporalize the termlink to match what appears in the task
+            try {
+                Temporalize t = new Temporalize();
+                t.knowTerm(task.term(), task.start(), task.end());
+                Event bs = t.solve(beliefTerm);
+                if (bs != null && !(bs.term instanceof Bool)) {
+                    beliefTerm = bs.term;
+                }
+            } catch (InvalidTermException t) {
+                if (Param.DEBUG) {
+                    logger.error("temporalize failure: {} {} {}", task.term(), beliefTerm, t.getMessage());
+                    //return 0;
+                }
+            }
+        }
 
-        Concept _beliefConcept = nar.conceptualize(beliefTerm);
+        Concept _beliefConcept = nar.conceptualize(rawBeliefTerm);
         boolean beliefIsTask = _beliefConcept != null && taskConcept.equals(_beliefConcept);
 
 
@@ -171,7 +188,7 @@ public class Premise extends Pri implements ITask {
                     @Nullable Task answered = task.onAnswered(match, nar);
                     if (answered != null) {
 
-                        float effectiveConf = answered.conf(answered.nearestTimeTo(task.mid()), dur);
+                        float effectiveConf = answered.conf(answered.nearestTimeBetween(task.start(), task.end()), dur);
 
                         nar.emotion.onAnswer(taskLink, answered, effectiveConf);
 
@@ -210,25 +227,6 @@ public class Premise extends Pri implements ITask {
             } else {
                 beliefTerm = belief.term(); //use the belief's actual possibly-temporalized term
             }
-        }
-        if (belief == null) {
-            if (beliefTerm.isTemporal()) {
-                //try to temporalize the termlink to match what appears in the task
-                try {
-                    Temporalize t = new Temporalize();
-                    t.knowTerm(task.term(), task.start());
-                    Event bs = t.solve(beliefTerm);
-                    if (bs != null && !(bs.term instanceof Bool)) {
-                        beliefTerm = bs.term;
-                    }
-                } catch (InvalidTermException t) {
-                    if (Param.DEBUG) {
-                        logger.error("temporalize failure: {} {} {}", task.term(), beliefTerm, t.getMessage());
-                        //return 0;
-                    }
-                }
-            }
-
         }
 
         d.run(this, task, belief, beliefTerm, ttlMax);

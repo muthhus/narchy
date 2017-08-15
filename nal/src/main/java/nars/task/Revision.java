@@ -161,6 +161,9 @@ public class Revision {
         int bdt = b.dt();
 
 
+//        if (adt!=bdt)
+//            System.err.print(adt + " " + bdt);
+
         depth /= 2f;
 
         //        if (forwardSubterms(a, adt)) {
@@ -421,7 +424,6 @@ public class Revision {
             }
         }
 
-        //System.out.println(a.term() + " " + b.term() + " " + cc);
 
         NALTask t = new NALTask(cc, a.punc(),
                 newTruth1,

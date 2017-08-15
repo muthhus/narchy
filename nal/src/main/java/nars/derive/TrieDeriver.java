@@ -428,6 +428,7 @@ public enum TrieDeriver {
 
     @NotNull
     static Stream<PrediTerm<Derivation>> conditions(@NotNull Stream<Term> t) {
+
 //
 //            final AtomicReference<UnificationPrototype> unificationParent = new AtomicReference<>(null);
 //
