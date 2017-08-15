@@ -324,9 +324,10 @@ public class Inperience extends LeakOut {
         int k = 0;
 
         arg[k++] = self;
+        Term x = s.term().negIf(tr != null && tr.isNegative());
         arg[k/*++*/] =
-            ((Compound) s.term().negIf(tr != null && tr.isNegative()))
-                    .transform(CompoundTransform.queryToDepVar); //unwrapping negation here isnt necessary sice the term of a task will be non-negated
+                x instanceof Compound ? ((Compound)x)
+                    .transform(CompoundTransform.queryToDepVar) : x; //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
 
 
