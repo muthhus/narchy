@@ -565,9 +565,9 @@ public class TemporalTermTest {
 
     @Test
     public void subtermTimeWithConjInImpl() throws Narsese.NarseseException {
-        @NotNull Term t = $("((b &&+5 c) ==>-10 (a &&+5 b))");
+        @NotNull Term t = $("((b &&+5 c) ==>-10 (a &&+5 d))");
         assertEquals(0, t.subtermTime($("(b &&+5 c)")));
-        assertEquals(-5, t.subtermTime($("(a &&+5 b)")));
+        assertEquals(-5, t.subtermTime($("(a &&+5 d)")));
         assertEquals(-5, t.subtermTime($("a")));
         assertEquals(0, t.subtermTime($("b")));
         assertEquals(5, t.subtermTime($("c")));

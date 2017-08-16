@@ -122,7 +122,7 @@ public class Temporalize implements ITemporalize {
                 ts = task.nearestTimeBetween(belief.start(), belief.end());
                 long bs = belief.nearestTimeBetween(ts, task.end());
                 if (ts != bs) {
-                    //TODO add confidence decay in proportion to lack of coherence
+                    //confidence decay in proportion to lack of coherence
                     if (task.isBeliefOrGoal()) {
                         float taskEvi = task.conf();
                         float beliefEvi = belief.conf();
@@ -416,8 +416,8 @@ public class Temporalize implements ITemporalize {
      */
     void know(Term x, @Nullable Event parent, int start, int end) {
 
-        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
-            return; //ignore variable's and completely-variablized's temporalities because it can conflict
+//        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
+//            return; //ignore variable's and completely-variablized's temporalities because it can conflict
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
         if (parent == null || parent.term != x) {

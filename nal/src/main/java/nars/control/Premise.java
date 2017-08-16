@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -231,6 +232,7 @@ public class Premise extends Pri implements ITask {
                 beliefTerm = belief.term(); //use the belief's actual possibly-temporalized term
             }
         }
+
 
         d.run(this, task, belief, beliefTerm, ttlMax);
 

@@ -430,8 +430,8 @@ public class TemporalizeTest {
         t.knowTerm($("(b &&+5 c)"), 6);
         assertEquals("(a &&+5 b)@[1..6]", t.solve($("(a &&+- b)")).toString());
         assertEquals("((a &&+5 b) &&+5 c)@[1..11]", t.solve($("((a &&+- b) &&+- c)")).toString());
-        assertEquals("((a &&+5 b)=|>(b &&+5 c))@1", t.solve($("((a &&+5 b) ==>+- (b &&+5 c))")).toString());
-        assertEquals("((b &&+5 c) ==>-10 (a &&+5 b))@6", t.solve($("((b &&+5 c) ==>+- (a &&+5 b))")).toString());
+        assertEquals("((a &&+5 b) ==>+5 c)@1", t.solve($("((a &&+5 b) ==>+- (b &&+5 c))")).toString());
+        assertEquals("((b &&+5 c) ==>-10 a)@6", t.solve($("((b &&+5 c) ==>+- (a &&+5 b))")).toString());
 
     }
 
@@ -488,7 +488,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
             Map<Term, Time> h = new HashMap();
             Event s = t.solve(the("a"), h);
             //assertNull(s); //no way to solve for 'a' except relatively:
-            assertEquals("a@-5->b", s.toString());
+            assertEquals("a@-5->(b &&+5 c)", s.toString());
 
         }
 

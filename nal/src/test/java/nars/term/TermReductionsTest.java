@@ -177,6 +177,13 @@ public class TermReductionsTest extends NarseseTest {
 
         assertEquals(Null, $("((a &&+5 $1) ==>-5 a"));
 
+    }
+    @Test public void testPointlessImplicationSubtermRepeat2() throws Narsese.NarseseException {
+        //unaffected because of eternality
+        assertEquals("((a &&+5 x)=|>(&&,x,y,z))", $("((a &&+5 x)=|>(&&,x,y,z))").toString());
+
+        //affected because of temporality
+        assertEquals("((a &&+5 x)=|>(y&|z))", $("((a &&+5 x)=|>((x&|y)&|z)))").toString());
 
     }
 
