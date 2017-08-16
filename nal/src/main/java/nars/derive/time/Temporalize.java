@@ -479,7 +479,8 @@ public class Temporalize implements ITemporalize {
 
 
                 int t = start;
-                int last = DTERNAL;
+
+                int lastStart = DTERNAL, lastEnd = DTERNAL;
 
                 //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
                 for (int i = 0; (i < l); i++) {
@@ -511,12 +512,22 @@ public class Temporalize implements ITemporalize {
 
                     if (i > 0) {
                         //IMPL: crosslink adjacent subterms.  conjunction is already temporalized in another method
-                        int rel = subStart - last;
+                        int relInner = lastEnd - subStart;
                         Term rt = tt.sub(i - 1);
-                        know(rt, newRelative(rt, st, rel));
-                        know(tt.sub(i), newRelative(st, rt, -rel));
+                        if (rt.dtRange() > 0) {
+                            //link to the previous term's starting event
+                            Term rtEarly = rt.sub(rt.dt() >= 0 ? 0 : 1);
+                            int relOuter = lastStart - subStart;
+                            know(rtEarly, newRelative(rtEarly, st, relOuter));
+                            know(st, newRelative(st, rtEarly, -relOuter));
+                        }
+
+                        know(rt, newRelative(rt, st, relInner));
+                        know(st, newRelative(st, rt, -relInner));
                     }
-                    last = subEnd;
+
+                    lastStart = subStart;
+                    lastEnd = subEnd;
 
 
                 }

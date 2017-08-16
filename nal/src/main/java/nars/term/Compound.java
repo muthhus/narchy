@@ -504,7 +504,7 @@ public interface Compound extends Term, IPair, TermContainer {
                     return false;
             }
         } else
-            return op.commutative;
+            return op.commutative && size()>1;
     }
 
 

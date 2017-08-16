@@ -359,7 +359,7 @@ public class TemporalTermTest {
             assertTrue(d == e);
 
             Term f0 = $("(y " + op + "+- x)");
-            assertEquals("(y " + op + "+- x)", f0.toString());
+            assertEquals("(x " + op + "+- y)", f0.toString());
             assertEquals("(x " + op + "+- y)", f0.eternal().toString());
 
             Concept f = n.conceptualize(f0);
@@ -882,7 +882,7 @@ public class TemporalTermTest {
     public void testRetermporalization2() throws Narsese.NarseseException {
         String su = "((--,(happy)) &&+- (--,((--,(o))&&+-(happy))))";
         Compound u = $.$(su);
-        assertEquals("((--,(happy)) &&+- (--,((--,(o)) &&+- (happy))))", u.toString());
+        assertEquals("((--,((--,(o)) &&+- (happy))) &&+- (--,(happy)))", u.toString());
 
         Term ye = $.terms.retemporalize(u, $.terms.retemporalizeDTERNAL);
         assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", ye.toString());

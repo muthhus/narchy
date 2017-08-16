@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.list.FasterList;
+import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Narsese;
@@ -307,12 +308,12 @@ public class TemporalizeTest {
         t.knowTerm($("a"), 1);
         t.knowTerm($("((a &&+5 b) ==>+5 #1)"), 1);
 
-        System.out.println(t);
-
         {
-            Event solution = t.solve($("#1"));
+            HashMap h = new HashMap();
+            Term depVar = $.varDep(1);
+            Event solution = t.solve(depVar, h);
             assertNotNull(solution);
-            assertEquals("#1@5-->(a &&+5 b)", solution.toString());
+            assertEquals(11, solution.start(h).abs());
         }
 
         {
@@ -496,7 +497,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
             Map<Term, Time> h = new HashMap();
             Event s = t.solve(the("a"), h);
             //assertNull(s); //no way to solve for 'a' except relatively:
-            assertEquals("a@-5->(b &&+5 c)", s.toString());
+            assertEquals("a@-5->b", s.toString());
 
         }
 
@@ -531,7 +532,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         Term a = $("(((--,a)&|b) &&+- a)");
         //System.out.println(a);
         //System.out.println(b);
-        String r = "(a &&+5 ((--,a)&|b))@[1..6]";
+        String r = "(b &&+5 ((--,a)&|b))@[1..6]";
 
         System.out.println(t);
         System.out.println(a);
@@ -539,7 +540,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         assertNotNull(ta);
         assertEquals(r, ta.toString());
 
-        Term b = $("(a &&+- ((--,a)&|b))"); //check mirror
+        Term b = $("(b &&+- ((--,a)&|b))"); //check mirror
         assertEquals(r, t.solve(b).toString());
 
     }

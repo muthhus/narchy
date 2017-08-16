@@ -143,11 +143,11 @@ public class Conclusion extends AbstractPred<Derivation> {
             Term t1;
             try {
                 t1 = new Temporalize(d.random).solve(d, c1, occ = new long[]{ETERNAL, ETERNAL}, eviGain);
-                if (occ[0] < 0) {
-                    //FOR A SPECIFIC TEST TEMPORAR
-                    System.err.println("wtf");
-                    new Temporalize(d.random).solve(d, c1, new long[]{ETERNAL, ETERNAL}, eviGain);
-                }
+//                if (occ[0] < 0) {
+//                    //FOR A SPECIFIC TEST TEMPORAR
+//                    System.err.println("wtf");
+//                    new Temporalize(d.random).solve(d, c1, new long[]{ETERNAL, ETERNAL}, eviGain);
+//                }
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {
                     logger.error("temporalize error: {} {} {}", d, c1, t.getMessage());

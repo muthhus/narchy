@@ -504,7 +504,7 @@ public class TestNAR {
 
     @NotNull
     public TestNAR mustBelieve(long withinCycles, @NotNull String term, float freq, float confidence) {
-        return mustBelieve(withinCycles, term, freq, confidence, Tense.Eternal);
+        return mustBelieve(withinCycles, term, freq, confidence, ETERNAL);
     }
 
     @NotNull

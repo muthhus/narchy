@@ -937,7 +937,7 @@ public enum Op implements $ {
     //new NullMemoize<>(buildTerm);
 
     public static boolean concurrent(int dt) {
-        return (dt == DTERNAL) || (dt == 0) || (dt == XTERNAL);
+        return (dt == DTERNAL) || (dt == 0);
     }
 
     final static Comparator<ObjectLongPair<Term>> conjEventComparator = Comparator.comparingLong(ObjectLongPair<Term>::getTwo).thenComparing(ObjectLongPair::getOne);
