@@ -201,7 +201,7 @@ public class Builtin {
 
 
                 List<ObjectLongPair<Term>> ee = $.newArrayList(2);
-                t.events(ee, 0);
+                t.events(ee::add, 0);
 
                 int toRemove = nar.random().nextInt(ee.size());
                 ee.remove(toRemove);

@@ -21,6 +21,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static nars.Op.CONJ;
+
 /**
  * HACK this should extend ProxyTerm or something
  */
@@ -84,9 +86,14 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 
 
             //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
-            return commutative ?
-                    xsubs.unifyCommute(ysubs, subst) :
-                    xsubs.unifyLinear(ysubs, subst);
+            if (commutative) return xsubs.unifyCommute(ysubs, subst);
+            else {
+                if (op() == CONJ) { //non-commutive, temporal CONJ
+                    return TermContainer.unifyConj(xsubs, dt(), ysubs, y.dt(), subst);
+                } else {
+                    return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
+                }
+            }
 
         } else if (y instanceof AliasConcept.AliasAtom) {
             Term abbreviated = ((AliasConcept.AliasAtom) y).target;

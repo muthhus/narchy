@@ -81,11 +81,11 @@ public abstract class AbstractVariable implements Variable {
         //var pattern will unify anything (below)
         //see: https://github.com/opennars/opennars/blob/4515f1d8e191a1f097859decc65153287d5979c5/nars_core/nars/language/Variables.java#L18
         if (commonalizableVariable(y) && commonalizableVariable(this)) {
-            if ((op().id >= y.op().id)) {
+            if ((op().id >= y.op().id)) { //allow indep to subsume dep but not vice versa
 
 
                 //TODO check if this is already a common variable containing y
-                return subst.putCommon(this, (Variable) y);
+                return subst.putCommon(this, (AbstractVariable) y);
 
             } else {
                 return false;

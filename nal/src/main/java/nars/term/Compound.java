@@ -298,22 +298,23 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
         Compound y = (Compound) ty;
-        if (op.temporal) {
-            int sdur = subst.dur;
-            if (sdur >= 0) {
-                if (!matchTemporalDT(this, y, sdur))
-                    return false;
-            }
-        }
+//        if (op.temporal) {
+//            int sdur = subst.dur;
+//            if (sdur >= 0) {
+//                if (!matchTemporalDT(this, y, sdur))
+//                    return false;
+//            }
+//        }
 
         TermContainer xsubs = subterms();
         TermContainer ysubs = y.subterms();
 
-
-        //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
-        if (isCommutative() || y.isCommutative() /* in case one is XTERNAL and the other isn't; to be sure use this */) {
+        if (op() == CONJ) { //non-commutive, temporal CONJ
+            return TermContainer.unifyConj(xsubs, dt(), ysubs, y.dt(), subst);
+        } else if (isCommutative()) {
             return xsubs.unifyCommute(ysubs, subst);
         } else {
+            //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
             return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
         }
 
@@ -491,7 +492,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     default boolean isCommutative() {
-        if (op().commutative) { //TODO only test dt() if equiv or conj
+        Op op = op();
+        if (op == CONJ) {
             int dt = dt();
             switch (dt) {
                 case 0:
@@ -501,8 +503,8 @@ public interface Compound extends Term, IPair, TermContainer {
                 default:
                     return false;
             }
-        }
-        return false;
+        } else
+            return op.commutative;
     }
 
 
@@ -658,7 +660,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     /* collects any contained events within a conjunction*/
     @Override
-    default void events(List<ObjectLongPair<Term>> events, long offset) {
+    default void events(Consumer<ObjectLongPair<Term>> events, long offset) {
         Op o = op();
         if (o == CONJ) {
             int dt = dt();
@@ -685,7 +687,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
         }
 
-        events.add(PrimitiveTuples.pair(this, offset));
+        events.accept(PrimitiveTuples.pair(this, offset));
     }
 
 

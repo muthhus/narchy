@@ -196,17 +196,17 @@ public enum Op implements $ {
 
 
             if (dt == XTERNAL) {
-                //leave un-sorted, un-de-duplicated
-                return /*conjImplReduction*/compound(CONJ, XTERNAL, tt);
+                //only sort (but dont deduplicate, allowing repeat)
+                Arrays.sort(tt);
+                return compound(CONJ, XTERNAL, tt);
             }
 
-            boolean commutive = concurrent(dt);
-            if (commutive) {
+            if (dt == DTERNAL || dt == 0) {
 
                 return implInConjReduction(junctionFlat(dt, tt));
 
             } else {
-                //NON-COMMUTIVE
+                //sequence or parallel
 
 
                 if (n > 2)
@@ -237,7 +237,11 @@ public enum Op implements $ {
                             a = b;
                             b = x;
                         }
-                        return nullIfNull(conjMerge(a, 0, b, dt + a.dtRange()));
+                        return conjMerge(a, 0, b,
+                                dt!=0 ? dt + a.dtRange() : //sequence
+                                0 //parallel
+                        );
+
                     }
 //                    if (dt > 0 && (imbalanced /*|| (bConj && !concurrent(b.dt()))*/)) {
 //                        return nullIfNull(conjMerge(a, 0, b, dt + a.dtRange()));
@@ -331,7 +335,7 @@ public enum Op implements $ {
                 }
             }
 
-            return False;
+            return Null;
         }
 
 
@@ -933,21 +937,26 @@ public enum Op implements $ {
     //new NullMemoize<>(buildTerm);
 
     public static boolean concurrent(int dt) {
-        return (dt == DTERNAL) || (dt == 0);
+        return (dt == DTERNAL) || (dt == 0) || (dt == XTERNAL);
     }
 
-    @Nullable
+    final static Comparator<ObjectLongPair<Term>> conjEventComparator = Comparator.comparingLong(ObjectLongPair<Term>::getTwo).thenComparing(ObjectLongPair::getOne);
+
+    @NotNull
     static public Term conjMerge(@NotNull Term a, long aStart, @NotNull Term b, long bStart) {
 
-        List<ObjectLongPair<Term>> events = $.newArrayList();
+        TreeSet<ObjectLongPair<Term>> eventSet = new TreeSet(conjEventComparator);
 
-        a.events(events, aStart);
-        b.events(events, bStart);
+        a.events(eventSet::add, aStart);
+        b.events(eventSet::add, bStart);
 
-        events.sort(Comparator.comparingLong(ObjectLongPair<Term>::getTwo).thenComparing(ObjectLongPair::getOne));
+        int ee = eventSet.size();
+        assert(ee > 0);
+        if (ee==1) {
+            return eventSet.first().getOne();
+        }
 
-        int ee = events.size();
-        assert (ee > 1);
+        List<ObjectLongPair<Term>> events = new FasterList<>(eventSet);
 
         //group all parallel clusters
         ObjectLongPair<Term> e0 = events.get(0);
@@ -971,7 +980,7 @@ public enum Op implements $ {
                         i--;
                         ee--;
                     }
-                    Term replacement = CONJ.the(0, p);
+                    Term replacement = p.length > 1 ? CONJ.the(0, p) : p[0];
                     if (events.isEmpty()) {
                         //got them all here
                         return replacement;
@@ -991,7 +1000,7 @@ public enum Op implements $ {
     /**
      * constructs a correctly merged conjunction from a list of events
      */
-    public static Term conj(List<ObjectLongPair<Term>> events) {
+    @NotNull public static Term conj(List<ObjectLongPair<Term>> events) {
 
         int ee = events.size();
         switch (ee) {
@@ -1411,7 +1420,7 @@ public enum Op implements $ {
             }
         }
 
-        if (subjConj || predConj) {
+        if (subjConj && predConj) {
             //filter duplicate events
             int pre = subject.dtRange();
             int edt = pre + (dt != DTERNAL ? dt : 0);

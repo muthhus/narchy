@@ -2,6 +2,7 @@ package nars.term;
 
 import jcog.Texts;
 import jcog.Util;
+import jcog.data.array.IntComparator;
 import jcog.data.sorted.SortedList;
 import jcog.list.FasterList;
 import nars.Op;
@@ -564,13 +565,13 @@ public enum Terms {
         return uniques;
     }
 
-   public static Term[] sorted(Collection<Term> s) {
+    public static Term[] sorted(Collection<Term> s) {
         if (s instanceof SortedSet)
-            return sorted((Set)s);
+            return sorted((Set) s);
         else {
             return sorted(s.toArray(new Term[s.size()]));
         }
-   }
+    }
 
     /**
      * a Set is already duplicate free, so just sort it
@@ -613,12 +614,22 @@ public enum Terms {
         return u;
     }
 
+    static final Comparator<Term> volumeComparator = Comparator.comparingInt(Term::volume);
+
     /**
      * for commutive conjunction
      *
      * @param dt will be either 0 or DTERNAL (commutive relation)
      */
     public static boolean flatten(@NotNull Op op, @NotNull Term[] u, int dt, ObjectByteHashMap<Term> s) {
+
+        //sort by volume, decreasing first. necessary for proper subsumption of events into sibling sequence compounds that may contain them
+        //may also provide some performance benefit for accelerated early termination in case of invalid construction attempts (ex: co-negation)
+
+        u = u.clone(); //dont modify input, it will confuse callee's
+
+        Arrays.sort(u, volumeComparator);
+
         for (Term x : u) {
             if (!flatten(op, dt, x, s))
                 return false;
@@ -649,29 +660,68 @@ public enum Terms {
                 return true; //silently ignore
 
             if (x == False)
-                return s.getIfAbsentPut(False, (byte) +1) == (byte) +1; //attempt to mark a False, for the chance it may become inverted and disappear rather than aborting any further construction here
+                return s.getIfAbsentPut(True, (byte) -1) == (byte) +1; //attempt to mark a False, for the chance it may become inverted and disappear rather than aborting any further construction here
 
             return false; //x must be Null
         }
 
         Op xo = x.op();
 
-        if ((xo == op) && flattenMatchDT(((Compound) x).dt(), dt)) {
-            return flatten(op, ((Compound) x).subterms(), dt, s); //recurse
+        if ((xo == op) && (flattenMatchDT(x.dt(), dt))) {
+            if (!flatten(op, x.subterms(), dt, s)) //recurse
+                return false;
+
+
+            return true;
+
         } else {
-            byte polarity;
-            Term t;
-            if (xo == NEG) {
-                polarity = -1;
-                t = x.unneg();
-            } else {
-                polarity = +1;
-                t = x;
+            if (!testCoNegate(x, s))
+                return false;
+
+            if (x.op() == CONJ) {
+                int xdt = x.dt();
+                if (xdt != 0) {
+                    //test for x's early subterm (left aligned t=0) in case it matches with a term in the superconjunction that x is a subterm of
+                    Term early = x.sub(xdt > 0 ? 0 : 1);
+
+                    //check if the early event is present, and if it is (with correct polarity) then include x without the early event
+                    Term earlyUnneg = early.unneg();
+                    byte earlyExisting = s.getIfAbsent(earlyUnneg, (byte) 0);
+                    if (earlyExisting != 0) {
+                        if (early.op() == NEG ^ (earlyExisting == -1))
+                            return false; //wrong polarity
+                        else {
+                            //subsume the existing term by removing it from the list, since it is part of 'x' which has been added in entirity already
+                            s.remove(earlyUnneg);
+                        }
+
+                    }
+
+                }
             }
-            if (s.getIfAbsentPut(t, polarity) != polarity)
-                return false; //CoNegation
+
+            return true;
         }
-        return true;
+
+    }
+
+    static boolean testCoNegate(Term x, ObjectByteHashMap<Term> s) {
+
+        assert (x != Null);
+
+        byte polarity;
+        Term t;
+        if (x.op() == NEG || x == False) {
+            polarity = -1;
+            t = x.unneg();
+        } else {
+            polarity = +1;
+            t = x;
+        }
+        if (s.getIfAbsentPut(t, polarity) != polarity)
+            return false; //CoNegation
+        else
+            return true;
     }
 
     @NotNull

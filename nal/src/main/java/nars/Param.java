@@ -55,7 +55,7 @@ public abstract class Param extends Services<Term,NAR> {
 //    public static final int PREDICTION_HORIZON = 4;
 
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
-    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 2;
+    public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 1;
 
     public static PriMerge termlinkMerge = PriMerge.max;
     public static final PriMerge tasklinkMerge = PriMerge.plus; //not safe to plus without enough headroom
@@ -110,8 +110,7 @@ public abstract class Param extends Services<Term,NAR> {
             //1f;
 
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
-    public static int DT_ABS_LIMIT = Integer.MAX_VALUE/8192;
-    public static int DT_ABS_SAFETY_LIMIT = Integer.MAX_VALUE/8192;
+    public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
 
     public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
     public final FloatParam valueNegativeDecay = new FloatParam(0.66f, 0, 1f);
@@ -151,12 +150,12 @@ public abstract class Param extends Services<Term,NAR> {
     public static boolean ANSWER_REPORTING = true;
 
 
-    public static final boolean DERIVATION_TRANSFORM_CACHE = false;
-
-    /** -1 for softref */
-    public static final int DERIVATION_TRANSFORM_CACHE_SIZE_PER_THREAD =
-            //-1; //softref
-            32 * 1024;
+//    public static final boolean DERIVATION_TRANSFORM_CACHE = false;
+//
+//    /** -1 for softref */
+//    public static final int DERIVATION_TRANSFORM_CACHE_SIZE_PER_THREAD =
+//            //-1; //softref
+//            32 * 1024;
 
     /**
      * hard upper-bound limit on Compound term complexity;
@@ -203,7 +202,7 @@ public abstract class Param extends Services<Term,NAR> {
     @Deprecated public final int UnificationTTLMax = matchTTL.intValue();
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
-    public static final float BELIEF_MATCH_TTL_FRACTION = 0.4f;
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.1f;
 
 
 

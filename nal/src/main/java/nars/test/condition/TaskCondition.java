@@ -18,11 +18,12 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.function.Consumer;
+import java.util.function.LongPredicate;
 import java.util.function.Predicate;
 
 import static nars.term.Terms.normalizedOrNull;
 
-public class EternalTaskCondition implements NARCondition, Predicate<Task>, Consumer<Tasked> {
+public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Tasked> {
 
     //private static final Logger logger = LoggerFactory.getLogger(EternalTaskCondition.class);
 
@@ -32,6 +33,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 
     @NotNull
     private final Term term;
+    private final LongPredicate start;
+    private final LongPredicate end;
 
     boolean succeeded;
     //long successTime = Tense.TIMELESS;
@@ -79,7 +82,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
 //        return DefaultTruth.NULL;
 //    }
 
-    public EternalTaskCondition(@NotNull NAR n, long creationStart, long creationEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax) throws RuntimeException, nars.Narsese.NarseseException {
+    public TaskCondition(@NotNull NAR n, long creationStart, long creationEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, LongPredicate start, LongPredicate end) throws RuntimeException, nars.Narsese.NarseseException {
         //super(n.task(sentenceTerm + punc).normalize(n.memory));
 
 
@@ -90,6 +93,8 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             throw new RuntimeException("cycleEnd must be after cycleStart by at least 1 cycle");
 
         this.nar = n;
+        this.start = start;
+        this.end = end;
 
         this.creationStart = creationStart;
         this.creationEnd = creationEnd;
@@ -113,7 +118,6 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
      */
     public static float termDistance(@NotNull Term a, @NotNull Term b, float ifLessThan) {
         if (a.equals(b)) return 0;
-        //TODO handle TermMetadata terms
 
         float dist = 0;
         if (a.op() != b.op()) {
@@ -230,8 +234,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             return false;
         }
 
-
-        return timeMatches(task);
+        return creationTimeMatches() && occurrenceTimeMatches(task);
     }
 
     private boolean truthMatches(@NotNull Truthed task) {
@@ -251,11 +254,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         }
     }
 
-    public boolean timeMatches(@NotNull Task t) {
-        return creationTimeMatches() && occurrenceTimeMatches(t);
-    }
-
-//    private boolean relativeTimeMatches(Task t) {
+    //    private boolean relativeTimeMatches(Task t) {
 //        if (term instanceof Compound) {
 //            return ((Compound)term).t() == t.term().t();
 //        }
@@ -269,7 +268,7 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
     }
 
     protected boolean occurrenceTimeMatches(@NotNull Task t) {
-        return (t.isEternal());
+        return start.test(t.start()) && end.test(t.end());
     }
 
     @Override
@@ -292,10 +291,10 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
         //TODO add the levenshtein distance of other task components
         float worstDiff = similar.size() >= maxSimilars ? similar.lastKey() : Float.POSITIVE_INFINITY;
 
-        float difference = 0;
+
         Term tterm = task.term();
-        difference +=
-                tterm.equals(term) ? 0 : (term.volume());
+        float difference =
+                3 * termDistance(tterm, term, worstDiff);
         if (difference >= worstDiff)
             return;
 
@@ -316,10 +315,6 @@ public class EternalTaskCondition implements NARCondition, Predicate<Task>, Cons
             if (difference >= worstDiff)
                 return;
         }
-
-        float termDifference =
-                termDistance(tterm, term, worstDiff);
-        difference += 3 * termDifference;
 
         if (difference >= worstDiff)
             return;

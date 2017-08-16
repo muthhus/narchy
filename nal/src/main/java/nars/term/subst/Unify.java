@@ -295,13 +295,11 @@ public abstract class Unify extends Versioning implements Subst {
 
     final static int CommonVariableBits = Op.or(Op.VAR_DEP, Op.VAR_INDEP, Op.VAR_QUERY);
 
-    public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
+    public boolean putCommon(AbstractVariable/* var */ x, AbstractVariable y) {
 
-        @NotNull Term common = CommonVariable.common((AbstractVariable) x, (AbstractVariable) y);
+        Term common = CommonVariable.common(x, y);
 
-        return (putXY(x, common) && putXY(y, common)
-                //&& putYX(y, common) //&& putYX(x,common)
-        );
+        return xy.tryPut(x, common) && xy.tryPut(y, common);
     }
 
     @Override
@@ -320,12 +318,11 @@ public abstract class Unify extends Versioning implements Subst {
         Term y0 = xy(x);
 
         if (y0 != null) {
-            //return y0.equals(y);
-            if (y0.equals(x))
-                return true;
-            else
+//            if (y0.equals(x))
+//                return true;
+//            else
                 return unify(y0, y);
-            //return unify(y, y0); //cross-over
+                //return unify(y, y0); //cross-over
         } else /*if (matchType(x0))*/ {
 
             return xy.tryPut(x, y);

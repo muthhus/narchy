@@ -277,6 +277,10 @@ public class TermReductionsTest extends NarseseTest {
                 Narsese.parse().task("((x) &&+10 (x)). :|:", NARS.shell()).toString());
     }
 
+    @Test public void testConjParallelWithSeq() throws Narsese.NarseseException {
+        assertEquals("(a &&+5 b)", $("((a &&+5 b)&|a)").toString());
+    }
+
     @Test public void testEmbeddedConjNormalizationN2() throws Narsese.NarseseException {
         Compound alreadyNormalized = $("((a &&+1 b) &&+1 c)");
         Compound needsNormalized = $("(a &&+1 (b &&+1 c))");
@@ -621,8 +625,9 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testConegatedConjunctionTerms0() throws Narsese.NarseseException {
-        assertEquals(False, $("(#1 && (--,#1))"));
-        assertEquals(False, $("(&&, #1, (--,#1), (x))"));
+        assertEquals(Null, $("(#1 && (--,#1))"));
+        assertEquals(Null, $("(#1 &| (--,#1))"));
+        assertEquals(Null, $("(&&, #1, (--,#1), (x))"));
 
         assertTrue($("((x) &&+1 --(x))") instanceof Compound);
         assertTrue($("(#1 &&+1 (--,#1))") instanceof Compound);
@@ -633,7 +638,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testConegatedConjunctionTerms01() throws Narsese.NarseseException {
-        assertEquals(False, parallel(varDep(1), varDep(1).neg()));
+        assertEquals(Null, parallel(varDep(1), varDep(1).neg()));
     }
 
     @Test
@@ -700,26 +705,26 @@ public class TermReductionsTest extends NarseseTest {
     public void testCoNegatedJunction() throws Narsese.NarseseException {
         //the conegation cancels out conflicting terms
 
-        assertEquals(False, $("(&&,x,a:b,(--,a:b))"));
+        assertEquals(Null, $("(&&,x,a:b,(--,a:b))"));
 
-        assertEquals(False, $("(&&, (a), (--,(a)), (b))")); //a cancels, reduce to 'b'
-        assertEquals(False, $("(&&, (a), (--,(a)), (b), (c))"));
+        assertEquals(Null, $("(&&, (a), (--,(a)), (b))")); //a cancels, reduce to 'b'
+        assertEquals(Null, $("(&&, (a), (--,(a)), (b), (c))"));
 
 
-        assertEquals(False, $("(&&,x,y,a:b,(--,a:b))"));
+        assertEquals(Null, $("(&&,x,y,a:b,(--,a:b))"));
     }
 
 
     @Test
     public void testCoNegatedDisjunction() throws Narsese.NarseseException {
 
-        assertEquals(True,
+        assertEquals(Null,
                 $("(||,x,a:b,(--,a:b))"));
 
-        assertEquals(True,
+        assertEquals(Null,
                 $("(||,x,y,a:b,(--,a:b))"));
 
-        assertEquals(False, parallel(varDep(0), varDep(0).neg(), Atomic.the("x")));
+        assertEquals(Null, parallel(varDep(0), varDep(0).neg(), Atomic.the("x")));
     }
 
     @Test
@@ -918,7 +923,7 @@ public class TermReductionsTest extends NarseseTest {
 
         assertEquals("((ball_right) &&+270 (--,(ball_left)))", c1.toString());
         assertEquals(
-                "(&|,((ball_right) &&+270 (--,(ball_left))),(ball_left),(ball_right))",
+                "(((ball_right) &&+270 (--,(ball_left)))&|(ball_left))", //ball_right subsumed by the sequence
 
                 //HACK: this narsese parser isnt implemented yet:
                 //$("( &&+0 ,(ball_left),(ball_right),((--,(ball_left)) &&-270 (ball_right)))")
@@ -1018,7 +1023,7 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testCoNegatedConjunctionParallelEternal() throws Narsese.NarseseException {
         //mix of parallel and eternal
-        assertEquals(False,
+        assertEquals(Null,
                 $("((--,(happy-->noid))&|((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))")
         );
     }

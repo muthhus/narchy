@@ -149,8 +149,8 @@ abstract public class NAgentX extends NAgent {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.25f);
-        n.goalConfidence(0.25f);
+        n.beliefConfidence(0.5f);
+        n.goalConfidence(0.5f);
 
 
         float priFactor = 0.25f;

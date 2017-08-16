@@ -165,7 +165,9 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
             //match both
             //code.add(new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints)));
 
-            if (taskFirst(task, belief)) {
+            if (task.equals(belief)) {
+                code.add(new MatchOneSubterm(task, 0, true));
+            } else if (taskFirst(task, belief)) {
                 //task first
                 code.add(new MatchOneSubterm(task, 0, false));
                 code.add(new MatchOneSubterm(belief, 1, true));

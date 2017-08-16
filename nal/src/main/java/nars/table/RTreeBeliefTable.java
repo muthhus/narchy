@@ -2,6 +2,7 @@ package nars.table;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
+import jcog.Util;
 import jcog.pri.Pri;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
@@ -53,7 +54,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private final static int EVAL_ALL_LTE_TASKS = 2;
 
     public static final int MIN_TASKS_PER_LEAF = 2;
-    public static final int MAX_TASKS_PER_LEAF = 4;
+    public static final int MAX_TASKS_PER_LEAF = 2;
 
 
     private transient NAR nar;
@@ -70,11 +71,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         /**
          * relative to time sameness (1)
          */
-        static final float FREQ_SAMENESS_IMPORTANCE = 0.25f;
+        static final float FREQ_SAMENESS_IMPORTANCE = 0.2f;
         /**
          * relative to time sameness (1)
          */
-        static final float CONF_SAMENESS_IMPORTANCE = 0.05f;
+        static final float CONF_SAMENESS_IMPORTANCE = 0.1f;
 
         public final long start;
         long end; //allow end to stretch for ongoing tasks
@@ -96,17 +97,17 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
 
         public float timeCost() {
-            return 1 + Math.abs(end - start);
+            return 1 + (end - start);
         }
 
         public float freqCost() {
-            float d = 1 + Math.abs(freqMax - freqMin);
-            return d * timeCost() * FREQ_SAMENESS_IMPORTANCE;
+            float d = (freqMax - freqMin);
+            return 1 + d * timeCost() * FREQ_SAMENESS_IMPORTANCE;
         }
 
         public float confCost() {
-            float d = 1 + Math.abs(confMax - confMin);
-            return d * timeCost() * CONF_SAMENESS_IMPORTANCE;
+            float d = (confMax - confMin);
+            return 1 + d * timeCost() * CONF_SAMENESS_IMPORTANCE;
         }
 
         @Override
@@ -649,11 +650,18 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         return (TaskRegion cb) -> {
 
-            long awayFromNow = //Math.abs(when - ((cb.start + cb.end)/2)); //now to its midpoint
-                                (Math.min(Math.abs(cb.start - when), Math.abs(cb.end - when)));
+            float awayFromNow = //Math.abs(when - ((cb.start + cb.end)/2)); //now to its midpoint
+                                //(Math.min(Math.abs(cb.start - when), Math.abs(cb.end - when)));
+                                Math.abs(cb.start - when)/((float)dur);
+
+
+            return (1 / ((1 + awayFromNow)))
+                    * ((1 + (cb.end - cb.start))/awayFromNow) /* range, in vanishing perspective proportion to distance */
+                    * ( cb.confMax ); /* conf, optimistic */
+
 
             //maximize confidence, minimize frequency variability, minimize distance to now
-            return (1f + cb.confMax) /  ((1 + (cb.freqMax - cb.freqMin)) * (1 + awayFromNow/((float)dur)));
+            //return (1 + awayFromNow/((float)dur)) * (1f + (cb.confMin+cb.confMax)/2 / (cb.freqMax - cb.freqMin) );
 
             //float timeSpan = (cb.end - cb.start) / fdur;
             //float timeSpanFactor = awayFromNow == 0 ? 0f : (timeSpan / ((timeSpan + awayFromNow)));

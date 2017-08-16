@@ -5,10 +5,10 @@ import jcog.event.Topic;
 import nars.*;
 import nars.task.ITask;
 import nars.task.Tasked;
-import nars.test.condition.EternalTaskCondition;
+import nars.test.condition.TaskCondition;
 import nars.test.condition.NARCondition;
-import nars.test.condition.TemporalTaskCondition;
 import nars.time.Tense;
+import org.eclipse.collections.impl.set.mutable.primitive.LongHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.LongPredicate;
 
 import static java.lang.Float.NaN;
 import static nars.Op.*;
@@ -158,7 +159,7 @@ public class TestNAR {
 
                 logger.error("mustNot: {}", t);
                 t.log(logger);
-                ((EternalTaskCondition) t).matched.forEach(shouldntHave -> logger.error("Must not:\n{}", shouldntHave.proof()));
+                ((TaskCondition) t).matched.forEach(shouldntHave -> logger.error("Must not:\n{}", shouldntHave.proof()));
 
 
                 success = false;
@@ -358,14 +359,15 @@ public class TestNAR {
     @NotNull
     TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end) {
         try {
-            return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, start, end, true);
+            return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax,
+                    s -> s == start, e -> e == end, true);
         } catch (Narsese.NarseseException e) {
             throw new RuntimeException(e);
         }
     }
 
     @NotNull
-    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end, boolean must) throws Narsese.NarseseException {
+    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, LongPredicate start, LongPredicate end, boolean must) throws Narsese.NarseseException {
 
 
         if (freqMin == -1)
@@ -376,14 +378,11 @@ public class TestNAR {
         cycleEnd += tt;
 
         float h = Param.TESTS_TRUTH_ERROR_TOLERANCE / 2.0f;
-        EternalTaskCondition tc = start == ETERNAL ?
-                new EternalTaskCondition(nar,
+        TaskCondition tc =
+                new TaskCondition(nar,
                         cycleStart, cycleEnd,
-                        sentenceTerm, punc, freqMin - h, freqMax + h, confMin - h, confMax + h) :
-                new TemporalTaskCondition(nar,
-                        cycleStart, cycleEnd,
-                        start, end,
-                        sentenceTerm, punc, freqMin - h, freqMax + h, confMin - h, confMax + h);
+                        sentenceTerm, punc, freqMin - h, freqMax + h, confMin - h, confMax + h, start, end);
+
 
         for (Topic<Tasked> cc : c) {
             cc.on(tc);
@@ -454,15 +453,28 @@ public class TestNAR {
      * tests for any truth value at the given occurrences
      */
     @NotNull
-    public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, @NotNull long... occs) {
-        assertTrue("no occurrence times specified", occs.length > 0);
-        for (long occ : occs)
-            mustNotOutput(withinCycles, term, punc, 0, 1, 0, 1, occ);
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, @NotNull long occ) {
+        //assertTrue("no occurrence times specified", occs.length > 0);
+        //LongHashSet badTimes = new LongHashSet(occs);
+        mustNotOutput(withinCycles, term, punc, 0f, 1f, 0f, 1f, occ);
+        return this;
+    }
+    @NotNull
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, @NotNull LongPredicate occ) {
+        //assertTrue("no occurrence times specified", occs.length > 0);
+        //LongHashSet badTimes = new LongHashSet(occs);
+        mustNotOutput(withinCycles, term, punc, 0f, 1f, 0f, 1f, occ);
         return this;
     }
 
     @NotNull
     public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, float freqMin, float freqMax, float confMin, float confMax, long occ) {
+        LongPredicate badTime = (l) -> l == occ;
+        return mustNotOutput(withinCycles, term, punc, freqMin, freqMax, confMin, confMax, badTime);
+    }
+
+    @NotNull
+    public TestNAR mustNotOutput(long withinCycles, @NotNull String term, byte punc, float freqMin, float freqMax, float confMin, float confMax, LongPredicate badTimes) {
         if (freqMin < 0 || freqMin > 1f || freqMax < 0 || freqMax > 1f || confMin < 0 || confMin > 1f || confMax < 0 || confMax > 1f || freqMin != freqMin || freqMax != freqMax)
             throw new UnsupportedOperationException();
 
@@ -471,7 +483,7 @@ public class TestNAR {
             return mustEmit(outputEvents,
                     time, time + withinCycles,
                     term, punc, freqMin, freqMax, confMin,
-                    confMax, occ, occ, false);
+                    confMax, badTimes, badTimes, false);
         } catch (Narsese.NarseseException e) {
             throw new RuntimeException(e);
         }

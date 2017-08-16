@@ -29,6 +29,8 @@ import java.util.stream.Stream;
 
 import static nars.Op.ZeroProduct;
 import static nars.Op.concurrent;
+import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 
 
 /**
@@ -898,6 +900,35 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //                }).collect(Collectors.);
 //    }
 
+    /** matches in the correct ordering conditions for CONJ */
+    static boolean unifyConj(TermContainer X, int Xdt, TermContainer Y, int Ydt, @NotNull Unify u) {
+        boolean xUnknown = Xdt == XTERNAL;
+        boolean yUnknown = Ydt == XTERNAL;
+        if (xUnknown || yUnknown) {
+            //if either is XTERNAL then the order is unknown so match commutively
+            return X.unifyCommute(Y, u);
+        }
+
+        boolean xEternal = Xdt == DTERNAL;
+        boolean yEternal = Ydt == DTERNAL;
+        if (xEternal ^ yEternal) {
+            //one is eternal, the other is not
+            return false;
+        }
+
+        if (xEternal && yEternal) {
+            //both eternal, match commutively
+            return X.unifyCommute(Y, u);
+        }
+
+        //both temporal here, so compare in the right sequence:
+        boolean xReversed = (Xdt < 0);
+        boolean yReversed = (Ydt < 0);
+        if (xReversed ^ yReversed) {
+            X = X.reverse(); //just need to reverse one
+        }
+        return X.unifyLinear(Y, u);
+    }
 
     default boolean unifyLinear(TermContainer Y, @NotNull Unify u) {
         /**

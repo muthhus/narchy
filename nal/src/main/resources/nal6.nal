@@ -19,6 +19,7 @@
     (M ==> P), (M ==> S), neq(S,P) |- (S ==>+- P), (Belief:Abduction)
 
     (P ==> M), (M ==> S), neq(S,P) |- (S ==>+- P), (Belief:Exemplification)
+        //(M ==> S), (P ==> M), neq(S,P) |- (S ==>+- P), (Belief:Exemplification)
 
 
 

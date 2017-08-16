@@ -307,6 +307,14 @@ public class TemporalizeTest {
         t.knowTerm($("a"), 1);
         t.knowTerm($("((a &&+5 b) ==>+5 #1)"), 1);
 
+        System.out.println(t);
+
+        {
+            Event solution = t.solve($("#1"));
+            assertNotNull(solution);
+            assertEquals("#1@5-->(a &&+5 b)", solution.toString());
+        }
+
         {
             Event solution = t.solve($("(a &&+- b)"));
             assertNotNull(solution);

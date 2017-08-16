@@ -243,7 +243,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
                 .input("reachable(SELF,{t002})! :|:")
                 .inputAt(5, "((on($1,#2) &&+0 at(SELF,#2)) ==>+0 reachable(SELF,$1)).")
                 .mustDesire(cycles, "(on({t002},#1) &&+0 at(SELF,#1))", 1.0f, 0.81f, 0)
-                .mustNotOutput(cycles, "(at(SELF,#1) &&+0 on({t002},#1))", GOAL, ETERNAL, 5);
+                .mustNotOutput(cycles, "(at(SELF,#1) &&+0 on({t002},#1))", GOAL, t -> t == ETERNAL || t == 5);
 
     }
 

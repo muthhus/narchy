@@ -188,7 +188,7 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public void events(List<ObjectLongPair<Term>> events, long dt) {
+    public void events(Consumer<ObjectLongPair<Term>> events, long dt) {
         ref.events(events, dt);
     }
 

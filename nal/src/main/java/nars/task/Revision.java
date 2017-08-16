@@ -340,16 +340,14 @@ public class Revision {
 
 
         if (timeOverlap == null && u > 0) {
-            factor *= (1f + s) / (1f + u);
+            if (u-s > nar.dur()*Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS)
+                factor *= (1f + s) / (1f + u);
         }
 
         @Nullable Truth rawTruth = revise(a, b, factor, 0);
         if (rawTruth == null)
             return null;
         //TODO maybe delay dithering until after the negation has been determined below
-        @Nullable Truth newTruth = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
-        if (newTruth == null)
-            return null;
 
 //            float conf = w2c(expected.evi() * factor);
 //            if (conf >= Param.TRUTH_EPSILON)
@@ -358,7 +356,6 @@ public class Revision {
 //                newTruth = null;
 
 
-        Truth newTruth1 = newTruth;
         assert (a.punc() == b.punc());
 
         float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
@@ -403,9 +400,11 @@ public class Revision {
 
 
         if (negated) {
-            newTruth1 = newTruth1.negated();
+            rawTruth = rawTruth.negated();
         }
-
+        Truth newTruth1 = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+        if (newTruth1 == null)
+            return null;
 
         long start, end;
         if (cc.op() == CONJ) {

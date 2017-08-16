@@ -40,9 +40,9 @@ public class NAL8Test extends AbstractNALTest {
 
                 .input("(open(t1) &&+5 opened(t1))! :|:")
                 .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //only temporal
-                .mustNotOutput(cycles, "open(t1)", GOAL, ETERNAL, 5) //no eternal
+                .mustNotOutput(cycles, "open(t1)", GOAL, t->t==ETERNAL || t == 5) //no eternal
                 .mustDesire(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal
-                .mustNotOutput(cycles, "opened(t1)", GOAL,  ETERNAL, 0) //no eternal
+                .mustNotOutput(cycles, "opened(t1)", GOAL,  t->t==ETERNAL || t == 0) //no eternal
         ;
     }
 
@@ -577,7 +577,9 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(0, "((happy) ==>-3 (out)). :|:")
                 .inputAt(13, "(happy)! :|:")
                 .mustDesire(cycles, "(out)", 1f, 0.45f, 10)
-                .mustNotOutput(cycles, "(out)", GOAL, 3, 16, 0);
+                .mustNotOutput(cycles, "(out)", GOAL,
+                        t -> t == 3 || t == 16 || t == 0
+                        );
     }
 
     @Test
@@ -633,7 +635,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(3, "((a) ==>+3 (b)). :|:")
                 .inputAt(6, "(b)! :|:")
                 .mustDesire(cycles, "(a)", 1f, 0.81f, 6) //desired NOW, not at time 10 as would happen during normal decompose
-                .mustNotOutput(cycles, "(a)", GOAL, ETERNAL, 10);
+                .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL || t == 10);
     }
 
     @Test
@@ -643,7 +645,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(3, "(--(a) ==>+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
                 .mustDesire(cycles, "(a)", 0f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
-                .mustNotOutput(cycles, "(a)", GOAL, ETERNAL, 10);
+                .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL || t == 10);
     }
 
     @Test

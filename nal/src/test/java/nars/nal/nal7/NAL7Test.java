@@ -80,7 +80,8 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(--x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0, 10)
 //                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0, 10)
                 .mustBelieve(cycles, "(x:before &&+10 --x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
-                .mustNotOutput(cycles, "(x:before &&-10 --x:after)", BELIEF, 0, 10)
+                .mustNotOutput(cycles, "(x:before &&-10 --x:after)", BELIEF,
+                        (t -> t == 0 || t == 10));
         ;
     }
 
@@ -111,6 +112,33 @@ public class NAL7Test extends AbstractNALTest {
     }
 
 
+    @Test public void testConjDecomposeWrongDirection() {
+        /*
+        $.13 b. -4 %1.0;.81% {399: 1;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
+            $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
+         */
+        test
+            .inputAt(1, "(a &&+5 b). :|:")
+            .inputAt(6, "(b &&+5 #1). :|:") //should not unify in the same direction
+            .mustBelieve(cycles, "(a &&+10 #1)", 1.00f, 0.81f, 1)
+            .mustBelieve(cycles, "a", 1.00f, 0.81f, 1)
+            .mustBelieve(cycles, "b", 1.00f, 0.81f, 6)
+            .mustNotOutput(cycles, "b", BELIEF, -4)
+        ;
+    }
+    @Test public void testConjDecomposeWrongDirection2() {
+        /*
+        $.13 b. -4 %1.0;.81% {399: 1;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
+            $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
+         */
+        test
+            .log()
+            .inputAt(1, "((a &&+5 b) ==>+5 #1). :|:")
+            .inputAt(1, "a. :|:")
+            .mustNotOutput(cycles, "(a &&+5 b)", BELIEF, (t) -> t < 0 /* any negative number occ */)
+        ;
+    }
+
     @Test
     public void testConjDecomposeShift() {
         /*
@@ -120,7 +148,6 @@ public class NAL7Test extends AbstractNALTest {
         */
 
         test
-            .log()
             .inputAt(1, "((a &&+5 b) &&+5 c). :|:")
             .mustBelieve(cycles, "(b &&+5 c)", 1.00f, 0.81f, 6, 11)
             .mustNotOutput(cycles, "(b &&+5 c)", BELIEF, ETERNAL)
@@ -925,8 +952,8 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "((x) &| (y))", 1f, 0.81f, 3)
                 .mustBelieve(cycles, "((y) &| (z))", 1f, 0.81f, 3)
                 .mustBelieve(cycles, "((x) &| (z))", 1f, 0.81f, 3)
-                .mustNotOutput(cycles, "((x) && (z))", BELIEF, 0, 3, ETERNAL) //the dternal (non-parallel) version of the term
-                .mustNotOutput(cycles, "((x) &| (z))", BELIEF, 0, ETERNAL); //the correct form but at the wrong occurrence time
+                .mustNotOutput(cycles, "((x) && (z))", BELIEF, (t) -> t == 0 || t == 3 || t == ETERNAL) //the dternal (non-parallel) version of the term
+                .mustNotOutput(cycles, "((x) &| (z))", BELIEF, (t) -> t == 0 || t == ETERNAL); //the correct form but at the wrong occurrence time
 
     }
 
@@ -953,7 +980,8 @@ public class NAL7Test extends AbstractNALTest {
                 .dur(1)
                 .inputAt(0, "(x --> a). :|:")
                 .inputAt(3, "(y --> a). :|:")
-                .mustNotOutput(cycles, "((x&y)-->a)", BELIEF, 0, 1, 2, 3)
+                .mustNotOutput(cycles, "((x&y)-->a)", BELIEF,
+                        t -> (t >= 0) && (t <= 3))
         ;
     }
 
@@ -1033,9 +1061,9 @@ public class NAL7Test extends AbstractNALTest {
                 .input("(x ==>+2 a). :|:")
                 .input("(y ==>+3 a). :|:")
                 .mustBelieve(cycles, "((y &&+1 x) ==>+2 a)", 1.00f, 0.81f, 0) //correct conj sub-term DT
-                .mustNotOutput(cycles, "((x &&+1 y) ==>+2 a)", BELIEF, 0, ETERNAL)
-                .mustNotOutput(cycles, "((x && y) ==>+2 a)", BELIEF, 0, ETERNAL)
-                .mustNotOutput(cycles, "((x && y) ==>+3 a)", BELIEF, 0, ETERNAL);
+                .mustNotOutput(cycles, "((x &&+1 y) ==>+2 a)", BELIEF, (t) -> t == 0 || t == ETERNAL)
+                .mustNotOutput(cycles, "((x && y) ==>+2 a)", BELIEF, (t) -> t == 0 || t == ETERNAL)
+                .mustNotOutput(cycles, "((x && y) ==>+3 a)", BELIEF, (t) -> t == 0 || t == ETERNAL);
     }
 
     @Test
@@ -1046,9 +1074,9 @@ public class NAL7Test extends AbstractNALTest {
                 .input("(a ==>+2 x). :|:")
                 .input("(a ==>+3 y). :|:")
                 .mustBelieve(cycles, "(a ==>+2 (x &&+1 y))", 1.00f, 0.81f, 0) //correct conj sub-term DT
-                .mustNotOutput(cycles, "(a ==>+2 (y &&+1 x))", BELIEF, 0, ETERNAL)
-                .mustNotOutput(cycles, "(a ==>+2 (x && y))", BELIEF, 0, ETERNAL)
-                .mustNotOutput(cycles, "(a ==>+3 (x && y))", BELIEF, 0, ETERNAL);
+                .mustNotOutput(cycles, "(a ==>+2 (y &&+1 x))", BELIEF, (t) -> t == 0 || t == ETERNAL)
+                .mustNotOutput(cycles, "(a ==>+2 (x && y))", BELIEF, (t) -> t == 0 || t == ETERNAL)
+                .mustNotOutput(cycles, "(a ==>+3 (x && y))", BELIEF,(t) -> t == 0 || t == ETERNAL);
     }
 
     @Test
@@ -1176,7 +1204,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(1, "((a-->b) &&+4 (c-->d)). :|:")
                 .inputAt(10, "(d-->e). :|:")
                 .mustBelieve(cycles, "(((a-->b) &&+4 (c-->#1)) &&+5 (#1-->e))", 1f, 0.81f, 1, 10)
-                .mustNotOutput(cycles, "(((a-->b) &&+4 (c-->#1)) &&+9 (#1-->e))", BELIEF, ETERNAL, 1);
+                .mustNotOutput(cycles, "(((a-->b) &&+4 (c-->#1)) &&+9 (#1-->e))", BELIEF, t -> t == ETERNAL || t == 1);
 
     }
 
@@ -1212,7 +1240,7 @@ public class NAL7Test extends AbstractNALTest {
                         "(((a) &&+2 (b)) &&+3 (c))",
                         1f, 0.81f, 1, 6)
                 .mustNotOutput(cycles * 2,
-                        "((b) &&+3 ((a) &&+5 (c)))", BELIEF, ETERNAL, 1);
+                        "((b) &&+3 ((a) &&+5 (c)))", BELIEF, (t) -> t == 1 || t == ETERNAL);
     }
 
     @Test
@@ -1253,11 +1281,11 @@ public class NAL7Test extends AbstractNALTest {
         List m = $.newArrayList();
         Term d = $("--((a) &&+3 --(c))");
         assertEquals(0, d.dtRange());
-        d.events(m);
+        d.events(m::add);
         System.out.println(m);
 
         List l = $.newArrayList();
-        $("(--((a) &&+3 --(c)) &&+4 (e))").events(l);
+        $("(--((a) &&+3 --(c)) &&+4 (e))").events(l::add);
         System.out.println(l);
         System.out.println();
 
@@ -1267,7 +1295,7 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles,
                         "(((--,((a) &&+3 (--,(c)))) &&+3 (b)) &&+1 (e))",
                         1f, 0.81f, 1, 5)
-                .mustNotOutput(cycles, "(((--,((a) &&+3 (--,(c)))) &&+3 (b)) &&+4 (e))", BELIEF, ETERNAL, 1);
+                .mustNotOutput(cycles, "(((--,((a) &&+3 (--,(c)))) &&+3 (b)) &&+4 (e))", BELIEF, t -> t == ETERNAL || t == 1);
 
     }
 
@@ -1298,7 +1326,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(1, "(((((a-->b) &&+1 (b-->c))) ==>+8 e) &&+9 (d-->e)). :|:")
                 .inputAt(1, "((((a-->b) &&+1 (b-->c))) ==>+8 e). :|:")
                 .mustBelieve(cycles, "(d-->e)", 1f, 0.45f /*0.73f*/, 10 /* 10? */)
-                .mustNotOutput(cycles, "(d-->e)", BELIEF, ETERNAL, 1, 19);
+                .mustNotOutput(cycles, "(d-->e)", BELIEF, (t) -> (t == ETERNAL || t == 1 || t == 19));
     }
 
     @Test
@@ -1317,8 +1345,8 @@ public class NAL7Test extends AbstractNALTest {
 //            .mustNotOutput(cycles, "((reshape(I,$1)&&($1-->[heated])) ==>-20 ($1-->[hardened]))", BELIEF, ETERNAL, 10, 20, 0)
 
                 .mustBelieve(cycles, "(($1-->[heated]) ==>+20 ($1-->[hardened]))", 1f, 0.73f, ETERNAL)
-                .mustNotOutput(cycles, "(($1-->[heated]) ==>-20 ($1-->[hardened]))", BELIEF, ETERNAL, 10, 20, 0)
-
+                .mustNotOutput(cycles, "(($1-->[heated]) ==>-20 ($1-->[hardened]))", BELIEF,
+                        (t -> t == ETERNAL || t == 10 || t == 20 || t ==  0));
         ;
     }
 

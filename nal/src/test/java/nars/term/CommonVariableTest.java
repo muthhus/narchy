@@ -4,6 +4,7 @@ import nars.Op;
 import nars.term.var.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -57,8 +58,9 @@ public class CommonVariableTest {
         );
     }
 
+    @Ignore
     @Test
-    public void commonVariableInstancing() {
+    public void CommonVariableOfCommonVariable() {
         //different lengths
 
         Variable c12 = common(

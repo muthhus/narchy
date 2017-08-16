@@ -53,10 +53,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -762,13 +764,13 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     /* collects any contained events */
-    default void events(List<ObjectLongPair<Term>> events) {
+    default void events(Consumer<ObjectLongPair<Term>> events) {
         events(events, 0);
     }
 
     default FasterList<ObjectLongPair<Term>> events(int offset) {
         FasterList<ObjectLongPair<Term>> events = new FasterList<>();
-        events(events, offset);
+        events(events::add, offset);
         return events;
     }
 
@@ -776,8 +778,8 @@ public interface Term extends Termlike, Comparable<Term> {
         return events(0);
     }
 
-    default void events(List<ObjectLongPair<Term>> events, long dt) {
-        events.add(PrimitiveTuples.pair(this, dt));
+    default void events(Consumer<ObjectLongPair<Term>> events, long dt) {
+        events.accept(PrimitiveTuples.pair(this, dt));
     }
 
     default void printRecursive() {

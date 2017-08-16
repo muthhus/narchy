@@ -14,9 +14,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -114,11 +112,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
         int s = size();
         int c = capacity();
-        if (s == 0 && toAdd==null) {
+        if (s == 0 && toAdd == null) {
             this.min = this.max = this.mass = 0;
             return null;
         }
-
 
 
         FasterList<Y> trash = new FasterList(0);
@@ -133,7 +130,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         if (toAdd != null) {
             if (s < c) {
                 //room to add an item
-                items.add(toAdd, this); this.mass += toAdd.priElseZero();
+                items.add(toAdd, this);
+                this.mass += toAdd.priElseZero();
                 s++;
 
             } else {
@@ -141,12 +139,14 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 Y removed;
                 if (toAdd.priElseZero() > min) {
                     //remove lowest
-                    assert(size()==s);
-                    assert(s > 0): "size is " + s + " and capacity is " + c + " so why are we removing an item";
+                    assert (size() == s);
+                    assert (s > 0) : "size is " + s + " and capacity is " + c + " so why are we removing an item";
 
-                    removed = items.removeLast(); this.mass -= removed.priElseZero();
+                    removed = items.removeLast();
+                    this.mass -= removed.priElseZero();
                     //add this
-                    items.add(toAdd, this); this.mass += toAdd.priElseZero();
+                    items.add(toAdd, this);
+                    this.mass += toAdd.priElseZero();
                 } else {
                     removed = toAdd;
                     rejection = true;
@@ -184,9 +184,20 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         if (s > 1) { //test again
             int[] stack = new int[sortSize(s) /* estimate */];
             qsort(stack, il, 0 /*dirtyStart - 1*/, (s - 1));
+
+
+            //Arrays.sort(il, sortComparator); //wont work because if the priorities are being changed from another thread it complains about sort order getting violated
         }
     }
 
+//    static final Comparator<Object> sortComparator = (x, y) -> {
+//        if (x == y) return 0;
+//        if (x == null) return +1;
+//        if (y == null) return -1;
+//        return Float.compare(
+//                ((Prioritized) y).priElseNeg1(), ((Prioritized) x).priElseNeg1()
+//        );
+//    };
 
     private int update(@Deprecated boolean toAdd, int s, List<Y> trash, @Nullable Consumer<Y> update) {
 

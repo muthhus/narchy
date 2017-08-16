@@ -149,6 +149,7 @@ public class Temporalize implements ITemporalize {
             occ[0] = occ[1] = k;
         }
 
+
         return e.term;
     }
 
@@ -414,29 +415,29 @@ public class Temporalize implements ITemporalize {
      * @param occ    superterm occurrence, may be ETERNAL
      * @param start, end - term-local temporal bounds
      */
-    void know(Term x, @Nullable Event parent, int start, int end) {
+    void know(Term x, @Nullable Event root, int start, int end) {
 
 //        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
 //            return; //ignore variable's and completely-variablized's temporalities because it can conflict
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
-        if (parent == null || parent.term != x) {
+        if (root == null || root.term != x) {
             SortedSet<Event> exist = constraints.get(x);
             if (exist != null)
                 return;
         }
 
-        if (parent != null) {
+        if (root != null) {
             Event event;
 
-            if (x.equals(parent.term)) {
-                event = parent;
+            if (x.equals(root.term)) {
+                event = root;
             } else {
-                Time occ = parent.start(null);
+                Time occ = root.start(null);
                 assert (occ.base != XTERNAL);
                 event = (occ.base != ETERNAL ?
                         absolute(x, occ.abs() + start, occ.abs() + end) :
-                        relative(x, parent.term, start, end)
+                        relative(x, root.term, start, end)
                 );
             }
 
@@ -505,17 +506,17 @@ public class Temporalize implements ITemporalize {
 //                    }
 
 
-                    t = subEnd; //the duration of the event
+                    t = subEnd;
 
 
                     if (i > 0) {
                         //IMPL: crosslink adjacent subterms.  conjunction is already temporalized in another method
-                        int rel = last - subStart;
+                        int rel = subStart - last;
                         Term rt = tt.sub(i - 1);
                         know(rt, newRelative(rt, st, rel));
                         know(tt.sub(i), newRelative(st, rt, -rel));
                     }
-                    last = subStart;
+                    last = subEnd;
 
 
                 }
@@ -857,8 +858,8 @@ public class Temporalize implements ITemporalize {
 
 
         Term newTerm = Op.conjMerge(a, ata, b, bta);
-        if (!newTerm.op().conceptualizable) //failed to create conj
-            return null;
+//        if (!newTerm.op().conceptualizable) //failed to create conj
+//            return null;
 
         Time early = ata < bta ? at : bt;
         return new TimeEvent(this, newTerm, early);
