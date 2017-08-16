@@ -43,8 +43,8 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .input("x:before. :|:")
                 .inputAt(10, "x:after. :|:")
-                .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0, 10)
-                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 0, 10)
+                .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0)
+                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 10)
 
                 //equivalent:
 //                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)

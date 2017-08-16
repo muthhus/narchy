@@ -37,7 +37,9 @@ public class Temporalize implements ITemporalize {
 
     public static final Time AMBIENT = Time.the(ETERNAL, DTERNAL);
 
-    /** left-aligned earliest event which other terms can relative to */
+    /**
+     * left-aligned earliest event which other terms can relative to
+     */
     public static final Time EARLIEST = Time.the(ETERNAL, 0);
 
     /**
@@ -66,30 +68,29 @@ public class Temporalize implements ITemporalize {
         Task belief = !d.single ? d.belief : null;
         dur = Math.max(1, Math.round(Param.DITHER_DT * d.dur));
 
-        ITemporalize model = this;
-
-        boolean taskRooted = true; //(belief == null) || ( !task.isEternal() );
+        ITemporalize t = this;
 
 
-        model.know(task, d, taskRooted);
+        ((Temporalize) t).knowTerm(task.term(), task.start(), task.end());
 
         if (belief != null) {
             if (!belief.equals(task)) {
 
-                model.know(belief, d, true); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+                ((Temporalize) t).knowTerm(d.beliefTerm, belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
             }
         } else if (d.beliefTerm != null) {
             if (!task.term().equals(d.beliefTerm)) //dont re-know the term
-                model.know(d.beliefTerm, d, null);
+                ((Temporalize) t).knowAmbient(d.beliefTerm);
+            //t.know(d.beliefTerm, d, null);
         }
 
         Map<Term, Time> trail = new HashMap<>();
         Event e;
         try {
-            e = model.solve(pattern, trail);
+            e = t.solve(pattern, trail);
         } catch (StackOverflowError ignored) {
             System.err.println(
-                    Arrays.toString(new Object[]{"temporalize stack overflow:\n{} {}\n\t{}\n\t{}", pattern, d, model, trail})
+                    Arrays.toString(new Object[]{"temporalize stack overflow:\n{} {}\n\t{}\n\t{}", pattern, d, t, trail})
                     //logger.error(
             );
 //            trail.clear();
@@ -506,7 +507,7 @@ public class Temporalize implements ITemporalize {
                         int relInner = lastEnd - subStart;
                         Term rt = tt.sub(i - 1);
                         int rtDT = rt.dt();
-                        if (rt.op()==CONJ && rtDT!=DTERNAL) {
+                        if (rt.op() == CONJ && rtDT != DTERNAL) {
                             //link to the subj term's starting event
                             Term rtEarly = rt.sub(rtDT >= 0 ? 0 : 1);
                             int relOuter = lastStart - subStart;
@@ -548,7 +549,7 @@ public class Temporalize implements ITemporalize {
 //                break;
             case CONJ:
                 int tdt = term.dt();
-                if (tdt != XTERNAL ) {
+                if (tdt != XTERNAL) {
                     //add the known timing of the conj's events
                     TermContainer ss = term.subterms();
                     int sss = ss.size();
@@ -559,7 +560,7 @@ public class Temporalize implements ITemporalize {
                         //relative to the root of the compound
                         know(a, relative(a, term, at, at + a.dtRange()));
 
-                        if (tdt!=DTERNAL) {
+                        if (tdt != DTERNAL) {
                             if (i < sss - 1) {
                                 //relative to sibling subterm
                                 Term b = ss.sub(i + 1);
@@ -787,7 +788,7 @@ public class Temporalize implements ITemporalize {
                 //as a last resort, check to see if the DT=DTERNAL form of the compound is known, because this will in fact match it
                 Term xEternal = x.dt(DTERNAL);
                 Event xEs = solve(xEternal, trail);
-                if (xEs!=null)
+                if (xEs != null)
                     return xEs;
 
             }
@@ -833,7 +834,7 @@ public class Temporalize implements ITemporalize {
                     return null; //can this happen?
                 case 1:
                     Event r = relevant.get(0);
-                    return relative( x, r.term, 0, x.dtRange());
+                    return relative(x, r.term, 0, x.dtRange());
 
             }
 
@@ -862,7 +863,7 @@ public class Temporalize implements ITemporalize {
         long bta = bt.abs();
 
         if (ata == ETERNAL && bta == ETERNAL) {
-            if (at.offset==DTERNAL || bt.offset==DTERNAL) {
+            if (at.offset == DTERNAL || bt.offset == DTERNAL) {
                 //assert(at.offset==bt.offset);
                 return new AbsoluteEvent(this, CONJ.the(DTERNAL, a, b), ETERNAL);
             }
@@ -882,38 +883,48 @@ public class Temporalize implements ITemporalize {
     }
 
     private Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {
-        long[] ii = intersect(ra, rb, trail);
-        if (ii != null) {
-            //overlap or adjacent
-            return new SolutionEvent(this, target, ii[0], ii[1]);
-        } else {
-            //not overlapping at all, compute point interpolation
-            Time as = ra.start(trail);
-            if (as != null) {
-                Time bs = rb.start(trail);
-                if (bs != null) {
-                    Time at = ra.end(trail);
-                    if (at != null) {
-                        Time bt = rb.end(trail);
-                        if (bt != null) {
-                            long ta = as.abs();
-                            long tz = at.abs();
-                            if (tz == ETERNAL) tz = ta;
-                            long ba = bs.abs();
-                            long bz = bt.abs();
-                            if (bz == ETERNAL) bz = ba;
-                            long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
-                            if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS >= ((float) dist) / dur) {
-                                long occ = ((ta + tz) / 2L + (ba + bz) / 2L) / 2L;
-                                //occInterpolate(t, b);
-                                return new SolutionEvent(this, target, occ);
+
+        //not overlapping at all, compute point interpolation
+        Time as = ra.start(trail);
+        if (as != null) {
+            Time bs = rb.start(trail);
+            if (bs != null) {
+                Time at = ra.end(trail);
+                if (at != null) {
+                    Time bt = rb.end(trail);
+                    if (bt != null) {
+                        long ta = as.abs();
+                        long tz = at.abs();
+                        if (tz == ETERNAL) tz = ta;
+                        long ba = bs.abs();
+                        long bz = bt.abs();
+                        if (bz == ETERNAL) bz = ba;
+
+                        if (ta == ETERNAL || bz == ETERNAL) {
+                            return new SolutionEvent(this, target, ETERNAL);
+                        } else {
+                            Interval ii = Interval.intersect(ta, tz, ba, bz);
+                            if (ii != null) {
+                                //overlap or adjacent
+                                return new SolutionEvent(this, target, ii.a, ii.b);
+                            } else {
+                                //interpolate
+                                long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
+                                if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS * dur >= ((float) dist)) {
+                                    long occ = ((ta + tz) / 2L + (ba + bz) / 2L) / 2L;
+                                    //occInterpolate(t, b);
+                                    return new SolutionEvent(this, target, occ);
+                                }
                             }
                         }
+
+
                     }
                 }
             }
-
         }
+
+
         return null;
     }
 

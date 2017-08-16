@@ -517,6 +517,24 @@ public class TemporalizeTest {
         assertNotNull(s);
         assertEquals("(z ==>+1 x)@ETE|-3", s.toString());
     }
+    @Test
+    public void testConjConjImpl() throws Narsese.NarseseException {
+        /*
+        WRONG, should be @ 1:
+        //    $.25 ((a,#1) &&+1 (#1,c)). 2⋈3 %1.0;.27% {70: 1;2;3} ((%1,(%2==>%1),time(urgent),notImpl(%1)),(%2,((AbductionRecursivePB-->Belief),(DeductionRecursivePB-->Goal))))
+        //      $.50 (c,d). 5 %1.0;.90% {5: 3}
+        //      $.13 (((a,#1) &&+1 (#1,c)) ==>+3 (c,d)). 1 %1.0;.42% {59: 1;2;3} ((%1,%2,time(raw),belief(positive),task("."),time(dtEventsOrEternals),neqAndCom(%1,%2),notImpl(%1),notImpl(%2)),(varIntro((%2 ==>+- %1)),((Abduction-->Belief))))
+         */
+
+        assertEquals($("( (#1,c) &&+- (a,#1) )"),  $("( (a,#1) &&+- (#1,c) )"));
+        Temporalize t = new Temporalize();
+        t.knowTerm($("(c,d)"), 5);
+        t.knowTerm($("(((a,#1) &&+1 (#1,c)) ==>+3 (c,d))"), 1);
+        Event s = t.solve($("( (#1,c) &&+- (a,#1) )"));
+        assertNotNull(s);
+        assertEquals("((a,#1) &&+1 (#1,c))@[1..2]", s.toString());
+    }
+
 
     @Test
     public void testConjLinked() throws Narsese.NarseseException {
