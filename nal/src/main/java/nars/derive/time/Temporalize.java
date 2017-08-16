@@ -129,9 +129,8 @@ public class Temporalize implements ITemporalize {
                         float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
                         k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
                         long distSum =
-                            Math.abs( task.nearestTimeTo(k) - k ) +
-                            Math.abs( belief.nearestTimeTo(k) - k )
-                        ;
+                                Math.abs(task.nearestTimeTo(k) - k) +
+                                        Math.abs(belief.nearestTimeTo(k) - k);
                         if (distSum > 0) {
                             eviGain[0] *= TruthPolation.evidenceDecay(1, d.dur, distSum);
                         }
@@ -514,9 +513,10 @@ public class Temporalize implements ITemporalize {
                         //IMPL: crosslink adjacent subterms.  conjunction is already temporalized in another method
                         int relInner = lastEnd - subStart;
                         Term rt = tt.sub(i - 1);
-                        if (rt.dtRange() > 0) {
+                        int rtDT = rt.dt();
+                        if (rtDT != DTERNAL && rt.dtRange() > 0) {
                             //link to the previous term's starting event
-                            Term rtEarly = rt.sub(rt.dt() >= 0 ? 0 : 1);
+                            Term rtEarly = rt.sub(rtDT >= 0 ? 0 : 1);
                             int relOuter = lastStart - subStart;
                             know(rtEarly, newRelative(rtEarly, st, relOuter));
                             know(st, newRelative(st, rtEarly, -relOuter));
@@ -554,7 +554,7 @@ public class Temporalize implements ITemporalize {
 //                break;
             case CONJ:
                 int tdt = term.dt();
-                if (tdt != XTERNAL) {
+                if (tdt != XTERNAL && tdt!=DTERNAL) {
                     //add the known timing of the conj's events
                     TermContainer ss = term.subterms();
                     int sss = ss.size();
@@ -692,7 +692,7 @@ public class Temporalize implements ITemporalize {
                 if (tts == 2) {
 
 
-                    boolean dir = true; //forward
+//                    boolean dir = true; //forward
                     Term t0 = tt.sub(0);
                     Term t1 = tt.sub(1);
 
@@ -704,11 +704,11 @@ public class Temporalize implements ITemporalize {
                     Event ea;
 //                    if (dir) {
 //                        //forward
-                        if ((ea = solve(t0, trail)) == null)
-                            return null;
-                    Event eb;
-                    if ((eb = solve(t1, trail)) == null)
-                            return null;
+                    if ((ea = solve(t0, trail)) != null) {
+
+                        Event eb;
+                        if ((eb = solve(t1, trail)) != null) {
+
 //                    } else {
 //                        //reverse
 //                        if ((eb = solve(t1, trail)) == null)
@@ -718,36 +718,37 @@ public class Temporalize implements ITemporalize {
 //                    }
 
 
-                    Time at = ea.start(trail);
+                            Time at = ea.start(trail);
 
-                    if (at != null) {
+                            if (at != null) {
 
-                        Time bt = eb.start(trail);
+                                Time bt = eb.start(trail);
 
-                        if (bt != null) {
+                                if (bt != null) {
 
-                            Term a = ea.term;
-                            Term b = eb.term;
+                                    Term a = ea.term;
+                                    Term b = eb.term;
 
-                            try {
-                                if (o == CONJ /*&& (a.op() == CONJ || b.op() == CONJ)*/) {
-                                    //conjunction merge, since the results could overlap
-                                    //either a or b, or both are conjunctions. and the result will be conjunction
+                                    try {
+                                        if (o == CONJ /*&& (a.op() == CONJ || b.op() == CONJ)*/) {
+                                            //conjunction merge, since the results could overlap
+                                            //either a or b, or both are conjunctions. and the result will be conjunction
 
-                                    Event e = solveConj(a, at, b, bt);
-                                    if (e != null)
-                                        return e;
+                                            Event e = solveConj(a, at, b, bt);
+                                            if (e != null)
+                                                return e;
 
-                                } else {
+                                        } else {
 
-                                    Event e = solveTemporal(o, a, at, b, bt);
-                                    if (e != null)
-                                        return e;
+                                            Event e = solveTemporal(o, a, at, b, bt);
+                                            if (e != null)
+                                                return e;
 
+                                        }
+                                    } catch (UnsupportedOperationException e) {
+                                        logger.warn("temporalization solution: {}", e.getMessage());
+                                    }
                                 }
-                            } catch (UnsupportedOperationException e) {
-                                logger.warn("temporalization solution: {}", e.getMessage());
-                                return null; //TODO
                             }
                         }
                     }
@@ -782,13 +783,15 @@ public class Temporalize implements ITemporalize {
                             int dt = dt(s0, s1, trail);
                             if (dt == 0 || dt == DTERNAL) {
                                 return new TimeEvent(this, o.the(dt, tt.toArray()), s0.start(trail));
-                            } else {
-                                return null; //invalid
                             }
                         }
                     }
 
                 }
+                //as a last resort, check to see if the DT=DTERNAL form of the compound is known, because this will in fact match it
+                Term xEternal = x.dt(DTERNAL);
+
+                return solve(xEternal, trail);
             }
         }
 
@@ -931,18 +934,10 @@ public class Temporalize implements ITemporalize {
 
 
             Term newTerm = o.the(dt, a, b);
+            if (newTerm instanceof Bool)
+                return null;
 
-            Time start = at;
-            if (o == CONJ && start.abs() != ETERNAL && dt != DTERNAL) {
-                long bStart = bt.abs();
-                if (bStart != ETERNAL) {
-                    if (bStart < start.abs())
-                        start = bt;
-                }
-
-            }
-
-            return new TimeEvent(this, newTerm, start);
+            return new TimeEvent(this, newTerm, at);
         }
         return null;
 

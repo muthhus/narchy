@@ -252,6 +252,19 @@ public class TemporalizeTest {
     }
 
     @Test
+    public void testDTernalize() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        Term dternal = $("(a&&b)");
+        Term xternal = $("(a &&+- b)");
+        t.knowTerm(dternal, ETERNAL); //these two overlap, so there should be a derivation
+
+        Event solution = t.solve(xternal);
+        assertNotNull(solution);
+        assertNotEquals("(a&|b)@ETE", solution.toString());
+        assertEquals("(a&&b)@ETE", solution.toString());
+    }
+
+    @Test
     public void testStatementEventsOneEternal() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         t.knowTerm($("(a-->b)"), ETERNAL); //these two overlap, so there should be a derivation
