@@ -335,10 +335,15 @@ public class TestNAR {
     public TestNAR mustOutput(long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long occTimeAbsolute) {
         return mustOutput(cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, occTimeAbsolute);
     }
+    @NotNull
+    public TestNAR mustOutput(long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, LongPredicate occ) {
+        mustEmit(outputEvents, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occ, occ);
+        return this;
+    }
 
     @NotNull
     public TestNAR mustOutput(long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end) {
-        mustEmit(outputEvents, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, start, end);
+        mustEmit(outputEvents, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, (l) -> l == start, (l) -> l == end);
         return this;
     }
 
@@ -357,10 +362,10 @@ public class TestNAR {
 //    }
 
     @NotNull
-    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, long start, long end) {
+    TestNAR mustEmit(@NotNull Topic<Tasked>[] c, long cycleStart, long cycleEnd, @NotNull String sentenceTerm, byte punc, float freqMin, float freqMax, float confMin, float confMax, LongPredicate start, LongPredicate end) {
         try {
             return mustEmit(c, cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax,
-                    s -> s == start, e -> e == end, true);
+                    start, end, true);
         } catch (Narsese.NarseseException e) {
             throw new RuntimeException(e);
         }
@@ -417,13 +422,16 @@ public class TestNAR {
 
         long now = time();
         String termString = t.term().toString();
+        float freq, conf;
         if (t.truth() != null) {
-            float freq = t.freq();
-            float conf = t.conf();
-            return mustEmit(c, now, now + withinCycles, termString, t.punc(), freq, freq, conf, conf, t.start(), t.end());
+            freq = t.freq();
+            conf = t.conf();
+
         } else {
-            return mustEmit(c, now, now + withinCycles, termString, t.punc(), NaN, NaN, NaN, NaN, t.start(), t.end());
+            freq = conf = NaN;
         }
+
+        return mustEmit(c, now, now + withinCycles, termString, t.punc(), freq, freq, conf, conf, (l) -> l == t.start(), (l) -> l == t.end());
     }
 
     @NotNull
@@ -533,6 +541,11 @@ public class TestNAR {
 
     @NotNull
     public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, long occ) {
+        long t = nar.time();
+        return mustOutput(t, t + withinCycles, goalTerm, GOAL, freq, freq, conf, conf, occ);
+    }
+    @NotNull
+    public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, LongPredicate occ) {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, goalTerm, GOAL, freq, freq, conf, conf, occ);
     }

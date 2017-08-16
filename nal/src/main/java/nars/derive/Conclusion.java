@@ -176,13 +176,12 @@ public class Conclusion extends AbstractPred<Derivation> {
                 if (taskStart!=ETERNAL) { //preserve any temporality, dont overwrite as eternal
                     long taskDur = occ[1] - occ[0];
 
+//                    int derInBelief = d.transform(d.beliefTerm).subtermTimeSafe(t1);
+//                    if (derInBelief!=DTERNAL) {
+//                        taskStart += derInBelief;
+//                    }
 
-                    int derInBelief = d.transform(d.beliefTerm).subtermTimeSafe(t1);
-                    if (derInBelief!=DTERNAL) {
-                        taskStart += derInBelief;
-                    }
-
-                    occ[0] = taskStart;
+                    occ[0] = d.time;
                     occ[1] = occ[0] + taskDur;
                 }
             }
