@@ -56,9 +56,9 @@ public class FocusedExecutioner extends Executioner {
             random, MAX_TASKS);
 
     public final Bag concepts =
-//            new ConcurrentCurveBag<>(Param.conceptMerge, new ConcurrentHashMap<>(),
-//                random, MAX_CONCEPTS);
-            new DefaultHijackBag(Param.conceptMerge, MAX_CONCEPTS, 3);
+            new ConcurrentCurveBag<>(Param.conceptMerge, new ConcurrentHashMap<>(),
+                random, MAX_CONCEPTS);
+            //new DefaultHijackBag(Param.conceptMerge, MAX_CONCEPTS, 3);
 
 
     final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
@@ -67,7 +67,6 @@ public class FocusedExecutioner extends Executioner {
      * temporary buffer for tasks about to be executed
      */
     private final FasterList<ITask> next = new FasterList(1024);
-    private long now;
 
     public FocusedExecutioner(Function<NAR, PrediTerm<Derivation>> deriverBuilder) {
         this.deriverBuilder = deriverBuilder;
@@ -83,15 +82,12 @@ public class FocusedExecutioner extends Executioner {
 
     @Override
     public synchronized void start(NAR nar) {
-        this.now = nar.time();
         super.start(nar);
         deriver = deriverBuilder.apply(nar);
     }
 
     @Override
     public void cycle() {
-
-        now = nar.time();
 
         if (Param.TRACE) {
             System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());

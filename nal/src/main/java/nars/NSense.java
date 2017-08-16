@@ -214,11 +214,11 @@ public interface NSense {
 
     @NotNull
     default ScalarConcepts senseNumberBi(Term id, FloatSupplier v)  {
-        return senseNumber(v, ScalarConcepts.Hard, inh(LOW, id), inh(HIH, id));
+        return senseNumber(v, ScalarConcepts.Fluid, inh(LOW, id), inh(HIH, id));
     }
     @NotNull
     default ScalarConcepts senseNumberTri(Term id, FloatSupplier v)  {
-        return senseNumber(v, ScalarConcepts.Hard,  inh(LOW, id), inh(MID, id), inh(HIH, id));
+        return senseNumber(v, ScalarConcepts.Fluid,  inh(LOW, id), inh(MID, id), inh(HIH, id));
     }
 
     default SensorConcept senseNumber(String id, FloatSupplier v) throws Narsese.NarseseException {

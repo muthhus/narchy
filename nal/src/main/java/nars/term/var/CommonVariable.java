@@ -8,8 +8,8 @@ import org.jetbrains.annotations.NotNull;
 public final class CommonVariable extends GenericNormalizedVariable {
 
 
-    CommonVariable(@NotNull Op type, int a, int b) {
-        super(type, hashMultiVar(a, b));
+    CommonVariable(@NotNull Op type, int hash) {
+        super(type, hash);
     }
 
     @Override
@@ -18,90 +18,31 @@ public final class CommonVariable extends GenericNormalizedVariable {
     }
 
 
-    public static @NotNull Variable common(@NotNull Variable A, @NotNull Variable B) {
+    public static @NotNull Variable common(@NotNull AbstractVariable A, @NotNull AbstractVariable B) {
 
+        int ai = A.id;        assert(ai < (1 << 7));
+        Op Aop = A.op();
+        byte ao = Aop.id;
+        int bi = B.id;        assert(bi < (1 << 7));
+        byte bo = B.op().id;
 
-//        if (v1 instanceof CommonVariable) {
-//            return (CommonVariable)v1; //combine into common common variable
-//            //System.out.println(v1 + " " + v2);
-//        }
-//        if (v2 instanceof CommonVariable) {
-//            return (CommonVariable)v2; //combine into common common variable
-//            //System.out.println(v1 + " " + v2);
-//        }
+        int h = (ao << 24) | (ai << 16) | (bi << 8) | bo;
 
-
-        if (A instanceof UnnormalizedVariable || B instanceof UnnormalizedVariable)
-            throw new RuntimeException("Generic Variable being made Common");
-
-        int a = A.id();
-        int b = B.id();
-
-        boolean aCommon = (A instanceof CommonVariable);
-        boolean bCommon = (B instanceof CommonVariable);
-        if (aCommon || bCommon) {
-
-            if (aCommon && B instanceof AbstractVariable) {
-                //check to see if b is included in a
-                int a1 = multiVariable(a, true);
-                int a2 = multiVariable(a, false);
-                if ((a1 == b) || (a2 == b))
-                    return A;
-
-            } else if (bCommon && A instanceof AbstractVariable) {
-
-                //check to see if a is included in b
-                int b1 = multiVariable(b, true);
-                int b2 = multiVariable(b, false);
-                if ((b1 == a) || (b2 == a))
-                    return B;
-
-            }
-
-            if (A.compareTo(B) < 0) {
-                Variable v = A; //swap lexically
-                A = B;
-                B = v;
-            }
-
-            //one or both of these will not fit in a normalized variable,
-            //so default to a String-based generic variable
-            return $.v(A.op(),
-                    A.toString().substring(1) /* remove leading variable char */ +
-                            B
-            );
-            //throw new RuntimeException("variable oob");
-        }
-
-        assert (a != b);
-
-        //lexical ordering: swap
-        if (b > a) {
-            int t = a;
-            a = b;
-            b = t;
-        }
-
-        Op type = A.op();
-
-        assert (B.op() == type);
-
-
-        return new CommonVariable(type, a, b);
+        return new CommonVariable(Aop, h);
 
     }
 
-    public boolean common(@NotNull AbstractVariable y) {
-        int yid = y.id;
-
-        int v1 = (hash & 0xff) - 1; //unhash
-        if (v1 == yid)
-            return true;
-
-        int v2 = ((hash >> 8) & 0xff) - 1; //unhash
-        return v2 == yid;
-
-    }
+//    public boolean common(@NotNull AbstractVariable y) {
+//        int yid = y.id;
+//
+//        int v1 = (hash & 0xff) - 1; //unhash
+//        if (v1 == yid)
+//            return true;
+//
+//        int v2 = ((hash >> 8) & 0xff) - 1; //unhash
+//        return v2 == yid;
+//
+//    }
 
 
 //    //TODO use a 2d array not an enum map, just flatten the 4 op types to 0,1,2,3

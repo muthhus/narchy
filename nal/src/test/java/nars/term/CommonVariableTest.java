@@ -1,9 +1,7 @@
 package nars.term;
 
 import nars.Op;
-import nars.term.var.CommonVariable;
-import nars.term.var.UnnormalizedVariable;
-import nars.term.var.Variable;
+import nars.term.var.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,7 +51,10 @@ public class CommonVariableTest {
 
 
     public static @NotNull Variable common(@NotNull UnnormalizedVariable v1, @NotNull UnnormalizedVariable v2) {
-        return CommonVariable.common(v1.normalize(1), v2.normalize(2));
+        return CommonVariable.common(
+                (AbstractVariable)v1.normalize(1),
+                (AbstractVariable)v2.normalize(2)
+        );
     }
 
     @Test
@@ -72,11 +73,11 @@ public class CommonVariableTest {
         assertEquals(0, c12_reverse.compareTo(c12));
         Assert.assertTrue(c12 != c12_reverse);
 
-        Variable c123 = CommonVariable.common(c12, p3.normalize(3));
+        Variable c123 = CommonVariable.common((AbstractVariable)c12, (AbstractVariable)p3.normalize(3));
         assertEquals("%770%3 class nars.term.var.UnnormalizedVariable", (c123 + " " + c123.getClass()));
 
         //duplicate: already included
-        Variable c122 = CommonVariable.common(c12, p2.normalize(2));
+        Variable c122 = CommonVariable.common((AbstractVariable)c12, (AbstractVariable)p2.normalize(2));
         assertEquals("%770 class nars.term.var.CommonVariable", (c122 + " " + c122.getClass()));
 
 

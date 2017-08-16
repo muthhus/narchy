@@ -63,16 +63,37 @@ public abstract class AbstractVariable implements Variable {
 
     @Override
     public final boolean equals(Object obj) {
-        return obj==this ||
+        return obj == this ||
                 (obj instanceof AbstractVariable
-                        && ((AbstractVariable)obj).hash == hash); //hash first, it is more likely to differ
-                //((obj instanceof Variable) && ((Variable)obj).hash == hash);
+                        && ((AbstractVariable) obj).hash == hash); //hash first, it is more likely to differ
+        //((obj instanceof Variable) && ((Variable)obj).hash == hash);
     }
+
+    static boolean commonalizableVariable(@NotNull Term x) {
+        return x instanceof VarDep || x instanceof VarIndep;
+    }
+
 
     @Override
     public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
 
-        return equals(y) || subst.putXY(this, y);
+        //do not test for equality
+        //var pattern will unify anything (below)
+        //see: https://github.com/opennars/opennars/blob/4515f1d8e191a1f097859decc65153287d5979c5/nars_core/nars/language/Variables.java#L18
+        if (commonalizableVariable(y) && commonalizableVariable(this)) {
+            if ((op().id >= y.op().id)) {
+
+
+                //TODO check if this is already a common variable containing y
+                return subst.putCommon(this, (Variable) y);
+
+            } else {
+                return false;
+            }
+        }
+
+        return subst.putXY(this, y);
+
 
 //        if (y instanceof Variable) {
 //            return subst.putXY(this, y);

@@ -79,10 +79,12 @@ abstract public class TemporalStabilityTest {
                if (!validOccurrence(s + x.getTwo() + xt.dtRange()))
                    return true;
             }
-            if (xt.op()==IMPL && xt.dt()!=DTERNAL) {
-                if (!validOccurrence(s + xt.sub(0).dtRange() + x.getTwo() + xt.dt()))
-                    return true;
-            }
+
+            //cant be determined unless analyzing the relative time only
+//            if (xt.op()==IMPL && xt.dt()!=DTERNAL) {
+//                if (!validOccurrence(s + xt.sub(0).dtRange() + x.getTwo() + xt.dt()))
+//                    return true;
+//            }
             return false;
         });
     }

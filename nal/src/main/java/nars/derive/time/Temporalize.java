@@ -58,7 +58,7 @@ public class Temporalize implements ITemporalize {
     public Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] eviGain) {
 
         Task task = d.task;
-        Task belief = d.belief;
+        Task belief = !d.single ? d.belief : null;
         dur = Math.max(1, Math.round(Param.DITHER_DT * d.dur));
 
         ITemporalize model = this;
@@ -71,11 +71,7 @@ public class Temporalize implements ITemporalize {
         if (belief != null) {
             if (!belief.equals(task)) {
 
-//                if (task.isEternal() && belief.isEternal() /*&& some interesction of terms is prsent */)
-//                    beliefRooted = false; //avoid confusing with multiple eternal roots; force relative calculation
-
-                boolean beliefRooted = true; //belief!=null && (!taskRooted || !belief.isEternal());
-                model.know(belief, d, beliefRooted); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+                model.know(belief, d, true); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
             }
         } else if (d.beliefTerm != null) {
             if (!task.term().equals(d.beliefTerm)) //dont re-know the term

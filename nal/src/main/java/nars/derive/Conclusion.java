@@ -11,9 +11,11 @@ import nars.derive.time.Temporalize;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
+import nars.task.NALTask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.time.Tense;
+import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.tuple.Pair;
@@ -23,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static nars.Op.GOAL;
@@ -254,21 +257,27 @@ public class Conclusion extends AbstractPred<Derivation> {
     }
 
     boolean same(Task derived, Task parent, float truthResolution) {
+        if (parent.isDeleted())
+            return false;
+
         if (derived.equals(parent)) return true;
 
         if (FILTER_SIMILAR_DERIVATIONS) {
             //test for same punc, term, start/end, freq, but different conf
             if (parent.term().equals(derived.term()) && parent.punc() == derived.punc() && parent.start() == derived.start() && parent.end() == derived.end()) {
-                if (parent.isQuestOrQuestion() ||
-                        (Util.equals(parent.freq(), derived.freq(), truthResolution) &&
-                                parent.evi() >= derived.evi() )
-                        ) {
-                    if (Param.DEBUG_SIMILAR_DERIVATIONS)
-                        logger.warn("similar derivation to parent:\n\t{} {}\n\t{}", derived, parent, rule);
+                if (Arrays.equals(derived.stamp(), parent.stamp())) {
+                    if (parent.isQuestOrQuestion() ||
+                            (Util.equals(parent.freq(), derived.freq(), truthResolution) &&
+                                    parent.evi() >= derived.evi())
+                            ) {
+                        if (Param.DEBUG_SIMILAR_DERIVATIONS)
+                            logger.warn("similar derivation to parent:\n\t{} {}\n\t{}", derived, parent, rule);
 
-                    //((NALTask)parent).merge(derived);
-                    parent.priMax(derived.priElseZero());
-                    return true;
+                        //((NALTask)parent).merge(derived);
+                        parent.priMax(derived.priElseZero());
+                        ((NALTask)parent).merge(derived); //merge cause
+                        return true;
+                    }
                 }
             }
         }

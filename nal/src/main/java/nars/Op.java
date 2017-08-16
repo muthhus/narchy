@@ -481,7 +481,7 @@ public enum Op implements $ {
 
 
     VAR_DEP('#', Op.ANY_LEVEL, OpType.Variable),
-    VAR_INDEP('$', 6 /*NAL6 for Indep Vars */, OpType.Variable),
+    VAR_INDEP('$', 5 /*NAL5..6 for Indep Vars */, OpType.Variable),
     VAR_QUERY('?', Op.ANY_LEVEL, OpType.Variable),
     VAR_PATTERN('%', Op.ANY_LEVEL, OpType.Variable),
 

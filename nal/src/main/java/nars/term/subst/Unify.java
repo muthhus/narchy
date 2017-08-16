@@ -7,13 +7,12 @@ import jcog.version.Versioning;
 import nars.Op;
 import nars.Param;
 import nars.derive.constraint.MatchConstraint;
+import nars.derive.match.Ellipsis;
+import nars.derive.match.EllipsisOneOrMore;
 import nars.derive.mutate.Termutator;
 import nars.index.term.NewCompound;
 import nars.term.Term;
-import nars.term.var.AbstractVariable;
-import nars.term.var.CommonVariable;
-import nars.term.var.UnnormalizedVariable;
-import nars.term.var.Variable;
+import nars.term.var.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -122,23 +121,32 @@ public abstract class Unify extends Versioning implements Subst {
     @Override
     public Term xy(@NotNull Term x0) {
 
-        Term xy = x0, y = null;
-        while ((xy = this.xy.get(xy)) != null) { //completely dereference
-            y = xy;
-        }
-        return y;
+//        Term xy = x0, y = null;
+//        while ((xy = this.xy.get(xy)) != null) { //completely dereference
+//            y = xy;
+//        }
+//        return y;
 
-        //SAFE VERSION:
+//        //SAFE VERSION:
 //        Term xy = x0, y0 = null, y = null;
 //        while ((xy = this.xy.get(xy))!=null) { //completely dereference
-//            if (y0!=null && xy.equals(y0))
+//            if (y0!=null)
 //                return y0;
 //            y0 = y;
 //            y = xy;
 //        }
 //        return y;
 
-        //return xy.get(t);
+        Term y0 = xy.get(x0);
+        if (y0 == null)
+            return null;
+        else {
+            Term y1 = xy.get(y0);
+            if (y1 == null)
+                return y0;
+            else
+                return y1;
+        }
     }
 
 
@@ -285,23 +293,12 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
 
+    final static int CommonVariableBits = Op.or(Op.VAR_DEP, Op.VAR_INDEP, Op.VAR_QUERY);
+
     public boolean putCommon(@NotNull Variable/* var */ x, @NotNull Variable y) {
 
-        if (x instanceof CommonVariable) {
-            if (y instanceof CommonVariable)
-                return false; //TODO support merging common variables
+        @NotNull Term common = CommonVariable.common((AbstractVariable) x, (AbstractVariable) y);
 
-            if (((CommonVariable) x).common((AbstractVariable) y))
-                return true;
-        }
-
-        if (y instanceof CommonVariable) {
-            if (((CommonVariable) y).common((AbstractVariable) x))
-                return true;
-        }
-
-
-        @NotNull Term common = CommonVariable.common((Variable) x, (Variable) y);
         return (putXY(x, common) && putXY(y, common)
                 //&& putYX(y, common) //&& putYX(x,common)
         );
@@ -323,27 +320,13 @@ public abstract class Unify extends Versioning implements Subst {
         Term y0 = xy(x);
 
         if (y0 != null) {
-            return unify(y0, y);
+            //return y0.equals(y);
+            if (y0.equals(x))
+                return true;
+            else
+                return unify(y0, y);
+            //return unify(y, y0); //cross-over
         } else /*if (matchType(x0))*/ {
-
-            if (y instanceof Variable) {
-                if (x.op() == y.op()) {
-
-                    assert (!(y instanceof UnnormalizedVariable) || (y instanceof CommonVariable)) :
-                            y + " (" + y.getClass() + ") is unnormalized: " + this + " unifying terms containing an unnormalized variable";
-
-                    //TODO check if this is already a common variable containing y
-                    return putCommon((Variable) x, (Variable) y);
-                } else if (y instanceof Variable) {
-
-                    //break any circular dependency between variables that common variable wouldnt solve
-                    //relies on a specific ordering of the variable enum values
-                    if (x.op().id < y.op().id)
-                        return false;
-
-                }
-            }
-
 
             return xy.tryPut(x, y);
 

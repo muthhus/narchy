@@ -234,6 +234,9 @@ public class NAL5Test extends AbstractNALTest {
     }
 
 
+//    static {
+//        Param.TRACE = true;
+//    }
     @Test
     public void compound_decomposition_one_premises() {
 

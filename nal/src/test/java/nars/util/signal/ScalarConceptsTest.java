@@ -50,7 +50,7 @@ public class ScalarConceptsTest {
 
         FloatPolarNormalized range = new FloatPolarNormalized(() -> m.floatValue());
         range.radius(1f);
-        ScalarConcepts f = new ScalarConcepts(range, n, ScalarConcepts.FuzzyTriangle,
+        ScalarConcepts f = new ScalarConcepts(range, n, ScalarConcepts.FuzzyNeedle,
                 $.p("low"), $.p("mid"), $.p("hih"));
 
 
@@ -127,7 +127,7 @@ public class ScalarConceptsTest {
         NAR n = NARS.tmp();
 
         FloatParam x = new FloatParam(0f, 0f, 1f);
-        ScalarConcepts xc = new ScalarConcepts(x, n, ScalarConcepts.Hard,
+        ScalarConcepts xc = new ScalarConcepts(x, n, ScalarConcepts.Fluid,
                 $.$("x(0)"), $.$("x(1)")
         );
 

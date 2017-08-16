@@ -82,7 +82,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
      * [ ] = freq 0
      * [x] = freq 1,
      */
-    public final static ScalarEncoder Hard = (v, i, indices, n) -> {
+    public final static ScalarEncoder Fluid = (v, i, indices, n) -> {
 
         float vv = v * indices;
 
@@ -100,21 +100,40 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
 
     };
 
+    /** hard */
+    public final static ScalarEncoder Needle = (v, i, indices, n) -> {
+
+        float vv = v * indices;
+
+        int which = (int) Math.floor(vv);
+        float f;
+        if (i < which) {
+            f = 0;
+        } else if (i > which) {
+            f = 0;
+        } else {
+            f = 1f;
+        }
+
+        return $.t(f, n.confDefault(Op.BELIEF));
+
+    };
 
     /**
      * analogous to a needle on a guage, the needle being the triangle spanning several of the 'digits'
-     * /      |       \
-     * /       / \        \
+     * /          |       \
+     * /         / \        \
      * /        /   \         \
      * + + +    + + +     + + +
      * TODO need to analyze the interaction of the produced frequency values being reported by all concepts.
      */
-    public final static ScalarEncoder FuzzyTriangle = (v, i, indices, n) -> {
+    public final static ScalarEncoder FuzzyNeedle = (v, i, indices, n) -> {
 
         float dr = 1f / (indices - 1);
 
         return $.t(Math.max(0, (1f - Math.abs((i * dr) - v) / dr)), n.confDefault(Op.BELIEF));
     };
+
 
     /**
      * TODO not quite working yet. it is supposed to recursively subdivide like a binary number, and each concept represents the balance corresponding to each radix's progressively increasing sensitivity

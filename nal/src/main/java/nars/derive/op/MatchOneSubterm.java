@@ -86,6 +86,7 @@ public final class MatchOneSubterm extends UnificationPrototype {
             int now = p.now();
             p.unifyAll(super.pattern, subterm == 0 ? p.taskTerm : p.beliefTerm /* current term */, eachMatch);
             return p.revertAndContinue(now);
+            //return p.live();
         }
     }
 
