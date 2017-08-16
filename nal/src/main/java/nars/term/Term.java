@@ -22,6 +22,7 @@ package nars.term;
 
 
 import com.google.common.io.ByteArrayDataOutput;
+import jcog.list.FasterList;
 import nars.$;
 import nars.IO;
 import nars.Op;
@@ -765,10 +766,14 @@ public interface Term extends Termlike, Comparable<Term> {
         events(events, 0);
     }
 
-    default List<ObjectLongPair<Term>> events() {
-        List<ObjectLongPair<Term>> events = $.newArrayList();
-        events(events);
+    default FasterList<ObjectLongPair<Term>> events(int offset) {
+        FasterList<ObjectLongPair<Term>> events = new FasterList<>();
+        events(events, offset);
         return events;
+    }
+
+    default List<ObjectLongPair<Term>> events() {
+        return events(0);
     }
 
     default void events(List<ObjectLongPair<Term>> events, long dt) {

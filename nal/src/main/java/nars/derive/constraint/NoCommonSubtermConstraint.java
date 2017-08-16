@@ -39,7 +39,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
         return recurse ?
 
                 //a.containsRecursively(b) || b.containsRecursively(a) :
-                a.containsRecursively(b, Op.nonProduct) || b.containsRecursively(a, Op.nonProduct) :
+                a.containsRecursively(b, Op.nonEventDelimeter) || b.containsRecursively(a, Op.nonEventDelimeter) :
 
                 a.contains(b) || b.contains(a);
     }

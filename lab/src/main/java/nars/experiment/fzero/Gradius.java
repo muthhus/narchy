@@ -34,11 +34,11 @@ public class Gradius extends NAgentX {
         float height = g.getHeight();
         @NotNull ScalarConcepts yPos = senseNumber($.p(id, the("Y")),
                 ()->g.player[Gradius4K.OBJ_Y] / height,
-                8, ScalarConcepts.FuzzyTriangle
+                8, ScalarConcepts.FuzzyNeedle
         ).resolution(0.2f);
         @NotNull ScalarConcepts xPos = senseNumber($.p(id, the("X")),
                 ()->g.player[Gradius4K.OBJ_X] / width,
-                8, ScalarConcepts.FuzzyTriangle
+                8, ScalarConcepts.FuzzyNeedle
         ).resolution(0.2f);
         window(
                 col(

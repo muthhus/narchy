@@ -149,8 +149,8 @@ abstract public class NAgentX extends NAgent {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.9f);
-        n.goalConfidence(0.8f);
+        n.beliefConfidence(0.25f);
+        n.goalConfidence(0.25f);
 
 
         float priFactor = 0.25f;
@@ -162,7 +162,7 @@ abstract public class NAgentX extends NAgent {
 
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, false, 8f);
+        MySTMClustered stmBelief = new MySTMClustered(n, 64, BELIEF, 4, false, 8f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, false, 2f);
         Inperience inp = new Inperience(n, 8, 0.02f);
@@ -252,55 +252,43 @@ abstract public class NAgentX extends NAgent {
 //            //n.emotion.happy(n.emotion.busyPri.getSum()/50000f);
 //        });
 
-        AgentService p = new AgentService.AgentBuilder(
-                //DQN::new,
-                HaiQAgent::new,
-                //() -> Util.tanhFast(a.dexterity())) //reward function
-                () -> a.dexterity() * Util.tanhFast( a.reward) /* - lag */ ) //reward function
 
-                .in(a::dexterity)
-                .in(new FloatNormalized(()->a.reward).decay(0.98f))
-                .in(new FloatNormalized(
-                        ((Emotivation) n.emotion).cycleDTRealMean::getValue)
-                            .decay(0.99f)
-                )
-                .in(new FloatNormalized(
-                        //TODO use a Long-specific impl of this:
-                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.taskDerivations.getValue().longValue())
-                ).decay(0.99f))
-                .in(new FloatNormalized(
-                        //TODO use a Long-specific impl of this:
-                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.conceptFirePremises.getValue().longValue())
-                    ).decay(0.99f)
-                ).in(new FloatNormalized(
-                        () -> n.emotion.busyVol.getSum()
-                    ).decay(0.99f)
-                ).out(
-                        new HarmonicController(n.confMin::setValue, 0.01f, 0.08f)
-                ).out(
-                        new HarmonicController(n.truthResolution::setValue, 0.01f, 0.08f)
-                ).out(
-                        new HarmonicController(a.curiosity::setValue, 0.01f, 0.16f)
-                ).get(n);
 
-        window(new MatrixView(p.in, (x, gl) -> {
-            Draw.colorBipolar(gl, x);
-            return 0;
-        }), 100, 100);
-
-//        new AgentService(
+//        AgentService p = new AgentService.AgentBuilder(
+//                //DQN::new,
 //                HaiQAgent::new,
-//                2,
-//                (f) -> {
-//                    f[0] = a.dexterity();
-//                    f[1] = a.reward;
-//                },
-//                ,
-//                3,
-//                new HarmonicController(n.truthResolution::setValue, 0.01f, 0.16f),
-//                new MutableFloat(1f),
-//                n
-//        );
+//                //() -> Util.tanhFast(a.dexterity())) //reward function
+//                () -> a.dexterity() * Util.tanhFast( a.reward) /* - lag */ ) //reward function
+//
+//                .in(a::dexterity)
+//                .in(new FloatNormalized(()->a.reward).decay(0.98f))
+//                .in(new FloatNormalized(
+//                        ((Emotivation) n.emotion).cycleDTRealMean::getValue)
+//                            .decay(0.99f)
+//                )
+//                .in(new FloatNormalized(
+//                        //TODO use a Long-specific impl of this:
+//                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.taskDerivations.getValue().longValue())
+//                ).decay(0.99f))
+//                .in(new FloatNormalized(
+//                        //TODO use a Long-specific impl of this:
+//                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.conceptFirePremises.getValue().longValue())
+//                    ).decay(0.99f)
+//                ).in(new FloatNormalized(
+//                        () -> n.emotion.busyVol.getSum()
+//                    ).decay(0.99f)
+//                ).out(
+//                        new HarmonicController(n.confMin::setValue, 0.01f, 0.08f)
+//                ).out(
+//                        new HarmonicController(n.truthResolution::setValue, 0.01f, 0.08f)
+//                ).out(
+//                        new HarmonicController(a.curiosity::setValue, 0.01f, 0.16f)
+//                ).get(n);
+//
+//        window(new MatrixView(p.in, (x, gl) -> {
+//            Draw.colorBipolar(gl, x);
+//            return 0;
+//        }), 100, 100);
 
 
         return n;

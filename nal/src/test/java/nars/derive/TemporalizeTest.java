@@ -301,6 +301,25 @@ public class TemporalizeTest {
     }
 
     @Test
+    public void testImplConjDepvar() throws Narsese.NarseseException {
+
+        Temporalize t = new Temporalize();
+        t.knowTerm($("a"), 1);
+        t.knowTerm($("((a &&+5 b) ==>+5 #1)"), 1);
+
+        {
+            Event solution = t.solve($("(a &&+- b)"));
+            assertNotNull(solution);
+            assertEquals("(a &&+5 b)@[1..6]", solution.toString());
+        }
+        {
+            Event solution = t.solve($("(a &&+- #1)"));
+            assertNotNull(solution);
+            assertEquals("(a &&+10 #1)@[1..11]", solution.toString());
+        }
+    }
+
+    @Test
     public void testSolveConjSequenceMerge() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
 

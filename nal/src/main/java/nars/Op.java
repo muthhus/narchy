@@ -1,6 +1,7 @@
 package nars;
 
 
+import jcog.list.FasterList;
 import nars.derive.match.Ellipsislike;
 import nars.index.term.TermContext;
 import nars.term.*;
@@ -1099,7 +1100,7 @@ public enum Op implements $ {
                         Null;
             case 2:
                 Term et0 = t[0], et1 = t[1];
-                if (et0.equals(et1) || et0.containsRecursively(et1, nonProduct) || et1.containsRecursively(et0, nonProduct))
+                if (et0.equals(et1) || et0.containsRecursively(et1, nonEventDelimeter) || et1.containsRecursively(et0, nonEventDelimeter))
                     return Null;
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, et0, et1);
@@ -1230,7 +1231,8 @@ public enum Op implements $ {
         return bits;
     }
 
-    public static final Predicate<Term> nonProduct = c -> c.op() != PROD;
+    //final static int EVENT_DELIMETER_OP = Op.or(Op.PROD, Op.NEG, Op.SETe, Op.SETi, Op.)
+    public static final Predicate<Term> nonEventDelimeter = c -> c.op().temporal; //!c.op().in(EVENT_DELIMETER_OP);
     private static final int InvalidImplicationSubj = or(IMPL);
     //private static final int InvalidImplicationPred = or(EQUI);
 
@@ -1305,8 +1307,8 @@ public enum Op implements $ {
 
 
                 if (concurrent(dt)) {
-                    if (subject.equals(predicate))
-                        return polarity ? True : False;
+                    if (subject.unneg().equals(predicate))
+                        return polarity ? True : /*False*/Null;
                 } //else: allow repeat
 
 
@@ -1328,82 +1330,104 @@ public enum Op implements $ {
                 break;
         }
 
+        boolean subjConj = subject.op() == CONJ;
+        boolean predConj = predicate.op() == CONJ;
 
         //factor out any common subterms iff concurrent
         if (concurrent(dt)) {
 
-            Term pu = predicate.unneg();
-            Term su = subject.unneg();
             //first layer only, not recursively
-            if ((pu.varPattern() == 0 && (subject.equals(pu) || subject.containsRecursively(pu, nonProduct))) ||
-                    (su.varPattern() == 0 && (predicate.equals(su) || predicate.containsRecursively(su, nonProduct))))
+            if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
+                    (subject.equals(predicate) ||
+                        subject.containsRecursively(predicate, nonEventDelimeter) ||
+                        predicate.containsRecursively(subject, nonEventDelimeter)))
                 //(!(su instanceof Variable) && predicate.contains(su)))
-                return False; //cyclic
+                return Null; //cyclic
 
 //            if (subject.varPattern() == 0 && predicate.varPattern() == 0 &&
 //                    !(subject instanceof Variable) && !(predicate instanceof Variable) &&
 //                    (subject.containsRecursively(predicate) || predicate.containsRecursively(subject))) //first layer only, not recursively
 //                return False; //cyclic
 
-            if (op == IMPL) { //TODO verify this works as it should
+            //TODO verify this works as it should
 
 
-                boolean subjConj = subject.op() == CONJ && concurrent(subject.dt());
-                boolean predConj = predicate.op() == CONJ && concurrent(predicate.dt());
-                if (subjConj && predConj) {
-                    final Term csub = subject;
-                    TermContainer subjs = csub.subterms();
-                    final Term cpred = predicate;
-                    TermContainer preds = cpred.subterms();
+            boolean subjComm = concurrent(subject.dt());
+            boolean predComm = concurrent(predicate.dt());
 
-                    Term[] common = TermContainer.intersect(subjs, preds);
-                    if (common != null) {
+            if (subjConj && predConj && subjComm && predComm) {
+                final Term csub = subject;
+                TermContainer subjs = csub.subterms();
+                final Term cpred = predicate;
+                TermContainer preds = cpred.subterms();
 
-                        @NotNull Set<Term> sss = subjs.toSortedSet();
-                        boolean modifiedS = false;
-                        for (Term cc : common)
-                            modifiedS |= sss.remove(cc);
+                Term[] common = TermContainer.intersect(subjs, preds);
+                if (common != null) {
 
-                        if (modifiedS) {
-                            int s0 = sss.size();
-                            switch (s0) {
-                                case 0:
-                                    subject = True;
-                                    break;
-                                case 1:
-                                    subject = sss.iterator().next();
-                                    break;
-                                default:
-                                    subject = CONJ.the(/*DTERNAL?*/csub.dt(), Terms.sorted(sss));
-                                    break;
-                            }
+                    @NotNull Set<Term> sss = subjs.toSortedSet();
+                    boolean modifiedS = false;
+                    for (Term cc : common)
+                        modifiedS |= sss.remove(cc);
+
+                    if (modifiedS) {
+                        int s0 = sss.size();
+                        switch (s0) {
+                            case 0:
+                                subject = True;
+                                break;
+                            case 1:
+                                subject = sss.iterator().next();
+                                break;
+                            default:
+                                subject = CONJ.the(/*DTERNAL?*/csub.dt(), Terms.sorted(sss));
+                                break;
                         }
+                    }
 
-                        @NotNull SortedSet<Term> ppp = preds.toSortedSet();
-                        boolean modifiedP = false;
-                        for (Term cc : common)
-                            modifiedP |= ppp.remove(cc);
+                    @NotNull SortedSet<Term> ppp = preds.toSortedSet();
+                    boolean modifiedP = false;
+                    for (Term cc : common)
+                        modifiedP |= ppp.remove(cc);
 
-                        if (modifiedP) {
-                            int s0 = ppp.size();
-                            switch (s0) {
-                                case 0:
-                                    predicate = True;
-                                    break;
-                                case 1:
-                                    predicate = ppp.iterator().next();
-                                    break;
-                                default:
-                                    predicate = CONJ.the(cpred.dt(), Terms.sorted(ppp));
-                                    break;
-                            }
+                    if (modifiedP) {
+                        int s0 = ppp.size();
+                        switch (s0) {
+                            case 0:
+                                predicate = True;
+                                break;
+                            case 1:
+                                predicate = ppp.iterator().next();
+                                break;
+                            default:
+                                predicate = CONJ.the(cpred.dt(), Terms.sorted(ppp));
+                                break;
                         }
+                    }
 
 
-                        boolean negate = !polarity;
-                        return IMPL.the(dt, subject, predicate).negIf(negate);
+                    return IMPL.the(dt, subject, predicate).negIf(!polarity);
+                }
+
+            }
+        }
+
+        if (subjConj || predConj) {
+            //filter duplicate events
+            int pre = subject.dtRange();
+            int edt = pre + (dt != DTERNAL ? dt : 0);
+            if (subjConj && predConj) {
+                Set<ObjectLongPair<Term>> se = new HashSet(subject.events());
+                FasterList<ObjectLongPair<Term>> pe = predicate.events(edt);
+                if (pe.removeIf(se::contains)) {
+                    if (pe.isEmpty()) {
+                        return Null;
+                    } else {
+                        //duplicates were removed, reconstruct new predicate
+                        int ndt = (int) pe.minBy(ObjectLongPair::getTwo).getTwo() - pre;
+                        return IMPL.the(ndt, subject, Op.conj(pe)).negIf(!polarity);
                     }
                 }
+
             }
         }
 
@@ -1434,9 +1458,7 @@ public enum Op implements $ {
         }
 
 
-        Term x = compound(op, dt, subject, predicate); //use the calculated ordering, not the TermContainer default for commutives
-        boolean negate = !polarity;
-        return x.negIf(negate);
+        return compound(op, dt, subject, predicate).negIf(!polarity);
     }
 
     @Nullable

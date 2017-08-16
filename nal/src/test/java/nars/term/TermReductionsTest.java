@@ -167,7 +167,21 @@ public class TermReductionsTest extends NarseseTest {
         assertEquals("(--,((P)==>(Q)))", $("((P)==>(--,(Q)))").toString());
         assertEquals(("((--,(P))==>(Q))"), $("((--,(P))==>(Q))").toString()); //SAME should not change
     }
-    @Test
+
+    @Test public void testPointlessImplicationSubtermRepeat() throws Narsese.NarseseException {
+        assertEquals("((a &&+5 x) ==>+5 c)", $("((a &&+5 x)=|>(x &&+5 c))").toString());
+
+        assertEquals(Null, $("((a &&+5 x)=|>x)"));
+
+        assertEquals("((a &&+5 $1) ==>+5 c)", $("((a &&+5 $1)=|>($1 &&+5 c))").toString());
+
+        assertEquals(Null, $("((a &&+5 $1) ==>-5 a"));
+
+
+    }
+
+    /** needs reviewed could be totally wrong */
+    @Ignore @Test
     public void testImplicationNegatedPredicateImplicated() throws Narsese.NarseseException {
 
         //((--,(x==>y)) ==> z)
@@ -727,8 +741,8 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testFilterCoNegatedStatements() throws Narsese.NarseseException {
-        assertEquals(False, $("((--,(a1)) <-> (a1))"));
-        assertEquals(False, $("((--,(a1)) --> (a1))"));
+        assertEquals("((--,(a1))<->(a1))", $("((--,(a1)) <-> (a1))").toString()); //valid
+        assertEquals(Null, $("((--,(a1)) --> (a1))"));
     }
 
 
@@ -1004,7 +1018,7 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testCoNegatedImplication() throws Narsese.NarseseException {
-        assertEquals(False,
+        assertEquals(Null,
                 $("((--,$1)=|>(((--,$1)&|(--,#2)) &&+16 #2))")
         );
     }

@@ -274,7 +274,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 new HashSet(id.volume());
         templates(tc, ctpl, nar, layers(id) - 1);
 
-        tc.add(id.term()); //add the local term but not the concept. this prevents reinserting a tasklink
+
+        Term idt = id.term();
+        if (idt.size() > 0)
+            tc.add(idt); //add the local term (if a compound) -- but not the concept. this prevents reinserting a tasklink
 
         if (!tc.isEmpty())
             return tc.toArray(new Termed[tc.size()]);
