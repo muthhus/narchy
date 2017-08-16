@@ -35,6 +35,11 @@ public class Temporalize implements ITemporalize {
 
     final static Logger logger = LoggerFactory.getLogger(Temporalize.class);
 
+    public static final Time AMBIENT = Time.the(ETERNAL, DTERNAL);
+
+    /** left-aligned earliest event which other terms can relative to */
+    public static final Time EARLIEST = Time.the(ETERNAL, 0);
+
     /**
      * constraint graph
      */
@@ -335,9 +340,9 @@ public class Temporalize implements ITemporalize {
 //        return new SolutionEvent(this, term, st, et);
     }
 
-    static String timeStr(int when) {
-        return when != DTERNAL ? (when != XTERNAL ? Integer.toString(when) : "?") : "DTE";
-    }
+//    static String timeStr(int when) {
+//        return when != DTERNAL ? (when != XTERNAL ? Integer.toString(when) : "?") : "DTE";
+//    }
 
     public RelativeEvent newRelative(Term term, Term relativeTo, int start) {
         return new RelativeEvent(this, term, relativeTo, start);
@@ -382,7 +387,7 @@ public class Temporalize implements ITemporalize {
         }
     }
 
-    private void know(Term term, @Nullable AbsoluteEvent root) {
+    public void know(Term term, @Nullable AbsoluteEvent root) {
         int d = term.dtRange();
 //        if (root != null && (term.op() == CONJ && (root.end - root.start != d)))
 //            return; //as a result of variables etc, the conjunction has been resized; the numbers may not be compareable so to be safe, cancel
@@ -489,21 +494,8 @@ public class Temporalize implements ITemporalize {
                     if (i > 0)
                         t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
 
-                    int sdt = st.dtRange();
-                    int subStart = t, subEnd = t + sdt;
-
-                    //                  System.out.println(parent + "\t" + st + " sub(" + i + ") " + subStart + ".." + subEnd);
-
-                    //the event is atomic, so forget the parent in computing the subterm relations (which is in IMPL only)
-//                    if (parent!=null) {
-//                        know(
-//                                parent,
-//                                //null,
-//                                //i == 0 ? parent : null,
-//                                //(o != IMPL) ? parent : null, //(!term.op().statement) ? parent : null,
-//                                //parent,
-//                                st, subStart, subEnd); //parent = null;
-//                    }
+                    int stDT = st.dtRange();
+                    int subStart = t, subEnd = t + stDT;
 
 
                     t = subEnd;
@@ -514,8 +506,8 @@ public class Temporalize implements ITemporalize {
                         int relInner = lastEnd - subStart;
                         Term rt = tt.sub(i - 1);
                         int rtDT = rt.dt();
-                        if (rtDT != DTERNAL && rt.dtRange() > 0) {
-                            //link to the previous term's starting event
+                        if (rt.op()==CONJ && rtDT!=DTERNAL) {
+                            //link to the subj term's starting event
                             Term rtEarly = rt.sub(rtDT >= 0 ? 0 : 1);
                             int relOuter = lastStart - subStart;
                             know(rtEarly, newRelative(rtEarly, st, relOuter));
@@ -524,6 +516,8 @@ public class Temporalize implements ITemporalize {
 
                         know(rt, newRelative(rt, st, relInner));
                         know(st, newRelative(st, rt, -relInner));
+
+
                     }
 
                     lastStart = subStart;
@@ -554,7 +548,7 @@ public class Temporalize implements ITemporalize {
 //                break;
             case CONJ:
                 int tdt = term.dt();
-                if (tdt != XTERNAL && tdt!=DTERNAL) {
+                if (tdt != XTERNAL ) {
                     //add the known timing of the conj's events
                     TermContainer ss = term.subterms();
                     int sss = ss.size();
@@ -565,14 +559,16 @@ public class Temporalize implements ITemporalize {
                         //relative to the root of the compound
                         know(a, relative(a, term, at, at + a.dtRange()));
 
-                        if (i < sss - 1) {
-                            //relative to sibling subterm
-                            Term b = ss.sub(i + 1);
-                            if (!a.containsRecursively(b) && !b.containsRecursively(a)) {
-                                int bt = term.subtermTime(b);
-                                int ba = bt - at;
-                                know(b, relative(b, a, ba, ba + b.dtRange()));
-                                know(a, relative(a, b, -ba, -ba + a.dtRange()));
+                        if (tdt!=DTERNAL) {
+                            if (i < sss - 1) {
+                                //relative to sibling subterm
+                                Term b = ss.sub(i + 1);
+                                if (!a.containsRecursively(b) && !b.containsRecursively(a)) {
+                                    int bt = term.subtermTime(b);
+                                    int ba = bt - at;
+                                    know(b, relative(b, a, ba, ba + b.dtRange()));
+                                    know(a, relative(a, b, -ba, -ba + a.dtRange()));
+                                }
                             }
                         }
                     }
@@ -603,10 +599,10 @@ public class Temporalize implements ITemporalize {
                 return null; //cyclic
         }
 
-        if (fullyEternal() && empty(trail) && x.op() != IMPL && x.dt() != XTERNAL) {
+        if (fullyEternal() && /*empty(trail) && */x.op() != IMPL && x.dt() != XTERNAL) {
             //HACK
-            trail.put(x, Time.the(ETERNAL, 0)); //glue
-            knowTerm(x, ETERNAL); //everything will be relative to this, in eternity
+            trail.put(x, EARLIEST); //glue
+            //knowTerm(x, ETERNAL); //everything will be relative to this, in eternity
         } else {
             trail.putIfAbsent(x, null); //placeholder
         }
@@ -790,8 +786,10 @@ public class Temporalize implements ITemporalize {
                 }
                 //as a last resort, check to see if the DT=DTERNAL form of the compound is known, because this will in fact match it
                 Term xEternal = x.dt(DTERNAL);
+                Event xEs = solve(xEternal, trail);
+                if (xEs!=null)
+                    return xEs;
 
-                return solve(xEternal, trail);
             }
         }
 
@@ -835,7 +833,7 @@ public class Temporalize implements ITemporalize {
                     return null; //can this happen?
                 case 1:
                     Event r = relevant.get(0);
-                    return new SolutionEvent(this, x, r.start(trail).abs(), r.end(trail).abs());
+                    return relative( x, r.term, 0, x.dtRange());
 
             }
 
@@ -864,6 +862,10 @@ public class Temporalize implements ITemporalize {
         long bta = bt.abs();
 
         if (ata == ETERNAL && bta == ETERNAL) {
+            if (at.offset==DTERNAL || bt.offset==DTERNAL) {
+                //assert(at.offset==bt.offset);
+                return new AbsoluteEvent(this, CONJ.the(DTERNAL, a, b), ETERNAL);
+            }
             ata = at.offset; //TODO maybe apply shift, and also needs to affect 'start'
             bta = bt.offset;// + a.dtRange();
         } else if (ata == ETERNAL ^ bta == ETERNAL) {
@@ -950,4 +952,17 @@ public class Temporalize implements ITemporalize {
     }
 
 
+    public void knowAmbient(@NotNull Term t) {
+        know(t, new AbsoluteEvent(this, t, ETERNAL, ETERNAL) {
+            @Override
+            public Time start(@Nullable Map<Term, Time> ignored) {
+                return AMBIENT;
+            }
+
+            @Override
+            public Time end(Map<Term, Time> ignored) {
+                return AMBIENT;
+            }
+        });
+    }
 }

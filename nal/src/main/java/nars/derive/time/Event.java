@@ -1,6 +1,7 @@
 package nars.derive.time;
 
 import nars.term.Term;
+import nars.term.atom.Bool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,6 +15,7 @@ public abstract class Event implements Comparable<Event> {
     protected final ITemporalize t;
 
     Event(ITemporalize t, Term term) {
+        assert(!(term instanceof Bool));
         this.t = t;
         this.term = term;
     }
@@ -65,11 +67,11 @@ public abstract class Event implements Comparable<Event> {
                     return Integer.compare(THIS.end, THAT.end);
                 } else {
 
-                    float xs = t.score(x);
-                    float ys = t.score(y);
-                    if (xs != ys) {
-                        return Float.compare(ys, xs);
-                    } else {
+//                    float xs = t.score(x);
+//                    float ys = t.score(y);
+//                    if (xs != ys) {
+//                        return Float.compare(ys, xs);
+//                    } else {
                         //prefer lower volume
                         int xv = x.volume();
                         int yv = y.volume();
@@ -77,7 +79,7 @@ public abstract class Event implements Comparable<Event> {
                             return x.compareTo(y);
                         else
                             return Integer.compare(xv, yv);
-                    }
+           //         }
                 }
 
             } else if (this instanceof AbsoluteEvent) {

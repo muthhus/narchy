@@ -17,10 +17,11 @@ public class Time {
     }
 
     static String str(int offset) {
-        if (offset == XTERNAL)
-            return "+-";
-        else
-            return Integer.toString(offset);
+        switch (offset) {
+            case XTERNAL: return "+-";
+            case DTERNAL: return "?";
+            default: return Integer.toString(offset);
+        }
     }
 
     static String str(long base) {
@@ -43,9 +44,9 @@ public class Time {
 //            }
     }
 
-    private Time(long base, int offset) {
+    protected Time(long base, int offset) {
         this.base = base;
-        assert(offset!=DTERNAL && offset!=XTERNAL);
+        assert( offset!=XTERNAL);
         this.offset = offset;
     }
 

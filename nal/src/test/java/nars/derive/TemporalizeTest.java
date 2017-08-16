@@ -61,15 +61,22 @@ public class TemporalizeTest {
         assertEquals(0, zx.compareTo(zx));
         assertEquals(0, zy.compareTo(zy));
 
-        assertEquals(+1, zx.compareTo(zy));
+
+        Term ab = $("(a-->b)");
+        RelativeEvent zab = t.newRelative(z, ab, 0);
+        assertEquals(-1, zx.compareTo(zab)); //prefer simpler referrents, always
+        assertEquals(-1, zy.compareTo(zab)); //prefer simpler referrents, always
+
+        assertEquals(-1, zx.compareTo(zy));
         assertEquals(-zy.compareTo(zx), zx.compareTo(zy));
 
 
         FasterList<RelativeEvent> l = new FasterList<>();
+        l.add(zab);
         l.add(zx);
         l.add(zy);
         l.sortThis();
-        assertEquals("[z@0->y, z@0->x]", l.toString()); //y first since it is non-eternal
+        assertEquals("[z@0->x, z@0->y, z@0->(a-->b)]", l.toString()); //y first since it is non-eternal
     }
 
     @Test
@@ -160,7 +167,7 @@ public class TemporalizeTest {
 
         Event s = t.solve($("(z ==>+- x)"));
         assertNotNull(s);
-        assertEquals("(z ==>+1 x)@ETE", s.toString());
+        assertEquals("(z ==>+1 x)@ETE|2", s.toString());
     }
 
 
@@ -252,6 +259,56 @@ public class TemporalizeTest {
     }
 
     @Test
+    public void testImplConjWTFWTFSubj() throws Narsese.NarseseException {
+        //$.26 a. -4 %1.0;.40% {16: 1;2} ((%1,(%1==>%2),time(urgent),notImpl(%1)),(%2,((DeductionRecursivePB-->Belief),(InductionRecursivePB-->Goal))))
+        //    $.50 (b &&+5 c). 6⋈11 %1.0;.90% {6: 2}
+        //    $.38 ((b &&+5 c) ==>-10 a). 6 %1.0;.45% {6: 1;2} ((%1,%2,time(raw),task(positive),task("."),time(dtEvents),notImpl(%1)),((%1 ==>+- %2),((Induction-->Belief))))
+
+        Temporalize t = new Temporalize();
+        t.knowTerm($("(b &&+5 c)"), 6, 11); //these two overlap, so there should be a derivation
+        t.knowTerm($("((b &&+5 c) ==>-10 a)"), 6 /* shouldnt matter what this is */);
+
+        Term a = $("a");
+        HashMap h = new HashMap();
+        Event solution = t.solve(a, h);
+        assertEquals(1, solution.start(h).abs());
+    }
+
+    @Test
+    public void testImplConjWTFWTFPred() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowTerm($("(b &&+5 c)"), 6, 11); //these two overlap, so there should be a derivation
+        t.knowTerm($("(a ==>+3 (b &&+5 c))"), ETERNAL /* shouldnt matter what this is */);
+
+        Term a = $("a");
+        HashMap h = new HashMap();
+        Event solution = t.solve(a, h);
+        System.out.println(h);
+        assertEquals(3, solution.start(h).abs());
+    }
+    @Test
+    public void testImplConjWTFWTFSubjPred() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowTerm($("(b &&+5 c)"), 6, 11); //these two overlap, so there should be a derivation
+        t.knowTerm($("((x &&+1 y) ==>+3 (b &&+5 c))"), ETERNAL /* shouldnt matter what this is */);
+
+        {
+            Term a = $("y");
+            HashMap h = new HashMap();
+            Event solution = t.solve(a, h);
+            System.out.println(h);
+            assertEquals(3, solution.start(h).abs());
+        }
+        {
+            Term a = $("x");
+            HashMap h = new HashMap();
+            Event solution = t.solve(a, h);
+            System.out.println(h);
+            assertEquals(2, solution.start(h).abs());
+        }
+    }
+
+    @Test
     public void testDTernalize() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         Term dternal = $("(a&&b)");
@@ -262,6 +319,26 @@ public class TemporalizeTest {
         assertNotNull(solution);
         assertNotEquals("(a&|b)@ETE", solution.toString());
         assertEquals("(a&&b)@ETE", solution.toString());
+    }
+    @Test
+    public void testEternalNotParallel() throws Narsese.NarseseException {
+        /*
+        (((#1-->swimmer)&&(#1-->$2))==>(swan-->$2)). %.90;.45%
+            ((#1-->swimmer) &&+- (#1-->$2))
+            YES: ((#1-->swimmer)&&(#1-->$2))
+             NO: ((#1-->swimmer)&|(#1-->$2))
+        */
+        Temporalize t = new Temporalize();
+
+
+        t.knowAmbient($("(((#1-->swimmer)&&(#1-->$2))==>(swan-->$2))"));
+
+        System.out.println(t);
+        HashMap h = new HashMap();
+        Event solution = t.solve($("((#1-->swimmer) &&+- (#1-->$2))"), h);
+        System.out.println(h);
+        assertNotNull(solution);
+        assertEquals("((#1-->swimmer)&&(#1-->$2))@ETE", solution.toString());
     }
 
     @Test
@@ -438,7 +515,7 @@ public class TemporalizeTest {
         t.knowTerm($("(z ==>+3 y)"), ETERNAL);
         Event s = t.solve($("(z ==>+- x)"));
         assertNotNull(s);
-        assertEquals("(z ==>+1 x)@ETE", s.toString());
+        assertEquals("(z ==>+1 x)@ETE|-3", s.toString());
     }
 
     @Test
@@ -468,6 +545,16 @@ public class TemporalizeTest {
         t.knowTerm($("(c &&+5 d)"), 11);
         t.knowTerm($("((a &&+5 b) &&+5 c)"), 1);
         assertEquals("((a &&+5 b) &&+5 (c &&+5 d))@[1..16]", t.solve($("((a &&+- b) &&+- (c &&+- d))")).toString());
+    }
+    @Test
+    public void testConjImpl23424234234() throws Narsese.NarseseException {
+//$.09 (c &&+5 d). 16⋈21 %1.0;.12% {48: 1;2;3;;} ((%1,(%2==>%1),time(urgent),notImpl(%1)),(%2,((AbductionRecursivePB-->Belief),(DeductionRecursivePB-->Goal))))
+//    $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
+//    $.11 ((c &&+5 d) ==>-15 (a &&+5 b)). 11 %1.0;.51% {48: 1;2;3;;} Revection Merge
+        Temporalize t = new Temporalize();
+        t.knowTerm($("(a &&+5 b)"), 1, 6);
+        t.knowTerm($("((c &&+5 d) ==>-15 (a &&+5 b))"), ETERNAL);
+        assertEquals("(c &&+5 d)@[11..16]", t.solve($("(c &&+- d)")).toString());
     }
 
     @Test

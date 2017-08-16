@@ -11,6 +11,10 @@ public class AbsoluteEvent extends Event {
 
     public final long start, end;
 
+    public AbsoluteEvent(ITemporalize t, Term term, long occ) {
+        this(t, term, occ, occ);
+    }
+
     public AbsoluteEvent(ITemporalize t, Term term, long start, long end) {
         super(t, term);
 

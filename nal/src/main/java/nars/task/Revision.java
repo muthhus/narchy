@@ -198,9 +198,11 @@ public class Revision {
         if (a0.equals(b0) && a1.equals(b1)) {
             return a.dt(dt);
         } else {
+            Term na = intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose);
+            Term nb = intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng, mergeOrChoose);
             return a.op().the(dt,
-                    intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose),
-                    intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng, mergeOrChoose));
+                    na,
+                    nb);
         }
 
     }
