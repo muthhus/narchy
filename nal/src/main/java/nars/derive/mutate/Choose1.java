@@ -58,7 +58,7 @@ public class Choose1 extends Termutator.AbstractTermutator {
         for (Term x = this.x; l >=0; l--) {
 
             Term y = this.yy[(shuffle + l) % this.yy.length];
-            if (f.putXY(x, y)) {
+            if (f.unify(x,y)) {
                 if (f.putXY(xEllipsis, EllipsisMatch.match(TermContainer.exceptThe(yy, y, m)))) {
                     f.tryMutate(chain, current);
                 }

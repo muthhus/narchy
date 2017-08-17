@@ -72,14 +72,10 @@
 // Conditional syllogism && Independent Variable Elimination
 //      If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C), time(urgent),neq(B,C),neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionRecursivePB, Goal:InductionRecursivePB)
-        A, (A ==> C), time(urgent), notImpl(A) |- C, (Belief:DeductionRecursivePB, Goal:InductionRecursivePB)
-    B, ((--,%A) ==> C), time(urgent),neq(B,C),neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:DeductionRecursivePBN, Goal:InductionRecursivePBN)
-        A, ((--,%A) ==> C), time(urgent), notImpl(A) |- C, (Belief:DeductionRecursivePBN, Goal:InductionRecursivePBN)
+    B, (A ==> C), time(urgent),neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePB, Goal:InductionRecursivePB)
+    B, ((--,%A) ==> C), time(urgent),neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePBN, Goal:InductionRecursivePBN)
 
-
-    B, (C ==> A), time(urgent), neq(B,C),neq(A,B), notImpl(B) |- subIfUnifiesAny(C,A,B,strict), (Belief:AbductionRecursivePB, Goal:DeductionRecursivePB)
-        A, (C ==> A), time(urgent), notImpl(A) |- C, (Belief:AbductionRecursivePB, Goal:DeductionRecursivePB)
+    B, (C ==> A), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePB, Goal:DeductionRecursivePB)
 
         //TODO maybe the belief(negative) cases are actually necessary to derive --C
 
@@ -108,11 +104,6 @@
     //(X==>Y),Z,task(".")       |- subIfUnifiesAny(X,Y,Z), (Belief:Abduction)
     //((--,%X)==>Y),Z,task(".") |- (--,subIfUnifiesAny(X,Y,Z)), (Belief:AbductionPN)
 
-    //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
-    //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
-
-    B, C, belief("&&"), task("!"), task(positive), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
-    B, C, belief("&&"), task("!"), task(negative), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),(--,%B)), (Goal:StrongN)
     //B, (C && A), task("!"), time(urgent) |- subIfUnifiesAny(C,A,B), (Goal:Strong)
     //B, (C && (--,%A)), task("!"), time(urgent) |- subIfUnifiesAny(C,A,B), (Goal:StrongN)
         //B, (C && A) |- (--,subIfUnifiesAny(C,A,B)), (Goal:StrongN)
@@ -202,14 +193,18 @@
      (&&,X,A..+), X, task("!") |- X, (Goal:Strong)
      (&&,(--,%X),A..+), X, task("!") |- (--,%X), (Goal:StrongPN)
 
+    //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
+    //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
+    B, C, belief("&&"), task("!"), task(positive), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
+    B, C, belief("&&"), task("!"), task(negative), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),(--,%B)), (Goal:StrongN)
+
     //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)
 
 //Anonymous Analogy (NAL5)
     //originally this only unified depvar (dep var elimination)
     //due to limitations in ellipsis matching, negation in the 2nd case is handled in the pattern.  this isn't optimal though
      (&&,X,A..+), Y, task(".") |- subIfUnifiesAny((&&,A..+),X,Y), (Belief:AnonymousAnalogy)
-     (&&,X,A..+), Y, task(".") |- subIfUnifiesAny((&&,A..+),X,(--,%Y)), (Belief:AnonymousAnalogyPN)
-        //this implies that the conjunction contains a negation. that could be added as a precondition to avoid the useless derivation process
+     (&&,(--,%X),A..+), Y, task(".") |- subIfUnifiesAny((&&,A..+),X,Y), (Belief:AnonymousAnalogyPN)
 
 
      //((&&,X,A..+) && Z), Z |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)

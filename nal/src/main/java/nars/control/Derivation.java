@@ -26,7 +26,6 @@ import java.util.HashMap;
 import static nars.Op.Null;
 import static nars.Op.VAR_PATTERN;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
-import static nars.op.substituteIfUnifies.substituteIfUnifiesDep;
 import static nars.time.Tense.ETERNAL;
 
 

@@ -155,9 +155,17 @@ public class NAL5Test extends AbstractNALTest {
     }
 
     @Test
+    public void anonymous_analogy1_neg2() {
+        TestNAR tester = test;
+        tester.believe("(&&, --x, y, z)");
+        tester.believe("x", 0.20f, 0.9f);
+        tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f);
+    }
+
+    @Test
     public void anonymous_analogy1_neg3() {
         TestNAR tester = test;
-        tester.believe("(&&, (--,x), y, z)");
+        tester.believe("(&&, --x, y, z)");
         tester.believe("x", 0.20f, 0.9f);
         tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f);
     }

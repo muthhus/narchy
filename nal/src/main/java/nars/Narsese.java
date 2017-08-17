@@ -1,5 +1,6 @@
 package nars;
 
+import com.github.fge.grappa.annotations.Cached;
 import com.github.fge.grappa.matchers.MatcherType;
 import com.github.fge.grappa.matchers.base.AbstractMatcher;
 import com.github.fge.grappa.matchers.base.Matcher;
@@ -133,7 +134,6 @@ public class Narsese extends BaseParser<Object> {
     public static Narsese parse() {
         return parsers.get();
     }
-
 
 
     public Rule Input() {
@@ -406,7 +406,6 @@ public class Narsese extends BaseParser<Object> {
 //        );
 //    }
 
-    static final ArrayList<String> puncStr = Lists.newArrayList(".", "?", "!", "@", ";");
 
     Rule SentencePunctuation(Var<Character> punc) {
 
@@ -424,12 +423,8 @@ public class Narsese extends BaseParser<Object> {
 //    }
 
 
-    @NotNull
-    protected Object nonNull(@Nullable Object o) {
-        return o != null ? o : new MiniNullPointerException();
-    }
 
-    //@Cached
+    @Cached
     Rule Term(boolean oper, boolean meta, boolean temporal) {
         /*
                  <term> ::= <word>                             // an atomic constant term
@@ -442,6 +437,10 @@ public class Narsese extends BaseParser<Object> {
                 s(),
                 firstOf(
                         QuotedAtom(),
+
+                        //negation shorthand
+                        seq(NEG.str, Atom(), push(($.the(pop())).neg())), //needs to be separate because Atom() actually returns a string, not a term. we can fix this later
+                        seq(NEG.str, Term(true,false,true), push(((Term) pop()).neg())),
 
                         //TODO match Ellipsis as an optional continuation of the prefix variable that was already parsed.\
                         //popping the pushed value should be all that's needed to do this
@@ -517,14 +516,12 @@ public class Narsese extends BaseParser<Object> {
 
                         Variable(),
 
-
-                        //negation shorthand
-                        seq(NEG.str, s(), Term(), push(((Term) pop()).neg())),
-
                         //deprecated form: <a --> b>
                         seq(OLD_STATEMENT_OPENER,
                                 MultiArgTerm(null, OLD_STATEMENT_CLOSER, false, true)
                         )
+
+
                 ),
 
                 s(),
@@ -545,7 +542,7 @@ public class Narsese extends BaseParser<Object> {
     public Rule ConjunctionParallel() {
         return seq(
 
-                "&|,", s(),
+                "&|", s(), ",", s(),
 
                 Term(true, false, true),
                 oneOrMore(sequence(
@@ -891,7 +888,7 @@ public class Narsese extends BaseParser<Object> {
     /**
      * list of terms prefixed by a particular compound term operate
      */
-    //@Cached
+    @Cached
     Rule MultiArgTerm(@Nullable Op defaultOp, char close, boolean initialOp, boolean allowInternalOp) {
 
         return sequence(
@@ -1040,7 +1037,7 @@ public class Narsese extends BaseParser<Object> {
 //                    throw new NarseseException("Too many operators involved: " + op + ',' + p + " in " + stack + ':' + vectorterms);
 //                }
 
-                if (op!=null)
+                if (op != null)
                     op[0] = (Op) p;
             }
         }
@@ -1178,8 +1175,6 @@ public class Narsese extends BaseParser<Object> {
 //        });
 
 
-
-
     /**
      * parse one task
      */
@@ -1235,9 +1230,9 @@ public class Narsese extends BaseParser<Object> {
                 t1 = m.truthDefault(punct);
             }
 
-            if (content.op()==NEG) {
+            if (content.op() == NEG) {
                 content = content.unneg();
-                if (t1!=null)
+                if (t1 != null)
                     t1 = t1.negated();
             }
 

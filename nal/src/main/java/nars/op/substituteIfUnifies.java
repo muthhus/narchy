@@ -6,7 +6,6 @@ import nars.control.Derivation;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.atom.Atom;
-import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.SubUnify;
 import org.jetbrains.annotations.NotNull;

@@ -235,21 +235,21 @@ public abstract class Unify extends Versioning implements Subst {
 //        }
 
 
-        Set<Term> free = this.free.get();
-        Term[][] match = new Term[free.size()][];
-        int m = 0;
-        for (Term x : free) {
-            Term y = xy(x);
-            if (y == null)
-                return;
-            match[m++] = new Term[]{x, y};
-        }
-        Arrays.sort(match, matchElementComparator); //sort by key
+//        Set<Term> free = this.free.get();
+//        Term[][] match = new Term[free.size()][];
+//        int m = 0;
+//        for (Term x : free) {
+//            Term y = xy(x);
+//            if (y == null)
+//                return;
+//            match[m++] = new Term[]{x, y};
+//        }
+//        Arrays.sort(match, matchElementComparator); //sort by key
 
 //        if (!matched.add(((ConstrainedVersionMap)xy).snapshot()))
 //            return; //already seen
 
-        onMatch(match);
+        onMatch(null /*match*/);
 
 
     }

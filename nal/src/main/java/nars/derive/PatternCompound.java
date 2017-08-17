@@ -14,7 +14,6 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -330,8 +329,20 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
     public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
 
+
+//        /** the components of this pattern compound other than the ellipsis "*/
+//        final ImmutableSet<Term> fixed;
+
         public PatternCompoundWithEllipsisCommutive(Op op, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(op, dt, ellipsis, subterms);
+
+//            MutableSet<Term> f = new UnifiedSet();
+//            subterms.forEach(s -> {
+//                if (!s.equals(ellipsis))
+//                    f.add(s);
+//            });
+//            this.fixed = f.toImmutable();
+
         }
 
         /**
@@ -366,7 +377,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
             //);
             //public final boolean matchEllipsedCommutative(@NotNull Compound X, @NotNull Ellipsis Xellipsis, @NotNull Compound Y) {
 
-            SortedSet<Term> xFree = new TreeSet();//$.newHashSet(0); //Global.newHashSet(0);
+            SortedSet<Term> xFixed = new TreeSet();//$.newHashSet(0); //Global.newHashSet(0);
 
 
             final Ellipsis ellipsis = this.ellipsis;
@@ -374,22 +385,35 @@ abstract public class PatternCompound extends GenericCompoundDT {
             SortedSet<Term> yFree = y.toSortedSet();
 
             int s = size();
-            int dir = subst.random.nextBoolean() ? +1 : -1;
-            int ik = subst.random.nextInt(s);
-            for (int k = 0; k < s; k++, ik += dir) {
 
-                //loop
-                if (ik == -1) ik = s - 1;
-                else if (ik == s) ik = 0;
+            for (int k = 0; k < s; k++) {
 
-                Term x = sub(ik);
 
-                //boolean xVar = x.op() == type;
-                //ellipsis to be matched in stage 2
-                if (Objects.equals(x, ellipsis))
+                Term x = sub(k);
+
+                if (x.equals(ellipsis))
                     continue;
 
-                Term v = subst.xy(x); //transform could be used here, but shouldnt be necessar if only a variable
+                //find (randomly) at least one element of 'y' which unifies with this fixed variable
+                //if one matches, remove it from yFree
+                //if none match, fail
+                //TODO this should be part of the termutator since there could be more than one match
+//                int dir = subst.random.nextBoolean() ? +1 : -1;
+//                int u = subst.random.nextInt(s);
+//                boolean matched = false;
+//                for (int w = 0; w < s; w++, u+=dir) {
+//                    if (u == -1) u = s - 1;
+//                    else if (u == s) u = 0;
+//                    //if (!yFree.contains(yu)) continue //?? would this help?
+//                    Term yu = y.sub(u);
+//                    if (subst.putXY(x, yu)) {
+//                        matched = true;
+//                        yFree.remove(yu);
+//                        break;
+//                    }
+//                }
+//                if (!matched)
+//                    return false;
 
                 /*if (v instanceof EllipsisMatch) {
 
@@ -404,26 +428,26 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
 
                 } else */
-                if (v != null) {
+//                if (v != null) {
+//
+//                    if (!yFree.remove(v)) {
+//                        //required but not actually present in Y
+//                        return false;
+//                    }
+//
+//                } else {
 
-                    if (!yFree.remove(v)) {
-                        //required but not actually present in Y
-                        return false;
-                    }
-
-                } else {
-
-                    xFree.add(x);
-                }
+                    xFixed.add(x);
+       //         }
 
 
             }
 
-            int numRemainingForEllipsis = yFree.size() - xFree.size();
+            int numRemainingForEllipsis = yFree.size() - xFixed.size();
 
             //if not invalid size there wouldnt be enough remaining matches to satisfy ellipsis cardinality
             return ellipsis.validSize(numRemainingForEllipsis) &&
-                    matchEllipsisCommutive(subst, xFree, yFree);
+                    matchEllipsisCommutive(subst, xFixed, yFree);
 
 
         }
@@ -431,8 +455,8 @@ abstract public class PatternCompound extends GenericCompoundDT {
         /**
          * toMatch matched into some or all of Y's terms
          */
-        boolean matchEllipsisCommutive(@NotNull Unify subst, @NotNull SortedSet<Term> xFree, @NotNull SortedSet<Term> yFree) {
-            int xs = xFree.size();
+        boolean matchEllipsisCommutive(@NotNull Unify subst, @NotNull SortedSet<Term> xFixed, @NotNull SortedSet<Term> yFree) {
+            int xs = xFixed.size();
 
             switch (xs) {
                 case 0:
@@ -440,14 +464,15 @@ abstract public class PatternCompound extends GenericCompoundDT {
                     return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
 
                 case 1:
-                    if (yFree.size()==1) {
-                        return subst.putXY(xFree.first(), yFree.first());
+                    Term x0 = xFixed.first();
+                    if (yFree.size() == 1) {
+                        return subst.unify(x0, yFree.first());
                     } else {
-                        return subst.termutes.add(new Choose1(ellipsis, xFree.first(), yFree));
+                        return subst.termutes.add(new Choose1(ellipsis, x0, yFree));
                     }
 
                 case 2:
-                    return subst.termutes.add(new Choose2(ellipsis, subst, xFree, yFree));
+                    return subst.termutes.add(new Choose2(ellipsis, subst, xFixed, yFree));
 
                 default:
                     //3 or more combination
