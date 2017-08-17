@@ -232,7 +232,7 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustBelieve(cycles, "(x)", 1f, 0.81f, 0)
                 .mustBelieve(cycles, "(y)", 1f, 0.81f, 3)
-                .mustDesire(cycles, "(x)", 1f, 0.81f, 0);
+                .mustDesire(cycles, "(x)", 1f, 0.81f, (t) -> t > 0);
     }
 
     @Test
@@ -635,7 +635,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(3, "((a) ==>+3 (b)). :|:")
                 .inputAt(6, "(b)! :|:")
                 .mustDesire(cycles, "(a)", 1f, 0.81f, 6) //desired NOW, not at time 10 as would happen during normal decompose
-                .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL || t == 10);
+                .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL);
     }
 
     @Test

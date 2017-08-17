@@ -139,9 +139,10 @@ public class NAL8EternalMixTest extends AbstractNALTest {
     public void goal_deduction_impl() {
 
         TestNAR tester = test;
+        tester.log();
         tester.input("x:y! :|:");
         tester.input("(goto(z) ==>+5 x:y).");
-        tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f, 0);
+        tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f, (t)->t>=0);
     }
 
     @Test

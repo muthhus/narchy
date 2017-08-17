@@ -140,8 +140,8 @@
 
 //conditional abduction
 
-    ((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
-    ((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
+    //((&&,M,X,A..*) ==> C), (Y ==> C), task(".") |- subIfUnifiesAny(M,X,Y), (Belief:Abduction)
+    //((&&,M,A..+) ==> C), ((&&,A..+) ==> C), task(".") |- M, (Belief:Abduction)
     (M ==> C), C, task(".") |- M, (Belief:Abduction)
 
         //TODO modify ellipsis to allow these two rules to be expressed as one:

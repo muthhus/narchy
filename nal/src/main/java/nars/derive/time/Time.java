@@ -67,7 +67,10 @@ public class Time {
 //        if (this.offset == XTERNAL)
 //            return Time.the(base, offset); //set initial dt
 //        else
-            return Time.the(base, this.offset + offset);
+        if (this.offset == DTERNAL)
+            offset = 0; //ignore the offset in eternity
+
+        return Time.the(base, this.offset + offset);
     }
 
     public long abs() {

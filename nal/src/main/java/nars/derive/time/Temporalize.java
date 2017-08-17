@@ -71,16 +71,23 @@ public class Temporalize implements ITemporalize {
         ITemporalize t = this;
 
 
-        ((Temporalize) t).knowTerm(task.term(), task.start(), task.end());
+        ((Temporalize) t).knowDerivedTerm(d, task.term(), task.start(), task.end());
 
         if (belief != null) {
             if (!belief.equals(task)) {
 
-                ((Temporalize) t).knowTerm(d.beliefTerm, belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+                ((Temporalize) t).knowDerivedTerm(d, d.beliefTerm, belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
             }
         } else if (d.beliefTerm != null) {
-            if (!task.term().equals(d.beliefTerm)) //dont re-know the term
-                ((Temporalize) t).knowAmbient(d.beliefTerm);
+            if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
+
+                Term b = d.beliefTerm;
+                ((Temporalize) t).knowAmbient(b);
+
+                Term b2 = d.transform(b);
+                if (!b2.equals(b) && !(b2 instanceof Bool))
+                    knowAmbient(b2);
+            }
             //t.know(d.beliefTerm, d, null);
         }
 
@@ -114,12 +121,12 @@ public class Temporalize implements ITemporalize {
             //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
             //uneternalize/retemporalize:
 
-//            if (/*(e.term.op() != IMPL) && */
-//                    (task.op() == IMPL) && (belief == null || d.beliefTerm.op()==IMPL)) {
-//                //dont retemporalize a non-implication derived from two implications
-//                //it means that the timing is unknown
-//                return null;
-//            }
+            if (/*(e.term.op() != IMPL) && */
+                    (task.op() == IMPL) && (belief == null || d.beliefTerm.op()==IMPL)) {
+                //dont retemporalize a non-implication derived from two implications
+                //it means that the timing is unknown
+                return null;
+            }
 
             long ts = task.start();
             long k;
@@ -327,7 +334,13 @@ public class Temporalize implements ITemporalize {
 //
 //            }
         }
-        throw new UnsupportedOperationException(a + " .. " + b); //maybe just return DTERNAL
+        if (a.offset==DTERNAL ^ b.offset==DTERNAL) {
+            //one is unknown so it is effectively a point interval around the known one
+            return 0;
+        } else {
+            return DTERNAL;
+        }
+        //throw new UnsupportedOperationException(a + " .. " + b); //maybe just return DTERNAL
     }
 
 
@@ -365,26 +378,12 @@ public class Temporalize implements ITemporalize {
     }
 
 
-    @Override
-    public void know(Task task, Subst d, boolean rooted) {
-        Term taskTerm = task.term();
-
-        AbsoluteEvent root =
-                (rooted) ?
-                        absolute(taskTerm, task.start(), task.end())
-                        :
-                        null;
-
-        know(taskTerm, d, root);
-    }
-
-    @Override
-    public void know(Term term, Subst d, @Nullable AbsoluteEvent root) {
-        know(term, root);
+    @Override public void knowDerivedTerm(Subst d, Term term, long start, long end) {
+        knowTerm(term, start, end);
 
         Term t2 = d.transform(term);
-        if (!t2.equals(term)) {
-            know(t2, root);
+        if (!t2.equals(term) && !(t2 instanceof Bool)) {
+            knowTerm(t2, start, end);
         }
     }
 
@@ -542,11 +541,11 @@ public class Temporalize implements ITemporalize {
         }
 
         switch (term.op()) {
-//            case NEG:
-//                Term u = term.unneg();
-//                SortedSet<Event> m = constraints.computeIfAbsent(u, (t) -> new TreeSet<>());
-//                m.add(relative(u, term, 0, term.dtRange()));
-//                break;
+            case NEG:
+                Term u = term.unneg();
+                SortedSet<Event> m = constraints.computeIfAbsent(u, (t) -> new TreeSet<>());
+                m.add(relative(u, term, 0, term.dtRange()));
+                break;
             case CONJ:
                 int tdt = term.dt();
                 if (tdt != XTERNAL) {
@@ -589,7 +588,7 @@ public class Temporalize implements ITemporalize {
 
     @Override
     public Event solve(final Term x, Map<Term, Time> trail) {
-
+        assert(!(x instanceof Bool));
         //System.out.println("solve " + target + "\t" + trail);
 
         if (trail.containsKey(x)) {
@@ -787,9 +786,11 @@ public class Temporalize implements ITemporalize {
                 }
                 //as a last resort, check to see if the DT=DTERNAL form of the compound is known, because this will in fact match it
                 Term xEternal = x.dt(DTERNAL);
-                Event xEs = solve(xEternal, trail);
-                if (xEs != null)
-                    return xEs;
+                if (!(xEternal instanceof Bool)) {
+                    Event xEs = solve(xEternal, trail);
+                    if (xEs != null)
+                        return xEs;
+                }
 
             }
         }
@@ -862,19 +863,24 @@ public class Temporalize implements ITemporalize {
         long ata = at.abs();
         long bta = bt.abs();
 
-        if (ata == ETERNAL && bta == ETERNAL) {
+        if (ata == ETERNAL || /* && */ bta == ETERNAL) {
             if (at.offset == DTERNAL || bt.offset == DTERNAL) {
                 //assert(at.offset==bt.offset);
-                return new AbsoluteEvent(this, CONJ.the(DTERNAL, a, b), ETERNAL);
+                Term ce = CONJ.the(DTERNAL, a, b);
+                if (ce instanceof Bool)
+                    return null;
+                return new AbsoluteEvent(this, ce, ETERNAL);
             }
             ata = at.offset; //TODO maybe apply shift, and also needs to affect 'start'
             bta = bt.offset;// + a.dtRange();
-        } else if (ata == ETERNAL ^ bta == ETERNAL) {
+        } /*else if (ata == ETERNAL ^ bta == ETERNAL) {
             return null; //one is eternal the other isn't
-        }
+        }*/
 
 
         Term newTerm = Op.conjMerge(a, ata, b, bta);
+        if (newTerm instanceof Bool)
+            return null;
 //        if (!newTerm.op().conceptualizable) //failed to create conj
 //            return null;
 
@@ -935,15 +941,17 @@ public class Temporalize implements ITemporalize {
         int dt = dt(at, bt);
         if (dt != XTERNAL) {
 
-            int innerRange = a.dtRange(); //only A, not B (because the end of A points to the start of B)
-//            if (dt > 0) {
-            dt -= innerRange;
-//            } else if (dt < 0) {
-//                dt += innerRange;
-//            }
+            if (dt!=DTERNAL) {
+                int innerRange = a.dtRange(); //only A, not B (because the end of A points to the start of B)
+                //            if (dt > 0) {
+                dt -= innerRange;
+                //            } else if (dt < 0) {
+                //                dt += innerRange;
+                //            }
 
-            if (dt != 0 && Math.abs(dt) < dur)
-                dt = 0; //perceived as simultaneous within duration
+                if (dt != 0 && Math.abs(dt) < dur)
+                    dt = 0; //perceived as simultaneous within duration
+            }
 
 
             Term newTerm = o.the(dt, a, b);

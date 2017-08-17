@@ -349,7 +349,7 @@ public class TemporalizeTest {
 
         Event solution = t.solve($("(a-->c)"));
         assertNotNull(solution);
-        assertEquals("(a-->c)@[5..25]", solution.toString());
+        assertEquals("(a-->c)@ETE", solution.toString());
     }
 
     @Test
@@ -534,7 +534,20 @@ public class TemporalizeTest {
         assertNotNull(s);
         assertEquals("((a,#1) &&+1 (#1,c))@[1..2]", s.toString());
     }
+    @Test
+    public void testCoNegationCrossloop() throws Narsese.NarseseException {
+        /*
+        WRONG, should be dt=-10
+            //$.04 ((--,(x-->b))=|>(x-->a)). 0 %0.0;.07% {13: 1;2;;} ((((--,%1)==>%2),%2),(((--,%2) ==>+- %1),((Contraposition-->Belief))))
+            //    $.08 ((--,(x-->a)) ==>+10 (x-->b)).
+         */
 
+        Temporalize t = new Temporalize();
+        t.knowTerm($("((--,(x-->a)) ==>+10 (x-->b))"), ETERNAL);
+        Event s = t.solve($("((--,(x-->b)) ==>+- (x-->a))"));
+        assertNotNull(s);
+        assertEquals("((--,(x-->b)) ==>-10 (x-->a))@ETE", s.toString());
+    }
 
     @Test
     public void testConjLinked() throws Narsese.NarseseException {
@@ -574,6 +587,8 @@ public class TemporalizeTest {
         t.knowTerm($("((c &&+5 d) ==>-15 (a &&+5 b))"), ETERNAL);
         assertEquals("(c &&+5 d)@[11..16]", t.solve($("(c &&+- d)")).toString());
     }
+
+
 
     @Test
     public void testImplFromConj() throws Narsese.NarseseException {
@@ -650,7 +665,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         Term a = $("(((--,a)&|b) &&+- a)");
         //System.out.println(a);
         //System.out.println(b);
-        String r = "(b &&+5 ((--,a)&|b))@[1..6]";
+        String r = "(a &&+5 ((--,a)&|b))@[1..6]";
 
         System.out.println(t);
         System.out.println(a);

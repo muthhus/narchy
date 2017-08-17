@@ -911,15 +911,15 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
         boolean xEternal = Xdt == DTERNAL;
         boolean yEternal = Ydt == DTERNAL;
-        if (xEternal ^ yEternal) {
-            //one is eternal, the other is not
-            return false;
-        }
 
-        if (xEternal && yEternal) {
+        if (xEternal || yEternal) {
             //both eternal, match commutively
             return X.unifyCommute(Y, u);
         }
+//        if (xEternal ^ yEternal) {
+//            //one is eternal, the other is not
+//            return false;
+//        }
 
         //both temporal here, so compare in the right sequence:
         boolean xReversed = (Xdt < 0);

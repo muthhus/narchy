@@ -24,11 +24,11 @@ public interface ITemporalize {
         return solve(target, new HashMap<>(target.volume()));
     }
 
+    void knowDerivedTerm(Subst d, Term term, long start, long end);
+
     Event solve(Term rel, Map<Term, Time> trail);
 
-    void know(Task task, @NotNull Subst d, boolean taskRooted);
 
-    void know(@NotNull Term beliefTerm, @NotNull Subst d, AbsoluteEvent root);
 
     static String timeStr(long when) {
         return when != ETERNAL ? Long.toString(when) : "ETE";
