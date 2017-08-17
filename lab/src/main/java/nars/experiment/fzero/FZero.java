@@ -59,7 +59,7 @@ public class FZero extends NAgentX {
 
 
         actionBipolar($.p(the("fwd"), id), (f) -> {
-            fz.vehicleMetrics[0][6] += (f) * 1.5f;
+            fz.vehicleMetrics[0][6] += (f) * 0.75f;
             return f;
         });//.resolution.setValue(0.02f);
         actionBipolar($.p(the("rot"), id), (r) -> {

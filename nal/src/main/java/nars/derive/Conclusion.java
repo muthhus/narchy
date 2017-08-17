@@ -15,7 +15,6 @@ import nars.task.NALTask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.time.Tense;
-import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.tuple.Pair;
@@ -30,7 +29,6 @@ import java.util.Map;
 
 import static nars.Op.GOAL;
 import static nars.Param.FILTER_SIMILAR_DERIVATIONS;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -85,9 +83,8 @@ public class Conclusion extends AbstractPred<Derivation> {
         //  which is already determined bythe constructed term's growing complexity) in m.budget()
 
 
-
         // 1. SUBSTITUTE
-        Term b1  = d.transform(this.pattern);
+        Term b1 = d.transform(this.pattern);
 //        if (b1.vars(null) > 0) {
 //            Term b2 = d.transform(b1);
 //                        if (!b1.equals(b2))
@@ -95,13 +92,11 @@ public class Conclusion extends AbstractPred<Derivation> {
 //            b1 = b2;
 //        }
 
-        assert (b1.varPattern() == 0): b1 + " has pattern variables";
+        assert (b1.varPattern() == 0) : b1 + " has pattern variables";
         if (!b1.op().conceptualizable)
             return true;
 
         /// 2. EVAL ----
-
-
 
 
         d.use(Param.TTL_DERIVE_EVAL);
@@ -135,7 +130,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         Truth truth = d.concTruth;
 
         @NotNull final long[] occ;
-        final float[] eviGain = { 1f }; //flat by default
+        final float[] eviGain = {1f}; //flat by default
 
         Term c2;
         if (d.temporal) {
@@ -143,7 +138,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             Term t1;
             try {
                 t1 = new Temporalize(d.random).solve(d, c1, occ = new long[]{ETERNAL, ETERNAL}, eviGain);
-//                if (occ[0] < 0) {
+//                if (t1!=null && occ[0] <= 0) {
 //                    //FOR A SPECIFIC TEST TEMPORAR
 //                    System.err.println("wtf");
 //                    new Temporalize(d.random).solve(d, c1, new long[]{ETERNAL, ETERNAL}, eviGain);
@@ -168,20 +163,14 @@ public class Conclusion extends AbstractPred<Derivation> {
                 return true;
             }
 
-            if (occ[1] == ETERNAL) occ[1] = occ[0];
+            if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
-            if (goalUrgent && d.concPunc==GOAL/* && occ[0]!=ETERNAL*/) {
+            if (goalUrgent && d.concPunc == GOAL && occ[0]!=ETERNAL) {
                 long taskStart = d.task.start();
-
-                if (taskStart!=ETERNAL) { //preserve any temporality, dont overwrite as eternal
+                if (taskStart != ETERNAL) {
                     long taskDur = occ[1] - occ[0];
 
-//                    int derInBelief = d.transform(d.beliefTerm).subtermTimeSafe(t1);
-//                    if (derInBelief!=DTERNAL) {
-//                        taskStart += derInBelief;
-//                    }
-
-                    occ[0] = d.time;
+                    occ[0] = taskStart;
                     occ[1] = occ[0] + taskDur;
                 }
             }
@@ -200,7 +189,6 @@ public class Conclusion extends AbstractPred<Derivation> {
         byte punc = d.concPunc;
         @Nullable ObjectBooleanPair<Term> c3n = Task.tryContent(c2, punc, true);
         if (c3n != null) {
-
 
 
             final Term C = c3n.getOne();
@@ -231,7 +219,6 @@ public class Conclusion extends AbstractPred<Derivation> {
             assert (priority == priority);
 
 
-
             short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
 
             //CONSTRUCT TASK
@@ -242,7 +229,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             t.setPri(priority);
 
-            if (same(t, d.task, d.truthResolution) || (d.belief!=null && same(t, d.belief, d.truthResolution))) {
+            if (same(t, d.task, d.truthResolution) || (d.belief != null && same(t, d.belief, d.truthResolution))) {
                 d.use(Param.TTL_DERIVE_TASK_SAME);
                 return true; //created a duplicate of the task
             }
@@ -279,7 +266,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
                         //((NALTask)parent).merge(derived);
                         parent.priMax(derived.priElseZero());
-                        ((NALTask)parent).merge(derived); //merge cause
+                        ((NALTask) parent).merge(derived); //merge cause
                         return true;
                     }
                 }

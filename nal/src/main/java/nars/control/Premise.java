@@ -129,7 +129,7 @@ public class Premise extends Pri implements ITask {
             //try to temporalize the termlink to match what appears in the task
             try {
                 Temporalize t = new Temporalize();
-                t.knowTerm(task.term(), ETERNAL);
+                t.knowAmbient(task.term());
                 Event bs = t.solve(beliefTerm);
                 if (bs != null && !(bs.term instanceof Bool)) {
                     beliefTerm = bs.term;

@@ -344,7 +344,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
         test
                 .input("(--,on({t002},{t003})). :|:")
                 .inputAt(2, "((--,on({t002},#1)) &&+0 at(SELF,#1)).")
-                .mustBelieve(cycles, "at(SELF,{t003})", 1.0f, 0.43f, 0)
+                .mustBelieve(cycles, "at(SELF,{t003})", 1.0f, 0.22f, 0)
                 .mustNotOutput(cycles, "at(SELF,{t003})", BELIEF, 0, 1f, 0, 1f, ETERNAL);
     }
 

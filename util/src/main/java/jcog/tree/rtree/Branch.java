@@ -312,6 +312,9 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
                 } // else its not the least
 
             }
+            if (bestNode == -1) {
+                throw new RuntimeException("rtree fault");
+            }
             assert(bestNode != -1);
             return bestNode;
         } else {

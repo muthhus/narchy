@@ -40,9 +40,10 @@ abstract public class Executioner implements Executor {
     }
 
     public synchronized void stop() {
-        assert(onClear!=null);
-        onClear.off();
-        onClear = null;
+        if (onClear!=null) {
+            onClear.off();
+            onClear = null;
+        }
     }
 
     protected synchronized void clear() {

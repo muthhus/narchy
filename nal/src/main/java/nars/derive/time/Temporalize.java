@@ -538,19 +538,27 @@ public class Temporalize implements ITemporalize {
 
                     for (int i = 0; i < sss - 1; i++) {
                         Term a = ss.sub(i);
-                        int at = term.subtermTime(a);
+                        int aStart = term.subtermTime(a);
                         //relative to the root of the compound
+                        int aDT = a.dtRange();
 
                         if (tdt != DTERNAL) {
-                            know(a, relative(a, term, at, at + a.dtRange()));
+                            if (superterm instanceof AbsoluteEvent) {
+                                //add direct link to this event by calculating its relative offset to the absolute super event
+                                AbsoluteEvent ase = (AbsoluteEvent) superterm;
+                                long start = ase.start == ETERNAL ? ETERNAL : ase.start + aStart;
+
+                                know(a, new AbsoluteEvent(this, a, start, start + aDT));
+                            }
+                            know(a, relative(a, term, aStart, aStart + aDT));
                             if (i < sss - 1) {
                                 //relative to sibling subterm
                                 Term b = ss.sub(i + 1);
                                 if (!a.equals(b) /*&& !a.containsRecursively(b) && !b.containsRecursively(a)*/) {
                                     int bt = term.subtermTime(b);
-                                    int ba = bt - at;
+                                    int ba = bt - aStart;
                                     know(b, relative(b, a, ba, ba + b.dtRange()));
-                                    know(a, relative(a, b, -ba, -ba + a.dtRange()));
+                                    know(a, relative(a, b, -ba, -ba + aDT));
                                 }
                             }
                         } else {
