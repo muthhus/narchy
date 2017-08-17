@@ -440,7 +440,11 @@ abstract public class PatternCompound extends GenericCompoundDT {
                     return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
 
                 case 1:
-                    return subst.termutes.add(new Choose1(ellipsis, xFree.first(), yFree));
+                    if (yFree.size()==1) {
+                        return subst.putXY(xFree.first(), yFree.first());
+                    } else {
+                        return subst.termutes.add(new Choose1(ellipsis, xFree.first(), yFree));
+                    }
 
                 case 2:
                     return subst.termutes.add(new Choose2(ellipsis, subst, xFree, yFree));
