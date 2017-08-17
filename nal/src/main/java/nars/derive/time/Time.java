@@ -37,7 +37,9 @@ public class Time {
 //                return Unknown;
 //            else {
 
-        if (base != ETERNAL && offset != DTERNAL && offset != XTERNAL)
+        assert(offset!=XTERNAL);
+
+        if (base != ETERNAL && offset != DTERNAL)
             return new Time(base + offset, 0); //direct absolute
         else
             return new Time(base, offset);
@@ -46,17 +48,20 @@ public class Time {
 
     protected Time(long base, int offset) {
         this.base = base;
-        assert( offset!=XTERNAL);
         this.offset = offset;
     }
 
 
     public Time add(int offset) {
 
-        assert(offset!=DTERNAL && offset!=XTERNAL);
+        assert(offset!=XTERNAL);
 
         if (offset == 0)
             return this;
+        if (offset == DTERNAL) {
+            if (this.offset == DTERNAL) return this;
+            else return Time.the(base, DTERNAL);
+        }
 
 //        if (this.offset == DTERNAL && offset == DTERNAL)
 //            return this; //no effect, adding dternal to dternal
@@ -67,8 +72,7 @@ public class Time {
 //        if (this.offset == XTERNAL)
 //            return Time.the(base, offset); //set initial dt
 //        else
-        if (this.offset == DTERNAL)
-            offset = 0; //ignore the offset in eternity
+
 
         return Time.the(base, this.offset + offset);
     }

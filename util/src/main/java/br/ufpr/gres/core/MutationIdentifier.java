@@ -18,11 +18,6 @@ package br.ufpr.gres.core;
 import br.ufpr.gres.core.classpath.ClassName;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 /**
  * Uniquely identifies a mutation
  */

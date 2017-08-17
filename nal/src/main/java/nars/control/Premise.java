@@ -14,6 +14,7 @@ import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
+import nars.index.term.TermIndex;
 import nars.table.BeliefTable;
 import nars.task.ITask;
 import nars.term.InvalidTermException;
@@ -26,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -133,7 +133,21 @@ public class Premise extends Pri implements ITask {
                 Event bs = t.solve(beliefTerm);
                 if (bs != null && !(bs.term instanceof Bool)) {
                     beliefTerm = bs.term;
+
+                    if (!(nar.nal() >= 7 || !beliefTerm.isTemporal())) {
+                        //HACK HACK HACK this is temporary until Temporalize correctly differnetiates between && and &| etc
+                        beliefTerm = nar.terms.retemporalize(beliefTerm, TermIndex.retemporalizeAllToDTERNAL);
+
+//                        Temporalize t2 = new Temporalize();
+//                        t2.knowTerm(task.term(), ETERNAL);
+//                        t2.solve(rawBeliefTerm);
+                        //TEMPORARY for DEBUG
+
+                        //assert (nar.nal() >= 7 || !beliefTerm.isTemporal()) : "non-eternal beliefTerm in premise: " + beliefTerm + " from " + rawBeliefTerm + " to match " + task.term();
+                    }
+
                 }
+
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {
                     logger.error("temporalize failure: {} {} {}", task.term(), beliefTerm, t.getMessage());

@@ -56,14 +56,14 @@ public class TemporalizeTest {
         t.constraints.put(y, new TreeSet(List.of(ya)));
 
         Term z = the("z");
-        RelativeEvent zx = t.newRelative(z, x, 0);
-        RelativeEvent zy = t.newRelative(z, y, 0);
+        RelativeEvent zx = t.relative(z, x, 0);
+        RelativeEvent zy = t.relative(z, y, 0);
         assertEquals(0, zx.compareTo(zx));
         assertEquals(0, zy.compareTo(zy));
 
 
         Term ab = $("(a-->b)");
-        RelativeEvent zab = t.newRelative(z, ab, 0);
+        RelativeEvent zab = t.relative(z, ab, 0);
         assertEquals(-1, zx.compareTo(zab)); //prefer simpler referrents, always
         assertEquals(-1, zy.compareTo(zab)); //prefer simpler referrents, always
 
@@ -88,7 +88,7 @@ public class TemporalizeTest {
         Term y = the("y");
         Event yTmp0 = t.absolute(y, 0, 0);
         Event xEte = t.absolute(x, ETERNAL, ETERNAL);
-        Event xRelY = t.newRelative(x, y, 0);
+        Event xRelY = t.relative(x, y, 0);
         assertEquals(+1, xEte.compareTo(xRelY));
 //        assertEquals(-1, tmp.compareTo(ete));
 //        assertEquals(0, ete.compareTo(ete));
@@ -320,6 +320,7 @@ public class TemporalizeTest {
         assertNotEquals("(a&|b)@ETE", solution.toString());
         assertEquals("(a&&b)@ETE", solution.toString());
     }
+
     @Test
     public void testEternalNotParallel() throws Narsese.NarseseException {
         /*
@@ -338,7 +339,8 @@ public class TemporalizeTest {
         Event solution = t.solve($("((#1-->swimmer) &&+- (#1-->$2))"), h);
         System.out.println(h);
         assertNotNull(solution);
-        assertEquals("((#1-->swimmer)&&(#1-->$2))@ETE", solution.toString());
+        assertEquals("((#1-->swimmer)&&(#1-->$2))@:->(((#1-->swimmer)&&(#1-->$2))==>(swan-->$2))", solution.toString());
+        assertEquals(ETERNAL, solution.start(h).abs());
     }
 
     @Test

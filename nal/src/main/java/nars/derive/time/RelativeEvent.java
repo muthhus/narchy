@@ -13,13 +13,11 @@ public class RelativeEvent extends Event {
     public final int start;
     public final int end;
 
-    public RelativeEvent(ITemporalize t, Term term, Term relativeTo, int start) {
-        this(t, term, relativeTo, start, start + term.dtRange());
-    }
 
-    public RelativeEvent(ITemporalize t, Term term, Term relativeTo, int start, int end) {
+
+    protected RelativeEvent(ITemporalize t, Term term, Term relativeTo, int start, int end) {
         super(t, term);
-        assert(start!=DTERNAL && start!=XTERNAL && end!=DTERNAL && end != XTERNAL);
+        assert(start!=XTERNAL && end != XTERNAL);
         //assert (!term.equals(relativeTo));
         this.rel = relativeTo;
         this.start = start;
@@ -45,6 +43,7 @@ public class RelativeEvent extends Event {
         return resolve(this.start, trail);
     }
 
+
     @Override
     public Time end(Map<Term, Time> trail) {
         return resolve(this.end, trail);
@@ -52,8 +51,6 @@ public class RelativeEvent extends Event {
 
     @Nullable
     private Time resolve(int offset, Map<Term, Time> trail) {
-
-        assert(offset!=DTERNAL);
 
         Event e = t.solve(rel, trail);
         if (e != null) {
@@ -67,7 +64,9 @@ public class RelativeEvent extends Event {
 
     @Override
     public String toString() {
-        if (start != end) {
+        if (start == DTERNAL) {
+            return term + "@:->" + rel;
+        } else if (start != end) {
             return term + "@[" + ITemporalize.timeStr(start) + ".." + ITemporalize.timeStr(end) + "]->" + rel;
         } else {
             return term + "@" + ITemporalize.timeStr(start) + "->" + rel;

@@ -105,7 +105,7 @@ public final class DynTruth implements Truthed {
         }
 
         if (null == (c = TermIndex.retemporalize(c,
-                start == ETERNAL ? TermIndex.retemporalizeDTERNAL : TermIndex.retemporalizeZero
+                start == ETERNAL ? TermIndex.retemporalizeXTERNALToDTERNAL : TermIndex.retemporalizeXTERNALToZero
         )))
             return null;
 

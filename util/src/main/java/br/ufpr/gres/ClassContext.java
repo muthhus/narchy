@@ -16,8 +16,8 @@
 package br.ufpr.gres;
 
 import br.ufpr.gres.core.ConcreteBlockCounter;
-import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.core.MutationIdentifier;
+import br.ufpr.gres.core.MutationInfo;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -2,7 +2,6 @@ package nars.term;
 
 import jcog.Texts;
 import jcog.Util;
-import jcog.data.array.IntComparator;
 import jcog.data.sorted.SortedList;
 import jcog.list.FasterList;
 import nars.Op;
@@ -398,7 +397,7 @@ public enum Terms {
 
     @Nullable
     public static <T extends Term> T normalizedOrNull(@Nullable Term t) {
-        return (T) normalizedOrNull(t, TermIndex.retemporalizeDTERNAL);
+        return (T) normalizedOrNull(t, TermIndex.retemporalizeXTERNALToDTERNAL);
     }
 
     @Nullable

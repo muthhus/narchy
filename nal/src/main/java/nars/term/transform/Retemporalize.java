@@ -28,7 +28,18 @@ abstract public class Retemporalize implements CompoundTransform {
 
     abstract public int dt(@NotNull Term x);
 
+    @Deprecated  public static class RetemporalizeAll extends Retemporalize {
 
+        final int targetDT;
+
+        public RetemporalizeAll(int targetDT) {
+            this.targetDT = targetDT;
+        }
+
+        @Override public int dt(@NotNull Term x) {
+            return targetDT;
+        }
+    }
     @Deprecated  public static class RetemporalizeNonXternal extends Retemporalize {
 
         final int dtIfXternal;

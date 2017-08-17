@@ -226,8 +226,9 @@ public abstract class TermIndex implements TermContext {
     }
 
 
-    public static final Retemporalize retemporalizeDTERNAL = new Retemporalize.RetemporalizeNonXternal(DTERNAL);
-    public static final Retemporalize retemporalizeZero = new Retemporalize.RetemporalizeNonXternal(0);
+    public static final Retemporalize retemporalizeAllToDTERNAL = new Retemporalize.RetemporalizeAll(DTERNAL);
+    public static final Retemporalize retemporalizeXTERNALToDTERNAL = new Retemporalize.RetemporalizeNonXternal(DTERNAL);
+    public static final Retemporalize retemporalizeXTERNALToZero = new Retemporalize.RetemporalizeNonXternal(0);
 
 
 

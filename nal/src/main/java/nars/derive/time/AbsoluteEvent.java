@@ -1,10 +1,12 @@
 package nars.derive.time;
 
 import nars.term.Term;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
+import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 public class AbsoluteEvent extends Event {
@@ -24,9 +26,7 @@ public class AbsoluteEvent extends Event {
 
             //int tdt = term.dtRange();
 
-            if (end == ETERNAL) {
-                end = start;
-            }
+            assert(end!=ETERNAL): "if eternal then start should also be ETERNAL";
 
             long te;
             if (start <= end) {
@@ -51,6 +51,7 @@ public class AbsoluteEvent extends Event {
         return new AbsoluteEvent(t, term.neg(), start, end);
     }
 
+    @NotNull
     @Override
     public Time start(@Nullable Map<Term, Time> ignored) {
 //            if(ignored!=null) {
@@ -62,6 +63,7 @@ public class AbsoluteEvent extends Event {
         return Time.the(start, 0);
     }
 
+    @NotNull
     @Override
     public Time end(Map<Term, Time> ignored) {
 //            int dt = term.dt();

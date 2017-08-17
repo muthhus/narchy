@@ -1,7 +1,5 @@
 package jcog.learn.ql;
 
-import static java.lang.System.out;
-
 /**
  * Deterministic Policy Gradient
  */

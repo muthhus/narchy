@@ -3,18 +3,12 @@ package br.ufpr.gres.util;
 
 import br.ufpr.gres.core.DynamicClassLoader;
 import br.ufpr.gres.core.classpath.ClassDetails;
-
 import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.commons.ClassRemapper;
-import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.SimpleRemapper;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import static org.objectweb.asm.Opcodes.ASM6;
 
 /**
  * Provides functionality to rename references to generated classes, including fully-qualified

@@ -1,11 +1,5 @@
 package jcog.learn.ql;
 
-import org.eclipse.collections.impl.bag.mutable.HashBag;
-import org.eclipse.collections.impl.bag.sorted.mutable.TreeBag;
-import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
-
-import static java.lang.System.out;
-
 /**
  * Created by me on 5/3/16.
  */

@@ -14,7 +14,6 @@ import static nars.time.Tense.ETERNAL;
 
 public interface ITemporalize {
 
-    float score(Term y);
 
 
     /**

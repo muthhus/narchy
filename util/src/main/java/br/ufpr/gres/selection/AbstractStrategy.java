@@ -15,8 +15,8 @@
  */
 package br.ufpr.gres.selection;
 
-import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.core.MutationIdentifier;
+import br.ufpr.gres.core.MutationInfo;
 import br.ufpr.gres.util.comparator.AlphanumComparator;
 
 import java.util.*;
