@@ -58,7 +58,7 @@ public class Time {
 
         if (offset == 0)
             return this;
-        if (offset == DTERNAL) {
+        if (offset == DTERNAL||this.offset==DTERNAL) {
             if (this.offset == DTERNAL) return this;
             else return Time.the(base, DTERNAL);
         }

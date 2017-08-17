@@ -434,7 +434,7 @@ public class Temporalize implements ITemporalize {
             if (dt == XTERNAL) {
 
                 //TODO UNKNOWN TO SOLVE FOR
-                throw new RuntimeException("no unknowns may be added during this phase");
+                //throw new RuntimeException("no unknowns may be added during this phase");
 
             } else if (dt == DTERNAL) {
                 //do not infer any specific temporal relation between the subterms
@@ -486,9 +486,11 @@ public class Temporalize implements ITemporalize {
                         if (rt.op() == CONJ && rtDT != DTERNAL) {
                             //link to the subj term's starting event
                             Term rtEarly = rt.sub(rtDT >= 0 ? 0 : 1);
-                            int relOuter = lastStart - subStart;
-                            know(rtEarly, relative(rtEarly, st, relOuter));
-                            know(st, relative(st, rtEarly, -relOuter));
+                            if (!st.equals(rtEarly)) { //HACK when multiple times can be tracked, this wont apply
+                                int relOuter = lastStart - subStart;
+                                know(rtEarly, relative(rtEarly, st, relOuter));
+                                know(st, relative(st, rtEarly, -relOuter));
+                            }
                         }
 
                         know(rt, relative(rt, st, relInner));

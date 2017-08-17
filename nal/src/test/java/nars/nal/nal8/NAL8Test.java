@@ -99,7 +99,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test
                 .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) && open({t001})))! :|:")
-                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
+                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.81f, 0)
                 .mustNotOutput(cycles, "hold(SELF,{t002})", GOAL, ETERNAL);
     }
 
@@ -634,7 +634,8 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(3, "((a) ==>+3 (b)). :|:")
                 .inputAt(6, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.81f, 6) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustDesire(cycles, "(a)", 1f, 0.81f,
+                        (t)-> t >= 6) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL);
     }
 
@@ -655,7 +656,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(6, "(--,(b))! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.81f, 6) //since b is not desired now, it should reverse predict the goal of (a)
+                .mustDesire(cycles, "(a)", 1f, 0.81f, (t)->t>=6) //since b is not desired now, it should reverse predict the goal of (a)
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
 

@@ -603,7 +603,8 @@ public class NAL8EternalMixTest extends AbstractNALTest {
                 .inputAt(0, "c(x)! :|:")
                 .inputAt(1, "a(x). :|:")
                 .input("((a($x) &&+4 b($x)) ==>-3 c($x)).")
-                .mustDesire(cycles * 2, "b(x)", 1f, 0.73f, 3 /* early since c(x) is alrady active when this gets derived */);
+                .mustDesire(cycles * 2, "b(x)", 1f, 0.73f,
+                        (t)->t>=3 /* early since c(x) is alrady active when this gets derived */);
     }
     @Test
     public void testPredictiveImplicationTemporalEternal() {
