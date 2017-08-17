@@ -152,7 +152,7 @@ public class Derivation extends Unify implements TermContext {
 //        transformsCache = cb.builder();
 
         final Functor substituteIfUnifiesAny = new substituteIfUnifiesAny(this);
-        final Functor substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
+        //final Functor substituteIfUnifiesDep = new substituteIfUnifiesDep(this);
         final Functor polarize = Functor.f2("polarize", (subterm, whichTask) -> {
             Truth compared;
             if (whichTask.equals(PremiseRule.Task)) {
@@ -175,7 +175,6 @@ public class Derivation extends Unify implements TermContext {
 
         derivationFunctors = functors(
                 substituteIfUnifiesAny,
-                substituteIfUnifiesDep,
                 polarize,
                 substitute,
                 nar.get($.the("dropAnyEvent")),

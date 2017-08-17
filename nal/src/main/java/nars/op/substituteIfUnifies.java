@@ -79,21 +79,18 @@ abstract public class substituteIfUnifies extends Functor {
 //    }
 
 
-    @Nullable
-    abstract protected Op unifying();
-
     @NotNull
     @Override
     public Term apply(@NotNull TermContainer a) {
 
         Term input = a.sub(0);
-        if (input instanceof Bool) return Null;
+        if (input == Null) return Null;
 
         Term x = a.sub(1);
-        if (x instanceof Bool) return Null;
+        if (x == Null) return Null;
 
         Term y = a.sub(2);
-        if (y instanceof Bool) return Null;
+        if (y == Null) return Null;
 
         boolean strict = a.subEquals(3, substitute.STRICT);
         if (x.equals(y))
@@ -126,27 +123,19 @@ abstract public class substituteIfUnifies extends Functor {
             super(func, parent);
         }
 
-        @Override
-        public Op unifying() {
-            return null;
-        }
     }
 
-    public static class substituteIfUnifiesDep extends substituteIfUnifies {
+//    public static class substituteIfUnifiesDep extends substituteIfUnifies {
+//
+//        final static Atom func = (Atom) $.the("subIfUnifiesDep");
+//
+//        public substituteIfUnifiesDep(Derivation parent) {
+//            super(func, parent);
+//        }
+//
+//
+//    }
 
-        final static Atom func = (Atom) $.the("subIfUnifiesDep");
-
-        public substituteIfUnifiesDep(Derivation parent) {
-            super(func, parent);
-        }
-
-
-        @NotNull
-        @Override
-        public Op unifying() {
-            return Op.VAR_DEP;
-        }
-    }
 //    public static final class substituteIfUnifiesIndep extends substituteIfUnifies {
 //
 //

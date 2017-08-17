@@ -1,6 +1,5 @@
 package nars.derive;
 
-import nars.$;
 import nars.Op;
 import nars.derive.match.Ellipsis;
 import nars.derive.match.EllipsisMatch;
@@ -14,10 +13,8 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -26,7 +23,7 @@ import static nars.Op.CONJ;
 /**
  * HACK this should extend ProxyTerm or something
  */
-abstract public class PatternCompound extends GenericCompoundDT  {
+abstract public class PatternCompound extends GenericCompoundDT {
 
     final int sizeCached;
     final int structureNecessary;
@@ -44,8 +41,8 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                 //seed.structure() & ~(Op.VariableBits);
                 structure() &
                         ~(Op.VAR_PATTERN.bit
-                            | Op.INH.bit | Op.PROD.bit //? exclude: pattern var, inh and prod (for any functors)
-                );
+                                | Op.INH.bit | Op.PROD.bit //? exclude: pattern var, inh and prod (for any functors)
+                        );
         commutative = super.isCommutative();
         minVolumeNecessary = volume();
         size = size();
@@ -62,16 +59,18 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 //        return structureNecessary;
 //    }
 
-    /** slightly modified from general compound unification */
+    /**
+     * slightly modified from general compound unification
+     */
     @Override
     public boolean unify(@NotNull Term y, @NotNull Unify subst) {
 
         if (
                 op == y.op() &&
-                y.hasAll(structureNecessary) &&
-                size == y.size()
-                //ty.volume() >= minVolumeNecessary
-            ) {
+                        y.hasAll(structureNecessary) &&
+                        size == y.size()
+            //ty.volume() >= minVolumeNecessary
+                ) {
 
             if (op.temporal) {
                 int sdur = subst.dur;
@@ -104,7 +103,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 
     }
 
-    abstract protected static class PatternCompoundWithEllipsis extends PatternCompound  {
+    abstract protected static class PatternCompoundWithEllipsis extends PatternCompound {
 
         @NotNull
         final Ellipsis ellipsis;
@@ -128,7 +127,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
     }
 
 
-    public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis  {
+    public static class PatternCompoundWithEllipsisLinear extends PatternCompoundWithEllipsis {
 
         public PatternCompoundWithEllipsisLinear(@NotNull Op op, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(op, dt, ellipsis, subterms);
@@ -189,10 +188,10 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                         } else {
                             //it is a single ellipsis term to unify against
                             if (!sub(j).unify(eMatched, subst))
-                            j++;
+                                j++;
                         }
                     }
-                        //previous match exists, match against what it had
+                    //previous match exists, match against what it had
 //                        if (i == xsize) {
 //                        //SUFFIX - match the remaining terms against what the ellipsis previously collected
 //                        //HACK this only works with EllipsisMatch type
@@ -329,7 +328,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 //
 //    }
 
-    public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis  {
+    public static final class PatternCompoundWithEllipsisCommutive extends PatternCompoundWithEllipsis {
 
         public PatternCompoundWithEllipsisCommutive(Op op, int dt, @NotNull Ellipsis ellipsis, @NotNull TermContainer subterms) {
             super(op, dt, ellipsis, subterms);
@@ -369,12 +368,10 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 
             SortedSet<Term> xFree = new TreeSet();//$.newHashSet(0); //Global.newHashSet(0);
 
-            //constant terms which have been verified existing in Y and will not need matched
-            Set<Term> alreadyInY = $.newHashSet(0);
 
             final Ellipsis ellipsis = this.ellipsis;
 
-            boolean ellipsisMatched = false;
+            SortedSet<Term> yFree = y.toSortedSet();
 
             int s = size();
             int dir = subst.random.nextBoolean() ? +1 : -1;
@@ -382,7 +379,7 @@ abstract public class PatternCompound extends GenericCompoundDT  {
             for (int k = 0; k < s; k++, ik += dir) {
 
                 //loop
-                if (ik == -1) ik = s-1;
+                if (ik == -1) ik = s - 1;
                 else if (ik == s) ik = 0;
 
                 Term x = sub(ik);
@@ -392,9 +389,9 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                 if (Objects.equals(x, ellipsis))
                     continue;
 
-                Term v = subst.xy(x); //xVar ? getXY(x) : x;
+                Term v = subst.xy(x); //transform could be used here, but shouldnt be necessar if only a variable
 
-                if (v instanceof EllipsisMatch) {
+                /*if (v instanceof EllipsisMatch) {
 
                     //assume it's THE ellipsis here, ie. x == xEllipsis by testing that Y contains all of these
                     if (!((EllipsisMatch) v).addWhileMatching(y, alreadyInY, ellipsis.sizeMin())) {
@@ -406,11 +403,10 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                     }
 
 
-                } else if (v != null) {
+                } else */
+                if (v != null) {
 
-                    if (y.contains(v)) {
-                        alreadyInY.add(v);
-                    } else {
+                    if (!yFree.remove(v)) {
                         //required but not actually present in Y
                         return false;
                     }
@@ -423,29 +419,12 @@ abstract public class PatternCompound extends GenericCompoundDT  {
 
             }
 
-            SortedSet<Term> yFree = y.toSortedSet();
+            int numRemainingForEllipsis = yFree.size() - xFree.size();
 
-            if (ellipsisMatched) {
-                //Xellipsis = null;
-                return alreadyInY.equals(yFree);
-            } else {
+            //if not invalid size there wouldnt be enough remaining matches to satisfy ellipsis cardinality
+            return ellipsis.validSize(numRemainingForEllipsis) &&
+                    matchEllipsisCommutive(subst, xFree, yFree);
 
-                if (!yFree.isEmpty()) {
-                    if (!alreadyInY.isEmpty())
-                        yFree.removeIf(alreadyInY::contains);
-
-                    if (!yFree.isEmpty())
-                        xFree.removeIf(yFree::remove); //eliminated
-                }
-
-                int numRemainingForEllipsis = yFree.size() - xFree.size();
-
-                //if not invalid size there wouldnt be enough remaining matches to satisfy ellipsis cardinality
-                return ellipsis.validSize(numRemainingForEllipsis) &&
-                        matchEllipsisCommutive(subst, xFree, yFree);
-
-
-            }
 
         }
 
@@ -459,23 +438,13 @@ abstract public class PatternCompound extends GenericCompoundDT  {
                 case 0:
                     //match everything
                     return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
-                case 1:
-                    Term theFreeX = xFree.first();
-                    if (yFree.size() == 1)
-                        return subst.putXY(ellipsis, yFree.first());
-                    else {
-                        @Nullable Term theFreeXassigned = subst.xy(theFreeX);
-                        if (theFreeXassigned!=null) {
-                            if (yFree.contains(theFreeXassigned))
-                                return true; //already assigned, do not create a termute loop
-                        }
 
-                        subst.termutes.add(new Choose1(ellipsis, theFreeX, yFree));
-                        return true;
-                    }
+                case 1:
+                    return subst.termutes.add(new Choose1(ellipsis, xFree.first(), yFree));
+
                 case 2:
-                    subst.termutes.add(new Choose2(ellipsis, subst, xFree, yFree));
-                    return true;
+                    return subst.termutes.add(new Choose2(ellipsis, subst, xFree, yFree));
+
                 default:
                     //3 or more combination
                     throw new RuntimeException("unimpl: " + xs + " arity combination unimplemented");

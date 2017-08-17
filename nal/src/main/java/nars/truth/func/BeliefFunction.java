@@ -241,7 +241,6 @@ public enum BeliefFunction implements TruthOperator {
     AnonymousAnalogy() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            if (B == null || T == null) return null;
             return TruthFunctions.anonymousAnalogy(T, B, minConf);
         }
     },

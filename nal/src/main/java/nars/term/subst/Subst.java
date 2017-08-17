@@ -90,7 +90,7 @@ public interface Subst {
 
         if (u instanceof EllipsisMatch) {
 
-            return (!((EllipsisMatch) u).forEachWhile(x -> addTransformed(x, next, filterTrueFalse)));
+            return ((EllipsisMatch) u).forEachWhile(x -> addTransformed(x, next, filterTrueFalse));
 
         } else {
 

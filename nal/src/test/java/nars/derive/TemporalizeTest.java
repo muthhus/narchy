@@ -660,8 +660,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         //              $.63 ((a &&+5 ((--,a)&|b)) &&+5 (--,b)). 1⋈11 %1.0;.81% {6: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImpl(%1),notImpl(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
         Temporalize t = new Temporalize();
 
-        Term x = $("((a &&+5 ((--,a)&|b)) &&+5 (--,b))");
-        assertEquals(10, x.dtRange());
+        Term x = $("((a &&+5 ((--,a)&|b)) &&+5 (--,b))"); assertEquals(10, x.dtRange());
         t.knowTerm(x, 1, 11);
 
         Term a = $("(((--,a)&|b) &&+- a)");

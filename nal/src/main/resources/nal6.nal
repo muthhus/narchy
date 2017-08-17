@@ -204,11 +204,12 @@
 
     //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)
 
-     (&&,X,A..+), Y, task(".") |- subIfUnifiesAny((&&,X,A..+),X,Y,strict), (Belief:AnonymousAnalogy)
-     //(&&,(--,%X),A..+), Y, task(".") |- (--,subIfUnifiesAny((&&,(--,%X),A..+),X,Y,strict)), (Belief:AnonymousAnalogy)
-
-        //TODO add a conj() guard to fast fail
-        //(&&,(--,%X),A..+), X |- (&&,A..+), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+//Anonymous Analogy (NAL5)
+    //originally this only unified depvar (dep var elimination)
+    //due to limitations in ellipsis matching, negation in the 2nd case is handled in the pattern.  this isn't optimal though
+     (&&,X,A..+), Y, task(".") |- subIfUnifiesAny((&&,A..+),X,Y), (Belief:AnonymousAnalogy)
+     (&&,X,A..+), Y, task(".") |- subIfUnifiesAny((&&,A..+),X,(--,%Y)), (Belief:AnonymousAnalogyPN)
+        //this implies that the conjunction contains a negation. that could be added as a precondition to avoid the useless derivation process
 
 
      //((&&,X,A..+) && Z), Z |- (X &&+- Z), (Belief:StructuralDeduction, Goal:StructuralDeduction)

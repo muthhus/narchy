@@ -828,7 +828,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * equality is compared by instance for speed
      */
     @NotNull
-    static Term[] exceptByInstance(@NotNull Term[] input, Term a, @NotNull Term[] output) {
+    static Term[] exceptThe(@NotNull Term[] input, Term a, @NotNull Term[] output) {
 //        int targetLen = input.size() - 1;
 //        if (output.length!= targetLen) {
 //            throw new RuntimeException("wrong size");
@@ -839,8 +839,8 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 output[j++] = x;
         }
 
-        if (j != output.length)
-            throw new RuntimeException("permute underflow");
+        assert(j == output.length):"permute underflow";
+
 
         return output;
     }

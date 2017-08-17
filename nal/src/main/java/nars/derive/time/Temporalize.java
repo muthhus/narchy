@@ -524,8 +524,10 @@ public class Temporalize implements ITemporalize {
         switch (term.op()) {
             case NEG:
                 Term u = term.unneg();
-                SortedSet<Event> m = constraints.computeIfAbsent(u, (t) -> new TreeSet<>());
-                m.add(relative(u, term, 0, term.dtRange()));
+
+
+                know(u, relative(u, superterm, 0));
+
                 break;
             case CONJ:
                 int tdt = term.dt();
