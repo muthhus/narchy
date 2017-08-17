@@ -6,7 +6,6 @@ import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.Op.ATOM;
 import static nars.Op.BOOL;
 import static nars.Op.Null;
 

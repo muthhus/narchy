@@ -18,7 +18,7 @@ public class QueueLock<X> implements Consumer<X> {
     public final Queue<X> queue;
     private final Consumer<X> proc;
 
-    final static int concurrency = Runtime.getRuntime().availableProcessors();
+    //final static int concurrency = Runtime.getRuntime().availableProcessors();
 
     public QueueLock(Consumer<X> procedure) {
         this(new LinkedBlockingQueue(), procedure);

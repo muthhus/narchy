@@ -3,7 +3,6 @@ package nars.experiment.tetris;
 import jcog.data.FloatParam;
 import nars.*;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.op.mental.Abbreviation;
 import nars.term.atom.Atomic;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;

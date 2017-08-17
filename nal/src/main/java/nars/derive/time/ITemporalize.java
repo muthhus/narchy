@@ -1,6 +1,5 @@
 package nars.derive.time;
 
-import nars.Task;
 import nars.control.Derivation;
 import nars.term.Term;
 import nars.term.subst.Subst;

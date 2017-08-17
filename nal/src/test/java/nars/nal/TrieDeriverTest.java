@@ -9,7 +9,6 @@ import nars.control.Premise;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.derive.TrieDeriver;
-import nars.derive.instrument.DebugDerivationPredicate;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
 import nars.term.Term;

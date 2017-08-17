@@ -1351,8 +1351,14 @@ public enum Util {
             Util.sleep(0);
         } else if (previousContiguousPauses < 128) {
             Util.sleep(1);
-        } else {
-            Util.sleep(100);
+        } else if (previousContiguousPauses < 256) {
+            Util.sleep(2);
+        } else if (previousContiguousPauses < 512) {
+            Util.sleep(4);
+        } else if (previousContiguousPauses < 2048) {
+            Util.sleep(16);
+        } else if (previousContiguousPauses < 16384) {
+            Util.sleep(32);
         }
     }
 

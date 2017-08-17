@@ -2,7 +2,6 @@ package nars.nal.nal1;
 
 import nars.*;
 import nars.task.util.TaskStatistics;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.test.DeductiveMeshTest;
 import nars.test.TestNAR;

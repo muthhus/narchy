@@ -5,6 +5,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.function.Supplier;
 
+import static jcog.Texts.n4;
+
 public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {
 
     AbstractPLink(float p) {
@@ -40,7 +42,7 @@ public abstract class AbstractPLink<X> extends Pri implements PriReference<X> {
 
     @Override
     public String toString() {
-        return get() + "=" + pri();
+        return "$" + n4(pri()) + " " + get();
     }
 
 }

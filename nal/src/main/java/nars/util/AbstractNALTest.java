@@ -5,7 +5,6 @@ import nars.NARS;
 import nars.Param;
 import nars.test.TestNAR;
 import org.junit.After;
-import org.junit.jupiter.api.AfterEach;
 
 
 public abstract class AbstractNALTest  {

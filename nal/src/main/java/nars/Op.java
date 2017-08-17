@@ -34,7 +34,6 @@ import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
 import static nars.derive.match.Ellipsis.firstEllipsis;
-import static nars.term.Term.nullIfNull;
 import static nars.term.Terms.flatten;
 import static nars.time.Tense.*;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;

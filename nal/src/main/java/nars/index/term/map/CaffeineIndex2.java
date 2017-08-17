@@ -11,10 +11,8 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.concurrent.Executor;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 

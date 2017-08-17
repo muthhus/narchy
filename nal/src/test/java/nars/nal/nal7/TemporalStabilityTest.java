@@ -8,8 +8,6 @@ import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.Op.CONJ;
-import static nars.Op.IMPL;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 

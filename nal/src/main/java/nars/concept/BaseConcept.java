@@ -13,9 +13,7 @@ import nars.table.QuestionTable;
 import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termlike;
-import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

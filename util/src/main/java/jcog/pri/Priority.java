@@ -126,11 +126,10 @@ public interface Priority extends Prioritized {
         return setPri(toAdd);
     }
 
-//    default float priAddAndGetDelta(float toAdd) {
-//
-//        float before = priElseZero();
-//        return setPri(before + notNaN(toAdd)) - before;
-//    }
+    default float priAddAndGetDelta(float toAdd) {
+        float before = priElseZero();
+        return setPri(before + notNaN(toAdd)) - before;
+    }
 
     default float priSub(float toSubtract) {
         //setPri(priElseZero() - toSubtract);

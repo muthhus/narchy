@@ -7,18 +7,20 @@ import jcog.version.Versioning;
 import nars.Op;
 import nars.Param;
 import nars.derive.constraint.MatchConstraint;
-import nars.derive.match.Ellipsis;
-import nars.derive.match.EllipsisOneOrMore;
 import nars.derive.mutate.Termutator;
 import nars.index.term.NewCompound;
 import nars.term.Term;
-import nars.term.var.*;
+import nars.term.var.AbstractVariable;
+import nars.term.var.CommonVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 import static jcog.data.UnenforcedConcatSet.concat;
 import static nars.Op.Null;

@@ -13,7 +13,6 @@ import com.github.fge.grappa.stack.ArrayValueStack;
 import com.github.fge.grappa.stack.ValueStack;
 import com.github.fge.grappa.support.Var;
 import com.github.fge.grappa.transform.ParserTransformer;
-import com.google.common.collect.Lists;
 import jcog.Texts;
 import jcog.list.FasterList;
 import nars.derive.match.Ellipsis;
@@ -28,7 +27,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;

@@ -1,15 +1,7 @@
 package nars;
 
-import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.learn.ql.DQN;
-import jcog.learn.ql.HaiQ;
-import jcog.learn.ql.HaiQAgent;
-import jcog.math.FirstOrderDifferenceFloat;
-import jcog.math.FloatNormalized;
-import jcog.math.FloatPolarNormalized;
 import jcog.pri.mix.control.MixContRL;
-import nars.control.AgentService;
 import nars.control.Derivation;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
@@ -31,7 +23,6 @@ import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
-import spacegraph.render.Draw;
 import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.meta.WindowButton;
 import spacegraph.widget.meter.MatrixView;

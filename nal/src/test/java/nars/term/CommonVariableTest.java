@@ -1,7 +1,10 @@
 package nars.term;
 
 import nars.Op;
-import nars.term.var.*;
+import nars.term.var.AbstractVariable;
+import nars.term.var.CommonVariable;
+import nars.term.var.UnnormalizedVariable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Assert;
 import org.junit.Ignore;

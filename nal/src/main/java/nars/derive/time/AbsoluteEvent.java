@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
 
 public class AbsoluteEvent extends Event {

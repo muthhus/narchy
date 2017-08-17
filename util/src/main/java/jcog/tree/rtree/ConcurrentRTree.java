@@ -20,6 +20,7 @@ package jcog.tree.rtree;
  * #L%
  */
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.tree.rtree.util.Stats;
 import jcog.util.QueueLock;
 import org.jetbrains.annotations.NotNull;
@@ -46,8 +47,8 @@ public class ConcurrentRTree<T> implements Space<T> {
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
-        toAdd = new QueueLock<>(this::add);
-        toRemove = new QueueLock<>(this::remove);
+        toAdd = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::add);
+        toRemove = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::remove);
     }
 
 
