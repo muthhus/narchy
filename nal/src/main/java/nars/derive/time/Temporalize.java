@@ -493,8 +493,10 @@ public class Temporalize implements ITemporalize {
                             }
                         }
 
-                        know(rt, relative(rt, st, relInner));
-                        know(st, relative(st, rt, -relInner));
+                        if (!rt.equals(st)) {
+                            know(rt, relative(rt, st, relInner));
+                            know(st, relative(st, rt, -relInner));
+                        }
 
 
                     }
@@ -542,7 +544,7 @@ public class Temporalize implements ITemporalize {
                             if (i < sss - 1) {
                                 //relative to sibling subterm
                                 Term b = ss.sub(i + 1);
-                                if (!a.containsRecursively(b) && !b.containsRecursively(a)) {
+                                if (!a.equals(b) /*&& !a.containsRecursively(b) && !b.containsRecursively(a)*/) {
                                     int bt = term.subtermTime(b);
                                     int ba = bt - at;
                                     know(b, relative(b, a, ba, ba + b.dtRange()));
