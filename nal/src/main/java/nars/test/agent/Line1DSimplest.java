@@ -36,6 +36,7 @@ public class Line1DSimplest extends NAgent {
 
     public Line1DSimplest(NAR n) {
         super("", n);
+        
 
 //        in = senseNumber( $.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
 //                this.i
@@ -43,7 +44,7 @@ public class Line1DSimplest extends NAgent {
         in = senseNumber(
                 //$.inh($.the("i"), id),
                 $.the("i"),
-                this.i, 4, ScalarConcepts.Fluid);
+                this.i, 8, ScalarConcepts.Needle);
 
 //        action( new GoalActionConcept($.p($.the("o"), id), nar, (b,d) -> {
 //            if (d!=null) {
@@ -53,7 +54,7 @@ public class Line1DSimplest extends NAgent {
 
         //out = null;
         Term O = //$.inh(Atomic.the("o"), id);
-                $.p("o");
+                $.the("o");
         out = actionTriState(O, (d) -> {
             switch (d) {
                 case -1:

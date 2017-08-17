@@ -29,6 +29,7 @@ public class FZero extends NAgentX {
             try {
                 //n.truthResolution.setValue(0.05f);
                 a = new FZero(n);
+                a.durations.setValue(2f); //2*
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
             }
@@ -57,12 +58,12 @@ public class FZero extends NAgentX {
 //                .resolution(0.05f);
 
 
-        actionBipolar($.inh(the("fwd"), id), (f) -> {
-            fz.vehicleMetrics[0][6] += (f) * 0.5f;
+        actionBipolar($.p(the("fwd"), id), (f) -> {
+            fz.vehicleMetrics[0][6] += (f) * 1.5f;
             return f;
         });//.resolution.setValue(0.02f);
-        actionBipolar($.inh(the("rot"), id), (r) -> {
-            fz.playerAngle += (r) * 0.05f;
+        actionBipolar($.p(the("rot"), id), (r) -> {
+            fz.playerAngle += (r) * 0.15f;
             return r;
         });//.resolution.setValue(0.01f);
 

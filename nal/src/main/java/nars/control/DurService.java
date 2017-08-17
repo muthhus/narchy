@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /** executes approximately once every N durations */
 abstract public class DurService extends CycleService {
 
-    private final MutableFloat durations;
+    public final MutableFloat durations;
     private long now;
 
     public DurService(NAR n, MutableFloat durations) {
