@@ -96,7 +96,10 @@ public class UtilityFunctions   {
 
     //may be more efficient than the for-loop version above, for 2 params
     public static float aveGeo(float a, float b) {
-        if ((a == 0)||(b==0)) return 0; //early result avoiding pow()
+//        float inner = (a*b);
+//        if (inner < Float.MIN_NORMAL) //early test to avoid sqrt()
+//            return 0;
+//        else
         return (float)sqrt(a*b);
     }
 

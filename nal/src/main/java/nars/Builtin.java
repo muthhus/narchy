@@ -177,7 +177,7 @@ public class Builtin {
         /** drops a random contained event, whether at first layer or below */
         nar.on(Functor.f1((Atom) $.the("dropAnyEvent"), (Term t) -> {
             Op oo = t.op();
-            if (!oo.in(CONJ.bit))
+            if (oo!=CONJ)
                 return Null;//returning the original value may cause feedback loop in callees expcting a change in value
 
             int tdt = t.dt();
@@ -209,8 +209,8 @@ public class Builtin {
                 r = Op.conj(ee);
             }
 
-//            if (r instanceof Variable && r.op()!=VAR_DEP)
-//                return Null; //dont allow returning a variable as an event during decomposition HACK TODO make more careful and return the only result if one subterm is a non-returnable variable
+//            if (r instanceof Variable /*&& r.op()!=VAR_DEP*/)
+//                return Null; //HACK dont allow returning a variable as an event during decomposition HACK TODO make more careful and return the only result if one subterm is a non-returnable variable
 
             return r;
         }));

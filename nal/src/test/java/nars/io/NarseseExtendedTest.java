@@ -182,7 +182,17 @@ public class NarseseExtendedTest extends NarseseTest {
     @Test public void testNegationShortHandOnAtomics() throws Narsese.NarseseException {
         assertEquals( "(--,x)", term("--x").toString() );
         assertEquals( "(--,wtf)", term("--wtf").toString() );
+
+        //combined with colon reversed inh
+        assertEquals( "(--,(before-->x))", term("--x:before").toString() );
+
+        assertEquals( "(--,sentence(x))", term("--sentence(x)").toString() );
+
+
+        //( --sentence($a,is,$b) ==> <$a --> $b> )
+
     }
+
     @Test public void testNegation3() throws Narsese.NarseseException {
 
 

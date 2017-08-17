@@ -436,18 +436,20 @@ public class Narsese extends BaseParser<Object> {
         return seq(
                 s(),
                 firstOf(
+
                         QuotedAtom(),
 
                         //negation shorthand
-                        seq(NEG.str, Atom(), push(($.the(pop())).neg())), //needs to be separate because Atom() actually returns a string, not a term. we can fix this later
-                        seq(NEG.str, Term(true,false,true), push(((Term) pop()).neg())),
+                        seq(NEG.str, Term(true,false,true), push(($.the(pop())).neg())),
+
+                        seq(oper, ColonReverseInheritance()),
+
 
                         //TODO match Ellipsis as an optional continuation of the prefix variable that was already parsed.\
                         //popping the pushed value should be all that's needed to do this
                         //and it should reduce the redundancy and need to run Ellipsis first
                         //same for ColonReverseInheritance, just continue and wrap
 
-                        seq(oper, ColonReverseInheritance()),
 
                         seq(meta, Ellipsis()),
 
@@ -464,7 +466,6 @@ public class Narsese extends BaseParser<Object> {
 
                         ),
 
-                        seq(temporal, TemporalRelation()),
 
                         //Functional form of an Operation, ex: operate(p1,p2), TODO move to FunctionalOperationTerm() rule
                         seq(oper,
@@ -487,6 +488,7 @@ public class Narsese extends BaseParser<Object> {
 
                         ),
 
+                        seq(temporal, TemporalRelation()),
 
                         seq(COMPOUND_TERM_OPENER, s(),
                                 firstOf(
@@ -524,7 +526,7 @@ public class Narsese extends BaseParser<Object> {
 
                 ),
 
-                s(),
+                firstOf(eof(),s()),
 
                 //ATOM
                 push((pop()))

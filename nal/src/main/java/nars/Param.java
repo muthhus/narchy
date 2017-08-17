@@ -58,14 +58,15 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 1;
 
     public static PriMerge termlinkMerge = PriMerge.max;
-    public static final PriMerge tasklinkMerge = PriMerge.plus; //not safe to plus without enough headroom
+    public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
-    public static final PriMerge conceptMerge = PriMerge.plus;
     public static final PriMerge premiseMerge = PriMerge.max;
+    public static final PriMerge conceptActivate = PriMerge.plus;
 
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
-            UtilityFunctions::aveAri;
+            //UtilityFunctions::aveAri;
+            UtilityFunctions::aveGeo;
             //Util::or; //potentially explosive
             //Util::and;
             //Math::min;
@@ -78,11 +79,17 @@ public abstract class Param extends Services<Term,NAR> {
                     //4;
                     16;
 
-    /** cost of a termutate call */
+    /** 'time to live', unification steps until unification is stopped */
+    public final MutableInteger matchTTL = new MutableInteger(256);
+
+    /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.2f;
+
+    /** cost of a termutate permutation */
     public static final int TTL_MUTATE = 1;
 
     /** cost of a term unification: should be very small or zero */
-    public static final int TTL_UNIFY = 0;
+    public static final int TTL_UNIFY = 1;
 
     /** cost of attempting a derivation */
     public static final int TTL_DERIVE_EVAL = 1;
@@ -91,10 +98,10 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int TTL_DERIVE_TASK_SUCCESS = 2;
 
     /** cost of a task derived, but too similar to one of its parents */
-    public static final int TTL_DERIVE_TASK_SAME = 1;
+    public static final int TTL_DERIVE_TASK_SAME = 2;
 
     /** cost of a failed/aborted task derivation */
-    public static final int TTL_DERIVE_TASK_FAIL = 1;
+    public static final int TTL_DERIVE_TASK_FAIL = 2;
 
     /** number between 0 and 1 controlling the proportion of activation going
      * forward (compound to subterms) vs. reverse (subterms to parent compound).
@@ -197,12 +204,6 @@ public abstract class Param extends Services<Term,NAR> {
 
     public static final int UnificationVariableCapInitial = 8;
 
-    /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(256);
-    @Deprecated public final int UnificationTTLMax = matchTTL.intValue();
-
-    /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
-    public static final float BELIEF_MATCH_TTL_FRACTION = 0.1f;
 
 
 

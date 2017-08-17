@@ -3,7 +3,6 @@ package nars.exe;
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
-import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
@@ -56,7 +55,7 @@ public class FocusedExecutioner extends Executioner {
             random, MAX_TASKS);
 
     public final Bag concepts =
-            new ConcurrentCurveBag<>(Param.conceptMerge, new ConcurrentHashMap<>(),
+            new ConcurrentCurveBag<>(Param.conceptActivate, new ConcurrentHashMap<>(),
                 random, MAX_CONCEPTS);
             //new DefaultHijackBag(Param.conceptMerge, MAX_CONCEPTS, 3);
 
