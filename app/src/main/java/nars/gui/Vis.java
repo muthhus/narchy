@@ -12,7 +12,7 @@ import nars.NAgent;
 import nars.Task;
 import nars.bag.leak.LeakOut;
 import nars.concept.Concept;
-import nars.exe.FocusedExecutioner;
+import nars.exe.FocusExec;
 import nars.gui.graph.EdgeDirected;
 import nars.gui.graph.run.SimpleConceptGraph1;
 import nars.term.Term;
@@ -236,7 +236,7 @@ public class Vis {
 
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                ((FocusedExecutioner)n.exe).concepts //TODO generalize
+                ((FocusExec)n.exe).concepts //TODO generalize
                 /* TODO */, 128, 256, 2, 7);
 
 

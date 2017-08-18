@@ -44,7 +44,7 @@ public class ActivateTest {
         Activate cf = new Activate(c, 1f);
 
         for (int i = 0; i < 500; i++) {
-            cf.hypothesize(nar).forEach(p -> {
+            cf.run(nar).forEach(p -> {
                 //System.out.println("tasklink=" + tasklink + " termlink=" + termlink);
                 if (p.termLink instanceof Atom)
                     return ; //ignore

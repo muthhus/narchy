@@ -62,7 +62,7 @@ public class ActiveQuestionTask extends NALTask implements Consumer<Task> {
     }
 
     @Override
-    public ITask[] run(@NotNull NAR nar) {
+    public @Nullable Iterable<? extends ITask> run(@NotNull NAR nar) {
         super.run(nar);
         this.random = nar.random();
         this.ttl = nar.matchTTL.intValue();

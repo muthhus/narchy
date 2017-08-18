@@ -8,7 +8,7 @@ import nars.NAR;
 import nars.NARS;
 import nars.concept.Concept;
 import nars.control.Activate;
-import nars.exe.FocusedExecutioner;
+import nars.exe.FocusExec;
 import nars.gui.graph.ConceptSpace;
 import nars.gui.graph.ConceptWidget;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +34,7 @@ public class SimpleUDPeerGraph {
         int population = 256;
 
         SimpleConceptGraph1 s = new SimpleConceptGraph1(n,
-                () -> (((FocusedExecutioner) (n.exe)).concepts)
+                () -> (((FocusExec) (n.exe)).concepts)
                         .stream()
                         .map(x -> x instanceof Activate ? ((Activate) x) : null)
                         .filter(Objects::nonNull)

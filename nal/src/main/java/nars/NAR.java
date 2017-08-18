@@ -19,7 +19,7 @@ import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
 import nars.control.*;
 import nars.derive.PrediTerm;
-import nars.exe.Executioner;
+import nars.exe.Exec;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
 import nars.op.Command;
@@ -94,7 +94,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     static final Set<String> logEvents = Sets.newHashSet("eventTask");
     static final String VERSION = "NARchy v?.?";
 
-    @NotNull public final Executioner exe;
+    @NotNull public final Exec exe;
     @NotNull protected final Random random;
 
     public final transient Topic<NAR> eventClear = new ArrayTopic<>();
@@ -130,6 +130,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     int nal;
 
     protected final NARLoop loop = new NARLoop(this);
+    private PrediTerm<Derivation> deriver;
 
 
     //private final PrediTerm<Derivation> deriver;
@@ -243,7 +244,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public NAR(@NotNull TermIndex terms, @NotNull Executioner exe, @NotNull Time time, @NotNull Random rng, @NotNull ConceptBuilder conceptBuilder, Function<NAR, PrediTerm<Derivation>> deriver) {
+    public NAR(@NotNull TermIndex terms, @NotNull Exec exe, @NotNull Time time, @NotNull Random rng, @NotNull ConceptBuilder conceptBuilder, Function<NAR, PrediTerm<Derivation>> deriver) {
         super(exe);
 
         this.random = rng;
@@ -254,6 +255,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         this.time = time;
         time.clear();
+
+        this.deriver = deriver.apply(this);
 
         this.nal = 8;
 
@@ -600,7 +603,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         ITask y = emotion.onInput(x);
         if (y!=null)
-            exe.run(y);
+            exe.add(y);
     }
 
 
@@ -913,8 +916,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final void cycle() {
 
         time.cycle(this);
-
-        exe.cycle();
 
         if (exe.concurrent())
             eventCycle.emitAsync(this, exe); //async, parallel
@@ -1554,6 +1555,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     public Derivation derivation(PrediTerm<Derivation> deriver) {
         return derivation.get().cycle(deriver);
+    }
+
+    public Premise premise(Task task, Term term, float pri) {
+        return new Premise(task, term, deriver, pri);
     }
 
     /**

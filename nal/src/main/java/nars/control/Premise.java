@@ -4,7 +4,6 @@
  */
 package nars.control;
 
-import jcog.Util;
 import jcog.pri.Pri;
 import nars.NAR;
 import nars.Op;
@@ -12,10 +11,12 @@ import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
+import nars.derive.PrediTerm;
 import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
 import nars.index.term.TermIndex;
 import nars.table.BeliefTable;
+import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
@@ -25,6 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
@@ -46,33 +49,33 @@ public class Premise extends Pri implements ITask {
 
     public final Task taskLink;
     public final Term termLink;
-    private final int hash;
+    private final PrediTerm<Derivation> deriver;
 
-
-    public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri) {
+    public Premise(@Nullable Task tasklink, @Nullable Term termlink, PrediTerm<Derivation> deriver, float pri) {
         super(pri);
         this.taskLink = tasklink;
         this.termLink = termlink;
-        this.hash = Util.hashCombine(tasklink.hashCode(), termlink.hashCode());
+        this.deriver = deriver;
+        //this.hash = Util.hashCombine(tasklink.hashCode(), termlink.hashCode());
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof Premise)) return false;
-        Premise x = (Premise) obj;
-        if (hash != x.hash) return false;
-        return taskLink.equals(((Premise) obj).taskLink) && termLink.equals(((Premise) obj).termLink);
-    }
-
-    @Override
-    public int hashCode() {
-        return hash;
-    }
+//    @Override
+//    public boolean equals(Object obj) {
+//        if (this == obj) return true;
+//        if (!(obj instanceof Premise)) return false;
+//        Premise x = (Premise) obj;
+//        if (hash != x.hash) return false;
+//        return taskLink.equals(((Premise) obj).taskLink) && termLink.equals(((Premise) obj).termLink);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return hash;
+//    }
 
     @Override
     public String toString() {
-        return taskLink + "+" + termLink;
+        return taskLink + "," + termLink + "," + deriver;
     }
 
     /**
@@ -90,7 +93,12 @@ public class Premise extends Pri implements ITask {
      * <p>
      * returns ttl used, -1 if failed before starting
      */
-    public int run(Derivation d, int ttlMax) {
+    @Override
+    public @Nullable Iterable<? extends ITask> run(@NotNull NAR n) {
+
+        int ttlMax = n.matchTTL.intValue(); //TODO adjust this, maybe by priority and other factors
+
+        Derivation d = n.derivation(deriver);
         d.nar.emotion.conceptFirePremises.increment();
 
         //nar.emotion.count("Premise_run");
@@ -98,7 +106,7 @@ public class Premise extends Pri implements ITask {
         Task taskLink = this.taskLink;
         final Task task = taskLink;
         if (task == null)
-            return 0;
+            return null;
 
         NAR nar = d.nar;
 
@@ -111,7 +119,7 @@ public class Premise extends Pri implements ITask {
             taskLink.delete();
             task.delete();
             delete();
-            return 0;
+            return null;
         }
 
 
@@ -197,7 +205,7 @@ public class Premise extends Pri implements ITask {
 //                            } else {
 //
 //                            }
-                long when = whenAnswer(task, now);
+                long when = answerFocus(task, now);
                 match = answerTable.answer(when, now, dur, task, beliefTerm, beliefConcept, nar);
                 if (match != null) {
                     @Nullable Task answered = task.onAnswered(match, nar);
@@ -213,7 +221,7 @@ public class Premise extends Pri implements ITask {
                     }
                 }
             } else {
-                long when = focus(task, now, dur);
+                long when = matchFocus(task, now, dur);
 
                 boolean tryMatch = true;
                 if (beliefIsTask && task.punc() == BELIEF && task.during(when)) {
@@ -248,23 +256,21 @@ public class Premise extends Pri implements ITask {
         }
 
 
-        d.run(this, task, belief, beliefTerm, ttlMax);
-
+        Set<DerivedTask> dd = d.run(this, task, belief, beliefTerm, ttlMax);
+        nar.emotion.taskDerivations.increment(dd.size());
+        return dd;
 
 //        long ds = d.transformsCache.estimatedSize();
 //        if (ds >0)
 //            System.out.println(ds + " " + d.transformsCache.stats());
 
-        int ttlAfter = d.ttl();
-
-        return ttlMax - ttlAfter;
 
     }
 
     /**
      * temporal focus control: determines when a matching belief or answer should be projected to
      */
-    static long focus(Task task, long now, int dur) {
+    static long matchFocus(Task task, long now, int dur) {
         if (now == ETERNAL)
             return ETERNAL;
 
@@ -291,7 +297,7 @@ public class Premise extends Pri implements ITask {
         //now + dur;
     }
 
-    protected static long whenAnswer(Task task, long now) {
+    protected static long answerFocus(Task task, long now) {
         return task.nearestTimeTo(now);
     }
 
@@ -343,9 +349,4 @@ public class Premise extends Pri implements ITask {
 //            return null;
     }
 
-    @Nullable
-    @Override
-    public ITask[] run(@NotNull NAR n) {
-        throw new UnsupportedOperationException();
-    }
 }

@@ -8,7 +8,7 @@ import nars.NARS;
 import nars.Narsese;
 import nars.Param;
 import nars.control.Activate;
-import nars.exe.FocusedExecutioner;
+import nars.exe.FocusExec;
 import nars.gui.NARChart;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;
@@ -103,7 +103,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                () -> (((FocusedExecutioner) (n.exe)).concepts)
+                () -> (((FocusExec) (n.exe)).concepts)
                         .stream()
                         .map(x -> x instanceof Activate ? ((Activate)x) : null)
                         .filter(Objects::nonNull)

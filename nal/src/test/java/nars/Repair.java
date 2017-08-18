@@ -1,7 +1,7 @@
 package nars;
 
 import jcog.pri.op.PriMerge;
-import nars.exe.FocusedExecutioner;
+import nars.exe.FocusExec;
 import nars.nal.nal1.NAL1Test;
 import nars.nal.nal2.NAL2Test;
 import nars.nal.nal3.NAL3Test;
@@ -51,7 +51,7 @@ public class Repair {
 
                                 //.set("cycles", 100)
                                 .call("subCycles", (n, v) -> {
-                                    ((FocusedExecutioner) (n.nar.exe)).subCycles = v;
+                                    ((FocusExec) (n.nar.exe)).subCycles = v;
                                 }, subCycles)
                                 .call("termlinkMerge", (n, v) -> {
                                     Param.termlinkMerge = termlinkMerge;

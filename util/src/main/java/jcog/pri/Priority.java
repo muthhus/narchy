@@ -39,26 +39,19 @@ public interface Priority extends Prioritized {
      */
     float EPSILON = 0.00001f;
 
-    /** ascending order */
-    Comparator<Priority> COMPARATOR = (Priority a, Priority b) -> {
+    /**
+     * decending order (highest first)
+     */
+    Comparator<Priority> IdentityComparator = (Priority a, Priority b) -> {
         if (a == b) return 0;
 
         float ap = a.priElseNeg1();
         float bp = b.priElseNeg1();
-//        if (a.equals(b)) {
-//            a.priMax(bp);
-//            b.priMax(ap); //max merge budgets
-//            return 0;
-//        }
-        int q = Float.compare(ap, bp);
+
+        int q = Float.compare(bp, ap);
         if (q == 0) {
-            //equal priority but different tasks
-            int h = Integer.compare(a.hashCode(), b.hashCode());
-            if (h == 0) {
-                //if still not equal, then use system identiy
-                return Integer.compare(System.identityHashCode(a), System.identityHashCode(b));
-            }
-            return h;
+            //if still not equal, then use system identiy
+            return Integer.compare(System.identityHashCode(a), System.identityHashCode(b));
         }
         return q;
     };
@@ -106,6 +99,7 @@ public interface Priority extends Prioritized {
     default float priMax(float max) {
         return setPri(Math.max(priElseZero(), max));
     }
+
     default void priMin(float min) {
         setPri(Math.min(priElseZero(), min));
     }
@@ -176,7 +170,9 @@ public interface Priority extends Prioritized {
         return excess;
     }
 
-    /** returns overflow */
+    /**
+     * returns overflow
+     */
     default float priAddOverflow(float toAdd) {
         if (Math.abs(toAdd) <= EPSILON) {
             return 0; //no change
@@ -204,7 +200,7 @@ public interface Priority extends Prioritized {
     @NotNull
     default float priMult(float factor) {
         float p = pri();
-        if (p==p)
+        if (p == p)
             return setPri(p * notNaNOrNeg(factor));
         return Float.NaN;
     }
@@ -289,8 +285,8 @@ public interface Priority extends Prioritized {
 
     static <X extends Priority> void normalize(X[] xx, float target) {
         int l = xx.length;
-        assert(target==target);
-        assert(l > 0);
+        assert (target == target);
+        assert (l > 0);
 
         float ss = sum(Priority::priElseZero, xx);
         if (ss <= Pri.EPSILON)

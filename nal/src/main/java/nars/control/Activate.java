@@ -8,6 +8,7 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
+import nars.op.data.flat;
 import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.Term;
@@ -19,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
@@ -32,6 +34,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     static final int TASKLINKS_SAMPLED = 1;
     static final int TERMLINKS_SAMPLED = 2;
+    //private final BiFunction<Task,Term,Premise> premiseBuilder ;
 
 
     public Activate(@NotNull Concept c, float pri) {
@@ -99,12 +102,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     }
 
-    @Override
-    @Deprecated public ITask[] run(NAR nar) {
-        throw new UnsupportedOperationException("use hypothesize method to feedback to callee the premises, not the NAR which could be a super-executioner");
-    }
-
-    public List<Premise> hypothesize(NAR nar) {
+    public List<Premise> run(NAR nar) {
         nar.emotion.conceptFires.increment();
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks().commit();//.normalize(0.1f);
@@ -197,7 +195,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 PriReference<Term> termlink = terml.get(j);
 
                 float pri = Param.tasktermLinkCombine.apply(tasklink.priElseZero(), termlink.priElseZero());
-                premises.add( new Premise(tasklink.get(), termlink.get(), pri) );
+                premises.add( nar.premise(tasklink.get(), termlink.get(), pri ) );
             }
         }
 

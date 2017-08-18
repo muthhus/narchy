@@ -5,8 +5,8 @@ import jcog.pri.mix.control.MixContRL;
 import nars.control.Derivation;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
-import nars.exe.FocusedExecutioner;
-import nars.exe.MultiExecutioner;
+import nars.exe.FocusExec;
+import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
 import nars.op.mental.Inperience;
@@ -123,9 +123,9 @@ abstract public class NAgentX extends NAgent {
         int THREADS = 3;
         NAR n = new NARS()
                 .exe(
-                        new MultiExecutioner((i) ->
-                                new MultiExecutioner.Worker(
-                                        new FocusedExecutioner(deriver)
+                        new MultiExec((i) ->
+                                new MultiExec.Worker(
+                                        new FocusExec()
                                 ), THREADS, 2))
                 .time(clock)
                 .index(

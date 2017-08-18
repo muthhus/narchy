@@ -21,10 +21,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static nars.Op.*;
@@ -892,7 +889,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //    }
 
     @Override
-    default ITask[] run(@NotNull NAR n) {
+    default @Nullable Iterable<? extends ITask> run(@NotNull NAR n) {
 
         n.emotion.busy(priElseZero(), this.volume());
 
@@ -919,7 +916,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                 }
 
 
-                return new Task[]{Command.logTask(n.time(), $.p(x, y))};
+                return Collections.singleton( Command.logTask(n.time(), $.p(x, y)) );
             }
         }
 

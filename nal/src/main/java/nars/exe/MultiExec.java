@@ -2,6 +2,7 @@ package nars.exe;
 
 import jcog.Loop;
 import jcog.Util;
+import jcog.event.On;
 import nars.NAR;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
@@ -10,24 +11,24 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.function.IntFunction;
+import java.util.stream.Stream;
 
 import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 
 /**
  * multithreaded execution system
  */
-public class MultiExecutioner extends Executioner {
+public class MultiExec extends Exec {
 
     private ForkJoinTask lastCycle;
     private final ForkJoinPool passive;
     private final Worker[] workers;
     private final int num;
+    private On onCycle;
 
 
-
-    public MultiExecutioner(IntFunction<Worker> workers, int numWorkers, int passive) {
+    public MultiExec(IntFunction<Worker> workers, int numWorkers, int passive) {
         this(
                 Util.map(0, numWorkers, workers, Worker[]::new),
                 new ForkJoinPool(passive, defaultForkJoinWorkerThreadFactory,
@@ -35,7 +36,7 @@ public class MultiExecutioner extends Executioner {
         );
     }
 
-    public MultiExecutioner(Worker[] workers, ForkJoinPool passive) {
+    public MultiExec(Worker[] workers, ForkJoinPool passive) {
         this.num = workers.length;
         assert (num > 0);
         this.workers = workers;
@@ -52,8 +53,10 @@ public class MultiExecutioner extends Executioner {
         super.start(nar);
 
         for (Worker w : workers) {
-            w.start(nar,0);
+            w.start(nar, 0);
         }
+
+        onCycle = nar.onCycle(this::cycle);
     }
 
     @Override
@@ -63,9 +66,9 @@ public class MultiExecutioner extends Executioner {
 
 
     @Override
-    public void run(@NotNull ITask x) {
+    public void add(@NotNull ITask x) {
         int sub = worker(x);
-        workers[sub].run(x);
+        workers[sub].add(x);
     }
 
     public int worker(@NotNull ITask x) {
@@ -87,12 +90,14 @@ public class MultiExecutioner extends Executioner {
 
         super.stop();
 
+        onCycle.off();
+        onCycle = null;
+
         lastCycle = null;
     }
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
-    @Override
     public void cycle() {
 
 
@@ -145,20 +150,17 @@ public class MultiExecutioner extends Executioner {
     }
 
     @Override
-    public void forEach(Consumer<ITask> each) {
-        for (Worker w : workers) {
-            w.forEach(each);
-        }
+    public Stream<ITask> stream() {
+        return Stream.of(workers).flatMap(Worker::stream);
     }
 
+    public static class Worker extends Exec {
 
-    public static class Worker extends Executioner {
-
-        private final Executioner model;
+        private final Exec model;
         private Executor passive;
         private Loop loop;
 
-        public Worker(Executioner delegate) {
+        public Worker(Exec delegate) {
             super();
             this.model = delegate;
         }
@@ -171,7 +173,7 @@ public class MultiExecutioner extends Executioner {
                 @Override
                 public boolean next() {
                     //System.out.println(Thread.currentThread() + " " + model);
-                    model.cycle();
+                    ((Runnable)model).run(); //HACK
                     return true;
                 }
             };
@@ -193,7 +195,7 @@ public class MultiExecutioner extends Executioner {
 
         @Override
         public synchronized void stop() {
-            if (loop!=null) {
+            if (loop != null) {
                 loop.stop();
                 model.stop();
                 loop = null;
@@ -201,8 +203,8 @@ public class MultiExecutioner extends Executioner {
         }
 
         @Override
-        public void cycle() {
-            throw new UnsupportedOperationException();
+        public Stream<ITask> stream() {
+            return model.stream();
         }
 
         @Override
@@ -210,14 +212,10 @@ public class MultiExecutioner extends Executioner {
             return model.concurrency();
         }
 
-        @Override
-        public void forEach(Consumer<ITask> each) {
-            model.forEach(each);
-        }
 
         @Override
-        public void run(@NotNull ITask input) {
-            model.run(input);
+        public void add(@NotNull ITask input) {
+            model.add(input);
         }
     }
 

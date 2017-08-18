@@ -6,8 +6,8 @@ import nars.concept.builder.DefaultConceptBuilder;
 import nars.control.Derivation;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
-import nars.exe.Executioner;
-import nars.exe.FocusedExecutioner;
+import nars.exe.Exec;
+import nars.exe.FocusExec;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;
@@ -49,7 +49,7 @@ public class NARS {
 
     protected Time time;
 
-    protected Supplier<Executioner> exe;
+    protected Supplier<Exec> exe;
 
     protected Supplier<Random> rng;
 
@@ -71,7 +71,7 @@ public class NARS {
         return this;
     }
 
-    public NARS exe(Executioner exe) {
+    public NARS exe(Exec exe) {
         this.exe = () -> exe;
         return this;
     }
@@ -92,7 +92,7 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = () -> new FocusedExecutioner(deriver);
+        exe = () -> new FocusExec();
                 //new BufferedExecutioner(64, 32, 0.2f);
 
         rng = () -> new XorShift128PlusRandom(1);

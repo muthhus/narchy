@@ -12,25 +12,28 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
-/** controls the relative amount of effort spent in 3 main ways:
+/**
  *
- *      perception
- *         processing input and activating its concepts
- *
- *      hypothesizing
- *         forming premises
- *
- *      proving
- *         exploring the conclusions derived from premises, which arrive as new input
+ * manages low level task scheduling and execution
  *
  */
-abstract public class Executioner implements Executor {
+abstract public class Exec implements Executor {
 
-    @Nullable
     protected NAR nar;
 
     private On onClear;
+
+
+    /** schedules the task for execution but makes no guarantee it will ever actually execute */
+    abstract public void add(@NotNull ITask input);
+
+    /** an estimate or exact number of parallel processes this runs */
+    abstract public int concurrency();
+
+
+    abstract public Stream<ITask> stream();
 
     public synchronized void start(NAR nar) {
         this.nar = nar;
@@ -50,12 +53,11 @@ abstract public class Executioner implements Executor {
 
     }
 
-    /** called each reasoner cycle */
-    abstract public void cycle();
+  /** visits any pending tasks */
+    @Deprecated public final void forEach(Consumer<ITask> each) {
+        stream().forEach(each);
+    }
 
-
-    /** an estimate or exact number of parallel processes this runs */
-    abstract public int concurrency();
 
     /** true if this executioner executes procedures concurrently.
      * in subclasses, if this is true but concurrency()==1, it will use
@@ -64,38 +66,6 @@ abstract public class Executioner implements Executor {
     public boolean concurrent() {
         return concurrency() > 1;
     }
-
-
-    /** visits any pending tasks */
-    abstract public void forEach(Consumer<ITask> each);
-
-
-//    /** default impl: */
-//    public final void run(@NotNull Consumer<NAR> r) {
-//        r.accept(nar);
-//    }
-
-//        if (nar!=null) {
-//            this.run(() -> r.accept(nar));
-//        } else {
-//            throw new RuntimeException("stopped");
-//        }
-
-
-
-
-
-    /** a positive or negative value indicating the percentage difference from the
-     * currently configured CPU usage target to the actual measured CPU usage.
-     *
-     * tasks can use this value to determine runtime parameters.
-     *
-     * if this value is positive then more work is allowed, if negative, less work is allowed.
-     *
-     * @return
-     */
-    //TODO public float throttle() { return 0; }
-
 
 
     @Override
@@ -108,55 +78,47 @@ abstract public class Executioner implements Executor {
     }
 
 
-
-    /** returns whether the input was accepted */
-    abstract public void run(@NotNull ITask input);
-
-    public Loop loop(float fps /* initial */, Runnable repeated) {
-        return new Periodic(fps, repeated);
-    }
-
     public void print(PrintStream out) {
         out.println(this);
     }
 
 
-    public class Periodic extends Loop {
-
-        //private final FloatParam fps = new FloatParam(0);
-        private final Runnable task;
-        final AtomicBoolean busy = new AtomicBoolean(false);
-        private long last;
-
-        public Periodic(float fps, Runnable task) {
-            super(fps);
-            this.task = task;
-            this.last = nar.time();
-        }
-
-        @Override
-        public boolean next() {
-            if (nar.time() <= this.last)
-                return true; //hasn't proceeded to next cycle
-
-            if (!busy.compareAndSet(false, true)) {
-                return true; //black-out, the last frame didnt even finish yet
-            }
-
-            //runLater(()->{
-                try {
-                    last = nar.time();
-                    task.run();
-                } finally {
-                    busy.set(false);
-                }
-            //});
-
-            return true;
-        }
-
-
-    }
+//    public class Periodic extends Loop {
+//
+//        final AtomicBoolean busy = new AtomicBoolean(false);
+//        //private final FloatParam fps = new FloatParam(0);
+//        private final Runnable task;
+//        private long last;
+//
+//        public Periodic(float fps, Runnable task) {
+//            super(fps);
+//            this.task = task;
+//            this.last = nar.time();
+//        }
+//
+//        @Override
+//        public boolean next() {
+//            if (nar.time() <= this.last)
+//                return true; //hasn't proceeded to next cycle
+//
+//            if (!busy.compareAndSet(false, true)) {
+//                return true; //black-out, the last frame didnt even finish yet
+//            }
+//
+//            //runLater(()->{
+//                try {
+//                    last = nar.time();
+//                    task.run();
+//                } finally {
+//                    busy.set(false);
+//                }
+//            //});
+//
+//            return true;
+//        }
+//
+//
+//    }
 
 }
 

@@ -3,27 +3,30 @@ package nars.exe;
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
+import jcog.event.On;
 import jcog.list.FasterList;
+import jcog.pri.Pri;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.control.Activate;
-import nars.control.Derivation;
 import nars.control.Premise;
-import nars.derive.PrediTerm;
 import nars.task.ITask;
 import nars.task.NALTask;
+import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * uses 3 bags/priority queues for a controlled, deterministic
@@ -32,10 +35,8 @@ import java.util.function.Predicate;
  * pending premises
  * activations
  */
-public class FocusedExecutioner extends Executioner {
+public class FocusExec extends Exec implements Runnable {
 
-    private PrediTerm<Derivation> deriver;
-    private final Function<NAR, PrediTerm<Derivation>> deriverBuilder;
 
     public int subCycles = 2;
     final int subCycleConcepts = 3;
@@ -48,28 +49,31 @@ public class FocusedExecutioner extends Executioner {
 
     final Random random = new XorShift128PlusRandom(1);
 
-    final CurveBag<Premise> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
-            new ConcurrentHashMap<>(), random, MAX_PREMISES);
+//    final CurveBag<Premise> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
+//            new ConcurrentHashMap<>(), random, MAX_PREMISES);
+    /** only needs to be a sorted set. concurrency isnt required since it's entirely internal */
+    TreeSet<Premise> premises = new TreeSet(Pri.IdentityComparator);
 
     final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
             random, MAX_TASKS);
 
     public final Bag concepts =
-            new ConcurrentCurveBag<>(Param.conceptActivate, new ConcurrentHashMap<>(),
+            new ConcurrentCurveBag<>(Param.conceptActivate,
+                    //new ConcurrentHashMap<>(),
+                    new ConcurrentHashMapUnsafe<>(),
                 random, MAX_CONCEPTS);
             //new DefaultHijackBag(Param.conceptMerge, MAX_CONCEPTS, 3);
 
 
-    final static Logger logger = LoggerFactory.getLogger(FocusedExecutioner.class);
+    final static Logger logger = LoggerFactory.getLogger(FocusExec.class);
 
     /**
      * temporary buffer for tasks about to be executed
      */
     private final FasterList<ITask> next = new FasterList(1024);
+    @Nullable
+    private On cycle;
 
-    public FocusedExecutioner(Function<NAR, PrediTerm<Derivation>> deriverBuilder) {
-        this.deriverBuilder = deriverBuilder;
-    }
 
     @Override
     protected synchronized void clear() {
@@ -82,11 +86,28 @@ public class FocusedExecutioner extends Executioner {
     @Override
     public synchronized void start(NAR nar) {
         super.start(nar);
-        deriver = deriverBuilder.apply(nar);
+
+        if (synchronous()) {
+            cycle = nar.onCycle(this::run);
+        }
     }
 
     @Override
-    public void cycle() {
+    public synchronized void stop() {
+        if (cycle!=null) {
+            cycle.off();
+            cycle = null;
+        }
+        super.stop();
+    }
+
+    /** if returns true, then each nar cycle will trigger the run method via an event handler */
+    protected boolean synchronous() {
+        return true;
+    }
+
+    /** run an iteration */
+    @Override public void run() {
 
         if (Param.TRACE) {
             System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());
@@ -102,7 +123,6 @@ public class FocusedExecutioner extends Executioner {
         for (int i = 0; i < subCycles; i++) {
 
             tasks.commit();
-            premises.commit();
             concepts.commit();
 
             //if (tasks.capacity() <= tasks.size())
@@ -127,23 +147,22 @@ public class FocusedExecutioner extends Executioner {
 
             execute(next);
 
-
             concepts.sample(subCycleConcepts, (Predicate<ITask>) (next::add));
 
             execute(next);
 
-            premises.pop(subCyclePremises, this::execute);
+            //execute the next set of premises
+            Iterator<Premise> pp = premises.iterator(); //TODO check correct direction
+            for (int p = 0; pp.hasNext() && p < subCyclePremises; p++) {
+                Premise pn = pp.next();
+                pp.remove();
+                execute(pn);
+            }
 
-//            System.out.println("PREMISES");
-//            next.forEach(System.out::println);
-//            System.out.println("/PREMISES");
 
         }
     }
 
-    protected void execute(Premise p) {
-        p.run(nar.derivation(deriver), Math.round(nar.matchTTL.intValue() * (0.5f + 0.5f * p.priElseZero())));
-    }
 
     public void execute(List<ITask> next) {
         if (!next.isEmpty()) {
@@ -154,16 +173,12 @@ public class FocusedExecutioner extends Executioner {
 
     protected void execute(ITask x) {
         try {
-//            if (x.isDeleted())
-//                return;
 
-            if (x instanceof Premise) {
-                throw new UnsupportedOperationException("use execute(Premise)");
-            } else if (x instanceof Activate) {
-                ((Activate) x).hypothesize(nar).forEach(premises::putAsync);
-            } else {
-                x.run(nar);
+            Iterable<? extends ITask> y = x.run(nar);
+            if (y!=null) {
+                y.forEach(this::add);
             }
+
         } catch (UnsupportedOperationException e) {
             e.printStackTrace();
         } catch (Throwable e) {
@@ -183,14 +198,13 @@ public class FocusedExecutioner extends Executioner {
     }
 
     @Override
-    public void forEach(Consumer<ITask> each) {
-        concepts.forEach(each);
-        tasks.forEach(each);
-        premises.forEach(each);
+    public Stream<ITask> stream() {
+        return Stream.concat(Stream.concat(concepts.stream(), premises.stream()), tasks.stream());
     }
 
+
     @Override
-    public void run(@NotNull ITask x) {
+    public void add(@NotNull ITask x) {
         if (x instanceof Task) {
             if (x.isInput())
                 execute(x); //execute immediately
@@ -198,7 +212,13 @@ public class FocusedExecutioner extends Executioner {
                 tasks.putAsync((Task) x); //buffer
 
         } else if (x instanceof Premise) {
-            premises.putAsync((Premise) x);
+
+            premises.add((Premise) x);
+
+            while (premises.size() >= MAX_PREMISES) {
+                premises.pollLast();
+            }
+
         } else if (x instanceof Activate) {
             concepts.putAsync(x);
         } else
