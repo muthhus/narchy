@@ -53,9 +53,9 @@ public class Repair {
                                 .call("subCycles", (n, v) -> {
                                     ((FocusExec) (n.nar.exe)).subCycles = v;
                                 }, subCycles)
-                                .call("termlinkMerge", (n, v) -> {
-                                    Param.termlinkMerge = termlinkMerge;
-                                }, termlinkMerge)
+//                                .call("termlinkMerge", (n, v) -> {
+//                                    Param.termlinkMerge = termlinkMerge;
+//                                }, termlinkMerge)
                                 .call("nar.matchTTL.setValue", ttl)
                                 //.call("nar.termVolumeMax.setValue", termVol)
                                 ;

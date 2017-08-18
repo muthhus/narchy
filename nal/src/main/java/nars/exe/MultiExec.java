@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
@@ -21,11 +22,13 @@ import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFacto
  */
 public class MultiExec extends Exec {
 
-    private ForkJoinTask lastCycle;
+    private static final long LAG_REPORT_THRESH_ms = 0;
+
+    //private ForkJoinTask lastCycle;
     private final ForkJoinPool passive;
     private final Worker[] workers;
     private final int num;
-    private On onCycle;
+    //private On onCycle;
 
 
     public MultiExec(IntFunction<Worker> workers, int numWorkers, int passive) {
@@ -56,7 +59,7 @@ public class MultiExec extends Exec {
             w.start(nar, 0);
         }
 
-        onCycle = nar.onCycle(this::cycle);
+        //onCycle = nar.onCycle(this::cycle);
     }
 
     @Override
@@ -90,54 +93,51 @@ public class MultiExec extends Exec {
 
         super.stop();
 
-        onCycle.off();
-        onCycle = null;
-
-        lastCycle = null;
+//        onCycle.off();
+//        onCycle = null;
+//        lastCycle = null;
     }
 
     final AtomicBoolean busy = new AtomicBoolean(false);
 
-    public void cycle() {
-
-
-//            int waitCycles = 0;
-//            while (!passive.isQuiescent()) {
-//                Util.pauseNext(waitCycles++);
+//    public void cycle() {
+//
+//
+////            int waitCycles = 0;
+////            while (!passive.isQuiescent()) {
+////                Util.pauseNext(waitCycles++);
+////            }
+//
+//        if (!busy.compareAndSet(false, true))
+//            return; //already in the cycle
+//
+//
+//        try {
+//
+//            if (!passive.isQuiescent()) {
+//                long start = System.currentTimeMillis();
+//                int pauseCount = 0;
+//
+//                do {
+//                    Util.pauseNext(pauseCount++);
+//                } while (!passive.isQuiescent());
+//
+//                long lagMS = System.currentTimeMillis() - start;
+//                if (lagMS > LAG_REPORT_THRESH_ms)
+//                    NAR.logger.info("cycle lag {} ms", lagMS);
 //            }
+//
+//        } finally {
+//            busy.set(false);
+//        }
+//    }
 
-        if (!busy.compareAndSet(false, true))
-            return; //already in the cycle
-
-
-        try {
-
-            if (lastCycle != null) {
-                //System.out.println(lastCycle + " " + lastCycle.isDone());
-                if (!lastCycle.isDone()) {
-                    long start = System.currentTimeMillis();
-                    lastCycle.join(); //wait for lastCycle's to finish
-                    NAR.logger.info("cycle lag {}", (System.currentTimeMillis() - start) + "ms");
-                }
-
-                lastCycle.reinitialize();
-                passive.execute(lastCycle);
-
-
-            } else {
-                lastCycle = passive.submit((Runnable) this::run);
-            }
-        } finally {
-            busy.set(false);
-        }
-    }
-
-    /**
-     * dont call directly
-     */
-    void run() {
-        nar.eventCycle.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
-    }
+//    /**
+//     * dont call directly
+//     */
+//    void run() {
+//        nar.eventCycle.emitAsync(nar, passive); //TODO make a variation of this for ForkJoin specifically
+//    }
 
     @Override
     public int concurrency() {

@@ -57,16 +57,16 @@ public abstract class Param extends Services<Term,NAR> {
     /** max time difference (measured in durations) between two non-adjacent/non-overlapping temporal tasks can be interpolated during a derivation */
     public static final int TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS = 1;
 
-    public static PriMerge termlinkMerge = PriMerge.max;
+    public static final PriMerge termlinkMerge = PriMerge.max;
     public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
     public static final PriMerge taskMerge = PriMerge.max;
-    public static final PriMerge premiseMerge = PriMerge.max;
     public static final PriMerge conceptActivate = PriMerge.plus;
+
 
     /** used on premise formation  */
     public static final FloatFloatToFloatFunction tasktermLinkCombine =
-            //UtilityFunctions::aveAri;
-            UtilityFunctions::aveGeo;
+            //UtilityFunctions::aveGeo;
+            UtilityFunctions::aveAri;
             //Util::or; //potentially explosive
             //Util::and;
             //Math::min;

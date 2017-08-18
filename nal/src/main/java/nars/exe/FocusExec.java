@@ -1,5 +1,6 @@
 package nars.exe;
 
+import edu.virginia.cs.skiptree.ConcurrentSkipTreeSet;
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
@@ -20,10 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -51,8 +49,10 @@ public class FocusExec extends Exec implements Runnable {
 
 //    final CurveBag<Premise> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
 //            new ConcurrentHashMap<>(), random, MAX_PREMISES);
-    /** only needs to be a sorted set. concurrency isnt required since it's entirely internal */
-    TreeSet<Premise> premises = new TreeSet(Pri.IdentityComparator);
+    /** only needs to be a sorted set */
+    NavigableSet<Premise> premises =
+            //new TreeSet(Pri.IdentityComparator);
+            new ConcurrentSkipTreeSet(Pri.IdentityComparator);
 
     final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
             random, MAX_TASKS);
@@ -152,10 +152,10 @@ public class FocusExec extends Exec implements Runnable {
             execute(next);
 
             //execute the next set of premises
-            Iterator<Premise> pp = premises.iterator(); //TODO check correct direction
-            for (int p = 0; pp.hasNext() && p < subCyclePremises; p++) {
-                Premise pn = pp.next();
-                pp.remove();
+            for (int p = 0; p < subCyclePremises; p++) {
+                Premise pn = premises.pollFirst();
+                if (pn == null)
+                    break;
                 execute(pn);
             }
 

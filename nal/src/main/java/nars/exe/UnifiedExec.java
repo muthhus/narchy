@@ -21,7 +21,7 @@ import static jcog.bag.Bag.*;
 import static jcog.bag.Bag.BagSample.*;
 
 /** probabalistic continuation kernel */
-public class UnifiedExec<X> extends Exec implements Runnable {
+public class UnifiedExec extends Exec implements Runnable {
 
     /** cpu throttle: 100% = full speed, 0 = paused */
     public final FloatParam cpu = new FloatParam(0.5f, 0f, 1f);
@@ -34,9 +34,6 @@ public class UnifiedExec<X> extends Exec implements Runnable {
 
     Bag<ITask,ITask> plan;
     private PrediTerm<Derivation> deriver;
-
-    public UnifiedExec() {
-    }
 
     @Override
     protected synchronized void clear() {

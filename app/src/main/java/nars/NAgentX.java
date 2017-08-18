@@ -125,7 +125,12 @@ abstract public class NAgentX extends NAgent {
                 .exe(
                         new MultiExec((i) ->
                                 new MultiExec.Worker(
-                                        new FocusExec()
+                                        new FocusExec() {
+                                            //HACK make this a parameter
+                                            @Override protected boolean synchronous() {
+                                                return false;
+                                            }
+                                        }
                                 ), THREADS, 2))
                 .time(clock)
                 .index(

@@ -103,9 +103,7 @@ public class SimpleConceptGraph1 extends DynamicConceptSpace {
 //        );
 
         SimpleConceptGraph1 cs = new SimpleConceptGraph1(n,
-                () -> (((FocusExec) (n.exe)).concepts)
-                        .stream()
-                        .map(x -> x instanceof Activate ? ((Activate)x) : null)
+                () -> n.exe.stream().map(x -> x instanceof Activate ? (Activate)x : null)
                         .filter(Objects::nonNull)
                         .iterator()
                 /* TODO */, 64, 64, 7, 15);
