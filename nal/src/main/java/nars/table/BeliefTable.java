@@ -4,6 +4,7 @@ import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;
+import nars.concept.Concept;
 import nars.control.Cause;
 import nars.task.NALTask;
 import nars.term.Term;
@@ -79,7 +80,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long when, long now, int dur, @NotNull Task question, Term template, BaseConcept beliefConcept, NAR nar) {
+        public Task answer(long when, long now, int dur, @NotNull Task question, Term template, Concept beliefConcept, NAR nar) {
             return null;
         }
 
@@ -205,7 +206,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
     /** projects a match */
-    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Term template, BaseConcept beliefConcept, NAR nar) {
+    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Term template, Concept beliefConcept, NAR nar) {
 
 
         Task answer = match(when, question, question.term(), false, nar);

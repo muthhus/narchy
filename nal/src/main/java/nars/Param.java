@@ -83,7 +83,7 @@ public abstract class Param extends Services<Term,NAR> {
     public final MutableInteger matchTTL = new MutableInteger(256);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
-    public static final float BELIEF_MATCH_TTL_FRACTION = 0.2f;
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.3f;
 
     /** cost of a termutate permutation */
     public static final int TTL_MUTATE = 1;

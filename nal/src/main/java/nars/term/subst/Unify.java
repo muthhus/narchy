@@ -78,7 +78,6 @@ public abstract class Unify extends Versioning implements Subst {
     /**
      * @param type       if null, unifies any variable type.  if non-null, only unifies that type
      * @param random
-     * @param versioning
      */
     protected Unify(@Nullable Op type, Random random, int stackMax, int initialTTL) {
         super(stackMax, initialTTL);
@@ -294,10 +293,7 @@ public abstract class Unify extends Versioning implements Subst {
                 oy == t; //the specified type
     }
 
-
-    final static int CommonVariableBits = Op.or(Op.VAR_DEP, Op.VAR_INDEP, Op.VAR_QUERY);
-
-    public boolean putCommon(AbstractVariable/* var */ x, AbstractVariable y) {
+    public boolean putCommon(AbstractVariable x, AbstractVariable y) {
 
         Term common = CommonVariable.common(x, y);
 
@@ -329,18 +325,8 @@ public abstract class Unify extends Versioning implements Subst {
 
             return xy.tryPut(x, y);
 
-//            if (xy.tryPut(x, y)) {
-////                if (!matchType(x)) {
-////                    //add to free variables to be included in transformation
-////                    Set<Term> knownFree = free.get();
-////                    if (!knownFree.contains(x))
-////                        free.set(concat(knownFree, Set.of(x)));
-////                }
-//                return true;
-//            }
         }
 
-        //return false;
     }
 
     public final int now() {
@@ -391,7 +377,7 @@ public abstract class Unify extends Versioning implements Subst {
         @NotNull
         @Override
         public Versioned newEntry(Term key) {
-            return new ConstrainedVersionedTerm(matchType(key));
+            return new ConstrainedVersionedTerm();
         }
 
         public NewCompound snapshot() {
@@ -408,10 +394,7 @@ public abstract class Unify extends Versioning implements Subst {
 
     final class ConstrainedVersionedTerm extends Versioned<Term> {
 
-        /**
-         * whether this is a for a matched variable type, so when popped we can decrement the assigned count
-         */
-        private final boolean forMatchedType;
+
 
         /**
          * lazyily constructed
@@ -424,9 +407,8 @@ public abstract class Unify extends Versioning implements Subst {
 //         */
 //        Versioned<MatchConstraint> fastConstraints = null;
 
-        ConstrainedVersionedTerm(boolean forMatchedType) {
+        ConstrainedVersionedTerm() {
             super(Unify.this, 1);
-            this.forMatchedType = forMatchedType;
         }
 
 //        @Override

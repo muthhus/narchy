@@ -910,6 +910,7 @@ public enum Op implements $ {
             case "==>":
             case "<=>":
             case "&&":
+            case "*":
                 allowsBool = true;
                 break;
             default:
@@ -1655,7 +1656,7 @@ public enum Op implements $ {
     }
 
     @NotNull
-    public Term the(@NotNull Term... u) {
+    public final Term the(@NotNull Term... u) {
         return the(DTERNAL, u);
     }
 

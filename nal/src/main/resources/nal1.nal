@@ -20,7 +20,7 @@
 
     // the second neqRCom() is to handle the Backward cases until a proper variable transform is implemented for those auto-generated rules
 
-    (A --> B), (B --> C), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong, Permute:Backward)
+    (A --> B), (B --> C), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
         //(B --> C), (A --> B), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
         (A --> C), (B --> C), task("."), neqRCom(A,B)  |- (A --> B), (Punctuation:Question)
     (A --> B), (A --> C), neqRCom(B,C)      |- (C --> B), (Belief:Abduction, Goal:Weak)
@@ -53,3 +53,12 @@
 
 //Conversion
     (P --> S), (S --> P),                               task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief)
+
+//Inheritance to Similarity
+    (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief)
+        //TODO negated subterm variant
+
+//Similarity to Inheritance
+    (S --> P), (S <-> P),                   task("?") |- (S --> P),   (Belief:StructuralIntersection, Punctuation:Belief)
+    (S --> P), (S <-> P),                   task("@") |- (S --> P),   (Goal:StructuralIntersection, Punctuation:Goal)
+

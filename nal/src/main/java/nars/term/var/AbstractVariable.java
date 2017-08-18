@@ -92,7 +92,11 @@ public abstract class AbstractVariable implements Variable {
             }
         }
 
-        return subst.putXY(this, y);
+        if (!subst.matchType(this)) {
+            return false;
+        } else {
+            return subst.putXY(this, y);
+        }
 
 
 //        if (y instanceof Variable) {

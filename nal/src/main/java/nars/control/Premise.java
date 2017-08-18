@@ -6,10 +6,8 @@ package nars.control;
 
 import jcog.pri.Pri;
 import nars.NAR;
-import nars.Op;
 import nars.Param;
 import nars.Task;
-import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.derive.PrediTerm;
 import nars.derive.time.Event;
@@ -21,6 +19,7 @@ import nars.task.ITask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.atom.Bool;
+import nars.term.subst.Unify;
 import nars.term.subst.UnifySubst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -131,13 +130,13 @@ public class Premise extends Pri implements ITask {
 
 
         Term beliefTerm = termLink;
-        Term rawBeliefTerm = beliefTerm;
 
+        Term taskTerm = task.term();
         if (beliefTerm.isTemporal()) {
             //try to temporalize the termlink to match what appears in the task
             try {
                 Temporalize t = new Temporalize();
-                t.knowAmbient(task.term());
+                t.knowAmbient(taskTerm);
                 Event bs = t.solve(beliefTerm);
                 if (bs != null && !(bs.term instanceof Bool)) {
                     beliefTerm = bs.term;
@@ -158,42 +157,51 @@ public class Premise extends Pri implements ITask {
 
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {
-                    logger.error("temporalize failure: {} {} {}", task.term(), beliefTerm, t.getMessage());
+                    logger.error("temporalize failure: {} {} {}", taskTerm, beliefTerm, t.getMessage());
                     //return 0;
                 }
             }
         }
 
-        Concept _beliefConcept = nar.conceptualize(rawBeliefTerm);
-        boolean beliefIsTask = _beliefConcept != null && taskConcept.equals(_beliefConcept);
-
 
         //Terms.equalAtemporally(task.term(), (beliefTerm));
 
-        boolean reUnified = false;
-        if (task.term().varQuery() > 0) {
 
-            int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
+        //if (taskTerm.varQuery() > 0) {
 
-            if (unify(task.term(), beliefTerm, nar, matchTTL)) {
-                reUnified = true;
+
+        boolean beliefConceptCanAnswerTaskConcept = false;
+
+        if (!taskTerm.equals(beliefTerm)) {
+            boolean beliefHasVars = beliefTerm.vars() > 0;
+            if (taskTerm.vars() > 0 || beliefHasVars) {
+                int[] matchTTL = {Math.round(ttlMax * Param.BELIEF_MATCH_TTL_FRACTION)};
+                Unify u = unify(taskTerm, beliefTerm, nar, matchTTL);
+                if (u != null) {
+                    if (beliefHasVars) {
+                        beliefTerm = u.transform(beliefTerm);
+                    }
+                    beliefConceptCanAnswerTaskConcept = true;
+                }
+                assert (matchTTL[0] <= 0);
+                ttlMax += matchTTL[0]; //changed if consumed in match (this value will be negative
             }
-
-            assert (matchTTL[0] <= 0);
-            ttlMax += matchTTL[0]; //changed if consumed in match (this value will be negative
         }
+
 
 
         //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
         Task belief = null;
-        if (_beliefConcept instanceof BaseConcept) { //beliefs/goals will only be in TaskConcepts
+        Concept beliefConcept = nar.concept(beliefTerm);
 
-            BaseConcept beliefConcept = (BaseConcept) _beliefConcept;
 
+        if (beliefConcept != null) { //beliefs/goals will only be in TaskConcepts
+
+            boolean beliefIsTask = beliefConcept.equals(taskConcept);
 
             Task match;
 
-            if (task.isQuestOrQuestion() && (reUnified || beliefIsTask)) {
+            if (task.isQuestOrQuestion() && (beliefIsTask || beliefConceptCanAnswerTaskConcept)) {
                 final BeliefTable answerTable =
                         (task.isGoal() || task.isQuest()) ?
                                 beliefConcept.goals() :
@@ -249,7 +257,7 @@ public class Premise extends Pri implements ITask {
         if (belief != null) {
             if (belief.equals(task)) { //do not repeat the same task for belief
                 belief = null; //force structural transform; also prevents potential inductive feedback loop
-                beliefTerm = task.term(); //use the task's term, which may have temporal information
+                beliefTerm = taskTerm; //use the task's term, which may have temporal information
             } else {
                 beliefTerm = belief.term(); //use the belief's actual possibly-temporalized term
             }
@@ -309,17 +317,16 @@ public class Premise extends Pri implements ITask {
      * sets a negative number in the ttl array, which is to be added to the callee's
      * ttl.  if zero, then no TTL was consumed
      */
-    @Nullable
-    private static boolean unify(@NotNull Term q, @NotNull Term a, NAR nar, int[] ttl) {
+    private static UnifySubst unify(@NotNull Term q, @NotNull Term a, NAR nar, int[] ttl) {
 
         final int startTTL = ttl[0];
         ttl[0] = 0;
 
         if (q.op() != a.op() /*|| q.size() != a.size()*/)
-            return false; //fast-fail: no chance
+            return null; //fast-fail: no chance
 
         final boolean[] result = {false};
-        UnifySubst u = new UnifySubst(Op.VAR_QUERY, nar, (aa) -> {
+        UnifySubst u = new UnifySubst(null /* any var type */, nar, (aa) -> {
 
             result[0] = true;
             return false;
@@ -341,7 +348,10 @@ public class Premise extends Pri implements ITask {
 
         ttl[0] = -(startTTL - u.ttl); //how much consumed
 
-        return result[0];
+        if (result[0])
+            return u;
+        else
+            return null;
 
 //        if (Terms.equal(q, a, false, true /* no need to unneg, task content is already non-negated */))
 //            return q;

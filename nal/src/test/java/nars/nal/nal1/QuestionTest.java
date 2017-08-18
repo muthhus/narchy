@@ -23,7 +23,7 @@ import static org.junit.Assert.assertTrue;
  */
 public class QuestionTest {
 
-    final int withinCycles = 512;
+    final int withinCycles = 64;
 
     @Test
     public void whQuestionUnifyQueryVar() throws Narsese.NarseseException {
@@ -36,7 +36,7 @@ public class QuestionTest {
     }
 
     @Test
-    public void testTemporal() throws Narsese.NarseseException {
+    public void testTemporalExact() throws Narsese.NarseseException {
         testQuestionAnswer(withinCycles,
                 "((a &&+1 b) &&+1 c)",
                 "((a &&+1 b) &&+1 c)",
