@@ -96,7 +96,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * returns subterm automatically casted as compound (Use with caution)
      */
     @Nullable
-    default public <C extends Compound> C cterm(int i) {
+    default <C extends Compound> C cterm(int i) {
         return (C) sub(i);
     }
 
@@ -109,7 +109,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     @Nullable
     default boolean subEquals(int i, @NotNull Term x) {
-        return size() <= i ? false : sub(i).equals(x);
+        return size() > i && sub(i).equals(x);
     }
 
 
@@ -287,7 +287,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     @NotNull
     default boolean recurseTermsToSet(int inStructure, @NotNull Collection<Term> t, boolean addOrRemoved) {
         final boolean[] r = {false};
-        Predicate<Term> selector = (Predicate<Term>) (s) -> {
+        Predicate<Term> selector = (s) -> {
 
             if (!addOrRemoved && r[0]) { //on removal we can exit early
                 return false;
@@ -449,7 +449,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * lead to disaster. by default, it will call 'toArray' which
      * guarantees a clone. override with caution
      */
-    default public Term[] theArray() {
+    default Term[] theArray() {
         return toArray();
     }
 
@@ -457,7 +457,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * an array of the subterms
      * this is meant to be a clone always
      */
-    default public Term[] toArray() {
+    default Term[] toArray() {
         int s = size();
         switch (s) {
             case 0:
@@ -733,7 +733,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * non-zero or non-iternal dt disqualifies any reason for needing a TermSet
      */
-    public static boolean mustSortAndUniquify(@NotNull Op op, int dt, int num) {
+    static boolean mustSortAndUniquify(@NotNull Op op, int dt, int num) {
         return num > 1 && op.commutative && (concurrent(dt));
     }
 
@@ -1020,7 +1020,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
      * match a range of subterms of Y.
      */
     @NotNull
-    default public Term[] toArraySubRange(int from, int to) {
+    default Term[] toArraySubRange(int from, int to) {
         if (from == 0 && to == size()) {
             return toArray();
         } else {

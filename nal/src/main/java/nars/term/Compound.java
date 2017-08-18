@@ -205,7 +205,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @NotNull
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
-        appendTo.add((byte) op().id);
+        appendTo.add(op().id);
         appendTo.add((byte) size());
         forEach(x -> {
             x.structureKey(appendTo);
@@ -737,7 +737,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 if (possibleFunc.op() == ATOM) {
                     Termed ff = index.getIfPresentElse(possibleFunc);
                     if (ff instanceof Functor) {
-                        u = ((Functor) ff).apply(((Compound) possibleArgs).subterms());
+                        u = ((Functor) ff).apply(possibleArgs.subterms());
                         if (u instanceof AbstractPred) {
                             u = $.the(((AbstractPred) u).test(null));
                         } else if (u == null)
@@ -767,7 +767,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    final static Logger logger = LoggerFactory.getLogger(Compound.class);
+    Logger logger = LoggerFactory.getLogger(Compound.class);
 
     @Nullable
     default Term normalize(int varOffset) {

@@ -482,7 +482,7 @@ public class Narsese extends BaseParser<Object> {
                                         MultiArgTerm(PROD, COMPOUND_TERM_CLOSER, false, false)
                                 ),
 
-                                push(INH.the(DTERNAL, (Term) pop(), (Term) $.the(pop())))
+                                push(INH.the(DTERNAL, (Term) pop(), $.the(pop())))
 
                         ),
 
@@ -1245,7 +1245,7 @@ public class Narsese extends BaseParser<Object> {
                                             m
                                     ));
 
-            if ((Float) x[0] == null)  /* do not set, Memory will apply defaults */
+            if (x[0] == null)  /* do not set, Memory will apply defaults */
                 ttt.setPri(m.priorityDefault(punct));
             else
                 ttt.setPri((Float) x[0]);

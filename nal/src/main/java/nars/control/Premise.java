@@ -143,7 +143,7 @@ public class Premise extends Pri implements ITask {
 
                     if (!(nar.nal() >= 7 || !beliefTerm.isTemporal())) {
                         //HACK HACK HACK this is temporary until Temporalize correctly differnetiates between && and &| etc
-                        beliefTerm = nar.terms.retemporalize(beliefTerm, TermIndex.retemporalizeAllToDTERNAL);
+                        beliefTerm = TermIndex.retemporalize(beliefTerm, TermIndex.retemporalizeAllToDTERNAL);
 
 //                        Temporalize t2 = new Temporalize();
 //                        t2.knowTerm(task.term(), ETERNAL);

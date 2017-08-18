@@ -1051,25 +1051,25 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return s != ETERNAL ? end() - s : 0;
     }
 
-    default boolean isFutureOf(long when) {
-        long x = nearestTimeTo(when);
-        return x == ETERNAL || x > when;
-    }
-
-    default boolean isPastOf(long when) {
-        long x = nearestTimeTo(when);
-        return x == ETERNAL || x < when;
-    }
-
-    default boolean isPresentOf(long when) {
-        long x = nearestTimeTo(when);
-        return x == ETERNAL || x == when;
-    }
-
-    default boolean isPresentOf(long when, int dur) {
-        long x = nearestTimeTo(when);
-        return x == ETERNAL || Math.abs(x - when) <= dur;
-    }
+//    default boolean isFutureOf(long when) {
+//        long x = nearestTimeTo(when);
+//        return x == ETERNAL || x > when;
+//    }
+//
+//    default boolean isPastOf(long when) {
+//        long x = nearestTimeTo(when);
+//        return x == ETERNAL || x < when;
+//    }
+//
+//    default boolean isPresentOf(long when) {
+//        long x = nearestTimeTo(when);
+//        return x == ETERNAL || x == when;
+//    }
+//
+//    default boolean isPresentOf(long when, int dur) {
+//        long x = nearestTimeTo(when);
+//        return x == ETERNAL || Math.abs(x - when) <= dur;
+//    }
 
     /**
      * TODO cause should be merged if possible when merging tasks in belief table or otherwise

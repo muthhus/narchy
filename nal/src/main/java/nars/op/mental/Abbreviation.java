@@ -122,7 +122,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
 
         if (vol <= volume.hi()) {
             if (t.conceptual().equals(t) /* identical to its conceptualize */) {
-                Concept abbreviable = (Concept) nar.concept(t);
+                Concept abbreviable = nar.concept(t);
                 if ((abbreviable == null) ||
                         !(abbreviable instanceof PermanentConcept) &&
                                 abbreviable.get(Abbreviation.class) == null) {

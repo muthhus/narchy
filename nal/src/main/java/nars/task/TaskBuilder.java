@@ -99,14 +99,14 @@ import static nars.time.Tense.*;
         super();
         pri = p; //direct set
 
-        this.punc = (byte) punctuation;
+        this.punc = punctuation;
 
         //unwrap top-level negation
         Term tt = term.term();
         if (tt.op() == Op.NEG) {
             Term nt = tt.sub(0);
             if (nt instanceof Compound) {
-                tt = (Compound) nt;
+                tt = nt;
 
                 if (punctuation == Op.BELIEF || punctuation == Op.GOAL)
                     truth = truth.negated();

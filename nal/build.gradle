@@ -1,3 +1,31 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11'
+    }
+}
+
+apply plugin: "info.solidsoft.pitest"
+
+
+pitest {
+
+
+    targetTests = ['nars.nal.nal1.NAL1Test','NAL1MultistepTest']
+    targetClasses = ['nars.control.*']
+
+    jvmArgs = ["-ea"]
+
+    pitestVersion = "1.2.3" //not needed when a default PIT version should be used
+
+    //enableDefaultIncrementalAnalysis = true
+    threads = 4
+    outputFormats = [ 'XML','HTML' ]
+    timestampedReports = false
+}
 description = ''
 dependencies {
     compile project(':util')
@@ -8,7 +36,6 @@ dependencies {
     compile group: 'net.byteseek', name: 'byteseek', version: '2.0.3'
     testCompile group: 'org.openjdk.jmh', name: 'jmh-core', version: '1.19'
     testCompile group: 'org.openjdk.jmh', name: 'jmh-generator-annprocess', version: '1.19'
-
 
 //    compile group: 'org.pitest', name: 'pitest', version: '1.2.2'
 //    testCompile group: 'org.pitest', name: 'pitest-command-line', version: '1.2.2'

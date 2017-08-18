@@ -423,7 +423,7 @@ public class Temporalize implements ITemporalize {
 
             know(x, event);
         } else {
-            know(x, (Event) null);
+            know(x, null);
         }
 
 

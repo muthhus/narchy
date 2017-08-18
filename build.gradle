@@ -1,18 +1,18 @@
-//buildscript {
-//  repositories { jcenter() }
-//  dependencies {
-//    classpath 'com.netflix.nebula:gradle-lint-plugin:latest.release'
-//  }
-//}
+buildscript {
+  repositories {
+      mavenLocal()
+      mavenCentral()
+  }
+}
 
 plugins {
   id 'com.github.ben-manes.versions' version '0.15.0' //dependencyUpdates
 }
 
 
-//tasks.withType(JavaCompile) {
-//   options.incremental = true // one flag, and things will get MUCH faster
-//}
+tasks.withType(JavaCompile) {
+   options.incremental = true // one flag, and things will get MUCH faster
+}
 
 
 

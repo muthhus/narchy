@@ -419,7 +419,7 @@ public enum Terms {
      */
     public static boolean isDisjunction(@NotNull Compound c) {
         if (c.dt() == DTERNAL && c.op() == NEG && c.subIs(0, CONJ)) {
-            return allNegated(((Compound) c.sub(0)).subterms());
+            return allNegated(c.sub(0).subterms());
         }
         return false;
     }
@@ -595,12 +595,12 @@ public enum Terms {
 
     @Nullable
     public static Term subj(@NotNull Termed statement) {
-        return ((TermContainer) statement.term()).sub(0);
+        return statement.term().sub(0);
     }
 
     @Nullable
     public static Term pred(@NotNull Termed statement) {
-        return ((TermContainer) statement.term()).sub(1);
+        return statement.term().sub(1);
     }
 
     @NotNull
@@ -647,9 +647,7 @@ public enum Terms {
 
     public static boolean flattenMatchDT(int candidate, int target) {
         if (candidate == target) return true;
-        if (target == 0 && candidate == DTERNAL)
-            return true; //promote to parallel
-        return false;
+        return target == 0 && candidate == DTERNAL;
     }
 
     public static boolean flatten(@NotNull Op op, int dt, Term x, ObjectByteHashMap<Term> s) {
@@ -667,11 +665,7 @@ public enum Terms {
         Op xo = x.op();
 
         if ((xo == op) && (flattenMatchDT(x.dt(), dt))) {
-            if (!flatten(op, x.subterms(), dt, s)) //recurse
-                return false;
-
-
-            return true;
+            return flatten(op, x.subterms(), dt, s);
 
         } else {
             if (!testCoNegate(x, s))
@@ -717,10 +711,7 @@ public enum Terms {
             polarity = +1;
             t = x;
         }
-        if (s.getIfAbsentPut(t, polarity) != polarity)
-            return false; //CoNegation
-        else
-            return true;
+        return s.getIfAbsentPut(t, polarity) == polarity;
     }
 
     @NotNull
@@ -763,7 +754,7 @@ public enum Terms {
     }
 
     interface SubtermScorer {
-        public int score(Compound superterm, Term subterm);
+        int score(Compound superterm, Term subterm);
     }
 
 }

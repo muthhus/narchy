@@ -325,7 +325,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     public void setSelf(String self) {
-        setSelf((Atom) Atomic.the(self));
+        setSelf(Atomic.the(self));
     }
 
     public void setSelf(Term self) {

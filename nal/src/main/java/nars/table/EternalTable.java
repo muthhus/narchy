@@ -351,9 +351,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
         synchronized (this) {
             int findAgainToBeSure = indexOf(x, this);
-            return (findAgainToBeSure != -1) ?
-                    remove(findAgainToBeSure) != null :
-                    false;
+            return (findAgainToBeSure != -1) && remove(findAgainToBeSure) != null;
         }
 
 
@@ -401,7 +399,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                     input.delete();
 
                     if (activation >= Pri.EPSILON) {
-                        ((NALTask) revised).merge(((NALTask) input));
+                        ((NALTask) revised).merge(input);
                     } else {
                         activated = null; //dont bother activating
                     }

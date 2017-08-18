@@ -139,7 +139,7 @@ public class Derivation extends Unify implements TermContext {
      * if using this, must set: nar, index, random, DerivationBudgeting
      */
     public Derivation(NAR nar) {
-        super(VAR_PATTERN, nar.random(), Param.UnificationStackMax, 0);
+        super(null, nar.random(), Param.UnificationStackMax, 0);
 
         this.nar = nar;
 
