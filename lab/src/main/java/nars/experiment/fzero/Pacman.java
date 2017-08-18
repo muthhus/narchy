@@ -47,7 +47,7 @@ public class Pacman extends NAgentX {
                 }
             }
 
-        actionTriState($.inh(Atomic.the("x"), id), (dh) -> {
+        actionTriState($.p(id, Atomic.the("x")), (dh) -> {
             g.keys[0 /* left */] = false;
             g.keys[1 /* right */] = false;
             switch (dh) {
@@ -60,7 +60,7 @@ public class Pacman extends NAgentX {
             }
         });
 
-       actionTriState($.inh(Atomic.the("y"), id), (dh) -> {
+       actionTriState($.p(id, Atomic.the("y")), (dh) -> {
             g.keys[2 /* up */] = false;
             g.keys[3 /* down */] = false;
             switch (dh) {

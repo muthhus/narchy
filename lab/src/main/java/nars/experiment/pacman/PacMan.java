@@ -13,6 +13,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class PacMan {
 
+	public static final double GHOST_SPEED_SCARED = 0.01;
+	public static final double GHOST_SPEED = 0.02;
+	public static final int UPDATES = -100;
 	int periodMS = 10;
 
 	static final boolean running = true;
@@ -33,7 +36,7 @@ public class PacMan {
 
 	public PacMan() {
 
-		updates = -200;
+		updates = UPDATES;
 		maze = Maze.create(18, 16);
 		player = new Player(maze, maze.playerStart().x, maze.playerStart().y);
 		keys = new boolean[4];
@@ -105,11 +108,11 @@ public class PacMan {
 
 		if(started) {
 
-			if(updates == -199)
+			if(updates == -99)
 				text = "";
-			if(updates == -150)
-				text = "Ready?";
 			if(updates == -50)
+				text = "Ready?";
+			if(updates == -25)
 				text = "";
 
 			updates++;
@@ -183,7 +186,7 @@ public class PacMan {
 							fruitTime = 0;
 
 							resetGhosts();
-							updates = -200;
+							updates = UPDATES;
 							if(player.die())
 								text = "You Lose!";
 

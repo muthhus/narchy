@@ -1209,7 +1209,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 return null;
         }
 
-        Term y = x.term().conceptual();
+        Term y = xt.term().conceptual();
 
         if (y instanceof Bool)
             throw new RuntimeException("failed to find conceptual root of " + y);

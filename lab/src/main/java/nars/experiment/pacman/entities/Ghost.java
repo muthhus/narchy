@@ -1,5 +1,6 @@
 package nars.experiment.pacman.entities;
 
+import nars.experiment.pacman.PacMan;
 import nars.experiment.pacman.maze.Maze;
 import nars.experiment.pacman.maze.Maze.Direction;
 
@@ -12,7 +13,7 @@ public class Ghost extends Entity {
 	public final static double[][] ghostShape = {
 		{0.1, 0.3},{0.2, 0.1}, {0.8, 0.1}, {0.9, .3}, {0.9, 0.9}, {0.8, 0.7}, {0.5, 0.9}, {0.2, 0.7}, {0.1, 0.9}
 	};
-	
+
 	public Color color;
 	public Point target;
 	public boolean free;
@@ -55,9 +56,9 @@ public class Ghost extends Entity {
 			}
 			
 			if(scared)
-				speed = 0.03;
+				speed = PacMan.GHOST_SPEED_SCARED;
 			else
-				speed = 0.04;
+				speed = PacMan.GHOST_SPEED;
 			
 			if( (Math.abs(x - tilex) > 0.8) && (Math.abs(Math.abs(x - Math.floor(x)) - 0.5) > 0.35) ||
 					(Math.abs(y - tiley) > 0.8) && (Math.abs(Math.abs(y - Math.floor(y)) - 0.5) > 0.35) ||
