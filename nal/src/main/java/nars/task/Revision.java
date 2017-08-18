@@ -107,22 +107,22 @@ public class Revision {
 
 
     @NotNull
-    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float curDepth, @NotNull Random rng, boolean mergeOrChoose) {
+    static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, float curDepth, @NotNull Random rng, boolean mergeOrChoose) {
         if (a.equals(b)) {
             return a;
         }
+
         int len = a.size();
         if (len > 0) {
 
             Op ao = a.op();
             Op bo = b.op();
-            boolean sameOp = ao == bo;
-            boolean sameSize = (len == b.size());
+            assert(ao == bo);
 
-            if (sameSize && sameOp) {
+            {
 
                 if (ao.temporal && len == 2) {
-                    return dtMergeTemporal(a, b, aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
+                    return dtMergeTemporal(a, b, aProp, curDepth / 2f, rng, mergeOrChoose);
                 } else {
                     //assert(ca.dt()== cb.dt());
 
@@ -134,7 +134,7 @@ public class Revision {
                         Term as = a.sub(i);
                         Term bs = b.sub(i);
                         if (!as.equals(bs)) {
-                            Term y = intermpolate(as, bs, aProp, accumulatedDifference, curDepth / 2f, rng, mergeOrChoose);
+                            Term y = intermpolate(as, bs, aProp, curDepth / 2f, rng, mergeOrChoose);
                             if (!as.equals(y)) {
                                 change = true;
                                 x[i] = y;
@@ -154,7 +154,7 @@ public class Revision {
     }
 
     @NotNull
-    private static Term dtMergeTemporal(@NotNull Term a, @NotNull Term b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @NotNull Random rng, boolean mergeOrChoose) {
+    private static Term dtMergeTemporal(@NotNull Term a, @NotNull Term b, float aProp, float depth, @NotNull Random rng, boolean mergeOrChoose) {
 
         int adt = a.dt();
 
@@ -198,8 +198,8 @@ public class Revision {
         if (a0.equals(b0) && a1.equals(b1)) {
             return a.dt(dt);
         } else {
-            Term na = intermpolate(a0, b0, aProp, accumulatedDifference, depth, rng, mergeOrChoose);
-            Term nb = intermpolate(a1, b1, aProp, accumulatedDifference, depth, rng, mergeOrChoose);
+            Term na = intermpolate(a0, b0, aProp, depth, rng, mergeOrChoose);
+            Term nb = intermpolate(a1, b1, aProp, depth, rng, mergeOrChoose);
             return a.op().the(dt,
                     na,
                     nb);
@@ -257,7 +257,7 @@ public class Revision {
     }
 
     public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull Random rng, boolean mergeOrChoose) {
-        return intermpolate(a, b, aProp, /* unused: */ new MutableFloat(), 1, rng, mergeOrChoose);
+        return intermpolate(a, b, aProp, 1, rng, mergeOrChoose);
     }
 
     /**
@@ -380,7 +380,7 @@ public class Revision {
                 t = at;
                 i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
             } else {
-                t = intermpolate(at, bt, aProp, new MutableFloat(0), 1f, nar.random(), Param.REVECTION_MERGE_OR_CHOOSE);
+                t = intermpolate(at, bt, aProp,1f, nar.random(), Param.REVECTION_MERGE_OR_CHOOSE);
                 if (!t.conceptual().equals(conceptTerm))
                     continue;
             }
@@ -624,7 +624,7 @@ public class Revision {
 //        throw new RuntimeException("interpolation failure: different or invalid internal structure and can not be compared:\n\t" + a + "\n\t" + b);
 //    }
 //
-//    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, @NotNull MutableFloat accumulatedDifference, float depth, @Nullable Random rng) {
+//    private static int dtCompare(@NotNull Compound a, @NotNull Compound b, float aProp, float depth, @Nullable Random rng) {
 //        int newDT;
 //        int adt = a.dt();
 //        if (adt != b.dt()) {
@@ -737,7 +737,7 @@ public class Revision {
 //    }
 
 //    @NotNull
-//    private static void dtDifference(@NotNull Term a, @NotNull Term b, @NotNull MutableFloat accumulatedDifference, float depth) {
+//    private static void dtDifference(@NotNull Term a, @NotNull Term b, float depth) {
 //        if (a.op() == b.op()) {
 //            if (a.size() == 2 && b.size() == 2) {
 //
