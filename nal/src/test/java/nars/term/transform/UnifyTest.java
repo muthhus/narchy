@@ -21,6 +21,8 @@ import static org.junit.Assert.*;
 
 public class UnifyTest {
 
+    public static final int INITIAL_TTL = 512;
+
     @Test
     public void testFindSubst1() throws Narsese.NarseseException {
         testUnify($.$("<a-->b>"), $.$("<?C-->b>"), true);
@@ -86,7 +88,7 @@ public class UnifyTest {
 
             Unify sub = new Unify(type,
                     new XorShift128PlusRandom(1),
-                    Param.UnificationStackMax, 128) {
+                    Param.UnificationStackMax, INITIAL_TTL) {
 
 
 
@@ -120,7 +122,6 @@ public class UnifyTest {
                         //assertFalse("match found but should not have", true);
                     }
 
-                    setTTL(0);//die
                 }
             };
 
@@ -972,7 +973,7 @@ public class UnifyTest {
                 assertEquals(
                         "(a-->b) (?1-->b) -?>",
                         a + " " + b + " -?>"  /*+ " remaining power"*/);
-                setTTL(0);
+
             }
         };
 

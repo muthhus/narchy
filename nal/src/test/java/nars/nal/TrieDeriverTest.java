@@ -1,9 +1,6 @@
 package nars.nal;
 
-import nars.NAR;
-import nars.NARS;
-import nars.Narsese;
-import nars.Task;
+import nars.*;
 import nars.control.Derivation;
 import nars.control.Premise;
 import nars.derive.Deriver;
@@ -157,7 +154,17 @@ public class TrieDeriverTest {
         assertEquals(0, t2.size());
 
     }
+   @Test
+    public void testConversionWierdness() throws Narsese.NarseseException {
 
+        String[] rules = {
+                "(P --> S), (S --> P), task(\"?\") |- (P --> S),   (Punctuation:Quest)"
+        };
+
+        Set<Task> t1 = testDerivation(rules, "(a-->b)?", "(b-->a)", 64, false);
+        assertEquals(1, t1.size());
+
+    }
     public static Set<Task> testDerivation(String[] rules, String task, String belief, int ttlMax) throws Narsese.NarseseException {
         return testDerivation(rules, task, belief, ttlMax, false);
     }
@@ -168,14 +175,13 @@ public class TrieDeriverTest {
         PrediTerm<Derivation> d = testCompile(n, debug, rules);
                 //.transform(DebugDerivationPredicate::new);
 
-        Derivation der = new Derivation(n).cycle(d);
-
         Set<Task> tasks = new LinkedHashSet();
         n.onTask(tasks::add);
+        n.log();
 
-        new Premise(Narsese.parse().task(task, n), n.term(belief), d, 0.5f).run(n);
-
-        n.run(1);  //to allow input tasks to get processed
+        new Premise(Narsese.parse().task(task, n), n.term(belief), d, 0.5f).run(n).forEach(x ->
+                tasks.add((Task)x)
+        );
 
         return tasks;
     }

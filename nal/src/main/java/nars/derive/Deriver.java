@@ -34,6 +34,7 @@ public interface Deriver {
             case 5:
                 files.add("induction.nal");  //TODO nal6 only needs general induction, not the temporal parts
                 files.add("nal6.nal");
+                files.add("misc.nal"); //TODO split this up
                 //fallthru
             case 4:
             case 3:
@@ -42,7 +43,6 @@ public interface Deriver {
                 files.add("nal2.nal");
                 //fallthru
             case 1:
-                files.add("misc.nal"); //TODO split this up
                 files.add("nal1.nal");
                 break;
             default:

@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static nars.Op.*;
 import static nars.Op.CONJ;
 
 /**
@@ -37,10 +38,10 @@ abstract public class PatternCompound extends GenericCompoundDT {
         this.op = op;
         sizeCached = subterms.size();
         structureNecessary =
-                //seed.structure() & ~(Op.VariableBits);
                 structure() &
-                        ~(Op.VAR_PATTERN.bit
-                                | Op.INH.bit | Op.PROD.bit //? exclude: pattern var, inh and prod (for any functors)
+                          ~(VAR_PATTERN.bit
+                        | (subterms.hasAny(ATOM) ?
+                                  (INH.bit | PROD.bit) : 0) // inh and prod (in case of any contained functors HACK)
                         );
         commutative = super.isCommutative();
         minVolumeNecessary = volume();
@@ -65,9 +66,9 @@ abstract public class PatternCompound extends GenericCompoundDT {
     public boolean unify(@NotNull Term y, @NotNull Unify subst) {
 
         if (
+                y.hasAll(structureNecessary) &&
                 op == y.op() &&
-                        y.hasAll(structureNecessary) &&
-                        size == y.size()
+                size == y.size()
             //ty.volume() >= minVolumeNecessary
                 ) {
 
@@ -83,14 +84,12 @@ abstract public class PatternCompound extends GenericCompoundDT {
             TermContainer ysubs = y.subterms();
 
 
-            //do not do a fast termcontainer test unless it's linear; in commutive mode we want to allow permutations even if they are initially equal
-            if (commutative) return xsubs.unifyCommute(ysubs, subst);
-            else {
-                if (op() == CONJ) { //non-commutive, temporal CONJ
-                    return TermContainer.unifyConj(xsubs, dt(), ysubs, y.dt(), subst);
-                } else {
-                    return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
-                }
+            if (op() == CONJ) { //non-commutive, temporal CONJ
+                return TermContainer.unifyConj(xsubs, dt(), ysubs, y.dt(), subst);
+            } else if (commutative) {
+                return xsubs.unifyCommute(ysubs, subst);
+            } else {
+                return /*xsubs.equals(ysubs) || */xsubs.unifyLinear(ysubs, subst);
             }
 
         } else if (y instanceof AliasConcept.AliasAtom) {
@@ -119,7 +118,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
         @Override
         public final boolean unify(@NotNull Term y, @NotNull Unify subst) {
-            return op() == y.op() && y.hasAll(structureNecessary) && matchEllipsis(y.subterms(), subst);
+            return y.hasAll(structureNecessary) && op() == y.op() && matchEllipsis(y.subterms(), subst);
         }
 
 
@@ -169,7 +168,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
                             if (!ellipsis.validSize(available))
                                 return false;
 
-                            return subst.putXY(ellipsis, EllipsisMatch.match(Y, j, j + available));
+                            return subst.unify(ellipsis, EllipsisMatch.match(Y, j, j + available));
 
                         } else {
                             //PREFIX the ellipsis occurred at the start and there are additional terms following it
@@ -391,8 +390,14 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
                 Term x = sub(k);
 
-                if (x.equals(ellipsis))
+                if (x.equals(ellipsis)) {
+                    Term v = subst.xy(x);
+                    if (v != null) {
+                        return ((EllipsisMatch) v).rematch(y, yFree);
+                    }
+
                     continue;
+                }
 
                 //find (randomly) at least one element of 'y' which unifies with this fixed variable
                 //if one matches, remove it from yFree
@@ -437,8 +442,8 @@ abstract public class PatternCompound extends GenericCompoundDT {
 //
 //                } else {
 
-                    xFixed.add(x);
-       //         }
+                xFixed.add(x);
+                //         }
 
 
             }
@@ -446,7 +451,8 @@ abstract public class PatternCompound extends GenericCompoundDT {
             int numRemainingForEllipsis = yFree.size() - xFixed.size();
 
             //if not invalid size there wouldnt be enough remaining matches to satisfy ellipsis cardinality
-            return ellipsis.validSize(numRemainingForEllipsis) &&
+            return ellipsis.validSize(numRemainingForEllipsis)
+                    &&
                     matchEllipsisCommutive(subst, xFixed, yFree);
 
 
@@ -461,12 +467,12 @@ abstract public class PatternCompound extends GenericCompoundDT {
             switch (xs) {
                 case 0:
                     //match everything
-                    return subst.putXY(ellipsis, EllipsisMatch.match(yFree));
+                    return subst.unify(ellipsis, EllipsisMatch.match(yFree));
 
                 case 1:
                     Term x0 = xFixed.first();
                     if (yFree.size() == 1) {
-                        return subst.unify(x0, yFree.first());
+                        return subst.unify(ellipsis, EllipsisMatch.empty) && subst.unify(x0, yFree.first());
                     } else {
                         return subst.termutes.add(new Choose1(ellipsis, x0, yFree));
                     }

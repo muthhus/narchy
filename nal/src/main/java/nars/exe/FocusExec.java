@@ -41,8 +41,8 @@ public class FocusExec extends Exec implements Runnable {
     final int subCycleTasks = 16;
     final int subCyclePremises = 4;
 
-    final int MAX_PREMISES = 64;
-    final int MAX_TASKS = 64;
+    final int MAX_PREMISES = subCyclePremises + 2;
+    final int MAX_TASKS = subCycleTasks*2;
     final int MAX_CONCEPTS = 64;
 
     final Random random = new XorShift128PlusRandom(1);

@@ -116,18 +116,17 @@ public class EllipsisMatch extends GenericCompound {
     }
 
 
-    public boolean addWhileMatching(@NotNull TermContainer y, @NotNull Collection<Term> target, int min) {
-        int n = 0;
+    public boolean rematch(@NotNull TermContainer y, @NotNull Collection<Term> yFree) {
         @NotNull TermContainer x = subterms();
         int xs = x.size();
         for (int i = 0; i < xs; i++) {
             Term e = x.sub(i);
-            if (!(y.contains(e) && target.add(e))) {
+            //if something in this ellipsis was not present in the matchable subterms
+            //or if something else has matched it
+            if (!y.contains(e) || !yFree.remove(e))
                 return false;
-            }
-            n++;
         }
-        return (n >= min);
+        return true;
     }
 
 

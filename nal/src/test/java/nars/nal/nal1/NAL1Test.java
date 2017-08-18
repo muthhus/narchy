@@ -9,7 +9,7 @@ import org.junit.Test;
 
 public class NAL1Test extends AbstractNALTest {
 
-    final int CYCLES = 10;
+    final int CYCLES = 100;
     static {
         Param.DEBUG = true;
         //Param.TRACE = true;
@@ -115,7 +115,6 @@ public class NAL1Test extends AbstractNALTest {
             .believe("<bird --> animal>")
             .mustOutput(CYCLES, "<animal --> robin>. %1.00;0.4475%");
     }
-
 
     @Test
     public void conversion() throws nars.Narsese.NarseseException {
