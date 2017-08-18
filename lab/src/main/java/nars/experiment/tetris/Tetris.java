@@ -58,7 +58,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
      * @param timePerFall larger is slower gravity
      */
     public Tetris(NAR nar, int width, int height, int timePerFall) throws Narsese.NarseseException {
-        super("tetris", nar);
+        super(nar);
 
         state = new TetrisState(width, height, timePerFall) {
             @Override
@@ -172,7 +172,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
     public void actions(TetrisState state) throws Narsese.NarseseException {
 
 
-        actionTriState($("tetris:x"), (i) -> {
+        actionTriState($("X"), (i) -> {
             switch (i) {
                 case -1:
                     state.take_action(LEFT);
@@ -184,7 +184,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
                     break;
             }
         });
-        actionTriState($("tetris:rotate"), (i) -> {
+        actionTriState($("R"), (i) -> {
             switch (i) {
                 case -1:
                     state.take_action(CCW);

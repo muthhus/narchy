@@ -166,23 +166,23 @@ public class MatchTaskBelief extends AbstractPred<Derivation> {
             //code.add(new MatchTerm.MatchTaskBeliefPair(pattern, initConstraints(constraints)));
 
             if (task.equals(belief)) {
-                code.add(new MatchOneSubterm(task, 0, true));
+                code.add(new UnifyOneSubterm(task, 0, true));
             } else if (taskFirst(task, belief)) {
                 //task first
-                code.add(new MatchOneSubterm(task, 0, false));
-                code.add(new MatchOneSubterm(belief, 1, true));
+                code.add(new UnifyOneSubterm(task, 0, false));
+                code.add(new UnifyOneSubterm(belief, 1, true));
             } else {
                 //belief first
-                code.add(new MatchOneSubterm(belief, 1, false));
-                code.add(new MatchOneSubterm(task, 0, true));
+                code.add(new UnifyOneSubterm(belief, 1, false));
+                code.add(new UnifyOneSubterm(task, 0, true));
             }
 
         } else if (belief!=null) {
             //match belief only
-            code.add(new MatchOneSubterm(belief, 1, true));
+            code.add(new UnifyOneSubterm(belief, 1, true));
         } else if (task!=null) {
             //match task only
-            code.add(new MatchOneSubterm(task, 0, true));
+            code.add(new UnifyOneSubterm(task, 0, true));
         } else {
             throw new RuntimeException("invalid");
         }

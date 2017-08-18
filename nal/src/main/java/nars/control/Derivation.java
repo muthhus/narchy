@@ -243,6 +243,8 @@ public class Derivation extends Unify implements TermContext {
     @NotNull
     public Set<DerivedTask> run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, int ttl) {
 
+        Term bt = beliefTerm.unneg();
+        assert (!(bt instanceof Bool));
 
         revert(0); //revert directly
 
@@ -284,10 +286,6 @@ public class Derivation extends Unify implements TermContext {
         this.belief = belief;
 
 
-        //assert(beliefTerm.op()!=NEG): beliefTerm + " is negated";
-
-        Term bt = beliefTerm.unneg();
-        assert (!(bt instanceof Bool));
 
 //        int ttv = taskTerm.vars();
 //        if (ttv > 0 && bt.vars() > 0) {
@@ -374,7 +372,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * only one thread should be in here at a time
      */
-    public final boolean unifyAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm<Derivation> eachMatch) {
+    public final void unifyAll(@NotNull Term x, @NotNull Term y, @Nullable PrediTerm<Derivation> eachMatch) {
 
         boolean finish = (this.forEachMatch = eachMatch) != null;
 //        if (!finish) {
@@ -390,7 +388,7 @@ public class Derivation extends Unify implements TermContext {
 //                assert (!(t instanceof UnnormalizedVariable));
 //            });
 
-            return unify(x, y, finish) && live();
+            unify(x, y, finish);
         } finally {
             this.forEachMatch = null;
         }

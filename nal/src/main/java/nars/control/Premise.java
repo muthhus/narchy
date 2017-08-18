@@ -144,6 +144,8 @@ public class Premise extends Pri implements ITask {
                     if (!(nar.nal() >= 7 || !beliefTerm.isTemporal())) {
                         //HACK HACK HACK this is temporary until Temporalize correctly differnetiates between && and &| etc
                         beliefTerm = TermIndex.retemporalize(beliefTerm, TermIndex.retemporalizeAllToDTERNAL);
+                        if (beliefTerm instanceof Bool)
+                            return null;
 
 //                        Temporalize t2 = new Temporalize();
 //                        t2.knowTerm(task.term(), ETERNAL);
@@ -180,6 +182,9 @@ public class Premise extends Pri implements ITask {
                 if (u != null) {
                     if (beliefHasVars) {
                         beliefTerm = u.transform(beliefTerm);
+                        if (beliefTerm instanceof Bool)
+                            return null;
+
                     }
                     beliefConceptCanAnswerTaskConcept = true;
                 }

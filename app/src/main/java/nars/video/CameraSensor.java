@@ -75,9 +75,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         };
     }
 
-    private static Int2Function<Compound> RadixProduct(Term root, int width, int height, int radix) {
+    private static Int2Function<Term> RadixProduct(Term root, int width, int height, int radix) {
         return (x, y) ->
-                $.inh(
+                $.p(root,
                         //$.inh(
 
 
@@ -88,9 +88,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                                 //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                                 //new Term[]{coord('x', x, width), coord('y', y, height)} :
                                 $.p(x, y)
-
-                        ,root
-
 
                 )
         ;
@@ -135,13 +132,13 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     }
 
 
-    public List<PixelConcept> encode(Int2Function<Compound> cellTerm, NAR nar) {
+    public List<PixelConcept> encode(Int2Function<Term> cellTerm, NAR nar) {
         List<PixelConcept> l = $.newArrayList();
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
 
                 //TODO support multiple coordinate termizations
-                Compound cell = cellTerm.get(x, y);
+                Term cell = cellTerm.get(x, y);
 
 
                 PixelConcept sss = new PixelConcept(cell, x, y, nar);
@@ -211,7 +208,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //        //private final int x, y;
         //private final TermContainer templates;
 
-        PixelConcept(Compound cell, int x, int y, NAR nar) {
+        PixelConcept(Term cell, int x, int y, NAR nar) {
             super(cell, nar, null, brightnessTruth);
             setSignal(() -> Util.unitize(src.brightness(x, y)));
 

@@ -120,7 +120,9 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         this.now = ETERNAL; //not started
 
         this.happy = new SensorConcept(
-                id == null ? p("happy") : $.inh(Atomic.the("happy"), id),
+                id == null ?
+                        $.the("happy") : //generally happy
+                        p(id, $.the("happy")), //happy in this environment
                 nar,
                 //new FloatPolarNormalized(() -> reward),
                 () -> reward /* -1..+1 */,

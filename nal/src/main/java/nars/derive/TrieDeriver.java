@@ -7,7 +7,7 @@ import nars.NAR;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.op.AbstractPatternOp.PatternOp;
-import nars.derive.op.MatchOneSubterm;
+import nars.derive.op.UnifyOneSubterm;
 import nars.derive.op.UnificationPrototype;
 import nars.derive.rule.PremiseRule;
 import nars.derive.rule.PremiseRuleSet;
@@ -197,8 +197,8 @@ public enum TrieDeriver {
             }
 //            TermTrie.indent(indent);
 //            out.println("}");
-        } else if (p instanceof MatchOneSubterm.UnifySubtermThenConclude) {
-            forEach(((MatchOneSubterm.UnifySubtermThenConclude) p).eachMatch, out);
+        } else if (p instanceof UnifyOneSubterm.UnifySubtermThenConclude) {
+            forEach(((UnifyOneSubterm.UnifySubtermThenConclude) p).eachMatch, out);
         } else {
 
             if (p instanceof UnificationPrototype)

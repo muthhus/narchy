@@ -345,10 +345,10 @@ public interface Term extends Termlike, Comparable<Term> {
      * equlity has already been tested prior to calling this
      *
      * @param y     another term
-     * @param subst the unification context
+     * @param ignored the unification context
      * @return whether unification succeeded
      */
-    default boolean unify(@NotNull Term y, @NotNull Unify subst) {
+    default boolean unify(/*@NotNull */Term y, Unify ignored) {
         return equals(y);
     }
 

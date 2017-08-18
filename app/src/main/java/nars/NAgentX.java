@@ -55,6 +55,10 @@ abstract public class NAgentX extends NAgent {
 
     public final Map<String, CameraSensor> cam = new LinkedHashMap<>();
 
+    public NAgentX(NAR nar) {
+        this("", nar);
+    }
+
     public NAgentX(String id, NAR nar) {
         super(id, nar);
     }

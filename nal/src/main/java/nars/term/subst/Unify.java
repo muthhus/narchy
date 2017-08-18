@@ -12,6 +12,7 @@ import nars.index.term.NewCompound;
 import nars.term.Term;
 import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -24,7 +25,6 @@ import java.util.Set;
 
 import static jcog.data.UnenforcedConcatSet.concat;
 import static nars.Op.Null;
-import static nars.Param.TTL_UNIFY;
 
 
 /* recurses a pair of compound term tree's subterms
@@ -49,7 +49,7 @@ public abstract class Unify extends Versioning implements Subst {
     @NotNull
     public final Random random;
 
-    @NotNull
+    @Nullable
     public final Op type;
 
     @NotNull
@@ -170,7 +170,7 @@ public abstract class Unify extends Versioning implements Subst {
         //assert (unassigned.isEmpty() ) : "non-purposeful unification";
         //this.freeCount.add( newFree.size() );
 
-        if (unify(x, y)) {
+        if (x.unify(y, this)) {
             if (finish) {
                 tryMatches();
             }
@@ -191,7 +191,7 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
 
-    public void tryMatches() {
+    void tryMatches() {
         int ts = termutes.size();
         if (ts > 0) {
 
@@ -255,7 +255,7 @@ public abstract class Unify extends Versioning implements Subst {
 
     }
 
-    final static Comparator<Term[]> matchElementComparator = Comparator.comparing(v -> v[0]);
+    //final static Comparator<Term[]> matchElementComparator = Comparator.comparing(v -> v[0]);
 
 
     @Override
@@ -264,16 +264,8 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
 
-    public final boolean unify(@NotNull Term x, @NotNull Term y) {
-        //for debugging:
-//        if (use(TTL_UNIFY)) {
-//            boolean r = x.unify(y, this);
-//            System.out.println(xy + "\t" + x + " " + y + " ? "+ r);
-//            return r;
-//        }
-//        return false;
-
-        return use(TTL_UNIFY) && x.unify(y, this);
+    @Deprecated  public final boolean unify(Term x, Term y) {
+        return x.unify(y, this);
     }
 
     /**
@@ -319,7 +311,8 @@ public abstract class Unify extends Versioning implements Subst {
 //            if (y0.equals(x))
 //                return true;
 //            else
-                return unify(y0, y);
+
+                return y0.equals(y);// || unify(y0, y);
                 //return unify(y, y0); //cross-over
         } else /*if (matchType(x0))*/ {
 

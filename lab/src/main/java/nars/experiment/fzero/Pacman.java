@@ -11,9 +11,7 @@ import nars.video.BufferedImageBitmap2D;
 import nars.video.Scale;
 import nars.video.SwingBitmap2D;
 
-/**
- * Created by me on 4/30/17.
- */
+
 public class Pacman extends NAgentX {
 
     private final PacMan g;
