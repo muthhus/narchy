@@ -17,23 +17,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.stream.Stream;
 
-import static jcog.bag.Bag.*;
+import static jcog.bag.Bag.BagSample;
 import static jcog.bag.Bag.BagSample.*;
 
-/** probabalistic continuation kernel */
-public class UnifiedExec extends Exec implements Runnable {
+/**
+ * probabalistic continuation kernel
+ */
+public class UnifiedExec extends Exec {
 
-    /** cpu throttle: 100% = full speed, 0 = paused */
-    public final FloatParam cpu = new FloatParam(0.5f, 0f, 1f);
+    Bag<ITask, ITask> plan;
 
-    /** fundamental frequency; context period */
-    static int cycleMS = 50;
-    private long nextCycle;
-    private Thread thread;
-
-
-    Bag<ITask,ITask> plan;
-    private PrediTerm<Derivation> deriver;
+    int workRemaining = 0;
 
     @Override
     protected synchronized void clear() {
@@ -45,44 +39,6 @@ public class UnifiedExec extends Exec implements Runnable {
         plan.put(input);
     }
 
-
-    public void run() {
-
-        try {
-            //long idleSince = ETERNAL;
-            int idleCount = -1;
-            while (true) {
-
-                if (plan.isEmpty()) {
-                    if (idleCount == -1) {
-                        //idleSince = System.currentTimeMillis();
-                        idleCount = 0;
-                    } else {
-                        idleCount++;
-                    }
-                    Util.pauseNext(idleCount);
-                } else {
-                    idleCount = -1;
-
-                    int awakeTime = (int) (cycleMS * cpu.asFloat());
-                    if (awakeTime > 0) {
-                        nextCycle = System.currentTimeMillis() + awakeTime;
-                        plan.commit().sample(this::exec);
-                    }
-                    int sleepTime = (int) (cycleMS * (1f - cpu.asFloat()));
-                    if (sleepTime > 0) {
-                        Util.stall(sleepTime);
-                    }
-                }
-
-
-            }
-        } catch (Exception stopped) {
-
-        } finally {
-
-        }
-    }
 
     public static final Logger logger = LoggerFactory.getLogger(UnifiedExec.class);
 
@@ -103,28 +59,28 @@ public class UnifiedExec extends Exec implements Runnable {
             keep = true;
         }
 
-        if (System.currentTimeMillis() > nextCycle)
+        if (done())
             return keep ? Stop : RemoveAndStop;
         else
             return keep ? Next : Remove;
+    }
+
+    private boolean done() {
+        //realtime: System.currentTimeMillis() > nextCycle
+
+        //iterative:
+        return --workRemaining > 0;
     }
 
     @Override
     public synchronized void start(NAR nar) {
         super.start(nar);
         plan = new ConcurrentCurveBag(PriMerge.plus, new ConcurrentHashMapUnsafe<>(1024), nar.random(), 1024);
-
-        deriver = Deriver.newDeriver(8).apply(nar);
-
-        thread = new Thread(this);
-        thread.start();
     }
 
     @Override
     public synchronized void stop() {
-        if (thread!=null) {
-            thread.interrupt();
-            thread = null;
+        if (plan != null) {
             plan.clear();
             plan = null;
         }
@@ -166,8 +122,6 @@ public class UnifiedExec extends Exec implements Runnable {
 //        }
 //
 //    }
-
-
 
 
 }

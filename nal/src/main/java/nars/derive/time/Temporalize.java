@@ -122,12 +122,12 @@ public class Temporalize implements ITemporalize {
             //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
             //uneternalize/retemporalize:
 
-            if (/*(e.term.op() != IMPL) && */
-                    (task.op() == IMPL) && (belief == null || d.beliefTerm.op() == IMPL)) {
-                //dont retemporalize a non-implication derived from two implications
-                //it means that the timing is unknown
-                return null;
-            }
+//            if (/*(e.term.op() != IMPL) && */
+//                    (task.op() == IMPL) && (belief == null || d.beliefTerm.op() == IMPL)) {
+//                //dont retemporalize a non-implication derived from two implications
+//                //it means that the timing is unknown
+//                return null;
+//            }
 
             long ts = task.start();
             long k;
@@ -679,24 +679,38 @@ public class Temporalize implements ITemporalize {
                 assert (tts > 1);
 
 
+                boolean has0 = false;
+                boolean hasEte = false;
+                for (Term y : constraints.keySet()) {
+                    if (y.op() == x.op()) {
+                        switch (y.dt()) {
+                            case 0: has0 = true; break;
+                            case DTERNAL: hasEte = true; break;
+                        }
+                    }
+                }
                 {
                     /* test for the exact appearance of temporalized form present in constraints */
-                    @NotNull Term xEte = x.dt(DTERNAL);
-                    if (!(xEte instanceof Bool) && constraints.get(xEte) != null) {
-                        Event ds = solve(xEte, trail);
-                        if (ds != null) {
-                            return relative(xEte, ds, DTERNAL);
+                    if (hasEte) { //quick test filter
+                        @NotNull Term xEte = x.dt(DTERNAL);
+                        if (!(xEte instanceof Bool) && constraints.get(xEte) != null) {
+                            Event ds = solve(xEte, trail);
+                            if (ds != null) {
+                                return relative(xEte, ds, DTERNAL);
+                            }
                         }
                     }
                 }
 
                 {
                     /* test for the exact appearance of temporalized form present in constraints */
-                    @NotNull Term xPar = x.dt(0);
-                    if (!(xPar instanceof Bool) && constraints.get(xPar) != null) {
-                        Event ds = solve(xPar, trail);
-                        if (ds != null)
-                            return relative(xPar, ds, 0);
+                    if (has0) { //quick test filter
+                        @NotNull Term xPar = x.dt(0);
+                        if (!(xPar instanceof Bool) && constraints.get(xPar) != null) {
+                            Event ds = solve(xPar, trail);
+                            if (ds != null)
+                                return relative(xPar, ds, 0);
+                        }
                     }
                 }
 

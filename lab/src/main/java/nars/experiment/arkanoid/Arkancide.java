@@ -83,7 +83,7 @@ public class Arkancide extends NAgentX {
 
 
     public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
-        super((Atomic.the("noid")), nar);
+        super(nar);
 
         //nar.derivedEvidenceGain.setValue(1f);
 
@@ -116,10 +116,10 @@ public class Arkancide extends NAgentX {
 
 
         if (numeric) {
-            SensorConcept a = senseNumber("noid:px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
-            SensorConcept ab = senseNumber("noid:dx", (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
-            SensorConcept b = senseNumber("noid:bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
-            SensorConcept c = senseNumber("noid:by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
+            SensorConcept a = senseNumber("px", (() -> noid.paddle.x / noid.getWidth())).resolution(resX);
+            SensorConcept ab = senseNumber("dx", (() -> /*Math.sqrt*/ /* sharpen */(Math.abs(noid.ball.x - noid.paddle.x) / noid.getWidth()))).resolution(resX);
+            SensorConcept b = senseNumber("bx", (() -> (noid.ball.x / noid.getWidth()))).resolution(resX);
+            SensorConcept c = senseNumber("by", (() -> 1f - (noid.ball.y / noid.getHeight()))).resolution(resY);
             //SensorConcept d = senseNumber("noid:bvx", new FloatPolarNormalized(() -> noid.ball.velocityX)).resolution(0.25f);
             //SensorConcept e = senseNumber("noid:bvy", new FloatPolarNormalized(() -> noid.ball.velocityY)).resolution(0.25f);
 
@@ -145,13 +145,12 @@ public class Arkancide extends NAgentX {
             }
             return $.t(paddleSpeed, nar.confidenceDefault('.'));
         }));*/
-        Compound paddleControl = $.inh(Atomic.the("pxMove"), id);
+
 //        actionUnipolarTransfer(paddleControl, (v) -> {
 //            return noid.paddle.moveTo(v, maxPaddleSpeed);
 //        });
         /*actionTriState*/
-        actionBipolar
-                (paddleControl, (s) -> {
+        actionBipolar($.the("x"), (s) -> {
 //           switch (s) {
 //               case 0:
 //                   break;

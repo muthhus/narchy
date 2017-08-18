@@ -12,7 +12,6 @@ import static nars.Op.VAR_QUERY;
 /** I = input term type, T = transformable subterm type */
 @FunctionalInterface public interface CompoundTransform  {
 
-    CompoundTransform Identity = (parent, subterm) -> subterm;
 
     /**
      * change all query variables to dep vars
@@ -30,6 +29,8 @@ import static nars.Op.VAR_QUERY;
     default boolean testSuperTerm(@NotNull Compound c) {
         return true;
     }
+
+//    CompoundTransform Identity = (parent, subterm) -> subterm;
 
 //    CompoundTransform<Compound,Term> None = new CompoundTransform<Compound,Term>() {
 //        @Override

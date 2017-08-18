@@ -796,7 +796,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     /** asynchronously adds the service */
     public void on(@NotNull NARService s) {
-        runLater(()-> add(s.term(), s));
+        add(s.term(), s);
     }
 
     @Deprecated

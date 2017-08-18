@@ -1,5 +1,6 @@
 package nars.derive;
 
+import com.google.common.base.Joiner;
 import jcog.list.FasterList;
 import nars.$;
 import nars.NAR;
@@ -790,37 +791,66 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
     @Test
     public void testDropAnyEvent1() throws Narsese.NarseseException {
-        //dropAnyEvent( ((a &&+5 ((--,a)&|b)) &&+5 ((--,b) &&+5 (--,c))) )    range=16
-        //  should not result:
-        //      ((a &&+5 b) &&+15 ((--,b) &&+5 (--,c)))    range=26
-        //                  ^ should be 5
+        testDropAnyEvent("(a &&+5 b)");
+    }
 
+    @Test
+    public void testDropAnyEvent2() throws Narsese.NarseseException {
+        testDropAnyEvent("((a &&+5 b) &&+5 c)");
+    }
+    @Test
+    public void testDropAnyEvent3() throws Narsese.NarseseException {
+        testDropAnyEvent("((a &&+5 b) &&+5 (#1 &&+5 d))");
+    }
+
+    @Test
+    public void testDropAnyEvent4() throws Narsese.NarseseException {
         testDropAnyEvent("((a &&+5 ((--,a)&|b)) &&+5 ((--,b) &&+5 (--,c)))");
     }
 
 
-    void testDropAnyEvent(String x) throws Narsese.NarseseException {
+    void testDropAnyEvent(String xs) throws Narsese.NarseseException {
         Set<Term> result = new TreeSet();
-        Term tx = $(x);
 
-        List<ObjectLongPair<Term>> events = tx.events();
+        Term x = $(xs);
+        int xdt = x.dtRange();
 
-        for (int i = 0; i < 10 * events.size(); i++) {
+        FasterList<ObjectLongPair<Term>> xe = x.events();
+        xe.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
+        Term first = xe.getFirst().getOne();
+        Term last = xe.getLast().getOne();
 
-            Term t = $("dropAnyEvent( " + x + " )").eval(n);
+        for (int i = 0; i < 10 * xe.size(); i++) {
 
-            assertNotEquals(tx, t);
-            assertTrue(t.dtRange() <= tx.dtRange());
+            Term y = $("dropAnyEvent( " + xs + " )").eval(n);
+            int ydt = y.dtRange();
 
-            List<ObjectLongPair<Term>> e2 = tx.events();
-            e2.forEach(e -> {
-                assertTrue(events.contains(e));
-            });
+            assertNotEquals(xe, y);
+            assertTrue(ydt <= xdt);
 
-            result.add(t);
+            FasterList<ObjectLongPair<Term>> ye = y.events();
+            if (ye.getFirst().getOne().equals(first) && ye.getLast().getOne().equals(last)) {
+                assertEquals(y + " has different dt span", xdt, ydt);
+            }
+
+            ye.sort(Comparator.comparingLong(ObjectLongPair::getTwo));
+
+
+            //same relative timing
+            for (int j = 1; j < ye.size(); j++) {
+                Term y1 = ye.get(j-1).getOne();
+                Term y2 = ye.get(j).getOne();
+                assertEquals(
+                y.subtermTime(y2) - y.subtermTime(y1),
+                x.subtermTime(y2) - x.subtermTime(y1)
+                );
+            }
+
+            result.add(y);
         }
-        //System.out.println(Joiner.on('\n').join(result));
-        assertEquals(events.size(), result.size());
+        System.out.println();
+        System.out.println(Joiner.on('\n').join(result));
+        assertEquals(xe.size(), result.size());
     }
 
 }

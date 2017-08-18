@@ -249,6 +249,14 @@ public class Services<X, C>  {
     }
 
 
+
+    public void remove(X serviceID) {
+        Service<C> s = services.get(serviceID);
+        if (s!=null) {
+            s.stop(this.id, exe, null);
+        }
+    }
+
     /**
      * Initiates service {@linkplain Service#stopAsync shutdown} if necessary on all the services
      * being managed.

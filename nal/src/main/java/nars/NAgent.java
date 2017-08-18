@@ -16,6 +16,7 @@ import nars.control.DurService;
 import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
+import nars.term.var.Variable;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -32,6 +33,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
+import static nars.$.*;
 import static nars.$.impl;
 import static nars.$.newArrayList;
 import static nars.$.p;
@@ -146,7 +148,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         curiosity = new FloatParam(0.10f, 0f, 1f);
 
 
-        if (id==null) id = $.quote(getClass().toString());
+        if (id==null) id = quote(getClass().toString());
         this.predict = nar.newCauseChannel(id + " predict");
     }
 
@@ -309,12 +311,10 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         //this.curiosityAttention = reinforcementAttention / actions.size();
 
         /** set the sensor budget policy */
-        int numSensors = sensors.size();
-        int numActions = actions.size();
 
-        @NotNull Term happiness = happy.term();
+        @NotNull Term happy = this.happy.term();
         predictors.add(
-                goal(happiness,
+                goal(happy,
                         t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
                         //ETERNAL
                 )
@@ -333,12 +333,19 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         for (Concept a : actions.keySet()) {
             Term action = a.term();
 
+            Term sad = happy.neg();
+            Variable what = $.varQuery(1);
+            Term notAction = action.neg();
+
             ((FasterList) predictors).addAll(
 
-                    question(impl(action, happiness)),
-                    question(impl(action.neg(), happiness)),
-                    question(impl(action, $.varQuery(1))),
-                    question(impl(action.neg(), $.varQuery(1))),
+                    question(impl(action, happy)),
+                    question(impl(notAction, happy)),
+                    question(impl(action, what)),
+                    question(impl(notAction, what)),
+
+                    question(impl(parallel(what, action), happy)),
+                    question(impl(parallel(what, notAction), happy)),
 
                     //question(seq(action, dur, happiness), now),
                     //question(seq(neg(action), dur, happiness), now),
@@ -352,7 +359,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 //                            //ETERNAL)
 
                     //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
-                    quest($.parallel($.varQuery(1), action.term()))
+                    quest(parallel(what, action.term()))
 
                     //quest((Compound)$.parallel(varQuery(1), happy.term(), (Compound) (action.term())), now)
 

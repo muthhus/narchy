@@ -773,7 +773,7 @@ public interface Term extends Termlike, Comparable<Term> {
         return events;
     }
 
-    default List<ObjectLongPair<Term>> events() {
+    default FasterList<ObjectLongPair<Term>> events() {
         return events(0);
     }
 

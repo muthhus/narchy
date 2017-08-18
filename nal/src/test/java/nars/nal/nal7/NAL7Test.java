@@ -24,49 +24,41 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL7Test extends AbstractNALTest {
 
-    public int cycles = 400;
+    public int cycles = 200;
 
-
-    public void cycles(int numCycles) {
-        this.cycles = numCycles;
+    @Test public void inductionDiffEventsAtom() {
+        testInduction("before", "after", 10);
     }
 
-    @Test
-    public void induction_on_events() {
-        //    P, S, after(Task,Belief), measure_time(I), notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |-
-        //              ((&/,S,I) =/> P), (Belief:Induction, Eternalize:Immediate),
-        //              (P =\> (&/,S,I)), (Belief:Abduction),
-        //              ((&/,S,I) </> P), (Belief:Comparison)
-        //    P, S, after(Task,Belief), notConjunction(P), notConjunction(S),  measure_time(I), notImplicationOrEquivalence(P), notImplicationOrEquivalence(S) |-
-        //              (&/,S,I,P), (Belief:Intersection)
-
-        test
-                .input("x:before. :|:")
-                .inputAt(10, "x:after. :|:")
-                .mustBelieve(cycles, "(x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0)
-                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 1.00f, 0.45f /*inductionConf*/, 10)
-
-                //equivalent:
-//                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)
-//                .mustBelieve(cycles, "(x:before <=>+10 x:after)", 1.00f, 0.45f /*comparisonConf*/, 0, 10)
-
-                //equivalent:
-                .mustBelieve(cycles, "(x:after &&-10 x:before)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
-                .mustBelieve(cycles, "(x:before &&+10 x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
-
-        ;
+    @Test public void inductionDiffEventsCompound() {
+        testInduction("x:before", "x:after", 10);
     }
 
-    @Test
-    public void induction_on_events_neg() {
+    @Test public void inductionDiffEventsNegPos() {
+        testInduction("--x:before", "x:after", 10);
+    }
 
+    @Test public void inductionSameEvents() {
+        testInduction("x", "x", 10);
+    }
+    @Test public void inductionSameEventsNeg() {
+        testInduction("--x", "--x", 10);
+    }
+    @Test public void inductionSameEventsInvertPosNeg() {
+        testInduction("x", "--x", 10);
+    }
+    @Test public void inductionSameEventsInvertNegPos() {
+        testInduction("--x", "x", 10);
+    }
+
+    void testInduction(String a, String b, int dt) {
+        int cycles = dt * 2;
         test
-                .input("--x:before. :|:")
-                .inputAt(10, "x:after. :|:")
-                .mustBelieve(cycles, "(--x:before ==>+10 x:after)", 1.00f, 0.45f /*abductionConf*/, 0)
-                .mustBelieve(cycles, "(x:after ==>-10 x:before)", 0.00f, 0.45f /*inductionConf*/, 10)
-//                .mustBelieve(cycles, "(x:after <=>-10 x:before)", 0.00f, 0.45f /*comparisonConf*/, 0, 10)
-                .mustBelieve(cycles, "(--x:before &&+10 x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
+                .input(a + ". :|:")
+                .inputAt(dt, b + ". :|:")
+                .mustBelieve(cycles, "(" + a + " ==>+" + dt + " " + b + ")", 1.00f, 0.45f /*abductionConf*/, 0)
+                .mustBelieve(cycles, "(" + b + " ==>-" + dt + " " + a + ")", 1.00f, 0.45f /*inductionConf*/, dt)
+                .mustBelieve(cycles, "(" + a + " &&+" + dt + " " + b + ")", 1.00f, 0.81f /*intersectionConf*/, 0, dt)
         ;
     }
 
@@ -120,7 +112,7 @@ public class NAL7Test extends AbstractNALTest {
         test
             .inputAt(1, "(a &&+5 b). :|:")
             .inputAt(6, "(b &&+5 #1). :|:") //should not unify in the same direction
-            .mustBelieve(cycles, "(a &&+10 #1)", 1.00f, 0.81f, 1)
+            .mustBelieve(cycles, "(a &&+10 #1)", 1.00f, 0.73f, 1, 11)
             .mustBelieve(cycles, "a", 1.00f, 0.81f, 1)
             .mustBelieve(cycles, "b", 1.00f, 0.81f, 6)
             .mustNotOutput(cycles, "b", BELIEF, -4)
@@ -1029,7 +1021,7 @@ public class NAL7Test extends AbstractNALTest {
 
         test
                 .input("hold(key). :|:")
-                .input("((hold(#x) && open(door)) ==> enter(room)). :|:")
+                .input("((hold(#x) && open(door)) =|> enter(room)). :|:")
                 .mustBelieve(cycles, "(open(door) ==> enter(room))",
                         1.00f, 0.81f,
                         0)
@@ -1042,7 +1034,7 @@ public class NAL7Test extends AbstractNALTest {
 
         test
                 .input("hold(key). :|:")
-                .input("(goto(door) ==> (hold(#x) && open(door))). :|:")
+                .input("(goto(door) =|> (hold(#x) && open(door))). :|:")
                 .mustBelieve(cycles, "(goto(door) ==> open(door))",
                         1.00f, 0.81f,
                         0);

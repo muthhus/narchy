@@ -13,17 +13,29 @@ apply plugin: "info.solidsoft.pitest"
 
 pitest {
 
-    targetTests = ['nars.nal.nal1.NAL1Test','NAL1MultistepTest','nars.nal.nal2','nars.task.*']
-    targetClasses = ['nars.term.*', 'nars.nal.*', 'nars.control.*']
+    targetTests = [
+            'nars.nal.nal1.NAL1Test',
+            'nars.nal.nal1.NAL1MultistepTest',
+            'nars.nal.nal2',
+            'nars.derive.TemporalizeTest',
+            'nars.task.*']
+    targetClasses = [
+        'nars.term.*',
+        'nars.nal.*',
+        'nars.table.*',
+        'nars.concept.*',
+        'nars.control.*',
+        'nars.derive.time.*'
+    ]
 
     jvmArgs = ["-ea"]
 
     pitestVersion = "1.2.3" //not needed when a default PIT version should be used
 
-    timeoutFactor = 4
+    timeoutFactor = 3
     enableDefaultIncrementalAnalysis = true
-    threads = 2
-    outputFormats = [ 'XML','HTML' ]
+    threads = 1
+    outputFormats = [ 'HTML' ]
     timestampedReports = false
 }
 description = ''

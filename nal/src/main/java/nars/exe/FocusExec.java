@@ -4,7 +4,6 @@ import edu.virginia.cs.skiptree.ConcurrentSkipTreeSet;
 import jcog.bag.Bag;
 import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
-import jcog.event.On;
 import jcog.list.FasterList;
 import jcog.pri.Pri;
 import jcog.random.XorShift128PlusRandom;
@@ -12,6 +11,8 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.control.Activate;
+import nars.control.CycleService;
+import nars.control.NARService;
 import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -71,8 +72,9 @@ public class FocusExec extends Exec implements Runnable {
      * temporary buffer for tasks about to be executed
      */
     private final FasterList<ITask> next = new FasterList(1024);
+
     @Nullable
-    private On cycle;
+    private NARService trigger;
 
 
     @Override
@@ -87,23 +89,25 @@ public class FocusExec extends Exec implements Runnable {
     public synchronized void start(NAR nar) {
         super.start(nar);
 
-        if (synchronous()) {
-            cycle = nar.onCycle(this::run);
-        }
+        trigger = newTrigger();
     }
 
     @Override
     public synchronized void stop() {
-        if (cycle!=null) {
-            cycle.off();
-            cycle = null;
+        if (trigger!=null) {
+            nar.remove(trigger.term());
+            trigger = null;
         }
         super.stop();
     }
 
-    /** if returns true, then each nar cycle will trigger the run method via an event handler */
-    protected boolean synchronous() {
-        return true;
+
+    @Nullable protected NARService newTrigger() {
+        return new CycleService(nar) {
+            @Override public void accept(NAR nar) {
+                run();
+            }
+        };
     }
 
     /** run an iteration */

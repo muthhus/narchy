@@ -396,7 +396,6 @@ public interface $ {
         return SETe.the(DTERNAL, t);
 
     }
-
     /**
      * shorthand for extensional set
      */
@@ -410,18 +409,6 @@ public interface $ {
         return SETi.the(DTERNAL, t);
     }
 
-//    /**
-//     * Try to make a new compound from two components. Called by the logic rules.
-//     * <p>
-//     *  A -]- B becomes A --> [B]
-//     * @param subject The first component
-//     * @param predicate The second component
-//     * @return A compound generated or null
-//     */
-//    @Nullable
-//    public static Term property(Term subject, Term predicate) {
-//        return inh(subject, $.seti(predicate));
-//    }
 
     /**
      * unnormalized variable
@@ -460,24 +447,20 @@ public interface $ {
     /**
      * parallel conjunction &| aka &&+0
      */
-    @Nullable
-    static <T extends Term> T parallel(Term... s) {
-        return (T) CONJ.the(0, s);
+    @NotNull
+    static Term parallel(Term... s) {
+        return CONJ.the(0, s);
     }
 
-    @Nullable
+    @NotNull
     static Term parallel(@NotNull Collection<Term> s) {
         return CONJ.the(0, s);
     }
 
-    @Nullable
+    @NotNull
     static Term disj(@NotNull Term... a) {
         return DISJ.the(a);
     }
-
-
-    Logging logging = new Logging();
-
 
     class Logging {
         {

@@ -22,7 +22,7 @@ public class Fork extends AbstractPred<Derivation> {
     public final PrediTerm[] cache;
 
     protected Fork(@NotNull PrediTerm[] actions) {
-        super($.sete((Term[]) actions) /* maybe should be a set but prod is faster */);
+        super($.s((Term[]) actions) /* maybe should be a set but prod is faster */);
         if (actions.length == 1)
             throw new RuntimeException("unnecessary use of fork");
         this.cache = actions;

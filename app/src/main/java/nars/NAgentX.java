@@ -3,6 +3,7 @@ package nars;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
 import nars.control.Derivation;
+import nars.control.NARService;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
@@ -21,6 +22,7 @@ import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
 import spacegraph.widget.console.ConsoleTerminal;
@@ -130,9 +132,8 @@ abstract public class NAgentX extends NAgent {
                         new MultiExec((i) ->
                                 new MultiExec.Worker(
                                         new FocusExec() {
-                                            //HACK make this a parameter
-                                            @Override protected boolean synchronous() {
-                                                return false;
+                                            @Override protected @Nullable NARService newTrigger() {
+                                                return null;
                                             }
                                         }
                                 ), THREADS, 2))
