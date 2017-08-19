@@ -8,6 +8,7 @@ import jcog.pri.Priority;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.TruthFunctions;
@@ -97,7 +98,8 @@ public enum TermGraph {
             return g;
         }
 
-        void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> done, Set<Termed> next, Term t) {
+        protected void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> done, Set<Termed> next, Term t) {
+
 
 
             Concept tc = nar.concept(t);
@@ -112,8 +114,12 @@ public enum TermGraph {
                                 ) {
 
                             Term s = l.sub(0);
+                            if (!acceptTerm(s))
+                                return;
 
                             Term p = l.sub(1);
+                            if (!acceptTerm(p))
+                                return;
 
                             //if (!g.nodes().contains(s) || !done.contains(p)) {
                             if ((s.equals(t) || s.containsRecursively(t)) ||
@@ -128,17 +134,21 @@ public enum TermGraph {
             );
         }
 
+        protected boolean acceptTerm(Term p) {
+            return true;
+        }
+
         private void impl(MutableValueGraph<Term, Float> g, NAR nar, long when, Term l, Term subj, Term pred) {
-            Concept c = nar.concept(l);
-            if (c == null)
-                return;
 
             int dur = nar.dur();
-            Task t = nar.belief(c.term(), when);
+            Task t = nar.belief(l, when);
             if (t == null)
                 return;
 
             int dt = t.dt();
+            if (dt == DTERNAL)
+                dt = 0;
+
             float evi =
                     t.evi(when, dur);
             //dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
@@ -152,10 +162,13 @@ public enum TermGraph {
             } else {
                 neg = false;
             }
-            if (val < Priority.EPSILON)
+
+            val *= TruthPolation.evidenceDecay(1f, Math.abs(dt), dur);
+
+            if (val!=val || val < Priority.EPSILON)
                 return;
 
-            boolean reverse = dt != DTERNAL && (dt < 0);
+            boolean reverse = dt < 0;
             Term S = reverse ? pred.negIf(neg) : subj;
             Term P = reverse ? subj : pred.negIf(neg);
             g.putEdgeValue(S, P, val + g.edgeValue(S, P).orElse(0f));

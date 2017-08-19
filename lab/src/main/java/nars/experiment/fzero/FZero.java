@@ -92,10 +92,7 @@ public class FZero extends NAgentX {
                 Vis.conceptBeliefPlots(this, ang, 4), 500, 500);
 
         //nar.mix.stream("Derive").setValue(1);
-        new ImplicationBooster(this, Iterables.concat(
-                Iterables.transform(actions.keySet(), ActionConcept::term),
-                Lists.newArrayList(happy.term())
-        ), happy.term);
+
 
 
 //        try {

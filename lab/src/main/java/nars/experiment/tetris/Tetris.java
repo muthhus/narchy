@@ -1,8 +1,12 @@
 package nars.experiment.tetris;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
 import nars.*;
+import nars.concept.ActionConcept;
 import nars.experiment.tetris.impl.TetrisState;
+import nars.op.ImplicationBooster;
 import nars.term.atom.Atomic;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
@@ -514,6 +518,9 @@ public class Tetris extends NAgentX implements Bitmap2D {
                 e.printStackTrace();
             }
 
+            new ImplicationBooster(a, Iterables.concat(
+                    Iterables.transform(a.actions.keySet(), ActionConcept::term)),
+                a.happy.term);
 
             return a;
         }, 25f);

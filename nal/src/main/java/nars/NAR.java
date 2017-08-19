@@ -523,11 +523,20 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @Nullable
     public Task goal(float pri, @NotNull Term goal, long when, float freq, float conf) throws InvalidTaskException {
-        return input(pri, goal, GOAL, when, freq, conf);
+        return input(pri, goal, GOAL, when, when, freq, conf);
+    }
+
+    @Nullable
+    public Task goal(float pri, @NotNull Term goal, long start, long end, float freq, float conf) throws InvalidTaskException {
+        return input(pri, goal, GOAL, start, end, freq, conf);
     }
 
     @Nullable
     public Task input(float pri, @NotNull Term term, byte punc, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
+        return input(pri, term, punc, occurrenceTime, occurrenceTime, freq, conf);
+    }
+    @Nullable
+    public Task input(float pri, @NotNull Term term, byte punc, long start, long end, float freq, float conf) throws InvalidTaskException {
 
 
         ObjectBooleanPair<Term> b = Task.tryContent(term, punc, false);
@@ -536,11 +545,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             freq = 1f - freq;
 
         DiscreteTruth tr = new DiscreteTruth(freq, conf, confMin.floatValue());
-        if (tr == null)
-            throw new InvalidTaskException(term, "insufficient confidence");
 
-
-        Task y = new NALTask(term, punc, tr, time(), occurrenceTime, occurrenceTime, new long[]{time.nextStamp()});
+        Task y = new NALTask(term, punc, tr, time(), start, end, new long[]{time.nextStamp()});
         y.setPri(pri);
 
         input(y);

@@ -3,12 +3,12 @@ package nars.op;
 import com.google.common.graph.EndpointPair;
 import com.google.common.graph.MutableValueGraph;
 import jcog.list.FasterList;
+import jcog.pri.Pri;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.Task;
 import nars.control.DurService;
-import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -30,8 +30,9 @@ public class ImplicationBooster extends DurService {
     private final TermGraph.ImplGraph tg;
     private final Iterable<Termed> seeds;
 
-    float momentum = 0.9f;
-    float min = 0.001f;
+    @Deprecated float momentum = 0.5f;
+    float min = Pri.EPSILON; //even though it's for truth
+
     MutableValueGraph<Term, Float> s = null;
 
     /**
@@ -39,11 +40,19 @@ public class ImplicationBooster extends DurService {
      */
     private Term target;
 
+    private float relativeTargetDur = +1f;
+
+
     public ImplicationBooster(NAgent a, Iterable<Termed> seeds, Term target) {
         super(a.nar, 1f);
 
         this.seeds = seeds;
-        this.tg = new TermGraph.ImplGraph();
+        this.tg = new TermGraph.ImplGraph() {
+            @Override
+            protected boolean acceptTerm(Term p) {
+                return !p.isTemporal();
+            }
+        };
         this.target = target;
     }
 
@@ -53,9 +62,11 @@ public class ImplicationBooster extends DurService {
         float confMin = nar.confMin.floatValue();
         long now = nar.time();
         int dur = nar.dur();
+        long targetTime = Math.round(now + relativeTargetDur * dur);
 
         if (s != null) {
-            List<EndpointPair<Term>> toRemove = new FasterList();
+            //prune or forget
+            List<EndpointPair<Term>> toRemove = new FasterList<>();
             Iterator<EndpointPair<Term>> ii = s.edges().iterator();
             while (ii.hasNext()) {
                 EndpointPair<Term> e = ii.next();
@@ -74,27 +85,25 @@ public class ImplicationBooster extends DurService {
 
         }
 
-        s = tg.snapshot(s, seeds, nar, now + dur / 2);
+        s = tg.snapshot(s, seeds, nar, targetTime);
 
         Set<EndpointPair<Term>> ee = s.edges();
 
-        if (ee.isEmpty()) {
-            return;
-        }
+//        if (ee.isEmpty()) {
+//            return;
+//        }
 
-        List<EndpointPair<Term>> ff = $.newArrayList(ee.size());
-        ff.addAll(ee);
-        ff.sort((aa, bb) ->
-
-        { //TODO faster
-            float av = s.edgeValue(aa.source(), aa.target()).orElse(-1f);
-            float bv = s.edgeValue(bb.source(), bb.target()).orElse(-1f);
-            int o = Float.compare(bv, av);
-            if (o == 0) {
-                return Integer.compare(aa.hashCode(), bb.hashCode());
-            }
-            return o;
-        });
+//        List<EndpointPair<Term>> ff = $.newArrayList(ee.size());
+//        ff.addAll(ee);
+//        ff.sort((aa, bb) -> { //TODO faster
+//            float av = s.edgeValue(aa.source(), aa.target()).orElse(0f);
+//            float bv = s.edgeValue(bb.source(), bb.target()).orElse(0f);
+//            int o = Float.compare(bv, av);
+//            if (o == 0) {
+//                return Integer.compare(aa.hashCode(), bb.hashCode());
+//            }
+//            return o;
+//        });
 
 
         System.out.println(ee.size() + " total implication edges");
@@ -103,7 +112,7 @@ public class ImplicationBooster extends DurService {
         Map<Term, TruthAccumulator> adjusts = new HashMap();
 
         //.subList(0, Math.min(ff.size(), maxInputs))
-        for (EndpointPair<Term> e : ff) {
+        for (EndpointPair<Term> e : s.edges()) {
 
 
             Term subj = e.source();
@@ -112,7 +121,11 @@ public class ImplicationBooster extends DurService {
 
             Term tt = null;
             final float freq;
-            float c = w2c(s.edgeValue(subj, pred).orElse(0f));
+            float w = s.edgeValue(subj, pred).orElse(0f);
+            if (w < Pri.EPSILON)
+                continue;
+
+            float c = w2c(w);
             if (c > confMin) {
                 Set<Term> recurse = null;
 
@@ -120,11 +133,9 @@ public class ImplicationBooster extends DurService {
                 if (pred.equals(target)) {
                     tt = subj;
                     freq = 1f;
-                    recurse = s.predecessors(subj);
                 } else if (pred.op() == NEG && pred.unneg().equals(target)) {
                     tt = subj;
                     freq = 0f;
-                    recurse = s.predecessors(subj);
                     //                        } else if (subj.equals(a.happy)) {
                     //                            tt = pred;
                     //                            freq = 1f;
@@ -134,12 +145,12 @@ public class ImplicationBooster extends DurService {
                     //                            freq = 0f;
                     //                            //recurse = s.successors(pred);
                 } else {
-                    freq = Float.NaN;
+                    continue;
                 }
 
-                if (tt != null) {
+                recurse = s.predecessors(subj);
 
-                    //float activation = w2c(s.edgeValue(subj, pred));
+                //float activation = w2c(s.edgeValue(subj, pred));
 //                                    if (activation >= Priority.EPSILON) {
 //                                        Concept csubj = n.concept(subj);
 //                                        if (csubj != null)
@@ -150,19 +161,16 @@ public class ImplicationBooster extends DurService {
 //                                            n.activate(cpred, activation);
 //                                    }
 
-                    add(adjusts, tt, freq, c);
 
-                    if (recurse != null) {
+                add(adjusts, tt, freq, c);
 
-                        recurse.forEach(rrr -> {
-                            float cc = c * w2c(s.edgeValue(rrr, subj).orElse(0f));
-                            if (cc > confMin) {
-                                //System.out.println(e + " " + rrr + " " );
-                                add(adjusts, rrr, freq, cc);
-                            }
+                if (recurse != null) {
 
-                        });
-                    }
+                    recurse.forEach(rrr -> {
+                        float cc = c * w2c(s.edgeValue(rrr, subj).orElse(0f));
+                        //System.out.println(e + " " + rrr + " " );
+                        add(adjusts, rrr, freq, cc);
+                    });
                 }
                 //                                    System.out.println(
                 //                                            Texts.n4(v) + "\t(" + subj + "==>" + pred + ")"
@@ -171,14 +179,17 @@ public class ImplicationBooster extends DurService {
             }
         }
 
-        adjusts.forEach((tt, a) ->
 
-        {
+        adjusts.forEach((tt, a) -> {
             @Nullable Truth uu = a.commitSum();
-            float c = uu.conf();
-            if (uu != null && c > confMin) {
-                Task x = nar.goal(nar.priorityDefault(GOAL), (Compound) tt, now + dur / 2, uu.freq(), c);
-                System.out.println("\t" + x);
+            if (uu != null) {
+                float c = uu.conf();
+                if (c >= confMin) {
+                    Task x = nar.goal(nar.priorityDefault(GOAL), tt,
+                            now, targetTime,
+                            uu.freq(), c);
+                    System.out.println("\t" + x);
+                }
             }
         });
 
@@ -186,10 +197,17 @@ public class ImplicationBooster extends DurService {
     }
 
     public void add(Map<Term, TruthAccumulator> adjusts, Term tt, float freq, float c) {
+        if (tt.op()==NEG) {
+            tt = tt.unneg();
+            freq = 1 - freq;
+        }
+
+        @Nullable Truth dt = $.t(freq, c);
+
         adjusts.compute(tt, (ttt, p) -> {
             if (p == null)
                 p = new TruthAccumulator();
-            p.add($.t(freq, c));
+            p.add(dt);
             return p;
         });
     }
