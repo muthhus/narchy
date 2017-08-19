@@ -1,9 +1,13 @@
 package nars.experiment.fzero;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import jcog.Util;
 import nars.*;
+import nars.concept.ActionConcept;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
+import nars.op.ImplicationBooster;
 import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +27,7 @@ public class FZero extends NAgentX {
         float fps = 25f;
 
 
-        NAgentX.runRT((n)->{
+        NAgentX.runRT((n) -> {
 
             FZero a = null;
             try {
@@ -40,7 +44,6 @@ public class FZero extends NAgentX {
         }, fps);
 
 
-
     }
 
     public FZero(NAR nar) throws Narsese.NarseseException {
@@ -49,7 +52,7 @@ public class FZero extends NAgentX {
         this.fz = new FZeroGame();
 
         senseCamera("fz", new Scale(() -> fz.image, 32, 24)/*.blur()*/)
-                //.resolution(0.01f)
+        //.resolution(0.01f)
         ;
 
 //        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
@@ -89,7 +92,10 @@ public class FZero extends NAgentX {
                 Vis.conceptBeliefPlots(this, ang, 4), 500, 500);
 
         //nar.mix.stream("Derive").setValue(1);
-        //implAccelerator(nar, this);
+        new ImplicationBooster(this, Iterables.concat(
+                Iterables.transform(actions.keySet(), ActionConcept::term),
+                Lists.newArrayList(happy.term())
+        ), happy.term);
 
 
 //        try {
@@ -234,8 +240,8 @@ public class FZero extends NAgentX {
         return Util.clamp(
                 //-0.5f /* bias */ +
                 (float) (-(FZeroGame.FULL_POWER - ((float) fz.power)) / FZeroGame.FULL_POWER +
-                //((float)fz.vehicleMetrics[0][6]/100f)+
-                deltaDistance), -1f, +1f);
+                        //((float)fz.vehicleMetrics[0][6]/100f)+
+                        deltaDistance), -1f, +1f);
     }
 
 

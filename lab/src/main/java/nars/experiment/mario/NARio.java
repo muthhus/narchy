@@ -20,7 +20,7 @@ public class NARio extends NAgentX {
     private final SensorConcept vx;
 
     public NARio(NAR nar) throws Narsese.NarseseException {
-        super("", nar);
+        super( nar);
 
         //Param.ANSWER_REPORTING = false;
         //Param.DEBUG = true;
@@ -96,10 +96,10 @@ public class NARio extends NAgentX {
 //        nar.believe("nario:{narioLocal, narioGlobal}");
 
 
-        vx = senseNumberDifference($("nario:vx"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0).resolution(0.25f);
-        senseNumberDifference($("nario:vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0).resolution(0.25f);
+        vx = senseNumberDifference($("vx"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0).resolution(0.25f);
+        senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0).resolution(0.25f);
 
-        actionTriState($("(x)"), i -> {
+        actionTriState($("x"), i -> {
             boolean n, p;
             switch (i) {
                 case -1:
@@ -121,7 +121,7 @@ public class NARio extends NAgentX {
             mario.scene.toggleKey(Mario.KEY_RIGHT, p);
             return true;
         });
-        actionTriState($("(y)"), i -> {
+        actionTriState($("y"), i -> {
             boolean n, p;
             switch (i) {
                 case -1:
@@ -146,7 +146,7 @@ public class NARio extends NAgentX {
         });
 
 
-        actionToggle($("(speed)"), (b) -> mario.scene.toggleKey(Mario.KEY_SPEED, b));
+        actionToggle($("speed"), (b) -> mario.scene.toggleKey(Mario.KEY_SPEED, b));
 
 
 //        frame.addKeyListener(mario);
@@ -221,7 +221,8 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 25);
+        }, 10);
+
 
 
 //        ArrayList<PLink<Concept>> x = Lists.newArrayList(nar.conceptsActive());

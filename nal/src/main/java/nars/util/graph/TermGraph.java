@@ -8,8 +8,8 @@ import jcog.pri.Priority;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
-import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.truth.TruthFunctions;
 
 import java.util.Iterator;
@@ -38,7 +38,7 @@ public enum TermGraph {
                     return; //no self loop
                 g.addNode(t);
                 float p = tl.pri();
-                if (p==p)
+                if (p == p)
                     g.putEdgeValue(s, t, p);
             });
         });
@@ -46,7 +46,7 @@ public enum TermGraph {
     }
 
 
-    public static class ImplGraph  {
+    public static class ImplGraph {
 
         //final static String VERTEX = "V";
 
@@ -64,11 +64,11 @@ public enum TermGraph {
             return t.op() == IMPL;
         }
 
-        public MutableValueGraph<Term, Float> snapshot(Iterable<? extends Term> sources, NAR nar, long when) {
+        public MutableValueGraph<Term, Float> snapshot(Iterable<Termed> sources, NAR nar, long when) {
             return snapshot(null, sources, nar, when);
         }
 
-        public MutableValueGraph<Term, Float> snapshot(MutableValueGraph<Term, Float> g, Iterable<? extends Term> sources, NAR nar, long when) {
+        public MutableValueGraph<Term, Float> snapshot(MutableValueGraph<Term, Float> g, Iterable<Termed> sources, NAR nar, long when) {
 
             if (g == null) {
                 g = ValueGraphBuilder
@@ -79,14 +79,14 @@ public enum TermGraph {
             Set<Term> done = Sets.newConcurrentHashSet();
 
             //TODO bag for pending concepts to visit?
-            Set<Term> next = Sets.newConcurrentHashSet();
+            Set<Termed> next = Sets.newConcurrentHashSet();
             Iterables.addAll(next, sources);
 
             int maxSize = 1024;
             do {
-                Iterator<Term> ii = next.iterator();
+                Iterator<Termed> ii = next.iterator();
                 while (ii.hasNext()) {
-                    Term t = ii.next();
+                    Term t = ii.next().term();
                     ii.remove();
                     if (!done.add(t))
                         continue;
@@ -97,19 +97,20 @@ public enum TermGraph {
             return g;
         }
 
-        void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> done, Set<Term> next, Term t) {
+        void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> done, Set<Termed> next, Term t) {
 
 
             Concept tc = nar.concept(t);
             if (tc == null)
                 return; //ignore non-conceptualized
 
-            tc.termlinks().forEachKey(m -> {
+            tc.termlinks().forEach(ml -> {
 
-                        if (m.op() == IMPL /* && m.vars()==0 */
+                        Term l = ml.get();
+                        if (l.op() == IMPL /* && m.vars()==0 */
                             //&& ((Compound)m).containsTermRecursively(t)) {
                                 ) {
-                            Compound l = (Compound) m;
+
                             Term s = l.sub(0);
 
                             Term p = l.sub(1);
@@ -127,7 +128,7 @@ public enum TermGraph {
             );
         }
 
-        private void impl(MutableValueGraph<Term, Float> g, NAR nar, long when, Compound l, Term subj, Term pred) {
+        private void impl(MutableValueGraph<Term, Float> g, NAR nar, long when, Term l, Term subj, Term pred) {
             Concept c = nar.concept(l);
             if (c == null)
                 return;
@@ -157,7 +158,7 @@ public enum TermGraph {
             boolean reverse = dt != DTERNAL && (dt < 0);
             Term S = reverse ? pred.negIf(neg) : subj;
             Term P = reverse ? subj : pred.negIf(neg);
-            g.putEdgeValue(S, P, val + g.edgeValueOrDefault(S, P, 0f));
+            g.putEdgeValue(S, P, val + g.edgeValue(S, P).orElse(0f));
 
         }
 
