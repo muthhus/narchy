@@ -18,10 +18,11 @@
 
 package jcog.data.graph;
 
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 
 /**
  * This class is an adaptor for representing special subgraphs of any graph.
@@ -77,25 +78,25 @@ public class PrefixSubGraph implements Graph {
 // ---------------------------------------------------------------
 
     @Override
-    public Collection<Integer> getNeighbours(int i) {
+    public IntHashSet neighbors(int i) {
 
         if (i < 0 || i >= prefSize) throw new IndexOutOfBoundsException();
 
-        List<Integer> result = new LinkedList<Integer>();
-        for (Integer j : g.getNeighbours(i)) {
+        IntHashSet result = new IntHashSet();
+        g.neighbors(i).forEach(j -> {
             if (j < prefSize) result.add(j);
-        }
+        });
 
-        return Collections.unmodifiableCollection(result);
+        return result;
     }
 
 // ---------------------------------------------------------------
 
     @Override
-    public Object getNode(int i) {
+    public Object vertex(int v) {
 
-        if (i < 0 || i >= prefSize) throw new IndexOutOfBoundsException();
-        return g.getNode(i);
+        if (v < 0 || v >= prefSize) throw new IndexOutOfBoundsException();
+        return g.vertex(v);
     }
 
 // ---------------------------------------------------------------
@@ -105,9 +106,9 @@ public class PrefixSubGraph implements Graph {
      * size().
      */
     @Override
-    public Object getEdge(int i, int j) {
+    public Object edge(int i, int j) {
 
-        if (isEdge(i, j)) return g.getEdge(i, j);
+        if (isEdge(i, j)) return g.edge(i, j);
         return null;
     }
 
@@ -142,7 +143,7 @@ public class PrefixSubGraph implements Graph {
      * not supported
      */
     @Override
-    public boolean clearEdge(int i, int j) {
+    public boolean removeEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
     }

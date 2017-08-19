@@ -18,17 +18,18 @@
 
 package jcog.data.graph;
 
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * This class is an adaptor making any Graph an undirected graph
  * by making its edges bidirectional. The graph to be made undirected
  * is passed to the constructor. Only the reference is stored so
  * if the directed graph changes later, the undirected version will
- * follow that change. However, {@link #getNeighbours} has O(n) time complexity
+ * follow that change. However, {@link #neighbors} has O(n) time complexity
  * (in other words, too slow for large graphs).
  *
  * @see ConstUndirGraph
@@ -70,22 +71,22 @@ public class UndirectedGraph implements Graph {
      * the underlying directed graph does.
      */
     @Override
-    public Collection<Integer> getNeighbours(int i) {
+    public IntHashSet neighbors(int i) {
 
-        Set<Integer> result = new HashSet<Integer>(g.getNeighbours(i));
+        IntHashSet result = new IntHashSet(g.neighbors(i));
         final int max = g.size();
         for (int j = 0; j < max; ++j) {
             if (g.isEdge(j, i)) result.add(j);
         }
 
-        return Collections.unmodifiableCollection(result);
+        return result;
     }
 
 // ---------------------------------------------------------------
 
     @Override
-    public Object getNode(int i) {
-        return g.getNode(i);
+    public Object vertex(int v) {
+        return g.vertex(v);
     }
 
 // ---------------------------------------------------------------
@@ -95,10 +96,10 @@ public class UndirectedGraph implements Graph {
      * edge, returns that, otherwise returns null.
      */
     @Override
-    public Object getEdge(int i, int j) {
+    public Object edge(int i, int j) {
 
-        if (g.isEdge(i, j)) return g.getEdge(i, j);
-        if (g.isEdge(j, i)) return g.getEdge(j, i);
+        if (g.isEdge(i, j)) return g.edge(i, j);
+        if (g.isEdge(j, i)) return g.edge(j, i);
         return null;
     }
 
@@ -133,7 +134,7 @@ public class UndirectedGraph implements Graph {
      * not supported
      */
     @Override
-    public boolean clearEdge(int i, int j) {
+    public boolean removeEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
     }
@@ -143,7 +144,7 @@ public class UndirectedGraph implements Graph {
     @Override
     public int degree(int i) {
 
-        return getNeighbours(i).size();
+        return neighbors(i).size();
     }
 
 // --------------------------------------------------------------------

@@ -18,10 +18,8 @@
 
 package jcog.data.graph;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
 /**
  * This class is an adaptor making any Graph an undirected graph
@@ -30,9 +28,9 @@ import java.util.List;
  * However, at construction time the incoming edges are stored
  * for each node, so if the graph
  * passed to the constructor changes over time then
- * methods {@link #getNeighbours(int)} and {@link #degree(int)}
+ * methods {@link #neighbors(int)} and {@link #degree(int)}
  * become inconsistent (but only those).
- * The upside of this inconvenience is that {@link #getNeighbours} will have
+ * The upside of this inconvenience is that {@link #neighbors} will have
  * constant time complexity.
  *
  * @see UndirectedGraph
@@ -46,7 +44,7 @@ public class ConstUndirGraph implements Graph {
 
     protected final Graph g;
 
-    protected final List<Integer>[] in;
+    protected final IntArrayList[] in;
 
 // ====================== public constructors ===================
 // ==============================================================
@@ -60,11 +58,7 @@ public class ConstUndirGraph implements Graph {
     public ConstUndirGraph(Graph g) {
 
         this.g = g;
-        if (!g.directed()) {
-            in = null;
-        } else {
-            in = new List[g.size()];
-        }
+        in = !g.directed() ? null : new IntArrayList[g.size()];
 
         initGraph();
     }
@@ -77,11 +71,12 @@ public class ConstUndirGraph implements Graph {
     protected void initGraph() {
 
         final int max = g.size();
-        for (int i = 0; i < max; ++i) in[i] = new ArrayList<Integer>();
+        for (int i = 0; i < max; ++i) in[i] = new IntArrayList();
         for (int i = 0; i < max; ++i) {
-            for (Integer j : g.getNeighbours(i)) {
-                if (!g.isEdge(j, i)) in[j].add(i);
-            }
+            int ii = i;
+            g.neighbors(i).forEach(j -> {
+                if (!g.isEdge(j, ii)) in[j].add(ii);
+            });
         }
     }
 
@@ -103,11 +98,12 @@ public class ConstUndirGraph implements Graph {
      * the underlying directed graph does.
      */
     @Override
-    public Collection<Integer> getNeighbours(int i) {
+    public IntHashSet neighbors(int i) {
 
-        List<Integer> result = new ArrayList<Integer>(g.getNeighbours(i));
+        IntHashSet result = new IntHashSet();
+        result.addAll(g.neighbors(i));
         if (in != null) result.addAll(in[i]);
-        return Collections.unmodifiableCollection(result);
+        return result;
     }
 
 // ---------------------------------------------------------------
@@ -116,8 +112,8 @@ public class ConstUndirGraph implements Graph {
      * Returns the node from the underlying graph
      */
     @Override
-    public Object getNode(int i) {
-        return g.getNode(i);
+    public Object vertex(int v) {
+        return g.vertex(v);
     }
 
 // ---------------------------------------------------------------
@@ -127,10 +123,10 @@ public class ConstUndirGraph implements Graph {
      * edge, returns that, otherwise returns null.
      */
     @Override
-    public Object getEdge(int i, int j) {
+    public Object edge(int i, int j) {
 
-        if (g.isEdge(i, j)) return g.getEdge(i, j);
-        if (g.isEdge(j, i)) return g.getEdge(j, i);
+        if (g.isEdge(i, j)) return g.edge(i, j);
+        if (g.isEdge(j, i)) return g.edge(j, i);
         return null;
     }
 
@@ -165,7 +161,7 @@ public class ConstUndirGraph implements Graph {
      * not supported
      */
     @Override
-    public boolean clearEdge(int i, int j) {
+    public boolean removeEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
     }

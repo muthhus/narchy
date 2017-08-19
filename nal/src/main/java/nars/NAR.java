@@ -1229,6 +1229,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return this;
     }
 
+    public Stream<Activate> conceptActive() {
+        return exe.stream().map(x -> x instanceof Activate ?  (Activate)x : null).filter(Objects::nonNull);
+    }
+
     @Deprecated public NAR forEachConceptActive(@NotNull Consumer<Activate> recip) {
         return forEachProtoTask(t -> {
             if (t instanceof Activate) {

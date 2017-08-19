@@ -18,6 +18,8 @@
 
 package jcog.data.graph;
 
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
+
 import java.util.*;
 
 /**
@@ -70,23 +72,23 @@ public class SubGraphEdges implements Graph {
 // ---------------------------------------------------------------
 
     @Override
-    public Collection<Integer> getNeighbours(int i) {
+    public IntHashSet neighbors(int i) {
 
-        List<Integer> result = new LinkedList<Integer>();
+        IntHashSet result = new IntHashSet();
         if (nodes.get(i)) {
-            for (Integer in : g.getNeighbours(i)) {
-                if (nodes.get(in)) result.add(in);
-            }
+            g.neighbors(i).forEach(j -> {
+                if (nodes.get(j)) result.add(j);
+            });
         }
 
-        return Collections.unmodifiableCollection(result);
+        return result;
     }
 
 // ---------------------------------------------------------------
 
     @Override
-    public Object getNode(int i) {
-        return g.getNode(i);
+    public Object vertex(int v) {
+        return g.vertex(v);
     }
 
 // ---------------------------------------------------------------
@@ -96,9 +98,9 @@ public class SubGraphEdges implements Graph {
      * graph has an (i,j) edge, returns that edge.
      */
     @Override
-    public Object getEdge(int i, int j) {
+    public Object edge(int i, int j) {
 
-        if (isEdge(i, j)) return g.getEdge(i, j);
+        if (isEdge(i, j)) return g.edge(i, j);
         return null;
     }
 
@@ -133,7 +135,7 @@ public class SubGraphEdges implements Graph {
      * not supported
      */
     @Override
-    public boolean clearEdge(int i, int j) {
+    public boolean removeEdge(int i, int j) {
 
         throw new UnsupportedOperationException();
     }
@@ -143,13 +145,13 @@ public class SubGraphEdges implements Graph {
     @Override
     public int degree(int i) {
 
-        int degree = 0;
+        final int[] degree = {0};
         if (nodes.get(i)) {
-            for (Integer in : g.getNeighbours(i)) {
-                if (nodes.get(in)) degree++;
-            }
+            g.neighbors(i).forEach(j -> {
+                if (nodes.get(j)) degree[0]++;
+            });
         }
-        return degree;
+        return degree[0];
     }
 
 

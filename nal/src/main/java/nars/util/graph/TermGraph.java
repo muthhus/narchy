@@ -2,8 +2,7 @@ package nars.util.graph;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
-import com.google.common.graph.MutableValueGraph;
-import com.google.common.graph.ValueGraphBuilder;
+import jcog.data.graph.AdjGraph;
 import jcog.pri.Priority;
 import nars.NAR;
 import nars.Task;
@@ -22,14 +21,14 @@ import static nars.time.Tense.DTERNAL;
 public enum TermGraph {
     ;
 
-
-    public static MutableValueGraph<Term, Float> termlink(NAR nar) {
-        MutableValueGraph<Term, Float> g = ValueGraphBuilder.directed().allowsSelfLoops(false).build();
+    public static AdjGraph<Term, Float> termlink(NAR nar) {
+        AdjGraph<Term, Float> g = new AdjGraph<>(true);
         return termlink(nar, g);
     }
 
-    private static MutableValueGraph<Term, Float> termlink(NAR nar, MutableValueGraph<Term, Float> g) {
-        nar.forEachConceptActive(cf -> {
+    private static AdjGraph<Term, Float> termlink(NAR nar, AdjGraph<Term, Float> g) {
+
+        nar.conceptActive().forEach(cf -> {
             Concept c = cf.get();
             Term s = c.term();
             g.addNode(s);
@@ -40,7 +39,7 @@ public enum TermGraph {
                 g.addNode(t);
                 float p = tl.pri();
                 if (p == p)
-                    g.putEdgeValue(s, t, p);
+                    g.setEdge(s, t, p);
             });
         });
         return g;
@@ -65,19 +64,17 @@ public enum TermGraph {
             return t.op() == IMPL;
         }
 
-        public MutableValueGraph<Term, Float> snapshot(Iterable<Termed> sources, NAR nar, long when) {
+        public AdjGraph<Term, Float> snapshot(Iterable<Termed> sources, NAR nar, long when) {
             return snapshot(null, sources, nar, when);
         }
 
-        public MutableValueGraph<Term, Float> snapshot(MutableValueGraph<Term, Float> g, Iterable<Termed> sources, NAR nar, long when) {
+        public AdjGraph<Term, Float> snapshot(AdjGraph<Term, Float> g, Iterable<Termed> sources, NAR nar, long when) {
 
             if (g == null) {
-                g = ValueGraphBuilder
-                        .directed()
-                        .allowsSelfLoops(true).build();
+                g = new AdjGraph<>(true);
             }
 
-            Set<Term> done = Sets.newConcurrentHashSet();
+            @Deprecated Set<Term> done = Sets.newConcurrentHashSet();
 
             //TODO bag for pending concepts to visit?
             Set<Termed> next = Sets.newConcurrentHashSet();
@@ -93,12 +90,12 @@ public enum TermGraph {
                         continue;
                     recurseTerm(nar, when, g, done, next, t);
                 }
-            } while (!next.isEmpty() && g.nodes().size() < maxSize);
+            } while (!next.isEmpty() && g.nodeCount() < maxSize);
 
             return g;
         }
 
-        protected void recurseTerm(NAR nar, long when, MutableValueGraph<Term, Float> g, Set<Term> done, Set<Termed> next, Term t) {
+        protected void recurseTerm(NAR nar, long when, AdjGraph<Term, Float> g, Set<Term> done, Set<Termed> next, Term t) {
 
 
 
@@ -109,7 +106,7 @@ public enum TermGraph {
             tc.termlinks().forEach(ml -> {
 
                         Term l = ml.get();
-                        if (l.op() == IMPL /* && m.vars()==0 */
+                        if (l.op() == IMPL && !l.hasVarQuery() && l.subterms().containsRecursively(t) /* && m.vars()==0 */
                             //&& ((Compound)m).containsTermRecursively(t)) {
                                 ) {
 
@@ -122,12 +119,12 @@ public enum TermGraph {
                                 return;
 
                             //if (!g.nodes().contains(s) || !done.contains(p)) {
-                            if ((s.equals(t) || s.containsRecursively(t)) ||
-                                    (p.equals(t) || p.containsRecursively(t))) {
+//                            if ((s.equals(t) || s.containsRecursively(t)) ||
+//                                    (p.equals(t) || p.containsRecursively(t))) {
                                 next.add(s);
                                 next.add(p);
                                 impl(g, nar, when, l, s, p);
-                            }
+                           // }
                             //}
                         }
                     }
@@ -138,7 +135,7 @@ public enum TermGraph {
             return true;
         }
 
-        private void impl(MutableValueGraph<Term, Float> g, NAR nar, long when, Term l, Term subj, Term pred) {
+        private void impl(AdjGraph<Term, Float> g, NAR nar, long when, Term l, Term subj, Term pred) {
 
             int dur = nar.dur();
             Task t = nar.belief(l, when);
@@ -171,8 +168,9 @@ public enum TermGraph {
             boolean reverse = dt < 0;
             Term S = reverse ? pred.negIf(neg) : subj;
             Term P = reverse ? subj : pred.negIf(neg);
-            g.putEdgeValue(S, P, val + g.edgeValue(S, P).orElse(0f));
-
+            g.addNode(S);
+            g.addNode(P);
+            g.setEdge(S, P, val + g.edge(S, P, 0f));
         }
 
     }

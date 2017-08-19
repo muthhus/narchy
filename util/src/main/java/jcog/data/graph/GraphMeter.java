@@ -18,6 +18,13 @@
 
 package jcog.data.graph;
 
+import jcog.list.FasterList;
+import org.eclipse.collections.api.collection.primitive.MutableIntCollection;
+import org.eclipse.collections.api.iterator.IntIterator;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.IntIntHashMap;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
+
 import java.util.*;
 
 /**
@@ -25,7 +32,7 @@ import java.util.*;
  * safe. Some algorithms are not static, many times the result of an
  * algorithm can be read from non-static fields.
  */
-public class GraphAlgorithms {
+public class GraphMeter {
 
 // =================== public fields ==================================
 // ====================================================================
@@ -44,12 +51,12 @@ public class GraphAlgorithms {
     /**
      * output of some algorithms is passed here
      */
-    public Set<Integer> cluster;
+    public IntHashSet cluster;
     /**
      * output of some algorithms is passed here
      */
     public int[] d;
-    private final Stack<Integer> stack = new Stack<Integer>();
+    private final IntArrayList stack = new IntArrayList();
     private int counter;
     private Graph g;
 
@@ -71,7 +78,7 @@ public class GraphAlgorithms {
         if (g.directed()) throw new IllegalArgumentException(
                 "graph is directed");
 
-        Object[] n = g.getNeighbours(i).toArray();
+        int[] n = g.neighbors(i).toArray();
 
         if (n.length == 1) return 1.0;
 
@@ -79,7 +86,7 @@ public class GraphAlgorithms {
 
         for (int j = 0; j < n.length; ++j)
             for (int k = j + 1; k < n.length; ++k)
-                if (g.isEdge((Integer) n[j], (Integer) n[k])) ++edges;
+                if (g.isEdge(n[j], n[k])) ++edges;
 
         return ((edges * 2.0) / n.length) / (n.length - 1);
     }
@@ -102,14 +109,12 @@ public class GraphAlgorithms {
         int c2[] = new int[g.size()];
         for (int i = 0; i < c1.length; ++i) c2[i] = c1[i] = WHITE;
         c2[0] = c1[0] = BLACK;
-        Collection<Integer> neighbours;
-        int black = 1;
 
         int k = 0;
-        for (; k < b.length || black < g.size(); ++k) {
+        for (int black = 1; k < b.length || black < g.size(); ++k) {
             for (int i = 0; i < c2.length; ++i) {
-                neighbours = g.getNeighbours(i);
-                Iterator<Integer> it = neighbours.iterator();
+                MutableIntCollection neighbours = g.neighbors(i);
+                IntIterator it = neighbours.intIterator();
                 for (int j = r.nextInt(neighbours.size()); j > 0; --j)
                     it.next();
                 int randn = it.next();
@@ -151,13 +156,13 @@ public class GraphAlgorithms {
 
         color[from] = GREY;
 
-        for (int j : g.getNeighbours(from)) {
+        g.neighbors(from).forEach(j->{
             if (color[j] == WHITE) {
                 dfs(j);
             } else {
                 if (color[j] < 0) cluster.add(color[j]);
             }
-        }
+        });
 
         color[from] = BLACK;
     }
@@ -177,8 +182,7 @@ public class GraphAlgorithms {
      */
     private void bfs(int from) {
 
-        List<Integer> q = new LinkedList<Integer>();
-        int u, du;
+        IntArrayList q = new IntArrayList();
 
         q.add(from);
         q.add(0);
@@ -187,21 +191,22 @@ public class GraphAlgorithms {
         color[from] = GREY;
 
         while (!q.isEmpty()) {
-            u = q.remove(0);
-            du = q.remove(0);
+            int u = q.removeAtIndex(0);
+            int du = q.removeAtIndex(0);
 
-            for (int j : g.getNeighbours(u)) {
-                if (color[j] == WHITE) {
+            g.neighbors(u).forEach(j->{
+                int cj = color[j];
+                if (cj == WHITE) {
                     color[j] = GREY;
 
                     q.add(j);
                     q.add(du + 1);
                     if (d != null) d[j] = du + 1;
                 } else {
-                    if (color[j] < 0)
-                        cluster.add(color[j]);
+                    if (cj < 0)
+                        cluster.add(cj);
                 }
-            }
+            });
             color[u] = BLACK;
         }
     }
@@ -215,9 +220,9 @@ public class GraphAlgorithms {
 
         color[i] = counter++;
         root[i] = i;
-        stack.push(i);
+        stack.add(i);
 
-        for (int j : g.getNeighbours(i)) {
+        g.neighbors(i).forEach(j->{
             if (color[j] == WHITE) {
                 tarjanVisit(j);
             }
@@ -226,13 +231,14 @@ public class GraphAlgorithms {
             {
                 root[i] = root[j];
             }
-        }
+        });
 
-        int j;
         if (root[i] == i) //this node is the root of its cluster
         {
+            int j;
+            int s = stack.size();
             do {
-                j = stack.pop();
+                j = stack.removeAtIndex(--s);
                 color[j] = -color[j];
                 root[j] = i;
             }
@@ -248,36 +254,47 @@ public class GraphAlgorithms {
      * each node has the cluster index as color. The cluster indexes carry no
      * information; we guarantee only that different clusters have different indexes.
      */
-    public Map weaklyConnectedClusters(Graph g) {
+    public List<IntHashSet> weakly(Graph g) {
+
+        int size = g.size();
 
         this.g = g;
-        if (cluster == null) cluster = new HashSet<Integer>();
-        if (color == null || color.length < g.size()) color = new int[g.size()];
+        if (cluster == null) cluster = new IntHashSet();
+        if (color == null || color.length < size) color = new int[size];
 
         // cluster numbers are negative integers
-        int i, j, actCluster = 0;
-        for (i = 0; i < g.size(); ++i) color[i] = WHITE;
-        for (i = 0; i < g.size(); ++i) {
-            if (color[i] == WHITE) {
-                cluster.clear();
-                bfs(i); // dfs is recursive, for large graphs not ok
-                --actCluster;
-                for (j = 0; j < g.size(); ++j) {
-                    if (color[j] == BLACK ||
-                            cluster.contains(color[j]))
-                        color[j] = actCluster;
-                }
+
+        for (int i = 0; i < size; ++i) color[i] = WHITE;
+        int actCluster = 0;
+        int j;
+        for (int i = 0; i < size; ++i) {
+            if (color[i] != WHITE)
+                continue;
+
+            cluster.clear();
+            bfs(i); // dfs is recursive, for large graphs not ok
+            --actCluster;
+            for (j = 0; j < size; ++j) {
+                int cj = color[j];
+                if (cj == BLACK || cluster.contains(cj))
+                    color[j] = actCluster;
             }
         }
 
-        Hashtable<Integer, Integer> ht = new Hashtable<Integer, Integer>();
-        for (j = 0; j < g.size(); ++j) {
-            Integer num = ht.get(color[j]);
-            if (num == null) ht.put(color[j], 1);
-            else ht.put(color[j], num + 1);
+        if (actCluster == 0)
+            return Collections.emptyList();
+
+        actCluster = -actCluster;
+        List<IntHashSet> x = new FasterList(actCluster);
+        for (int i = 0; i < actCluster; i++) {
+            x.add(new IntHashSet(1));
         }
 
-        return ht;
+        for (j = 0; j < size; ++j) {
+            x.get(-color[j] - 1).add(j);
+        }
+
+        return x;
     }
 
 // --------------------------------------------------------------------
@@ -322,7 +339,7 @@ public class GraphAlgorithms {
 // --------------------------------------------------------------------
 
     /**
-     * Returns the strongly connected cluster roots with size as a value.
+     * Tarjan: Returns the strongly connected cluster roots with size as a value.
      * Cluster membership can be seen from the content of the array {@link #root};
      * each node has the root of the strongly connected cluster it belongs to.
      * A word of caution: for large graphs that have a large diameter and that
@@ -330,27 +347,29 @@ public class GraphAlgorithms {
      * because of the large depth of recursion.
      */
 //XXX implement a non-recursive version ASAP!!!
-    public Map tarjan(Graph g) {
+    public IntIntHashMap strongly(Graph g) {
 
         this.g = g;
         stack.clear();
-        if (root == null || root.length < g.size()) root = new int[g.size()];
-        if (color == null || color.length < g.size()) color = new int[g.size()];
-        for (int i = 0; i < g.size(); ++i) color[i] = WHITE;
+        int size = g.size();
+        if (root == null || root.length < size) root = new int[size];
+        if (color == null || color.length < size) color = new int[size];
+        for (int i = 0; i < size; ++i) color[i] = WHITE;
         counter = 1;
 
         // color is WHITE (0): not visited
         // not WHITE, positive (c>1): visited as the c-th node
         // color is negative (c<1): inComponent true
-        for (int i = 0; i < g.size(); ++i) {
+        for (int i = 0; i < size; ++i) {
             if (color[i] == WHITE) tarjanVisit(i);
         }
-        for (int i = 0; i < g.size(); ++i) color[i] = 0;
-        for (int i = 0; i < g.size(); ++i) color[root[i]]++;
-        Hashtable<Integer, Integer> ht = new Hashtable<Integer, Integer>();
-        for (int j = 0; j < g.size(); ++j) {
-            if (color[j] > 0) {
-                ht.put(j, color[j]);
+        for (int i = 0; i < size; ++i) color[i] = 0;
+        for (int i = 0; i < size; ++i) color[root[i]]++;
+        IntIntHashMap ht = new IntIntHashMap();
+        for (int j = 0; j < size; ++j) {
+            int cj = color[j];
+            if (cj > 0) {
+                ht.put(j, cj);
             }
         }
 

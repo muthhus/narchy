@@ -1,7 +1,7 @@
 package nars.nal;
 
 
-import com.google.common.graph.MutableValueGraph;
+import jcog.data.graph.AdjGraph;
 import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
@@ -123,8 +123,8 @@ public class LinkageTest extends AbstractNALTest {
         assertNotNull(p2.state());
         //c2.print(); System.out.println("------------------------");
 
-        MutableValueGraph<Term, Float> g = TermGraph.termlink(nar);
-        System.out.println("\tEdges:" + g.edges());
+        AdjGraph<Term, Float> g = TermGraph.termlink(nar);
+
 
         boolean p12 = linksIndirectly(p1, p2, nar);
         assertTrue(premise1 + " no link to " + premise2, p12);
@@ -135,9 +135,9 @@ public class LinkageTest extends AbstractNALTest {
 
         //System.err.println(premise1 + " not linked with " + premise2);
 
-        int numNodes = g.nodes().size();
+        int numNodes = g.nodeCount();
         assertTrue(numNodes > 0);
-        assertTrue(g.toString(), !g.edges().isEmpty());
+        assertTrue(g.toString(), g.edgeCount()>0);
 
 //        for (Term x : g.nodes()) {
 //            assertEquals(x + " not reachable by all other nodes", numNodes, Graphs.reachableNodes(g.asGraph(), x).size());

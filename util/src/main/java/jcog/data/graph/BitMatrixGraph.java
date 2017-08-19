@@ -18,6 +18,8 @@
 
 package jcog.data.graph;
 
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
+
 import java.util.*;
 
 /**
@@ -60,7 +62,7 @@ public class BitMatrixGraph implements Graph {
      */
     public BitMatrixGraph(int n, boolean directed) {
 
-        sets = new ArrayList<BitSet>(n);
+        sets = new ArrayList<>(n);
         for (int i = 0; i < n; ++i) sets.add(new BitSet());
         this.directed = directed;
     }
@@ -79,16 +81,16 @@ public class BitMatrixGraph implements Graph {
 // ---------------------------------------------------------------
 
     @Override
-    public Collection<Integer> getNeighbours(int i) {
+    public IntHashSet neighbors(int i) {
 
-        Set<Integer> result = new HashSet<Integer>();
+        IntHashSet result = new IntHashSet();
         BitSet neighb = sets.get(i);
         final int max = size();
         for (int j = 0; j < max; ++j) {
             if (neighb.get(j)) result.add(j);
         }
 
-        return Collections.unmodifiableCollection(result);
+        return result;
     }
 
 // ---------------------------------------------------------------
@@ -97,7 +99,7 @@ public class BitMatrixGraph implements Graph {
      * Returns null always
      */
     @Override
-    public Object getNode(int i) {
+    public Object vertex(int v) {
         return null;
     }
 
@@ -107,7 +109,7 @@ public class BitMatrixGraph implements Graph {
      * Returns null always.
      */
     @Override
-    public Object getEdge(int i, int j) {
+    public Object edge(int i, int j) {
         return null;
     }
 
@@ -148,7 +150,7 @@ public class BitMatrixGraph implements Graph {
 // --------------------------------------------------------------------
 
     @Override
-    public boolean clearEdge(int i, int j) {
+    public boolean removeEdge(int i, int j) {
 
         if (i > size() || j > size() || i < 0 || j < 0) throw new
                 IndexOutOfBoundsException();

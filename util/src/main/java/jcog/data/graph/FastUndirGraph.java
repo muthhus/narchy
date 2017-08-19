@@ -22,6 +22,8 @@
  */
 package jcog.data.graph;
 
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 
@@ -54,21 +56,22 @@ public class FastUndirGraph extends ConstUndirGraph {
         final int max = g.size();
         triangle = new BitSet[max];
         for (int i = 0; i < max; ++i) {
-            in[i] = new ArrayList<Integer>();
+            in[i] = new IntArrayList();
             triangle[i] = new BitSet(i);
         }
 
         for (int i = 0; i < max; ++i) {
-            for (Integer out : g.getNeighbours(i)) {
+            int ii = i;
+            g.neighbors(i).forEach(out -> {
                 int j = out;
-                if (!g.isEdge(j, i))
-                    in[j].add(i);
+                if (!g.isEdge(j, ii))
+                    in[j].add(ii);
                 // But always add the link to the triangle
-                if (i > j) // make sure i>j
-                    triangle[i].set(j);
+                if (ii > j) // make sure i>j
+                    triangle[ii].set(j);
                 else
-                    triangle[j].set(i);
-            }
+                    triangle[j].set(ii);
+            });
         }
     }
 
@@ -79,8 +82,8 @@ public class FastUndirGraph extends ConstUndirGraph {
 
     @Override
     public boolean isEdge(int i, int j) {
-        // make sure i>j
         if (i < j) {
+            //sorted order
             int ii = i;
             i = j;
             j = ii;

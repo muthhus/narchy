@@ -18,6 +18,10 @@
 
 package jcog.data.graph;
 
+import org.eclipse.collections.api.collection.primitive.MutableIntCollection;
+import org.eclipse.collections.api.iterator.IntIterator;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
+
 import java.util.Collection;
 
 /**
@@ -30,7 +34,7 @@ import java.util.Collection;
  * Undirected graphs are modelled by the interface as directed graphs in which
  * every edge (i,j) has a corresponding reverse edge (j,i).
  */
-public interface Graph {
+public interface Graph<V,E> {
 
     /**
      * Returns true if there is a directed edge between node i
@@ -44,19 +48,19 @@ public interface Graph {
      * In any case, modifying the returned collection is not safe and
      * may result in unspecified behavior.
      */
-    Collection<Integer> getNeighbours(int i);
+    IntHashSet neighbors(int i);
 
     /**
      * Returns the node object associated with the index. Optional
      * operation.
      */
-    Object getNode(int i);
+    V vertex(int v);
 
     /**
      * Returns the edge object associated with the index. Optional
      * operation.
      */
-    Object getEdge(int i, int j);
+    E edge(int i, int j);
 
     /**
      * The number of nodes in the graph.
@@ -75,11 +79,15 @@ public interface Graph {
      */
     boolean setEdge(int i, int j);
 
+    default boolean setEdge(int i, int j, E value) {
+        throw new UnsupportedOperationException();
+    }
+
     /**
      * Removes given edge, returns true if it existed before. If the graph is
      * undirected, removes the edge (j,i) as well. Optional operation.
      */
-    boolean clearEdge(int i, int j);
+    boolean removeEdge(int i, int j);
 
     /**
      * Returns the degree of the given node. If the graph is directed,

@@ -23,7 +23,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.BitSet;
-import java.util.Iterator;
 
 /**
  * Implements static methods to load and write graphs.
@@ -44,10 +43,10 @@ public class GraphIO {
     public static void writeEdgeList(Graph g, PrintStream out) {
 
         for (int i = 0; i < g.size(); ++i) {
-            Iterator it = g.getNeighbours(i).iterator();
-            while (it.hasNext()) {
-                out.println(i + " " + it.next());
-            }
+            int ii = i;
+            g.neighbors(i).forEach(o -> {
+                out.println(ii + " " + o);
+            });
         }
     }
 
@@ -63,10 +62,9 @@ public class GraphIO {
 
         for (int i = 0; i < g.size(); ++i) {
             out.print(i + " ");
-            Iterator it = g.getNeighbours(i).iterator();
-            while (it.hasNext()) {
-                out.print(it.next() + " ");
-            }
+            g.neighbors(i).forEach(o -> {
+                out.print(o + " ");
+            });
             out.println();
         }
     }
@@ -82,14 +80,13 @@ public class GraphIO {
         out.println((g.directed() ? "digraph" : "graph") + " {");
 
         for (int i = 0; i < g.size(); ++i) {
-            Iterator<Integer> it = g.getNeighbours(i).iterator();
-            while (it.hasNext()) {
-                final int j = it.next();
+            int ii = i;
+            g.neighbors(i).forEach(j -> {
                 if (g.directed())
-                    out.println(i + " -> " + j + ';');
-                else if (i <= j)
-                    out.println(i + " -- " + j + ';');
-            }
+                    out.println(ii + " -> " + j + ';');
+                else if (ii <= j)
+                    out.println(ii + " -- " + j + ';');
+            });
         }
 
         out.println("}");
@@ -109,11 +106,11 @@ public class GraphIO {
             out.println("node [ id " + i + " ]");
 
         for (int i = 0; i < g.size(); ++i) {
-            Iterator it = g.getNeighbours(i).iterator();
-            while (it.hasNext()) {
+            int ii = i;
+            g.neighbors(i).forEach(o -> {
                 out.println(
-                        "edge [ source " + i + " target " + it.next() + " ]");
-            }
+                        "edge [ source " + ii + " target " + o + " ]");
+            });
         }
 
         out.println("]");
@@ -133,11 +130,11 @@ public class GraphIO {
 
         out.println("*Arcs");
         for (int i = 0; i < g.size(); ++i) {
-            Iterator it = g.getNeighbours(i).iterator();
-            while (it.hasNext()) {
-                out.println((i + 1) + " " +
-                        ((Integer) it.next() + 1) + " 1");
-            }
+            int ii = i;
+            g.neighbors(i).forEach(o -> {
+                out.println((ii + 1) + " " +
+                        (o + 1) + " 1");
+            });
         }
         out.println("*Edges");
     }
@@ -154,10 +151,9 @@ public class GraphIO {
 
         for (int i = 0; i < g.size(); ++i) {
             out.print(" " + (i + 1));
-            Iterator it = g.getNeighbours(i).iterator();
-            while (it.hasNext()) {
-                out.print(" " + ((Integer) it.next() + 1));
-            }
+            g.neighbors(i).forEach(o -> {
+                out.print(" " + (o + 1));
+            });
             out.println();
         }
         out.println();
@@ -175,10 +171,9 @@ public class GraphIO {
 
         for (int i = 0; i < g.size(); ++i) {
             BitSet bs = new BitSet(g.size());
-            Iterator it = g.getNeighbours(i).iterator();
-            while (it.hasNext()) {
-                bs.set((Integer) it.next());
-            }
+            g.neighbors(i).forEach(o -> {
+                bs.set(o);
+            });
             for (int j = 0; j < g.size(); ++j) {
                 out.print(bs.get(j) ? " 1" : " 0");
             }
@@ -201,15 +196,14 @@ public class GraphIO {
                 "warning: you're saving a directed graph in Chaco format");
 
         long edges = 0;
-        for (int i = 0; i < g.size(); ++i) edges += g.getNeighbours(i).size();
+        for (int i = 0; i < g.size(); ++i) edges += g.neighbors(i).size();
 
         out.println(g.size() + " " + edges / 2);
 
         for (int i = 0; i < g.size(); ++i) {
-            Iterator it = g.getNeighbours(i).iterator();
-            while (it.hasNext()) {
-                out.print(((Integer) it.next() + 1) + " ");
-            }
+            g.neighbors(i).forEach(o -> {
+                out.print((o + 1) + " ");
+            });
             out.println();
         }
 
@@ -243,7 +237,7 @@ public class GraphIO {
     public static Graph readNewscastGraph(String file, int direction)
             throws IOException {
 
-        NeighbourListGraph gr = new NeighbourListGraph(direction != 2);
+        AdjGraph gr = new AdjGraph(direction != 2);
         FileInputStream fis = new FileInputStream(file);
         DataInputStream dis = new DataInputStream(fis);
 
