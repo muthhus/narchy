@@ -18,7 +18,6 @@ import nars.time.Tense;
 import nars.truth.Truth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.tuple.Pair;
-import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -165,7 +164,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
-            if (goalUrgent && d.concPunc == GOAL && occ[0]!=ETERNAL) {
+            if (goalUrgent && d.concPunc == GOAL && occ[0] != ETERNAL) {
                 long taskStart = d.task.start();
                 if (taskStart != ETERNAL) {
                     long taskDur = occ[1] - occ[0];
@@ -174,7 +173,6 @@ public class Conclusion extends AbstractPred<Derivation> {
                     occ[1] = occ[0] + taskDur;
                 }
             }
-
 
             c2 = t1;
 
@@ -187,65 +185,58 @@ public class Conclusion extends AbstractPred<Derivation> {
         //5. VALIDATE FOR TASK TERM
 
         byte punc = d.concPunc;
-        @Nullable ObjectBooleanPair<Term> c3n = Task.tryContent(c2, punc, true);
-        if (c3n != null) {
+        Task t = Task.tryTask(c2, punc, truth, (C, tr) -> {
 
-
-            final Term C = c3n.getOne();
-            if (!C.op().conceptualizable)
-                return true;
-
-            if (truth != null) {
-
-                boolean negating = c3n.getTwo();
-                if (negating)
-                    truth = truth.negated();
-
-                truth = truth.ditherFreqConf(d.truthResolution, d.confMin, eviGain[0]);
-                if (truth == null)
-                    return true;
+            if (tr!=null) { //beliefs and goals
+                tr = tr.ditherFreqConf(d.truthResolution, d.confMin, eviGain[0]);
+                if (tr == null)
+                    return null; //HACK
             }
 
             long start = occ[0];
             long end = occ[1];
             //assert (end >= start);
             if (end < start) {
-                long t = end;
+                long e = end;
                 end = start;
-                start = t;
+                start = e;
             }
-
-            float priority = d.premisePri; //d.budgeting.budget(d, C, truth, punc, start, end);
-            assert (priority == priority);
 
 
             short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
 
             //CONSTRUCT TASK
-            DerivedTask t =
+            return
                     Param.DEBUG ?
-                            new DebugDerivedTask(C, punc, truth, d, start, end, cause) :
-                            new DerivedTask(C, punc, truth, d, start, end, cause);
+                            new DebugDerivedTask(C, punc, tr, d, start, end, cause) :
+                            new DerivedTask(C, punc, tr, d, start, end, cause);
+        });
 
-            t.setPri(priority);
-
-            if (same(t, d.task, d.truthResolution) || (d.belief != null && same(t, d.belief, d.truthResolution))) {
-                d.use(Param.TTL_DERIVE_TASK_SAME);
-                return true; //created a duplicate of the task
-            }
-
-
-            if (Param.DEBUG)
-                t.log(rule);
-
-            d.accept(t);
-            d.use(Param.TTL_DERIVE_TASK_SUCCESS);
+        if (t == null) {
+            d.use(Param.TTL_DERIVE_TASK_FAIL);
             return true;
         }
 
-        d.use(Param.TTL_DERIVE_TASK_FAIL);
+
+        if (same(t, d.task, d.truthResolution) || (d.belief != null && same(t, d.belief, d.truthResolution))) {
+            d.use(Param.TTL_DERIVE_TASK_SAME);
+            return true; //created a duplicate of the task
+        }
+
+        float priority = d.premisePri; //d.budgeting.budget(d, C, truth, punc, start, end);
+        assert (priority == priority);
+
+        t.setPri(priority);
+
+
+        if (Param.DEBUG)
+            t.log(rule);
+
+        d.accept(t);
+        d.use(Param.TTL_DERIVE_TASK_SUCCESS);
         return true;
     }
+
 
     boolean same(Task derived, Task parent, float truthResolution) {
         if (parent.isDeleted())

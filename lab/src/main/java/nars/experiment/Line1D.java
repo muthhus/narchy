@@ -41,7 +41,7 @@ public class Line1D {
 //                        new TaskExecutor(256, 0.5f)
 //                );
 //
-            NAR n = new NARS().get();
+            NAR n = NARS.threadSafe();
 
             //new STMTemporalLinkage(n, 2, false);
             n.time.dur(1);
@@ -111,8 +111,8 @@ public class Line1D {
     }
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.001f; //in time units
-        float yResolution = 0.2f; //in 0..1.0
+        float tHz = 0.01f; //in time units
+        float yResolution = 0.1f; //in 0..1.0
         float periods = 16;
 
         final int runtime = Math.round(periods / tHz);

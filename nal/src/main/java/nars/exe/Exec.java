@@ -2,8 +2,14 @@ package nars.exe;
 
 import jcog.Loop;
 import jcog.event.On;
+import jcog.pri.Prioritized;
+import jcog.pri.Priority;
+import jcog.pri.op.PriMerge;
 import nars.NAR;
+import nars.Task;
+import nars.control.Activate;
 import nars.task.ITask;
+import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +25,7 @@ import java.util.stream.Stream;
  * manages low level task scheduling and execution
  *
  */
-abstract public class Exec implements Executor {
+abstract public class Exec implements Executor, PriMerge {
 
     protected NAR nar;
 
@@ -82,8 +88,20 @@ abstract public class Exec implements Executor {
         out.println(this);
     }
 
+    @Override
+    public float merge(Priority existing, Prioritized incoming) {
+        if (existing instanceof Activate) {
+            return PriMerge.plus.merge(existing, incoming);
+        } else {
+            if (existing instanceof NALTask) {
+                ((NALTask)existing).merge((NALTask) incoming);
+            }
+            return PriMerge.max.merge(existing, incoming);
+        }
 
-//    public class Periodic extends Loop {
+    }
+
+    //    public class Periodic extends Loop {
 //
 //        final AtomicBoolean busy = new AtomicBoolean(false);
 //        //private final FloatParam fps = new FloatParam(0);

@@ -221,7 +221,7 @@ public class TestNAR {
 
 
         //preinit
-        nar.time.exeScheduled(MoreExecutors.directExecutor());
+        nar.time.synch();
 
         //try {
         int frames = Math.max(0,(int) (finalCycle - time()));

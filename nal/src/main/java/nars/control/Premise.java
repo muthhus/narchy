@@ -14,7 +14,6 @@ import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
 import nars.index.term.TermIndex;
 import nars.table.BeliefTable;
-import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
@@ -269,7 +268,7 @@ public class Premise extends Pri implements ITask {
         }
 
 
-        Set<DerivedTask> dd = d.run(this, task, belief, beliefTerm, ttlMax);
+        Set<Task> dd = d.run(this, task, belief, beliefTerm, ttlMax);
         nar.emotion.taskDerivations.increment(dd.size());
         return dd;
 

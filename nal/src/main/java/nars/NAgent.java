@@ -308,154 +308,155 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         now = nar.time();
 
 
-        //this.curiosityAttention = reinforcementAttention / actions.size();
+        nar.runLater(()-> {
+            //this.curiosityAttention = reinforcementAttention / actions.size();
 
-        /** set the sensor budget policy */
+            /** set the sensor budget policy */
 
-        @NotNull Term happy = this.happy.term();
-        predictors.add(
-                goal(happy,
-                        t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
-                        //ETERNAL
-                )
-        );
-
-//        p.add(
-//            question(seq($.varQuery(1), dur, happiness),
-//                now)
-//                //ETERNAL)
-//        );
-
-
-//        predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
-//        predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
-
-        for (Concept a : actions.keySet()) {
-            Term action = a.term();
-
-            Term sad = happy.neg();
-            Variable what = $.varQuery(1);
-            Term notAction = action.neg();
-
-            ((FasterList) predictors).addAll(
-
-                    question(impl(action, happy)),
-                    question(impl(notAction, happy)),
-                    question(impl(action, what)),
-                    question(impl(notAction, what)),
-
-                    question(impl(parallel(what, action), happy)),
-                    question(impl(parallel(what, notAction), happy)),
-
-                    //question(seq(action, dur, happiness), now),
-                    //question(seq(neg(action), dur, happiness), now),
-
-                    //question(seq(action, dur, $.varQuery(1)), now),
-                    //question(seq(neg(action), dur, $.varQuery(1)), now),
-
-                    //dangerous: may lead to immobilizing self-fulfilling prophecy
-                    //quest((Compound) (action.term()),now+dur)
-
-//                            //ETERNAL)
-
-                    //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
-                    quest(parallel(what, action.term()))
-
-                    //quest((Compound)$.parallel(varQuery(1), happy.term(), (Compound) (action.term())), now)
-
-
-//                    question(impl(conj(varQuery(0),action), dur, happiness), now),
-//                    question(impl(conj(varQuery(0),neg(action)), dur, happiness), now)
-
-//                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
-//                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
-
-//                    new PredictionTask($.impl($.parallel(action, $.varQuery(1)), happiness), '?')
-//                            .eternal(),
-//                            //.time(nar, dur),
-//                    new PredictionTask($.impl($.parallel($.neg(action), $.varQuery(1)), happiness), '?')
-//                            .eternal(),
-//                            //.time(nar, dur)
-
-                    //question(impl(neg(action), dur, varQuery(1)), nar.time()),
-
-//                    question(impl(happiness, -dur, conj(varQuery(1),action)), now),
-//                    question(impl(neg(happiness), -dur, conj(varQuery(1),action)), now)
-
-//                    question(impl(happiness, -dur, action), now),
-//                    question(impl(neg(happiness), -dur, action), now)
-
-
-//                    question(seq(action, dur, happiness), now),
-//                    question(seq(neg(action), dur, happiness), now),
-//                    question(seq(action, dur, neg(happiness)), now),
-//                    question(seq(neg(action), dur, neg(happiness)), now)
-
-
-//                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
-//                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
-
-
-//                    new PredictionTask($.seq(action, dur, varQuery(1)), '@')
-//                        .present(nar),
-//
-//
-//                    new PredictionTask($.seq($.neg(action), dur, varQuery(1)), '@')
-//                        .present(nar)
-
-//                    new TaskBuilder($.impl(action, dur, happiness), '?', null)
-//                            .present(nar),
-//                            //.eternal(),
-//                    new TaskBuilder($.impl($.neg(action), dur, happiness), '?', null)
-//                            .present(nar)
-//                            //.eternal()
-
-
-                    //new TaskBuilder($.seq($.varQuery(0), dur, action), '?', null).eternal(),
-                    //new TaskBuilder($.impl($.varQuery(0), dur, action), '?', null).eternal(),
-
-                    //new TaskBuilder($.impl($.parallel($.varDep(0), action), dur, happiness), '?', null).time(now, now + dur),
-                    //new TaskBuilder($.impl($.parallel($.varDep(0), $.neg( action )), dur, happiness), '?', null).time(now, now + dur)
+            @NotNull Term happy = this.happy.term();
+            predictors.add(
+                    goal(happy,
+                            t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
+                            //ETERNAL
+                    )
             );
 
-        }
-
-//        predictors.add(
-//                new TaskBuilder($.seq($.varQuery(0 /*"what"*/), dur, happiness), '?', null).time(now, now)
-//        );
-//        predictors.add(
-//                goal(happiness,
-//                        t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
-//                        ETERNAL
-//                )
-//        );
+            //        p.add(
+            //            question(seq($.varQuery(1), dur, happiness),
+            //                now)
+            //                //ETERNAL)
+            //        );
 
 
-//        predictors.addAll(
-//                //what will imply reward
-//                new TaskBuilder($.equi(what, dt, happiness), '?', null).time(now, now),
-//                //new TaskBuilder($.equi(sth, dt, happiness), '.', null).time(now,now),
-//
-//                //what will imply non-reward
-//                //new TaskBuilder($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
-//                //new TaskBuilder($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
-//
-//                //what co-occurs with reward
-//                new TaskBuilder($.parallel(what, happiness), '?', null).time(now, now)
-//
-//                //what co-occurs with non-reward
-//                //new TaskBuilder($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
-//        );
+            //        predictors.add( question((Compound)$.parallel(happiness, $.varDep(1)), now) );
+            //        predictors.add( question((Compound)$.parallel($.neg(happiness), $.varDep(1)), now) );
 
-//        predictors.add(
-//                nar.ask($.seq(what, dt, happy.term()), '?', now)
-//        );
-//        predictors.add( //+2 cycles ahead
-//                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
-//        );
+            for (Concept a : actions.keySet()) {
+                Term action = a.term();
+
+                Variable what = $.varQuery(1);
+                Term notAction = action.neg();
+
+                ((FasterList) predictors).addAll(
+
+                        question(impl(action, happy)),
+                        question(impl(notAction, happy)),
+                        question(impl(action, what)),
+                        question(impl(notAction, what)),
+
+                        question(impl(parallel(what, action), happy)),
+                        question(impl(parallel(what, notAction), happy)),
+
+                        //question(seq(action, dur, happiness), now),
+                        //question(seq(neg(action), dur, happiness), now),
+
+                        //question(seq(action, dur, $.varQuery(1)), now),
+                        //question(seq(neg(action), dur, $.varQuery(1)), now),
+
+                        //dangerous: may lead to immobilizing self-fulfilling prophecy
+                        //quest((Compound) (action.term()),now+dur)
+
+                        //                            //ETERNAL)
+
+                        //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
+                        quest(parallel(what, action.term()))
+
+                        //quest((Compound)$.parallel(varQuery(1), happy.term(), (Compound) (action.term())), now)
 
 
-        //System.out.println(Joiner.on('\n').join(predictors));
+                        //                    question(impl(conj(varQuery(0),action), dur, happiness), now),
+                        //                    question(impl(conj(varQuery(0),neg(action)), dur, happiness), now)
+
+                        //                    new PredictionTask($.impl(action, dur, happiness), '?').time(nar, dur),
+                        //                    new PredictionTask($.impl($.neg(action), dur, happiness), '?').time(nar, dur),
+
+                        //                    new PredictionTask($.impl($.parallel(action, $.varQuery(1)), happiness), '?')
+                        //                            .eternal(),
+                        //                            //.time(nar, dur),
+                        //                    new PredictionTask($.impl($.parallel($.neg(action), $.varQuery(1)), happiness), '?')
+                        //                            .eternal(),
+                        //                            //.time(nar, dur)
+
+                        //question(impl(neg(action), dur, varQuery(1)), nar.time()),
+
+                        //                    question(impl(happiness, -dur, conj(varQuery(1),action)), now),
+                        //                    question(impl(neg(happiness), -dur, conj(varQuery(1),action)), now)
+
+                        //                    question(impl(happiness, -dur, action), now),
+                        //                    question(impl(neg(happiness), -dur, action), now)
+
+
+                        //                    question(seq(action, dur, happiness), now),
+                        //                    question(seq(neg(action), dur, happiness), now),
+                        //                    question(seq(action, dur, neg(happiness)), now),
+                        //                    question(seq(neg(action), dur, neg(happiness)), now)
+
+
+                        //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq(action, dur, happiness)), '?').eternal(),
+                        //                    new PredictionTask($.seq($.varQuery("x"), 0, $.seq($.neg(action), dur, happiness)), '?').eternal()
+
+
+                        //                    new PredictionTask($.seq(action, dur, varQuery(1)), '@')
+                        //                        .present(nar),
+                        //
+                        //
+                        //                    new PredictionTask($.seq($.neg(action), dur, varQuery(1)), '@')
+                        //                        .present(nar)
+
+                        //                    new TaskBuilder($.impl(action, dur, happiness), '?', null)
+                        //                            .present(nar),
+                        //                            //.eternal(),
+                        //                    new TaskBuilder($.impl($.neg(action), dur, happiness), '?', null)
+                        //                            .present(nar)
+                        //                            //.eternal()
+
+
+                        //new TaskBuilder($.seq($.varQuery(0), dur, action), '?', null).eternal(),
+                        //new TaskBuilder($.impl($.varQuery(0), dur, action), '?', null).eternal(),
+
+                        //new TaskBuilder($.impl($.parallel($.varDep(0), action), dur, happiness), '?', null).time(now, now + dur),
+                        //new TaskBuilder($.impl($.parallel($.varDep(0), $.neg( action )), dur, happiness), '?', null).time(now, now + dur)
+                );
+
+            }
+
+            //        predictors.add(
+            //                new TaskBuilder($.seq($.varQuery(0 /*"what"*/), dur, happiness), '?', null).time(now, now)
+            //        );
+            //        predictors.add(
+            //                goal(happiness,
+            //                        t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL),nar.confDefault(/*BELIEF*/ BELIEF))),
+            //                        ETERNAL
+            //                )
+            //        );
+
+
+            //        predictors.addAll(
+            //                //what will imply reward
+            //                new TaskBuilder($.equi(what, dt, happiness), '?', null).time(now, now),
+            //                //new TaskBuilder($.equi(sth, dt, happiness), '.', null).time(now,now),
+            //
+            //                //what will imply non-reward
+            //                //new TaskBuilder($.equi(what, dt, $.neg(happiness)), '?', null).time(now, now),
+            //                //new TaskBuilder($.equi(sth, dt, $.neg(happiness)), '.', null).time(now,now),
+            //
+            //                //what co-occurs with reward
+            //                new TaskBuilder($.parallel(what, happiness), '?', null).time(now, now)
+            //
+            //                //what co-occurs with non-reward
+            //                //new TaskBuilder($.parallel(what, $.neg(happiness)), '?', null).time(now, now)
+            //        );
+
+            //        predictors.add(
+            //                nar.ask($.seq(what, dt, happy.term()), '?', now)
+            //        );
+            //        predictors.add( //+2 cycles ahead
+            //                nar.ask($.seq(what, dt*2, happy.term()), '?', now)
+            //        );
+
+
+            //System.out.println(Joiner.on('\n').join(predictors));
+        });
     }
 
 //    public SensorConcept randomSensor() {

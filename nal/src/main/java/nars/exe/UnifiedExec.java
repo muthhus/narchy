@@ -1,20 +1,18 @@
 package nars.exe;
 
-import jcog.Util;
 import jcog.bag.Bag;
-import jcog.bag.impl.ConcurrentCurveBag;
-import jcog.data.FloatParam;
-import jcog.pri.op.PriMerge;
+import jcog.bag.impl.hijack.PriorityHijackBag;
+import jcog.pri.op.PriForget;
 import nars.NAR;
-import nars.control.Derivation;
-import nars.derive.Deriver;
-import nars.derive.PrediTerm;
+import nars.control.Activate;
+import nars.control.Premise;
 import nars.task.ITask;
-import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static jcog.bag.Bag.BagSample;
@@ -23,11 +21,17 @@ import static jcog.bag.Bag.BagSample.*;
 /**
  * probabalistic continuation kernel
  */
-public class UnifiedExec extends Exec {
+public class UnifiedExec extends Exec implements Runnable {
+
+    public static final int BATCH_SIZE = 128;
+    public static final int CAPACITY = 1024;
 
     Bag<ITask, ITask> plan;
 
     int workRemaining = 0;
+
+    float activationFactor = 0.25f;
+    float premiseFactor = 0.5f;
 
     @Override
     protected synchronized void clear() {
@@ -36,13 +40,16 @@ public class UnifiedExec extends Exec {
 
     @Override
     public void add(@NotNull ITask input) {
-        plan.put(input);
+        if (nar != null && input.isInput())
+            execute(input);
+        else
+            plan.put(input);
     }
 
 
     public static final Logger logger = LoggerFactory.getLogger(UnifiedExec.class);
 
-    private BagSample exec(ITask x) {
+    private BagSample execute(ITask x) {
         Iterable<? extends ITask> next = null;
 
         try {
@@ -74,8 +81,44 @@ public class UnifiedExec extends Exec {
 
     @Override
     public synchronized void start(NAR nar) {
+
+        plan =
+                new PriorityHijackBag<ITask, ITask>(4) {
+                    @Override
+                    public ITask key(ITask value) {
+                        return value;
+                    }
+
+                    @Override
+                    public float pri(@NotNull ITask key) {
+                        if (key instanceof Activate)
+                            return activationFactor * key.priElseZero();
+                        else if (key instanceof Premise)
+                            return premiseFactor * key.priElseZero();
+
+                        return super.pri(key);
+                    }
+
+                    @Override
+                    protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, MutableFloat overflowing) {
+                        float overflow = UnifiedExec.this.merge(existing, incoming); //modify existing
+                        if (overflow > 0) {
+                            //pressurize(-overflow);
+                            if (overflowing != null) overflowing.add(overflow);
+                        }
+                        return existing;
+                    }
+
+                    @Override
+                    protected Consumer<ITask> forget(float rate) {
+                        return new PriForget(rate);
+                    }
+                };
+        plan.setCapacity(CAPACITY);
+//            new ConcurrentCurveBag(this,
+//                new ConcurrentHashMapUnsafe<>(1024), nar.random(), 1024);
+
         super.start(nar);
-        plan = new ConcurrentCurveBag(PriMerge.plus, new ConcurrentHashMapUnsafe<>(1024), nar.random(), 1024);
     }
 
     @Override
@@ -96,6 +139,12 @@ public class UnifiedExec extends Exec {
     @Override
     public Stream<ITask> stream() {
         return plan.stream();
+    }
+
+    @Override
+    public synchronized void run() {
+        workRemaining = BATCH_SIZE;
+        plan.commit().sample(this::execute);
     }
 
 //    public static void main(String... args) {

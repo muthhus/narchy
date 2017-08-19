@@ -8,6 +8,7 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
+import nars.exe.UnifiedExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
 import nars.op.mental.Inperience;
@@ -131,11 +132,13 @@ abstract public class NAgentX extends NAgent {
                 .exe(
                         new MultiExec((i) ->
                                 new MultiExec.Worker(
-                                        new FocusExec() {
-                                            @Override protected @Nullable NARService newTrigger() {
-                                                return null;
-                                            }
-                                        }
+//                                        new FocusExec() {
+//                                            @Override protected @Nullable NARService newTrigger() {
+//                                                return null;
+//                                            }
+//                                        }
+                                        new UnifiedExec()
+
                                 ), THREADS, 2))
                 .time(clock)
                 .index(

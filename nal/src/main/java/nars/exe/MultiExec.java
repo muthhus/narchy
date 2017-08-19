@@ -5,6 +5,7 @@ import jcog.Util;
 import jcog.event.On;
 import nars.NAR;
 import nars.task.ITask;
+import nars.util.CPUThrottle;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
@@ -169,6 +170,7 @@ public class MultiExec extends Exec {
             this.start(nar);
             model.start(nar);
 
+//            new CPUThrottle()
             return this.loop = new Loop(periodMS) {
                 @Override
                 public boolean next() {

@@ -2,6 +2,7 @@ package nars.time;
 
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.primitives.Longs;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.netflix.servo.util.Clock;
 import nars.NAR;
 import org.eclipse.collections.api.tuple.primitive.LongObjectPair;
@@ -101,5 +102,10 @@ public abstract class Time implements Clock, Serializable {
         exeScheduled(n.exe);
     }
 
+
+    /** flushes the pending work queued for the current time */
+    public synchronized void synch() {
+        exeScheduled(MoreExecutors.directExecutor());
+    }
 
 }

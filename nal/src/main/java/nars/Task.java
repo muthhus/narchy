@@ -107,9 +107,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     default boolean eternalizable() {
 
 
-        return false;
+        //return false;
         //return true;
-        //return term().vars() > 0;
+        return term().vars() > 0;
         //return term().varIndep() > 0;
         //return term().varIndep() > 0 || term().op() == IMPL; //isAny(Op.IMPL.bit | Op.EQUI.bit);
         //return true;
@@ -1006,7 +1006,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
         ObjectBooleanPair<Term> x = tryContent(t, punc, true);
         if (x != null) {
-            return res.apply(x.getOne(), tr.negIf(x.getTwo()));
+            return res.apply(x.getOne(), tr!=null ? tr.negIf(x.getTwo()) : null);
         }
         return null;
     }

@@ -36,6 +36,7 @@ public class NARS {
         NAR n = new NAR(index.get(), exe.get(), time, rng.get(), concepts.get(), deriver);
         init(n);
         after.forEach(x -> x.accept(n));
+        n.time.synch();
         return n;
     }
 
