@@ -13,7 +13,6 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
-import nars.exe.UnifiedExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
 import nars.op.mental.Inperience;

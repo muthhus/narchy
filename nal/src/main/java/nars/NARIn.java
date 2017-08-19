@@ -1,5 +1,6 @@
 package nars;
 
+import nars.index.term.TermIndex;
 import nars.task.ActiveQuestionTask;
 import nars.task.ITask;
 import nars.term.Term;
@@ -17,7 +18,7 @@ public interface NARIn {
     void input(ITask... t);
 
     default <T extends Term> T term(@NotNull String t) throws Narsese.NarseseException {
-        return $.terms.term(t);
+        return TermIndex.term(t);
     }
 
     @Nullable

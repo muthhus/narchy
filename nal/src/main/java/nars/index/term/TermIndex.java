@@ -89,12 +89,12 @@ public abstract class TermIndex implements TermContext {
 
 
     @NotNull
-    public final Term the(@NotNull Compound csrc, @NotNull Term... args) {
+    public static Term the(@NotNull Compound csrc, @NotNull Term... args) {
         return csrc.equalTerms(args) ? csrc : csrc.op().the(csrc.dt(), args);
     }
 
     @NotNull
-    public final Term the(@NotNull Compound csrc, int newDT) {
+    public static Term the(@NotNull Compound csrc, int newDT) {
         return csrc.dt() == newDT ? csrc : csrc.op().the(newDT, csrc.toArray());
     }
 
@@ -143,12 +143,12 @@ public abstract class TermIndex implements TermContext {
     }
 
     /** un-normalized */
-    @NotNull public <T extends Term> T termRaw(@NotNull String termToParse) throws Narsese.NarseseException {
+    @NotNull public static <T extends Term> T termRaw(@NotNull String termToParse) throws Narsese.NarseseException {
         return (T) Narsese.term(termToParse, false);
     }
 
     /** normalized */
-    @NotNull public <T extends Term> T term(@NotNull String termToParse) throws Narsese.NarseseException {
+    @NotNull public static <T extends Term> T term(@NotNull String termToParse) throws Narsese.NarseseException {
         return (T) (Narsese.term(termToParse, true));
     }
 

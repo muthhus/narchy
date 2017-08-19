@@ -133,7 +133,7 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
 
 
     @Override
-    public @Nullable Term sub(int i, @Nullable Term ifOutOfBounds) {
+    public Term sub(int i, Term ifOutOfBounds) {
         return ref.sub(i, ifOutOfBounds);
     }
 

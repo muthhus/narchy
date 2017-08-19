@@ -1,6 +1,5 @@
 package nars.test;
 
-import com.google.common.util.concurrent.MoreExecutors;
 import jcog.event.Topic;
 import nars.*;
 import nars.task.ITask;

@@ -38,7 +38,7 @@ public class TermIndexTest {
 
     }
 
-    void testIndex(@NotNull TermIndex i) throws Narsese.NarseseException {
+    static void testIndex(@NotNull TermIndex i) throws Narsese.NarseseException {
         NAR t = NARS.shell();
         i.start(t);
 
@@ -72,7 +72,7 @@ public class TermIndexTest {
 //        );
 //        //testIndex(new MapIndex2(newHashMap(), conceptBuilder));
 //    }
-    @Ignore @Test public void testTermSharing5c() throws Narsese.NarseseException {
+    @Ignore @Test public static void testTermSharing5c() throws Narsese.NarseseException {
         testIndex(
                 new BasicTermIndex(1024)
         );
@@ -91,7 +91,7 @@ public class TermIndexTest {
 //    }
 
 
-    void testTermSharing(@NotNull TermIndex tt) throws Narsese.NarseseException {
+    static void testTermSharing(@NotNull TermIndex tt) throws Narsese.NarseseException {
 
         tt.start(NARS.shell());
         testShared(tt, "<<x-->w> --> <y-->z>>");
@@ -126,12 +126,12 @@ public class TermIndexTest {
         assertTrue(t1 != t2);
     }
 
-    private void testShared(@NotNull TermIndex i, @NotNull String s) throws Narsese.NarseseException {
+    private static void testShared(@NotNull TermIndex i, @NotNull String s) throws Narsese.NarseseException {
 
         int t0 = i.size();
         //int s0 = i.subtermsCount();
 
-        Term a = i.get(i.term(s), true).term(); //create by parsing then manually intern it
+        Term a = i.get(TermIndex.term(s), true).term(); //create by parsing then manually intern it
 
         int t1 = i.size();
         //int s1 = i.subtermsCount();
@@ -141,7 +141,7 @@ public class TermIndexTest {
             assertTrue(t0 < t1);
         }
 
-        Term a2 = i.get(i.term(s), true).term(); //create by parsing again
+        Term a2 = i.get(TermIndex.term(s), true).term(); //create by parsing again
         testShared(a, a2);
 
         assertEquals(i.size(), t1 /* unchanged */);
@@ -150,7 +150,7 @@ public class TermIndexTest {
         //i.print(System.out); System.out.println();
 
         //create by composition
-        Compound b = (Compound) i.get(i.term('(' + s + ')'), true).term();
+        Compound b = (Compound) i.get(TermIndex.term('(' + s + ')'), true).term();
         testShared(a.term(), b.sub(0));
 
         assertEquals(i.size(), t1 + 1 /* one more for the product container */);

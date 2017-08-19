@@ -73,7 +73,7 @@ public class Premise extends Pri implements ITask {
 
     @Override
     public String toString() {
-        return taskLink + "," + termLink + "," + deriver;
+        return taskLink + "," + termLink + ',' + deriver;
     }
 
     /**

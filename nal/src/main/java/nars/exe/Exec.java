@@ -1,22 +1,18 @@
 package nars.exe;
 
-import jcog.Loop;
 import jcog.event.On;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
-import nars.Task;
 import nars.control.Activate;
 import nars.task.ITask;
 import nars.task.NALTask;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 

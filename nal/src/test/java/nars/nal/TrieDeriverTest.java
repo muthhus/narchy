@@ -1,6 +1,9 @@
 package nars.nal;
 
-import nars.*;
+import nars.NAR;
+import nars.NARS;
+import nars.Narsese;
+import nars.Task;
 import nars.control.Derivation;
 import nars.control.Premise;
 import nars.derive.Deriver;

@@ -241,7 +241,7 @@ public class EllipsisTest {
         @Override
         public Compound getPattern(String prefix, String suffix) throws Narsese.NarseseException {
             PatternTermIndex pi = new PatternTermIndex();
-            Compound pattern = (Compound) pi.term(prefix + "%1, " + ellipsisTerm + suffix).term();
+            Compound pattern = (Compound) TermIndex.term(prefix + "%1, " + ellipsisTerm + suffix).term();
             return pattern;
         }
 
@@ -250,7 +250,7 @@ public class EllipsisTest {
         @Override
         public @NotNull Term getResult() throws Narsese.NarseseException {
             final PatternTermIndex pi = new PatternTermIndex();
-            return pi.term("<%1 --> (" + ellipsisTerm + ")>").normalize().term();
+            return TermIndex.term("<%1 --> (" + ellipsisTerm + ")>").normalize().term();
         }
 
     }

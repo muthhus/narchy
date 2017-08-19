@@ -2,16 +2,12 @@ package nars.exe;
 
 import jcog.Loop;
 import jcog.Util;
-import jcog.event.On;
 import nars.NAR;
 import nars.task.ITask;
-import nars.util.CPUThrottle;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinTask;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;

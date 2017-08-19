@@ -694,7 +694,7 @@ public class PremiseRule extends GenericCompound {
         constraints.add(new StructureExclusionConstraint(t, structure));
     }
 
-    private void neq(@NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
+    private static void neq(@NotNull SortedSet<MatchConstraint> constraints, @NotNull Term x, @NotNull Term y) {
         constraints.add(new NotEqualConstraint(x, y));
         constraints.add(new NotEqualConstraint(y, x));
     }

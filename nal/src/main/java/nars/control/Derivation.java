@@ -311,7 +311,7 @@ public class Derivation extends Unify implements TermContext {
 
             this.beliefTruth = beliefTruth;
 
-            overlap = (cyclic |= belief.cyclic()) | Stamp.overlapping(task, belief);
+            overlap = (cyclic |= belief.cyclic()) || Stamp.overlapping(task, belief);
 
         } else {
             this.beliefTruth = this.beliefTruthRaw = null;

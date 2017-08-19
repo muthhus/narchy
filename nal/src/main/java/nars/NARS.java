@@ -8,7 +8,6 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.Exec;
 import nars.exe.FocusExec;
-import nars.exe.UnifiedExec;
 import nars.index.term.BasicTermIndex;
 import nars.index.term.TermIndex;
 import nars.index.term.map.CaffeineIndex;

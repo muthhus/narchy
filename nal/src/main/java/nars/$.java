@@ -14,6 +14,7 @@ import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.derive.LambdaPred;
 import nars.derive.PrediTerm;
 import nars.index.term.StaticTermIndex;
+import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -66,7 +67,7 @@ public interface $ {
 
     @NotNull
     static <T extends Term> T $(@NotNull String term) throws Narsese.NarseseException {
-        return terms.term(term);
+        return TermIndex.term(term);
     }
 
     static <T extends Term> T $safe(@NotNull String term) {
@@ -463,7 +464,7 @@ public interface $ {
     }
 
     class Logging {
-        {
+        static {
             Thread.currentThread().setName("$");
 
             //http://logback.qos.ch/manual/layouts.html
@@ -879,11 +880,13 @@ public interface $ {
 
     @NotNull
     static String unquote(String x) {
-        int len = x.length();
-        if (len > 0 && x.charAt(0) == '\"' && x.charAt(len - 1) == '\"') {
-            return unquote(x.substring(1, len - 1));
-        } else {
-            return x;
+        while (true) {
+            int len = x.length();
+            if (len > 0 && x.charAt(0) == '\"' && x.charAt(len - 1) == '\"') {
+                x = x.substring(1, len - 1);
+            } else {
+                return x;
+            }
         }
     }
 

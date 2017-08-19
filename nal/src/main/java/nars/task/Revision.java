@@ -13,7 +13,6 @@ import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import nars.truth.Truthed;
-import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

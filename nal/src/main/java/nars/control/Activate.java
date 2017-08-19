@@ -8,8 +8,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.op.data.flat;
-import nars.task.ITask;
 import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
@@ -20,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;

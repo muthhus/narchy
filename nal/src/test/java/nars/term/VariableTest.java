@@ -1,6 +1,7 @@
 package nars.term;
 
 import nars.*;
+import nars.index.term.TermIndex;
 import nars.term.atom.Atomic;
 import org.junit.Test;
 
@@ -134,7 +135,7 @@ public class VariableTest {
 
     private static Compound raw(String a) {
         try {
-            return (Compound) $.terms.termRaw(a);
+            return (Compound) TermIndex.termRaw(a);
         } catch (Narsese.NarseseException e) {
             assertTrue(false);
             return null;

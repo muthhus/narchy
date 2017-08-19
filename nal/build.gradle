@@ -16,8 +16,8 @@ pitest {
     targetTests = [
             'nars.nal.nal1.NAL1Test',
             'nars.nal.nal1.NAL1MultistepTest',
-            'nars.nal.nal2',
-            'nars.derive.TemporalizeTest',
+            'nars.nal.nal2.*',
+            //'nars.derive.TemporalizeTest',
             'nars.task.*']
     targetClasses = [
         'nars.term.*',
@@ -34,7 +34,8 @@ pitest {
 
     timeoutFactor = 3
     enableDefaultIncrementalAnalysis = true
-    threads = 1
+    threads = 4
+
     outputFormats = [ 'HTML' ]
     timestampedReports = false
 }

@@ -7,8 +7,6 @@ import jcog.data.FloatParam;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
-import nars.term.Compound;
-import nars.term.atom.Atomic;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.CameraSensor;
 import nars.video.Scale;

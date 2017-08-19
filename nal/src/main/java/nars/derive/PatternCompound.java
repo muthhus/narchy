@@ -18,7 +18,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import static nars.Op.*;
-import static nars.Op.CONJ;
 
 /**
  * HACK this should extend ProxyTerm or something

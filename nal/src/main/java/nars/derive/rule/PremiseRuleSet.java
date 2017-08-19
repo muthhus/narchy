@@ -264,13 +264,13 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         }
 
         String A = '(' + ab[0].trim() + ')';
-        Term a = index.termRaw(A);
+        Term a = TermIndex.termRaw(A);
         if (!(a instanceof Compound)) {
             throw new Narsese.NarseseException("Left rule component must be compound: " + src);
         }
 
         String B = '(' + ab[1].trim() + ')';
-        Term b = index.termRaw(B);
+        Term b = TermIndex.termRaw(B);
         if (!(b instanceof Compound)) {
             throw new Narsese.NarseseException("Right rule component must be compound: " + src);
         }

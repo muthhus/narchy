@@ -12,13 +12,11 @@ import nars.index.term.NewCompound;
 import nars.term.Term;
 import nars.term.var.AbstractVariable;
 import nars.term.var.CommonVariable;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;

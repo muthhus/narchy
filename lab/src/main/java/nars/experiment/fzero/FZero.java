@@ -1,13 +1,9 @@
 package nars.experiment.fzero;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import jcog.Util;
 import nars.*;
-import nars.concept.ActionConcept;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
-import nars.op.ImplicationBooster;
 import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;

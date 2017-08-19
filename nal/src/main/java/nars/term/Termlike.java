@@ -91,7 +91,7 @@ public interface Termlike extends Termed {
      * or of is out of bounds or not a container,
      * returns the provided ifOutOfBounds
      */
-    @Nullable <T extends Term> T sub(int i, @Nullable T ifOutOfBounds);
+    Term sub(int i, Term ifOutOfBounds);
 
     default boolean impossibleSubTermVolume(int otherTermVolume) {
 //        return otherTermVolume >

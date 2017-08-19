@@ -27,6 +27,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -109,7 +110,7 @@ public class Narsese extends BaseParser<Object> {
             //() -> Grappa.createParser(Narsese.class)
             () -> {
                 try {
-                    return (Narsese) parser.newInstance();
+                    return (Narsese) parser.getConstructor().newInstance();
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;
@@ -1282,7 +1283,7 @@ public class Narsese extends BaseParser<Object> {
         } catch (Exception e) {
             ee = e;
         }
-        throw new NarseseException(s.toString(), null, ee);
+        throw new NarseseException(s, null, ee);
     }
 
 //    static LoadingCache<String, Term> singleTerms = Caffeine.newBuilder().maximumSize(32 * 1024)
@@ -1489,7 +1490,7 @@ public class Narsese extends BaseParser<Object> {
         }
 
         public NarseseException(String input, ParsingResult result, Throwable cause) {
-            super(input + "\n" + result, cause);
+            super(input + '\n' + result, cause);
             this.result = result;
         }
     }

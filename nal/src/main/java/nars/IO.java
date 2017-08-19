@@ -7,6 +7,7 @@ import com.google.common.io.ByteStreams;
 import jcog.byt.DynBytes;
 import jcog.data.string.Utf8Writer;
 import jcog.pri.Prioritized;
+import nars.index.term.TermIndex;
 import nars.task.NALTask;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
@@ -258,7 +259,7 @@ public class IO {
 
     @NotNull public static Term readSpecialTerm(@NotNull DataInput in) throws IOException {
         try {
-            return $.terms.termRaw(in.readUTF());
+            return TermIndex.termRaw(in.readUTF());
         } catch (Narsese.NarseseException e) {
             throw new IOException(e);
         }

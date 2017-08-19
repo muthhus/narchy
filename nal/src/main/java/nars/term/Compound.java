@@ -355,7 +355,7 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
-    default Term sub(int i, @Nullable Term ifOutOfBounds) {
+    default Term sub(int i, Term ifOutOfBounds) {
         return subterms().sub(i, ifOutOfBounds);
     }
 

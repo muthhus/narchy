@@ -136,13 +136,13 @@ public class VersionMap<X, Y> extends AbstractMap<X, Y> {
     }
 
     @NotNull
-    public Versioned<Y> newEntry(X ignored) {
+    protected Versioned<Y> newEntry(X ignored) {
         return new Versioned<>(context, elementStackSizeDefault);
         //return cache(k) ? new Versioned(context) :
         //return new RemovingVersionedEntry(k);
     }
 
-    public boolean forEachVersioned(@NotNull BiPredicate<? super X, ? super Y> each) {
+    public boolean forEachVersioned(BiPredicate<? super X, ? super Y> each) {
         Set<Entry<X, Versioned<Y>>> ee = map.entrySet();
         for (Entry<X, Versioned<Y>> e : ee) {
             Y y = e.getValue().get();

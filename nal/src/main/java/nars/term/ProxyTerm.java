@@ -229,8 +229,7 @@ public class ProxyTerm<T extends Term> implements Term {
 //    }
 
     @Override
-    @Nullable
-    public <U extends Term> U sub(int i, @Nullable U ifOutOfBounds) {
+    public Term sub(int i, Term ifOutOfBounds) {
         return ref.sub(i, ifOutOfBounds);
     }
 

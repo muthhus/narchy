@@ -205,7 +205,7 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
     }
 
     @Override
-    public <T extends Term> @Nullable T sub(int i, @Nullable T ifOutOfBounds) {
+    public Term sub(int i, Term ifOutOfBounds) {
         return term.sub(i, ifOutOfBounds);
     }
 

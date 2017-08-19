@@ -8,7 +8,6 @@ import nars.NARS;
 import nars.Narsese;
 import nars.Param;
 import nars.control.Activate;
-import nars.exe.FocusExec;
 import nars.gui.NARChart;
 import nars.gui.graph.DynamicConceptSpace;
 import nars.gui.graph.EdgeDirected;

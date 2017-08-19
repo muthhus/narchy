@@ -1,7 +1,6 @@
 package nars.experiment.tetris;
 
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
 import nars.*;
 import nars.concept.ActionConcept;

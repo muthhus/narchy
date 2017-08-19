@@ -33,10 +33,11 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static jcog.Texts.n2;
-import static nars.$.*;
 import static nars.$.impl;
 import static nars.$.newArrayList;
 import static nars.$.p;
+import static nars.$.parallel;
+import static nars.$.quote;
 import static nars.$.t;
 import static nars.Op.*;
 import static nars.time.Tense.ETERNAL;

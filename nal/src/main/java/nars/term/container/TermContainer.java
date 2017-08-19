@@ -102,8 +102,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
 
     @Override
-    @Nullable
-    default Term sub(int i, @Nullable Term ifOutOfBounds) {
+    default Term sub(int i, Term ifOutOfBounds) {
         return size() <= i ? ifOutOfBounds : sub(i);
     }
 

@@ -7,7 +7,6 @@ import nars.Op;
 import nars.term.Term;
 import nars.term.Termlike;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.util.function.BiPredicate;
@@ -125,9 +124,8 @@ public interface Atomic extends Term {
     @Override
     default int volume() { return 1; }
 
-    @Nullable
     @Override
-    default Term sub(int i, @Nullable Term ifOutOfBounds) {
+    default Term sub(int i, Term ifOutOfBounds) {
         //no superterms to select
         return ifOutOfBounds;
     }

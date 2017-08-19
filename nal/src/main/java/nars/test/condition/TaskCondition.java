@@ -6,6 +6,7 @@ import nars.$;
 import nars.NAR;
 import nars.Op;
 import nars.Task;
+import nars.index.term.TermIndex;
 import nars.task.Tasked;
 import nars.term.Term;
 import nars.term.Terms;
@@ -104,7 +105,7 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
         this.confMin = Math.max(0.0f, confMin);
         this.punc = punc;
         this.term =
-                normalizedOrNull($.terms.term(sentenceTerm).term());
+                normalizedOrNull(TermIndex.term(sentenceTerm).term());
     }
 
     @NotNull
