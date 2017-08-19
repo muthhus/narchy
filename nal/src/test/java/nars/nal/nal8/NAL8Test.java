@@ -589,7 +589,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(5, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, /*~*/5)
+                .mustDesire(cycles, "(out)", 0f, 0.81f, /*~*/8)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -604,7 +604,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(0, "((happy) ==>+3 --(out)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, 13)
+                .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 

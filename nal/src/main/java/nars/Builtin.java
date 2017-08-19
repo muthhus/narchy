@@ -10,12 +10,14 @@ import nars.op.data.intersect;
 import nars.op.substitute;
 import nars.term.Functor;
 import nars.term.Term;
+import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
@@ -324,50 +326,50 @@ public class Builtin {
 //            selector :-
 //            a specific integer value index, from 0 to compound size
 //            (a,b) pair of integers, a range of indices */
-//            Functor.f("slice", (args) -> {
-//                if (args.size() == 2) {
-//                    Compound x = compoundOrNull(args.sub(0));
-//                    if (x != null) {
-//                        int len = x.size();
-//
-//                        Term index = args.sub(1);
-//                        Op o = index.op();
-//                        if (o == INT) {
-//                            //specific index
-//                            int i = ((IntTerm) index).val;
-//                            if (i >= 0 && i < len)
-//                                return x.sub(i);
-//                            else
-//                                return False;
-//
-//                        } else if (o == PROD && index.size() == 2) {
-//                            Term start = ((Compound) index).sub(0);
-//                            if (start.op() == INT) {
-//                                Term end = ((Compound) index).sub(1);
-//                                if (end.op() == INT) {
-//                                    int si = ((IntTerm) start).val;
-//                                    if (si >= 0 && si < len) {
-//                                        int ei = ((IntTerm) end).val;
-//                                        if (ei >= 0 && ei <= len) {
-//                                            if (si == ei)
-//                                                return Terms.ZeroProduct;
-//                                            if (si < ei) {
-//                                                return $.p(Arrays.copyOfRange(x.toArray(), si, ei));
-//                                            }
-//                                        }
-//                                    }
-//                                    //TODO maybe reverse order will return reversed subproduct
-//                                    return False;
-//                                }
-//                            }
-//
-//                        }
-//                    }
-//                }
-//                return null;
-//            })
-//
-//    };
+            nar.on(Functor.f("slice", (args) -> {
+                if (args.size() == 2) {
+                    Term x = args.sub(0);
+                    if (x.size() > 0) {
+                        int len = x.size();
+
+                        Term index = args.sub(1);
+                        Op o = index.op();
+                        if (o == INT) {
+                            //specific index
+                            int i = ((Int) index).id;
+                            if (i >= 0 && i < len)
+                                return x.sub(i);
+                            else
+                                return False;
+
+                        } else if (o == PROD && index.size() == 2) {
+                            Term start = (index).sub(0);
+                            if (start.op() == INT) {
+                                Term end = (index).sub(1);
+                                if (end.op() == INT) {
+                                    int si = ((Int) start).id;
+                                    if (si >= 0 && si < len) {
+                                        int ei = ((Int) end).id;
+                                        if (ei >= 0 && ei <= len) {
+                                            if (si == ei)
+                                                return Op.ZeroProduct;
+                                            if (si < ei) {
+                                                return $.p(Arrays.copyOfRange(x.subterms().toArray(), si, ei));
+                                            }
+                                        }
+                                    }
+                                    //TODO maybe reverse order will return reversed subproduct
+                                    return False;
+                                }
+                            }
+
+                        }
+                    }
+                }
+                return null;
+            }));
+
+
 
 
 //                Functor.f0("help", () -> {

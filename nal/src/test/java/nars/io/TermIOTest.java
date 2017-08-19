@@ -163,7 +163,7 @@ public class TermIOTest {
 
         NAR a = NARS.tmp()
                 .input("a:b.", "b:c.", "c:d!")
-                .run(32)
+                .run(16)
                 .output(baos);
 
         byte[] x = baos.toByteArray();

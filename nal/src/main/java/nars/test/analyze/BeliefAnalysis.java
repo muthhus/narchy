@@ -17,13 +17,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** utility class for analyzing the belief/goal state of a concept */
-public class BeliefAnalysis extends EnergyAnalysis implements Termed {
+public class BeliefAnalysis implements Termed {
 
-	public final Compound term;
+	public final Term term;
+	public final NAR nar;
 
-	public BeliefAnalysis(NAR n, Compound term) {
-		super(n);
+	public BeliefAnalysis(NAR n, Term term) {
+		this.nar = n;
 		this.term = term;
+	}
+
+	public BeliefAnalysis(@NotNull NAR n, @NotNull String term) throws Narsese.NarseseException {
+		this( n, n.term(term));
 	}
 
 	@Override
@@ -31,9 +36,6 @@ public class BeliefAnalysis extends EnergyAnalysis implements Termed {
 		return term;
 	}
 
-	public BeliefAnalysis(@NotNull NAR n, @NotNull String term) throws Narsese.NarseseException {
-		this(n, n.term(term));
-	}
 
 	@NotNull
 	public BeliefAnalysis goal(float freq, float conf) {

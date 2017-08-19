@@ -33,7 +33,7 @@ import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
 import static nars.Op.*;
-import static nars.task.RevisionTest.AB;
+import static nars.task.RevisionTest.x;
 import static org.junit.Assert.*;
 
 /**
@@ -675,11 +675,7 @@ public class TermTest {
 //
 //    }
 
-    @Test public void testStatemntString() {
-        assertTrue(AB.op().statement);
-        assertTrue(AB instanceof Compound);
-        assertEquals("(a-->b)", AB.toString());
-    }
+
 
 //    @Test
 //    public void testImageConstructionExt() throws Narsese.NarseseException {
@@ -791,8 +787,8 @@ public class TermTest {
 
     @Test
     public void testSubTermStructure() throws Narsese.NarseseException {
-        assertTrue( AB.term().impossibleSubTerm( AB.term() ) );
-        assertTrue( !AB.hasAll(n.term("<a-->#b>").term().structure()) );
+        assertTrue( x.term().impossibleSubTerm( x.term() ) );
+        assertTrue( !x.hasAll(n.term("<a-->#b>").term().structure()) );
     }
 
     @Test

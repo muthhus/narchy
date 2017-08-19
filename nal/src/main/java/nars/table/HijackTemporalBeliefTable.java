@@ -381,7 +381,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
                     (1f / (1f + abs(yRange - (xe - xs)))) *
                     (1f + Math.min(abs(xe - now), abs(xs - now)) / yDist) *
                     (1f + overlap / (1 + yRange)) *
-                    (1f - Stamp.overlapFraction(yStamp, x.stamp()) / 2f)
+                    (1f - Stamp.overlapFraction(yStamp, x.stamp()))
                     //(1f + (1f - x.conf()))
                     ;
         };

@@ -1,11 +1,11 @@
 package nars.exe;
 
-import edu.virginia.cs.skiptree.ConcurrentSkipTreeSet;
 import jcog.bag.Bag;
+import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
+import jcog.data.sorted.SortedArray;
 import jcog.list.FasterList;
-import jcog.pri.Pri;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
 import nars.Param;
@@ -16,6 +16,7 @@ import nars.control.NARService;
 import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
+import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.NavigableSet;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
@@ -45,27 +46,23 @@ public class FocusExec extends Exec implements Runnable {
     final int subCycleTasks = subCyclePremises * 2;
 
     final int MAX_PREMISES = subCyclePremises * 2;
-    final int MAX_TASKS = subCycleTasks*2;
+    final int MAX_TASKS = subCycleTasks * 2;
     final int MAX_CONCEPTS = 64;
 
     final Random random = new XorShift128PlusRandom(1);
 
-//    final CurveBag<Premise> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
-//            new ConcurrentHashMap<>(), random, MAX_PREMISES);
-    /** only needs to be a sorted set */
-    NavigableSet<Premise> premises =
-            //new TreeSet(Pri.IdentityComparator);
-            new ConcurrentSkipTreeSet(Pri.IdentityComparator);
+    final CurveBag<Premise> premises = new ConcurrentCurveBag<>(Param.premiseMerge /* TODO make separate premise merge param */,
+            new ConcurrentHashMap<>(), null, MAX_PREMISES);
 
     final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
-            random, MAX_TASKS);
+            null, MAX_TASKS);
 
     public final Bag concepts =
             new ConcurrentCurveBag<>(Param.conceptActivate,
                     //new ConcurrentHashMap<>(),
                     new ConcurrentHashMapUnsafe<>(),
-                random, MAX_CONCEPTS);
-            //new DefaultHijackBag(Param.conceptMerge, MAX_CONCEPTS, 3);
+                    random, MAX_CONCEPTS);
+    //new DefaultHijackBag(Param.conceptMerge, MAX_CONCEPTS, 3);
 
 
     final static Logger logger = LoggerFactory.getLogger(FocusExec.class);
@@ -78,6 +75,10 @@ public class FocusExec extends Exec implements Runnable {
     @Nullable
     private NARService trigger;
 
+    public FocusExec() {
+
+
+    }
 
     @Override
     protected synchronized void clear() {
@@ -96,7 +97,7 @@ public class FocusExec extends Exec implements Runnable {
 
     @Override
     public synchronized void stop() {
-        if (trigger!=null) {
+        if (trigger != null) {
             nar.remove(trigger.term());
             trigger = null;
         }
@@ -104,16 +105,21 @@ public class FocusExec extends Exec implements Runnable {
     }
 
 
-    @Nullable protected NARService newTrigger() {
+    @Nullable
+    protected NARService newTrigger() {
         return new CycleService(nar) {
-            @Override public void accept(NAR nar) {
+            @Override
+            public void accept(NAR nar) {
                 run();
             }
         };
     }
 
-    /** run an iteration */
-    @Override public void run() {
+    /**
+     * run an iteration
+     */
+    @Override
+    public void run() {
 
         if (Param.TRACE) {
             System.out.println("tasks=" + tasks.size() + " concepts=" + concepts.size() + " premises=" + premises.size());
@@ -158,13 +164,7 @@ public class FocusExec extends Exec implements Runnable {
             execute(next);
 
             //execute the next set of premises
-            for (int p = 0; p < subCyclePremises; p++) {
-                Premise pn = premises.pollFirst();
-                if (pn == null)
-                    break;
-                execute(pn);
-            }
-
+            premises.pop(subCyclePremises, this::execute);
 
         }
     }
@@ -181,7 +181,7 @@ public class FocusExec extends Exec implements Runnable {
         try {
 
             Iterable<? extends ITask> y = x.run(nar);
-            if (y!=null) {
+            if (y != null) {
                 y.forEach(this::add);
             }
 
@@ -205,7 +205,9 @@ public class FocusExec extends Exec implements Runnable {
 
     @Override
     public Stream<ITask> stream() {
-        return Stream.concat(Stream.concat(concepts.stream(), premises.stream()), tasks.stream());
+        return Stream.concat(Stream.concat(concepts.stream(),
+                premises.stream()
+        ), tasks.stream());
     }
 
 
@@ -219,11 +221,7 @@ public class FocusExec extends Exec implements Runnable {
 
         } else if (x instanceof Premise) {
 
-            premises.add((Premise) x);
-
-            while (premises.size() >= MAX_PREMISES) {
-                premises.pollLast();
-            }
+            premises.putAsync((Premise)x);
 
         } else if (x instanceof Activate) {
             concepts.putAsync(x);

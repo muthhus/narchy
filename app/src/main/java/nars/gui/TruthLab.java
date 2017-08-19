@@ -230,7 +230,7 @@ public class TruthLab extends Grid {
         n.log()
             .inputAt(10, "(x).   :|: %1.0;0.9%")
             .inputAt(20, "(y).   :|: %1.0;0.9%")
-            .inputAt(30, "--(x). :|: %1.0;0.8%")
+            .inputAt(30, "--(x). :|: %1.0;0.9%")
             .inputAt(40, "--(y). :|: %1.0;0.8%")
             .run(60);
 

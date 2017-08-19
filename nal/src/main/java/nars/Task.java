@@ -66,15 +66,17 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
         Truth t = truth();
         long a = start();
-        float cw = t.evi();
+
 
         if (a == ETERNAL)
-            return cw;
+            return t.evi();
         else if (when == ETERNAL)
             return t.eviEternalized();
         else {
+
+            float cw = t.evi();
             long z = end();
-            assert (z >= a) : this + " has mismatched start/end times";
+            //assert (z >= a) : this + " has mismatched start/end times";
 
             if ((when >= a) && (when <= z)) {
 
@@ -82,11 +84,26 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
             } else {
                 //nearest endpoint of the interval
-                long dist = Math.min(Math.abs(a - when), Math.abs(z - when));
+
+                long touched =
+                        //nearestTimeTo(when);
+                        mid(); //to be fair to other more precisely endured tasks
+
+                long dist = Math.abs(when - touched);
                 assert (dist > 0) : "what time is " + a + ".." + z + " supposed to mean relative to " + when;
 
+
+                //experimental: decay slower according to complexity, ie. more complex learned rules will persist longer
+                float durAdjusted = dur;// * (volume());
+
+//                long r = z - a;
+//                cw = r != 0 ?
+//                        (cw / (1f + ((float) r) / dur)) //dilute the endured task in proportion to how many durations it consumes beyond point-like (=0)
+//                        :
+//                        cw;
+
                 assert (dur > 0);
-                cw = TruthPolation.evidenceDecay(cw, dur, dist); //decay
+                cw = TruthPolation.evidenceDecay(cw, durAdjusted, dist); //decay
                 //cw = 0; //immediate cut-off
 
 
@@ -419,7 +436,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                 //HACK there is probably a better way
 
                 if ((x > a) && (y < b)) {
-                    return (x+y)/2; //midpoint of the contained range
+                    return (x + y) / 2; //midpoint of the contained range
                 } else if (x <= a && y >= b) {
                     return mid(); //midpoint of this within the range
                 } else {
@@ -916,7 +933,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                 }
 
 
-                return Collections.singleton( Command.logTask(n.time(), $.p(x, y)) );
+                return Collections.singleton(Command.logTask(n.time(), $.p(x, y)));
             }
         }
 
@@ -1006,7 +1023,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
         ObjectBooleanPair<Term> x = tryContent(t, punc, true);
         if (x != null) {
-            return res.apply(x.getOne(), tr!=null ? tr.negIf(x.getTwo()) : null);
+            return res.apply(x.getOne(), tr != null ? tr.negIf(x.getTwo()) : null);
         }
         return null;
     }

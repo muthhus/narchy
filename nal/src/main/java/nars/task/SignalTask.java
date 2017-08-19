@@ -27,6 +27,7 @@ public class SignalTask extends NALTask {
         return false;
     }
 
+
     @Override public long end() {
         if (this.slidingEnd == ETERNAL)
             return start();

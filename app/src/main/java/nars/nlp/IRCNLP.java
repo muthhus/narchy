@@ -291,7 +291,8 @@ public class IRCNLP extends IRC {
 
 
         IRCNLP bot = new IRCNLP(n,
-                "exp" + Math.round(10000 * Math.random()),
+                //"exp" + Math.round(10000 * Math.random()),
+                "patham10",
 
                 "irc.freenode.net",
                 //"#123xyz"

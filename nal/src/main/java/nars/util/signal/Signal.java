@@ -39,6 +39,8 @@ public class Signal extends AtomicReference<SignalTask> {
 
     final byte punc;
 
+    private static final int lookAheadDurs = 1;
+
 
     public Signal(byte punc, FloatSupplier resolution) {
         super(null);
@@ -68,7 +70,7 @@ public class Signal extends AtomicReference<SignalTask> {
                 current.priMax(p);
 
 
-                if (current.stretchKey == null) {
+                if (current.stretchKey != null) {
                     Concept c = nar.concept(current);
                     if (c!=null) {
                         DefaultBeliefTable bt = (DefaultBeliefTable) ((BaseConcept) c).table(current.punc);
@@ -95,9 +97,10 @@ public class Signal extends AtomicReference<SignalTask> {
 
                     //TODO move the task construction out of this critical update section?
                     next = task(term, nextTruth.truth(),
-                            now, now,
+                            now, now + lookAheadDurs * nar.dur(),
                             stamper.getAsLong(), dt);
 
+                    next.stretchKey = this; //temporary placeholder, for at least signaling the stretch to itself
                     next.setEnd(now);
 
                     //System.out.println(current + " " + next );

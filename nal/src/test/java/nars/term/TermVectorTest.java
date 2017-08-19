@@ -7,7 +7,7 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import org.junit.Test;
 
-import static nars.task.RevisionTest.AB;
+import static nars.task.RevisionTest.x;
 import static org.junit.Assert.*;
 
 /**
@@ -16,9 +16,9 @@ import static org.junit.Assert.*;
 public class TermVectorTest {
 
     @Test
-    public void testSubtermsEquality() {
+    public void testSubtermsEquality() throws Narsese.NarseseException {
 
-        Compound a = AB;
+        Term a = $.$("(a-->b)");
         //return Atom.the(Utf8.toUtf8(name));
 
         //        int olen = name.length();

@@ -59,6 +59,7 @@ public abstract class Param extends Services<Term,NAR> {
 
     public static final PriMerge termlinkMerge = PriMerge.max;
     public static final PriMerge tasklinkMerge = PriMerge.max; //not safe to plus without enough headroom
+    public static final PriMerge premiseMerge = PriMerge.max;
     public static final PriMerge taskMerge = PriMerge.max;
     public static final PriMerge conceptActivate = PriMerge.plus;
 
@@ -77,13 +78,13 @@ public abstract class Param extends Services<Term,NAR> {
                     //0;
                     //Integer.MAX_VALUE;
                     //4;
-                    16;
+                    8;
 
     /** 'time to live', unification steps until unification is stopped */
-    public final MutableInteger matchTTL = new MutableInteger(128);
+    public final MutableInteger matchTTL = new MutableInteger(256);
 
     /** how much percent of a premise's allocated TTL can be used in the belief matching phase. */
-    public static final float BELIEF_MATCH_TTL_FRACTION = 0.3f;
+    public static final float BELIEF_MATCH_TTL_FRACTION = 0.25f;
 
     /** cost of attempting a unification */
     public static final int TTL_UNIFY = 1;
@@ -101,7 +102,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int TTL_DERIVE_TASK_SAME = 2;
 
     /** cost of a failed/aborted task derivation */
-    public static final int TTL_DERIVE_TASK_FAIL = 2;
+    public static final int TTL_DERIVE_TASK_FAIL = 1;
 
     /** number between 0 and 1 controlling the proportion of activation going
      * forward (compound to subterms) vs. reverse (subterms to parent compound).
@@ -119,8 +120,8 @@ public abstract class Param extends Services<Term,NAR> {
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
     public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.66f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.95f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
 
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */

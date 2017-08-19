@@ -1,5 +1,6 @@
 package nars.table;
 
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import jcog.pri.Pri;
@@ -50,10 +51,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * if the szie is less than or equal to this value, all the entries will
      * be evaluated when matching a task or interpolating a truth.
      */
-    private final static int EVAL_ALL_LTE_TASKS = 2;
+    private final static int EVAL_ALL_LTE_TASKS = 3;
 
     public static final int MIN_TASKS_PER_LEAF = 2;
-    public static final int MAX_TASKS_PER_LEAF = 2;
+    public static final int MAX_TASKS_PER_LEAF = 3;
 
 
     private transient NAR nar;
@@ -250,10 +251,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //                remove(changed); //return true; //stop tracking
 //            }
 
-        @Nullable Object changed = task.stretchKey;
-        if (changed != null) {
+        @Nullable Object stretch = task.stretchKey;
+        if (stretch instanceof TaskRegion) {
 
-            TaskRegion t = (TaskRegion) changed;
+            TaskRegion t = (TaskRegion) stretch;
 
             boolean removed = tree.remove(t);
             if (removed) {
@@ -277,7 +278,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 return null; //couldnt add
             }
         }*/
-        return null;
+        return stretch;
     }
 
 //    public void updateSignalTasks(long now) {
@@ -309,10 +310,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             FloatFunction<Task> ts = taskStrength(when, dur);
             FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task));
 
-            float confMin = nar.confMin.floatValue();
             int enoughSampled = Math.min(s, Math.round(Math.max(1, enoughSamplesRate * capacity)));
 
-            List<TaskRegion> tt;
+            List<? extends Tasked> tt;
             if (s <= EVAL_ALL_LTE_TASKS) {
                 tt = ordering(new UniqueRanker<>(strongestTask))
                         .greatestOf(tree.iterator(), maxSamplesTruthpolated);
@@ -341,24 +341,43 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 }
             }
 
-            return truth(when, nar, ete, dur, confMin, tt); //eternal included
+            if (!tt.isEmpty()) {
+                //prefilter if any exactly match the target time
+                boolean anyMatchTime = false;
+                for (int i = 0, ttSize = tt.size(); i < ttSize; i++) {
+                    Tasked x = tt.get(i);
+                    if (x.task().during(when)) {
+                        anyMatchTime = true;
+                        break;
+                    }
+                }
+
+//                Iterable<? extends Tasked> ii;
+//                if (anyMatchTime) {
+//                    //tt.removeIf((x) -> !x.task().during(when));
+//                    ii = Iterables.filter(tt, (x) -> x.task().during(when));
+//                } else {
+//                    ii = tt;
+//                }
+                return truth(when, nar, ete, dur, tt); //eternal included
+            }
         }
 
         return ete != null ? ete.truth() : null;
 
     }
 
-    static Truth truth(long when, NAR nar, Task ete, int dur, float confMin, List<TaskRegion> tt) {
-        int tts = tt.size();
-        if (tts > 0) {
+    static Truth truth(long when, NAR nar, Task ete, int dur, Iterable<? extends Tasked> tt) {
+
             //applying eternal should not influence the scan for temporal so it is left null here
             @Nullable PreciseTruth t = TruthPolation.truth(
                     ete, when, dur, tt);
             if (t != null /*&& t.conf() >= confMin*/) {
-                return t.ditherFreqConf(nar.truthResolution.floatValue(), confMin, 1f);
+                return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+            } else {
+                return null;
             }
-        }
-        return null;
+
     }
 
     /**
@@ -449,13 +468,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         this.nar = n;
 
-        TaskRegion tr = x instanceof SignalTask && ((SignalTask) x).stretchKey != null ?
+        boolean isSignal = x instanceof SignalTask;
+        TaskRegion tr = isSignal && (((SignalTask) x).stretchKey instanceof TaskRegion) ?
                 ((TaskRegion) ((SignalTask) x).stretchKey) :
                 new TaskRegion(x);
 
         if (tree.add(tr)) {
 
-            if (x instanceof SignalTask)
+            if (isSignal)
                 ((SignalTask) x).stretchKey = tr;
 
             //check capacity overage

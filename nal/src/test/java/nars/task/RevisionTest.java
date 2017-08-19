@@ -70,7 +70,7 @@ public class RevisionTest {
     }
 
 
-    public final static Compound AB = $.inh(Atomic.the("a"), Atomic.the("b"));
+    public final static Term x = $.the("x");
 
     void testRevision(int delay1, boolean beliefOrGoal) {
         Param.DEBUG = true;
@@ -81,7 +81,7 @@ public class RevisionTest {
 
         //arbitrary time delays in which to observe that certain behavior does not happen
 
-        BeliefAnalysis b = new BeliefAnalysis(n, AB)
+        BeliefAnalysis b = new BeliefAnalysis(n, x)
             .input(beliefOrGoal, 1f, 0.9f).run(1);
 
         assertEquals(1, b.size(beliefOrGoal));
@@ -110,7 +110,7 @@ public class RevisionTest {
 
         int offCycles = 2;
 
-        BeliefAnalysis b = new BeliefAnalysis(n, AB);
+        BeliefAnalysis b = new BeliefAnalysis(n, x);
 
         //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
 
@@ -155,7 +155,7 @@ public class RevisionTest {
 
 
 
-        BeliefAnalysis b = new BeliefAnalysis(n, AB);
+        BeliefAnalysis b = new BeliefAnalysis(n, x);
 
         //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
 
@@ -253,7 +253,7 @@ public class RevisionTest {
     @Test public void testRevisionBudgeting() {
         NAR n = newNAR(6);
 
-        BeliefAnalysis b = new BeliefAnalysis(n, AB);
+        BeliefAnalysis b = new BeliefAnalysis(n, x);
 
         assertEquals(0, b.priSum(), 0.01f);
 

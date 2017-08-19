@@ -481,68 +481,6 @@ public class TemporalTermTest {
     }
 
 
-    @Test
-    public void testConceptualizationIntermpolationEternal() throws Narsese.NarseseException {
-
-        NAR d = NARS.shell();
-        d.believe("((a ==>+2 b)-->[pill])");
-        d.believe("((a ==>+6 b)-->[pill])"); //same concept
-        d.run(1);
-
-
-        //assertTrue(5 <= size(d.focus().concepts()));
-        //Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
-
-
-        Term term = $("((a==>b)-->[pill])");
-
-        Concept cc = d.concept(term);
-        assertNotNull(cc);
-        String q = "((a ==>+- b)-->[pill])";
-        assertEquals(q, cc.toString());
-        //assertEquals(q, cc.toString());
-
-
-        //INTERMPOLATION APPLIED DURING REVISION:
-        //TODO should be either 2 or 6, not 4
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(ETERNAL, null, null, true, null).term().toString());
-    }
-
-    @Test
-    public void testConceptualizationIntermpolationTemporal() throws Narsese.NarseseException {
-
-        n.believe("((a ==>+2 b)-->[pill])", Tense.Present, 1f, 0.9f);
-        n.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
-        n.run(1);
-
-        //@NotNull Bag<Concept, PLink<Concept>> cb = n.focus.active;
-        //assertTrue(5 <= cb.size());
-
-        String abpill = "((a==>b)-->[pill])";
-        BaseConcept cc = (BaseConcept) n.conceptualize(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
-
-        assertNotNull(cc);
-
-        String correctMerge = "((a ==>+4 b)-->[pill])";
-
-
-        cc.beliefs().print();
-
-        //test belief match interpolated a result
-        assertEquals(correctMerge, cc.beliefs().match((long) 0, null, null, true, n).term().toString());
-
-
-        //test merge after capacity shrink:
-
-        cc.beliefs().setCapacity(1, 1); //set to capacity=1 to force compression
-
-        cc.print();
-
-        //n.forEachTask(System.out::println);
-
-        //INTERMPOLATION APPLIED AFTER REVECTION:
-        assertEquals(correctMerge, cc.beliefs().match((long) 0, null, null, true, n).term().toString());
-    }
 
     @Test
     public void testSubtermTimeRecursive() throws Narsese.NarseseException {

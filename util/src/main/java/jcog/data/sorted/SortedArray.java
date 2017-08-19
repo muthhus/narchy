@@ -45,7 +45,7 @@ import java.util.function.Consumer;
  * @param <E>
  * @author Andreas Hollmann
  */
-public class SortedArray<E> implements Iterable<E> {
+public abstract class SortedArray<E> implements Iterable<E> {
 
 
     public static final int binarySearchThreshold = 8;
@@ -256,13 +256,20 @@ public class SortedArray<E> implements Iterable<E> {
     /**
      * generally, uses grow(oldSize) (not oldSize directly!) to get the final constructed array length
      */
-    protected E[] newArray(int oldSize) {
-        throw new UnsupportedOperationException("impl in subclasses");
-    }
+    abstract protected E[] newArray(int oldSize);
+//    {
+//        throw new UnsupportedOperationException("impl in subclasses");
+//    }
 
     protected static int grow(int oldSize) {
         return oldSize + 2;
         //return oldSize == 0 ? 4 : oldSize * 2;
+    }
+
+    @Nullable public E removeFirst() {
+        if (size == 0)
+            return null;
+        return remove(0);
     }
 
     public E removeLast() {

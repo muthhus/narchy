@@ -202,7 +202,8 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
      * non-null: revised task
      */
     @Nullable
-    private /*Revision*/Task tryRevision(@NotNull Task y /* input */, @NotNull BaseConcept concept, @NotNull NAR nar) {
+    private /*Revision*/Task tryRevision(@NotNull Task y /* input */,
+                                         @Nullable NAR nar) {
 
         Object[] list = this.list;
         int bsize = list.length;
@@ -280,7 +281,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             NALTask r = new NALTask(t,
                     y.punc(),
                     revisionTruth,
-                    nar.time(),
+                    nar!=null ? nar.time() : ETERNAL /* creation time */,
                     ETERNAL, ETERNAL,
                     Stamp.zip(prevBelief.stamp(), y.stamp(), 0.5f /* TODO proportionalize */)
             );
@@ -381,7 +382,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         } else {
 
 
-            Task revised = tryRevision(input, c, nar);
+            Task revised = tryRevision(input, nar);
             if (revised != null) {
                 if (revised == input) {
                     //already present duplicate, so ignore

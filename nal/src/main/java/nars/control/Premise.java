@@ -15,11 +15,13 @@ import nars.derive.time.Temporalize;
 import nars.index.term.TermIndex;
 import nars.table.BeliefTable;
 import nars.task.ITask;
+import nars.task.UnaryTask;
 import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.term.subst.UnifySubst;
+import org.eclipse.collections.impl.tuple.Tuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -41,7 +43,7 @@ import static nars.time.Tense.ETERNAL;
  * It is meant to be disposable and should not be kept referenced longer than necessary
  * to avoid GC loops, so it may need to be weakly referenced.
  */
-public class Premise extends Pri implements ITask {
+public class Premise extends UnaryTask {
 
     static final Logger logger = LoggerFactory.getLogger(Premise.class);
 
@@ -50,31 +52,13 @@ public class Premise extends Pri implements ITask {
     private final PrediTerm<Derivation> deriver;
 
     public Premise(@Nullable Task tasklink, @Nullable Term termlink, PrediTerm<Derivation> deriver, float pri) {
-        super(pri);
+        super(Tuples.pair(Tuples.pair(tasklink, termlink), deriver), pri);
         this.taskLink = tasklink;
         this.termLink = termlink;
         this.deriver = deriver;
-        //this.hash = Util.hashCombine(tasklink.hashCode(), termlink.hashCode());
     }
 
-//    @Override
-//    public boolean equals(Object obj) {
-//        if (this == obj) return true;
-//        if (!(obj instanceof Premise)) return false;
-//        Premise x = (Premise) obj;
-//        if (hash != x.hash) return false;
-//        return taskLink.equals(((Premise) obj).taskLink) && termLink.equals(((Premise) obj).termLink);
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        return hash;
-//    }
 
-    @Override
-    public String toString() {
-        return taskLink + "," + termLink + ',' + deriver;
-    }
 
     /**
      * resolve the most relevant belief of a given term/concept
@@ -236,15 +220,15 @@ public class Premise extends Pri implements ITask {
                 long when = matchFocus(task, now, dur);
 
                 boolean tryMatch = true;
-                if (beliefIsTask && task.punc() == BELIEF && task.during(when)) {
-                    if (Math.abs(when - now) > 0 /*= dur*/) {
-                        //try projecting to now (maybe also a future time) because it will be a different time
-                        when = now;
-                    } else {
-                        //leave belief blank. it already matches itself
-                        tryMatch = false;
-                    }
-                }
+//                if (beliefIsTask && task.punc() == BELIEF && task.during(when)) {
+//                    if (Math.abs(when - now) > 0 /*= dur*/) {
+//                        //try projecting to now (maybe also a future time) because it will be a different time
+//                        when = now;
+//                    } else {
+//                        //leave belief blank. it already matches itself
+//                        tryMatch = false;
+//                    }
+//                }
                 if (tryMatch) {
                     match = beliefConcept.beliefs().match(when, task, beliefTerm, true, nar);
                 } else {
@@ -286,9 +270,9 @@ public class Premise extends Pri implements ITask {
         if (now == ETERNAL)
             return ETERNAL;
 
-        return now;
+        //return now;
         //return now + dur;
-        //return task.nearestTimeTo(now);
+        return task.nearestTimeTo(now);
 
 //        if (task.isEternal()) {
 //            return ETERNAL;

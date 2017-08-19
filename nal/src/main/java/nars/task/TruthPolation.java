@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
+import static jcog.Util.sqr;
 import static nars.truth.TruthFunctions.w2c;
 
 /**
@@ -26,21 +27,21 @@ public enum TruthPolation { ;
     /**
      * dt > 0
      */
-    public static float evidenceDecay(float evi, int dur, long dt) {
+    public static float evidenceDecay(float evi, float dur, long dt) {
 
         //hard linear with half duration on either side of the task -> sum to 1.0 duration
-//        float scale = ((float)dt) / dur;
+//        float scale = dt / dur;
 //        if (scale > 0.5f) return 0;
 //        else return evi * (1f - scale*2f);
 
 
         //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
 
-        return evi / (1 + (((float) dt) / dur)); //inverse linear
+        return evi / (1 + ( dt / dur)); //inverse linear
 
-        //return evi / ( 1f + sqr( ((float)dt)/dur) ); //inverse square
+        //return evi / ( sqr( 1 + dt/dur) ); //inverse square
 
-        //return evi * 1f/( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
+        //return evi /( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
 
 
         //return evi / (1f + dt / dur ); //first order decay
@@ -69,14 +70,8 @@ public enum TruthPolation { ;
             Task task = t.task();
             float tw = task.evi(when, dur);
             if (tw > 0) {
-
-                if (!task.isEternal())
-                    tw = tw/(1f + ((float)task.range())/dur); //dilute the long task in proportion to how many durations it consumes beyond point-like (=0)
-
                 eviSum += tw;
-
-                float f = task.freq();
-                wFreqSum += tw * f;
+                wFreqSum += tw * task.freq();
             }
 
         }

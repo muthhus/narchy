@@ -1,18 +1,26 @@
 package nars.table;
 
-import nars.NAR;
-import nars.Narsese;
-import nars.Param;
+import com.google.common.collect.Lists;
+import nars.*;
+import nars.concept.BaseConcept;
+import nars.concept.Concept;
+import nars.concept.dynamic.DynamicBeliefTable;
+import nars.term.Term;
 import nars.test.analyze.BeliefAnalysis;
+import nars.time.Tense;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.List;
+
 import static junit.framework.TestCase.assertNotNull;
-import static nars.task.RevisionTest.AB;
+import static nars.$.$;
 import static nars.task.RevisionTest.newNAR;
+import static nars.task.RevisionTest.x;
 import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -20,53 +28,18 @@ import static org.junit.Assert.assertTrue;
 /**
  * Created by me on 7/5/15.
  */
-public class BeliefTableTest  {
-
-
-//    @Test public void testRevisionBeliefs() {
-//        NAR n = new Default();
-//
-//        //ArrayListBeliefTable t = new ArrayListBeliefTable(4);
-//
-//        Task pos = n.inputTask("<a --> b>. %1.00;0.90%");
-//        n.frame(1);
-//
-//        Concept c = n.concept("<a -->b>");
-//        BeliefTable b = c.getBeliefs();
-//        assertEquals(b.toString(), 1, b.size());
-//
-//
-//        //after the 2nd belief, a revision is created
-//        //and inserted with the 2 input beliefs
-//        //to produce two beliefs.
-//        Task neg = n.inputTask("<a --> b>. %0.00;0.90%");
-//
-//        n.frame(100);
-//        assertEquals(b.toString(), 3, b.size());
-//
-//        //sicne they are equal and opposite, the
-//        //revised belief will be the average of them
-//        //but with a higher confidence.
-//
-//        //assertTrue(p && n);
-//        //assertTrue();
-//
-//        System.out.println(b);
-//
-//    }
-
+public class BeliefTableTest {
 
     @Test
     public void testExpectation() throws Narsese.NarseseException {
 
-        assertEquals(0.859f, new DiscreteTruth(0.9f,0.9f).expectation(), 0.001f);
-
+        assertEquals(0.859f, new DiscreteTruth(0.9f, 0.9f).expectation(), 0.001f);
 
 
         NAR n = newNAR(12);
 
 
-        BeliefAnalysis b = new BeliefAnalysis(n, AB);
+        BeliefAnalysis b = new BeliefAnalysis(n, x);
 
         n.input("b:a. %0.9|0.9%"); //highest positive
         n.input("b:a. %0.8|0.8%");
@@ -80,8 +53,8 @@ public class BeliefTableTest  {
         assertNotNull("belief truth " + b.term + " at " + when, bt);
         assertEquals(0.86f, bt.expectation(), 0.1f);
 
-        n.input("b:a. %0.2|0.7%");
-        n.input("b:a. %0.1|0.8%"); //highest negative
+        n.believe(x, Tense.Present, 0.2f, 0.7f);
+        n.believe(x, Tense.Present, 0.1f, 0.8f); //highest negative
 
         n.cycle();
         b.print();
@@ -90,18 +63,17 @@ public class BeliefTableTest  {
     }
 
 
-
     @Test
     public void testEternalBeliefRanking() {
 
         Param.DEBUG = true;
 
-        int maxBeliefs = 10;
-        NAR n = newNAR(maxBeliefs);
+        int cap = 10;
 
-        BeliefAnalysis b = new BeliefAnalysis(n, AB);
+        NAR n = NARS.shell();
+        BeliefAnalysis b = new BeliefAnalysis(n, x);
 
-        b.believe(1.0f, 0.5f); n.cycle();
+        b.believe(1.0f, 0.5f);
         b.print();
 
         BeliefTable beliefs = b.concept().beliefs();
@@ -112,146 +84,245 @@ public class BeliefTableTest  {
         assertEquals(0.5, bt.conf(), 0.001);
         assertEquals(1, beliefs.size());
 
-        b.believe(1.0f, 0.5f); n.cycle();
+        b.believe(1.0f, 0.5f);
+        n.cycle();
         b.print();
         assertEquals(3 /* revision */, beliefs.size());
         assertEquals(0.669, beliefs.match(ETERNAL, null, null, true, null).conf(), 0.01);
 
-        b.believe(1.0f, 0.5f); n.cycle();
+        b.believe(1.0f, 0.5f);
+        n.cycle();
         b.print();
         assertEquals(5, beliefs.size());
         @NotNull BeliefTable bb = beliefs;
         assertEquals(0.75, bb.match(ETERNAL, null, null, true, null).conf(), 0.001);
         assertEquals(0.75, n.beliefTruth(b, n.time()).conf(), 0.01);
 
-        b.believe(1.0f, 0.5f); n.cycle();
+        b.believe(1.0f, 0.5f);
+        n.cycle();
         b.print();
         assertEquals(0.79, beliefs.match(ETERNAL, null, null, true, null).conf(), 0.02);
         assertEquals(7, beliefs.size());
 
-        //n.step();
-        //b.print();
-
-//        int period = 1;
-//        int loops = 20;
-//
-//        for (int i = 0; i < loops; i++) {
-//
-//
-//            b.run(period);
-//            //b.printEnergy();
-//
-//
-//            long now = b.nar.time();
-//
-//            Task tt = b.concept().getBeliefs().top(now);
-//            //float p = tt.getExpectation() * tt.projectionRank(now);
-//
-//            System.out.println(now + " " + " " +  tt);
-//
-//            //b.print();
-//        }
-
-        //b.print();
-
     }
+
     @Test
     public void testPolation0() {
 
-        Param.DEBUG = true;
-
-        int maxBeliefs = 4; //includes 3 eternal beliefs we arent using:
-        NAR n = newNAR(maxBeliefs);
-        n.time.dur(16);
-
-
-        BeliefAnalysis b = new BeliefAnalysis(n, AB);
-
-        //assertEquals(0.0, (Double) b.energy().get(MemoryBudget.Budgeted.ActiveConceptPrioritySum), 0.001);
-
         int spacing = 4;
-        float conf = 0.85f;
+        float conf = 0.9f;
+        float[] freqPattern =
+                //new float[]{0, 0.25f, 0.5f, 0.75f, 1f};
+                new float[]{0, 0.5f, 1f};
+        long[] timing =
+                new long[] { 0, 2, 4 };
 
-        //create linear gradient of belief across time, freq beginning at 0 and increasing to 1
-        for (int i = 0; i < maxBeliefs; i++) {
-            b.believe(0.5f, i/((float)maxBeliefs-1), conf, i * spacing).run(spacing);
+        int dur = 1;
 
-            assertTrue(i+1 <= b.size(true));
+        NAR n = NARS.shell();
+        n.time.dur(dur);
+
+        BeliefAnalysis b = new BeliefAnalysis(n, x);
+
+        assertEquals(timing.length, freqPattern.length);
+        int k = 0;
+        for (float f : freqPattern) {
+            //create linear gradient of belief across time, freq beginning at 0 and increasing to 1
+            b.believe(0.5f, freqPattern[k], conf, timing[k]);
+            k++;
         }
-
-        b.print();
-        System.out.println();
-
-        assertEquals(maxBeliefs, b.size(true));
-
-        int margin = spacing * (maxBeliefs/2);
+        int c = freqPattern.length;
+        assertEquals(c, b.size(true));
 
         @NotNull BeliefTable table = b.concept().beliefs();
 
-
-        for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
-            System.out.println(i + "\t" + table.truth((long) i, n));
-        }
-        System.out.println();
-        for (int i = -margin; i < spacing * maxBeliefs + margin; i++) {
+        b.print();
+        int margin = spacing * (c / 2);
+        for (int i = -margin; i < spacing * c + margin; i++)
             System.out.println(i + "\t" + table.truth(i,    /* relative to zero */  n));
+
+        //measure exact timing
+        for (int i = 0; i < c; i++) {
+            long w = timing[i];
+            Truth truth = table.truth(w, n);
+            float fExpected = freqPattern[i];
+            assertEquals("exact truth @" + w + " == " + fExpected, fExpected, truth.freq(), 0.01f);
+
+            Task match = table.match(w, null, null, false, n);
+            assertEquals("exact belief @" + w + " == " + fExpected, fExpected, match.freq(), 0.01f);
         }
 
-        /* first */
-        @Nullable Truth firstBeliefTruth = table.truth((long) 0, n);
-        assertEquals(0.43f, firstBeliefTruth.freq(), 0.1f);
+        //measure midpoint interpolation
+        for (int i = 0; i < c-1; i++) {
+            float f = (freqPattern[i] + freqPattern[i+1])/2f;
+            long w = (timing[i] + timing[i+1])/2;
+            assertEquals(f, table.truth(w, n).freq(), 0.1f);
+        }
 
-        /* last */
-        int dur = n.dur();
-        @Nullable Truth lastBeliefTruth = table.truth((long) (spacing * (maxBeliefs - 1)), n);
-        assertEquals(0.56f, lastBeliefTruth.freq(), 0.1f);
 
-        @Nullable Truth endTruth = table.truth((long) (spacing * (maxBeliefs - 1) + margin), n);
-        assertEquals(0.55f, endTruth.freq(), 0.2f);
-        assertTrue(lastBeliefTruth.conf() >= endTruth.conf());
 
-        @Nullable Truth startTruth = table.truth((long) (0 - margin), n);
-        assertEquals(0.44f, startTruth.freq(), 0.2f);
-        assertTrue(firstBeliefTruth.conf() >= startTruth.conf());
+
+//        /* first */
+//        @Nullable Truth firstBeliefTruth = table.truth((long) 0, n);
+//        assertEquals(0.43f, firstBeliefTruth.freq(), 0.1f);
+//
+//        /* last */
+//        @Nullable Truth lastBeliefTruth = table.truth((long) (spacing * (c - 1)), n);
+//        assertEquals(0.56f, lastBeliefTruth.freq(), 0.1f);
+//
+//        @Nullable Truth endTruth = table.truth((long) (spacing * (c - 1) + margin), n);
+//        assertEquals(0.55f, endTruth.freq(), 0.2f);
+//        assertTrue(lastBeliefTruth.conf() >= endTruth.conf());
+//
+//        @Nullable Truth startTruth = table.truth((long) (0 - margin), n);
+//        assertEquals(0.44f, startTruth.freq(), 0.2f);
+//        assertTrue(firstBeliefTruth.conf() >= startTruth.conf());
+    }
+    @Test
+    public void testConceptualizationIntermpolationEternal() throws Narsese.NarseseException {
+
+        NAR d = NARS.shell();
+        d.believe("((a ==>+2 b)-->[pill])");
+        d.believe("((a ==>+6 b)-->[pill])"); //same concept
+        d.run(1);
+
+
+        //assertTrue(5 <= size(d.focus().concepts()));
+        //Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
+
+
+        Term term = $("((a==>b)-->[pill])");
+
+        Concept cc = d.concept(term);
+        assertNotNull(cc);
+        String q = "((a ==>+- b)-->[pill])";
+        assertEquals(q, cc.toString());
+        //assertEquals(q, cc.toString());
+
+
+        //INTERMPOLATION APPLIED DURING REVISION:
+        //TODO should be either 2 or 6, not 4
+        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(ETERNAL, null, null, true, null).term().toString());
+    }
+
+        @Test
+    public void testLinearTruthpolation() throws Narsese.NarseseException {
+        NAR n = new NARS().get();
+        n.time.dur(5);
+        n.inputAt(10, "(x). :|:");
+        n.run(10);
+        //with duration = 5, the evidence surrounding a point
+        // belief/goal will decay in the +/- 2.5 radius of time surrounding it.
+
+        n.conceptualize("(x)").print();
+
+        assertEquals(0.85f, n.beliefTruth("(x)",  7).conf(), 0.01f );
+        assertEquals(0.86f, n.beliefTruth("(x)",  8).conf(), 0.01f );
+        assertEquals(0.88f, n.beliefTruth("(x)",  9).conf(), 0.01f );
+        assertEquals(0.90f, n.beliefTruth("(x)", 10).conf(), 0.01f );
+        assertEquals(0.88f, n.beliefTruth("(x)", 11).conf(), 0.01f );
+        assertEquals(0.86f, n.beliefTruth("(x)", 12).conf(), 0.01f );
+        //assertNull( n.beliefTruth("(x)", 13000) );
+
+    }
+
+    @Test
+    public void testDurationDithering() throws Narsese.NarseseException {
+        NAR n = NARS.shell();
+        n.time.dur(5);
+
+        assertEquals( $.$("((x) &| (y))"), n.term("((x) &&+1 (y))"));
+        assertEquals( $.$("((x) &| (y))"), n.term("((x) &&-1 (y))"));
+        assertEquals( "(&|,(x),(y),(z))", n.term("(((x) &&+1 (y)) &&+1 (z))").toString());
+        assertEquals( $.$("((x) &&+6 (y))"), n.term("((x) &&+6 (y))"));
+        assertEquals( $.$("((x) =|> (y))"), n.term("((x) ==>+1 (y))"));
+//        assertEquals( $.$("((x) <|> (y))"), n.term("((x) <=>+1 (y))"));
+
+    }
+
+    @Test
+    public void testTemporalIntersection() throws Narsese.NarseseException {
+
+        //this.activeTasks = activeTasks;
+        NAR n = NARS.tmp();
+
+        //n.log();
+        n.inputAt( 0,"a:x. :|:");
+        n.inputAt(10,"a:y. :|:");
+        n.run(128);
+
+        assertDuration(n, "a:(x|y)", 5, 5);
+        assertDuration(n, "a:(x&y)", 5, 5);
+        assertDuration(n, "a:(y~x)", 5, 5);
+        assertDuration(n, "a:(x~y)", 5, 5);
+        //assertDuration(n, "(x<->y)", 5, 5);
+
+        //n.concept("(x-->a)").print();
+        //n.concept("(y-->a)").print();
+    }
+
+    @Test public void testDurationIntersection() {
+        /*
+        WRONG: t=25 is not common to both; 30 is however
+        $.12 ((happy|i)-->L). 25 %.49;.81% {37: b;k} (((%1-->%2),(%3-->%2),task("."),notSet(%3),notSet(%1),neqRCom(%3,%1)),(((%1|%3)-->%2),((Intersection-->Belief))))
+            $.25 (i-->L). 30 %.84;.90% {30: k}
+            $.22 (happy-->L). 20⋈30 %.58;.90% {20: b}
+        */
+
+    }
+
+    static void assertDuration(NAR n, String c, long start, long end) throws Narsese.NarseseException {
+        BaseConcept cc = (BaseConcept) n.conceptualize(c);
+        Assert.assertNotNull(c + " unconceptualized", cc);
+
+        List<Task> tt = Lists.newArrayList(cc.beliefs());
+        assertTrue(c + " not believed", cc.beliefs() instanceof DynamicBeliefTable || tt.size() > 0);
+
+        if (tt.size() > 0) {
+            Task t = tt.get(0);
+            //System.out.println(sim.proof());
+            //System.out.println(sim.start() + ".." + /*sim.occurrence() + ".."*/ + sim.end());
+            assertEquals(start, t.start());
+            assertEquals(end, t.end());
+        }
     }
 
 
+    @Test
+    public void testConceptualizationIntermpolationTemporal() throws Narsese.NarseseException {
+        NAR n = NARS.tmp();
+        n.believe("((a ==>+2 b)-->[pill])", Tense.Present, 1f, 0.9f);
+        n.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
+        n.run(1);
 
-//    @Ignore
-//    @Test
-//    public void testTruthOscillationLongTerm() {
-//
-//        NAR n = newNAR(16, (c, b) -> {
-//            return new BeliefTable.BeliefConfidenceAndCurrentTime(c);
-//        });
-//        n.memory().duration.set(1);
-//
-//        int period = 2;
-//
-//        BeliefAnalysis b = new BeliefAnalysis(n, "<a-->b>");
-//
-//        boolean state = true;
-//
-//        //for (int i = 0; i < 16; i++) {
-//        for (int i = 0; i < 255; i++) {
-//
-//            if (i % (period) == 0) {
-//                b.believe(state ? 1f : 0f, 0.9f, Tense.Present);
-//                state = !state;
-//            }
-//            else {
-//                //nothing
-//            }
-//
-//            n.frame();
-//
-//            /*if (i % 10 == 0) {
-//                b.printWave();
-//                b.printEnergy();
-//                b.print();
-//            }*/
-//        }
-//
-//
-//    }
+        //@NotNull Bag<Concept, PLink<Concept>> cb = n.focus.active;
+        //assertTrue(5 <= cb.size());
+
+        String abpill = "((a==>b)-->[pill])";
+        BaseConcept cc = (BaseConcept) n.conceptualize(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
+
+        assertNotNull(cc);
+
+        String correctMerge = "((a ==>+4 b)-->[pill])";
+
+
+        cc.beliefs().print();
+
+        //test belief match interpolated a result
+        assertEquals(correctMerge, cc.beliefs().match((long) 0, null, null, true, n).term().toString());
+
+
+        //test merge after capacity shrink:
+
+        cc.beliefs().setCapacity(1, 1); //set to capacity=1 to force compression
+
+        cc.print();
+
+        //n.forEachTask(System.out::println);
+
+        //INTERMPOLATION APPLIED AFTER REVECTION:
+        assertEquals(correctMerge, cc.beliefs().match((long) 0, null, null, true, n).term().toString());
+    }
+
+
 }

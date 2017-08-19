@@ -360,10 +360,10 @@ public class Temporalize implements ITemporalize {
     public void knowDerivedTerm(Subst d, Term term, long start, long end) {
         knowTerm(term, start, end);
 
-        Term t2 = d.transform(term);
-        if (!t2.equals(term) && !(t2 instanceof Bool)) {
-            knowTerm(t2, start, end);
-        }
+//        Term t2 = d.transform(term);
+//        if (!t2.equals(term) && !(t2 instanceof Bool)) {
+//            knowTerm(t2, start, end);
+//        }
     }
 
 

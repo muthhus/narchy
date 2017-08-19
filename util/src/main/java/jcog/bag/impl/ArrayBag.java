@@ -320,7 +320,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      * gets the scalar float value used in a comparison of BLink's
      * essentially the same as b.priIfFiniteElseNeg1 except it also includes a null test. otherwise they are interchangeable
      */
-    static float pCmp(@Nullable Prioritized b) {
+    public static float pCmp(@Nullable Prioritized b) {
         return (b == null) ? -2f : b.priElseNeg1(); //sort nulls beneath
 
 //        float p = b.pri();
@@ -374,12 +374,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 //        return this;
 //    }
 
-    protected int random(int s) {
-        return random().nextInt(s);
-    }
-
-    protected Random random() {
-        return ThreadLocalRandom.current();
+    @Nullable protected Random random() {
+        return null;
     }
 
 
@@ -387,9 +383,12 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      * size > 0
      */
     protected int sampleStart(int size) {
-        if (size == 1) return 0;
-        else
-            return random().nextInt(size);
+        if (size > 1) {
+            Random rng = random();
+            if (rng != null)
+                return rng.nextInt(size);
+        }
+        return 0;
     }
 
     /**
@@ -419,7 +418,8 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         an insertion from another thread, it will not be available in this sampling
          */
 
-        boolean direction = random().nextBoolean();
+        Random rng = random();
+        boolean direction = rng!=null ? rng.nextBoolean() : true;
         int nulls = 0; //# of nulls encountered. when this reaches the array length we know it is empty
         while (!next.stop && nulls < s0) {
             Y x = (Y) ii[i];

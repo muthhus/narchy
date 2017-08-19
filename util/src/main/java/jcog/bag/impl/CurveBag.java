@@ -5,6 +5,7 @@ import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Random;
@@ -14,6 +15,7 @@ import java.util.Random;
  */
 public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
 
+    @Nullable
     private final Random random;
 
     public CurveBag(@NotNull PriMerge mergeFunction, @NotNull Map<X, X> map, Random rng, int cap) {
@@ -29,7 +31,7 @@ public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
 
     @Override
     protected int sampleStart(int size) {
-        if (size == 1)
+        if (size == 1 || random==null)
             return 0;
         else {
             float min = this.min;

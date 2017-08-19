@@ -334,7 +334,7 @@ public interface Stamp {
                 common++;
         }
 
-        return (common == 0) ? 0 : ((float) common / ((aSize + b.length) - (common)));
+        return (common == 0) ? 0 : (((float) common) / Math.min(aSize, b.length));
     }
 
     long creation();
