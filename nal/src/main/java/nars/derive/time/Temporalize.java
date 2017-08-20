@@ -536,7 +536,7 @@ public class Temporalize implements ITemporalize {
                     TermContainer ss = term.subterms();
                     int sss = ss.size();
 
-                    for (int i = 0; i < sss - 1; i++) {
+                    for (int i = 0; i < sss; i++) {
                         Term a = ss.sub(i);
                         int aStart = term.subtermTime(a);
                         //relative to the root of the compound
@@ -546,11 +546,23 @@ public class Temporalize implements ITemporalize {
                             if (superterm instanceof AbsoluteEvent) {
                                 //add direct link to this event by calculating its relative offset to the absolute super event
                                 AbsoluteEvent ase = (AbsoluteEvent) superterm;
-                                long start = ase.start == ETERNAL ? ETERNAL : ase.start + aStart;
+                                long s, e;
+                                if (ase.start == ETERNAL) {
+                                    s = e = ETERNAL;
+                                } else {
+                                    if (tdt >= 0) {
+                                        s = ase.start + aStart;
+                                    } else {
+                                        s = ase.end + tdt + aStart;
+                                    }
+                                    e = s + aDT;
+                                }
 
-                                know(a, new AbsoluteEvent(this, a, start, start + aDT));
+                                know(a, new AbsoluteEvent(this, a, s, e));
                             }
-                            know(a, relative(a, term, aStart, aStart + aDT));
+
+                            //know(a, relative(a, term, aStart, aStart + aDT));
+
                             if (i < sss - 1) {
                                 //relative to sibling subterm
                                 Term b = ss.sub(i + 1);

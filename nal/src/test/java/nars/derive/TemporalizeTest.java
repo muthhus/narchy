@@ -287,6 +287,7 @@ public class TemporalizeTest {
         System.out.println(h);
         assertEquals(3, solution.start(h).abs());
     }
+
     @Test
     public void testImplConjWTFWTFSubjPred() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
@@ -297,12 +298,22 @@ public class TemporalizeTest {
             Term a = $("y");
             HashMap h = new HashMap();
             Event solution = t.solve(a, h);
+            System.out.println(t);
             System.out.println(h);
             assertEquals(3, solution.start(h).abs());
         }
+        System.out.println();
         {
             Term a = $("x");
-            HashMap h = new HashMap();
+            System.out.println(t);
+            System.out.println(t.constraints.get(a));
+            HashMap h = new HashMap() {
+                @Override
+                public Object put(Object key, Object value) {
+                    System.out.println(" --> " + key + "   " + value);
+                    return super.put(key, value);
+                }
+            };
             Event solution = t.solve(a, h);
             System.out.println(h);
             assertEquals(2, solution.start(h).abs());
@@ -585,13 +596,13 @@ public class TemporalizeTest {
 //$.09 (c &&+5 d). 16⋈21 %1.0;.12% {48: 1;2;3;;} ((%1,(%2==>%1),time(urgent),notImpl(%1)),(%2,((AbductionRecursivePB-->Belief),(DeductionRecursivePB-->Goal))))
 //    $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
 //    $.11 ((c &&+5 d) ==>-15 (a &&+5 b)). 11 %1.0;.51% {48: 1;2;3;;} Revection Merge
-        Temporalize t = new Temporalize();
-        t.knowTerm($("(a &&+5 b)"), 1, 6);
-        t.knowTerm($("((c &&+5 d) ==>-15 (a &&+5 b))"), ETERNAL);
-        assertEquals("(c &&+5 d)@[11..16]", t.solve($("(c &&+- d)")).toString());
+        for (long invariant : new long[] { ETERNAL, 11, -10 } ) {
+            Temporalize t = new Temporalize();
+            t.knowTerm($("(a &&+5 b)"), 1, 6);
+            t.knowTerm($("((c &&+5 d) ==>-15 (a &&+5 b))"), invariant);
+            assertEquals(invariant + ":", "(c &&+5 d)@[11..16]", t.solve($("(c &&+- d)")).toString());
+        }
     }
-
-
 
     @Test
     public void testImplFromConj() throws Narsese.NarseseException {
@@ -661,21 +672,30 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         //              $.63 ((a &&+5 ((--,a)&|b)) &&+5 (--,b)). 1⋈11 %1.0;.81% {6: 1;2} ((%1,%2,task("."),time(raw),time(dtEvents),notImpl(%1),notImpl(%2)),((polarize(%1,task) &&+- polarize(%2,belief)),((IntersectionDepolarized-->Belief))))
         Temporalize t = new Temporalize();
 
+        int start = 1;
         Term x = $("((a &&+5 ((--,a)&|b)) &&+5 (--,b))"); assertEquals(10, x.dtRange());
-        t.knowTerm(x, 1, 11);
+        t.knowTerm(x, start, start+10);
 
-        Term a = $("(((--,a)&|b) &&+- a)");
+
+        Term A = $("a");
+        Term Aneg = A.neg();
+
+        System.out.println(t);
+        System.out.println(t.constraints.get(A));
+        System.out.println(t.constraints.get(Aneg));
+
+        assertEquals("(--,a)@" + (x.subtermTime(Aneg) + start), t.solve(Aneg).toString());
+        assertEquals("a@" + (x.subtermTime(A) + start), t.solve(A).toString());
+
         //System.out.println(a);
         //System.out.println(b);
         String r = "(a &&+5 ((--,a)&|b))@[1..6]";
 
-        System.out.println(t);
-        System.out.println(a);
-        Event ta = t.solve(a);
+        Event ta = t.solve($("(((--,a)&|b) &&+- a)"));
         assertNotNull(ta);
         assertEquals(r, ta.toString());
 
-        Term b = $("(b &&+- ((--,a)&|b))"); //check mirror
+        Term b = $("(a &&+- ((--,a)&|b))"); //check mirror
         assertEquals(r, t.solve(b).toString());
 
     }
