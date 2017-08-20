@@ -480,7 +480,7 @@ public class Temporalize implements ITemporalize {
 
                     if (i > 0) {
                         //IMPL: crosslink adjacent subterms.  conjunction is already temporalized in another method
-                        int relInner = lastEnd - subStart;
+                        int relInner = lastStart - subStart;
                         Term rt = tt.sub(i - 1);
                         int rtDT = rt.dt();
                         if (rt.op() == CONJ && rtDT != DTERNAL) {
@@ -726,6 +726,15 @@ public class Temporalize implements ITemporalize {
                     }
                 }
 
+                //HACK try this trick: fully anonymous match
+                Term xRoot = x.conceptual();
+                if (x.equals(xRoot)) {
+                    for (Term y : constraints.keySet()) {
+                        if (y.root().equals(xRoot)) {
+                            return solve(y, trail);
+                        }
+                    }
+                }
 
 //                {
 //                    /* failed to find the sequential case: >=2 or more, so dt=DTERNAL or dt=0 */

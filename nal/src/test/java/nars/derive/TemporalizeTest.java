@@ -421,9 +421,11 @@ public class TemporalizeTest {
         }
 
         {
-            Event solution = t.solve($("(a &&+- b)"));
+            Map<Term, Time> h = new HashMap();
+            Event solution = t.solve($("(a &&+- b)"), h);
             assertNotNull(solution);
-            assertEquals("(a &&+5 b)@[1..6]", solution.toString());
+            assertEquals("(a &&+5 b)", solution.term.toString());
+            assertEquals(1, solution.start(h).abs()); //@[1..6]
         }
         {
             Event solution = t.solve($("(a &&+- #1)"));
@@ -544,10 +546,14 @@ public class TemporalizeTest {
         Temporalize t = new Temporalize();
         t.knowTerm($("(c,d)"), 5);
         t.knowTerm($("(((a,#1) &&+1 (#1,c)) ==>+3 (c,d))"), 1);
-        Event s = t.solve($("( (#1,c) &&+- (a,#1) )"));
+        Map<Term, Time> h = new HashMap();
+        Event s = t.solve($("( (#1,c) &&+- (a,#1) )"), h);
         assertNotNull(s);
-        assertEquals("((a,#1) &&+1 (#1,c))@[1..2]", s.toString());
+        assertEquals("((a,#1) &&+1 (#1,c))", s.term.toString());
+        assertEquals(1, s.start(h).abs()); //@[1..2]
+
     }
+
     @Test
     public void testCoNegationCrossloop() throws Narsese.NarseseException {
         /*
@@ -600,7 +606,29 @@ public class TemporalizeTest {
             Temporalize t = new Temporalize();
             t.knowTerm($("(a &&+5 b)"), 1, 6);
             t.knowTerm($("((c &&+5 d) ==>-15 (a &&+5 b))"), invariant);
-            assertEquals(invariant + ":", "(c &&+5 d)@[11..16]", t.solve($("(c &&+- d)")).toString());
+            Map<Term, Time> h = new HashMap();
+            Event s = t.solve($("(c &&+- d)"), h);
+            assertEquals(invariant + ":", "(c &&+5 d)", s.term.toString());
+            assertEquals(11, s.start(h).abs()); //@[11..16]
+        }
+    }
+    @Test
+    public void testConjImpl23424232354234() throws Narsese.NarseseException {
+        {
+            Temporalize t = new Temporalize();
+            t.knowTerm($("a"), 1);
+            t.knowTerm($("(((b &&+5 c) &&+5 d) ==>-15 a)"), 6);
+            System.out.println(t);
+
+            assertEquals("[((b &&+5 c) &&+5 d)@[5..15]->a]", t.constraints.get($("((b &&+5 c) &&+5 d)")).toString());
+            assertEquals("[(b &&+5 c)@[5..10]->a, (b &&+5 c)@[-10..-5]->d]", t.constraints.get($("(b &&+5 c)")).toString());
+
+            Term r = $("((b &&+- c) &&+- d)");
+            Map<Term, Time> h = new HashMap();
+            Event e = t.solve(r, h);
+            assertNotNull(e);
+            assertEquals( "((b &&+5 c) &&+5 d)@[5..15]->a", e.toString());
+            assertEquals(6, e.start(h).abs());
         }
     }
 
