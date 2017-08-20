@@ -11,6 +11,7 @@ import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.util.UtilityFunctions;
+import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -113,9 +114,8 @@ public abstract class Param extends Services<Term,NAR> {
     /** how many durations above which to dither dt relations to dt=0 (parallel)
      *  set to zero to disable dithering.  typically the value will be 0..~1.0.
      */
-    public static float DITHER_DT =
-            0f;
-            //1f;
+    public final MutableFloat dtDither = new MutableFloat(0f);
+
 
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
     public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;

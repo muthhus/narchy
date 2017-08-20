@@ -166,6 +166,7 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
         n.termVolumeMax.setValue(24);
 
+        n.dtDither.setValue(1f);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
         MySTMClustered stmBelief = new MySTMClustered(n, 64, BELIEF, 4, false, 8f);

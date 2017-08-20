@@ -207,7 +207,7 @@ public interface NSense {
         return senseNumber(v, model, Util.map(0, precision,
                 (int x) ->
                         //($.inh($.the(x), id))
-                        ($.p($.the(x), id))
+                        ($.p(id, $.the(x)))
                 ,
                 Term[]::new));
     }

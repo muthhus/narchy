@@ -26,7 +26,7 @@ public class Implier extends DurService {
     private final TermGraph.ImplGraph tg;
     private final Iterable<Term> seeds;
 
-    @Deprecated float momentum = 0.5f;
+    @Deprecated float momentum = 0f;
     float min = Pri.EPSILON; //even though it's for truth
     Map<Term, TruthAccumulator> goals = new HashMap();
 
@@ -61,14 +61,18 @@ public class Implier extends DurService {
 
         if (graph != null) {
             //prune or forget
-            graph = graph.compact((a, b, prev)-> {
-                float next = prev * momentum;
-                if (next >= min) {
-                    //s.setEdge(a, b, next);
-                    return next;
-                }
-                return null;
-            });
+            if (momentum > 0) {
+                graph = graph.compact((a, b, prev) -> {
+                    float next = prev * momentum;
+                    if (next >= min) {
+                        //s.setEdge(a, b, next);
+                        return next;
+                    }
+                    return null;
+                });
+            } else {
+                graph = null;
+            }
         }
 
         graph = tg.snapshot(graph, seeds, nar, targetTime);

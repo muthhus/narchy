@@ -42,7 +42,7 @@ public class FZero extends NAgentX {
     }
 
     public FZero(NAR nar) throws Narsese.NarseseException {
-        super("fz", nar);
+        super(nar);
 
         this.fz = new FZeroGame();
 
@@ -56,11 +56,11 @@ public class FZero extends NAgentX {
 //                .resolution(0.05f);
 
 
-        actionBipolar($.p(the("fwd"), id), (f) -> {
+        actionBipolar(the("fwd"), (f) -> {
             fz.vehicleMetrics[0][6] += (f) * 0.75f;
             return f;
         });//.resolution.setValue(0.02f);
-        actionBipolar($.p(the("rot"), id), (r) -> {
+        actionBipolar(the("rot"), (r) -> {
             fz.playerAngle += (r) * 0.15f;
             return r;
         });//.resolution.setValue(0.01f);
@@ -78,7 +78,7 @@ public class FZero extends NAgentX {
         //senseNumberDifference($.inh(the("joy"), id), happy).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("angVel"), id), () -> (float) fz.playerAngle).resolution.setValue(0.02f);
 //        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
-        @NotNull ScalarConcepts ang = senseNumber($.inh(the("ang"), id), () ->
+        @NotNull ScalarConcepts ang = senseNumber(the("ang"), () ->
                         (float) (0.5f + 0.5f * MathUtils.normalizeAngle(fz.playerAngle, 0) / (Math.PI)),
                 16,
                 ScalarConcepts.Needle

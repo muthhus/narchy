@@ -68,7 +68,7 @@ public class Temporalize implements ITemporalize {
 
         Task task = d.task;
         Task belief = !d.single ? d.belief : null;
-        dur = Math.max(1, Math.round(Param.DITHER_DT * d.dur));
+        dur = Math.max(1, Math.round(d.nar.dtDither.floatValue() * d.dur));
 
         ITemporalize t = this;
 
@@ -848,6 +848,18 @@ public class Temporalize implements ITemporalize {
             return null; //one is eternal the other isn't
         }*/
 
+        Time early = ata < bta ? at : bt;
+        Time late = ata < bta ? bt : at;
+
+        int cDur;
+        if (Math.abs(ata - bta) < dur) {
+            //dither
+            cDur = (int) Math.abs(ata - bta);
+            bta = ata;
+            late = early;
+        } else {
+            cDur = -1;
+        }
 
         Term newTerm = Op.conjMerge(a, ata, b, bta);
         if (newTerm instanceof Bool)
@@ -855,8 +867,8 @@ public class Temporalize implements ITemporalize {
 //        if (!newTerm.op().conceptualizable) //failed to create conj
 //            return null;
 
-        Time early = ata < bta ? at : bt;
-        return new TimeEvent(this, newTerm, early);
+
+        return new TimeEvent(this, newTerm, early, cDur == -1 ? newTerm.dtRange() : cDur);
     }
 
     private Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {
@@ -920,8 +932,7 @@ public class Temporalize implements ITemporalize {
                 //                dt += innerRange;
                 //            }
 
-                if (dt != 0 && Math.abs(dt) < dur)
-                    dt = 0; //perceived as simultaneous within duration
+                dt = dither(dt);
             }
 
 
@@ -933,6 +944,12 @@ public class Temporalize implements ITemporalize {
         }
         return null;
 
+    }
+
+    private int dither(int dt) {
+        if (dt != 0 && Math.abs(dt) < dur)
+            return 0; //perceived as simultaneous within duration
+        return dt;
     }
 
 

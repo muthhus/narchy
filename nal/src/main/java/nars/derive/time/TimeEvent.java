@@ -13,9 +13,14 @@ public class TimeEvent extends Event {
     private final int dur;
 
     TimeEvent(ITemporalize t, Term term, Time time) {
+        this(t, term, time, 0);
+    }
+
+    TimeEvent(ITemporalize t, Term term, Time time, int dur) {
         super(t, term);
         this.time = time;
-        this.dur = term.op() == CONJ ? term.dtRange() : 0;
+        this.dur = dur;
+                //term.op() == CONJ ? term.dtRange() : 0;
     }
 
     @Override

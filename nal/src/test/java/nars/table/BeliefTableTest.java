@@ -6,6 +6,7 @@ import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.dynamic.DynamicBeliefTable;
 import nars.term.Term;
+import nars.test.TestNAR;
 import nars.test.analyze.BeliefAnalysis;
 import nars.time.Tense;
 import nars.truth.DiscreteTruth;
@@ -228,15 +229,24 @@ public class BeliefTableTest {
 
     @Test
     public void testDurationDithering() throws Narsese.NarseseException {
-        NAR n = NARS.shell();
-        n.time.dur(5);
+        NAR n = NARS.tmp();
+        n.dtDither.setValue(1f);
+        n.time.dur(3);
+        TestNAR t = new TestNAR(n);
+        t.log();
+        t.inputAt(1, "x. :|:");
+        t.inputAt(2, "y. :|:");
+        t.mustBelieve(5, "(x&|y)", 1f, 0.81f, 1, 2);
+        t.mustBelieve(5, "(x=|>y)", 1f, 0.81f, 1);
+        t.run(true);
 
-        assertEquals( $.$("((x) &| (y))"), n.term("((x) &&+1 (y))"));
-        assertEquals( $.$("((x) &| (y))"), n.term("((x) &&-1 (y))"));
-        assertEquals( "(&|,(x),(y),(z))", n.term("(((x) &&+1 (y)) &&+1 (z))").toString());
-        assertEquals( $.$("((x) &&+6 (y))"), n.term("((x) &&+6 (y))"));
-        assertEquals( $.$("((x) =|> (y))"), n.term("((x) ==>+1 (y))"));
-//        assertEquals( $.$("((x) <|> (y))"), n.term("((x) <=>+1 (y))"));
+
+//        assertEquals( $.$("((x) &| (y))"), n.term("((x) &&+1 (y))"));
+//        assertEquals( $.$("((x) &| (y))"), n.term("((x) &&-1 (y))"));
+//        assertEquals( "(&|,(x),(y),(z))", n.term("(((x) &&+1 (y)) &&+1 (z))").toString());
+//        assertEquals( $.$("((x) &&+6 (y))"), n.term("((x) &&+6 (y))"));
+//        assertEquals( $.$("((x) =|> (y))"), n.term("((x) ==>+1 (y))"));
+////        assertEquals( $.$("((x) <|> (y))"), n.term("((x) <=>+1 (y))"));
 
     }
 
