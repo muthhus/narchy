@@ -467,14 +467,9 @@ public class Revision {
         if (a.equals(b)) return 0f;
 
         Op ao = a.op();
-        int len = a.size();
-
-        /*
         Op bo = b.op();
-        assert (ao == bo);
-
-        assert (b.size() == len);
-        */
+        if (ao != bo)
+            return Float.POSITIVE_INFINITY; //why?
 
         float dLocal = 0;
         int adt = a.dt();
@@ -495,8 +490,13 @@ public class Revision {
         }
 
         float d = dLocal;
+
         TermContainer aa = a.subterms();
+        int len = aa.size();
         TermContainer bb = b.subterms();
+        if (bb.size()!=len)
+            return Float.POSITIVE_INFINITY; //? why
+
         for (int i = 0; i < len; i++) {
             d += dtDiff(aa.sub(i), bb.sub(i), depth + 1);
         }

@@ -600,11 +600,12 @@ public class Temporalize implements ITemporalize {
             else
                 return null;
         } else if (o.temporal) {
+            int xSize = x.size();
             if (x.dt() != XTERNAL) {
                 //TODO verify that the provided subterm timing is correct.
                 // if so, return the input as-is
                 // if not, return null
-                if (x.op() == CONJ && x.size() == 2) {
+                if (x.op() == CONJ && xSize == 2) {
                     Term a = x.sub(0);
                     Event ae = solve(a, trail);
                     Term b = x.sub(1);
@@ -662,11 +663,22 @@ public class Temporalize implements ITemporalize {
                 }
 
                 //HACK try this trick: fully anonymous match
-                Term xRoot = x.conceptual();
-                if (x.equals(xRoot)) {
-                    for (Term y : constraints.keySet()) {
-                        if (y.root().equals(xRoot)) {
-                            return solve(y, trail);
+                if (!constraints.isEmpty()) {
+                    Term xRoot = x.root();
+                    int xRootStr = xRoot.structure();
+                    if (x.equals(xRoot)) {
+                        //Op xRootOp = xRoot.op();
+                        for (Term y : constraints.keySet()) {
+                            int xRootVol = xRoot.volume();
+                            if (y.hasAll(xRootStr) && y.volume() >= xRootVol && y.root().equals(xRoot)) {
+                                Event e = solve(y, trail);
+                                if (e != null) {
+                                    return (e.term.op()==NEG ^ o==NEG) ?
+                                        e.neg()  //negate, because the root term will always be unneg
+                                        :
+                                        e;
+                                }
+                            }
                         }
                     }
                 }

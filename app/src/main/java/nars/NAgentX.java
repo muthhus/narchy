@@ -164,9 +164,9 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
-        n.termVolumeMax.setValue(24);
+        n.termVolumeMax.setValue(30);
 
-        n.dtDither.setValue(1f);
+        n.dtDither.setValue(0.5f);
         n.dtMergeOrChoose.setValue(true);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);

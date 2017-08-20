@@ -160,7 +160,7 @@ public class TruthLab extends Grid {
 
         public BeliefTableTimeline(Compound t, BeliefTable b, long start, long end, int samplePeriod) {
             super(start, end, samplePeriod, (w) -> {
-                Task x = b.match((long) w, $.task(t, QUESTION, null).apply(nar), null, true, nar);
+                Task x = b.match((long) w, null, true, nar);
                 if (x!=null)
                     return x.truth(w, dur, Param.TRUTH_EPSILON);
                 return null;

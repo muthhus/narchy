@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Set;
 
 import static nars.Op.BELIEF;
+import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -122,7 +123,14 @@ public class Premise extends UnaryTask {
                 t.knowAmbient(taskTerm);
                 Event bs = t.solve(beliefTerm);
                 if (bs != null && !(bs.term instanceof Bool)) {
-                    beliefTerm = bs.term;
+//                    if (bs.term.op() == NEG) {
+//                        Temporalize t2 = new Temporalize();
+//                        t2.knowAmbient(taskTerm);
+//                        Event c = t2.solve(beliefTerm);
+//                        System.err.println("NEG why");
+//                    }
+
+                    beliefTerm = bs.term.unneg();
 
                     if (!(nar.nal() >= 7 || !beliefTerm.isTemporal())) {
                         //HACK HACK HACK this is temporary until Temporalize correctly differnetiates between && and &| etc
@@ -176,7 +184,7 @@ public class Premise extends UnaryTask {
             }
         }
 
-
+        assert(beliefTerm.op()!=NEG);
 
         //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
         Task belief = null;

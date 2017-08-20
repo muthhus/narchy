@@ -1,6 +1,5 @@
 package nars.table;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import jcog.pri.Pri;
@@ -370,14 +369,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     static Truth truth(long when, NAR nar, Task ete, int dur, Iterable<? extends Tasked> tt) {
 
-            //applying eternal should not influence the scan for temporal so it is left null here
-            @Nullable PreciseTruth t = TruthPolation.truth(
-                    ete, when, dur, tt);
-            if (t != null /*&& t.conf() >= confMin*/) {
-                return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
-            } else {
-                return null;
-            }
+        //applying eternal should not influence the scan for temporal so it is left null here
+        @Nullable PreciseTruth t = TruthPolation.truth(
+                ete, when, dur, tt);
+        if (t != null /*&& t.conf() >= confMin*/) {
+            return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+        } else {
+            return null;
+        }
 
     }
 
@@ -474,30 +473,33 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 ((TaskRegion) ((SignalTask) x).stretchKey) :
                 new TaskRegion(x);
 
-        if (tree.add(tr)) {
+        if (isSignal)
+            ((SignalTask) x).stretchKey = tr;
 
-            if (isSignal)
-                ((SignalTask) x).stretchKey = tr;
+        ((ConcurrentRTree<TaskRegion>) tree).withWriteLock((t) -> {
+
 
             //check capacity overage
-            int over = size() - capacity;
-            if (over > 0) {
-                addAfterCompressing(tr, n).forEach(ii ->
-                        n.input(Activate.activate(ii, ii.priElseZero(), c, n))
-                );
+            if (size() >= capacity) {
+                addAfterCompressing(t, tr, n);
+//                        .forEach(ii -> {
+//                    t.add(new TaskRegion(ii));
+//                    //n.input(Activate.activate(ii, ii.priElseZero(), c, n))
+//                });
+            } else {
+                t.add(tr);
             }
-        }
-    }
+            assert (size() <= capacity) : "size=" + size() + " cap=" + capacity;
 
-    private void add(@NotNull Task t) {
-        tree.addAsync(new TaskRegion(t));
+
+        });
     }
 
     /**
      * assumes called with writeLock
      */
     @NotNull
-    private List<Task> addAfterCompressing(TaskRegion tr, NAR nar) {
+    private List<Task> addAfterCompressing(Space<TaskRegion> tree, TaskRegion tr, NAR nar) {
         //if (compressing.compareAndSet(false, true)) {
         try {
 
@@ -513,16 +515,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             FloatFunction<TaskRegion> rs = regionStrength(now, dur);
             FloatFunction<Leaf<TaskRegion>> mergeableRegion = (l) -> -rs.floatValueOf((TaskRegion) l.region);
 
-            ConcurrentRTree<TaskRegion> lt = ((ConcurrentRTree) tree);
+
 
             List<Task> toActivate = $.newArrayList(1);
-            lt.withWriteLock((r) -> {
+
 
 
                 Top<TaskRegion> deleteVictim = new Top<>(weakestTask);
                 Top<Leaf<TaskRegion>> mergeVictim = new Top<>(mergeableRegion);
 
-                compressNext(tree.root(), deleteVictim, mergeVictim, inputConf, now, dur);
+                compressNext(tree, tree.root(), deleteVictim, mergeVictim, inputConf, now, dur);
 
                 //decide to remove or merge:
                 @Nullable TaskRegion toRemove = deleteVictim.the;
@@ -532,7 +534,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 boolean merged = false;
                 if (toMerge != null) {
                     Task activation = null;
-                    if ((activation = compressMerge(toMerge, now, dur, nar)) != null) {
+                    if ((activation = compressMerge(tree, toMerge, now, dur, nar)) != null) {
                         toActivate.add(activation);
                         merged = true;
                     }
@@ -541,11 +543,11 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     compressEvict(toRemove);
                 }
 
-                if (r.size() < capacity)
+                if (tree.size() < capacity)
                     tree.add(tr);
                 else
                     toActivate.clear();
-            });
+
 
             return toActivate;
             //nar.input(toActivate);
@@ -557,7 +559,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     }
 
-    private Task compressMerge(Leaf<TaskRegion> l, long now, int dur, NAR nar) {
+    private static Task compressMerge(Space<TaskRegion> tree, Leaf<TaskRegion> l, long now, int dur, NAR nar) {
         short s = l.size;
         assert (s > 0);
 
@@ -577,9 +579,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             Task c = Revision.merge(a.task, b.task, now, nar);
             if (c != null) {
                 //already has write lock so just use non-async methods
-                remove(a);
-                remove(b);
-                add(c);
+                tree.remove(a);
+                tree.remove(b);
+                tree.add(new TaskRegion(c));
 
                 //run but don't broadcast it
                 return c;
@@ -597,22 +599,22 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         remove(t);
     }
 
-    void compressNext(Node<TaskRegion, ?> next, Consumer<TaskRegion> deleteVictim, Consumer<Leaf<TaskRegion>> mergeVictim, float inputConf, long now, int dur) {
+    static void compressNext(Space<TaskRegion> tree, Node<TaskRegion, ?> next, Consumer<TaskRegion> deleteVictim, Consumer<Leaf<TaskRegion>> mergeVictim, float inputConf, long now, int dur) {
         if (next instanceof Leaf) {
 
-            compressLeaf((Leaf) next, deleteVictim, inputConf, now, dur);
+            compressLeaf(tree, (Leaf) next, deleteVictim, inputConf, now, dur);
 
             if (next.size() > 1)
                 mergeVictim.accept((Leaf) next);
 
         } else if (next instanceof Branch) {
-            compressBranch((Branch) next, deleteVictim, mergeVictim, inputConf, now, dur);
+            compressBranch(tree, (Branch) next, deleteVictim, mergeVictim, inputConf, now, dur);
         } else {
             throw new RuntimeException();
         }
     }
 
-    void compressBranch(Branch<TaskRegion> b, Consumer<TaskRegion> deleteVictims, Consumer<Leaf<TaskRegion>> mergeVictims, float inputConf, long now, int dur) {
+    static void compressBranch(Space<TaskRegion> tree, Branch<TaskRegion> b, Consumer<TaskRegion> deleteVictims, Consumer<Leaf<TaskRegion>> mergeVictims, float inputConf, long now, int dur) {
         //options:
         //a. smallest
         //b. oldest
@@ -640,13 +642,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
 
             if (weakest.a != null)
-                compressNext(weakest.a, deleteVictims, mergeVictims, inputConf, now, dur);
+                compressNext(tree, weakest.a, deleteVictims, mergeVictims, inputConf, now, dur);
             if (weakest.b != null)
-                compressNext(weakest.b, deleteVictims, mergeVictims, inputConf, now, dur);
+                compressNext(tree, weakest.b, deleteVictims, mergeVictims, inputConf, now, dur);
         }
     }
 
-    void compressLeaf(Leaf<TaskRegion> l, Consumer<TaskRegion> deleteVictims, float inputConf, long now, int dur) {
+    static void compressLeaf(Space<TaskRegion> tree, Leaf<TaskRegion> l, Consumer<TaskRegion> deleteVictims, float inputConf, long now, int dur) {
 
         int size = l.size;
         Object[] ld = l.data;
@@ -658,7 +660,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 continue;
             TaskRegion t = (TaskRegion) x;
             if (t.isDeleted()) {
-                remove(t); //already has write lock so just use non-async methods
+                tree.remove(t); //already has write lock so just use non-async methods
             } else {
                 if (t.task.conf(now, dur) <= inputConf)
                     deleteVictims.accept(t);
@@ -671,13 +673,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         return (TaskRegion cb) -> {
 
             float awayFromNow = //Math.abs(when - ((cb.start + cb.end)/2)); //now to its midpoint
-                                //(Math.min(Math.abs(cb.start - when), Math.abs(cb.end - when)));
-                                Math.abs(cb.start - when)/((float)dur);
+                    //(Math.min(Math.abs(cb.start - when), Math.abs(cb.end - when)));
+                    Math.abs(cb.start - when) / ((float) dur);
 
 
             return (1 / ((1 + awayFromNow)))
-                    * ((1 + (cb.end - cb.start))/awayFromNow) /* range, in vanishing perspective proportion to distance */
-                    * ( cb.confMax ); /* conf, optimistic */
+                    * ((1 + (cb.end - cb.start)) / awayFromNow) /* range, in vanishing perspective proportion to distance */
+                    * (cb.confMax); /* conf, optimistic */
 
 
             //maximize confidence, minimize frequency variability, minimize distance to now
@@ -704,8 +706,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     static FloatFunction<Task> taskStrength(long when, int dur) {
         return (Task x) -> temporalTaskPriority(x, when, dur);
     }
+
     static FloatFunction<Task> taskStrength(@Nullable Term template, long when, int dur) {
-        if (template==null || !template.isTemporal()) { //TODO this result can be cached for the entire table once knowing what term it stores
+        if (template == null || !template.isTemporal()) { //TODO this result can be cached for the entire table once knowing what term it stores
             return taskStrength(when, dur);
         } else {
             return (Task x) -> {
@@ -766,7 +769,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     public void remove(TaskRegion x) {
-        tree.removeAsync(x);
+        tree.remove(x);
     }
 
     @Override
