@@ -164,7 +164,7 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
-        n.termVolumeMax.setValue(30);
+        n.termVolumeMax.setValue(20);
 
         n.dtDither.setValue(0.5f);
         n.dtMergeOrChoose.setValue(true);

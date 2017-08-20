@@ -499,7 +499,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * assumes called with writeLock
      */
     @NotNull
-    private List<Task> addAfterCompressing(Space<TaskRegion> tree, TaskRegion tr, NAR nar) {
+    private void addAfterCompressing(Space<TaskRegion> tree, TaskRegion inputRegion, NAR nar) {
         //if (compressing.compareAndSet(false, true)) {
         try {
 
@@ -507,7 +507,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             long now = nar.time();
             int dur = nar.dur();
 
-            Task input = tr.task;
+            Task input = inputRegion.task;
             float inputConf = input.conf(now, dur);
 
             FloatFunction<Task> ts = taskStrength(now, dur);
@@ -517,7 +517,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
 
-            List<Task> toActivate = $.newArrayList(1);
+
 
 
 
@@ -533,10 +533,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
                 boolean merged = false;
                 if (toMerge != null) {
-                    Task activation = null;
-                    if ((activation = compressMerge(tree, toMerge, now, dur, nar)) != null) {
-                        toActivate.add(activation);
-                        merged = true;
+                    Task mergedTask = null;
+                    if ((mergedTask = compressMerge(tree, toMerge, now, dur, nar)) != null) {
+                        merged = true; //the result has already been added in compressMerge
                     }
                 }
                 if (!merged && toRemove != null) {
@@ -544,12 +543,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 }
 
                 if (tree.size() < capacity)
-                    tree.add(tr);
-                else
-                    toActivate.clear();
+                    tree.add(inputRegion);
 
-
-            return toActivate;
             //nar.input(toActivate);
 
         } finally {
