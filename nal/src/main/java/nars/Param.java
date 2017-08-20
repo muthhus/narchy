@@ -11,6 +11,7 @@ import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.util.UtilityFunctions;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,7 +34,7 @@ public abstract class Param extends Services<Term,NAR> {
      * true: dt values will be interpolated
      * false: dt values will be chosen by weighted random decision
      * */
-    public static final boolean REVECTION_MERGE_OR_CHOOSE = false;
+    public final MutableBoolean dtMergeOrChoose = new MutableBoolean(false);
 
     /** how many INT terms are canonically interned/cached. [0..n) */
     public final static int MAX_CACHED_INTS = 64;
@@ -148,7 +149,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static final int MAX_INPUT_ANSWERS = 8;
 
     /** max retries for termpolation to produce a valid task content result during revision */
-    public static final int MAX_TERMPOLATE_RETRIES = 2;
+    public static final int MAX_TERMPOLATE_RETRIES = 1;
 
 
 

@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
 
 
@@ -246,7 +245,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             Truth xt = x.truth();
 
             Truth yt = Revision.revise(newBeliefTruth, xt, 1f, conclusion == null ? 0 : conclusion.evi());
-            if (yt==null)
+            if (yt == null)
                 continue;
 
             yt = yt.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
@@ -266,13 +265,12 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
         //TODO use Task.tryContent in building the task:
 
         float aProp = newBeliefWeight / (newBeliefWeight + oldBelief.evi());
-        Term t = normalizedOrNull(
+        Term t =
                 Revision.intermpolate(
-                y.term(), oldBelief.term(),
-                aProp,
-                nar.random(),
-                false
-        ));
+                        y.term(), oldBelief.term(),
+                        aProp,
+                        nar
+                );
 
 
         Truth revisionTruth = conclusion;
@@ -281,7 +279,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             NALTask r = new NALTask(t,
                     y.punc(),
                     revisionTruth,
-                    nar!=null ? nar.time() : ETERNAL /* creation time */,
+                    nar != null ? nar.time() : ETERNAL /* creation time */,
                     ETERNAL, ETERNAL,
                     Stamp.zip(prevBelief.stamp(), y.stamp(), 0.5f /* TODO proportionalize */)
             );

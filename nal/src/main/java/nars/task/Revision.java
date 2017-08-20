@@ -256,6 +256,10 @@ public class Revision {
 
     }
 
+    public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, NAR nar) {
+        return intermpolate(a, b, aProp, nar.random(), nar.dtMergeOrChoose.booleanValue());
+    }
+
     public static Term intermpolate(@NotNull Term a, @NotNull Term b, float aProp, @NotNull Random rng, boolean mergeOrChoose) {
         return intermpolate(a, b, aProp, 1, rng, mergeOrChoose);
     }
@@ -382,7 +386,7 @@ public class Revision {
                 t = at;
                 i = Param.MAX_TERMPOLATE_RETRIES; //no need to retry
             } else {
-                t = intermpolate(at, bt, aProp,1f, nar.random(), Param.REVECTION_MERGE_OR_CHOOSE);
+                t = intermpolate(at, bt, aProp, nar);
                 if (!t.conceptual().equals(conceptTerm))
                     continue;
             }

@@ -23,6 +23,8 @@ import static nars.$.$;
 import static nars.task.RevisionTest.newNAR;
 import static nars.task.RevisionTest.x;
 import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.Eternal;
+import static nars.time.Tense.Present;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -31,37 +33,6 @@ import static org.junit.Assert.assertTrue;
  */
 public class BeliefTableTest {
 
-    @Test
-    public void testExpectation() throws Narsese.NarseseException {
-
-        assertEquals(0.859f, new DiscreteTruth(0.9f, 0.9f).expectation(), 0.001f);
-
-
-        NAR n = newNAR(12);
-
-
-        BeliefAnalysis b = new BeliefAnalysis(n, x);
-
-        n.input("b:a. %0.9|0.9%"); //highest positive
-        n.input("b:a. %0.8|0.8%");
-
-
-        n.cycle();
-        b.print();
-
-        long when = n.time();
-        Truth bt = n.beliefTruth(b, when);
-        assertNotNull("belief truth " + b.term + " at " + when, bt);
-        assertEquals(0.86f, bt.expectation(), 0.1f);
-
-        n.believe(x, Tense.Present, 0.2f, 0.7f);
-        n.believe(x, Tense.Present, 0.1f, 0.8f); //highest negative
-
-        n.cycle();
-        b.print();
-
-        //assertEquals(0.24f, b.beliefs().top(n).expectation(false), 0.01f);
-    }
 
 
     @Test
@@ -179,32 +150,6 @@ public class BeliefTableTest {
 //        assertEquals(0.44f, startTruth.freq(), 0.2f);
 //        assertTrue(firstBeliefTruth.conf() >= startTruth.conf());
     }
-    @Test
-    public void testConceptualizationIntermpolationEternal() throws Narsese.NarseseException {
-
-        NAR d = NARS.shell();
-        d.believe("((a ==>+2 b)-->[pill])");
-        d.believe("((a ==>+6 b)-->[pill])"); //same concept
-        d.run(1);
-
-
-        //assertTrue(5 <= size(d.focus().concepts()));
-        //Concept cc = ((ArrayBag<Concept>) cb).get(0).get();
-
-
-        Term term = $("((a==>b)-->[pill])");
-
-        Concept cc = d.concept(term);
-        assertNotNull(cc);
-        String q = "((a ==>+- b)-->[pill])";
-        assertEquals(q, cc.toString());
-        //assertEquals(q, cc.toString());
-
-
-        //INTERMPOLATION APPLIED DURING REVISION:
-        //TODO should be either 2 or 6, not 4
-        assertEquals("((a ==>+4 b)-->[pill])", cc.beliefs().match(ETERNAL, null, null, true, null).term().toString());
-    }
 
         @Test
     public void testLinearTruthpolation() throws Narsese.NarseseException {
@@ -237,7 +182,7 @@ public class BeliefTableTest {
         t.inputAt(1, "x. :|:");
         t.inputAt(2, "y. :|:");
         t.mustBelieve(5, "(x&|y)", 1f, 0.81f, 1, 2);
-        t.mustBelieve(5, "(x=|>y)", 1f, 0.81f, 1);
+        t.mustBelieve(5, "(x=|>y)", 1f, 0.45f, 1);
         t.run(true);
 
 
@@ -298,40 +243,42 @@ public class BeliefTableTest {
     }
 
 
+
     @Test
-    public void testConceptualizationIntermpolationTemporal() throws Narsese.NarseseException {
-        NAR n = NARS.tmp();
-        n.believe("((a ==>+2 b)-->[pill])", Tense.Present, 1f, 0.9f);
-        n.believe("((a ==>+6 b)-->[pill])", Tense.Present, 1f, 0.9f);
-        n.run(1);
+    public void testConceptualizationIntermpolation() throws Narsese.NarseseException {
+        for (Tense t : new Tense[] { Present, Eternal }) {
+            NAR n = NARS.tmp();
+            n.dtMergeOrChoose.setValue(true);
+            n.believe("((a ==>+2 b)-->[pill])", t, 1f, 0.9f);
+            n.believe("((a ==>+6 b)-->[pill])", t, 1f, 0.9f);
+            n.run(1);
 
-        //@NotNull Bag<Concept, PLink<Concept>> cb = n.focus.active;
-        //assertTrue(5 <= cb.size());
+            //@NotNull Bag<Concept, PLink<Concept>> cb = n.focus.active;
+            //assertTrue(5 <= cb.size());
 
-        String abpill = "((a==>b)-->[pill])";
-        BaseConcept cc = (BaseConcept) n.conceptualize(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
+            String abpill = "((a==>b)-->[pill])";
+            BaseConcept cc = (BaseConcept) n.conceptualize(abpill); //iterator().next().get();//((ArrayBag<Concept>) cb).get(0).get();
 
-        assertNotNull(cc);
+            assertNotNull(cc);
 
-        String correctMerge = "((a ==>+4 b)-->[pill])";
+            String correctMerge = "((a ==>+4 b)-->[pill])";
+            cc.beliefs().print();
 
-
-        cc.beliefs().print();
-
-        //test belief match interpolated a result
-        assertEquals(correctMerge, cc.beliefs().match((long) 0, null, null, true, n).term().toString());
+            //test belief match interpolated a result
+            assertEquals(correctMerge, cc.beliefs().match(t == Present ? 0 : ETERNAL, null, null, true, n).term().toString());
 
 
-        //test merge after capacity shrink:
+            //test merge after capacity shrink:
 
-        cc.beliefs().setCapacity(1, 1); //set to capacity=1 to force compression
+            cc.beliefs().setCapacity(1, 1); //set to capacity=1 to force compression
 
-        cc.print();
+            cc.print();
 
-        //n.forEachTask(System.out::println);
+            //n.forEachTask(System.out::println);
 
-        //INTERMPOLATION APPLIED AFTER REVECTION:
-        assertEquals(correctMerge, cc.beliefs().match((long) 0, null, null, true, n).term().toString());
+            //INTERMPOLATION APPLIED AFTER REVECTION:
+            assertEquals(correctMerge, cc.beliefs().match((long) 0, null, null, true, n).term().toString());
+        }
     }
 
 
