@@ -183,7 +183,7 @@ public class Premise extends UnaryTask {
         Concept beliefConcept = nar.concept(beliefTerm);
 
 
-        if (beliefConcept != null) { //beliefs/goals will only be in TaskConcepts
+        if (beliefConcept != null && !beliefTerm.hasVarQuery()) { //doesnt make sense to look for a belief in a term with query var, it will have none
 
             boolean beliefIsTask = beliefConcept.equals(taskConcept);
 
@@ -202,7 +202,7 @@ public class Premise extends UnaryTask {
 //
 //                            }
                 long when = answerFocus(task, now);
-                match = answerTable.answer(when, now, dur, task, beliefTerm, beliefConcept, nar);
+                match = answerTable.answer(when, now, dur, task, beliefTerm, nar);
                 if (match != null) {
                     @Nullable Task answered = task.onAnswered(match, nar);
                     if (answered != null) {
@@ -230,7 +230,7 @@ public class Premise extends UnaryTask {
 //                    }
 //                }
                 if (tryMatch) {
-                    match = beliefConcept.beliefs().match(when, task, beliefTerm, true, nar);
+                    match = beliefConcept.beliefs().match(when, beliefTerm, true, nar);
                 } else {
                     match = null;
                 }

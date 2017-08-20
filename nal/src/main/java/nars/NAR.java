@@ -347,7 +347,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public <T extends Term> T term(@NotNull String t) throws NarseseException {
-        return TermIndex.term(t);
+        return $.$(t);
     }
 
     @NotNull
@@ -1527,15 +1527,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return match(c, GOAL, when);
     }
 
-    /**
-     * punc must be either BELIEF or GOAL
-     */
-    public Task match(Term  c, byte punc, long when) {
+    public Task match(Term c, byte punc, long when) {
+        assert(punc == BELIEF || punc == GOAL);
         Concept concept = concept(c);
         if (!(concept instanceof BaseConcept))
             return null;
 
-        return ((BeliefTable) ((BaseConcept) concept).table(punc)).match(when, null, null, false, this);
+        return ((BeliefTable) ((BaseConcept) concept).table(punc)).match(when,  c, false, this);
     }
 
 

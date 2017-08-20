@@ -88,10 +88,10 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
     @Override
-    public Task match(long when, @Nullable Task target, Term template, boolean noOverlap, NAR nar) {
+    public Task match(long when, Term template, boolean noOverlap, NAR nar) {
 //        if (isEmpty())
 //            return null;
-        Task x = super.match(when, target, template, noOverlap, nar);
+        Task x = super.match(when, template, noOverlap, nar);
 
         if (template == null) {
             return x;

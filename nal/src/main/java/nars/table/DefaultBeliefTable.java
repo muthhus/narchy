@@ -107,14 +107,14 @@ public class DefaultBeliefTable implements BeliefTable {
      * get the most relevant belief/goal with respect to a specific time.
      */
     @Override
-    public Task match(long when, @Nullable Task against, Term template, boolean noOverlap, NAR nar) {
+    public Task match(long when, Term template, boolean noOverlap, NAR nar) {
 
         final Task ete = eternal.strongest();
         if (ete != null && when == ETERNAL) {
             return ete;
         }
 
-        Task tmp = temporal.match(when, against, nar);
+        Task tmp = temporal.match(when, template, nar);
 
         if (tmp == null) {
             return ete;

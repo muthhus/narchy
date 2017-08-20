@@ -131,7 +131,7 @@ public class TermIndexTest {
         int t0 = i.size();
         //int s0 = i.subtermsCount();
 
-        Term a = i.get(TermIndex.term(s), true).term(); //create by parsing then manually intern it
+        Term a = i.get(Narsese.term(s, true), true).term(); //create by parsing then manually intern it
 
         int t1 = i.size();
         //int s1 = i.subtermsCount();
@@ -141,7 +141,7 @@ public class TermIndexTest {
             assertTrue(t0 < t1);
         }
 
-        Term a2 = i.get(TermIndex.term(s), true).term(); //create by parsing again
+        Term a2 = i.get(Narsese.term(s, true), true).term(); //create by parsing again
         testShared(a, a2);
 
         assertEquals(i.size(), t1 /* unchanged */);
@@ -150,7 +150,7 @@ public class TermIndexTest {
         //i.print(System.out); System.out.println();
 
         //create by composition
-        Compound b = (Compound) i.get(TermIndex.term('(' + s + ')'), true).term();
+        Compound b = (Compound) i.get(Narsese.term('(' + s + ')', true), true).term();
         testShared(a.term(), b.sub(0));
 
         assertEquals(i.size(), t1 + 1 /* one more for the product container */);

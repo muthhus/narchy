@@ -10,6 +10,7 @@ import nars.Task;
 import nars.control.Cause;
 import nars.control.Derivation;
 import nars.term.Term;
+import nars.term.container.TermContainer;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -26,6 +27,7 @@ import static jcog.Util.lerp;
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * Revision / Projection / Revection Utilities
@@ -117,41 +119,42 @@ public class Revision {
 
             Op ao = a.op();
             Op bo = b.op();
-            assert(ao == bo);
+            assert (ao == bo);
 
-            {
 
-                if (ao.temporal && len == 2) {
-                    return dtMergeTemporal(a, b, aProp, curDepth / 2f, rng, mergeOrChoose);
-                } else {
-                    //assert(ca.dt()== cb.dt());
+            if (ao.temporal && len == 2) {
+                return dtMergeTemporal(a, b, aProp, curDepth / 2f, rng, mergeOrChoose);
+            } else {
 
-                    //Term[] x = choose(ca.terms(), cb.terms(), aProp, rng)
-
-                    Term[] x = new Term[len];
-                    boolean change = false;
-                    for (int i = 0; i < len; i++) {
-                        Term as = a.sub(i);
-                        Term bs = b.sub(i);
-                        if (!as.equals(bs)) {
-                            Term y = intermpolate(as, bs, aProp, curDepth / 2f, rng, mergeOrChoose);
-                            if (!as.equals(y)) {
-                                change = true;
-                                x[i] = y;
-                                continue;
-                            }
+                Term[] ab = new Term[len];
+                boolean change = false;
+                TermContainer aa = a.subterms();
+                TermContainer bb = b.subterms();
+                for (int i = 0; i < len; i++) {
+                    Term ai = aa.sub(i);
+                    Term bi = bb.sub(i);
+                    if (!ai.equals(bi)) {
+                        Term y = intermpolate(ai, bi, aProp, curDepth / 2f, rng, mergeOrChoose);
+                        if (!ai.equals(y)) {
+                            change = true;
+                            ai = y;
                         }
-                        x[i] = as;
                     }
-
-                    return !change ? a : ao.the(a.dt(), x);
+                    ab[i] = ai;
                 }
+
+                return !change ? a : ao.the(
+                        choose(a, b, aProp, rng).dt()  /** this effectively chooses between && and &| in a size >2 case */,
+                        ab
+                );
             }
+
         }
 
         return choose(a, b, aProp, rng);
 
     }
+
 
     @NotNull
     private static Term dtMergeTemporal(@NotNull Term a, @NotNull Term b, float aProp, float depth, @NotNull Random rng, boolean mergeOrChoose) {
@@ -348,7 +351,7 @@ public class Revision {
 
 
         if (timeOverlap == null && u > 0) {
-            if (u-s > nar.dur()*Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS)
+            if (u - s > nar.dur() * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS)
                 factor *= (1f + s) / (1f + u);
         }
 
@@ -445,6 +448,62 @@ public class Revision {
             t.log("Revection Merge");
         return t;
     }
+
+
+    /**
+     * heuristic representing the difference between the dt components
+     * of two temporal terms.
+     * 0 means they are identical or otherwise match.
+     * > 0 means there is some difference.
+     * <p>
+     * this adds a 0.5 difference for && vs &| and +1 for each dt
+     * XTERNAL matches anything
+     */
+    public static float dtDiff(Term a, Term b) {
+        return dtDiff(a, b, 1);
+    }
+
+    static float dtDiff(Term a, Term b, int depth) {
+        if (a.equals(b)) return 0f;
+
+        Op ao = a.op();
+        int len = a.size();
+
+        /*
+        Op bo = b.op();
+        assert (ao == bo);
+
+        assert (b.size() == len);
+        */
+
+        float dLocal = 0;
+        int adt = a.dt();
+        int bdt = b.dt();
+        if (adt != bdt && adt!=XTERNAL && bdt!=XTERNAL) {
+
+            if (adt == ETERNAL) {
+                adt = 0;
+                dLocal += 0.5f;
+            }
+            if (bdt == ETERNAL) {
+                bdt = 0;
+                dLocal += 0.5f;
+            }
+
+            dLocal += Math.abs(adt - bdt);
+            dLocal /= depth;
+        }
+
+        float d = dLocal;
+        TermContainer aa = a.subterms();
+        TermContainer bb = b.subterms();
+        for (int i = 0; i < len; i++) {
+            d += dtDiff(aa.sub(i), bb.sub(i), depth + 1);
+        }
+
+        return d;
+    }
+
 }
 
 //    /** get the task which occurrs nearest to the target time */

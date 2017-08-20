@@ -4,6 +4,7 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.task.SignalTask;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +18,10 @@ import java.util.stream.Stream;
 public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
 
+    /**
+     * TODO make a version of this which takes as argument min and max (one of which
+     * will be infinity) so it can exit early if it will not rank
+     */
     static float temporalTaskPriority(Task t, long now, int dur) {
         float fdur = dur;
         return
@@ -28,7 +33,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
 
     /** finds or generates the strongest match to the specified parameters.
      * Task against is an optional argument which can be used to compare internal temporal dt structure for similarity */
-    Task match(long when,  @Nullable Task against, NAR nar);
+    Task match(long when, @Nullable Term against, NAR nar);
 
     /** estimates the truth value for the provided time.
      * the eternal table's top value, if existent, contributes a 'background'
@@ -98,7 +103,7 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long when, @Nullable Task against, NAR nar) {
+        public Task match(long when, @Nullable Term against, NAR nar) {
             return null;
         }
 

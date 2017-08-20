@@ -14,7 +14,6 @@ import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.derive.LambdaPred;
 import nars.derive.PrediTerm;
 import nars.index.term.StaticTermIndex;
-import nars.index.term.TermIndex;
 import nars.task.TaskBuilder;
 import nars.term.Compound;
 import nars.term.Term;
@@ -67,7 +66,7 @@ public interface $ {
 
     @NotNull
     static <T extends Term> T $(@NotNull String term) throws Narsese.NarseseException {
-        return TermIndex.term(term);
+        return (T) Narsese.term(term, true);
     }
 
     static <T extends Term> T $safe(@NotNull String term) {

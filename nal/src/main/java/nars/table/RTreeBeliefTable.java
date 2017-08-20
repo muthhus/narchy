@@ -14,6 +14,7 @@ import nars.Task;
 import nars.concept.BaseConcept;
 import nars.control.Activate;
 import nars.task.*;
+import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -390,7 +391,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
     @Override
-    public Task match(long when, @Nullable Task against, NAR nar) {
+    public Task match(long when, @Nullable Term against, NAR nar) {
 
         int s = size();
         if (s == 0)
@@ -399,7 +400,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         int dur = nar.dur();
 
 
-        FloatFunction<Task> ts = taskStrength(when, dur);
+        FloatFunction<Task> ts = taskStrength(against, when, dur);
         FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task);
 
         if (s <= EVAL_ALL_LTE_TASKS) {
@@ -700,8 +701,17 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         };
     }
 
-    private static FloatFunction<Task> taskStrength(long when, int dur) {
+    static FloatFunction<Task> taskStrength(long when, int dur) {
         return (Task x) -> temporalTaskPriority(x, when, dur);
+    }
+    static FloatFunction<Task> taskStrength(@Nullable Term template, long when, int dur) {
+        if (template==null || !template.isTemporal()) { //TODO this result can be cached for the entire table once knowing what term it stores
+            return taskStrength(when, dur);
+        } else {
+            return (Task x) -> {
+                return temporalTaskPriority(x, when, dur) / (1f + Revision.dtDiff(template, x.term()));
+            };
+        }
     }
 
 

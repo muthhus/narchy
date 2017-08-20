@@ -147,11 +147,6 @@ public abstract class TermIndex implements TermContext {
         return (T) Narsese.term(termToParse, false);
     }
 
-    /** normalized */
-    @NotNull public static <T extends Term> T term(@NotNull String termToParse) throws Narsese.NarseseException {
-        return (T) (Narsese.term(termToParse, true));
-    }
-
 
     /**
      * applies normalization and anonymization to resolve the term of the concept the input term maps t

@@ -65,11 +65,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         public void setCapacity(int eternals, int temporals) {
         }
 
-        @Override
-        public Task match(long when, Task question, Term template, boolean noOverlap, NAR nar) {
-            return null;
-        }
-
         public @Nullable Task match(long when, long now, int dur, NAR nar) {
             return null;
         }
@@ -81,7 +76,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long when, long now, int dur, @NotNull Task question, Term template, Concept beliefConcept, NAR nar) {
+        public Task answer(long when, long now, int dur, @NotNull Task question, Term template, NAR nar) {
             return null;
         }
 
@@ -94,6 +89,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         @Override
         public void add(@NotNull Task input, BaseConcept concept, @NotNull NAR nar) {
 
+        }
+
+        @Override
+        public Task match(long when, @Nullable Term template, boolean noOverlap, NAR nar) {
+            return null;
         }
 
 
@@ -155,7 +155,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      */
     void add(@NotNull Task input, BaseConcept concept, @NotNull NAR nar);
 
-    Task match(long when, Task question, @Nullable Term template, boolean noOverlap, NAR nar);
+    Task match(long when, @Nullable Term template, boolean noOverlap, NAR nar);
 
 
     default void print(@NotNull PrintStream out) {
@@ -207,10 +207,10 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
     /** projects a match */
-    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Term template, Concept beliefConcept, NAR nar) {
+    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Term template, NAR nar) {
 
 
-        Task answer = match(when, question, question.term(), false, nar);
+        Task answer = match(when, template, false, nar);
         if (answer == null || answer.isDeleted())
             return null;
 

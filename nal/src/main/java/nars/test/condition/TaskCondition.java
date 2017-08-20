@@ -2,11 +2,7 @@ package nars.test.condition;
 
 
 import jcog.Texts;
-import nars.$;
-import nars.NAR;
-import nars.Op;
-import nars.Task;
-import nars.index.term.TermIndex;
+import nars.*;
 import nars.task.Tasked;
 import nars.term.Term;
 import nars.term.Terms;
@@ -105,7 +101,7 @@ public class TaskCondition implements NARCondition, Predicate<Task>, Consumer<Ta
         this.confMin = Math.max(0.0f, confMin);
         this.punc = punc;
         this.term =
-                normalizedOrNull(TermIndex.term(sentenceTerm).term());
+                normalizedOrNull(Narsese.term(sentenceTerm, true).term());
     }
 
     @NotNull

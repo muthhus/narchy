@@ -9,6 +9,7 @@ import nars.bag.TaskHijackBag;
 import nars.concept.BaseConcept;
 import nars.task.Revision;
 import nars.task.TruthPolation;
+import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -463,7 +464,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    public Task match(long when,  @Nullable Task against, NAR nar) {
+    public Task match(long when, @Nullable Term against, NAR nar) {
 
         long now = nar.time();
         int dur = nar.dur();
