@@ -49,6 +49,7 @@ public class Temporalize implements ITemporalize {
     public final Map<Term, SortedSet<Event>> constraints = new HashMap<>();
     private final Random random;
     public int dur = 1;
+    private static final boolean knowTransformed = true;
 
     /**
      * for testing
@@ -85,9 +86,11 @@ public class Temporalize implements ITemporalize {
                 Term b = d.beliefTerm;
                 ((Temporalize) t).knowAmbient(b);
 
-                Term b2 = d.transform(b);
-                if (!b2.equals(b) && !(b2 instanceof Bool))
-                    knowAmbient(b2);
+                if (knowTransformed) {
+                    Term b2 = d.transform(b);
+                    if (!b2.equals(b) && !(b2 instanceof Bool))
+                        knowAmbient(b2);
+                }
             }
             //t.know(d.beliefTerm, d, null);
         }
@@ -290,10 +293,12 @@ public class Temporalize implements ITemporalize {
     public void knowDerivedTerm(Subst d, Term term, long start, long end) {
         knowTerm(term, start, end);
 
-//        Term t2 = d.transform(term);
-//        if (!t2.equals(term) && !(t2 instanceof Bool)) {
-//            knowTerm(t2, start, end);
-//        }
+        if (knowTransformed) {
+            Term t2 = d.transform(term);
+            if (!t2.equals(term) && !(t2 instanceof Bool)) {
+                knowTerm(t2, start, end);
+            }
+        }
     }
 
 

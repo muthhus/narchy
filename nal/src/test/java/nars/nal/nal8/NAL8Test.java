@@ -16,7 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 public class NAL8Test extends AbstractNALTest {
 
-    public static final int cycles = 430;
+    public static final int cycles = 830;
 
 
 

@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL7Test extends AbstractNALTest {
 
-    public int cycles = 200;
+    public int cycles = 500;
 
     @Test public void inductionDiffEventsAtom() {
         testInduction("before", "after", 10);
@@ -734,10 +734,11 @@ public class NAL7Test extends AbstractNALTest {
             $.26;.39;.95$ (--,(p4)). 1+0 %1.0;.90% {1+0: j} Input
         */
 
+
         test
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
-                .mustBelieve(cycles, "(x)", 0f, 0.75f /* some smaller conf since it is a prediction */, 4);
+                .mustBelieve(cycles, "(x)", 0f, 0.64f /* some smaller conf since it is a prediction */, 4);
     }
 
     @Test
