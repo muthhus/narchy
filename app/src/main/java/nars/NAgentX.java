@@ -1,12 +1,7 @@
 package nars;
 
-import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.learn.ql.HaiQAgent;
-import jcog.math.FirstOrderDifferenceFloat;
-import jcog.math.FloatNormalized;
 import jcog.pri.mix.control.MixContRL;
-import nars.control.AgentService;
 import nars.control.Derivation;
 import nars.control.NARService;
 import nars.derive.Deriver;
@@ -15,6 +10,7 @@ import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
+import nars.op.Implier;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -38,6 +34,7 @@ import spacegraph.widget.meter.Plot2D;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
@@ -137,7 +134,8 @@ abstract public class NAgentX extends NAgent {
                         new MultiExec((i) ->
                                 new MultiExec.Worker(
                                         new FocusExec() {
-                                            @Override protected @Nullable NARService newTrigger() {
+                                            @Override
+                                            protected @Nullable NARService newTrigger() {
                                                 return null;
                                             }
                                         }
@@ -261,6 +259,12 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
+        new Implier(a.nar,
+                //Iterables.concat(
+                //Iterables.transform(a.actions.keySet(), ActionConcept::term),
+                List.of(a.happy.term)
+                //)
+        );
 
 //        AgentService p = new AgentService.AgentBuilder(
 //                //DQN::new,
@@ -333,7 +337,7 @@ abstract public class NAgentX extends NAgent {
             if (i < 0) i = 0;
             if (i >= v.length) i = v.length - 1;
             //if (this.x != i) {
-                update.value(v[x = i]);
+            update.value(v[x = i]);
             //}
         }
 

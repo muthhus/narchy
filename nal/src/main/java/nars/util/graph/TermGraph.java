@@ -17,6 +17,7 @@ import java.util.Set;
 
 import static nars.Op.IMPL;
 import static nars.time.Tense.DTERNAL;
+import static nars.truth.TruthFunctions.w2c;
 
 public enum TermGraph {
     ;
@@ -64,11 +65,11 @@ public enum TermGraph {
             return t.op() == IMPL;
         }
 
-        public AdjGraph<Term, Float> snapshot(Iterable<Termed> sources, NAR nar, long when) {
+        public AdjGraph<Term, Float> snapshot(Iterable<Term> sources, NAR nar, long when) {
             return snapshot(null, sources, nar, when);
         }
 
-        public AdjGraph<Term, Float> snapshot(AdjGraph<Term, Float> g, Iterable<Termed> sources, NAR nar, long when) {
+        public AdjGraph<Term, Float> snapshot(AdjGraph<Term, Float> g, Iterable<Term> sources, NAR nar, long when) {
 
             if (g == null) {
                 g = new AdjGraph<>(true);
@@ -152,7 +153,7 @@ public enum TermGraph {
 
             float freq = t.freq();
             boolean neg;
-            float val = (TruthFunctions.expectation(freq, evi) - 0.5f) * 2f;
+            float val = (freq - 0.5f) * 2f * evi;
             if (val < 0f) {
                 val = -val;
                 neg = true;
@@ -160,7 +161,7 @@ public enum TermGraph {
                 neg = false;
             }
 
-            val *= TruthPolation.evidenceDecay(1f, Math.abs(dt), dur);
+            val *= TruthPolation.evidenceDecay(1f, dur, Math.abs(dt));
 
             if (val!=val || val < Priority.EPSILON)
                 return;

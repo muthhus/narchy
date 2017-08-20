@@ -14,17 +14,18 @@ apply plugin: "info.solidsoft.pitest"
 pitest {
 
     targetTests = [
-            'nars.nal.nal1.NAL1Test',
-            'nars.nal.nal1.NAL1MultistepTest',
-            'nars.nal.nal2.*',
-            //'nars.derive.TemporalizeTest',
-            'nars.task.*']
+            //'nars.nal.nal1.NAL1Test',
+            //'nars.nal.nal1.NAL1MultistepTest',
+            //'nars.nal.nal2.*',
+            'nars.derive.TemporalizeTest',
+            //'nars.task.*'
+    ]
     targetClasses = [
-        'nars.term.*',
-        'nars.nal.*',
-        'nars.table.*',
-        'nars.concept.*',
-        'nars.control.*',
+        //'nars.term.*',
+        //'nars.nal.*',
+        //'nars.table.*',
+        //'nars.concept.*',
+        //'nars.control.*',
         'nars.derive.time.*'
     ]
 

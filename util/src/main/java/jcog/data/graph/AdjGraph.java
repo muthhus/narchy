@@ -18,8 +18,12 @@
 
 package jcog.data.graph;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.Iterables;
 import jcog.TriConsumer;
+import jcog.list.FasterList;
 import jcog.util.TriFunction;
+import org.eclipse.collections.api.block.function.Function2;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.LongObjectHashMap;
 import org.eclipse.collections.impl.map.mutable.primitive.ObjectIntHashMap;
@@ -86,7 +90,7 @@ public class AdjGraph<V, E> implements Graph<V, E>, java.io.Serializable {
      * than this anyway). Note that the nodes vector is still necessary to
      * provide constant access to nodes based on indexes.
      */
-    private final ObjectIntHashMap<Node<V>> nodes;
+    public final ObjectIntHashMap<Node<V>> nodes;
     private final IntObjectHashMap<Node<V>> antinodes;
 
 
@@ -203,7 +207,10 @@ public class AdjGraph<V, E> implements Graph<V, E>, java.io.Serializable {
 
     @Override
     public String toString() {
-        return antinodes.makeString() + " x " + edges.makeString();
+        return nodes + " * " + Joiner.on(",").join(Iterables.transform(edges.keyValuesView(), (e)-> {
+            long id = e.getOne();
+            return (id >> 32) + "->" + (id & 0xffffffffL) + "=" + e.getTwo();
+        }));
     }
 
     @Override

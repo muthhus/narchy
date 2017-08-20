@@ -65,5 +65,9 @@ public class TruthAccumulator extends AtomicReference<double[]> {
     }
 
 
-
+    @Override
+    public String toString() {
+        Truth t = peekSum();
+        return t!=null ? t.toString() : "null";
+    }
 }

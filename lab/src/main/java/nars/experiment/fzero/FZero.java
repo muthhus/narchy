@@ -28,7 +28,7 @@ public class FZero extends NAgentX {
             try {
                 //n.truthResolution.setValue(0.05f);
                 a = new FZero(n);
-                a.durations.setValue(2f); //2*
+                //a.durations.setValue(2f); //2*
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
             }

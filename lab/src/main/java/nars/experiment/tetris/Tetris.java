@@ -5,10 +5,12 @@ import jcog.data.FloatParam;
 import nars.*;
 import nars.concept.ActionConcept;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.op.ImplicationBooster;
+import nars.op.Implier;
 import nars.term.atom.Atomic;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
+
+import java.util.List;
 
 import static nars.$.$;
 import static nars.experiment.tetris.impl.TetrisState.*;
@@ -518,9 +520,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
                 e.printStackTrace();
             }
 
-//            new ImplicationBooster(a, Iterables.concat(
-//                    Iterables.transform(a.actions.keySet(), ActionConcept::term)),
-//                a.happy.term);
 
             return a;
         }, 10f);
