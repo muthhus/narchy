@@ -209,15 +209,15 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
     @Override
     public void accept(NAgent a) {
         NAR n = a.nar;
-        accept(n);
+        update(a.now, n.dur(), n);
     }
 
-    public void accept(NAR n) {
+    public void update(long now, int dur, NAR n) {
 
         value.set(input.asFloat());
 
         output.input(sensors.stream().map(x -> {
-            return x.apply(n);
+            return x.update(now, dur, n);
         }));
     }
 

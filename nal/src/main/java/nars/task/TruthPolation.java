@@ -57,18 +57,19 @@ public enum TruthPolation { ;
      */
     public static class TruthPolationBasic implements Consumer<Tasked> {
         float eviSum, wFreqSum;
-        final long when;
+        final long start, end;
         final int dur;
 
-        public TruthPolationBasic(long when, int dur) {
-            this.when = when;
+        public TruthPolationBasic(long start, long end, int dur) {
+            this.start = start;
+            this.end = end;
             this.dur = dur;
         }
 
         @Override
         public void accept(Tasked t) {
             Task task = t.task();
-            float tw = task.evi(when, dur);
+            float tw = task.evi(task.nearestTimeBetween(start, end), dur);
             if (tw > 0) {
                 eviSum += tw;
                 wFreqSum += tw * task.freq();
@@ -247,12 +248,12 @@ public enum TruthPolation { ;
     }
 
     @Nullable
-    public static PreciseTruth truth(@Nullable Task topEternal, long when, int dur, @NotNull Iterable<? extends Tasked> tasks) {
+    public static PreciseTruth truth(@Nullable Task topEternal, long start, long end, int dur, @NotNull Iterable<? extends Tasked> tasks) {
 
         assert (dur > 0);
 
         TruthPolationBasic t =
-                new TruthPolationBasic(when, dur);
+                new TruthPolationBasic(start, end, dur);
                 //new TruthPolationGreedy(when, dur);
                 //new TruthPolationRoulette(when, dur);
                 //new TruthPolationWithVariance(when, dur);

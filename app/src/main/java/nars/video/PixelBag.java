@@ -302,17 +302,17 @@ public abstract class PixelBag implements Bitmap2D {
         actions = $.newArrayList(3);
 
         if (horizontal)
-            actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("rx")), this::setXRelative));
+            actions.add(a.actionUnipolar($.p( termRoot, Atomic.the("panX")), this::setXRelative));
         else
             X = 0.5f;
 
         if (vertical)
-            actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("ry")), this::setYRelative));
+            actions.add(a.actionUnipolar($.p( termRoot, Atomic.the("panY")), this::setYRelative));
         else
             Y = 0.5f;
 
         if (zoom)
-            actions.add(a.actionUnipolar($.func("see", termRoot, Atomic.the("zoom")), this::setZoom));
+            actions.add(a.actionUnipolar($.p( termRoot, Atomic.the("zoom")), this::setZoom));
         else
             Z = 0.5f;
 

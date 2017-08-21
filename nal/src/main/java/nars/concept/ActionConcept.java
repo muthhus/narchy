@@ -12,7 +12,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 
-public abstract class ActionConcept extends WiredConcept implements Function<NAR,Stream<Task>> {
+public abstract class ActionConcept extends WiredConcept {
 
 
     protected ActionConcept(@NotNull Term term, BeliefTable beliefs, BeliefTable goals, @NotNull NAR n) {
@@ -23,6 +23,8 @@ public abstract class ActionConcept extends WiredConcept implements Function<NAR
         super(term, null, null, n);
     }
 
+    abstract public Stream<Task> update(long now, int dur, NAR nar);
+    
 //    @Deprecated public static class CuriosityTask extends GeneratedTask {
 //
 //        public CuriosityTask(Compound term, byte punc, Truth truth, long creation, long start, long end, long[] stamp) {

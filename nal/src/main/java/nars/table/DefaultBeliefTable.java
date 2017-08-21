@@ -40,8 +40,8 @@ public class DefaultBeliefTable implements BeliefTable {
      * TODO this value can be cached per cycle (when,now) etc
      */
     @Override
-    public Truth truth(long when, NAR nar) {
-        return temporal.truth(when, eternal, nar);
+    public Truth truth(long start, long end, NAR nar) {
+        return temporal.truth(start, end, eternal, nar);
     }
 
     @Override
@@ -115,14 +115,14 @@ public class DefaultBeliefTable implements BeliefTable {
      * get the most relevant belief/goal with respect to a specific time.
      */
     @Override
-    public Task match(long when, Term template, boolean noOverlap, NAR nar) {
+    public Task match(long start, long end, Term template, boolean noOverlap, NAR nar) {
 
         final Task ete = eternal.strongest();
-        if (ete != null && when == ETERNAL) {
+        if (ete != null && start == ETERNAL) {
             return ete;
         }
 
-        Task tmp = temporal.match(when, template, nar);
+        Task tmp = temporal.match(start, end, template, nar);
 
         if (tmp == null) {
             return ete;
@@ -130,7 +130,7 @@ public class DefaultBeliefTable implements BeliefTable {
             if (ete == null) {
                 return tmp;
             } else {
-                return (ete.evi() > tmp.evi(when, nar.dur())) ?
+                return (ete.evi() > tmp.evi(tmp.nearestTimeBetween(start,end), nar.dur())) ?
                         ete : tmp;
             }
         }

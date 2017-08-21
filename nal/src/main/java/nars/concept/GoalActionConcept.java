@@ -87,14 +87,13 @@ public class GoalActionConcept extends ActionConcept {
         return this;
     }
 
-    @Override
-    public Stream<Task> apply(NAR nar) {
+
+    @Override public Stream<Task> update(long now, int dur, NAR nar) {
 
 
-        //int dur = nar.dur();
-        long now = nar.time();
-
-        Truth goal = this.goals().truth(now, nar);
+        long pStart = now - dur / 2;
+        long pEnd = now + dur / 2;
+        Truth goal = this.goals().truth(pStart, pEnd, nar);
 
         //float curiPeriod = 2; //TODO vary this
         float cur = curiosity.floatValue();
@@ -133,7 +132,7 @@ public class GoalActionConcept extends ActionConcept {
         }
 
 
-        Truth belief = this.beliefs().truth(now, nar);
+        Truth belief = this.beliefs().truth(pStart, pEnd, nar);
 
 //        //HACK try to improve this
 //        //if (goal == null) goal = belief; //use belief state, if exists (latch)
@@ -157,18 +156,18 @@ public class GoalActionConcept extends ActionConcept {
 
         LongSupplier stamper = nar.time::nextStamp;
 
-        Task fb = feedback.set(term, beliefFeedback, stamper, nar);
+        Task fb = feedback.set(term, beliefFeedback, stamper, now, dur, nar);
 
         Task fg;
         boolean latchGoal = false; //experimental
         if (latchGoal) {
             if (goal!=null)
-                fg = action.set(term, goal, stamper, nar);
+                fg = action.set(term, goal, stamper, now, dur, nar);
                         //+1 * nar.dur() /* next moment */);
             else
                 fg = action.get(); //latch previous goal
         } else {
-            fg = action.set(term, goal, stamper, nar);
+            fg = action.set(term, goal, stamper, now, dur, nar);
                     //+1 * nar.dur() /* next moment */);
         }
 

@@ -116,7 +116,7 @@ public class DynamicBeliefTableTest {
         DynamicBeliefTable xtable = (DynamicBeliefTable) (cc.beliefs());
         Compound template = $("((x) &&+4 (y))");
 
-        DynTruth xt = xtable.truth(0, template, true, n);
+        DynTruth xt = xtable.truth(0, 0, template, true, n);
         assertNotNull(xt);
         assertTrue(xt.truth().toString(), $.t(1f, 0.83f).equals(xt.truth(), 0.05f));
 
@@ -130,11 +130,11 @@ public class DynamicBeliefTableTest {
 //            System.out.println( xtable.truth(when, template.dt(), true) + " " + xtable.generate(template, when));
 //        }
 
-        assertEquals(0.79f, xtable.generate($("((x) &&+6 (y))"), 0, n).conf(), 0.05f);
-        assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0,  n).conf(), 0.05f); //best match to the input
-        assertEquals(0.79f, xtable.generate($("((x) &&+2 (y))"),  0, n).conf(), 0.05f);
-        assertEquals(0.77f, xtable.generate($("((x) &&+0 (y))"),  0, n).conf(), 0.05f);
-        assertEquals(0.6f, xtable.generate($("((x) &&-32 (y))"), 0,  n).conf(), 0.1f);
+        assertEquals(0.79f, xtable.generate($("((x) &&+6 (y))"), 0, 0, null, n).conf(), 0.05f);
+        assertEquals(0.81f, xtable.generate($("((x) &&+4 (y))"), 0, 0,  null, n).conf(), 0.05f); //best match to the input
+        assertEquals(0.79f, xtable.generate($("((x) &&+2 (y))"),  0, 0, null, n).conf(), 0.05f);
+        assertEquals(0.77f, xtable.generate($("((x) &&+0 (y))"),  0, 0,null,  n).conf(), 0.05f);
+        assertEquals(0.6f, xtable.generate($("((x) &&-32 (y))"), 0, 0, null,  n).conf(), 0.1f);
 
 
     }

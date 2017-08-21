@@ -26,7 +26,7 @@ abstract public class DynamicTruthModel {
 
 
     @Nullable
-    public DynTruth eval(Term superterm, boolean beliefOrGoal, long when, boolean stamp, NAR n) {
+    public DynTruth eval(Term superterm, boolean beliefOrGoal, long start, long end, boolean stamp, NAR n) {
 
         Term[] inputs = components(superterm);
 
@@ -58,20 +58,26 @@ abstract public class DynamicTruthModel {
 
             Truth nt;
             Task bt = null;
+
+            //TODO check these times
+            long subStart = start + dt;
+            long subEnd = end + dt + subterm.dtRange();
+
             if (evi) {
                 //task
-                bt = ((BeliefTable)((BaseConcept)subConcept).table(beliefOrGoal ? BELIEF : GOAL)).match( when + dt, subterm, false, n);
+                bt = ((BeliefTable)((BaseConcept)subConcept).table(beliefOrGoal ? BELIEF : GOAL))
+                        .match(subStart, subEnd, subterm, false, n);
                 if (bt == null) {
                     return null;
                 }
 
-                nt = bt.truth(when + dt, dur); //project to target time if task isnt at it
+                nt = bt.truth(subStart, subEnd, dur, 0f); //project to target time if task isnt at it
                 if (nt==null)
                     return null;
 
             } else {
                 //truth only
-                nt = n.truth(subConcept, beliefOrGoal ? BELIEF : GOAL, when + dt);
+                nt = n.truth(subConcept, beliefOrGoal ? BELIEF : GOAL, subStart, subEnd);
             }
 
             if (nt == null || nt.conf() < n.confMin.floatValue() || !add(i, d, nt.negIf(negated), confMin)) {

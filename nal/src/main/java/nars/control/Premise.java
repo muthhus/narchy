@@ -4,7 +4,6 @@
  */
 package nars.control;
 
-import jcog.pri.Pri;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
@@ -29,8 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
-import static nars.Op.BELIEF;
-import static nars.Op.NEG;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -225,7 +222,13 @@ public class Premise extends UnaryTask {
                     }
                 }
             } else {
-                long when = matchFocus(task, now, dur);
+                long focus = matchFocus(task, now, dur);
+                long focusStart, focusEnd;
+                if (focus == ETERNAL) focusStart = focusEnd = ETERNAL;
+                else {
+                    focusStart = focus - dur;
+                    focusEnd = focus + dur;
+                }
 
                 boolean tryMatch = true;
 //                if (beliefIsTask && task.punc() == BELIEF && task.during(when)) {
@@ -238,7 +241,7 @@ public class Premise extends UnaryTask {
 //                    }
 //                }
                 if (tryMatch) {
-                    match = beliefConcept.beliefs().match(when, beliefTerm, true, nar);
+                    match = beliefConcept.beliefs().match(focusStart, focusEnd, beliefTerm, true, nar);
                 } else {
                     match = null;
                 }

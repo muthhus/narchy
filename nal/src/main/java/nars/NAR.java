@@ -94,20 +94,26 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     static final Set<String> logEvents = Sets.newHashSet("eventTask");
     static final String VERSION = "NARchy v?.?";
 
-    @NotNull public final Exec exe;
-    @NotNull protected final Random random;
+    @NotNull
+    public final Exec exe;
+    @NotNull
+    protected final Random random;
 
     public final transient Topic<NAR> eventClear = new ArrayTopic<>();
 
     public final transient ArrayTopic<NAR> eventCycle = new ArrayTopic<>();
 
-    /** a task has been processed or re-processed (priority changed) */
+    /**
+     * a task has been processed or re-processed (priority changed)
+     */
     public final transient Topic<Task> eventTask = new ArrayTopic<>();
 
-    /** scoped to this NAR so it can be reset by it */
+    /**
+     * scoped to this NAR so it can be reset by it
+     */
     final IterableThreadLocal<Derivation> derivation =
-            new IterableThreadLocal<Derivation>(()->new Derivation(this));
-            //ThreadLocal.withInitial(()->new Derivation(this));
+            new IterableThreadLocal<Derivation>(() -> new Derivation(this));
+    //ThreadLocal.withInitial(()->new Derivation(this));
 
 
     @NotNull
@@ -277,7 +283,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     public void setEmotion(Emotion emotion) {
-        synchronized(self) { //lol
+        synchronized (self) { //lol
             this.emotion = emotion;
         }
     }
@@ -314,7 +320,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * initialization and post-reset procedure
      */
     protected void restart() {
-
 
 
         time.clear();
@@ -535,6 +540,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public Task input(float pri, @NotNull Term term, byte punc, long occurrenceTime, float freq, float conf) throws InvalidTaskException {
         return input(pri, term, punc, occurrenceTime, occurrenceTime, freq, conf);
     }
+
     @Nullable
     public Task input(float pri, @NotNull Term term, byte punc, long start, long end, float freq, float conf) throws InvalidTaskException {
 
@@ -571,7 +577,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         assert ((punc == QUESTION) || (punc == QUEST)); //throw new RuntimeException("invalid punctuation");
 
         return inputAndGet(
-                new NALTask( term.unneg(), punc, null,
+                new NALTask(term.unneg(), punc, null,
                         time(), when, when,
                         new long[]{time.nextStamp()}
                 ).budget(this)
@@ -608,7 +614,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
         ITask y = emotion.onInput(x);
-        if (y!=null)
+        if (y != null)
             exe.add(y);
     }
 
@@ -800,9 +806,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    /** asynchronously adds the service */
+    /**
+     * asynchronously adds the service
+     */
     public void on(@NotNull NARService s) {
-        runLater(()-> add(s.term(), s));
+        runLater(() -> add(s.term(), s));
     }
 
     @Deprecated
@@ -820,7 +828,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 Term c = t.term();
                 Atomic op = (Atomic) (c.sub(1));
                 @NotNull Term[] args = ((Compound) (t.term().sub(0))).toArray();
-                nar.runLater(()->{                o.run(op, args, nar); });
+                nar.runLater(() -> {
+                    o.run(op, args, nar);
+                });
                 return t;
             }
 
@@ -850,14 +860,19 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return random;
     }
 
+    @Nullable
+    public Truth truth(@Nullable Termed concept, byte punc, long when) {
+        return truth(concept, punc, when, when);
+    }
+
     /**
      * returns concept belief/goal truth evaluated at a given time
      */
     @Nullable
-    public Truth truth(@Nullable Termed concept, byte punc, long when) {
+    public Truth truth(@Nullable Termed concept, byte punc, long start, long end) {
         if (concept != null) {
 
-            assert(concept.op().conceptualizable): "asking for truth of unconceptualizable: " + concept; //filter NEG etc
+            assert (concept.op().conceptualizable) : "asking for truth of unconceptualizable: " + concept; //filter NEG etc
 
             @Nullable Concept c = concept(concept);
             if (c instanceof BaseConcept) {
@@ -873,7 +888,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                     default:
                         throw new UnsupportedOperationException();
                 }
-                return table.truth(when, this);
+                return table.truth(start, end, this);
             }
         }
         return null;
@@ -936,8 +951,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         emotion.cycle();
 
     }
-
-
 
 
     /**
@@ -1177,12 +1190,17 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             time.at(whenOrAfter, then);
     }
 
-    /** tasks in concepts */
-    @NotNull public Stream<Task> tasks(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
+    /**
+     * tasks in concepts
+     */
+    @NotNull
+    public Stream<Task> tasks(boolean includeConceptBeliefs, boolean includeConceptQuestions, boolean includeConceptGoals, boolean includeConceptQuests) {
         return concepts().flatMap(c -> c.tasks(includeConceptBeliefs, includeConceptQuestions, includeConceptGoals, includeConceptQuests));
     }
-    @NotNull public Stream<Task> tasks() {
-        return tasks(true,true,true,true);
+
+    @NotNull
+    public Stream<Task> tasks() {
+        return tasks(true, true, true, true);
     }
 
 
@@ -1227,16 +1245,18 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    @Deprecated public NAR forEachProtoTask(@NotNull Consumer<ITask> recip) {
+    @Deprecated
+    public NAR forEachProtoTask(@NotNull Consumer<ITask> recip) {
         exe.forEach(recip);
         return this;
     }
 
     public Stream<Activate> conceptActive() {
-        return exe.stream().map(x -> x instanceof Activate ?  (Activate)x : null).filter(Objects::nonNull);
+        return exe.stream().map(x -> x instanceof Activate ? (Activate) x : null).filter(Objects::nonNull);
     }
 
-    @Deprecated public NAR forEachConceptActive(@NotNull Consumer<Activate> recip) {
+    @Deprecated
+    public NAR forEachConceptActive(@NotNull Consumer<Activate> recip) {
         return forEachProtoTask(t -> {
             if (t instanceof Activate) {
                 recip.accept(((Activate) t));
@@ -1245,7 +1265,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     public Stream<Concept> concepts() {
-        return terms.stream().filter(t -> t instanceof Concept).map(t -> (Concept)t);
+        return terms.stream().filter(t -> t instanceof Concept).map(t -> (Concept) t);
     }
 
 
@@ -1395,11 +1415,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return inputBinary(new BufferedInputStream(new FileInputStream(input), 64 * 1024));
     }
 
-    @NotNull public NAR outputBinary(@NotNull File f, boolean append) throws IOException {
-        return outputBinary(f, append, t->t);
+    @NotNull
+    public NAR outputBinary(@NotNull File f, boolean append) throws IOException {
+        return outputBinary(f, append, t -> t);
     }
 
-    @NotNull public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
+    @NotNull
+    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
         FileOutputStream ff = new FileOutputStream(f, append);
         outputBinary(ff, each);
         ff.close();
@@ -1519,25 +1541,36 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * strongest matching belief for the target time
      */
+    public Task belief(Term c, long start, long end) {
+        return answer(c, BELIEF, start, end);
+    }
     public Task belief(Term c, long when) {
-        return match(c, BELIEF, when);
+        return belief(c, when, when);
     }
 
     /**
      * strongest matching goal for the target time
      */
-    public final Task goal(Term  c, long when) {
-        return match(c, GOAL, when);
+    public final Task goal(Term c, long start, long end) {
+        return answer(c, GOAL, start, end);
     }
 
-    public Task match(Term c, byte punc, long when) {
-        assert(punc == BELIEF || punc == GOAL);
+    public final Task goal(Term c, long when) {
+        return goal(c, when, when);
+    }
+
+    public Task answer(Term c, byte punc, long when) {
+        return answer(c, punc, when, when);
+    }
+
+    public Task answer(Term c, byte punc, long start, long end) {
+        assert (punc == BELIEF || punc == GOAL);
         Concept concept = concept(c);
         if (!(concept instanceof BaseConcept))
             return null;
 
         //return ((BeliefTable) ((BaseConcept) concept).table(punc)).match(when,  c, false, this);
-        return ((BeliefTable) ((BaseConcept) concept).table(punc)).answer(when,  c, this);
+        return ((BeliefTable) ((BaseConcept) concept).table(punc)).answer(start, end, c, this);
     }
 
 
@@ -1562,7 +1595,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * table of values influencing reasoner heuristics
      */
     public final FasterList<Cause> causes = new FasterList(512);
-
 
 
     public Derivation derivation(PrediTerm<Derivation> deriver) {
@@ -1722,7 +1754,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                         t.cause = new short[]{ci};
                     } else {
                         //concat
-                        t.cause = Arrays.copyOf(t.cause, tcl+1);
+                        t.cause = Arrays.copyOf(t.cause, tcl + 1);
                         t.cause[tcl] = ci;
                     }
                 }

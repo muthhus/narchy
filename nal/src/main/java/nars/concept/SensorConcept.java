@@ -20,7 +20,7 @@ import java.util.function.LongSupplier;
 /**
  * primarily a collector for believing time-changing input signals
  */
-public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier, Function<NAR, Task> {
+public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier {
 
     public final ScalarSignal sensor;
     private FloatSupplier signal;
@@ -87,9 +87,8 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
      * should only be called if autoupdate() is false
      */
     @Nullable
-    @Override
-    public Task apply(NAR nar) {
-        return sensor.apply(nar);
+    public Task update(long time, int dur, NAR nar) {
+        return sensor.update(nar, time, dur);
     }
 
     public SensorConcept resolution(float r) {

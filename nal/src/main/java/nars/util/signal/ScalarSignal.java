@@ -13,7 +13,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.DoubleSupplier;
-import java.util.function.Function;
 import java.util.function.LongSupplier;
 
 import static nars.Op.BELIEF;
@@ -25,7 +24,7 @@ import static nars.Op.BELIEF;
  * when NAR wants to update the signal, it will call Function.apply. it can return
  * an update Task, or null if no change
  */
-public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleSupplier {
+public class ScalarSignal extends Signal implements  DoubleSupplier {
 
 
 
@@ -66,8 +65,11 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
 //        this.lastInputTime = nar.time() - minTimeBetweenUpdates;
 //    }
 
-    /** does not input the task, only generates it */
-    @Override public Task apply(@NotNull NAR nar) {
+    /** does not input the task, only generates it.
+     *  the time is specified instead of obtained from NAR so that
+     *  all sensor readings can be timed with perfect consistency within the same cycle
+     * */
+    public Task update(@NotNull NAR nar, long now, int dur) {
 
         //long now = nar.time();
 
@@ -87,7 +89,7 @@ public class ScalarSignal extends Signal implements Function<NAR, Task>, DoubleS
         Task nextTask = set(term,
                 truth,
                 stamp(truth, nar),
-                nar);
+                now, dur, nar);
 //        if (nextTask == current && !(nextTask!=null && nextTask.end()!=currentEnd))
 //            return null; //dont input anything unless its a new task, or it has stretched
 //        else

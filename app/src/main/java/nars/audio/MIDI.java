@@ -108,7 +108,7 @@ public class MIDI {
                 //TODO
                 //n.input(c.feedbackGoal.set(c.term(), v == v ? $.t(v, nar.confDefault(GOAL)) : null, n.time::nextStamp, n));
 
-                n.input(c.apply(n));
+                n.input(c.update(n.time(), n.dur(), n));
             });
 
 

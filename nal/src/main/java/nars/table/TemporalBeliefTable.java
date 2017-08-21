@@ -22,28 +22,25 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
      * TODO make a version of this which takes as argument min and max (one of which
      * will be infinity) so it can exit early if it will not rank
      */
-    static float temporalTaskPriority(Task t, long now, int dur) {
+    static float temporalTaskPriority(Task t, long start, long end, int dur) {
         float fdur = dur;
         return
-                t.conf() * //raw because time is considered below. this covers cases where the task eternalizes
+                t.evi() * //raw because time is considered below. this covers cases where the task eternalizes
                 //t.conf(now, dur) *
                 //t.evi(now, dur) *
-                (1f + t.range()/ fdur)/(1+Math.abs(now - t.nearestTimeTo(now))/fdur);
+                (1f + t.range()/ fdur)/(1+ t.distanceTo(start, end)/fdur);
     }
 
     /** finds or generates the strongest match to the specified parameters.
      * Task against is an optional argument which can be used to compare internal temporal dt structure for similarity */
-    Task match(long when, @Nullable Term against, NAR nar);
+    Task match(long start, long end, @Nullable Term against, NAR nar);
 
     /** estimates the truth value for the provided time.
      * the eternal table's top value, if existent, contributes a 'background'
      * level in interpolation.
      * */
-    Truth truth(long when, EternalTable eternal, NAR nar);
+    Truth truth(long start, long end, EternalTable eternal, NAR nar);
 
-    default Truth truth(long when,  NAR nar) {
-        return truth(when, null, nar);
-    }
 
     @Override
     void clear();
@@ -108,12 +105,12 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long when, @Nullable Term against, NAR nar) {
+        public Task match(long start, long end, @Nullable Term against, NAR nar) {
             return null;
         }
 
         @Override
-        public Truth truth(long when, EternalTable eternal, NAR nar) {
+        public Truth truth(long start, long end, EternalTable eternal, NAR nar) {
             return null;
         }
 

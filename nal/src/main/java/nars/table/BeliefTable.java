@@ -1,5 +1,6 @@
 package nars.table;
 
+import jcog.math.Interval;
 import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
@@ -69,7 +70,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
         }
 
-        public @Nullable Task match(long when, long now, int dur, NAR nar) {
+        public @Nullable Task match(long start, long end, int dur, NAR nar) {
             return null;
         }
 
@@ -80,7 +81,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long when, long now, int dur, @NotNull Task question, Term template, NAR nar) {
+        public Task answer(long start, long end, int dur, @NotNull Task question, Term template, NAR nar) {
             return null;
         }
 
@@ -96,7 +97,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
-        public Task match(long when, @Nullable Term template, boolean noOverlap, NAR nar) {
+        public Task match(long start, long end, @Nullable Term template, boolean noOverlap, NAR nar) {
             return null;
         }
 
@@ -117,7 +118,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Truth truth(long when, NAR nar) {
+        public Truth truth(long start, long end, NAR nar) {
             return null;
         }
 
@@ -162,7 +163,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      */
     void add(@NotNull Task input, BaseConcept concept, @NotNull NAR nar);
 
-    Task match(long when, @Nullable Term template, boolean noOverlap, NAR nar);
 
 
     default void print(@NotNull PrintStream out) {
@@ -185,11 +185,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         return (float) stream().mapToDouble(Prioritized::pri).sum();
     }
 
-    /**
-     * estimates the current truth value from the top task, projected to the specified 'when' time;
-     * returns null if no evidence is available
-     */
-    Truth truth(long when, NAR nar);
+
 
 
     //    default float expectation(long when, int dur) {
@@ -211,18 +207,33 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
      */
     void clear();
 
+    /**
+     * estimates the current truth value from the top task, projected to the specified 'when' time;
+     * returns null if no evidence is available
+     */
+    Truth truth(long start, long end, NAR nar);
 
-    default Task answer(long when, Term template, NAR nar) {
-        return answer(when, nar.time(), nar.dur(), null, template, nar);
+    default Truth truth(long when, NAR nar) {
+        return truth(when, when, nar);
+    }
+
+    Task match(long start, long end, @Nullable Term template, boolean noOverlap, NAR nar);
+
+    default Task match(long when, @Nullable Term template, boolean noOverlap, NAR nar) {
+        return match(when, when, template, noOverlap, nar);
+    }
+
+    default Task answer(long start, long end, Term template, NAR nar) {
+        return answer(start, end, nar.dur(), null, template, nar);
     }
 
     /**
      * projects a match
      */
-    default Task answer(long when, long now, int dur, @Nullable Task question, Term template, NAR nar) {
+    default Task answer(long start, long end, int dur, @Nullable Task question, Term template, NAR nar) {
 
 
-        Task answer = match(when, template, false, nar);
+        Task answer = match(start, end, template, false, nar);
         if (answer == null || answer.isDeleted())
             return null;
 
@@ -232,15 +243,19 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
         //project if different occurrence
 
-        boolean relevantTime = answer.during(when);
+        boolean relevantTime = answer.isEternal() || start==ETERNAL || Interval.intersect(start, end, answer.start(), answer.end())!=null;
 
         if (/*!answer.isEternal() && */!relevantTime) {
 
-            if (when == ETERNAL)
-                when = now;
+            long now = nar.time();
+
+            if (start == ETERNAL) {
+                start = end = now;
+            }
 
 
-            Truth aProj = answer.truth(when, dur, nar.confMin.floatValue());
+            Truth aProj = answer.truth(start, end,
+                    dur, nar.confMin.floatValue());
             if (aProj != null) {
 
                 Term at = normalizedOrNull(answer.term(), TermIndex.retemporalizeXTERNALToZero);
@@ -250,7 +265,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
                 NALTask a = new NALTask(
                         at,
                         answer.punc(),
-                        aProj, now, when, when,
+                        aProj, now, start, end,
                         (question != null) ?
                                 Stamp.zip(answer.stamp(), question.stamp(), 0.5f) : answer.stamp());
                 a.setPri(answer.priElseZero());

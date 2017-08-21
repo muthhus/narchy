@@ -34,25 +34,27 @@ public class BeliefActionConcept extends ActionConcept {
 //    }
 
     @Override
-    public Stream<Task> apply(NAR nar) {
+    public Stream<Task> update(long now, int dur, NAR nar) {
 
-        int dur = nar.dur();
-        long now = nar.time();
+        long nowStart = now - dur/2;
+        long nowEnd = now + dur/2;
 
         Truth belief =
-                this.beliefs().truth(now, nar);
+                this.beliefs().truth(nowStart, nowEnd, nar);
                 //beliefIntegrated.commitAverage();
         action.accept(belief);
 
         Truth goal =
-                this.goals().truth(now, nar);
+                this.goals().truth(nowStart, nowEnd, nar);
                 //goalIntegrated.commitAverage();
         if (goal!=null) {
             //allow any goal desire to influence belief to some extent
             float rate = 1f;
             DiscreteTruth t = new DiscreteTruth(goal.freq(), goal.conf() * rate);
             if (t!=null) {
-                return Stream.of(new NALTask(term(), BELIEF, t, now, now, (now + dur), new long[]{nar.time.nextStamp()}));
+                NALTask y = new NALTask(term(), BELIEF, t, now, nowStart, nowEnd, new long[]{nar.time.nextStamp()});
+                y.pri(nar.priorityDefault(BELIEF));
+                return Stream.of(y);
             }
         }
 

@@ -187,9 +187,12 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
         NAR nar = a.nar;
 
+        long now = a.now;
+        int dur = nar.dur();
+
         this.conf = nar.confDefault(Op.BELIEF);
         in.input(pixels.stream() /*filter(PixelConcept::update).*/
-                        .map(c -> c.apply(nar)));
+                        .map(c -> c.update(now, dur, nar)));
     }
 
 

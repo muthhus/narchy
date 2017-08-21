@@ -7,7 +7,6 @@ import nars.concept.BaseConcept;
 import nars.concept.state.DefaultConceptState;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import nars.test.analyze.BeliefAnalysis;
 import nars.time.Tense;
 import nars.truth.Truth;
@@ -233,7 +232,7 @@ public class RevisionTest {
                 .run(1);
         BaseConcept c = (BaseConcept) n.conceptualize("(x ==> y)");
         c.print();
-        Task t = n.match(c.term(), BELIEF, ETERNAL);
+        Task t = n.answer(c.term(), BELIEF, ETERNAL);
         assertEquals(0.5f, t.freq(), 0.01f);
         assertEquals(0.947f, t.conf(), 0.01f);
     }

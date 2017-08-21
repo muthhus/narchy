@@ -37,7 +37,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
     final byte punc;
 
-    private static final int lookAheadDurs = 1;
+    private static final int lookAheadDurs = 0;
 
 
     public Signal(byte punc, FloatSupplier resolution) {
@@ -47,19 +47,12 @@ public class Signal extends AtomicReference<SignalTask> {
         this.resolution = resolution;
     }
 
-    public Task set(@NotNull Term term, @Nullable Truthed nextTruth, LongSupplier stamper, NAR nar) {
-        return set(term, nextTruth, stamper, nar, 0);
-    }
-
-    public Task set(@NotNull Term term, @Nullable Truthed nextTruth, LongSupplier stamper, NAR nar, int dt) {
+    public Task set(@NotNull Term term, @Nullable Truthed nextTruth, LongSupplier stamper, long now, int dur, NAR nar) {
 
 
         //int halfDur = Math.max(1, nar.dur() / 2);
         //long next = now + halfDur;
         SignalTask toInput = updateAndGet((current) -> {
-
-            long now = nar.time();
-
 
             if (current != null) {
                 current.setEnd(now);
@@ -79,13 +72,13 @@ public class Signal extends AtomicReference<SignalTask> {
                 if (current == null ||
                         current.isDeleted() ||
                         (!current.truth.equals(nextTruth, nar.truthResolution.floatValue()) ||
-                                (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - current.start() >= nar.dur() * Param.SIGNAL_LATCH_TIME_MAX)
+                                (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - current.start() >= dur * Param.SIGNAL_LATCH_TIME_MAX)
                         )) {
 
                     //TODO move the task construction out of this critical update section?
                     next = task(term, nextTruth.truth(),
-                            now, now + lookAheadDurs * nar.dur(),
-                            stamper.getAsLong(), dt);
+                            now, now + lookAheadDurs * dur,
+                            stamper.getAsLong());
 
 
                     next.stretchKey = Pending; //temporary placeholder, for at least signaling the stretch to itself
@@ -114,10 +107,10 @@ public class Signal extends AtomicReference<SignalTask> {
     }
 
     @Nullable
-    protected SignalTask task(Term term, Truth t, long start, long end, long stamp, int dt) {
+    protected SignalTask task(Term term, Truth t, long start, long end, long stamp) {
 
 
-        SignalTask s = new SignalTask(term, punc, t, start + dt, end + dt, stamp);
+        SignalTask s = new SignalTask(term, punc, t, start, end, stamp);
         s.priMax(pri.asFloat());
         return s;
     }

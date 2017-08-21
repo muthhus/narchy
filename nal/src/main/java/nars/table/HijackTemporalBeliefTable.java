@@ -33,7 +33,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
     @Override
     public float pri(@NotNull Task t) {
-        return TemporalBeliefTable.temporalTaskPriority(t, now, 1 /*HACK*/);
+        return TemporalBeliefTable.temporalTaskPriority(t, now, now, 1 /*HACK*/);
     }
 
 
@@ -464,7 +464,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    public Task match(long when, @Nullable Term against, NAR nar) {
+    public Task match(long start, long end, @Nullable Term against, NAR nar) {
 
         long now = nar.time();
         int dur = nar.dur();
@@ -474,7 +474,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
         //choose top 2 and merge them:
-        Top2<Task> s = new Top2(evidence(when, now, dur), this);
+        Top2<Task> s = new Top2(evidence(start, now, dur), this);
         Task a = s.a;
         if (s.b == null)
             return a;
@@ -484,17 +484,18 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
     @Override
-    public Truth truth(long when,  @Nullable EternalTable eternal, NAR nar) {
+    public Truth truth(long start, long end,  @Nullable EternalTable eternal, NAR nar) {
 
         Truth x = TruthPolation.truth(
                 eternal != null ? eternal.strongest() : null,
-                when, nar.dur(), this);
+                start, end, nar.dur(), this);
+        return x;
 
-        if (x != null && x.conf() >= Param.TRUTH_EPSILON) {
-            return x.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
-        } else {
-            return null; //cut-off
-        }
+//        if (x != null && x.conf() >= Param.TRUTH_EPSILON) {
+//            return x.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+//        } else {
+//            return null; //cut-off
+//        }
 
 
         //return Truth.maxConf(r, topEternal);

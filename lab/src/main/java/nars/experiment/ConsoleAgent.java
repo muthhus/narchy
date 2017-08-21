@@ -319,7 +319,7 @@ public abstract class ConsoleAgent extends NAgentX {
                         $.inh(terms[cx][cy], $.quote(String.valueOf(value))),
                         $.t(1f, 0.9f),
                         () -> nextStamp,
-                        nar);
+                        nar.time(), nar.dur(), nar);
             }
         }
 

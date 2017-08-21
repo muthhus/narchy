@@ -29,18 +29,10 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         this.beliefOrGoal = beliefOrGoal;
     }
 
-
-    public NALTask generate( @NotNull Term template, long when, NAR nar) {
-        if (!template.op().conceptualizable)
-            return null;
-        return generate(template, when, null, nar);
-    }
-
-
     @Nullable
-    public NALTask generate(@NotNull Term template, long when, @Nullable Priority b, NAR nar) {
+    public NALTask generate(@NotNull Term template, long start, long end, @Nullable Priority b, NAR nar) {
 
-        DynTruth yy = truth(when,  template, true, nar);
+        DynTruth yy = truth(start, end,  template, true, nar);
         if (yy == null)
             return null;
 
@@ -49,49 +41,49 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
         if (ee == null || ee.isEmpty())
             return null;
 
-        boolean ete = false;
-        long end = Long.MIN_VALUE;
-        long start = Long.MAX_VALUE;
-        for (int i = 0, e1Size = ee.size(); i < e1Size; i++) {
-            Task x = ee.get(i);
-            long s = x.start();
-            if (s!=ETERNAL) {
-                long e = x.end();
-                if (s < start) start = s;
-                if (e > end) end = e;
-            } else {
-                ete = true;
-            }
-        }
-        if (end == Long.MIN_VALUE) {
-            assert(ete); //should be eternal in this case
-            start = end = ETERNAL;
-        }
+//        boolean ete = false;
+//        long end = Long.MIN_VALUE;
+//        long start = Long.MAX_VALUE;
+//        for (int i = 0, e1Size = ee.size(); i < e1Size; i++) {
+//            Task x = ee.get(i);
+//            long s = x.start();
+//            if (s!=ETERNAL) {
+//                long e = x.end();
+//                if (s < start) start = s;
+//                if (e > end) end = e;
+//            } else {
+//                ete = true;
+//            }
+//        }
+//        if (end == Long.MIN_VALUE) {
+//            assert(ete); //should be eternal in this case
+//            start = end = ETERNAL;
+//        }
 
 
         return yy.task(template, beliefOrGoal, nar.time(), start, end, b, nar);
     }
 
     @Override
-    public Truth truth(long when, NAR nar) {
-        DynTruth d = truth(when, term, false, nar);
+    public Truth truth(long start, long end, NAR nar) {
+        DynTruth d = truth(start, end, term, false, nar);
         return Truth.maxConf(d != null ? d.truth() : null,
-                super.truth(when, nar) /* includes only non-dynamic beliefs */);
+                super.truth(start, end, nar) /* includes only non-dynamic beliefs */);
     }
 
 
 
 
     @Nullable
-    public DynTruth truth(long when, @NotNull Term template, boolean evidence, NAR nar) {
-        return model.eval(template, beliefOrGoal, when, evidence, nar); //newDyn(evidence);
+    public DynTruth truth(long start, long end, @NotNull Term template, boolean evidence, NAR nar) {
+        return model.eval(template, beliefOrGoal, start, end, evidence, nar); //newDyn(evidence);
     }
 
     @Override
-    public Task match(long when, Term template, boolean noOverlap, NAR nar) {
+    public Task match(long start, long end, Term template, boolean noOverlap, NAR nar) {
 //        if (isEmpty())
 //            return null;
-        Task x = super.match(when, template, noOverlap, nar);
+        Task x = super.match(start, end, template, noOverlap, nar);
 
         if (template == null) {
             return x;
@@ -126,7 +118,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 //
 //        template = template2;
 
-        Task y = generate(template, when, nar);
+        Task y = generate(template, start, end, null, nar);
 
 
         if (x == null) return y;
@@ -142,8 +134,8 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
         //choose higher confidence
         int dur = nar.dur();
-        float xc = x.evi(when, dur);
-        float yc = y.evi(when, dur);
+        float xc = x.evi(start, end, dur);
+        float yc = y.evi(start, end, dur);
         //if (!Util.equals(xc, yc, TRUTH_EPSILON)) {
         return xc >= yc ? x : y;
         //}

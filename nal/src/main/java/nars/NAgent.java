@@ -55,9 +55,9 @@ abstract public class NAgent extends DurService implements NSense, NAct {
      **/
     public final Term id;
 
-    public final Map<SensorConcept,CauseChannel<Task>> sensors = new LinkedHashMap();
+    public final Map<SensorConcept, CauseChannel<Task>> sensors = new LinkedHashMap();
 
-    public final Map<ActionConcept,CauseChannel<Task>> actions = new LinkedHashMap();
+    public final Map<ActionConcept, CauseChannel<Task>> actions = new LinkedHashMap();
 
     /**
      * the general reward signal for this agent
@@ -76,8 +76,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     private final CauseChannel<Task> predict;
 
 
-
-
     /**
      * action exploration rate; analogous to epsilon in QLearning
      */
@@ -93,7 +91,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     public boolean trace = false;
 
-    protected long now;
+    public long now;
 
     public float rewardSum = 0;
 
@@ -149,7 +147,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         curiosity = new FloatParam(0.10f, 0f, 1f);
 
 
-        if (id==null) id = quote(getClass().toString());
+        if (id == null) id = quote(getClass().toString());
         this.predict = nar.newCauseChannel(id + " predict");
     }
 
@@ -160,11 +158,12 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     @NotNull
     @Override
-    public final Map<SensorConcept,CauseChannel<Task>> sensors() {
+    public final Map<SensorConcept, CauseChannel<Task>> sensors() {
         return sensors;
     }
 
-    @NotNull @Override
+    @NotNull
+    @Override
     public final Map<ActionConcept, CauseChannel<Task>> actions() {
         return actions;
     }
@@ -187,8 +186,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     int actionFrame = 0;
 
-    final AtomicBoolean busy = new AtomicBoolean(false);
-
 
     protected void senseAndMotor() {
         //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
@@ -205,13 +202,14 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         //        if (load < 1) {
 
 
-        long next = now + nar.dur()
+        int dur = nar.dur();
+        long next = now + dur
                 //+(dur * 3 / 2);
                 ;
 
 
         predict.input(
-                /*Stream.of(*/happy.apply(nar)/*, fireHappy)*/
+                /*Stream.of(*/happy.update(now, dur, nar)/*, fireHappy)*/
         );
 
         //contribution of this agent to the NAR's global happiness measurement
@@ -224,12 +222,12 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 //                            (float) Math.sqrt( Math.abs(dxm - lastDexterity) ));
 //            this.lastDexterity = dxm;
 
-        sensors.forEach((s,c)->{
-            c.input(s.apply(nar));
+        sensors.forEach((s, c) -> {
+            c.input(s.update(now, dur, nar));
         });
 
-        actions.forEach((a,c)->{
-            c.input(a.apply(nar));
+        actions.forEach((a, c) -> {
+            c.input(a.update(now, dur, nar));
         });
 
         eventFrame.emitAsync(this, nar.exe);
@@ -309,7 +307,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         now = nar.time();
 
 
-        nar.runLater(()-> {
+        nar.runLater(() -> {
             //this.curiosityAttention = reinforcementAttention / actions.size();
 
             /** set the sensor budget policy */
@@ -471,18 +469,14 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 //    }
 
 
-
     @Override
     protected void runDur(NAR nar) {
-        if (enabled.get() && busy.compareAndSet(false, true)) {
-            this.now = now;
-            try {
-                //only execute at most one agent frame per duration
-                senseAndMotor();
-                predict();
-            } finally {
-                busy.set(false);
-            }
+        if (enabled.get()) {
+            this.now = nar.time();
+
+            senseAndMotor();
+            predict();
+
         }
     }
 

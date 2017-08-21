@@ -2,6 +2,7 @@ package nars;
 
 import jcog.Texts;
 import jcog.bag.impl.ArrayBag;
+import jcog.math.Interval;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.concept.Concept;
@@ -54,6 +55,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
      */
     @Override
     long end();
+
+    default float evi(long start, long end, final int dur) {
+        return evi(nearestTimeBetween(start, end), dur);
+    }
 
     /**
      * amount of evidence measured at a given time with a given duration window
@@ -721,6 +726,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     }
 
     @Nullable
+    default Truth truth(long start, long end, int dur, float minConf) {
+        return truth(nearestTimeBetween(start, end), dur, minConf);
+    }
+
+    @Nullable
     default Truth truth(long when, int dur, float minConf) {
         float eve = evi(when, dur);
         if (eve == eve && eve > 0) {
@@ -1093,4 +1103,22 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
      */
     short[] cause();
 
+    /** TODO see if this can be made faster */
+    default long distanceTo(long start, long end) {
+        long s = this.start();
+        if (s == ETERNAL) return 0;
+
+        assert(start!=ETERNAL);
+
+        if (start == end)
+            return Math.abs(start - nearestTimeBetween(start, end)); //fast
+        else {
+            long e = this.end();
+            if (Interval.intersectLength(s, e, start, end) >= 0)
+                return 0; //intersects
+            else {
+                return Interval.unionLength(s, e, start, end) - (end - start) - (e - s);
+            }
+        }
+    }
 }

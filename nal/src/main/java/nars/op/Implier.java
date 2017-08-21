@@ -87,7 +87,7 @@ public class Implier extends DurService {
         belief.clear();
         goalTruth.clear();
 
-        if (impl!=null && impl.edgeCount() > 256) { //HACK
+        if (impl != null && impl.edgeCount() > 256) { //HACK
 //            System.err.print("saved impl graph to file");
 //            try {
 //                impl.writeGML(new PrintStream(new FileOutputStream("/tmp/x.gml")));
@@ -145,8 +145,6 @@ public class Implier extends DurService {
         });
 
 
-        if (!goalTruth.isEmpty()) {
-
 //            List<IntHashSet> ws = new GraphMeter().weakly(s);
 //            ws.forEach(x -> {
 //                if (!x.isEmpty()) { //HACK
@@ -154,22 +152,20 @@ public class Implier extends DurService {
 //                }
 //            });
 
-            goalTruth.forEach((t, a) -> {
-                @Nullable Truth uu = a.commitSum();
-                if (uu != null) {
-                    float c = uu.conf();
-                    if (c >= confMin) {
-                            //Math.abs(uu.expectation() - 0.5f) >= confMin /* confmin here used in expectation comparison */) {
-                        NALTask y = new NALTask(t, GOAL, uu, now, now, next, nar.time.nextInputStamp());
-                        y.pri(nar.priorityDefault(GOAL));
+        goalTruth.forEach((t, a) -> {
+            @Nullable Truth uu = a.commitSum();
+            if (uu != null) {
+                float c = uu.conf();
+                if (c >= confMin) {
+                    NALTask y = new NALTask(t, GOAL, uu, now, now, next, nar.time.nextInputStamp());
+                    y.pri(nar.priorityDefault(GOAL));
 //                        if (Param.DEBUG)
 //                            y.log("")
-                        in.input(y);
-                        System.err.println("\t" + y);
-                    }
+                    in.input(y);
+                    System.err.println("\t" + y);
                 }
-            });
-        }
+            }
+        });
 
 //        if (s!=null)
 //            System.out.println(s.toString());
@@ -185,7 +181,7 @@ public class Implier extends DurService {
     }
 
     private Task belief(Term x) {
-        return belief.computeIfAbsent(x, (xx) -> nar.belief(xx, now));
+        return belief.computeIfAbsent(x, (xx) -> nar.belief(xx, now, now));
     }
 
     public void goal(Map<Term, TruthAccumulator> goals, Term tt, Truth g) {

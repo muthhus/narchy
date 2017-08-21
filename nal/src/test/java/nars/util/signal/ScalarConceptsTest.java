@@ -91,7 +91,7 @@ public class ScalarConceptsTest {
 
 
             double freqSum = StreamSupport.stream(f.sensors.spliterator(), false)
-                    .peek(x -> n.input(x.apply(n)))
+                    .peek(x -> n.input(x.update(n.time(), n.dur(), n)))
                     .map(x -> n.beliefTruth(x, n.time()))
                     .mapToDouble(x -> x != null ? x.freq() : 0f).sum();
 
@@ -137,7 +137,7 @@ public class ScalarConceptsTest {
 
 
             x.setValue(v);
-            xc.accept(n);
+            xc.update(n.time(), n.dur(), n);
             n.run(1);
 
             System.out.println("\n" + n.time() + " x=" + x);

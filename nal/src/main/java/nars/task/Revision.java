@@ -295,16 +295,12 @@ public class Revision {
         float stampDiscount =
 //                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
 //                //TODO weight the contributed overlap amount by the relative confidence provided by each task
-                1f - Stamp.overlapFraction(a.stamp(), b.stamp());
+                1f - Stamp.overlapFraction(a.stamp(), b.stamp())/2f;
+
         float factor = 1f * stampDiscount;
         if (factor < Pri.EPSILON)
             return null;
-//
-////            //relate to loss of stamp when its capacity to contain the two incoming is reached
-////            float stampCapacityDiscount =
-////                    Math.min(1f, ((float) Param.STAMP_CAPACITY) / (a.stamp().length + b.stamp().length));
-//
-//
+
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
 //            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);
 //
