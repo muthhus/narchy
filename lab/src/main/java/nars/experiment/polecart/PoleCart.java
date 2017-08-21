@@ -40,7 +40,7 @@ public class PoleCart extends NAgentX {
                 e.printStackTrace();
                 return null;
             }
-        }, 20);
+        }, 30);
     }
 
     private final JPanel panel;
@@ -115,10 +115,10 @@ public class PoleCart extends NAgentX {
 
         //angle
 
-        this.angX = senseNumber($.the("angX"),
+        this.angX = senseNumber($.p("angX"),
                 () -> (float)(0.5f + 0.5f * (Math.sin(angle))))
                 .resolution(0.1f);
-        this.angY = senseNumber($.the("angY"),
+        this.angY = senseNumber($.p("angY"),
                 () -> (float)(0.5f + 0.5f * (Math.cos(angle))))
                 .resolution(0.1f);
 
@@ -128,7 +128,7 @@ public class PoleCart extends NAgentX {
                 new FloatPolarNormalized(()->(float)angleDot)
         ).resolution(0.1f);
 
-        this.move = actionBipolar($.the("move"), (a) -> {
+        this.move = actionBipolar($.p("move"), (a) -> {
             if (!manualOverride)
                 action = a;
             return a;

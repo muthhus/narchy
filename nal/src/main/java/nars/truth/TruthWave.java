@@ -148,8 +148,8 @@ public class TruthWave {
             long u = t + idt;
             long mid = (t + u)/2;
             load(data, (j++) * ENTRY_SIZE, mid, mid,
-                    nar.truth(c, punc, t, u)
-                    //nar.truth(c, punc, (t + u)/2)
+                    nar.truth(c, punc, mid, mid) //point
+                    //nar.truth(c, punc, t, u) //range
             );
             t += dt;
         }

@@ -36,7 +36,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private int capacity;
     static final int TRUTHPOLATED_MAX = 8;
 
-    public static final float FUTURE_BOOST = 1.5f;
+    public static final float FUTURE_BOOST = 2f;
 
 
     private transient NAR nar;
@@ -58,7 +58,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         /**
          * relative to time sameness (1)
          */
-        static final float CONF_SAMENESS_IMPORTANCE = 0.1f;
+        static final float CONF_SAMENESS_IMPORTANCE = 0.05f;
 
         public final long start;
         long end; //allow end to stretch for ongoing tasks
@@ -375,7 +375,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         int s = size();
         if (s < MAX_TASKS_PER_LEAF * 2) {
             //all
-            tree.iterator().forEachRemaining(u::add);
+            tree.forEach(u::add);
         } else {
             //scan
             TaskRegion bounds = (TaskRegion) tree.root().region();
@@ -633,7 +633,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
             return (1 / ((1 + awayFromNow)))
-                    * ((1 + (cb.end - cb.start) / awayFromNow)) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
+                    * (1 + (cb.end - cb.start) / awayFromNow) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
                     * (cb.confMax); /* conf, optimistic */
 
 
