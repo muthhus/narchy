@@ -66,12 +66,6 @@ public interface Variable extends Atomic {
     }
 
     @Override
-    default Set<Term> varsUnique(@Nullable Op type) {
-        if (type == null || op() == type) return Set.of(this);
-        else return null;
-    }
-
-    @Override
     @Nullable
     default Set<Term> varsUnique(@Nullable Op type, @NotNull Set<Term> exceptIfHere) {
         if (((type == null || op() == type)) && !exceptIfHere.contains(this))

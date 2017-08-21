@@ -1068,15 +1068,15 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return s != ETERNAL ? end() - s : 0;
     }
 
-//    default boolean isFutureOf(long when) {
-//        long x = nearestTimeTo(when);
-//        return x == ETERNAL || x > when;
-//    }
-//
-//    default boolean isPastOf(long when) {
-//        long x = nearestTimeTo(when);
-//        return x == ETERNAL || x < when;
-//    }
+    default boolean isAfter(long when) {
+        long x = nearestTimeTo(when);
+        return x == ETERNAL || x > when;
+    }
+
+    default boolean isBefore(long when) {
+        long x = nearestTimeTo(when);
+        return x == ETERNAL || x < when;
+    }
 //
 //    default boolean isPresentOf(long when) {
 //        long x = nearestTimeTo(when);

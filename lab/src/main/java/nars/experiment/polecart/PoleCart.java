@@ -106,9 +106,9 @@ public class PoleCart extends NAgentX {
          */
         //TODO extract 'senseAngle()' for NSense interface
 
-        this.x = senseNumber("x",
+        this.x = senseNumber("(x)",
                 new FloatPolarNormalized(() -> (float) pos)).resolution(0.1f);
-        this.xVel = senseNumber("xVel",
+        this.xVel = senseNumber("(xVel)",
                 //() -> Util.sigmoid((float) posDot)
                 new FloatPolarNormalized(() -> (float) posDot)
         ).resolution(0.1f);
@@ -123,7 +123,7 @@ public class PoleCart extends NAgentX {
                 .resolution(0.1f);
 
         //angular velocity
-        this.angVel = senseNumber("angVel",
+        this.angVel = senseNumber("(angVel)",
                 //() -> Util.sigmoid(angleDot / 4f)
                 new FloatPolarNormalized(()->(float)angleDot)
         ).resolution(0.1f);

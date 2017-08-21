@@ -54,7 +54,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private final static int EVAL_ALL_LTE_TASKS = 3;
 
     public static final int MIN_TASKS_PER_LEAF = 2;
-    public static final int MAX_TASKS_PER_LEAF = 3;
+    public static final int MAX_TASKS_PER_LEAF = 4;
+
+
+    public static final float FUTURE_BOOST = 2f;
 
 
     private transient NAR nar;
@@ -497,14 +500,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         Task input = inputRegion.task;
 
-        FloatFunction<Task> taskStrength = taskStrength(now, dur);
+        FloatFunction<Task> taskStrength = taskStrengthWithFutureBoost(now, FUTURE_BOOST, now, dur);
 
         FloatFunction<TaskRegion> weakestTask = (t -> -taskStrength.floatValueOf(t.task));
 
         FloatFunction<TaskRegion> rs = regionStrength(now, dur);
-        FloatFunction<Node<?,TaskRegion>> leafWeakness = (l) -> -rs.floatValueOf((TaskRegion) (l.region()));
 
         FloatFunction<TaskRegion> regionWeakness = (r) -> -rs.floatValueOf(r);
+
+        FloatFunction<Node<?,TaskRegion>> leafWeakness = (l) -> -rs.floatValueOf((TaskRegion) (l.region()));
+
 
 
         float inputStrength = taskStrength.floatValueOf(input);
@@ -517,12 +522,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         Top<Leaf<TaskRegion>> mergeVictim = new Top(leafWeakness);
 
-
-
-        compressNext(tree, tree.root(), deleteVictim, mergeVictim);
+        compressNode(tree, tree.root(), deleteVictim, mergeVictim);
 
         //decide to remove or merge:
-        @Nullable TaskRegion toRemove = deleteVictim.the;
         @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
 
 
@@ -533,8 +535,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 merged = true; //the result has already been added in compressMerge
             }
         }
+
+        @Nullable TaskRegion toRemove = deleteVictim.the;
         if (!merged && toRemove != null) {
-            compressEvict(toRemove);
+            remove(toRemove); //evicted
         }
 
         if (tree.size() < capacity)
@@ -585,11 +589,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
 
-    private void compressEvict(TaskRegion t) {
-        remove(t);
-    }
-
-    static void compressNext(Space<TaskRegion> tree, Node<TaskRegion, ?> next, Consumer<TaskRegion> deleteVictim, Top<Leaf<TaskRegion>> mergeVictim) {
+    static void compressNode(Space<TaskRegion> tree, Node<TaskRegion, ?> next, Consumer<TaskRegion> deleteVictim, Top<Leaf<TaskRegion>> mergeVictim) {
         if (next instanceof Leaf) {
 
             compressLeaf(tree, (Leaf) next, deleteVictim);
@@ -631,9 +631,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             }
 
             if (weakest.a != null)
-                compressNext(tree, weakest.a, deleteVictims, mergeVictims);
+                compressNode(tree, weakest.a, deleteVictims, mergeVictims);
             if (weakest.b != null)
-                compressNext(tree, weakest.b, deleteVictims, mergeVictims);
+                compressNode(tree, weakest.b, deleteVictims, mergeVictims);
         }
     }
 
@@ -656,17 +656,18 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
     }
 
+    /** TODO use the same heuristics as task strength */
     private static FloatFunction<TaskRegion> regionStrength(long when, int dur) {
 
         return (TaskRegion cb) -> {
 
             float awayFromNow = //Math.abs(when - ((cb.start + cb.end)/2)); //now to its midpoint
                     //(Math.min(Math.abs(cb.start - when), Math.abs(cb.end - when)));
-                    Math.abs(cb.start - when) / ((float) dur);
+                    Math.min(Math.abs(cb.start - when), Math.abs(cb.end - when)) / ((float) dur); //optimistic distance
 
 
             return (1 / ((1 + awayFromNow)))
-                    * ((1 + (cb.end - cb.start)) / awayFromNow) /* range, in vanishing perspective proportion to distance */
+                    * ((1 + (cb.end - cb.start) / awayFromNow) ) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
                     * (cb.confMax); /* conf, optimistic */
 
 
@@ -693,6 +694,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     static FloatFunction<Task> taskStrength(long when, int dur) {
         return (Task x) -> temporalTaskPriority(x, when, dur);
+    }
+
+    static FloatFunction<Task> taskStrengthWithFutureBoost(long now, float futureBoost, long when, int dur) {
+        return (Task x) -> {
+            //boost for present and future
+            return (!x.isBefore(now) ? futureBoost : 1f) * temporalTaskPriority(x, when, dur);
+        };
     }
 
     static FloatFunction<Task> taskStrength(@Nullable Term template, long when, int dur) {
@@ -740,6 +748,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public Stream<Task> stream() {
         return Streams.stream(taskIterator());
+    }
+
+    @Override
+    public void forEach(long minT, long maxT, Consumer<? super Task> each) {
+        tree.intersecting(timeRange(minT, maxT), (t) -> {
+           each.accept(t.task);
+           return true;
+        });
     }
 
     @Override

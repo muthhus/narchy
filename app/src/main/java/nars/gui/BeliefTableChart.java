@@ -117,17 +117,26 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
         cc = (BaseConcept)nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
 
+        long minT, maxT;
+        if (range!=null) {
+            minT = range[0];
+            maxT = range[1];
+        } else {
+            minT = Long.MIN_VALUE;
+            maxT = Long.MAX_VALUE;
+        }
+
         if (cc != null) {
             cp = 1f; /*nar.pri(cc);*/ if (cp!=cp) cp = 0;
-            beliefs.set(cc.beliefs(), now, dur, nar);
+            beliefs.set(cc.beliefs(), now, dur, nar, minT, maxT);
             beliefs.current = nar.beliefTruth(cc, now);
-            goals.set(cc.goals(), now, dur, nar);
+            goals.set(cc.goals(), now, dur, nar, minT, maxT);
             goals.current = nar.goalTruth(cc, now);
         } else {
             cp = 0;
-            beliefs.set(BeliefTable.Empty, now, dur, nar);
+            beliefs.clear();
             beliefs.current = null;
-            goals.set(BeliefTable.Empty, now, dur, nar);
+            goals.clear();
             goals.current = null;
         }
 

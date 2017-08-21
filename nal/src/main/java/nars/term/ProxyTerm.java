@@ -199,11 +199,6 @@ public class ProxyTerm<T extends Term> implements Term {
     }
 
     @Override
-    public Set<Term> varsUnique(@Nullable Op type) {
-        return ref.varsUnique(type);
-    }
-
-    @Override
     public @Nullable Set<Term> varsUnique(@Nullable Op type, Set<Term> exceptIfHere) {
         return ref.varsUnique(type, exceptIfHere);
     }

@@ -10,6 +10,7 @@ import nars.control.CauseChannel;
 import nars.control.DurService;
 import nars.task.NALTask;
 import nars.term.Term;
+import nars.term.var.Variable;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
 import nars.truth.func.BeliefFunction;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 import static nars.Op.GOAL;
 import static nars.Op.NEG;
+import static nars.Op.VAR_DEP;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -77,7 +79,7 @@ public class Implier extends DurService {
         this.tg = new TermGraph.ImplGraph() {
             @Override
             protected boolean acceptTerm(Term p) {
-                return !p.isTemporal();
+                return !(p instanceof Variable) && !p.isTemporal();
             }
         };
     }

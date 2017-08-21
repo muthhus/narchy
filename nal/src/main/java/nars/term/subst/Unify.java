@@ -17,6 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -162,8 +163,11 @@ public abstract class Unify extends Versioning implements Subst {
     public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
         //accumulate any new free variables in this next matched term
-        if (null == free.set(freeVariables(x))) //plus and not equals because this may continue from another unification!!!!!
+        Set<Term> freeX = freeVariables(x);
+        if (null == free.set(freeX)) //plus and not equals because this may continue from another unification!!!!!
             return false;
+//        if (freeX.isEmpty())
+//            return x.equals(y);
 
         //assert (unassigned.isEmpty() ) : "non-purposeful unification";
         //this.freeCount.add( newFree.size() );
@@ -184,7 +188,7 @@ public abstract class Unify extends Versioning implements Subst {
      */
     Set<Term> freeVariables(@NotNull Term x) {
         Set<Term> prevFree = free.get();
-        Set<Term> nextFree = prevFree != null ? x.varsUnique(type, prevFree) : x.varsUnique(type);
+        Set<Term> nextFree = x.varsUnique(type, prevFree != null ?  prevFree : Collections.emptySet());
         return concat(prevFree, nextFree);
     }
 

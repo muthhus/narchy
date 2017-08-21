@@ -16,7 +16,7 @@
 //raw product composition, may be redundant because general induction via && does the equivalent
  //    A, B, task("*"), belief("*") |- (A | B), (Belief:Intersection)
  //   A, B, task("*"), belief("*") |- (A & B), (Belief:Union)
- //   A, B, task("*"), belief("*") |- (A ~ B), (Belief:Difference)
+    A, B, task("*"), belief("*"), neqRCom(A,B) |- (A - B), (Belief:Difference)
 //raw product decomposition ?
 
 //// inheritance decomposition ////////////////////////////////////////////////////////////////////////////////////

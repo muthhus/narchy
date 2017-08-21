@@ -829,13 +829,7 @@ public interface Term extends Termlike, Comparable<Term> {
     /**
      * return null if none, cheaper than using an empty iterator
      */
-    @Nullable
-    default Set<Term> varsUnique(@Nullable Op type) {
-        return null;
-    }
-
-    @Nullable
-    default Set<Term> varsUnique(@Nullable Op type, @Nullable Set<Term> exceptIfHere) {
+    @Nullable default Set<Term> varsUnique(@Nullable Op type, @Nullable Set<Term> exceptIfHere) {
         return null;
     }
 

@@ -65,6 +65,11 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         public void setCapacity(int eternals, int temporals) {
         }
 
+        @Override
+        public void forEachTask(boolean includeEternal, long minT, long maxT, Consumer<? super Task> x) {
+
+        }
+
         public @Nullable Task match(long when, long now, int dur, NAR nar) {
             return null;
         }
@@ -127,6 +132,8 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
     void setCapacity(int eternals, int temporals);
 
+    /** minT and maxT inclusive */
+    void forEachTask(boolean includeEternal, long minT, long maxT, Consumer<? super Task> x);
 
 //    /**
 //     * projects to a new task at a given time

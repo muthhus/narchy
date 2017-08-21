@@ -35,6 +35,7 @@ import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.transform.VariableNormalization;
+import nars.term.var.Variable;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.set.MutableSet;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
@@ -253,16 +254,14 @@ public interface Compound extends Term, IPair, TermContainer {
 
             recurseTerms(parent -> vars(type) > 0,
                     (sub) -> {
-                        if (sub.op() == type) {
+                        if (sub instanceof Variable && (type == null || sub.op() == type)) {
                             if (!unlessHere.contains(sub))
                                 u.add(sub);
                             remain[0]--;
                         }
                         return (remain[0] > 0);
                     });
-            if (u.isEmpty())
-                return null;
-            return u;
+            return u.isEmpty() ? null : u;
         }
     }
 

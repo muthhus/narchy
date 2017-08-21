@@ -301,7 +301,6 @@ public class NAL3Test extends AbstractNALTest {
                 .believe("(a-->b)", 0.25f, 0.9f)
                 .believe("(a-->(|,b,c))", 0.25f, 0.9f)
                 .mustBelieve(cycles, "(a-->c)", 0.19f, 0.15f, ETERNAL);
-
     }
 
     @Test public void testIntersectDiffUnionOfCommonSubterms() {
@@ -324,6 +323,12 @@ public class NAL3Test extends AbstractNALTest {
 
     }
 
-
+    @Test public void testRawProductDifference() {
+        test
+                .believe("(x,0)", 1f, 0.9f)
+                .believe("(x,1)", 0.5f, 0.9f)
+                .mustBelieve(cycles, "((x,1)-(x,0))", 0.0f, 0.81f, ETERNAL)
+                .mustBelieve(cycles, "((x,0)-(x,1))", 0.5f, 0.81f, ETERNAL);
+    }
 }
 

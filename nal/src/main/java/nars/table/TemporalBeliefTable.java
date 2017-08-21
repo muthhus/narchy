@@ -103,6 +103,11 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
         }
 
         @Override
+        public void forEach(long minT, long maxT, Consumer<? super Task> x) {
+
+        }
+
+        @Override
         public Task match(long when, @Nullable Term against, NAR nar) {
             return null;
         }
@@ -119,4 +124,11 @@ public interface TemporalBeliefTable extends TaskTable, Iterable<Task> {
     };
 
 
+    /** minT and maxT inclusive */
+    default void forEach(long minT, long maxT, Consumer<? super Task> each) {
+        forEach(x -> {
+            if (x.start() >= minT && x.end() <= maxT)
+                each.accept(x);
+        });
+    }
 }

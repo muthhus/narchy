@@ -45,7 +45,7 @@ public class TruthWave {
         clear();
     }
 
-    private void clear() {
+    public void clear() {
         size = 0;
         start = end = Tense.ETERNAL;
     }
@@ -56,25 +56,26 @@ public class TruthWave {
 
     public TruthWave(@NotNull BeliefTable b, @NotNull NAR n) {
         this(b.size());
-        set(b, n.time(), n.dur(), n);
+        set(b, n.time(), n.dur(), n, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
     /**
      * clears and fills this wave with the data from a table
      */
-    public void set(@NotNull BeliefTable b, long now, int dur, NAR nar) {
+    public void set(@NotNull BeliefTable b, long now, int dur, NAR nar, long minT, long maxT) {
         int s = b.size();
         if (s == 0) {
             this.current = null;
             clear();
             return;
         }
+
         ensureSize(s);
 
         float[] t = this.truth;
 
         final int[] size = {0};
-        b.forEachTask(x -> {
+        b.forEachTask(false, minT, maxT, x -> {
             int ss = size[0];
             if (ss < s) { //HACK in case the table size changed since allocating above
                 int j = (size[0]++) * ENTRY_SIZE;

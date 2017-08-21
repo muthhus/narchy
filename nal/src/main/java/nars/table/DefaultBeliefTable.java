@@ -66,6 +66,14 @@ public class DefaultBeliefTable implements BeliefTable {
     }
 
     @Override
+    public void forEachTask(boolean includeEternal, long minT, long maxT, Consumer<? super Task> x) {
+        if (includeEternal) {
+            eternal.forEachTask(x);
+        }
+        temporal.forEach(minT, maxT, x);
+    }
+
+    @Override
     public void forEach(@NotNull Consumer<? super Task> action) {
         forEachTask(action);
     }

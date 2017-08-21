@@ -114,11 +114,6 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return Compound.super.evalSafe(index, remain);
     }
 
-    @Override
-    public Set<Term> varsUnique(@Nullable Op type) {
-        return Compound.super.varsUnique(type);
-    }
-
     @Nullable
     @Override
     public Set<Term> varsUnique(@Nullable Op type, Set<Term> exceptIfHere) {

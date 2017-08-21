@@ -58,6 +58,7 @@ public interface TaskTable  {
 //        return null;
 //    }
 
+
     void forEachTask(Consumer<? super Task> x);
 //    default void forEachTask(Consumer<? super Task> x) {
 //        //TODO filter deleted tasks
