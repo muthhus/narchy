@@ -4,7 +4,6 @@ import jcog.data.graph.AdjGraph;
 import jcog.pri.Pri;
 import nars.$;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.control.DurService;
@@ -13,7 +12,6 @@ import nars.term.Term;
 import nars.term.var.Variable;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
-import nars.truth.func.BeliefFunction;
 import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
 import nars.util.graph.TermGraph;
@@ -25,7 +23,6 @@ import java.util.Map;
 
 import static nars.Op.GOAL;
 import static nars.Op.NEG;
-import static nars.Op.VAR_DEP;
 import static nars.time.Tense.DTERNAL;
 
 
@@ -36,7 +33,6 @@ public class Implier extends DurService {
 
     private final TermGraph.ImplGraph tg;
     private final Iterable<Term> seeds;
-    private final Iterable<Term> goals;
     private final NAR nar;
     private final CauseChannel<Task> in;
 
@@ -65,16 +61,12 @@ public class Implier extends DurService {
         this(n, List.of(seeds));
     }
 
-    public Implier(NAR n, Iterable<Term> seeds) {
-        this(n, seeds, seeds);
-    }
 
-    public Implier(NAR n, Iterable<Term> seeds, Iterable<Term> goals) {
+    public Implier(NAR n, Iterable<Term> seeds) {
         super(n, 1f);
 
         this.nar = n;
         this.seeds = seeds;
-        this.goals = goals;
         this.in = n.newCauseChannel(this);
         this.tg = new TermGraph.ImplGraph() {
             @Override
@@ -95,8 +87,15 @@ public class Implier extends DurService {
         belief.clear();
         goalTruth.clear();
 
-        if (impl!=null && impl.edgeCount() > 128) //HACK
+        if (impl!=null && impl.edgeCount() > 256) { //HACK
+//            System.err.print("saved impl graph to file");
+//            try {
+//                impl.writeGML(new PrintStream(new FileOutputStream("/tmp/x.gml")));
+//            } catch (FileNotFoundException e) {
+//                e.printStackTrace();
+//            }
             impl = null; //reset
+        }
 
         impl = tg.snapshot(impl, seeds, nar, next);
         int implCount = impl.edgeCount();
@@ -146,15 +145,6 @@ public class Implier extends DurService {
         });
 
 
-//            if (nar.random().nextInt(25) == 0) {
-//                System.err.println("saving graph");
-//                try {
-//                    s.writeGML(new PrintStream(new FileOutputStream("/tmp/x.gml")));
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-
         if (!goalTruth.isEmpty()) {
 
 //            List<IntHashSet> ws = new GraphMeter().weakly(s);
@@ -171,6 +161,7 @@ public class Implier extends DurService {
                     if (c >= confMin) {
                             //Math.abs(uu.expectation() - 0.5f) >= confMin /* confmin here used in expectation comparison */) {
                         NALTask y = new NALTask(t, GOAL, uu, now, now, next, nar.time.nextInputStamp());
+                        y.pri(nar.priorityDefault(GOAL));
 //                        if (Param.DEBUG)
 //                            y.log("")
                         in.input(y);

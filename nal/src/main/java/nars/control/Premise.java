@@ -184,7 +184,7 @@ public class Premise extends UnaryTask {
             }
         }
 
-        assert(beliefTerm.op()!=NEG);
+        beliefTerm = beliefTerm.unneg(); //HACK ?? assert(beliefTerm.op()!=NEG);
 
         //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
         Task belief = null;

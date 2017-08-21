@@ -3,23 +3,20 @@ package nars.util.graph;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import jcog.data.graph.AdjGraph;
-import jcog.pri.Priority;
+import jcog.pri.PriReference;
 import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
-import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.truth.TruthFunctions;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static nars.Op.IMPL;
-import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
-import static nars.truth.TruthFunctions.w2c;
 
 public enum TermGraph {
     ;
@@ -83,7 +80,7 @@ public enum TermGraph {
             Set<Termed> next = Sets.newConcurrentHashSet();
             Iterables.addAll(next, sources);
 
-            int maxSize = 1024;
+            int maxSize = 128;
             do {
                 Iterator<Termed> ii = next.iterator();
                 while (ii.hasNext()) {
@@ -91,47 +88,59 @@ public enum TermGraph {
                     ii.remove();
                     if (!done.add(t))
                         continue;
-                    recurseTerm(nar, when, g, done, next, t);
+                    AdjGraph<Term, Term> gg = g;
+                    recurseTerm(nar, when, g, (impl) -> {
+                        if (!done.contains(impl)) {
+                            Term s = impl.sub(0).conceptual();
+                            if (!acceptTerm(s)) {
+                                done.add(impl);
+                                return;
+                            }
+
+                            Term p = impl.sub(1).conceptual();
+                            if (!acceptTerm(p)) {
+                                done.add(impl);
+                                return;
+                            }
+
+                            next.add(s);
+                            next.add(p);
+                            impl(gg, nar, when, impl, s, p);
+                            done.add(impl);
+                        }
+                    }, t);
                 }
             } while (!next.isEmpty() && g.nodeCount() < maxSize);
 
+            System.out.println(g.nodeCount() + " " + g.edgeCount());
             return g;
         }
 
-        protected void recurseTerm(NAR nar, long when, AdjGraph<Term, Term> g, Set<Term> done, Set<Termed> next, Term t) {
-
+        protected void recurseTerm(NAR nar, long when, AdjGraph<Term, Term> g, Consumer<Term> next, Term t) {
 
 
             Concept tc = nar.concept(t);
             if (tc == null)
                 return; //ignore non-conceptualized
 
-            tc.termlinks().forEach(ml -> {
+            Consumer<PriReference<? extends Termed>> each = ml -> {
 
-                        Term l = ml.get();
-                        if (l.op() == IMPL && !l.hasVarQuery() && l.subterms().containsRecursively(t) /* && m.vars()==0 */
-                            //&& ((Compound)m).containsTermRecursively(t)) {
-                                ) {
+                Term l = ml.get().term().conceptual();
+                if (l.op() == IMPL && !l.hasVarQuery() /*&& l.subterms().containsRecursively(t)*/ /* && m.vars()==0 */
+                    //&& ((Compound)m).containsTermRecursively(t)) {
+                        ) {
 
-                            Term s = l.sub(0);
-                            if (!acceptTerm(s))
-                                return;
 
-                            Term p = l.sub(1);
-                            if (!acceptTerm(p))
-                                return;
-
-                            //if (!g.nodes().contains(s) || !done.contains(p)) {
+                    //if (!g.nodes().contains(s) || !done.contains(p)) {
 //                            if ((s.equals(t) || s.containsRecursively(t)) ||
 //                                    (p.equals(t) || p.containsRecursively(t))) {
-                                next.add(s);
-                                next.add(p);
-                                impl(g, nar, when, l, s, p);
-                           // }
-                            //}
-                        }
-                    }
-            );
+                    next.accept(l);
+                    // }
+                    //}
+                }
+            };
+            tc.termlinks().forEach(each);
+            //tc.tasklinks().forEach(each);
         }
 
         protected boolean acceptTerm(Term p) {

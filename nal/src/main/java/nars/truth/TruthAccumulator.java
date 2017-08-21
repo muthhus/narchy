@@ -43,8 +43,8 @@ public class TruthAccumulator extends AtomicReference<double[]> {
             return null;
 
         int n = (int)fc[2];
-        float c = w2c((sumOrAverage) ? ((float)e) : ((float)e)/n);
-        return $.t((float)(fc[0]/e), c);
+        float ee = ((sumOrAverage) ? ((float)e) : ((float)e)/n);
+        return new PreciseTruth((float)(fc[0]/e), ee, false);
     }
 
     public void add(@Nullable Truth t) {

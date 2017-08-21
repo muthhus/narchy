@@ -63,7 +63,8 @@ public class Signal extends AtomicReference<SignalTask> {
 
             if (current != null) {
                 current.setEnd(now);
-                current.stretchKey.accept(current);
+                if (current.stretchKey!=null)
+                    current.stretchKey.accept(current);
             }
 
 

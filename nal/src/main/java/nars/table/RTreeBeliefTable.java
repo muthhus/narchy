@@ -404,7 +404,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 if (ct.size() == 0)
                     continue;
 
-                return match(nar, when, ct.topSorted(strongestTask, 2));
+                return match(nar, when, ct.topSorted(strongestTask, 1));
             }
         }
 
@@ -469,7 +469,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 //ignore, it is already present; this actually should never be reached if the Signal works right
                 return;
             } else {
-                throw new UnsupportedOperationException(sx + " either stretching or it isn't");
+                //throw new UnsupportedOperationException(sx + " either stretching or it isn't");
+                tr = new TaskRegion(x);
             }
         } else {
             tr = new TaskRegion(x);

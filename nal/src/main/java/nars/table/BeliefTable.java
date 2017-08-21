@@ -4,7 +4,6 @@ import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;
-import nars.concept.Concept;
 import nars.control.Cause;
 import nars.index.term.TermIndex;
 import nars.task.NALTask;
@@ -117,7 +116,6 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
         }
 
 
-
         @Override
         public Truth truth(long when, NAR nar) {
             return null;
@@ -132,7 +130,9 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
     void setCapacity(int eternals, int temporals);
 
-    /** minT and maxT inclusive */
+    /**
+     * minT and maxT inclusive
+     */
     void forEachTask(boolean includeEternal, long minT, long maxT, Consumer<? super Task> x);
 
 //    /**
@@ -212,9 +212,14 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     void clear();
 
 
+    default Task answer(long when, Term template, NAR nar) {
+        return answer(when, nar.time(), nar.dur(), null, template, nar);
+    }
 
-    /** projects a match */
-    default Task answer(long when, long now, int dur, @NotNull Task question, @Deprecated Term template, NAR nar) {
+    /**
+     * projects a match
+     */
+    default Task answer(long when, long now, int dur, @Nullable Task question, Term template, NAR nar) {
 
 
         Task answer = match(when, template, false, nar);
@@ -222,7 +227,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             return null;
 
         boolean novel = false; //(answer instanceof AnswerTask); //includes: answers, revision, or dynamic
-                    //&& !(answer instanceof DynamicBeliefTask);
+        //&& !(answer instanceof DynamicBeliefTask);
 
 
         //project if different occurrence
@@ -239,16 +244,19 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             if (aProj != null) {
 
                 Term at = normalizedOrNull(answer.term(), TermIndex.retemporalizeXTERNALToZero);
-                if (at==null)
+                if (at == null)
                     return null;
 
                 NALTask a = new NALTask(
                         at,
                         answer.punc(),
                         aProj, now, when, when,
-                        Stamp.zip(answer.stamp(), question.stamp(), 0.5f));
+                        (question != null) ?
+                                Stamp.zip(answer.stamp(), question.stamp(), 0.5f) : answer.stamp());
                 a.setPri(answer.priElseZero());
-                a.cause = Cause.zip(question, answer);
+                if (question != null)
+                    a.cause = Cause.zip(question, answer);
+
 
                 //            if (Param.DEBUG)
                 //                a.log("Answer Projected");
@@ -258,13 +266,12 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
             }
         }
 
-        if (novel && relevantTime && question.isQuestOrQuestion()) {
+        if (novel && question != null && relevantTime && question.isQuestOrQuestion()) {
             nar.input(answer);
         }
 
         return answer;
     }
-
 
 
 //    /** 2-element array containing running min/max range accumulator */

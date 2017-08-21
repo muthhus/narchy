@@ -1536,7 +1536,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         if (!(concept instanceof BaseConcept))
             return null;
 
-        return ((BeliefTable) ((BaseConcept) concept).table(punc)).match(when,  c, false, this);
+        //return ((BeliefTable) ((BaseConcept) concept).table(punc)).match(when,  c, false, this);
+        return ((BeliefTable) ((BaseConcept) concept).table(punc)).answer(when,  c, this);
     }
 
 

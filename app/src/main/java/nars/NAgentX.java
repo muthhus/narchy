@@ -13,7 +13,6 @@ import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
 import nars.op.Implier;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -38,7 +37,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
@@ -139,7 +137,8 @@ abstract public class NAgentX extends NAgent {
                                 new MultiExec.Worker(
                                         new FocusExec() {
                                             @Override
-                                            protected @Nullable NARService newTrigger() {
+                                            protected @Nullable
+                                            NARService newTrigger() {
                                                 return null;
                                             }
                                         }
@@ -159,7 +158,7 @@ abstract public class NAgentX extends NAgent {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.5f);
+        n.beliefConfidence(0.9f);
         n.goalConfidence(0.5f);
 
 
@@ -178,7 +177,7 @@ abstract public class NAgentX extends NAgent {
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, false, 2f);
         Inperience inp = new Inperience(n, 8, 0.02f);
-        Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
+        //Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
 
 
         NAgent a = init.apply(n);
@@ -267,10 +266,9 @@ abstract public class NAgentX extends NAgent {
 
         new Implier(a.nar,
                 Iterables.concat(
-                    Iterables.transform(a.actions.keySet(), ActionConcept::term),
-                    Collections.singleton(a.happy.term)
-                ),
-                Collections.singleton(a.happy.term)
+                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
+                        Collections.singleton(a.happy.term)
+                )
         );
 
 //        AgentService p = new AgentService.AgentBuilder(
