@@ -9,12 +9,17 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class Top<T> implements Consumer<T> {
-    private final FloatFunction<T> rank;
+    public final FloatFunction<T> rank;
     public T the;
-    public float score = Float.NEGATIVE_INFINITY;
+    public float score;
 
     public Top(FloatFunction<T> rank) {
+        this(rank, Float.NEGATIVE_INFINITY);
+    }
+
+    public Top(FloatFunction<T> rank, float minScore) {
         this.rank = rank;
+        this.score = minScore;
     }
 
     @Override
