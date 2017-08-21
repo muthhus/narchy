@@ -130,7 +130,7 @@ public class TruthWave {
     /**
      * fills the wave with evenly sampled points in a time range
      */
-    public void project(Concept c, @NotNull boolean beliefOrGoal, float minT, float maxT, int dur, int points, NAR nar) {
+    public void project(Concept c, @NotNull boolean beliefOrGoal, long minT, long maxT, int dur, int points, NAR nar) {
         clear();
 
         if (minT == maxT) {
@@ -138,21 +138,25 @@ public class TruthWave {
         }
         ensureSize(points);
 
-        float dt = (maxT - minT) / (points);
-        float t = minT;
+        float dt = (maxT - minT) / ((float)points);
+        long t = minT;
         float[] data = this.truth;
         int j = 0;
+        int idt = Math.round(dt);
+        byte punc = beliefOrGoal ? BELIEF : GOAL;
         for (int i = 0; i < points; i++) {
-            long lt = (long) t;
-            load(data, (j++) * ENTRY_SIZE, lt, lt,
-                    nar.truth(c, beliefOrGoal ? BELIEF : GOAL, lt)
+            long u = t + idt;
+            long mid = (t + u)/2;
+            load(data, (j++) * ENTRY_SIZE, mid, mid,
+                    nar.truth(c, punc, t, u)
+                    //nar.truth(c, punc, (t + u)/2)
             );
             t += dt;
         }
         this.current = null;
         this.size = j;
-        this.start = (long) Math.floor(minT);
-        this.end = (long) Math.ceil(maxT);
+        this.start = minT;
+        this.end = maxT;
     }
 
     public boolean isEmpty() {

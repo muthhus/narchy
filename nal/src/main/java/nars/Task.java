@@ -56,9 +56,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     @Override
     long end();
 
-    default float evi(long start, long end, final int dur) {
-        return evi(nearestTimeBetween(start, end), dur);
-    }
 
     /**
      * amount of evidence measured at a given time with a given duration window
@@ -726,8 +723,24 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     }
 
     @Nullable
-    default Truth truth(long start, long end, int dur, float minConf) {
-        return truth(nearestTimeBetween(start, end), dur, minConf);
+    default Truth truth(long targetStart, long targetEnd, int dur, float minConf) {
+        long t;
+        if (targetStart == targetEnd) {
+            t = targetStart;
+        } else {
+            t = distanceTo(targetStart) < distanceTo(targetEnd) ? targetStart : targetEnd;
+        }
+        return truth(t, dur, minConf);
+    }
+
+    default float evi(long targetStart, long targetEnd, final int dur) {
+        long t;
+        if (targetStart == targetEnd) {
+            t = targetStart;
+        } else {
+            t = distanceTo(targetStart) < distanceTo(targetEnd) ? targetStart : targetEnd;
+        }
+        return evi(t, dur);
     }
 
     @Nullable
@@ -886,6 +899,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //            return y;
 //        }
 //    }
+
+    default boolean during(long a, long b) {
+        return distanceTo(a, b) == 0;
+    }
 
     default boolean during(long when) {
         long start = start();
@@ -1103,17 +1120,28 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
      */
     short[] cause();
 
-    /** TODO see if this can be made faster */
-    default long distanceTo(long start, long end) {
+    default long distanceTo(long when) {
         long s = this.start();
         if (s == ETERNAL) return 0;
+        assert (when != ETERNAL);
+        return Math.abs(when - nearestTimeTo(when));
+    }
 
-        assert(start!=ETERNAL);
+    /**
+     * TODO see if this can be made faster
+     */
+    default long distanceTo(long start, long end) {
 
-        if (start == end)
-            return Math.abs(start - nearestTimeBetween(start, end)); //fast
-        else {
+        if (start == end) {
+            return distanceTo(start);
+        } else {
+            long s = this.start();
+            if (s == ETERNAL) return 0;
+
+            assert (start != ETERNAL);
+
             long e = this.end();
+
             if (Interval.intersectLength(s, e, start, end) >= 0)
                 return 0; //intersects
             else {

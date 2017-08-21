@@ -122,6 +122,12 @@ public class DefaultBeliefTable implements BeliefTable {
             return ete;
         }
 
+        if (start == ETERNAL) {
+            int dur = nar.dur();
+            start = nar.time() - dur/2;
+            end = nar.time() + dur/2;
+        }
+
         Task tmp = temporal.match(start, end, template, nar);
 
         if (tmp == null) {

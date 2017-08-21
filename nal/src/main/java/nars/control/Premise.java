@@ -206,8 +206,8 @@ public class Premise extends UnaryTask {
 //                            } else {
 //
 //                            }
-                long when = answerFocus(task, now);
-                match = answerTable.answer(when, now, dur, task, beliefTerm, nar);
+
+                match = answerTable.answer(task.start(), task.end(), dur, task, beliefTerm, nar);
                 if (match != null) {
                     @Nullable Task answered = task.onAnswered(match, nar);
                     if (answered != null) {
@@ -224,7 +224,9 @@ public class Premise extends UnaryTask {
             } else {
                 long focus = matchFocus(task, now, dur);
                 long focusStart, focusEnd;
-                if (focus == ETERNAL) focusStart = focusEnd = ETERNAL;
+                if (focus == ETERNAL) {
+                    focusStart = focusEnd = ETERNAL;
+                }
                 else {
                     focusStart = focus - dur;
                     focusEnd = focus + dur;
@@ -304,9 +306,7 @@ public class Premise extends UnaryTask {
         //now + dur;
     }
 
-    protected static long answerFocus(Task task, long now) {
-        return task.nearestTimeTo(now);
-    }
+
 
 
     /**

@@ -2,6 +2,9 @@ package nars.table;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
+import jcog.data.sorted.SortedArray;
+import jcog.data.sorted.SortedList;
+import jcog.data.sorted.TopN;
 import jcog.pri.Pri;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
@@ -19,10 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -33,13 +33,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     public static final int MIN_TASKS_PER_LEAF = 2;
     public static final int MAX_TASKS_PER_LEAF = 4;
 
+    private int capacity;
+    static final int TRUTHPOLATED_MAX = 8;
 
-    public static final float FUTURE_BOOST = 2f;
+    public static final float FUTURE_BOOST = 1.5f;
 
 
     private transient NAR nar;
 
-    private static final int maxSamplesTruthpolated = 16;
 
 
     /**
@@ -132,6 +133,37 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             this(a, b, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
         }
 
+        @Override
+        public double coord(boolean maxOrMin, int dimension) {
+            switch (dimension) {
+                case 0:
+                    return maxOrMin ? end : start;
+                case 1:
+                    return maxOrMin ? freqMax : freqMin;
+                case 2:
+                    return maxOrMin ? confMax : confMin;
+            }
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean intersects(HyperRegion x) {
+            //        for (int i = 0; i < d; i++)
+            //            if (coord(false, i) > x.coord(true, i) ||
+            //                    coord(true, i) < x.coord(false, i))
+            //                return false;
+            //        return true;
+            TaskRegion t = (TaskRegion) x;
+            if ((start > t.end) || (end < t.start))
+                return false;
+            if ((freqMin > t.freqMax) || (freqMax < t.freqMin))
+                return false;
+            if ((confMin > t.confMax) || (confMax < t.confMin))
+                return false;
+            return true;
+        }
+
+        //TODO fast contains()
 
         /**
          * computes a mbr of the given regions
@@ -153,19 +185,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         @Override
         public TaskRegion mbr(HyperRegion r) {
             return TaskRegion.mbr(this, (TaskRegion) r);
-        }
-
-        @Override
-        public double coord(boolean maxOrMin, int dimension) {
-            switch (dimension) {
-                case 0:
-                    return maxOrMin ? end : start;
-                case 1:
-                    return maxOrMin ? freqMax : freqMin;
-                case 2:
-                    return maxOrMin ? confMax : confMin;
-            }
-            throw new UnsupportedOperationException();
         }
 
 
@@ -262,7 +281,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         setCapacity(cap);
     }
 
-    private int capacity;
 
     @Override
     public Truth truth(long start, long end, EternalTable eternal, NAR nar) {
@@ -279,16 +297,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task));
 
 
-            RTreeCursor<TaskRegion> c = cursor(start, end);
-
-            List<TaskRegion> tt;
-            if (c != null && c.size() > 0) {
-                tt = c.topSorted(strongestTask, maxSamplesTruthpolated);
-            } else {
-                tt = null;
-            }
-
-
+            TopN<TaskRegion> tt = scan(
+                    new TopN<TaskRegion>(new TaskRegion[Math.min(s, TRUTHPOLATED_MAX)], strongestTask),
+                    start, end);
             if (tt != null && !tt.isEmpty()) {
 
 //                Iterable<? extends Tasked> ii;
@@ -300,8 +311,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //                }
 
                 //applying eternal should not influence the scan for temporal so it is left null here
-                return TruthPolation.truth(
-                        ete, start, end, dur, tt);
+                return TruthPolation.truth(ete, start, end, dur, tt);
 
                 //        if (t != null /*&& t.conf() >= confMin*/) {
                 //            return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
@@ -316,14 +326,14 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     }
 
-    /**
-     * timerange spanned by entries in this table
-     */
-    public float timeRange() {
-        if (tree.isEmpty())
-            return 0f;
-        return (float) tree.root().region().range(0);
-    }
+//    /**
+//     * timerange spanned by entries in this table
+//     */
+//    public float timeRange() {
+//        if (tree.isEmpty())
+//            return 0f;
+//        return (float) tree.root().region().range(0);
+//    }
 
     @Override
     public Task match(long start, long end, @Nullable Term template, NAR nar) {
@@ -334,30 +344,56 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         int dur = nar.dur();
 
-
         FloatFunction<Task> ts = taskStrength(template, start, end, dur);
         FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task);
 
-
-        RTreeCursor<TaskRegion> ct = cursor(start, end);
-        if (ct.size() == 0)
-            return null;
-
-        List<TaskRegion> tt = ct.topSorted(strongestTask, 2);
+        Top2<TaskRegion> tt = scan(new Top2(strongestTask), start, end);
         switch (tt.size()) {
+
             case 0:
                 return null;
+
             case 1:
-                return tt.get(0).task;
+                return tt.a.task;
 
             default:
-                Task a = tt.get(0).task;
-                Task b = tt.get(1).task;
+                Task a = tt.a.task;
+                Task b = tt.b.task;
+                if (a.during(start, end) && !b.during(start, end))
+                    return a; //only 'a' is for that time
+
 
                 //otherwise interpolate
                 Task c = Revision.merge(a, b, start, nar);
                 return c != null ? c : a;
         }
+    }
+
+    private <X extends Collection<TaskRegion>> X scan(X u, long start, long end) {
+        //return ((ConcurrentRTree)tree).withReadLock() ?
+
+        int s = size();
+        if (s < MAX_TASKS_PER_LEAF * 2) {
+            //all
+            tree.iterator().forEachRemaining(u::add);
+        } else {
+            //scan
+            TaskRegion bounds = (TaskRegion) tree.root().region();
+
+            //TODO scan but avoid the central area where it has already iterated
+            long quarterBoundsRange = Math.max(1, (bounds.end - bounds.start) / 4);
+            long scanStart = start, scanEnd = end;
+            do {
+                HyperRegion target = timeRange(scanStart, scanEnd);
+                tree.intersecting(target, x -> {
+                    u.add(x);
+                    return true;
+                });
+                scanStart -= quarterBoundsRange;
+                scanEnd += quarterBoundsRange;
+            } while (u.isEmpty() || scanStart > bounds.start || scanEnd < bounds.end);
+        }
+        return u;
     }
 
 
@@ -484,7 +520,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         TaskRegion a, b;
         if (s > 2) {
             Top2<TaskRegion> w = new Top2<>(regionWeakness);
-            l.forEach(w);
+            l.forEach(w::add);
             a = w.a;
             b = w.b;
         } else {
@@ -554,7 +590,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 if (bb != null) {
                     if (bb instanceof Leaf && bb.size() > 1)
                         mergeVictims.accept((Leaf) bb);
-                    weakest.accept(bb);
+                    weakest.add(bb);
                 }
             }
 

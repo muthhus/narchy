@@ -51,10 +51,15 @@ public class CameraSensorView extends MatrixView implements MatrixView.ViewFunct
     @Override
     public float update(int x, int y, GL2 g) {
 
+        long now = nar.time();
+        int dur = nar.dur();
+        long start = now - dur/2;
+        long end = now + dur/2;
+
         BaseConcept s = cam.matrix[x][y];
-        Truth b = s.beliefs().truth(now, nar);
+        Truth b = s.beliefs().truth(start, end, nar);
         float bf = b != null ? b.freq() : 0.5f;
-        Truth d = s.goals().truth(now, nar);
+        Truth d = s.goals().truth(start, end, nar);
 //        if (d == null) {
 //            dr = dg = 0;
 //        } else {

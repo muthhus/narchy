@@ -119,7 +119,7 @@ public class Revision {
 
             Op ao = a.op();
             Op bo = b.op();
-            assert (ao == bo);
+            assert (ao == bo): a + " and " + b + " have different op";
 
 
             if (ao.temporal && len == 2) {

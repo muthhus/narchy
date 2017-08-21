@@ -226,7 +226,7 @@ public class RTree<T> implements Space<T> {
     public void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile) {
         if (size == 0)
             return;
-        root().intersectingNodes(start, eachWhile, model);
+        root.intersectingNodes(start, eachWhile, model);
     }
 
     @Override

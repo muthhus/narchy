@@ -671,7 +671,7 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .inputAt(1, "(a &&+1 b). :|:")
                 .inputAt(1, "((a &&+1 b) ==>+4 c). :|:")
-                .mustBelieve(cycles, "c", 1f, 0.81f, 6 /* occ */)
+                .mustBelieve(cycles, "c", 1f, 0.77f, 6 /* occ */)
                 .mustNotOutput(cycles, "c", BELIEF, ETERNAL)
         //.mustNotOutput(cycles, "c", BELIEF, 6)
         ;

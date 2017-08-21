@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 //@RunWith(Parameterized.class)
 public class NAL5Test extends AbstractNALTest {
 
-    final int cycles = 100;
+    final int cycles = 200;
 
     @Before
     public void nal() {

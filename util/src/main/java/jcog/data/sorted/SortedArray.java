@@ -45,7 +45,7 @@ import java.util.function.Consumer;
  * @param <E>
  * @author Andreas Hollmann
  */
-public abstract class SortedArray<E> implements Iterable<E> {
+public abstract class SortedArray<E> extends AbstractCollection<E> implements Iterable<E> {
 
 
     public static final int binarySearchThreshold = 8;
@@ -54,7 +54,9 @@ public abstract class SortedArray<E> implements Iterable<E> {
 
     protected int size;
 
-    /** direct array access; use with caution ;) */
+    /**
+     * direct array access; use with caution ;)
+     */
     public Object[] array() {
         return list;
     }
@@ -151,7 +153,7 @@ public abstract class SortedArray<E> implements Iterable<E> {
     public void forEach(Consumer<? super E> action) {
         for (Object x : list) {
             if (x != null) {
-                action.accept((E)x);
+                action.accept((E) x);
             } else {
                 break; //first null element at the end of the array indicates the end
             }
@@ -207,12 +209,20 @@ public abstract class SortedArray<E> implements Iterable<E> {
         return size == 0;
     }
 
+    protected boolean grows() {
+        return true;
+    }
+
     public void addInternal(E e) {
         int s = this.size;
         Object[] l = this.list;
         if (l.length == s) {
-            int newLen = Math.max(l.length, s);
-            l = resize(newLen);
+            if (grows()) {
+                int newLen = Math.max(l.length, s);
+                l = resize(newLen);
+            } else {
+                return;
+            }
         }
         l[this.size++] = e;
     }
@@ -238,16 +248,23 @@ public abstract class SortedArray<E> implements Iterable<E> {
     }
 
     private void addAtIndex(int index, E element) {
-        int oldSize = this.size++;
+        int oldSize = this.size;
         E[] list = this.list;
         if (list.length == oldSize) {
+            if (!grows()) {
+                return; //didnt rank
+            }
+
+            this.size++;
             E[] newItems = newArray(oldSize); //new Object[this.sizePlusFiftyPercent(oldSize)];
             if (index > 0) {
                 System.arraycopy(list, 0, newItems, 0, index);
             }
             System.arraycopy(list, index, newItems, index + 1, oldSize - index);
             this.list = list = newItems;
+
         } else {
+            this.size++;
             System.arraycopy(list, index, list, index + 1, oldSize - index);
         }
         list[index] = element;
@@ -266,7 +283,8 @@ public abstract class SortedArray<E> implements Iterable<E> {
         //return oldSize == 0 ? 4 : oldSize * 2;
     }
 
-    @Nullable public E removeFirst() {
+    @Nullable
+    public E removeFirst() {
         if (size == 0)
             return null;
         return remove(0);

@@ -69,7 +69,7 @@ public enum TruthPolation { ;
         @Override
         public void accept(Tasked t) {
             Task task = t.task();
-            float tw = task.evi(task.nearestTimeBetween(start, end), dur);
+            float tw = task.evi(start, end, dur);
             if (tw > 0) {
                 eviSum += tw;
                 wFreqSum += tw * task.freq();

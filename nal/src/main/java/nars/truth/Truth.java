@@ -278,22 +278,6 @@ public interface Truth extends Truthed {
         return new PreciseTruth(freq(freq(), resolution), c);
     }
 
-    @Nullable default Truth ditherFreq(float resolution) {
-        return new PreciseTruth(freq(freq(), resolution), conf());
-    }
-
-    /** dithers the frequency but deducts evidence in proportion to the
-     * amount of frequency change
-     */
-    @Nullable default Truth ditherFreqAdjustConf(float resolution) {
-        float f = freq();
-        float ff = freq(f, resolution);
-        float e = evi() * (Math.abs(f - ff)/resolution);
-        if (e > 0)
-            return new PreciseTruth(ff, e, false);
-        else
-            return null;
-    }
 
 
     default float eviEternalized() {
