@@ -8,6 +8,7 @@ import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.subst.SubUnify;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -88,12 +89,23 @@ abstract public class substituteIfUnifies extends Functor {
         Term x = a.sub(1);
         if (x == Null) return Null;
 
+        boolean strict = a.subEquals(3, substitute.STRICT);
+
+        //check if nothing would be transformed
+        //TODO there may be other cases when 'x' is a compound and its components are what transform the input
+        if (x instanceof Variable) {
+            if (!input.containsRecursively(x)) {
+                return strict ? Null : input;
+            }
+        }
+
         Term y = a.sub(2);
         if (y == Null) return Null;
 
-        boolean strict = a.subEquals(3, substitute.STRICT);
         if (x.equals(y))
-            return strict ? Null: input; //unification would occurr but no changes would result
+            return strict ? Null : input; //unification would occurr but no changes would result
+
+
 
 //        if (y.equals(input))
 //            return failureTerm;

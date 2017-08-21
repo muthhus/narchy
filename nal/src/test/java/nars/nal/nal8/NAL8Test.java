@@ -3,6 +3,7 @@ package nars.nal.nal8;
 import nars.$;
 import nars.Narsese;
 import nars.Op;
+import nars.task.NALTask;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;
@@ -65,6 +66,21 @@ public class NAL8Test extends AbstractNALTest {
 
 
 
+    @Test
+    public void testCorrectGoalOccAndDuration() throws Narsese.NarseseException {
+        /*
+        $1.0 (happy-->dx)! 1751 %.46;.15% {1753: _gpeß~Èkw;_gpeß~Èky} (((%1-->%2),(%3-->%2),neqRCom(%1,%3)),((%1-->%3),((Induction-->Belief),(Weak-->Goal),(Backwards-->Permute))))
+            $NaN (happy-->noid)! 1754⋈1759 %1.0;.90% {1748: _gpeß~Èky}
+            $1.0 (dx-->noid). 1743⋈1763 %.46;.90% {1743: _gpeß~Èkw}
+         */
+
+        test
+                .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
+                .input(new NALTask($.$("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
+                .mustDesire(cycles, "(a-->c)", 1f, 0.4f, 10, 20)
+        ;
+
+    }
 
 
 

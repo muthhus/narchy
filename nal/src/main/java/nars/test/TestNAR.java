@@ -41,6 +41,7 @@ public class TestNAR {
     static final boolean collectTrace = false;
 
     public int temporalTolerance;
+    float truthTolerance = Param.TESTS_TRUTH_ERROR_TOLERANCE;
 
     @NotNull
     public final NAR nar;
@@ -88,7 +89,12 @@ public class TestNAR {
         //eventMeters = new EventCount(nar).eventMeters;
     }
 
-//    /** returns the "cost", which can be considered the inverse of a "score".
+    public TestNAR truthTolerance(float truthTolerance) {
+        this.truthTolerance = truthTolerance;
+        return this;
+    }
+
+    //    /** returns the "cost", which can be considered the inverse of a "score".
 //     * it is proportional to the effort (ex: # of cycles) expended by
 //     * this reasoner in attempts to satisfy success conditions.
 //     * If the conditions are not successful, the result will be INFINITE,
@@ -380,7 +386,7 @@ public class TestNAR {
         cycleStart -= tt;
         cycleEnd += tt;
 
-        float h = Param.TESTS_TRUTH_ERROR_TOLERANCE / 2.0f;
+        float h = truthTolerance / 2.0f;
         TaskCondition tc =
                 new TaskCondition(nar,
                         cycleStart, cycleEnd,

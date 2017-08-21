@@ -124,7 +124,6 @@ public class NAL7Test extends AbstractNALTest {
             $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
          */
         test
-            .log()
             .inputAt(1, "((a &&+5 b) ==>+5 #1). :|:")
             .inputAt(1, "a. :|:")
             .mustNotOutput(cycles, "(a &&+5 b)", BELIEF, (t) -> t < 0 /* any negative number occ */)
@@ -629,7 +628,7 @@ public class NAL7Test extends AbstractNALTest {
             $.75;.06;.12$ ((p2) ==>+0 (--,(p3))). 1-1 %1.0;.45% {1-1: 5;7} ((%1,%2,time(dtAfterReverse),neq(%1,%2),notImplicationOrEquivalence(%1),notImplicationOrEquivalence(%2)),((%2==>%1),((Abduction-->Belief)))) */
 
         test
-
+                .truthTolerance(0.1f)
                 .inputAt(0, "(a). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
                 .mustNotOutput(cycles, "(b)", BELIEF, ETERNAL)
@@ -1412,20 +1411,5 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
-    @Test
-    public void testCorrectGoalOccAndDuration() throws Narsese.NarseseException {
-        /*
-        $1.0 (happy-->dx)! 1751 %.46;.15% {1753: _gpeß~Èkw;_gpeß~Èky} (((%1-->%2),(%3-->%2),neqRCom(%1,%3)),((%1-->%3),((Induction-->Belief),(Weak-->Goal),(Backwards-->Permute))))
-            $NaN (happy-->noid)! 1754⋈1759 %1.0;.90% {1748: _gpeß~Èky}
-            $1.0 (dx-->noid). 1743⋈1763 %.46;.90% {1743: _gpeß~Èkw}
-         */
-
-        test
-                .input(new NALTask($("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
-                .input(new NALTask($("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
-                .mustDesire(cycles, "(a-->c)", 1f, 0.4f, 10, 20)
-        ;
-
-    }
 
 }

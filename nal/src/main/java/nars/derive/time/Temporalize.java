@@ -332,8 +332,8 @@ public class Temporalize implements ITemporalize {
      */
     private void know(Term x, @Nullable AbsoluteEvent root, int start, int end) {
 
-//        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
-//            return; //ignore variable's and completely-variablized's temporalities because it can conflict
+        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
+            return; //ignore variable's and completely-variablized's temporalities because it can conflict
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
         if (root == null || root.term != x) {
