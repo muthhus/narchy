@@ -4,14 +4,12 @@ import nars.NAR;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /** executes approximately once every N durations */
 abstract public class DurService extends CycleService {
 
     public final MutableFloat durations;
     private long now;
-    private final AtomicBoolean busy = new AtomicBoolean(false);
+
 
     public DurService(NAR n, float durs) {
         this(n, new MutableFloat(durs));
@@ -32,10 +30,10 @@ abstract public class DurService extends CycleService {
         long lastNow = this.now;
         long now = nar.time();
         if (now - lastNow >= durations.floatValue() * nar.dur()) {
-            this.now = now;
             if (busy.compareAndSet(false, true)) {
+                this.now = now;
                 try {
-                    runDur(nar);
+                    run(nar);
                 } finally {
                     busy.set(false);
                 }
@@ -44,5 +42,4 @@ abstract public class DurService extends CycleService {
         }
     }
 
-    abstract protected void runDur(NAR nar);
 }

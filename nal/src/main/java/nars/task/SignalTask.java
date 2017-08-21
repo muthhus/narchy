@@ -16,13 +16,14 @@ import static nars.time.Tense.ETERNAL;
 public class SignalTask extends NALTask {
 
     /** because this is an input task, its hash and equality will not depend on this value so it is free to change to represent a growing duration */
-    public long slidingEnd = ETERNAL;
+    public long slidingEnd;
 
     public Consumer<Task> stretchKey;
 
     public SignalTask(@NotNull Term t, byte punct, @NotNull Truth truth, long start, long end, long stamp) {
         super(t, punct, truth, start, start, end,
                 new long[] { stamp } /* TODO use an implementation which doenst need an array for this */ );
+        slidingEnd = end;
     }
 
     @Override
@@ -32,14 +33,15 @@ public class SignalTask extends NALTask {
 
 
     @Override public long end() {
-        if (this.slidingEnd == ETERNAL)
-            return start();
-        else
-            return slidingEnd;
+        return slidingEnd;
     }
 
-    public void setEnd(long now) {
-        this.slidingEnd = now;
+    public boolean setEnd(long e) {
+        if (e <= start() || e <= slidingEnd)
+            return false;
+
+        this.slidingEnd = e;
+        return true;
     }
 
 

@@ -107,12 +107,7 @@ public class FocusExec extends Exec implements Runnable {
 
     @Nullable
     protected NARService newTrigger() {
-        return new CycleService(nar) {
-            @Override
-            public void accept(NAR nar) {
-                run();
-            }
-        };
+        return new MyTrigger();
     }
 
     /**
@@ -229,4 +224,14 @@ public class FocusExec extends Exec implements Runnable {
             throw new UnsupportedOperationException("what is " + x);
     }
 
+    private class MyTrigger extends CycleService {
+        public MyTrigger() {
+            super(FocusExec.this.nar);
+        }
+
+        @Override
+        public void run(NAR nar) {
+            FocusExec.this.run();
+        }
+    }
 }

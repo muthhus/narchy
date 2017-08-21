@@ -746,11 +746,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     @Nullable
     default Truth truth(long when, int dur, float minConf) {
         float eve = evi(when, dur);
-        if (eve == eve && eve > 0) {
+        if (eve == eve && eve >= c2w(minConf)) {
 
 
-            float minEve = c2w(minConf);
-            if (eve >= minEve) {
+
+            {
                 return new PreciseTruth(freq(), eve, false);
 
                 //quantum entropy uncertainty:

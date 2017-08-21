@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Created by jcovert on 12/30/15.
@@ -174,6 +175,8 @@ public interface Space<T> extends Nodelike<T> {
     void intersectingNodes(HyperRegion start, Predicate<Node<T, ?>> eachWhile);
 
     HyperRegion bounds(T task);
+
+    Stream<T> stream();
 
     default Iterator<T> iterator() {
         int s = size();

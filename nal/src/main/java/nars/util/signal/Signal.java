@@ -55,7 +55,9 @@ public class Signal extends AtomicReference<SignalTask> {
         SignalTask toInput = updateAndGet((current) -> {
 
             if (current != null) {
-                current.setEnd(now);
+                if (!current.setEnd(now))
+                    return current; //already set for this time period
+
                 if (current.stretchKey!=null)
                     current.stretchKey.accept(current);
             }

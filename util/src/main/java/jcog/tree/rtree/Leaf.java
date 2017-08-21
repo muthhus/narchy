@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Node that will contain the data entries. Implemented by different type of SplitType leaf classes.
@@ -45,6 +46,11 @@ public class Leaf<T> implements Node<T, T> {
         this.region = null;
         this.data = (T[]) new Object[mMax];
         this.size = 0;
+    }
+
+    @Override
+    public Stream<T> stream() {
+        return streamNodes();
     }
 
     @Override

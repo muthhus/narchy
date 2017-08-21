@@ -77,7 +77,7 @@ public class Implier extends DurService {
     }
 
     @Override
-    protected void runDur(NAR nar) {
+    protected void run(NAR nar) {
 
         int dur = nar.dur();
         now = nar.time();

@@ -26,10 +26,12 @@ import jcog.tree.rtree.util.Stats;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * <p>Data structure to make range searching more efficient. Indexes multi-dimensional information
@@ -61,6 +63,15 @@ public class RTree<T> implements Space<T> {
     public RTree(Spatialization<T> model) {
         this.model = model;
         clear();
+    }
+
+    public Stream<T> stream() {
+        return root.stream();
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return stream().iterator();
     }
 
     @Override

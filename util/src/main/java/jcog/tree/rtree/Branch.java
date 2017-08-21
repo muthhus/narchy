@@ -28,6 +28,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * RTree node that contains leaf nodes
@@ -368,6 +369,11 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
     @Override
     public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
         return nodeAND(ci -> !(rect.intersects(ci.region()) && !ci.intersecting(rect, t, model)));
+    }
+
+    @Override
+    public Stream<T> stream() {
+        return streamNodes().flatMap(Node::stream);
     }
 
     @Override

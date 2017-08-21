@@ -161,47 +161,46 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
     }
 
 
-    public final void add(final E element, FloatFunction<E> cmp) {
-        // use the linked-list sorting if the type is set or if the list-size
-        // is to small
-        int s = this.size;
+    public final float add(final E element, FloatFunction<E> cmp) {
+        float elementRank = cmp.floatValueOf(element);
 
-        if (s < binarySearchThreshold)
-            addLinear(element, s, cmp);
-        else
-            addBinary(element, s, cmp);
-
+        return add(element, cmp, this.size, elementRank);
     }
 
-    public void addBinary(E element, int s, FloatFunction<E> cmp) {
+    protected float add(E element, FloatFunction<E> cmp, int s, float elementRank) {
+        if (s < binarySearchThreshold)
+            return addLinear(element, s, elementRank, cmp);
+        else
+            return addBinary(element, s, elementRank, cmp);
+    }
+
+    public float addBinary(E element, int s, float elementRank, FloatFunction<E> cmp) {
         // use the binary search
-        float elementRank = cmp.floatValueOf(element);
         final int index = this.findInsertionIndex(elementRank, 0, s - 1, new int[1], cmp);
 
         final E last = list[s - 1];
+
+        boolean added;
         if (index == s || Util.fastCompare(cmp.floatValueOf(last), elementRank) < 0) {
-            addInternal(element);
+            added = addInternal(element);
         } else {
-            if (index == -1)
-                addInternal(element);
-            else
-                addInternal(index, element);
+            added = (index == -1 ? addInternal(element) : addInternal(index, element));
         }
+
+        return added ? elementRank : Float.NaN;
     }
 
-    public void addLinear(E element, int s, FloatFunction<E> cmp) {
+    public float addLinear(E element, int s, float elementRank, FloatFunction<E> cmp) {
         Object[] l = this.list;
         if (s > 0 && l.length > 0) {
-            float elementRank = cmp.floatValueOf(element);
             for (int i = 0; i < s; i++) {
                 final E current = (E) l[i];
                 if (0 <= Util.fastCompare(cmp.floatValueOf(current), elementRank)) {
-                    addInternal(i, element);
-                    return;
+                    return addInternal(i, element) ? elementRank : Float.NaN;
                 }
             }
         }
-        addInternal(element); //add to end
+        return addInternal(element) ? elementRank : Float.NaN; //add to end
     }
 
 
@@ -213,7 +212,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
         return true;
     }
 
-    public void addInternal(E e) {
+    public boolean addInternal(E e) {
         int s = this.size;
         Object[] l = this.list;
         if (l.length == s) {
@@ -221,10 +220,11 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
                 int newLen = Math.max(l.length, s);
                 l = resize(newLen);
             } else {
-                return;
+                return false;
             }
         }
         l[this.size++] = e;
+        return true;
     }
 
     protected Object[] resize(int newLen) {
@@ -234,13 +234,15 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
         return list;
     }
 
-    public void addInternal(int index, E e) {
+    public boolean addInternal(int index, E e) {
         int s = this.size;
         if (index > -1 && index < s) {
             this.addAtIndex(index, e);
+            return true;
         } else if (index == s) {
-            this.addInternal(e);
+            return this.addInternal(e);
         }
+        throw new UnsupportedOperationException();
 //		else
 //		{
 //			this.throwOutOfBounds(index);

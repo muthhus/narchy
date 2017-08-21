@@ -63,7 +63,9 @@ public interface Truthed  {
 
     /** weight of evidence ( confidence converted to weight, 'c2w()' )  */
     default float evi() {
-        return c2w(conf());
+        Truth t = truth();
+        //return t == null ? Float.NaN : t.freq();
+        return t.evi(); //throw NPE if not a belief/goal
     }
 
 

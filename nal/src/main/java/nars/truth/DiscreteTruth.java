@@ -4,6 +4,8 @@ import jcog.Util;
 import nars.Param;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.truth.TruthFunctions.c2w;
+
 
 /**
  * truth rounded to a fixed size precision
@@ -75,6 +77,10 @@ public class DiscreteTruth implements Truth {
         return conf;
     }
 
+    @Override
+    public float evi() {
+        return c2w(conf);
+    }
 
     @NotNull
     @Override

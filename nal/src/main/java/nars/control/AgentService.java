@@ -37,7 +37,7 @@ public class AgentService extends DurService {
     }
 
     @Override
-    protected void runDur(NAR nar) {
+    protected void run(NAR nar) {
         input.accept(in);
         int a = agent.act(reward.asFloat(), in);
         act.accept(a);

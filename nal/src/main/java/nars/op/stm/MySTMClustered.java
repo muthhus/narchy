@@ -219,6 +219,8 @@ public class MySTMClustered extends STMClustered {
                             long ze = z.end();
                             if (start[0] > zs) start[0] = zs;
                             if (end[0] < ze) end[0] = ze;
+                            if (end[0] < start[0])
+                                throw new RuntimeException("wtf");
 
                             vv.merge(z.term(), z, (prevZ, newZ) -> {
                                 if (prevZ == null || newZ.conf() > prevZ.conf())

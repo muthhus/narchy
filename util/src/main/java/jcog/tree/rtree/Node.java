@@ -47,12 +47,14 @@ public interface Node<L, V> extends Nodelike<L> {
     boolean isLeaf();
 
     default FasterList<V> childMinList(FloatFunction<V> rank, int limit) {
-        return new FasterList(stream().sorted(new FloatFunctionComparator(rank)).limit(limit).toArray());
+        return new FasterList(streamNodes().sorted(new FloatFunctionComparator(rank)).limit(limit).toArray());
     }
 
-    default Stream<V> stream() {
+    default Stream<V> streamNodes() {
         return IntStream.range(0, size()).mapToObj(this::get);
     }
+
+    Stream<L> stream();
 
     default FasterList<V> toList() {
         int s = size();

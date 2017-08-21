@@ -30,11 +30,14 @@ public class TruthLab extends Grid {
 
     private final List<Compound> concepts;
 
-    /** samples per frame */
+    /**
+     * samples per frame
+     */
     int samplePeriod = 1;
 
     long start, end;
-    boolean showBeliefs;
+    boolean showBeliefs = true;
+    private static boolean truthOrProjectedTaskTruth = false;
 
     public TruthLab(NAR n, Compound... x) {
         super(VERTICAL);
@@ -58,7 +61,7 @@ public class TruthLab extends Grid {
         this.end = Math.max(this.end, n.time());
 
         List<Surface> cc = $.newArrayList();
-        views.forEach(l -> cc.addAll( l.update(n, start, end, samplePeriod) ));
+        views.forEach(l -> cc.addAll(l.update(n, start, end, samplePeriod)));
         set(cc);
         layout();
     }
@@ -76,7 +79,7 @@ public class TruthLab extends Grid {
         final int samples;
 
         public TruthTimeline(long start, long end, int samplePeriod, IntToObjectFunction<Truth> eval) {
-            this.data = new float[(int)Math.ceil( ((double)(end - start))/samplePeriod) * 3];
+            this.data = new float[(int) Math.ceil(((double) (end - start)) / samplePeriod) * 3];
 
             int i = 0;
             int samples = 0;
@@ -132,7 +135,7 @@ public class TruthLab extends Grid {
                 float x = occ * timeScale;
                 float y = (1f - sh) / 2f;
 
-                gl.glColor4f(1-f, f, 0, c);
+                gl.glColor4f(1 - f, f, 0, c);
                 Draw.rect(gl, x, y, sw, sh);
                 gl.glColor4f(0.5f, 0.5f, 0.5f, 0.5f);
                 Draw.rectStroke(gl, x, y, sw, sh);
@@ -157,12 +160,15 @@ public class TruthLab extends Grid {
     class BeliefTableTimeline extends TruthTimeline {
 
 
-        public BeliefTableTimeline(Compound t, BeliefTable b, long start, long end, int samplePeriod) {
+        public BeliefTableTimeline(Compound t, BeliefTable b, long start, long end, int samplePeriod, boolean truthOrProjectedTaskTruth) {
             super(start, end, samplePeriod, (w) -> {
-                Task x = b.match((long) w, w, null, true, nar);
-                if (x!=null)
-                    return x.truth(w, dur, Param.TRUTH_EPSILON);
-                return null;
+                if (truthOrProjectedTaskTruth) {
+                    return b.truth(w, w, nar);
+                } else {
+                    Task x = b.answer((long) w, w, null, nar);
+                    return x != null ? x.truth(w, dur, Param.TRUTH_EPSILON) : null;
+
+                }
             });
 
             this.label = t.toString();
@@ -192,8 +198,7 @@ public class TruthLab extends Grid {
             } else {
 
 
-
-                cc.add(new BeliefTableTimeline(term, c.beliefs(), start, end, samplePeriod));
+                cc.add(new BeliefTableTimeline(term, c.beliefs(), start, end, samplePeriod, truthOrProjectedTaskTruth));
 
                 if (showBeliefs) {
                     c.beliefs().forEachTask(b -> {
@@ -227,12 +232,11 @@ public class TruthLab extends Grid {
 
         Param.DEBUG = true;
         n.log()
-            .inputAt(10, "(x).   :|: %1.0;0.9%")
-            .inputAt(20, "(y).   :|: %1.0;0.9%")
-            .inputAt(30, "--(x). :|: %1.0;0.9%")
-            .inputAt(40, "--(y). :|: %1.0;0.8%")
-            .run(60);
-
+                .inputAt(10, "(x).   :|: %1.0;0.9%")
+                .inputAt(20, "(y).   :|: %1.0;0.9%")
+                .inputAt(30, "--(x). :|: %1.0;0.9%")
+                .inputAt(40, "--(y). :|: %1.0;0.8%")
+                .run(60);
 
 
         n.run(1);

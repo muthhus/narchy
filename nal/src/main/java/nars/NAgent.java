@@ -470,7 +470,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
 
     @Override
-    protected void runDur(NAR nar) {
+    protected void run(NAR nar) {
         if (enabled.get()) {
             this.now = nar.time();
 

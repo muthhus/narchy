@@ -5,6 +5,7 @@ import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 public class TopN<E> extends SortedArray<E> {
 
     private final FloatFunction<E> rank;
+    float minSeen = Float.POSITIVE_INFINITY;
 
     public TopN(E[] target, FloatFunction<E> rank) {
         this.list = target;
@@ -12,9 +13,22 @@ public class TopN<E> extends SortedArray<E> {
     }
 
     @Override
+    protected float add(E element, FloatFunction<E> cmp, int s, float elementRank) {
+        if (size() == list.length && elementRank < minSeen)
+            return Float.NaN; //insufficient
+
+        return super.add(element, cmp, s, elementRank);
+    }
+
+    @Override
     public boolean add(E e) {
-        add(e, rank);
-        return true; //TODO return if it was actually inserted
+        float r = add(e, rank);
+        if (r == r) {
+            if (r < minSeen)
+                minSeen = r;
+            return true;
+        }
+        return false;
     }
 
     @Override

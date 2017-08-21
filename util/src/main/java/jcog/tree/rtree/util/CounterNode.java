@@ -27,6 +27,7 @@ import jcog.tree.rtree.Spatialization;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Created by jcovert on 6/18/15.
@@ -43,6 +44,11 @@ public final class CounterNode<T> implements Node<T, Object> {
     @Override
     public Object get(int i) {
         return node.get(i);
+    }
+
+    @Override
+    public Stream<T> stream() {
+        return node.stream();
     }
 
     @Override

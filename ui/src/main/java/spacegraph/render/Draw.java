@@ -1163,6 +1163,7 @@ public enum Draw {
 //                        //Draw.class.getClassLoader().getResource("spacegraph/font/hershey/" + font + ".jhf").toURI()
 //                    )
 //                );
+
             lines = new String(Draw.class.getClassLoader().getResourceAsStream("spacegraph/font/hershey/" + font + ".jhf").readAllBytes()).split("\n");
         } catch (IOException e) {
             e.printStackTrace();

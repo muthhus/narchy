@@ -25,10 +25,12 @@ import jcog.tree.rtree.util.Stats;
 import jcog.util.QueueLock;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Created by jcovert on 12/30/15.
@@ -322,6 +324,17 @@ public class ConcurrentRTree<T> implements Space<T> {
             readLock.unlock();
         }
         return result;
+    }
+
+
+    @Override
+    public Stream<T> stream() {
+        return root().stream();
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return stream().iterator();
     }
 
     @Override

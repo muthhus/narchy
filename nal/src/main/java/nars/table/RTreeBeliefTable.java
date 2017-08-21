@@ -2,8 +2,6 @@ package nars.table;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
-import jcog.data.sorted.SortedArray;
-import jcog.data.sorted.SortedList;
 import jcog.data.sorted.TopN;
 import jcog.pri.Pri;
 import jcog.tree.rtree.*;
@@ -22,8 +20,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
@@ -40,7 +42,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
     private transient NAR nar;
-
 
 
     /**
@@ -299,8 +300,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             TopN<TaskRegion> tt = scan(
                     new TopN<TaskRegion>(new TaskRegion[Math.min(s, TRUTHPOLATED_MAX)], strongestTask),
-                    start, end);
-            if (tt != null && !tt.isEmpty()) {
+                    start, end, 1);
+            if (!tt.isEmpty()) {
 
 //                Iterable<? extends Tasked> ii;
 //                if (anyMatchTime) {
@@ -347,7 +348,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         FloatFunction<Task> ts = taskStrength(template, start, end, dur);
         FloatFunction<TaskRegion> strongestTask = t -> +ts.floatValueOf(t.task);
 
-        Top2<TaskRegion> tt = scan(new Top2(strongestTask), start, end);
+        Top2<TaskRegion> tt = scan(new Top2(strongestTask), start, end, 1);
         switch (tt.size()) {
 
             case 0:
@@ -369,29 +370,59 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         }
     }
 
-    private <X extends Collection<TaskRegion>> X scan(X u, long start, long end) {
+    private <X extends Collection<TaskRegion>> X scan(X u, long start, long end, int min) {
         //return ((ConcurrentRTree)tree).withReadLock() ?
 
         int s = size();
+
         if (s < MAX_TASKS_PER_LEAF * 2) {
             //all
             tree.forEach(u::add);
         } else {
-            //scan
-            TaskRegion bounds = (TaskRegion) tree.root().region();
 
-            //TODO scan but avoid the central area where it has already iterated
-            long quarterBoundsRange = Math.max(1, (bounds.end - bounds.start) / 4);
-            long scanStart = start, scanEnd = end;
-            do {
-                HyperRegion target = timeRange(scanStart, scanEnd);
-                tree.intersecting(target, x -> {
-                    u.add(x);
-                    return true;
-                });
-                scanStart -= quarterBoundsRange;
-                scanEnd += quarterBoundsRange;
-            } while (u.isEmpty() || scanStart > bounds.start || scanEnd < bounds.end);
+            min = Math.min(s, min);
+
+            //scan
+            Predicate<TaskRegion> update = x -> {
+                u.add(x);
+                return true;
+            };
+
+            //check the precise range first
+            tree.intersecting(timeRange(start, end), update);
+
+            if (u.isEmpty()) {
+
+                //scan outwards
+
+                TaskRegion bounds = (TaskRegion) tree.root().region();
+                long expand = Math.max(1, (bounds.end - bounds.start) / 8);
+
+                long scanStart = start-1, scanEnd = end+1;
+                long nextStart = start,nextEnd=end;
+                int done;
+                do {
+                    nextStart -= expand;
+                    nextEnd += expand;
+                    done = 0;
+
+                    if (nextStart >= bounds.start)
+                        tree.intersecting(timeRange(nextStart, scanStart), update);
+                    else
+                        done++;
+
+                    if (nextEnd <= bounds.end)
+                        tree.intersecting(timeRange(scanEnd, nextEnd), update);
+                    else
+                        done++;
+
+                    if (u.size() >= min)
+                        break;
+
+                    scanStart = nextStart;
+                    scanEnd = nextEnd;
+                } while (done<2);
+            }
         }
         return u;
     }
