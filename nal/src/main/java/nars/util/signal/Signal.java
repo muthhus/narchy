@@ -4,9 +4,6 @@ import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.concept.BaseConcept;
-import nars.concept.Concept;
-import nars.table.DefaultBeliefTable;
 import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -15,6 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.LongSupplier;
 
 /**
@@ -58,25 +56,14 @@ public class Signal extends AtomicReference<SignalTask> {
 
         //int halfDur = Math.max(1, nar.dur() / 2);
         //long next = now + halfDur;
-        return updateAndGet((current) -> {
+        SignalTask toInput = updateAndGet((current) -> {
 
             long now = nar.time();
-            float p = pri.asFloat();
+
 
             if (current != null) {
                 current.setEnd(now);
-
-
-                current.priMax(p);
-
-
-                if (current.stretchKey != null) {
-                    Concept c = nar.concept(current);
-                    if (c!=null) {
-                        DefaultBeliefTable bt = (DefaultBeliefTable) ((BaseConcept) c).table(current.punc);
-                        current.stretchKey = bt.temporal.stretch(current);
-                    }
-                }
+                current.stretchKey.accept(current);
             }
 
 
@@ -94,16 +81,15 @@ public class Signal extends AtomicReference<SignalTask> {
                                 (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - current.start() >= nar.dur() * Param.SIGNAL_LATCH_TIME_MAX)
                         )) {
 
-
                     //TODO move the task construction out of this critical update section?
                     next = task(term, nextTruth.truth(),
                             now, now + lookAheadDurs * nar.dur(),
                             stamper.getAsLong(), dt);
 
-                    next.stretchKey = this; //temporary placeholder, for at least signaling the stretch to itself
-                    next.setEnd(now);
 
-                    //System.out.println(current + " " + next );
+                    next.stretchKey = Pending; //temporary placeholder, for at least signaling the stretch to itself
+
+
                 } else {
 
                     next = current;
@@ -112,16 +98,18 @@ public class Signal extends AtomicReference<SignalTask> {
 
             }
 
-
-            if (next != null) {
-                next.priMax(p);
+            if (current!=null && current!=next) {
+                current.stretchKey = null; //end previous
             }
-
 
             return next; //nothing, keep as-is
 
         });
 
+        if (toInput==null || toInput.stretchKey!=Pending)
+            return null; //doesn't need re-inserted. it has been stretched directly by the belief table it resides in
+
+        return toInput;
     }
 
     @Nullable
@@ -129,7 +117,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
 
         SignalTask s = new SignalTask(term, punc, t, start + dt, end + dt, stamp);
-
+        s.priMax(pri.asFloat());
         return s;
     }
 
@@ -144,5 +132,8 @@ public class Signal extends AtomicReference<SignalTask> {
         pri(() -> p);
         return this;
     }
+
+    public static final Consumer<Task> Pending = (x) -> {
+    };
 
 }

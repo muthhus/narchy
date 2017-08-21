@@ -21,22 +21,22 @@ public class ImplierTest {
         n.log();
         n.input("(x ==> y). :|:");
 
-        System.out.println(imp.graph);
+        System.out.println(imp.impl);
 
         for (int i = 0; i < 2; i++) {
 
             n.run(1);
-            System.out.println(imp.graph);
-            assertEquals(2, imp.graph.nodeCount());
-            assertEquals(1, imp.graph.edgeCount());
+            System.out.println(imp.impl);
+            assertEquals(2, imp.impl.nodeCount());
+            assertEquals(1, imp.impl.edgeCount());
         }
 
         n.input("(z ==> x). :|:");
         n.run(1);
-        System.out.println(imp.graph);
+        System.out.println(imp.impl);
         n.run(1);
-        System.out.println(imp.graph);
-        System.out.println(imp.goals);
+        System.out.println(imp.impl);
+        System.out.println(imp.goalTruth);
 
     }
 }

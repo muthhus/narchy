@@ -35,6 +35,7 @@ import static nars.time.Tense.ETERNAL;
  * To remember activity as internal action operations
  * <p>
  * https://www.youtube.com/watch?v=ia4wMU-vfrw
+ * "Imperience": http://www.merrell-wolff.org/sites/default/files/M127.pdf
  */
 public class Inperience extends LeakOut {
 

@@ -1014,7 +1014,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     @Nullable
     default Truth truth(long when, int dur) {
         float e = evi(when, dur);
-        if (e <= 0)
+        if (e <= Float.MIN_NORMAL)
             return null;
         return new PreciseTruth(freq(), e, false);
     }

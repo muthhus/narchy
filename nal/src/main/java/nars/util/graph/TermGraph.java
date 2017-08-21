@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 import jcog.data.graph.AdjGraph;
 import jcog.pri.Priority;
+import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 import static nars.Op.IMPL;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.XTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
 public enum TermGraph {
@@ -65,11 +67,11 @@ public enum TermGraph {
             return t.op() == IMPL;
         }
 
-        public AdjGraph<Term, Float> snapshot(Iterable<Term> sources, NAR nar, long when) {
+        public AdjGraph<Term, Term> snapshot(Iterable<Term> sources, NAR nar, long when) {
             return snapshot(null, sources, nar, when);
         }
 
-        public AdjGraph<Term, Float> snapshot(AdjGraph<Term, Float> g, Iterable<Term> sources, NAR nar, long when) {
+        public AdjGraph<Term, Term> snapshot(AdjGraph<Term, Term> g, Iterable<Term> sources, NAR nar, long when) {
 
             if (g == null) {
                 g = new AdjGraph<>(true);
@@ -96,7 +98,7 @@ public enum TermGraph {
             return g;
         }
 
-        protected void recurseTerm(NAR nar, long when, AdjGraph<Term, Float> g, Set<Term> done, Set<Termed> next, Term t) {
+        protected void recurseTerm(NAR nar, long when, AdjGraph<Term, Term> g, Set<Term> done, Set<Termed> next, Term t) {
 
 
 
@@ -136,42 +138,42 @@ public enum TermGraph {
             return true;
         }
 
-        private void impl(AdjGraph<Term, Float> g, NAR nar, long when, Term l, Term subj, Term pred) {
+        private void impl(AdjGraph<Term, Term> g, NAR nar, long when, Term l, Term subj, Term pred) {
 
-            int dur = nar.dur();
-            Task t = nar.belief(l, when);
-            if (t == null)
-                return;
+//            int dur = nar.dur();
+//            Task t = nar.belief(l, when);
+//            if (t == null)
+//                return;
 
-            int dt = t.dt();
-            if (dt == DTERNAL)
-                dt = 0;
-
-            float evi =
-                    t.evi(when, dur);
-            //dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
-
-            float freq = t.freq();
-            boolean neg;
-            float val = (freq - 0.5f) * 2f * evi;
-            if (val < 0f) {
-                val = -val;
-                neg = true;
-            } else {
-                neg = false;
-            }
-
-            val *= TruthPolation.evidenceDecay(1f, dur, Math.abs(dt));
-
-            if (val!=val || val < Priority.EPSILON)
-                return;
-
-            boolean reverse = dt < 0;
-            Term S = reverse ? pred.negIf(neg) : subj;
-            Term P = reverse ? subj : pred.negIf(neg);
-            g.addNode(S);
-            g.addNode(P);
-            g.setEdge(S, P, val + g.edge(S, P, 0f));
+//            int dt = t.dt();
+//            if (dt == DTERNAL)
+//                dt = 0;
+//
+//            float evi =
+//                    t.evi(when, dur);
+//            //dt!=DTERNAL ? w2c(TruthPolation.evidenceDecay(t.evi(), dur, dt)) : t.conf();
+//
+//            float freq = t.freq();
+//            boolean neg;
+//            float val = (freq - 0.5f) * 2f * evi;
+//            if (val < 0f) {
+//                val = -val;
+//                neg = true;
+//            } else {
+//                neg = false;
+//            }
+//
+//            val *= TruthPolation.evidenceDecay(1f, dur, Math.abs(dt));
+//
+//            if (val!=val || val < Priority.EPSILON)
+//                return;
+//
+//            boolean reverse = dt < 0;
+//            Term S = reverse ? pred.negIf(neg) : subj;
+//            Term P = reverse ? subj : pred.negIf(neg);
+            g.addNode(subj);
+            g.addNode(pred);
+            g.setEdge(subj, pred, $.impl(subj, XTERNAL /* whatever best matches, regardless of time */, pred));
         }
 
     }

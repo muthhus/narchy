@@ -80,7 +80,7 @@ public abstract class Param extends Services<Term,NAR> {
                     //0;
                     //Integer.MAX_VALUE;
                     //4;
-                    8;
+                    32;
 
     /** 'time to live', unification steps until unification is stopped */
     public final MutableInteger matchTTL = new MutableInteger(256);

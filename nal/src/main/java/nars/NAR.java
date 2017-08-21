@@ -856,6 +856,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @Nullable
     public Truth truth(@Nullable Termed concept, byte punc, long when) {
         if (concept != null) {
+
+            assert(concept.op().conceptualizable): "asking for truth of unconceptualizable: " + concept; //filter NEG etc
+
             @Nullable Concept c = concept(concept);
             if (c instanceof BaseConcept) {
                 BaseConcept tc = (BaseConcept) c;

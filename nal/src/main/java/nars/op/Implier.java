@@ -4,45 +4,76 @@ import jcog.data.graph.AdjGraph;
 import jcog.pri.Pri;
 import nars.$;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
+import nars.control.CauseChannel;
 import nars.control.DurService;
+import nars.task.NALTask;
 import nars.term.Term;
-import nars.term.Termed;
 import nars.truth.Truth;
 import nars.truth.TruthAccumulator;
+import nars.truth.func.BeliefFunction;
+import nars.truth.func.GoalFunction;
+import nars.truth.func.TruthOperator;
 import nars.util.graph.TermGraph;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static nars.Op.GOAL;
 import static nars.Op.NEG;
-import static nars.truth.TruthFunctions.w2c;
+import static nars.time.Tense.DTERNAL;
 
 
-/** causal implication booster / compiler */
+/**
+ * causal implication booster / compiler
+ */
 public class Implier extends DurService {
 
     private final TermGraph.ImplGraph tg;
     private final Iterable<Term> seeds;
+    private final Iterable<Term> goals;
+    private final NAR nar;
+    private final CauseChannel<Task> in;
 
-    @Deprecated float momentum = 0f;
     float min = Pri.EPSILON; //even though it's for truth
-    Map<Term, TruthAccumulator> goals = new HashMap();
+    Map<Term, TruthAccumulator> goalTruth = new HashMap();
 
-    AdjGraph<Term, Float> graph = null;
+    AdjGraph<Term, Term> impl = null;
 
     private float relativeTargetDur = +1f;
 
+    /**
+     * truth cache
+     */
+    private HashMap<Term, Truth> desire = new HashMap();
+    /**
+     * truth cache
+     */
+    private HashMap<Term, Task> belief = new HashMap();
+
+    private long next;
+    private long now;
+
+    final static TruthOperator dedRec = GoalFunction.get($.the("DeductionRecursivePB"));
 
     public Implier(NAR n, Term... seeds) {
         this(n, List.of(seeds));
     }
 
     public Implier(NAR n, Iterable<Term> seeds) {
+        this(n, seeds, seeds);
+    }
+
+    public Implier(NAR n, Iterable<Term> seeds, Iterable<Term> goals) {
         super(n, 1f);
 
+        this.nar = n;
         this.seeds = seeds;
+        this.goals = goals;
+        this.in = n.newCauseChannel(this);
         this.tg = new TermGraph.ImplGraph() {
             @Override
             protected boolean acceptTerm(Term p) {
@@ -54,98 +85,62 @@ public class Implier extends DurService {
     @Override
     protected void runDur(NAR nar) {
 
-        float confMin = nar.confMin.floatValue();
-        long now = nar.time();
         int dur = nar.dur();
-        long targetTime = Math.round(now + relativeTargetDur * dur);
+        now = nar.time();
+        next = (now + (long) (relativeTargetDur * dur));
 
-        if (graph != null) {
-            //prune or forget
-            if (momentum > 0) {
-                graph = graph.compact((a, b, prev) -> {
-                    float next = prev * momentum;
-                    if (next >= min) {
-                        //s.setEdge(a, b, next);
-                        return next;
-                    }
-                    return null;
-                });
-            } else {
-                graph = null;
-            }
-        }
+        desire.clear();
+        belief.clear();
+        goalTruth.clear();
 
-        graph = tg.snapshot(graph, seeds, nar, targetTime);
+        if (impl!=null && impl.edgeCount() > 128) //HACK
+            impl = null; //reset
 
-        goals.clear();
+        impl = tg.snapshot(impl, seeds, nar, next);
+        int implCount = impl.edgeCount();
 
-        graph.each((subj, pred, w) -> {
+        if (implCount == 0)
+            return;
 
-            if (w < Pri.EPSILON)
+        float confMin = nar.confMin.floatValue();
+        float confSubMin = confMin / implCount;
+
+
+        //System.out.println(impl);
+
+        impl.each((subj, pred, impl) -> {
+
+
+            Task SGimpl = belief(impl);
+            if (SGimpl == null)
                 return;
 
+            //G, (S ==> G) |- S  (Goal:DeductionRecursivePB)
 
-            float c = w2c(w);
-            if (c > confMin) {
-                Term tt = null;
-                Set<Term> recurse = null;
+            float SGimplTruth = SGimpl.conf(now, dur);
+            if (SGimplTruth < confSubMin)
+                return;
 
+            int dt = SGimpl.dt();
+            if (dt == DTERNAL)
+                dt = 0;
 
-                for (Termed target : seeds) {
-                    final float freq;
+            Truth Gg = desire(pred, +dt); //the desire at the predicate time
+            if (Gg == null)
+                return;
 
-                    if (pred.equals(target)) {
-                        tt = subj;
-                        freq = 1f;
-                    } else if (pred.op() == NEG && pred.unneg().equals(target)) {
-                        tt = subj;
-                        freq = 0f;
-                        //                        } else if (subj.equals(a.happy)) {
-                        //                            tt = pred;
-                        //                            freq = 1f;
-                        //                            //recurse = s.successors(pred);
-                        //                        } else if (subj.op() == NEG && subj.unneg().equals(a.happy)) {
-                        //                            tt = pred;
-                        //                            freq = 0f;
-                        //                            //recurse = s.successors(pred);
-                    } else {
-                        freq = Float.NaN;
-                    }
-
-                    if (freq==freq)
-                        goal(goals, tt, freq, c);
-                }
-
-
-
-                //float activation = w2c(s.edgeValue(subj, pred));
-//                                    if (activation >= Priority.EPSILON) {
-//                                        Concept csubj = n.concept(subj);
-//                                        if (csubj != null)
-//                                            n.activate(csubj, activation);
-//
-//                                        Concept cpred = n.concept(pred);
-//                                        if (cpred != null)
-//                                            n.activate(cpred, activation);
-//                                    }
-
-
-
-
-//                recurse = s.predecessors(subj);
-//                if (recurse != null) {
-//
-//                    recurse.forEach(rrr -> {
-//                        float cc = c * w2c(s.edge(rrr, subj, 0f));
-//                        //System.out.println(e + " " + rrr + " " );
-//                        add(adjusts, rrr, freq, cc);
-//                    });
-//                }
-                //                                    System.out.println(
-                //                                            Texts.n4(v) + "\t(" + subj + "==>" + pred + ")"
-                //
-                //                                    );
+            float f = SGimpl.freq();
+            if (subj.op() == NEG) {
+                subj = subj.unneg();
+                f = 1 - f;
             }
+
+            Truth Sg = dedRec.apply(Gg, $.t(f, SGimplTruth), nar, confSubMin);
+
+            if (Sg != null) {
+                goal(goalTruth, subj, Sg);
+            }
+
         });
 
 
@@ -158,7 +153,7 @@ public class Implier extends DurService {
 //                }
 //            }
 
-        if (!goals.isEmpty()) {
+        if (!goalTruth.isEmpty()) {
 
 //            List<IntHashSet> ws = new GraphMeter().weakly(s);
 //            ws.forEach(x -> {
@@ -167,15 +162,17 @@ public class Implier extends DurService {
 //                }
 //            });
 
-            goals.forEach((tt, a) -> {
+            goalTruth.forEach((t, a) -> {
                 @Nullable Truth uu = a.commitSum();
                 if (uu != null) {
                     float c = uu.conf();
                     if (c >= confMin) {
-                        Task x = nar.goal(nar.priorityDefault(GOAL), tt,
-                                now, targetTime,
-                                uu.freq(), c);
-                        System.out.println("\t" + x);
+                            //Math.abs(uu.expectation() - 0.5f) >= confMin /* confmin here used in expectation comparison */) {
+                        NALTask y = new NALTask(t, GOAL, uu, now, now, next, nar.time.nextInputStamp());
+//                        if (Param.DEBUG)
+//                            y.log("")
+                        in.input(y);
+                        System.err.println("\t" + y);
                     }
                 }
             });
@@ -186,18 +183,23 @@ public class Implier extends DurService {
 
     }
 
-    public void goal(Map<Term, TruthAccumulator> goals, Term tt, float freq, float c) {
-        if (tt.op()==NEG) {
-            tt = tt.unneg();
-            freq = 1 - freq;
-        }
+    private Truth desire(Term x, long when) {
+        return nar.goalTruth(x, when);
+    }
 
-        @Nullable Truth dt = $.t(freq, c);
+    private Truth desire(Term x) {
+        return desire.computeIfAbsent(x, (xx) -> desire(xx, next));
+    }
 
+    private Task belief(Term x) {
+        return belief.computeIfAbsent(x, (xx) -> nar.belief(xx, now));
+    }
+
+    public void goal(Map<Term, TruthAccumulator> goals, Term tt, Truth g) {
         goals.compute(tt, (ttt, p) -> {
             if (p == null)
                 p = new TruthAccumulator();
-            p.add(dt);
+            p.add(g);
             return p;
         });
     }

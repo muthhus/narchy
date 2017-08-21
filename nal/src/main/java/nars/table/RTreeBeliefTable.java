@@ -7,7 +7,6 @@ import jcog.tree.rtree.*;
 import jcog.util.Top;
 import jcog.util.Top2;
 import jcog.util.UniqueRanker;
-import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;
@@ -16,6 +15,7 @@ import nars.task.*;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
+import nars.util.signal.Signal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -200,7 +200,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     final Space<TaskRegion> tree;
 
-    //private final AtomicBoolean compressing = new AtomicBoolean(false);
 
     public RTreeBeliefTable() {
         Spatialization<TaskRegion> model = new Spatialization<TaskRegion>((t -> t), Spatialization.DefaultSplits.AXIAL, MIN_TASKS_PER_LEAF, MAX_TASKS_PER_LEAF) {
@@ -245,41 +244,28 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     }
 
 
-    @Override
-    public Object stretch(SignalTask task) {
-//            if (changed.isDeleted()) {
-//                remove(changed); //return true; //stop tracking
-//            }
+    final class MyTaskStretcher implements Consumer<Task> {
 
-        @Nullable Object stretch = task.stretchKey;
-        if (stretch instanceof TaskRegion) {
+        public final TaskRegion region;
 
-            TaskRegion t = (TaskRegion) stretch;
+        public MyTaskStretcher(TaskRegion region) {
+            this.region = region;
+        }
 
-            boolean removed = tree.remove(t);
-            if (removed) {
+        @Override
+        public void accept(Task task) {
+            ((ConcurrentRTree<TaskRegion>) tree).withWriteLock((tree) -> {
 
-                t.end = task.end();
+                boolean removed = tree.remove(region);
 
-                boolean ready = tree.add(t);
-                if (ready) {
-                    //assert(readded);
+                region.end = task.end();
 
-                    return t; //keep tracking
-                } else {
-                    return null;
-                }
-            }
-        } /*else {
-            TaskRegion tr = new TaskRegion(task);
-            if (tree.add(tr)) {
-                return tr;
-            } else {
-                return null; //couldnt add
-            }
-        }*/
-        return stretch;
+                boolean added = tree.add(region);
+
+            });
+        }
     }
+
 
 //    public void updateSignalTasks(long now) {
 //
@@ -469,30 +455,34 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         this.nar = n;
 
         boolean isSignal = x instanceof SignalTask;
-        TaskRegion tr = isSignal && (((SignalTask) x).stretchKey instanceof TaskRegion) ?
-                ((TaskRegion) ((SignalTask) x).stretchKey) :
-                new TaskRegion(x);
 
-        if (isSignal)
-            ((SignalTask) x).stretchKey = tr;
-
-        ((ConcurrentRTree<TaskRegion>) tree).withWriteLock((t) -> {
-
-
-            //check capacity overage
-            if (size() >= capacity) {
-                addAfterCompressing(t, tr, n);
-//                        .forEach(ii -> {
-//                    t.add(new TaskRegion(ii));
-//                    //n.input(Activate.activate(ii, ii.priElseZero(), c, n))
-//                });
+        TaskRegion tr;
+        if (isSignal) {
+            SignalTask sx = (SignalTask) x;
+            if (sx.stretchKey == Signal.Pending) {
+                //set the stretcher
+                sx.stretchKey = new MyTaskStretcher(tr = new TaskRegion(x));
+            } else if (sx.stretchKey instanceof MyTaskStretcher) {
+                //ignore, it is already present; this actually should never be reached if the Signal works right
+                return;
             } else {
-                t.add(tr);
+                throw new UnsupportedOperationException(sx + " either stretching or it isn't");
             }
-            assert (size() <= capacity) : "size=" + size() + " cap=" + capacity;
+        } else {
+            tr = new TaskRegion(x);
+        }
 
 
-        });
+        //check capacity overage
+        if (size() >= capacity) {
+            ((ConcurrentRTree<TaskRegion>) tree).withWriteLock((t) -> {
+                addAfterCompressing(t, tr, n);
+                assert (size() <= capacity*2) : "size=" + size() + " cap=" + capacity;
+            });
+        } else {
+            tree.addAsync(tr);
+        }
+
     }
 
     /**
@@ -500,57 +490,46 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      */
     @NotNull
     private void addAfterCompressing(Space<TaskRegion> tree, TaskRegion inputRegion, NAR nar) {
-        //if (compressing.compareAndSet(false, true)) {
-        try {
 
 
-            long now = nar.time();
-            int dur = nar.dur();
+        long now = nar.time();
+        int dur = nar.dur();
 
-            Task input = inputRegion.task;
-            float inputConf = input.conf(now, dur);
+        Task input = inputRegion.task;
+        float inputConf = input.conf(now, dur);
 
-            FloatFunction<Task> ts = taskStrength(now, dur);
-            FloatFunction<TaskRegion> weakestTask = (t -> -ts.floatValueOf(t.task));
-            FloatFunction<TaskRegion> rs = regionStrength(now, dur);
-            FloatFunction<Leaf<TaskRegion>> mergeableRegion = (l) -> -rs.floatValueOf((TaskRegion) l.region);
-
-
+        FloatFunction<Task> ts = taskStrength(now, dur);
+        FloatFunction<TaskRegion> weakestTask = (t -> -ts.floatValueOf(t.task));
+        FloatFunction<TaskRegion> rs = regionStrength(now, dur);
+        FloatFunction<Leaf<TaskRegion>> mergeableRegion = (l) -> -rs.floatValueOf((TaskRegion) l.region);
 
 
+        Top<TaskRegion> deleteVictim = new Top<>(weakestTask);
+        Top<Leaf<TaskRegion>> mergeVictim = new Top<>(mergeableRegion);
+
+        compressNext(tree, tree.root(), deleteVictim, mergeVictim, inputConf, now, dur);
+
+        //decide to remove or merge:
+        @Nullable TaskRegion toRemove = deleteVictim.the;
+        @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
 
 
-
-                Top<TaskRegion> deleteVictim = new Top<>(weakestTask);
-                Top<Leaf<TaskRegion>> mergeVictim = new Top<>(mergeableRegion);
-
-                compressNext(tree, tree.root(), deleteVictim, mergeVictim, inputConf, now, dur);
-
-                //decide to remove or merge:
-                @Nullable TaskRegion toRemove = deleteVictim.the;
-                @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
-
-
-                boolean merged = false;
-                if (toMerge != null) {
-                    Task mergedTask = null;
-                    if ((mergedTask = compressMerge(tree, toMerge, now, dur, nar)) != null) {
-                        merged = true; //the result has already been added in compressMerge
-                    }
-                }
-                if (!merged && toRemove != null) {
-                    compressEvict(toRemove);
-                }
-
-                if (tree.size() < capacity)
-                    tree.add(inputRegion);
-
-            //nar.input(toActivate);
-
-        } finally {
-            //compressing.set(false);
+        boolean merged = false;
+        if (toMerge != null) {
+            Task mergedTask = null;
+            if ((mergedTask = compressMerge(tree, toMerge, now, dur, nar)) != null) {
+                merged = true; //the result has already been added in compressMerge
+            }
         }
-        //}
+        if (!merged && toRemove != null) {
+            compressEvict(toRemove);
+        }
+
+        if (tree.size() < capacity)
+            tree.add(inputRegion);
+
+        //nar.input(toActivate);
+
 
     }
 
