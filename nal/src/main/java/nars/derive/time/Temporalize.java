@@ -247,17 +247,7 @@ public class Temporalize implements ITemporalize {
     }
 
 
-    private Event solution(Term term, Time start) {
-        return new TimeEvent(this, term, start);
-//        long st = start.abs();
-//        long et;
-//        if (st == ETERNAL) et = ETERNAL;
-//        else et = term.op() == CONJ ? st + term.dtRange() : st;
-//
-//        return new SolutionEvent(this, term, st, et);
-    }
-
-//    static String timeStr(int when) {
+    //    static String timeStr(int when) {
 //        return when != DTERNAL ? (when != XTERNAL ? Integer.toString(when) : "?") : "DTE";
 //    }
 
@@ -435,9 +425,9 @@ public class Temporalize implements ITemporalize {
             case CONJ:
                 int tdt = term.dt();
                 if (tdt == DTERNAL) {
-                    term.subterms().forEach(sub -> {
-                        know(sub, relative(sub, term, 0)); //link to super-conj
-                    });
+//                    term.subterms().forEach(sub -> {
+//                        know(sub, relative(sub, term, 0)); //link to super-conj
+//                    });
                 } else if (tdt != XTERNAL) {
                     //add the known timing of the conj's events
 
@@ -535,15 +525,14 @@ public class Temporalize implements ITemporalize {
         if (trail.containsKey(x)) {
             Time xs = trail.get(x);
             if (xs != null)
-                return solution(x, xs);
+                return new TimeEvent(this, x, xs);
             else
                 return null; //cyclic
         }
 
-        if (fullyEternal() && /*empty(trail) && */x.op() != IMPL && x.dt() != XTERNAL) {
-            //HACK
-            trail.put(x, (x.op().temporal && x.dt() == DTERNAL) ? AMBIENT_EVENT : EARLIEST_EVENT); //glue
-            //knowTerm(x, ETERNAL); //everything will be relative to this, in eternity
+        if (fullyEternal() && !x.op().temporal) { //*empty(trail) && */x.op() != IMPL && x.dt() != XTERNAL) {
+            //HACK anchor in eternity
+            trail.putIfAbsent(x, EARLIEST_EVENT); //glue
         } else {
             trail.putIfAbsent(x, null); //placeholder
         }
@@ -642,6 +631,20 @@ public class Temporalize implements ITemporalize {
                         }
                     }
                 }
+
+                //test for 0 first because it's more specific
+                {
+                    /* test for the exact appearance of temporalized form present in constraints */
+                    if (has0) { //quick test filter
+                        @NotNull Term xPar = x.dt(0);
+                        if (!(xPar instanceof Bool) && constraints.get(xPar) != null) {
+                            Event ds = solve(xPar, trail);
+                            if (ds != null)
+                                return relative(xPar, ds, 0);
+                        }
+                    }
+                }
+
                 {
                     /* test for the exact appearance of temporalized form present in constraints */
                     if (hasEte) { //quick test filter
@@ -655,17 +658,7 @@ public class Temporalize implements ITemporalize {
                     }
                 }
 
-                {
-                    /* test for the exact appearance of temporalized form present in constraints */
-                    if (has0) { //quick test filter
-                        @NotNull Term xPar = x.dt(0);
-                        if (!(xPar instanceof Bool) && constraints.get(xPar) != null) {
-                            Event ds = solve(xPar, trail);
-                            if (ds != null)
-                                return relative(xPar, ds, 0);
-                        }
-                    }
-                }
+
 
                 //HACK try this trick: fully anonymous match
                 if (!constraints.isEmpty()) {

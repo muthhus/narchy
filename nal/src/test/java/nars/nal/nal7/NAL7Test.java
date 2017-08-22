@@ -1021,7 +1021,7 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .input("hold(key). :|:")
                 .input("((hold(#x) && open(door)) =|> enter(room)). :|:")
-                .mustBelieve(cycles, "(open(door) ==> enter(room))",
+                .mustBelieve(cycles, "(open(door) =|> enter(room))",
                         1.00f, 0.81f,
                         0)
         ;
@@ -1034,7 +1034,7 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .input("hold(key). :|:")
                 .input("(goto(door) =|> (hold(#x) && open(door))). :|:")
-                .mustBelieve(cycles, "(goto(door) ==> open(door))",
+                .mustBelieve(cycles, "(goto(door) =|> open(door))",
                         1.00f, 0.81f,
                         0);
     }

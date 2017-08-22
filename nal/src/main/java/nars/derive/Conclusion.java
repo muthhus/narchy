@@ -165,13 +165,14 @@ public class Conclusion extends AbstractPred<Derivation> {
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
             if (goalUrgent && d.concPunc == GOAL && occ[0] != ETERNAL) {
-//                long taskStart = d.task.start();
-//                if (taskStart != ETERNAL) {
-//                    long taskDur = occ[1] - occ[0];
-//
-//                    occ[0] = taskStart;
-//                    occ[1] = occ[0] + taskDur;
-//                }
+                long taskStart = d.task.start();
+                if (taskStart != ETERNAL) {
+                    if (occ[0] < taskStart) {
+                        long taskDur = occ[1] - occ[0];
+                        occ[0] = taskStart;
+                        occ[1] = occ[0] + taskDur;
+                    }
+                }
             }
 
             c2 = t1;

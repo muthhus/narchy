@@ -350,7 +350,7 @@ public class TemporalizeTest {
         Event solution = t.solve($("((#1-->swimmer) &&+- (#1-->$2))"), h);
         System.out.println(h);
         assertNotNull(solution);
-        assertEquals("((#1-->swimmer)&&(#1-->$2))@:->(swan-->$2)", solution.toString());
+        assertEquals("((#1-->swimmer)&&(#1-->$2))@ETE", solution.toString());
         assertEquals(ETERNAL, solution.start(h).abs());
     }
 
