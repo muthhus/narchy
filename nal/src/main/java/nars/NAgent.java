@@ -343,8 +343,8 @@ abstract public class NAgent extends DurService implements NSense, NAct {
                         question(impl(action, what)),
                         question(impl(notAction, what)),
 
-                        question(impl(parallel(what, action), happy)),
-                        question(impl(parallel(what, notAction), happy)),
+//                        question(impl(parallel(what, action), happy)),
+//                        question(impl(parallel(what, notAction), happy)),
 
                         //question(seq(action, dur, happiness), now),
                         //question(seq(neg(action), dur, happiness), now),

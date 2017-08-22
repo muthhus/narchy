@@ -271,7 +271,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             if (!tc.add(b))
                 continue; //already added
 
-            if (!b.op().conceptualizable) //|| b.hasAny(VAR_QUERY.bit | VAR_PATTERN.bit))
+            if (!b.op().conceptualizable || b.hasAny(VAR_QUERY.bit | VAR_PATTERN.bit))
                 continue;
 
             if (layersRemain > 0)
