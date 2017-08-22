@@ -262,8 +262,13 @@ public class Premise extends UnaryTask {
 
 
         Set<Task> dd = d.run(this, task, belief, beliefTerm, ttlMax);
-        nar.emotion.taskDerivations.increment(dd.size());
-        return dd;
+        int dds = dd.size();
+        if (dds > 0) {
+            nar.emotion.taskDerivations.increment(dds);
+            return dd;
+        } else {
+            return null;
+        }
 
 //        long ds = d.transformsCache.estimatedSize();
 //        if (ds >0)

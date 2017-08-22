@@ -912,7 +912,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         assertEquals(xe.size(), result.size());
     }
 
-    @Test public void testDropAnyEventInner() throws Narsese.NarseseException {
+    @Test public void testDropAnyEventInnerSubj() throws Narsese.NarseseException {
         /*
         BAD
         $.02 ((at(SELF,{t001})&|open({t001})) ==>+5 ({t001}-->[opened])). %1.0;.81% {7: 1;;} (((%1==>%2),%1,belief("&&")),((dropAnyEvent(%1) ==>+- %2),((StructuralDeduction-->Belief))))
@@ -922,13 +922,16 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         t.knowAbsolute($("(((hold(SELF,{t002}) &&+5 at(SELF,{t001})) &&+5 open({t001})) ==>+5 ({t001}-->[opened]))"), ETERNAL);
         t.print();
 
-        System.out.println();
-
-
         Term P = $("((at(SELF,{t001}) &&+- open({t001})) ==>+- ({t001}-->[opened]))");
 
         Event s = t.solve(P);
         assertEquals("((at(SELF,{t001}) &&+5 open({t001})) ==>+5 ({t001}-->[opened]))", s.term.toString());
+    }
+    @Test public void testDropAnyEventInnerPred() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowAbsolute($("(({t001}-->[opened]) ==>+5 ((hold(SELF,{t002}) &&+5 at(SELF,{t001})) &&+5 open({t001})))"), ETERNAL);
+        Event s = t.solve($("(({t001}-->[opened]) ==>+- (at(SELF,{t001}) &&+- open({t001})))"));
+        assertEquals("(({t001}-->[opened]) ==>+10 (at(SELF,{t001}) &&+5 open({t001})))", s.term.toString());
     }
 
 }

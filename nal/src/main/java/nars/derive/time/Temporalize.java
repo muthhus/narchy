@@ -386,16 +386,34 @@ public class Temporalize implements ITemporalize {
                     know(implPred, relative(implPred, implSubj, predFromSubj));
                     know(implSubj, relative(implSubj, implPred, -predFromSubj));
 
-                    implSubj.events().forEach(oe -> {
-                        Term ss = oe.getOne();
-                        if (!ss.equals(implPred)) {
-                            int t = -predFromSubj + ((int) oe.getTwo());
-                            know(ss, relative(ss, implPred, t));
-                            know(implPred, relative(implPred, ss, -t));
-                        } else {
-                            //TODO repeat case
+                    if (implSubj.hasAny(CONJ)) {
+                        FasterList<ObjectLongPair<Term>> se = implSubj.events();
+                        for (int i = 0, eventsSize = se.size(); i < eventsSize; i++) {
+                            ObjectLongPair<Term> oe = se.get(i);
+                            Term ss = oe.getOne();
+                            if (!ss.equals(implPred)) {
+                                int t = -predFromSubj + ((int) oe.getTwo());
+                                know(ss, relative(ss, implPred, t));
+                                know(implPred, relative(implPred, ss, -t));
+                            } else {
+                                //TODO repeat case
+                            }
                         }
-                    });
+                    }
+                    if (implPred.hasAny(CONJ)) {
+                        FasterList<ObjectLongPair<Term>> pe = implPred.events();
+                        for (int i = 0, eventsSize = pe.size(); i < eventsSize; i++) {
+                            ObjectLongPair<Term> oe = pe.get(i);
+                            Term pp = oe.getOne();
+                            if (!pp.equals(implSubj)) {
+                                int t = predFromSubj + ((int) oe.getTwo());
+                                know(pp, relative(pp, implSubj, t));
+                                know(implSubj, relative(implSubj, pp, -t));
+                            } else {
+                                //TODO repeat case
+                            }
+                        }
+                    }
                 } else {
                     //TODO repeat case
                 }
@@ -657,7 +675,6 @@ public class Temporalize implements ITemporalize {
                         }
                     }
                 }
-
 
 
                 //HACK try this trick: fully anonymous match
