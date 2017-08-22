@@ -54,13 +54,13 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     }
 
 
-    static final GLAutoDrawable sharedDrawable;
+    //static final GLAutoDrawable sharedDrawable;
 
     static {
-        GLCapabilitiesImmutable cfg = newDefaultConfig();
-        sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
-        sharedDrawable.display(); // triggers GLContext object creation and native realization.
-        Draw.init(sharedDrawable.getGL().getGL2());
+//        GLCapabilitiesImmutable cfg = newDefaultConfig();
+//        sharedDrawable = GLDrawableFactory.getFactory(cfg.getGLProfile()).createDummyAutoDrawable(null, true, cfg, null);
+//        sharedDrawable.display(); // triggers GLContext object creation and native realization.
+//        Draw.init(sharedDrawable.getGL().getGL2());
         a.start();
     }
 
@@ -70,7 +70,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         GLWindow w = GLWindow.create(config);
         w.addGLEventListener(j);
         w.addWindowListener(j);
-        w.setSharedContext(sharedDrawable.getContext());
+        //w.setSharedContext(sharedDrawable.getContext());
 
 
         //TODO FPSAnimator
@@ -154,10 +154,13 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         GLCapabilities config = new GLCapabilities(
 
                 //GLProfile.getMinimum(true)
-                GLProfile.getDefault()
-                //GLProfile.getMaximum(true)
+                //GLProfile.getDefault()
+                GLProfile.getMaximum(true)
+
 
         );
+
+
 
 //        config.setBackgroundOpaque(false);
 //        config.setTransparentRedValue(-1);
@@ -297,6 +300,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
     public static class GameAnimatorControl extends AnimatorBase {
         final FPSCounterImpl fpsCounter;
         private final Loop loop;
+        private final float fps;
         private boolean pauseIssued;
         private boolean quitIssued;
         public boolean isAnimating;
@@ -304,6 +308,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         GameAnimatorControl(float initialFPS) {
             super();
 
+            this.fps = initialFPS;
             setIgnoreExceptions(true);
             setPrintExceptions(false);
 
@@ -435,7 +440,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
 
             animThread = loop.thread();
             loop.runFPS(initialFPS);
-            //setExclusiveContext(loop.thread);
+            setExclusiveContext(animThread);
         }
 
         @Override

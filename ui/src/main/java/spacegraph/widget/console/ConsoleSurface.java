@@ -2,10 +2,13 @@ package spacegraph.widget.console;
 
 import com.googlecode.lanterna.TextCharacter;
 import com.jogamp.opengl.GL2;
+import com.jogamp.opengl.util.gl2.GLUT;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
 import java.awt.*;
+
+import static spacegraph.render.JoglSpace.glut;
 
 /**
  * Created by me on 4/1/16.
@@ -81,6 +84,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
                     0.5f,  (rows - 1 - row),
                     dz);
 
+
+
             for (int col = 0; col < cols; col++) {
 
 
@@ -111,6 +116,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
                     gl.glColor4f(1f,1f,1f, fgAlpha);
 
                     Draw.textNext(gl, cc, col/charScaleX);
+
+
                 }
             }
 

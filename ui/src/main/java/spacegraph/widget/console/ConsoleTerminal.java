@@ -165,17 +165,17 @@ public class ConsoleTerminal extends ConsoleSurface {
 
         //this.term.flush();
 
-        if (eterm instanceof TerminalUI) {
-            TerminalUI ee = (TerminalUI) eterm;
-            ee.gui.getGUIThread().invokeLater(() -> {
-                try {
-                    ee.gui.processInput();
-                    ee.gui.updateScreen();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            });
-        }
+//        if (eterm instanceof TerminalUI) {
+//            TerminalUI ee = (TerminalUI) eterm;
+////            ee.gui.getGUIThread().invokeLater(() -> {
+//                try {
+//                    ee.gui.processInput();
+//                    //ee.gui.updateScreen();
+//                } catch (IOException e1) {
+//                    e1.printStackTrace();
+//                }
+////            });
+//        }
         return true;
     }
 
