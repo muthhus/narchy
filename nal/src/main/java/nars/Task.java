@@ -600,18 +600,18 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
      */
     @Nullable
     default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
-        if (isInput()) {
-            Concept concept = concept(nar, true);
-            if (concept != null) {
-                ArrayBag<Task, PriReference<Task>> answers = (ArrayBag<Task, PriReference<Task>>) concept.computeIfAbsent(Op.QUESTION, (q) ->
-                        new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
-                answers.commit();
-
-                float confEffective = answer.conf();//nearestTimeTo(nar.time()), nar.dur());
-                answers.put(new PLink<>(answer, confEffective * 1f));
-            }
-
-        }
+//        if (isInput()) {
+//            Concept concept = concept(nar, true);
+//            if (concept != null) {
+//                ArrayBag<Task, PriReference<Task>> answers = (ArrayBag<Task, PriReference<Task>>) concept.computeIfAbsent(Op.QUESTION, (q) ->
+//                        new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
+//                answers.commit();
+//
+//                float confEffective = answer.conf();//nearestTimeTo(nar.time()), nar.dur());
+//                answers.put(new PLink<>(answer, confEffective * 1f));
+//            }
+//
+//        }
 
         return answer;
     }

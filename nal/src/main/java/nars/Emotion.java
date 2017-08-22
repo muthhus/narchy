@@ -34,7 +34,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
     public final Counter busyPri = new StepCounter(id("busyPri"));
 
     public final Counter conceptFires = new BasicCounter(id("concept fire count"));
-    public final Counter conceptActivations = new BasicCounter(id("concept fire activations"));
+    public final Counter taskActivations = new BasicCounter(id("concept fire activations"));
     public final Counter conceptFirePremises = new BasicCounter(id("concept fire premises"));
     public final Counter taskDerivations = new BasicCounter(id("derivation task"));
 
@@ -313,7 +313,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
     }
 
     public void onActivate(@NotNull Task t, float activation, Concept origin, NAR n) {
-        n.emotion.conceptActivations.increment();
+        n.emotion.taskActivations.increment();
     }
 
     public void value(short[] x, float taskValue) {

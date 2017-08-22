@@ -43,14 +43,14 @@ public class Choose1 extends Termutator.AbstractTermutator {
     }
 
     @Override
-    public void mutate(@NotNull Unify f, Termutator[] chain, int current) {
+    public void mutate(@NotNull Unify u, Termutator[] chain, int current) {
 
         @NotNull Term[] yy = this.yy;
 
         int l = yy.length-1;
-        int shuffle = f.random.nextInt(yy.length); //randomize starting offset
+        int shuffle = u.random.nextInt(yy.length); //randomize starting offset
 
-        int start = f.now();
+        int start = u.now();
 
         Term[] m = new Term[l];
 
@@ -58,14 +58,14 @@ public class Choose1 extends Termutator.AbstractTermutator {
         for (Term x = this.x; l >=0; l--) {
 
             Term y = this.yy[(shuffle + l) % this.yy.length];
-            if (f.unify(x,y)) {
-                if (f.unify(xEllipsis, EllipsisMatch.match(TermContainer.exceptThe(yy, y, m)))) {
-                    f.tryMutate(chain, current);
+            if (x.unify(y, u)) {
+                if (xEllipsis.unify(EllipsisMatch.match(TermContainer.exceptThe(yy, y, m)), u)) {
+                    u.tryMutate(chain, current);
                 }
 
             }
 
-            if (!f.revertAndContinue(start))
+            if (!u.revertAndContinue(start))
                 break;
         }
 

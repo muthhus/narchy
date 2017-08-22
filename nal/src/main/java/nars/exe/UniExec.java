@@ -2,6 +2,7 @@ package nars.exe;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
+import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
 import nars.NAR;
 import nars.control.Activate;
@@ -19,9 +20,10 @@ import static jcog.bag.Bag.BagSample;
 import static jcog.bag.Bag.BagSample.*;
 
 /**
+ * unified executor
  * probabalistic continuation kernel
  */
-public class UnifiedExec extends Exec implements Runnable {
+public class UniExec extends Exec implements Runnable {
 
     public static final int BATCH_SIZE = 128;
     public static final int CAPACITY = 1024;
@@ -47,7 +49,7 @@ public class UnifiedExec extends Exec implements Runnable {
     }
 
 
-    public static final Logger logger = LoggerFactory.getLogger(UnifiedExec.class);
+    public static final Logger logger = LoggerFactory.getLogger(UniExec.class);
 
     private BagSample execute(ITask x) {
         Iterable<? extends ITask> next = null;
@@ -101,7 +103,7 @@ public class UnifiedExec extends Exec implements Runnable {
 
                     @Override
                     protected ITask merge(@NotNull ITask existing, @NotNull ITask incoming, MutableFloat overflowing) {
-                        float overflow = UnifiedExec.this.merge(existing, incoming); //modify existing
+                        float overflow = UniExec.this.merge(existing, incoming); //modify existing
                         if (overflow > 0) {
                             //pressurize(-overflow);
                             if (overflowing != null) overflowing.add(overflow);
@@ -111,7 +113,14 @@ public class UnifiedExec extends Exec implements Runnable {
 
                     @Override
                     protected Consumer<ITask> forget(float rate) {
-                        return new PriForget(rate);
+                        return null;
+//                        return new PriForget(rate) {
+//                            @Override
+//                            public void accept(@NotNull Priority b) {
+//                                if (b instanceof Activate || b instanceof )
+//                                super.accept(b);
+//                            }
+//                        };
                     }
                 };
         plan.setCapacity(CAPACITY);

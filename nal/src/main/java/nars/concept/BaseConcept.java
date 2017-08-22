@@ -120,7 +120,7 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
                     //new UnifiedSet<>(id.volume() /* estimate */);
                     new HashSet(volume());
 
-            Activate.templates(tc, ctpl, nar, Activate.layers(term) - 1);
+            Activate.templates(tc, ctpl, nar, Activate.layers(term) );
 
             if (term.size() > 0)
                 tc.add(term); //structural transform: add the local term (if a compound) -- but not the concept. this prevents reinserting a tasklink

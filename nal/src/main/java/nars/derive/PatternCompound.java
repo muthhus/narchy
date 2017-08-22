@@ -144,7 +144,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
          * WARNING this implementation only works if there is one ellipse in the subterms
          * this is not tested for either
          */
-        final boolean matchEllipsedLinear(@NotNull TermContainer Y, @NotNull Unify subst) {
+        final boolean matchEllipsedLinear(@NotNull TermContainer Y, @NotNull Unify u) {
 
             int i = 0, j = 0;
             int xsize = sizeCached;
@@ -158,7 +158,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
                 if (x instanceof Ellipsis) {
                     int available = ysize - j;
 
-                    Term eMatched = subst.xy(x); //EllipsisMatch, or null
+                    Term eMatched = u.xy(x); //EllipsisMatch, or null
                     if (eMatched == null) {
 
                         //COLLECT
@@ -167,7 +167,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
                             if (!ellipsis.validSize(available))
                                 return false;
 
-                            return subst.unify(ellipsis, EllipsisMatch.match(Y, j, j + available));
+                            return u.unify(ellipsis, EllipsisMatch.match(Y, j, j + available));
 
                         } else {
                             //PREFIX the ellipsis occurred at the start and there are additional terms following it
@@ -179,12 +179,12 @@ abstract public class PatternCompound extends GenericCompoundDT {
 
                         if (eMatched instanceof EllipsisMatch) {
                             EllipsisMatch ex = (EllipsisMatch) eMatched;
-                            if (!ex.linearMatch(Y, j, subst))
+                            if (!ex.linearMatch(Y, j, u))
                                 return false;
                             j += ex.size();
                         } else {
                             //it is a single ellipsis term to unify against
-                            if (!sub(j).unify(eMatched, subst))
+                            if (!sub(j).unify(eMatched, u))
                                 j++;
                         }
                     }
@@ -207,7 +207,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
 //                        }
 //                    }
                 } else {
-                    if (ysize <= j || !subst.unify(x, Y.sub(j++)))
+                    if (ysize <= j || !x.unify(Y.sub(j++), u))
                         return false;
                 }
             }

@@ -99,7 +99,7 @@ public class UnifyTest {
 
 
                         this.xy.forEachVersioned((k, v) -> {
-                            if (matchType(k))
+                            if (matchType(k.op()))
                                 assertNotNull(v);
                             return true;
                         });

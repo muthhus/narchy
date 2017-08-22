@@ -1,20 +1,15 @@
 package nars;
 
-import com.google.common.collect.Iterables;
 import jcog.data.FloatParam;
 import jcog.pri.mix.control.MixContRL;
-import nars.concept.ActionConcept;
 import nars.control.Derivation;
 import nars.control.NARService;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
-import nars.exe.UnifiedExec;
 import nars.gui.Vis;
-import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex2;
-import nars.op.Implier;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -37,7 +32,6 @@ import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -165,7 +159,7 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.5f);
 
 
-        float priFactor = 1f;
+        float priFactor = 0.01f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;

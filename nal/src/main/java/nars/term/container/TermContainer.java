@@ -969,7 +969,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     }
 
-    default boolean unifyCommute(TermContainer y, @NotNull Unify subst) {
+    default boolean unifyCommute(TermContainer y, @NotNull Unify u) {
 
         if (y.equals(this))
             return true;
@@ -999,13 +999,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
             //  note for validation: the reverse will not work (trying to assign multiple different terms to the same variable in x)
             Term yy = ys.first();
             for (Term x : xs) {
-                if (!subst.unify(x, yy))
+                if (!x.unify(yy, u))
                     return false;
             }
             return true; //they all unified
         } else if (yss == xss) {
 
-            subst.termutes.add(new CommutivePermutations(
+            u.termutes.add(new CommutivePermutations(
                     TermVector.the(xs), TermVector.the(ys)
             ));
             return true;

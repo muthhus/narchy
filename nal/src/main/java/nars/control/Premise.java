@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 
+import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -209,6 +210,8 @@ public class Premise extends UnaryTask {
 
                 match = answerTable.answer(task.start(), task.end(), dur, task, beliefTerm, nar);
                 if (match != null) {
+                    assert (task.isQuest() || match.punc()==BELIEF): "quest answered with a belief but should be a goal";
+
                     @Nullable Task answered = task.onAnswered(match, nar);
                     if (answered != null) {
 
@@ -221,10 +224,8 @@ public class Premise extends UnaryTask {
                 long focusStart, focusEnd;
                 if (focus == ETERNAL) {
                     focusStart = focusEnd = ETERNAL;
-                }
-                else {
-                    focusStart = focus - dur;
-                    focusEnd = focus + dur;
+                } else {
+                    focusStart = focusEnd = focus;
                 }
 
                 boolean tryMatch = true;

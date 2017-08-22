@@ -129,8 +129,8 @@ public class FocusExec extends Exec implements Runnable {
 
         for (int i = 0; i < subCycles; i++) {
 
-            tasks.commit();
-            concepts.commit();
+            //tasks.commit(null);
+            //concepts.commit(null); //<- concepts decay on their own
 
             //if (tasks.capacity() <= tasks.size())
 

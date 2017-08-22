@@ -270,12 +270,6 @@ public abstract class Unify extends Versioning implements Subst {
         return x.unify(y, this);
     }
 
-    /**
-     * whether the term is assignable
-     */
-    public final boolean matchType(@NotNull Term y) {
-        return matchType(y.op());
-    }
 
     /**
      * whether the op is assignable

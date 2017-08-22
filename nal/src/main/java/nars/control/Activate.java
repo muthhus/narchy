@@ -117,7 +117,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
 
 
-        Collection<Termed> localTemplates = id.templates(nar);
 
 
         //concept priority transfers into:
@@ -129,7 +128,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         float decayed = cPri * decayRate;
         priSub(decayed); //for balanced budgeting: important
 
-
+        Collection<Termed> localTemplates = id.templates(nar);
         float subDecay = decayed / localTemplates.size();
         float balance = Param.TERMLINK_BALANCE;
         float subDecayForward = subDecay * balance;
@@ -258,45 +257,51 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //    }
 
 
+    @Override
+    public boolean delete() {
+        throw new UnsupportedOperationException();
+    }
+
     public static void templates(Set<Termed> tc, Iterable<? extends Termed> next, NAR nar, int layersRemain) {
 
         for (Termed bb : next) {
 
-            Term b;
-            if (!(b = bb.unneg()).op().conceptualizable || b.hasAny(VAR_QUERY.bit | VAR_PATTERN.bit)) {
-                continue;
-            }
-
+            Term b = bb.unneg();
 
             if (!tc.add(b))
                 continue; //already added
 
-            @Nullable Concept c = nar.conceptualize(b);
+            if (!b.op().conceptualizable) //|| b.hasAny(VAR_QUERY.bit | VAR_PATTERN.bit))
+                continue;
 
-            Iterable<? extends Termed> e = null;
-            if (c != null) {
-//                    if (layersRemain > 0) {
-                e = c.templates(nar);
-//                        if (e.size() == 0) {
-//                            //System.out.println(c);
-//                            //HACK TODO determine if good
-//                            //c.termlinks().sample(ctpl.size(), (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
-//                        }
-//                    }
-            } else /*if (!b.equals(id))*/ {
+            if (layersRemain > 0)
+                templates(tc, b.subterms(), nar, layersRemain-1);
 
-//                    if (layersRemain > 0) {
-                e = b.subterms();
-//                        if (e.size() == 0) {
-//                            //System.out.println(" ? " + e);
-//                            //e.termlinks().sample(10, (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
-//                        }
-//                    }
+//            @Nullable Concept c = nar.conceptualize(b);
+//
+//            Iterable<? extends Termed> e = null;
+//            if (c != null) {
+////                    if (layersRemain > 0) {
+//                e = c.subterms();
+////                        if (e.size() == 0) {
+////                            //System.out.println(c);
+////                            //HACK TODO determine if good
+////                            //c.termlinks().sample(ctpl.size(), (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
+////                        }
+////                    }
+//            } else /*if (!b.equals(id))*/ {
+//
+////                    if (layersRemain > 0) {
+//                e = b.subterms();
+////                        if (e.size() == 0) {
+////                            //System.out.println(" ? " + e);
+////                            //e.termlinks().sample(10, (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
+////                        }
+////                    }
+//
+//
+//            }
 
-
-            }
-
-            templates(tc, e, nar, layersRemain - 1);
         }
     }
 

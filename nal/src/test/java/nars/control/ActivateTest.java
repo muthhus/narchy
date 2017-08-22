@@ -114,9 +114,13 @@ public class ActivateTest {
     @Test public void testTemplates4() throws Narsese.NarseseException {
         //dont descend past layer 3:
         testTemplates("(open(John,portal:interdimensional) ==> #x)",
-                "[(John,(interdimensional-->portal)), open(John,(interdimensional-->portal)), open, (open(John,(interdimensional-->portal)) ==>+- #1), (interdimensional-->portal), #1, John]");
+                "[interdimensional, portal, (John,(interdimensional-->portal)), open(John,(interdimensional-->portal)), open, (open(John,(interdimensional-->portal)) ==>+- #1), (interdimensional-->portal), #1, John]");
     }
-
+   @Test public void testTemplates4b() throws Narsese.NarseseException {
+        //dont descend past layer 3:
+        testTemplates("(open(John,portal(a(d),b,c)) ==> #x)",
+                "[portal(a(d),b,c), open(John,portal(a(d),b,c)), portal, (John,portal(a(d),b,c)), (a(d),b,c), open, (open(John,portal(a(d),b,c)) ==>+- #1), #1, John]");
+    }
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {
         NAR n = NARS.tmp(1);
         n.believe(term + ".");
