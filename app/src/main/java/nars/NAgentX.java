@@ -10,7 +10,9 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
+import nars.exe.UnifiedExec;
 import nars.gui.Vis;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex2;
 import nars.op.Implier;
 import nars.op.mental.Inperience;
@@ -142,14 +144,15 @@ abstract public class NAgentX extends NAgent {
                                                 return null;
                                             }
                                         }
-                                        //new UnifiedExec()
+
+//                                        new UnifiedExec()
 
                                 ), THREADS, 2))
                 .time(clock)
                 .index(
                         //new CaffeineIndex(128 * 1024)
-                        new CaffeineIndex2(128 * 1024)
-                        //new HijackTermIndex(128 * 1024,  4)
+                        //new CaffeineIndex2(128 * 1024)
+                        new HijackTermIndex(64 * 1024,  3)
                 )
                 .get();
 

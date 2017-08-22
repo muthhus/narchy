@@ -167,7 +167,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             if (goalUrgent && d.concPunc == GOAL && occ[0] != ETERNAL) {
                 long taskStart = d.task.start();
                 if (taskStart != ETERNAL) {
-                    if (occ[0] < taskStart) {
+                    /*if (occ[0] < taskStart)*/ {
                         long taskDur = occ[1] - occ[0];
                         occ[0] = taskStart;
                         occ[1] = occ[0] + taskDur;

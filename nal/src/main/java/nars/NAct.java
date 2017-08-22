@@ -140,7 +140,7 @@ public interface NAct {
                 return $.t( f, nar().confDefault(BELIEF));
             }
 
-            return null;
+            return b;
         });
         //m.resolution(1f);
         return addAction(m);

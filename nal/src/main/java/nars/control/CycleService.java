@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 
 abstract public class CycleService extends NARService implements Consumer<NAR> {
 
-    public final AtomicBoolean busy = new AtomicBoolean(false);
+    protected final AtomicBoolean busy = new AtomicBoolean(false);
 
     public CycleService(NAR nar) {
         super(nar);

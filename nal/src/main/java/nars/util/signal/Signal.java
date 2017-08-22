@@ -6,6 +6,7 @@ import nars.Param;
 import nars.Task;
 import nars.task.SignalTask;
 import nars.term.Term;
+import nars.truth.PreciseTruth;
 import nars.truth.Truth;
 import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
@@ -65,20 +66,23 @@ public class Signal extends AtomicReference<SignalTask> {
 
             SignalTask next;
 
-            if (nextTruth == null) {
+            @Nullable PreciseTruth tt = nextTruth!=null ? nextTruth.truth().ditherFreqConf(resolution.asFloat(), nar.confMin.floatValue(), 1f) : null;
+
+            if (tt == null) {
 
                 next = null;             //no signal
 
             } else {
 
+
                 if (current == null ||
                         current.isDeleted() ||
-                        (!current.truth.equals(nextTruth, nar.truthResolution.floatValue()) ||
+                        (!current.truth.equals(tt, nar.truthResolution.floatValue()) ||
                                 (Param.SIGNAL_LATCH_TIME_MAX != Integer.MAX_VALUE && now - current.start() >= dur * Param.SIGNAL_LATCH_TIME_MAX)
                         )) {
 
                     //TODO move the task construction out of this critical update section?
-                    next = task(term, nextTruth.truth(),
+                    next = task(term, tt,
                             now, now + lookAheadDurs * dur,
                             stamper.getAsLong());
 
