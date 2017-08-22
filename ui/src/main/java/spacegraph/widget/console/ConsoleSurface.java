@@ -1,6 +1,7 @@
 package spacegraph.widget.console;
 
 import com.googlecode.lanterna.TextCharacter;
+import com.googlecode.lanterna.TextColor;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
 import spacegraph.Surface;
@@ -16,7 +17,8 @@ import static spacegraph.render.JoglSpace.glut;
 public abstract class ConsoleSurface extends Surface implements Appendable {
 
 
-    public static final float thickness = 2f;
+    public static final float thickness = 3f;
+    public static final Color TRANSLUCENT = new Color(Color.TRANSLUCENT);
 
 
     private int cols, rows;
@@ -35,6 +37,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
     float bgAlpha = 0.35f;
     float fgAlpha = 0.9f;
+    private Color bg;
 
 
     public ConsoleSurface(int cols, int rows) {
@@ -73,6 +76,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         gl.glLineWidth(thickness);
 
         //gl.glColor4f(0.75f, 0.75f, 0.75f, fgAlpha);
+        bg = TRANSLUCENT;
 
         for (int row = 0; row < rows; row++) {
 
@@ -94,7 +98,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
                 if (setBackgroundColor(gl, c, col, row)) {
                     Draw.rect(gl,
                         Math.round((col - 0.5f) * 20/charScaleX), 0,
-                        Math.round(20f/charScaleX), 22
+                        Math.round(20f/charScaleX), 24
                     );
                 }
 
@@ -106,25 +110,22 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
 
                 char cc = visible(c.getCharacter());
-                if ((cc != 0) && (cc != ' ')) {
+                if (cc != 0) {
 
-                    gl.glColor3f(1f, 1f, 1f);
+                    //gl.glColor3f(1f, 1f, 1f);
 
                     //TODO TextColor fg = c.getForegroundColor();
                     //TODO: if (!fg.equals(previousFG))
 
-                    gl.glColor4f(1f,1f,1f, fgAlpha);
+                    Color fg = c.getForegroundColor().toColor();
+                    gl.glColor4f(fg.getRed()/256f,fg.getGreen()/256f,fg.getBlue()/256f, fgAlpha);
 
                     Draw.textNext(gl, cc, col/charScaleX);
-
-
                 }
             }
 
 
             gl.glPopMatrix(); //next line
-
-
         }
 
         int[] cursor = getCursorPos();
@@ -150,8 +151,11 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     /** return true to paint a character's background. if so, then it should set the GL color */
     protected boolean setBackgroundColor(GL2 gl, TextCharacter ch, int col, int row) {
         if (ch!=null) {
-            Color bg = ch.getBackgroundColor().toColor();
-            gl.glColor3f(bg.getRed()/256f, bg.getGreen()/256f, bg.getBlue()/256f);
+            bg = ch.getBackgroundColor().toColor();
+//            if (!nextColor.equals(bg)) {
+//                this.bg = nextColor;
+                gl.glColor3f(bg.getRed() / 256f, bg.getGreen() / 256f, bg.getBlue() / 256f);
+            //}
             return true;
         }
 
@@ -170,6 +174,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
         //see: https://github.com/Hexworks/zircon/blob/master/src/main/kotlin/org/codetome/zircon/Symbols.kt
 
         switch (cc) {
+            case ' ':
+                return 0;
             case 9474:
                 cc = '|';
                 break;

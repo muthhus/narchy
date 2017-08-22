@@ -202,7 +202,7 @@ public class FocusExec extends Exec implements Runnable {
     public Stream<ITask> stream() {
         return Stream.concat(Stream.concat(concepts.stream(),
                 premises.stream()
-        ), tasks.stream());
+        ), tasks.stream()).filter(Objects::nonNull);
     }
 
 
