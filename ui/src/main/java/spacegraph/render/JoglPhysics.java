@@ -199,24 +199,27 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 
         window.addKeyListener(this);
 
-        initLighting();
+
 
 
         gl.glEnable(GL_POINT_SPRITE);
         gl.glEnable(GL_POINT_SMOOTH);
         gl.glEnable(GL_LINE_SMOOTH);
-        gl.glEnable(GL_POLYGON_SMOOTH);
-        //gl.glEnable(GL2.GL_MULTISAMPLE);
+        //gl.glEnable(GL_POLYGON_SMOOTH); //[Polygon smooth] is not a recommended method for anti-aliasing. Use Multisampling instead.
+        gl.glEnable(GL2.GL_MULTISAMPLE);
 
         gl.glShadeModel(GL_SMOOTH);
 
 
+        gl.glHint(GL_POLYGON_SMOOTH_HINT,
+                //GL_NICEST);
+                GL_FASTEST);
         gl.glHint(GL_LINE_SMOOTH_HINT,
-                GL_NICEST);
-                //GL_FASTEST);
+                //GL_NICEST);
+                GL_FASTEST);
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT,
-                GL_NICEST);
-                //GL_FASTEST);
+                //GL_NICEST);
+                GL_FASTEST);
 
         //https://www.sjbaker.org/steve/omniv/opengl_lighting.html
         gl.glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
@@ -255,6 +258,7 @@ abstract public class JoglPhysics<X> extends JoglSpace implements KeyListener {
 //        gl.glEnable(gl.GL_CULL_FACE);
 //        gl.glCullFace(gl.GL_BACK);
 
+        initLighting();
     }
 
     protected void initLighting() {

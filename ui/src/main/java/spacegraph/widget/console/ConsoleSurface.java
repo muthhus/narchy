@@ -41,7 +41,7 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
     public void resize(int cols, int rows) {
         this.cols = cols;
         this.rows = rows;
-        align(Align.Center, cols/1.5f, rows);
+        //align(Align.Center, cols/1.5f, rows);
     }
 
 
@@ -88,8 +88,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
                 if (setBackgroundColor(gl, c, col, row)) {
                     Draw.rect(gl,
-                        (col - 0.5f) * 20/charScaleX, 0,
-                        (float) 20/charScaleX, 22
+                        Math.round((col - 0.5f) * 20/charScaleX), 0,
+                        Math.round(20f/charScaleX), 22
                     );
                 }
 
@@ -159,6 +159,8 @@ public abstract class ConsoleSurface extends Surface implements Appendable {
 
     public char visible(char cc) {
         //HACK: un-ANSIfy
+
+        //see: https://github.com/Hexworks/zircon/blob/master/src/main/kotlin/org/codetome/zircon/Symbols.kt
 
         switch (cc) {
             case 9474:

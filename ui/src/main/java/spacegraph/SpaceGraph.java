@@ -16,6 +16,7 @@ import spacegraph.math.v3;
 import spacegraph.phys.constraint.BroadConstraint;
 import spacegraph.render.JoglPhysics;
 import spacegraph.render.JoglSpace;
+import spacegraph.render.SpaceGraphFlat;
 import spacegraph.space.ListSpace;
 import spacegraph.widget.meta.ReflectionSurface;
 
@@ -86,10 +87,6 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         add(cc);
     }
 
-    public SpaceGraph(Ortho o) {
-        this();
-        add(o);
-    }
 
 
     public void addFrameListener(Consumer<SpaceGraph> f) {
@@ -268,7 +265,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
     }
 
     public static SpaceGraph window(Surface s, int w, int h) {
-        SpaceGraph win = new SpaceGraph(new ZoomOrtho(s)
+        SpaceGraph win = new SpaceGraphFlat(new ZoomOrtho(s)
                 //.scale(Math.min(w,h))
                 .maximize()
         );
@@ -313,6 +310,7 @@ public class SpaceGraph<X> extends JoglPhysics<X> {
         camPos.set(x, y, z);
         return this;
     }
+
 
 
     //    public static class PickDragMouse extends SpaceMouse {

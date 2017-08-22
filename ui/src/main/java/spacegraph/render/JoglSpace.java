@@ -262,7 +262,7 @@ public abstract class JoglSpace implements GLEventListener, WindowListener {
         g.setTitle(title);
         g.setDefaultCloseOperation(WindowClosingProtocol.WindowClosingMode.DISPOSE_ON_CLOSE);
         g.preserveGLStateAtDestroy(false);
-        g.setSurfaceSize(w, h);
+        g.setSize(w, h);
         g.setAutoSwapBufferMode(true);
         if (x != Integer.MIN_VALUE) {
             g.setPosition(x, y);

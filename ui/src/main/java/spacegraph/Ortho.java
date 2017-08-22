@@ -1,12 +1,14 @@
 package spacegraph;
 
 import com.jogamp.newt.event.*;
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import org.apache.commons.lang3.ArrayUtils;
 import spacegraph.input.Finger;
 import spacegraph.math.v2;
 import spacegraph.phys.util.AnimVector2f;
 
+import static com.jogamp.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 import static spacegraph.Surface.Align.None;
 import static spacegraph.math.v3.v;
 
@@ -86,6 +88,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
 
 
     public void render(GL2 gl) {
+
         gl.glPushMatrix();
 
         gl.glTranslatef(translate.x, translate.y, 0);
@@ -98,6 +101,7 @@ public class Ortho implements WindowListener, KeyListener, MouseListener {
         );
 
         gl.glPopMatrix();
+
     }
 
     /**
