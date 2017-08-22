@@ -939,7 +939,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 return true; //shouldnt ever happen
 
             case 1:
-                return u.unify(sub(0), Y.sub(0));
+                return sub(0).unify(Y.sub(0), u);
 
 //                case 2: {
 //
@@ -958,7 +958,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                 //begin at random offset to shuffle the order of the match sequence
                 int j = u.random.nextInt(s);
                 for (int i = s - 1; i >= 0; i--) {
-                    if (!u.unify(sub(j), Y.sub(j)))
+                    if (!sub(j).unify(Y.sub(j), u))
                         return false;
                     if (i > 0 && ++j == s)
                         j = 0;

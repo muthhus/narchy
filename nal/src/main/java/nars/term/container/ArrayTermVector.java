@@ -16,7 +16,6 @@ import java.util.function.Predicate;
  */
 public class ArrayTermVector extends TermVector {
 
-
     @NotNull
     public final Term[] terms;
 
@@ -100,7 +99,7 @@ public class ArrayTermVector extends TermVector {
         return true;
     }
 
-    @Override public void recurseTerms(@NotNull Consumer<Term> v) {
+    @Override public final void recurseTerms(@NotNull Consumer<Term> v) {
         for (Term sub : terms)
             sub.recurseTerms(v);
     }

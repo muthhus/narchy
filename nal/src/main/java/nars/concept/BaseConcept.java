@@ -1,34 +1,34 @@
 package nars.concept;
 
+import com.google.common.collect.Lists;
 import jcog.bag.Bag;
 import jcog.pri.PriReference;
-import nars.Emotivation;
-import nars.NAR;
-import nars.Op;
-import nars.Task;
+import nars.*;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.state.ConceptState;
+import nars.control.Activate;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.table.TaskTable;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.Termlike;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
 import static nars.Op.*;
 import static nars.concept.state.ConceptState.Deleted;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
-public class BaseConcept<T extends Term> implements Concept, Termlike {
+public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Concept, Termlike {
 
     @NotNull public final T term;
     @NotNull public final BeliefTable beliefs;
@@ -39,7 +39,6 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
     @NotNull public final Bag<Term,PriReference<Term>> termLinks;
     @NotNull public transient ConceptState state = Deleted;
 
-    @Nullable private Map meta;
 
     /**
      * Constructor, called in Memory.getConcept only
@@ -70,18 +69,16 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
     }
 
 
-
-
-//    @Override
-//    public @NotNull TermContainer subterms() {
-//        return term.subterms();
-//    }
-//
-//    @Override
-//    public void setNormalized() {
-//        //ignore
-//        assert(isNormalized()): "why wasnt this already normalized";
-//    }
+    @Override
+    public Activate activate(float pri, NAR n) {
+        Activate a = (Activate)computeIfAbsent(n.self(), (s) ->
+            new Activate(BaseConcept.this, 0 )
+        );
+        //TODO forget based on dt
+        a.priAdd(pri);
+        n.input(a);
+        return a;
+    }
 
     @Override
     public final Term term() {
@@ -99,17 +96,6 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
 
 
     @Override
-    public void setMeta(@NotNull Map newMeta) {
-        this.meta = newMeta;
-    }
-
-
-    @Override
-    public @Nullable Map<Object, Object> meta() {
-        return meta;
-    }
-
-    @Override
     public @NotNull Bag<Task,PriReference<Task>> tasklinks() {
         return taskLinks;
     }
@@ -120,9 +106,35 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
         return termLinks;
     }
 
+    final static Term TEMPLATE_KEY = $.the("templates");
+
     @Override
-    public TermContainer templates() {
-        return term.subterms();
+    public Collection<Termed> templates(NAR nar) {
+
+        if (term.size() == 0) return emptyList();
+
+        return (Collection<Termed>)computeIfAbsent(TEMPLATE_KEY, (x) -> {
+            TermContainer ctpl = subterms();
+
+            Set<Termed> tc =
+                    //new UnifiedSet<>(id.volume() /* estimate */);
+                    new HashSet(volume());
+
+            Activate.templates(tc, ctpl, nar, Activate.layers(term) - 1);
+
+            if (term.size() > 0)
+                tc.add(term); //structural transform: add the local term (if a compound) -- but not the concept. this prevents reinserting a tasklink
+
+            if (!tc.isEmpty())
+                return Lists.newArrayList(tc); //store as list for compactness and fast iteration
+            else
+                return emptyList();
+
+            //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
+
+            //                templateConcepts = Concept.EmptyArray;
+            //                templateConceptsCount = 0;
+        });
     }
 
     /**
@@ -390,8 +402,8 @@ public class BaseConcept<T extends Term> implements Concept, Termlike {
         goals.clear();
         questions.clear();
         quests.clear();
-        if(meta!=null)
-            meta.clear();
+        state(ConceptState.Deleted);
+        clear();
     }
 
     @Override public Stream<Task> tasks(boolean includeBeliefs, boolean includeQuestions, boolean includeGoals, boolean includeQuests) {

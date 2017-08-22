@@ -10,7 +10,7 @@ public interface Termed /* TODO finish implementing: extends Termlike */ {
 
     @NotNull Term term();
 
-    default int size() { return term().size(); }
+//    default int size() { return term().size(); }
 
     default Term sub(int i) { return subterms().sub(i); }
 

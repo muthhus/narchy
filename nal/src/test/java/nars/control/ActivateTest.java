@@ -13,6 +13,7 @@ import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Collection;
 
 import static nars.$.$;
 import static org.junit.Assert.assertEquals;
@@ -119,8 +120,9 @@ public class ActivateTest {
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {
         NAR n = NARS.tmp(1);
         n.believe(term + ".");
-        Activate a = new Activate(n.conceptualize($(term)), 0.5f);
-        Termed[] t = Activate.templates(a.id, n);
-        assertEquals(expect, Arrays.toString(t));
+        Concept c = n.conceptualize($(term));
+        Activate a = new Activate(c, 0.5f);
+        Collection<Termed> t = c.templates(n);
+        assertEquals(expect, t.toString());
     }
 }

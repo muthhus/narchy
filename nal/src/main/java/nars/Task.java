@@ -603,7 +603,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         if (isInput()) {
             Concept concept = concept(nar, true);
             if (concept != null) {
-                ArrayBag<Task, PriReference<Task>> answers = concept.computeIfAbsent(Op.QUESTION, () ->
+                ArrayBag<Task, PriReference<Task>> answers = (ArrayBag<Task, PriReference<Task>>) concept.computeIfAbsent(Op.QUESTION, (q) ->
                         new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
                 answers.commit();
 

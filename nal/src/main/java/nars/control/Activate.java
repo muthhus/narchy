@@ -11,11 +11,11 @@ import nars.concept.Concept;
 import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -41,10 +41,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     }
 
 
-
     public static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n) {
         if (n.exe.concurrent()) {
-            n.exe.execute(()->activate(t, activationApplied, n, true));
+            n.exe.execute(() -> activate(t, activationApplied, n, true));
         } else {
             activate(t, activationApplied, n, true);
         }
@@ -65,7 +64,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //            if (n.exe.concurrent())
 //                n.eventTaskProcess.emitAsync(/*post*/t, n.exe);
 //            else
-                n.eventTask.emit(t);
+            n.eventTask.emit(t);
         }
         //}
     }
@@ -101,6 +100,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     public List<Premise> run(NAR nar) {
         nar.emotion.conceptFires.increment();
+        nar.terms.commit(id); //index cache update
 
         final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks().commit();//.normalize(0.1f);
         if (tasklinks.isEmpty()) {
@@ -117,11 +117,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
 
 
-        Termed[] localTemplates = templates(id, nar);
-        int localTemplateConcepts = 0;
-        for (Termed t : localTemplates)
-            if (t instanceof Concept)
-                localTemplateConcepts++;
+        Collection<Termed> localTemplates = id.templates(nar);
 
 
         //concept priority transfers into:
@@ -133,94 +129,100 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         float decayed = cPri * decayRate;
         priSub(decayed); //for balanced budgeting: important
 
-        if (localTemplates.length > 0) {
-            float subDecay = decayed / localTemplates.length;
-            float balance = Param.TERMLINK_BALANCE;
-            float subDecayForward = subDecay * balance;
-            float subDecayReverse = subDecay * (1f - balance);
-            Term thisTerm = id.term();
-            float activationFactor = 1f; //priElseZero();
-            for (Termed localSub : localTemplates) {
-                float d;
-                if (localSub instanceof Concept) {
 
-                    Concept localSubConcept = (Concept) localSub;
+        float subDecay = decayed / localTemplates.size();
+        float balance = Param.TERMLINK_BALANCE;
+        float subDecayForward = subDecay * balance;
+        float subDecayReverse = subDecay * (1f - balance);
+        Term thisTerm = id.term();
+        float activationFactor = 1f; //priElseZero();
 
-                    nar.input(new Activate(localSubConcept, activationFactor * subDecay));
+        List<Concept> localSubConcepts = $.newArrayList(); //temporary for this function call only, so as not to retain refs to Concepts
+
+        for (Termed localSub : localTemplates) {
+            float d;
+            if (localSub.op().conceptualizable) {
+
+
+                Concept localSubConcept = nar.conceptualize(localSub);
+                if (localSubConcept != null) {
+                    localSubConcept.activate(activationFactor * subDecay, nar);
 
                     localSubConcept.termlinks().putAsync(
                             new PLink(thisTerm, subDecayReverse)
                     );
-
-                    d = subDecayForward;
-
-                } else {
-                    d = subDecay; //full subdecay to the non-concept subterm
+                    localSubConcepts.add(localSubConcept);
                 }
 
-                id.termlinks().putAsync(
-                        new PLink(localSub.term(), d)
-                );
+                d = subDecayForward;
+
+            } else {
+                d = subDecay; //full subdecay to the non-concept subterm
             }
+
+            id.termlinks().putAsync(
+                    new PLink(localSub.term(), d)
+            );
         }
 
 
         List<PriReference<Term>> terml;
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
         if (termlinks.isEmpty()) {
-            terml = emptyList();
+            return emptyList();
         } else {
             int tlSampled = Math.min(termlinks.size(), TERMLINKS_SAMPLED);
             terml = $.newArrayList(tlSampled);
             termlinks.sample(tlSampled, ((Consumer<PriReference<Term>>) terml::add));
         }
 
-        int tasklSize = taskl.size();
-        int termlSize = terml.size();
+        int tasklSize = taskl.size();  if (tasklSize == 0) return emptyList();
+        int termlSize = terml.size();  if (termlSize == 0) return emptyList();
+
         List<Premise> premises = $.newArrayList(tasklSize * termlSize);
 
         for (int i = 0; i < tasklSize; i++) {
             PriReference<Task> tasklink = taskl.get(i);
 
-            if (localTemplateConcepts > 0) {
-                activateSubterms(tasklink, localTemplates, localTemplateConcepts,
-                        1f
+
+            activateSubterms(tasklink, localSubConcepts,
+                    1f
                         /*decayed*/);
-            }
+
 
             for (int j = 0; j < termlSize; j++) {
                 PriReference<Term> termlink = terml.get(j);
 
                 float pri = Param.tasktermLinkCombine.apply(tasklink.priElseZero(), termlink.priElseZero());
-                premises.add( nar.premise(tasklink.get(), termlink.get(), pri ) );
+                premises.add(nar.premise(tasklink.get(), termlink.get(), pri));
             }
         }
 
-        nar.terms.commit(id); //index cache update
 
         return premises;
     }
 
-    public static void activateSubterms(PriReference<Task> tasklink, Termed[] localTemplates, int localTemplateConcepts, float cPri) {
+    static void activateSubterms(PriReference<Task> tasklink, List<Concept> subs, float cPri) {
+        if (subs.isEmpty())
+            return;
+
         Task task = tasklink.get();
         if (task == null)
             return;
 
-        float tfa =  cPri * tasklink.priElseZero();
-        float tfaEach = tfa / localTemplateConcepts;
+        float tfa = cPri * tasklink.priElseZero();
+        float tfaEach = tfa / subs.size();
 
 
-        for (Termed localSub : localTemplates) {
+        for (Concept localSubConcept : subs) {
 
-            if (localSub instanceof Concept) {
-                Concept localSubConcept = (Concept) localSub;
-                localSubConcept.tasklinks().putAsync(
-                        new PLink<>(task, tfaEach)
-                );
+
+            localSubConcept.tasklinks().putAsync(
+                    new PLink<>(task, tfaEach)
+            );
 //                localSubConcept.termlinks().putAsync(
 //                        new PLink(task.term(), tfaEach)
 //                );
-            }
 
 
         }
@@ -255,75 +257,46 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 //        }
 //    }
 
-    public static Termed[] templates(@NotNull Concept id, NAR nar) {
-        TermContainer ctpl = id.templates();
 
-//        if (ctpl == null || ctpl.size()==0) {
-//            Term sampledTermLink = id.termlinks().sample().get();
-//            if (sampledTermLink!=null)
-//                ctpl = TermVector.the(sampledTermLink);
-//        }
+    public static void templates(Set<Termed> tc, Iterable<? extends Termed> next, NAR nar, int layersRemain) {
 
-        Set<Termed> tc =
-                //new UnifiedSet<>(id.volume() /* estimate */);
-                new HashSet(id.volume());
-        templates(tc, ctpl, nar, layers(id) - 1);
+        for (Termed bb : next) {
+
+            Term b;
+            if (!(b = bb.unneg()).op().conceptualizable || b.hasAny(VAR_QUERY.bit | VAR_PATTERN.bit)) {
+                continue;
+            }
 
 
-        Term idt = id.term();
-        if (idt.size() > 0)
-            tc.add(idt); //add the local term (if a compound) -- but not the concept. this prevents reinserting a tasklink
+            if (!tc.add(b))
+                continue; //already added
 
-        if (!tc.isEmpty())
-            return tc.toArray(new Termed[tc.size()]);
+            @Nullable Concept c = nar.conceptualize(b);
 
-        //id.termlinks().sample(2, (PriReference<Term> x) -> templatize.accept(x.get()));
-
-//                templateConcepts = Concept.EmptyArray;
-//                templateConceptsCount = 0;
-        return Termed.EmptyArray;
-
-    }
-
-    public static void templates(Set<Termed> tc, TermContainer ctpl, NAR nar, int layersRemain) {
-
-        int cs = ctpl.size();
-        for (int i = 0; i < cs; i++) {
-            Term b = ctpl.sub(i);
-
-            @Nullable Concept c =
-                    //b instanceof Concept ? ((Concept) b) :
-                            (b = b.unneg()).op().conceptualizable && (!b.hasAny(VAR_QUERY.bit | VAR_PATTERN.bit)) ?
-                                    nar.conceptualize(b) : null;
-
-            TermContainer e = null;
+            Iterable<? extends Termed> e = null;
             if (c != null) {
-                if (/*!c.equals(id) && */tc.add(c)) {
-                    if (layersRemain > 0) {
-                        e = c.templates();
-                        if (e.size() == 0) {
-                            //System.out.println(c);
-                            //HACK TODO determine if good
-                            //c.termlinks().sample(ctpl.size(), (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
-                        }
-                    }
-                }
+//                    if (layersRemain > 0) {
+                e = c.templates(nar);
+//                        if (e.size() == 0) {
+//                            //System.out.println(c);
+//                            //HACK TODO determine if good
+//                            //c.termlinks().sample(ctpl.size(), (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
+//                        }
+//                    }
             } else /*if (!b.equals(id))*/ {
 
-                    if (tc.add(b)) { //variable or other non-conceptualizable term
-                        if (layersRemain > 0) {
-                            e = b.subterms();
-                            if (e.size() == 0) {
-                                //System.out.println(" ? " + e);
-                                //e.termlinks().sample(10, (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
-                            }
-                        }
-                    }
+//                    if (layersRemain > 0) {
+                e = b.subterms();
+//                        if (e.size() == 0) {
+//                            //System.out.println(" ? " + e);
+//                            //e.termlinks().sample(10, (Consumer<PriReference<Term>>)(x->tc.add(x.get())));
+//                        }
+//                    }
+
 
             }
 
-            if (e != null)
-                templates(tc, e, nar, layersRemain - 1);
+            templates(tc, e, nar, layersRemain - 1);
         }
     }
 
@@ -338,7 +311,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         return id.term();
     }
 
-    static int layers(@NotNull Termed host) {
+    public static int layers(@NotNull Termed host) {
         switch (host.op()) {
 
             case PROD:

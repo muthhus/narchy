@@ -8,10 +8,14 @@ import nars.concept.Concept;
 import nars.index.term.TermContext;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import nars.term.atom.Atom;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 /**
  * the proxy concepts present a bidirectional facade between a referenced and an alias term (alias term can be just a serial # atom wrapped in a product).
@@ -72,7 +76,6 @@ public final class AliasConcept extends BaseConcept {
 
     @NotNull
     public final Compound abbr;
-    private final TermContainer templates;
 
     @NotNull static public AliasConcept get(@NotNull String compressed, @NotNull Concept decompressed, @NotNull NAR nar) {
         AliasConcept a = new AliasConcept(compressed, decompressed, nar);
@@ -85,7 +88,6 @@ public final class AliasConcept extends BaseConcept {
                 new Bag[] { decompressed.termlinks(), decompressed.tasklinks() } );
 
         this.abbr = (Compound) decompressed.term();
-        this.templates = decompressed.templates();
         put(Abbreviation.class, abbr);
 
 //            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
@@ -96,9 +98,11 @@ public final class AliasConcept extends BaseConcept {
         //rewriteLinks(nar);
     }
 
+
     @Override
-    public TermContainer templates() {
-        return templates;
+    public Collection<Termed> templates(NAR nar) {
+        @Nullable Concept c = nar.conceptualize(abbr);
+        return c == null ? null : c.templates(nar);
     }
 
     //

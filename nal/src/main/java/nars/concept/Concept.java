@@ -25,6 +25,7 @@ import jcog.pri.PriReference;
 import nars.NAR;
 import nars.Task;
 import nars.concept.state.ConceptState;
+import nars.control.Activate;
 import nars.table.BeliefTable;
 import nars.table.QuestionTable;
 import nars.term.Term;
@@ -36,65 +37,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public interface Concept extends Termed {
-
+public interface Concept extends Termed, ConcurrentMap {
 
 
     @NotNull Bag<Task,PriReference<Task>> tasklinks();
 
     @NotNull Bag<Term,PriReference<Term>> termlinks();
-
-    @Nullable Map meta();
-
-    /**
-     * should not be called directly
-     */
-    void setMeta(@NotNull Map newMeta);
-
-    /**
-     * follows Map.compute() semantics
-     */
-    @NotNull
-    default <C> C meta(@NotNull Object key, @NotNull BiFunction value) {
-        @Nullable Map meta = meta();
-        if (meta == null) {
-            if (value!=null) {
-                Object v;
-                put(key, v = value.apply(key, null));
-                return (C) v;
-            } else {
-                return null;
-            }
-        } else {
-            return (C) meta.compute(key, value);
-        }
-    }
-
-    /**
-     * like Map.gett for getting data stored in meta map
-     */
-    @Nullable
-    default <C> C get(@NotNull Object key) {
-        Map m = meta();
-        return null == m ? null : (C) m.get(key);
-    }
-
-    default <C> C remove(@NotNull Object key) {
-
-        Map m = meta();
-        if (m == null)
-            return null;
-        //synchronized (m) {
-        return (C) m.remove(key);
-        //}
-
-    }
 
 
     @NotNull BeliefTable beliefs();
@@ -105,82 +61,14 @@ public interface Concept extends Termed {
 
     @Nullable QuestionTable quests();
 
-
-    @Nullable
-    default Map metaOrCreate() {
-        Map<Object, Object> m = meta();
-        if (m == null) {
-            setMeta(
-                m = new UnifiedMap(1)
-                //TODO try FlatMap3
-            );
-            //new WeakIdentityHashMap();
-            //new SoftValueHashMap(1));
-        }
-        return m;
-    }
-
-    Concept[] EmptyArray = new Concept[0];
-
-    /**
-     * like Map.put for storing data in meta map
-     *
-     * @param value if null will perform a removal
-     */
-    @Nullable
-    default Object put(@NotNull Object key, @Nullable Object value) {
-        if (value != null) {
-            return metaOrCreate().put(key, value);
-        } else {
-            return remove(key);
-        }
-    }
+    Activate activate(float pri, NAR n);
 
 
-    default void delete(@NotNull NAR nar) {
-        termlinks().clear();
-        tasklinks().clear();
-        state(ConceptState.Deleted);
-    }
-
-
-    /**
-     * same Map.putIfAbsent semantics: returns null if no previous value existed
-     */
-    default Object putIfAbsent(@NotNull Object key, @NotNull Object value) {
-        synchronized (term()) {
-            return metaOrCreate().putIfAbsent(key, value);
-        }
-    }
-
-    default <X> X computeIfAbsent(@NotNull Object key, Supplier value) {
-        synchronized (term()) {
-            return (X) metaOrCreate().computeIfAbsent(key, (k) -> value.get());
-        }
-    }
-
+    void delete(@NotNull NAR nar);
 
     default boolean isDeleted() {
         return state() == ConceptState.Deleted;
     }
-
-
-
-
-//    @NotNull
-//    default Iterator<Task> iterateTasks(boolean onbeliefs, boolean ongoals, boolean onquestions, boolean onquests) {
-//
-//        TaskTable beliefs = onbeliefs ? beliefs() : null;
-//        TaskTable goals = ongoals ? goals() : null;
-//        TaskTable questions = onquestions ? questions() : null;
-//        TaskTable quests = onquests ? quests() : null;
-//
-//        Iterator<Task> b1 = beliefs != null ? beliefs.taskIterator() : Collections.emptyIterator();
-//        Iterator<Task> b2 = goals != null ? goals.taskIterator() : Collections.emptyIterator();
-//        Iterator<Task> b3 = questions != null ? questions.taskIterator() : Collections.emptyIterator();
-//        Iterator<Task> b4 = quests != null ? quests.taskIterator() : Collections.emptyIterator();
-//        return Iterators.concat(b1, b2, b3, b4);
-//    }
 
 
     default void print() {
@@ -292,7 +180,7 @@ public interface Concept extends Termed {
     ConceptState state(@NotNull ConceptState c);
 
     /** should not include itself, although this will be included with these templates on activation */
-    @NotNull TermContainer templates();
+    @NotNull Collection<Termed> templates(NAR nar);
 
 
     void process(Task task, @NotNull NAR n);
