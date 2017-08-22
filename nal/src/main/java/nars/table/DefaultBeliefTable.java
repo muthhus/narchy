@@ -123,10 +123,8 @@ public class DefaultBeliefTable implements BeliefTable {
         }
 
         if (start == ETERNAL) {
-            int dur = nar.dur();
             long now = nar.time();
-            start = now - dur/2;
-            end = now + dur/2;
+            start = end = now;
         }
 
         Task tmp = temporal.match(start, end, template, nar);
@@ -137,7 +135,7 @@ public class DefaultBeliefTable implements BeliefTable {
             if (ete == null) {
                 return tmp;
             } else {
-                return (ete.evi() > tmp.evi(tmp.nearestTimeBetween(start,end), nar.dur())) ?
+                return (ete.evi() > tmp.evi(start, end, nar.dur())) ?
                         ete : tmp;
             }
         }

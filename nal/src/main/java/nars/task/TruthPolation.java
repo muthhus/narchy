@@ -133,7 +133,7 @@ public enum TruthPolation { ;
         @Override
         public void accept(Tasked t) {
             Task task = t.task();
-            conf.add(task.conf(when, dur));
+            conf.add(task.conf(when, dur)); //TODO start,end
             freq.add(task.freq());
         }
 

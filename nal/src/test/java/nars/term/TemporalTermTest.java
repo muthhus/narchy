@@ -71,6 +71,16 @@ public class TemporalTermTest {
         }
     }
 
+    @Test public void testEventsWithXTERNAL() throws Narsese.NarseseException {
+        //cant decompose
+        assertEquals("[(x &&+- y):0]", $("(x &&+- y)").events().toString());
+        assertEquals("[(x &&+- y):0, z:1]", $("((x &&+- y) &&+1 z)").events().toString());
+    }
+  @Test public void testEventsWithDTERNAL() throws Narsese.NarseseException {
+        //cant decompose
+        assertEquals("[(x&&y):0]", $("(x && y)").events().toString());
+        assertEquals("[(x&&y):0, z:1]", $("((x && y) &&+1 z)").events().toString());
+    }
     @Test
     public void testAtemporalization() throws Narsese.NarseseException {
         Term t = n.term("((x) ==>+10 (y))");

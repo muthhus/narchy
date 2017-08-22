@@ -83,8 +83,8 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //        }
 //    }
 
-    static FloatFunction<Task> evidence(long when, long now, int dur) {
-        return (x) -> x.evi(when, dur);
+    static FloatFunction<Task> evidence(long start, long end, long now, int dur) {
+        return (x) -> x.evi(start, end, dur);
 
 
             //float r = t.evi(when, dur) * (1+ (t.end()-t.start()) );// * t.qua();
@@ -474,10 +474,11 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
 
         //choose top 2 and merge them:
-        Top2<Task> s = new Top2(evidence(start, now, dur), this);
+        Top2<Task> s = new Top2(evidence(start, end, now, dur), this);
         Task a = s.a;
-        if (s.b == null)
+        if (s.b == null || (s.a.during(start,end) && !s.b.during(start, end)))
             return a;
+
         Task c = Revision.merge(a, s.b, now, nar);
         return c != null ? c : a;
     }

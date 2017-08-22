@@ -91,11 +91,11 @@ public class Emotivation extends Emotion {
 
 
     @Override
-    public void onAnswer(Task question, @Nullable Task answer, float effectiveConf) {
-        super.onAnswer(question, answer, effectiveConf);
+    public void onAnswer(Task question, @Nullable Task answer) {
+        super.onAnswer(question, answer);
 
         //reward answer for answering the question
-        value(answer.cause(), effectiveConf);
+        value(answer.cause(), answer.conf());
     }
 
     /**

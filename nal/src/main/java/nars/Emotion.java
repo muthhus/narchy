@@ -320,12 +320,12 @@ public class Emotion extends ConcurrentMonitorRegistry {
         //default impl: do nothing
     }
 
-    public void onAnswer(Task question, @Nullable Task answer, float effectiveConf) {
+    public void onAnswer(Task question, @Nullable Task answer) {
         //transfer budget from question to answer
         //float qBefore = taskBudget.priSafe(0);
         //float aBefore = answered.priSafe(0);
         BudgetFunctions.fund(question, answer,
-                                /*Util.sqr*/effectiveConf, false);
+                                /*Util.sqr*/answer.conf()*answer.originality(), false);
 
     }
 

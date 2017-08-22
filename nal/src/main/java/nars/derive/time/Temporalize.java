@@ -1,6 +1,7 @@
 package nars.derive.time;
 
 import jcog.Util;
+import jcog.list.FasterList;
 import jcog.math.Interval;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
@@ -14,6 +15,7 @@ import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
 import nars.term.subst.Subst;
 import nars.time.Tense;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -278,11 +280,13 @@ public class Temporalize implements ITemporalize {
     }
 
 
-    protected void print() {
+    public void print() {
 
         constraints.forEach((k, v) -> {
-            for (Event vv : v)
-                System.out.println(k + " " + vv);
+            System.out.println(k);
+            for (Event vv : v) {
+                System.out.println("\t" + vv);
+            }
         });
 
         System.out.println();
@@ -291,12 +295,12 @@ public class Temporalize implements ITemporalize {
 
     @Override
     public void knowDerivedTerm(Subst d, Term term, long start, long end) {
-        knowTerm(term, start, end);
+        knowAbsolute(term, start, end);
 
         if (knowTransformed) {
             Term t2 = d.transform(term);
             if (!t2.equals(term) && !(t2 instanceof Bool)) {
-                knowTerm(t2, start, end);
+                knowAbsolute(t2, start, end);
             }
         }
     }
@@ -305,16 +309,16 @@ public class Temporalize implements ITemporalize {
     /**
      * convenience method for testing: assumes start offset of zero, and dtRange taken from term
      */
-    public void knowTerm(Term term, long when) {
-        knowTerm(term, when, when != ETERNAL ? when + term.dtRange() : ETERNAL);
+    public void knowAbsolute(Term term, long when) {
+        knowAbsolute(term, when, when != ETERNAL ? when + term.dtRange() : ETERNAL);
     }
 
     /**
      * convenience method for testing: assumes start offset of zero, and dtRange taken from term
      */
-    public void knowTerm(Term term, long from, long to) {
+    public void knowAbsolute(Term term, long from, long to) {
         AbsoluteEvent basis = absolute(term, from, to);
-        if (from!=ETERNAL) {
+        if (from != ETERNAL) {
             know(term, basis,
                     0, (int) (to - from)
             );
@@ -332,8 +336,8 @@ public class Temporalize implements ITemporalize {
      */
     private void know(Term x, @Nullable AbsoluteEvent root, int start, int end) {
 
-        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
-            return; //ignore variable's and completely-variablized's temporalities because it can conflict
+//        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
+//            return; //ignore variable's and completely-variablized's temporalities because it can conflict
 
         //TODO support multiple but different occurrences  of the same event term within the same supercompound
         if (root == null || root.term != x) {
@@ -364,20 +368,29 @@ public class Temporalize implements ITemporalize {
 
         Op o = x.op();
         if (o == IMPL) { //CONJ already handled in a call from the above know
-            int dt = x.dt();
+            Term impl = x;
+            int implDT = x.dt();
 
-            if (dt == XTERNAL) {
+            if (implDT == XTERNAL) {
 
                 //TODO UNKNOWN TO SOLVE FOR
                 //throw new RuntimeException("no unknowns may be added during this phase");
+                return;
+            }
 
-            } else if (dt == DTERNAL) {
+                TermContainer implComponents = x.subterms();
+                Term implSubj = implComponents.sub(0);
+                Term implPred = implComponents.sub(1);
+
+            if (implDT == DTERNAL) {
                 //do not infer any specific temporal relation between the subterms
                 //just inherit from the parent directly
-                x.subterms().forEach(st -> this.know(st, relative(st, root, DTERNAL)));
+                //impl.subterms().forEach(i -> know(i, relative(i, root, 0)));
+
+                know(implSubj, relative(implSubj, implPred, DTERNAL));
+                know(implPred, relative(implPred, implSubj, DTERNAL));
 
             } else {
-                TermContainer tt = x.subterms();
 //                boolean reverse;
 //                    reverse = false;
 //                } else if (dt >= 0) {
@@ -391,57 +404,54 @@ public class Temporalize implements ITemporalize {
 //                }
 
 
-                int l = tt.size();
-
-
-                int t = start;
-
-                int lastStart = DTERNAL, lastEnd = DTERNAL;
-
                 //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
-                for (int i = 0; (i < l); i++) {
+                for (int i = 0; i < 2; i++) {
 
-                    Term st = tt.sub(i);
+                    Term implComponent = implComponents.sub(i);
 
-                    if (i > 0)
-                        t += dt; //the dt offset (doesnt apply to the first term which is early/left-aligned)
-
-                    int stDT = st.dtRange();
-                    int subStart = t, subEnd = t + stDT;
-
-
-                    t = subEnd;
+                    //know(implComponent, relative(implComponent, root, 0));
 
 
                     if (i > 0) {
                         //IMPL: crosslink adjacent subterms.  conjunction is already temporalized in another method
-                        int relInner = lastStart - subStart;
-                        Term rt = tt.sub(i - 1);
-                        int rtDT = rt.dt();
-                        if (rt.op() == CONJ && rtDT != DTERNAL) {
-                            //link to the subj term's starting event
-                            Term rtEarly = rt.sub(rtDT >= 0 ? 0 : 1);
-                            if (!st.equals(rtEarly)) { //HACK when multiple times can be tracked, this wont apply
-                                int relOuter = lastStart - subStart;
-                                know(rtEarly, relative(rtEarly, st, relOuter));
-                                know(st, relative(st, rtEarly, -relOuter));
-                            }
-                        }
+                        //int subjDT = implSubj.dt();
 
-                        if (!rt.equals(st)) {
-                            know(rt, relative(rt, st, relInner));
-                            know(st, relative(st, rt, -relInner));
-                        }
+                        //link an inner conj to an outer impl
+                        //if (rt.op() == CONJ  && rtDT!=XTERNAL) {
+                        //know(rt, relative(rt,  st, -dt - rt.dtRange()));
+
+//                            //link to the subj term's starting event
+//                            int rtEarlySub = rtDT >= 0 ? 0 : 1;
+//                            Term rtEarly = rt.sub(rtEarlySub);
+//                            if (!st.equals(rtEarly)) { //HACK when multiple times can be tracked, this wont apply
+//
+//                                int relOuter = lastStart - subStart;
+//                                know(rtEarly, relative(rtEarly, st, relOuter + rt.subtermTime(rtEarly)));
+//
+//                                //know(st, relative(st, rtEarly, -relOuter));
+//
+//
+//                                Term rtLate = rt.sub(1-rtEarlySub);
+//                                know(rtLate /* late */, relative(rtLate, st, relOuter + rt.subtermTime(rtLate)));
+//
+//
+//                            }
+                        //}
 
 
                     }
 
-                    lastStart = subStart;
-                    lastEnd = subEnd;
-
 
                 }
 
+
+                if (!implSubj.equals(implPred)) {
+                    int predFromSubj = implDT + implSubj.dtRange();
+                    know(implPred, relative(implPred, implSubj, predFromSubj));
+                    know(implSubj, relative(implSubj, implPred, -predFromSubj));
+                } else {
+                    //TODO repeat case
+                }
 
             }
 
@@ -468,50 +478,75 @@ public class Temporalize implements ITemporalize {
                 int tdt = term.dt();
                 if (tdt != XTERNAL) {
                     //add the known timing of the conj's events
-                    TermContainer ss = term.subterms();
-                    int sss = ss.size();
 
-                    for (int i = 0; i < sss; i++) {
-                        Term a = ss.sub(i);
-                        int aStart = term.subtermTime(a);
-                        //relative to the root of the compound
-                        int aDT = a.dtRange();
+                    FasterList<ObjectLongPair<Term>> ee = term.events();
+                    Event prev = null;
+                    int prevTime = DTERNAL;
+                    for (ObjectLongPair<Term> oe : ee) {
+                        Term nextTerm = oe.getOne(); //conj subevent
+                        if (nextTerm.equals(superterm.term))
+                            continue; //loop?
 
-                        if (tdt != DTERNAL) {
-                            if (superterm instanceof AbsoluteEvent) {
-                                //add direct link to this event by calculating its relative offset to the absolute super event
-                                AbsoluteEvent ase = (AbsoluteEvent) superterm;
-                                long s, e;
-                                if (ase.start == ETERNAL) {
-                                    s = e = ETERNAL;
-                                } else {
-                                    if (tdt >= 0) {
-                                        s = ase.start + aStart;
-                                    } else {
-                                        s = ase.end + tdt + aStart;
-                                    }
-                                    e = s + aDT;
-                                }
+                        int nextTime = (int) oe.getTwo();
+                        Event next;
+                        know(nextTerm, next = relative(nextTerm, superterm, nextTime)); //link to superterm
 
-                                know(a, new AbsoluteEvent(this, a, s, e));
-                            }
-
-                            //know(a, relative(a, term, aStart, aStart + aDT));
-
-                            if (i < sss - 1) {
-                                //relative to sibling subterm
-                                Term b = ss.sub(i + 1);
-                                if (!a.equals(b) /*&& !a.containsRecursively(b) && !b.containsRecursively(a)*/) {
-                                    int bt = term.subtermTime(b);
-                                    int ba = bt - aStart;
-                                    know(b, relative(b, a, ba, ba + b.dtRange()));
-                                    know(a, relative(a, b, -ba, -ba + aDT));
-                                }
-                            }
-                        } else {
-                            know(a, superterm);
+                        if (prev != null) {
+                            //chain to previous term
+                            Term prevTerm = prev.term;
+                            int prevDT = prevTerm.dtRange();
+                            know(nextTerm, relative(nextTerm, prev, nextTime - prevTime - prevDT));
+                            know(prevTerm, relative(prevTerm, next, prevTime - nextTime + prevDT));
                         }
+
+                        prev = next;
+                        prevTime = nextTime;
                     }
+
+//                    TermContainer ss = term.subterms();
+//                    int sss = ss.size();
+//
+//                    for (int i = 0; i < sss; i++) {
+//                        Term a = ss.sub(i);
+//                        int aStart = term.subtermTime(a);
+//                        //relative to the root of the compound
+//                        int aDT = a.dtRange();
+//
+//                        if (tdt != DTERNAL) {
+//                            if (superterm instanceof AbsoluteEvent) {
+//                                //add direct link to this event by calculating its relative offset to the absolute super event
+//                                AbsoluteEvent ase = (AbsoluteEvent) superterm;
+//                                long s, e;
+//                                if (ase.start == ETERNAL) {
+//                                    s = e = ETERNAL;
+//                                } else {
+//                                    if (tdt >= 0) {
+//                                        s = ase.start + aStart;
+//                                    } else {
+//                                        s = ase.end + tdt + aStart;
+//                                    }
+//                                    e = s + aDT;
+//                                }
+//
+//                                know(a, new AbsoluteEvent(this, a, s, e));
+//                            }
+//
+//                            //know(a, relative(a, term, aStart, aStart + aDT));
+//
+//                            if (i < sss - 1) {
+//                                //relative to sibling subterm
+//                                Term b = ss.sub(i + 1);
+//                                if (!a.equals(b) /*&& !a.containsRecursively(b) && !b.containsRecursively(a)*/) {
+//                                    int bt = term.subtermTime(b);
+//                                    int ba = bt - aStart;
+//                                    know(b, relative(b, a, ba, ba + b.dtRange()));
+//                                    know(a, relative(a, b, -ba, -ba + aDT));
+//                                }
+//                            }
+//                        } else {
+//                            know(a, superterm);
+//                        }
+//                    }
                 }
                 break;
         }
@@ -541,7 +576,7 @@ public class Temporalize implements ITemporalize {
 
         if (fullyEternal() && /*empty(trail) && */x.op() != IMPL && x.dt() != XTERNAL) {
             //HACK
-            trail.put(x, (x.op().temporal && x.dt()==DTERNAL) ? AMBIENT_EVENT : EARLIEST_EVENT); //glue
+            trail.put(x, (x.op().temporal && x.dt() == DTERNAL) ? AMBIENT_EVENT : EARLIEST_EVENT); //glue
             //knowTerm(x, ETERNAL); //everything will be relative to this, in eternity
         } else {
             trail.putIfAbsent(x, null); //placeholder
@@ -632,8 +667,12 @@ public class Temporalize implements ITemporalize {
                 for (Term y : constraints.keySet()) {
                     if (y.op() == x.op()) {
                         switch (y.dt()) {
-                            case 0: has0 = true; break;
-                            case DTERNAL: hasEte = true; break;
+                            case 0:
+                                has0 = true;
+                                break;
+                            case DTERNAL:
+                                hasEte = true;
+                                break;
                         }
                     }
                 }
@@ -673,10 +712,10 @@ public class Temporalize implements ITemporalize {
                             if (y.hasAll(xRootStr) && y.volume() >= xRootVol && y.root().equals(xRoot)) {
                                 Event e = solve(y, trail);
                                 if (e != null) {
-                                    return (e.term.op()==NEG ^ o==NEG) ?
-                                        e.neg()  //negate, because the root term will always be unneg
-                                        :
-                                        e;
+                                    return (e.term.op() == NEG ^ o == NEG) ?
+                                            e.neg()  //negate, because the root term will always be unneg
+                                            :
+                                            e;
                                 }
                             }
                         }

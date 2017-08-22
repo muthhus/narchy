@@ -212,12 +212,7 @@ public class Premise extends UnaryTask {
                     @Nullable Task answered = task.onAnswered(match, nar);
                     if (answered != null) {
 
-                        float effectiveConf =
-                                answered.isEternal() ?
-                                        answered.conf() :
-                                        answered.conf(answered.nearestTimeBetween(task.start(), task.end()), dur);
-
-                        nar.emotion.onAnswer(taskLink, answered, effectiveConf);
+                        nar.emotion.onAnswer(taskLink, answered);
 
                     }
                 }

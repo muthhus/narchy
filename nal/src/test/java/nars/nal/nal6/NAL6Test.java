@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 100;
+    final int cycles = 200;
 
     @Before
     public void nal() {
@@ -685,6 +685,7 @@ public class NAL6Test extends AbstractNALTest {
 
 
         test
+                //.log()
                 .believe("num:0", 1.0f, 0.9f)
                 .believe("( num:$1 ==> num($1) )", 1.0f, 0.9f)
                 .ask("num(((0)))")

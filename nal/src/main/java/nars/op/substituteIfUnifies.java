@@ -91,13 +91,7 @@ abstract public class substituteIfUnifies extends Functor {
 
         boolean strict = a.subEquals(3, substitute.STRICT);
 
-        //check if nothing would be transformed
-        //TODO there may be other cases when 'x' is a compound and its components are what transform the input
-        if (x instanceof Variable) {
-            if (!input.containsRecursively(x)) {
-                return strict ? Null : input;
-            }
-        }
+
 
         Term y = a.sub(2);
         if (y == Null) return Null;

@@ -38,6 +38,320 @@ import static nars.truth.TruthFunctions.w2c;
 public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
 
+    static boolean equal(@NotNull Task a, @NotNull Task b) {
+
+        @NotNull long[] evidence = a.stamp();
+
+        if ((!Arrays.equals(evidence, b.stamp())))
+            return false;
+
+        if (evidence.length > 1) {
+            if (!Objects.equals(a.truth(), b.truth()))
+                return false;
+
+            if ((a.start() != b.start()) || (a.end() != b.end()))
+                return false;
+        }
+
+        if (a.punc() != b.punc())
+            return false;
+
+        return a.term().equals(b.term());
+    }
+
+    static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
+        //TODO StringBuilder
+
+        for (int i = 0; i < indent; i++)
+            sb.append("  ");
+        task.appendTo(sb, null, true);
+        sb.append("\n  ");
+
+
+        if (task instanceof DerivedTask) {
+            Task pt = ((DerivedTask) task).getParentTask();
+            if (pt != null) {
+                //sb.append("  PARENT ");
+                proof(pt, indent + 1, sb);
+            }
+
+            Task pb = ((DerivedTask) task).getParentBelief();
+            if (pb != null) {
+                //sb.append("  BELIEF ");
+                proof(pb, indent + 1, sb);
+            }
+        }
+    }
+
+    @Nullable
+    static boolean taskContentValid(@NotNull Term t, byte punc, @Nullable NAR nar, boolean safe) {
+
+        if (t.op() == NEG)
+            //must be applied before instantiating Task
+            return fail(t, "negation operator invalid for task term", safe);
+
+        if (!t.hasAny(Op.ATOM.bit | Op.INT.bit | Op.VAR_PATTERN.bit))
+            return fail(t, "filter terms which have been completely variable-ized", safe); //filter any terms that have been completely variable introduced
+
+        if (punc != COMMAND) {
+            if (!t.isNormalized())
+                return fail(t, "task term not a normalized Compound", safe);
+
+
+            if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
+                return fail(t, "belief or goal with query variable", safe);
+            }
+
+            if (nar != null) {
+                int maxVol = nar.termVolumeMax.intValue();
+                if (t.volume() > maxVol)
+                    return fail(t, "task term exceeds maximum volume", safe);
+
+                int nalLevel = nar.nal();
+                if (!t.levelValid(nalLevel))
+                    return fail(t, "task term exceeds maximum NAL level", safe);
+            }
+
+//        if (t.op().temporal && t.dt() == XTERNAL) {
+//            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
+//        }
+
+            if (!(t.op().conceptualizable)) {
+                return fail(t, "op not conceptualizable", safe);
+            }
+            if (Param.DEBUG && !t.conceptual().op().conceptualizable) {
+                return fail(t, "term not conceptualizable", safe);
+            }
+
+            return (t.size() == 0) || validTaskCompound(t, punc, safe);
+        }
+
+        return true;
+    }
+
+    /**
+     * call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
+     * these can all be tested prenormalization, because normalization will not affect the result
+     */
+    static boolean validTaskCompound(@NotNull Term t, byte punc, boolean safe) {
+        /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
+
+//        if (t.varDep()==1) {
+//            return fail(t, "singular dependent variable", safe);
+//        }
+
+        switch (t.varIndep()) {
+            case 0:
+                break;  //OK
+            case 1:
+                return fail(t, "singular independent variable", safe);
+            default:
+                if (!t.hasAny(Op.StatementBits)) {
+                    return fail(t, "InDep variables must be subterms of statements", safe);
+                } else {
+                    //TODO use a byte[] path thing to reduce duplicate work performed in indepValid findPaths
+                    if (t.hasAny(Op.VAR_INDEP)) {
+                        UnifiedSet unique = new UnifiedSet(1); //likely only one var indep repeated twice
+                        if (!t.ANDrecurse(
+                                v -> (v.op() != VAR_INDEP) || !unique.add(v) || indepValid(t, v))) {
+                            return fail(t, "unbalanced InDep variable pairing", safe);
+                        }
+                    }
+                }
+        }
+
+
+        Op op = t.op();
+        if ((op == Op.IMPL) && (punc == Op.GOAL || punc == Op.QUEST))
+            return fail(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
+
+        return true;
+    }
+
+    static boolean indepValid(@NotNull Term comp, @NotNull Term selected) {
+
+        List<byte[]> pp = comp.pathsTo(selected);
+
+        int pSize = pp.size();
+        if (pSize == 0)
+            return true; //a compound which didnt contain it
+
+        byte[][] paths = pp.toArray(new byte[pSize][]);
+
+        @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(pSize);
+        for (int occurrence = 0; occurrence < pSize; occurrence++) {
+            byte[] p = paths[occurrence];
+            Term t = null; //root
+            int pathLength = p.length;
+            for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
+                t = (i == -1) ? comp : t.sub(p[i]);
+                Op o = t.op();
+
+                if (validIndepVarSuperterm(o)) {
+                    byte inside = (byte) (1 << p[i + 1]);
+                    m.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
+                }
+            }
+        }
+
+        return m.anySatisfy(b -> b == 0b11);
+
+    }
+
+    static boolean fail(@Nullable Term t, String reason, boolean safe) {
+        if (safe)
+            return false;
+        else
+            throw new InvalidTaskException(t, reason);
+    }
+
+    static long nearestStartOrEnd(long a, long b, long x, long y) {
+        long u = nearestStartOrEnd(a, b, x);
+        long v = nearestStartOrEnd(a, b, y);
+        if (Math.min(Math.abs(u - a), Math.abs(u - b)) <
+                Math.min(Math.abs(v - a), Math.abs(v - b))) {
+            return u;
+        } else {
+            return v;
+        }
+    }
+
+    static long nearestStartOrEnd(long s, long e, long when) {
+        assert (s != ETERNAL);
+
+        if (e == s) {
+            return s; //point
+        } else if (when >= s && when <= e) {
+            return when; //internal
+        } else if (Math.abs(when - s) <= Math.abs(when - e)) {
+            return s; //at or beyond the start
+        } else {
+            return e; //at or beyond the end
+        }
+
+    }
+
+    @Deprecated
+    @Nullable
+    static NALTask clone(@NotNull Task x, @NotNull Term newContent) {
+
+
+        boolean negated = (newContent.op() == NEG);
+        if (negated) {
+            newContent = newContent.unneg();
+        }
+
+        if (!Task.taskContentValid(newContent, x.punc(), null, true)) {
+            return null;
+        }
+
+        NALTask y = new NALTask(newContent, x.punc(),
+                x.isBeliefOrGoal() ? (DiscreteTruth) x.truth().negIf(negated) : null,
+                x.creation(),
+                x.start(), x.end(),
+                x.stamp());
+        y.setPri(x);
+        y.meta = x.meta();
+        return y;
+    }
+
+//    @Nullable
+//    static boolean taskStatementValid(@NotNull Compound t, boolean safe) {
+//        return taskStatementValid(t, (byte) 0, safe); //ignore the punctuation-specific conditions
+//    }
+
+    static @Nullable Task execute(Task cmd, NAR nar) {
+
+
+        Term inputTerm = cmd.term();
+        if (inputTerm.hasAll(Op.EvalBits) && inputTerm.op() == INH) {
+            Term func = inputTerm.sub(1);
+            if (func != Null && func.op() == ATOM) {
+                Term args = inputTerm.sub(0);
+                if (args != Null && args.op() == PROD) {
+                    Concept funcConcept = nar.concept(func);
+                    if (funcConcept instanceof Command) {
+                        Command o = (Command) funcConcept;
+
+                        Task result = o.run(cmd, nar);
+                        if (result != null && result != cmd) {
+                            //return input(result); //recurse
+                            return execute(result, nar);
+                        }
+
+                        //                            } else {
+//
+//                                if (!cmd.isEternal() && cmd.start() > time() + time.dur()) {
+//                                    inputAt(cmd.start(), cmd); //schedule for execution later
+//                                    return null;
+//                                } else {
+//                                    if (executable(cmd)) {
+//                                        Task result = o.run(cmd, this);
+//                                        if (result != cmd) { //instance equality, not actual equality in case it wants to change this
+//                                            if (result == null) {
+//                                                return null; //finished
+//                                            } else {
+//                                                //input(result); //recurse until its stable
+//                                                return result;
+//                                            }
+//                                        }
+//                                    }
+//                                }
+//                            }
+
+
+                    }
+                }
+            }
+        }
+
+        /*if (isCommand)*/
+        nar.eventTask.emit(cmd);
+        return null;
+
+    }
+
+    @Nullable
+    static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
+        ObjectBooleanPair<Term> x = tryContent(t, punc, true);
+        if (x != null) {
+            return res.apply(x.getOne(), tr != null ? tr.negIf(x.getTwo()) : null);
+        }
+        return null;
+    }
+
+    /**
+     * attempts to prepare a term for use as a Task content.
+     *
+     * @return null if unsuccessful, otherwise the resulting compound term and a
+     * boolean indicating whether a truth negation occurred,
+     * necessitating an inversion of truth when constructing a Task with the input term
+     */
+    @Nullable
+    static ObjectBooleanPair<Term> tryContent(@NotNull Term t, byte punc, boolean safe) {
+
+        Op o = t.op();
+
+        boolean negated = false;
+        if (o == NEG) {
+            t = t.unneg();
+            o = t.op();
+            negated = !negated;
+        }
+
+        if (!o.conceptualizable)
+            return null;
+
+        if ((t = normalizedOrNull(t)) == null)
+            return null;
+
+        if (Task.taskContentValid(t, punc, null, safe))
+            return PrimitiveTuples.pair(t, negated);
+        else
+            return null;
+
+    }
+
     @Override
     long creation();
 
@@ -55,7 +369,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
      */
     @Override
     long end();
-
 
     /**
      * amount of evidence measured at a given time with a given duration window
@@ -140,189 +453,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         //return op.statement || term.vars() > 0;
     }
 
-
-    static boolean equal(@NotNull Task a, @NotNull Task b) {
-
-        @NotNull long[] evidence = a.stamp();
-
-        if ((!Arrays.equals(evidence, b.stamp())))
-            return false;
-
-        if (evidence.length > 1) {
-            if (!Objects.equals(a.truth(), b.truth()))
-                return false;
-
-            if ((a.start() != b.start()) || (a.end() != b.end()))
-                return false;
-        }
-
-        if (a.punc() != b.punc())
-            return false;
-
-        return a.term().equals(b.term());
-    }
-
-
-    static void proof(@NotNull Task task, int indent, @NotNull StringBuilder sb) {
-        //TODO StringBuilder
-
-        for (int i = 0; i < indent; i++)
-            sb.append("  ");
-        task.appendTo(sb, null, true);
-        sb.append("\n  ");
-
-
-        if (task instanceof DerivedTask) {
-            Task pt = ((DerivedTask) task).getParentTask();
-            if (pt != null) {
-                //sb.append("  PARENT ");
-                proof(pt, indent + 1, sb);
-            }
-
-            Task pb = ((DerivedTask) task).getParentBelief();
-            if (pb != null) {
-                //sb.append("  BELIEF ");
-                proof(pb, indent + 1, sb);
-            }
-        }
-    }
-
-    @Nullable
-    static boolean taskContentValid(@NotNull Term t, byte punc, @Nullable NAR nar, boolean safe) {
-
-        if (t.op() == NEG)
-            //must be applied before instantiating Task
-            return fail(t, "negation operator invalid for task term", safe);
-
-        if (!t.hasAny(Op.ATOM.bit | Op.INT.bit | Op.VAR_PATTERN.bit))
-            return fail(t, "filter terms which have been completely variable-ized", safe); //filter any terms that have been completely variable introduced
-
-        if (punc != COMMAND) {
-            if (!t.isNormalized())
-                return fail(t, "task term not a normalized Compound", safe);
-
-
-            if ((punc == Op.BELIEF || punc == Op.GOAL) && (t.hasVarQuery())) {
-                return fail(t, "belief or goal with query variable", safe);
-            }
-
-            if (nar != null) {
-                int maxVol = nar.termVolumeMax.intValue();
-                if (t.volume() > maxVol)
-                    return fail(t, "task term exceeds maximum volume", safe);
-
-                int nalLevel = nar.nal();
-                if (!t.levelValid(nalLevel))
-                    return fail(t, "task term exceeds maximum NAL level", safe);
-            }
-
-//        if (t.op().temporal && t.dt() == XTERNAL) {
-//            return fail(t, "top-level temporal term with dt=XTERNAL", safe);
-//        }
-
-            if (!(t.op().conceptualizable)) {
-                return fail(t, "op not conceptualizable", safe);
-            }
-            if (Param.DEBUG && !t.conceptual().op().conceptualizable) {
-                return fail(t, "term not conceptualizable", safe);
-            }
-
-            return (t.size() == 0) || validTaskCompound(t, punc, safe);
-        }
-
-        return true;
-    }
-
-//    @Nullable
-//    static boolean taskStatementValid(@NotNull Compound t, boolean safe) {
-//        return taskStatementValid(t, (byte) 0, safe); //ignore the punctuation-specific conditions
-//    }
-
-    /**
-     * call this directly instead of taskContentValid if the level, volume, and normalization have already been tested.
-     * these can all be tested prenormalization, because normalization will not affect the result
-     */
-    static boolean validTaskCompound(@NotNull Term t, byte punc, boolean safe) {
-        /* A statement sentence is not allowed to have a independent variable as subj or pred"); */
-
-//        if (t.varDep()==1) {
-//            return fail(t, "singular dependent variable", safe);
-//        }
-
-        switch (t.varIndep()) {
-            case 0:
-                break;  //OK
-            case 1:
-                return fail(t, "singular independent variable", safe);
-            default:
-                if (!t.hasAny(Op.StatementBits)) {
-                    return fail(t, "InDep variables must be subterms of statements", safe);
-                } else {
-                    //TODO use a byte[] path thing to reduce duplicate work performed in indepValid findPaths
-                    if (t.hasAny(Op.VAR_INDEP)) {
-                        UnifiedSet unique = new UnifiedSet(1); //likely only one var indep repeated twice
-                        if (!t.ANDrecurse(
-                                v -> (v.op() != VAR_INDEP) || !unique.add(v) || indepValid(t, v))) {
-                            return fail(t, "unbalanced InDep variable pairing", safe);
-                        }
-                    }
-                }
-        }
-
-
-        Op op = t.op();
-        if ((op == Op.IMPL) && (punc == Op.GOAL || punc == Op.QUEST))
-            return fail(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
-
-        return true;
-    }
-
-
-    static boolean indepValid(@NotNull Term comp, @NotNull Term selected) {
-
-        List<byte[]> pp = comp.pathsTo(selected);
-
-        int pSize = pp.size();
-        if (pSize == 0)
-            return true; //a compound which didnt contain it
-
-        byte[][] paths = pp.toArray(new byte[pSize][]);
-
-        @Nullable ObjectByteHashMap<Term> m = new ObjectByteHashMap<>(pSize);
-        for (int occurrence = 0; occurrence < pSize; occurrence++) {
-            byte[] p = paths[occurrence];
-            Term t = null; //root
-            int pathLength = p.length;
-            for (int i = -1; i < pathLength - 1 /* dont include the selected term itself */; i++) {
-                t = (i == -1) ? comp : t.sub(p[i]);
-                Op o = t.op();
-
-                if (validIndepVarSuperterm(o)) {
-                    byte inside = (byte) (1 << p[i + 1]);
-                    m.updateValue(t, inside, (previous) -> (byte) ((previous) | inside));
-                }
-            }
-        }
-
-        return m.anySatisfy(b -> b == 0b11);
-
-    }
-
-
-    static boolean fail(@Nullable Term t, String reason, boolean safe) {
-        if (safe)
-            return false;
-        else
-            throw new InvalidTaskException(t, reason);
-    }
-
-
     @Override
     @NotNull
     default Task task() {
         return this;
     }
-
 
     default boolean isQuestion() {
         return (punc() == QUESTION);
@@ -332,6 +467,13 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return (punc() == BELIEF);
     }
 
+//    /**
+//     * called if this task is entered into a concept's belief tables
+//     * TODO what about for questions/quests
+//     */
+//    void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar);
+//
+
     default boolean isGoal() {
         return (punc() == GOAL);
     }
@@ -339,6 +481,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     default boolean isQuest() {
         return (punc() == QUEST);
     }
+
+//    /** allows for budget feedback that occurrs on revision */
+//    default boolean onRevision(Task conclusion) {
+//        return true;
+//    }
 
     default boolean isCommand() {
         return (punc() == COMMAND);
@@ -354,7 +501,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     default Appendable toString(NAR memory, boolean showStamp) {
         return appendTo(new StringBuilder(), memory, showStamp);
     }
-
 
     @Nullable
     default Concept concept(@NotNull NAR n, boolean conceptualize) {
@@ -372,102 +518,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //        }
     }
 
-//    /**
-//     * called if this task is entered into a concept's belief tables
-//     * TODO what about for questions/quests
-//     */
-//    void feedback(TruthDelta delta, float deltaConfidence, float deltaSatisfaction, NAR nar);
-//
-
-    default boolean isQuestOrQuestion() {
-        byte c = punc();
-        return c == Op.QUESTION || c == Op.QUEST;
-    }
-
-    default boolean isBeliefOrGoal() {
-        byte c = punc();
-        return c == Op.BELIEF || c == Op.GOAL;
-    }
-
-//    /** allows for budget feedback that occurrs on revision */
-//    default boolean onRevision(Task conclusion) {
-//        return true;
-//    }
-
-    /**
-     * for question tasks: when an answer appears.
-     * <p>
-     * <p>
-     * return the input task, or a modification of it to use a customized matched premise belief. or null to
-     * to cancel any matched premise belief.
-     */
-    @Nullable
-    default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
-        if (isInput()) {
-            Concept concept = concept(nar, true);
-            if (concept != null) {
-                ArrayBag<Task, PriReference<Task>> answers = concept.computeIfAbsent(Op.QUESTION, () ->
-                        new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
-                answers.commit();
-
-                float confEffective = answer.conf(nearestTimeTo(nar.time()), nar.dur());
-                answers.put(new PLink<>(answer, confEffective * 1f));
-            }
-
-        }
-
-        return answer;
-    }
-
-
-    /**
-     * to the interval [x,y]
-     */
-    default long nearestTimeBetween(final long x, final long y) {
-        long a = this.start();
-        if (a == ETERNAL)
-            throw new UnsupportedOperationException();
-
-        long b = this.end();
-        if (x == y) {
-            return nearestStartOrEnd(a, b, x);
-        } else {
-            if (a == b) {
-                return nearestStartOrEnd(x, y, a);
-            } else {
-                //HACK there is probably a better way
-
-                if ((x > a) && (y < b)) {
-                    return (x + y) / 2; //midpoint of the contained range
-                } else if (x <= a && y >= b) {
-                    return mid(); //midpoint of this within the range
-                } else {
-                    //overlap or no overlap
-                    return nearestStartOrEnd(a, b, x, y);
-                }
-
-            }
-        }
-    }
-
-    static long nearestStartOrEnd(long a, long b, long x, long y) {
-        long u = nearestStartOrEnd(a, b, x);
-        long v = nearestStartOrEnd(a, b, y);
-        if (Math.min(Math.abs(u - a), Math.abs(u - b)) <
-                Math.min(Math.abs(v - a), Math.abs(v - b))) {
-            return u;
-        } else {
-            return v;
-        }
-    }
-
-    default long nearestTimeTo(long when) {
-        long s = start();
-        if (s == ETERNAL)
-            return ETERNAL;
-        return nearestStartOrEnd(s, end(), when);
-    }
-
 // TODO
 //    default long nearestTimeTo(Task otherTask) {
 //        long s = start();
@@ -483,19 +533,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //        return nearestStartOrEnd(s, end(), when);
 //    }
 
-    static long nearestStartOrEnd(long s, long e, long when) {
-        assert (s != ETERNAL);
-
-        if (e == s) {
-            return s; //point
-        } else if (when >= s && when <= e) {
-            return when; //internal
-        } else if (Math.abs(when - s) <= Math.abs(when - e)) {
-            return s; //at or beyond the start
-        } else {
-            return e; //at or beyond the end
-        }
-
+    default boolean isQuestOrQuestion() {
+        byte c = punc();
+        return c == Op.QUESTION || c == Op.QUEST;
     }
 
 
@@ -545,6 +585,73 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //            return "Solved: " + get();
 //        }
 //    }
+
+    default boolean isBeliefOrGoal() {
+        byte c = punc();
+        return c == Op.BELIEF || c == Op.GOAL;
+    }
+
+    /**
+     * for question tasks: when an answer appears.
+     * <p>
+     * <p>
+     * return the input task, or a modification of it to use a customized matched premise belief. or null to
+     * to cancel any matched premise belief.
+     */
+    @Nullable
+    default Task onAnswered(@NotNull Task answer, @NotNull NAR nar) {
+        if (isInput()) {
+            Concept concept = concept(nar, true);
+            if (concept != null) {
+                ArrayBag<Task, PriReference<Task>> answers = concept.computeIfAbsent(Op.QUESTION, () ->
+                        new AnswerBag(nar, this, Param.MAX_INPUT_ANSWERS));
+                answers.commit();
+
+                float confEffective = answer.conf();//nearestTimeTo(nar.time()), nar.dur());
+                answers.put(new PLink<>(answer, confEffective * 1f));
+            }
+
+        }
+
+        return answer;
+    }
+
+    /**
+     * to the interval [x,y]
+     */
+    default long nearestTimeBetween(final long x, final long y) {
+        long a = this.start();
+        if (a == ETERNAL)
+            throw new UnsupportedOperationException();
+
+        long b = this.end();
+        if (x == y) {
+            return nearestStartOrEnd(a, b, x);
+        } else {
+            if (a == b) {
+                return nearestStartOrEnd(x, y, a);
+            } else {
+                //HACK there is probably a better way
+
+                if ((x > a) && (y < b)) {
+                    return (x + y) / 2; //midpoint of the contained range
+                } else if (x <= a && y >= b) {
+                    return mid(); //midpoint of this within the range
+                } else {
+                    //overlap or no overlap
+                    return nearestStartOrEnd(a, b, x, y);
+                }
+
+            }
+        }
+    }
+
+    default long nearestTimeTo(long when) {
+        long s = start();
+        if (s == ETERNAL)
+            return ETERNAL;
+        return nearestStartOrEnd(s, end(), when);
+    }
 
     @NotNull
     default Appendable toString(/**@Nullable*/NAR memory) {
@@ -669,7 +776,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return buffer;
     }
 
-
     /**
      * Check if a Task is a direct input,
      * or if its origin has been forgotten or never known
@@ -682,11 +788,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         //return (evidence().length <= 1) && ;
     }
 
-
     default boolean isEternal() {
         return start() == ETERNAL;
     }
-
 
     @Deprecated
     default String getTense(long currentTime) {
@@ -706,7 +810,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                 return Op.TENSE_PRESENT;
         }
     }
-
 
     default boolean cyclic() {
         return Stamp.isCyclic(stamp());
@@ -764,12 +867,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return null;
     }
 
-
     default long mid() {
         long s = start();
         return (s != ETERNAL) ? ((s + end()) / 2L) : ETERNAL;
     }
-
 
     /**
      * prints this task as a TSV/CSV line.  fields:
@@ -808,32 +909,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return this;
     }
 
-
-    @Deprecated
-    @Nullable
-    static NALTask clone(@NotNull Task x, @NotNull Term newContent) {
-
-
-        boolean negated = (newContent.op() == NEG);
-        if (negated) {
-            newContent = newContent.unneg();
-        }
-
-        if (!Task.taskContentValid(newContent, x.punc(), null, true)) {
-            return null;
-        }
-
-        NALTask y = new NALTask(newContent, x.punc(),
-                x.isBeliefOrGoal() ? (DiscreteTruth) x.truth().negIf(negated) : null,
-                x.creation(),
-                x.start(), x.end(),
-                x.stamp());
-        y.setPri(x);
-        y.meta = x.meta();
-        return y;
-    }
-
-
     Map meta();
 
     <X> X meta(Object key);
@@ -855,38 +930,16 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return exist;
     }
 
-
     @Nullable
     default Object lastLogged() {
         List log = log();
         return log == null || log.isEmpty() ? null : log.get(log.size() - 1);
     }
 
-
     @NotNull
     default String proof() {
         StringBuilder sb = new StringBuilder(512);
         return proof(sb).toString();
-    }
-
-    @NotNull
-    default StringBuilder proof(@NotNull StringBuilder temporary) {
-        temporary.setLength(0);
-        proof(this, 0, temporary);
-        return temporary;
-    }
-
-
-    /**
-     * auto budget by truth (if belief/goal, or punctuation if question/quest)
-     */
-    default Task budget(NAR nar) {
-        return budget(1f, nar);
-    }
-
-    default Task budget(float factor, NAR nar) {
-        setPri(factor * nar.priorityDefault(punc()));
-        return this;
     }
 
     //    default Task eternalized() {
@@ -899,6 +952,38 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //            return y;
 //        }
 //    }
+
+    @NotNull
+    default StringBuilder proof(@NotNull StringBuilder temporary) {
+        temporary.setLength(0);
+        proof(this, 0, temporary);
+        return temporary;
+    }
+
+    /**
+     * auto budget by truth (if belief/goal, or punctuation if question/quest)
+     */
+    default Task budget(NAR nar) {
+        return budget(1f, nar);
+    }
+
+    //    /**
+//     * returns the time separating this task from a target time. if the target occurrs
+//     * during this task, the distance is zero. if this task is eternal, then ETERNAL is returned
+//     */
+//    default long timeDistance(long t) {
+//        long s = start();
+//        if (s == ETERNAL) return ETERNAL;
+//        long e = end();
+//        if ((t >= s) || (t <= e)) return 0;
+//        else if (t > e) return t - e;
+//        else return s - t;
+//    }
+
+    default Task budget(float factor, NAR nar) {
+        setPri(factor * nar.priorityDefault(punc()));
+        return this;
+    }
 
     default boolean during(long a, long b) {
         return distanceTo(a, b) == 0;
@@ -918,19 +1003,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             return true;
         }
     }
-
-    //    /**
-//     * returns the time separating this task from a target time. if the target occurrs
-//     * during this task, the distance is zero. if this task is eternal, then ETERNAL is returned
-//     */
-//    default long timeDistance(long t) {
-//        long s = start();
-//        if (s == ETERNAL) return ETERNAL;
-//        long e = end();
-//        if ((t >= s) || (t <= e)) return 0;
-//        else if (t > e) return t - e;
-//        else return s - t;
-//    }
 
     @Override
     default @Nullable Iterable<? extends ITask> run(@NotNull NAR n) {
@@ -982,59 +1054,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         return null;
     }
 
-
-    static @Nullable Task execute(Task cmd, NAR nar) {
-
-
-        Term inputTerm = cmd.term();
-        if (inputTerm.hasAll(Op.EvalBits) && inputTerm.op() == INH) {
-            Term func = inputTerm.sub(1);
-            if (func != Null && func.op() == ATOM) {
-                Term args = inputTerm.sub(0);
-                if (args != Null && args.op() == PROD) {
-                    Concept funcConcept = nar.concept(func);
-                    if (funcConcept instanceof Command) {
-                        Command o = (Command) funcConcept;
-
-                        Task result = o.run(cmd, nar);
-                        if (result != null && result != cmd) {
-                            //return input(result); //recurse
-                            return execute(result, nar);
-                        }
-
-                        //                            } else {
-//
-//                                if (!cmd.isEternal() && cmd.start() > time() + time.dur()) {
-//                                    inputAt(cmd.start(), cmd); //schedule for execution later
-//                                    return null;
-//                                } else {
-//                                    if (executable(cmd)) {
-//                                        Task result = o.run(cmd, this);
-//                                        if (result != cmd) { //instance equality, not actual equality in case it wants to change this
-//                                            if (result == null) {
-//                                                return null; //finished
-//                                            } else {
-//                                                //input(result); //recurse until its stable
-//                                                return result;
-//                                            }
-//                                        }
-//                                    }
-//                                }
-//                            }
-
-
-                    }
-                }
-            }
-        }
-
-        /*if (isCommand)*/
-        nar.eventTask.emit(cmd);
-        return null;
-
-    }
-
-
     /**
      * projected truth value
      */
@@ -1044,47 +1063,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         if (e <= Float.MIN_NORMAL)
             return null;
         return new PreciseTruth(freq(), e, false);
-    }
-
-    @Nullable
-    static Task tryTask(@NotNull Term t, byte punc, Truth tr, BiFunction<Term, Truth, ? extends Task> res) {
-        ObjectBooleanPair<Term> x = tryContent(t, punc, true);
-        if (x != null) {
-            return res.apply(x.getOne(), tr != null ? tr.negIf(x.getTwo()) : null);
-        }
-        return null;
-    }
-
-    /**
-     * attempts to prepare a term for use as a Task content.
-     *
-     * @return null if unsuccessful, otherwise the resulting compound term and a
-     * boolean indicating whether a truth negation occurred,
-     * necessitating an inversion of truth when constructing a Task with the input term
-     */
-    @Nullable
-    static ObjectBooleanPair<Term> tryContent(@NotNull Term t, byte punc, boolean safe) {
-
-        Op o = t.op();
-
-        boolean negated = false;
-        if (o == NEG) {
-            t = t.unneg();
-            o = t.op();
-            negated = !negated;
-        }
-
-        if (!o.conceptualizable)
-            return null;
-
-        if ((t = normalizedOrNull(t)) == null)
-            return null;
-
-        if (Task.taskContentValid(t, punc, null, safe))
-            return PrimitiveTuples.pair(t, negated);
-        else
-            return null;
-
     }
 
     /**
