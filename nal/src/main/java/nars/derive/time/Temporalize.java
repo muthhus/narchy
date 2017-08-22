@@ -378,9 +378,9 @@ public class Temporalize implements ITemporalize {
                 return;
             }
 
-                TermContainer implComponents = x.subterms();
-                Term implSubj = implComponents.sub(0);
-                Term implPred = implComponents.sub(1);
+            TermContainer implComponents = x.subterms();
+            Term implSubj = implComponents.sub(0);
+            Term implPred = implComponents.sub(1);
 
             if (implDT == DTERNAL) {
                 //do not infer any specific temporal relation between the subterms
@@ -391,69 +391,27 @@ public class Temporalize implements ITemporalize {
                 know(implPred, relative(implPred, implSubj, DTERNAL));
 
             } else {
-//                boolean reverse;
-//                    reverse = false;
-//                } else if (dt >= 0) {
-//                    reverse = false;
-//                } else {
-//                    reverse = true;
-//                    if (o == CONJ) {
-//                        tt = tt.reverse();
-//                        dt = -dt;
-//                    }
-//                }
-
-
-                //System.out.println(tt + " presubs " + t + "..reverse=" + reverse);
-                for (int i = 0; i < 2; i++) {
-
-                    Term implComponent = implComponents.sub(i);
-
-                    //know(implComponent, relative(implComponent, root, 0));
-
-
-                    if (i > 0) {
-                        //IMPL: crosslink adjacent subterms.  conjunction is already temporalized in another method
-                        //int subjDT = implSubj.dt();
-
-                        //link an inner conj to an outer impl
-                        //if (rt.op() == CONJ  && rtDT!=XTERNAL) {
-                        //know(rt, relative(rt,  st, -dt - rt.dtRange()));
-
-//                            //link to the subj term's starting event
-//                            int rtEarlySub = rtDT >= 0 ? 0 : 1;
-//                            Term rtEarly = rt.sub(rtEarlySub);
-//                            if (!st.equals(rtEarly)) { //HACK when multiple times can be tracked, this wont apply
-//
-//                                int relOuter = lastStart - subStart;
-//                                know(rtEarly, relative(rtEarly, st, relOuter + rt.subtermTime(rtEarly)));
-//
-//                                //know(st, relative(st, rtEarly, -relOuter));
-//
-//
-//                                Term rtLate = rt.sub(1-rtEarlySub);
-//                                know(rtLate /* late */, relative(rtLate, st, relOuter + rt.subtermTime(rtLate)));
-//
-//
-//                            }
-                        //}
-
-
-                    }
-
-
-                }
-
-
                 if (!implSubj.equals(implPred)) {
                     int predFromSubj = implDT + implSubj.dtRange();
                     know(implPred, relative(implPred, implSubj, predFromSubj));
                     know(implSubj, relative(implSubj, implPred, -predFromSubj));
+
+                    implSubj.events().forEach(oe -> {
+                        Term ss = oe.getOne();
+                        if (!ss.equals(implPred)) {
+                            int t = -predFromSubj + ((int) oe.getTwo());
+                            know(ss, relative(ss, implPred, t));
+                            know(implPred, relative(implPred, ss, -t));
+                        } else {
+                            //TODO repeat case
+                        }
+                    });
                 } else {
                     //TODO repeat case
                 }
 
             }
+
 
         }
     }
@@ -471,36 +429,44 @@ public class Temporalize implements ITemporalize {
                 Term u = term.unneg();
 
 
-                know(u, relative(u, superterm, 0));
+                know(u, relative(u, term, 0));
 
                 break;
             case CONJ:
                 int tdt = term.dt();
-                if (tdt != XTERNAL) {
+                if (tdt == DTERNAL) {
+                    term.subterms().forEach(sub -> {
+                        know(sub, relative(sub, term, 0)); //link to super-conj
+                    });
+                } else if (tdt != XTERNAL) {
                     //add the known timing of the conj's events
 
                     FasterList<ObjectLongPair<Term>> ee = term.events();
-                    Event prev = null;
-                    int prevTime = DTERNAL;
-                    for (ObjectLongPair<Term> oe : ee) {
-                        Term nextTerm = oe.getOne(); //conj subevent
-                        if (nextTerm.equals(superterm.term))
-                            continue; //loop?
+                    int numEvents = ee.size();
 
-                        int nextTime = (int) oe.getTwo();
-                        Event next;
-                        know(nextTerm, next = relative(nextTerm, superterm, nextTime)); //link to superterm
+                    if (numEvents <= 1) {
+                        return;
+                    }
 
-                        if (prev != null) {
-                            //chain to previous term
-                            Term prevTerm = prev.term;
-                            int prevDT = prevTerm.dtRange();
-                            know(nextTerm, relative(nextTerm, prev, nextTime - prevTime - prevDT));
-                            know(prevTerm, relative(prevTerm, next, prevTime - nextTime + prevDT));
+                    //matrix n^2/2
+                    for (int i = 0, eeSize = ee.size(); i < eeSize; i++) {
+                        ObjectLongPair<Term> ii = ee.get(i);
+                        Term a = ii.getOne(); //conj subevent
+
+                        int at = (int) ii.getTwo();
+                        know(a, relative(a, term, at)); //link to super-conj
+
+                        for (int j = i + 1; j < eeSize; j++) {
+                            ObjectLongPair<Term> jj = ee.get(j);
+                            Term b = jj.getOne();
+
+                            if (!ii.getOne().equals(b)) {
+                                //chain to previous term
+                                int bt = (int) jj.getTwo();
+                                know(a, relative(a, b, at - bt));
+                                know(b, relative(b, a, bt - at));
+                            }
                         }
-
-                        prev = next;
-                        prevTime = nextTime;
                     }
 
 //                    TermContainer ss = term.subterms();

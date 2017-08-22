@@ -410,7 +410,7 @@ public class TemporalizeTest {
         Temporalize t = new Temporalize();
         t.knowAbsolute($("a"), 1);
         t.knowAbsolute($("((a &&+5 b) ==>+5 #1)"), 1);
-
+        t.print();
 //        {
 //            HashMap h = new HashMap();
 //            Term depVar = $.varDep(1);
@@ -670,8 +670,8 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
             Map<Term, Time> h = new HashMap();
             Event s = t.solve(the("a"), h);
-            //assertNull(s); //no way to solve for 'a' except relatively:
-            assertEquals("a@-5->(b &&+5 c)", s.toString());
+
+            assertEquals("a@-5->b", s.toString());
 
         }
 
@@ -843,7 +843,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         assertNotNull(s);
         assertEquals(
                 //only the eternal nature can be inferred. but during derivation this will typically be un-eternalized if the premise has temporality
-                "((a-->b) ==>+4 (c-->d))@1",
+                "((a-->b) ==>+4 (c-->d))@ETE",
                 s.toString());
 
     }
