@@ -71,6 +71,7 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
 
     @Override
     public Activate activate(float pri, NAR n) {
+        //store per 'self' term allowing a schizo NAR to assign different activations to each 'personality'
         Activate a = (Activate)computeIfAbsent(n.self(), (s) ->
             new Activate(BaseConcept.this, 0 )
         );

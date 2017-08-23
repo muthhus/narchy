@@ -69,10 +69,10 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     /**
      * lookahead time in durations (multiples of duration)
      */
-    public final FloatParam predictAheadDurs = new FloatParam(2, 1, 32);
+    public final FloatParam predictAheadDurs = new FloatParam(8, 1, 32);
 
 
-    //public final FloatParam predictorProbability = new FloatParam(1f);
+    public final FloatParam predictorProbability = new FloatParam(0.125f);
     private final CauseChannel<Task> predict;
 
 
@@ -239,9 +239,11 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     }
 
     protected void predict() {
-        predict.input(predictions(now));
-        int dur = nar.dur();
-        int horizon = Math.round(this.predictAheadDurs.floatValue()) * dur;
+        if (nar.random().nextFloat() < predictorProbability.floatValue())
+            predict.input(predictions(now));
+
+        //int dur = nar.dur();
+        //int horizon = Math.round(this.predictAheadDurs.floatValue()) * dur;
 //        if (sensors.size() > 0) {
 //            actions.forEach(a -> {
 //                for (Compound t : new Compound[] {

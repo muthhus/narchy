@@ -55,13 +55,13 @@ public interface Deriver {
         return RULES;
     }
 
-    static Function<NAR, PrediTerm<Derivation>> newDeriver(int nal, String... otherFiles) {
+    static Function<NAR, PrediTerm<Derivation>> newDeriver(int nal, String... additional) {
         if (nal == 0) {
             return (n) -> PrediTerm.NullDeriver;
         }
 
         return (nar) -> {
-            PrediTerm<Derivation> x = TrieDeriver.the(DEFAULT(nal, otherFiles), nar, (PrediTerm<Derivation> d) -> {
+            PrediTerm<Derivation> x = TrieDeriver.the(DEFAULT(nal, additional), nar, (PrediTerm<Derivation> d) -> {
                 if (Param.TRACE)
                     return new DebugDerivationPredicate(d);
                 else

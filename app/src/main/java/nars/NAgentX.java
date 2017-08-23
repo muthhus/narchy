@@ -124,7 +124,8 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8, "motivation.nal");
+        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8);
+                //,"motivation.nal");
 
         int THREADS = 3;
         NAR n = new NARS()

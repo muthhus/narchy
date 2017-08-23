@@ -38,7 +38,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     private int capacity;
     static final int TRUTHPOLATED_MAX = 8;
 
-    public static final float FUTURE_BOOST = 2f;
+    public static final float PRESENT_AND_FUTURE_BOOST = 2f;
 
 
     private transient NAR nar;
@@ -496,7 +496,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         Task input = inputRegion.task;
 
-        FloatFunction<Task> taskStrength = taskStrengthWithFutureBoost(now, FUTURE_BOOST, now, dur);
+        FloatFunction<Task> taskStrength = taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur);
 
         FloatFunction<TaskRegion> weakestTask = (t -> -taskStrength.floatValueOf(t.task));
 
@@ -693,10 +693,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         return (Task x) -> temporalTaskPriority(x, start, end, dur);
     }
 
-    static FloatFunction<Task> taskStrengthWithFutureBoost(long now, float futureBoost, long when, int dur) {
+    static FloatFunction<Task> taskStrengthWithFutureBoost(long now, float presentAndFutureBoost, long when, int dur) {
         return (Task x) -> {
             //boost for present and future
-            return (!x.isBefore(now) ? futureBoost : 1f) * temporalTaskPriority(x, when, when, dur);
+            return (!x.isBefore(now-dur) ? presentAndFutureBoost : 1f) * temporalTaskPriority(x, when, when, dur);
         };
     }
 
