@@ -924,7 +924,9 @@ public interface Compound extends Term, IPair, TermContainer {
 //            } else
             if (o.commutative) {
                 if (s[0].compareTo(s[1]) > 0) { //lexical sort
-                    s = new Term[]{s[1], s[0]};
+                    Term x = s[0];
+                    s[0] = s[1];
+                    s[1] = x;
                     subsChanged = true;
                 }
             }
@@ -934,6 +936,9 @@ public interface Compound extends Term, IPair, TermContainer {
 
         if (!subsChanged && !dtChanging) {
             return this; //no change is necessary
+        }
+        if (!subsChanged) {
+            s = subs.theArray(); //re-use the instance from the input
         }
 
         Term y =
