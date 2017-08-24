@@ -1,5 +1,6 @@
 package nars.concept.builder;
 
+import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
@@ -30,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import static nars.Op.*;
 
@@ -285,6 +288,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     public TemporalBeliefTable newTemporalBeliefTable(Term c) {
         if (c.complexity() < 12) {
             return new RTreeBeliefTable();
+                //c.complexity() < 6 ? new DisruptorBlockingQueue() : new LinkedBlockingQueue<>()/
         } else {
             return new HijackTemporalBeliefTable();
         }
@@ -343,7 +347,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @NotNull
     public Map newBagMap(int volume) {
         //int defaultInitialCap = 0;
-        float loadFactor = 0.75f;
+        float loadFactor = 0.9f;
 
         if (concurrent()) {
 //            //return new ConcurrentHashMap(defaultInitialCap, 1f);

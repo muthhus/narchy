@@ -109,8 +109,8 @@ public class BagTest {
         a.commit();
 
         //x should now be ahead
-        assertTrue(a.listCopy().toString().contains("[x="));
-        assertTrue(a.listCopy().toString().contains(", y="));
+        assertTrue(a.listCopy().toString().contains("x,")); //x first
+        assertTrue(a.listCopy().toString().contains("y]")); //y second
 
         ii = a.iterator();
         assertEquals("x", ii.next().get());

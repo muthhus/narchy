@@ -127,12 +127,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             this.confMin = this.confMax = task.conf();
         }
 
-        /**
-         * all inclusive time region
-         */
-        TaskRegion(long a, long b) {
-            this(a, b, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
-        }
+//        /**
+//         * all inclusive time region
+//         */
+//        TaskRegion(long a, long b) {
+//            this(a, b, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY, Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY);
+//        }
 
         @Override
         public double coord(boolean maxOrMin, int dimension) {
@@ -154,29 +154,46 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             //                    coord(true, i) < x.coord(false, i))
             //                return false;
             //        return true;
-            TaskRegion t = (TaskRegion) x;
-            if ((start > t.end) || (end < t.start))
-                return false;
-            if ((freqMin > t.freqMax) || (freqMax < t.freqMin))
-                return false;
-            if ((confMin > t.confMax) || (confMax < t.confMin))
-                return false;
-            return true;
+            if (x instanceof TimeRange) {
+                TimeRange t = (TimeRange)x;
+                return !((start > t.end) || (end < t.start));
+            } else {
+                TaskRegion t = (TaskRegion) x;
+                if ((start > t.end) || (end < t.start))
+                    return false;
+                if ((freqMin > t.freqMax) || (freqMax < t.freqMin))
+                    return false;
+                if ((confMin > t.confMax) || (confMax < t.confMin))
+                    return false;
+                return true;
+            }
         }
 
-        //TODO fast contains()
-
-        /**
-         * computes a mbr of the given regions
-         */
-        static TaskRegion mbr(TaskRegion x, TaskRegion y) {
-            if (x == y) return x;
-            return new TaskRegion(
-                    Math.min(x.start, y.start), Math.max(x.end, y.end),
-                    Math.min(x.freqMin, y.freqMin), Math.max(x.freqMax, y.freqMax),
-                    Math.min(x.confMin, y.confMin), Math.max(x.confMax, y.confMax)
-            );
+        @Override
+        public boolean contains(HyperRegion x) {
+            //    default boolean contains(HyperRegion<X> x) {
+            //        int d = dim();
+            //        for (int i = 0; i < d; i++)
+            //            if (coord(false, i) > x.coord(false, i) ||
+            //                    coord(true, i) < x.coord(true, i))
+            //                return false;
+            //        return true;
+            //    }
+            if (x instanceof TimeRange) {
+                TimeRange t = (TimeRange)x;
+                return !((start > t.start) || (end < t.end));
+            } else {
+                TaskRegion t = (TaskRegion) x;
+                if ((start > t.start) || (end < t.end))
+                    return false;
+                if ((freqMin > t.freqMin) || (freqMax < t.freqMax))
+                    return false;
+                if ((confMin > t.confMin) || (confMax < t.confMax))
+                    return false;
+                return true;
+            }
         }
+
 
         @Override
         public int dim() {
@@ -185,7 +202,18 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         @Override
         public TaskRegion mbr(HyperRegion r) {
-            return TaskRegion.mbr(this, (TaskRegion) r);
+            if (this == r || contains(r))
+                return this;
+            else {
+                TaskRegion er = (TaskRegion) r;
+                if (r.contains(this))
+                    return er;
+                else return new TaskRegion(
+                        Math.min(start, er.start), Math.max(end, er.end),
+                        Math.min(freqMin, er.freqMin), Math.max(freqMax, er.freqMax),
+                        Math.min(confMin, er.confMin), Math.max(confMax, er.confMax)
+                );
+            }
         }
 
 
@@ -276,11 +304,6 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //
 //        this.lastUpdate = now;
 //    }
-
-    public RTreeBeliefTable(int cap) {
-        this();
-        setCapacity(cap);
-    }
 
 
     @Override
@@ -388,8 +411,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 return true;
             };
 
+            TimeRange r = new TimeRange(); //recycled
+
             //check the precise range first
-            tree.intersecting(timeRange(start, end), update);
+            tree.intersecting(r.set(start, end), update);
 
             if (u.isEmpty()) {
 
@@ -407,12 +432,12 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     done = 0;
 
                     if (nextStart >= bounds.start)
-                        tree.intersecting(timeRange(nextStart, scanStart), update);
+                        tree.intersecting(r.set(nextStart, scanStart), update);
                     else
                         done++;
 
                     if (nextEnd <= bounds.end)
-                        tree.intersecting(timeRange(scanEnd, nextEnd), update);
+                        tree.intersecting(r.set(scanEnd, nextEnd), update);
                     else
                         done++;
 
@@ -427,15 +452,50 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         return u;
     }
 
+    /** only valid for comparison during rtree iteration */
+    static class TimeRange implements HyperRegion {
 
-    private RTreeCursor<TaskRegion> cursor(long start, long end) {
-        return tree.cursor(timeRange(start, end));
+        long start, end;
+
+        public TimeRange() {
+
+        }
+
+        public TimeRange(long s, long e) {
+            set(s, e);
+        }
+
+        public TimeRange set(long s, long e) {
+            this.start = s;
+            this.end = e;
+            return this;
+        }
+
+        @Override
+        public HyperRegion mbr(HyperRegion r) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int dim() {
+            return 3;
+        }
+
+        @Override
+        public double coord(boolean maxOrMin, int dimension) {
+//            switch (dimension) {
+//                case 0: return maxOrMin ? end : start;
+//            }
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean contains(HyperRegion x) {
+//            TaskRegion t = (TaskRegion)x;
+//            return !((start > t.start) || (end < t.end));
+            throw new UnsupportedOperationException();
+        }
     }
-
-    private static HyperRegion timeRange(long a, long b) {
-        return new TaskRegion(a, b);
-    }
-
 
     @Override
     public void setCapacity(int capacity) {
@@ -749,7 +809,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
     @Override
     public void forEach(long minT, long maxT, Consumer<? super Task> each) {
-        tree.intersecting(timeRange(minT, maxT), (t) -> {
+        tree.intersecting(new TimeRange(minT, maxT), (t) -> {
             each.accept(t.task);
             return true;
         });

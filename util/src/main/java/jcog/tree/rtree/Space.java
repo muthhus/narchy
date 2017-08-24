@@ -115,6 +115,13 @@ public interface Space<T> extends Nodelike<T> {
 
     void forEach(Consumer<? super T> consumer);
 
+//    default boolean intersecting(HyperRegion rect, Consumer<T> consumer) {
+//        return intersecting(rect, (x) -> {
+//            consumer.accept(x);
+//            return true;
+//        });
+//    }
+
     boolean intersecting(HyperRegion rect, Predicate<T> consumer);
 
     boolean containing(HyperRegion rect, Predicate<T> consumer);

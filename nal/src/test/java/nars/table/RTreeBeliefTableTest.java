@@ -21,7 +21,8 @@ public class RTreeBeliefTableTest {
     public void testBasicOperations() throws Narsese.NarseseException {
         NAR n = NARS.shell();
         BaseConcept X = (BaseConcept) n.conceptualize($.$("a:b"));
-        RTreeBeliefTable r = new RTreeBeliefTable(4);
+        RTreeBeliefTable r = new RTreeBeliefTable();
+        r.setCapacity(4);
 
         assertEquals(0, r.size());
 

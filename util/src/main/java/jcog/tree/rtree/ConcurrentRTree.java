@@ -45,12 +45,20 @@ public class ConcurrentRTree<T> implements Space<T> {
     public final Lock writeLock;
 
     public ConcurrentRTree(RTree<T> tree) {
+        this(tree, false);
+    }
+
+    public ConcurrentRTree(RTree<T> tree, boolean async) {
         this.tree = tree;
         ReentrantReadWriteLock lock = new ReentrantReadWriteLock(false);
         this.readLock = lock.readLock();
         this.writeLock = lock.writeLock();
-        toAdd = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::add);
-        toRemove = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::remove);
+        if (async) {
+            toAdd = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::add);
+            toRemove = new QueueLock<>(new DisruptorBlockingQueue<T>(8), this::remove);
+        } else {
+            toAdd = toRemove = null;
+        }
     }
 
 
@@ -111,12 +119,18 @@ public class ConcurrentRTree<T> implements Space<T> {
      */
     @Override
     public void addAsync(@NotNull T t) {
-        toAdd.accept(t);
+        if (toAdd!=null)
+            toAdd.accept(t);
+        else
+            add(t);
     }
 
     @Override
     public void removeAsync(@NotNull T t) {
-        toRemove.accept(t);
+        if (toRemove!=null)
+            toRemove.accept(t);
+        else
+            remove(t);
     }
 
     /**

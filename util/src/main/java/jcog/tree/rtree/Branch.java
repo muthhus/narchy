@@ -271,7 +271,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
         for (int i = 0; i < size; i++) {
             Node c = child[i];
-            if (rect.intersects(c.region())) {
+            if (c.region().intersects(rect)) {
                 if (!c.containing(rect, t, model))
                     return false;
             }
@@ -368,7 +368,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     @Override
     public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
-        return nodeAND(ci -> !(rect.intersects(ci.region()) && !ci.intersecting(rect, t, model)));
+        return nodeAND(ci -> !(ci.region().intersects(rect) && !ci.intersecting(rect, t, model)));
     }
 
     @Override

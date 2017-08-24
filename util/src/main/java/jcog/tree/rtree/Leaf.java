@@ -250,7 +250,7 @@ public class Leaf<T> implements Node<T, T> {
     public boolean intersecting(HyperRegion rect, Predicate<T> t, Spatialization<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
-            if (rect.intersects(model.region(d))) {
+            if (model.region(d).intersects(rect)) {
                 if (!t.test(d))
                     return false;
             }
