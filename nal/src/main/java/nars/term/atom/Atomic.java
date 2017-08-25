@@ -65,6 +65,10 @@ public interface Atomic extends Term {
     @Override
     String toString();
 
+    @Override
+    default int dtRange() {
+        return 0;
+    }
 
     @Override
     default boolean recurseTerms(BiPredicate<Term, Term> whileTrue, Term parent) {

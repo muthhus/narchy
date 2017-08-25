@@ -532,6 +532,7 @@ public class TemporalizeTest {
         assertNotNull(s);
         assertEquals("(z ==>+1 x)@ETE|-3", s.toString());
     }
+
     @Test
     public void testConjConjImpl() throws Narsese.NarseseException {
         /*
@@ -541,7 +542,7 @@ public class TemporalizeTest {
         //      $.13 (((a,#1) &&+1 (#1,c)) ==>+3 (c,d)). 1 %1.0;.42% {59: 1;2;3} ((%1,%2,time(raw),belief(positive),task("."),time(dtEventsOrEternals),neqAndCom(%1,%2),notImpl(%1),notImpl(%2)),(varIntro((%2 ==>+- %1)),((Abduction-->Belief))))
          */
 
-        assertEquals($("( (#1,c) &&+- (a,#1) )"),  $("( (a,#1) &&+- (#1,c) )"));
+        assertEquals($("( (#1,c) &&+- (a,#1) )"), $("( (a,#1) &&+- (#1,c) )"));
         Temporalize t = new Temporalize();
         t.knowAbsolute($("(c,d)"), 5);
         t.knowAbsolute($("(((a,#1) &&+1 (#1,c)) ==>+3 (c,d))"), 1);
@@ -596,12 +597,13 @@ public class TemporalizeTest {
         t.knowAbsolute($("((a &&+5 b) &&+5 c)"), 1);
         assertEquals("((a &&+5 b) &&+5 (c &&+5 d))@[1..16]", t.solve($("((a &&+- b) &&+- (c &&+- d))")).toString());
     }
+
     @Test
     public void testConjImpl23424234234() throws Narsese.NarseseException {
 //$.09 (c &&+5 d). 16⋈21 %1.0;.12% {48: 1;2;3;;} ((%1,(%2==>%1),time(urgent),notImpl(%1)),(%2,((AbductionRecursivePB-->Belief),(DeductionRecursivePB-->Goal))))
 //    $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
 //    $.11 ((c &&+5 d) ==>-15 (a &&+5 b)). 11 %1.0;.51% {48: 1;2;3;;} Revection Merge
-        for (long invariant : new long[] { ETERNAL, 11, -10 } ) {
+        for (long invariant : new long[]{ETERNAL, 11, -10}) {
             Temporalize t = new Temporalize();
             t.knowAbsolute($("(a &&+5 b)"), 1, 6);
             t.knowAbsolute($("((c &&+5 d) ==>-15 (a &&+5 b))"), invariant);
@@ -611,6 +613,7 @@ public class TemporalizeTest {
             assertEquals(11, s.start(h).abs()); //@[11..16]
         }
     }
+
     @Test
     public void testConjImpl23424232354234() throws Narsese.NarseseException {
         {
@@ -619,14 +622,14 @@ public class TemporalizeTest {
             t.knowAbsolute($("(((b &&+5 c) &&+5 d) ==>-15 a)"), 6);
             System.out.println(t);
 
-            assertTrue( t.constraints.get($("((b &&+5 c) &&+5 d)")).toString().contains("((b &&+5 c) &&+5 d)@[5..15]->a"));
+            assertTrue(t.constraints.get($("((b &&+5 c) &&+5 d)")).toString().contains("((b &&+5 c) &&+5 d)@[5..15]->a"));
             //assertEquals("[(b &&+5 c)@[5..10]->a, (b &&+5 c)@[-10..-5]->d]", t.constraints.get($("(b &&+5 c)")).toString());
 
             Term r = $("((b &&+- c) &&+- d)");
             Map<Term, Time> h = new HashMap();
             Event e = t.solve(r, h);
             assertNotNull(e);
-            assertEquals( "((b &&+5 c) &&+5 d)@[5..15]->a", e.toString());
+            assertEquals("((b &&+5 c) &&+5 d)@[5..15]->a", e.toString());
             assertEquals(6, e.start(h).abs());
         }
     }
@@ -700,8 +703,9 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         Temporalize t = new Temporalize();
 
         int start = 1;
-        Term x = $("((a &&+5 ((--,a)&|b)) &&+5 (--,b))"); assertEquals(10, x.dtRange());
-        t.knowAbsolute(x, start, start+10);
+        Term x = $("((a &&+5 ((--,a)&|b)) &&+5 (--,b))");
+        assertEquals(10, x.dtRange());
+        t.knowAbsolute(x, start, start + 10);
 
 
         Term A = $("a");
@@ -717,7 +721,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
             assertEquals("(--,a)", st.term.toString());
             assertEquals((x.subtermTime(Aneg) + start), st.start(h).abs());
         }
-      {
+        {
             HashMap h = new HashMap();
             Event st = t.solve(A, h);
             assertEquals("a", st.term.toString());
@@ -857,6 +861,7 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
     public void testDropAnyEvent2() throws Narsese.NarseseException {
         testDropAnyEvent("((a &&+5 b) &&+5 c)");
     }
+
     @Test
     public void testDropAnyEvent3() throws Narsese.NarseseException {
         testDropAnyEvent("((a &&+5 b) &&+5 (#1 &&+5 d))");
@@ -897,11 +902,11 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
             //same relative timing
             for (int j = 1; j < ye.size(); j++) {
-                Term y1 = ye.get(j-1).getOne();
+                Term y1 = ye.get(j - 1).getOne();
                 Term y2 = ye.get(j).getOne();
                 assertEquals(
-                y.subtermTime(y2) - y.subtermTime(y1),
-                x.subtermTime(y2) - x.subtermTime(y1)
+                        y.subtermTime(y2) - y.subtermTime(y1),
+                        x.subtermTime(y2) - x.subtermTime(y1)
                 );
             }
 
@@ -912,7 +917,8 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         assertEquals(xe.size(), result.size());
     }
 
-    @Test public void testDropAnyEventInnerSubj() throws Narsese.NarseseException {
+    @Test
+    public void testDropAnyEventInnerSubj() throws Narsese.NarseseException {
         /*
         BAD
         $.02 ((at(SELF,{t001})&|open({t001})) ==>+5 ({t001}-->[opened])). %1.0;.81% {7: 1;;} (((%1==>%2),%1,belief("&&")),((dropAnyEvent(%1) ==>+- %2),((StructuralDeduction-->Belief))))
@@ -927,14 +933,17 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         Event s = t.solve(P);
         assertEquals("((at(SELF,{t001}) &&+5 open({t001})) ==>+5 ({t001}-->[opened]))", s.term.toString());
     }
-    @Test public void testDropAnyEventInnerPred() throws Narsese.NarseseException {
+
+    @Test
+    public void testDropAnyEventInnerPred() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         t.knowAbsolute($("(({t001}-->[opened]) ==>+5 ((hold(SELF,{t002}) &&+5 at(SELF,{t001})) &&+5 open({t001})))"), ETERNAL);
         Event s = t.solve($("(({t001}-->[opened]) ==>+- (at(SELF,{t001}) &&+- open({t001})))"));
         assertEquals("(({t001}-->[opened]) ==>+10 (at(SELF,{t001}) &&+5 open({t001})))", s.term.toString());
     }
 
-    @Test public void testRepeatEvents1() throws Narsese.NarseseException {
+    @Test
+    public void testRepeatEvents1() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         t.knowAbsolute($("(x &&+5 x)"), ETERNAL);
         Event s = t.solve($("(x &&+- x)"));
@@ -942,7 +951,21 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         assertEquals("(x &&+5 x)", s.term.toString());
     }
 
-      @Test public void testRepeatEvents2() throws Narsese.NarseseException {
+    @Test
+    public void testRepeatEvents2() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        Term x = $("x");
+        t.knowAbsolute(x, 0);
+        t.knowAbsolute(x, 5);
+        t.print();
+
+        Event s = t.solve($("(x &&+- x)"));
+        assertNotNull(s);
+        assertEquals("(x &&+5 x)", s.term.toString());
+    }
+
+    @Test
+    public void testRepeatEvents3() throws Narsese.NarseseException {
         Temporalize t = new Temporalize();
         t.knowAbsolute($("(x &&+5 x)"), ETERNAL);
         t.print();

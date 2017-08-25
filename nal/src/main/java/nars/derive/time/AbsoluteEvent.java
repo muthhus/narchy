@@ -11,6 +11,8 @@ import static nars.time.Tense.ETERNAL;
 public class AbsoluteEvent extends Event {
 
     public final long start, end;
+    public final Time startTime;
+    private final Time endTime;
 
     public AbsoluteEvent(Term term, long occ) {
         this(term, occ, occ);
@@ -38,6 +40,8 @@ public class AbsoluteEvent extends Event {
 
             this.end = te;
         }
+        this.startTime = Time.the(start, 0);
+        this.endTime = Time.the(end, 0);
     }
 
 //        @Override
@@ -59,7 +63,7 @@ public class AbsoluteEvent extends Event {
 //                    System.out.println("conflict?: " + existingTime + " " + Time.the(start, 0));
 //                }
 //            }
-        return Time.the(start, 0);
+        return startTime;
     }
 
     @NotNull
@@ -68,7 +72,7 @@ public class AbsoluteEvent extends Event {
 //            int dt = term.dt();
 //            if (dt == DTERNAL)
 //                dt = 0;
-        return Time.the(end, 0);
+        return endTime;// Time.the(end, 0);
     }
 
     @Override

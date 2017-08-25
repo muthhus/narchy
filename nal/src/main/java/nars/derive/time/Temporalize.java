@@ -201,14 +201,7 @@ public class Temporalize implements ITemporalize {
      * convenience method for testing: assumes start offset of zero, and dtRange taken from term
      */
     public void knowAbsolute(Term term, long from, long to) {
-        AbsoluteEvent basis = absolute(term, from, to);
-        if (from != ETERNAL) {
-            know(basis,
-                    0, (int) (to - from)
-            );
-        } else {
-            know(basis, 0, 0);
-        }
+        know(absolute(term, from, to), 0, from != ETERNAL ? (int) (to - from) : 0);
     }
 
 
@@ -222,7 +215,7 @@ public class Temporalize implements ITemporalize {
      * @param occ    superterm occurrence, may be ETERNAL
      * @param start, end - term-local temporal bounds
      */
-    private void know( @NotNull AbsoluteEvent root, int start, int end) {
+    private void know(@NotNull AbsoluteEvent root, int start, int end) {
 
 //        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
 //            return; //ignore variable's and completely-variablized's temporalities because it can conflict
@@ -245,92 +238,93 @@ public class Temporalize implements ITemporalize {
         know(x, event);
 
 
-        Op o = x.op();
-        if (o == IMPL) { //CONJ already handled in a call from the above know
-            Term impl = x;
-            int implDT = x.dt();
-
-            if (implDT == XTERNAL) {
-
-                //TODO UNKNOWN TO SOLVE FOR
-                //throw new RuntimeException("no unknowns may be added during this phase");
-                return;
-            }
-
-            TermContainer implComponents = x.subterms();
-            Term implSubj = implComponents.sub(0);
-            Term implPred = implComponents.sub(1);
-
-            if (implDT == DTERNAL) {
-                //do not infer any specific temporal relation between the subterms
-                //just inherit from the parent directly
-                //impl.subterms().forEach(i -> know(i, relative(i, root, 0)));
-
-                know(implSubj, relative(implSubj, implPred, DTERNAL));
-                know(implPred, relative(implPred, implSubj, DTERNAL));
-
-            } else {
-                if (!implSubj.equals(implPred)) {
-                    int predFromSubj = implDT + implSubj.dtRange();
-                    know(implPred, relative(implPred, implSubj, predFromSubj));
-                    know(implSubj, relative(implSubj, implPred, -predFromSubj));
-
-                    if (implSubj.hasAny(CONJ)) {
-                        FasterList<ObjectLongPair<Term>> se = implSubj.events();
-                        for (int i = 0, eventsSize = se.size(); i < eventsSize; i++) {
-                            ObjectLongPair<Term> oe = se.get(i);
-                            Term ss = oe.getOne();
-                            if (!ss.equals(implPred)) {
-                                int t = -predFromSubj + ((int) oe.getTwo());
-                                know(ss, relative(ss, implPred, t));
-                                know(implPred, relative(implPred, ss, -t));
-                            } else {
-                                //TODO repeat case
-                            }
-                        }
-                    }
-                    if (implPred.hasAny(CONJ)) {
-                        FasterList<ObjectLongPair<Term>> pe = implPred.events();
-                        for (int i = 0, eventsSize = pe.size(); i < eventsSize; i++) {
-                            ObjectLongPair<Term> oe = pe.get(i);
-                            Term pp = oe.getOne();
-                            if (!pp.equals(implSubj)) {
-                                int t = predFromSubj + ((int) oe.getTwo());
-                                know(pp, relative(pp, implSubj, t));
-                                know(implSubj, relative(implSubj, pp, -t));
-                            } else {
-                                //TODO repeat case
-                            }
-                        }
-                    }
-                } else {
-                    //TODO repeat case
-                }
-
-            }
-
-
-        }
     }
 
 
-    private void know(Term term, @Nullable Event superterm) {
+    private void know(Term x, @Nullable Event superterm) {
 
         if (superterm != null) {
-            SortedSet<Event> l = constraints.computeIfAbsent(term, (t) -> new TreeSet<>());
+            SortedSet<Event> l = constraints.computeIfAbsent(x, (t) -> new TreeSet<>());
             l.add(superterm);
         }
 
-        switch (term.op()) {
+        switch (x.op()) {
+            case IMPL:
+                Term impl = x;
+                int implDT = x.dt();
+
+                if (implDT == XTERNAL) {
+
+                    //TODO UNKNOWN TO SOLVE FOR
+                    //throw new RuntimeException("no unknowns may be added during this phase");
+                    return;
+                }
+
+                TermContainer implComponents = x.subterms();
+                Term implSubj = implComponents.sub(0);
+                Term implPred = implComponents.sub(1);
+
+                if (implDT == DTERNAL) {
+                    //do not infer any specific temporal relation between the subterms
+                    //just inherit from the parent directly
+                    //impl.subterms().forEach(i -> know(i, relative(i, root, 0)));
+
+                    know(implSubj, relative(implSubj, implPred, DTERNAL));
+                    know(implPred, relative(implPred, implSubj, DTERNAL));
+
+                } else {
+                    if (!implSubj.equals(implPred)) {
+                        int predFromSubj = implDT + implSubj.dtRange();
+                        know(implPred, relative(implPred, implSubj, predFromSubj));
+                        know(implSubj, relative(implSubj, implPred, -predFromSubj));
+
+                        if (implSubj.hasAny(CONJ)) {
+                            FasterList<ObjectLongPair<Term>> se = implSubj.events();
+                            for (int i = 0, eventsSize = se.size(); i < eventsSize; i++) {
+                                ObjectLongPair<Term> oe = se.get(i);
+                                Term ss = oe.getOne();
+                                if (!ss.equals(implPred)) {
+                                    int t = -predFromSubj + ((int) oe.getTwo());
+                                    know(ss, relative(ss, implPred, t));
+                                    know(implPred, relative(implPred, ss, -t));
+                                } else {
+                                    //TODO repeat case
+                                }
+                            }
+                        }
+                        if (implPred.hasAny(CONJ)) {
+                            FasterList<ObjectLongPair<Term>> pe = implPred.events();
+                            for (int i = 0, eventsSize = pe.size(); i < eventsSize; i++) {
+                                ObjectLongPair<Term> oe = pe.get(i);
+                                Term pp = oe.getOne();
+                                if (!pp.equals(implSubj)) {
+                                    int t = predFromSubj + ((int) oe.getTwo());
+                                    know(pp, relative(pp, implSubj, t));
+                                    know(implSubj, relative(implSubj, pp, -t));
+                                } else {
+                                    //TODO repeat case
+                                }
+                            }
+                        }
+                    } else {
+                        //TODO repeat case
+                    }
+
+                }
+
+
+                break;
+
+
             case NEG:
-                Term u = term.unneg();
+                Term u = x.unneg();
 
 
-                know(u, relative(u, term, 0));
+                know(u, relative(u, x, 0));
 
                 break;
             case CONJ:
-                int tdt = term.dt();
+                int tdt = x.dt();
                 if (tdt == DTERNAL) {
 //                    term.subterms().forEach(sub -> {
 //                        know(sub, relative(sub, term, 0)); //link to super-conj
@@ -338,7 +332,7 @@ public class Temporalize implements ITemporalize {
                 } else if (tdt != XTERNAL) {
                     //add the known timing of the conj's events
 
-                    FasterList<ObjectLongPair<Term>> ee = term.events();
+                    FasterList<ObjectLongPair<Term>> ee = x.events();
                     int numEvents = ee.size();
 
                     if (numEvents <= 1) {
@@ -351,7 +345,7 @@ public class Temporalize implements ITemporalize {
                         Term a = ii.getOne(); //conj subevent
 
                         int at = (int) ii.getTwo();
-                        know(a, relative(a, term, at)); //link to super-conj
+                        know(a, relative(a, x, at)); //link to super-conj
 
                         for (int j = i + 1; j < eeSize; j++) {
                             ObjectLongPair<Term> jj = ee.get(j);
@@ -440,16 +434,49 @@ public class Temporalize implements ITemporalize {
     }
 
 
+    protected List<AbsoluteEvent> overloaded(Term x) {
+        SortedSet<Event> cc = constraints.get(x);
+        if (cc==null || cc.size() == 1)
+            return null;
+
+        List<AbsoluteEvent> oo = $.newArrayList(1);
+        for (Event e : cc) {
+            if (e instanceof AbsoluteEvent) {
+                oo.add((AbsoluteEvent) e);
+            }
+        }
+        return oo.size() > 1 ? oo : null;
+    }
+
     @Override
     public Event solve(final Term x, Map<Term, Time> trail) {
         assert (!(x instanceof Bool));
         //System.out.println("solve " + target + "\t" + trail);
 
+
         if (trail.containsKey(x)) {
             Time xs = trail.get(x);
-            if (xs != null)
-                return new TimeEvent(x, xs);
-            else
+            if (xs != null) {
+                //round-robin assignment of overloads
+                //TODO generalize to RelativeEvent's
+                List<AbsoluteEvent> oo = overloaded(x);
+                if (oo != null) {
+                    int current = 0;
+                    int oos = oo.size();
+                    for (int i = 0; i < oos; i++) {
+                        if (xs == oo.get(i).startTime) {
+                            current = (i + 1)%oos;
+                            break;
+                        }
+                    }
+
+                    trail.put(x, oo.get(current).startTime);
+                    return oo.get(current);
+                } else {
+                    return new TimeEvent(x, xs);
+                }
+
+            } else
                 return null; //cyclic
         }
 
