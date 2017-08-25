@@ -4,6 +4,7 @@ import jcog.math.ByteShuffler;
 import nars.*;
 import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
+import nars.derive.time.Temporalize;
 import nars.index.term.TermContext;
 import nars.op.substitute;
 import nars.term.Functor;
@@ -122,6 +123,7 @@ public class Derivation extends Unify implements TermContext {
     public final ByteShuffler shuffler = new ByteShuffler(64);
     public boolean single;
     private final Set<Task> derivations = new LinkedHashSet();
+    public Temporalize temporalize;
 
 //    private transient Term[][] currentMatch;
 
@@ -465,6 +467,7 @@ public class Derivation extends Unify implements TermContext {
     @Override
     public void clear() {
         derivations.clear();
+        temporalize = null;
         super.clear();
     }
 

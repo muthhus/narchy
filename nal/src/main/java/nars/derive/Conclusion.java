@@ -136,7 +136,8 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             Term t1;
             try {
-                t1 = new Temporalize(d.random).solve(d, c1, occ = new long[]{ETERNAL, ETERNAL}, eviGain);
+                occ = new long[]{ETERNAL, ETERNAL};
+                t1 = solveTime(d, c1, occ, eviGain);
 //                if (t1!=null && occ[0] <= 0) {
 //                    //FOR A SPECIFIC TEST TEMPORAR
 //                    System.err.println("wtf");
@@ -236,6 +237,16 @@ public class Conclusion extends AbstractPred<Derivation> {
         d.accept(t);
         d.use(Param.TTL_DERIVE_TASK_SUCCESS);
         return true;
+    }
+
+    private Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] eviGain) {
+        Term t1;
+        Temporalize dt = d.temporalize;
+        if (dt == null) {
+            d.temporalize = dt = new Temporalize(d.random); //cache in derivation
+        }
+        t1 = dt.solve(d, c1, occ, eviGain);
+        return t1;
     }
 
 
