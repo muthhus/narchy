@@ -528,12 +528,30 @@ public class Temporalize implements ITemporalize {
     }
 
     private boolean fullyEternal() {
-        return events().noneMatch(x -> x.term.op() != IMPL && x instanceof AbsoluteEvent && ((AbsoluteEvent) x).start != ETERNAL);
+        if (fullyEternal == null) {
+            for (SortedSet<Event> x : constraints.values()) {
+                for (Event y : x) {
+                    if (y instanceof AbsoluteEvent && ((AbsoluteEvent) y).start != ETERNAL && y.term.op() != IMPL) {
+                        fullyEternal = false;
+                        return false;
+                    }
+                }
+            }
+            fullyEternal = true;
+            return true;
+        } else {
+            return fullyEternal;
+        }
+
+        //return events().noneMatch(x -> x instanceof AbsoluteEvent && ((AbsoluteEvent) x).start != ETERNAL && x.term.op() != IMPL);
     }
 
     private Stream<? extends Event> events() {
         return constraints.values().stream().flatMap(Collection::stream);
     }
+
+    /** HACK move this this to the solution instance class when it is separated from the pattern class */
+    Boolean fullyEternal = null;
 
     @Override
     public Event solve(final Term x, Map<Term, Time> trail) {
@@ -548,7 +566,7 @@ public class Temporalize implements ITemporalize {
                 return null; //cyclic
         }
 
-        if (fullyEternal() && !x.op().temporal) { //*empty(trail) && */x.op() != IMPL && x.dt() != XTERNAL) {
+        if (!x.op().temporal && fullyEternal()) { //*empty(trail) && */x.op() != IMPL && x.dt() != XTERNAL) {
             //HACK anchor in eternity
             trail.putIfAbsent(x, EARLIEST_EVENT); //glue
         } else {

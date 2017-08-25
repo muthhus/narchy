@@ -39,9 +39,9 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     private final Node<T, ?>[] child;
 
-    short childDiff;
+    private short childDiff;
     private HyperRegion region;
-    short size;
+    private short size;
 
     public Branch(int cap) {
         this.region = null;
@@ -51,7 +51,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
     @Override
     public boolean contains(T t, Spatialization<T> model) {
-        if (!region().contains(model.region(t)))
+        if (!region.contains(model.region(t)))
             return false;
         for (int i = 0; i < size; i++) {
             if (child[i].contains(t, model))
@@ -296,18 +296,17 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
 
             for (int i = 0; i < size; i++) {
                 HyperRegion cir = child[i].region();
-                HyperRegion childMbr = cir.mbr(tRect);
+                HyperRegion childMbr = tRect.mbr(cir);
                 final double nodeEnlargement = childMbr.cost() - (cir.cost() + tCost);
-                double perimeter = childMbr.perimeter();
                 if (nodeEnlargement < leastEnlargement) {
                     leastEnlargement = nodeEnlargement;
-                    leastPerimeter = perimeter;
+                    leastPerimeter = childMbr.perimeter();
                     bestNode = i;
                 } else if (RTree.equals(nodeEnlargement, leastEnlargement)) {
-                    final double childPerimeter = perimeter;
-                    if (childPerimeter < leastPerimeter) {
+                    double perimeter = childMbr.perimeter();
+                    if (perimeter < leastPerimeter) {
                         leastEnlargement = nodeEnlargement;
-                        leastPerimeter = childPerimeter;
+                        leastPerimeter = perimeter;
                         bestNode = i;
                     }
                 } // else its not the least
@@ -316,7 +315,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
             if (bestNode == -1) {
                 throw new RuntimeException("rtree fault");
             }
-            assert(bestNode != -1);
+            //assert(bestNode != -1);
             return bestNode;
         } else {
             final Node<T, ?> n = model.newLeaf();
@@ -350,7 +349,7 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         return true;
     }
 
-    boolean nodeAND(Predicate<Node<T, ?>> p) {
+    private boolean nodeAND(Predicate<Node<T, ?>> p) {
         for (int i = 0; i < size; i++) {
             if (!p.test(child[i]))
                 return false;
@@ -381,10 +380,9 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         if (!region.intersects(rect) || !t.test(this))
             return;
 
-        Node<T, ?>[] children = this.child;
         short s = this.size;
         for (int i = 0; i < s; i++) {
-            Node<T, ?> c = children[i];
+            Node<T, ?> c = this.child[i];
             if (c!=null)
                 c.intersectingNodes(rect, t, model);
         }

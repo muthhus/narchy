@@ -14,6 +14,7 @@ import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -110,7 +111,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      * may include the item being added
      */
     @Nullable
-    private FasterList<Y> update(@Nullable Y toAdd, @Nullable Consumer<Y> update) {
+    private LinkedList<Y> update(@Nullable Y toAdd, @Nullable Consumer<Y> update) {
 
         int s = size();
         int c = capacity();
@@ -120,7 +121,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         }
 
 
-        FasterList<Y> trash = new FasterList(0);
+        LinkedList<Y> trash =
+                //new FasterList(1);
+                new LinkedList();
         if (s > 0) {
             s = update(toAdd != null, s, trash, update);
         } else {
@@ -529,7 +532,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                     if (size() == capacity)
                         pressurize(p);
 
-                    @Nullable FasterList<Y> trsh = update(incoming, null);
+                    @Nullable LinkedList<Y> trsh = update(incoming, null);
                     if (trsh != null) {
                         trash[0] = trsh;
                         if (trsh.getLast() == incoming)
@@ -653,7 +656,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
         if (update == null && !checkCapacity)
             return;
 
-        @Nullable FasterList<Y> trash = null;
+        @Nullable List<Y> trash = null;
         synchronized (items) {
             if (size() == 0)
                 return;
