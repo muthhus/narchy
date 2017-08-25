@@ -2,7 +2,7 @@ description = ''
 dependencies {
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
-    compile group: 'org.eclipse.collections', name: 'eclipse-collections', version: '9.0.0.M2'
+    compile group: 'org.eclipse.collections', name: 'eclipse-collections', version: '9.0.0.M3'
     compile group: 'com.conversantmedia', name: 'disruptor', version: '1.2.11'
     compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.16'
     compile(group: 'io.thekraken', name: 'grok', version: '0.1.5') {

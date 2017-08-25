@@ -12,11 +12,9 @@ import static nars.time.Tense.ETERNAL;
 public abstract class Event implements Comparable<Event> {
 
     public final Term term;
-    protected final ITemporalize t;
 
-    Event(ITemporalize t, Term term) {
+    Event(Term term) {
         assert(!(term instanceof Bool));
-        this.t = t;
         this.term = term;
     }
 

@@ -12,12 +12,15 @@ public class RelativeEvent extends Event {
     public final Term rel;
     public final int start;
     public final int end;
-
+    protected final ITemporalize t;
 
 
     protected RelativeEvent(ITemporalize t, Term term, Term relativeTo, int start, int end) {
-        super(t, term);
-        assert(start!=XTERNAL && end != XTERNAL);
+        super(term);
+        assert (start != XTERNAL && end != XTERNAL);
+
+        this.t = t;
+
         //assert (!term.equals(relativeTo));
         this.rel = relativeTo;
         this.start = start;

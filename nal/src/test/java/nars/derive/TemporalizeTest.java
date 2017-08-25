@@ -934,4 +934,21 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         assertEquals("(({t001}-->[opened]) ==>+10 (at(SELF,{t001}) &&+5 open({t001})))", s.term.toString());
     }
 
+    @Test public void testRepeatEvents1() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowAbsolute($("(x &&+5 x)"), ETERNAL);
+        Event s = t.solve($("(x &&+- x)"));
+        assertNotNull(s);
+        assertEquals("(x &&+5 x)", s.term.toString());
+    }
+
+      @Test public void testRepeatEvents2() throws Narsese.NarseseException {
+        Temporalize t = new Temporalize();
+        t.knowAbsolute($("(x &&+5 x)"), ETERNAL);
+        t.print();
+        Map h = new HashMap();
+        Event s = t.solve($("((x &&+2 #1) &&+- x)"), h);
+        assertNotNull(s);
+        assertEquals("((x &&+2 #1) &&+3 x)", s.term.toString());
+    }
 }

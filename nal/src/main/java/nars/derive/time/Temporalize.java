@@ -1,15 +1,11 @@
 package nars.derive.time;
 
-import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.Interval;
 import jcog.random.XorShift128PlusRandom;
 import nars.$;
 import nars.Op;
 import nars.Param;
-import nars.Task;
-import nars.control.Derivation;
-import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.container.TermContainer;
@@ -53,7 +49,9 @@ public class Temporalize implements ITemporalize {
     public int dur = 1;
     protected static final boolean knowTransformed = true;
 
-    /** HACK move this this to the solution instance class when it is separated from the pattern class */
+    /**
+     * HACK move this this to the solution instance class when it is separated from the pattern class
+     */
     Boolean fullyEternal = null;
 
     /**
@@ -66,7 +64,6 @@ public class Temporalize implements ITemporalize {
     public Temporalize(Random random) {
         this.random = random;
     }
-
 
 
 //    /**
@@ -113,7 +110,7 @@ public class Temporalize implements ITemporalize {
 //    }
 
     public AbsoluteEvent absolute(Term x, long start, long end) {
-        return new AbsoluteEvent(this, x, start, end);
+        return new AbsoluteEvent(x, start, end);
     }
 
 
@@ -206,14 +203,18 @@ public class Temporalize implements ITemporalize {
     public void knowAbsolute(Term term, long from, long to) {
         AbsoluteEvent basis = absolute(term, from, to);
         if (from != ETERNAL) {
-            know(term, basis,
+            know(basis,
                     0, (int) (to - from)
             );
         } else {
-            know(term, basis, 0, 0);
+            know(basis, 0, 0);
         }
     }
 
+
+//    protected Term intern(Term x) {
+//        return x;
+//    }
 
     /**
      * recursively calculates the start and end time of all contained events within a term
@@ -221,36 +222,27 @@ public class Temporalize implements ITemporalize {
      * @param occ    superterm occurrence, may be ETERNAL
      * @param start, end - term-local temporal bounds
      */
-    private void know(Term x, @Nullable AbsoluteEvent root, int start, int end) {
+    private void know( @NotNull AbsoluteEvent root, int start, int end) {
 
 //        if (!x.op().conceptualizable) // || (!term.hasAny(ATOM.bit | INT.bit)))
 //            return; //ignore variable's and completely-variablized's temporalities because it can conflict
+        Term x = root.term;
 
-        //TODO support multiple but different occurrences  of the same event term within the same supercompound
-        if (root == null || root.term != x) {
-            SortedSet<Event> exist = constraints.get(x);
-            if (exist != null)
-                return;
-        }
 
-        if (root != null) {
-            Event event;
+        Event event;
 
-            if (x.equals(root.term)) {
-                event = root;
-            } else {
-                Time occ = root.start(null);
-                assert (occ.base != XTERNAL);
-                event = (occ.base != ETERNAL ?
-                        absolute(x, occ.abs() + start, occ.abs() + end) :
-                        relative(x, root.term, start, end)
-                );
-            }
-
-            know(x, event);
+        if (x.equals(root.term)) {
+            event = root;
         } else {
-            know(x, null);
+            Time occ = root.start(null);
+            assert (occ.base != XTERNAL);
+            event = (occ.base != ETERNAL ?
+                    absolute(x, occ.abs() + start, occ.abs() + end) :
+                    relative(x, root.term, start, end)
+            );
         }
+
+        know(x, event);
 
 
         Op o = x.op();
@@ -456,7 +448,7 @@ public class Temporalize implements ITemporalize {
         if (trail.containsKey(x)) {
             Time xs = trail.get(x);
             if (xs != null)
-                return new TimeEvent(this, x, xs);
+                return new TimeEvent(x, xs);
             else
                 return null; //cyclic
         }
@@ -780,7 +772,7 @@ public class Temporalize implements ITemporalize {
                 Term ce = CONJ.the(DTERNAL, a, b);
                 if (ce instanceof Bool)
                     return null;
-                return new AbsoluteEvent(this, ce, ETERNAL);
+                return new AbsoluteEvent(ce, ETERNAL);
             }
             ata = at.offset; //TODO maybe apply shift, and also needs to affect 'start'
             bta = bt.offset;// + a.dtRange();
@@ -808,7 +800,7 @@ public class Temporalize implements ITemporalize {
 //            return null;
 
 
-        return new TimeEvent(this, newTerm, early, cDur == -1 ? newTerm.dtRange() : cDur);
+        return new TimeEvent(newTerm, early, cDur == -1 ? newTerm.dtRange() : cDur);
     }
 
     private Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {
@@ -830,19 +822,19 @@ public class Temporalize implements ITemporalize {
                         if (bz == ETERNAL) bz = ba;
 
                         if (ta == ETERNAL || bz == ETERNAL) {
-                            return new SolutionEvent(this, target, ETERNAL);
+                            return new SolutionEvent(target, ETERNAL);
                         } else {
                             Interval ii = Interval.intersect(ta, tz, ba, bz);
                             if (ii != null) {
                                 //overlap or adjacent
-                                return new SolutionEvent(this, target, ii.a, ii.b);
+                                return new SolutionEvent(target, ii.a, ii.b);
                             } else {
                                 //interpolate
                                 long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
                                 if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS * dur >= ((float) dist)) {
                                     long occ = ((ta + tz) / 2L + (ba + bz) / 2L) / 2L;
                                     //occInterpolate(t, b);
-                                    return new SolutionEvent(this, target, occ);
+                                    return new SolutionEvent(target, occ);
                                 }
                             }
                         }
@@ -880,7 +872,7 @@ public class Temporalize implements ITemporalize {
             if (newTerm instanceof Bool)
                 return null;
 
-            return new TimeEvent(this, newTerm, at);
+            return new TimeEvent(newTerm, at);
         }
         return null;
 
@@ -900,12 +892,12 @@ public class Temporalize implements ITemporalize {
 
 
     public void knowAmbient(@NotNull Term t) {
-        know(t, new AmbientEvent(t), 0, t.dtRange());
+        know(new AmbientEvent(t), 0, t.dtRange());
     }
 
-    private final class AmbientEvent extends AbsoluteEvent {
+    private final static class AmbientEvent extends AbsoluteEvent {
         public AmbientEvent(@NotNull Term t) {
-            super(Temporalize.this, t, Tense.ETERNAL, Tense.ETERNAL);
+            super(t, Tense.ETERNAL, Tense.ETERNAL);
         }
 
         @NotNull

@@ -12,12 +12,12 @@ public class TimeEvent extends Event {
     private final Time time;
     private final int dur;
 
-    TimeEvent(ITemporalize t, Term term, Time time) {
-        this(t, term, time, 0);
+    TimeEvent(Term term, Time time) {
+        this(term, time, 0);
     }
 
-    TimeEvent(ITemporalize t, Term term, Time time, int dur) {
-        super(t, term);
+    TimeEvent(Term term, Time time, int dur) {
+        super(term);
         this.time = time;
         this.dur = dur;
                 //term.op() == CONJ ? term.dtRange() : 0;
@@ -35,7 +35,7 @@ public class TimeEvent extends Event {
 
     @Override
     public Event neg() {
-        return new TimeEvent(t, term.neg(), time);
+        return new TimeEvent(term.neg(), time);
     }
 
     @Override

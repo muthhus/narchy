@@ -7,12 +7,12 @@ import static nars.time.Tense.ETERNAL;
 public class SolutionEvent extends AbsoluteEvent {
 
 
-    SolutionEvent(ITemporalize  t, Term term, long start) {
-        this(t, term, start, start != ETERNAL ? start + term.dtRange() : ETERNAL);
+    SolutionEvent(Term term, long start) {
+        this(term, start, start != ETERNAL ? start + term.dtRange() : ETERNAL);
     }
 
-    SolutionEvent(ITemporalize t, Term term, long start, long end) {
-        super(t, term, start, end);
+    SolutionEvent(Term term, long start, long end) {
+        super(term, start, end);
     }
 
 //        SolutionEvent(Term unknown) {

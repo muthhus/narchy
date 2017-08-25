@@ -12,12 +12,12 @@ public class AbsoluteEvent extends Event {
 
     public final long start, end;
 
-    public AbsoluteEvent(ITemporalize t, Term term, long occ) {
-        this(t, term, occ, occ);
+    public AbsoluteEvent(Term term, long occ) {
+        this(term, occ, occ);
     }
 
-    public AbsoluteEvent(ITemporalize t, Term term, long start, long end) {
-        super(t, term);
+    public AbsoluteEvent(Term term, long start, long end) {
+        super(term);
 
         if (start == ETERNAL) {
             this.start = this.end = ETERNAL;
@@ -47,7 +47,7 @@ public class AbsoluteEvent extends Event {
 
     @Override
     public Event neg() {
-        return new AbsoluteEvent(t, term.neg(), start, end);
+        return new AbsoluteEvent(term.neg(), start, end);
     }
 
     @NotNull
