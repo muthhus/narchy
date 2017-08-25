@@ -74,6 +74,8 @@ public class DerivationTemporalize extends Temporalize {
     @Nullable
     public Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] eviGain) {
 
+        Task belief = d.single ? null : this.belief; //if single, ignore belief occurrence HACK this may not completely ignore any absolute values associated with events contained in the belief
+
         Map<Term, Time> trail = new HashMap<>();
         Event e;
         try {

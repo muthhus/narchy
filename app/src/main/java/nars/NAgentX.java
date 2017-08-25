@@ -307,6 +307,8 @@ abstract public class NAgentX extends NAgent {
 //        }), 100, 100);
 
 
+        System.gc();
+
         return n;
     }
 
