@@ -7,7 +7,6 @@ import nars.Param;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.control.Derivation;
-import nars.derive.time.Temporalize;
 import nars.op.DepIndepVarIntroduction;
 import nars.task.DebugDerivedTask;
 import nars.task.DerivedTask;
@@ -168,7 +167,8 @@ public class Conclusion extends AbstractPred<Derivation> {
             if (goalUrgent && d.concPunc == GOAL && occ[0] != ETERNAL) {
                 long taskStart = d.task.start();
                 if (taskStart != ETERNAL) {
-                    /*if (occ[0] < taskStart)*/ {
+                    /*if (occ[0] < taskStart)*/
+                    {
                         long taskDur = occ[1] - occ[0];
                         occ[0] = taskStart;
                         occ[1] = occ[0] + taskDur;
@@ -189,7 +189,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         byte punc = d.concPunc;
         Task t = Task.tryTask(c2, punc, truth, (C, tr) -> {
 
-            if (tr!=null) { //beliefs and goals
+            if (tr != null) { //beliefs and goals
                 tr = tr.ditherFreqConf(d.truthResolution, d.confMin, eviGain[0]);
                 if (tr == null)
                     return null; //HACK
@@ -240,15 +240,13 @@ public class Conclusion extends AbstractPred<Derivation> {
     }
 
     private Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] eviGain) {
-        Term t1;
-        Temporalize dt = d.temporalize;
+        DerivationTemporalize dt = d.temporalize;
         if (dt == null) {
-            d.temporalize = dt = new Temporalize(d.random); //cache in derivation
+            d.temporalize = dt = new DerivationTemporalize(d); //cache in derivation
         }
-        t1 = dt.solve(d, c1, occ, eviGain);
-        return t1;
+//        dt = new DerivationTemporalize(d);
+        return dt.solve(d, c1, occ, eviGain);
     }
-
 
     boolean same(Task derived, Task parent, float truthResolution) {
         if (parent.isDeleted())

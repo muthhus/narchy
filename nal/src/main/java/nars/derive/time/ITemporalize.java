@@ -33,25 +33,6 @@ public interface ITemporalize {
     }
 
 
-        /**
-     * unknowns to solve otherwise the result is impossible:
-     * - derived task start time
-     * - derived task end time
-     * - dt intervals for any XTERNAL appearing in the input term
-     * knowns:
-     * - for each task and optional belief in the derived premise:
-     * - start/end time of the task
-     * - start/end time of any contained events
-     * - possible relations between events referred to in the conclusion that
-     * appear in the premise.  this may be partial due to variable introduction
-     * and other reductions. an attempt can be made to back-solve the result.
-     * if that fails, a heuristic could decide the match. in the worst case,
-     * the derivation will not be temporalizable and this method returns null.
-     *
-     * @param eviGain length-1 float array. the value will be set to 1f by default
-     *
-     */
-    @Nullable Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] eviGain);
 
 
 }

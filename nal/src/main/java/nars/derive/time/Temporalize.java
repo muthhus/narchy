@@ -51,7 +51,10 @@ public class Temporalize implements ITemporalize {
     public final Map<Term, SortedSet<Event>> constraints = new HashMap<>();
     private final Random random;
     public int dur = 1;
-    private static final boolean knowTransformed = true;
+    protected static final boolean knowTransformed = true;
+
+    /** HACK move this this to the solution instance class when it is separated from the pattern class */
+    Boolean fullyEternal = null;
 
     /**
      * for testing
@@ -64,112 +67,6 @@ public class Temporalize implements ITemporalize {
         this.random = random;
     }
 
-    @Override
-    @Nullable
-    public Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] eviGain) {
-
-        Task task = d.task;
-        Task belief = !d.single ? d.belief : null;
-        dur = Math.max(1, Math.round(d.nar.dtDither.floatValue() * d.dur));
-
-        ITemporalize t = this;
-
-
-        t.knowDerivedTerm(d, task.term(), task.start(), task.end());
-
-        if (belief != null) {
-            if (!belief.equals(task)) {
-
-                t.knowDerivedTerm(d, d.beliefTerm, belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
-            }
-        } else /*if (d.beliefTerm != null)*/ {
-            if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
-
-                Term b = d.beliefTerm;
-                ((Temporalize) t).knowAmbient(b);
-
-                if (knowTransformed) {
-                    Term b2 = d.transform(b);
-                    if (!b2.equals(b) && !(b2 instanceof Bool))
-                        knowAmbient(b2);
-                }
-            }
-            //t.know(d.beliefTerm, d, null);
-        }
-
-        Map<Term, Time> trail = new HashMap<>();
-        Event e;
-        try {
-            e = t.solve(pattern, trail);
-        } catch (StackOverflowError ignored) {
-            System.err.println(
-                    Arrays.toString(new Object[]{"temporalize stack overflow:\n{} {}\n\t{}\n\t{}", pattern, d, t, trail})
-                    //logger.error(
-            );
-//            trail.clear();
-//            model.solve(pattern, trail);
-            return null;
-        }
-        if (e == null || !e.term.op().conceptualizable)
-            return null;
-
-        if (e instanceof AbsoluteEvent) {
-            AbsoluteEvent a = (AbsoluteEvent) e; //faster, preferred since pre-calculated
-            occ[0] = a.start;
-            occ[1] = a.end;
-        } else {
-            occ[0] = e.start(trail).abs();
-            occ[1] = e.end(trail).abs();
-        }
-
-        boolean te = task.isEternal();
-        if (occ[0] == ETERNAL && (!te || (belief != null && !belief.isEternal()))) {
-            //"eternal derived from non-eternal premise:\n" + task + ' ' + belief + " -> " + occ[0];
-            //uneternalize/retemporalize:
-
-//            if (/*(e.term.op() != IMPL) && */
-//                    (task.op() == IMPL) && (belief == null || d.beliefTerm.op() == IMPL)) {
-//                //dont retemporalize a non-implication derived from two implications
-//                //it means that the timing is unknown
-//                return null;
-//            }
-
-            long ts = task.start();
-            long k;
-            if (!te && (belief != null && !belief.isEternal())) {
-                //interpolate
-                ts = task.nearestTimeBetween(belief.start(), belief.end());
-                long bs = belief.nearestTimeBetween(ts, task.end());
-                if (ts != bs) {
-                    //confidence decay in proportion to lack of coherence
-                    if (task.isBeliefOrGoal()) {
-                        float taskEvi = task.conf();
-                        float beliefEvi = belief.conf();
-                        float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
-                        k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
-                        long distSum =
-                                Math.abs(task.nearestTimeTo(k) - k) +
-                                        Math.abs(belief.nearestTimeTo(k) - k);
-                        if (distSum > 0) {
-                            eviGain[0] *= TruthPolation.evidenceDecay(1, d.dur, distSum);
-                        }
-                    } else {
-                        k = bs;
-                    }
-                } else {
-                    k = ts;
-                }
-            } else if (te) {
-                k = belief.start(); //TODO any duration?
-            } else /*if (be)*/ {
-                k = ts; //TODO any duration?
-            }
-            occ[0] = occ[1] = k;
-        }
-
-
-        return e.term;
-    }
 
 
 //    /**
@@ -550,8 +447,6 @@ public class Temporalize implements ITemporalize {
         return constraints.values().stream().flatMap(Collection::stream);
     }
 
-    /** HACK move this this to the solution instance class when it is separated from the pattern class */
-    Boolean fullyEternal = null;
 
     @Override
     public Event solve(final Term x, Map<Term, Time> trail) {
