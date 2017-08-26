@@ -305,9 +305,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             }
         }
 
-        /*if (isCommand)*/
-        nar.eventTask.emit(cmd);
-        return null;
+//        if (isCommand())
+//        nar.eventTask.emit(cmd);
+        return cmd;
 
     }
 
@@ -1036,9 +1036,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             }
         }
 
-        if (isCommand()) {
-            execute(this, n);
-            return null; //done
+        if (isCommand() || (isGoal() && !isEternal())) {
+            Task exe = execute(this, n);
+            if (exe!=this)
+                return null; //done
         }
 
 //        if (n.time instanceof FrameTime) {

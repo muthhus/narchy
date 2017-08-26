@@ -318,6 +318,7 @@ public abstract class Unify extends Versioning implements Subst {
 
     }
 
+    /** stack counter, not time */
     public final int now() {
         return this.size();
     }

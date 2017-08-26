@@ -17,6 +17,7 @@ import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
+import nars.time.Tense;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -317,12 +318,13 @@ abstract public class NAgent extends DurService implements NSense, NAct {
             /** set the sensor budget policy */
 
             @NotNull Term happy = this.happy.term();
-            predictors.add(
-                    goal(happy,
-                            t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
-                            //ETERNAL
-                    )
-            );
+            nar.goal(happy); /* eternal */
+//            predictors.add(
+//                    goal(happy,
+//                            t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
+//                            //ETERNAL
+//                    )
+//            );
 
             //        p.add(
             //            question(seq($.varQuery(1), dur, happiness),
