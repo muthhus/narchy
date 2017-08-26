@@ -1,7 +1,12 @@
 package nars;
 
+import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.learn.ql.HaiQAgent;
+import jcog.math.FirstOrderDifferenceFloat;
+import jcog.math.FloatNormalized;
 import jcog.pri.mix.control.MixContRL;
+import nars.control.AgentService;
 import nars.control.Derivation;
 import nars.control.NARService;
 import nars.derive.Deriver;
@@ -10,6 +15,7 @@ import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
+import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -124,8 +130,8 @@ abstract public class NAgentX extends NAgent {
 
         clock.durFPS(durFPS);
 
-        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8);
-                //,"motivation.nal");
+        Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
+                ,"motivation.nal");
 
         int THREADS = 3;
         NAR n = new NARS()
@@ -157,15 +163,15 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.75f);
+        n.goalConfidence(0.5f);
 
 
         float priFactor = 0.25f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
-        n.DEFAULT_GOAL_PRIORITY = 0.75f * priFactor;
-        n.DEFAULT_QUESTION_PRIORITY = 0.25f * priFactor;
-        n.DEFAULT_QUEST_PRIORITY = 0.25f * priFactor;
-        n.termVolumeMax.setValue(24);
+        n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
+        n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
+        n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
+        n.termVolumeMax.setValue(28);
 
         n.dtDither.setValue(0.5f);
         //n.dtMergeOrChoose.setValue(true);
@@ -173,9 +179,9 @@ abstract public class NAgentX extends NAgent {
         STMLinkage stmLink = new STMLinkage(n, 1, false);
         MySTMClustered stmBelief = new MySTMClustered(n, 64, BELIEF, 4, false, 8f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
-        MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, false, 2f);
+        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, false, 2f);
         Inperience inp = new Inperience(n, 8, 0.02f);
-        //Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
+        Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
 
 
         NAgent a = init.apply(n);
@@ -276,28 +282,30 @@ abstract public class NAgentX extends NAgent {
 //                () -> a.dexterity() * Util.tanhFast( a.reward) /* - lag */ ) //reward function
 //
 //                .in(a::dexterity)
-//                .in(new FloatNormalized(()->a.reward).decay(0.98f))
+//                .in(new FloatNormalized(()->a.reward).decay(0.9f))
 //                .in(new FloatNormalized(
 //                        ((Emotivation) n.emotion).cycleDTRealMean::getValue)
-//                            .decay(0.99f)
+//                            .decay(0.9f)
 //                )
 //                .in(new FloatNormalized(
 //                        //TODO use a Long-specific impl of this:
 //                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.taskDerivations.getValue().longValue())
-//                ).decay(0.99f))
+//                ).decay(0.9f))
 //                .in(new FloatNormalized(
 //                        //TODO use a Long-specific impl of this:
 //                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.conceptFirePremises.getValue().longValue())
-//                    ).decay(0.99f)
+//                    ).decay(0.9f)
 //                ).in(new FloatNormalized(
 //                        () -> n.emotion.busyVol.getSum()
-//                    ).decay(0.99f)
+//                    ).decay(0.9f)
 //                ).out(
-//                        new HarmonicController(n.confMin::setValue, 0.01f, 0.08f)
+//                        new StepController((x) -> n.time.dur(Math.round(x)), 1, n.dur(), n.dur()*2)
 //                ).out(
-//                        new HarmonicController(n.truthResolution::setValue, 0.01f, 0.08f)
+//                        StepController.harmonic(n.confMin::setValue, 0.01f, 0.08f)
 //                ).out(
-//                        new HarmonicController(a.curiosity::setValue, 0.01f, 0.16f)
+//                        StepController.harmonic(n.truthResolution::setValue, 0.01f, 0.08f)
+//                ).out(
+//                        StepController.harmonic(a.curiosity::setValue, 0.01f, 0.16f)
 //                ).get(n);
 
 //
@@ -318,14 +326,18 @@ abstract public class NAgentX extends NAgent {
      * <p>
      * TODO allow powers other than 2, ex: 1.618
      */
-    public static class HarmonicController implements IntConsumer, IntObjectPair<HarmonicController> {
+    public static class StepController implements IntConsumer, IntObjectPair<StepController> {
 
         private final FloatProcedure update;
         final float[] v;
         int x;
 
-        public HarmonicController(FloatProcedure update, float min, float max) {
+        public StepController(FloatProcedure update, float... steps) {
+            v = steps;
             this.update = update;
+        }
+
+        public static StepController harmonic(FloatProcedure update, float min, float max) {
 
             FloatArrayList f = new FloatArrayList();
             float x = min;
@@ -334,7 +346,7 @@ abstract public class NAgentX extends NAgent {
                 x *= 2;
             }
             assert (f.size() > 1);
-            v = f.toArray();
+            return new StepController(update, f.toArray());
             //set(0);
         }
 
@@ -373,12 +385,12 @@ abstract public class NAgentX extends NAgent {
         }
 
         @Override
-        public HarmonicController getTwo() {
+        public StepController getTwo() {
             return this;
         }
 
         @Override
-        public int compareTo(@NotNull IntObjectPair<HarmonicController> o) {
+        public int compareTo(@NotNull IntObjectPair<StepController> o) {
             throw new UnsupportedOperationException();
         }
     }

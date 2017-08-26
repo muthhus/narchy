@@ -136,7 +136,7 @@ public class MySTMClustered extends STMClustered {
             float deltaT = now - lastIteration;
             lastIteration = now;
 
-            int inputs = Math.round(inputsPerDur * deltaT / dur);
+            int inputs = Math.round(in.factor() * inputsPerDur * deltaT / dur);
             if (inputs > 0) {
                 cluster(inputs, minGroupSize, maxGroupSize, nar);
             }

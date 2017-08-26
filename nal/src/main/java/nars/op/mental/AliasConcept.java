@@ -10,10 +10,8 @@ import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atom;
-import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
@@ -28,6 +26,8 @@ import java.util.Collection;
  */
 public final class AliasConcept extends BaseConcept {
 
+
+    private final Collection<Termed> templates;
 
     public static class AliasAtom extends Atom {
 
@@ -77,7 +77,8 @@ public final class AliasConcept extends BaseConcept {
     @NotNull
     public final Compound abbr;
 
-    @NotNull static public AliasConcept get(@NotNull String compressed, @NotNull Concept decompressed, @NotNull NAR nar) {
+    @NotNull
+    static public AliasConcept get(@NotNull String compressed, @NotNull Concept decompressed, @NotNull NAR nar) {
         AliasConcept a = new AliasConcept(compressed, decompressed, nar);
         return a;
     }
@@ -85,7 +86,7 @@ public final class AliasConcept extends BaseConcept {
     AliasConcept(@NotNull String abbreviation, Concept decompressed, @NotNull NAR nar) {
         super(new AliasAtom(abbreviation, decompressed.term()),
                 decompressed.beliefs(), decompressed.goals(), decompressed.questions(), decompressed.quests(),
-                new Bag[] { decompressed.termlinks(), decompressed.tasklinks() } );
+                new Bag[]{decompressed.termlinks(), decompressed.tasklinks()});
 
         this.abbr = (Compound) decompressed.term();
         put(Abbreviation.class, abbr);
@@ -93,7 +94,7 @@ public final class AliasConcept extends BaseConcept {
 //            Term[] tl = ArrayUtils.add(abbreviated.templates().terms(), abbreviated.term());
 //            if (additionalTerms.length > 0)
 //                tl = ArrayUtils.addAll(tl, additionalTerms);
-//            this.templates = TermVector.the(tl);
+        this.templates = decompressed.templates(nar);
 
         //rewriteLinks(nar);
     }
@@ -101,8 +102,9 @@ public final class AliasConcept extends BaseConcept {
 
     @Override
     public Collection<Termed> templates(NAR nar) {
-        @Nullable Concept c = nar.conceptualize(abbr);
-        return c == null ? null : c.templates(nar);
+        return templates;
+//        @Nullable Concept c = nar.conceptualize(abbr);
+//        return c == null ? null : c.templates(nar);
     }
 
     //
@@ -139,10 +141,6 @@ public final class AliasConcept extends BaseConcept {
 //        }
 
 
-
-
-
-
 //        @Override
 //        public boolean equals(Object u) {
 //            return super.equals(u);
@@ -153,7 +151,6 @@ public final class AliasConcept extends BaseConcept {
 //        public final Activation process(@NotNull Task input, NAR nar) {
 //            return abbr.process(input, nar);
 //        }
-
 
 
 //        @NotNull

@@ -72,7 +72,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     public final FloatParam predictAheadDurs = new FloatParam(8, 1, 32);
 
 
-    public final FloatParam predictorProbability = new FloatParam(0.5f);
+    public final FloatParam predictorProbability = new FloatParam(0.25f);
     private final CauseChannel<Task> predict;
 
 
