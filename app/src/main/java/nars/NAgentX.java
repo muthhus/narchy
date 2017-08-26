@@ -1,11 +1,13 @@
 package nars;
 
+import com.google.common.collect.Iterables;
 import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.learn.ql.HaiQAgent;
 import jcog.math.FirstOrderDifferenceFloat;
 import jcog.math.FloatNormalized;
 import jcog.pri.mix.control.MixContRL;
+import nars.concept.ActionConcept;
 import nars.control.AgentService;
 import nars.control.Derivation;
 import nars.control.NARService;
@@ -13,8 +15,10 @@ import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
+import nars.exe.UniExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
+import nars.op.Implier;
 import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
@@ -38,6 +42,7 @@ import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -146,7 +151,7 @@ abstract public class NAgentX extends NAgent {
                                             }
                                         }
 
-//                                        new UnifiedExec()
+//                                        new UniExec()
 
                                 ), THREADS, 2))
                 .time(clock)
@@ -163,25 +168,26 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.5f);
+        n.goalConfidence(0.7f);
+
 
 
         float priFactor = 0.25f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
-        n.DEFAULT_QUESTION_PRIORITY = 0.5f * priFactor;
-        n.DEFAULT_QUEST_PRIORITY = 0.5f * priFactor;
+        n.DEFAULT_QUESTION_PRIORITY = 0.25f * priFactor;
+        n.DEFAULT_QUEST_PRIORITY = 0.25f * priFactor;
         n.termVolumeMax.setValue(28);
 
-        n.dtDither.setValue(0.5f);
+        //n.dtDither.setValue(0.5f);
         //n.dtMergeOrChoose.setValue(true);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
         MySTMClustered stmBelief = new MySTMClustered(n, 64, BELIEF, 4, false, 8f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
-        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 2, false, 2f);
+        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 3, false, 2f);
         Inperience inp = new Inperience(n, 8, 0.02f);
-        Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
+        //Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
 
 
         NAgent a = init.apply(n);
@@ -193,12 +199,13 @@ abstract public class NAgentX extends NAgent {
 //                System.out.println(t);
 //        });
 
-        chart(a);
-        chart(n, a);
+
 
         NInner nin = new NInner(n);
         nin.start();
 
+        chart(a);
+        chart(n, a);
         window(/*row*/(
 
                 causePlot(n)
@@ -250,7 +257,8 @@ abstract public class NAgentX extends NAgent {
 
         //init();
 
-        NARLoop loop = a.nar.startFPS(fps);
+        NARLoop loop =
+                a.nar.startFPS(fps);
 
 //        this.loop = nar.exe.loop(fps, () -> {
 //            if (enabled.get()) {

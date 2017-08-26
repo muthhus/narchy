@@ -29,6 +29,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.table.TemporalBeliefTable.temporalTaskPriority;
+import static nars.time.Tense.ETERNAL;
 
 public class RTreeBeliefTable implements TemporalBeliefTable {
 
@@ -362,6 +363,9 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public Task match(long start, long end, @Nullable Term template, NAR nar) {
 
+        assert(end >= start);
+        assert(start!=ETERNAL);
+
         int s = size();
         if (s == 0)
             return null;
@@ -444,8 +448,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     if (u.size() >= min)
                         break;
 
-                    scanStart = nextStart;
-                    scanEnd = nextEnd;
+                    scanStart = nextStart-1;
+                    scanEnd = nextEnd+1;
                 } while (done<2);
             }
         }

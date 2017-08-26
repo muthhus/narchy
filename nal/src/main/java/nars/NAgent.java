@@ -530,7 +530,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         int dur = nar.dur();
         long now = nar.time();
         actions.keySet().forEach(a -> {
-            Truth g = nar.goalTruth(a, now);
+            Truth g = nar.goalTruth(a, now-dur/2, now+dur/2);
             float c;
             if (g != null) {
                 c = g.evi();

@@ -84,7 +84,7 @@ public interface TruthOperator {
         }
 
         @Override @Nullable public Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf) {
-            return task == null ? null : o.apply(task.negated(), belief, m, minConf);
+            return task == null ? null : o.apply(task.neg(), belief, m, minConf);
         }
 
         @NotNull @Override public final String toString() {
@@ -107,7 +107,7 @@ public interface TruthOperator {
         }
 
         @Override @Nullable public Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf) {
-            return o.apply(task, belief!=null ? belief.negated() : null, m, minConf);
+            return o.apply(task, belief!=null ? belief.neg() : null, m, minConf);
         }
 
         @NotNull @Override public final String toString() {
@@ -144,7 +144,7 @@ public interface TruthOperator {
                 if (t!=null && (o == BeliefFunction.Comparison /* || o == GoalFunction.Comparison */)) {
                     //special case(s): commutive xor
                     if (tn ^ bn)
-                        t = t.negated();
+                        t = t.neg();
                 }
                 return t;
             }
@@ -171,7 +171,7 @@ public interface TruthOperator {
         }
 
         @Override @Nullable public Truth apply(@Nullable Truth task, @Nullable Truth belief, NAR m, float minConf) {
-            return task == null ? null : o.apply(task.negated(), belief!=null ? belief.negated() : null, m, minConf);
+            return task == null ? null : o.apply(task.neg(), belief!=null ? belief.neg() : null, m, minConf);
         }
 
         @NotNull @Override public final String toString() {

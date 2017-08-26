@@ -22,7 +22,7 @@ import nars.derive.PrediTerm;
 import nars.exe.Exec;
 import nars.index.term.TermContext;
 import nars.index.term.TermIndex;
-import nars.op.Command;
+import nars.op.Operation;
 import nars.op.Operator;
 import nars.table.BeliefTable;
 import nars.task.ITask;
@@ -821,7 +821,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @Deprecated
     public final void on(@NotNull Atom a, @NotNull Operator o) {
 
-        on(new Command(a, this) {
+        on(new Operation(a, this) {
 
             @Override
             public @Nullable Task run(@NotNull Task t, @NotNull NAR nar) {
@@ -837,7 +837,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         });
     }
 
-    public final void on(@NotNull Command c) {
+    public final void on(@NotNull Operation c) {
         terms.set(c);
     }
 
@@ -908,10 +908,18 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public Truth beliefTruth(Termed concept, long when) {
         return truth(concept, BELIEF, when);
     }
+    @Nullable
+    public Truth beliefTruth(Termed concept, long start, long end) {
+        return truth(concept, BELIEF, start, end);
+    }
 
     @Nullable
     public Truth goalTruth(Termed concept, long when) {
         return truth(concept, GOAL, when);
+    }
+    @Nullable
+    public Truth goalTruth(Termed concept, long start, long end) {
+        return truth(concept, GOAL, start, end);
     }
 
 

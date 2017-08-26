@@ -13,7 +13,10 @@ import java.util.function.BiConsumer;
 
 import static nars.time.Tense.ETERNAL;
 
-abstract public class DebouncedCommand extends Command implements BiConsumer<Task, NAR> {
+/**
+ * debounced and atomically/asynchronously executable operation
+ */
+abstract public class AtomicOperation extends Operation implements BiConsumer<Task, NAR> {
 
     private final float minPeriod;
     private final float expThresh;
@@ -24,9 +27,9 @@ abstract public class DebouncedCommand extends Command implements BiConsumer<Tas
     final AtomicLong rise = new AtomicLong(ETERNAL);
 
     long lastActivity = ETERNAL;
-    public static final Logger logger = LoggerFactory.getLogger(DebouncedCommand.class);
+    public static final Logger logger = LoggerFactory.getLogger(AtomicOperation.class);
 
-    protected DebouncedCommand(@NotNull Atom atom, float minPeriod /* dur's */, float expThresh, NAR n) {
+    protected AtomicOperation(@NotNull Atom atom, float minPeriod /* dur's */, float expThresh, NAR n) {
         super(atom, n);
         this.minPeriod = minPeriod;
         this.expThresh = expThresh;
@@ -35,11 +38,12 @@ abstract public class DebouncedCommand extends Command implements BiConsumer<Tas
 
     @Override
     public @Nullable Task run(@NotNull Task x, @NotNull NAR n) {
-        long now = n.time();
-        int dur = n.dur();
 
-        if (x.during(now - dur/2, now + dur/2)) {
-            if (x.expectation() >= expThresh) {
+
+        if (x.expectation() >= expThresh) {
+            long now = n.time();
+            int dur = n.dur();
+            if (x.during(now - dur / 2, now + dur / 2)) {
                 tryInvoke(x, n);
             }
         }

@@ -43,7 +43,6 @@ public class Signal extends AtomicReference<SignalTask> {
 
     public Signal(byte punc, FloatSupplier resolution) {
         super(null);
-        pri(1);
         this.punc = punc;
         this.resolution = resolution;
     }
@@ -127,11 +126,6 @@ public class Signal extends AtomicReference<SignalTask> {
         return this;
     }
 
-    @NotNull
-    public Signal pri(float p) {
-        pri(() -> p);
-        return this;
-    }
 
     public static final Consumer<Task> Pending = (x) -> {
     };

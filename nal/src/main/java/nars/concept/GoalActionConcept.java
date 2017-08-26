@@ -6,6 +6,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAct;
 import nars.Task;
+import nars.task.SignalTask;
 import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -70,7 +71,7 @@ public class GoalActionConcept extends ActionConcept {
 
         float v = super.value(t, activation, when, n);
 
-        if (t.isBeliefOrGoal() /*t.isGoal()*/ && !t.isInput()) {
+        if (t.isBeliefOrGoal() /*t.isGoal()*/ && !t.isInput() && !(t instanceof SignalTask)) {
 
             long now = n.time();
             if (!t.isBefore(now)) {

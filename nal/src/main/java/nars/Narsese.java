@@ -27,7 +27,6 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -1234,7 +1233,7 @@ public class Narsese extends BaseParser<Object> {
             if (content.op() == NEG) {
                 content = content.unneg();
                 if (t1 != null)
-                    t1 = t1.negated();
+                    t1 = t1.neg();
             }
 
             TaskBuilder ttt =

@@ -113,8 +113,9 @@ public class DerivationTemporalize extends Temporalize {
 //            model.solve(pattern, trail);
             return null;
         }
-        if (e == null || !e.term.op().conceptualizable)
+        if (e == null || !e.term.op().conceptualizable) {
             return null;
+        }
 
         if (e instanceof AbsoluteEvent) {
             AbsoluteEvent a = (AbsoluteEvent) e; //faster, preferred since pre-calculated
@@ -147,8 +148,8 @@ public class DerivationTemporalize extends Temporalize {
                 if (ts != bs) {
                     //confidence decay in proportion to lack of coherence
                     if (task.isBeliefOrGoal()) {
-                        float taskEvi = task.conf();
-                        float beliefEvi = belief.conf();
+                        float taskEvi = task.evi();
+                        float beliefEvi = belief.evi();
                         float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
                         k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
                         long distSum =

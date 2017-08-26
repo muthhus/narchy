@@ -24,6 +24,7 @@ import java.util.Map;
 import static nars.Op.GOAL;
 import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
+import static nars.truth.TruthFunctions.w2c;
 
 
 /**
@@ -56,6 +57,8 @@ public class Implier extends DurService {
     private long now;
 
     final static TruthOperator dedRec = GoalFunction.get($.the("DeductionRecursivePB"));
+    final static TruthOperator indRec = GoalFunction.get($.the("InductionRecursivePB"));
+    private long nowStart, nowEnd;
 
     public Implier(NAR n, Term... seeds) {
         this(n, List.of(seeds));
@@ -71,7 +74,7 @@ public class Implier extends DurService {
         this.tg = new TermGraph.ImplGraph() {
             @Override
             protected boolean acceptTerm(Term p) {
-                return !(p instanceof Variable) && !p.isTemporal();
+                return !(p instanceof Variable);// && !p.isTemporal();
             }
         };
     }
@@ -81,6 +84,8 @@ public class Implier extends DurService {
 
         int dur = nar.dur();
         now = nar.time();
+        nowStart = now - dur / 2;
+        nowEnd = now + dur / 2;
         next = (now + (long) (relativeTargetDur * dur));
 
         desire.clear();
@@ -116,31 +121,64 @@ public class Implier extends DurService {
             if (SGimpl == null)
                 return;
 
-            //G, (S ==> G) |- S  (Goal:DeductionRecursivePB)
-
-            float SGimplTruth = SGimpl.conf(now, dur);
-            if (SGimplTruth < confSubMin)
+            float implConf = w2c(SGimpl.evi(nowStart, nowEnd, dur));
+            if (implConf < confSubMin)
                 return;
 
-            int dt = SGimpl.dt();
-            if (dt == DTERNAL)
-                dt = 0;
+            int implDT = SGimpl.dt();
+            if (implDT == DTERNAL)
+                implDT = 0;
 
-            Truth Gg = desire(pred, +dt); //the desire at the predicate time
-            if (Gg == null)
-                return;
 
             float f = SGimpl.freq();
-            if (subj.op() == NEG) {
-                subj = subj.unneg();
-                f = 1 - f;
-            }
 
-            Truth Sg = dedRec.apply(Gg, $.t(f, SGimplTruth), nar, confSubMin);
 
-            if (Sg != null) {
-                goal(goalTruth, subj, Sg);
+            {
+                //G, (S ==> G) |- S  (Goal:DeductionRecursivePB)
+                Truth Pg = desire(pred, nowStart + implDT, nowEnd + implDT); //the desire at the predicate time
+                if (Pg == null)
+                    return;
+
+                float implFreq = f;
+//                if (subj.op() == NEG) {
+//                    subj = subj.unneg();
+//                    implFreq = 1 - implFreq;
+//                }
+
+                Truth Sg = dedRec.apply(Pg, $.t(implFreq, implConf), nar, confSubMin);
+
+                if (Sg != null) {
+                    goal(goalTruth, subj, Sg);
+                }
             }
+            //experimental:
+//            {
+//                //G, (G ==> P) |- P (Goal:InductionRecursivePB)
+//                //G, ((--,G) ==> P) |- P (Goal:InductionRecursivePBN)
+//
+//                //HACK only immediate future otherwise it needs scheduled further
+//                if (implDT >= 0 && implDT <= dur/2) {
+//
+//                    Truth Ps = desire(subj, nowStart, nowEnd); //subj desire now
+//                    if (Ps == null)
+//                        return;
+//
+//                    float implFreq = f;
+//
+//
+//
+//                    if (Ps.isNegative()) {
+//                        subj = subj.neg();
+//                        Ps = Ps.neg();
+//                    }
+//
+//                    //TODO invert g and choose indRec/indRecN
+//                    Truth Pg = indRec.apply(Ps, $.t(implFreq, implConf), nar, confSubMin);
+//                    if (Pg != null) {
+//                        goal(goalTruth, pred, Pg);
+//                    }
+//                }
+//            }
 
         });
 
@@ -172,16 +210,16 @@ public class Implier extends DurService {
 
     }
 
-    private Truth desire(Term x, long when) {
-        return nar.goalTruth(x, when);
+    private Truth desire(Term x, long from, long to) {
+        return nar.goalTruth(x, from, to);
     }
 
     private Truth desire(Term x) {
-        return desire.computeIfAbsent(x, (xx) -> desire(xx, next));
+        return desire.computeIfAbsent(x, (xx) -> desire(xx, now, next));
     }
 
     private Task belief(Term x) {
-        return belief.computeIfAbsent(x, (xx) -> nar.belief(xx, now, now));
+        return belief.computeIfAbsent(x, (xx) -> nar.belief(xx, nowStart, nowEnd));
     }
 
     public void goal(Map<Term, TruthAccumulator> goals, Term tt, Truth g) {

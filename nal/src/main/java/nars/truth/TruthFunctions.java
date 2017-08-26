@@ -58,7 +58,7 @@ public final class TruthFunctions  {
      */
     @Nullable
     public static Truth negation(@Nullable Truth v1, float minConf) {
-        return ((v1 == null) || (v1.conf() < minConf)) ? null : v1.negated();
+        return ((v1 == null) || (v1.conf() < minConf)) ? null : v1.neg();
 
         /*
 
@@ -383,7 +383,7 @@ public final class TruthFunctions  {
         Truth v11 = deductionR(i12, 1.0f, minConf);
         if (v11 == null) return null;
 
-        return v11.negated(); //negation(v11, minConf);
+        return v11.neg(); //negation(v11, minConf);
 
 
 //        AnalyticTruth x = deduction(
@@ -434,7 +434,7 @@ public final class TruthFunctions  {
 
     @Nullable
     public static Truth difference(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
-        return intersection(a, b.negated(), minConf);
+        return intersection(a, b.neg(), minConf);
 
 //        float f1 = a.freq();
 //        float f2 = b.freq();

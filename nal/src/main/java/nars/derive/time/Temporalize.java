@@ -312,9 +312,9 @@ public class Temporalize implements ITemporalize {
             case CONJ:
                 int tdt = x.dt();
                 if (tdt == DTERNAL) {
-//                    term.subterms().forEach(sub -> {
-//                        know(sub, relative(sub, term, 0)); //link to super-conj
-//                    });
+                    x.subterms().forEach(sub -> {
+                        know(sub, relative(sub, x, 0)); //link to super-conj
+                    });
                 } else if (tdt != XTERNAL) {
                     //add the known timing of the conj's events
 
@@ -541,12 +541,15 @@ public class Temporalize implements ITemporalize {
                         if (at != null) {
                             Time bt = be.start(trail);
                             if (bt != null) {
-                                return solveConj(a, at, b, bt);
+                                Event e = solveConj(a, at, b, bt);
+                                if (e != null)
+                                    return e;
                             }
                         }
                     }
                 }
-            } else /*if (target.dt() == XTERNAL)*/ {
+                return new AmbientEvent(x); //last resort, use the input as-is
+            } else {
                 TermContainer tt = x.subterms();
 
                 int tts = tt.size();

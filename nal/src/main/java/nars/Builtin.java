@@ -2,7 +2,7 @@ package nars;
 
 import jcog.Texts;
 import nars.concept.Concept;
-import nars.op.Command;
+import nars.op.Operation;
 import nars.op.DepIndepVarIntroduction;
 import nars.op.Operator;
 import nars.op.data.*;
@@ -10,7 +10,6 @@ import nars.op.data.intersect;
 import nars.op.substitute;
 import nars.term.Functor;
 import nars.term.Term;
-import nars.term.Terms;
 import nars.term.atom.Atom;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
@@ -261,7 +260,7 @@ public class Builtin {
 
         Operator log = (a, t, n) -> NAR.logger.info(" {}", t);
         nar.on("log", log);
-        nar.on(Command.LOG_FUNCTOR, log);
+        nar.on(Operation.LOG_FUNCTOR, log);
 
         nar.on("error", (a, t, n) -> NAR.logger.error(" {}", t));
 
@@ -272,11 +271,11 @@ public class Builtin {
         nar.on("clear", (op, args, n) -> {
             n.runLater(() -> {
                 n.clear();
-                Command.log(n, "ready");
+                Operation.log(n, "ready");
             });
         });
 
-        nar.on("stat", (op, args, n) -> Command.log(n,
+        nar.on("stat", (op, args, n) -> Operation.log(n,
                 $.p(
                         $.quote(n.emotion.summary()),
                         $.quote(n.terms.summary()),

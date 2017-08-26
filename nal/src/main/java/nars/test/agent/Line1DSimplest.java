@@ -44,7 +44,7 @@ public class Line1DSimplest extends NAgent {
         in = senseNumber(
                 //$.inh($.the("i"), id),
                 $.the("i"),
-                this.i, 3, ScalarConcepts.Needle);
+                this.i, 2, ScalarConcepts.Needle);
 
 //        action( new GoalActionConcept($.p($.the("o"), id), nar, (b,d) -> {
 //            if (d!=null) {

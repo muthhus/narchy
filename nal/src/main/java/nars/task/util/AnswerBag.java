@@ -7,7 +7,7 @@ import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
-import nars.op.Command;
+import nars.op.Operation;
 import org.jetbrains.annotations.NotNull;
 
 public final class AnswerBag extends PLinkArrayBag<Task> {
@@ -26,6 +26,6 @@ public final class AnswerBag extends PLinkArrayBag<Task> {
     @Override
     public void onAdded(@NotNull PriReference<Task> x) {
         if (Param.ANSWER_REPORTING)
-            Command.log(nar, question + "  " + x.get());
+            Operation.log(nar, question + "  " + x.get());
     }
 }

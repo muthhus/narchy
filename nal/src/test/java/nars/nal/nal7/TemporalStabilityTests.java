@@ -14,7 +14,7 @@ import org.junit.Test;
  */
 public class TemporalStabilityTests {
 
-    static final int CYCLES = 100;
+    static final int CYCLES = 500;
 
 //    static {
 //        Param.DEBUG = true;

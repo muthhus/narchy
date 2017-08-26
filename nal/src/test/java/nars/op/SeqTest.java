@@ -64,7 +64,7 @@ public class SeqTest {
             return Joiner.on('\n').join(seqs.entrySet());
         }
 
-        private class seqAdd extends Command {
+        private class seqAdd extends Operation {
 
 
             public seqAdd(NAR n) {

@@ -8,6 +8,7 @@ import nars.$;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
+import nars.index.term.TermIndex;
 import nars.term.Term;
 import nars.term.Termed;
 
@@ -90,23 +91,27 @@ public enum TermGraph {
                         continue;
                     AdjGraph<Term, Term> gg = g;
                     recurseTerm(nar, when, g, (impl) -> {
-                        if (!done.contains(impl)) {
+                        if (!done.add(impl)) {
                             Term s = impl.sub(0).conceptual();
                             if (!acceptTerm(s)) {
-                                done.add(impl);
                                 return;
                             }
 
                             Term p = impl.sub(1).conceptual();
                             if (!acceptTerm(p)) {
-                                done.add(impl);
                                 return;
                             }
+
+                            s = TermIndex.retemporalize(s, TermIndex.retemporalizeXTERNALToZero);
+                            if (s == null)
+                                return;
+                            p = TermIndex.retemporalize(p, TermIndex.retemporalizeXTERNALToZero);
+                            if (p == null)
+                                return;
 
                             next.add(s);
                             next.add(p);
                             impl(gg, nar, when, impl, s, p);
-                            done.add(impl);
                         }
                     }, t);
                 }
@@ -140,7 +145,7 @@ public enum TermGraph {
                 }
             };
             tc.termlinks().forEach(each);
-            //tc.tasklinks().forEach(each);
+            tc.tasklinks().forEach(each);
         }
 
         protected boolean acceptTerm(Term p) {

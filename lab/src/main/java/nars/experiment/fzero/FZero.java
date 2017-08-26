@@ -46,7 +46,7 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", new Scale(() -> fz.image, 32, 24)/*.blur()*/)
+        senseCamera("fz", new Scale(() -> fz.image, 32, 24).blur())
         //.resolution(0.01f)
         ;
 
@@ -61,7 +61,7 @@ public class FZero extends NAgentX {
             return f;
         });//.resolution.setValue(0.02f);
         actionBipolar(the("rot"), (r) -> {
-            fz.playerAngle += (r) * 0.15f;
+            fz.playerAngle += (r) * 0.07f;
             return r;
         });//.resolution.setValue(0.01f);
 

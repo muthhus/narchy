@@ -681,7 +681,6 @@ public class NAL7Test extends AbstractNALTest {
     public void testImplicationDecompositionContradictionFairness() {
 
         test
-                .log()
                 .inputAt(0, "(b). :|:")
                 .inputAt(0, "((a) ==>+1 (b)). :|:")
                 .mustBelieve(cycles, "(a)", 1f, 0.45f, -1)

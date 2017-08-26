@@ -407,7 +407,7 @@ public class Revision {
 
 
         if (negated) {
-            rawTruth = rawTruth.negated();
+            rawTruth = rawTruth.neg();
         }
         Truth newTruth1 = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
         if (newTruth1 == null)

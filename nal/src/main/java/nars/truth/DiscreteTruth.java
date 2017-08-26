@@ -55,7 +55,7 @@ public class DiscreteTruth implements Truth {
     }
 
     @Override
-    public DiscreteTruth negated() {
+    public DiscreteTruth neg() {
         return new DiscreteTruth(1f - freq(), conf());
     }
 

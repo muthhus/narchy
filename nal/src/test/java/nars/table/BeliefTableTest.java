@@ -192,15 +192,15 @@ public class BeliefTableTest {
         //this.activeTasks = activeTasks;
         NAR n = NARS.tmp();
 
-        //n.log();
-        n.inputAt(0, "a:x. :|:");
+        n.log();
+        n.inputAt(2, "a:x. :|:");
         n.inputAt(10, "a:y. :|:");
         n.run(128);
 
-        assertDuration(n, "a:(x|y)", 5, 5);
-        assertDuration(n, "a:(x&y)", 5, 5);
-        assertDuration(n, "a:(y~x)", 5, 5);
-        assertDuration(n, "a:(x~y)", 5, 5);
+        assertDuration(n, "a:(x|y)", 6, 6);
+        assertDuration(n, "a:(x&y)", 6, 6);
+        assertDuration(n, "a:(y~x)", 6, 6);
+        assertDuration(n, "a:(x~y)", 6, 6);
         //assertDuration(n, "(x<->y)", 5, 5);
 
         //n.concept("(x-->a)").print();

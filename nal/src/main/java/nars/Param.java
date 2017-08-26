@@ -127,18 +127,21 @@ public abstract class Param extends Services<Term,NAR> {
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */
     public static float inputCost(Task t, NAR nar) {
+
         //prefer simple
-        float c = (1f + ((float)t.volume())/nar.termVolumeMax.floatValue());
+        float c = (1f + ((float)t.complexity())/nar.termVolumeMax.floatValue());
+
         if (t.isBeliefOrGoal()) {
 
-            //prefer confident
+            //prefer confidence
             c *= (1f + (1f - Math.min(1f, t.conf()/nar.confDefault(t.punc()))));
 
             //prefer polarized
-            c *= (1f + (0.5f - Math.abs(t.freq()-0.5f)));
+            //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
         } else {
 
         }
+
         return -c;
     }
 

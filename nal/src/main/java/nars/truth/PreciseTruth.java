@@ -36,7 +36,7 @@ public class PreciseTruth implements Truth {
     }
 
     @NotNull @Override
-    public Truth negated() {
+    public Truth neg() {
         return new PreciseTruth(1f - f, e, false);
     }
 

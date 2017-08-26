@@ -26,7 +26,7 @@ import jcog.pri.op.PriMerge;
 import nars.control.Activate;
 import nars.control.NARService;
 import nars.nlp.Hear;
-import nars.op.Command;
+import nars.op.Operation;
 import nars.task.ITask;
 import org.slf4j.LoggerFactory;
 
@@ -305,7 +305,7 @@ public class TextUI {
                         try {
                             nar.input(t);
                         } catch (Narsese.NarseseException e) {
-                            Command.log(nar, e);
+                            Operation.log(nar, e);
                         }
                     }
                 }

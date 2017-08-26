@@ -115,16 +115,12 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
         if (term.size() == 0) return emptyList();
 
         return (Collection<Termed>)computeIfAbsent(TEMPLATE_KEY, (x) -> {
-            TermContainer ctpl = subterms();
 
             Set<Termed> tc =
                     //new UnifiedSet<>(id.volume() /* estimate */);
-                    new HashSet(volume());
+                    new HashSet(term.volume());
 
-            Activate.templates(tc, ctpl, nar, Activate.layers(term) );
-
-            if (term.size() > 0)
-                tc.add(term); //structural transform: add the local term (if a compound) -- but not the concept. this prevents reinserting a tasklink
+            Activate.templates(tc, term, nar, 1 + Activate.layers(term) );
 
             if (!tc.isEmpty())
                 return Lists.newArrayList(tc); //store as list for compactness and fast iteration

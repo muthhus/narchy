@@ -15,7 +15,7 @@ public class NARLoop extends Loop {
     public final NAR nar;
 
 
-    private static final int framesPerLoop = 1;
+
     private long cycles;
 
 
@@ -39,7 +39,7 @@ public class NARLoop extends Loop {
 
     @Override
     public final boolean next() {
-        nar.run(framesPerLoop);
+        nar.cycle();
         cycles++;
         return true;
     }

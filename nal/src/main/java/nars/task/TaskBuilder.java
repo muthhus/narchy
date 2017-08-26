@@ -109,7 +109,7 @@ import static nars.time.Tense.*;
                 tt = nt;
 
                 if (punctuation == Op.BELIEF || punctuation == Op.GOAL)
-                    truth = truth.negated();
+                    truth = truth.neg();
             } else {
                 throw new InvalidTaskException(this, "Top-level negation");
             }

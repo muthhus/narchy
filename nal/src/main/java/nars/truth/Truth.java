@@ -226,7 +226,7 @@ public interface Truth extends Truthed {
 //    }
 
     /** the negated (1 - freq) of this truth value */
-    @NotNull default Truth negated() {
+    @NotNull default Truth neg() {
         return new PreciseTruth(1f - freq(), conf());
     }
 
@@ -236,7 +236,7 @@ public interface Truth extends Truthed {
 
     @NotNull
     default Truth negIf(boolean negate) {
-        return negate ? negated() : this;
+        return negate ? neg() : this;
     }
 
 //    default float eternalizedConf() {

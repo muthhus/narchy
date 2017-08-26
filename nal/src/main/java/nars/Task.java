@@ -1,14 +1,10 @@
 package nars;
 
 import jcog.Texts;
-import jcog.bag.impl.ArrayBag;
 import jcog.math.Interval;
-import jcog.pri.PLink;
-import jcog.pri.PriReference;
 import nars.concept.Concept;
-import nars.op.Command;
+import nars.op.Operation;
 import nars.task.*;
-import nars.task.util.AnswerBag;
 import nars.task.util.InvalidTaskException;
 import nars.term.Term;
 import nars.term.Termed;
@@ -270,8 +266,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                 Term args = inputTerm.sub(0);
                 if (args != Null && args.op() == PROD) {
                     Concept funcConcept = nar.concept(func);
-                    if (funcConcept instanceof Command) {
-                        Command o = (Command) funcConcept;
+                    if (funcConcept instanceof Operation) {
+                        Operation o = (Operation) funcConcept;
 
                         Task result = o.run(cmd, nar);
                         if (result != null && result != cmd) {
@@ -439,9 +435,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     default boolean eternalizable() {
 
 
-        return false;
+        //return false;
         //return true;
-        //return term().vars() > 0;
+        return term().vars() > 0;
         //return term().varIndep() > 0;
         //return term().varIndep() > 0 || term().op() == IMPL; //isAny(Op.IMPL.bit | Op.EQUI.bit);
         //return true;
@@ -838,11 +834,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
     default float evi(long targetStart, long targetEnd, final int dur) {
         long t;
-        if (targetStart == targetEnd) {
+        if (targetStart == targetEnd)
             t = targetStart;
-        } else {
+        else
             t = distanceTo(targetStart) < distanceTo(targetEnd) ? targetStart : targetEnd;
-        }
         return evi(t, dur);
     }
 
@@ -1032,7 +1027,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                 }
 
 
-                return Collections.singleton(Command.logTask(n.time(), $.p(x, y)));
+                return Collections.singleton(Operation.logTask(n.time(), $.p(x, y)));
             }
         }
 

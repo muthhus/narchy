@@ -6,7 +6,7 @@ import jcog.event.On;
 import jcog.io.Twokenize;
 import nars.*;
 import nars.concept.Concept;
-import nars.op.Command;
+import nars.op.Operation;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.term.atom.Atomic;
@@ -159,7 +159,7 @@ public class Hear extends Loop {
 
                 Hear.hear(nar, strippedText, page, 250, 0.1f);
 
-                Command.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
+                Operation.log(n, "Reading " + base + ":" + page + ": " + strippedText.length() + " characters");
 
             } catch (Exception e) {
                 e.printStackTrace();

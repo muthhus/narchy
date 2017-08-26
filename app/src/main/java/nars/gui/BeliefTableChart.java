@@ -128,10 +128,14 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
         if (cc != null) {
             cp = 1f; /*nar.pri(cc);*/ if (cp!=cp) cp = 0;
+
+            long nowStart = now - dur / 2;
+            long nowEnd = now + dur / 2;
+
             beliefs.set(cc.beliefs(), now, dur, nar, minT, maxT);
-            beliefs.current = nar.beliefTruth(cc, now);
+            beliefs.current = nar.beliefTruth(cc, nowStart, nowEnd);
             goals.set(cc.goals(), now, dur, nar, minT, maxT);
-            goals.current = nar.goalTruth(cc, now);
+            goals.current = nar.goalTruth(cc, nowStart, nowEnd);
         } else {
             cp = 0;
             beliefs.clear();

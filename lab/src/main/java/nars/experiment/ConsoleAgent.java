@@ -38,12 +38,14 @@ public abstract class ConsoleAgent extends NAgentX {
     final ConcurrentLinkedDeque<Task> queue = new ConcurrentLinkedDeque<Task>();
 
 
+    final static int WIDTH = 4;
+    final static int HEIGHT = 1;
     final ConsoleTerminal Rlabel = Vis.newInputEditor();
 
     final TestConsole R = new TestConsole(
             Atomic.the("it"),
             true,
-            4, 4);
+            WIDTH, HEIGHT);
     final TestConsole W;
 
 
@@ -121,21 +123,26 @@ public abstract class ConsoleAgent extends NAgentX {
 
         NAgentX.runRT((n) -> {
             @NotNull ConsoleAgent a = new ConsoleAgent(n) {
+                float prevSim = 0;
+
                 @Override
                 protected float act() {
                     //copy
                     float s = similarity(R.chars, W.chars);
-                    if (s == 1f)
-                        return +1f;
-                    else {
-                        return -1f + s;
-                    }
+                    float d = s - prevSim;
+                    prevSim = s;
+                    return d;
+//                    if (s == 1f)
+//                        return +1f;
+//                    else {
+//                        return -1f + s;
+
                 }
             };
 
             a.trace = true;
             return a;
-        }, 4f);
+        }, 16f);
 
     }
 

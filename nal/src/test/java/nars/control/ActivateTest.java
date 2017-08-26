@@ -99,31 +99,44 @@ public class ActivateTest {
 
         //layer 1:
         testTemplates("open:door",
-                "[door, (door-->open), open]");
+                "[(door-->open), door, open]");
     }
     @Test public void testTemplates2() throws Narsese.NarseseException {
         //layer 2:
         testTemplates("open(John,door)",
-                "[open, door, John, open(John,door), (John,door)]");
+                "[open, door, open(John,door), John, (John,door)]");
     }
     @Test public void testTemplates3() throws Narsese.NarseseException {
         //layer 3:
         testTemplates("(open(John,door) ==> #x)",
-                "[door, (John,door), (open(John,door) ==>+- #1), open, #1, open(John,door), John]");
+                "[(open(John,door) ==>+- #1), open, #1, open(John,door), (John,door)]");
     }
     @Test public void testTemplates4() throws Narsese.NarseseException {
         //dont descend past layer 3:
         testTemplates("(open(John,portal:interdimensional) ==> #x)",
-                "[interdimensional, portal, (John,(interdimensional-->portal)), open(John,(interdimensional-->portal)), open, (open(John,(interdimensional-->portal)) ==>+- #1), (interdimensional-->portal), #1, John]");
+                "[(John,(interdimensional-->portal)), (open(John,(interdimensional-->portal)) ==>+- #1), open(John,(interdimensional-->portal)), open, #1]");
     }
    @Test public void testTemplates4b() throws Narsese.NarseseException {
         //dont descend past layer 3:
         testTemplates("(open(John,portal(a(d),b,c)) ==> #x)",
-                "[portal(a(d),b,c), open(John,portal(a(d),b,c)), portal, (John,portal(a(d),b,c)), (a(d),b,c), open, (open(John,portal(a(d),b,c)) ==>+- #1), #1, John]");
+                "[open(John,portal(a(d),b,c)), (John,portal(a(d),b,c)), (open(John,portal(a(d),b,c)) ==>+- #1), open, #1]");
     }
+   @Test public void testTemplatesWithInt2() throws Narsese.NarseseException {
+        testTemplates("num((0))",
+                "[(0), ((0)), num((0)), num]");
+    }
+  @Test public void testTemplatesWithInt1() throws Narsese.NarseseException {
+        testTemplates("(0)",
+                "[0, (0)]");
+    }
+  @Test public void testTemplatesWithQueryVar() throws Narsese.NarseseException {
+        testTemplates("(x --> ?1)",
+                "[(x-->?1), x, ?1]");
+    }
+
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {
         NAR n = NARS.tmp(1);
-        n.believe(term + ".");
+        //n.believe(term + ".");
         Concept c = n.conceptualize($(term));
         Activate a = new Activate(c, 0.5f);
         Collection<Termed> t = c.templates(n);

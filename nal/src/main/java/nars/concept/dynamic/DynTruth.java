@@ -119,7 +119,7 @@ public final class DynTruth implements Truthed {
 
         if (c.op() == NEG) {
             c = c.unneg();
-            tr = tr.negated();
+            tr = tr.neg();
         }
 
         NALTask dyn = new NALTask(c, beliefOrGoal ? Op.BELIEF : Op.GOAL,

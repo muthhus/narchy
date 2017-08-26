@@ -16,13 +16,12 @@ import org.jetbrains.annotations.Nullable;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.time.Tense.DTERNAL;
+import static nars.time.Tense.ETERNAL;
 
 /**
  * Created by me on 12/4/16.
  */
 abstract public class DynamicTruthModel {
-
-
 
 
     @Nullable
@@ -60,19 +59,24 @@ abstract public class DynamicTruthModel {
             Task bt = null;
 
             //TODO check these times
-            long subStart = start + dt;
-            long subEnd = end + dt + subterm.dtRange();
+            long subStart, subEnd;
+            if (start == ETERNAL) {
+                subStart = subEnd = ETERNAL;
+            } else {
+                subStart = start + dt;
+                subEnd = end + dt + subterm.dtRange();
+            }
 
             if (evi) {
                 //task
-                bt = ((BeliefTable)((BaseConcept)subConcept).table(beliefOrGoal ? BELIEF : GOAL))
+                bt = ((BeliefTable) ((BaseConcept) subConcept).table(beliefOrGoal ? BELIEF : GOAL))
                         .match(subStart, subEnd, subterm, false, n);
                 if (bt == null) {
                     return null;
                 }
 
                 nt = bt.truth(subStart, subEnd, dur, 0f); //project to target time if task isnt at it
-                if (nt==null)
+                if (nt == null)
                     return null;
 
             } else {
@@ -106,8 +110,6 @@ abstract public class DynamicTruthModel {
     //protected abstract DynTruth eval(Compound template, long when, boolean stamp, NAR n);
 
     protected abstract boolean add(int subterm, DynTruth d, Truth t, float confMin);
-
-
 
 
     /**
@@ -248,6 +250,7 @@ abstract public class DynamicTruthModel {
         public DynamicIntersection(Term term) {
             this.subterms = term.subterms().toArray();
         }
+
         @NotNull
         @Override
         public Term[] components(Term superterm) {

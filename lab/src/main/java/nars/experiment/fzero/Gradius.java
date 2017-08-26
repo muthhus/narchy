@@ -25,7 +25,7 @@ public class Gradius extends NAgentX {
 
         this.g = new Gradius4K();
 
-        g.updateMS = 30;
+        g.updateMS = 20;
 
         //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
         senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.01f);
@@ -85,10 +85,10 @@ public class Gradius extends NAgentX {
 //        }
 
 
-        actionToggle($.inh(Atomic.the("fire"), id),
+        actionToggle($.p(id, Atomic.the("fire")),
                 (b) -> g.keys[Gradius4K.VK_SHOOT] = b);
 
-        actionTriState($.inh(Atomic.the("x"), id), (dh) -> {
+        actionTriState($.p(id, Atomic.the("x")), (dh) -> {
             g.keys[Gradius4K.VK_LEFT] = false;
             g.keys[Gradius4K.VK_RIGHT] = false;
             switch (dh) {
@@ -101,7 +101,7 @@ public class Gradius extends NAgentX {
             }
         });
 
-        actionTriState($.inh(Atomic.the("y"), id), (dh) -> {
+        actionTriState($.p(id, Atomic.the("y")), (dh) -> {
             g.keys[Gradius4K.VK_UP] = false;
             g.keys[Gradius4K.VK_DOWN] = false;
             switch (dh) {
@@ -147,7 +147,7 @@ public class Gradius extends NAgentX {
 
             return a;
 
-        }, 25f);
+        }, 10f);
 
     }
 

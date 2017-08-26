@@ -12,10 +12,8 @@ import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -78,6 +76,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         n.emotion.onActivate(t, activation, origin, n);
 
+
         origin.tasklinks().putAsync(
                 //new PLinkUntilDeleted<>(t, activation)
                 new PLink<>(t, activation)
@@ -117,8 +116,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
 
 
-
-
         //concept priority transfers into:
         //      its termlinks to subterms
         //      and their reverse links back to this
@@ -137,6 +134,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         float activationFactor = 1f; //priElseZero();
 
         List<Concept> localSubConcepts = $.newArrayList(); //temporary for this function call only, so as not to retain refs to Concepts
+        final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
 
         for (Termed localSub : localTemplates) {
             float d;
@@ -159,14 +157,13 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 d = subDecay; //full subdecay to the non-concept subterm
             }
 
-            id.termlinks().putAsync(
+            termlinks.putAsync(
                     new PLink(localSub.term(), d)
             );
         }
 
 
         List<PriReference<Term>> terml;
-        final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
         if (termlinks.isEmpty()) {
             return emptyList();
         } else {
@@ -175,8 +172,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             termlinks.sample(tlSampled, ((Consumer<PriReference<Term>>) terml::add));
         }
 
-        int tasklSize = taskl.size();  if (tasklSize == 0) return emptyList();
-        int termlSize = terml.size();  if (termlSize == 0) return emptyList();
+        int tasklSize = taskl.size();
+        if (tasklSize == 0) return emptyList();
+        int termlSize = terml.size();
+        if (termlSize == 0) return emptyList();
 
         List<Premise> premises = $.newArrayList(tasklSize * termlSize);
 
@@ -262,20 +261,22 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         throw new UnsupportedOperationException();
     }
 
-    public static void templates(Set<Termed> tc, Iterable<? extends Termed> next, NAR nar, int layersRemain) {
+    public static void templates(Set<Termed> tc, Term root, NAR nar, int layersRemain) {
 
-        for (Termed bb : next) {
 
-            Term b = bb.unneg();
+        Term b = root.unneg();
 
-            if (!tc.add(b))
-                continue; //already added
+        if (!tc.add(b))
+            return; //already added
 
-            if (!b.op().conceptualizable || b.hasAny(VAR_QUERY.bit | VAR_PATTERN.bit))
-                continue;
+        layersRemain--;
 
-            if (layersRemain > 0)
-                templates(tc, b.subterms(), nar, layersRemain-1);
+        if (layersRemain <= 0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
+            return;
+
+        for (Term bb : b.subterms()) {
+
+            templates(tc, bb, nar, layersRemain);
 
 //            @Nullable Concept c = nar.conceptualize(b);
 //
@@ -335,6 +336,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             case SECTe:
                 return 1;
 
+            case CONJ:
+                return 2;
+
             case SIM:
                 return 2;
 
@@ -344,8 +348,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             case IMPL:
                 return 3;
 
-            case CONJ:
-                return 1;
+
 
 //                int s = host.size();
 //                if (s <= Param.MAX_CONJ_SIZE_FOR_LAYER2_TEMPLATES) {

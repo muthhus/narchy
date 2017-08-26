@@ -59,7 +59,7 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
         traffic.accept(p);
 
         if (bias!=0 || amplitude!=1) {
-            x.setPri(bias + p * value());
+            x.setPri(bias + p * amplitude);
         }
 
         target.accept(x);

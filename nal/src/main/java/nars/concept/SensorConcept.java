@@ -65,16 +65,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         return this.currentValue = signal.asFloat();
     }
 
-    @NotNull
-    public final void pri(FloatSupplier v) {
-        sensor.pri(v);
-    }
-
-    @NotNull
-    public SensorConcept pri(float v) {
-        sensor.pri(v);
-        return this;
-    }
 
 
     @Override

@@ -1,7 +1,7 @@
 package nars.nar;
 
 import nars.*;
-import nars.op.DebouncedCommand;
+import nars.op.AtomicOperation;
 import nars.op.Operator;
 import nars.term.Term;
 import nars.term.atom.Atom;
@@ -16,7 +16,7 @@ import static org.junit.Assert.*;
 
 
 @Ignore
-public class CommandTest {
+public class OperationTest {
 
     @Test
     public void testEcho() throws Narsese.NarseseException {
@@ -52,7 +52,7 @@ public class CommandTest {
 //            }
 //        });
         final int[] count = {0};
-        n.on(new DebouncedCommand((Atom) $.the("x"), 2, 0.66f, n) {
+        n.on(new AtomicOperation((Atom) $.the("x"), 2, 0.66f, n) {
             @Override
             public void accept(Task x, NAR nar) {
                 System.err.println("INVOKE " + x);
@@ -73,7 +73,7 @@ public class CommandTest {
     public void testChoose() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
         n.time.dur(10);
-        n.on(new DebouncedCommand((Atom) $.the("x"), 1, 0.51f, n) {
+        n.on(new AtomicOperation((Atom) $.the("x"), 1, 0.51f, n) {
             @Override
             public void accept(Task x, NAR nar) {
                 Term[] args = Operator.args(x);
@@ -105,7 +105,7 @@ public class CommandTest {
     @Test
     public void testGoal2() throws Narsese.NarseseException {
         NAR n = NARS.tmp();
-        n.on(new DebouncedCommand((Atom) $.the("x"), 2, 0.66f, n) {
+        n.on(new AtomicOperation((Atom) $.the("x"), 2, 0.66f, n) {
             @Override
             public void accept(Task t, NAR nar) {
                 Term x = t.term();

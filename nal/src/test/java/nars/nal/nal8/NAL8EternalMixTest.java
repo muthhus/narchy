@@ -453,7 +453,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
         tester.input("((hold(SELF,{t002}) &&+5 ( at(SELF,{t001}) &&+5 open({t001}))) ==>+5 opened:{t001}).");
 
         tester.mustBelieve(cycles, "( hold(SELF,{t002}) &&+5 ( at(SELF,{t001}) &&+5 open({t001})))",
-                1.0f, 0.45f,
+                1.0f, 0.3f,
                 -15, -5);
 
     }

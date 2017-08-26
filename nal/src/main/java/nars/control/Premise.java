@@ -82,6 +82,7 @@ public class Premise extends UnaryTask {
         Derivation d = n.derivation(deriver);
         d.nar.emotion.conceptFirePremises.increment();
 
+
         //nar.emotion.count("Premise_run");
 
         Task taskLink = this.taskLink;
@@ -224,8 +225,10 @@ public class Premise extends UnaryTask {
                 long focusStart, focusEnd;
                 if (focus == ETERNAL) {
                     focusStart = focusEnd = ETERNAL;
-                } else {
-                    focusStart = focusEnd = focus;
+                }
+                else {
+                    focusStart = focus - dur;
+                    focusEnd = focus + dur;
                 }
 
                 boolean tryMatch = true;
