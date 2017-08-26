@@ -380,9 +380,10 @@ public final class Branch<T> implements Node<T, Node<T,?>> {
         if (!region.intersects(rect) || !t.test(this))
             return;
 
+        Node<T, ?>[] children = this.child;
         short s = this.size;
         for (int i = 0; i < s; i++) {
-            Node<T, ?> c = this.child[i];
+            Node<T, ?> c = children[i];
             if (c!=null)
                 c.intersectingNodes(rect, t, model);
         }

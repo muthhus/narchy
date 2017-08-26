@@ -52,7 +52,7 @@ public class Temporalize implements ITemporalize {
     /**
      * HACK move this this to the solution instance class when it is separated from the pattern class
      */
-    Boolean fullyEternal = null;
+    protected Boolean fullyEternal = null;
 
     /**
      * for testing
@@ -177,17 +177,6 @@ public class Temporalize implements ITemporalize {
     }
 
 
-    @Override
-    public void knowDerivedTerm(Subst d, Term term, long start, long end) {
-        knowAbsolute(term, start, end);
-
-        if (knowTransformed) {
-            Term t2 = d.transform(term);
-            if (!t2.equals(term) && !(t2 instanceof Bool)) {
-                knowAbsolute(t2, start, end);
-            }
-        }
-    }
 
 
     /**
@@ -205,9 +194,6 @@ public class Temporalize implements ITemporalize {
     }
 
 
-//    protected Term intern(Term x) {
-//        return x;
-//    }
 
     /**
      * recursively calculates the start and end time of all contained events within a term
@@ -410,7 +396,7 @@ public class Temporalize implements ITemporalize {
 
     }
 
-    private boolean fullyEternal() {
+    protected boolean fullyEternal() {
         if (fullyEternal == null) {
             for (SortedSet<Event> x : constraints.values()) {
                 for (Event y : x) {
@@ -434,19 +420,19 @@ public class Temporalize implements ITemporalize {
     }
 
 
-    protected List<AbsoluteEvent> overloaded(Term x) {
-        SortedSet<Event> cc = constraints.get(x);
-        if (cc==null || cc.size() == 1)
-            return null;
-
-        List<AbsoluteEvent> oo = $.newArrayList(1);
-        for (Event e : cc) {
-            if (e instanceof AbsoluteEvent) {
-                oo.add((AbsoluteEvent) e);
-            }
-        }
-        return oo.size() > 1 ? oo : null;
-    }
+//    protected List<AbsoluteEvent> overloaded(Term x) {
+//        SortedSet<Event> cc = constraints.get(x);
+//        if (cc==null || cc.size() == 1)
+//            return null;
+//
+//        List<AbsoluteEvent> oo = $.newArrayList(1);
+//        for (Event e : cc) {
+//            if (e instanceof AbsoluteEvent) {
+//                oo.add((AbsoluteEvent) e);
+//            }
+//        }
+//        return oo.size() > 1 ? oo : null;
+//    }
 
     @Override
     public Event solve(final Term x, Map<Term, Time> trail) {
@@ -459,22 +445,22 @@ public class Temporalize implements ITemporalize {
             if (xs != null) {
                 //round-robin assignment of overloads
                 //TODO generalize to RelativeEvent's
-                List<AbsoluteEvent> oo = overloaded(x);
-                if (oo != null) {
-                    int current = 0;
-                    int oos = oo.size();
-                    for (int i = 0; i < oos; i++) {
-                        if (xs == oo.get(i).startTime) {
-                            current = (i + 1)%oos;
-                            break;
-                        }
-                    }
-
-                    trail.put(x, oo.get(current).startTime);
-                    return oo.get(current);
-                } else {
+//                List<AbsoluteEvent> oo = overloaded(x);
+//                if (oo != null) {
+//                    int current = 0;
+//                    int oos = oo.size();
+//                    for (int i = 0; i < oos; i++) {
+//                        if (xs == oo.get(i).startTime) {
+//                            current = (i + 1)%oos;
+//                            break;
+//                        }
+//                    }
+//
+//                    trail.put(x, oo.get(current).startTime);
+//                    return oo.get(current);
+//                } else {
                     return new TimeEvent(x, xs);
-                }
+     //           }
 
             } else
                 return null; //cyclic
@@ -726,66 +712,66 @@ public class Temporalize implements ITemporalize {
         }
 
 
-        /**
-         * for novel compounds, (ex. which might be created by syllogistic rules
-         * we wont be able to find them in the constraints.
-         * this heuristic computes the temporal intersection of all involved subterms.
-         * if they are coherent, then create the solved term as-is (since it will not contain any XTERNAL) with the appropriate
-         * temporal bounds. */
-        if (o.statement && constraints.get(x) == null) {
-            //choose two absolute events which cover both 'a' and 'b' terms
-            List<Event> relevant = $.newArrayList(); //maybe should be Set?
-            Set<Term> uncovered = new HashSet();
-            x.subterms().recurseTermsToSet(
-                    ~(Op.SECTi.bit | Op.SECTe.bit | Op.DIFFe.bit | Op.DIFFi.bit) /* everything but sect/diff; just their content */,
-                    uncovered, true);
+//        /**
+//         * for novel compounds, (ex. which might be created by syllogistic rules
+//         * we wont be able to find them in the constraints.
+//         * this heuristic computes the temporal intersection of all involved subterms.
+//         * if they are coherent, then create the solved term as-is (since it will not contain any XTERNAL) with the appropriate
+//         * temporal bounds. */
+//        if (o.statement && constraints.get(x) == null) {
+//            //choose two absolute events which cover both 'a' and 'b' terms
+//            List<Event> relevant = $.newArrayList(); //maybe should be Set?
+//            Set<Term> uncovered = new HashSet();
+//            x.subterms().recurseTermsToSet(
+//                    ~(Op.SECTi.bit | Op.SECTe.bit | Op.DIFFe.bit | Op.DIFFi.bit) /* everything but sect/diff; just their content */,
+//                    uncovered, true);
+//
+//            for (Term c : constraints.keySet()) {
+//
+//                if (c.equals(x)) continue; //cyclic; already tried above
+//
+//                Event ce = solve(c, trail);
+//
+//                if (ce != null) {
+//                    if (uncovered.removeIf(c::containsRecursively)) {
+//                        relevant.add(ce);
+//                        if (uncovered.isEmpty())
+//                            break; //got them all
+//                    }
+//                }
+//
+//            }
+//            if (!uncovered.isEmpty())
+//                return null; //insufficient information
+//
+//            //HACK just use the only two for now, it is likely what is relevant anyway
+//            int rr = relevant.size();
+//            switch (rr) {
+//                case 0:
+//                    return null; //can this happen?
+//                case 1:
+//                    Event r = relevant.get(0);
+//                    return relative(x, r.term, 0, x.dtRange());
+//
+//            }
+//
+//            int retries = rr > 2 ? 2 : 1;
+//
+//            for (int i = 0; i < retries; i++) {
+//
+//                if (rr > 2)
+//                    Collections.shuffle(relevant, random); //dont reshuffle if only 2, it's pointless; intersection is symmetric
+//
+//                Event ra = relevant.get(0);
+//                Event rb = relevant.get(1);
+//
+//                Event ii = solveStatement(x, trail, ra, rb);
+//                if (ii != null)
+//                    return ii;
+//            }
+//        }
 
-            for (Term c : constraints.keySet()) {
-
-                if (c.equals(x)) continue; //cyclic; already tried above
-
-                Event ce = solve(c, trail);
-
-                if (ce != null) {
-                    if (uncovered.removeIf(c::containsRecursively)) {
-                        relevant.add(ce);
-                        if (uncovered.isEmpty())
-                            break; //got them all
-                    }
-                }
-
-            }
-            if (!uncovered.isEmpty())
-                return null; //insufficient information
-
-            //HACK just use the only two for now, it is likely what is relevant anyway
-            int rr = relevant.size();
-            switch (rr) {
-                case 0:
-                    return null; //can this happen?
-                case 1:
-                    Event r = relevant.get(0);
-                    return relative(x, r.term, 0, x.dtRange());
-
-            }
-
-            int retries = rr > 2 ? 2 : 1;
-
-            for (int i = 0; i < retries; i++) {
-
-                if (rr > 2)
-                    Collections.shuffle(relevant, random); //dont reshuffle if only 2, it's pointless; intersection is symmetric
-
-                Event ra = relevant.get(0);
-                Event rb = relevant.get(1);
-
-                Event ii = solveStatement(x, trail, ra, rb);
-                if (ii != null)
-                    return ii;
-            }
-        }
-
-        return null;
+        return new SolutionEvent(x, ETERNAL);
     }
 
 
@@ -856,13 +842,13 @@ public class Temporalize implements ITemporalize {
                                 //overlap or adjacent
                                 return new SolutionEvent(target, ii.a, ii.b);
                             } else {
-                                //interpolate
-                                long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
-                                if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS * dur >= ((float) dist)) {
-                                    long occ = ((ta + tz) / 2L + (ba + bz) / 2L) / 2L;
-                                    //occInterpolate(t, b);
-                                    return new SolutionEvent(target, occ);
-                                }
+//                                //interpolate
+//                                long dist = Interval.unionLength(ta, tz, ba, bz) - (tz - ta) - (bz - ba);
+//                                if (Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS * dur >= ((float) dist)) {
+//                                    long occ = ((ta + tz) / 2L + (ba + bz) / 2L) / 2L;
+//                                    //occInterpolate(t, b);
+//                                    return new SolutionEvent(target, occ);
+//                                }
                             }
                         }
 

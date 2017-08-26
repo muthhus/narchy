@@ -1,5 +1,6 @@
 package nars.control;
 
+import jcog.Util;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.pri.Priority;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +59,7 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
         traffic.accept(p);
 
         if (bias!=0 || amplitude!=1) {
-            x.setPri(bias + p * amplitude);
+            x.setPri(bias + p * value());
         }
 
         target.accept(x);
@@ -76,4 +77,10 @@ public class CauseChannel<X extends Priority> extends Cause<X> implements Consum
         return this;
     }
 
+    public float factor() {
+        return Util.tanhFast(value());
+    }
+    public float gain() {
+         return factor()+1;
+    }
 }

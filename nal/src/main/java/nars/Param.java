@@ -121,16 +121,24 @@ public abstract class Param extends Services<Term,NAR> {
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
     public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.8f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.8f, 0, 1f);
+    public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
+    public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
 
     /** pessimistic negative value applied to each accepted task. this may
      * be balanced by a future positive value (ie. on concept processing) */
-    public static float valueAtInput(Task accepted, NAR nar) {
-        //prefer simple and confident:
-        return -((1 + accepted.volume()))/nar.termVolumeMax.floatValue()/800f *
-                ((accepted.isBeliefOrGoal() ? (1f-accepted.conf()) : 0.5f))
-                * accepted.priElseZero();
+    public static float inputCost(Task accepted, NAR nar) {
+        //prefer simple
+        float c = (1f + ((float)accepted.volume())/nar.termVolumeMax.floatValue());
+        if (accepted.isBeliefOrGoal()) {
+            //prefer confident
+            c *= (1f - accepted.conf());
+
+            //prefer polarized
+            c *= (1f + (0.5f - Math.abs(accepted.freq()-0.5f)));
+        } else {
+
+        }
+        return -c;
     }
 
 

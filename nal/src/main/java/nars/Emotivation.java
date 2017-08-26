@@ -99,11 +99,9 @@ public class Emotivation extends Emotion {
     }
 
     /**
-     * returns a "value" adjusted priority
-     * which is also applied to the given task.
-     * returns NaN possibly
+     * adjusts the task priority
      */
-    public float evaluate(Task x) {
+    public void evaluate(Task x) {
 
         float gain = nar.evaluate(x, x.cause(), nar.taskCauses.get(x));
         assert (gain == gain);
@@ -114,10 +112,10 @@ public class Emotivation extends Emotion {
 //            amp *= amp; //sharpen, psuedo-logarithmic x^4
 //            amp *= amp;
 
-            return x.priMult(amp);
-        } else {
+            x.priMult(amp);
+        } /* else {
             return x.pri();
-        }
+        } */
     }
 
     @Override
@@ -127,7 +125,7 @@ public class Emotivation extends Emotion {
         if (x instanceof Task && !((Task) x).isCommand()) {
             Task t = (Task) x;
 
-            value(t.cause(), Param.valueAtInput(t, nar));
+            value(t.cause(), Param.inputCost(t, nar));
 
             evaluate(t);
 //            if (tp != tp || tp < Pri.EPSILON)
@@ -152,8 +150,8 @@ public class Emotivation extends Emotion {
 
     }
 
-    public static float preferConfidentAndRelevant(@NotNull Task t, float activation, long when, NAR n) {
-        return 0.001f * activation * (t.isBeliefOrGoal() ? t.conf(when, n.dur()) : 0.5f);
-    }
+//    public static float preferConfidentAndRelevant(@NotNull Task t, float activation, long when, NAR n) {
+//        return 0.001f * activation * (t.isBeliefOrGoal() ? t.conf(when, n.dur()) : 0.5f);
+//    }
 
 }

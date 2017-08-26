@@ -39,6 +39,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public CameraSensor(Term root, P src, NAgent a) {
         super(src, src.width(), src.height(), a.nar);
+        this.id = root;
 
         this.w = src.width();
         this.h = src.height();
@@ -51,7 +52,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
         a.onFrame(this);
 
-        this.id = root;
     }
 
 

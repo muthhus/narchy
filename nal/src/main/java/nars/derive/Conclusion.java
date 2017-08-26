@@ -104,23 +104,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         if (!c1.op().conceptualizable)
             return true;
 
-        // 3. VAR INTRO
-        if (varIntro) {
-            //var intro before temporalizing.  otherwise any calculated temporal data may not applied to the changed term (ex: occ shift)
-            @Nullable Pair<Term, Map<Term, Term>> vc = DepIndepVarIntroduction.varIntroX(c1, d.random);
-            if (vc == null) return true;
 
-            Term v = vc.getOne();
-            if (!(v.op().conceptualizable) || (v.equals(c1) /* keep only if it differs */))
-                return true;
-
-            if (d.temporal) {
-                Map<Term, Term> m = vc.getTwo();
-                m.forEach(d.xy::tryPut); //store the mapping so that temporalization can resolve with it
-            }
-
-            c1 = v;
-        }
 
 
         // 4. TEMPORALIZE --
@@ -183,6 +167,23 @@ public class Conclusion extends AbstractPred<Derivation> {
             c2 = c1;
         }
 
+                // 3. VAR INTRO
+        if (varIntro) {
+            //var intro before temporalizing.  otherwise any calculated temporal data may not applied to the changed term (ex: occ shift)
+            @Nullable Pair<Term, Map<Term, Term>> vc = DepIndepVarIntroduction.varIntroX(c2, d.random);
+            if (vc == null) return true;
+
+            Term v = vc.getOne();
+            if (!(v.op().conceptualizable) || (v.equals(c1) /* keep only if it differs */))
+                return true;
+
+//            if (d.temporal) {
+//                Map<Term, Term> m = vc.getTwo();
+//                m.forEach(d.xy::tryPut); //store the mapping so that temporalization can resolve with it
+//            }
+
+            c2 = v;
+        }
 
         //5. VALIDATE FOR TASK TERM
 

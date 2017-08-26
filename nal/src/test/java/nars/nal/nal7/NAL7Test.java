@@ -54,6 +54,7 @@ public class NAL7Test extends AbstractNALTest {
     void testInduction(String a, String b, int dt) {
         int cycles = dt * 2;
         test
+                .log()
                 .input(a + ". :|:")
                 .inputAt(dt, b + ". :|:")
                 .mustBelieve(cycles, "(" + a + " ==>+" + dt + " " + b + ")", 1.00f, 0.45f /*abductionConf*/, 0)
@@ -670,7 +671,7 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .inputAt(1, "(a &&+1 b). :|:")
                 .inputAt(1, "((a &&+1 b) ==>+4 c). :|:")
-                .mustBelieve(cycles, "c", 1f, 0.77f, 6 /* occ */)
+                .mustBelieve(cycles, "c", 1f, 0.82f, 6 /* occ */)
                 .mustNotOutput(cycles, "c", BELIEF, ETERNAL)
         //.mustNotOutput(cycles, "c", BELIEF, 6)
         ;
@@ -955,8 +956,8 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .dur(2)
                 .inputAt(0, "(x --> a). :|:")
-                .inputAt(1, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 0)
+                .inputAt(2, "(y --> a). :|:")
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.68f, 1)
         ;
     }
 

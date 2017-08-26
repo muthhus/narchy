@@ -3,10 +3,14 @@ package nars.derive;
 import jcog.Util;
 import nars.Task;
 import nars.control.Derivation;
-import nars.derive.time.*;
+import nars.derive.time.AbsoluteEvent;
+import nars.derive.time.Event;
+import nars.derive.time.Temporalize;
+import nars.derive.time.Time;
 import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.term.atom.Bool;
+import nars.term.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import static nars.Op.IMPL;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -32,7 +37,6 @@ import static nars.time.Tense.ETERNAL;
  * the derivation will not be temporalizable and this method returns null.
  *
  * @param eviGain length-1 float array. the value will be set to 1f by default
- *
  */
 public class DerivationTemporalize extends Temporalize {
 
@@ -44,33 +48,53 @@ public class DerivationTemporalize extends Temporalize {
         belief = d.belief; //!d.single ? d.belief : null;
         dur = Math.max(1, Math.round(d.nar.dtDither.floatValue() * d.dur));
 
-        ITemporalize t = this;
 
-
-        t.knowDerivedTerm(d, task.term(), task.start(), task.end());
+        knowDerivedAbsolute(d, task.term(), task.start(), task.end());
 
         if (belief != null) {
             if (!belief.equals(task)) {
 
-                t.knowDerivedTerm(d, d.beliefTerm, belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+                knowDerivedAbsolute(d, d.beliefTerm, belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
             }
         } else /*if (d.beliefTerm != null)*/ {
             if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
 
                 Term b = d.beliefTerm;
-                ((Temporalize) t).knowAmbient(b);
+                knowDerivedAmbient(d, b);
 
-                if (knowTransformed) {
-                    Term b2 = d.transform(b);
-                    if (!b2.equals(b) && !(b2 instanceof Bool))
-                        knowAmbient(b2);
-                }
             }
             //t.know(d.beliefTerm, d, null);
         }
 
 
     }
+
+    void knowDerivedAmbient(Subst d, Term x) {
+        knowAmbient(x);
+        if (knowTransformed) {
+            Term x2 = d.transform(x);
+            if (!x2.equals(x) && !(x2 instanceof Bool))
+                knowAmbient(x2);
+        }
+    }
+
+    void knowDerivedAbsolute(Subst d, Term term, long start, long end) {
+        if (term.op() == IMPL && (!fullyEternal())) {
+            //only know an impl as ambient if there is already non-eternal events detected
+            knowDerivedAmbient(d, term);
+            return;
+        }
+
+        knowAbsolute(term, start, end);
+
+        if (knowTransformed) {
+            Term t2 = d.transform(term);
+            if (!t2.equals(term) && !(t2 instanceof Bool)) {
+                knowAbsolute(t2, start, end);
+            }
+        }
+    }
+
     @Nullable
     public Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] eviGain) {
 

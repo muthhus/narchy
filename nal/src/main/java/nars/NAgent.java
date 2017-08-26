@@ -72,7 +72,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     public final FloatParam predictAheadDurs = new FloatParam(8, 1, 32);
 
 
-    public final FloatParam predictorProbability = new FloatParam(0.125f);
+    public final FloatParam predictorProbability = new FloatParam(0.5f);
     private final CauseChannel<Task> predict;
 
 
@@ -239,7 +239,9 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     }
 
     protected void predict() {
-        if (nar.random().nextFloat() < predictorProbability.floatValue())
+
+        //System.out.println(predictGain);
+        if (nar.random().nextFloat() < predictorProbability.floatValue() * predict.gain())
             predict.input(predictions(now));
 
         //int dur = nar.dur();
@@ -342,8 +344,8 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
                         question(impl(action, happy)),
                         question(impl(notAction, happy)),
-                        question(impl(action, what)),
-                        question(impl(notAction, what)),
+                        //question(impl(action, what)),
+                        //question(impl(notAction, what)),
 
 //                        question(impl(parallel(what, action), happy)),
 //                        question(impl(parallel(what, notAction), happy)),
@@ -360,7 +362,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
                         //                            //ETERNAL)
 
                         //question((Compound)$.parallel(varQuery(1), (Compound) (action.term())), now),
-                        quest(parallel(what, action.term()))
+                        quest(parallel(what, action))
 
                         //quest((Compound)$.parallel(varQuery(1), happy.term(), (Compound) (action.term())), now)
 

@@ -6,6 +6,7 @@ import nars.$;
 import nars.NAR;
 import nars.NAct;
 import nars.Task;
+import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
@@ -65,18 +66,27 @@ public class GoalActionConcept extends ActionConcept {
     @Override
     public float value(@NotNull Task t, float activation, long when, NAR n) {
 
+        float factor = 1f;
+
         float v = super.value(t, activation, when, n);
 
-        if (t.isGoal() && !t.isInput()) {
+        if (t.isBeliefOrGoal() /*t.isGoal()*/ && !t.isInput()) {
 
-            //allow the boost to apply to D durations ahead, to promote goal prediction
-            for (int d = 1; d < 5; d++) {
-                v = Math.max(v,
-                        super.value(t, activation, n.time() + d * n.dur(), n));
+            long now = n.time();
+            if (!t.isBefore(now)) {
+                int dur = n.dur();
+
+                float boost = factor * TruthPolation.evidenceDecay(t.conf() * activation, dur, t.distanceTo(now));
+                v += boost;
             }
+            //allow the boost to apply to D durations ahead, to promote goal prediction
+//            for (int d = 1; d < 3; d++) {
+//                b = Math.max(v,
+//                        super.value(t, activation, now + d * dur, n));
+//            }
 
-            assert(v >= 0);
-            v *= 2; //boost goal derivations in general
+//            assert(v >= 0);
+//            v *= 2; //boost goal derivations in general
         }
 
         return v;
