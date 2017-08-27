@@ -29,6 +29,9 @@ public abstract class Param extends Services<Term,NAR> {
     /** must be big enough to support as many layers of compound terms as exist in an eval */
     public static final int MAX_EVAL_RECURSION = 16;
 
+    /** rate that integers in integer-containing termlink compounds will be dynamically mutated on activation */
+    public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
+
     /**
      * controls interpolation policy:
      * true: dt values will be interpolated

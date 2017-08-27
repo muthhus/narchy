@@ -398,7 +398,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
                 long touched =
                         //nearestTimeTo(when);
-                        mid(); //to be fair to other more precisely endured tasks
+                        (a + z)/2; //midpoint: to be fair to other more precisely endured tasks
 
                 long dist = Math.abs(when - touched);
                 assert (dist > 0) : "what time is " + a + ".." + z + " supposed to mean relative to " + when;

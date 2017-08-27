@@ -3,11 +3,12 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
-import jcog.random.XORShiftRandom;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.Param;
+import nars.Task;
 import nars.concept.Concept;
 import nars.task.UnaryTask;
-import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Int;
@@ -16,10 +17,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
+import static nars.Op.INT;
 
 /**
  * concept firing, activation, etc
@@ -135,13 +138,13 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         List<Concept> localSubConcepts = $.newArrayList(); //temporary for this function call only, so as not to retain refs to Concepts
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
 
-        for (Termed localSub_ : localTemplates) {
+        Random rng = nar.random();
+        for (Termed localSub : localTemplates) {
             float d;
 
-            Term localSub = localSub_.term(); //for special Termed instances, ex: RotatedInt etc
+            localSub = local(localSub, rng); //for special Termed instances, ex: RotatedInt etc
 
             if (localSub.op().conceptualizable) {
-
 
                 Concept localSubConcept = nar.conceptualize(localSub);
                 if (localSubConcept != null) {
@@ -200,6 +203,44 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
         return premises;
+    }
+
+    /**
+     * preprocess termlink
+     */
+    private Termed local(Termed x, Random rng) {
+
+        if (Param.MUTATE_INT_CONTAINING_TERMS_RATE > 0) {
+            Term t = x.term();
+            if (t.hasAny(INT) && t.subterms().OR(xx -> xx instanceof Int) && rng.nextFloat() <= Param.MUTATE_INT_CONTAINING_TERMS_RATE) {
+
+                Term[] xx = t.subterms().toArray();
+                boolean changed = false;
+                for (int i = 0; i < xx.length; i++) {
+                    Term y = xx[i];
+                    if (y instanceof Int) {
+                        int shift =
+                                rng.nextInt(3) - 1;
+                                //nar.random().nextInt(5) - 2;
+                        if (shift != 0) {
+                            int yy = ((Int) y).id;
+                            int j =
+                                    Math.max(0 /* avoid negs for now */, yy + shift);
+                            if (yy != j) {
+                                xx[i] = Int.the(j);
+                                changed = true;
+                            }
+                        }
+                    }
+                }
+                if (changed)
+                    return t.op().the(t.dt(), xx);
+
+            }
+
+        }
+
+        return x;
     }
 
     static void activateSubterms(PriReference<Task> tasklink, List<Concept> subs, float cPri) {
@@ -271,52 +312,8 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         if (!(b instanceof Variable) && !b.op().conceptualizable)
             return; //variables are ok
 
-        if (b.hasAny(Op.INT) && b.subterms().OR(x -> x instanceof Int)) {
-            Term finalB = b;
-            b = new ProxyTerm(finalB) {
-
-                final XORShiftRandom rng = new XORShiftRandom(nar.random().nextLong());
-
-                @Override
-                public boolean equals(Object o) {
-                    return o == this;
-                }
-
-                @Override
-                public Term term() {
-                    Term[] x = subterms().toArray();
-                    boolean changed = false;
-                    for (int i = 0; i < x.length; i++) {
-                        Term y = x[i];
-                        if (y instanceof Int) {
-                            int shift =
-                                    //rng.nextInt(3) - 1;
-                                    rng.nextInt(5) - 2;
-                            if (shift != 0) {
-                                int yy = ((Int) y).id;
-                                int j =
-                                        Math.max(0 /* avoid negs for now */, yy + shift);
-                                if (yy!=j) {
-                                    x[i] = Int.the(j);
-                                    changed = true;
-                                }
-                            }
-                        }
-                    }
-                    if (changed)
-                        return op().the(dt(), x);
-                    else
-                        return ref;
-                }
-            };
-
-//            Int i = (Int) b;
-//            tc.add(new Int.RotatedInt(Math.max(0, i.id - 1) /* avoid negatives for now */, i.id + 1));
-
-        } else {
-            if (!tc.add(b))
-                return; //already added
-        }
+        if (!tc.add(b))
+            return; //already added
 
         layersRemain--;
 
