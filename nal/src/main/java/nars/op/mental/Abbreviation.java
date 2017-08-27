@@ -4,7 +4,7 @@ import jcog.bag.impl.ArrayBag;
 import jcog.data.FloatParam;
 import jcog.data.MutableIntRange;
 import jcog.pri.PLink;
-import jcog.pri.Priority;
+import jcog.pri.Prioritized;
 import jcog.pri.op.PriMerge;
 import nars.$;
 import nars.NAR;
@@ -108,14 +108,14 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
         if ((!(taskTerm instanceof Compound)) || task.meta(Abbreviation.class) != null)
             return;
 
-        Priority b = task;
+        Prioritized b = task;
         if (b != null) {
 
             input(b, bag.bag::put, (Compound) taskTerm, 1f, nar);
         }
     }
 
-    private void input(@NotNull Priority b, @NotNull Consumer<PLink<Compound>> each, @NotNull Compound t, float scale, NAR nar) {
+    private void input(@NotNull Prioritized b, @NotNull Consumer<PLink<Compound>> each, @NotNull Compound t, float scale, NAR nar) {
         int vol = t.volume();
         if (vol < volume.lo())
             return;
@@ -127,7 +127,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
                         !(abbreviable instanceof PermanentConcept) &&
                                 abbreviable.get(Abbreviation.class) == null) {
 
-                    each.accept(new PLink<>(t, b.priSafe(0)));
+                    each.accept(new PLink<>(t, b.priElseZero()));
                 }
             }
         } else {
@@ -188,7 +188,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     //private boolean createRelation = false;
 
 
-    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Priority b, NAR nar) {
+    protected boolean abbreviate(@NotNull Compound abbreviated, @NotNull Prioritized b, NAR nar) {
 
         String id;
 //            id = newCanonicalTerm(abbreviated);
@@ -227,7 +227,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
                         Termed aliasTerm = alias != null ? alias : Atomic.the(id);
                         ta.meta(Abbreviation.class, new Term[]{abbreviatedTerm, aliasTerm.term()});
                         ta.log("Abbreviate"); //, abbreviatedTerm, aliasTerm
-                        ta.priority().setPri(b);
+                        ta.setPri(b);
 
                         nar.input(ta);
                         logger.info("+ {}", ta);

@@ -1,6 +1,6 @@
 package nars.table;
 
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.bag.TaskHijackBag;
@@ -21,7 +21,7 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
 
 //    @Override
 //    public float pri(@NotNull Task key) {
-//        return (1f + key.priSafe(0)) * (1f * key.qua());
+//        return (1f + key.priElseZero()) * (1f * key.qua());
 //    }
 
 
@@ -29,7 +29,7 @@ public class HijackQuestionTable extends TaskHijackBag implements QuestionTable 
     public void add(@NotNull Task x, BaseConcept c, NAR n) {
         super.add(x, c, n);
 
-        if (pressure.floatValue() >= Pri.EPSILON)
+        if (pressure.floatValue() >= Prioritized.EPSILON)
             commit(); //apply forgetting
     }
 

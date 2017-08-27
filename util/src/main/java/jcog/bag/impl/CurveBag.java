@@ -1,8 +1,8 @@
 package jcog.bag.impl;
 
 import jcog.Util;
-import jcog.pri.Pri;
 import jcog.pri.Prioritized;
+import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +13,7 @@ import java.util.Random;
 /**
  * ArrayBag with a randomized sampling range
  */
-public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
+public class CurveBag<X extends Priority> extends PriArrayBag<X> {
 
     @Nullable
     private final Random random;
@@ -37,7 +37,7 @@ public class CurveBag<X extends Prioritized> extends PriArrayBag<X> {
             float min = this.min;
             float max = this.max;
             float diff = max - min;
-            if (diff > Pri.EPSILON * size) {
+            if (diff > Prioritized.EPSILON * size) {
                 float i = random.nextFloat(); //uniform
                 //normalize to the lack of dynamic range
                 i = Util.lerp(diff, i /* flat */, (i*i) /* curved */);

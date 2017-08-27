@@ -180,7 +180,7 @@ public class IO {
 //    }
 
     public static void writePriority(@NotNull DataOutput out, @NotNull Prioritized t) throws IOException {
-        out.writeFloat(t.priSafe(0));
+        out.writeFloat(t.priElseZero());
     }
 
     public static void writeBudget(@NotNull DataOutput out, @NotNull Prioritized t) throws IOException {

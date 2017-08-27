@@ -6,6 +6,7 @@ import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 
 import static jcog.pri.op.PriMerge.PriMergeOp.*;
@@ -14,7 +15,7 @@ import static jcog.pri.op.PriMerge.PriMergeOp.*;
  * Budget merge function, with input scale factor
  */
 @FunctionalInterface
-public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
+public interface PriMerge extends BiConsumer<Priority, Prioritized> {
 
 
 
@@ -33,9 +34,8 @@ public interface PriMerge extends BiFunction<Priority, Prioritized, Priority> {
 
     @Nullable
     @Override
-    default Priority apply(@NotNull Priority existing, @NotNull Prioritized incoming) {
+    default void accept(@NotNull Priority existing, @NotNull Prioritized incoming) {
         merge(existing, incoming);
-        return existing;
     }
 
     static void max(Priority existing, Prioritized incoming) {

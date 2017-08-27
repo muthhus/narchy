@@ -205,7 +205,7 @@
 //        if (nar.concept(abbreviated) instanceof PermanentConcept)
 //            return false;
 //
-//        float p = b.priSafe(0);
+//        float p = b.priElseZero();
 //
 //        Abbr abb = code.get(abbreviated);
 //        if (abb != null) {

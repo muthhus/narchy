@@ -79,7 +79,7 @@ abstract public class ConceptSpace extends NARSpace<Term, ConceptWidget> {
 
     protected ConceptWidget nodeGetOrCreate(PriReference<Activate> clink) {
         ConceptWidget cw = nodeGetOrCreate(clink.get());
-        cw.pri = clink.priSafe(0);
+        cw.pri = clink.priElseZero();
         return cw;
     }
 

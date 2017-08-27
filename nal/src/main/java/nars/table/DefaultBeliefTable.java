@@ -87,7 +87,7 @@ public class DefaultBeliefTable implements BeliefTable {
     @Override
     public float priSum() {
         final float[] total = {0};
-        Consumer<Task> totaler = t -> total[0] += t.priSafe(0);
+        Consumer<Task> totaler = t -> total[0] += t.priElseZero();
         eternal.forEachTask(totaler);
         temporal.forEachTask(totaler);
         return total[0];

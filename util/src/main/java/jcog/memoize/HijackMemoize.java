@@ -4,7 +4,7 @@ import jcog.Texts;
 import jcog.bag.impl.HijackBag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.MwCounter;
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.random.XorShift128PlusRandom;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectLongProcedure;
@@ -153,7 +153,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         //TODO make this a momentum parameter
         float cut = boost / (reprobes*2);
 
-        assert(cut > Pri.EPSILON);
+        assert(cut > Prioritized.EPSILON);
 
         set(boost, cut);
 

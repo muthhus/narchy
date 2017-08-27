@@ -6,10 +6,7 @@ import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
-import jcog.pri.PLink;
-import jcog.pri.Pri;
-import jcog.pri.PriReference;
-import jcog.pri.Priority;
+import jcog.pri.*;
 import jcog.pri.op.PriMerge;
 import jcog.random.XorShift128PlusRandom;
 import jcog.tensor.ArrayTensor;
@@ -50,7 +47,7 @@ public class BagTest {
         }
 
         //insert an item with (nearly) zero budget
-        PLink x0 = new PLink("x", 2 * Pri.EPSILON);
+        PLink x0 = new PLink("x", 2 * Prioritized.EPSILON);
         PriReference added = c.put(x0);
         assertSame(added, x0);
         c.commit();
@@ -58,12 +55,12 @@ public class BagTest {
         assertEquals(1, c.size());
 
 
-        assertEquals(0, c.priMin(), Pri.EPSILON * 2);
+        assertEquals(0, c.priMin(), Prioritized.EPSILON * 2);
 
         PriReference<String> x = c.get("x");
         assertNotNull(x);
         assertSame(x, x0);
-        assertTrue(Priority.Zero.equalsBudget(x, 0.01f));
+        assertTrue(Util.equals(Prioritized.Zero.priElseNeg1(), x.priElseNeg1(), 0.01f));
 
     }
 
@@ -80,8 +77,7 @@ public class BagTest {
 
         PriReference<String> agx = a.get("x");
         Pri expect = new Pri(0.2f);
-        assertTrue(agx + "==?==" + expect, expect.equalsBudget(
-                agx, 0.01f));
+        assertTrue(agx + "==?==" + expect, Util.equals(expect.priElseNeg1(), agx.priElseNeg1(), 0.01f));
 
     }
 

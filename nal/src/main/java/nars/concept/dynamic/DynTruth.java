@@ -2,7 +2,7 @@ package nars.concept.dynamic;
 
 import jcog.list.FasterList;
 import jcog.pri.Pri;
-import jcog.pri.Priority;
+import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -87,13 +87,13 @@ public final class DynTruth implements Truthed {
         return truth().toString();
     }
 
-    public NALTask task(@NotNull Term c, boolean beliefOrGoal, long cre, long start, long end, @Nullable Priority b, NAR nar) {
+    public NALTask task(@NotNull Term c, boolean beliefOrGoal, long cre, long start, long end, @Nullable Prioritized b, NAR nar) {
 
         Truth tr = truth().ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
         if (tr == null)
             return null;
 
-        Priority priority;
+        Prioritized priority;
         if (b != null) {
             if ((priority = b).isDeleted())
                 return null;

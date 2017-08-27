@@ -9,7 +9,7 @@ import com.google.common.escape.Escapers;
 import jcog.Util;
 import jcog.list.FasterList;
 import jcog.pri.Pri;
-import jcog.pri.Priority;
+import jcog.pri.Prioritized;
 import jdk.nashorn.api.scripting.NashornScriptEngine;
 import nars.derive.LambdaPred;
 import nars.derive.PrediTerm;
@@ -635,7 +635,7 @@ public interface $ {
         return new PreciseTruth(f, c);
     }
 
-    static Priority b(float p) {
+    static Prioritized b(float p) {
         return new Pri(p);
     }
 

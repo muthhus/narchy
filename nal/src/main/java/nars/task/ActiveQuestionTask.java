@@ -3,7 +3,7 @@ package nars.task;
 import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.event.On;
-import jcog.pri.PLinkUntilDeleted;
+import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
@@ -127,14 +127,14 @@ public class ActiveQuestionTask extends NALTask implements Consumer<Task> {
 
     public Task onAnswer(Task answer) {
         //answer = super.onAnswered(answer, nar);
-        answers.putAsync(new PLinkUntilDeleted<>(answer, answer.priSafe(0)));
+        answers.putAsync(new PLink<>(answer, answer.priElseZero()));
         return answer;
     }
 
 //    @Override
 //    public Task onAnswered(Task answer, NAR nar) {
 //        //answer = super.onAnswered(answer, nar);
-//        answers.putAsync(new PLinkUntilDeleted<>(answer, answer.priSafe(0)));
+//        answers.putAsync(new PLinkUntilDeleted<>(answer, answer.priElseZero()));
 //        return answer;
 //    }
 }

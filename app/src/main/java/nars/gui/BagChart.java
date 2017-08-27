@@ -66,7 +66,7 @@ abstract public class BagChart<X extends Prioritized> extends TreeChart<X> imple
 
 //    @Override
 //    public void accept(X x, ItemVis<X> y) {
-//        float p = x.priSafe(0);
+//        float p = x.priElseZero();
 //        y.update(p, p, 0, 1f);
 //    }
 }

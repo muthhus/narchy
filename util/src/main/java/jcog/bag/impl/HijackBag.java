@@ -4,7 +4,7 @@ import com.google.common.util.concurrent.AtomicDouble;
 import jcog.bag.Bag;
 import jcog.bag.util.Treadmill;
 import jcog.list.FasterList;
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import jcog.pri.op.PriForget;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
@@ -351,7 +351,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
     protected boolean hijackSoftmax(float newPri, float oldPri, float temperature) {
 
 
-        float priEpsilon = Pri.EPSILON;
+        float priEpsilon = Prioritized.EPSILON;
 
         if (oldPri > priEpsilon) {
             assert (temperature < reprobes);
@@ -508,7 +508,7 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
         return commit(
                 ((s > 0) && (p > 0)) ?
-                        PriForget.forget(s, capacity(), p, mass, PriForget.DEFAULT_TEMP, Pri.EPSILON, this::forget) :
+                        PriForget.forget(s, capacity(), p, mass, PriForget.DEFAULT_TEMP, Prioritized.EPSILON, this::forget) :
                         null
         );
 

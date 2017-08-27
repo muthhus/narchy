@@ -56,8 +56,8 @@ public class PriForget<P extends Priority> implements Consumer<P> {
 
 //        b.priSub(avgToBeRemoved
 //            ,0.5f //50% retained
-////            //,(1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
-////            //,0.5f * (1f - b.priSafe(0))  //retained inversely proportional to existing pri, so higher burden on higher priority
+////            //,(1f - b.priElseZero())  //retained inversely proportional to existing pri, so higher burden on higher priority
+////            //,0.5f * (1f - b.priElseZero())  //retained inversely proportional to existing pri, so higher burden on higher priority
 //        );
     }
 

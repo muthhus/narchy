@@ -39,11 +39,6 @@ public class Pri implements Priority {
         return p!=p; //fast NaN check
     }
 
-    @Override
-    public final @NotNull Priority priority() {
-        return this;
-    }
-
     @Nullable
     @Deprecated @Override
     public Priority clonePri() {
@@ -58,13 +53,21 @@ public class Pri implements Priority {
      * @return The current priority
      */
     @Override
-    public float pri() {
+    public final float pri() {
         return pri;
     }
 
 
-
-
+    /** duplicate of Prioritized's impl, for speed (hopefully) */
+    @Override public final float priElseNeg1() {
+        float p = pri; //pri() if there are any subclasses they should call pri()
+        return p == p ? p : -1;
+    }
+    /** duplicate of Prioritized's impl, for speed (hopefully) */
+    @Override public final float priElseZero() {
+        float p = pri; //pri() if there are any subclasses they should call pri()
+        return p == p ? p : 0;
+    }
 
     @Override
     public boolean delete() {
@@ -115,8 +118,8 @@ public class Pri implements Priority {
 
     public static final FloatFunction<? extends Pri> floatValue = Pri::pri;
 
-    public static float sum(Priority... src) {
-        return Util.sum(Priority::priElseZero, src);
+    public static float sum(Prioritized... src) {
+        return Util.sum(Prioritized::priElseZero, src);
     }
 
 

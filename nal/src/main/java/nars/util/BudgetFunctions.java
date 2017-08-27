@@ -21,6 +21,7 @@
 package nars.util;
 
 import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import org.jetbrains.annotations.NotNull;
 
@@ -214,7 +215,7 @@ public final class BudgetFunctions  {
 
 
     @NotNull
-    public static Priority fund(float maxPri, boolean copyOrTransfer, Priority... src) {
+    public static Prioritized fund(float maxPri, boolean copyOrTransfer, Priority... src) {
         float priSum = Math.min(maxPri, Pri.sum(src));
         float perSrc = priSum / src.length;
 

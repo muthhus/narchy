@@ -3,7 +3,7 @@ package nars.table;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Streams;
 import jcog.data.sorted.TopN;
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import jcog.tree.rtree.*;
 import jcog.util.Top;
 import jcog.util.Top2;
@@ -244,7 +244,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     return; //same instance
 
                 float activation = i.priElseZero();
-                if (activation < Pri.EPSILON)
+                if (activation < Prioritized.EPSILON)
                     return;
 
                 float before = e.priElseZero();
@@ -253,7 +253,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 float activationApplied = (after - before);
 
 
-                if (activationApplied >= Pri.EPSILON)
+                if (activationApplied >= Prioritized.EPSILON)
                     Activate.activate(e, activationApplied, nar);
             }
         };
@@ -1237,7 +1237,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 //                return;
 //            } else {
 //                //MERGE //assert(found.equals(x));
-//                float actualActivation = x.priSafe(0); //will have been set; get this set pri which is actually the effective activation; then delete the task
+//                float actualActivation = x.priElseZero(); //will have been set; get this set pri which is actually the effective activation; then delete the task
 //                x.delete();
 //                if (actualActivation >= Pri.EPSILON) {
 //                    TaskTable.activate(found, actualActivation, nar);

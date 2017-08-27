@@ -155,7 +155,7 @@ public class BagLab  {
             //BLink<Integer> sample = bag.sample();
             for (PriReference<Integer> sample : sampled) {
                 if (sample != null) {
-                    float p = sample.priSafe(0);
+                    float p = sample.priElseZero();
                     selectionHistogram[Util.bin(p, bins - 1)]++;
                 } else {
                     break;

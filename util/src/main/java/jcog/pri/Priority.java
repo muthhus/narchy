@@ -1,100 +1,32 @@
 package jcog.pri;
 
 import jcog.Texts;
-import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Comparator;
 
 import static jcog.Util.*;
 
 /**
- * Created by me on 2/17/17.
+ * Mutable Prioritized
  */
 public interface Priority extends Prioritized {
-
     /**
-     * common instance for a 'Deleted budget'.
+     * Change priority value
+     *
+     * @param p The new priority
+     * @return whether the operation had any effect
      */
-    Priority Deleted = new PriRO(Float.NaN);
+    float setPri(float p);
 
-    /**
-     * common instance for a 'full budget'.
-     */
-    Priority One = new PriRO(1f);
-
-    /**
-     * common instance for a 'half budget'.
-     */
-    Priority Half = new PriRO(0.5f);
-
-    /**
-     * common instance for a 'zero budget'.
-     */
-    Priority Zero = new PriRO(0);
-
-    /**
-     * default minimum difference necessary to indicate a significant modification in budget float number components
-     */
-    float EPSILON = 0.00001f;
-
-    /**
-     * decending order (highest first)
-     */
-    Comparator<Priority> IdentityComparator = (Priority a, Priority b) -> {
-        if (a == b) return 0;
-
-        float ap = a.priElseNeg1();
-        float bp = b.priElseNeg1();
-
-        int q = Float.compare(bp, ap);
-        if (q == 0) {
-            //if still not equal, then use system identiy
-            return Integer.compare(System.identityHashCode(a), System.identityHashCode(b));
-        }
-        return q;
-    };
-
-
-    static String toString(@NotNull Priority b) {
-        return toStringBuilder(null, Texts.n4(b.pri())).toString();
+    default float setPri(@NotNull Prioritized p) {
+        return setPri(p.pri());
     }
 
-    @NotNull
-    static StringBuilder toStringBuilder(@Nullable StringBuilder sb, @NotNull String priorityString) {
-        int c = 1 + priorityString.length();
-        if (sb == null)
-            sb = new StringBuilder(c);
-        else {
-            sb.ensureCapacity(c);
-        }
+    /**
+     * returns null if already deleted
+     */
+    @Nullable Priority clonePri();
 
-        sb.append('$')
-                .append(priorityString);
-        //.append(Op.BUDGET_VALUE_MARK);
-
-        return sb;
-    }
-
-    @NotNull
-    static Ansi.Color budgetSummaryColor(@NotNull Prioritized tv) {
-        int s = (int) Math.floor(tv.priElseZero() * 5);
-        switch (s) {
-            default:
-                return Ansi.Color.DEFAULT;
-
-            case 1:
-                return Ansi.Color.MAGENTA;
-            case 2:
-                return Ansi.Color.GREEN;
-            case 3:
-                return Ansi.Color.YELLOW;
-            case 4:
-                return Ansi.Color.RED;
-
-        }
-    }
 
     default float priMax(float max) {
         return setPri(Math.max(priElseZero(), max));
@@ -139,11 +71,6 @@ public interface Priority extends Prioritized {
         }
     }
 
-    @Override
-    @NotNull
-    default Priority priority() {
-        return this;
-    }
 
 //    default void priAvg(float pOther, float rate) {
 //        float cu = priElseZero();
@@ -154,6 +81,7 @@ public interface Priority extends Prioritized {
 //        return priAddOverflow(toAdd, null);
 //    }
 
+    @Override
     default float priAddOverflow(float toAdd, @Nullable float[] pressurized) {
         if (Math.abs(toAdd) <= EPSILON) {
             return 0; //no change
@@ -173,6 +101,7 @@ public interface Priority extends Prioritized {
     /**
      * returns overflow
      */
+    @Override
     default float priAddOverflow(float toAdd) {
         if (Math.abs(toAdd) <= EPSILON) {
             return 0; //no change
@@ -185,17 +114,6 @@ public interface Priority extends Prioritized {
         return toAdd - delta;
     }
 
-    /**
-     * Change priority value
-     *
-     * @param p The new priority
-     * @return whether the operation had any effect
-     */
-    float setPri(float p);
-
-    default float setPri(@NotNull Prioritized p) {
-        return setPri(p.pri());
-    }
 
     @NotNull
     default float priMult(float factor) {
@@ -207,7 +125,7 @@ public interface Priority extends Prioritized {
 
 
     @NotNull
-    default Priority priLerp(float target, float speed) {
+    default Prioritized priLerp(float target, float speed) {
         float pri = pri();
         if (pri == pri)
             setPri(lerp(speed, pri, target));
@@ -238,10 +156,6 @@ public interface Priority extends Prioritized {
 //        }
 //    }
 
-    /**
-     * returns null if already deleted
-     */
-    @Nullable Priority clonePri();
 
 
     /**
@@ -249,25 +163,30 @@ public interface Priority extends Prioritized {
      *
      * @return String representation of the value with 2-digit accuracy
      */
+    @Override
     @NotNull
     default Appendable toBudgetStringExternal() {
         return toBudgetStringExternal(null);
     }
 
+    @Override
     default @NotNull StringBuilder toBudgetStringExternal(StringBuilder sb) {
-        return Priority.toStringBuilder(sb, Texts.n2(pri()));
+        return Prioritized.toStringBuilder(sb, Texts.n2(pri()));
     }
 
+    @Override
     @NotNull
     default String toBudgetString() {
         return toBudgetStringExternal().toString();
     }
 
+    @Override
     @NotNull
     default String getBudgetString() {
-        return toString(this);
+        return Prioritized.toString(this);
     }
 
+    @Override
     default void normalizePri(float min, float range) {
         //setPri( (p - min)/range );
         normalizePri(min, range, 1f);
@@ -276,27 +195,12 @@ public interface Priority extends Prioritized {
     /**
      * normalizes the current value to within: min..(range+min), (range=max-min)
      */
+    @Override
     default void normalizePri(float min, float range, float lerp) {
         float p = priElseNeg1();
         if (p < 0) return; //dont normalize if deleted
 
         priLerp((p - min) / range, lerp);
-    }
-
-    static <X extends Priority> void normalize(X[] xx, float target) {
-        int l = xx.length;
-        assert (target == target);
-        assert (l > 0);
-
-        float ss = sum(Priority::priElseZero, xx);
-        if (ss <= Pri.EPSILON)
-            return;
-
-        float factor = target / ss;
-
-        for (X x : xx)
-            x.priMult(factor);
-
     }
 
 

@@ -6,7 +6,7 @@ import jcog.bag.impl.hijack.PriorityHijackBag;
 import jcog.data.MutableInteger;
 import jcog.learn.gng.NeuralGasNet;
 import jcog.learn.gng.impl.Node;
-import jcog.pri.WeakPLinkUntilDeleted;
+import jcog.pri.PLink;
 import nars.NAR;
 import nars.Task;
 import nars.control.TaskService;
@@ -235,7 +235,7 @@ public abstract class STMClustered extends TaskService {
     /**
      * temporal link, centroid
      */
-    public final class TLink extends WeakPLinkUntilDeleted<Task> implements Truthed {
+    public final class TLink extends PLink<Task> implements Truthed {
 
         /**
          * feature vector representing the item as learned by clusterer

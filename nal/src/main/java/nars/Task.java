@@ -748,7 +748,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
 
         if (showBudget) {
-            priority().toBudgetStringExternal(buffer).append(' ');
+            toBudgetStringExternal(buffer).append(' ');
         }
 
         buffer.append(contentName).append((char) punc());

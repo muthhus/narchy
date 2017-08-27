@@ -1,7 +1,7 @@
 package nars.op;
 
 import jcog.data.graph.AdjGraph;
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import nars.$;
 import nars.NAR;
 import nars.Task;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import static nars.Op.GOAL;
-import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -37,7 +36,7 @@ public class Implier extends DurService {
     private final NAR nar;
     private final CauseChannel<Task> in;
 
-    float min = Pri.EPSILON; //even though it's for truth
+    float min = Prioritized.EPSILON; //even though it's for truth
     Map<Term, TruthAccumulator> goalTruth = new HashMap();
 
     AdjGraph<Term, Term> impl = null;

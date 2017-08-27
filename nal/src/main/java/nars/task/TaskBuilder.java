@@ -2,7 +2,7 @@ package nars.task;
 
 import jcog.data.array.LongArrays;
 import jcog.pri.Pri;
-import jcog.pri.Priority;
+import jcog.pri.Prioritized;
 import nars.*;
 import nars.concept.Concept;
 import nars.task.util.InvalidTaskException;
@@ -200,7 +200,7 @@ import static nars.time.Tense.*;
 
 
         //if quality is not specified (NaN), then this means to assign the default budgeting according to the task's punctuation
-        float pp = priSafe(-1);
+        float pp = priElseNeg1();
         if (pp < 0) {
             setPri(n.priorityDefault(punc));
         }
@@ -548,7 +548,7 @@ import static nars.time.Tense.*;
     }
 
     @NotNull
-    public final TaskBuilder pri(@NotNull Priority bb) {
+    public final TaskBuilder pri(@NotNull Prioritized bb) {
         setPri(bb);
         //        if (srcCopy == null) {
 //            delete();

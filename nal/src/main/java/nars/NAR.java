@@ -8,7 +8,6 @@ import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import jcog.list.FasterList;
-import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.util.IterableThreadLocal;
@@ -735,8 +734,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 //            float reactivation;
 //            Budget e = existing.budget();
 //            if (!existing.isDeleted()) {
-//                float ep = e.priSafe(0);
-//                reactivation = Util.unitize((input.priSafe(0) - ep) / ep);
+//                float ep = e.priElseZero();
+//                reactivation = Util.unitize((input.priElseZero() - ep) / ep);
 //                if (reactivation > 0) {
 //                    DuplicateMerge.merge(e, input, 1f);
 //                }
@@ -1072,7 +1071,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                             Ansi.Attribute.INTENSITY_BOLD :
                             Ansi.Attribute.INTENSITY_FAINT)
                     .a(tv.pri() > 0.75f ? Ansi.Attribute.NEGATIVE_ON : Ansi.Attribute.NEGATIVE_OFF)
-                    .fg(Priority.budgetSummaryColor(tv))
+                    .fg(Prioritized.budgetSummaryColor(tv))
                     .a(
                             tv.toString(this, true)
                     )
@@ -1626,7 +1625,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             this.max = max;
             assert (max > min);
             this.range = max - min;
-            assert (range > Pri.EPSILON);
+            assert (range > Prioritized.EPSILON);
             this.levels = Util.map(0, levels, (l) -> src.apply(id + l), Cause[]::new);
         }
 

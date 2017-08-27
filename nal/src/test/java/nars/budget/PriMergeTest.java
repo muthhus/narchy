@@ -1,6 +1,7 @@
 package nars.budget;
 
 import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import nars.$;
@@ -79,13 +80,13 @@ public class PriMergeTest {
 //        RawBudget y = new RawBudget(inPri, inQua);
 //        return testMerge(x, y, scale, m, ouPri, ouQua);
 //    }
-    private static Priority testMerge(Priority x, Priority y, @NotNull PriMerge m, float ouPri) {
+    private static Prioritized testMerge(Priority x, Prioritized y, @NotNull PriMerge m, float ouPri) {
         return testMerge(x, y, m, ouPri, -1f);
     }
-    private static Priority testMerge(Priority x, Priority y, @NotNull PriMerge m, float ouPri, float expectedOverflow) {
+    private static Prioritized testMerge(Priority x, Prioritized y, @NotNull PriMerge m, float ouPri, float expectedOverflow) {
         x = x.clonePri();
 
-        Priority x0 = x.clonePri();
+        Prioritized x0 = x.clonePri();
 
         float overflow = m.merge(x, y);
 

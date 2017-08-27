@@ -19,7 +19,7 @@ public class ConceptBagChart extends NARChart<PriReference<Concept>> {
 
     @Override
     public void accept(PriReference<Concept> x, ItemVis<PriReference<Concept>> y) {
-        float p = x.priSafe(0);
+        float p = x.priElseZero();
 
         float r, g, b;
 

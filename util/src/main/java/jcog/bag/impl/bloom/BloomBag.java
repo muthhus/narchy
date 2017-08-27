@@ -83,7 +83,7 @@ public class BloomBag<X> implements Bag<X,PriReference<X>> {
             return null;
         byte[] hx = byteHash(x);
         @Nullable PriReference<X> z = get(x, hx);
-        if (z.priSafe(0) > 0)
+        if (z.priElseZero() > 0)
             pri.set(hx, 0);
         //TODO remove x from the collection?
         onRemoved(z);
@@ -96,7 +96,7 @@ public class BloomBag<X> implements Bag<X,PriReference<X>> {
 
         byte[] hc = byteHash(c);
         float e = p(hc);
-        float bp = b.priSafe(0);
+        float bp = b.priElseZero();
         if (bp <= 0)
             return null;
 

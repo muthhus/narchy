@@ -2,8 +2,8 @@ package jcog.decide;
 
 import jcog.Util;
 import jcog.list.FasterList;
-import jcog.pri.Pri;
 import jcog.pri.PriReference;
+import jcog.pri.Prioritized;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +14,7 @@ import static java.lang.Math.exp;
 public class DecideRoulette<X> extends FasterList<X> {
 
     public final static FloatFunction<? super PriReference> linearPri = (p) -> {
-        return Math.max(p.priElseZero(), Pri.EPSILON);
+        return Math.max(p.priElseZero(), Prioritized.EPSILON);
     };
 
     final static FloatFunction<? super PriReference> softMaxPri = (p) -> {

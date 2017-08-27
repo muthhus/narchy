@@ -29,7 +29,7 @@ import com.google.common.primitives.Longs;
 import jcog.io.BinTxt;
 import jcog.math.NumberException;
 import jcog.math.OneDHaar;
-import jcog.pri.Priority;
+import jcog.pri.Prioritized;
 import org.HdrHistogram.AbstractHistogram;
 import org.HdrHistogram.DoubleHistogram;
 import org.apache.commons.lang3.ArrayUtils;
@@ -979,13 +979,13 @@ public enum Util {
 
 
     public static double normalize(double x, double min, double max) {
-        if (equals(min, max, Priority.EPSILON))
+        if (equals(min, max, Prioritized.EPSILON))
             return min;
         return (x - min) / (max - min);
     }
 
     public static float normalize(float x, float min, float max) {
-        if (equals(min, max, Priority.EPSILON))
+        if (equals(min, max, Prioritized.EPSILON))
             return min;
         return (x - min) / (max - min);
     }

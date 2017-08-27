@@ -55,7 +55,7 @@ import org.jetbrains.annotations.NotNull;
 //                if (c.vars() == 0 && c.varPattern() == 0) {
 //                    long occurrence = g.start();
 //                    if (occurrence == ETERNAL || occurrence >= nar.time()) {
-//                        b = nar.believe(g.priSafe(0), c, occurrence, g.freq(), nar.confDefault(BELIEF));
+//                        b = nar.believe(g.priElseZero(), c, occurrence, g.freq(), nar.confDefault(BELIEF));
 //                    }
 //                }
 //                onExec.accept(g, b);

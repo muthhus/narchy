@@ -239,7 +239,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
     @Override
     public void accept(PriReference<? extends Termed> tgt) {
-        float pri = tgt.priSafe(-1);
+        float pri = tgt.priElseNeg1();
         if (pri < 0)
             return;
 
@@ -289,7 +289,7 @@ public class ConceptWidget extends Cuboid<Term> implements Consumer<PriReference
 
 
         public void add(PriReference b, boolean termOrTask) {
-            float p = b.priSafe(0);
+            float p = b.priElseZero();
             if (termOrTask) {
                 termlinkPri += p;
             } else {

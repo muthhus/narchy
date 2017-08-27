@@ -3,8 +3,6 @@ package jcog.bag.impl;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.bag.Bag;
 import jcog.data.sorted.SortedArray;
-import jcog.list.FasterList;
-import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
@@ -18,7 +16,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
 
@@ -26,7 +23,7 @@ import java.util.function.Consumer;
  * A bag implemented as a combination of a Map and a SortedArrayList
  * TODO extract a version of this which will work for any Prioritized, not only BLink
  */
-abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable<X, Y> implements Bag<X, Y> {
+abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X, Y> implements Bag<X, Y> {
 
     final PriMerge mergeFunction;
 
@@ -200,7 +197,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 //        if (x == null) return +1;
 //        if (y == null) return -1;
 //        return Float.compare(
-//                ((Prioritized) y).priElseNeg1(), ((Prioritized) x).priElseNeg1()
+//                ((Priority) y).priElseNeg1(), ((Priority) x).priElseNeg1()
 //        );
 //    };
 
@@ -231,7 +228,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                 min = Math.min(min, p);
                 max = Math.max(max, p);
                 mass += p;
-                if (p - above >= Pri.EPSILON)
+                if (p - above >= Prioritized.EPSILON)
                     mustSort = true;
 
                 above = p;
@@ -277,45 +274,25 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 //    }
 
 
-    static boolean cmpGT(@Nullable Object o1, @Nullable Object o2) {
-        return cmpGT((Prioritized) o1, (Prioritized) o2);
-    }
-
-    static boolean cmpGT(/*@Nullable */Object o1, float o2) {
-        return cmpGT((Prioritized) o1, o2);
-    }
-
     /**
      * true iff o1 > o2
      */
-    static boolean cmpGT(@Nullable Prioritized o1, @Nullable Prioritized o2) {
+    static boolean cmpGT(@Nullable Priority o1, @Nullable Priority o2) {
         return cmpGT(o1, pCmp(o2));
     }
 
-    static boolean cmpGT(@Nullable Prioritized o1, float o2) {
+    static boolean cmpGT(@Nullable Priority o1, float o2) {
         return (pCmp(o1) < o2);
     }
 
-    /**
-     * true iff o1 > o2
-     */
-    static boolean cmpGT(float o1, @Nullable Prioritized o2) {
-        return (o1 < pCmp(o2));
-    }
+
 
     static boolean cmpGT(float o1, float o2) {
         return (o1 < o2);
     }
 
 
-    /**
-     * true iff o1 < o2
-     */
-    static boolean cmpLT(@Nullable Prioritized o1, @Nullable Prioritized o2) {
-        return cmpLT(o1, pCmp(o2));
-    }
-
-    static boolean cmpLT(@Nullable Prioritized o1, float o2) {
+    static boolean cmpLT(@Nullable Priority o1, float o2) {
         return (pCmp(o1) > o2);
     }
 
@@ -323,7 +300,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
      * gets the scalar float value used in a comparison of BLink's
      * essentially the same as b.priIfFiniteElseNeg1 except it also includes a null test. otherwise they are interchangeable
      */
-    public static float pCmp(@Nullable Prioritized b) {
+    public static float pCmp(@Nullable Priority b) {
         return (b == null) ? -2f : b.priElseNeg1(); //sort nulls beneath
 
 //        float p = b.pri();
@@ -422,7 +399,7 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
          */
 
         Random rng = random();
-        boolean direction = rng!=null ? rng.nextBoolean() : true;
+        boolean direction = rng == null || rng.nextBoolean();
         int nulls = 0; //# of nulls encountered. when this reaches the array length we know it is empty
         while (!next.stop && nulls < s0) {
             Y x = (Y) ii[i];
@@ -511,13 +488,13 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                         int s = size();
                         boolean atCap = s == capacity;
                         float priBefore = existing.priElseZero();
-                        float oo = mergeFunction.merge((Priority) existing /* HACK */, incoming);
+                        float oo = mergeFunction.merge(existing /* HACK */, incoming);
 
                         if (overflow != null)
                             overflow.add(oo);
 
                         float delta = existing.priElseZero() - priBefore;
-                        if (delta >= Pri.EPSILON) {
+                        if (delta >= Prioritized.EPSILON) {
                             if (atCap) {
                                 pressurize(delta);
                             }
@@ -637,9 +614,9 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
     @Deprecated
     public Bag<X, Y> commit() {
         double p = this.pressure.getAndSet(0);
-        if (p >= Pri.EPSILON) {
+        if (p >= Prioritized.EPSILON) {
             return commit(PriForget.forget(size(), capacity(),
-                    (float) p, mass, PriForget.DEFAULT_TEMP, Priority.EPSILON, PriForget::new));
+                    (float) p, mass, PriForget.DEFAULT_TEMP, Prioritized.EPSILON, PriForget::new));
         }
         return this;
     }
@@ -826,10 +803,10 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
             if (right - left <= 7) {
                 //bubble sort on a region of right less than 8?
                 for (j = left + 1; j <= right; j++) {
-                    Prioritized swap = (Prioritized) c[j];
+                    Priority swap = (Priority) c[j];
                     i = j - 1;
                     float swapV = pCmp(swap);
-                    while (i >= left && cmpGT((Prioritized) c[i], swapV)) {
+                    while (i >= left && cmpGT((Priority) c[i], swapV)) {
                         swap(c, i + 1, i);
                         i--;
                     }
@@ -849,15 +826,15 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
 
                 swap(c, i, median);
 
-                float cl = pCmp((Prioritized) c[left]);
-                float cr = pCmp((Prioritized) c[right]);
+                float cl = pCmp((Priority) c[left]);
+                float cr = pCmp((Priority) c[right]);
                 if (cmpGT(cl, cr)) {
                     swap(c, right, left);
                     float x = cr;
                     cr = cl;
                     cl = x;
                 }
-                float ci = pCmp((Prioritized) c[i]);
+                float ci = pCmp((Priority) c[i]);
                 if (cmpGT(ci, cr)) {
                     swap(c, right, i);
                     float x = cr; /*cr = ci;*/
@@ -868,12 +845,12 @@ abstract public class ArrayBag<X, Y extends Prioritized> extends SortedListTable
                     //float x = cl; cl = ci; ci = x;
                 }
 
-                Prioritized temp = (Prioritized) c[i];
+                Priority temp = (Priority) c[i];
                 float tempV = pCmp(temp);
 
                 while (true) {
-                    while (i < cLenMin1 && cmpLT((Prioritized) c[++i], tempV)) ;
-                    while (j > 0 && /* <- that added */ cmpGT(c[--j], tempV)) ;
+                    while (i < cLenMin1 && cmpLT((Priority) c[++i], tempV)) ;
+                    while (j > 0 && /* <- that added */ cmpGT((Priority)c[--j], tempV)) ;
                     if (j < i) {
                         break;
                     }

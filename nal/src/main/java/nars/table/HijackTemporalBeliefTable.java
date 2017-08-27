@@ -47,7 +47,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //        if (exPri!=exPri)
 //            return true;
 //
-//        float inPri = incoming.priSafe(0);
+//        float inPri = incoming.priElseZero();
 //        if (!replace(inPri, exPri)) {
 //            //existing.priMult(1f - /*temperature() * */ inPri/reprobes);
 //            return false;
@@ -211,7 +211,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //    @Override
 //    public float pri(@NotNull Task t) {
 //        return t.pri();
-////        //return (1f + t.priSafe(0)) * (1f + t.conf());
+////        //return (1f + t.priElseZero()) * (1f + t.conf());
 ////        float p = t.priSafe(-1);
 ////        if (p >= 0)
 ////            return Util.or((1f + p), (1f + t.conf()));
@@ -248,7 +248,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 //                    float penalty = df * ((1f + overlapLength) / (1f + (xe - xs)));
 //                    if (penalty > Param.BUDGET_EPSILON) {
 //                        Priority b = x.budget();
-//                        float pBefore = b.priSafe(0), pAfter;
+//                        float pBefore = b.priElseZero(), pAfter;
 //                        if (pBefore > 0) {
 //                            b.priMult(1f - penalty);
 //                            pAfter = b.pri();

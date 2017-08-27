@@ -3,7 +3,7 @@ package nars;
 import com.netflix.servo.monitor.BasicGauge;
 import com.netflix.servo.monitor.LongGauge;
 import jcog.Util;
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import nars.concept.Concept;
 import nars.control.Cause;
 import nars.task.ITask;
@@ -57,7 +57,7 @@ public class Emotivation extends Emotion {
     @Override
     public void value(short[] causes, float value) {
 
-        if (Math.abs(value)<Pri.EPSILON) return; //no change
+        if (Math.abs(value)< Prioritized.EPSILON) return; //no change
 
         int numCauses = causes.length;
 

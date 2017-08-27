@@ -2,7 +2,7 @@ package nars.task;
 
 import jcog.Util;
 import jcog.math.Interval;
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -298,7 +298,7 @@ public class Revision {
                 1f - Stamp.overlapFraction(a.stamp(), b.stamp())/2f;
 
         float factor = 1f * stampDiscount;
-        if (factor < Pri.EPSILON)
+        if (factor < Prioritized.EPSILON)
             return null;
 
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));

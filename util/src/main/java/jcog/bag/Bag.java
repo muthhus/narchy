@@ -2,8 +2,8 @@ package jcog.bag;
 
 import jcog.Util;
 import jcog.list.FasterList;
-import jcog.pri.Pri;
 import jcog.pri.PriReference;
+import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.table.Table;
 import org.apache.commons.lang3.mutable.MutableFloat;
@@ -27,7 +27,7 @@ import static jcog.bag.Bag.BagSample.*;
 /**
  * K=key, V = item/value of type Item
  */
-public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
+public interface Bag<K, V> extends Table<K, V> {
 
 
     /** action returned from bag sampling visitor indicating what to do with the current
@@ -143,12 +143,12 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
     default void normalizeAll(float lerp) {
 
         int size = size();
-        if (size == 0 || lerp < Priority.EPSILON)
+        if (size == 0 || lerp < Prioritized.EPSILON)
             return;
 
         float min = priMin();
         float max = priMax();
-        if (Util.equals(min, max, Priority.EPSILON)) {
+        if (Util.equals(min, max, Prioritized.EPSILON)) {
             //flatten all to 0.5
             commit(x -> ((Priority) x).priLerp(0.5f, lerp));
         } else {
@@ -214,7 +214,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
          * value would never exceed the provided current best,
          * which is initialized to NEGATIVE_INFINITY
          */
-        public float floatValueOf(X x, float mustExceed);
+        float floatValueOf(X x, float mustExceed);
     }
 
     @Nullable
@@ -514,7 +514,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
         frac = Util.unitize(frac);
         float p = depressurize();
         float pF = frac * p;
-        if (pF >= Pri.EPSILON) {
+        if (pF >= Prioritized.EPSILON) {
             pressurize(p - pF);
             return pF;
         }
@@ -527,7 +527,7 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
 
 
     @NotNull
-    public static double[] priHistogram(Iterable<? extends PriReference> pp, @NotNull double[] x) {
+    static double[] priHistogram(Iterable<? extends PriReference> pp, @NotNull double[] x) {
         int bins = x.length;
         final double[] total = {0};
 
@@ -551,11 +551,11 @@ public interface Bag<K, V> extends Table<K, V>, Iterable<V> {
      * double[histogramID][bin]
      */
     @NotNull
-    public static <X, Y> double[][] histogram(@NotNull Iterable<PriReference<Y>> pp, @NotNull BiConsumer<PriReference<Y>, double[][]> each, @NotNull double[][] d) {
+    static <X, Y> double[][] histogram(@NotNull Iterable<PriReference<Y>> pp, @NotNull BiConsumer<PriReference<Y>, double[][]> each, @NotNull double[][] d) {
 
         pp.forEach(y -> {
             each.accept(y, d);
-            //float p = y.priSafe(0);
+            //float p = y.priElseZero();
             //x[Util.bin(p, bins - 1)]++;
         });
 

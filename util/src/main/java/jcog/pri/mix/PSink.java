@@ -1,7 +1,7 @@
 package jcog.pri.mix;
 
 import jcog.data.FloatParam;
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 
 import java.util.function.Consumer;
@@ -16,7 +16,7 @@ public class PSink<X extends Priority, Y extends Priority> extends FloatParam im
     public final Object id;
     private final Consumer<Y> target;
 
-    float minThresh = Pri.EPSILON;
+    float minThresh = Prioritized.EPSILON;
 
     public PSink(Object id, Consumer<Y> target) {
         super(1f, 0f, 2f);

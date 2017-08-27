@@ -155,8 +155,8 @@
 //
 ////                @Override
 ////                public float pri(@NotNull Task key) {
-////                    //return (1f + key.priSafe(0)) * (1f + key.qua());
-////                    //return (1f + key.priSafe(0)) * (1f + key.qua());
+////                    //return (1f + key.priElseZero()) * (1f + key.qua());
+////                    //return (1f + key.priElseZero()) * (1f + key.qua());
 ////                }
 //
 ////                @Override

@@ -1,7 +1,7 @@
 package nars.bag;
 
 import jcog.bag.impl.hijack.PriorityHijackBag;
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import jcog.pri.op.PriForget;
 import nars.NAR;
 import nars.Task;
@@ -72,7 +72,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
     @Override
     public void add(@NotNull Task x, BaseConcept c, NAR n) {
 
-        float activation = x.priSafe(0);
+        float activation = x.priElseZero();
 
 
         MutableFloat oo = new MutableFloat();
@@ -85,7 +85,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
                 //fully inserted or merged with existing item, and activate only the absorbed amount
                 activation -= oo.floatValue();
                 x.delete();
-                if (activation < Pri.EPSILON) {
+                if (activation < Prioritized.EPSILON) {
                     return; //no significant change
                 }
             }

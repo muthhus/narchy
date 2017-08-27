@@ -172,7 +172,7 @@ abstract public class NAgentX extends NAgent {
 
 
 
-        float priFactor = 0.25f;
+        float priFactor = 1f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.25f * priFactor;
@@ -438,7 +438,7 @@ abstract public class NAgentX extends NAgent {
 //
 //                    @Override
 //                    public void accept(ITask x, ItemVis<ITask> y) {
-//                        float p = Math.max(x.priSafe(0), Pri.EPSILON);
+//                        float p = Math.max(x.priElseZero(), Pri.EPSILON);
 //                        float r = 0, g = 0, b = 0;
 //                        int hash = x.hashCode();
 //                        switch (Math.abs(hash) % 3) {

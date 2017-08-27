@@ -3,7 +3,7 @@ package nars.op.stm;
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.data.FloatParam;
 import jcog.pri.PLink;
-import jcog.pri.Pri;
+import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.concept.Concept;
@@ -59,7 +59,7 @@ public final class STMLinkage extends TaskService {
             return;
 
         float strength = this.strength.floatValue();
-        float tPri = t.priSafe(0);
+        float tPri = t.priElseZero();
         if (tPri == 0)
             return;
 
@@ -77,8 +77,8 @@ public final class STMLinkage extends TaskService {
 
 
         /** current task's... */
-        float interStrength = tPri * tb.priSafe(0) * strength;
-        if (interStrength >= Pri.EPSILON) {
+        float interStrength = tPri * tb.priElseZero() * strength;
+        if (interStrength >= Prioritized.EPSILON) {
             Concept ca = ta.concept(nar, true);
             if (ca != null) {
                 Concept cb = tb.concept(nar, true);

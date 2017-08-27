@@ -244,7 +244,7 @@ public enum TermGraph {
 //
 //                //average:
 //                if (existing != null) {
-//                    float pAdd = incoming.priSafe(0);
+//                    float pAdd = incoming.priElseZero();
 //                    existing.priAvg(pAdd, scale);
 //                    return 0;
 //                } else {

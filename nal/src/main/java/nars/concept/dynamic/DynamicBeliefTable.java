@@ -1,7 +1,7 @@
 package nars.concept.dynamic;
 
 import jcog.list.FasterList;
-import jcog.pri.Priority;
+import jcog.pri.Prioritized;
 import nars.NAR;
 import nars.Task;
 import nars.table.DefaultBeliefTable;
@@ -11,8 +11,6 @@ import nars.term.Term;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static nars.time.Tense.ETERNAL;
 
 
 public class DynamicBeliefTable extends DefaultBeliefTable {
@@ -30,7 +28,7 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
     }
 
     @Nullable
-    public NALTask generate(@NotNull Term template, long start, long end, @Nullable Priority b, NAR nar) {
+    public NALTask generate(@NotNull Term template, long start, long end, @Nullable Prioritized b, NAR nar) {
 
         DynTruth yy = truth(start, end,  template, true, nar);
         if (yy == null)

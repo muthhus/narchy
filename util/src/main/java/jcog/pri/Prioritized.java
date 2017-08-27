@@ -1,8 +1,15 @@
 package jcog.pri;
 
 
+import jcog.Texts;
 import jcog.Util;
+import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Comparator;
+
+import static jcog.Util.sum;
 
 /**
  * something which has a priority floating point value
@@ -16,20 +23,110 @@ public interface Prioritized extends Deleteable {
      * a value in range 0..1.0 inclusive.
      * if the value is NaN, then it means this has been deleted
      */
-    /*default float pri() {
-        return priority().pri();
-    }*/
     float pri();
+
+    /**
+     * common instance for a 'Deleted budget'.
+     */
+    Prioritized Deleted = new PriRO(Float.NaN);
+    /**
+     * common instance for a 'full budget'.
+     */
+    Prioritized One = new PriRO(1f);
+    /**
+     * common instance for a 'half budget'.
+     */
+    Prioritized Half = new PriRO(0.5f);
+    /**
+     * common instance for a 'zero budget'.
+     */
+    Prioritized Zero = new PriRO(0);
+    /**
+     * default minimum difference necessary to indicate a significant modification in budget float number components
+     */
+    float EPSILON = 0.00001f;
+    /**
+     * decending order (highest first)
+     */
+    Comparator<Prioritized> IdentityComparator = (Prioritized a, Prioritized b) -> {
+        if (a == b) return 0;
+
+        float ap = a.priElseNeg1();
+        float bp = b.priElseNeg1();
+
+        int q = Float.compare(bp, ap);
+        if (q == 0) {
+            //if still not equal, then use system identiy
+            return Integer.compare(System.identityHashCode(a), System.identityHashCode(b));
+        }
+        return q;
+    };
+
+    static String toString(@NotNull Prioritized b) {
+        return toStringBuilder(null, Texts.n4(b.pri())).toString();
+    }
+
+    @NotNull
+    static StringBuilder toStringBuilder(@Nullable StringBuilder sb, @NotNull String priorityString) {
+        int c = 1 + priorityString.length();
+        if (sb == null)
+            sb = new StringBuilder(c);
+        else {
+            sb.ensureCapacity(c);
+        }
+
+        sb.append('$')
+                .append(priorityString);
+        //.append(Op.BUDGET_VALUE_MARK);
+
+        return sb;
+    }
+
+    @NotNull
+    static Ansi.Color budgetSummaryColor(@NotNull Prioritized tv) {
+        int s = (int) Math.floor(tv.priElseZero() * 5);
+        switch (s) {
+            default:
+                return Ansi.Color.DEFAULT;
+
+            case 1:
+                return Ansi.Color.MAGENTA;
+            case 2:
+                return Ansi.Color.GREEN;
+            case 3:
+                return Ansi.Color.YELLOW;
+            case 4:
+                return Ansi.Color.RED;
+
+        }
+    }
+
+    static <X extends Priority> void normalize(X[] xx, float target) {
+        int l = xx.length;
+        assert (target == target);
+        assert (l > 0);
+
+        float ss = sum(Prioritized::priElseZero, xx);
+        if (ss <= Pri.EPSILON)
+            return;
+
+        float factor = target / ss;
+
+        for (X x : xx)
+            x.priMult(factor);
+
+    }
 
     default float priSafe(float valueIfDeleted) {
         float p = pri();
         return p == p ? p : valueIfDeleted;
     }
 
+
     default float priElseZero() {
         float p = pri();
         return p == p ? p : 0;
-        //return priSafe(0);
+        //return priElseZero();
     }
     default float priElseNeg1() {
         float p = pri();
@@ -49,9 +146,6 @@ public interface Prioritized extends Deleteable {
 //        return p!=p; //fast NaN check
 //    }
 
-    @NotNull
-    Priority priority();
-
     static float priSum(@NotNull Iterable<? extends Prioritized> c) {
         float totalPriority = 0;
         for (Prioritized i : c)
@@ -59,9 +153,21 @@ public interface Prioritized extends Deleteable {
         return totalPriority;
     }
 
-    default boolean equalsBudget(@NotNull Prioritized t, float epsilon) {
-        return Util.equals(priElseNeg1(), t.priElseNeg1(), epsilon);
-    }
+    float priAddOverflow(float toAdd, @Nullable float[] pressurized);
+
+    float priAddOverflow(float toAdd);
+
+    @NotNull Appendable toBudgetStringExternal();
+
+    @NotNull StringBuilder toBudgetStringExternal(StringBuilder sb);
+
+    @NotNull String toBudgetString();
+
+    @NotNull String getBudgetString();
+
+    void normalizePri(float min, float range);
+
+    void normalizePri(float min, float range, float lerp);
 
 
 //    static void normalizePriSum(@NotNull Iterable<? extends Prioritized> l, float total) {
@@ -87,7 +193,7 @@ public interface Prioritized extends Deleteable {
 //        P s = null;
 //        for (P i : c) {
 //            s = i;
-//            r -= s.priSafe(0);
+//            r -= s.priElseZero();
 //            if (r < 0)
 //                return s;
 //        }
