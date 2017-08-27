@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 400;
+    final int cycles = 1400;
 
     @Before
     public void nal() {
@@ -282,7 +282,7 @@ public class NAL6Test extends AbstractNALTest {
     public void variable_introduction() {
 
         TestNAR tester = test;
-        //
+        tester.log();
         tester.believe("<swan --> bird>"); //en("A swan is a bird.");
         tester.believe("<swan --> swimmer>", 0.80f, 0.9f); //en("A swan is usually a swimmer.");
         tester.mustBelieve(cycles, "<<$1 --> bird> ==> <$1 --> swimmer>>", 0.80f, 0.45f); //en("I guess a bird is usually a swimmer.");
@@ -338,6 +338,7 @@ public class NAL6Test extends AbstractNALTest {
         //
         tester.believe("<#1 --> swimmer>"); //en("A gull is a swimmer.");
         tester.believe("<swan --> swimmer>", 0.80f, 0.9f); //en("Usually, a swan is a swimmer.");
+
         tester.mustBelieve(cycles, "<<#1 --> $2> ==> <swan --> $2>>", 0.80f, 0.45f); //en("I guess what can be said about gull usually can also be said about swan.");
         tester.mustBelieve(cycles, "<<swan --> $1> ==> <#2 --> $1>>", 1.00f, 0.39f); //en("I guess what can be said about swan can also be said about gull.");
 //        tester.mustBelieve(cycles, "<<#1 --> $2> <=> <swan --> $2>>", 0.80f, 0.45f); //en("I guess gull and swan share most properties.");

@@ -68,10 +68,10 @@ public abstract class Unify extends Versioning implements Subst {
     public int dur = -1;
 
 
-    /**
-     * free variables remaining unassigned, for counting
-     */
-    protected final Versioned<Set<Term>> free;
+//    /**
+//     * free variables remaining unassigned, for counting
+//     */
+//    protected final Versioned<Set<Term>> free;
 
 
     /**
@@ -87,7 +87,7 @@ public abstract class Unify extends Versioning implements Subst {
         this.type = type;
 
         xy = new ConstrainedVersionMap(this, Param.UnificationVariableCapInitial);
-        this.free = new Versioned<>(this, 4); //task, belief, subIfUnifies + ?
+        //this.free = new Versioned<>(this, 4); //task, belief, subIfUnifies + ?
         //this.freeCount = new Versioned<>(versioning, 8);
 
     }
@@ -163,9 +163,9 @@ public abstract class Unify extends Versioning implements Subst {
     public boolean unify(@NotNull Term x, @NotNull Term y, boolean finish) {
 
         //accumulate any new free variables in this next matched term
-        Set<Term> freeX = freeVariables(x);
-        if (null == free.set(freeX)) //plus and not equals because this may continue from another unification!!!!!
-            return false;
+//        Set<Term> freeX = freeVariables(x);
+////        if (null == free.set(freeX)) //plus and not equals because this may continue from another unification!!!!!
+////            return false;
 //        if (freeX.isEmpty())
 //            return x.equals(y);
 
@@ -182,15 +182,15 @@ public abstract class Unify extends Versioning implements Subst {
         return false;
     }
 
-    /**
-     * computes a lazy set with the new free variables added by the incoming term, to continue
-     * from a previous partial unification if necessary.
-     */
-    Set<Term> freeVariables(@NotNull Term x) {
-        Set<Term> prevFree = free.get();
-        Set<Term> nextFree = x.varsUnique(type, prevFree != null ?  prevFree : Collections.emptySet());
-        return concat(prevFree, nextFree);
-    }
+//    /**
+//     * computes a lazy set with the new free variables added by the incoming term, to continue
+//     * from a previous partial unification if necessary.
+//     */
+//    Set<Term> freeVariables(@NotNull Term x) {
+//        Set<Term> prevFree = free.get();
+//        Set<Term> nextFree = x.varsUnique(type, prevFree != null ?  prevFree : Collections.emptySet());
+//        return concat(prevFree, nextFree);
+//    }
 
 
     void tryMatches() {
