@@ -264,6 +264,9 @@ public class Premise extends UnaryTask {
         }
 
 
+        if (beliefTerm instanceof Bool)
+            return null;
+
         Set<Task> dd = d.run(this, task, belief, beliefTerm, ttlMax);
         int dds = dd.size();
         if (dds > 0) {

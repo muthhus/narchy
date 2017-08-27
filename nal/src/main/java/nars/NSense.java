@@ -206,6 +206,7 @@ public interface NSense {
     default ScalarConcepts senseNumber(Term id, FloatSupplier v, int precision, ScalarConcepts.ScalarEncoder model)  {
         return senseNumber(v, model, Util.map(0, precision,
                 (int x) ->
+                        //($.inh(id, $.the(x)))
                         //($.inh($.the(x), id))
                         ($.p(id, $.the(x)))
                 ,

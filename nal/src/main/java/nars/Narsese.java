@@ -136,16 +136,17 @@ public class Narsese extends BaseParser<Object> {
 
     public Rule Input() {
         return sequence(
-                zeroOrMore( //1 or more?
-                        //sequence(
-                        //firstOf(
-                        //LineComment(),
-                        s(),
-                        Task()
-                        //)
+                zeroOrMore(
 
-                        //)
-                ), s(), eof());
+                        firstOf(
+                                LineComment(),
+                                Task()
+                        )
+
+
+                ),
+                s() //optional trailing whitespace
+                );
     }
 
 //    /**
@@ -218,6 +219,7 @@ public class Narsese extends BaseParser<Object> {
                 //),
                 //sNonNewLine(),
                 //LineCommentEchoed(),
+                zeroOrMore(noneOf("\n")),
                 firstOf("\n", eof() /* may not have newline at end of file */)
         );
     }
@@ -421,7 +423,6 @@ public class Narsese extends BaseParser<Object> {
 //    }
 
 
-
     @Cached
     Rule Term(boolean oper, boolean meta, boolean temporal) {
         /*
@@ -438,7 +439,7 @@ public class Narsese extends BaseParser<Object> {
                         QuotedAtom(),
 
                         //negation shorthand
-                        seq(NEG.str, Term(true,false,true), push(($.the(pop())).neg())),
+                        seq(NEG.str, Term(true, false, true), push(($.the(pop())).neg())),
 
                         seq(oper, ColonReverseInheritance()),
 
@@ -524,7 +525,7 @@ public class Narsese extends BaseParser<Object> {
 
                 ),
 
-                firstOf(eof(),s()),
+                firstOf(eof(), s()),
 
                 //ATOM
                 push((pop()))

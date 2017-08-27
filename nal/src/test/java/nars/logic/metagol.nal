@@ -1,0 +1,18 @@
+// adapted from Metagol: https://github.com/metagol/metagol
+
+//metarule([P,Q],([P,A,B]:-[[Q,A,B]])). % identity
+( ($Q:($A,$B) ==> $P:($A,$B)) <-> identity($P,$Q) ).
+
+//metarule([P,Q],([P,A,B]:-[[Q,B,A]])). % inverse
+( ($Q:($B,$A) ==> $P:($A,$B)) <-> inverse($P,$Q) ).
+
+//metarule([P,Q,X],([P,A,B]:-[[Q,A,B,X]])). % curry
+( ($Q:($A,$B,$X) ==> $P:($A,$B)) <-> curry($P,$Q,$X) ).
+
+//metarule([P,Q,R],([P,A,B]:-[[Q,A],[R,A,B]])). % precon
+//..
+
+//metarule([P,Q,R],([P,A,B]:-[[Q,A,B],[R,B]])). % postcon
+//..
+
+//metarule([P,Q,R],([P,A,B]:-[[Q,A,C],[R,C,B]])).

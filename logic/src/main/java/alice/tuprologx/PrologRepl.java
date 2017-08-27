@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
 public class PrologRepl extends Automaton implements OutputListener, SpyListener, WarningListener/*Castagna 06/2011*/, ExceptionListener/**/{
 
 	final BufferedReader  stdin;
-    final Prolog          engine;
+    final Prolog prolog;
 
 
     static final String incipit =
@@ -28,24 +28,32 @@ public class PrologRepl extends Automaton implements OutputListener, SpyListener
         }
         
 
-        engine = new Prolog();
+        prolog = new Prolog();
         /**
          * Added the method setExecution to conform
          * the operation of CUIConsole as that of JavaIDE
          */
-        IOLibrary IO = (IOLibrary)engine.library("alice.tuprolog.lib.IOLibrary");
+        IOLibrary IO = (IOLibrary) prolog.library("alice.tuprolog.lib.IOLibrary");
         IO.setExecutionType(IOLibrary.consoleExecution);
+
+
         /***/
         stdin = new BufferedReader(new InputStreamReader(System.in));
-        //engine.addWarningListener(this);
-        engine.addOutputListener(this);
-        engine.addSpyListener(this);
+        prolog.addQueryListener(new QueryListener() {
+            @Override
+            public void accept(QueryEvent e) {
+                System.out.println(e);
+            }
+        });
+        prolog.addExceptionListener((e)->System.err.println(e));
+        prolog.addOutputListener(this);
+        prolog.addSpyListener(this);
         /*Castagna 06/2011*/   
-        engine.addExceptionListener(this);
+        prolog.addExceptionListener(this);
         /**/
         if (args.length>0) {
             try {
-                engine.setTheory(new Theory(new FileInputStream(args[0])));
+                prolog.setTheory(new Theory(new FileInputStream(args[0])));
             } catch (InvalidTheoryException ex){
                 System.err.println("invalid theory - line: "+ex.line);
                 System.exit(-1);
@@ -79,7 +87,7 @@ public class PrologRepl extends Automaton implements OutputListener, SpyListener
     void solveGoal(String goal){
 
         try {
-        	Solution info = engine.solve(goal);
+        	Solution info = prolog.solve(goal);
    
             /*Castagna 06/2011*/        	
         	//if (engine.isHalted())
@@ -94,7 +102,7 @@ public class PrologRepl extends Automaton implements OutputListener, SpyListener
                 System.out.println("no.");
                 become("goalRequest");
             } else
-                if (!engine.hasOpenAlternatives()) {
+                if (!prolog.hasOpenAlternatives()) {
                     String binds = info.toString();
                     if (binds.isEmpty()) {
                         System.out.println("yes.");
@@ -142,12 +150,12 @@ public class PrologRepl extends Automaton implements OutputListener, SpyListener
         } catch (IOException ex){}
         if (!choice.equals(";")) {
             System.out.println("yes.");
-            engine.solveEnd();
+            prolog.solveEnd();
             become("goalRequest");
         } else {
             try {
                 System.out.println();
-                Solution info = engine.solveNext();
+                Solution info = prolog.solveNext();
                 if (!info.isSuccess()){
                     System.out.println("no.");
                     become("goalRequest");

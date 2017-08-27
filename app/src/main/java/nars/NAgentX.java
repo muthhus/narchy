@@ -157,7 +157,7 @@ abstract public class NAgentX extends NAgent {
                 .time(clock)
                 .index(
                         //new CaffeineIndex(128 * 1024)
-                        new CaffeineIndex2(256 * 1024)
+                        new CaffeineIndex2(128 * 1024)
                         //new HijackTermIndex(64 * 1024,  3)
                 )
                 .get();
@@ -168,7 +168,7 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.7f);
+        n.goalConfidence(0.9f);
 
 
 
@@ -177,7 +177,7 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.25f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.25f * priFactor;
-        n.termVolumeMax.setValue(28);
+        n.termVolumeMax.setValue(32);
 
         //n.dtDither.setValue(0.5f);
         //n.dtMergeOrChoose.setValue(true);

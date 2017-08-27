@@ -21,8 +21,11 @@ public class TestProloglike {
 //        Param.TRACE = true;
 //    }
 
-    /** http://www.doc.gold.ac.uk/~mas02gw/prolog_tutorial/prologpages/rules.html */
-    @Test public void testProloglike1() throws Narsese.NarseseException {
+    /**
+     * http://www.doc.gold.ac.uk/~mas02gw/prolog_tutorial/prologpages/rules.html
+     */
+    @Test
+    public void testProloglike1() throws Narsese.NarseseException {
         Param.DEBUG = true;
         NAR n = NARS.tmp();
         /*
@@ -38,20 +41,19 @@ public class TestProloglike {
 
         n.truthResolution.setValue(0.1f);
         n.believe(
-            "((red($x) && car($x))==>fun($x))",
-            "((blue($x) && bike($x))==>fun($x))",
-            "(car($x) <=> (--,bike($x)))",
-            "(red($x) <=> (--,blue($x)))",
-            "car(vw_beatle)", "car(ford_escort)", "bike(harley_davidson)", "red(vw_beatle)", "blue(ford_escort)", "blue(harley_davidson)"
+                "((red($x) && car($x))==>fun($x))",
+                "((blue($x) && bike($x))==>fun($x))",
+                "(car($x) <=> (--,bike($x)))",
+                "(red($x) <=> (--,blue($x)))",
+                "car(vw_beatle)", "car(ford_escort)", "bike(harley_davidson)", "red(vw_beatle)", "blue(ford_escort)", "blue(harley_davidson)"
         );
         //n.log();
         n.DEFAULT_QUESTION_PRIORITY = 0.99f;
-        n.question("fun(?x)", ETERNAL, (q,a)->{
+        n.question("fun(?x)", ETERNAL, (q, a) -> {
             //System.out.println(a.term() + " " + a.truth());
             System.out.println(a.proof());
         });
         n.run(1000);
-
 
 
     }
@@ -64,13 +66,41 @@ public class TestProloglike {
         n.termVolumeMax.setValue(1024);
         n.log();
         n.inputNarsese(
-            TestProloglike.class.getResource("einsteinsRiddle.nal")
+                TestProloglike.class.getResource("einsteinsRiddle.nal")
         );
         n.run(128);
 
 
-
     }
 
+    @Test
+    public void testMetagol() throws IOException, Narsese.NarseseException {
+        NAR n = NARS.tmp();
+
+        //n.termVolumeMax.setValue(1024);
+        n.log();
+        n.inputNarsese(
+                TestProloglike.class.getResource("metagol.nal")
+        );
+
+        n.input("grandparent(ann,amelia).",
+                "grandparent(steve,amelia).",
+                "grandparent(ann,spongebob).",
+                "grandparent(steve,spongebob).",
+                "grandparent(linda,amelia).",
+                "--grandparent(amy,amelia).",
+                "parent(ann,andy).",
+                "parent(steve,andy).",
+                "parent(ann,amy).",
+                "$0.99 identity(?x,?y)?",
+                "$0.99 identity(grandparent,?y)?",
+                "$0.99 curry(?x,?y)?",
+                "$0.99 curry(#x,#y)?",
+                "$0.99 curry(grandparent,?y)?"
+        );
+        n.run(1024);
+
+
+    }
 
 }
