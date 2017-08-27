@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import static nars.Op.GOAL;
+import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -55,8 +56,8 @@ public class Implier extends DurService {
     private long next;
     private long now;
 
-    final static TruthOperator dedRec = GoalFunction.get($.the("DeductionRecursivePB"));
-    final static TruthOperator indRec = GoalFunction.get($.the("InductionRecursivePB"));
+    final static TruthOperator ded = GoalFunction.get($.the("GoductionRecursivePB"));
+    final static TruthOperator ind = GoalFunction.get($.the("InductionRecursivePB"));
     private long nowStart, nowEnd;
 
     public Implier(NAR n, Term... seeds) {
@@ -138,13 +139,7 @@ public class Implier extends DurService {
                 if (Pg == null)
                     return;
 
-                float implFreq = f;
-//                if (subj.op() == NEG) {
-//                    subj = subj.unneg();
-//                    implFreq = 1 - implFreq;
-//                }
-
-                Truth Sg = dedRec.apply(Pg, $.t(implFreq, implConf), nar, confSubMin);
+                Truth Sg = ded.apply(Pg, $.t(f, implConf), nar, confSubMin);
 
                 if (Sg != null) {
                     goal(goalTruth, subj, Sg);
@@ -222,11 +217,14 @@ public class Implier extends DurService {
     }
 
     public void goal(Map<Term, TruthAccumulator> goals, Term tt, Truth g) {
-        goals.compute(tt, (ttt, p) -> {
-            if (p == null)
-                p = new TruthAccumulator();
-            p.add(g);
-            return p;
-        });
+
+        if (tt.op() == NEG) {
+            tt = tt.unneg();
+            g = g.neg();
+        }
+
+        goals.computeIfAbsent(tt, (ttt) -> {
+            return new TruthAccumulator();
+        }).add(g);
     }
 }

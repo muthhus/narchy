@@ -92,12 +92,12 @@ public enum TermGraph {
                     AdjGraph<Term, Term> gg = g;
                     recurseTerm(nar, when, g, (impl) -> {
                         if (!done.add(impl)) {
-                            Term s = impl.sub(0).conceptual();
+                            Term s = impl.sub(0);
                             if (!acceptTerm(s)) {
                                 return;
                             }
 
-                            Term p = impl.sub(1).conceptual();
+                            Term p = impl.sub(1);
                             if (!acceptTerm(p)) {
                                 return;
                             }

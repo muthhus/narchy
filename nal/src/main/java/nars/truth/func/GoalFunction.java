@@ -34,19 +34,24 @@ public enum GoalFunction implements TruthOperator {
     Deduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+            return deduction(T, B, minConf);
+        }
+    },
+    Goduction() {
+        @Override
+        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return desireDed(T, B, minConf);
         }
     },
-
-    @AllowOverlap  DeductionRecursivePB() {
+    @AllowOverlap  GoductionRecursivePB() {
         @Override
         public Truth apply(Truth T, Truth B, NAR m, float minConf) {
-              if (B.isNegative()) {
-                Truth x = Deduction.apply(T, B.neg(), m, minConf);
-                return x != null ? x.neg() : null;
-            } else {
-                return Deduction.apply(T, B, m, minConf);
-            }
+//              if (B.isNegative()) {
+//                Truth x = Goduction.apply(T, B.neg(), m, minConf);
+//                return x != null ? x.neg() : null;
+//            } else {
+                return Goduction.apply(T, B, m, minConf);
+//            }
         }
     },
 
@@ -76,6 +81,7 @@ public enum GoalFunction implements TruthOperator {
     Induction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+
             return desireInd(T, B, minConf);
         }
     },

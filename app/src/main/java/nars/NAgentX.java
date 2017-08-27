@@ -17,6 +17,7 @@ import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.exe.UniExec;
 import nars.gui.Vis;
+import nars.index.term.HijackTermIndex;
 import nars.index.term.map.CaffeineIndex2;
 import nars.op.Implier;
 import nars.op.mental.Abbreviation;
@@ -157,8 +158,8 @@ abstract public class NAgentX extends NAgent {
                 .time(clock)
                 .index(
                         //new CaffeineIndex(128 * 1024)
-                        new CaffeineIndex2(128 * 1024)
-                        //new HijackTermIndex(64 * 1024,  3)
+                        //new CaffeineIndex2(128 * 1024)
+                        new HijackTermIndex(64 * 1024,  3)
                 )
                 .get();
 
@@ -168,7 +169,7 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.9f);
+        n.goalConfidence(0.75f);
 
 
 
@@ -177,13 +178,13 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.25f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.25f * priFactor;
-        n.termVolumeMax.setValue(32);
+        n.termVolumeMax.setValue(24);
 
-        //n.dtDither.setValue(0.5f);
+        n.dtDither.setValue(0.5f);
         //n.dtMergeOrChoose.setValue(true);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 64, BELIEF, 4, false, 8f);
+        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, true, 8f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 3, false, 2f);
         Inperience inp = new Inperience(n, 8, 0.02f);
@@ -323,6 +324,7 @@ abstract public class NAgentX extends NAgent {
 //        }), 100, 100);
 
 
+        //get ready
         System.gc();
 
         return n;

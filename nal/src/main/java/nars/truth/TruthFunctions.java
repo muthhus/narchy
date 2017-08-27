@@ -36,12 +36,14 @@ import static nars.util.UtilityFunctions.and;
 /**
  * All truth-value (and desire-value) functions used in logic rules
  */
-public final class TruthFunctions  {
+public final class TruthFunctions {
     public static final float MAX_CONF = 1f - Param.TRUTH_EPSILON;
 
     /* ----- Single argument functions, called in MatchingRules ----- */
+
     /**
      * {<A ==> B>} |- <B ==> A>
+     *
      * @param t Truth value of the premise
      * @return Truth value of the conclusion
      */
@@ -52,8 +54,10 @@ public final class TruthFunctions  {
     }
 
     /* ----- Single argument functions, called in StructuralRules ----- */
+
     /**
      * {A} |- (--A)
+     *
      * @return Truth value of the conclusion
      */
     @Nullable
@@ -76,6 +80,7 @@ public final class TruthFunctions  {
 
     /**
      * {<A ==> B>} |- <(--, B) ==> (--, A)>
+     *
      * @param t Truth value of the premise
      * @return Truth value of the conclusion
      */
@@ -92,7 +97,8 @@ public final class TruthFunctions  {
 
     /**
      * {M, <M ==> P>} |- P
-     * @param a Truth value of the first premise
+     *
+     * @param a        Truth value of the first premise
      * @param reliance Confidence of the second (analytical) premise
      * @return AnalyticTruth value of the conclusion, because it is structural
      */
@@ -104,7 +110,9 @@ public final class TruthFunctions  {
     }
         /* ----- double argument functions, called in SyllogisticRules ----- */
 
-    /** assumes belief freq=1f */
+    /**
+     * assumes belief freq=1f
+     */
     @Nullable
     public static Truth deduction1(/*@NotNull*/ Truth a, float bC, float minConf) {
         return deductionB(a, 1f, bC, minConf);
@@ -119,8 +127,6 @@ public final class TruthFunctions  {
     public static Truth deductionB(/*@NotNull*/ Truth a, float bF, float bC, float minConf) {
 
         float f = and(a.freq(), bF);
-
-
         float c = and(f, a.conf(), bC);
 
         return c >= minConf ? t(f, c) : null;
@@ -128,6 +134,7 @@ public final class TruthFunctions  {
 
     /**
      * {<S ==> M>, <M <=> P>} |- <S ==> P>
+     *
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
@@ -137,6 +144,7 @@ public final class TruthFunctions  {
         float c = and(a.conf(), bc, bf);
         return c < minConf ? null : t(and(a.freq(), bf), c);
     }
+
     @Nullable
     public static Truth analogy(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         return analogy(a, b.freq(), b.conf(), minConf);
@@ -144,6 +152,7 @@ public final class TruthFunctions  {
 
     /**
      * {<S <=> M>, <M <=> P>} |- <S <=> P>
+     *
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
@@ -158,13 +167,20 @@ public final class TruthFunctions  {
 
     /**
      * {<S ==> M>, <P ==> M>} |- <S ==> P>
+     *
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion, or null if either truth is analytic already
      */
     public static Truth abduction(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
-        float c = w2c(and(b.freq(), a.conf(), b.conf()));
-        return (c < minConf) ? null : t(a.freq(), c);
+        float c = w2c(and(a.freq(), a.conf(), b.conf()));
+
+//        float aF = a.freq();
+//        float bF = b.freq();
+//        float c = w2c(and(
+//                freqSimilarity(aF, bF),
+//                a.conf(), b.conf()));
+        return (c < minConf) ? null : t(b.freq(), c);
     }
 
 //    /**
@@ -184,6 +200,7 @@ public final class TruthFunctions  {
 
     /**
      * {<M ==> S>, <M ==> P>} |- <S ==> P>
+     *
      * @param v1 Truth value of the first premise
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
@@ -194,6 +211,7 @@ public final class TruthFunctions  {
 
     /**
      * {<M ==> S>, <P ==> M>} |- <S ==> P>
+     *
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
@@ -211,6 +229,7 @@ public final class TruthFunctions  {
 
     /**
      * {<M ==> S>, <M ==> P>} |- <S <=> P>
+     *
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
@@ -232,17 +251,21 @@ public final class TruthFunctions  {
         return t(f, c);
     }
 
-    /** measures the similarity or coherence of two freqency values */
+    /**
+     * measures the similarity or coherence of two freqency values
+     */
     public static float freqSimilarity(float aFreq, float bFreq) {
+        if (aFreq == bFreq) return 1f;
 
         //return 1f - Math.abs(aFreq - bFreq);
-        return Math.max( (aFreq * bFreq), (1f-aFreq) * (1f-bFreq) );
+        return Math.max((aFreq * bFreq), (1f - aFreq) * (1f - bFreq));
     }
 
     /**
      * A function specially designed for desire value [To be refined]
      */
-    @Nullable public static Truth desireStrongNew(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
+    @Nullable
+    public static Truth desireStrongNew(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float aFreq = a.freq();
         float bFreq = b.freq();
         float c = and(a.conf(), b.conf(), freqSimilarity(aFreq, bFreq));
@@ -252,7 +275,8 @@ public final class TruthFunctions  {
     /**
      * A function specially designed for desire value [To be refined]
      */
-    @Nullable public static Truth desireStrongOriginal(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
+    @Nullable
+    public static Truth desireStrongOriginal(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
         float bFreq = b.freq();
         float c = and(a.conf(), b.conf(), bFreq);
         return c < minConf ? null : desire(a.freq(), bFreq, c);
@@ -266,6 +290,7 @@ public final class TruthFunctions  {
 //        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq,bFreq), w2c(1.0f));
 //        return c < minConf ? null : desire(aFreq, bFreq, c);
 //    }
+
     /**
      * A function specially designed for desire value [To be refined]
      */
@@ -274,38 +299,56 @@ public final class TruthFunctions  {
         float c = and(a.conf(), b.conf(), bFreq, w2c(1.0f));
         return c < minConf ? null : desire(a.freq(), bFreq, c);
     }
-    /*@NotNull*/ static Truth desire(float f1, float f2, float c) {
+
+    /*@NotNull*/
+    static Truth desire(float f1, float f2, float c) {
         return t(and(f1, f2), c);
     }
 
 
+    public static Truth desireDed(Truth a, Truth b, float minConf) {
+        return desireDed(a, b.freq(), b.conf(), minConf);
+    }
+
     /**
      * original name: desireDed
      * A function specially designed for desire value [To be refined]
+     *
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
      */
     @Nullable
-    public static Truth desireDed(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
-        float abConf = and(a.conf(), b.conf());
-        return abConf < minConf ? null : t(and(a.freq(), b.freq()), abConf);
+    public static Truth desireDed(/*@NotNull*/ Truth a, float bf, float bc, float minConf) {
+
+        float abConf = and(a.conf(), bc);
+        if (abConf < minConf) return null;
+        else {
+            //float f = and(a.freq(), b.freq());
+            float f = 0.5f + 2 * ((a.freq() - 0.5f) * (bf - 0.5f));
+            return t(f, abConf);
+        }
     }
 
     /**
      * A function specially designed for desire value [To be refined]
+     *
      * @param v1 Truth value of the first premise
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
     public static Truth desireInd(/*@NotNull*/ Truth v1, /*@NotNull*/ Truth v2, float minConf) {
-        float c = w2c(and(v2.freq(), v1.conf(), v2.conf()));
-        return c < minConf ? null : t(v1.freq(), c);
+        float f1 = v1.freq();
+        float f2 = v2.freq();
+        float c = w2c(and(freqSimilarity(f1, f2), v1.conf(), v2.conf()));
+        return c < minConf ? null : t(f1, c);
     }
 
     /* ----- double argument functions, called in CompositionalRules ----- */
+
     /**
      * {<M --> S>, <M <-> P>} |- <M --> (S|P)>
+     *
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
@@ -320,6 +363,7 @@ public final class TruthFunctions  {
 
     /**
      * {<M --> S>, <M <-> P>} |- <M --> (S&P)>
+     *
      * @param v1 Truth value of the first premise
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
@@ -369,6 +413,7 @@ public final class TruthFunctions  {
 
     /**
      * {(--, (&&, A, B)), B} |- (--, A)
+     *
      * @return Truth value of the conclusion
      */
     @Nullable
@@ -409,6 +454,7 @@ public final class TruthFunctions  {
 
     /**
      * {(&&, <#x() ==> M>, <#x() ==> P>), S ==> M} |- <S ==> P>
+     *
      * @param a Truth value of the first premise
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion
@@ -419,7 +465,9 @@ public final class TruthFunctions  {
         return v0c < minConf ? null : analogy(b, a.freq(), v0c, minConf);
     }
 
-    /** decompose positive / negative */
+    /**
+     * decompose positive / negative
+     */
     @Nullable
     public static Truth decompose(@Nullable Truth a, @Nullable Truth b, boolean x, boolean y, boolean z, float minConf) {
         if (a == null || b == null) return null;
@@ -427,7 +475,7 @@ public final class TruthFunctions  {
         float c12 = and(a.conf(), b.conf());
         if (c12 < minConf) return null;
         float f1 = a.freq(), f2 = b.freq();
-        float f = and(x ? f1 : 1-f1, y ? f2 : 1-f2);
+        float f = and(x ? f1 : 1 - f1, y ? f2 : 1 - f2);
         float c = and(f, c12);
         return c < minConf ? null : t(z ? f : 1 - f, c);
     }
@@ -454,7 +502,6 @@ public final class TruthFunctions  {
     }
 
 
-
 //    public static float eternalize(float conf) {
 //        return w2c(conf);
 //    }
@@ -466,11 +513,12 @@ public final class TruthFunctions  {
 
     /**
      * A function to convert confidence to weight
+     *
      * @param c confidence, in [0, 1)
      * @return The corresponding weight of evidence, a non-negative real number
      */
     private static float c2w(float c, float horizon) {
-        if (c!=c || (c > MAX_CONF) || (c < 0))
+        if (c != c || (c > MAX_CONF) || (c < 0))
             throw new InvalidParameterException();
         return c2wSafe(c, horizon);
     }
@@ -481,6 +529,7 @@ public final class TruthFunctions  {
 
     /**
      * A function to convert weight to confidence
+     *
      * @param w Weight of evidence, a non-negative real number
      * @return The corresponding confidence, in [0, 1)
      */
@@ -502,11 +551,11 @@ public final class TruthFunctions  {
     }
 
     public static float originality(int evidenceLength) {
-        if (evidenceLength==1) {
+        if (evidenceLength == 1) {
             return 1f;
         } else {
-            assert(evidenceLength>0);
-            return 1.0f / (1f + (evidenceLength - 1f) / (Param.STAMP_CAPACITY-1));
+            assert (evidenceLength > 0);
+            return 1.0f / (1f + (evidenceLength - 1f) / (Param.STAMP_CAPACITY - 1));
         }
     }
 

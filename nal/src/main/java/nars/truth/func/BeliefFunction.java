@@ -35,7 +35,7 @@ public enum BeliefFunction implements TruthOperator {
     StructuralAbduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
-            return TruthFunctions.abduction(B, defaultTruth(m), minConf);
+            return TruthFunctions.abduction(defaultTruth(m), B, minConf);
         }
     },
 
@@ -43,6 +43,7 @@ public enum BeliefFunction implements TruthOperator {
     Deduction() {
         @Override
         public Truth apply(Truth T, Truth B, NAR m, float minConf) {
+
             return TruthFunctions.deduction(T, B, minConf);
         }
     },

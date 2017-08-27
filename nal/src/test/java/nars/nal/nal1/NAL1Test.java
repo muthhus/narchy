@@ -62,8 +62,8 @@ public class NAL1Test extends AbstractNALTest {
         test
                 .believe("<sport --> competition>", 1f, 0.9f)
                 .believe("<chess --> competition>", 0.90f, 0.9f)
-                .mustBelieve(CYCLES, "<chess --> sport>", 1f, 0.42f)
-                .mustBelieve(CYCLES, "<sport --> chess>", 0.9f, 0.45f);
+                .mustBelieve(CYCLES, "<chess --> sport>", 0.9f, 0.45f)
+                .mustBelieve(CYCLES, "<sport --> chess>", 1f, 0.42f);
 
                 //.en("I guess chess is a type of sport");
     }
@@ -80,9 +80,9 @@ public class NAL1Test extends AbstractNALTest {
         test
             .believe("<swan --> swimmer>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
             .believe("<swan --> bird>") //.en("Swan is a type of bird.");
-            .mustBelieve(CYCLES, "<bird --> swimmer>", 0.90f, 0.45f) //.en("I guess bird is a type of swimmer.");
+            .mustBelieve(CYCLES, "<bird --> swimmer>", 1f, 0.42f) //.en("I guess bird is a type of swimmer.");
             //.mustNotOutput(CYCLES, "<bird --> swimmer>", BELIEF, 1f, 1f, 0.41f, 0.43f, ETERNAL) //test for correct ordering of the premise wrt truth value function
-            .mustBelieve(CYCLES, "<swimmer --> bird>", 1.0f, 0.42f)
+            .mustBelieve(CYCLES, "<swimmer --> bird>", 0.9f, 0.45f)
             //.mustNotOutput(CYCLES, "<swimmer --> bird>", BELIEF, 0.9f, 0.9f, 0.44f, 0.46f, ETERNAL) //test for correct ordering of the premise wrt truth value function
             ;
     }
@@ -100,8 +100,8 @@ public class NAL1Test extends AbstractNALTest {
         test
                 .believe("<parakeet --> bird>", 0.90f, 0.9f) //.en("Swan is a type of swimmer.");
                 .believe("<pteradactyl --> bird>") //.en("Swan is a type of bird.");
-                .mustBelieve(CYCLES, "<parakeet --> pteradactyl>", 1, 0.42f)
-                .mustBelieve(CYCLES, "<pteradactyl --> parakeet>", 0.9f, 0.45f)
+                .mustBelieve(CYCLES, "<pteradactyl --> parakeet>", 1, 0.42f)
+                .mustBelieve(CYCLES, "<parakeet --> pteradactyl>", 0.9f, 0.45f)
         ;
     }
 

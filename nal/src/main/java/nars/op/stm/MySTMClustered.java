@@ -10,6 +10,7 @@ import nars.Op;
 import nars.Task;
 import nars.control.CauseChannel;
 import nars.task.NALTask;
+import nars.task.util.InvalidTaskException;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Stamp;
@@ -136,7 +137,7 @@ public class MySTMClustered extends STMClustered {
             float deltaT = now - lastIteration;
             lastIteration = now;
 
-            int inputs = Math.round(in.factor() * inputsPerDur * deltaT / dur);
+            int inputs = Math.round(in.gain() * 0.5f /* swing: 0.5..+1 */ * inputsPerDur * deltaT / dur);
             if (inputs > 0) {
                 cluster(inputs, minGroupSize, maxGroupSize, nar);
             }
@@ -160,10 +161,6 @@ public class MySTMClustered extends STMClustered {
                 .sorted(Comparator.comparingDouble(x -> x.localError() / (x.size())))
                 .filter(n -> {
 
-                    //System.out.println(n.localError() + " " + n.size() + " " + n.toString());
-
-                    if (n == null || n.size() < minGroupSize)
-                        return false;
 
                     //TODO wrap all the coherence tests in one function call which the node can handle in a synchronized way because the results could change in between each of the sub-tests:
 
@@ -251,8 +248,10 @@ public class MySTMClustered extends STMClustered {
 
                                 int uuLen = uu.length;
                                 long[] evidence = Stamp.zip(() -> new ArrayIterator<>(uu), uuLen); //HACK
-                                NALTask m = new NALTask(cp.getOne(), punc,
-                                        t, now, start[0], end[0], evidence); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+                                NALTask m = new STMClusterTask(cp, t, start, end, evidence, punc, now); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
+
+                                for (Task u : uu)
+                                    m.merge(u); //cause merge
 
                                 float maxPri = new FasterList<>(uuLen, uu)
                                         .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List
@@ -284,5 +283,16 @@ public class MySTMClustered extends STMClustered {
                 );
 
 
+    }
+
+    private static class STMClusterTask extends NALTask {
+        public STMClusterTask(@Nullable ObjectBooleanPair<Term> cp, PreciseTruth t, long[] start, long[] end, long[] evidence, byte punc, long now) throws InvalidTaskException {
+            super(cp.getOne(), punc, t, now, start[0], end[0], evidence);
+        }
+
+        @Override
+        public boolean isInput() {
+            return true;
+        }
     }
 }
