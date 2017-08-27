@@ -5,7 +5,10 @@ import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * true if the terms have any non-variable in common
+ * invalid if any of the following:
+ *      terms are equal
+ *      a term contains the other
+ *      the terms have no non-variable subterms in common
  */
 public final class CommonSubtermConstraint extends CommonalityConstraint {
 
@@ -20,7 +23,8 @@ public final class CommonSubtermConstraint extends CommonalityConstraint {
 
     @Override
     protected boolean invalid(Term x, Term y) {
-        return !TermContainer.hasCommonSubtermsRecursive(x, y, true);
+
+        return x.equals(y) || x.containsRecursively(y) || y.containsRecursively(x) || !TermContainer.hasCommonSubtermsRecursive(x, y, true);
     }
 
 }

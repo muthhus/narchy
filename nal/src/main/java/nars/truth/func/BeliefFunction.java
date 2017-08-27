@@ -246,10 +246,10 @@ public enum BeliefFunction implements TruthOperator {
             return TruthFunctions.anonymousAnalogy(T, B, minConf);
         }
     },
+
     Exemplification() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            if (B == null || T == null) return null;
             return TruthFunctions.exemplification(T, B, minConf);
         }
     },
@@ -342,7 +342,7 @@ public enum BeliefFunction implements TruthOperator {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
             if (B == null) return null;
-            return TruthFunctions.analogy(B, $.t(1f, defaultConfidence(m)), minConf);
+            return TruthFunctions.analogy(B, 1f, defaultConfidence(m), minConf);
         }
     },
 

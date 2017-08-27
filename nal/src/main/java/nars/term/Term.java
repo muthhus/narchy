@@ -348,7 +348,7 @@ public interface Term extends Termlike, Comparable<Term> {
      * @param ignored the unification context
      * @return whether unification succeeded
      */
-    default boolean unify(/*@NotNull */Term y, Unify ignored) {
+    default boolean unify(/*@NotNull */Term y, Unify u) {
         return equals(y);
     }
 
