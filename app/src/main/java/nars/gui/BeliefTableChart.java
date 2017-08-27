@@ -7,7 +7,6 @@ import nars.NAR;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
-import nars.table.BeliefTable;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
@@ -59,7 +58,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
      */
     int projections = 32;
 
-    private boolean showTaskLinks = true;
+    private boolean showTaskLinks = false;
     @Deprecated
     private boolean showEternal = true;
 
@@ -111,40 +110,51 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
         if (!redraw.compareAndSet(true, false)) {
             return;
         }
+        try {
 
-        long now = this.now = nar.time();
-        int dur = this.dur = nar.dur();
+            long now = this.now = nar.time();
+            int dur = this.dur = nar.dur();
 
-        cc = (BaseConcept)nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
+            cc = (BaseConcept) nar.concept(term/* lookup by term, not the termed which could be a dead instance */);
 
-        long minT, maxT;
-        if (range!=null) {
-            minT = range[0];
-            maxT = range[1];
-        } else {
-            minT = Long.MIN_VALUE;
-            maxT = Long.MAX_VALUE;
+            long minT, maxT;
+            if (range != null) {
+                minT = range[0];
+                maxT = range[1];
+            } else {
+                minT = Long.MIN_VALUE;
+                maxT = Long.MAX_VALUE;
+            }
+
+            if (cc != null) {
+                cp = 1f; /*nar.pri(cc);*/
+                if (cp != cp) cp = 0;
+
+                long nowStart = now - dur / 2;
+                long nowEnd = now + dur / 2;
+
+                beliefs.set(cc.beliefs(), now, dur, nar, minT, maxT);
+                beliefs.current = nar.beliefTruth(cc, nowStart, nowEnd);
+                goals.set(cc.goals(), now, dur, nar, minT, maxT);
+                goals.current = nar.goalTruth(cc, nowStart, nowEnd);
+
+                if (projections > 0 && minT != maxT) {
+                    beliefProj.project(cc, true, minT, maxT, dur, projections, nar);
+                    goalProj.project(cc, false, minT, maxT, dur, projections, nar);
+                }
+
+            } else {
+                cp = 0;
+                beliefs.clear();
+                beliefs.current = null;
+                goals.clear();
+                goals.current = null;
+                beliefProj.clear();
+                goalProj.clear();
+            }
+        } finally {
+            redraw.set(true);
         }
-
-        if (cc != null) {
-            cp = 1f; /*nar.pri(cc);*/ if (cp!=cp) cp = 0;
-
-            long nowStart = now - dur / 2;
-            long nowEnd = now + dur / 2;
-
-            beliefs.set(cc.beliefs(), now, dur, nar, minT, maxT);
-            beliefs.current = nar.beliefTruth(cc, nowStart, nowEnd);
-            goals.set(cc.goals(), now, dur, nar, minT, maxT);
-            goals.current = nar.goalTruth(cc, nowStart, nowEnd);
-        } else {
-            cp = 0;
-            beliefs.clear();
-            beliefs.current = null;
-            goals.clear();
-            goals.current = null;
-        }
-
-        ready();
 
     }
 
@@ -297,10 +307,6 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
     }
 
 
-    public void ready() {
-        redraw.set(true);
-    }
-
     private void renderTable(Concept c, long minT, long maxT, long now, GL2 gl, TruthWave wave, boolean beliefOrGoal) {
 
         if (c == null)
@@ -324,11 +330,7 @@ public class BeliefTableChart extends Widget implements Consumer<NAR> {
 
         //draw projections
         if (projections > 0 && minT != maxT) {
-
-
-
-            TruthWave pwave = beliefProj;
-            pwave.project(c, beliefOrGoal, minT, maxT, dur, projections, nar);
+            TruthWave pwave = beliefOrGoal ? beliefProj : goalProj;
             renderWaveLine(nowX, minT, maxT, gl, pwave, beliefOrGoal);
         }
 
