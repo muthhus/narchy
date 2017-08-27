@@ -24,7 +24,7 @@ import static nars.$.t;
  */
 public enum BeliefFunction implements TruthOperator {
 
-    StructuralIntersection() {
+    @AllowOverlap StructuralIntersection() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
             return B != null ? TruthFunctions.intersection(B, defaultTruth(m), minConf) : null;
@@ -32,7 +32,7 @@ public enum BeliefFunction implements TruthOperator {
     },
 
 
-    StructuralAbduction() {
+    @AllowOverlap StructuralAbduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, /*@NotNull*/ NAR m, float minConf) {
             return TruthFunctions.abduction(defaultTruth(m), B, minConf);
@@ -79,6 +79,7 @@ public enum BeliefFunction implements TruthOperator {
             return Deduction.apply(T, B, m, minConf);
         }
     },
+
     @AllowOverlap
     DeductionRecursivePB() {
         @Override

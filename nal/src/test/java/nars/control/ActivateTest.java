@@ -12,7 +12,6 @@ import org.eclipse.collections.api.tuple.primitive.ObjectIntPair;
 import org.eclipse.collections.impl.bag.mutable.HashBag;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import static nars.$.$;
@@ -109,17 +108,16 @@ public class ActivateTest {
     @Test public void testTemplates3() throws Narsese.NarseseException {
         //layer 3:
         testTemplates("(open(John,door) ==> #x)",
-                "[(open(John,door) ==>+- #1), open, #1, open(John,door), (John,door)]");
+                "[(open(John,door) ==>+- #1), open, door, open(John,door), John, (John,door)]");
     }
     @Test public void testTemplates4() throws Narsese.NarseseException {
         //dont descend past layer 3:
         testTemplates("(open(John,portal:interdimensional) ==> #x)",
-                "[(John,(interdimensional-->portal)), (open(John,(interdimensional-->portal)) ==>+- #1), open(John,(interdimensional-->portal)), open, #1]");
+                "[(John,(interdimensional-->portal)), (open(John,(interdimensional-->portal)) ==>+- #1), open(John,(interdimensional-->portal)), open, (interdimensional-->portal), John]");
     }
    @Test public void testTemplates4b() throws Narsese.NarseseException {
-        //dont descend past layer 3:
         testTemplates("(open(John,portal(a(d),b,c)) ==> #x)",
-                "[open(John,portal(a(d),b,c)), (John,portal(a(d),b,c)), (open(John,portal(a(d),b,c)) ==>+- #1), open, #1]");
+                "[portal(a(d),b,c), open(John,portal(a(d),b,c)), (John,portal(a(d),b,c)), (open(John,portal(a(d),b,c)) ==>+- #1), open, John]");
     }
    @Test public void testTemplatesWithInt2() throws Narsese.NarseseException {
         testTemplates("num((0))",
@@ -127,13 +125,18 @@ public class ActivateTest {
     }
   @Test public void testTemplatesWithInt1() throws Narsese.NarseseException {
         testTemplates("(0)",
-                "[0, (0)]");
-    }
-  @Test public void testTemplatesWithQueryVar() throws Narsese.NarseseException {
-        testTemplates("(x --> ?1)",
-                "[(x-->?1), x, ?1]");
+                "[(0)]");
     }
 
+    @Test
+    public void testTemplatesWithQueryVar() throws Narsese.NarseseException {
+        testTemplates("(x --> ?1)",
+                "[(x-->?1), x]");
+    }
+    @Test public void testTemplateConj1() throws Narsese.NarseseException {
+        testTemplates("(x && y)",
+                "[(x &&+- y), y, x]");
+    }
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {
         NAR n = NARS.tmp(1);
         //n.believe(term + ".");

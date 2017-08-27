@@ -40,18 +40,18 @@ public enum GoalFunction implements TruthOperator {
     Goduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return desireDed(T, B, minConf);
+            return deduction(T, B, minConf);
         }
     },
     @AllowOverlap  GoductionRecursivePB() {
         @Override
         public Truth apply(Truth T, Truth B, NAR m, float minConf) {
-//              if (B.isNegative()) {
-//                Truth x = Goduction.apply(T, B.neg(), m, minConf);
-//                return x != null ? x.neg() : null;
-//            } else {
+              if (B.isNegative()) {
+                Truth x = Goduction.apply(T, B.neg(), m, minConf);
+                return x != null ? x.neg() : null;
+            } else {
                 return Goduction.apply(T, B, m, minConf);
-//            }
+            }
         }
     },
 
@@ -81,33 +81,20 @@ public enum GoalFunction implements TruthOperator {
     Induction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-
-            return desireInd(T, B, minConf);
+            return induction(T, B, minConf);
         }
     },
 
     @AllowOverlap  InductionRecursivePB() {
         @Override public Truth apply( final Truth T,  final Truth B, NAR m, float minConf) {
            if (B.isNegative()) {
-                Truth x = Induction.apply(T, B.neg(), m, minConf);
+                Truth x = induction(T, B.neg(), minConf);
                 return x!=null ? x.neg() : null;
             } else {
-                return Induction.apply(T, B, m, minConf);
+                return induction(T, B, minConf);
             }
         }
     },
-
-
-
-
-//    //EXPERIMENTAL
-//    Abduction() {
-//        
-//        @Override public Truth apply( final Truth T,  final Truth B, Memory m, float minConf) {
-//            return TruthFunctions.abduction(T, B, minConf);
-//        }
-//    },
-
 
     DecomposePositiveNegativeNegative() {
         @Override

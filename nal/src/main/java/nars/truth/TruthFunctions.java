@@ -172,31 +172,18 @@ public final class TruthFunctions {
      * @param b Truth value of the second premise
      * @return Truth value of the conclusion, or null if either truth is analytic already
      */
-    public static Truth abduction(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
-        float c = w2c(and(a.freq(), a.conf(), b.conf()));
+    public static Truth induction(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
+        float c = w2c(and(b.freq(), a.conf(), b.conf()));
 
 //        float aF = a.freq();
 //        float bF = b.freq();
 //        float c = w2c(and(
 //                freqSimilarity(aF, bF),
 //                a.conf(), b.conf()));
-        return (c < minConf) ? null : t(b.freq(), c);
+        return (c < minConf) ? null : t(a.freq(), c);
     }
 
-//    /**
-//     * {M, <P ==> M>} |- P
-//     * @param t Truth value of the first premise
-//     * @param reliance Confidence of the second (analytical) premise
-//     * @return Truth value of the conclusion
-//     */
-//    /*@NotNull*/
-//    public static Truth abduction(/*@NotNull*/ Truth t, float reliance) {
-//        float f1 = t.freq();
-//        float c1 = t.conf();
-//        float w = and(c1, reliance);
-//        float c = w2c(w);
-//        return t(f1, c);
-//    }
+
 
     /**
      * {<M ==> S>, <M ==> P>} |- <S ==> P>
@@ -205,8 +192,8 @@ public final class TruthFunctions {
      * @param v2 Truth value of the second premise
      * @return Truth value of the conclusion
      */
-    public static Truth induction(/*@NotNull*/ Truth v1, /*@NotNull*/ Truth v2, float minConf) {
-        return abduction(v2, v1, minConf);
+    public static Truth abduction(/*@NotNull*/ Truth v1, /*@NotNull*/ Truth v2, float minConf) {
+        return induction(v2, v1, minConf);
     }
 
     /**
@@ -306,43 +293,28 @@ public final class TruthFunctions {
     }
 
 
-    public static Truth desireDed(Truth a, Truth b, float minConf) {
-        return desireDed(a, b.freq(), b.conf(), minConf);
-    }
 
-    /**
-     * original name: desireDed
-     * A function specially designed for desire value [To be refined]
-     *
-     * @param a Truth value of the first premise
-     * @param b Truth value of the second premise
-     * @return Truth value of the conclusion
-     */
-    @Nullable
-    public static Truth desireDed(/*@NotNull*/ Truth a, float bf, float bc, float minConf) {
+//    /**
+//     * original name: desireDed
+//     * A function specially designed for desire value [To be refined]
+//     *
+//     * @param a Truth value of the first premise
+//     * @param b Truth value of the second premise
+//     * @return Truth value of the conclusion
+//     */
+//    @Nullable
+//    public static Truth desireDed(/*@NotNull*/ Truth a, float bf, float bc, float minConf) {
+//
+//        float abConf = and(a.conf(), bc);
+//        if (abConf < minConf) return null;
+//        else {
+//            //float f = and(a.freq(), b.freq());
+//            float f = 0.5f + 2 * ((a.freq() - 0.5f) * (bf - 0.5f));
+//            return t(f, abConf);
+//        }
+//    }
 
-        float abConf = and(a.conf(), bc);
-        if (abConf < minConf) return null;
-        else {
-            //float f = and(a.freq(), b.freq());
-            float f = 0.5f + 2 * ((a.freq() - 0.5f) * (bf - 0.5f));
-            return t(f, abConf);
-        }
-    }
 
-    /**
-     * A function specially designed for desire value [To be refined]
-     *
-     * @param v1 Truth value of the first premise
-     * @param v2 Truth value of the second premise
-     * @return Truth value of the conclusion
-     */
-    public static Truth desireInd(/*@NotNull*/ Truth v1, /*@NotNull*/ Truth v2, float minConf) {
-        float f1 = v1.freq();
-        float f2 = v2.freq();
-        float c = w2c(and(freqSimilarity(f1, f2), v1.conf(), v2.conf()));
-        return c < minConf ? null : t(f1, c);
-    }
 
     /* ----- double argument functions, called in CompositionalRules ----- */
 

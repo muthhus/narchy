@@ -266,11 +266,6 @@ public abstract class Unify extends Versioning implements Subst {
     }
 
 
-    @Deprecated  public final boolean unify(Term x, Term y) {
-        return x.unify(y, this);
-    }
-
-
     /**
      * whether the op is assignable
      */

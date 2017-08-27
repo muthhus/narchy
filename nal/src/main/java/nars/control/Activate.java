@@ -3,10 +3,7 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import nars.*;
 import nars.concept.Concept;
 import nars.task.UnaryTask;
 import nars.term.Term;
@@ -306,20 +303,24 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     public static void templates(Set<Termed> tc, Term root, NAR nar, int layersRemain) {
 
-
         Term b = root.unneg();
 
-        if (!(b instanceof Variable) && !b.op().conceptualizable)
-            return; //variables are ok
+        Op o = b.op();
+        switch (o) {
+            //case VAR_DEP:
+            //case VAR_INDEP:
+            //case VAR_QUERY:
+              //  break; //OK
+            default:
+                if (!o.conceptualizable)
+                    return;
+        }
 
         if (!tc.add(b))
             return; //already added
 
-        layersRemain--;
-
-        if (layersRemain <= 0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
+        if (--layersRemain <= 0 || b.size()==0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
             return;
-
 
         for (Term bb : b.subterms()) {
 

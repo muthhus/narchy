@@ -3,10 +3,7 @@
 // Statement about Statement: (A --> B) ==> (X --> Y): If A is true, so is/will be B
 // --> is a relation in meaning of terms, while ==> is a relation of truth between statements.
 
-//// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
-//If S is a special case of P, and P is a special case of S, then S and P are similar
 
-    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong)
 
 //// inheritance-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 // If A is a special case of B, and B is a special case of C, so is A a special case of C (strong), the other variations are hypotheses (weak)
@@ -21,11 +18,11 @@
     // the second neqRCom() is to handle the Backward cases until a proper variable transform is implemented for those auto-generated rules
 
     (A --> B), (B --> C), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
-        //(B --> C), (A --> B), neqRCom(A,C)      |- (A --> C), (Belief:Deduction, Goal:Strong)
-        (A --> C), (B --> C), task("."), neqRCom(A,B)  |- (A --> B), (Punctuation:Question)
     (A --> B), (A --> C), neqRCom(B,C)      |- (C --> B), (Belief:Abduction, Goal:Weak)
     (A --> C), (B --> C), neqRCom(A,B)      |- (A --> B), (Belief:Induction, Goal:Weak)
     (A --> B), (B --> C), neqRCom(A,C)      |- (C --> A), (Belief:Exemplification, Goal:Weak)
+
+    (A --> C), (B --> C), task("."), neqRCom(A,B)  |- (A --> B), (Punctuation:Question)
 
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
@@ -57,6 +54,11 @@
 //Inheritance to Similarity
     (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief)
         //TODO negated subterm variant
+
+//// similarity from inheritance ////////////////////////////////////////////////////////////////////////////////////
+//If S is a special case of P, and P is a special case of S, then S and P are similar
+
+    (S --> P), (P --> S) |- (S <-> P), (Belief:Intersection, Goal:Strong)
 
 //Similarity to Inheritance
     (S --> P), (S <-> P),                   task("?") |- (S --> P),   (Belief:StructuralIntersection, Punctuation:Belief)

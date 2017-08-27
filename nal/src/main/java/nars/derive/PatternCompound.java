@@ -167,7 +167,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
                             if (!ellipsis.validSize(available))
                                 return false;
 
-                            return u.unify(ellipsis, EllipsisMatch.match(Y, j, j + available));
+                            return ellipsis.unify(EllipsisMatch.match(Y, j, j + available), u);
 
                         } else {
                             //PREFIX the ellipsis occurred at the start and there are additional terms following it
@@ -466,12 +466,12 @@ abstract public class PatternCompound extends GenericCompoundDT {
             switch (xs) {
                 case 0:
                     //match everything
-                    return subst.unify(ellipsis, EllipsisMatch.match(yFree));
+                    return ellipsis.unify(EllipsisMatch.match(yFree), subst);
 
                 case 1:
                     Term x0 = xFixed.first();
                     if (yFree.size() == 1) {
-                        return subst.unify(ellipsis, EllipsisMatch.empty) && subst.unify(x0, yFree.first());
+                        return ellipsis.unify(EllipsisMatch.empty, subst) && x0.unify(yFree.first(), subst);
                     } else {
                         return subst.termutes.add(new Choose1(ellipsis, x0, yFree));
                     }

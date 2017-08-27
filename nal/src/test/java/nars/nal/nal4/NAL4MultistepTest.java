@@ -21,7 +21,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
 
         TestNAR tester = test;
 
-        tester.nar.truthResolution.setValue(0.25f);
+        tester.nar.truthResolution.setValue(0.1f);
 
         //tester.log();
 
@@ -31,7 +31,7 @@ public class NAL4MultistepTest extends AbstractNALTest {
         tester.input("<{tom} --> cat>."); //en("tom is a cat");
         tester.input("likes({tom},{sky})."); //en("tom likes the sky");
 
-        tester.input("likes(cat,[blue])?"); //cats like blue?
+        tester.input("$0.9 likes(cat,[blue])?"); //cats like blue?
 
         //return mustOutput(cycleStart, cycleEnd, sentenceTerm, punc, freqMin, freqMax, confMin, confMax, occTimeAbsolute, occTimeAbsolute);
         tester.mustBelieve(time, "likes(cat,[blue])",

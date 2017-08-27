@@ -5,25 +5,21 @@
 //              \           /
 //               \         /
 //                (A ==> C)
-//If after S M happens, and after M P happens, so P happens after S
 
     //"Please note that the temporal order in the conclusion of a weak rule is
     //not necessarily the same as the order in the premises, given the hypothetical
     //nature of such a rule."
 
+    //If after S M happens, and after M P happens, so P happens after S
     (M ==> P), (S ==> M), neq(S,P) |- (S ==>+- P), (Belief:Deduction)
         (S ==> M), (M ==> P), neq(S,P) |- (S ==>+- P), (Belief:Deduction)
 
-    (P ==> M), (S ==> M), neq(S,P) |- (S ==>+- P), (Belief:Induction)
+    (M ==> S), (M ==> P), neq(S,P) |- (S ==>+- P), (Belief:Abduction)
 
-    (M ==> P), (M ==> S), neq(S,P) |- (S ==>+- P), (Belief:Abduction)
+    (P ==> M), (S ==> M), neq(S,P) |- (P ==>+- S), (Belief:Induction)
 
     (P ==> M), (M ==> S), neq(S,P) |- (S ==>+- P), (Belief:Exemplification)
         //(M ==> S), (P ==> M), neq(S,P) |- (S ==>+- P), (Belief:Exemplification)
-
-
-
-
 
 
 
@@ -146,7 +142,7 @@
     //the strange composition of && is to preserve temporality
 
     ((&&,M,A..+) ==> C), (B ==> M), neqRCom(C,B)  |- (((&&,A..+) &&+- B) ==>+- C), (Belief:Deduction)
-    ((&&,B,A..+) ==> C), (B ==> M), neqRCom(C,M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Abduction)
+    ((&&,B,A..+) ==> C), (B ==> M), neqRCom(C,M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
     ((&&,A..+) ==> C), M, neqRCom(C,M), notImpl(M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
 
     ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (B ==>+- M), (Belief:Induction)

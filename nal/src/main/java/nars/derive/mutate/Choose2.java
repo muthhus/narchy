@@ -78,12 +78,12 @@ public class Choose2 extends Termutator.AbstractTermutator {
 
             Term y1 = yy.sub(c0);
 
-            if (f.unify(x[0], y1)) {
+            if (x[0].unify(y1, f)) {
 
                 Term y2 = yy.sub(c1);
 
-                if (f.unify(x[1], y2) &&
-                        f.unify(xEllipsis, EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)))) {
+                if (x[1].unify(y2, f) &&
+                        xEllipsis.unify(EllipsisMatch.match(TermContainer.except(yy, y1, y2, m)), f)) {
 
                     f.tryMutate(chain, current);
                 }
