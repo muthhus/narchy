@@ -9,6 +9,7 @@ import nars.Op;
 import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
+import nars.term.Termed;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;
@@ -479,6 +480,28 @@ public class Int implements Intlike {
 
     }
 
+
+    public static class RotatedInt implements Termed {
+
+        private final int min, max;
+        private Int i;
+
+        public RotatedInt(int min /* inclusive */, int max /* exclusive */) {
+            this.min = min;
+            this.max = max;
+            this.i = Int.the((min + max)/2);
+        }
+
+        @Override
+        public @NotNull Term term() {
+            Term cur = i;
+            int next = this.i.id + 1;
+            if (next >= max)
+                next = min; //round robin
+            this.i = Int.the(next);
+            return cur;
+        }
+    }
 
 }
 //public class ArithmeticInduction {

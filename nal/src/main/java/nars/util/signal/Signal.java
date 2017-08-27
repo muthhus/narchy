@@ -43,6 +43,7 @@ public class Signal extends AtomicReference<SignalTask> {
 
     public Signal(byte punc, FloatSupplier resolution) {
         super(null);
+        pri(()->1);
         this.punc = punc;
         this.resolution = resolution;
     }

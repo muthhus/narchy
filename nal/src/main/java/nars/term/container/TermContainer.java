@@ -92,13 +92,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     }
 
 
-    /**
-     * returns subterm automatically casted as compound (Use with caution)
-     */
-    @Nullable
-    default <C extends Compound> C cterm(int i) {
-        return (C) sub(i);
-    }
 
 
     @Override

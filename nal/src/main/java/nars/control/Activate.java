@@ -3,14 +3,15 @@ package nars.control;
 import jcog.bag.Bag;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
-import nars.$;
-import nars.NAR;
-import nars.Param;
-import nars.Task;
+import jcog.random.XORShiftRandom;
+import nars.*;
 import nars.concept.Concept;
 import nars.task.UnaryTask;
+import nars.term.ProxyTerm;
 import nars.term.Term;
 import nars.term.Termed;
+import nars.term.atom.Int;
+import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -19,8 +20,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
-import static nars.Op.VAR_PATTERN;
-import static nars.Op.VAR_QUERY;
 
 /**
  * concept firing, activation, etc
@@ -136,8 +135,11 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         List<Concept> localSubConcepts = $.newArrayList(); //temporary for this function call only, so as not to retain refs to Concepts
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
 
-        for (Termed localSub : localTemplates) {
+        for (Termed localSub_ : localTemplates) {
             float d;
+
+            Term localSub = localSub_.term(); //for special Termed instances, ex: RotatedInt etc
+
             if (localSub.op().conceptualizable) {
 
 
@@ -266,13 +268,61 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
         Term b = root.unneg();
 
-        if (!tc.add(b))
-            return; //already added
+        if (!(b instanceof Variable) && !b.op().conceptualizable)
+            return; //variables are ok
+
+        if (b.hasAny(Op.INT) && b.subterms().OR(x -> x instanceof Int)) {
+            Term finalB = b;
+            b = new ProxyTerm(finalB) {
+
+                final XORShiftRandom rng = new XORShiftRandom(nar.random().nextLong());
+
+                @Override
+                public boolean equals(Object o) {
+                    return o == this;
+                }
+
+                @Override
+                public Term term() {
+                    Term[] x = subterms().toArray();
+                    boolean changed = false;
+                    for (int i = 0; i < x.length; i++) {
+                        Term y = x[i];
+                        if (y instanceof Int) {
+                            int shift =
+                                    //rng.nextInt(3) - 1;
+                                    rng.nextInt(5) - 2;
+                            if (shift != 0) {
+                                int yy = ((Int) y).id;
+                                int j =
+                                        Math.max(0 /* avoid negs for now */, yy + shift);
+                                if (yy!=j) {
+                                    x[i] = Int.the(j);
+                                    changed = true;
+                                }
+                            }
+                        }
+                    }
+                    if (changed)
+                        return op().the(dt(), x);
+                    else
+                        return ref;
+                }
+            };
+
+//            Int i = (Int) b;
+//            tc.add(new Int.RotatedInt(Math.max(0, i.id - 1) /* avoid negatives for now */, i.id + 1));
+
+        } else {
+            if (!tc.add(b))
+                return; //already added
+        }
 
         layersRemain--;
 
         if (layersRemain <= 0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
             return;
+
 
         for (Term bb : b.subterms()) {
 
@@ -347,7 +397,6 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
             case IMPL:
                 return 3;
-
 
 
 //                int s = host.size();

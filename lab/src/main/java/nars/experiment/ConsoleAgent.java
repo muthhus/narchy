@@ -217,7 +217,7 @@ public abstract class ConsoleAgent extends NAgentX {
                 }
             });
             for (char c : vocabulary) {
-                Term ct = $.func(Atomic.the("write"), $.quote(String.valueOf(c)), id);
+                Term ct = $.func(Atomic.the("write"), $.the(String.valueOf(c)), id);
 
 //                    ActionConcept m = new GoalActionConcept(ct, nar(), (b, d) -> {
 //                        boolean next = d != null && d.expectation() > 0.75f;
@@ -317,13 +317,13 @@ public abstract class ConsoleAgent extends NAgentX {
             char value = chars[cx][cy];
 
             if (prev == 0 || (value != prev)) {
-//                Task prevBelief = beliefs[cx][cy];
-//                if (prevBelief!=null) {
-//                    //..
-//                }
+                Task prevBelief = beliefs[cx][cy]!=null ? beliefs[cx][cy].get() : null;
+                if (prevBelief!=null) {
+                    //..
+                }
 
                 beliefs[cx][cy].set(
-                        $.inh(terms[cx][cy], $.quote(String.valueOf(value))),
+                        $.inst(terms[cx][cy], $.the(String.valueOf(value))),
                         $.t(1f, 0.9f),
                         () -> nextStamp,
                         nar.time(), nar.dur(), nar);
