@@ -114,13 +114,18 @@ abstract public class ProxyBag<X,Y> implements Bag<X,Y> {
 
 
     @Override
-    public void onAdded(Y v) {
-        bag.onAdded(v);
+    public void onAdd(Y v) {
+        bag.onAdd(v);
     }
 
     @Override
-    public void onRemoved(@NotNull Y v) {
-        bag.onRemoved(v);
+    public void onRemove(@NotNull Y v) {
+        bag.onRemove(v);
+    }
+
+    @Override
+    public void onReject(@NotNull Y v) {
+        bag.onReject(v);
     }
 
     @Override

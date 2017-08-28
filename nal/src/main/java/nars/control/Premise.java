@@ -270,7 +270,7 @@ public class Premise extends UnaryTask {
         Set<Task> dd = d.run(this, task, belief, beliefTerm, ttlMax);
         int dds = dd.size();
         if (dds > 0) {
-            nar.emotion.taskDerivations.increment(dds);
+            nar.emotion.taskDerived.increment(dds);
             return dd;
         } else {
             return null;

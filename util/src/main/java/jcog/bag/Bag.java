@@ -297,11 +297,16 @@ public interface Bag<K, V> extends Table<K, V> {
     /**
      * @return null if this is an event which was rejected on input, non-null if it was a re
      */
-    default void onRemoved(@NotNull V value) {
+    default void onRemove(@NotNull V value) {
 
     }
 
-    default void onAdded(@NotNull V v) {
+    /** called if an item which was attempted to be inserted was not */
+    default void onReject(@NotNull V value) {
+
+    }
+
+    default void onAdd(@NotNull V v) {
 
     }
 

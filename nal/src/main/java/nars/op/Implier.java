@@ -53,12 +53,10 @@ public class Implier extends DurService {
      */
     private HashMap<Term, Task> belief = new HashMap();
 
-    private long next;
-    private long now;
 
     final static TruthOperator ded = GoalFunction.get($.the("GoductionRecursivePB"));
     final static TruthOperator ind = GoalFunction.get($.the("InductionRecursivePB"));
-    private long nowStart, nowEnd;
+    private long now;
 
     public Implier(NAR n, Term... seeds) {
         this(n, List.of(seeds));
@@ -82,11 +80,8 @@ public class Implier extends DurService {
     @Override
     protected void run(NAR nar) {
 
-        int dur = nar.dur();
-        now = nar.time();
-        nowStart = now - dur / 2;
-        nowEnd = now + dur / 2;
-        next = (now + (long) (relativeTargetDur * dur));
+
+
 
         desire.clear();
         belief.clear();
@@ -102,7 +97,7 @@ public class Implier extends DurService {
             impl = null; //reset
         }
 
-        impl = tg.snapshot(impl, seeds, nar, next);
+        impl = tg.snapshot(impl, seeds, nar);
         int implCount = impl.edgeCount();
 
         if (implCount == 0)
@@ -111,6 +106,8 @@ public class Implier extends DurService {
         float confMin = nar.confMin.floatValue();
         float confSubMin = confMin / implCount;
 
+        int dur = nar.dur();
+        now = nar.time();
 
         //System.out.println(impl);
 
@@ -121,7 +118,7 @@ public class Implier extends DurService {
             if (SGimpl == null)
                 return;
 
-            float implConf = w2c(SGimpl.evi(nowStart, nowEnd, dur));
+            float implConf = w2c(SGimpl.evi(this.now, dur));
             if (implConf < confSubMin)
                 return;
 
@@ -135,7 +132,7 @@ public class Implier extends DurService {
 
             {
                 //G, (S ==> G) |- S  (Goal:DeductionRecursivePB)
-                Truth Pg = desire(pred, nowStart + implDT, nowEnd + implDT); //the desire at the predicate time
+                Truth Pg = desire(pred, this.now + implDT); //the desire at the predicate time
                 if (Pg == null)
                     return;
 
@@ -189,7 +186,8 @@ public class Implier extends DurService {
             if (uu != null) {
                 float c = uu.conf();
                 if (c >= confMin) {
-                    NALTask y = new NALTask(t, GOAL, uu, now, now, next, nar.time.nextInputStamp());
+                    NALTask y = new NALTask(t, GOAL, uu, now, now, now + dur,
+                            nar.time.nextInputStamp());
                     y.pri(nar.priorityDefault(GOAL));
 //                        if (Param.DEBUG)
 //                            y.log("")
@@ -204,16 +202,16 @@ public class Implier extends DurService {
 
     }
 
-    private Truth desire(Term x, long from, long to) {
-        return nar.goalTruth(x, from, to);
+    private Truth desire(Term x, long from) {
+        return nar.goalTruth(x, from);
     }
 
     private Truth desire(Term x) {
-        return desire.computeIfAbsent(x, (xx) -> desire(xx, now, next));
+        return desire.computeIfAbsent(x, (xx) -> desire(xx, now));
     }
 
     private Task belief(Term x) {
-        return belief.computeIfAbsent(x, (xx) -> nar.belief(xx, nowStart, nowEnd));
+        return belief.computeIfAbsent(x, (xx) -> nar.belief(xx, now));
     }
 
     public void goal(Map<Term, TruthAccumulator> goals, Term tt, Truth g) {

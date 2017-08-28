@@ -65,11 +65,11 @@ public enum TermGraph {
             return t.op() == IMPL;
         }
 
-        public AdjGraph<Term, Term> snapshot(Iterable<Term> sources, NAR nar, long when) {
-            return snapshot(null, sources, nar, when);
+        public AdjGraph<Term, Term> snapshot(Iterable<Term> sources, NAR nar) {
+            return snapshot(null, sources, nar);
         }
 
-        public AdjGraph<Term, Term> snapshot(AdjGraph<Term, Term> g, Iterable<Term> sources, NAR nar, long when) {
+        public AdjGraph<Term, Term> snapshot(AdjGraph<Term, Term> g, Iterable<Term> sources, NAR nar) {
 
             if (g == null) {
                 g = new AdjGraph<>(true);
@@ -90,7 +90,7 @@ public enum TermGraph {
                     if (!done.add(t))
                         continue;
                     AdjGraph<Term, Term> gg = g;
-                    recurseTerm(nar, when, g, (impl) -> {
+                    recurseTerm(nar, g, (impl) -> {
                         if (!done.add(impl)) {
                             Term s = impl.sub(0);
                             if (!acceptTerm(s)) {
@@ -111,7 +111,7 @@ public enum TermGraph {
 
                             next.add(s);
                             next.add(p);
-                            impl(gg, nar, when, impl, s, p);
+                            impl(gg, nar, impl, s, p);
                         }
                     }, t);
                 }
@@ -121,7 +121,7 @@ public enum TermGraph {
             return g;
         }
 
-        protected void recurseTerm(NAR nar, long when, AdjGraph<Term, Term> g, Consumer<Term> next, Term t) {
+        protected void recurseTerm(NAR nar, AdjGraph<Term, Term> g, Consumer<Term> next, Term t) {
 
 
             Concept tc = nar.concept(t);
@@ -152,7 +152,7 @@ public enum TermGraph {
             return true;
         }
 
-        private void impl(AdjGraph<Term, Term> g, NAR nar, long when, Term l, Term subj, Term pred) {
+        private void impl(AdjGraph<Term, Term> g, NAR nar, Term l, Term subj, Term pred) {
 
 //            int dur = nar.dur();
 //            Task t = nar.belief(l, when);

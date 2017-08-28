@@ -2,9 +2,8 @@ package nars.exe;
 
 import jcog.bag.Bag;
 import jcog.bag.impl.hijack.PriorityHijackBag;
-import jcog.pri.Priority;
-import jcog.pri.op.PriForget;
 import nars.NAR;
+import nars.Task;
 import nars.control.Activate;
 import nars.control.Premise;
 import nars.task.ITask;
@@ -109,6 +108,20 @@ public class UniExec extends Exec implements Runnable {
                             if (overflowing != null) overflowing.add(overflow);
                         }
                         return existing;
+                    }
+
+                    @Override
+                    public void onRemove(@NotNull ITask value) {
+                        if (value instanceof Task) {
+                            ignore((Task) value);
+                        }
+                    }
+
+                    @Override
+                    public void onReject(@NotNull ITask value) {
+                        if (value instanceof Task) {
+                            ignore((Task) value);
+                        }
                     }
 
                     @Override

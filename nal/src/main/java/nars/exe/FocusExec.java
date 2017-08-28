@@ -1,10 +1,8 @@
 package nars.exe;
 
 import jcog.bag.Bag;
-import jcog.bag.impl.ArrayBag;
 import jcog.bag.impl.ConcurrentCurveBag;
 import jcog.bag.impl.CurveBag;
-import jcog.data.sorted.SortedArray;
 import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
 import nars.NAR;
@@ -16,7 +14,6 @@ import nars.control.NARService;
 import nars.control.Premise;
 import nars.task.ITask;
 import nars.task.NALTask;
-import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.impl.map.mutable.ConcurrentHashMapUnsafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,7 +43,7 @@ public class FocusExec extends Exec implements Runnable {
     final int subCycleTasks = subCyclePremises * 2;
 
     final int MAX_PREMISES = subCyclePremises * 2;
-    final int MAX_TASKS = subCycleTasks * 2;
+    final int MAX_TASKS = subCycleTasks * 4;
     final int MAX_CONCEPTS = 16;
 
     final Random random = new XorShift128PlusRandom(1);
@@ -55,7 +52,19 @@ public class FocusExec extends Exec implements Runnable {
             new ConcurrentHashMap<>(), null, MAX_PREMISES);
 
     final CurveBag<Task> tasks = new ConcurrentCurveBag<>(Param.taskMerge, new ConcurrentHashMap<>(),
-            null, MAX_TASKS);
+            null, MAX_TASKS) {
+        @Override
+        public void onRemove(@NotNull Task value) {
+            ignore(value);
+        }
+
+        @Override
+        public void onReject(@NotNull Task value) {
+            ignore(value);
+        }
+    };
+
+
 
     public final Bag concepts =
             new ConcurrentCurveBag<>(Param.conceptActivate,

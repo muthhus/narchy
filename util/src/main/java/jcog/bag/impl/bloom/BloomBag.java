@@ -86,7 +86,7 @@ public class BloomBag<X> implements Bag<X,PriReference<X>> {
         if (z.priElseZero() > 0)
             pri.set(hx, 0);
         //TODO remove x from the collection?
-        onRemoved(z);
+        onRemove(z);
         return z;
     }
 

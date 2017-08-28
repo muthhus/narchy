@@ -5,6 +5,7 @@ import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import nars.NAR;
+import nars.Task;
 import nars.control.Activate;
 import nars.task.ITask;
 import nars.task.NALTask;
@@ -69,6 +70,10 @@ abstract public class Exec implements Executor, PriMerge {
         return concurrency() > 1;
     }
 
+    protected void ignore(@NotNull Task t) {
+        t.delete();
+        nar.emotion.taskIgnored.increment();
+    }
 
     @Override
     public void execute(Runnable r) {

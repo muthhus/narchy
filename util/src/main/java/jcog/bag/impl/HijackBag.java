@@ -397,7 +397,10 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
         if (((float)Math.abs(c - s)) / c < PRESSURE_THRESHOLD)
             pressurize(pri(v));
 
-        return update(k, v, PUT, overflowing);
+        V x = update(k, v, PUT, overflowing);
+        if (x == null)
+            onReject(v);
+        return x;
     }
 
 
@@ -586,12 +589,12 @@ public abstract class HijackBag<K, V> extends Treadmill implements Bag<K, V> {
 
     private void _onAdded(V x) {
         xIncrementAndGet(tSIZE);
-        onAdded(x);
+        onAdd(x);
     }
 
     private int _onRemoved(V x) {
         int s = xDecrementAndGet(tSIZE);
-        onRemoved(x);
+        onRemove(x);
         return s;
     }
 

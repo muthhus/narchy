@@ -246,7 +246,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
     }
 
     @Override
-    public void onRemoved(@NotNull HijackMemoize.HalfWeakPair<K, V> value) {
+    public void onRemove(@NotNull HijackMemoize.HalfWeakPair<K, V> value) {
         value.delete();
         evict.inc();
     }

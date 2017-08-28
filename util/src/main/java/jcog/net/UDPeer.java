@@ -132,13 +132,13 @@ public class UDPeer extends UDP {
         them = new HijackBag<Integer, UDProfile>(3) {
 
             @Override
-            public void onAdded(UDProfile p) {
+            public void onAdd(UDProfile p) {
                 logger.debug("connect {}", p);
                 onAddRemove(p, true);
             }
 
             @Override
-            public void onRemoved(@NotNull UDPeer.UDProfile p) {
+            public void onRemove(@NotNull UDPeer.UDProfile p) {
                 logger.debug("disconnect {}", p);
                 onAddRemove(p, false);
             }

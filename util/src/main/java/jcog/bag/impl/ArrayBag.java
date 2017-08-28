@@ -538,11 +538,14 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
         if (trash[0] != null) {
             trash[0].forEach(x -> {
                 if (x != incoming)
-                    onRemoved(x);
+                    onRemove(x);
             });
         }
-        if (added[0]) {
-            onAdded(inserted);
+
+        if (inserted == null) {
+            onReject(incoming);
+        } else if (added[0]) {
+            onAdd(inserted);
         }
 
 
@@ -650,7 +653,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
         //then outside the synch:
         if (trash != null) {
-            trash.forEach(this::onRemoved);
+            trash.forEach(this::onRemove);
         }
 
     }
@@ -725,7 +728,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
             //map is possibly shared with another bag. only remove the items from it which are present in items
             items.forEach(x -> {
                 map.remove(key(x));
-                onRemoved(x);
+                onRemove(x);
             });
             items.clear();
         }

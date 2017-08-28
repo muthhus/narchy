@@ -111,7 +111,7 @@ public class ActiveQuestionTask extends NALTask implements Consumer<Task> {
     ArrayBag<Task, PriReference<Task>> newBag(int history) {
         return new PLinkArrayBag<>(history, PriMerge.max, new ConcurrentHashMap<>(history)) {
             @Override
-            public void onAdded(@NotNull PriReference<Task> t) {
+            public void onAdd(@NotNull PriReference<Task> t) {
                 eachAnswer.accept(ActiveQuestionTask.this, t.get());
             }
         };

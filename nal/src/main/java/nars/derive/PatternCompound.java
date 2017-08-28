@@ -19,9 +19,6 @@ import java.util.TreeSet;
 
 import static nars.Op.*;
 
-/**
- * HACK this should extend ProxyTerm or something
- */
 abstract public class PatternCompound extends GenericCompoundDT {
 
     final int sizeCached;
@@ -111,7 +108,6 @@ abstract public class PatternCompound extends GenericCompoundDT {
             this.ellipsis = ellipsis;
 
         }
-
 
         abstract protected boolean matchEllipsis(@NotNull TermContainer y, @NotNull Unify subst);
 

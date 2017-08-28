@@ -28,12 +28,12 @@ public class DynamicConceptSpace extends ConceptSpace {
             }
 
             @Override
-            public void onAdded(PriReference<Activate> conceptPLink) {
+            public void onAdd(PriReference<Activate> conceptPLink) {
 
             }
 
             @Override
-            public void onRemoved(@NotNull PriReference<Activate> value) {
+            public void onRemove(@NotNull PriReference<Activate> value) {
                 removeNode(value.get());
             }
         };

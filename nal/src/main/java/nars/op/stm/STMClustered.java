@@ -88,7 +88,7 @@ public abstract class STMClustered extends TaskService {
                 }
 
                 @Override
-                public void onAdded(@NotNull TLink x) {
+                public void onAdd(@NotNull TLink x) {
                     x.node = TasksNode.this;
                 }
 
