@@ -470,16 +470,16 @@ public class Revision {
         float dLocal = 0;
         int adt = a.dt();
         int bdt = b.dt();
-        if (adt != bdt && adt!=XTERNAL && bdt!=XTERNAL) {
+        if (adt != bdt && adt!=XTERNAL && bdt!=XTERNAL && adt!=DTERNAL && bdt!=DTERNAL) {
 
-            if (adt == ETERNAL) {
-                adt = 0;
-                dLocal += 0.5f;
-            }
-            if (bdt == ETERNAL) {
-                bdt = 0;
-                dLocal += 0.5f;
-            }
+//            if (adt == DTERNAL) {
+//                adt = 0;
+//                dLocal += 0.5f;
+//            }
+//            if (bdt == DTERNAL) {
+//                bdt = 0;
+//                dLocal += 0.5f;
+//            }
 
             dLocal += Math.abs(adt - bdt);
             dLocal /= depth;

@@ -286,13 +286,28 @@ public enum Op implements $ {
 
             //TODO if there are no negations in u then an accelerated construction is possible
 
-            assert (u.length > 0 && (dt == 0 || dt == DTERNAL || dt == XTERNAL)); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
+            assert (u.length > 1 && (dt == 0 || dt == DTERNAL)); //throw new RuntimeException("should only have been called with dt==0 or dt==DTERNAL");
+
+
+            //simple accelerated case:
+            if (u.length == 2) {
+                if ((u[0].op()==NEG && u[0].unneg().equals(u[1])) ||
+                    (u[1].op()==NEG && u[1].unneg().equals(u[0])) )
+                    return False; //co-neg
+
+                //it will already have been sorted and de-duplicated upon arriving here
+                // if (u[0].equals(u[1])) return u[0];
+                // u = Terms.sorted(u)
+
+                if (!u[0].hasAny(CONJ) && !u[1].hasAny(CONJ)) //if it's simple
+                    return compound(CONJ, dt, u);
+            }
+
 
             ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length);
 
-            if (!flatten(CONJ, u, dt, s)) {
+            if (!flatten(CONJ, u, dt, s))
                 return False;
-            }
 
             if (s.isEmpty())
                 return True; //? does this happen
@@ -319,10 +334,9 @@ public enum Op implements $ {
                             csi.remove();
 
                             if (!disjSubs.isEmpty()) {
-                                Term y = NEG.the(CONJ.the(disj.dt(), Terms.sorted(disjSubs)));
                                 if (csa == null)
                                     csa = $.newArrayList(1);
-                                csa.add(y);
+                                csa.add(CONJ.the(disj.dt(), Terms.sorted(disjSubs)).neg());
                             }
                         }
                     }

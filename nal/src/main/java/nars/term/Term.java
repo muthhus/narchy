@@ -128,6 +128,9 @@ public interface Term extends Termlike, Comparable<Term> {
     default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, Term parent) {
         return whileTrue.test(this);
     }
+    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue) {
+        return recurseTerms(parentsMust, whileTrue, this);
+    }
 
     @Override
     default boolean containsRecursively(Term t, Predicate<Term> inSubtermsOf) {

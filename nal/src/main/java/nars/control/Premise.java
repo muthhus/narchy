@@ -187,7 +187,7 @@ public class Premise extends UnaryTask {
 
         //QUESTION ANSWERING and TERMLINK -> TEMPORALIZED BELIEF TERM projection
         Task belief = null;
-        Concept beliefConcept = nar.concept(beliefTerm);
+        Concept beliefConcept = nar.conceptualize(beliefTerm);
 
 
         if (beliefConcept != null && !beliefTerm.hasVarQuery()) { //doesnt make sense to look for a belief in a term with query var, it will have none

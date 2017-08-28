@@ -74,11 +74,22 @@ public class SubUnify extends Unify {
             Term result = transform(transformed);
             if (!(result instanceof Bool)) {
                 if (!result.equals(transformed)) {
-                    this.result = result;
+                    if (
+                        //xy.forEachVersioned(parent.xy::tryPut)
+                    xy.forEachVersioned((x,y)->{
+                        parent.xy.tryPut(x, y);
+                        //parent.xy.tryPut(y,x);
+                        return true;
+                    })
+                    ) {
+                        this.result = result;
+                    } else {
+                        return; //maybe try again
+                    }
 
                     //copy mappings to parent if succeeded
                     //this is needed to resolve task/belief to any transformations appearing in the conclusion
-                    xy.forEachVersioned(parent.xy::tryPut);
+
                 } else {
                     this.result = transformed; //no change
                 }

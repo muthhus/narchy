@@ -159,9 +159,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
-    default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue) {
-        return recurseTerms(parentsMust, whileTrue, this);
-    }
+
 
     @Override
     default boolean recurseTerms(Predicate<Term> parentsMust, Predicate<Term> whileTrue, @Nullable Term parent) {
@@ -327,7 +325,7 @@ public interface Compound extends Term, IPair, TermContainer {
         int a = aa.dt();
         if (a == XTERNAL || a == DTERNAL) return true;
         int b = bb.dt();
-        if (b == XTERNAL || b == DTERNAL) return true;
+        if (a == b || b == XTERNAL || b == DTERNAL) return true;
 
         return Math.abs(a - b) <= dur;
     }

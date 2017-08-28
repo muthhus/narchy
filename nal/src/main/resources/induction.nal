@@ -18,7 +18,7 @@
 
 
 //&&
-    A, B, task("."), time(raw), time(dtEvents)                                                  |- (polarize(A,task) &&+- polarize(B,belief)), (Belief:IntersectionDepolarized)
+    A, B, task("."), time(raw), time(dtEvents), notImpl(A),notImpl(B)                             |- (polarize(A,task) &&+- polarize(B,belief)), (Belief:IntersectionDepolarized)
     A, B, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B), notImpl(A),notImpl(B)   |- varIntro((polarize(A,task) &&+- polarize(B,belief))), (Belief:IntersectionDepolarized)
 
 //NAL3 difference

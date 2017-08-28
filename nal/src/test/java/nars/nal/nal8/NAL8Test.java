@@ -361,11 +361,12 @@ public class NAL8Test extends AbstractNALTest {
     public void testInhibitionInverse() {
 
         test
-                .goal("(--,(reward))")
-                .believe("((good) ==> (reward))", 1, 0.9f)
-                .believe("((--,(bad)) ==> (reward))", 1, 0.9f)
-                .mustDesire(cycles, "(good)", 0.0f, 0.81f)
-                .mustDesire(cycles, "(bad)", 1.0f, 0.81f)
+                //.log()
+                .goal("--reward")
+                .believe("(good ==> reward)", 1, 0.9f)
+                .believe("(bad ==> reward)", 0, 0.9f)
+                .mustDesire(cycles, "good", 0.0f, 0.66f)
+                .mustDesire(cycles, "bad", 1.0f, 0.81f)
         ;
     }
 
