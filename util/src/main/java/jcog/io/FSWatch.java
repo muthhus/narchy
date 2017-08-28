@@ -1,8 +1,9 @@
-package nars;
+package jcog.io;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
@@ -30,7 +31,7 @@ public class FSWatch implements Runnable {
 
         watchService = FileSystems.getDefault().newWatchService();
 
-        this.path = Paths.get(path);
+        this.path = Paths.get(path).toAbsolutePath();
 
         watchKey = this.path.register(watchService,
             StandardWatchEventKinds.ENTRY_CREATE,
@@ -64,6 +65,12 @@ public class FSWatch implements Runnable {
 
         running = true;
 
+        File f = path.toFile();
+        if (f.isDirectory()) {
+            for (File e : f.listFiles()) {
+                onEvent.accept(e.toPath());
+            }
+        }
         while (running) {
 
             WatchKey key;
@@ -85,13 +92,12 @@ public class FSWatch implements Runnable {
                 //System.out.println("Event kind: " + eventKind);
 
                 if (eventKind == OVERFLOW) {
-
                     continue; // pending events for loop
                 }
 
                 WatchEvent pathEvent = genericEvent;
-                Path file = (Path) pathEvent.context();
-                this.onEvent.accept(file);
+                Path file = this.path.resolve((Path) pathEvent.context()).toAbsolutePath();
+                onEvent.accept(file);
             }
 
             boolean validKey = key.reset();
