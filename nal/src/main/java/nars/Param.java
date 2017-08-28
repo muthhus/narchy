@@ -32,6 +32,9 @@ public abstract class Param extends Services<Term,NAR> {
     /** rate that integers in integer-containing termlink compounds will be dynamically mutated on activation */
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
 
+    /** how many truth resolutions (multiples) beyond which a non-authentic signal belief is considered inaccurate */
+    public static final int SENSOR_FEEDBACK_FREQ_THRESHOLD = 4;
+
     /**
      * controls interpolation policy:
      * true: dt values will be interpolated

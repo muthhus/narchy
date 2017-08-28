@@ -168,6 +168,9 @@ public class GoalActionConcept extends ActionConcept {
         LongSupplier stamper = nar.time::nextStamp;
 
         Task fb = feedback.set(term, beliefFeedback, stamper, now, dur, nar);
+        if (fb != null) {
+            SensorConcept.feedback(fb, beliefs(), now, nar);
+        }
 
         Task fg;
         boolean latchGoal = false; //experimental

@@ -2,7 +2,10 @@ package nars.concept;
 
 import jcog.math.FloatSupplier;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
+import nars.table.BeliefTable;
+import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.ScalarSignal;
@@ -13,7 +16,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.function.Function;
 import java.util.function.LongSupplier;
 
 
@@ -66,7 +68,6 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
     }
 
 
-
     @Override
     public float asFloat() {
         return currentValue;
@@ -78,7 +79,45 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
      */
     @Nullable
     public Task update(long time, int dur, NAR nar) {
-        return sensor.update(nar, time, dur);
+
+        Task x = sensor.update(nar, time, dur);
+
+        if (x != null) {
+            feedback(x, beliefs(), time, nar);
+        }
+
+        return x;
+    }
+
+    public static void feedback(Task x, @NotNull BeliefTable beliefs, long time, NAR nar) {
+        float xFreq = x.freq();
+        float xConf = x.conf();
+
+
+        float fThresh = 1f - Math.max(0, Math.min(1f, (Param.SENSOR_FEEDBACK_FREQ_THRESHOLD * nar.truthResolution.floatValue())));
+
+
+        int dur = nar.dur();
+
+        //sensor feedback
+        //punish any non-signal beliefs at the current time which contradict this sensor reading, and reward those which it supports
+        beliefs.forEachTask(false, time - dur / 2, time + dur / 2, (y) -> {
+            if (y instanceof SignalTask)
+                return; //ignore previous signaltask
+
+            float coherence = 1f - Math.abs(y.freq() - xFreq);
+
+            float confidence = y.conf() / xConf; //allow > 1
+
+            if (coherence > fThresh) {
+                //reward
+                nar.emotion.value(y.cause(), confidence);
+            } else {
+                //punish
+                nar.emotion.value(y.cause(), -confidence * (1f - coherence));
+                y.delete();
+            }
+        });
     }
 
     public SensorConcept resolution(float r) {

@@ -113,6 +113,7 @@ public class Premise extends UnaryTask {
 
 
         Term beliefTerm = termLink;
+        Term beliefTermRaw = beliefTerm;
 
         Term taskTerm = task.term();
         if (beliefTerm.isTemporal()) {
@@ -242,7 +243,7 @@ public class Premise extends UnaryTask {
 //                    }
 //                }
                 if (tryMatch) {
-                    match = beliefConcept.beliefs().match(focusStart, focusEnd, beliefTerm, true, nar);
+                    match = beliefConcept.beliefs().match(focusStart, focusEnd, beliefTermRaw, true, nar);
                 } else {
                     match = null;
                 }

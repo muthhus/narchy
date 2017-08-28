@@ -59,7 +59,7 @@ public class FZero extends NAgentX {
         actionBipolar(the("fwd"), (f) -> {
             if (f > 0) {
                 //accelerator
-                fz.vehicleMetrics[0][6] += (f) * 0.75f;
+                fz.vehicleMetrics[0][6] += (f) * 1.5f;
             } else {
                 float brake = -f;
                 fz.vehicleMetrics[0][6] *= (1f - brake);
@@ -67,7 +67,7 @@ public class FZero extends NAgentX {
             return f;
         });//.resolution.setValue(0.02f);
         actionBipolar(the("rot"), (r) -> {
-            fz.playerAngle += (r) * 0.07f;
+            fz.playerAngle += (r) * 0.12f;
             return r;
         });//.resolution.setValue(0.01f);
 

@@ -190,7 +190,7 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
 
     @Override
     public final boolean equals(Object obj) {
-        return this == obj || term.equals(obj);
+        return this == obj || (obj instanceof Concept && term.equals(((Concept)obj).term()));
     }
 
     @Override

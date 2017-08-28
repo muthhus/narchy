@@ -17,6 +17,7 @@ import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.XTERNAL;
 
 /**
  * Created by me on 12/4/16.
@@ -27,9 +28,12 @@ abstract public class DynamicTruthModel {
     @Nullable
     public DynTruth eval(Term superterm, boolean beliefOrGoal, long start, long end, boolean stamp, NAR n) {
 
+        if (superterm.dt()==XTERNAL)
+            return null;
+
         Term[] inputs = components(superterm);
 
-        DynTruth d = new DynTruth(stamp ? new FasterList(0) : null);
+        DynTruth d = new DynTruth(stamp ? new FasterList(inputs.length) : null);
         d.freq = d.conf = 1f;
 
         final float confMin = 0; //n.confMin.floatValue();
@@ -38,6 +42,7 @@ abstract public class DynamicTruthModel {
 
         for (int i = 0; i < inputs.length; i++) {
             @NotNull Term subterm = inputs[i];
+            Term actualSubterm = subterm; //in case unnegated
 
             boolean negated = subterm.op() == Op.NEG;
             if (negated)
@@ -49,9 +54,9 @@ abstract public class DynamicTruthModel {
             else if (!(subConcept instanceof BaseConcept))
                 throw new RuntimeException("dynamically evaluated term should have only believable subterms");
 
-            int dt = superterm.subtermTimeSafe(subterm);
+            int dt = superterm.subtermTimeSafe(actualSubterm);
             if (dt == DTERNAL)
-                dt = 0; //TODO maybe this should never happen, and if it does there is an error
+                return null; //dt = 0; //TODO maybe this should never happen, and if it does there is an error
 
             boolean evi = d.e != null;
 
