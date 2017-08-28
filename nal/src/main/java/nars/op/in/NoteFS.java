@@ -79,17 +79,12 @@ public class NoteFS extends NARService {
         return tasks;
     }
 
-    private void unload(Path p, List<Task> tasks) {
-        logger.info("{} unload {} tasks", p, tasks.size());
-        tasks.forEach(t -> {
+    private void unload(Path p, List<Task> toUnload) {
+        logger.info("{} unload {} tasks", p, toUnload.size());
+        toUnload.forEach(t -> {
             if (t.isEternal() && t.isInput())
                 nar.retract(t.stamp()[0]);
         });
     }
 
-    public static void main(String[] args) throws IOException {
-        NAR n = NARS.realtime().get();
-        n.log();
-        new NoteFS("/tmp/nal", n);
-    }
 }

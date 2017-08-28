@@ -314,7 +314,11 @@ public interface Stamp {
 
     /**
      * the fraction of components in common divided by the total amount of unique components.
-     * returns >0 if there is at least one common component; 1.0 if they are equal.
+     *
+     *      == 0 if nothing in common, completely independent
+     *      >0 if there is at least one common component;
+     *          1.0 if they are equal, or if one is entirely contained within the other
+     *          < 1.0 if they have some component in common
      *
      * assumes the arrays are sorted and contain no duplicates
      */
@@ -330,11 +334,20 @@ public interface Stamp {
     static float overlapFraction(@NotNull LongSet aa, int aSize, @NotNull long[] b) {
         int common = 0;
         for (long x: b) {
-            if (aa.contains(x))
+            if (x!=Long.MAX_VALUE /* cyclic */ && aa.contains(x))
                 common++;
         }
+        if (common == 0)
+            return 0f;
 
-        return (common == 0) ? 0 : (((float) common) / Math.max(aSize, b.length));
+        if (aa.contains(Long.MAX_VALUE))
+            aSize--;
+
+        int bSize = b.length;
+        if (isCyclic(b))
+            bSize--;
+
+        return (((float) common) / Math.min(aSize, bSize));
     }
 
     long creation();

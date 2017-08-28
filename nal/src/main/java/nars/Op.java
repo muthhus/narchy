@@ -290,48 +290,53 @@ public enum Op implements $ {
 
             ObjectByteHashMap<Term> s = new ObjectByteHashMap<>(u.length);
 
-            if (flatten(CONJ, u, dt, s) && !s.isEmpty()) {
-                SortedSet<Term> cs = junctionGroupNonDTSubterms(s);
-                if (!cs.isEmpty()) {
+            if (!flatten(CONJ, u, dt, s)) {
+                return False;
+            }
+
+            if (s.isEmpty())
+                return True; //? does this happen
+
+            SortedSet<Term> cs = junctionGroupNonDTSubterms(s);
+            if (!cs.isEmpty()) {
 
 
-                    //annihilate common terms inside and outside of disjunction
-                    //      ex:
-                    //          -X &&  ( X ||  Y)
-                    //          -X && -(-X && -Y)  |-   -X && Y
-                    Iterator<Term> csi = cs.iterator();
-                    List<Term> csa = null;
-                    while (csi.hasNext()) {
-                        Term x = csi.next();
+                //annihilate common terms inside and outside of disjunction
+                //      ex:
+                //          -X &&  ( X ||  Y)
+                //          -X && -(-X && -Y)  |-   -X && Y
+                Iterator<Term> csi = cs.iterator();
+                List<Term> csa = null;
+                while (csi.hasNext()) {
+                    Term x = csi.next();
 
-                        if (x.op() == NEG && x.subIs(0, CONJ)) { //DISJUNCTION
-                            Term disj = x.unneg();
-                            SortedSet<Term> disjSubs = disj.subterms().toSortedSet();
-                            //factor out occurrences of the disj's contents outside the disjunction, so remove from inside it
-                            if (disjSubs.removeAll(cs)) {
-                                //reconstruct disj if changed
-                                csi.remove();
+                    if (x.op() == NEG && x.subIs(0, CONJ)) { //DISJUNCTION
+                        Term disj = x.unneg();
+                        SortedSet<Term> disjSubs = disj.subterms().toSortedSet();
+                        //factor out occurrences of the disj's contents outside the disjunction, so remove from inside it
+                        if (disjSubs.removeAll(cs)) {
+                            //reconstruct disj if changed
+                            csi.remove();
 
-                                if (!disjSubs.isEmpty()) {
-                                    Term y = NEG.the(CONJ.the(disj.dt(), Terms.sorted(disjSubs)));
-                                    if (csa == null)
-                                        csa = $.newArrayList(1);
-                                    csa.add(y);
-                                }
+                            if (!disjSubs.isEmpty()) {
+                                Term y = NEG.the(CONJ.the(disj.dt(), Terms.sorted(disjSubs)));
+                                if (csa == null)
+                                    csa = $.newArrayList(1);
+                                csa.add(y);
                             }
                         }
                     }
-                    if (csa != null)
-                        cs.addAll(csa);
-
-                    if (cs.size() == 1)
-                        return cs.first();
-
-                    Term[] scs = Terms.sorted(cs);
-                    return !Arrays.equals(scs, u) ?
-                            CONJ.the(dt, scs) : //changed, recurse
-                            compound(CONJ, dt, scs);
                 }
+                if (csa != null)
+                    cs.addAll(csa);
+
+                if (cs.size() == 1)
+                    return cs.first();
+
+                Term[] scs = Terms.sorted(cs);
+                return !Arrays.equals(scs, u) ?
+                        CONJ.the(dt, scs) : //changed, recurse
+                        compound(CONJ, dt, scs);
             }
 
             return Null;

@@ -1031,7 +1031,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
             }
         }
 
-        if (isCommand() || (isGoal() && !isEternal())) {
+        boolean cmd = isCommand();
+        if (cmd || (isGoal() && !isEternal())) {
             Task exe = execute(this, n);
             if (exe!=this)
                 return null; //done
@@ -1042,9 +1043,11 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //            ((FrameTime) n.time).validate(this.stamp());
 //        }
 
-        Concept c = concept(n, true);
-        if (c != null) {
-            c.process(this, n);
+        if (!cmd) {
+            Concept c = concept(n, true);
+            if (c != null) {
+                c.process(this, n);
+            }
         }
 
         return null;

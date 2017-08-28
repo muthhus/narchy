@@ -27,6 +27,7 @@ import nars.control.Activate;
 import nars.control.NARService;
 import nars.nlp.Hear;
 import nars.op.Operation;
+import nars.op.in.NoteFS;
 import nars.task.ITask;
 import org.slf4j.LoggerFactory;
 
@@ -81,13 +82,15 @@ public class TextUI {
 
         NAR nar = NARS
                 .realtime()
-                .memory("/tmp/nars")
+                .memory("/tmp/nal")
                 .then(Hear::wiki)
                 .get();
 
         nar.startFPS(2f);
 
         try {
+            new NoteFS("/tmp/nal", nar);
+
             InterNAR i = new InterNAR(nar, 8, 0);
             i.recv.amplitude(0.1f);
             i.runFPS(2);

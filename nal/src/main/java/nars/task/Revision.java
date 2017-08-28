@@ -292,12 +292,12 @@ public class Revision {
 //            float freqDiscount =
 //                    (1f - 0.5f * Math.abs(a.freq() - b.freq()));
 //
-        float stampDiscount =
-//                //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
-//                //TODO weight the contributed overlap amount by the relative confidence provided by each task
-                1f - Stamp.overlapFraction(a.stamp(), b.stamp())/2f;
 
-        float factor = 1f * stampDiscount;
+        //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
+        //TODO weight the contributed overlap amount by the relative confidence provided by each task
+        float overlap = Stamp.overlapFraction(a.stamp(), b.stamp());
+        float stampDiscount = 1f - overlap;
+        float factor = stampDiscount;
         if (factor < Prioritized.EPSILON)
             return null;
 

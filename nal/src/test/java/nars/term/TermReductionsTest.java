@@ -625,21 +625,21 @@ public class TermReductionsTest extends NarseseTest {
 
     @Test
     public void testConegatedConjunctionTerms0() throws Narsese.NarseseException {
-        assertEquals(Null, $("(#1 && (--,#1))"));
-        assertEquals(Null, $("(#1 &| (--,#1))"));
-        assertEquals(Null, $("(&&, #1, (--,#1), (x))"));
+        assertEquals(false, true && false);
+        assertEquals(False, $("(#1 && (--,#1))"));
+        assertEquals(False, $("(#1 &| (--,#1))"));
+        assertEquals(False, parallel(varDep(1), varDep(1).neg()));
 
-        assertTrue($("((x) &&+1 --(x))") instanceof Compound);
-        assertTrue($("(#1 &&+1 (--,#1))") instanceof Compound);
+        assertEquals(False, $("(&&, #1, (--,#1), (x))"));
+        assertEquals("(x)", $("(&&, --(#1 && (--,#1)), (x))").toString());
+
+        assertTrue($("((x) &&+1 --(x))").op() == CONJ);
+        assertTrue($("(#1 &&+1 (--,#1))").op() == CONJ);
 
 
     }
 
 
-    @Test
-    public void testConegatedConjunctionTerms01() throws Narsese.NarseseException {
-        assertEquals(Null, parallel(varDep(1), varDep(1).neg()));
-    }
 
     @Test
     public void testInvalidStatementIndepVarTask() throws Narsese.NarseseException {
@@ -705,26 +705,25 @@ public class TermReductionsTest extends NarseseTest {
     public void testCoNegatedJunction() throws Narsese.NarseseException {
         //the conegation cancels out conflicting terms
 
-        assertEquals(Null, $("(&&,x,a:b,(--,a:b))"));
+        assertEquals(False, $("(&&,x,a:b,(--,a:b))"));
 
-        assertEquals(Null, $("(&&, (a), (--,(a)), (b))")); //a cancels, reduce to 'b'
-        assertEquals(Null, $("(&&, (a), (--,(a)), (b), (c))"));
+        assertEquals(False, $("(&&, (a), (--,(a)), (b))")); //a cancels, reduce to 'b'
+        assertEquals(False, $("(&&, (a), (--,(a)), (b), (c))"));
 
 
-        assertEquals(Null, $("(&&,x,y,a:b,(--,a:b))"));
+        assertEquals(False, $("(&&,x,y,a:b,(--,a:b))"));
     }
 
 
     @Test
     public void testCoNegatedDisjunction() throws Narsese.NarseseException {
 
-        assertEquals(Null,
+        assertEquals(True,
                 $("(||,x,a:b,(--,a:b))"));
 
-        assertEquals(Null,
+        assertEquals(True,
                 $("(||,x,y,a:b,(--,a:b))"));
 
-        assertEquals(Null, parallel(varDep(0), varDep(0).neg(), Atomic.the("x")));
     }
 
     @Test
@@ -1023,7 +1022,7 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testCoNegatedConjunctionParallelEternal() throws Narsese.NarseseException {
         //mix of parallel and eternal
-        assertEquals(Null,
+        assertEquals(False,
                 $("((--,(happy-->noid))&|((--,((x-->ball)&&(x-->paddle)))&&(happy-->noid)))")
         );
     }

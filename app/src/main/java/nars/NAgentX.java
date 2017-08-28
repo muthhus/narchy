@@ -277,12 +277,12 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-//        new Implier(a.nar,
-//                Iterables.concat(
-//                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
-//                        Collections.singleton(a.happy.term)
-//                )
-//        );
+        new Implier(a.nar,
+                Iterables.concat(
+                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
+                        Collections.singleton(a.happy.term)
+                )
+        );
 
 //        AgentService p = new AgentService.AgentBuilder(
 //                //DQN::new,
