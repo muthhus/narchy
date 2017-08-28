@@ -81,7 +81,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
         @Override
-        public Task answer(long start, long end, int dur, @NotNull Task question, Term template, NAR nar) {
+        public Task answer(long start, long end, int dur, Task question, Term template, NAR nar) {
             return null;
         }
 

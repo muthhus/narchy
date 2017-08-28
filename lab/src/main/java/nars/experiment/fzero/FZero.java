@@ -57,7 +57,13 @@ public class FZero extends NAgentX {
 
 
         actionBipolar(the("fwd"), (f) -> {
-            fz.vehicleMetrics[0][6] += (f) * 0.75f;
+            if (f > 0) {
+                //accelerator
+                fz.vehicleMetrics[0][6] += (f) * 0.75f;
+            } else {
+                float brake = -f;
+                fz.vehicleMetrics[0][6] *= (1f - brake);
+            }
             return f;
         });//.resolution.setValue(0.02f);
         actionBipolar(the("rot"), (r) -> {
@@ -80,9 +86,9 @@ public class FZero extends NAgentX {
 //        senseNumberDifference($.prop(the("accel"), id), () -> (float) fz.vehicleMetrics[0][6]).resolution.setValue(0.02f);
         @NotNull ScalarConcepts ang = senseNumber(the("ang"), () ->
                         (float) (0.5f + 0.5f * MathUtils.normalizeAngle(fz.playerAngle, 0) / (Math.PI)),
-                16,
+                5,
                 ScalarConcepts.Needle
-        );//.resolution(0.33f);
+        ).resolution(0.2f);
         window(
                 Vis.conceptBeliefPlots(this, ang, 4), 500, 500);
 

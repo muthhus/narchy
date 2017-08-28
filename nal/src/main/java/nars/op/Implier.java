@@ -186,7 +186,7 @@ public class Implier extends DurService {
             if (uu != null) {
                 float c = uu.conf();
                 if (c >= confMin) {
-                    NALTask y = new NALTask(t, GOAL, uu, now, now, now + dur,
+                    NALTask y = new NALTask(t, GOAL, uu, now, now, now /* + dur */,
                             nar.time.nextInputStamp());
                     y.pri(nar.priorityDefault(GOAL));
 //                        if (Param.DEBUG)

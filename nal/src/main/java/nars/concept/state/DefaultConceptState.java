@@ -30,8 +30,8 @@ public final class DefaultConceptState extends ConceptState {
         this(   id,
                 new MutableInteger(clamp(beliefsCapTotal/4, 2, 6)), //belief ete ~1/4
                 new MutableInteger(clamp(beliefsCapTotal/4, 2, 6)),   //goal ete  ~1/4
-                new MutableInteger(Math.max(3, beliefsCapTotal * 3 / 4)), //belief temp ~3/4
-                new MutableInteger(Math.max(3, goalsCapTotal   * 3 / 4)), //goal temp  ~3/4
+                new MutableInteger(Math.max(3, beliefsCapTotal)), //belief temp
+                new MutableInteger(Math.max(3, goalsCapTotal)), //goal temp
                 new MutableInteger(questionsMax),
                 new MutableInteger(termlinksCapacity),
                 new MutableInteger(taskLinksCapacity)

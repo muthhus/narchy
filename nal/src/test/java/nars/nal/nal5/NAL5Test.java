@@ -138,8 +138,6 @@ public class NAL5Test extends AbstractNALTest {
     }
 
 
-
-
 //    @Test
 //    public void comparisonNegNeg(){
 //        TestNAR tester = test();
@@ -184,7 +182,7 @@ public class NAL5Test extends AbstractNALTest {
 
 
     @Test
-    public void compound_composition_two_premises() {
+    public void compound_composition_Pred() {
 
         TestNAR tester = test;
         tester.believe("<<robin --> bird> ==> <robin --> animal>>"); //.en("If robin is a type of bird then robin is a type of animal.");
@@ -198,7 +196,7 @@ public class NAL5Test extends AbstractNALTest {
 
 
     @Test
-    public void compound_composition_two_premises2() {
+    public void compound_composition_Subj() {
 
         TestNAR tester = test;
         tester.believe("<<robin --> bird> ==> <robin --> animal>>"); //.en("If robin is a type of bird then robin is a type of animal.");
@@ -208,6 +206,13 @@ public class NAL5Test extends AbstractNALTest {
 
     }
 
+    @Test
+    public void compound_composition_SubjPosNeg() {
+        test
+            .believe("<<robin --> bird> ==> <robin --> animal>>") //.en("If robin is a type of bird then robin is a type of animal.")
+            .believe("--<<robin --> [alien]> ==> <robin --> animal>>") //.en("If robin is alien then robin isnt a type of animal.");
+            .mustBelieve(cycles, " <(&&,<robin --> bird>, --<robin --> [alien]>) ==> <robin --> animal>>", 1f, 0.81f); //.en("If robin isnt alien and is a type of bird then robin is a type of animal.");
+    }
 
     @Test
     public void compound_decomposition_two_premises1() {
@@ -261,7 +266,7 @@ public class NAL5Test extends AbstractNALTest {
     }
 
 
-//    static {
+    //    static {
 //        Param.TRACE = true;
 //    }
     @Test
@@ -509,7 +514,7 @@ public class NAL5Test extends AbstractNALTest {
 //                .mustNotOutput(cycles, "(y)", BELIEF, 0.5f, 1f, 0, 1, ETERNAL);
 //    }
 
-//    static {
+    //    static {
 //        Param.TRACE = true;
 //    }
     @Test

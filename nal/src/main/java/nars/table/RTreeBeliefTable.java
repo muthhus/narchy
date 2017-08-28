@@ -156,7 +156,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             //                return false;
             //        return true;
             if (x instanceof TimeRange) {
-                TimeRange t = (TimeRange)x;
+                TimeRange t = (TimeRange) x;
                 return !((start > t.end) || (end < t.start));
             } else {
                 TaskRegion t = (TaskRegion) x;
@@ -181,7 +181,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             //        return true;
             //    }
             if (x instanceof TimeRange) {
-                TimeRange t = (TimeRange)x;
+                TimeRange t = (TimeRange) x;
                 return !((start > t.start) || (end < t.end));
             } else {
                 TaskRegion t = (TaskRegion) x;
@@ -363,8 +363,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public Task match(long start, long end, @Nullable Term template, NAR nar) {
 
-        assert(end >= start);
-        assert(start!=ETERNAL);
+        assert (end >= start);
+        assert (start != ETERNAL);
 
         int s = size();
         if (s == 0)
@@ -427,8 +427,8 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 TaskRegion bounds = (TaskRegion) tree.root().region();
                 long expand = Math.max(1, (bounds.end - bounds.start) / 8);
 
-                long scanStart = start-1, scanEnd = end+1;
-                long nextStart = start,nextEnd=end;
+                long scanStart = start - 1, scanEnd = end + 1;
+                long nextStart = start, nextEnd = end;
                 int done;
                 do {
                     nextStart -= expand;
@@ -448,15 +448,17 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     if (u.size() >= min)
                         break;
 
-                    scanStart = nextStart-1;
-                    scanEnd = nextEnd+1;
-                } while (done<2);
+                    scanStart = nextStart - 1;
+                    scanEnd = nextEnd + 1;
+                } while (done < 2);
             }
         }
         return u;
     }
 
-    /** only valid for comparison during rtree iteration */
+    /**
+     * only valid for comparison during rtree iteration
+     */
     static class TimeRange implements HyperRegion {
 
         long start, end;
@@ -535,16 +537,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             tr = new TaskRegion(x);
         }
 
+        ((ConcurrentRTree<TaskRegion>) tree).withWriteLock((t) -> {
 
-        //check capacity overage
-        if (size() >= capacity) {
-            ((ConcurrentRTree<TaskRegion>) tree).withWriteLock((t) -> {
-                addAfterCompressing(t, tr, n);
+            final int capacity = this.capacity;
+            if (size() < capacity) {
+                t.add(tr);
+            } else {
+                addAfterCompressing(t, tr, n, capacity);
                 assert (size() <= capacity * 2) : "size=" + size() + " cap=" + capacity;
-            });
-        } else {
-            tree.addAsync(tr);
-        }
+            }
+        });
 
     }
 
@@ -552,7 +554,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      * assumes called with writeLock
      */
     @NotNull
-    private void addAfterCompressing(Space<TaskRegion> tree, TaskRegion inputRegion, NAR nar) {
+    private static void addAfterCompressing(Space<TaskRegion> tree, TaskRegion inputRegion, NAR nar, int cap) {
 
 
         long now = nar.time();
@@ -597,10 +599,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         @Nullable TaskRegion toRemove = deleteVictim.the;
         if (!merged && toRemove != null) {
-            remove(toRemove); //evicted
+            tree.remove(toRemove); //evicted
         }
 
-        if (tree.size() < capacity)
+        if (tree.size() < cap)
             tree.add(inputRegion);
 
         //nar.input(toActivate);
@@ -760,7 +762,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     static FloatFunction<Task> taskStrengthWithFutureBoost(long now, float presentAndFutureBoost, long when, int dur) {
         return (Task x) -> {
             //boost for present and future
-            return (!x.isBefore(now-dur) ? presentAndFutureBoost : 1f) * temporalTaskPriority(x, when, when, dur);
+            return (!x.isBefore(now - dur) ? presentAndFutureBoost : 1f) * temporalTaskPriority(x, when, when, dur);
         };
     }
 
