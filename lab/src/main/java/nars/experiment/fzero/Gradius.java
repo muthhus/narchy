@@ -32,14 +32,14 @@ public class Gradius extends NAgentX {
 
         float width = g.getWidth();
         float height = g.getHeight();
-        @NotNull ScalarConcepts yPos = senseNumber($.p(id, the("Y")),
+        @NotNull ScalarConcepts yPos = senseNumber(the("Y"),
                 ()->g.player[Gradius4K.OBJ_Y] / height,
-                8, ScalarConcepts.FuzzyNeedle
-        ).resolution(0.2f);
-        @NotNull ScalarConcepts xPos = senseNumber($.p(id, the("X")),
+                4, ScalarConcepts.FuzzyNeedle
+        ).resolution(0.1f);
+        @NotNull ScalarConcepts xPos = senseNumber(the("X"),
                 ()->g.player[Gradius4K.OBJ_X] / width,
-                8, ScalarConcepts.FuzzyNeedle
-        ).resolution(0.2f);
+                4, ScalarConcepts.FuzzyNeedle
+        ).resolution(0.1f);
         window(
                 col(
                         Vis.conceptBeliefPlots(this, xPos, 4),
@@ -84,11 +84,12 @@ public class Gradius extends NAgentX {
 //            ).resolution(0.05f);
 //        }
 
+        /*nar.believe($.inh(*/$.sete(
 
-        actionToggle($.p(id, Atomic.the("fire")),
-                (b) -> g.keys[Gradius4K.VK_SHOOT] = b);
+        actionToggle($.p(Atomic.the("fire")),
+                (b) -> g.keys[Gradius4K.VK_SHOOT] = b).term(),
 
-        actionTriState($.p(id, Atomic.the("x")), (dh) -> {
+        actionTriState($.p(Atomic.the("dx")), (dh) -> {
             g.keys[Gradius4K.VK_LEFT] = false;
             g.keys[Gradius4K.VK_RIGHT] = false;
             switch (dh) {
@@ -99,9 +100,9 @@ public class Gradius extends NAgentX {
                     g.keys[Gradius4K.VK_LEFT] = true;
                     break;
             }
-        });
+        }).term(),
 
-        actionTriState($.p(id, Atomic.the("y")), (dh) -> {
+        actionTriState($.p(Atomic.the("dy")), (dh) -> {
             g.keys[Gradius4K.VK_UP] = false;
             g.keys[Gradius4K.VK_DOWN] = false;
             switch (dh) {
@@ -112,7 +113,7 @@ public class Gradius extends NAgentX {
                     g.keys[Gradius4K.VK_UP] = true;
                     break;
             }
-        });
+        }).term())/*, id))*/;
 
 
     }

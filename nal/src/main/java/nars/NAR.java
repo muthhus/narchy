@@ -2,6 +2,7 @@ package nars;
 
 
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Longs;
 import jcog.Util;
 import jcog.data.MutableInteger;
 import jcog.event.ArrayTopic;
@@ -1610,6 +1611,11 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     public Premise premise(Task task, Term term, float pri) {
         return new Premise(task, term, deriver, pri);
+    }
+
+    /** deletes any task with a stamp containing the component */
+    public void retract(long stampComponent) {
+        tasks().filter(x -> Longs.contains(x.stamp(), stampComponent)).forEach(Task::delete);
     }
 
     /**
