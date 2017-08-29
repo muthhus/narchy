@@ -36,13 +36,13 @@
 
 
     (P ==> M), (S ==> M) |- ((P &&+- S) ==>+- M), (Belief:Intersection)
-    (P ==> M), (S ==> M) |- ((P &&+- --S) ==>+- M), (Belief:Difference)
+    (P ==> M), (S ==> M) |- ((P &&+- --S) ==>+- M), (Belief:IntersectionPN)
         //(P ==> M), (S ==> M), neqCom(P,S) |- (--((--,%P) &&+- (--,%S)) ==>+- M), (Belief:Union)
                 //(P || S) ==>+-M
 
 
     (M ==> P), (M ==> S) |- (M ==>+- (P &&+- S)), (Belief:Intersection)
-    (M ==> P), (M ==> S) |- (M ==>+- (P &&+- --S)), (Belief:Difference)
+    (M ==> P), (M ==> S) |- (M ==>+- (P &&+- --S)), (Belief:IntersectionPN)
         //(M ==> P), (M ==> S), neqCom(P,S) |- (M ==>+- --((--,%P) &&+- (--,%S))), (Belief:Union)
                 //M ==>+- (P || S)
 

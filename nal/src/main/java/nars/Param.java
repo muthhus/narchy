@@ -145,7 +145,7 @@ public abstract class Param extends Services<Term,NAR> {
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
         } else {
-
+            c *= 2;
         }
 
         return -c;

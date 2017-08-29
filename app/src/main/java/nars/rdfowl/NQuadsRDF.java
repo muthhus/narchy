@@ -378,8 +378,8 @@ public abstract class NQuadsRDF {
         } else if (predicate.equals(equivalentClass)) {
 
             belief = equi(
-                    inh(varIndep("subj"), subject),
-                    inh(varIndep("pred"), object)
+                    inst(varIndep("subj"), subject),
+                    inst(varIndep("pred"), object)
             );
         } else if (predicate.equals(isPartOf)) {
             belief = $.instprop(subject, object);
@@ -398,13 +398,13 @@ public abstract class NQuadsRDF {
 
             belief = $.impl(
                     $.func(subject, $.varIndep(1), $.varDep(2)),
-                    $.inh($.varIndep(1), object)
+                    $.inst($.varIndep(1), object)
             );
 
         } else if (predicate.equals(range)) {
             belief = $.impl(
                     $.func(subject, $.varDep(2), $.varIndep(1)),
-                    $.inh($.varIndep(1), object)
+                    $.inst($.varIndep(1), object)
             );
             // PROPERTY range CLASS
             //<PROPERTY($subj, $obj) ==> <$obj -{- CLASS>>.
@@ -430,7 +430,7 @@ public abstract class NQuadsRDF {
         } else if (predicate.equals(disjointWith)) {
             //System.out.println(subject + " " + predicate + " " + object);
 
-            belief = $.inh($.varDep(1),
+            belief = $.inst($.varDep(1),
                     $.secti(subject, object)
             ).neg();
 

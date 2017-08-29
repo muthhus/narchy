@@ -15,7 +15,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
      *   true: recursive
      *   false: only cross-compares the first layer of subterms.
      */
-    public NoCommonSubtermConstraint(Term target, @NotNull Term x, boolean recurse) {
+    public NoCommonSubtermConstraint(@NotNull Term target, @NotNull Term x, boolean recurse) {
         super(recurse ? "neqRCom" : "neqCom",
                 target, x );
         this.recurse = recurse;
@@ -39,7 +39,7 @@ public final class NoCommonSubtermConstraint extends CommonalityConstraint {
         return recurse ?
 
                 //a.containsRecursively(b) || b.containsRecursively(a) :
-                a.containsRecursively(b, Op.nonEventDelimeter) || b.containsRecursively(a, Op.nonEventDelimeter) :
+                a.containsRecursively(b, Op.recursiveCommonalityDelimeter) || b.containsRecursively(a, Op.recursiveCommonalityDelimeter) :
 
                 a.contains(b) || b.contains(a);
     }

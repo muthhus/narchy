@@ -1,10 +1,14 @@
 package nars.term.atom;
 
+import com.google.common.collect.Iterators;
 import nars.*;
 import nars.term.Term;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Arrays;
+
+import static nars.$.$;
 import static nars.term.atom.Int.range;
 import static nars.term.atom.Int.the;
 import static org.junit.Assert.assertEquals;
@@ -75,7 +79,12 @@ public class IntTest {
         n.believe($.inh($.p(the(1), range(0,2)), $.the("x")));
         n.run(10);
     }
-
+    @Test
+    public void testMultidimUnroll() throws Narsese.NarseseException {
+        Term a = $.secti($("(1,1)"), $("(1,2)"));
+        assertEquals("(1,1..2)", a.toString());
+        assertEquals("[(1,1), (1,2)]", Arrays.toString(Iterators.toArray(Int.unroll(a), Term.class)));
+    }
 }
 ///**
 // * Created by me on 8/5/16.

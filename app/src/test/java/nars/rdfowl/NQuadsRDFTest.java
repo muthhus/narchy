@@ -21,7 +21,6 @@ import static junit.framework.TestCase.assertTrue;
 public class NQuadsRDFTest {
 
 
-
     @Test
     public void test1() throws Exception {
         final NAR n = NARS.tmp();
@@ -81,16 +80,16 @@ public class NQuadsRDFTest {
         File output = new File(input + ".nal");
         PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512 * 1024));
 
-        n.log();
 
-        n.input(
-                NQuadsRDF.stream(n, new File(
-                    input
-                )).peek(t -> {
-                    t.pri(n.priorityDefault(t.punc()));
-                    pout.println(t + ".");
-                })
-        );
+        NQuadsRDF.stream(n, new File(
+                input
+        )).peek(t -> {
+            t.pri(n.priorityDefault(t.punc())/10f);
+            pout.println(t + ".");
+        }).forEach(x -> {
+            n.input(x);
+            n.run(1); //allow process
+        });
 
         pout.close();
 
@@ -99,13 +98,23 @@ public class NQuadsRDFTest {
 //        });
 //        n.run(512);
 
-        n.concepts().forEach(Concept::print);
-        //n.concept($.the("Buyer")).print();
+        /*n.concepts().forEach(Concept::print);
+        n.concept($.the("Buyer")).print();*/
 
-//        n.input("(I-->Seller).");
-//        n.input("(Them-->Buyer).");
-//        n.input("(?x-->Value)?");
-//        n.run(512);
+        n.clear();
+        n.log();
+        n.input("({I}-->Seller).");
+        n.run(1);
+        n.input("({Them}-->Buyer)!");
+        n.run(1);
+        n.input("isReceiverOfPhysicalValue(I,#1)!");
+        n.input("--isReceiverOfPhysicalValue(Them,#1)!");
+        n.run(1);
+        n.input("isReceiverOfObligationValue(I,#1)!");
+        n.input("--isReceiverOfObligationValue(Them,#1)!");
+        n.run(1);
+        n.input("(I<->?x)?");
+        n.run(256);
 
     }
 }

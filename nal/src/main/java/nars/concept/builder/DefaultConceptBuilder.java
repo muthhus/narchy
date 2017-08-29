@@ -142,17 +142,25 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         if (validUnwrappableSubterms(subj.subterms())) {
                             int s = subj.size();
                             FasterList<Term> lx = new FasterList(s);
-                            for (int i = 0; i < s; i++) {
-                                Term csi = subj.sub(i);
-                                if (csi instanceof Int.IntRange) {
-                                    Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
-                                } else {
+                            if (subj instanceof Int.IntRange || so==PROD && subj.hasAny(INT)) {
+                                Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
+                            }
+                            if (so!=PROD) {
+                                for (int i = 0; i < s; i++) {
+                                    Term csi = subj.sub(i);
+                                    //                                if (csi instanceof Int.IntRange) {
+                                    //                                    //TODO??
+                                    ////                                    lx.add(
+                                    ////
+                                    ////                                            Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
+                                    //                                } else {
                                     lx.add(INH.the(csi, pred));
+                                    //                                }
                                 }
                             }
 
                             boolean valid = true;
-                            if (valid) {
+                            if (lx.size() > 1 && valid) {
                                 Term[] x = lx.toArray(Term[]::new);
                                 switch (so) {
                                     case INT:
@@ -251,7 +259,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             case CONJ:
                 //allow variables onlyif they are not themselves direct subterms of this
                 if (validUnwrappableSubterms(t.subterms())) {
-                    dmt = new DynamicTruthModel.DynamicIntersection(t);
+                    dmt = new DynamicTruthModel.Intersection(t.subterms().theArray());
                 }
                 break;
 

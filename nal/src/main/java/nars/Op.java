@@ -1128,7 +1128,7 @@ public enum Op implements $ {
                         Null;
             case 2:
                 Term et0 = t[0], et1 = t[1];
-                if (et0.equals(et1) || et0.containsRecursively(et1, nonEventDelimeter) || et1.containsRecursively(et0, nonEventDelimeter))
+                if (et0.equals(et1) || et0.containsRecursively(et1, recursiveCommonalityDelimeter) || et1.containsRecursively(et0, recursiveCommonalityDelimeter))
                     return Null;
                 else if ((et0.op() == set && et1.op() == set))
                     return difference(set, et0, et1);
@@ -1259,8 +1259,11 @@ public enum Op implements $ {
         return bits;
     }
 
-    //final static int EVENT_DELIMETER_OP = Op.or(Op.PROD, Op.NEG, Op.SETe, Op.SETi, Op.)
-    public static final Predicate<Term> nonEventDelimeter = c -> c.op().temporal; //!c.op().in(EVENT_DELIMETER_OP);
+    final static int EVENT_DELIMETER_OP = Op.or(Op.PROD, Op.CONJ);
+    public static final Predicate<Term> recursiveCommonalityDelimeter =
+            c -> c.op().in(EVENT_DELIMETER_OP);
+            //c -> c.op().temporal; //!c.op().in(EVENT_DELIMETER_OP);
+
     private static final int InvalidImplicationSubj = or(IMPL);
     //private static final int InvalidImplicationPred = or(EQUI);
 
@@ -1367,8 +1370,8 @@ public enum Op implements $ {
             //first layer only, not recursively
             if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
                     (subject.equals(predicate) ||
-                        subject.containsRecursively(predicate, nonEventDelimeter) ||
-                        predicate.containsRecursively(subject, nonEventDelimeter)))
+                        subject.containsRecursively(predicate, recursiveCommonalityDelimeter) ||
+                        predicate.containsRecursively(subject, recursiveCommonalityDelimeter)))
                 //(!(su instanceof Variable) && predicate.contains(su)))
                 return Null; //cyclic
 

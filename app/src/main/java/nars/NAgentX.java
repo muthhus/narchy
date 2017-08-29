@@ -188,7 +188,7 @@ abstract public class NAgentX extends NAgent {
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
         Inperience inp = new Inperience(n, 8, 0.02f);
-        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 32);
+        //Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 32);
 
 
         NAgent a = init.apply(n);
@@ -277,12 +277,12 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-        new Implier(a.nar,
-                Iterables.concat(
-                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
-                        Collections.singleton(a.happy.term)
-                )
-        );
+//        new Implier(a.nar,
+//                Iterables.concat(
+//                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
+//                        Collections.singleton(a.happy.term)
+//                )
+//        );
 
 //        AgentService p = new AgentService.AgentBuilder(
 //                //DQN::new,

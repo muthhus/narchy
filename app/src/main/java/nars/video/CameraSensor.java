@@ -80,8 +80,9 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     private static Int2Function<Term> RadixProduct(Term root, int width, int height, int radix) {
         return (x, y) ->
-                $.p(root,
-                        //$.inh(
+                $.inh(
+                //$.p(root,
+
 
 
                         //$.secte
@@ -91,8 +92,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
                                 //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
                                 //new Term[]{coord('x', x, width), coord('y', y, height)} :
                                 $.p(x, y)
-
-                )
+                    , root)
         ;
     }
 

@@ -1,17 +1,39 @@
 package nars.derive.constraint;
 
+import nars.$;
 import nars.NARS;
+import nars.Narsese;
+import nars.term.Term;
 import nars.test.TestNAR;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 
 public class MatchConstraintTest {
 
-    final static int CYCLES = 1024;
+    final static int CYCLES = 64;
+
+    @Test public void testNeqComRecursiveConstraint() throws Narsese.NarseseException {
+        NoCommonSubtermConstraint c = new NoCommonSubtermConstraint($.varQuery(1), $.varQuery(2), true);
+        assertFalse(
+                c.invalid((Term)$.$("X"), (Term)$.$("Y"))
+        );
+        assertFalse(
+                c.invalid((Term)$.$("X"), (Term)$.$("f(X,Y)")) //allow since a product separates
+        );
+        assertFalse(
+                c.invalid((Term)$.$("X"), (Term)$.$("(X && Y)")) //allow since a product separates
+        );
+        assertTrue(
+                c.invalid((Term)$.$("X"), (Term)$.$("(X|Y)"))
+        );
+    }
+
 
     @Test public void testNeqComRecursiveConstraintAllRules() {
 
@@ -21,7 +43,7 @@ public class MatchConstraintTest {
             $.04;.75$ happy(L). 497⋈512 %.55;.75% {497⋈512: æ0IáËÑþKÄ}
             $.05;.53$ ((L)-->(o-(i-happy))). 527 %.54;.53% {527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÉ;æ0IáËÑþKÌ} Dynamic
         */
-        new TestNAR(new NARS().get())
+        new TestNAR(NARS.tmp())
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("((L)-->(o-(i-happy)))", 1f, 0.9f)
                 .mustNotOutput(CYCLES, "((o-(i-happy))-->happy)", BELIEF, ETERNAL);
@@ -35,13 +57,12 @@ public class MatchConstraintTest {
             $.04;.75$ happy(L). 497⋈512 %.55;.75% {497⋈512: æ0IáËÑþKÄ}
             $.05;.53$ ((L)-->(o-(i-happy))). 527 %.54;.53% {527: æ0IáËÑþKn;æ0IáËÑþKM;æ0IáËÑþKÉ;æ0IáËÑþKÌ} Dynamic
         */
-        new TestNAR(new NARS().get())
+        new TestNAR(NARS.tmp())
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("((L)-->(o-(i-happy)))", 1f, 0.9f)
                 .mustNotOutput(CYCLES, "((o-(i-happy))-->happy)", BELIEF, ETERNAL);
     }
 
-    @Ignore
     @Test public void testNeqComConstraint() {
         /*
         SHOULD NOT HAPPEN:
@@ -49,7 +70,7 @@ public class MatchConstraintTest {
             $.08;.75$ happy(L). 1866⋈1876 %1.0;.75% {1866⋈1876: êbaîCóòrj}
             $.04;.43$ ((((L)~(i|(L)))|(L))-->happy). 1876 %.10;.21% {1876: êbaîCóòmh;êbaîCóòoÁ;êbaîCóòoÃ;êbaîCóòrm;êbaîCóòrÏ} Dynamic
         */
-        new TestNAR(new NARS().get())
+        new TestNAR(NARS.tmp())
                 .believe("happy(L)", 1f, 0.9f)
                 .believe("(((i)|(L))-->happy)", 1f, 0.9f)
                 .mustNotOutput(CYCLES, "(((i)|(L))-->happy)", BELIEF, 1f, 1f, 0.81f, 0.81f, ETERNAL);

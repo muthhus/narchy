@@ -81,7 +81,7 @@ public enum TermGraph {
             Set<Termed> next = Sets.newConcurrentHashSet();
             Iterables.addAll(next, sources);
 
-            int maxSize = 1024;
+            int maxSize = 256;
             do {
                 Iterator<Termed> ii = next.iterator();
                 while (ii.hasNext()) {

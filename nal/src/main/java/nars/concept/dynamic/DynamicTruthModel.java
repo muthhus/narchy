@@ -14,10 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.Op.BELIEF;
+import static nars.Op.CONJ;
 import static nars.Op.GOAL;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
+import static nars.time.Tense.*;
 
 /**
  * Created by me on 12/4/16.
@@ -28,10 +27,12 @@ abstract public class DynamicTruthModel {
     @Nullable
     public DynTruth eval(Term superterm, boolean beliefOrGoal, long start, long end, boolean stamp, NAR n) {
 
-        if (superterm.dt()==XTERNAL)
-            return null;
+        int sdt = superterm.dt();
+//        if (sdt == XTERNAL)
+//            return null;
 
         Term[] inputs = components(superterm);
+        assert (inputs.length > 0): this + " yielded no dynamic components for superterm " + superterm;
 
         DynTruth d = new DynTruth(stamp ? new FasterList(inputs.length) : null);
         d.freq = d.conf = 1f;
@@ -54,9 +55,17 @@ abstract public class DynamicTruthModel {
             else if (!(subConcept instanceof BaseConcept))
                 throw new RuntimeException("dynamically evaluated term should have only believable subterms");
 
-            int dt = superterm.subtermTimeSafe(actualSubterm);
-            if (dt == DTERNAL)
-                return null; //dt = 0; //TODO maybe this should never happen, and if it does there is an error
+            int dt;
+            if (superterm.op() == CONJ) {
+                dt = superterm.subtermTimeSafe(actualSubterm);
+                if (dt == DTERNAL) {
+                    if (sdt != DTERNAL && sdt != XTERNAL) {
+                        return null; //dt = 0; //TODO maybe this should never happen, and if it does there is an error
+                    }
+                }
+            } else {
+                dt = DTERNAL; //
+            }
 
             boolean evi = d.e != null;
 
@@ -68,8 +77,12 @@ abstract public class DynamicTruthModel {
             if (start == ETERNAL) {
                 subStart = subEnd = ETERNAL;
             } else {
-                subStart = start + dt;
-                subEnd = end + dt + subterm.dtRange();
+                if (dt == DTERNAL) {
+                    subStart = subEnd = start;
+                } else {
+                    subStart = start + dt;
+                    subEnd = end + dt + subterm.dtRange();
+                }
             }
 
             if (evi) {
@@ -89,9 +102,12 @@ abstract public class DynamicTruthModel {
                 nt = n.truth(subConcept, beliefOrGoal ? BELIEF : GOAL, subStart, subEnd);
             }
 
-            if (nt == null || nt.conf() < n.confMin.floatValue() || !add(i, d, nt.negIf(negated), confMin)) {
+            if (nt == null || nt.conf() < n.confMin.floatValue()) {
                 return null;
             }
+
+            if (!add(i, d, nt.negIf(negated), confMin))
+                return null;
 
             if (evi)
                 d.e.add(bt);
@@ -124,6 +140,7 @@ abstract public class DynamicTruthModel {
 
         public Union(@NotNull Term... comp) {
             super(comp);
+            assert(comp.length > 1);
         }
 
         @Override
@@ -143,12 +160,13 @@ abstract public class DynamicTruthModel {
         @NotNull
         private final Term[] comp;
 
-        protected Intersection() {
-            this.comp = Term.EmptyArray;
-        }
+//        protected Intersection() {
+//            this.comp = Term.EmptyArray;
+//        }
 
         public Intersection(@NotNull Term... comp) {
             this.comp = comp;
+            assert(comp.length > 1);
         }
 
         @Override
@@ -246,21 +264,22 @@ abstract public class DynamicTruthModel {
         }
     }
 
-    /**
-     * N-ary intersection truth function of subterms
-     */
-    public static class DynamicIntersection extends DynamicTruthModel.Intersection {
-        private final Term[] subterms;
-
-        public DynamicIntersection(Term term) {
-            this.subterms = term.subterms().toArray();
-        }
-
-        @NotNull
-        @Override
-        public Term[] components(Term superterm) {
-            return subterms;
-        }
-    }
+//    /**
+//     * N-ary intersection truth function of subterms
+//     */
+//    public static class DynamicIntersection extends DynamicTruthModel.Intersection {
+//        private final Term[] subterms;
+//
+//        public DynamicIntersection(Term term) {
+//            this.subterms = term.subterms().theArray();
+//            assert(subterms.length > 1);
+//        }
+//
+//        @NotNull
+//        @Override
+//        public Term[] components(Term superterm) {
+//            return subterms;
+//        }
+//    }
 
 }

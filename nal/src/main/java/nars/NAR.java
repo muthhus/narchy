@@ -1735,7 +1735,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             }
         }
 
-        return boost / numCauses;
+        return numCauses > 0 ? boost / numCauses : 0;
     }
 
     public Cause newCause(Object x) {

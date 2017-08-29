@@ -103,7 +103,7 @@ public class Emotivation extends Emotion {
      */
     public void evaluate(Task x) {
 
-        float gain = nar.evaluate(x, x.cause(), nar.taskCauses.get(x));
+        float gain = nar.evaluate(x, x.cause() /*, nar.taskCauses.get(x)*/);
         assert (gain == gain);
         if (gain != 0) {
 
@@ -125,11 +125,13 @@ public class Emotivation extends Emotion {
         if (x instanceof Task && !((Task) x).isCommand()) {
             Task t = (Task) x;
 
-            value(t.cause(), Param.inputCost(t, nar));
+            //float p0 = t.priSafe(0);
+            float cost = Param.inputCost(t, nar);
+            float p = t.priMult(1f/-cost);
+
+            value(t.cause(), cost);
 
             evaluate(t);
-//            if (tp != tp || tp < Pri.EPSILON)
-//                return null; //TODO track what might cause this
 
         }
 
