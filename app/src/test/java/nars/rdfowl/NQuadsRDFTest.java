@@ -1,8 +1,10 @@
 package nars.rdfowl;
 
+import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
+import nars.concept.Concept;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -18,10 +20,11 @@ import static junit.framework.TestCase.assertTrue;
  */
 public class NQuadsRDFTest {
 
-    final NAR n = NARS.tmp();
+
 
     @Test
     public void test1() throws Exception {
+        final NAR n = NARS.tmp();
         n.log();
         NQuadsRDF.input(n, "<http://example.org/#spiderman> <http://xmlns.com/foaf/0.1/name> \"Человек-паук\"@ru .");
         n.run(1);
@@ -31,7 +34,7 @@ public class NQuadsRDFTest {
     @Ignore
     @Test
     public void testSchema1() throws Exception {
-
+        final NAR n = NARS.tmp();
         File output = new File("/tmp/onto.nal");
         PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512 * 1024));
 
@@ -59,6 +62,7 @@ public class NQuadsRDFTest {
 
         //Param.DEBUG = true;
 
+
         n.run(128);
 
 //        n.index.forEach(c -> {
@@ -70,6 +74,7 @@ public class NQuadsRDFTest {
     @Test
     public void testSchema2() throws Exception {
 
+        final NAR n = NARS.tmp();
 
         Param.DEBUG = true;
         String input = "/home/me/d/finance/money.orig.n3";
@@ -82,6 +87,7 @@ public class NQuadsRDFTest {
                 NQuadsRDF.stream(n, new File(
                     input
                 )).peek(t -> {
+                    t.pri(n.priorityDefault(t.punc()));
                     pout.println(t + ".");
                 })
         );
@@ -91,8 +97,15 @@ public class NQuadsRDFTest {
 //        n.forEachActiveConcept(c -> {
 //            c.print();
 //        });
+//        n.run(512);
 
-        n.run(128);
+        n.concepts().forEach(Concept::print);
+        //n.concept($.the("Buyer")).print();
+
+//        n.input("(I-->Seller).");
+//        n.input("(Them-->Buyer).");
+//        n.input("(?x-->Value)?");
+//        n.run(512);
 
     }
 }
