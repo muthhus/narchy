@@ -65,10 +65,11 @@ public abstract class STMClustered extends TaskService {
          */
 
 
-        public TasksNode(int id) {
+        public TasksNode(int id, int cap) {
 
             super(id, dims);
-            tasks = new PriorityHijackBag<>(capacity.intValue(), 3) {
+            tasks = new PriorityHijackBag<>(cap, 3) {
+
 
                 @Override
                 protected TLink merge(@NotNull STMClustered.TLink existing, @NotNull STMClustered.TLink incoming, @Nullable MutableFloat overflowing) {
@@ -81,6 +82,8 @@ public abstract class STMClustered extends TaskService {
 //                    }
 //                    return existing; //default to the original instance
                 }
+
+
 
                 @Override
                 protected Consumer<TLink> forget(float rate) {
@@ -141,6 +144,7 @@ public abstract class STMClustered extends TaskService {
             tasks.remove(x);
         }
 
+
         public int size() {
             return tasks.size();
         }
@@ -182,8 +186,13 @@ public abstract class STMClustered extends TaskService {
             final int[] subterms = {0};
             final int[] currentVolume = {0};
             return tasks.stream().
-                    //filter(x -> x.get() != null).
-                            collect(Collectors.groupingBy(tx -> {
+                    filter(x -> {
+                        if (x.get().isDeleted()) {
+                            return false;
+                        }
+                        return true;
+                    })
+                    .collect(Collectors.groupingBy(tx -> {
 
                         Task x = tx.get();
                         if (x == null)
@@ -205,9 +214,9 @@ public abstract class STMClustered extends TaskService {
                         return group[0];
                     }))
                     .entrySet().stream()
-                    .filter(c -> c.getKey() >= 0)
+                    .filter(c -> c.getKey() >= 0 && c.getValue().size() > 1) //only batches of >1
                     .map(Map.Entry::getValue)//ignore the -1 discard group
-                    .filter(c -> c.size() > 1); //only batches of >1
+                    .peek(c -> c.forEach(tasks::remove));
 
         }
 

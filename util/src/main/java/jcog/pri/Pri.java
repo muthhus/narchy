@@ -53,18 +53,18 @@ public class Pri implements Priority {
      * @return The current priority
      */
     @Override
-    public final float pri() {
+    public float pri() {
         return pri;
     }
 
 
     /** duplicate of Prioritized's impl, for speed (hopefully) */
-    @Override public final float priElseNeg1() {
+    @Override public float priElseNeg1() {
         float p = pri; //pri() if there are any subclasses they should call pri()
         return p == p ? p : -1;
     }
     /** duplicate of Prioritized's impl, for speed (hopefully) */
-    @Override public final float priElseZero() {
+    @Override public float priElseZero() {
         float p = pri; //pri() if there are any subclasses they should call pri()
         return p == p ? p : 0;
     }

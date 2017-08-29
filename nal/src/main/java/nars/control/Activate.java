@@ -2,6 +2,7 @@ package nars.control;
 
 import jcog.bag.Bag;
 import jcog.pri.PLink;
+import jcog.pri.PLinkUntilDeleted;
 import jcog.pri.PriReference;
 import nars.*;
 import nars.concept.Concept;
@@ -12,10 +13,7 @@ import nars.term.atom.Int;
 import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static java.util.Collections.emptyList;
@@ -100,13 +98,15 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         nar.emotion.conceptFires.increment();
         nar.terms.commit(id); //index cache update
 
-        final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks().commit();//.normalize(0.1f);
-        if (tasklinks.isEmpty()) {
-            //nar.emotion.count("ConceptFire_run_but_zero_taskslinks");
-            return emptyList();
-        }
+        final Bag<Task, PriReference<Task>> tasklinks = id.tasklinks();
+
+
+        tasklinks.commit();
 
         int talSampled = Math.min(tasklinks.size(), TASKLINKS_SAMPLED);
+        if (talSampled == 0)
+            return Collections.emptyList();
+
         List<PriReference<Task>> taskl = $.newArrayList(talSampled);
         tasklinks.sample(talSampled, ((Consumer<PriReference<Task>>) taskl::add));
         if (taskl.isEmpty()) {
@@ -256,7 +256,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
             localSubConcept.tasklinks().putAsync(
-                    new PLink<>(task, tfaEach)
+                    new PLinkUntilDeleted<>(task, tfaEach)
             );
 //                localSubConcept.termlinks().putAsync(
 //                        new PLink(task.term(), tfaEach)
