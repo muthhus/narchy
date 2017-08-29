@@ -168,8 +168,8 @@ abstract public class NAgentX extends NAgent {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.9f);
-        n.goalConfidence(0.8f);
+        n.beliefConfidence(0.75f);
+        n.goalConfidence(0.75f);
 
 
 
@@ -177,18 +177,18 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.25f * priFactor;
-        n.DEFAULT_QUEST_PRIORITY = 0.25f * priFactor;
-        n.termVolumeMax.setValue(24);
+        n.DEFAULT_QUEST_PRIORITY = 0.3f * priFactor;
+        n.termVolumeMax.setValue(28);
 
-        //n.dtDither.setValue(0.5f);
+        //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 4, true, 8f);
+        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 5, true, 10f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
-        //MySTMClustered stmGoal = new MySTMClustered(n, 32, GOAL, 3, false, 2f);
+        MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
         Inperience inp = new Inperience(n, 8, 0.02f);
-        //Abbreviation abb = new Abbreviation(n, "z", 5, 9, 0.01f, 32);
+        Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 32);
 
 
         NAgent a = init.apply(n);

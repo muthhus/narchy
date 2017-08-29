@@ -16,13 +16,13 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentX {
 
     static boolean numeric = true;
-    static boolean cam = false;
+    static boolean cam = true;
 
     public final FloatParam ballSpeed = new FloatParam(1f, 0.1f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 
-    final int visW = 64;
+    final int visW = 24;
     final int visH = 12;
 
     //final int afterlife = 60;
@@ -60,7 +60,7 @@ public class Arkancide extends NAgentX {
 
             return a;
 
-        }, 10);
+        }, 25);
 
 
 //        nar.forEachActiveConcept(c -> {
@@ -97,8 +97,8 @@ public class Arkancide extends NAgentX {
 
         maxPaddleSpeed = 80 * noid.BALL_VELOCITY;
 
-        float resX = 0.02f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
-        float resY = 0.02f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
+        float resX = 0.1f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
+        float resY = 0.1f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
 
         if (cam) {
 
@@ -154,11 +154,13 @@ public class Arkancide extends NAgentX {
 //                   break;
 //               case -1:
 //               case 1:
-                    if (s > 0 && Util.equals(noid.paddle.x, noid.getWidth(), 1f))
-                        return 0f; //edge
-                    if (s < 0 && Util.equals(noid.paddle.x, 0, 1f))
-                        return 0f; //edge
-                   noid.paddle.move( maxPaddleSpeed * s);
+//                    if (s > 0 && Util.equals(noid.paddle.x, noid.getWidth(), 1f))
+//                        return 0f; //edge
+//                    if (s < 0 && Util.equals(noid.paddle.x, 0, 1f))
+//                        return 0f; //edge
+                   if (!noid.paddle.move( maxPaddleSpeed * s)) {
+                       return 0f; //against wall
+                   }
 //                    break;
 //           }
                     return s;

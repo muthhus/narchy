@@ -2,6 +2,7 @@ package nars.rdfowl;
 
 import nars.NAR;
 import nars.NARS;
+import nars.Param;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -16,6 +17,7 @@ import static junit.framework.TestCase.assertTrue;
  * Created by me on 9/13/16.
  */
 public class NQuadsRDFTest {
+
     final NAR n = NARS.tmp();
 
     @Test
@@ -37,10 +39,9 @@ public class NQuadsRDFTest {
                 NQuadsRDF.stream(n, new File(
                         //"/tmp/all-layers.nq"
                         "/home/me/Downloads/nquad"
-                )).map(t -> {
+                )).peek(t -> {
                     pout.println(t.term().toString() + t.punc());
                     //t.budget(0, 0.5f);
-                    return t;
                 })
         );
 
@@ -63,5 +64,35 @@ public class NQuadsRDFTest {
 //        n.index.forEach(c -> {
 //            System.out.println(c);
 //        });
+    }
+
+    @Ignore
+    @Test
+    public void testSchema2() throws Exception {
+
+
+        Param.DEBUG = true;
+        String input = "/home/me/d/finance/money.orig.n3";
+        File output = new File(input + ".nal");
+        PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512 * 1024));
+
+        n.log();
+
+        n.input(
+                NQuadsRDF.stream(n, new File(
+                    input
+                )).peek(t -> {
+                    pout.println(t + ".");
+                })
+        );
+
+        pout.close();
+
+//        n.forEachActiveConcept(c -> {
+//            c.print();
+//        });
+
+        n.run(128);
+
     }
 }

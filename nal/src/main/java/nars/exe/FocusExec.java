@@ -39,8 +39,8 @@ public class FocusExec extends Exec implements Runnable {
 
     public int subCycles = 1;
     final int subCycleConcepts = 1;
-    final int subCyclePremises = subCycleConcepts * 2;
-    final int subCycleTasks = subCyclePremises * 2;
+    final int subCyclePremises = subCycleConcepts * 3;
+    final int subCycleTasks = subCyclePremises * 3;
 
     final int MAX_PREMISES = subCyclePremises * 2;
     final int MAX_TASKS = subCycleTasks * 4;
@@ -138,9 +138,6 @@ public class FocusExec extends Exec implements Runnable {
 
         for (int i = 0; i < subCycles; i++) {
 
-            //tasks.commit(null);
-            //concepts.commit(null); //<- concepts decay on their own
-
             //if (tasks.capacity() <= tasks.size())
 
             final int[] maxTasks = {subCycleTasks};
@@ -149,7 +146,7 @@ public class FocusExec extends Exec implements Runnable {
 //            tasks.print();
 //            System.out.println();
 
-            tasks.sample((x) -> {
+            tasks.commit(null).sample((x) -> {
                 NALTask tt = (NALTask) x;
                 next.add(tt);
                 boolean save =
@@ -163,12 +160,12 @@ public class FocusExec extends Exec implements Runnable {
 
             execute(next);
 
-            concepts.sample(subCycleConcepts, (Predicate<ITask>) (next::add));
+            concepts.commit().sample(subCycleConcepts, (Predicate<ITask>) (next::add));
 
             execute(next);
 
             //execute the next set of premises
-            premises.pop(subCyclePremises, this::execute);
+            premises.commit().pop(subCyclePremises, this::execute);
 
         }
     }

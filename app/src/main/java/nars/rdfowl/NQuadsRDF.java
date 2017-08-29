@@ -57,16 +57,16 @@ public abstract class NQuadsRDF {
 //    );
 
     public static void input(@NotNull NAR nar, String input) {
-        NxParser p  = new NxParser();
+        NxParser p = new NxParser();
         p.parse(Collections.singleton(input));
         input(nar, p);
     }
 
     public static void input(@NotNull NAR nar, @NotNull InputStream input) {
         //try {
-            NxParser p = new NxParser();
-            p.parse(input);
-            input(nar, p);
+        NxParser p = new NxParser();
+        p.parse(input);
+        input(nar, p);
         //}
 //        catch (Exception pe) {
 //            //try turtle parser
@@ -76,7 +76,8 @@ public abstract class NQuadsRDF {
 //        }
     }
 
-    @Deprecated public static void input(@NotNull NAR nar, @NotNull Iterable<Node[]> nxp) {
+    @Deprecated
+    public static void input(@NotNull NAR nar, @NotNull Iterable<Node[]> nxp) {
         input(nar, stream(nxp));
     }
 
@@ -91,8 +92,9 @@ public abstract class NQuadsRDF {
         return stream(p);
     }
 
-    @Deprecated public static void input(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
-        nar.input(  stream(nar, nxp) );
+    @Deprecated
+    public static void input(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
+        nar.input(stream(nar, nxp));
     }
 
 
@@ -102,27 +104,25 @@ public abstract class NQuadsRDF {
 
     public static Stream<Task> stream(@NotNull NAR nar, @NotNull Stream<Node[]> nxp) {
 
-        return nxp.map( (Node[] nx) -> {
+        return nxp.map((Node[] nx) -> {
             if (nx.length >= 3) {
                 //return inputRaw(
 
-                    return inputNALlike(
-                            nar,
-                            resource(nx[0]),
-                            resource(nx[1]),
-                            resource(nx[2])
-                    );
+                return inputNALlike(
+                        nar,
+                        resource(nx[0]),
+                        resource(nx[1]),
+                        resource(nx[2])
+                );
 
             }
             return null;
-        } ).filter(Objects::nonNull);
+        }).filter(Objects::nonNull);
     }
 
 //    public static void input(NAR nar, File input) throws Exception {
 //        input(nar, new Scanner(input));
 //    }
-
-
 
 
 //    /**
@@ -197,25 +197,24 @@ public abstract class NQuadsRDF {
     public static Atomic resource(@NotNull Node n) {
         String s = n.getLabel();
         //if (s.startsWith("<") && s.endsWith(">")) {
-            //s = s.substring(1, s.length() - 1);
+        //s = s.substring(1, s.length() - 1);
 
-            if (s.contains("#")) {
-                String[] a = s.split("#");
-                //String p = a[0]; //TODO handle the namespace
-                s = a[1];
-            }
-            else {
-                String[] a = s.split("/");
-                if (a.length == 0) return null;
-                s = a[a.length - 1];
-            }
+        if (s.contains("#")) {
+            String[] a = s.split("#");
+            //String p = a[0]; //TODO handle the namespace
+            s = a[1];
+        } else {
+            String[] a = s.split("/");
+            if (a.length == 0) return null;
+            s = a[a.length - 1];
+        }
 
-            if (s.isEmpty()) return null;
+        if (s.isEmpty()) return null;
 
-            return Atomic.the(s);
+        return Atomic.the(s);
         //}
         //else
-          //  return null;
+        //  return null;
     }
 //    public static Term resourceOrValue(String s) {
 //        Atom a = resource(s);
@@ -235,11 +234,13 @@ public abstract class NQuadsRDF {
 
     public static Term atom(@NotNull String uri) {
         int lastSlash = uri.lastIndexOf('/');
-        if (lastSlash!=-1)
+        if (lastSlash != -1)
             uri = uri.substring(lastSlash + 1);
 
-        switch(uri) {
-            case "owl#Thing": uri = "thing"; break;
+        switch (uri) {
+            case "owl#Thing":
+                uri = "thing";
+                break;
         }
 
         //return Atom.the(Utf8.toUtf8(name));
@@ -291,7 +292,11 @@ public abstract class NQuadsRDF {
     static final Atomic range = Atomic.the("range");
     static final Atomic sameAs = Atomic.the("sameAs");
     static final Atomic differentFrom = Atomic.the("differentFrom");
+
     static final Atomic dataTypeProperty = Atomic.the("DatatypeProperty");
+    static final Atomic objProperty = Atomic.the("ObjectProperty");
+    static final Atomic funcProp = Atomic.the("FunctionalProperty");
+    static final Atomic invFuncProp = Atomic.the("InverseFunctionalProperty");
 
 
     @Nullable
@@ -310,8 +315,8 @@ public abstract class NQuadsRDF {
     }};
 
     public static Task inputRaw(@NotNull NAR nar,
-                             @Nullable Atom subject,
-                             @NotNull Atom predicate, @NotNull Term object) {
+                                @Nullable Atom subject,
+                                @NotNull Atom predicate, @NotNull Term object) {
 
         if (subject == null)
             return null;
@@ -326,117 +331,128 @@ public abstract class NQuadsRDF {
             Task t = new TaskBuilder(term, BELIEF, $.t(1f, nar.confDefault(BELIEF))).apply(nar);
             return t;
         } catch (Exception e) {
-            logger.error("rdf({}) to task: {}", new Term[] { subject, object, predicate }, e);
+            logger.error("rdf({}) to task: {}", new Term[]{subject, object, predicate}, e);
             return null;
         }
 
     }
 
 
-        /**
-         * Saves the relation into the database. Both entities must exist if the
-         * relation is to be saved. Takes care of updating relation_types as well.
-         *
-         */
+    /**
+     * Saves the relation into the database. Both entities must exist if the
+     * relation is to be saved. Takes care of updating relation_types as well.
+     */
     public static Task inputNALlike(@NotNull NAR nar,
-                              @Nullable Atomic subject,
-                              @Nullable Atomic predicate, @Nullable Term object) {
+                                    @Nullable Atomic subject,
+                                    @Nullable Atomic predicate, @Nullable Term object) {
 
         //http://www.w3.org/TR/owl-ref/
 
         Term belief = null;
 
 
-
         if (predicatesIgnored.contains(predicate))
             return null;
 
-        if (predicate.equals(type) ||predicate.equals(subClassOf)||predicate.equals(subPropertyOf)) {
+        if (predicate.equals(type) || predicate.equals(subClassOf) || predicate.equals(subPropertyOf)) {
             if (object.equals(owlClass)) {
-                return null;
+                belief = $.inst($.varDep(1), subject); //some instance of the type
             }
 
             //if (!includeDataType) {
-                if (object.equals(dataTypeProperty)) {
-                    return null;
-                }
-            //}
+            else if (object.equals(dataTypeProperty) ||
+                    object.equals(funcProp) ||
+                    object.equals(invFuncProp) ||
+                    object.equals(objProperty)
+                    ) {
+                return null;
+            } else {
+                //}
 
-            belief = inh(subject, object);
+                belief = inh(subject, object);
+            }
 
         } else if ((predicate.equals(parentOf))) {
             //.. parentOf is probably redundant
-        }
-        else if (predicate.equals(equivalentClass)) {
+            //System.out.println(subject + " " + predicate + " " + object);
+        } else if (predicate.equals(equivalentClass)) {
 
             belief = equi(
-                inh(varIndep("subj"), subject),
-                inh(varIndep("pred"), object)
+                    inh(varIndep("subj"), subject),
+                    inh(varIndep("pred"), object)
             );
         } else if (predicate.equals(isPartOf)) {
-            belief = $.instprop( subject, object );
+            belief = $.instprop(subject, object);
         } else if (predicate.equals(sameAs)) {
             belief = sim(subject, object);
-        }
-        else if (predicate.equals(differentFrom)) {
+        } else if (predicate.equals(differentFrom)) {
             belief = sim(subject, object).neg();
-        }
-        else if (predicate.equals(domain)) {
+        } else if (predicate.equals(domain)) {
             // PROPERTY domain CLASS
             //<PROPERTY($subj, $obj) ==> <$subj -{- CLASS>>.
 
 
-            Term b = inh(varIndep("subj"), object);
-            belief = conj(subjObjInh(subject, '$', '#', false),b);
-        }
-        else if (predicate.equals(range)) {
+            //Term b = inh(varIndep("subj"), object);
+            //belief = conj(subjObjInh(subject, '$', '#', false),b);
+
+
+            belief = $.impl(
+                    $.func(subject, $.varIndep(1), $.varDep(2)),
+                    $.inh($.varIndep(1), object)
+            );
+
+        } else if (predicate.equals(range)) {
+            belief = $.impl(
+                    $.func(subject, $.varDep(2), $.varIndep(1)),
+                    $.inh($.varIndep(1), object)
+            );
             // PROPERTY range CLASS
             //<PROPERTY($subj, $obj) ==> <$obj -{- CLASS>>.
 
-            Term b = inh(varIndep("obj"), object);
-            belief = conj(subjObjInh(subject, '#', '$', false),b);
+            //Term b = inh(varIndep("obj"), object);
+            //belief = conj(subjObjInh(subject, '#', '$', false),b);
 
 //            belief = nar.term(
 //                    //"<" + subject + "($subj,$obj) ==> <$obj -{- " + object + ">>"
 //                    "(" + subject + "($subj,$obj) && <$obj -{- " + object + ">)"
 //            );
 
-        }
-        else if (predicate.equals(equivalentProperty)) {
+        } else if (predicate.equals(equivalentProperty)) {
 
             belief = sim(subject, object);
-        }
-        else if (predicate.equals(inverseOf)) {
+        } else if (predicate.equals(inverseOf)) {
 
             //PREDSUBJ(#subj, #obj) <=> PREDOBJ(#obj, #subj)
             belief = equi(
                     subjObjInh(subject, '$', '$', false),
                     subjObjInh(object, '$', '$', true));
 
-        }
-        else if (predicate.equals(disjointWith)) {
+        } else if (predicate.equals(disjointWith)) {
             //System.out.println(subject + " " + predicate + " " + object);
 
+            belief = $.inh($.varDep(1),
+                    $.secti(subject, object)
+            ).neg();
+
             //disjoint classes have no common instances:
-            // (--, (&&, {#x} --> subject, {#x} --> object ) ).
-            Term x = varDep(1);
-            belief = conj(new Term[]{inh(x, subject), inh(x, object)}).neg();
+            //TODO
+
         } else {
-            if (subject!=null && object!=null && predicate!=null) {
+            if (subject != null && object != null && predicate != null) {
                 belief =
-                    //inst
-                    inh
-                        (
-                        p(subject, object),
-                        predicate
-                );
+                        //inst
+                        inh(
+                                p(subject, object),
+                                predicate
+                        );
             }
         }
 
         if (belief instanceof Compound) {
             //System.out.println(subject + " " + predicate + " " + object + " :: " + belief);
 
-            return new TaskBuilder(belief, BELIEF, $.t(1f, nar.confDefault(BELIEF)))
+            return new TaskBuilder(belief, BELIEF,
+                    $.t(1f, nar.confDefault(BELIEF)))
                     .eternal().apply(nar);
         }
 
@@ -444,11 +460,12 @@ public abstract class NQuadsRDF {
     }
 
     public static Term equi(@Nullable Term subj, @Nullable Term pred) {
-        return $.conj(new Term[] { impl(subj,pred), impl(pred,subj) });
+        return $.conj(new Term[]{impl(subj, pred), impl(pred, subj)});
     }
 
 
     // ======== String manipulation methods ========
+
     /**
      * Format the XML tag. Takes as input the QName of the tag, and formats it
      * to a namespace:tagname format.
@@ -490,7 +507,8 @@ public abstract class NQuadsRDF {
 
     final static Logger logger = LoggerFactory.getLogger(NQuadsRDF.class);
 
-    @Deprecated public static void input(NAR n, File f) throws FileNotFoundException {
+    @Deprecated
+    public static void input(NAR n, File f) throws FileNotFoundException {
         logger.info("loading {}", f);
         input(n, new BufferedInputStream(new FileInputStream(f)));
 

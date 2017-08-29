@@ -1,5 +1,7 @@
 package nars.experiment.arkanoid;
 
+import jcog.Util;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -115,10 +117,12 @@ public class Arkanoid extends JFrame implements KeyListener {
 		}
 
 		/** returns percent of movement accomplished */
-		public void move(float dx) {
+		public boolean move(float dx) {
+			float px = x;
 			x += dx;
 			x = Math.max(x, sizeX);
 			x = Math.min(x, SCREEN_WIDTH - sizeX);
+			return !Util.equals(px, x, 1f);
 		}
 
 		void update() {
