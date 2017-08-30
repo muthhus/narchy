@@ -168,7 +168,7 @@ abstract public class NAgentX extends NAgent {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.75f);
+        n.beliefConfidence(0.9f);
         n.goalConfidence(0.75f);
 
 

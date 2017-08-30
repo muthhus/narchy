@@ -273,7 +273,7 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default boolean unify(@NotNull Term ty, @NotNull Unify subst) {
 
-        if (equals(ty))
+        if (Term.super.unify(ty, subst))
             return true;
 
         if (ty instanceof AliasConcept.AliasAtom) {

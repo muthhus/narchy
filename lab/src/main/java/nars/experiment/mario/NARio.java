@@ -49,10 +49,10 @@ public class NARio extends NAgentX {
 
         PixelBag cc = PixelBag.of(() -> mario.image, 36, 28);
         cc.addActions($.the("nario"), this, false, false, true);
-        cc.actions.forEach(a -> a.resolution.setValue(0.2f));
+        cc.actions.forEach(a -> a.resolution.setValue(0.25f));
         cc.setClarity(0.8f, 0.95f);
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
-        sc.resolution(0.02f);
+        sc.resolution(0.03f);
 
 
 

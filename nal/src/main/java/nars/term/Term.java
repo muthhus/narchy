@@ -41,6 +41,7 @@ import nars.term.subst.Subst;
 import nars.term.subst.Unify;
 import nars.term.transform.CompoundTransform;
 import nars.term.var.AbstractVariable;
+import nars.term.var.Variable;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.list.primitive.ImmutableByteList;
@@ -352,7 +353,10 @@ public interface Term extends Termlike, Comparable<Term> {
      * @return whether unification succeeded
      */
     default boolean unify(/*@NotNull */Term y, Unify u) {
-        return equals(y);
+        if (y instanceof Variable)
+            return y.unify(this, u);
+        else
+            return equals(y);
     }
 
 

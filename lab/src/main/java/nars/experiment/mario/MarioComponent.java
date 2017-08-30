@@ -24,7 +24,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 //        mapScene.startMusic();
 //        mapScene.init();
 
-        startLevel( (int)(Math.random()*50000), 0, LevelGenerator.TYPE_UNDERGROUND);
+        startLevel( (int)(Math.random()*50000), 1, LevelGenerator.TYPE_UNDERGROUND);
     }
 
     private static final long serialVersionUID = 739318775993206607L;
