@@ -1,17 +1,21 @@
 package jake2;
 
+import jake2.client.CL;
 import jake2.client.CL_input;
+import jake2.client.Key;
 import jake2.client.refexport_t;
+import jake2.game.Cmd;
 import jake2.game.PlayerView;
 import jake2.game.edict_t;
+import jake2.qcommon.Cbuf;
 import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
+import nars.video.CameraSensor;
 import nars.video.PixelBag;
-import nars.video.Sensor2D;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -39,6 +43,9 @@ public class Jake2Agent extends NAgentX implements Runnable {
     final ComponentColorModel colorModel = new ComponentColorModel(raster, nBits, false, false, 1, 0);
 
     final Supplier<BufferedImage> screenshotter = () -> {
+        if (seen == null || width == 0 || height == 0)
+            return null;
+
         byte[] bb = seen.array();
 
         WritableRaster raster1 = Raster.createInterleavedRaster(
@@ -48,7 +55,7 @@ public class Jake2Agent extends NAgentX implements Runnable {
         return b;
     };
 
-    public static class PlayerData {
+    public class PlayerData {
         public float health;
         public float velX;
         public float velY;
@@ -60,9 +67,17 @@ public class Jake2Agent extends NAgentX implements Runnable {
 
         protected void update() {
             edict_t p = PlayerView.current_player;
-            if (p==null) return;
+            if (p == null) return;
+            if (p.deadflag > 0) {
+                //Cmd.ExecuteString("map " + nextMap());
+                //Cmd.ExecuteString("begin");
+                jake2.client.Menu.Event(Key.K_ENTER, true, 0);
+                return;
+            }
 
             health = p.health;
+
+
             weaponState = p.client.weaponstate;
 
             frags = p.client.ps.stats[STAT_FRAGS];
@@ -74,17 +89,28 @@ public class Jake2Agent extends NAgentX implements Runnable {
             velX = v[0];
             velY = v[1];
             velZ = v[2];
-            speed = (float) Math.sqrt(velX*velX+velY*velY+velZ*velZ );
+            speed = (float) Math.sqrt(velX * velX + velY * velY + velZ * velZ);
 
         }
+
+
     }
+
+    protected String nextMap() {
+        return "demo2";
+    }
+
     final PlayerData player = new PlayerData();
 
     public Jake2Agent(NAR nar) throws Narsese.NarseseException {
         super("q", nar);
 
 
-        Sensor2D<PixelBag> qcam = senseCameraRetina("q", screenshotter, 64, 64);
+        CameraSensor<PixelBag> qcam =
+                senseCameraRetina("q", screenshotter, 32, 24);
+        qcam.src.setMinZoomOut(0.5f);
+        qcam.src.setMaxZoomOut(1f);
+        qcam.resolution(0.04f);
         qcam.src.vflip = true;
 
 //        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);
@@ -118,17 +144,24 @@ public class Jake2Agent extends NAgentX implements Runnable {
         new Thread(this).start();
     }
 
+    float state = 0;
+
     @Override
     protected float act() {
 
-
         player.update();
 
-        return player.health * 4f + player.speed/2f + player.frags * 2f;
+        float nextState = player.health * 4f + player.speed / 2f + player.frags * 2f;
+
+        float delta = nextState - state;
+
+        state = nextState;
+
+        return delta;
     }
 
     @Override
-    public void run()  {
+    public void run() {
 
         //http://aq2maps.quadaver.org/
         //https://www.quaddicted.com/reviews/
@@ -137,15 +170,19 @@ public class Jake2Agent extends NAgentX implements Runnable {
         IN.mouse_avail = false;
         Jake2.run(new String[]{
                 "+god",
+                //"+vid_gamma 3",
                 //"+debuggraph",
                 //"+give all",
                 //"+use chaingun",
                 //"+mlook 0", //disable mouse
                 //"+in_initmouse 0",
                 //"+in_mouse 0",
+                "+dmflags 1024", //deathmatch force respawn
                 "+cl_gun 0", //hide gun
                 "+timescale 0.5",
-                "+map base1"
+                //"+timescale 1.5",
+                //"+map base1"
+                "+map " + nextMap()
                 //"+connect .."
         }, this::onDraw);
 
@@ -218,7 +255,6 @@ public class Jake2Agent extends NAgentX implements Runnable {
     }
 
 
-
     public static void main(String[] args) {
         runRT(nar1 -> {
             try {
@@ -227,7 +263,7 @@ public class Jake2Agent extends NAgentX implements Runnable {
                 e.printStackTrace();
                 return null;
             }
-        }, 10);
+        }, 8);
     }
 }
 

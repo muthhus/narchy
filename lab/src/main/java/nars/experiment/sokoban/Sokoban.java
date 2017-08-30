@@ -352,7 +352,7 @@ public class Sokoban extends Applet {
             BufferedImage t = (BufferedImage) (tiles[tile.charAt(i)] = new BufferedImage(16, 16, BufferedImage.TYPE_INT_RGB));
             Graphics g = tiles[tile.charAt(i)].getGraphics();
 
-            float h =  (((float) i) / ((float)(tile.length())));
+            float h =  (((float) i) / ((float)(tile.length()-1)));
 
             g.setColor(Color.getHSBColor(h, 0.8f, 0.8f));
             g.fillRect(0, 0, t.getWidth(), t.getHeight());
@@ -380,21 +380,21 @@ public class Sokoban extends Applet {
         g.fillRect(0, 0, d.width, d.height);
 
         //if (r.x < 72) { // only do this if necessary!
-            g.setFont(fontb);
-            g.setColor(Color.blue);
-            g.drawString("Sokoban", 0, 16);
-            g.setFont(font);
-            g.setColor(Color.GRAY);
-            String[] help = {"h=Left", "j=Down", "k=Up", "l=Right", " (or Arrows)",
-                    "H,J,K,L=", " FastMove", "u=Undo", "A=Restart", "S=Save", "R=Restore",
-                    "+=UpLevel", "-=DownLevel"};
-            for (int i = 0; i < help.length; i++)
-                g.drawString(help[i], 0, 80 + 16 * i);
-            g.setFont(fontb);
-            g.drawString("Level:", 0, 32);
-            g.drawString("Move:", 0, 48);
-            g.drawString("Push:", 0, 64);
-            drawStatus(g);
+            //g.setFont(fontb);
+            //g.setColor(Color.blue);
+            //g.drawString("Sokoban", 0, 16);
+//            g.setFont(font);
+//            g.setColor(Color.GRAY);
+//            String[] help = {"h=Left", "j=Down", "k=Up", "l=Right", " (or Arrows)",
+//                    "H,J,K,L=", " FastMove", "u=Undo", "A=Restart", "S=Save", "R=Restore",
+//                    "+=UpLevel", "-=DownLevel"};
+//            for (int i = 0; i < help.length; i++)
+//                g.drawString(help[i], 0, 80 + 16 * i);
+//            g.setFont(fontb);
+//            g.drawString("Level:", 0, 32);
+//            g.drawString("Move:", 0, 48);
+//            g.drawString("Push:", 0, 64);
+//            drawStatus(g);
         //}
 
         int y = -16 + h, x = -16 + w;
@@ -413,13 +413,13 @@ public class Sokoban extends Applet {
     }
 
     public void drawStatus(Graphics g) {
-        g.setColor(Color.lightGray);
-        g.fillRect(40, 16, 32, 48);
-        g.setColor(Color.black);
-        g.setFont(font);
-        g.drawString("" + (currlevel + 1), 40, 32);
-        g.drawString("" + move, 40, 48);
-        g.drawString("" + push, 40, 64);
+//        g.setColor(Color.lightGray);
+//        g.fillRect(40, 16, 32, 48);
+//        g.setColor(Color.black);
+//        g.setFont(font);
+//        g.drawString("" + (currlevel + 1), 40, 32);
+//        g.drawString("" + move, 40, 48);
+//        g.drawString("" + push, 40, 64);
     }
 
     public void drawMove() {

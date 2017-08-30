@@ -13,17 +13,18 @@ public class GO extends JPanel implements MouseListener{
 
 	ArrayList<int[][]> boardHist = new ArrayList<int[][]>();
 	Color bg = new Color(0xA2,0x64,0x18);
-	static int[][] board = new int[21][21];
+	public static final int DIM = 9;
+	static int[][] board = new int[DIM][DIM];
 	int turn;
 	static int blackP;
 	static int whiteP;
 	
 	{
-		for(int i =0;i<21;i++){
+		for(int i =0;i<DIM;i++){
 		board[i][0]=3;
 		board[0][i]=3;
-		board[20][i]=3;
-		board[i][20]=3;
+		board[DIM-1][i]=3;
+		board[i][DIM-1]=3;
 		}
 		boardHist.add(board);
 	}
@@ -59,8 +60,8 @@ public class GO extends JPanel implements MouseListener{
     g.fillOval(426, 426, 8, 8);
     g.fillOval(270, 426, 8, 8);
     
-    for(int i = 1; i<20; i++){
-    	for(int k =1; k<20;k++){
+    for(int i = 1; i<DIM-1; i++){
+    	for(int k =1; k<DIM-1;k++){
     		if(boardHist.get(turn)[i][k]==1){
     			g.setColor(Color.BLACK);
     			g.fillOval(4 + i*26, 4 + k*26, 20, 20);
@@ -131,12 +132,12 @@ public class GO extends JPanel implements MouseListener{
   }
   public void reset(){
 	  turn = 0;
-	  board = new int[21][21];
-			for(int i =0;i<21;i++){
+	  board = new int[DIM][DIM];
+			for(int i =0;i<DIM;i++){
 			board[i][0]=3;
 			board[0][i]=3;
-			board[20][i]=3;
-			board[i][20]=3;
+			board[DIM-1][i]=3;
+			board[i][DIM-1]=3;
 			}
 	boardHist.clear();
 	boardHist.add(board);
@@ -186,7 +187,7 @@ public void mouseReleased(MouseEvent e ) {
 	x++; y++;
 	System.out.print(turn%2==1?"W ":"B ");
 	System.out.println(x+","+y);
-	board = new int[21][21];
+	board = new int[DIM][DIM];
 	for(int r = 0;r<boardHist.get(turn).length;r++){
 		for(int c = 0;c<boardHist.get(turn).length;c++){
 			board[r][c] = boardHist.get(turn)[r][c];
@@ -194,7 +195,7 @@ public void mouseReleased(MouseEvent e ) {
 	}
 	boolean matches = true;
 
-	if(x>=0&&x<20&&y>=0&&y<20&&board[x][y]==0){
+	if(x>=0&&x<DIM-1&&y>=0&&y<DIM-1&&board[x][y]==0){
 		board[x][y] = 1+turn%2;
 		p = 0;
 		kamikaze = false;
@@ -238,7 +239,7 @@ public void mouseReleased(MouseEvent e ) {
 		}
 		
 		matches = true;
-		for(int i =0;i<21;i++){
+		for(int i =0;i<DIM;i++){
 			if(turn>=3){
 				if(!Arrays.toString(boardHist.get(turn-1)[i]).equals(Arrays.toString(board[i]))){
 					matches = false;
@@ -266,7 +267,7 @@ public void mouseReleased(MouseEvent e ) {
 }
 
 	public static boolean checkSurround(int x, int y, int c){
-		boolean[][] checked = new boolean[21][21];
+		boolean[][] checked = new boolean[DIM][DIM];
 		checked[x][y]=true;
 		if(board[x][y]==c){
 			return( checkSurround(x+1,y,c,checked)&&

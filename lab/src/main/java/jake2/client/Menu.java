@@ -214,7 +214,7 @@ public final class Menu extends Key {
         cls.key_dest = key_menu;
     }
 
-    static void ForceMenuOff() {
+    public static void ForceMenuOff() {
         m_drawfunc = null;
         m_keyfunc = null;
         cls.key_dest = key_game;
