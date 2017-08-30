@@ -9,6 +9,7 @@ import nars.op.Implier;
 import nars.term.atom.Atomic;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
+import nars.video.ShapeSensor;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
     //private final int visionSyncPeriod = 4; //16 * TIME_DILATION;
 
-    private final CameraSensor pixels;
+    private final CameraSensor<Bitmap2D> pixels;
 
 //        public MatrixView vis4 = new MatrixView(tetris_width, tetris_height, (x,y,gl)->{
 //            float r = concept[x][y].goalFreq(now, 0.5f);
@@ -112,8 +113,10 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        });
 
 
-        senseCamera("", pixels = new CameraSensor(Atomic.the("tetris"), this, this));
+        senseCamera("", pixels = new CameraSensor<Bitmap2D>(Atomic.the("tetris"), this, this));
         //pixels.resolution(0.1f);
+
+        //new ShapeSensor(pixels.src, this);
 
         actions(state);
 
