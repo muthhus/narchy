@@ -178,13 +178,13 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 0.25f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 0.3f * priFactor;
-        n.termVolumeMax.setValue(28);
+        n.termVolumeMax.setValue(22);
 
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);
 
         STMLinkage stmLink = new STMLinkage(n, 1, false);
-        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 5, true, 10f);
+        MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 3, true, 10f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
         MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
         Inperience inp = new Inperience(n, 8, 0.02f);
@@ -277,12 +277,12 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-//        new Implier(a.nar,
-//                Iterables.concat(
-//                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
-//                        Collections.singleton(a.happy.term)
-//                )
-//        );
+        new Implier(a.nar,
+                Iterables.concat(
+                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
+                        Collections.singleton(a.happy.term)
+                )
+        );
 
 //        AgentService p = new AgentService.AgentBuilder(
 //                //DQN::new,

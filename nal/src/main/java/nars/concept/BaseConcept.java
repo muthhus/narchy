@@ -120,7 +120,7 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
                     //new UnifiedSet<>(id.volume() /* estimate */);
                     new HashSet(term.volume());
 
-            Activate.templates(tc, term, nar, 1 + Activate.layers(term) );
+            Activate.templates(tc, term, nar, Activate.layers(term) );
 
             if (!tc.isEmpty())
                 return Lists.newArrayList(tc); //store as list for compactness and fast iteration

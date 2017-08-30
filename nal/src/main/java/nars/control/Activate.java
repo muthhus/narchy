@@ -25,7 +25,7 @@ import static nars.Op.INT;
 public class Activate extends UnaryTask<Concept> implements Termed {
 
     static final int TASKLINKS_SAMPLED = 2;
-    static final int TERMLINKS_SAMPLED = 3;
+    static final int TERMLINKS_SAMPLED = 4;
     //private final BiFunction<Task,Term,Premise> premiseBuilder ;
 
 
@@ -401,7 +401,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 return 3;
 
             case IMPL:
-                return 3;
+                return 4;
 
 
 //                int s = host.size();

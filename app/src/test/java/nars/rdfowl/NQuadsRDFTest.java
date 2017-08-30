@@ -115,7 +115,7 @@ public class NQuadsRDFTest {
         n.run(1).input("isReceiverOfObligationValue(I,#1)!");
         n.run(1).input("--isReceiverOfObligationValue(#1,I)!");
         n.run(1).input("$0.99 (I<->?x)?");
-        n.run(512);
+        n.run(2512);
 
     }
 }
