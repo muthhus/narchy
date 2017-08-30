@@ -417,7 +417,7 @@ public class TermTest {
             assertNotNull(b);
             assertEquals(n2a.toString(), b.toString());
             assertEquals(n2a.hashCode(), b.hashCode());
-            assertEquals(n2a, b);
+            assertEquals(n2a.term(), b);
         }
 
     }
