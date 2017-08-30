@@ -76,22 +76,23 @@ public class NQuadsRDFTest {
         final NAR n = NARS.tmp();
 
         Param.DEBUG = true;
-        String input = "/home/me/d/finance/money.orig.n3";
-        File output = new File(input + ".nal");
-        PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512 * 1024));
 
+        for (String input : new String[] { "/home/me/d/finance/money.orig.n3", "/home/me/d/finance/finance.orig.n3" } ) {
+            File output = new File(input + ".nal");
+            PrintStream pout = new PrintStream(new BufferedOutputStream(new FileOutputStream(output), 512 * 1024));
 
-        NQuadsRDF.stream(n, new File(
-                input
-        )).peek(t -> {
-            t.pri(n.priorityDefault(t.punc())/10f);
-            pout.println(t + ".");
-        }).forEach(x -> {
-            n.input(x);
-            n.run(1); //allow process
-        });
+            NQuadsRDF.stream(n, new File(
+                    input
+            )).peek(t -> {
+                t.pri(n.priorityDefault(t.punc()) / 10f);
+                pout.println(t + ".");
+            }).forEach(x -> {
+                n.input(x);
+                n.run(1); //allow process
+            });
 
-        pout.close();
+            pout.close();
+        }
 
 //        n.forEachActiveConcept(c -> {
 //            c.print();
@@ -103,18 +104,17 @@ public class NQuadsRDFTest {
 
         n.clear();
         n.log();
-        n.input("({I}-->Seller).");
-        n.run(1);
-        n.input("({Them}-->Buyer)!");
-        n.run(1);
-        n.input("isReceiverOfPhysicalValue(I,#1)!");
-        n.input("--isReceiverOfPhysicalValue(Them,#1)!");
-        n.run(1);
-        n.input("isReceiverOfObligationValue(I,#1)!");
-        n.input("--isReceiverOfObligationValue(Them,#1)!");
-        n.run(1);
-        n.input("$0.99 (I<->?x)?");
-        n.input("$0.99 (Them<->?x)?");
+        n.run(1).input("({I}-->PhysicalPerson).");
+        n.run(1).input("({I}-->Seller).");
+        n.run(1).input("({I}-->ExternalRisk).");
+        n.run(1).input("({I}-->Service).");
+        n.run(1).input("({I}-->FinancialInstrument).");
+        n.run(1).input("({I}-->NonResidentCapitalOwner)!");
+        n.run(1).input("isReceiverOfPhysicalValue(I,#1)!");
+        n.run(1).input("--isReceiverOfPhysicalValue(#1,I)!");
+        n.run(1).input("isReceiverOfObligationValue(I,#1)!");
+        n.run(1).input("--isReceiverOfObligationValue(#1,I)!");
+        n.run(1).input("$0.99 (I<->?x)?");
         n.run(512);
 
     }

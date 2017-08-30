@@ -154,6 +154,7 @@ public interface Atomic extends Term {
                 (t.charAt(len - 1) == '\"'))
             return false; //already quoted
 
+
         for (int i = 0; i < len; i++) {
             char c = t.charAt(i);
             if (!Narsese.isValidAtomChar(c))

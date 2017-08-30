@@ -215,11 +215,11 @@ public class FocusExec extends Exec implements Runnable {
     @Override
     public void add(@NotNull ITask x) {
         if (x instanceof Task) {
-            if (x.isInput())
+            if (x.isInput()) {
                 execute(x); //execute immediately
-            else
+            } else {
                 tasks.putAsync((Task) x); //buffer
-
+            }
         } else if (x instanceof Premise) {
 
             premises.putAsync((Premise)x);

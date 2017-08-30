@@ -211,7 +211,12 @@ public abstract class NQuadsRDF {
 
         if (s.isEmpty()) return null;
 
-        return Atomic.the(s);
+        try {
+            return Atomic.the(s);
+        } catch (Exception e) {
+            return $.quote(s); //HACK
+        }
+
         //}
         //else
         //  return null;
