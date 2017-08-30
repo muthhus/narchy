@@ -152,6 +152,7 @@
     ((&&,A..+) ==> C), M, neqRCom(C,M), notImpl(M) |- (((&&,A..+) &&+- M) ==>+- C), (Belief:Induction)
 
     ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (B ==>+- M), (Belief:Induction)
+    ((&&,M,A..+) ==> C), ((&&,B,A..+) ==> C) |- (M ==>+- B), (Belief:Induction)
 
 
 

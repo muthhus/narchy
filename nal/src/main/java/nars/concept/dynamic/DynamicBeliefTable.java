@@ -132,8 +132,13 @@ public class DynamicBeliefTable extends DefaultBeliefTable {
 
         //choose higher confidence
         int dur = nar.dur();
-        float xc = x.evi(start, end, dur);
-        float yc = y.evi(start, end, dur);
+        float xc =
+                //x.evi(start, end, dur);
+                x.evi(); //use absolute evidence for its own time, not coercively projected to the specified time
+        float yc =
+                //y.evi(start, end, dur);
+                y.evi(); //use absolute evidence for its own time, not coercively projected to the specified time
+
         //if (!Util.equals(xc, yc, TRUTH_EPSILON)) {
         return xc >= yc ? x : y;
         //}

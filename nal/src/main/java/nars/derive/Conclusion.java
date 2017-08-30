@@ -121,10 +121,10 @@ public class Conclusion extends AbstractPred<Derivation> {
             try {
                 occ = new long[]{ETERNAL, ETERNAL};
                 t1 = solveTime(d, c1, occ, eviGain);
-//                if (t1!=null && occ[0] <= 0) {
+//                if (t1!=null && occ[0] == 7) {
 //                    //FOR A SPECIFIC TEST TEMPORAR
 //                    System.err.println("wtf");
-//                    new Temporalize(d.random).solve(d, c1, new long[]{ETERNAL, ETERNAL}, eviGain);
+//                    solveTime(d, c1, occ, eviGain);
 //                }
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {

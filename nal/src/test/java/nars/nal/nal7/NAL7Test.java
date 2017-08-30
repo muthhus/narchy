@@ -147,6 +147,23 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
+    @Test public void testDropAnyEventSimple() {
+        /*
+          instability:
+            $0.0 (c). 7 %1.0;.73% {89: 2;3;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
+                $.18 ((b) &&+3 (c)). 2⋈5 %1.0;.81% {11: 2;3} ((%1,%2,task("."),time(raw),time(dtEvents),notImpl(%1),notImpl(%2)),((polarize(%2,belief) &&+- polarize(%1,task)),((IntersectionDepolarized-->Belief))))
+                  $.50 (b). 2 %1.0;.90% {2: 2}
+                  $.50 (c). 5 %1.0;.90% {5: 3}
+         */
+       test
+            .log()
+            .inputAt(1, "(a). :|:") //try to ignore this
+            .inputAt(2, "(b). :|:")
+            .inputAt(5, "(c). :|:")
+            .mustBelieve(cycles, "((b) &&+3 (c))", 1.00f, 0.81f, 2, 5)
+            .mustNotOutput(cycles, "(c)", BELIEF, 7)
+        ;
+    }
     @Test
     public void updating_and_revision() {
         testTemporalRevision(10, 0.50f, 0.7f, "<(John,key) --> hold>");
