@@ -77,7 +77,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
                 .input(new NALTask($.$("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
-                .mustDesire(cycles, "(a-->c)", 1f, 0.4f, 10, 20)
+                .mustDesire(cycles, "(a-->c)", 1f, 0.4f, (x) -> (x >= 10 && x <= 20))
         ;
 
     }

@@ -1262,7 +1262,8 @@ public enum Op implements $ {
     final static int EVENT_DELIMETER_OP = Op.or(Op.PROD, Op.CONJ);
     public static final Predicate<Term> recursiveCommonalityDelimeter =
             c -> c.op().in(EVENT_DELIMETER_OP);
-            //c -> c.op().temporal; //!c.op().in(EVENT_DELIMETER_OP);
+    public static final Predicate<Term> nonEventDelimeter =
+            c -> !c.op().temporal;
 
     private static final int InvalidImplicationSubj = or(IMPL);
     //private static final int InvalidImplicationPred = or(EQUI);
@@ -1370,8 +1371,8 @@ public enum Op implements $ {
             //first layer only, not recursively
             if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
                     (subject.equals(predicate) ||
-                        subject.containsRecursively(predicate, recursiveCommonalityDelimeter) ||
-                        predicate.containsRecursively(subject, recursiveCommonalityDelimeter)))
+                        subject.containsRecursively(predicate, nonEventDelimeter) ||
+                        predicate.containsRecursively(subject, nonEventDelimeter)))
                 //(!(su instanceof Variable) && predicate.contains(su)))
                 return Null; //cyclic
 

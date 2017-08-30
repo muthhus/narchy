@@ -22,12 +22,19 @@ public abstract class CommonalityConstraint extends MatchConstraint {
     public final boolean invalid(@NotNull Term y, @NotNull Unify f) {
 
         Term x = f.xy(other);
-        if (x == null || x == Null)
+        if (x == null) {
             return false; //not invalid until both are present to be compared
-
-        if (x.equals(y)) {
+        } else if (x.equals(y)) {
             return true;
         } else {
+//            if (!invalid(x,y)) {
+//                if (x.containsRecursively(y) || y.containsRecursively(x)) {
+//                    invalid(x,y);
+//                    System.err.println("wtf");
+//                }
+//                return false;
+//            }
+//            return true;
             return invalid(x, y);
         }
     }
