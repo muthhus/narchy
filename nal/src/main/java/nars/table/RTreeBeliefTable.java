@@ -313,37 +313,39 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         final Task ete = eternal != null ? eternal.strongest() : null;
 
-        int s = size();
-        if (s > 0) {
+        if (start!=ETERNAL) {
+            int s = size();
+            if (s > 0) {
 
-            int dur = nar.dur();
+                int dur = nar.dur();
 
-            FloatFunction<Task> ts = taskStrength(start, end, dur);
-            FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task));
+                FloatFunction<Task> ts = taskStrength(start, end, dur);
+                FloatFunction<TaskRegion> strongestTask = (t -> +ts.floatValueOf(t.task));
 
 
-            TopN<TaskRegion> tt = scan(
-                    new TopN<TaskRegion>(new TaskRegion[Math.min(s, TRUTHPOLATED_MAX)], strongestTask),
-                    start, end, 1);
-            if (!tt.isEmpty()) {
+                TopN<TaskRegion> tt = scan(
+                        new TopN<TaskRegion>(new TaskRegion[Math.min(s, TRUTHPOLATED_MAX)], strongestTask),
+                        start, end, 1);
+                if (!tt.isEmpty()) {
 
-//                Iterable<? extends Tasked> ii;
-//                if (anyMatchTime) {
-//                    //tt.removeIf((x) -> !x.task().during(when));
-//                    ii = Iterables.filter(tt, (x) -> x.task().during(when));
-//                } else {
-//                    ii = tt;
-//                }
+                    //                Iterable<? extends Tasked> ii;
+                    //                if (anyMatchTime) {
+                    //                    //tt.removeIf((x) -> !x.task().during(when));
+                    //                    ii = Iterables.filter(tt, (x) -> x.task().during(when));
+                    //                } else {
+                    //                    ii = tt;
+                    //                }
 
-                //applying eternal should not influence the scan for temporal so it is left null here
-                return TruthPolation.truth(ete, start, end, dur, tt);
+                    //applying eternal should not influence the scan for temporal so it is left null here
+                    return TruthPolation.truth(ete, start, end, dur, tt);
 
-                //        if (t != null /*&& t.conf() >= confMin*/) {
-                //            return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
-                //        } else {
-                //            return null;
-                //        }
+                    //        if (t != null /*&& t.conf() >= confMin*/) {
+                    //            return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
+                    //        } else {
+                    //            return null;
+                    //        }
 
+                }
             }
         }
 

@@ -93,6 +93,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
         float xFreq = x.freq();
         float xConf = x.conf();
 
+        float factor = 2;
 
         float fThresh = 1f - Math.max(0, Math.min(1f, (Param.SENSOR_FEEDBACK_FREQ_THRESHOLD * nar.truthResolution.floatValue())));
 
@@ -109,14 +110,17 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
             float confidence = y.conf() / xConf; //allow > 1
 
+            short[] cc = y.cause();
+            float v;
             if (coherence > fThresh) {
                 //reward
-                nar.emotion.value(y.cause(), confidence);
+                v = factor * confidence;
             } else {
                 //punish
-                nar.emotion.value(y.cause(), -confidence * (1f - coherence));
+                v = factor * -confidence * (1f - coherence);
                 y.delete();
             }
+            nar.emotion.value(cc, v);
         });
     }
 

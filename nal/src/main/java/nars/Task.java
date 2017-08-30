@@ -202,8 +202,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     }
 
     static long nearestStartOrEnd(long a, long b, long x, long y) {
-        long u = nearestStartOrEnd(a, b, x);
-        long v = nearestStartOrEnd(a, b, y);
+        long u = nearestBetween(a, b, x);
+        long v = nearestBetween(a, b, y);
         if (Math.min(Math.abs(u - a), Math.abs(u - b)) <
                 Math.min(Math.abs(v - a), Math.abs(v - b))) {
             return u;
@@ -212,14 +212,16 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         }
     }
 
-    static long nearestStartOrEnd(long s, long e, long when) {
-        assert (s != ETERNAL);
+    static long nearestBetween(long s, long e, long when) {
+        assert (when != ETERNAL);
 
-        if (e == s) {
+        if (s == ETERNAL) {
+            return when;
+        } else if (e == s) {
             return s; //point
         } else if (when >= s && when <= e) {
             return when; //internal
-        } else if (Math.abs(when - s) <= Math.abs(when - e)) {
+        } else if (when < s) {
             return s; //at or beyond the start
         } else {
             return e; //at or beyond the end
@@ -618,35 +620,24 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     default long nearestTimeBetween(final long x, final long y) {
         long a = this.start();
         if (a == ETERNAL)
-            throw new UnsupportedOperationException();
+            return (x+y)/2; //use midpoint of the two if this task is eternal
 
         long b = this.end();
         if (x == y) {
-            return nearestStartOrEnd(a, b, x);
+            return nearestBetween(a, b, x);
+        } else if (a == b) {
+            return nearestBetween(x, y, a);
+        } else if (x <= a && y >= b) {
+            return (a + b) / 2; //midpoint of this within the range
+        } else if ((x > a) && (y < b)) {
+            return (x + y) / 2; //midpoint of the contained range
         } else {
-            if (a == b) {
-                return nearestStartOrEnd(x, y, a);
-            } else {
-                //HACK there is probably a better way
-
-                if ((x > a) && (y < b)) {
-                    return (x + y) / 2; //midpoint of the contained range
-                } else if (x <= a && y >= b) {
-                    return mid(); //midpoint of this within the range
-                } else {
-                    //overlap or no overlap
-                    return nearestStartOrEnd(a, b, x, y);
-                }
-
-            }
+            return nearestStartOrEnd(a, b, x, y); //overlap or no overlap
         }
     }
 
     default long nearestTimeTo(long when) {
-        long s = start();
-        if (s == ETERNAL)
-            return ETERNAL;
-        return nearestStartOrEnd(s, end(), when);
+        return nearestBetween(start(), end(), when);
     }
 
     @NotNull
@@ -1098,9 +1089,6 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     short[] cause();
 
     default long distanceTo(long when) {
-        long s = this.start();
-        if (s == ETERNAL) return 0;
-        assert (when != ETERNAL);
         return Math.abs(when - nearestTimeTo(when));
     }
 
