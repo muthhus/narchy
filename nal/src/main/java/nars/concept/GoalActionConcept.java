@@ -2,12 +2,8 @@ package nars.concept;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import nars.$;
-import nars.NAR;
-import nars.NAct;
-import nars.Task;
+import nars.*;
 import nars.task.SignalTask;
-import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.truth.Truth;
 import nars.util.signal.Signal;
@@ -77,7 +73,7 @@ public class GoalActionConcept extends ActionConcept {
             if (!t.isBefore(now)) {
                 int dur = n.dur();
 
-                float boost = factor * TruthPolation.evidenceDecay(t.conf() * activation, dur, t.distanceTo(now));
+                float boost = factor * Param.evidenceDecay(t.conf() * activation, dur, t.distanceTo(now));
                 v += boost;
             }
             //allow the boost to apply to D durations ahead, to promote goal prediction

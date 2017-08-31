@@ -1,5 +1,7 @@
 package nars.video;
 
+import jcog.Util;
+
 import java.awt.image.BufferedImage;
 import java.util.function.Supplier;
 
@@ -99,6 +101,26 @@ public class BufferedImageBitmap2D implements Bitmap2D, Supplier<BufferedImage> 
 //            }
 //        }
 //    }
+
+
+    @Override
+    public float brightness(int xx, int yy, float rFactor, float gFactor, float bFactor) {
+        if (out!=null) {
+            rFactor = Util.unitize(rFactor);
+            gFactor = Util.unitize(gFactor);
+            bFactor = Util.unitize(bFactor);
+            float sum = rFactor + gFactor + bFactor;
+            if (sum == 0)
+                return 0;
+
+            int rgb = out.getRGB(xx, yy);
+            float r = rFactor > 0 ? rFactor * decodeRed(rgb) : 0;
+            float g = gFactor > 0 ? gFactor * decodeGreen(rgb) : 0;
+            float b = bFactor > 0 ? bFactor * decodeBlue(rgb) : 0;
+            return (r + g + b) / (sum);
+        }
+        return Float.NaN;
+    }
 
     @Override public float brightness(int xx, int yy) {
         if (out!=null) {

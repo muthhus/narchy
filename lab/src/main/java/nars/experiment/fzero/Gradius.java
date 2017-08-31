@@ -32,9 +32,13 @@ public class Gradius extends NAgentX {
         g.updateMS = 20;
 
         //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
-        CameraSensor<?> c = senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.01f);
+        CameraSensor<?> c1 = senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.01f);
 
-        new ShapeSensor($.p(id, $.the("shape")), new BufferedImageBitmap2D(()->g.image),this);
+//        senseCamera($.p(id, $.the("r")), new Scale(() -> g.image, 4, 4).mode(BufferedImageBitmap2D.ColorMode.R)).resolution(0.1f);
+//        senseCamera($.p(id, $.the("g")), new Scale(() -> g.image, 4, 4).mode(BufferedImageBitmap2D.ColorMode.G)).resolution(0.1f);
+//        senseCamera($.p(id, $.the("b")), new Scale(() -> g.image, 4, 4).mode(BufferedImageBitmap2D.ColorMode.B)).resolution(0.1f);
+
+        //new ShapeSensor($.p(id, $.the("shape")), new BufferedImageBitmap2D(()->g.image),this);
 
         float width = g.getWidth();
         float height = g.getHeight();
@@ -154,7 +158,7 @@ public class Gradius extends NAgentX {
 
             return a;
 
-        }, 10f);
+        }, 20f);
 
     }
 

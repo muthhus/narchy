@@ -1,9 +1,13 @@
 package nars.experiment.fzero;
 
 import jcog.Util;
+import jcog.learn.ql.HaiQAgent;
+import jcog.math.FloatNormalized;
 import nars.*;
 import nars.concept.ScalarConcepts;
+import nars.control.AgentService;
 import nars.gui.Vis;
+import nars.video.CameraSensor;
 import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
@@ -46,9 +50,8 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        senseCamera("fz", new Scale(() -> fz.image, 32, 24)/*.blur()*/)
-        //.resolution(0.01f)
-        ;
+        CameraSensor<Scale> c = senseCamera("fz", new Scale(() -> fz.image, 32, 24)/*.blur()*/);//.resolution(0.01f)
+                ;
 
 //        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
 //        cc.addActions($.the("fz"), this, false, false, true);
@@ -94,6 +97,25 @@ public class FZero extends NAgentX {
 
         //nar.mix.stream("Derive").setValue(1);
 
+        AgentService p = new AgentService.AgentBuilder(
+                //DQN::new,
+                HaiQAgent::new,
+                //() -> Util.tanhFast(a.dexterity())) //reward function
+                () -> dexterity() * Util.tanhFast( reward) /* - lag */ ) //reward function
+
+                .in(this::dexterity)
+                .in(new FloatNormalized(()->reward).decay(0.9f))
+                .in(new FloatNormalized(
+                        ((Emotivation) nar.emotion).cycleDTRealMean::getValue)
+                            .decay(0.9f)
+                ).in(new FloatNormalized(
+                        () -> nar.emotion.busyVol.getSum()
+                    ).decay(0.9f)
+                ).out(
+                        new StepController((x) -> c.in.amplitude(x), 0, 0.25f, 0.5f, 0.75f, 1f)
+                ).out(
+                        new StepController((x) -> ang.in.amplitude(x), 0, 0.25f, 0.5f, 0.75f, 1f)
+                ).get(nar);
 
 
 //        try {

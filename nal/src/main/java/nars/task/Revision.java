@@ -11,10 +11,7 @@ import nars.control.Cause;
 import nars.control.Derivation;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import nars.truth.PreciseTruth;
-import nars.truth.Stamp;
-import nars.truth.Truth;
-import nars.truth.Truthed;
+import nars.truth.*;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -286,18 +283,17 @@ public class Revision {
         //float bb = be * (1 + bi.length());
         //float p = aa / (aa + bb);
 
+        float factor = 1f;
 //            //relate high frequency difference with low confidence
-//            float freqDiscount =
-//                    (1f - 0.5f * Math.abs(a.freq() - b.freq()));
-//
+        float freqDiscount =
+                0.5f + 0.5f * TruthFunctions.freqSimilarity(a.freq(), b.freq());
+        factor *= freqDiscount; if (factor < Prioritized.EPSILON) return null;
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
         float overlap = Stamp.overlapFraction(a.stamp(), b.stamp());
         float stampDiscount = 1f - overlap;
-        float factor = stampDiscount;
-        if (factor < Prioritized.EPSILON)
-            return null;
+        factor *= stampDiscount; if (factor < Prioritized.EPSILON) return null;
 
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
 //            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);

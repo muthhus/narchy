@@ -2,6 +2,8 @@ package nars.video;
 
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
+import boofcv.alg.filter.binary.ThresholdImageOps;
+import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.shapes.ShapeFittingOps;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImagePanel;
@@ -45,6 +47,10 @@ public class ShapeSensor implements Runnable {
 
     static ImagePanel  gui = debug ? new ImagePanel(400,200) : null;
 
+    private float R = 1f;
+    private float G = 1f;
+    private float B = 1f;
+
     public ShapeSensor(Term id, Bitmap2D input, NAgent a) {
         this.id = id;
         this.input = input;
@@ -56,6 +62,16 @@ public class ShapeSensor implements Runnable {
 
         in = a.nar.newCauseChannel(this);
         this.nar = a.nar;
+
+//        a.actionUnipolar($.p(id, $.the("R")), (v) -> {
+//           return R = v;
+//        });
+//        a.actionUnipolar($.p(id, $.the("G")), (v) -> {
+//           return G = v;
+//        });
+//        a.actionUnipolar($.p(id, $.the("B")), (v) -> {
+//           return B = v;
+//        });
         a.onFrame(this);
     }
 
@@ -97,7 +113,7 @@ public class ShapeSensor implements Runnable {
         int h = img.height;
         for (int x = 0; x < w; x++) {
             for (int y = 0; y < h; y++) {
-                img.set(x, y, Math.round(256f * input.brightness(x, y)));
+                img.set(x, y, Math.round(256f * input.brightness(x, y, R, G, B)));
             }
         }
 
@@ -111,15 +127,15 @@ public class ShapeSensor implements Runnable {
         }
 
         // the mean pixel value is often a reasonable threshold when creating a binary image
-        //int mean = (int) ImageStatistics.mean(img);
+        int mean = (int) ImageStatistics.mean(img);
 
         // create a binary image by thresholding
-        //ThresholdImageOps.threshold(img, img,  mean, true);
+        ThresholdImageOps.threshold(img, img,  mean, true);
 
         // reduce noise with some filtering
         GrayU8 filtered = img;
         //for (int i = 0; i < 2; i++) {
-            filtered = BinaryImageOps.dilate8(filtered, 2, null);
+            filtered = BinaryImageOps.dilate8(filtered, 1, null);
             filtered = BinaryImageOps.erode8(filtered, 1, null);
         //}
 
@@ -147,7 +163,7 @@ public class ShapeSensor implements Runnable {
             if (debug) {
                 g2.setColor(Color.getHSBColor(c.id/10f, 0.8f, 0.8f));
                 VisualizeShapes.drawPolygon(p,true,g2);
-                System.out.println(c + ": " + polygon);
+                //System.out.println(c + ": " + polygon);
             }
 
             input(k++, p, w, h);

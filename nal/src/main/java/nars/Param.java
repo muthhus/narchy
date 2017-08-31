@@ -6,6 +6,8 @@ import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.pri.op.PriMerge;
 import jcog.util.FloatFloatToFloatFunction;
+import nars.task.Tasked;
+import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.term.atom.Atom;
 import nars.truth.PreciseTruth;
@@ -17,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadLocalRandom;
 
 import static nars.Op.*;
 
@@ -284,6 +287,55 @@ public abstract class Param extends Services<Term,NAR> {
      * values of 1 means no budget is transferred
      */
     public final FloatParam momentum = new FloatParam(0.5f, 0, 1f);
+
+    /**
+     * dt > 0
+     */
+    public static float evidenceDecay(float evi, float dur, long dt) {
+
+        //hard linear with half duration on either side of the task -> sum to 1.0 duration
+//        float scale = dt / dur;
+//        if (scale > 0.5f) return 0;
+//        else return evi * (1f - scale*2f);
+
+
+        //return evi / (1 + ((float) Math.log(1+dt/dur))); //inverse log
+
+        //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
+
+        return evi / (1 + ( dt / dur) ); //inverse linear
+
+        //return evi / ( 1f + (dt*dt)/dur ); //inverse square
+
+        //return evi /( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
+
+
+        //return evi / (1f + dt / dur ); //first order decay
+        //return evi / (1f + (dt*dt) / (dur*dur) ); //2nd order decay
+
+    }
+
+    @Nullable
+    public static PreciseTruth truth(@Nullable Task topEternal, long start, long end, int dur, @NotNull Iterable<? extends Tasked> tasks) {
+
+        assert (dur > 0);
+
+        TruthPolation t =
+                new TruthPolation.TruthPolationBasic(start, end, dur);
+                //new TruthPolation.TruthPolationGreedy(start, end, dur);
+                //..SoftMax..
+                //new TruthPolation.TruthPolationRoulette(start, end, dur, ThreadLocalRandom.current());
+                //new TruthPolationWithVariance(when, dur);
+
+        // Contribution of each task's truth
+        // use forEach instance of the iterator(), since HijackBag forEach should be cheaper
+        tasks.forEach(t);
+        if (topEternal != null) {
+            t.accept(topEternal);
+        }
+
+        return t.truth();
+    }
 
 
     public float confDefault(byte punctuation) {

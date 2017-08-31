@@ -11,6 +11,7 @@ import nars.Param;
 import nars.gui.Vis;
 import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
+import nars.truth.PreciseTruth;
 import spacegraph.layout.Grid;
 import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meter.Plot2D;
@@ -18,6 +19,7 @@ import spacegraph.widget.meter.Plot2D;
 import java.util.List;
 
 import static java.lang.Math.PI;
+import static jcog.Texts.n4;
 import static nars.Op.IMPL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.VERTICAL;
@@ -56,16 +58,28 @@ public class Line1DCalibrate {
 
             final int runtime = Math.round(periods / tHz);
 
-//            n.onTask(t -> {
-//               if (t instanceof DerivedTask) {
-//                   if (t.isGoal()) {
-//                       System.out.println(t.proof());
-//                       System.out.println();
-//                   } else {
-//                       System.err.println(t.toString(n));
-//                   }
-//               }
-//            });
+            n.onTask(t -> {
+               if (t instanceof DerivedTask) {
+                   if (t.isGoal()) {
+                       if (t.term().equals(a.out.term())) {
+
+                           float dir = new PreciseTruth(t.freq(), t.evi(a.nar.time(), a.nar.dur()), false).expectation() - 0.5f;
+
+                           //TEST POLARITY
+                           float i = a.i.floatValue();
+                           float o = a.o.floatValue();
+                           float neededDir = (i - o);
+                           boolean good = Math.signum(neededDir) == Math.signum(dir);
+                           System.err.println(n4(dir) + "\t" + good + " " + i + " <-? " + o + " .. " + dir);
+                           System.err.println(t.proof());
+                       }
+
+                       System.out.println();
+                   } else {
+                       //System.err.println(t.toString(n));
+                   }
+               }
+            });
 
             a.speed.setValue(yResolution);
 
@@ -131,11 +145,11 @@ public class Line1DCalibrate {
 
             //n.startFPS(100);
             n.run(2000);
-            n.tasks().forEach(x -> {
-               if (x.isBelief() && x.op()==IMPL) {
-                   System.out.println(x.proof());
-               }
-            });
+//            n.tasks().forEach(x -> {
+//               if (x.isBelief() && x.op()==IMPL) {
+//                   System.out.println(x.proof());
+//               }
+//            });
 
 
         }

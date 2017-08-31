@@ -8,6 +8,7 @@ import jcog.tree.rtree.*;
 import jcog.util.Top;
 import jcog.util.Top2;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.control.Activate;
@@ -337,7 +338,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     //                }
 
                     //applying eternal should not influence the scan for temporal so it is left null here
-                    return TruthPolation.truth(ete, start, end, dur, tt);
+                    return Param.truth(ete, start, end, dur, tt);
 
                     //        if (t != null /*&& t.conf() >= confMin*/) {
                     //            return t.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);

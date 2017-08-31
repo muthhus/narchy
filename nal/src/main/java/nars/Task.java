@@ -419,7 +419,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //                        cw;
 
                 assert (dur > 0);
-                cw = TruthPolation.evidenceDecay(cw, durAdjusted, dist); //decay
+                cw = Param.evidenceDecay(cw, durAdjusted, dist); //decay
                 //cw = 0; //immediate cut-off
 
 

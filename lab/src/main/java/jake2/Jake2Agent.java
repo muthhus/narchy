@@ -11,11 +11,11 @@ import jake2.qcommon.Cbuf;
 import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
+import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.video.CameraSensor;
-import nars.video.PixelBag;
+import nars.video.*;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -25,6 +25,7 @@ import java.util.function.Supplier;
 
 import static jake2.Globals.*;
 import static jake2.render.Base.vid;
+import static nars.$.*;
 import static nars.$.$;
 
 /**
@@ -110,8 +111,19 @@ public class Jake2Agent extends NAgentX implements Runnable {
                 senseCameraRetina("q", screenshotter, 32, 24);
         qcam.src.setMinZoomOut(0.5f);
         qcam.src.setMaxZoomOut(1f);
-        qcam.resolution(0.04f);
+        qcam.resolution(0.1f);
         qcam.src.vflip = true;
+
+        new ShapeSensor(p(id, the("shape")), new Scale(screenshotter, 128, 96) {
+            @Override
+            public float brightness(int xx, int yy, float rFactor, float gFactor, float bFactor) {
+                if (ph> 0)
+                    return super.brightness(xx, (ph - 1) - yy, rFactor, gFactor, bFactor);
+                else
+                    return Float.NaN;
+            }
+        },this);
+
 
 //        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);
 //        window(camAE.newChart(), 500, 500);
@@ -127,13 +139,13 @@ public class Jake2Agent extends NAgentX implements Runnable {
         actionToggle($("q(moveright)"), (x) -> CL_input.in_moveright.state = x ? 1 : 0);
         actionToggle($("q(jump)"), (x) -> CL_input.in_up.state = x ? 1 : 0);
         actionBipolar($("q(lookyaw)"), (x) -> {
-            float yawSpeed = 10;
+            float yawSpeed = 20;
             cl.viewangles[Defines.YAW] += yawSpeed * x;
             //return CL_input.in_lookup.state = x ? 1 : 0;
             return x;
         });
         actionBipolar($("q(lookpitch)"), (x) -> {
-            float pitchSpeed = 20; //absolute
+            float pitchSpeed = 30; //absolute
             cl.viewangles[Defines.PITCH] = pitchSpeed * x;
             //return CL_input.in_lookup.state = x ? 1 : 0;
             return x;

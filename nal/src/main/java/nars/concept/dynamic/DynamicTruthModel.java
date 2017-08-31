@@ -26,8 +26,8 @@ abstract public class DynamicTruthModel {
     public DynTruth eval(Term superterm, boolean beliefOrGoal, long start, long end, boolean stamp, NAR n) {
 
         int sdt = superterm.dt();
-//        if (sdt == XTERNAL)
-//            return null;
+        if (sdt == XTERNAL)
+            return null;
 
         Term[] inputs = components(superterm);
         assert (inputs.length > 0): this + " yielded no dynamic components for superterm " + superterm;

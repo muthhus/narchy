@@ -25,7 +25,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     public static final int RADIX = 1;
 
     public final List<PixelConcept> pixels;
-    private final CauseChannel<Task> in;
+    public final CauseChannel<Task> in;
     private final Term id;
 
     float resolution = 0.01f;//Param.TRUTH_EPSILON;

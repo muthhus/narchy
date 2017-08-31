@@ -511,7 +511,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
             try {
                 //n.truthResolution.setValue(0.05f);
                 a = new MyTetris(n);
-                a.durations.setValue(2f);
                 //a.durations.setValue(2f);
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();

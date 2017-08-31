@@ -30,7 +30,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
     private final Term id;
 
     final AtomicDouble value = new AtomicDouble();
-    private final CauseChannel<Task> output;
+    public final CauseChannel<Task> in;
 
     @Override
     public float asFloat() {
@@ -190,7 +190,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
 
         this.conf = nar.confDefault(Op.BELIEF);
         this.input = input;
-        this.output = nar.newCauseChannel(this);
+        this.in = nar.newCauseChannel(this);
         //output.amplitude(1f / numStates);
 
         this.sensors = $.newArrayList(numStates);
@@ -216,7 +216,7 @@ public class ScalarConcepts extends NARService implements Iterable<SensorConcept
 
         value.set(input.asFloat());
 
-        output.input(sensors.stream().map(x -> {
+        in.input(sensors.stream().map(x -> {
             return x.update(now, dur, n);
         }));
     }

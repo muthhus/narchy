@@ -9,6 +9,7 @@ import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
@@ -21,35 +22,10 @@ import static nars.truth.TruthFunctions.w2c;
  * https://en.wikipedia.org/wiki/Category:Intertemporal_economics
  * https://en.wikipedia.org/wiki/Discounted_utility
  */
-public enum TruthPolation { ;
+public interface TruthPolation extends Consumer<Tasked> {
 
+    PreciseTruth truth();
 
-    /**
-     * dt > 0
-     */
-    public static float evidenceDecay(float evi, float dur, long dt) {
-
-        //hard linear with half duration on either side of the task -> sum to 1.0 duration
-//        float scale = dt / dur;
-//        if (scale > 0.5f) return 0;
-//        else return evi * (1f - scale*2f);
-
-
-        //return evi / (1 + ((float) Math.log(1+dt/dur))); //inverse log
-
-        //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
-
-        return evi / (1 + ( dt / dur) ); //inverse linear
-
-        //return evi / ( 1f + (dt*dt)/dur ); //inverse square
-
-        //return evi /( 1 + 2 * (dt/dur) ); //inverse linear * 2 (nyquist recovery period)
-
-
-        //return evi / (1f + dt / dur ); //first order decay
-        //return evi / (1f + (dt*dt) / (dur*dur) ); //2nd order decay
-
-    }
 
     /**
      * computes truth at a given time from iterative task samples
@@ -57,7 +33,7 @@ public enum TruthPolation { ;
      * uses "waldorf method" to calculate a running variance
      * additionally, the variance is weighted by the contributor's confidences
      */
-    public static class TruthPolationBasic implements Consumer<Tasked> {
+    public static class TruthPolationBasic implements TruthPolation {
         float eviSum, wFreqSum;
         final long start, end;
         final int dur;
@@ -92,35 +68,40 @@ public enum TruthPolation { ;
         }
     }
 
-    public static class TruthPolationGreedy implements Consumer<Tasked> {
+    /** TODO this does not fairly handle equal values; the first will be chosen */
+    public static class TruthPolationGreedy implements TruthPolation {
 
-        final long when;
+        final long start, end;
         final int dur;
-        Truth best;
+        float bestE = Float.NEGATIVE_INFINITY, bestF = Float.NaN;
 
-        public TruthPolationGreedy(long when, int dur) {
-            this.when = when;
+        public TruthPolationGreedy(long start, long end, int dur) {
+            this.start = start;
+            this.end = end;
             this.dur = dur;
         }
 
         @Override
         public void accept(Tasked t) {
             Task task = t.task();
-            Truth tt = task.truth(when,dur);
-            if (best==null || best.conf() < tt.conf())
-                best = tt;
+            float e = task.evi(start, end, dur);
+            if (e > bestE) {
+                bestE = e;
+                bestF = task.freq();
+            }
         }
 
 
         public PreciseTruth truth() {
-            if (best == null)
+            float f = this.bestF;
+            if (f != f)
                 return null;
 
-            return new PreciseTruth(best.freq(), best.conf());
+            return new PreciseTruth(f, bestE, false);
         }
     }
 
-    public static class TruthPolationSoftMax implements Consumer<Tasked> {
+    public static class TruthPolationSoftMax implements TruthPolation {
 
         final long when;
         final int dur;
@@ -153,29 +134,32 @@ public enum TruthPolation { ;
 
         }
     }
-    public static class TruthPolationRoulette implements Consumer<Tasked> {
+    public static class TruthPolationRoulette implements TruthPolation {
 
-        final long when;
+        final long start, end;
         final int dur;
         final FloatArrayList freq = new FloatArrayList();
         final FloatArrayList evi = new FloatArrayList();
+        private final Random rng;
 
-        public TruthPolationRoulette(long when, int dur) {
-            this.when = when;
+        public TruthPolationRoulette(long start, long end, int dur, final Random rng) {
+            this.start = start;
+            this.end = end;
             this.dur = dur;
+            this.rng = rng;
         }
 
         @Override
         public void accept(Tasked t) {
             Task task = t.task();
-            evi.add(task.evi(when, dur));
+            evi.add(task.evi(start, end, dur));
             freq.add(task.freq());
         }
 
 
         public PreciseTruth truth() {
             if (!evi.isEmpty()) {
-                int which = Util.decideRoulette(freq.size(), evi::get, ThreadLocalRandom.current());
+                int which = Util.decideRoulette(freq.size(), evi::get, rng);
                 float f = freq.get(which);
                 float e = evi.get(which);
                 return new PreciseTruth(f, e, false);
@@ -193,7 +177,7 @@ public enum TruthPolation { ;
      * uses "waldorf method" to calculate a running variance
      * additionally, the variance is weighted by the contributor's confidences
      */
-    public static class TruthPolationWithVariance implements Consumer<Tasked> {
+    public static class TruthPolationWithVariance implements TruthPolation {
         float eviSum, wFreqSum;
         float meanSum = 0.5f, deltaSum;
         int count;
@@ -249,26 +233,6 @@ public enum TruthPolation { ;
         }
     }
 
-    @Nullable
-    public static PreciseTruth truth(@Nullable Task topEternal, long start, long end, int dur, @NotNull Iterable<? extends Tasked> tasks) {
-
-        assert (dur > 0);
-
-        TruthPolationBasic t =
-                new TruthPolationBasic(start, end, dur);
-                //new TruthPolationGreedy(when, dur);
-                //new TruthPolationRoulette(when, dur);
-                //new TruthPolationWithVariance(when, dur);
-
-        // Contribution of each task's truth
-        // use forEach instance of the iterator(), since HijackBag forEach should be cheaper
-        tasks.forEach(t);
-        if (topEternal != null) {
-            t.accept(topEternal);
-        }
-
-        return t.truth();
-    }
 
 //    /**
 //     * returns (freq, evid) pair

@@ -15,6 +15,11 @@ public interface Bitmap2D {
     /** returns a value 0..1.0 indicating the monochrome brightness (white level) at the specified pixel */
     float brightness(int xx, int yy);
 
+    /** RGB filtered brightness, if supported; otherwise the factors are ignored */
+    default float brightness(int xx, int yy, float rFactor, float gFactor, float bFactor) {
+        return brightness(xx, yy); //DEFAULT: unsupported
+    }
+
     static float rgbToMono(int r, int g, int b) {
         return (r+g+b)/256f/3f;
     }

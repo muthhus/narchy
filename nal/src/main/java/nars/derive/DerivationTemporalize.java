@@ -1,13 +1,13 @@
 package nars.derive;
 
 import jcog.Util;
+import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
 import nars.derive.time.AbsoluteEvent;
 import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
 import nars.derive.time.Time;
-import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.subst.Subst;
@@ -156,7 +156,7 @@ public class DerivationTemporalize extends Temporalize {
                                 Math.abs(task.nearestTimeTo(k) - k) +
                                         Math.abs(belief.nearestTimeTo(k) - k);
                         if (distSum > 0) {
-                            eviGain[0] *= TruthPolation.evidenceDecay(1, d.dur, distSum);
+                            eviGain[0] *= Param.evidenceDecay(1, d.dur, distSum);
                         }
                     } else {
                         k = bs;

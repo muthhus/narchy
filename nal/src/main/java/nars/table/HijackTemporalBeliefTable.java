@@ -3,11 +3,11 @@ package nars.table;
 import jcog.list.FasterList;
 import jcog.util.Top2;
 import nars.NAR;
+import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
 import nars.concept.BaseConcept;
 import nars.task.Revision;
-import nars.task.TruthPolation;
 import nars.term.Term;
 import nars.truth.Stamp;
 import nars.truth.Truth;
@@ -486,7 +486,7 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
     @Override
     public Truth truth(long start, long end,  @Nullable EternalTable eternal, NAR nar) {
 
-        Truth x = TruthPolation.truth(
+        Truth x = Param.truth(
                 eternal != null ? eternal.strongest() : null,
                 start, end, nar.dur(), this);
         return x;
