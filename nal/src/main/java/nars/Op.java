@@ -753,30 +753,8 @@ public enum Op implements $ {
      */
     @NotNull
     private static Term compound(Op o, Term... subterms) {
-
-        assert (!o.atomic);
-
-        if (!o.allowsBool) {
-            for (Term x : subterms)
-                if (x instanceof Bool)
-                    return Null;
-
-        }
-
-        int s = subterms.length;
-        assert (o.maxSize >= s) : "subterm overflow: " + o + ' ' + Arrays.toString(subterms);
-
-        assert (o.minSize <= s || hasEllipsis(subterms)) : "subterm underflow: " + o + ' ' + Arrays.toString(subterms);
-
-        switch (s) {
-            case 1:
-                return new UnitCompound1(o, subterms[0]);
-
-            default:
-                return new GenericCompound(o, subterms(subterms));
-        }
+        return Builder.Compound.the.apply(o, subterms);
     }
-
 
     @NotNull
     public static TermContainer subterms(@NotNull Term... s) {
@@ -1083,13 +1061,9 @@ public enum Op implements $ {
 
         if (dt == 0 || dt == DTERNAL) {
             return CONJ.the(dt, left, right); //send through again
+        } else {
+            return compound(compound(CONJ, left, right), dt);
         }
-
-        GenericCompound g = new GenericCompound(CONJ,
-                subterms(left, right)
-        );
-
-        return compound(g, dt);
     }
 
 //    protected static Term conjMergeLeftAlign(List<ObjectLongPair<Term>> events, int from, int to) {

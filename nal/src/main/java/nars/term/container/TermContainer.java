@@ -857,21 +857,21 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return s == null ? Collections.emptySet() : s;
     }
 
-    /**
-     * constructs a new container with the matching elements missing
-     * TODO elide creating a new vector if nothing would change
-     */
-    @NotNull
-    default TermContainer asFiltered(Predicate<Term> p) {
-        if (!(this instanceof TermContainer))
-            throw new UnsupportedOperationException("only implemented for TermVector instance currently");
-
-        List<Term> c = $.newArrayList(size());
-        if (OR(x -> p.test(x) && c.add(x)))
-            return TermVector.the(c);
-        else
-            return ZeroProduct;
-    }
+//    /**
+//     * constructs a new container with the matching elements missing
+//     * TODO elide creating a new vector if nothing would change
+//     */
+//    @NotNull
+//    default TermContainer asFiltered(Predicate<Term> p) {
+//        if (!(this instanceof TermContainer))
+//            throw new UnsupportedOperationException("only implemented for TermVector instance currently");
+//
+//        List<Term> c = $.newArrayList(size());
+//        if (OR(x -> p.test(x) && c.add(x)))
+//            return TermVector.the(c);
+//        else
+//            return ZeroProduct;
+//    }
 
     /**
      * stream of each subterm

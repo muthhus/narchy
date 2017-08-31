@@ -34,6 +34,8 @@ public enum TruthPolation { ;
 //        else return evi * (1f - scale*2f);
 
 
+        //return evi / (1 + ((float) Math.log(1+dt/dur))); //inverse log
+
         //return evi / (1 + (((float) Math.log(1+dt)) / dur)); //inverse log
 
         return evi / (1 + ( dt / dur)); //inverse linear

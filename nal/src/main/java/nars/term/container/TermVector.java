@@ -90,7 +90,7 @@ public abstract class TermVector implements TermContainer {
         }
     }
 
-    public static TermContainer the(@NotNull Collection<? extends Term> t) {
+    protected static TermContainer the(@NotNull Collection<? extends Term> t) {
         return Op.subterms(t.toArray(new Term[t.size()]));
     }
 
