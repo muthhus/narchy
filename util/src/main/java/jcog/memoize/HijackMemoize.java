@@ -169,6 +169,11 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         this.CACHE_DENY_DAMAGE = cut;
     }
 
+    @Override
+    public void pressurize(float f) {
+        //pressurize disabled
+    }
+
     @NotNull
     @Override
     public HijackBag<K, HalfWeakPair<K, V>> commit(@Nullable Consumer<HalfWeakPair<K, V>> update) {
