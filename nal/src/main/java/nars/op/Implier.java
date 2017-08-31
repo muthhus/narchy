@@ -58,6 +58,7 @@ public class Implier extends DurService {
     final static TruthOperator ded = GoalFunction.get($.the("GoductionRecursivePB"));
     final static TruthOperator ind = GoalFunction.get($.the("InductionRecursivePB"));
     private long now;
+    private long next;
 
     public Implier(NAR n, Term... seeds) {
         this(n, List.of(seeds));
@@ -109,6 +110,7 @@ public class Implier extends DurService {
 
         int dur = nar.dur();
         now = nar.time();
+        next = now + dur;
 
         //System.out.println(impl);
 
@@ -187,7 +189,7 @@ public class Implier extends DurService {
             if (uu != null) {
                 float c = uu.conf();
                 if (c >= confMin) {
-                    NALTask y = new NALTask(t, GOAL, uu, now, now, now /* + dur */,
+                    NALTask y = new NALTask(t, GOAL, uu, now, now, next /* + dur */,
                             nar.time.nextInputStamp());
                     y.pri(nar.priDefault(GOAL));
 //                        if (Param.DEBUG)

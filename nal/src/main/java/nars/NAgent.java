@@ -17,6 +17,7 @@ import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
+import nars.time.Tense;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
@@ -101,6 +102,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     public float reward;
     private Loop loop;
     public NAR nar;
+    private int dur;
     //final private ConceptFire fireHappy;
 
 
@@ -184,106 +186,6 @@ abstract public class NAgent extends DurService implements NSense, NAct {
      */
     protected abstract float act();
 
-    int actionFrame = 0;
-
-
-    protected void senseAndMotor() {
-        //System.out.println(nar.conceptPriority(reward) + " " + nar.conceptPriority(dRewardSensor));
-
-
-        float r = reward = act();
-        if (r == r) {
-            rewardSum += r;
-        }
-
-
-        /** safety valve: if overloaded, enter shock / black out and do not receive sensor input */
-        //        float load = nar.exe.load();
-        //        if (load < 1) {
-
-
-        int dur = nar.dur();
-        long next = now + dur
-                //+(dur * 3 / 2);
-                ;
-
-
-        predict.input(
-                /*Stream.of(*/happy.update(now, dur, nar)/*, fireHappy)*/
-        );
-
-        //contribution of this agent to the NAR's global happiness measurement
-        //nar.emotion.happy(Util.sigmoid(reward));
-        nar.emotion.happy(dexterity() /* /nar.confDefault(GOAL) */);
-
-//              float dxm = c2w(dexterity());
-//            nar.emotion.happy(
-//                    Math.signum(dxm - lastDexterity) *
-//                            (float) Math.sqrt( Math.abs(dxm - lastDexterity) ));
-//            this.lastDexterity = dxm;
-
-        sensors.forEach((s, c) -> {
-            c.input(s.update(now, dur, nar));
-        });
-
-        actions.forEach((a, c) -> {
-            c.input(a.update(now, dur, nar));
-        });
-
-        eventFrame.emitAsync(this, nar.exe);
-
-        if (trace)
-            logger.info(summary());
-
-
-    }
-
-    protected void predict() {
-
-        //System.out.println(predictGain);
-        if (nar.random().nextFloat() < predictorProbability.floatValue() * predict.gain())
-            predict.input(predictions(now));
-
-        //int dur = nar.dur();
-        //int horizon = Math.round(this.predictAheadDurs.floatValue()) * dur;
-//        if (sensors.size() > 0) {
-//            actions.forEach(a -> {
-//                for (Compound t : new Compound[] {
-//                        $.impl(a, dur, randomSensor()),
-//                        $.impl($.neg(a), dur, randomSensor())} )
-//                    predict.input(question(t, now + nar.random().nextInt(horizon) ));
-//            });
-//        }
-    }
-
-//    /**
-//     * provides the stream of the environment's next sensory percept tasks
-//     */
-//    public Stream<ITask> sense(NAR nar, long when) {
-//        return sensors.stream().map(s -> s.apply(nar));
-//    }
-
-
-//    protected Stream<Task> curious(long next) {
-//        float conf = curiosityConf.floatValue();
-//        float confMin = nar.confMin.floatValue();
-//        if (conf < confMin)
-//            return Stream.empty();
-//
-//        float curiPerMotor = curiosityProb.floatValue() / actions.size();
-//        return actions.stream().map(action -> {
-//
-//            if (nar.random().nextFloat() < curiPerMotor) {
-//                return action.curiosity(conf, next, nar);
-//            }/* else {
-//                nar.activate(action, 1f);
-//            }*/
-//            return null;
-//
-//        }).filter(Objects::nonNull);
-//
-//    }
-
 
     @NotNull
     public String summary() {
@@ -318,12 +220,12 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
             @NotNull Term happy = this.happy.term();
             nar.goal(happy); /* eternal */
-//            predictors.add(
-//                    goal(happy,
-//                            t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
-//                            //ETERNAL
-//                    )
-//            );
+            predictors.add(
+                    goal(happy,
+                            t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
+                            //ETERNAL
+                    )
+            );
 
             //        p.add(
             //            question(seq($.varQuery(1), dur, happiness),
@@ -476,13 +378,58 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
     @Override
     protected void run(NAR nar) {
-        if (enabled.get()) {
-            this.now = nar.time();
+        if (!enabled.get())
+            return;
 
-            senseAndMotor();
-            predict();
+        this.dur = nar.dur();
 
+        this.now = nar.time();
+
+        float r = reward = act();
+        if (r == r) {
+            rewardSum += r;
         }
+
+        this.now = nar.time();
+
+        nar.input(
+            /*Stream.of(*/happy.update(now, dur, nar)/*, fireHappy)*/
+        );
+
+
+        this.now = nar.time();
+
+        sensors.forEach((s, c) -> {
+            //nar.exe.execute(() -> {
+                c.input(s.update(now, dur, nar));
+            //});
+        });
+
+        this.now = nar.time();
+
+        if (nar.random().nextFloat() < predictorProbability.floatValue() * predict.gain()) {
+            //nar.exe.execute(() -> {
+                predict.input(predictions(now));
+            //});
+        }
+
+        this.now = nar.time();
+
+        actions.forEach((a, c) -> {
+            //nar.exe.execute(() -> {
+                c.input(a.update(now, dur, nar));
+            //});
+        });
+
+        nar.emotion.happy(dexterity() /* /nar.confDefault(GOAL) */);
+
+        this.now = nar.time();
+
+        eventFrame.emit(this);
+
+
+        if (trace)
+            logger.info(summary());
     }
 
 //    /**
@@ -529,7 +476,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
         int dur = nar.dur();
         long now = nar.time();
         actions.keySet().forEach(a -> {
-            Truth g = nar.goalTruth(a, now-dur/2, now+dur/2);
+            Truth g = nar.goalTruth(a, now - dur / 2, now + dur / 2);
             float c;
             if (g != null) {
                 c = g.evi();

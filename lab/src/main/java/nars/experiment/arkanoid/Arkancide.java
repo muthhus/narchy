@@ -15,7 +15,7 @@ import spacegraph.SpaceGraph;
 
 public class Arkancide extends NAgentX {
 
-    static boolean numeric = true;
+    static boolean numeric = false;
     static boolean cam = true;
 
     public final FloatParam ballSpeed = new FloatParam(1f, 0.1f, 6f);

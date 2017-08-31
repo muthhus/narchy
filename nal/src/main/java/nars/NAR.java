@@ -949,10 +949,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         time.cycle(this);
 
-        if (exe.concurrent())
-            eventCycle.emitAsync(this, exe); //async, parallel
-        else
-            eventCycle.emit(this); //synchronous
+        eventCycle.emit(this); //synchronous only
 
         valueUpdate();
 

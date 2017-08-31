@@ -407,7 +407,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
 
                 //experimental: decay slower according to complexity, ie. more complex learned rules will persist longer
-                float durAdjusted = dur;// * (volume());
+                float durAdjusted = dur *
+                        1
+                        //volume()
+                ;
 
 //                long r = z - a;
 //                cw = r != 0 ?
@@ -437,10 +440,10 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
     default boolean eternalizable() {
 
 
-        return false;
+        //return false;
         //return true;
         //return term().vars() > 0;
-        //return term().varIndep() > 0;
+        return term().varIndep() > 0;
         //return term().varIndep() > 0 || term().op() == IMPL; //isAny(Op.IMPL.bit | Op.EQUI.bit);
         //return true;
         //return op().temporal;

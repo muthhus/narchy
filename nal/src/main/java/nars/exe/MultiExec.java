@@ -2,12 +2,14 @@ package nars.exe;
 
 import jcog.Loop;
 import jcog.Util;
+import jcog.event.On;
 import nars.NAR;
 import nars.task.ITask;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
@@ -25,7 +27,7 @@ public class MultiExec extends Exec {
     private final ForkJoinPool passive;
     private final Worker[] workers;
     private final int num;
-    //private On onCycle;
+    private On onCycle;
 
 
     public MultiExec(IntFunction<Worker> workers, int numWorkers, int passive) {
@@ -56,7 +58,7 @@ public class MultiExec extends Exec {
             w.start(nar, 0);
         }
 
-        //onCycle = nar.onCycle(this::cycle);
+        onCycle = nar.onCycle(this::cycle);
     }
 
     @Override
@@ -95,15 +97,18 @@ public class MultiExec extends Exec {
 //        lastCycle = null;
     }
 
-    final AtomicBoolean busy = new AtomicBoolean(false);
 
-//    public void cycle() {
-//
-//
-////            int waitCycles = 0;
-////            while (!passive.isQuiescent()) {
-////                Util.pauseNext(waitCycles++);
-////            }
+
+    public void cycle() {
+        while (!passive.awaitQuiescence(10, TimeUnit.MILLISECONDS) ) {
+            Thread.yield();
+        }
+    }
+
+//            int waitCycles = 0;
+//            while (!passive.isQuiescent()) {
+//                Util.pauseNext(waitCycles++);
+//            }
 //
 //        if (!busy.compareAndSet(false, true))
 //            return; //already in the cycle

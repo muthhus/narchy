@@ -36,11 +36,11 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
     public static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n) {
-        if (n.exe.concurrent()) {
-            n.exe.execute(() -> activate(t, activationApplied, n, true));
-        } else {
+//        if (n.exe.concurrent()) {
+//            n.exe.execute(() -> activate(t, activationApplied, n, true));
+//        } else {
             activate(t, activationApplied, n, true);
-        }
+//        }
     }
 
     static void activate(@NotNull Task t, float activationApplied, @NotNull NAR n, boolean process) {

@@ -4,7 +4,9 @@ import nars.NAR;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.jetbrains.annotations.NotNull;
 
-/** executes approximately once every N durations */
+/**
+ * executes approximately once every N durations
+ */
 abstract public class DurService extends CycleService {
 
     public final MutableFloat durations;
@@ -26,17 +28,20 @@ abstract public class DurService extends CycleService {
     }
 
 
-    @Override public final void accept(NAR nar) {
+    @Override
+    public final void accept(NAR nar) {
         long lastNow = this.now;
         long now = nar.time();
         if (now - lastNow >= durations.floatValue() * nar.dur()) {
             if (busy.compareAndSet(false, true)) {
                 this.now = now;
-                try {
-                    run(nar);
-                } finally {
-                    busy.set(false);
-                }
+                nar.runLater(() -> { //asynch
+                    try {
+                        run(nar);
+                    } finally {
+                        busy.set(false);
+                    }
+                });
             }
 
         }

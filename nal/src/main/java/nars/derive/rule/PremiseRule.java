@@ -216,6 +216,7 @@ public class PremiseRule extends GenericCompound {
         if (b == TaskPunctuation.Quest) return TaskPunctuation.class;
         if (b == TaskPunctuation.QuestionOrQuest) return TaskPunctuation.class;
         if (b.getClass() == TaskBeliefOp.class) return TaskBeliefOp.class;
+        if (b.getClass() == TaskBeliefOp.TaskBeliefConjSeq.class) return TaskBeliefOp.class;
 
 //        if (b instanceof TermNotEquals) return TermNotEquals.class;
 
@@ -545,6 +546,9 @@ public class PremiseRule extends GenericCompound {
                         case "\"&&\"":
                             pres.add(new TaskBeliefOp(CONJ, false, true));
                             break;
+                        case "\"&&+\"": //sequence
+                            pres.add(new TaskBeliefOp.TaskBeliefConjSeq(false, true));
+                            break;
                         default:
                             throw new UnsupportedOperationException();
                     }
@@ -821,6 +825,7 @@ public class PremiseRule extends GenericCompound {
         return PremiseRuleSet.normalize(new PremiseRule(TermVector.the(newPremise, newConclusion)), index);
 
     }
+
 
 
 }
