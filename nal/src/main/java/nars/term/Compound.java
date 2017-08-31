@@ -555,22 +555,23 @@ public interface Compound extends Term, IPair, TermContainer {
         int dt;
         Op o = op();
         if (o.temporal && nextDT != (dt = this.dt())) {
-            Op op = o;
             Compound b = this instanceof GenericCompoundDT ?
                     ((GenericCompoundDT) this).ref : this;
 
-            if ((nextDT != XTERNAL && !concurrent(nextDT)) && size() > 2)
+            @NotNull TermContainer subs = subterms();
+            if ((nextDT != XTERNAL && !concurrent(nextDT)) && subs.size() > 2)
                 return Null; //tried to temporalize what can only be commutive
 
             if (nextDT == XTERNAL) {
                 return Op.compound(b, nextDT);
             }
 
-            if (o.commutative && sub(0).compareTo(sub(1)) > 0) {
+            Term[] ss = subs.theArray();
+            if (o.commutative && ss[0].compareTo(ss[1]) > 0) {
                 //must re-arrange the order to lexicographic, and invert dt
-                return o.the(nextDT != DTERNAL ? -nextDT : DTERNAL, sub(1), sub(0));
+                return o.the(nextDT != DTERNAL ? -nextDT : DTERNAL, ss[1], ss[0]);
             } else {
-                return op.the(nextDT, toArray());
+                return o.the(nextDT, ss);
             }
 
         } else {

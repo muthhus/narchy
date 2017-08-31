@@ -12,7 +12,6 @@ import nars.term.atom.Int;
 import nars.term.compound.GenericCompound;
 import nars.term.compound.UnitCompound1;
 import nars.term.container.TermContainer;
-import nars.term.container.TermVector;
 import nars.term.var.UnnormalizedVariable;
 import nars.time.Tense;
 import org.eclipse.collections.api.map.ImmutableMap;
@@ -33,7 +32,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
-import static nars.derive.match.Ellipsis.firstEllipsis;
+import static nars.derive.match.Ellipsis.hasEllipsis;
 import static nars.term.Terms.flatten;
 import static nars.time.Tense.*;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
@@ -237,8 +236,8 @@ public enum Op implements $ {
                             b = x;
                         }
                         return conjMerge(a, 0, b,
-                                dt!=0 ? dt + a.dtRange() : //sequence
-                                0 //parallel
+                                dt != 0 ? dt + a.dtRange() : //sequence
+                                        0 //parallel
                         );
 
                     }
@@ -291,8 +290,8 @@ public enum Op implements $ {
 
             //simple accelerated case:
             if (u.length == 2) {
-                if ((u[0].op()==NEG && u[0].unneg().equals(u[1])) ||
-                    (u[1].op()==NEG && u[1].unneg().equals(u[0])) )
+                if ((u[0].op() == NEG && u[0].unneg().equals(u[1])) ||
+                        (u[1].op() == NEG && u[1].unneg().equals(u[0])))
                     return False; //co-neg
 
                 //it will already have been sorted and de-duplicated upon arriving here
@@ -757,18 +756,17 @@ public enum Op implements $ {
 
         assert (!o.atomic);
 
-        if (Param.DEBUG) {
-            if (!o.allowsBool) {
-                for (Term x : subterms)
-                    if (x instanceof Bool)
-                        return Null;
-            }
+        if (!o.allowsBool) {
+            for (Term x : subterms)
+                if (x instanceof Bool)
+                    return Null;
+
         }
 
         int s = subterms.length;
         assert (o.maxSize >= s) : "subterm overflow: " + o + ' ' + Arrays.toString(subterms);
 
-        assert (o.minSize <= s || (firstEllipsis(subterms) != null)) : "subterm underflow: " + o + ' ' + Arrays.toString(subterms);
+        assert (o.minSize <= s || hasEllipsis(subterms)) : "subterm underflow: " + o + ' ' + Arrays.toString(subterms);
 
         switch (s) {
             case 1:
@@ -779,9 +777,10 @@ public enum Op implements $ {
         }
     }
 
+
     @NotNull
     public static TermContainer subterms(@NotNull Term... s) {
-        return TermVector.the(s);
+        return Builder.Subterms.the.apply(s);
     }
 
 
@@ -970,8 +969,8 @@ public enum Op implements $ {
         b.events(eventSet::add, bStart);
 
         int ee = eventSet.size();
-        assert(ee > 0);
-        if (ee==1) {
+        assert (ee > 0);
+        if (ee == 1) {
             return eventSet.first().getOne();
         }
 
@@ -1019,7 +1018,8 @@ public enum Op implements $ {
     /**
      * constructs a correctly merged conjunction from a list of events
      */
-    @NotNull public static Term conj(List<ObjectLongPair<Term>> events) {
+    @NotNull
+    public static Term conj(List<ObjectLongPair<Term>> events) {
 
         int ee = events.size();
         switch (ee) {
@@ -1086,13 +1086,10 @@ public enum Op implements $ {
         }
 
         GenericCompound g = new GenericCompound(CONJ,
-                TermVector.the(left, right)
+                subterms(left, right)
         );
 
-        if (dt == DTERNAL)
-            return g;
-        else
-            return compound(g, dt);
+        return compound(g, dt);
     }
 
 //    protected static Term conjMergeLeftAlign(List<ObjectLongPair<Term>> events, int from, int to) {
@@ -1225,23 +1222,8 @@ public enum Op implements $ {
      */
     public static Term compound(Term c, int dt) {
         if (dt != DTERNAL && (c instanceof Compound)) {
-//            if (dt != XTERNAL) {
-////                switch (c.sub(0).op()) {
-////                    case VAR_PATTERN:
-////                    case VAR_QUERY:
-////                    case VAR_INDEP:
-////                    case VAR_DEP:
-////                    case NEG:
-////
-////                }
-//
-//                //&& Math.abs(dt) > Param.DT_ABS_SAFETY_LIMIT
-//
-////                Term c1 = c.sub(1);
-////                if (c1 instanceof Variable && c1.equals(c.sub(0)))
-////                    return c.sub(0);
-//
-//            }
+//            if (c.dt() == dt)
+//                return c;
 
             return new GenericCompoundDT((Compound) c, dt);
         }
@@ -1371,8 +1353,8 @@ public enum Op implements $ {
             //first layer only, not recursively
             if ((subject.varPattern() == 0 && predicate.varPattern() == 0) &&
                     (subject.equals(predicate) ||
-                        subject.containsRecursively(predicate, nonEventDelimeter) ||
-                        predicate.containsRecursively(subject, nonEventDelimeter)))
+                            subject.containsRecursively(predicate, nonEventDelimeter) ||
+                            predicate.containsRecursively(subject, nonEventDelimeter)))
                 //(!(su instanceof Variable) && predicate.contains(su)))
                 return Null; //cyclic
 
