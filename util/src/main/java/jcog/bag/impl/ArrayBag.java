@@ -3,6 +3,7 @@ package jcog.bag.impl;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.bag.Bag;
 import jcog.data.sorted.SortedArray;
+import jcog.pri.Pri;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriForget;
@@ -487,24 +488,34 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
                         int s = size();
                         boolean atCap = s == capacity;
+
+                        int posBefore = items.indexOf(existing, this);
+                        assert(posBefore!=-1);
+
                         float priBefore = existing.priElseZero();
                         float oo = mergeFunction.merge(existing /* HACK */, incoming);
 
-                        if (overflow != null)
+                        float delta = existing.priElseZero() - priBefore;
+
+                        if (Math.abs(delta) > Pri.EPSILON) {
+                            items.adjust(posBefore, delta, this);
+
+                            if (delta >= Prioritized.EPSILON) {
+                                if (atCap) {
+                                    pressurize(delta);
+                                }
+                            }
+                        }
+
+                        if (oo > Pri.EPSILON && overflow != null)
                             overflow.add(oo);
 
-                        float delta = existing.priElseZero() - priBefore;
-                        if (delta >= Prioritized.EPSILON) {
-                            if (atCap) {
-                                pressurize(delta);
-                            }
-                            mustSort = true;
-                        }
+
                     }
+
                     return existing;
 
                 } else {
-
 
                     if (size() == capacity)
                         pressurize(p);
@@ -531,7 +542,7 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                 });
             }
 
-            ensureSorted();
+            //ensureSorted();
         }
 
         //this can be done outside critical section

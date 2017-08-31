@@ -311,6 +311,31 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
         return list.length;
     }
 
+    /** called when an item's sort order may have changed */
+    public void adjust(int index, float delta, FloatFunction<E> cmp) {
+        float cur = cmp.floatValueOf(list[index]);
+
+        boolean reinsert = false;
+
+        if (delta > 0 && index > 0) {
+            float f = cmp.floatValueOf(list[index - 1]);
+            if (f > cur)
+                reinsert = true;
+        }
+
+        //TODO only if decreased
+        if (delta < 0 && index < size-1) {
+            float f = cmp.floatValueOf(list[index + 1]);
+            if (f < cur)
+                reinsert = true;
+        }
+
+        if (reinsert) {
+            E i = remove(index);
+            add(i, cmp);
+        }
+    }
+
 
     static class ArrayIterator<E> implements ListIterator<E> {
         private final E[] array;
