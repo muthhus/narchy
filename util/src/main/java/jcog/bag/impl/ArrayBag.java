@@ -500,6 +500,8 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
                         if (Math.abs(delta) > Pri.EPSILON) {
                             items.adjust(posBefore, delta, this);
 
+                            updateRange(delta);
+
                             if (delta >= Prioritized.EPSILON) {
                                 if (atCap) {
                                     pressurize(delta);
@@ -517,14 +519,18 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 
                 } else {
 
-                    if (size() == capacity)
+                    if (size() == capacity) {
                         pressurize(p);
 
-                    @Nullable LinkedList<Y> trsh = update(incoming, null);
-                    if (trsh != null) {
-                        trash[0] = trsh;
-                        if (trsh.getLast() == incoming)
-                            return null;
+                        @Nullable LinkedList<Y> trsh = update(incoming, null);
+                        if (trsh != null) {
+                            trash[0] = trsh;
+                            if (trsh.getLast() == incoming)
+                                return null;
+                        }
+                    } else {
+                        items.add(incoming, this);
+                        updateRange(p);
                     }
 
                     added[0] = true;
@@ -614,6 +620,12 @@ abstract public class ArrayBag<X, Y extends Priority> extends SortedListTable<X,
 //            }
 //        }
 
+    }
+
+    private void updateRange(float deltaMass) {
+        mass += deltaMass;
+        min = pri(items.last());
+        max = pri(items.first());
     }
 
 
