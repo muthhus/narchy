@@ -1,6 +1,7 @@
 package nars.op;
 
 import jcog.data.graph.AdjGraph;
+import jcog.list.FasterList;
 import jcog.pri.Prioritized;
 import nars.$;
 import nars.NAR;
@@ -15,12 +16,14 @@ import nars.truth.TruthAccumulator;
 import nars.truth.func.GoalFunction;
 import nars.truth.func.TruthOperator;
 import nars.util.graph.TermGraph;
+import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static nars.Op.CONJ;
 import static nars.Op.GOAL;
 import static nars.Op.NEG;
 import static nars.time.Tense.DTERNAL;
@@ -219,6 +222,22 @@ public class Implier extends DurService {
         if (tt.op() == NEG) {
             tt = tt.unneg();
             g = g.neg();
+        }
+
+        //recursively divide the desire among the conjunction events, emulating (not necessarily exactly) StructuralDeduction's
+        if (tt.op() == CONJ) {
+            FasterList<ObjectLongPair<Term>> e = tt.events();
+            if (e.size() > 1) {
+                float eSub = g.evi() / e.size();
+                float cSub = w2c(eSub);
+                if (cSub >= nar.confMin.floatValue()) {
+                    Truth gSub = $.t(g.freq(), cSub);
+                    for (ObjectLongPair<Term> ee : e) {
+                        goal(goals, ee.getOne(), gSub);
+                    }
+                }
+                return;
+            }
         }
 
         goals.computeIfAbsent(tt, (ttt) -> {
