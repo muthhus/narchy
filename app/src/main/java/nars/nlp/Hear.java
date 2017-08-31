@@ -123,13 +123,13 @@ public class Hear extends Loop {
             if (concept == null) {
                 //input a constant negative bias - we dont hear the word when it is not spoken
                 //only input when first conceptualized
-                nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
+                nar.believe(nar.priDefault(BELIEF) * priorityFactor,
                         term, nar.time(), 0.5f, offConf);
             }
         }
 
         float onConf = nar.confDefault(BELIEF) * confFactor;
-        nar.believe(nar.priorityDefault(BELIEF) * priorityFactor,
+        nar.believe(nar.priDefault(BELIEF) * priorityFactor,
                 term, //1 word
                 nar.time(), 1f, onConf);
 

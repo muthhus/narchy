@@ -8,8 +8,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
 
-import static nars.time.Tense.ETERNAL;
-
 /**
  * Created by me on 2/12/17.
  */

@@ -3,7 +3,6 @@ package nars.table;
 import jcog.list.FasterList;
 import jcog.util.Top2;
 import nars.NAR;
-import nars.Param;
 import nars.Task;
 import nars.bag.TaskHijackBag;
 import nars.concept.BaseConcept;

@@ -5,8 +5,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
-import static nars.Op.CONJ;
-
 public class TimeEvent extends Event {
 
     private final Time time;

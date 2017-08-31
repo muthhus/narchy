@@ -53,7 +53,7 @@ public class BeliefActionConcept extends ActionConcept {
             DiscreteTruth t = new DiscreteTruth(goal.freq(), goal.conf() * rate);
             if (t!=null) {
                 NALTask y = new NALTask(term(), BELIEF, t, now, nowStart, nowEnd, new long[]{nar.time.nextStamp()});
-                y.pri(nar.priorityDefault(BELIEF));
+                y.pri(nar.priDefault(BELIEF));
                 return Stream.of(y);
             }
         }

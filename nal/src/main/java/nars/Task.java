@@ -967,7 +967,7 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //    }
 
     default Task budget(float factor, NAR nar) {
-        setPri(factor * nar.priorityDefault(punc()));
+        setPri(factor * nar.priDefault(punc()));
         return this;
     }
 

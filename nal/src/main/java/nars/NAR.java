@@ -408,7 +408,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @Nullable
     public Task goal(@NotNull Term goalTerm, @NotNull Tense tense, float freq, float conf) {
         return goal(
-                priorityDefault(GOAL),
+                priDefault(GOAL),
                 goalTerm, time(tense), freq, conf);
     }
 
@@ -419,7 +419,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
     @NotNull
     public NAR believe(@NotNull Term term, @NotNull long when, float freq, float conf) {
-        believe(priorityDefault(BELIEF), term, when, freq, conf);
+        believe(priDefault(BELIEF), term, when, freq, conf);
         return this;
     }
 
@@ -446,7 +446,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     @NotNull
     public NAR believe(@NotNull String term, @NotNull Tense tense, float freq, float conf) {
         try {
-            believe(priorityDefault(BELIEF), term(term), time(tense), freq, conf);
+            believe(priDefault(BELIEF), term(term), time(tense), freq, conf);
         } catch (NarseseException e) {
             throw new RuntimeException(e);
         }

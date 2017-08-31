@@ -1,11 +1,8 @@
 package nars.truth;
 
-import nars.$;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.atomic.AtomicReference;
-
-import static nars.truth.TruthFunctions.w2c;
 
 /** thread-safe truth accumulator/integrator
  *  TODO implement Truth interface, rename to ConcurrentTruth, extend AtomicDoubleArray

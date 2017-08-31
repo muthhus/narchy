@@ -1,6 +1,5 @@
 package nars.concept.builder;
 
-import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
 import jcog.bag.Bag;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
@@ -31,8 +30,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import static nars.Op.*;
 

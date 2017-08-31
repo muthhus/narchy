@@ -23,9 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static nars.Op.CONJ;
-import static nars.Op.GOAL;
-import static nars.Op.NEG;
+import static nars.Op.*;
 import static nars.time.Tense.DTERNAL;
 import static nars.truth.TruthFunctions.w2c;
 
@@ -191,7 +189,7 @@ public class Implier extends DurService {
                 if (c >= confMin) {
                     NALTask y = new NALTask(t, GOAL, uu, now, now, now /* + dur */,
                             nar.time.nextInputStamp());
-                    y.pri(nar.priorityDefault(GOAL));
+                    y.pri(nar.priDefault(GOAL));
 //                        if (Param.DEBUG)
 //                            y.log("")
                     in.input(y);

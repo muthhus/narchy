@@ -3,7 +3,6 @@ package nars.nal.nal7;
 import nars.$;
 import nars.Narsese;
 import nars.Param;
-import nars.task.NALTask;
 import nars.term.Term;
 import nars.test.TestNAR;
 import nars.time.Tense;

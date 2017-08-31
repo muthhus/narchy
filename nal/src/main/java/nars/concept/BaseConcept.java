@@ -13,7 +13,6 @@ import nars.table.TaskTable;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.Termlike;
-import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

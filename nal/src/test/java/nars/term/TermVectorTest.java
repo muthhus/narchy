@@ -7,7 +7,6 @@ import nars.term.container.TermContainer;
 import nars.term.container.TermVector;
 import org.junit.Test;
 
-import static nars.task.RevisionTest.x;
 import static org.junit.Assert.*;
 
 /**

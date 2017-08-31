@@ -5,10 +5,7 @@ import jcog.data.FloatParam;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
-import nars.video.CameraSensor;
-import nars.video.PixelBag;
-import nars.video.Scale;
-import nars.video.ShapeSensor;
+import nars.video.*;
 
 import javax.swing.*;
 
@@ -56,7 +53,8 @@ public class NARio extends NAgentX {
         CameraSensor<PixelBag> sc = senseCamera("nario" /*"(nario,local)"*/, cc);
         sc.resolution(0.03f);
 
-        new ShapeSensor(new Scale(()->mario.image, 256, 128), this);
+        //new ShapeSensor($.the("shape"), new BufferedImageBitmap2D(()->mario.image),this);
+
 
 
 //        try {

@@ -3,7 +3,6 @@ package nars.op.in;
 import com.google.common.io.Files;
 import jcog.io.FSWatch;
 import nars.NAR;
-import nars.NARS;
 import nars.Narsese;
 import nars.Task;
 import nars.control.NARService;
@@ -14,11 +13,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public class NoteFS extends NARService {
 

@@ -17,12 +17,10 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-import static jcog.data.UnenforcedConcatSet.concat;
 import static nars.Op.Null;
 
 

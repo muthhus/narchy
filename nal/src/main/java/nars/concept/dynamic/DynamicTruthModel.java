@@ -13,9 +13,7 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.BELIEF;
-import static nars.Op.CONJ;
-import static nars.Op.GOAL;
+import static nars.Op.*;
 import static nars.time.Tense.*;
 
 /**

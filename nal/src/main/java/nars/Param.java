@@ -329,7 +329,7 @@ public abstract class Param extends Services<Term,NAR> {
 
 
 
-    public float priorityDefault(byte punctuation) {
+    public float priDefault(byte punctuation) {
         switch (punctuation) {
             case BELIEF:
                 return DEFAULT_BELIEF_PRIORITY;

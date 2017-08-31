@@ -7,6 +7,10 @@ import nars.NAgentX;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
 import nars.term.atom.Atomic;
+import nars.video.BufferedImageBitmap2D;
+import nars.video.CameraSensor;
+import nars.video.Scale;
+import nars.video.ShapeSensor;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.term.atom.Atomic.the;
@@ -28,7 +32,9 @@ public class Gradius extends NAgentX {
         g.updateMS = 20;
 
         //BufferedImageBitmap2D cc = new Scale(() -> g.image, 48, 48).blur();
-        senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.01f);
+        CameraSensor<?> c = senseCameraRetina(id, () -> g.image, 24, 24).resolution(0.01f);
+
+        new ShapeSensor($.p(id, $.the("shape")), new BufferedImageBitmap2D(()->g.image),this);
 
         float width = g.getWidth();
         float height = g.getHeight();

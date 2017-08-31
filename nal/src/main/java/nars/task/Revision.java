@@ -25,9 +25,7 @@ import java.util.Random;
 
 import static jcog.Util.lerp;
 import static nars.Op.CONJ;
-import static nars.time.Tense.DTERNAL;
-import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.XTERNAL;
+import static nars.time.Tense.*;
 
 /**
  * Revision / Projection / Revection Utilities

@@ -202,7 +202,7 @@ import static nars.time.Tense.*;
         //if quality is not specified (NaN), then this means to assign the default budgeting according to the task's punctuation
         float pp = priElseNeg1();
         if (pp < 0) {
-            setPri(n.priorityDefault(punc));
+            setPri(n.priDefault(punc));
         }
 
 

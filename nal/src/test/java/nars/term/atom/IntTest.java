@@ -13,7 +13,6 @@ import java.util.Arrays;
 import static nars.$.$;
 import static nars.term.atom.Int.range;
 import static nars.term.atom.Int.the;
-import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertEquals;
 
 public class IntTest {

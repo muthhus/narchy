@@ -10,7 +10,6 @@ import nars.task.UnaryTask;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Int;
-import nars.term.var.Variable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;

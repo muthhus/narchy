@@ -5,7 +5,6 @@ import nars.NARS;
 import nars.Narsese;
 import nars.term.Term;
 import nars.test.TestNAR;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static nars.Op.BELIEF;

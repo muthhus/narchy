@@ -2,8 +2,8 @@ package nars;
 
 import jcog.Texts;
 import nars.concept.Concept;
-import nars.op.Operation;
 import nars.op.DepIndepVarIntroduction;
+import nars.op.Operation;
 import nars.op.Operator;
 import nars.op.data.*;
 import nars.op.data.intersect;

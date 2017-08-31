@@ -4,8 +4,6 @@ import nars.term.Term;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
 
-import static nars.Op.Null;
-
 /**
  * note: if the two terms are equal, it is automatically invalid ("neq")
  */

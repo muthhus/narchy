@@ -3,8 +3,6 @@ package nars.truth;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.truth.TruthFunctions.c2w;
-
 /** indicates an implementation has, or is associated with a specific TruthValue */
 public interface Truthed  {
 

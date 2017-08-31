@@ -1,37 +1,39 @@
 package nars.video;
 
-import boofcv.alg.feature.detect.edge.CannyEdge;
-import boofcv.alg.feature.detect.edge.EdgeContour;
-import boofcv.alg.feature.detect.edge.EdgeSegment;
 import boofcv.alg.filter.binary.BinaryImageOps;
 import boofcv.alg.filter.binary.Contour;
-import boofcv.alg.filter.binary.ThresholdImageOps;
-import boofcv.alg.misc.ImageStatistics;
 import boofcv.alg.shapes.ShapeFittingOps;
-import boofcv.factory.feature.detect.edge.FactoryEdgeDetectors;
-import boofcv.gui.ListDisplayPanel;
 import boofcv.gui.feature.VisualizeShapes;
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ScaleOptions;
 import boofcv.gui.image.ShowImages;
-import boofcv.io.image.ConvertBufferedImage;
-import boofcv.io.image.UtilImageIO;
 import boofcv.struct.ConnectRule;
 import boofcv.struct.PointIndex_I32;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.GrayU8;
-import georegression.struct.point.Point2D_I32;
+import georegression.geometry.UtilPolygons2D_I32;
+import georegression.struct.shapes.Polygon2D_I32;
+import georegression.struct.shapes.Rectangle2D_I32;
+import nars.$;
+import nars.NAR;
 import nars.NAgent;
+import nars.Task;
+import nars.control.CauseChannel;
+import nars.task.NALTask;
+import nars.term.Term;
+import nars.truth.Truth;
 
-import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.Random;
+
+import static nars.Op.BELIEF;
 
 public class ShapeSensor implements Runnable {
 
     private final Bitmap2D input;
+    private final CauseChannel<Task> in;
+    private final Term id;
+    private final NAR nar;
     //GrayF32 img = null;
     GrayU8 img = null;
 
@@ -41,9 +43,10 @@ public class ShapeSensor implements Runnable {
     static double splitFraction = 0.05;
     static double minimumSideFraction = 0.1;
 
-    static ImagePanel  gui = debug ? new ImagePanel() : null;
+    static ImagePanel  gui = debug ? new ImagePanel(400,200) : null;
 
-    public ShapeSensor(Bitmap2D input, NAgent a) {
+    public ShapeSensor(Term id, Bitmap2D input, NAgent a) {
+        this.id = id;
         this.input = input;
 
         if (debug) {
@@ -51,6 +54,8 @@ public class ShapeSensor implements Runnable {
             gui.setScaling(ScaleOptions.ALL);
         }
 
+        in = a.nar.newCauseChannel(this);
+        this.nar = a.nar;
         a.onFrame(this);
     }
 
@@ -112,13 +117,16 @@ public class ShapeSensor implements Runnable {
         //ThresholdImageOps.threshold(img, img,  mean, true);
 
         // reduce noise with some filtering
-        GrayU8 filtered = BinaryImageOps.erode8(img, 1, null);
-        filtered = BinaryImageOps.dilate8(img, 2, null);
+        GrayU8 filtered = img;
+        //for (int i = 0; i < 2; i++) {
+            filtered = BinaryImageOps.dilate8(filtered, 2, null);
+            filtered = BinaryImageOps.erode8(filtered, 1, null);
+        //}
 
 
         // Find the contour around the shapes
 
-        List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.FOUR /* EIGHT */, null);
+        List<Contour> contours = BinaryImageOps.contour(filtered, ConnectRule.EIGHT /*FOUR*/ /* EIGHT */, null);
 
 //		// Fit a polygon to each shape and draw the results
         Graphics2D g2;
@@ -129,17 +137,20 @@ public class ShapeSensor implements Runnable {
             g2 = null;
         }
 
+        int k = 0;
         for (Contour c : contours) {
             // Fit the polygon to the found external contour.  Note loop = true
-            List<PointIndex_I32> vertexes = ShapeFittingOps.fitPolygon(c.external, true,
+            List<PointIndex_I32> p = ShapeFittingOps.fitPolygon(c.external, true,
                     splitFraction, minimumSideFraction, 100);
 
 
             if (debug) {
                 g2.setColor(Color.getHSBColor(c.id/10f, 0.8f, 0.8f));
-                VisualizeShapes.drawPolygon(vertexes,true,g2);
-                System.out.println(c + ": " + vertexes);
+                VisualizeShapes.drawPolygon(p,true,g2);
+                System.out.println(c + ": " + polygon);
             }
+
+            input(k++, p, w, h);
 
 //			// handle internal contours now
 //			g2.setColor(Color.BLUE);
@@ -157,6 +168,31 @@ public class ShapeSensor implements Runnable {
 //            gui.addImage(polygon, "shapes");
         }
 
+    }
+
+    private void input(int k, List<PointIndex_I32> polygon, float w, float h) {
+        Polygon2D_I32 p = new Polygon2D_I32();
+        for (PointIndex_I32 v : polygon)
+            p.vertexes.add(v);
+        Rectangle2D_I32 quad = new Rectangle2D_I32();
+        UtilPolygons2D_I32.bounding(p, quad);
+        float cx = ((quad.x0 + quad.x1)/2f)/w;
+        float cy = ((quad.y0 + quad.y1)/2f)/h;
+        float cw = quad.getWidth()/w;
+        float ch = quad.getHeight()/h;
+        Term pid = $.p(id, $.the(k));
+        float conf = nar.confDefault(BELIEF);
+
+        long now = nar.time();
+        believe(now, $.inh(pid, $.the("x")), $.t(cx, conf));
+        believe(now, $.inh(pid, $.the("y")), $.t(cy, conf));
+        believe(now, $.inh(pid, $.the("w")), $.t(cw, conf));
+        believe(now, $.inh(pid, $.the("h")), $.t(ch, conf));
+    }
+
+    private void believe(long now, Term term, Truth truth) {
+        float pri = nar.priDefault(BELIEF);;
+        in.input((Task)new NALTask(term, BELIEF, truth, now, now, now, nar.time.nextInputStamp() ).pri(pri));
     }
 
 

@@ -1,10 +1,8 @@
 package nars.rdfowl;
 
-import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
-import nars.concept.Concept;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -84,7 +82,7 @@ public class NQuadsRDFTest {
             NQuadsRDF.stream(n, new File(
                     input
             )).peek(t -> {
-                t.pri(n.priorityDefault(t.punc()) / 10f);
+                t.pri(n.priDefault(t.punc()) / 10f);
                 pout.println(t + ".");
             }).forEach(x -> {
                 n.input(x);

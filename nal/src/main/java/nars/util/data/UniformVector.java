@@ -28,7 +28,7 @@ public class UniformVector  {
         nar = n;
         this.prefix = prefix;
         this.data = data;
-        priority = n.priorityDefault(BELIEF);
+        priority = n.priDefault(BELIEF);
     }
 
     public void update() {

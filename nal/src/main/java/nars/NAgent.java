@@ -17,7 +17,6 @@ import nars.task.NALTask;
 import nars.term.Term;
 import nars.term.atom.Atomic;
 import nars.term.var.Variable;
-import nars.time.Tense;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
