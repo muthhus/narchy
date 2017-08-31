@@ -85,8 +85,8 @@ public final class STMLinkage extends TaskService {
                 if (cb != null && !cb.equals(ca)) { //null or same concept?
 
                     //TODO handle overflow?
-                    //cb.termlinks().putAsync(new PLink(ca.term(), interStrength));
-                    //ca.termlinks().putAsync(new PLink(cb.term(), interStrength));
+                    cb.termlinks().putAsync(new PLink(ca.term(), interStrength));
+                    ca.termlinks().putAsync(new PLink(cb.term(), interStrength));
 
                     //tasklinks, not sure:
                     cb.tasklinks().putAsync( new PLink<>(ta, interStrength));

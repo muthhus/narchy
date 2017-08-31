@@ -30,21 +30,23 @@ abstract public class DurService extends CycleService {
 
     @Override
     public final void accept(NAR nar) {
-        long lastNow = this.now;
-        long now = nar.time();
-        if (now - lastNow >= durations.floatValue() * nar.dur()) {
-            if (busy.compareAndSet(false, true)) {
-                this.now = now;
-                nar.runLater(() -> { //asynch
-                    try {
-                        run(nar);
-                    } finally {
-                        busy.set(false);
+        //long lastNow = this.now;
+        //long now = nar.time();
+        //if (now - lastNow >= durations.floatValue() * nar.dur()) {
+        {
+            nar.runLater(() -> { //asynch
+                long noww = nar.time();
+                if (noww - this.now >= durations.floatValue() * nar.dur()) {
+                    if (busy.compareAndSet(false, true)) {
+                        this.now = noww;
+                        try {
+                            run(nar);
+                        } finally {
+                            busy.set(false);
+                        }
                     }
-                });
-            }
-
+                }
+            });
         }
     }
-
 }

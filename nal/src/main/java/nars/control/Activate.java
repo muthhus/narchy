@@ -81,9 +81,10 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
         origin.tasklinks().putAsync(
-                //new PLinkUntilDeleted<>(t, activation)
-                new PLink<>(t, activation)
+                new PLinkUntilDeleted<>(t, activation)
+                //new PLink<>(t, activation)
         );
+
 
 
 //            if (origin instanceof CompoundConcept) {
@@ -130,50 +131,59 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         float decayed = cPri * decayRate;
         priSub(decayed); //for balanced budgeting: important
 
-        Collection<Termed> localTemplates = id.templates(nar);
-        float subDecay = decayed / localTemplates.size();
-        float balance = Param.TERMLINK_BALANCE;
-        float subDecayForward = subDecay * balance;
-        float subDecayReverse = subDecay * (1f - balance);
-        Term thisTerm = id.term();
-        float activationFactor = 1f; //priElseZero();
-
-        List<Concept> localSubConcepts = $.newArrayList(); //temporary for this function call only, so as not to retain refs to Concepts
         final Bag<Term, PriReference<Term>> termlinks = id.termlinks().commit();//.normalize(0.1f);
 
-        Random rng = nar.random();
-        for (Termed localSub : localTemplates) {
-            float d;
 
-            localSub = local(localSub, rng); //for special Termed instances, ex: RotatedInt etc
+        Collection<Termed> localTemplates = id.templates(nar);
 
-            if (localSub.op().conceptualizable) {
 
-                Concept localSubConcept = nar.conceptualize(localSub);
-                if (localSubConcept != null) {
-                    localSubConcept.activate(activationFactor * subDecay, nar);
+        List<Concept> localSubConcepts;
+        if (!localTemplates.isEmpty()) {
+            float subDecay = decayed / localTemplates.size();
+            float balance = Param.TERMLINK_BALANCE;
+            float subDecayForward = subDecay * balance;
+            float subDecayReverse = subDecay * (1f - balance);
+            Term thisTerm = id.term();
+            float activationFactor = 1f; //priElseZero();
 
-                    localSubConcept.termlinks().putAsync(
-                            new PLink(thisTerm, subDecayReverse)
-                    );
-                    localSubConcepts.add(localSubConcept);
+            localSubConcepts = $.newArrayList(); //temporary for this function call only, so as not to retain refs to Concepts
+
+            Random rng = nar.random();
+            for (Termed localSub : localTemplates) {
+                float d;
+
+                localSub = local(localSub, rng); //for special Termed instances, ex: RotatedInt etc
+
+                if (localSub.op().conceptualizable) {
+
+                    Concept localSubConcept = nar.conceptualize(localSub);
+                    if (localSubConcept != null) {
+                        localSubConcept.activate(activationFactor * subDecay, nar);
+
+                        localSubConcept.termlinks().putAsync(
+                                new PLink(thisTerm, subDecayReverse)
+                        );
+                        localSubConcepts.add(localSubConcept);
+                    }
+
+                    d = subDecayForward;
+
+                } else {
+                    d = subDecay; //full subdecay to the non-concept subterm
                 }
 
-                d = subDecayForward;
-
-            } else {
-                d = subDecay; //full subdecay to the non-concept subterm
+                termlinks.putAsync(
+                        new PLink(localSub.term(), d)
+                );
             }
-
-            termlinks.putAsync(
-                    new PLink(localSub.term(), d)
-            );
+        } else {
+            localSubConcepts = Collections.emptyList();
         }
 
 
         List<PriReference<Term>> terml;
         if (termlinks.isEmpty()) {
-            return emptyList();
+            return null;
         } else {
             int tlSampled = Math.min(termlinks.size(), TERMLINKS_SAMPLED);
             terml = $.newArrayList(tlSampled);
@@ -181,9 +191,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         }
 
         int tasklSize = taskl.size();
-        if (tasklSize == 0) return emptyList();
+        if (tasklSize == 0) return null;
         int termlSize = terml.size();
-        if (termlSize == 0) return emptyList();
+        if (termlSize == 0) return null;
 
         List<Premise> premises = $.newArrayList(tasklSize * termlSize);
 

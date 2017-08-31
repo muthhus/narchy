@@ -206,13 +206,13 @@ public class NAL5Test extends AbstractNALTest {
 
     }
 
-    @Test
-    public void compound_composition_SubjPosNeg() {
-        test
-            .believe("<<robin --> bird> ==> <robin --> animal>>") //.en("If robin is a type of bird then robin is a type of animal.")
-            .believe("--<<robin --> [alien]> ==> <robin --> animal>>") //.en("If robin is alien then robin isnt a type of animal.");
-            .mustBelieve(cycles, " <(&&,<robin --> bird>, --<robin --> [alien]>) ==> <robin --> animal>>", 1f, 0.81f); //.en("If robin isnt alien and is a type of bird then robin is a type of animal.");
-    }
+//    @Test
+//    public void compound_composition_SubjPosNeg() {
+//        test
+//            .believe("<<robin --> bird> ==> <robin --> animal>>") //.en("If robin is a type of bird then robin is a type of animal.")
+//            .believe("--<<robin --> [alien]> ==> <robin --> animal>>") //.en("If robin is alien then robin isnt a type of animal.");
+//            .mustBelieve(cycles, " <(&&,<robin --> bird>, --<robin --> [alien]>) ==> <robin --> animal>>", 1f, 0.81f); //.en("If robin isnt alien and is a type of bird then robin is a type of animal.");
+//    }
 
     @Test
     public void compound_decomposition_two_premises1() {

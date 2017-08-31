@@ -90,7 +90,10 @@ public class Conclusion extends AbstractPred<Derivation> {
 //            b1 = b2;
 //        }
 
-        assert (b1.varPattern() == 0) : b1 + " has pattern variables";
+        //assert (b1.varPattern() == 0) : b1 + " has pattern variables";
+        if (b1.varPattern() > 0)
+            return true;
+
         if (!b1.op().conceptualizable)
             return true;
 

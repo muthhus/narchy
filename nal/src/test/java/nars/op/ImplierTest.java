@@ -25,7 +25,7 @@ public class ImplierTest {
 
         for (int i = 0; i < 2; i++) {
 
-            n.run(1);
+            n.run(2);
             System.out.println(imp.impl);
             assertEquals(2, imp.impl.nodeCount());
             assertEquals(1, imp.impl.edgeCount());

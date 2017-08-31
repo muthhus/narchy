@@ -51,6 +51,7 @@ import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 import static nars.$.$;
+import static nars.Builder.Compound.HijackCompoundBuilder;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static spacegraph.SpaceGraph.window;
@@ -124,6 +125,8 @@ abstract public class NAgentX extends NAgent {
 
     public static NAR runRT(Function<NAR, NAgent> init, float fps, long endTime) {
 
+        Builder.Subterms.the = Builder.Subterms.HijackSubtermBuilder;
+        Builder.Compound.the = Builder.Compound.HijackCompoundBuilder;
 
         float durFPS =
                 fps;
@@ -139,7 +142,7 @@ abstract public class NAgentX extends NAgent {
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
                 ,"motivation.nal");
 
-        int THREADS = 3;
+        int THREADS = 2;
         NAR n = new NARS()
                 .exe(
                         new MultiExec((i) ->
@@ -158,7 +161,7 @@ abstract public class NAgentX extends NAgent {
                 .time(clock)
                 .index(
                         //new CaffeineIndex(128 * 1024)
-                        new CaffeineIndex2(128 * 1024)
+                        new CaffeineIndex2(64 * 1024)
                         //new HijackTermIndex(64 * 1024,  3)
                 )
                 .get();
@@ -169,7 +172,7 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.85f);
+        n.goalConfidence(0.8f);
 
 
 

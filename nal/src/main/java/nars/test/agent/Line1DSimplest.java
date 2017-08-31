@@ -6,6 +6,7 @@ import nars.NAR;
 import nars.NAgent;
 import nars.concept.GoalActionConcept;
 import nars.concept.ScalarConcepts;
+import nars.concept.SensorConcept;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,20 +32,20 @@ public class Line1DSimplest extends NAgent {
      * the current value
      */
     public final FloatParam o = new FloatParam(0.5f, 0, 1f);
-    public final ScalarConcepts in;
+    public final SensorConcept in;
 
 
     public Line1DSimplest(NAR n) {
         super("", n);
         
 
-//        in = senseNumber( $.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
-//                this.i
-//        );
-        in = senseNumber(
-                //$.inh($.the("i"), id),
-                $.the("i"),
-                this.i, 2, ScalarConcepts.Needle);
+        in = senseNumber( $.the("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+                this.i
+        );
+//        in = senseNumber(
+//                //$.inh($.the("i"), id),
+//                $.the("i"),
+//                this.i, 2, ScalarConcepts.Needle);
 
 //        action( new GoalActionConcept($.p($.the("o"), id), nar, (b,d) -> {
 //            if (d!=null) {

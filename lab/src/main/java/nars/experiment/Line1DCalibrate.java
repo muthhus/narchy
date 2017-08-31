@@ -18,6 +18,7 @@ import spacegraph.widget.meter.Plot2D;
 import java.util.List;
 
 import static java.lang.Math.PI;
+import static nars.Op.IMPL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.VERTICAL;
 import static spacegraph.layout.Grid.col;
@@ -49,21 +50,22 @@ public class Line1DCalibrate {
 
             };
 
-            float tHz = 0.005f; //in time units
+            float tHz = 0.05f; //in time units
             float yResolution = 0.1f; //in 0..1.0
             float periods = 16;
 
             final int runtime = Math.round(periods / tHz);
 
-            n.onTask(t -> {
-               if (t instanceof DerivedTask) {
-                   if (t.isGoal()) {
-                       System.out.println(t.proof());
-                   } else {
-                       System.out.println(t.toString(n));
-                   }
-               }
-            });
+//            n.onTask(t -> {
+//               if (t instanceof DerivedTask) {
+//                   if (t.isGoal()) {
+//                       System.out.println(t.proof());
+//                       System.out.println();
+//                   } else {
+//                       System.err.println(t.toString(n));
+//                   }
+//               }
+//            });
 
             a.speed.setValue(yResolution);
 
@@ -102,32 +104,38 @@ public class Line1DCalibrate {
 
 //            a.runCycles(runtime);
 
-                    new Thread(() -> {
-                        //NAgentX.chart(a);
-                        int history = 800;
-                        window(
-                                row(
-                                        conceptPlot(a.nar, Lists.newArrayList(
-                                                () -> (float) a.i.floatValue(),
-                                                a.o,
-                                                //a.out.feedback.current!=null ? a.out.feedback.current.freq() : 0f,
-                                                () -> a.reward
-                                                //() -> a.rewardSum
-                                                )
-                                                ,
-                                                history),
-                                        col(
-                                                new Vis.EmotionPlot(history, a),
-                                                new ReflectionSurface<>(a),
-                                                Vis.beliefCharts(history,
-                                                        Iterables.concat(a.sensors.keySet(), a.actions.keySet()), a.nar)
-                                        )
-                                )
-                                , 900, 900);
+//                    new Thread(() -> {
+//                        //NAgentX.chart(a);
+//                        int history = 800;
+//                        window(
+//                                row(
+//                                        conceptPlot(a.nar, Lists.newArrayList(
+//                                                () -> (float) a.i.floatValue(),
+//                                                a.o,
+//                                                //a.out.feedback.current!=null ? a.out.feedback.current.freq() : 0f,
+//                                                () -> a.reward
+//                                                //() -> a.rewardSum
+//                                                )
+//                                                ,
+//                                                history),
+//                                        col(
+//                                                new Vis.EmotionPlot(history, a),
+//                                                new ReflectionSurface<>(a),
+//                                                Vis.beliefCharts(history,
+//                                                        Iterables.concat(a.sensors.keySet(), a.actions.keySet()), a.nar)
+//                                        )
+//                                )
+//                                , 900, 900);
+//
+//                    }).start();
 
-                    }).start();
-
-            n.startFPS(1);
+            //n.startFPS(100);
+            n.run(2000);
+            n.tasks().forEach(x -> {
+               if (x.isBelief() && x.op()==IMPL) {
+                   System.out.println(x.proof());
+               }
+            });
 
 
         }

@@ -24,6 +24,7 @@
 
     (A --> C), (B --> C), task("."), neqRCom(A,B)  |- (A --> B), (Punctuation:Question)
 
+
 //// similarity-based syllogism ////////////////////////////////////////////////////////////////////////////////////
 //If P and S are a special case of M, then they might be similar (weak),
 //also if P and S are a general case of M
@@ -49,7 +50,7 @@
         //(S <-> (--,%P)), (P --> S) |- (--,(S --> P)), (Belief:ReduceConjunction, Goal:Strong)
 
 //Conversion
-    (P --> S), (S --> P),                               task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief)
+    (P --> S), (S --> P),             task("?") |- (P --> S),   (Belief:Conversion, Punctuation:Belief)
 
 //Inheritance to Similarity
     (S <-> P), (S --> P), task("?") |- (S <-> P), (Belief:StructuralAbduction, Punctuation:Belief)

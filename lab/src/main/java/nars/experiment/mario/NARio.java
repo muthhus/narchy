@@ -195,6 +195,7 @@ public class NARio extends NAgentX {
             NAgentX x = null;
             try {
                 x = new NARio(n);
+                //x.durations.setValue(2f);
                 x.trace = true;
             } catch (Narsese.NarseseException e) {
                 e.printStackTrace();
@@ -222,7 +223,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 20);
+        }, 40);
 
 
 

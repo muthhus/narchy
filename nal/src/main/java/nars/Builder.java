@@ -43,7 +43,7 @@ public class Builder {
                     }
                 };
 
-        private static Function<Term[], TermContainer> HijackSubtermBuilder =
+        public static Function<Term[], TermContainer> HijackSubtermBuilder =
                 new Function<Term[], TermContainer>() {
 
                     final HijackMemoize<NewCompound, TermContainer> cache
@@ -59,9 +59,9 @@ public class Builder {
                 };
 
         public static Function<Term[], TermContainer> the =
-                //HeapSubtermBuilder;
+                HeapSubtermBuilder;
                 //CaffeineSubtermBuilder;
-                HijackSubtermBuilder;
+                //HijackSubtermBuilder;
 
     }
 
@@ -92,7 +92,7 @@ public class Builder {
         };
 
 
-        private static BiFunction<Op, Term[], Term> HijackCompoundBuilder =
+        public static BiFunction<Op, Term[], Term> HijackCompoundBuilder =
                 new BiFunction<Op, Term[], Term>() {
 
                     final HijackMemoize<NewCompound, Term> cache
@@ -108,8 +108,8 @@ public class Builder {
                 };
 
         public static BiFunction<Op, Term[], Term> the =
-            //HeapCompoundBuilder;
-            HijackCompoundBuilder;
+            HeapCompoundBuilder;
+            //HijackCompoundBuilder;
 
     }
 }
