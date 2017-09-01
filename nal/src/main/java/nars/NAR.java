@@ -1604,7 +1604,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final FasterList<Cause> causes = new FasterList(512);
 
 
+    /** default deriver */
     public Derivation derivation() {
+        return derivation(deriver);
+    }
+
+    /** another deriver */
+    public Derivation derivation(PrediTerm<Derivation> deriver) {
         return derivation.get().cycle(deriver);
     }
 

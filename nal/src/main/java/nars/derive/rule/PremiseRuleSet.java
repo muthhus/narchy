@@ -37,14 +37,14 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     private final boolean permuteBackwards, permuteForwards;
 
     @NotNull
-    public static PremiseRuleSet rules(boolean permute, String... name) {
+    public static PremiseRuleSet rules(boolean permute, String... filename) {
 
         final PatternTermIndex p = new PatternTermIndex();
-        PremiseRuleSet rs = new PremiseRuleSet(parsedRules(p, name), p, permute);
+        PremiseRuleSet rs = new PremiseRuleSet(parsedRules(p, filename), p, permute);
 
         //logger.info("{} totalRules={}, uniqueComponents={}", name, rs.rules.size(), rs.patterns.size());
         if (rs.errors[0] > 0) {
-            logger.error("{} errors={}", name, rs.errors[0]);
+            logger.error("{} errors={}", filename, rs.errors[0]);
         }
 
         return rs;
@@ -80,23 +80,14 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     @NotNull
     public final PatternTermIndex patterns;
 
-
     private static final Logger logger = LoggerFactory.getLogger(PremiseRuleSet.class);
 
 
-    public PremiseRuleSet(PatternTermIndex index, @NotNull PremiseRule... rules) {
-        this(false, index, rules);
+    @Deprecated public PremiseRuleSet(PatternTermIndex index, @NotNull String... rules) {
+        this(false, index, (PremiseRule[]) parse($.terms, rules));
     }
 
-    public PremiseRuleSet(@NotNull String... rules) {
-        this(new PatternTermIndex(), rules);
-    }
-
-    public PremiseRuleSet(PatternTermIndex index, @NotNull String... rules) {
-        this(index, (PremiseRule[]) parse($.terms, rules));
-    }
-
-    public PremiseRuleSet(boolean permute, @NotNull PatternTermIndex index, @NotNull PremiseRule... rules) {
+    @Deprecated public PremiseRuleSet(boolean permute, @NotNull PatternTermIndex index, @NotNull PremiseRule... rules) {
         super();
         this.patterns = index;
         for (PremiseRule p : rules) {
@@ -115,7 +106,20 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
     public PremiseRuleSet(@NotNull Stream<Pair<PremiseRule, String>> parsed, @NotNull PatternTermIndex patterns, boolean permute) {
         this.patterns = patterns;
         this.permuteBackwards = this.permuteForwards = permute;
-        permute(parsed, patterns).forEach(this::add);
+        parsed.map(rawAndSrc -> {
+
+            String src = rawAndSrc.getTwo();
+
+            Collection<PremiseRule> ur = $.newArrayList(4);
+            try {
+                PremiseRule preNorm = new PremiseRule(rawAndSrc.getOne());
+                permute(preNorm, src, patterns, ur);
+            } catch (RuntimeException ex) {
+                throw new RuntimeException("Invalid TaskRule: " + src, ex);
+            }
+
+            return ur;
+        }).flatMap(Collection::stream).forEach(this::add);
     }
 
 
@@ -219,7 +223,7 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
 //            .builder();
 
     @NotNull
-    static Stream<Pair<PremiseRule, String>> parse(@NotNull Stream<String> rawRules, @NotNull PatternTermIndex index) {
+    public static Stream<Pair<PremiseRule, String>> parse(@NotNull Stream<String> rawRules, @NotNull PatternTermIndex index) {
 
         return rawRules.map(src -> Tuples.pair(lines.computeIfAbsent(src, s -> {
             try {
@@ -276,24 +280,6 @@ public class PremiseRuleSet extends HashSet<PremiseRule> {
         }
 
         return TermVector.the(a, b);
-    }
-
-    @NotNull
-    Stream<PremiseRule> permute(@NotNull Stream<Pair<PremiseRule, String>> rawRules, @NotNull PatternTermIndex index) {
-        return rawRules.map(rawAndSrc -> {
-
-            String src = rawAndSrc.getTwo();
-
-            Collection<PremiseRule> ur = $.newArrayList(4);
-            try {
-                PremiseRule preNorm = new PremiseRule(rawAndSrc.getOne());
-                permute(preNorm, src, index, ur);
-            } catch (RuntimeException ex) {
-                throw new RuntimeException("Invalid TaskRule: " + src, ex);
-            }
-
-            return ur;
-        }).flatMap(Collection::stream);
     }
 
     @NotNull

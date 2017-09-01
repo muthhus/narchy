@@ -74,7 +74,7 @@ public class Premise extends UnaryTask {
 
         int ttlMax = n.matchTTL.intValue(); //TODO adjust this, maybe by priority and other factors
 
-        Derivation d = n.derivation();
+        Derivation d = derivation(n);
         d.nar.emotion.conceptFirePremises.increment();
 
 
@@ -277,6 +277,10 @@ public class Premise extends UnaryTask {
 //            System.out.println(ds + " " + d.transformsCache.stats());
 
 
+    }
+
+    protected Derivation derivation(@NotNull NAR n) {
+        return n.derivation();
     }
 
     /**

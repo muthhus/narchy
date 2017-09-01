@@ -22,7 +22,9 @@ import org.junit.Test;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Stream;
 
+import static nars.derive.rule.PremiseRuleSet.parse;
 import static org.junit.Assert.*;
 
 /**
@@ -94,7 +96,8 @@ public class TrieDeriverTest {
 
     public static PrediTerm<Derivation> testCompile(NAR n, boolean debug, String... rules) {
 
-        PremiseRuleSet src = new PremiseRuleSet(rules);
+        @NotNull PatternTermIndex pi = new PatternTermIndex();
+        PremiseRuleSet src = new PremiseRuleSet(PremiseRuleSet.parse(Stream.of(rules), pi), pi, false);
         PrediTerm d = TrieDeriver.the(src, n);
 
         if (debug) d.printRecursive();
@@ -106,21 +109,21 @@ public class TrieDeriverTest {
             byIdentity.add(a);
         });
 
-        if (debug) {
-            System.out.println("           volume: " + d.volume());
-            System.out.println("       complexity: " + d.complexity());
-            System.out.println("terms by equality: " + byEquality.size());
-            System.out.println("terms by identity: " + byIdentity.size());
-
-            System.out.println("  values: " + n.causes.size());
-            n.causes.forEach(System.out::println);
-        }
-        assertTrue(n.causes.size() > 0);
-
-        if (debug) {
-            System.out.println();
-            TrieDeriver.print(d, System.out);
-        }
+//        if (debug) {
+//            System.out.println("           volume: " + d.volume());
+//            System.out.println("       complexity: " + d.complexity());
+//            System.out.println("terms by equality: " + byEquality.size());
+//            System.out.println("terms by identity: " + byIdentity.size());
+//
+//            System.out.println("  values: " + n.causes.size());
+//            n.causes.forEach(System.out::println);
+//        }
+//        assertTrue(n.causes.size() > 0);
+//
+//        if (debug) {
+//            System.out.println();
+//            TrieDeriver.print(d, System.out);
+//        }
 
         return d;
 
@@ -152,9 +155,9 @@ public class TrieDeriverTest {
                 "(A --> B), C, task(\"?\") |- (A ==> C), (Punctuation:Question)"
         };
 
-        Set<Task> t1 = testDerivation(rules, "(a-->b).", "b", 64, false);
+        Set<Task> t1 = testDerivation(rules, "(a-->b)?", "b", 64, false);
         assertEquals(2, t1.size());
-        Set<Task> t2 = testDerivation(rules, "(a<->b).", "b", 64);
+        Set<Task> t2 = testDerivation(rules, "(a<->b)?", "b", 64);
         assertEquals(0, t2.size());
 
     }
@@ -165,7 +168,7 @@ public class TrieDeriverTest {
                 "(P --> S), (S --> P), task(\"?\") |- (P --> S),   (Punctuation:Quest)"
         };
 
-        Set<Task> t1 = testDerivation(rules, "(a-->b)?", "(b-->a)", 64, false);
+        Set<Task> t1 = testDerivation(rules, "(a-->b)?", "(b-->a)", 64, true);
         assertEquals(1, t1.size());
 
     }
@@ -187,7 +190,12 @@ public class TrieDeriverTest {
         assertNotNull(t);
         Term b = n.term(belief);
         assertNotNull(b);
-        Iterable<? extends ITask> derived = new Premise(t, b, 0.5f).run(n);
+
+        Iterable<? extends ITask> derived = new Premise(t, b, 0.5f) {
+            @Override protected Derivation derivation(@NotNull NAR n) {
+                return n.derivation(d);
+            }
+        }.run(n);
         if (derived!=null) {
             derived.forEach(x ->
                     tasks.add((Task) x)

@@ -446,8 +446,8 @@ public abstract class Unify extends Versioning implements Subst {
 
     public boolean constrain(MatchConstraint... cc) {
         for (MatchConstraint m : cc) {
-            Versioned<Term> v = xy.getOrCreateIfAbsent(m.target);
-            if (!((ConstrainedVersionedTerm) v).constrain(m))
+            Versioned<Term> v = xy.map.get(m.target);
+            if (v!=null && !((ConstrainedVersionedTerm) v).constrain(m))
                 return false;
         }
         return true;
