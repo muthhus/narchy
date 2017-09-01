@@ -13,11 +13,11 @@ public class TopN<E> extends SortedArray<E> {
     }
 
     @Override
-    protected float add(E element, FloatFunction<E> cmp, int s, float elementRank) {
+    protected float add(E element, float elementRank, FloatFunction<E> cmp, int size) {
         if (size() == list.length && elementRank < minSeen)
             return Float.NaN; //insufficient
 
-        return super.add(element, cmp, s, elementRank);
+        return super.add(element, elementRank, cmp, size);
     }
 
     @Override

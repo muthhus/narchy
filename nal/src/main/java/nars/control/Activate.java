@@ -393,7 +393,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         switch (host.op()) {
 
             case PROD:
-                return 1;
+                return 0;
 
             case SETe:
             case SETi:

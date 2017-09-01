@@ -59,6 +59,7 @@ public class Implier extends DurService {
     final static TruthOperator ind = GoalFunction.get($.the("InductionRecursivePB"));
     private long now;
     private long next;
+    private float strength = 0.5f;
 
     public Implier(NAR n, Term... seeds) {
         this(n, List.of(seeds));
@@ -187,9 +188,9 @@ public class Implier extends DurService {
         goalTruth.forEach((t, a) -> {
             @Nullable Truth uu = a.commitSum();
             if (uu != null) {
-                float c = uu.conf();
+                float c = uu.conf() * strength;
                 if (c >= confMin) {
-                    NALTask y = new NALTask(t, GOAL, uu, now, now, next /* + dur */,
+                    NALTask y = new NALTask(t, GOAL, uu, now, now, now + dur /* + dur */,
                             nar.time.nextInputStamp());
                     y.pri(nar.priDefault(GOAL));
 //                        if (Param.DEBUG)

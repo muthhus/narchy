@@ -139,10 +139,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                         if (validUnwrappableSubterms(subj.subterms())) {
                             int s = subj.size();
                             FasterList<Term> lx = new FasterList(s);
-                            if (subj instanceof Int.IntRange || so==PROD && subj.hasAny(INT)) {
+                            if (subj instanceof Int.IntRange || so == PROD && subj.hasAny(INT)) {
                                 Int.unroll(subj).forEachRemaining(dsi -> lx.add(INH.the(dsi, pred)));
                             }
-                            if (so!=PROD) {
+                            if (so != PROD) {
                                 for (int i = 0; i < s; i++) {
                                     Term csi = subj.sub(i);
                                     //                                if (csi instanceof Int.IntRange) {
@@ -289,16 +289,16 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         if (beliefOrGoal && o.beliefable || !beliefOrGoal && o.goalable) {
             DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable(c));
             return b;
-        } else {
-            return BeliefTable.Empty;
         }
+
+        return BeliefTable.Empty;
     }
 
     @Override
     public TemporalBeliefTable newTemporalBeliefTable(Term c) {
         if (c.complexity() < 12) {
             return new RTreeBeliefTable();
-                //c.complexity() < 6 ? new DisruptorBlockingQueue() : new LinkedBlockingQueue<>()/
+            //c.complexity() < 6 ? new DisruptorBlockingQueue() : new LinkedBlockingQueue<>()/
         } else {
             return new HijackTemporalBeliefTable();
         }
@@ -335,7 +335,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         }
 
         Concept c = newConcept(term);
-        if (c!=null) {
+        if (c != null) {
             c.state(awake);
         }
         return c;

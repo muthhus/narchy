@@ -164,43 +164,47 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
     public final float add(final E element, FloatFunction<E> cmp) {
         float elementRank = cmp.floatValueOf(element);
 
-        return add(element, cmp, this.size, elementRank);
+        return add(element, elementRank, cmp, this.size);
     }
 
-    protected float add(E element, FloatFunction<E> cmp, int s, float elementRank) {
-        if (s < binarySearchThreshold)
-            return addLinear(element, s, elementRank, cmp);
+    protected float add(E element, float elementRank, FloatFunction<E> cmp, int size) {
+        if (size < binarySearchThreshold)
+            return addLinear(element, elementRank, cmp, size);
         else
-            return addBinary(element, s, elementRank, cmp);
+            return addBinary(element, elementRank, cmp, size);
     }
 
-    public float addBinary(E element, int s, float elementRank, FloatFunction<E> cmp) {
+    public float addBinary(E element, float elementRank, FloatFunction<E> cmp, int size) {
         // use the binary search
-        final int index = this.findInsertionIndex(elementRank, 0, s - 1, new int[1], cmp);
+        final int index = this.findInsertionIndex(elementRank, 0, size - 1, new int[1], cmp);
 
-        final E last = list[s - 1];
+        return insert(element, index, elementRank, cmp, size);
+    }
+
+    private float insert(E element, int index, float elementRank, FloatFunction<E> cmp, int size) {
+        final E last = list[size - 1];
 
         boolean added;
-        if (index == s || Util.fastCompare(cmp.floatValueOf(last), elementRank) < 0) {
-            added = addInternal(element);
+        if (index == size || Util.fastCompare(cmp.floatValueOf(last), elementRank) < 0) {
+            added = addEnd(element);
         } else {
-            added = (index == -1 ? addInternal(element) : addInternal(index, element));
+            added = (index == -1 ? addEnd(element) : addInternal(index, element));
         }
 
         return added ? elementRank : Float.NaN;
     }
 
-    public float addLinear(E element, int s, float elementRank, FloatFunction<E> cmp) {
+    public float addLinear(E element, float elementRank, FloatFunction<E> cmp, int size) {
         Object[] l = this.list;
-        if (s > 0 && l.length > 0) {
-            for (int i = 0; i < s; i++) {
+        if (size > 0 && l.length > 0) {
+            for (int i = 0; i < size; i++) {
                 final E current = (E) l[i];
                 if (0 <= Util.fastCompare(cmp.floatValueOf(current), elementRank)) {
                     return addInternal(i, element) ? elementRank : Float.NaN;
                 }
             }
         }
-        return addInternal(element) ? elementRank : Float.NaN; //add to end
+        return addEnd(element) ? elementRank : Float.NaN; //add to end
     }
 
 
@@ -212,7 +216,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
         return true;
     }
 
-    public boolean addInternal(E e) {
+    public boolean addEnd(E e) {
         int s = this.size;
         Object[] l = this.list;
         if (l.length == s) {
@@ -240,7 +244,7 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
             this.addAtIndex(index, e);
             return true;
         } else if (index == s) {
-            return this.addInternal(e);
+            return this.addEnd(e);
         }
         throw new UnsupportedOperationException();
 //		else
@@ -324,16 +328,35 @@ public abstract class SortedArray<E> extends AbstractCollection<E> implements It
         }
 
         //TODO only if decreased
-        if (delta < 0 && index < size-1) {
+        int s = this.size;
+        if (delta < 0 && index < s -1) {
             float f = cmp.floatValueOf(list[index + 1]);
             if (f < cur)
                 reinsert = true;
         }
 
         if (reinsert) {
-            E i = remove(index);
-            add(i, cmp);
+            int next = this.findInsertionIndex(cur, 0, s - 1, new int[1], cmp);
+            if (next == index-1) {
+                //swap with above
+                swap(index, index-1);
+            } else if (next == index+1 ) {
+                //swap with below
+                swap(index, index+1);
+            } else {
+                //remove and insert somewhere else
+                E i = remove(index);
+                insert(i, next, cur, cmp, s);
+            }
         }
+    }
+
+    private void swap(int a, int b) {
+        assert(a!=b);
+        E[] l = this.list;
+        E x = l[b];
+        l[b] = l[a];
+        l[a] = x;
     }
 
 

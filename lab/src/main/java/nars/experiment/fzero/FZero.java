@@ -112,9 +112,9 @@ public class FZero extends NAgentX {
                         () -> nar.emotion.busyVol.getSum()
                     ).decay(0.9f)
                 ).out(
-                        new StepController((x) -> c.in.amplitude(x), 0, 0.25f, 0.5f, 0.75f, 1f)
+                        new StepController((x) -> c.in.amplitude(x), 0, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f)
                 ).out(
-                        new StepController((x) -> ang.in.amplitude(x), 0, 0.25f, 0.5f, 0.75f, 1f)
+                        new StepController((x) -> ang.in.amplitude(x), 0, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f)
                 ).get(nar);
 
 
