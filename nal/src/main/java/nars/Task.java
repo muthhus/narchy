@@ -423,8 +423,9 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
                 //cw = 0; //immediate cut-off
 
 
-                if (eternalizable()) {
-                    float et = t.eviEternalized();
+                float ete = eternalizable();
+                if (ete > 0) {
+                    float et = t.eviEternalized() * ete;
                     if (et > cw)
                         cw = et;
                 }
@@ -437,14 +438,14 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
     }
 
-    default boolean eternalizable() {
 
+    default float eternalizable() {
 
         //return false;
         //return true;
         //return term().vars() > 0;
-        return term().varIndep() > 0;
-        //return term().varIndep() > 0 || term().op() == IMPL; //isAny(Op.IMPL.bit | Op.EQUI.bit);
+        //return term().varIndep() > 0;
+        return term().varIndep() > 0 || term().op() == IMPL ? 0.5f + 0.5f * polarity() : 0f;
         //return true;
         //return op().temporal;
 

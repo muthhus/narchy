@@ -12,6 +12,11 @@ public interface Truthed  {
 
     default float expectation() { return truth().expectation(); }
 
+    /** value between 0 and 1 indicating how distant the frequency is from 0.5 (neutral) */
+    default float polarity() {
+        return Math.abs(0.5f - freq())*2f;
+    }
+
 //    /** balanced form of expectation, where -1 = no, +1 = yes, and 0 = maybe */
 //    default float motivationUnweighted() {
 //        return (freq() - 0.5f) * conf() * 2f;

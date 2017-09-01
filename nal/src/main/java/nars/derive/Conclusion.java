@@ -155,13 +155,13 @@ public class Conclusion extends AbstractPred<Derivation> {
                 long taskStart = d.task.start();
                 if (d.temporal && taskStart == ETERNAL)
                     taskStart = d.time;
-                if (taskStart != ETERNAL) {
-                    /*if (occ[0] < taskStart)*/
-                    {
+                //if (taskStart != ETERNAL) {
+                if (taskStart != ETERNAL && occ[0] < taskStart) {
+
                         long taskDur = occ[1] - occ[0];
                         occ[0] = taskStart;
                         occ[1] = occ[0] + taskDur;
-                    }
+
                 }
             }
 

@@ -171,8 +171,8 @@ abstract public class NAgentX extends NAgent {
         n.confMin.setValue(0.01f);
         n.truthResolution.setValue(0.01f);
 
-        n.beliefConfidence(0.5f);
-        n.goalConfidence(0.5f);
+        n.beliefConfidence(0.9f);
+        n.goalConfidence(0.8f);
 
 
 
@@ -189,8 +189,8 @@ abstract public class NAgentX extends NAgent {
         STMLinkage stmLink = new STMLinkage(n, 1, false);
         MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 3, true, 10f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
-        //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Inperience inp = new Inperience(n, 8, 0.02f);
+        MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
+        Inperience inp = new Inperience(n, 16, 0.05f);
         //Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 32);
 
 
