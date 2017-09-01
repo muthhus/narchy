@@ -133,18 +133,19 @@ public abstract class Param extends Services<Term,NAR> {
     /** abs(term.dt()) safety limit for non-dternal/non-xternal temporal compounds */
     public static int DT_ABS_LIMIT = Integer.MAX_VALUE/256;
 
-    public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
-    public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
+//    public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
+//    public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
 
-    /** pessimistic positive value measuring the cost of inputting a task
+    /** pessimistic positive value measuring the computational cost of
+     * inputting a task
      * (from now until the time of concept processing)
      * this may be balanced by a future positive value (ie. on concept processing) */
     public static float inputCost(Task t, NAR nar) {
 
 //        //prefer simple
-        float c = (1f + ((float)t.complexity())/nar.termVolumeMax.floatValue());
+        float c = ((float)t.complexity())/nar.termVolumeMax.floatValue();
 
-        c *= t.priSafe(0);
+        //c *= t.priSafe(0);
 
         return c;
 //
@@ -254,7 +255,7 @@ public abstract class Param extends Services<Term,NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 16;
+    public static final int CAUSE_CAPACITY = 8;
 
     public final static int UnificationStackMax = 72; //how many assignments can be stored in the 'versioning' maps
 

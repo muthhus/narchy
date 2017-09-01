@@ -212,8 +212,28 @@ public class RecycledSummaryStatistics implements FloatProcedure, StatisticalSum
     /** returns the proportion that is lies between min and max. if min==max, then returns 0.  clips to 0..1.0 */
     public float norm(float x) {
         double min = this.min;
+        double max = this.max;
+        return norm(x, min, max);
+    }
+
+    private static float norm(float x, double min, double max) {
         double r = max - min;
         if (r < Double.MIN_NORMAL) return 0;
         return Util.unitize( (float)((x - min) / r) );
     }
+
+    public float normPolar(float x) {
+        if (x < 0) {
+            return -norm(x, min, 0);
+        } else {
+            return norm(x, 0, max);
+        }
+    }
+
+    public void bipolarize() {
+        double a = Math.max(Math.abs(this.max), Math.abs(this.min));
+        min = -a;
+        max = +a;
+    }
+
 }

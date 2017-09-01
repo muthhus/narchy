@@ -1,19 +1,15 @@
 package nars.control;
 
-import com.google.common.primitives.Doubles;
 import com.google.common.util.concurrent.AtomicDouble;
-import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -38,16 +34,19 @@ public class Cause<X> {
     private float value;
 
     /** value and momentum correspond to the possible values in Purpose enum */
-    public static void update(FasterList<Cause> causes, float[] value, RecycledSummaryStatistics[] valueSummary, float[] momentum) {
+    public static void update(FasterList<Cause> causes, float[] value, RecycledSummaryStatistics[] summary, float[] momentum) {
 
-        for (RecycledSummaryStatistics r : valueSummary)
+        for (RecycledSummaryStatistics r : summary)
             r.clear();
 
         for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
-            causes.get(i).commit(momentum, valueSummary);
+            causes.get(i).commit(momentum, summary);
         }
 
         int p = value.length;
+        for (int j = 0; j < p; j++) {
+            summary[j].bipolarize();
+        }
 
         for (float v : value) assert(v >= 0): "value should be non-negative";
 
@@ -55,10 +54,12 @@ public class Cause<X> {
             Cause c = causes.get(i);
             float v = 0;
             for (int j = 0; j < p; j++) {
-                v += value[j] * valueSummary[j].norm( c.purpose[j].current );
+                v += value[j] * summary[j].normPolar( c.purpose[j].current );
             }
             c.setValue(v);
         }
+
+
 
 //        System.out.println("WORST");
 //        causes.stream().map(x -> PrimitiveTuples.pair(x, x.negTotal())).sorted(
@@ -95,13 +96,10 @@ public class Cause<X> {
         public void commit(float momentum) {
             double next = getAndSet(0);
             this.total += next;
-            this.current = decay(current, next, momentum);
+            this.current = smooth(current, next, momentum);
         }
     }
 
-    /** pos,neg range limit */
-    final static float LIMIT = 1;
-    final static float EPSILON = 0.0000001f;
 
     public final short id;
     public final Object name;
@@ -215,8 +213,8 @@ public class Cause<X> {
         //return Util.tanhFast( pos ) - Util.tanhFast( neg );
     }
 
-    static float decay(float cur, double acc, float momentum) {
-        return Util.clamp( (float)((cur * momentum) + acc), 0, +LIMIT);
+    static float smooth(float cur, double next, float momentum) {
+        return (float)((cur * momentum) + ((1f - momentum) * next));
     }
 
 }

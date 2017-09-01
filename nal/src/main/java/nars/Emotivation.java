@@ -101,8 +101,10 @@ public class Emotivation extends Emotion {
             //float p0 = t.priSafe(0);
             float cost = Param.inputCost(t, nar);
 
-            if (cost != 0)
+            if (cost != 0) {
+                value(Cause.Purpose.Active, nar.taskCauses.get(t), -cost);
                 value(Cause.Purpose.Active, t.cause(), -cost);
+            }
 
             evaluate(t);
         }

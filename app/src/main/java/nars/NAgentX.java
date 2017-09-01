@@ -143,7 +143,7 @@ abstract public class NAgentX extends NAgent {
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
                 ,"motivation.nal");
 
-        int THREADS = 3;
+        int THREADS = 2;
         NAR n = new NARS()
                 .exe(
                         new MultiExec((i) ->
