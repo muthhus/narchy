@@ -13,8 +13,16 @@ final public class TaskPunctuation extends AbstractPred<Derivation> {
 
     public final byte punc;
 
-    public static final PrediTerm Belief = new TaskPunctuation('.');
-    public static final PrediTerm Goal = new TaskPunctuation('!');
+    public static final PrediTerm<Derivation> Belief = new TaskPunctuation('.');
+    public static final PrediTerm<Derivation> Goal = new TaskPunctuation('!');
+
+    public static final PrediTerm<Derivation> BeliefOrGoal  = new AbstractPred<Derivation>("task:\".!\"") {
+        @Override
+        public boolean test(@NotNull Derivation o) {
+            byte c = o.taskPunct;
+            return c == Op.BELIEF || c == Op.GOAL;
+        }
+    };
 
     public static final PrediTerm<Derivation> QuestionOrQuest = new AbstractPred<Derivation>("task:\"?@\"") {
         @Override

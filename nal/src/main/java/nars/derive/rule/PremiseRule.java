@@ -214,6 +214,7 @@ public class PremiseRule extends GenericCompound {
         if (b == TaskPunctuation.Belief) return TaskPunctuation.class;
         if (b == TaskPunctuation.Question) return TaskPunctuation.class;
         if (b == TaskPunctuation.Quest) return TaskPunctuation.class;
+        if (b == TaskPunctuation.BeliefOrGoal) return TaskPunctuation.class;
         if (b == TaskPunctuation.QuestionOrQuest) return TaskPunctuation.class;
         if (b.getClass() == TaskBeliefOp.class) return TaskBeliefOp.class;
         if (b.getClass() == TaskBeliefOp.TaskBeliefConjSeq.class) return TaskBeliefOp.class;
@@ -617,22 +618,10 @@ public class PremiseRule extends GenericCompound {
             if (i >= postcons.length)
                 throw new RuntimeException("invalid rule: missing meta term for postcondition involving " + t);
 
-            Term[] modifiers = ((Compound) postcons[i++]).toArray();
-
-            postConditions.add(PostCondition.make(this, t, Terms.sorted(modifiers)));
+            postConditions.add(PostCondition.make(this, t, Terms.sorted(((Compound) postcons[i++]).toArray())));
         }
 
-        if (taskPunc == 0) {
-            //default: add explicit no-questions rule
-            // TODO restrict this further somehow
-            //pres.add(TaskPunctuation.NotQuestion);
-        } else if (taskPunc == ' ') {
-            //any task type
-            taskPunc = 0;
-        }
 
-        //store to arrays
-        this.PRE = pres.toArray(new PrediTerm[pres.size()]);
 
 
         if (Sets.newHashSet(postConditions).size() != postConditions.size())
@@ -643,6 +632,39 @@ public class PremiseRule extends GenericCompound {
             //System.out.println(Arrays.toString(postcons));
             throw new RuntimeException("no postconditions");
         }
+
+        if (taskPunc == 0) {
+            //default: add explicit no-questions rule
+            // TODO restrict this further somehow
+
+
+            boolean b = false, g = true;
+            for (PostCondition x : POST) {
+                if (x.puncOverride!=0) {
+                    throw new RuntimeException("puncOverride with no input punc specifier");
+                } else {
+                    b |= (x.beliefTruth!=null);
+                    g |= (x.goalTruth!=null);
+                }
+            }
+
+            if (!b && !g) {
+                throw new RuntimeException("can not assume this applies only to questions");
+            } else if (b && g) {
+                pres.add(TaskPunctuation.BeliefOrGoal);
+            } else if (b) {
+                pres.add(TaskPunctuation.Belief);
+            } else {
+                pres.add(TaskPunctuation.Goal);
+            }
+
+        } else if (taskPunc == ' ') {
+            //any task type
+            taskPunc = 0;
+        }
+
+        //store to arrays
+        this.PRE = pres.toArray(new PrediTerm[pres.size()]);
 
         //TODO add modifiers to affect minNAL (ex: anything temporal set to 7)
         //this will be raised by conclusion postconditions of higher NAL level
@@ -825,7 +847,6 @@ public class PremiseRule extends GenericCompound {
         return PremiseRuleSet.normalize(new PremiseRule(TermVector.the(newPremise, newConclusion)), index);
 
     }
-
 
 
 }
