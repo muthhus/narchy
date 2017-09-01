@@ -27,7 +27,8 @@ abstract public class DynamicTruthModel {
 
         int sdt = superterm.dt();
         if (sdt == XTERNAL)
-            return null;
+            sdt = DTERNAL; //DEFAULT
+            // return null;
 
         Term[] inputs = components(superterm);
         assert (inputs.length > 0): this + " yielded no dynamic components for superterm " + superterm;

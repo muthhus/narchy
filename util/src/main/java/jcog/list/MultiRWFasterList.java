@@ -556,6 +556,11 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
     }
 
     @Override
+    public <V> MutableList<T> distinctBy(Function<? super T, ? extends V> function) {
+        throw new UnsupportedOperationException("TODO");
+    }
+
+    @Override
     public MutableList<T> sortThis() {
         this.acquireWriteLock();
         try {
@@ -946,6 +951,12 @@ public class MultiRWFasterList<T> extends AbstractMultiReaderMutableCollection<T
         private UntouchableMutableList(MutableList<T> delegate) {
             this.delegate = delegate;
         }
+
+        @Override
+        public <V> MutableList<T> distinctBy(Function<? super T, ? extends V> function) {
+            throw new UnsupportedOperationException("TODO");
+        }
+
 
         @Override
         public MutableList<T> with(T element) {

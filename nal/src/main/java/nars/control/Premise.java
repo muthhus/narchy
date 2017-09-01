@@ -32,10 +32,6 @@ import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;
 
 /**
- * NOTE: this currently isnt input to the NAR like ITask's are even though it inherits
- * from that superclass. this is temporary until the Premise behavior is determined
- * to be either reified or virtual (executed within a conceptfire execution only)
- * <p>
  * Defines the conditions used in an instance of a derivation
  * Contains the information necessary for generating derivation Tasks via reasoning rules.
  * <p>

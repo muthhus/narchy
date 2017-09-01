@@ -72,15 +72,9 @@ abstract public class Solve extends AbstractPred<Derivation> {
                 if (m.cyclic)
                     return false;
 
-//                switch (m.taskPunct) {
-//                    case BELIEF:
-//                    case QUESTION:
-//                        break;
-//                    case GOAL:
-//                    case QUEST:
-//                        punc = QUEST; //apply similar behavior for Question to Quests
-//                        break;
-//                }
+                byte tp = m.taskPunct;
+                if ((tp == QUEST) || (tp == GOAL))
+                    punc = QUEST; //use QUEST in relation to GOAL or QUEST task
 
                 single = true;
                 t = null;
