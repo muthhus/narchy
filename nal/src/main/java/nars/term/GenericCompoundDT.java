@@ -74,12 +74,6 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     }
 
     @Override
-    public @NotNull Term root() {
-        return Compound.super.root();
-    }
-
-
-    @Override
     public @NotNull Term eternal() {
         return Compound.super.eternal();
     }

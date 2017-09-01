@@ -840,13 +840,7 @@ public interface Term extends Termlike, Comparable<Term> {
         return null;
     }
 
-    /**
-     * returns the term which identifies the concept that this term would be categorized by.
-     * ex: any temporality is atemporalized.
-     */
-    default @NotNull Term root() {
-        return this;
-    }
+
 
     /** TODO override in Compound implementations for accelerated root comparison without root() instantiation */
     default boolean eternalEquals(Term x) {
@@ -857,7 +851,7 @@ public interface Term extends Termlike, Comparable<Term> {
      * returns this term in a form which can identify a concept, or Null if it can't
      */
     default @NotNull Term conceptual() {
-        return root().unneg();
+        return this; //root().unneg();
     }
 
     /**

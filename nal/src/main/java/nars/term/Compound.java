@@ -950,9 +950,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
     @Override
     @NotNull
-    default Term root() {
-
-        Term term = unneg().eternal();
+    default Term conceptual() {
+      Term term = unneg().eternal();
 
 
         //atemporalizing can reset normalization state of the result instance
@@ -962,6 +961,7 @@ public interface Compound extends Term, IPair, TermContainer {
         if (term == null) return Null;
 
         return term.unneg();
+
     }
 
 
