@@ -223,7 +223,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 40);
+        }, 15);
 
 
 

@@ -12,6 +12,7 @@ import nars.Param;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
+import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.time.Tense;
@@ -53,7 +54,7 @@ public class Recog2D extends NAgentX {
 
     private final Training train;
 
-    boolean mlpLearn = true, mlpSupport;
+    boolean mlpLearn = true, mlpSupport = true;
 
     BufferedImage canvas;
 
@@ -63,8 +64,12 @@ public class Recog2D extends NAgentX {
     int image;
     final int maxImages = 4;
 
-    int imagePeriod = 100;
-    FloatToFloatFunction goalInfluence = (x) -> x > 0.5f ? 1 : 0; //1f/(maxImages); //how much goal feedback will influence beliefs, <=1
+    int imagePeriod = 8;
+
+    //goal -> belief transfer function
+    FloatToFloatFunction goalInfluence = (x) ->
+            x;
+            //x > 0.5f ? 1 : 0; //1f/(maxImages); //how much goal feedback will influence beliefs, <=1
 
 //    float theta;
 //    float dTheta = 0.25f;
@@ -117,7 +122,7 @@ public class Recog2D extends NAgentX {
 
         //nar.log();
 
-        outs = new Outputs(ii -> $.inh(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
+        outs = new Outputs(ii -> $.p(Atomic.the("s" + ii), id), maxImages, this, goalInfluence);
         train = new Training(
                 //sensors,
                 Lists.newArrayList(
@@ -137,11 +142,11 @@ public class Recog2D extends NAgentX {
 
         Plot2D p;
 
-        int history = 1024;
+        int history = 256;
 
         Grid g = col(
 
-                row(beliefTableCharts(nar, out.keySet(), 1024)),
+                row(beliefTableCharts(nar, out.keySet(), 256)),
 
                 row(p = new Plot2D(history, Plot2D.Line).add("Reward", () ->
                                 reward
@@ -206,9 +211,10 @@ public class Recog2D extends NAgentX {
                     }
                 }).toArray(Surface[]::new)));
 
-        nar.onCycle(() -> {
+        final int[] frames = {0};
+        onFrame(() -> {
 
-            if (nar.time() % imagePeriod == 0) {
+            if (frames[0]++ % imagePeriod == 0) {
                 nextImage();
             }
 
@@ -236,10 +242,10 @@ public class Recog2D extends NAgentX {
     }
 
     @Deprecated
-    public static List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {
+    public List<Surface> beliefTableCharts(NAR nar, Collection<? extends Termed> terms, long window) {
         long[] btRange = new long[2];
-        nar.onCycle(nn -> {
-            long now = nn.time();
+        onFrame(() -> {
+            long now = nar.time();
             btRange[0] = now - window;
             btRange[1] = now + window;
         });
@@ -305,9 +311,11 @@ public class Recog2D extends NAgentX {
         NAgentX.runRT((n) -> {
 
             Recog2D a = new Recog2D(n);
+            a.nar.truthResolution.setValue(0.1f);
+            a.nar.termVolumeMax.setValue(24);
             return a;
 
-        }, 15);
+        }, 7);
     }
 
     public static class Training {

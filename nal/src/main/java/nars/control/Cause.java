@@ -45,6 +45,7 @@ public class Cause<X> {
 
     /** summary */
     private float value;
+    private double posTotal = 0, negTotal = 0;
 
     public Cause(short id, Object name) {
         this.id = id;
@@ -128,7 +129,9 @@ public class Cause<X> {
     }
 
     public void commit(float posDecay, float negDecay) {
+        this.posTotal += posAcc.get();
         this.pos = decay(pos, posAcc, posDecay);
+        this.negTotal += negAcc.get();
         this.neg = decay(neg, negAcc, negDecay);
         this.value = value(pos, neg);
     }
@@ -155,4 +158,11 @@ public class Cause<X> {
         return value;
     }
 
+    public double posTotal() {
+        return negTotal;
+    }
+
+    public double negTotal() {
+        return negTotal;
+    }
 }

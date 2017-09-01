@@ -151,9 +151,6 @@ public abstract class PixelBag implements Bitmap2D {
         float cy = py / 2f;
 
 
-        //not perfect calculation, because it doesnt account for max/min min/max differences due to non-square dimensions
-        //but suffices for now
-        float maxCenterDistanceSq = Math.max(cx, cy) * Math.max(cx, cy) * 2;
 
         float pxf = px - 1;
         float pyf = py - 1;
@@ -164,8 +161,15 @@ public abstract class PixelBag implements Bitmap2D {
         float xRange = maxX - minX;
         float yRange = maxY - minY;
 
+        updateClip(sw, sh, minX, maxX, minY, maxY, cx, cy, pxf, pyf, fr, fg, fb, fSum, xRange, yRange);
+    }
+
+    private void updateClip(int sw, int sh, float minX, float maxX, float minY, float maxY, float cx, float cy, float pxf, float pyf, float fr, float fg, float fb, float fSum, float xRange, float yRange) {
         int supersampling = Math.min((int) Math.floor(xRange / px / 2f), (int) Math.floor(yRange / py / 2f));
 
+        //not perfect calculation, because it doesnt account for max/min min/max differences due to non-square dimensions
+        //but suffices for now
+        float maxCenterDistanceSq = Math.max(cx, cy) * Math.max(cx, cy) * 2;
 
         for (int ly = 0; ly < py; ly++) {
             float l = ly / pyf;

@@ -35,8 +35,8 @@ public abstract class Param extends Services<Term,NAR> {
     /** rate that integers in integer-containing termlink compounds will be dynamically mutated on activation */
     public static final float MUTATE_INT_CONTAINING_TERMS_RATE = 0.5f;
 
-    /** how many truth resolutions (multiples) beyond which a non-authentic signal belief is considered inaccurate */
-    public static final int SENSOR_FEEDBACK_FREQ_THRESHOLD = 4;
+    /** freq coherence below which a contradictory sensor belief is dis-valued, and above which it is valued */
+    public static final float SENSOR_FEEDBACK_FREQ_THRESHOLD = 0.9f;
 
     /**
      * controls interpolation policy:
@@ -133,17 +133,44 @@ public abstract class Param extends Services<Term,NAR> {
     public final FloatParam valuePositiveDecay = new FloatParam(0.9f, 0, 1f);
     public final FloatParam valueNegativeDecay = new FloatParam(0.9f, 0, 1f);
 
-    /** pessimistic negative value applied to each accepted task. this may
-     * be balanced by a future positive value (ie. on concept processing) */
+    /** pessimistic positive value measuring the cost of inputting a task
+     * (from now until the time of concept processing)
+     * this may be balanced by a future positive value (ie. on concept processing) */
     public static float inputCost(Task t, NAR nar) {
 
-        //prefer simple
+//        //prefer simple
         float c = (1f + ((float)t.complexity())/nar.termVolumeMax.floatValue());
 
-        if (t.isBeliefOrGoal()) {
+        c *= t.priSafe(0);
+
+        return c;
+//
+//        if (t.isBeliefOrGoal()) {
+//
+//            //prefer confidence
+//            c *= (1f + (1f - Math.min(1f, t.conf()/nar.confDefault(t.punc()))));
+//
+//            //prefer polarized
+//            //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
+//        } else {
+//            c *= 2;
+//        }
+//
+//        return c;
+
+
+
+        //return 0;
+    }
+
+    public float derivationBudgetFactor(Term t, Truth tr, byte punc) {
+        float c = (1f + ((float)t.complexity())/termVolumeMax.floatValue());
+
+
+        if (/* belief or goal */ tr!=null) {
 
             //prefer confidence
-            c *= (1f + (1f - Math.min(1f, t.conf()/nar.confDefault(t.punc()))));
+            c *= (1f + (1f - Math.min(1f, tr.conf()/confDefault(punc))));
 
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
@@ -151,8 +178,9 @@ public abstract class Param extends Services<Term,NAR> {
             c *= 2;
         }
 
-        return -c;
+        return c;
     }
+
 
 
 

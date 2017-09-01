@@ -2,6 +2,7 @@ package nars;
 
 
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 import jcog.Util;
 import jcog.data.MutableInteger;
@@ -46,6 +47,7 @@ import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -1786,9 +1788,18 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
 
     public void valueUpdate() {
+
         float p = valuePositiveDecay.floatValue();
         float n = valueNegativeDecay.floatValue();
         causes.forEach(c -> c.commit(p, n));
+
+//        System.out.println("WORST");
+//        causes.stream().map(x -> PrimitiveTuples.pair(x, x.negTotal())).sorted(
+//                (x,y) -> Doubles.compare(y.getTwo(), x.getTwo())
+//        ).limit(10).forEach(x -> {
+//            System.out.println("\t" + x);
+//        });
+//        System.out.println();
     }
 
 }

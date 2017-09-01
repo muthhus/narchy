@@ -231,7 +231,8 @@ public class Conclusion extends AbstractPred<Derivation> {
             return true; //created a duplicate of the task
         }
 
-        float priority = d.premisePri; //d.budgeting.budget(d, C, truth, punc, start, end);
+        float priority = d.premisePri / nar.derivationBudgetFactor(t.term(), t.truth(), t.punc());
+
         assert (priority == priority);
 
         t.setPri(priority);

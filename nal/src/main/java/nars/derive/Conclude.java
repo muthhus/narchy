@@ -55,7 +55,7 @@ public final class Conclude extends ProxyTerm implements Function<NAR,Conclusion
 
     @Override
     public Conclusion apply(@NotNull NAR nar) {
-        CauseChannel<Task> input = nar.newChannel(term());
+        CauseChannel<Task> input = nar.newChannel(rule);
         return new Conclusion(this, input);
     }
 

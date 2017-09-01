@@ -75,8 +75,8 @@ public class Maze {
 	
 	public static Maze create(int width, int height) {
 		
-		width = Math.max(width, 17);
-		height = Math.max(height, 15);
+		//width = Math.max(width, 17);
+		//height = Math.max(height, 15);
 		
 		width |= 1;
 		height |= 3;
@@ -86,7 +86,7 @@ public class Maze {
 		half.generate();
 		Maze full = half.doubleUp();
 		
-		Dimension ghostCage = new Dimension(7, 5);
+		Dimension ghostCage = new Dimension(5, 3);
 		Point offset = new Point(width / 2 - ghostCage.width / 2, height / 2 - ghostCage.height / 2);
 		
 		for(int ix = 0; ix < ghostCage.width; ix++ ) {

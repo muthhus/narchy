@@ -28,7 +28,7 @@ public class Pacman extends NAgentX {
 //        } catch (Narsese.NarseseException e) {
 //            e.printStackTrace();
 //        }
-         Scale camScale = new Scale( new SwingBitmap2D(g.view), 24, 24);
+         Scale camScale = new Scale( new SwingBitmap2D(g.view), 28, 28);
             for (BufferedImageBitmap2D.ColorMode cm : new BufferedImageBitmap2D.ColorMode[] {
                     BufferedImageBitmap2D.ColorMode.R,
                     BufferedImageBitmap2D.ColorMode.G,
@@ -38,7 +38,7 @@ public class Pacman extends NAgentX {
                     senseCamera("(G,c" + cm.name() + ")",
                             camScale.filter(cm)//.blur()
                     )
-                            .resolution(0.01f);
+                            .resolution(0.1f);
 
                 } catch (Narsese.NarseseException e) {
                     e.printStackTrace();
@@ -98,7 +98,7 @@ public class Pacman extends NAgentX {
             Pacman a = new Pacman(n);
             return a;
 
-        }, 10);
+        }, 30);
     }
 
 }

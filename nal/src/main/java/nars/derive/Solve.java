@@ -41,6 +41,8 @@ abstract public class Solve extends AbstractPred<Derivation> {
 
                 Truth bt;
                 if (single) {
+                    if (m.belief!=null)
+                        return false;
                     bt = null;
                 } else {
                     if ((bt = (beliefProjected ? m.beliefTruth : m.beliefTruthRaw))==null)

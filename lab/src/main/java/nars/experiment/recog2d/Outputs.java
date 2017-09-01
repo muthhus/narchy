@@ -6,6 +6,7 @@ import nars.NAgent;
 import nars.concept.BaseConcept;
 import nars.concept.GoalActionConcept;
 import nars.term.Compound;
+import nars.term.Term;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
@@ -102,12 +103,12 @@ public class Outputs {
     boolean verify;
 
 
-    public Outputs(IntFunction<Compound> namer, int maxStates, NAgent a, FloatToFloatFunction transferFunction) {
+    public Outputs(IntFunction<Term> namer, int maxStates, NAgent a, FloatToFloatFunction transferFunction) {
         this.nar = a.nar;
         this.states = maxStates;
         this.out = new LinkedHashMap<>(maxStates);
         this.outVector = IntStream.range(0, maxStates).mapToObj((int i) -> {
-                    Compound tt = namer.apply(i);
+                    Term tt = namer.apply(i);
                     @NotNull GoalActionConcept aa = a.action(tt, (b, d) -> {
 //                        if (train) {
 //                            float ee = expected(i);
@@ -133,7 +134,7 @@ public class Outputs {
 
                         //return d!=null ? new PreciseTruth(d.freq(), d.conf()goalInfluence.d.eviMult(goalInfluence, a.nar.dur()) : null;
                     });
-                    aa.resolution.setValue(1f);
+                    //aa.resolution.setValue(1f);
                     return aa;
                 }
 //                        a.sense(namer.apply(i), () -> {
@@ -150,7 +151,7 @@ public class Outputs {
                 .toArray(BaseConcept[]::new);
 
 
-        a.nar.onCycle(nn -> {
+        a.onFrame(() -> {
             long now = nar.time();
             int dur = nar.dur();
             out.forEach((cc, nnn) -> {

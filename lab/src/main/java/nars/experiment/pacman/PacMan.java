@@ -37,7 +37,7 @@ public class PacMan {
 	public PacMan() {
 
 		updates = UPDATES;
-		maze = Maze.create(18, 16);
+		maze = Maze.create(13, 13);
 		player = new Player(maze, maze.playerStart().x, maze.playerStart().y);
 		keys = new boolean[4];
 		resetGhosts();
@@ -49,6 +49,7 @@ public class PacMan {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setTitle("Pacman");
 		frame.setVisible(true);
+		frame.setResizable(false);
 
 		frame.addKeyListener(new KeyListener() {
 

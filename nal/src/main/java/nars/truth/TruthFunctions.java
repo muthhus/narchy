@@ -244,8 +244,11 @@ public final class TruthFunctions {
     public static float freqSimilarity(float aFreq, float bFreq) {
         if (aFreq == bFreq) return 1f;
 
-        //return 1f - Math.abs(aFreq - bFreq);
-        return Math.max((aFreq * bFreq), (1f - aFreq) * (1f - bFreq));
+        //linear
+        return 1f - Math.abs(aFreq - bFreq);
+
+        //TODO check this:
+        //return Math.max((aFreq * bFreq), (1f - aFreq) * (1f - bFreq));
     }
 
     /**

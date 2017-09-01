@@ -51,6 +51,7 @@ public class Line1D {
             n.onCycle((nn) -> {
                 nn.stats(System.out);
             });
+            n.setEmotion(new Emotivation(n));
 
             new Line1DExperiment() {
                 @Override

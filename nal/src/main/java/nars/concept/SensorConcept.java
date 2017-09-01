@@ -8,6 +8,7 @@ import nars.table.BeliefTable;
 import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.Truth;
+import nars.truth.TruthFunctions;
 import nars.util.signal.ScalarSignal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
@@ -95,7 +96,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         float factor = 1;
 
-        float fThresh = 1f - Math.max(0, Math.min(1f, (Param.SENSOR_FEEDBACK_FREQ_THRESHOLD * nar.truthResolution.floatValue())));
+        float fThresh = Param.SENSOR_FEEDBACK_FREQ_THRESHOLD;
 
 
         int dur = nar.dur();
@@ -106,7 +107,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             if (y instanceof SignalTask)
                 return; //ignore previous signaltask
 
-            float coherence = 1f - Math.abs(y.freq() - xFreq);
+            float coherence = 1f - TruthFunctions.freqSimilarity(xFreq, y.freq());
 
             float confidence = y.conf() / xConf; //allow > 1
 

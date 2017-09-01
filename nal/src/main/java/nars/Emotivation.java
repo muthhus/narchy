@@ -127,12 +127,11 @@ public class Emotivation extends Emotion {
 
             //float p0 = t.priSafe(0);
             float cost = Param.inputCost(t, nar);
-            float p = t.priMult(1f/-cost);
 
-            value(t.cause(), cost);
+            if (cost != 0)
+                value(t.cause(), -cost);
 
             evaluate(t);
-
         }
 
         return x;
