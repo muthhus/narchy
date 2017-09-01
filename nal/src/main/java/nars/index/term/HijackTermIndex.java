@@ -2,6 +2,7 @@ package nars.index.term;
 
 import jcog.Util;
 import jcog.bag.impl.hijack.PLinkHijackBag;
+import jcog.memoize.HijackMemoize;
 import jcog.pri.PLink;
 import jcog.pri.PriReference;
 import nars.NAR;
@@ -43,6 +44,7 @@ public class HijackTermIndex extends MaplikeTermIndex implements Runnable {
 
         updateBatchSize = 4096; //1 + (capacity / (reprobes * 2));
         updatePeriodMS = 100;
+
 
         this.table = new PLinkHijackBag<>(capacity, reprobes) {
 

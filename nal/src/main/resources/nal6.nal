@@ -77,7 +77,7 @@
     B, ((--,%A) ==> C), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePBN, Goal:InductionRecursivePBN)
 
     //SUSPECT:
-    //B, (C ==> A), belief(positive), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePB, Goal:GoductionRecursivePB)
+    B, (C ==> A), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePB, Goal:GoductionRecursivePB)
         //B, (C ==> A), belief(negative), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePBNN, Goal:GoductionRecursivePBNN)
 
         //TODO maybe the belief(negative) cases are actually necessary to derive --C

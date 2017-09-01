@@ -22,25 +22,30 @@ import static jcog.Texts.n4;
  * TODO add an instrumentation wrapper to collect statistics
  * about cache efficiency and also processing time of the calculations
  */
-public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.HalfWeakPair<K, V>> implements Memoize<K,V> {
+public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.HalfWeakPair<K, V>> implements Memoize<K, V> {
 
     private final Random rng = new XorShift128PlusRandom();
 
-    public static class HalfWeakPair<K,V> extends /*WeakReference*/SoftReference<V> implements Priority {
+    public static class HalfWeakPair<K, V> extends
+            SoftReference<V>
+            ///*WeakReference*/SoftReference<V>
+            implements Priority {
+
         public final K key;
         private final int hash;
         private float pri;
 
-        public HalfWeakPair(@NotNull K key, @NotNull V value) {
+        public HalfWeakPair(@NotNull K key, @NotNull V value, float pri) {
             super(value);
             this.key = key;
             this.hash = key.hashCode();
+            this.pri = pri;
         }
 
         @Override
         public boolean equals(Object obj) {
-            HalfWeakPair h = (HalfWeakPair)obj;
-            return hash == h.hash && key.equals( h.key );
+            HalfWeakPair h = (HalfWeakPair) obj;
+            return hash == h.hash && key.equals(h.key);
         }
 
         @Override
@@ -50,20 +55,16 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
         @Override
         public float setPri(float p) {
-            if (get()!=null)
-                return this.pri = p;
-            else
+//            if (get()!=null)
+            float r = this.pri;
+            if (r != r)
                 return Float.NaN;
+
+            return this.pri = p;
+//            else
+//                return Float.NaN;
         }
 
-        @Nullable
-        @Override
-        public V get() {
-            V v = super.get();
-            if (v == null)
-                this.pri = Float.NaN;
-            return v;
-        }
 
         @Override
         public @Nullable Priority clonePri() {
@@ -72,28 +73,43 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
 
         @Override
         public String toString() {
-            return '$' + n4(pri) + ' ' +  key;
+            return '$' + n4(pri) + ' ' + key;
         }
 
         @Override
         public boolean delete() {
-            clear();
+            super.clear();
             this.pri = Float.NaN;
             return true;
         }
 
         @Override
+        public V get() {
+            V v = super.get();
+            if (v == null) {
+                this.pri = Float.NaN;
+                return null;
+            }
+            return v;
+        }
+
+
+        @Override
         public float pri() {
-            get();
-            return pri;
+            float p = pri;
+            if (p==p) {
+                V x = get();
+                if (x != null)
+                    return pri;
+            }
+            return Float.NaN;
         }
 
         @Override
         public boolean isDeleted() {
             float p = pri();
-            return p!=p;
+            return p != p;
         }
-
 
     }
 
@@ -151,9 +167,9 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         // for example, 1/(N*reprobes)
         // to ammortize additional attempts where the cut was not necessary
         //TODO make this a momentum parameter
-        float cut = boost / (reprobes*2);
+        float cut = boost / (reprobes * 2);
 
-        assert(cut > Prioritized.EPSILON);
+        assert (cut > Prioritized.EPSILON);
 
         set(boost, cut);
 
@@ -185,7 +201,7 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         HalfWeakPair<K, V> exists = get(k);
         if (exists != null) {
             V e = exists.get();
-            if (e!=null) {
+            if (e != null) {
                 exists.priAdd(CACHE_HIT_BOOST);
                 hit.inc();
                 return e;
@@ -209,19 +225,13 @@ public class HijackMemoize<K, V> extends PriorityHijackBag<K, HijackMemoize.Half
         V v = getIfPresent(k);
         if (v == null) {
             v = func.apply(k);
-            HalfWeakPair h = new HalfWeakPair(k, v);
-                    //new PLink<>(key, value)
-                    //new WeakPLink<>(key, value)
-            h.setPri(0.5f);
-            if (put(h) != null) {
-                miss.inc();
-            } else {
-                reject.inc();
-            }
+            HalfWeakPair h = new HalfWeakPair(k, v, 0.5f);
+            //new PLink<>(key, value)
+            //new WeakPLink<>(key, value)
+            ((put(h) != null) ? miss : reject).inc();
         }
         return v;
     }
-
 
 
     @Override

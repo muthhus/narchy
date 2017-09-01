@@ -32,7 +32,7 @@ public class Builder {
                 new Function<Term[], TermContainer>() {
 
                     final Cache<NewCompound, TermContainer> cache =
-                            Caffeine.newBuilder().maximumSize(128 * 1024).build();
+                            Caffeine.newBuilder().maximumSize(64453 /* prime */).build();
 
                     @Override
                     public TermContainer apply(Term[] o) {
@@ -48,7 +48,7 @@ public class Builder {
 
                     final HijackMemoize<NewCompound, TermContainer> cache
                             = new HijackMemoize<>((x) -> HeapSubtermBuilder.apply(x.subs),
-                            128 * 1024, 3);
+                            64453 /* prime */, 3);
 
                     @Override
                     public TermContainer apply(Term[] o) {
