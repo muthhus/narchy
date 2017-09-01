@@ -2,7 +2,6 @@ package nars;
 
 
 import com.google.common.collect.Sets;
-import com.google.common.primitives.Doubles;
 import com.google.common.primitives.Longs;
 import jcog.Util;
 import jcog.data.MutableInteger;
@@ -10,6 +9,7 @@ import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import jcog.list.FasterList;
+import jcog.math.RecycledSummaryStatistics;
 import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.util.IterableThreadLocal;
@@ -47,7 +47,6 @@ import org.HdrHistogram.ShortCountsHistogram;
 import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.tuple.Twin;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -221,17 +220,17 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         //x.put("termlink usage", ((double) termlinkCount.getTotalCount()) / termlinksCap.getSum());
         x.put("termlink count", ((double) termlinkCount.getTotalCount()));
 
-        DoubleSummaryStatistics pos = new DoubleSummaryStatistics();
-        DoubleSummaryStatistics neg = new DoubleSummaryStatistics();
-        causes.forEach(c -> pos.accept(c.pos()));
-        causes.forEach(c -> neg.accept(c.neg()));
-        x.put("value count", pos.getCount());
-        x.put("value pos mean", pos.getAverage());
-        x.put("value pos min", pos.getMin());
-        x.put("value pos max", pos.getMax());
-        x.put("value neg mean", neg.getAverage());
-        x.put("value neg min", neg.getMin());
-        x.put("value neg max", neg.getMax());
+//        DoubleSummaryStatistics pos = new DoubleSummaryStatistics();
+//        DoubleSummaryStatistics neg = new DoubleSummaryStatistics();
+//        causes.forEach(c -> pos.accept(c.pos()));
+//        causes.forEach(c -> neg.accept(c.neg()));
+//        x.put("value count", pos.getCount());
+//        x.put("value pos mean", pos.getAverage());
+//        x.put("value pos min", pos.getMin());
+//        x.put("value pos max", pos.getMax());
+//        x.put("value neg mean", neg.getAverage());
+//        x.put("value neg min", neg.getMin());
+//        x.put("value neg max", neg.getMax());
 
 
         //x.put("volume mean", volume.);
@@ -270,6 +269,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         self = new AtomicReference<>(null);
         setSelf(Param.randomSelf());
+
+        for (int i = 0; i < valueSummary.length; i++)
+            valueSummary[i] = new RecycledSummaryStatistics();
+        value[Cause.Purpose.Active.ordinal()] = 0.5f;
+        value[Cause.Purpose.Accurate.ordinal()] = 1.0f;
+        value[Cause.Purpose.Answer.ordinal()] = 0.75f;
+        value[Cause.Purpose.Action.ordinal()] = 1.0f;
+        Arrays.fill(valueMomentum, 0.9f);
 
         this.emotion = new Emotion(this);
 
@@ -953,7 +960,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         eventCycle.emit(this); //synchronous only
 
-        valueUpdate();
+        Cause.update(causes, value, valueSummary, valueMomentum);
 
         emotion.cycle();
 
@@ -1601,8 +1608,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * table of values influencing reasoner heuristics
      */
-    public final FasterList<Cause> causes = new FasterList(512);
-
+    public final FasterList<Cause> causes = new FasterList(256);;
+    final float[] value = new float[Cause.Purpose.values().length];
+    final float[] valueMomentum = new float[value.length];
+    final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[value.length];
 
     /** default deriver */
     public Derivation derivation() {
@@ -1790,19 +1799,5 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public void valueUpdate() {
-
-        float p = valuePositiveDecay.floatValue();
-        float n = valueNegativeDecay.floatValue();
-        causes.forEach(c -> c.commit(p, n));
-
-//        System.out.println("WORST");
-//        causes.stream().map(x -> PrimitiveTuples.pair(x, x.negTotal())).sorted(
-//                (x,y) -> Doubles.compare(y.getTwo(), x.getTwo())
-//        ).limit(10).forEach(x -> {
-//            System.out.println("\t" + x);
-//        });
-//        System.out.println();
-    }
 
 }

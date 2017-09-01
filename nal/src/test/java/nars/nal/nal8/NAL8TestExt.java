@@ -59,7 +59,7 @@ public class NAL8TestExt extends AbstractNALTest {
                 //.log()
                 .input("at:t1. :|:") //@ 0
                 .inputAt(10, "(at:t1 &&+5 (open(t1) &&+5 [opened]:t1))!")
-                .mustDesire(time, "(open(t1) &&+5 [opened]:t1)", 1.0f, 0.81f, 5)
+                .mustGoal(time, "(open(t1) &&+5 [opened]:t1)", 1.0f, 0.81f, 5)
                 //.mustDesire(time, "open(t1)", 1.0f, 0.73f, 5)
         ;
     }

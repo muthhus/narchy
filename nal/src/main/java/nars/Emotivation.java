@@ -3,7 +3,6 @@ package nars;
 import com.netflix.servo.monitor.BasicGauge;
 import com.netflix.servo.monitor.LongGauge;
 import jcog.Util;
-import jcog.pri.Prioritized;
 import nars.concept.Concept;
 import nars.control.Cause;
 import nars.task.ITask;
@@ -51,32 +50,6 @@ public class Emotivation extends Emotion {
             registerFields(this);
     }
 
-    /**
-     * set the value of a cause trace
-     */
-    @Override
-    public void value(short[] causes, float value) {
-
-        if (Math.abs(value)< Prioritized.EPSILON) return; //no change
-
-        int numCauses = causes.length;
-
-        //float sum = 0.5f * numCauses * (numCauses + 1);
-        float vPer = value / numCauses; //flat
-
-        for (int i = 0; i < numCauses; i++) {
-            short c = causes[i];
-            Cause cc = nar.causes.get(c);
-            if (cc == null)
-                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
-                /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
-
-            //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
-            if (vPer != 0) {
-                cc.apply(vPer);
-            }
-        }
-    }
 
     @Override
     public synchronized void cycle() {
@@ -95,7 +68,7 @@ public class Emotivation extends Emotion {
         super.onAnswer(question, answer);
 
         //reward answer for answering the question
-        value(answer.cause(), answer.conf());
+        value(Cause.Purpose.Answer, answer.cause(), answer.conf());
     }
 
     /**
@@ -103,7 +76,7 @@ public class Emotivation extends Emotion {
      */
     public void evaluate(Task x) {
 
-        float gain = nar.evaluate(x, x.cause() /*, nar.taskCauses.get(x)*/);
+        float gain = nar.evaluate(x, x.cause(), nar.taskCauses.get(x));
         assert (gain == gain);
         if (gain != 0) {
 
@@ -129,7 +102,7 @@ public class Emotivation extends Emotion {
             float cost = Param.inputCost(t, nar);
 
             if (cost != 0)
-                value(t.cause(), -cost);
+                value(Cause.Purpose.Active, t.cause(), -cost);
 
             evaluate(t);
         }
@@ -144,9 +117,9 @@ public class Emotivation extends Emotion {
         short[] x = t.cause();
         int xl = x.length;
         if (xl > 0) {
-            float taskValue = origin.value(t, activation, n.time(), n);
-            if (taskValue!=0)
-                value(x, taskValue);
+            float conceptValue = origin.value(t, activation, n.time(), n);
+            if (conceptValue!=0)
+                value(Cause.Purpose.Active, x, conceptValue);
         }
 
     }

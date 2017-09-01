@@ -3,6 +3,7 @@ package nars.term;
 import jcog.Util;
 import nars.$;
 import nars.NAR;
+import nars.Op;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.concept.PermanentConcept;
@@ -18,6 +19,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import static nars.Op.Null;
 import static nars.term.Terms.atomOrNull;
 import static nars.term.atom.Atomic.the;
 
@@ -198,15 +200,29 @@ abstract public class Functor extends BaseConcept implements PermanentConcept, F
             super(id);
         }
 
+        public boolean validOp(Op o) {
+            return true;
+        }
+
         @Nullable
         @Override public final Term apply(@NotNull TermContainer x) {
             if (x.size()!=2)
                 throw new UnsupportedOperationException("# args must equal 2");
 
-            return apply(x.sub(0), x.sub(1));
+
+            Term a = x.sub(0);
+            Term b = x.sub(1);
+            if ((a instanceof Variable) || (b instanceof Variable))
+                return null;
+
+            if (!validOp(a.op()) || !validOp(b.op()))
+                return Null;
+
+            return apply(a, b);
         }
 
         @Nullable
         public abstract Term apply(@NotNull Term a, @NotNull Term b);
     }
+
 }

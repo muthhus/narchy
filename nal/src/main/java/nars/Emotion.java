@@ -5,7 +5,9 @@ import com.netflix.servo.monitor.Counter;
 import com.netflix.servo.monitor.StepCounter;
 import jcog.math.AtomicSummaryStatistics;
 import jcog.meter.event.BufferedFloatGuage;
+import jcog.pri.Prioritized;
 import nars.concept.Concept;
+import nars.control.Cause;
 import nars.task.ITask;
 import nars.term.Compound;
 import nars.util.BudgetFunctions;
@@ -76,6 +78,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
      */
     @NotNull
     public final AtomicSummaryStatistics happy = new AtomicSummaryStatistics();
+    private final NAR nar;
 
     float _happy;
 
@@ -100,13 +103,12 @@ public class Emotion extends ConcurrentMonitorRegistry {
 //    public final FloatGuage alert;
 
 
-
     //final ResourceMeter resourceMeter = new ResourceMeter();
 
     public Emotion(NAR n) {
         super();
 
-
+        this.nar = n;
 
         //logger = LoggerFactory.getLogger(class);
 
@@ -123,7 +125,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
         this.errrVol = new BufferedFloatGuage("error");
 
-        if (getClass()==Emotion.class) //HACK
+        if (getClass() == Emotion.class) //HACK
             registerFields(this);
 
     }
@@ -318,8 +320,27 @@ public class Emotion extends ConcurrentMonitorRegistry {
         n.emotion.taskActivations.increment();
     }
 
-    public void value(short[] x, float taskValue) {
-        //default impl: do nothing
+    public void value(Cause.Purpose p, short[] causes, float strength) {
+
+        if (Math.abs(strength) < Prioritized.EPSILON) return; //no change
+
+        int numCauses = causes.length;
+
+        //float sum = 0.5f * numCauses * (numCauses + 1);
+        float vPer = strength / numCauses; //flat
+
+        for (int i = 0; i < numCauses; i++) {
+            short c = causes[i];
+            Cause cc = nar.causes.get(c);
+            if (cc == null)
+                continue; //ignore, maybe some edge case where the cause hasnt been registered yet?
+                /*assert(cc!=null): c + " missing from: " + n.causes.size() + " causes";*/
+
+            //float vPer = (((float) (i + 1)) / sum) * value; //linear triangle increasing to inc, warning this does not integrate to 100% here
+            if (vPer != 0) {
+                cc.apply(p, vPer);
+            }
+        }
     }
 
     public void onAnswer(Task question, @Nullable Task answer) {
@@ -327,7 +348,7 @@ public class Emotion extends ConcurrentMonitorRegistry {
         //float qBefore = taskBudget.priElseZero();
         //float aBefore = answered.priElseZero();
         BudgetFunctions.fund(question, answer,
-                                /*Util.sqr*/answer.conf()*answer.originality(), false);
+                                /*Util.sqr*/answer.conf() * answer.originality(), false);
 
     }
 

@@ -141,7 +141,7 @@ public class PatrickTests extends AbstractNALTest {
                 //"<toothbrush --> here>. :|:" //there is a toothbrush here NOW
         );
 
-        tt.mustDesire(1200, "lighter(I, toothbrush)", 1f,
+        tt.mustGoal(1200, "lighter(I, toothbrush)", 1f,
                 0.2f,
                 (t) -> t >= 0);
 

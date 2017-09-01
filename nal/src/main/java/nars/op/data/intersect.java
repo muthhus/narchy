@@ -1,5 +1,6 @@
 package nars.op.data;
 
+import nars.Op;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Terms;
@@ -9,6 +10,11 @@ public class intersect extends Functor.BinaryFunctor {
 
     public intersect() {
         super("intersect");
+    }
+
+    @Override
+    public boolean validOp(Op o) {
+        return o.commutative;
     }
 
     @Override

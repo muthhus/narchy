@@ -20,7 +20,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
         test
                 .input("(R)!")
                 .input("((G) <=> (R)).")
-                .mustDesire(cycles, "(G)", 1.0f, 0.81f);
+                .mustGoal(cycles, "(G)", 1.0f, 0.81f);
     }
 
     @Test
@@ -29,7 +29,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
         test
                 .input("--(R)!")
                 .input("((G) <=> (R)).")
-                .mustDesire(cycles, "(G)", 0.0f, 0.81f);
+                .mustGoal(cycles, "(G)", 0.0f, 0.81f);
     }
 
     @Test
@@ -38,7 +38,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
         test
                 .input("(happy)!")
                 .input("((happy) <=>+0 ((--,(x)) &| (--,(out)))).")
-                .mustDesire(cycles, "((--,(x)) &| (--,(out)))", 1f, 0.81f);
+                .mustGoal(cycles, "((--,(x)) &| (--,(out)))", 1f, 0.81f);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
                 .log()
                 .input("(happy)!")
                 .input("(--(happy) <=>+0 ((--,(x))&&(--,(out)))).")
-                .mustDesire(cycles, "((--,(x))&&(--,(out)))", 0f, 0.81f);
+                .mustGoal(cycles, "((--,(x))&&(--,(out)))", 0f, 0.81f);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
         test
                 .inputAt(0, "((out) <=>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.81f, 16)
+                .mustGoal(cycles, "(out)", 1f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -67,7 +67,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
         TestNAR tester = test;
         tester.input("x:y! :|:");
         tester.input("(goto(z) <=>+5 x:y).");
-        tester.mustDesire(cycles, "goto(z)", 1.0f, 0.81f, 0);
+        tester.mustGoal(cycles, "goto(z)", 1.0f, 0.81f, 0);
         tester.mustNotOutput(cycles, "goto(z)", GOAL, ETERNAL);
     }
     @Test
@@ -76,7 +76,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
         TestNAR tester = test;
         tester.input("--x:y! :|:");
         tester.input("(goto(z) <=>+5 x:y).");
-        tester.mustDesire(cycles, "goto(z)", 0.0f, 0.81f, 0);
+        tester.mustGoal(cycles, "goto(z)", 0.0f, 0.81f, 0);
         tester.mustNotOutput(cycles, "goto(z)", GOAL, 0.9f, 1f, 0f, 0.81f, -5);
     }
 
@@ -86,7 +86,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
         test
                 .input("(R)! :|:")
                 .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S ==> R)
-                .mustDesire(cycles, "(S)", 0.0f, 0.81f, 0);
+                .mustGoal(cycles, "(S)", 0.0f, 0.81f, 0);
 
     }
 
@@ -97,7 +97,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
 
                 .input("g(x)! :|:")
                 .input("(f($1) <=>+5 --g($1)).") //internally, this reduces to --(S ==> R)
-                .mustDesire(cycles, "f(x)", 0.0f, 0.81f, 0)
+                .mustGoal(cycles, "f(x)", 0.0f, 0.81f, 0)
                 .mustNotOutput(cycles, "goto({t003})", GOAL, 0);
 
     }
@@ -109,7 +109,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
                 .log()
                 .input("--(R)! :|:")
                 .input("((S) <=>+5 --(R)).") //internally, this reduces to --(S <=> R)
-                .mustDesire(cycles, "(S)", 1.0f, 0.81f, 0 /* shifted to present */)
+                .mustGoal(cycles, "(S)", 1.0f, 0.81f, 0 /* shifted to present */)
                 .mustNotOutput(cycles, "(S)", GOAL, 0f, 0.5f, 0f, 1f, 0)
                 .mustNotOutput(cycles, "(S)", GOAL, 0, 0.5f, 0f, 1f, -5)
         ;
@@ -121,7 +121,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
         TestNAR tester = test;
         tester.input("x:y! :|:");
         tester.input("(goto($1) <=>+5 $1:y).");
-        tester.mustDesire(cycles, "goto(x)", 1.0f, 0.81f, 0);
+        tester.mustGoal(cycles, "goto(x)", 1.0f, 0.81f, 0);
     }
     @Test
     public void goalInferredFromEquivAndImplEternalAndPresent() {
@@ -131,7 +131,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
         tester.input("(a:b<=>c:d)."); //ETERNAL
         tester.input("(c:d &&+0 e:f). :|:"); //PRESENT
         tester.input("e:f! :|:"); //PRESENT
-        tester.mustDesire(cycles, "a:b", 1.0f, 0.73f, 0);
+        tester.mustGoal(cycles, "a:b", 1.0f, 0.73f, 0);
         tester.mustNotOutput(cycles, "a:b", GOAL, ETERNAL);
     }
 
@@ -153,7 +153,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
 
         tester.input("(a:b<=>c:d)."); //ETERNAL
         tester.input("(c:d &&+0 e:f)! :|:"); //PRESENT
-        tester.mustDesire(cycles, "(a:b &&+0 e:f)", 1.0f, 0.81f, 0);
+        tester.mustGoal(cycles, "(a:b &&+0 e:f)", 1.0f, 0.81f, 0);
         tester.mustNotOutput(cycles, "(a:b &&+0 e:f)", BELIEF, ETERNAL);
     }
 
@@ -201,7 +201,7 @@ public class NAL8EquivalenceTest extends AbstractNALTest {
                 .inputAt(0, "((out) <=>-3 (happy)). :|:")
                 .inputAt(5, "(happy)!")
                 //.mustDesire(cycles, "(out)", 1f, 0.04f, 17)
-                .mustDesire(16, "(out)", 1f, 0.81f, 3)
+                .mustGoal(16, "(out)", 1f, 0.81f, 3)
         //.mustNotOutput(cycles, "(out)", GOAL, 13, 0)
         ;
     }

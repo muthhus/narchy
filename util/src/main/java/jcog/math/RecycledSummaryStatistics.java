@@ -1,5 +1,6 @@
 package jcog.math;
 
+import jcog.Util;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
@@ -208,4 +209,11 @@ public class RecycledSummaryStatistics implements FloatProcedure, StatisticalSum
         return sSum / (c);
     }
 
+    /** returns the proportion that is lies between min and max. if min==max, then returns 0.  clips to 0..1.0 */
+    public float norm(float x) {
+        double min = this.min;
+        double r = max - min;
+        if (r < Double.MIN_NORMAL) return 0;
+        return Util.unitize( (float)((x - min) / r) );
+    }
 }

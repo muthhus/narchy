@@ -68,7 +68,7 @@ public class Builder {
     public static class Compound {
 
         public static BiFunction<Op, Term[], Term> HeapCompoundBuilder = (o, subterms) -> {
-            assert (!o.atomic);
+            assert (!o.atomic): o + " is atomic, with subterms: " + Arrays.toString(subterms);
 
             if (!o.allowsBool) {
                 for (Term x : subterms)

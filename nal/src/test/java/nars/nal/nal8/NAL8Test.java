@@ -40,9 +40,9 @@ public class NAL8Test extends AbstractNALTest {
         test
 
                 .input("(open(t1) &&+5 opened(t1))! :|:")
-                .mustDesire(cycles, "open(t1)", 1.0f, 0.81f, 0) //only temporal
+                .mustGoal(cycles, "open(t1)", 1.0f, 0.81f, 0) //only temporal
                 .mustNotOutput(cycles, "open(t1)", GOAL, t->t==ETERNAL || t == 5) //no eternal
-                .mustDesire(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal
+                .mustGoal(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal
                 .mustNotOutput(cycles, "opened(t1)", GOAL,  t->t==ETERNAL || t == 0) //no eternal
         ;
     }
@@ -77,7 +77,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
                 .input(new NALTask($.$("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
-                .mustDesire(cycles, "(a-->c)", 1f, 0.4f, (x) -> (x >= 10 && x <= 20))
+                .mustGoal(cycles, "(a-->c)", 1f, 0.4f, (x) -> (x >= 10 && x <= 20))
         ;
 
     }
@@ -115,7 +115,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test
                 .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) && open({t001})))! :|:")
-                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.81f, 0)
+                .mustGoal(cycles, "hold(SELF,{t002})", 1.0f, 0.81f, 0)
                 .mustNotOutput(cycles, "hold(SELF,{t002})", GOAL, ETERNAL);
     }
 
@@ -124,7 +124,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test
                 .input("(hold(SELF,{t002}) &&+5 (at(SELF,{t001}) &&+5 open({t001})))! :|:")
-                .mustDesire(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
+                .mustGoal(cycles, "hold(SELF,{t002})", 1.0f, 0.73f, 0)
                 .mustNotOutput(cycles, "hold(SELF,{t002})", GOAL, ETERNAL);
     }
 
@@ -189,7 +189,7 @@ public class NAL8Test extends AbstractNALTest {
 
                 .believe("(x)")
                 .goal("((x)&&(y))")
-                .mustDesire(cycles, "(y)", 1f, 0.81f);
+                .mustGoal(cycles, "(y)", 1f, 0.81f);
     }
 
     @Test
@@ -199,7 +199,7 @@ public class NAL8Test extends AbstractNALTest {
         t
                 .goal("(x)")
                 .believe("((x)==>(y))")
-                .mustDesire(cycles, "(y)", 1f, 0.45f);
+                .mustGoal(cycles, "(y)", 1f, 0.45f);
     }
 
     @Test
@@ -207,7 +207,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test
                 .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
-                .mustDesire(cycles, "(x)", 1f, 0.81f, 0)
+                .mustGoal(cycles, "(x)", 1f, 0.81f, 0)
                 //.mustNotOutput(cycles, "(y)", GOAL, 3)
                 .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
     }
@@ -248,7 +248,7 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustBelieve(cycles, "(x)", 1f, 0.81f, 0)
                 .mustBelieve(cycles, "(y)", 1f, 0.81f, 3)
-                .mustDesire(cycles, "(x)", 1f, 0.81f, (t) -> t > 0);
+                .mustGoal(cycles, "(x)", 1f, 0.81f, (t) -> t > 0);
     }
 
     @Test
@@ -284,7 +284,7 @@ public class NAL8Test extends AbstractNALTest {
 
                 .goal("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .believe("(x)", Tense.Present, 1f, 0.9f)
-                .mustDesire(cycles, "(y)", 1f, 0.81f, 3)
+                .mustGoal(cycles, "(y)", 1f, 0.81f, 3)
                 .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
     }
 
@@ -352,8 +352,8 @@ public class NAL8Test extends AbstractNALTest {
                 .goal("(reward)")
                 .believe("((good) ==> (reward))", 1, 0.9f)
                 .believe("((--,(bad)) ==> (reward))", 1, 0.9f)
-                .mustDesire(cycles, "(good)", 1.0f, 0.81f)
-                .mustDesire(cycles, "(bad)", 0.0f, 0.81f);
+                .mustGoal(cycles, "(good)", 1.0f, 0.81f)
+                .mustGoal(cycles, "(bad)", 0.0f, 0.81f);
 
     }
 
@@ -365,8 +365,8 @@ public class NAL8Test extends AbstractNALTest {
                 .goal("--reward")
                 .believe("(good ==> reward)", 1, 0.9f)
                 .believe("(bad ==> reward)", 0, 0.9f)
-                .mustDesire(cycles, "good", 0.0f, 0.66f)
-                .mustDesire(cycles, "bad", 1.0f, 0.81f)
+                .mustGoal(cycles, "good", 0.0f, 0.66f)
+                .mustGoal(cycles, "bad", 1.0f, 0.81f)
         ;
     }
 
@@ -377,7 +377,7 @@ public class NAL8Test extends AbstractNALTest {
 
                 .goal("(reward)")
                 .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
-                .mustDesire(cycles, "(bad)", 0.0f, 0.81f)
+                .mustGoal(cycles, "(bad)", 0.0f, 0.81f)
                 .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0f, 1f, ETERNAL);
     }
 
@@ -390,9 +390,9 @@ public class NAL8Test extends AbstractNALTest {
                 .goal("(reward)")
                 .believe("((good) ==> (reward))", 1, 0.9f)
                 .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
-                .mustDesire(cycles, "(good)", 1.0f, 0.81f)
+                .mustGoal(cycles, "(good)", 1.0f, 0.81f)
                 .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.7f, 0.5f, 1f, ETERNAL)
-                .mustDesire(cycles, "(bad)", 0.0f, 0.81f)
+                .mustGoal(cycles, "(bad)", 0.0f, 0.81f)
                 .mustNotOutput(cycles, "(bad)", GOAL, 0.3f, 1f, 0f, 1f, ETERNAL);
     }
 
@@ -405,8 +405,8 @@ public class NAL8Test extends AbstractNALTest {
                 .goal("(reward)")
                 .believe("((reward) ==> (good))", 1, 0.9f)
                 .believe("((--,(reward)) ==> (bad))", 1, 0.9f)
-                .mustDesire(cycles, "(good)", 1.0f, 0.45f)
-                .mustDesire(cycles, "(bad)", 0.0f, 0.45f)
+                .mustGoal(cycles, "(good)", 1.0f, 0.45f)
+                .mustGoal(cycles, "(bad)", 0.0f, 0.45f)
                 .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0.0f, 1f, ETERNAL)
                 .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0.0f, 1f, ETERNAL);
     }
@@ -467,8 +467,8 @@ public class NAL8Test extends AbstractNALTest {
         test
 
                 .inputAt(0, "(((in)|(left))-->cam)! :|:")
-                .mustDesire(cycles, "cam(in)", 1f, 0.81f, 0)
-                .mustDesire(cycles, "cam(left)", 1f, 0.81f, 0);
+                .mustGoal(cycles, "cam(in)", 1f, 0.81f, 0)
+                .mustGoal(cycles, "cam(left)", 1f, 0.81f, 0);
 
     }
 
@@ -531,7 +531,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input("(a)!")
                 .input("((a) && (b)).")
-                .mustDesire(cycles, "(b)", 1f, 0.81f);
+                .mustGoal(cycles, "(b)", 1f, 0.81f);
     }
 
     @Test
@@ -540,7 +540,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input("--(a)!")
                 .input("(--(a) && (b)).")
-                .mustDesire(cycles, "(b)", 1f, 0.81f);
+                .mustGoal(cycles, "(b)", 1f, 0.81f);
     }
 
     @Test
@@ -549,7 +549,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input("(a)!")
                 .input("((a) && --(b)).")
-                .mustDesire(cycles, "(b)", 0f, 0.81f);
+                .mustGoal(cycles, "(b)", 0f, 0.81f);
     }
 
 
@@ -560,7 +560,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input("(happy)!")
                 .input("((--,(in)) =|> ((happy)&&(--,(out)))).")
-                .mustDesire(cycles, "(in)", 0f, 0.73f);
+                .mustGoal(cycles, "(in)", 0f, 0.73f);
     }
 
     @Test
@@ -568,7 +568,7 @@ public class NAL8Test extends AbstractNALTest {
 
         test
                 .input("(#1&&(--,(out)))! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, 0);
+                .mustGoal(cycles, "(out)", 0f, 0.81f, 0);
     }
 
     @Test
@@ -583,7 +583,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "((out) ==>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.81f, 13)
+                .mustGoal(cycles, "(out)", 1f, 0.81f, 13)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -593,7 +593,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "((happy) ==>-3 (out)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 1f, 0.45f, 10)
+                .mustGoal(cycles, "(out)", 1f, 0.45f, 10)
                 .mustNotOutput(cycles, "(out)", GOAL,
                         t -> t == 3 || t == 16 || t == 0
                         );
@@ -606,7 +606,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(5, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, /*~*/8)
+                .mustGoal(cycles, "(out)", 0f, 0.81f, /*~*/8)
                 .mustNotOutput(cycles, "(out)", GOAL, t -> t != 8);
     }
 
@@ -621,7 +621,7 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(0, "((happy) ==>+3 --(out)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustDesire(cycles, "(out)", 0f, 0.81f, 16)
+                .mustGoal(cycles, "(out)", 0f, 0.81f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -631,7 +631,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(3, "((a) &&+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustGoal(cycles, "(a)", 1f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
 
@@ -641,7 +641,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(3, "(--(a) &&+3 (b)). :|:")
                 .inputAt(6, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 0f, 0.81f, 6) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustGoal(cycles, "(a)", 0f, 0.81f, 6) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
 
@@ -651,7 +651,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(3, "((a) ==>+3 (b)). :|:")
                 .inputAt(6, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.81f,
+                .mustGoal(cycles, "(a)", 1f, 0.81f,
                         (t)-> t >= 6) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL);
     }
@@ -662,7 +662,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(3, "(--(a) ==>+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustDesire(cycles, "(a)", 0f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustGoal(cycles, "(a)", 0f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL || t == 10);
     }
 
@@ -673,7 +673,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(6, "(--,(b))! :|:")
-                .mustDesire(cycles, "(a)", 1f, 0.81f, (t)->t>=6) //since b is not desired now, it should reverse predict the goal of (a)
+                .mustGoal(cycles, "(a)", 1f, 0.81f, (t)->t>=6) //since b is not desired now, it should reverse predict the goal of (a)
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
 
@@ -686,8 +686,8 @@ public class NAL8Test extends AbstractNALTest {
                 .input("c:b.")
                 .input("--y:x!") //negative pair
                 .input("z:y.")
-                .mustDesire(cycles, "c:a", 1f, 0.81f)
-                .mustDesire(cycles, "z:x", 0f, 0.81f);
+                .mustGoal(cycles, "c:a", 1f, 0.81f)
+                .mustGoal(cycles, "z:x", 0f, 0.81f);
     }
 
 

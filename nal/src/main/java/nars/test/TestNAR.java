@@ -525,7 +525,7 @@ public class TestNAR {
     }
 
     @NotNull
-    public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf) {
+    public TestNAR mustGoal(long withinCycles, @NotNull String goalTerm, float freq, float conf) {
         return mustOutput(withinCycles, goalTerm, GOAL, freq, conf);
     }
 
@@ -544,18 +544,18 @@ public class TestNAR {
     }
 
     @NotNull
-    public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, long occ) {
+    public TestNAR mustGoal(long withinCycles, @NotNull String goalTerm, float freq, float conf, long occ) {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, goalTerm, GOAL, freq, freq, conf, conf, occ);
     }
     @NotNull
-    public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, LongPredicate occ) {
+    public TestNAR mustGoal(long withinCycles, @NotNull String goalTerm, float freq, float conf, LongPredicate occ) {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, goalTerm, GOAL, freq, freq, conf, conf, occ);
     }
 
     @NotNull
-    public TestNAR mustDesire(long withinCycles, @NotNull String goalTerm, float freq, float conf, long start, long end) {
+    public TestNAR mustGoal(long withinCycles, @NotNull String goalTerm, float freq, float conf, long start, long end) {
         long t = nar.time();
         return mustOutput(t, t + withinCycles, goalTerm, GOAL, freq, freq, conf, conf, start, end);
     }

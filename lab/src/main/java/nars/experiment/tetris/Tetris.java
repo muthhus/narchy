@@ -1,17 +1,11 @@
 package nars.experiment.tetris;
 
-import com.google.common.collect.Iterables;
 import jcog.data.FloatParam;
 import nars.*;
-import nars.concept.ActionConcept;
 import nars.experiment.tetris.impl.TetrisState;
-import nars.op.Implier;
 import nars.term.atom.Atomic;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
-import nars.video.ShapeSensor;
-
-import java.util.List;
 
 import static nars.$.$;
 import static nars.experiment.tetris.impl.TetrisState.*;
@@ -503,10 +497,10 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        }
 
     public static void main(String[] args) {
-        //Param.DEBUG = true;
+        Param.DEBUG = true;
 
 
-        NAgentX.runRT((n) -> {
+        NAR nn = NAgentX.runRT((n) -> {
             Tetris a = null;
             try {
                 //n.truthResolution.setValue(0.05f);
@@ -523,6 +517,16 @@ public class Tetris extends NAgentX implements Bitmap2D {
                 e.printStackTrace();
             }
 
+
+            Tetris aa = a;
+            n.onTask((t) -> {
+                if (t.isEternal()) {
+                    System.err.println(t.proof());
+                }
+                if (t.isGoal() && t.truth().isNegative() && t.term().equals(aa.happy.term)) {
+                    System.err.println(t.proof());
+                }
+            });
 
             return a;
         }, 20f);
@@ -547,11 +551,6 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
 
         //NARBuilder.newALANN(clock, 4, 64, 5, 4, 1);
-
-//        n.onTask((t)->{
-//            if (t.isEternal())
-//                System.out.println(t.proof());
-//        });
 
 //            n.onCycle(new Runnable() {
 //
@@ -784,6 +783,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
             new MyTetris(n);
             n.run(200);
 
+            //n.concepts().map(x -> x.toString()).sorted().forEach(c -> {
             n.concepts().forEach(c -> {
                 System.out.println(c);
                 c.tasks().forEach(t -> {
@@ -791,6 +791,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
                 });
                 System.out.println();
             });
+
             n.stats(System.out);
         }
     }

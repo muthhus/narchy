@@ -4,6 +4,7 @@ import jcog.math.FloatSupplier;
 import nars.NAR;
 import nars.Param;
 import nars.Task;
+import nars.control.Cause;
 import nars.table.BeliefTable;
 import nars.task.SignalTask;
 import nars.term.Term;
@@ -121,7 +122,7 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
                 v = factor * -confidence * (1f - coherence);
                 y.delete();
             }
-            nar.emotion.value(cc, v);
+            nar.emotion.value(Cause.Purpose.Accurate, cc, v);
         });
     }
 

@@ -1427,5 +1427,19 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
+    @Test public void testConjDecomposeRightTime() {
+        /** should have been 1328:
+        $0.0 happy! 1253 %.34;.03% {1434: ÝÛÊã3ÄËëÇ;ÝÛÊã3ÄËíÒ;ÝÛÊã3ÄËïy;ÝÛÊã3ÄËð1} ((%1,%2,belief("&&"),task("!"),task(negative)),(subIfUnifiesAny(conjEvent(%2,early),conjEvent(%2,late),(--,%1)),((StrongN-->Goal))))
+            $.50 tetris(0,1)! 1421⋈1426 %.33;.07% {1421: ÝÛÊã3ÄËð1}
+            $.09 (happy &&+93 (--,tetris(0,1))).
+         */
+        test
+                .log()
+                .inputAt(5, "--tetris(0,1)! :|:")
+                .inputAt(10, "(happy &&+3 (--,tetris(0,1))). :|:")
+                .mustGoal(cycles, "happy", 1f, 0.81f, 2)
+        ;
+
+    }
 
 }

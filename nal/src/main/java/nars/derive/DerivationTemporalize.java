@@ -49,12 +49,16 @@ public class DerivationTemporalize extends Temporalize {
         dur = Math.max(1, Math.round(d.nar.dtDither.floatValue() * d.dur));
 
 
-        knowDerivedAbsolute(d, task.term(), task.start(), task.end());
+        knowDerivedAbsolute(d,
+                polarizedTaskTerm(task),
+                task.start(), task.end());
 
         if (belief != null) {
             if (!belief.equals(task)) {
 
-                knowDerivedAbsolute(d, d.beliefTerm, belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+                knowDerivedAbsolute(d,
+                        polarizedTaskTerm(belief),
+                        belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
             }
         } else /*if (d.beliefTerm != null)*/ {
             if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
@@ -67,6 +71,11 @@ public class DerivationTemporalize extends Temporalize {
         }
 
 
+    }
+
+    /** negate if negated, for precision in discriminating positive/negative */
+    static Term polarizedTaskTerm(Task t) {
+        return t.term().negIf(t.truth()!=null && t.truth().isNegative());
     }
 
     void knowDerivedAmbient(Subst d, Term x) {

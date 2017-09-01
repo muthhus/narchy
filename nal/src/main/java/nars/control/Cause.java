@@ -1,14 +1,19 @@
 package nars.control;
 
+import com.google.common.primitives.Doubles;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
+import jcog.list.FasterList;
+import jcog.math.RecycledSummaryStatistics;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -30,6 +35,70 @@ import static nars.Param.CAUSE_CAPACITY;
  */
 public class Cause<X> {
 
+    private float value;
+
+    /** value and momentum correspond to the possible values in Purpose enum */
+    public static void update(FasterList<Cause> causes, float[] value, RecycledSummaryStatistics[] valueSummary, float[] momentum) {
+
+        for (RecycledSummaryStatistics r : valueSummary)
+            r.clear();
+
+        for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
+            causes.get(i).commit(momentum, valueSummary);
+        }
+
+        int p = value.length;
+
+        for (float v : value) assert(v >= 0): "value should be non-negative";
+
+        for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
+            Cause c = causes.get(i);
+            float v = 0;
+            for (int j = 0; j < p; j++) {
+                v += value[j] * valueSummary[j].norm( c.purpose[j].current );
+            }
+            c.setValue(v);
+        }
+
+//        System.out.println("WORST");
+//        causes.stream().map(x -> PrimitiveTuples.pair(x, x.negTotal())).sorted(
+//                (x,y) -> Doubles.compare(y.getTwo(), x.getTwo())
+//        ).limit(10).forEach(x -> {
+//            System.out.println("\t" + x);
+//        });
+//        System.out.println();
+
+    }
+
+
+    public enum Purpose {
+        /** neg: accepted for input, pos: activated in concept to some degree */
+        Active,
+
+        /** pos: anwers a question */
+        Answer,
+
+        /** pos: actuated a goal concept */
+        Action,
+
+        /** pos: confirmed a sensor input;  neg: contradicted a sensor input */
+        Accurate
+    }
+
+    /** the AtomicDouble this inherits holds the accumulated value which is periodically (every cycle) committed  */
+    public static class Traffic extends AtomicDouble {
+        /** current, ie. the last commited value */
+        public float current = 0;
+
+        public double total = 0;
+
+        public void commit(float momentum) {
+            double next = getAndSet(0);
+            this.total += next;
+            this.current = decay(current, next, momentum);
+        }
+    }
+
     /** pos,neg range limit */
     final static float LIMIT = 1;
     final static float EPSILON = 0.0000001f;
@@ -37,31 +106,22 @@ public class Cause<X> {
     public final short id;
     public final Object name;
 
-    final AtomicDouble posAcc = new AtomicDouble(); //accumulating
-    float pos; //current value
 
-    final AtomicDouble negAcc = new AtomicDouble(); //accumulating
-    float neg; //current value
-
-    /** summary */
-    private float value;
-    private double posTotal = 0, negTotal = 0;
+    public final Traffic[] purpose;
 
     public Cause(short id, Object name) {
         this.id = id;
         this.name = name;
+        purpose = new Traffic[Purpose.values().length];
+        for (int i = 0; i < purpose.length; i++) {
+            purpose[i] = new Traffic();
+        }
     }
 
     @Override
     public String toString() {
         return name + "[" + id + "]=" + super.toString();
     }
-
-    /** current optimism level */
-    public float pos() { return pos; }
-
-    /** current pessimism level */
-    public float neg() { return neg; }
 
 
     public static short[] zip(@Nullable Task... e) {
@@ -120,20 +180,25 @@ public class Cause<X> {
         return ll;
     }
 
-    public void apply(float v) {
-        if (v >= EPSILON) {
-            posAcc.addAndGet(v);
-        } else if (v <= -EPSILON) {
-            negAcc.addAndGet(-v);
-        }
+    public void apply(Purpose p, float v) {
+        purpose[p.ordinal()].addAndGet(v);
     }
 
-    public void commit(float posDecay, float negDecay) {
-        this.posTotal += posAcc.get();
-        this.pos = decay(pos, posAcc, posDecay);
-        this.negTotal += negAcc.get();
-        this.neg = decay(neg, negAcc, negDecay);
-        this.value = value(pos, neg);
+    public void setValue(float nextValue) {
+        this.value = nextValue;
+    }
+
+    /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
+    public float value() {
+        return value;
+    }
+
+    public void commit(float[] momentums, RecycledSummaryStatistics[] valueSummary) {
+        for (int i = 0, purposeLength = purpose.length; i < purposeLength; i++) {
+            Traffic p = purpose[i];
+            p.commit(momentums[i]);
+            valueSummary[i].accept(p.current);
+        }
     }
 
     /** calculate the value scalar  from the distinctly tracked positive and negative values;
@@ -150,19 +215,8 @@ public class Cause<X> {
         //return Util.tanhFast( pos ) - Util.tanhFast( neg );
     }
 
-    static float decay(float cur, AtomicDouble acc, float decay) {
-        return Util.clamp( (float)((cur * decay) + acc.getAndSet(0)), 0, +LIMIT);
+    static float decay(float cur, double acc, float momentum) {
+        return Util.clamp( (float)((cur * momentum) + acc), 0, +LIMIT);
     }
 
-    public float value() {
-        return value;
-    }
-
-    public double posTotal() {
-        return negTotal;
-    }
-
-    public double negTotal() {
-        return negTotal;
-    }
 }
