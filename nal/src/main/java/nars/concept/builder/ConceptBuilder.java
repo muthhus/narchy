@@ -21,7 +21,7 @@ public interface ConceptBuilder extends Function<Term, Termed> {
     @NotNull ConceptState awake();
     @NotNull ConceptState sleep();
 
-    QuestionTable newQuestionTable();
+    QuestionTable newQuestionTable(Term term, boolean questionOrQuest);
     BeliefTable newBeliefTable(Term t, boolean beliefOrGoal);
     TemporalBeliefTable newTemporalBeliefTable(Term c);
 
@@ -67,7 +67,7 @@ public interface ConceptBuilder extends Function<Term, Termed> {
         }
 
         @Override
-        public QuestionTable newQuestionTable() {
+        public QuestionTable newQuestionTable(Term term, boolean questionOrQuest) {
             return QuestionTable.Empty;
         }
 

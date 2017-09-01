@@ -137,8 +137,8 @@ public class TrieDeriverTest {
     @Test
     public void testCompilePatternOpSwitch() {
         testCompile(
-                "(A --> B), C |- (A --> C), (Punctuation:Question)",
-                "(A ==> B), C |- (A ==> C), (Punctuation:Question)"
+                "(A --> B), C, task(\"?\") |- (A --> C), (Punctuation:Question)",
+                "(A ==> B), C, task(\"?\") |- (A ==> C), (Punctuation:Question)"
         );
 
     }
@@ -147,8 +147,8 @@ public class TrieDeriverTest {
     public void testConclusionFold() throws Narsese.NarseseException {
 
         String[] rules = {
-                "(A --> B), C |- (A --> C), (Punctuation:Question)",
-                "(A --> B), C |- (A ==> C), (Punctuation:Question)"
+                "(A --> B), C, task(\"?\") |- (A --> C), (Punctuation:Question)",
+                "(A --> B), C, task(\"?\") |- (A ==> C), (Punctuation:Question)"
         };
 
         Set<Task> t1 = testDerivation(rules, "(a-->b).", "b", 64, false);

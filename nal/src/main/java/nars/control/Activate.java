@@ -335,8 +335,16 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         if (!tc.add(b))
             return; //already added
 
-        if (--layersRemain <= 0 || b.size()==0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
+        if (b.size() == 0)
             return;
+
+
+
+        if (--layersRemain <= 0) // || !b.op().conceptualizable || b.isAny(VAR_QUERY.bit | VAR_PATTERN.bit))
+            return;
+
+        int lb = layers(b);
+        layersRemain = Math.min(lb, layersRemain);
 
         for (Term bb : b.subterms()) {
 
@@ -385,7 +393,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         switch (host.op()) {
 
             case PROD:
-                return 0;
+                return 1;
 
             case SETe:
             case SETi:

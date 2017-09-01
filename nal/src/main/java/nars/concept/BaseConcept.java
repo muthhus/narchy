@@ -63,7 +63,7 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
         this(term,
                 beliefs!=null ? beliefs : conceptBuilder.newBeliefTable(term, true),
                 goals!=null ? goals : conceptBuilder.newBeliefTable(term, false),
-                conceptBuilder.newQuestionTable(), conceptBuilder.newQuestionTable(), conceptBuilder.newLinkBags(term));
+                conceptBuilder.newQuestionTable(term, true), conceptBuilder.newQuestionTable(term, false), conceptBuilder.newLinkBags(term));
         assert(term.op().conceptualizable);
     }
 
@@ -143,7 +143,7 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
 
     public BaseConcept(@NotNull T term, @NotNull ConceptBuilder b) {
         this(term, b.newBeliefTable(term, true), b.newBeliefTable(term, false),
-                b.newQuestionTable(), b.newQuestionTable(),
+                b.newQuestionTable(term, true), b.newQuestionTable(term, false),
                 b.newLinkBags(term));
     }
 

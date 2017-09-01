@@ -661,6 +661,7 @@ public enum Op implements $ {
 
 
     public final boolean conceptualizable;
+    public final boolean beliefable, goalable;
 
 //    public interface TermInstancer {
 //
@@ -915,6 +916,19 @@ public enum Op implements $ {
         }
 
         conceptualizable = !(var || virtual || str.equals("+") /* INT */ || str.equals("B") /* Bool */);
+        if (!conceptualizable || str.equals("==>")) {
+            goalable = false;
+        } else {
+            goalable = true;
+        }
+
+        if (!conceptualizable) {
+            beliefable = false;
+        } else {
+            beliefable = true;
+        }
+
+
     }
 
     public static boolean hasAll(int existing, int possiblyIncluded) {

@@ -446,7 +446,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         //return term().vars() > 0;
         //return term().varIndep() > 0;
 
-        return term().varIndep() > 0 || term().op() == IMPL ?
+        Term t = term();
+        return t.varIndep() > 0 || t.op() == IMPL ?
                 //0.5f + 0.5f * polarity()
                 polarity()
                     : 0f;

@@ -137,6 +137,12 @@ public class ActivateTest {
         testTemplates("(x && y)",
                 "[(x &&+- y), y, x]");
     }
+    @Test public void testTemplateConj2() throws Narsese.NarseseException {
+        testTemplates("(&&,<#x --> lock>,(<$y --> key> ==> open($y,#x)))",
+                "[(($1-->key) &&+- (#2-->lock)), ((($1-->key) &&+- (#2-->lock)) ==>+- open($1,#2)), (#2-->lock), ($1,#2), key, open($1,#2), open, ($1-->key), lock]");
+
+    }
+
     static void testTemplates(String term, String expect) throws Narsese.NarseseException {
         NAR n = NARS.tmp(1);
         //n.believe(term + ".");

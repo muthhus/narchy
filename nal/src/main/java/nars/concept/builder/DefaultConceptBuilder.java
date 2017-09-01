@@ -285,8 +285,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         //TemporalBeliefTable newTemporalTable(final int tCap, NAR nar) {
         //return new HijackTemporalBeliefTable(tCap);
         //return new RTreeBeliefTable(tCap);
-        DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable(c));
-        return b;
+        Op o = c.op();
+        if (beliefOrGoal && o.beliefable || !beliefOrGoal && o.goalable) {
+            DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable(c));
+            return b;
+        } else {
+            return BeliefTable.Empty;
+        }
     }
 
     @Override
@@ -301,8 +306,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
 
 
     @Override
-    public QuestionTable newQuestionTable() {
-        return new HijackQuestionTable(0, 2);
+    public QuestionTable newQuestionTable(Term term, boolean questionOrQuest) {
+        Op o = term.op();
+        if (questionOrQuest && o.beliefable || !questionOrQuest && o.goalable) {
+            return new HijackQuestionTable(0, 2);
+        } else {
+            return QuestionTable.Empty;
+        }
     }
 
     private static boolean validUnwrappableSubterms(@NotNull TermContainer subterms) {
