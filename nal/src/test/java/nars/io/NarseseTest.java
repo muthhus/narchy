@@ -5,6 +5,7 @@ import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.InvalidTermException;
 import nars.term.Term;
+import nars.term.atom.Bool;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Ignore;
@@ -32,7 +33,7 @@ public class NarseseTest {
         for (String s : inputs) {
             try {
                 Term e = term(s);
-                if (Op.bool(e)) {
+                if (e instanceof Bool) {
                     assertTrue(true);
                 } else {
                     assertTrue(s + " should not be parseable but got: " + e, false); //must throw exception

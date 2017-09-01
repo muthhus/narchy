@@ -109,6 +109,9 @@ public abstract class Param extends Services<Term,NAR> {
     /** cost of a successful task derivation */
     public static final int TTL_DERIVE_TASK_SUCCESS = 2;
 
+    /** cost of a repeat (of another within the premise's batch) task derivation */
+    public static final int TTL_DERIVE_TASK_REPEAT = 1;
+
     /** cost of a task derived, but too similar to one of its parents */
     public static final int TTL_DERIVE_TASK_SAME = 2;
 
@@ -163,22 +166,24 @@ public abstract class Param extends Services<Term,NAR> {
         //return 0;
     }
 
-    public float derivationBudgetFactor(Term t, Truth tr, byte punc) {
-        float c = (1f + ((float)t.complexity())/termVolumeMax.floatValue());
+    public float derivePriority(Term t, Truth tr, byte punc) {
+        float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());
 
 
         if (/* belief or goal */ tr!=null) {
 
             //prefer confidence
-            c *= (1f + (1f - Math.min(1f, tr.conf()/confDefault(punc))));
+            float cMin = confMin.floatValue();
+            float cDef = confDefault(punc);
+            p *= Util.unitize( (tr.conf()-cMin) / (cDef-cMin) );
 
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
         } else {
-            c *= 2;
+            p *= 0.5f;
         }
 
-        return c;
+        return p;
     }
 
 

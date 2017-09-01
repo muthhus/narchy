@@ -11,6 +11,7 @@ import nars.derive.PrediTerm;
 import nars.derive.TrieDeriver;
 import nars.derive.rule.PremiseRuleSet;
 import nars.index.term.PatternTermIndex;
+import nars.task.ITask;
 import nars.term.Term;
 import nars.term.Termed;
 import net.byteseek.utils.collections.IdentityHashSet;
@@ -182,9 +183,16 @@ public class TrieDeriverTest {
         n.onTask(tasks::add);
         n.log();
 
-        new Premise(Narsese.parse().task(task, n), n.term(belief), d, 0.5f).run(n).forEach(x ->
-                tasks.add((Task)x)
-        );
+        Task t = Narsese.parse().task(task, n);
+        assertNotNull(t);
+        Term b = n.term(belief);
+        assertNotNull(b);
+        Iterable<? extends ITask> derived = new Premise(t, b, 0.5f).run(n);
+        if (derived!=null) {
+            derived.forEach(x ->
+                    tasks.add((Task) x)
+            );
+        }
 
         return tasks;
     }

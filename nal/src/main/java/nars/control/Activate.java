@@ -210,7 +210,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
                 PriReference<Term> termlink = terml.get(j);
 
                 float pri = Param.tasktermLinkCombine.apply(tasklink.priElseZero(), termlink.priElseZero());
-                premises.add(nar.premise(tasklink.get(), termlink.get(), pri));
+                premises.add(new Premise(tasklink.get(), termlink.get(), pri));
             }
         }
 

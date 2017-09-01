@@ -32,7 +32,6 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import static java.util.Arrays.copyOfRange;
-import static nars.derive.match.Ellipsis.hasEllipsis;
 import static nars.term.Terms.flatten;
 import static nars.time.Tense.*;
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
@@ -935,10 +934,6 @@ public enum Op implements $ {
         return ((existing | possiblyIncluded) == existing);
     }
 
-    public static boolean bool(@NotNull Term x) {
-        return x instanceof Bool;
-    }
-
     public static boolean isTrueOrFalse(@NotNull Term x) {
         return x == True || x == False;
     }
@@ -1250,16 +1245,19 @@ public enum Op implements $ {
         switch (op) {
 
             case SIM:
-
-                if (subject.equals(predicate))
+                if (subject.eternalEquals(predicate))
                     return True;
-                if (bool(subject) || bool(predicate))
+                if (subject instanceof Bool || predicate instanceof Bool)
                     return False;
                 break;
 
+            case ATOM:
+                break;
+            case NEG:
+                break;
             case INH:
 
-                if (subject.equals(predicate)) //equal test first to allow, ex: False<->False to result in True
+                if (subject == predicate)
                     return True;
                 if (isTrueOrFalse(subject) || isTrueOrFalse(predicate))
                     return False;
@@ -1278,9 +1276,29 @@ public enum Op implements $ {
                     polarity = !polarity;
                 }
 
+                if (subject.eternalEquals(predicate))
+                    return $.the(polarity);
+
+
                 break;
 
 
+            case SECTe:
+                break;
+            case SECTi:
+                break;
+            case DIFFe:
+                break;
+            case DIFFi:
+                break;
+            case PROD:
+                break;
+            case CONJ:
+                break;
+            case SETi:
+                break;
+            case SETe:
+                break;
             case IMPL:
 
                 //special case for implications: reduce to --predicate if the subject is False
@@ -1292,7 +1310,7 @@ public enum Op implements $ {
                         return Null; //no temporal basis
                     }
                 }
-                if (bool(predicate /* absolute truth is immutable so it can not be the consequence of anything mutable */))
+                if (predicate instanceof Bool)
                     return Null;
 
                 if (subject.hasAny(InvalidImplicationSubj))
@@ -1329,6 +1347,26 @@ public enum Op implements $ {
                 }
 
 
+                break;
+            case VAR_DEP:
+                break;
+            case VAR_INDEP:
+                break;
+            case VAR_QUERY:
+                break;
+            case VAR_PATTERN:
+                break;
+            case INT:
+                break;
+            case BOOL:
+                break;
+            case INSTANCE:
+                break;
+            case PROPERTY:
+                break;
+            case INSTANCE_PROPERTY:
+                break;
+            case DISJ:
                 break;
         }
 
@@ -1727,6 +1765,11 @@ public enum Op implements $ {
         }
 
         @Override
+        public boolean eternalEquals(Term x) {
+            return false;
+        }
+
+        @Override
         public @NotNull Term unneg() {
             return this;
         }
@@ -1742,6 +1785,11 @@ public enum Op implements $ {
         @Override
         public final int opX() {
             return rankBoolFalse;
+        }
+
+        @Override
+        public boolean eternalEquals(Term x) {
+            return x == this;
         }
 
         @NotNull
@@ -1761,6 +1809,11 @@ public enum Op implements $ {
         @Override
         public final int opX() {
             return rankBoolTrue;
+        }
+
+        @Override
+        public boolean eternalEquals(Term x) {
+            return x == this;
         }
 
         @NotNull

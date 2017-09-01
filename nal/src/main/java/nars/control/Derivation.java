@@ -7,6 +7,7 @@ import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.op.substitute;
+import nars.task.ITask;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
@@ -21,9 +22,7 @@ import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import static nars.Op.Null;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
@@ -122,7 +121,7 @@ public class Derivation extends Unify implements TermContext {
     public PrediTerm<Derivation> deriver;
     public final ByteShuffler shuffler = new ByteShuffler(64);
     public boolean single;
-    private final Set<Task> derivations = new LinkedHashSet();
+    public final Map<Task,Task> derivations = new LinkedHashMap();
     public DerivationTemporalize temporalize;
 
 //    private transient Term[][] currentMatch;
@@ -238,7 +237,7 @@ public class Derivation extends Unify implements TermContext {
     /**
      * tasklink/termlink scope
      */
-    public Set<Task> run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, int ttl) {
+    public Collection<Task> run(@NotNull Premise p, Task task, Task belief, Term beliefTerm, int ttl) {
 
         Term bt = beliefTerm.unneg();
         assert (!(bt instanceof Bool));
@@ -350,10 +349,9 @@ public class Derivation extends Unify implements TermContext {
             this.parentCause = new short[]{beliefCause[0]};
         }
 
-
         deriver.test(this);
 
-        return derivations;
+        return derivations.values();
     }
 
 
@@ -456,9 +454,7 @@ public class Derivation extends Unify implements TermContext {
         return ttl;
     }
 
-    public void accept(Task t) {
-        derivations.add(t);
-    }
+
 
     public void reset() {
         clear();

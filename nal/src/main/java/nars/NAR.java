@@ -1243,7 +1243,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 return null;
         }
 
-        Term y = xt.term().conceptual();
+        Term y = xt.conceptual();
 
         if (y instanceof Bool)
             throw new RuntimeException("failed to find conceptual root of " + y);
@@ -1604,13 +1604,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public final FasterList<Cause> causes = new FasterList(512);
 
 
-    public Derivation derivation(PrediTerm<Derivation> deriver) {
+    public Derivation derivation() {
         return derivation.get().cycle(deriver);
     }
 
-    public Premise premise(Task task, Term term, float pri) {
-        return new Premise(task, term, deriver, pri);
-    }
 
     /** deletes any task with a stamp containing the component */
     public void retract(long stampComponent) {

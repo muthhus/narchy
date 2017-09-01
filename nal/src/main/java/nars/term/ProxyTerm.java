@@ -296,8 +296,8 @@ public class ProxyTerm<T extends Term> implements Term {
 
 
     @Override
-    public boolean subIs(Op thisOp, int i, Term sub) {
-        return ref.subIs(thisOp, i, sub);
+    public boolean isAndSubEquals(Op thisOp, int i, Term sub) {
+        return ref.isAndSubEquals(thisOp, i, sub);
     }
 
     @Override

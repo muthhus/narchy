@@ -14,6 +14,8 @@ import java.util.TreeSet;
 
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
+import static nars.Op.False;
+import static nars.Op.True;
 import static nars.term.container.TermContainer.theTermArray;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
@@ -61,6 +63,33 @@ public class TemporalTermTest {
         assertInvalidTask("((x) &&+0 (--,(x))).");
     }
 
+    @Test
+    public void testInvalidInheritanceOfEternalAndItsTemporal() throws Narsese.NarseseException {
+        assertEquals(
+                Op.True,
+                $("((a &&+1 b)-->(a && b))")
+        );
+        assertEquals(
+                Op.False,
+                $("(--(a &&+1 b)-->(a && b))")
+        );
+        assertEquals(
+                Op.False,
+                $("((a &&+1 b) --> --(a && b))")
+        );
+        assertEquals(
+                Op.True,
+                $("((a && b)-->(a &&+1 b))")
+        );
+        assertEquals(
+                Op.True,
+                $("((a && b)<->(a &&+1 b))")
+        );
+        assertEquals(
+                Op.True,
+                $("((x,((--,R) &&+6 (--,happy)))-->(x,((--,R)&&(--,happy))))")
+        );
+    }
 
     public void assertInvalidTask(@NotNull String ss) {
         try {
@@ -71,16 +100,20 @@ public class TemporalTermTest {
         }
     }
 
-    @Test public void testEventsWithXTERNAL() throws Narsese.NarseseException {
+    @Test
+    public void testEventsWithXTERNAL() throws Narsese.NarseseException {
         //cant decompose
         assertEquals("[(x &&+- y):0]", $("(x &&+- y)").events().toString());
         assertEquals("[(x &&+- y):0, z:1]", $("((x &&+- y) &&+1 z)").events().toString());
     }
-  @Test public void testEventsWithDTERNAL() throws Narsese.NarseseException {
+
+    @Test
+    public void testEventsWithDTERNAL() throws Narsese.NarseseException {
         //cant decompose
         assertEquals("[(x&&y):0]", $("(x && y)").events().toString());
         assertEquals("[(x&&y):0, z:1]", $("((x && y) &&+1 z)").events().toString());
     }
+
     @Test
     public void testAtemporalization() throws Narsese.NarseseException {
         Term t = n.term("((x) ==>+10 (y))");
@@ -88,18 +121,21 @@ public class TemporalTermTest {
         assertEquals("((x) ==>+- (y))", c.toString());
     }
 
-    @Test public void testAtemporalization2() throws Narsese.NarseseException {
+    @Test
+    public void testAtemporalization2() throws Narsese.NarseseException {
 
         assertEquals("((--,y) &&+- y)", $.<Compound>$("(y &&+3 (--,y))").eternal().toString());
     }
 
-    @Test public void testAtemporalization3() throws Narsese.NarseseException {
+    @Test
+    public void testAtemporalization3() throws Narsese.NarseseException {
 
         assertEquals("(--,((x &&+- $1) ==>+- ((--,y) &&+- $1)))",
                 $.<Compound>$("(--,(($1&&x) ==>+1 ((--,y) &&+2 $1)))").eternal().toString());
     }
 
-    @Test public void testAtemporalization4() throws Narsese.NarseseException {
+    @Test
+    public void testAtemporalization4() throws Narsese.NarseseException {
         //maintain temporal information that would otherwise be factored out if non-temporal
 
         assertEquals("((x &&+- $1) ==>+- (y &&+- $1))",
@@ -107,8 +143,9 @@ public class TemporalTermTest {
     }
 
 
-    @Test public void testAtemporalization5() throws Narsese.NarseseException {
-        for (String s : new String[] {"(y &&+- (x==>y))",  "((x==>y) &&+- y)"}) {
+    @Test
+    public void testAtemporalization5() throws Narsese.NarseseException {
+        for (String s : new String[]{"(y &&+- (x==>y))", "((x==>y) &&+- y)"}) {
             Term c = $(s);
             assertTrue(c instanceof Compound);
 
@@ -117,7 +154,8 @@ public class TemporalTermTest {
         }
     }
 
-    @Test public void testAtemporalization6() throws Narsese.NarseseException {
+    @Test
+    public void testAtemporalization6() throws Narsese.NarseseException {
         Compound x = $("((--,(($1&&x) ==>+1 ((--,y) &&+2 $1))) &&+3 (--,y))");
 
         Term y = x.eternal();
@@ -208,7 +246,8 @@ public class TemporalTermTest {
     }
 
 
-    @Test public void testCommutiveConjTemporal() throws Narsese.NarseseException {
+    @Test
+    public void testCommutiveConjTemporal() throws Narsese.NarseseException {
         Term x = $("(a &&+1 b)");
         assertEquals("a", x.sub(0).toString());
         assertEquals("b", x.sub(1).toString());
@@ -381,8 +420,7 @@ public class TemporalTermTest {
 
             //co-negation
             Concept h = n.conceptualize($("(x " + op + "+- (--,x))"));
-            assertEquals("((--,x) " + op + "+- x)" , h.toString());
-
+            assertEquals("((--,x) " + op + "+- x)", h.toString());
 
 
         }
@@ -470,7 +508,6 @@ public class TemporalTermTest {
         n.run(2);
 
 
-
         BaseConcept xImplY = (BaseConcept) n.conceptualize($("(x==>y)"));
         assertEquals(3, xImplY.beliefs().size());
 
@@ -491,7 +528,6 @@ public class TemporalTermTest {
     }
 
 
-
     @Test
     public void testSubtermTimeRecursive() throws Narsese.NarseseException {
         Compound c = $("(hold:t2 &&+1 (at:t1 &&+3 ([opened]:t1 &&+5 open(t1))))");
@@ -503,7 +539,7 @@ public class TemporalTermTest {
         assertEquals(9, c.dtRange());
     }
 
-  @Test
+    @Test
     public void testSubtermNonCommutivePosNeg() throws Narsese.NarseseException {
         Term x = $("((d-->c) ==>-3 (a-->b))");
         assertEquals(0, x.subtermTime($("(d-->c)")));
@@ -579,17 +615,18 @@ public class TemporalTermTest {
     public void testDTRange() throws Narsese.NarseseException {
         assertEquals(1, $("((z) &&+1 (y))").dtRange());
     }
+
     @Test
     public void testDTRange2() throws Narsese.NarseseException {
         Term t = $("((x) &&+1 ((z) &&+1 (y)))");
         assertEquals(2, t.dtRange());
     }
+
     @Test
     public void testDTRange3() throws Narsese.NarseseException {
         assertEquals(4, $("((x) &&+1 ((z) &&+1 ((y) &&+2 (w))))").dtRange());
         assertEquals(4, $("(((z) &&+1 ((y) &&+2 (w))) &&+1 (x))").dtRange());
     }
-
 
 
     @Test

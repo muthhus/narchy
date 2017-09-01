@@ -52,6 +52,7 @@ abstract public class Bool extends AtomicToString {
         return u == this;
     }
 
+
     @Override
     @NotNull
     public final Term conceptual() {

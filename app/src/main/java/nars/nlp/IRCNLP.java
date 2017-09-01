@@ -314,7 +314,7 @@ public class IRCNLP extends IRC {
                     long now = n.time();
                     int dur = n.dur();
                     if (start >= now - dur) {
-                        if (tt.subIs(Op.INH, 1, HEAR)) {
+                        if (tt.isAndSubEquals(Op.INH, 1, HEAR)) {
                             if (tt.subIs(0, PROD) && tt.sub(0).subIs(0, Op.ATOM)) {
                                 bot.speak(tt.sub(0).sub(0), start, t.truth());
                             }

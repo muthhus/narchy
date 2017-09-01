@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Iterator;
 import java.util.function.Consumer;
 
+import static nars.Op.Null;
+
 /**
  * Size 1 TermVector
  */
@@ -35,30 +37,18 @@ public final class TermVector2 extends TermVector {
             case 0: return x;
             case 1: return y;
             default:
-                throw new ArrayIndexOutOfBoundsException();
+                return Null; //throw new ArrayIndexOutOfBoundsException();
         }
     }
 
     @Override
     public boolean subIs(int i, Op o) {
-        switch (i) {
-            case 0: return x.op()==o;
-            case 1: return y.op()==o;
-            default:
-                return false;
-                //throw new ArrayIndexOutOfBoundsException();
-        }
+        return sub(i).op()==o;
     }
 
     @Override
-    public boolean subIs(int i, Term maybeEquals) {
-        switch (i) {
-            case 0: return x.equals(maybeEquals);
-            case 1: return y.equals(maybeEquals);
-            default:
-                return false;
-                //throw new ArrayIndexOutOfBoundsException();
-        }
+    public boolean subEquals(int i, Term maybeEquals) {
+        return sub(i).equals(maybeEquals);
     }
 
     @Override
@@ -67,7 +57,7 @@ public final class TermVector2 extends TermVector {
         if (obj instanceof TermContainer) {
             if (hash == obj.hashCode()) {
                 TermContainer t = (TermContainer) obj;
-                return (t.size() == 2 && t.subIs(0, x) && t.subIs(1, y));
+                return (t.size() == 2 && t.sub(0).equals(x) && t.sub(1).equals(y));
             }
         }
         return false;

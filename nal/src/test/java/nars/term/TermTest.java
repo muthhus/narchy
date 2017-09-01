@@ -19,6 +19,7 @@ package nars.term;
 import nars.*;
 import nars.concept.Concept;
 import nars.term.atom.Atomic;
+import nars.term.atom.Bool;
 import nars.term.container.ArrayTermVector;
 import nars.term.container.TermVector;
 import nars.term.container.TermVector1;
@@ -626,7 +627,7 @@ public class TermTest {
 
     public static void assertValid(Term o) {
         assertNotNull(o);
-        assertTrue(!bool(o));
+        assertTrue(!(o instanceof Bool));
     }
 
     public static void assertValidTermValidConceptInvalidTaskContent(@NotNull Supplier<Term> o) {

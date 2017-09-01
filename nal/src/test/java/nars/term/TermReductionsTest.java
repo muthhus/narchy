@@ -753,7 +753,10 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testFilterCoNegatedStatements() throws Narsese.NarseseException {
         assertEquals("((--,(a1))<->(a1))", $("((--,(a1)) <-> (a1))").toString()); //valid
-        assertEquals(Null, $("((--,(a1)) --> (a1))"));
+
+    }
+    @Test public void testInheritFromItsNegative() throws Narsese.NarseseException {
+        assertEquals(False, $("((--,(a1)) --> (a1))"));
     }
 
 

@@ -26,6 +26,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Set;
 
 import static nars.Op.BELIEF;
@@ -44,13 +45,11 @@ public class Premise extends UnaryTask {
 
     public final Task taskLink;
     public final Term termLink;
-    private final PrediTerm<Derivation> deriver;
 
-    public Premise(@Nullable Task tasklink, @Nullable Term termlink, PrediTerm<Derivation> deriver, float pri) {
-        super(Tuples.pair(Tuples.pair(tasklink, termlink), deriver), pri);
+    public Premise(@Nullable Task tasklink, @Nullable Term termlink, float pri) {
+        super(Tuples.pair(tasklink, termlink), pri);
         this.taskLink = tasklink;
         this.termLink = termlink;
-        this.deriver = deriver;
     }
 
 
@@ -75,7 +74,7 @@ public class Premise extends UnaryTask {
 
         int ttlMax = n.matchTTL.intValue(); //TODO adjust this, maybe by priority and other factors
 
-        Derivation d = n.derivation(deriver);
+        Derivation d = n.derivation();
         d.nar.emotion.conceptFirePremises.increment();
 
 
@@ -264,7 +263,7 @@ public class Premise extends UnaryTask {
         if (beliefTerm instanceof Bool)
             return null;
 
-        Set<Task> dd = d.run(this, task, belief, beliefTerm, ttlMax);
+        Collection<Task> dd = d.run(this, task, belief, beliefTerm, ttlMax);
         int dds = dd.size();
         if (dds > 0) {
             nar.emotion.taskDerived.increment(dds);

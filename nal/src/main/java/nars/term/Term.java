@@ -848,11 +848,16 @@ public interface Term extends Termlike, Comparable<Term> {
         return this;
     }
 
+    /** TODO override in Compound implementations for accelerated root comparison without root() instantiation */
+    default boolean eternalEquals(Term x) {
+        return eternal().equals(x.eternal());
+    }
+
     /**
      * returns this term in a form which can identify a concept, or Null if it can't
      */
     default @NotNull Term conceptual() {
-        return root();
+        return root().unneg();
     }
 
     /**

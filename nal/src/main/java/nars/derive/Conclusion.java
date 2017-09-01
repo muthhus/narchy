@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import static nars.Op.GOAL;
 import static nars.Param.FILTER_SIMILAR_DERIVATIONS;
@@ -68,9 +69,9 @@ public class Conclusion extends AbstractPred<Derivation> {
      * false to stop it
      */
     @Override
-    public final boolean test(@NotNull Derivation d) {
+    public final boolean test(@NotNull Derivation p) {
 
-        NAR nar = d.nar;
+        NAR nar = p.nar;
 
         nar.emotion.derivationTry.increment();
 
@@ -82,7 +83,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
 
         // 1. SUBSTITUTE
-        Term b1 = d.transform(this.pattern);
+        Term b1 = p.transform(this.pattern);
 //        if (b1.vars(null) > 0) {
 //            Term b2 = d.transform(b1);
 //                        if (!b1.equals(b2))
@@ -100,30 +101,29 @@ public class Conclusion extends AbstractPred<Derivation> {
         /// 2. EVAL ----
 
 
-        d.use(Param.TTL_DERIVE_EVAL);
+        p.use(Param.TTL_DERIVE_EVAL);
         nar.emotion.derivationEval.increment();
 
-        Term c1 = b1.eval(d); //TODO cache pure eval terms
+        Term c1 = b1.eval(p); //TODO cache pure eval terms
         if (!c1.op().conceptualizable)
             return true;
 
 
-
-
         // 4. TEMPORALIZE --
 
-        Truth truth = d.concTruth;
+        Truth truth = p.concTruth;
 
         @NotNull final long[] occ;
         final float[] eviGain = {1f}; //flat by default
 
         Term c2;
-        if (d.temporal) {
+        long now = p.time;
+        if (p.temporal) {
 
             Term t1;
             try {
                 occ = new long[]{ETERNAL, ETERNAL};
-                t1 = solveTime(d, c1, occ, eviGain);
+                t1 = solveTime(p, c1, occ, eviGain);
 //                if (t1!=null && occ[0] == 7) {
 //                    //FOR A SPECIFIC TEST TEMPORAR
 //                    System.err.println("wtf");
@@ -131,7 +131,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 //                }
             } catch (InvalidTermException t) {
                 if (Param.DEBUG) {
-                    logger.error("temporalize error: {} {} {}", d, c1, t.getMessage());
+                    logger.error("temporalize error: {} {} {}", p, c1, t.getMessage());
                 }
                 return true;
             }
@@ -151,16 +151,16 @@ public class Conclusion extends AbstractPred<Derivation> {
 
             if (occ[1] == ETERNAL) occ[1] = occ[0]; //HACK probbly isnt needed
 
-            if (goalUrgent && d.concPunc == GOAL) {
-                long taskStart = d.task.start();
-                if (d.temporal && taskStart == ETERNAL)
-                    taskStart = d.time;
+            if (goalUrgent && p.concPunc == GOAL) {
+                long taskStart = p.task.start();
+                if (p.temporal && taskStart == ETERNAL)
+                    taskStart = now;
                 //if (taskStart != ETERNAL) {
                 if (taskStart != ETERNAL && occ[0] < taskStart) {
 
-                        long taskDur = occ[1] - occ[0];
-                        occ[0] = taskStart;
-                        occ[1] = occ[0] + taskDur;
+                    long taskDur = occ[1] - occ[0];
+                    occ[0] = taskStart;
+                    occ[1] = occ[0] + taskDur;
 
                 }
             }
@@ -172,10 +172,10 @@ public class Conclusion extends AbstractPred<Derivation> {
             c2 = c1;
         }
 
-                // 3. VAR INTRO
+        // 3. VAR INTRO
         if (varIntro) {
             //var intro before temporalizing.  otherwise any calculated temporal data may not applied to the changed term (ex: occ shift)
-            @Nullable Pair<Term, Map<Term, Term>> vc = DepIndepVarIntroduction.varIntroX(c2, d.random);
+            @Nullable Pair<Term, Map<Term, Term>> vc = DepIndepVarIntroduction.varIntroX(c2, p.random);
             if (vc == null) return true;
 
             Term v = vc.getOne();
@@ -192,11 +192,11 @@ public class Conclusion extends AbstractPred<Derivation> {
 
         //5. VALIDATE FOR TASK TERM
 
-        byte punc = d.concPunc;
+        byte punc = p.concPunc;
         Task t = Task.tryTask(c2, punc, truth, (C, tr) -> {
 
             if (tr != null) { //beliefs and goals
-                tr = tr.ditherFreqConf(d.truthResolution, d.confMin, eviGain[0]);
+                tr = tr.ditherFreqConf(p.truthResolution, p.confMin, eviGain[0]);
                 if (tr == null)
                     return null; //HACK
             }
@@ -210,41 +210,52 @@ public class Conclusion extends AbstractPred<Derivation> {
                 start = e;
             }
 
+            short[] cause = ArrayUtils.addAll(p.parentCause, channel.id);
 
-            short[] cause = ArrayUtils.addAll(d.parentCause, channel.id);
+            long[] evi = p.single ? p.evidenceSingle() : p.evidenceDouble();
 
-            //CONSTRUCT TASK
-            return
+            DerivedTask derived =
                     Param.DEBUG ?
-                            new DebugDerivedTask(C, punc, tr, d, start, end, cause) :
-                            new DerivedTask(C, punc, tr, d, start, end, cause);
+                            new DebugDerivedTask(C, punc, tr, now, start, end, evi, cause, p.task, !p.single ? p.belief : null) :
+                            new DerivedTask(C, punc, tr, now, start, end, evi, cause);
+
+
+            return derived;
         });
 
         if (t == null) {
-            d.use(Param.TTL_DERIVE_TASK_FAIL);
+            p.use(Param.TTL_DERIVE_TASK_FAIL);
             return true;
         }
 
-
-        if (same(t, d.task, d.truthResolution) || (d.belief != null && same(t, d.belief, d.truthResolution))) {
-            d.use(Param.TTL_DERIVE_TASK_SAME);
+        if (same(t, p.task, p.truthResolution) || (p.belief != null && same(t, p.belief, p.truthResolution))) {
+            p.use(Param.TTL_DERIVE_TASK_SAME);
             return true; //created a duplicate of the task
         }
 
-        float priority = d.premisePri / nar.derivationBudgetFactor(t.term(), t.truth(), t.punc());
 
+        float priority = p.premisePri * nar.derivePriority(t.term(), t.truth(), punc);
         assert (priority == priority);
 
-        t.setPri(priority);
-
+        float tp = t.setPri(priority);
 
         if (Param.DEBUG)
             t.log(rule);
 
-        d.accept(t);
-        d.use(Param.TTL_DERIVE_TASK_SUCCESS);
+        if (p.derivations.merge(t, t, MAX_MERGE) == t) {
+            p.use(Param.TTL_DERIVE_TASK_SUCCESS);
+        } else {
+            p.use(Param.TTL_DERIVE_TASK_REPEAT);
+        }
+
         return true;
     }
+
+    final static BiFunction<Task, Task, Task> MAX_MERGE = (pp, tt) -> {
+        pp.priMax(tt.pri());
+        ((NALTask)pp).merge(tt);
+        return pp;
+    };
 
     private Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] eviGain) {
         DerivationTemporalize dt = d.temporalize;

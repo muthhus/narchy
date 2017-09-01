@@ -14,6 +14,7 @@ import nars.term.InvalidTermException;
 import nars.term.Term;
 import nars.term.Terms;
 import nars.term.atom.Atomic;
+import nars.term.atom.Bool;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.UnnormalizedVariable;
@@ -307,7 +308,7 @@ public class IO {
         Term[] s = new Term[siz];
         for (int i = 0; i < siz; i++) {
             Term read = (s[i] = readTerm(in));
-            if (read == null || bool(read))
+            if (read == null || read instanceof Bool)
                 throw new InvalidTermException(Op.PROD /* consider the termvector as a product */, s, "invalid");
         }
 
@@ -332,7 +333,7 @@ public class IO {
         }
 
         Term y = o.the(dt, v);
-        if (bool(y))
+        if (y instanceof Bool)
             throw new InvalidTermException(o, dt, v, "invalid term");
 
 //        if (key == null)

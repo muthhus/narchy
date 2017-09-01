@@ -838,7 +838,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 return null;
 
             if (y.size() > 0) {
-                y = ((Compound) y).transform(t); //recurse
+                y = ((Compound)y).transform(t); //recurse
             }
 
             if (y == null)

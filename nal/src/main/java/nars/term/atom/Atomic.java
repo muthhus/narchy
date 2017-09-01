@@ -80,7 +80,10 @@ public interface Atomic extends Term {
         v.accept(this);
     }
 
-
+    @Override
+    default boolean eternalEquals(Term x) {
+        return equals(x);
+    }
 
     @Override
     default boolean ANDrecurse(@NotNull Predicate<Term> v) { return AND(v); }
