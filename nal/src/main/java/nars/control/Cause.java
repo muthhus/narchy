@@ -1,5 +1,6 @@
 package nars.control;
 
+import com.google.common.primitives.Doubles;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.list.FasterList;
@@ -7,16 +8,11 @@ import jcog.math.RecycledSummaryStatistics;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
-import org.jetbrains.annotations.NotNull;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
 import static nars.Param.CAUSE_CAPACITY;
 
 /**
@@ -35,8 +31,13 @@ public class Cause<X> {
 
     private float value;
 
+        /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
+    public float value() {
+        return value;
+    }
+
     /** value and momentum indices correspond to the possible values in Purpose enum */
-    public static void update(FasterList<Cause> causes, float[] value, RecycledSummaryStatistics[] summary, float[] momentum) {
+    public static void update(FasterList<Cause> causes, float[] value, RecycledSummaryStatistics[] summary) {
 
         for (RecycledSummaryStatistics r : summary) {
             //double m = r.getMax();
@@ -45,8 +46,11 @@ public class Cause<X> {
         }
 
         for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
-            causes.get(i).commit(momentum, summary);
+            causes.get(i).commit(summary);
         }
+
+        final float LIMIT = +4f;
+        final float momentum = 0.95f;
 
         int p = value.length;
         for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
@@ -56,20 +60,36 @@ public class Cause<X> {
                 float y = c.purpose[j].current;
                 v += value[j] * RecycledSummaryStatistics.norm( y, 0, summary[j].getMax() );
             }
-            c.setValue(v);
+
+
+            float nextValue =
+                    Util.clamp(c.value * momentum + v, -LIMIT, LIMIT);
+                    //smooth(c.value, v, 0.5f);
+
+            c.setValue(
+                    nextValue
+            );
         }
 
 
 
 //        System.out.println("WORST");
-//        causes.stream().map(x -> PrimitiveTuples.pair(x, x.negTotal())).sorted(
-//                (x,y) -> Doubles.compare(y.getTwo(), x.getTwo())
-//        ).limit(10).forEach(x -> {
+//        causes.stream().map(x -> PrimitiveTuples.pair(x, x.value())).sorted(
+//                (x,y) -> Doubles.compare(x.getTwo(), y.getTwo())
+//        ).limit(20).forEach(x -> {
 //            System.out.println("\t" + x);
 //        });
 //        System.out.println();
 
     }
+
+//    public static DurService updates(NAR nar) {
+//        return new DurService(nar) {
+//            @Override protected void run(NAR nar) {
+//                update(nar.causes, nar.value, nar.valueSummary, nar.valueMomentum);
+//            }
+//        };
+//    }
 
 
     public enum Purpose {
@@ -99,10 +119,10 @@ public class Cause<X> {
 
         public double total = 0;
 
-        public void commit(float momentum) {
+        public void commit() {
             double next = getAndSet(0);
             this.total += next;
-            this.current = smooth(current, next, momentum);
+            this.current = (float) next; //smooth(current, (float)next, momentum);
         }
     }
 
@@ -201,23 +221,20 @@ public class Cause<X> {
         this.value = nextValue;
     }
 
-    /** scalar value representing the contribution of this cause to the overall valuation of a potential input that involves it */
-    public float value() {
-        return value;
-    }
 
-    void commit(float[] momentums, RecycledSummaryStatistics[] valueSummary) {
+
+    void commit(RecycledSummaryStatistics[] valueSummary) {
         for (int i = 0, purposeLength = purpose.length; i < purposeLength; i++) {
             Traffic p = purpose[i];
-            p.commit(momentums[i]);
+            p.commit();
             valueSummary[i].accept(p.current);
         }
     }
 
 
 
-    static float smooth(float cur, double next, float momentum) {
-        return (float)((cur * momentum) + ((1f - momentum) * next));
+    static float smooth(float cur, float next, float momentum) {
+        return (float)((momentum * cur) + ((1f - momentum) * next));
     }
 
 }

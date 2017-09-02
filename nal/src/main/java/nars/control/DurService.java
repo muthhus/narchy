@@ -33,7 +33,7 @@ abstract public class DurService extends CycleService {
         //long lastNow = this.now;
         //long now = nar.time();
         //if (now - lastNow >= durations.floatValue() * nar.dur()) {
-        {
+        if (!busy.get()) {
             nar.runLater(() -> { //asynch
                 long noww = nar.time();
                 if (noww - this.now >= durations.floatValue() * nar.dur()) {

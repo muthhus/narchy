@@ -331,8 +331,7 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
     }
 
     public float value(@NotNull Task t, float activation, long when, NAR n) {
-        if (t.isInput())
-            return 0f; //dont affect input
+
         return Param.inputCost(t, n) * activation; //undo the input load in proportion to the activation factor
 
         //return Emotivation.preferConfidentAndRelevant(t, activation, when, n);

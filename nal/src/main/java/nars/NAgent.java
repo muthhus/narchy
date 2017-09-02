@@ -89,6 +89,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
     public final List<Supplier<Task>> predictors = newArrayList();
 
     public final AtomicBoolean enabled = new AtomicBoolean(true);
+    private final CauseChannel<Task> rewardIn;
 
     public boolean trace = false;
 
@@ -150,6 +151,8 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
 
         if (id == null) id = quote(getClass().toString());
+
+        this.rewardIn = nar.newCauseChannel(id + " reward");
         this.predict = nar.newCauseChannel(id + " predict");
     }
 
@@ -392,7 +395,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         this.now = nar.time();
 
-        nar.input(
+        rewardIn.input(
             /*Stream.of(*/happy.update(now, dur, nar)/*, fireHappy)*/
         );
 

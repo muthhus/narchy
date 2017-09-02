@@ -272,13 +272,18 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         for (int i = 0; i < valueSummary.length; i++)
             valueSummary[i] = new RecycledSummaryStatistics();
-        value[Cause.Purpose.Input.ordinal()] = -0.1f;
-        value[Cause.Purpose.Process.ordinal()] = +0.1f;
-        value[Cause.Purpose.Accurate.ordinal()] = +0.5f;
+
+        value[Cause.Purpose.Input.ordinal()] = -0.5f;
+        value[Cause.Purpose.Process.ordinal()] = +0.25f;
+
+        value[Cause.Purpose.Accurate.ordinal()] = +1f;
         value[Cause.Purpose.Inaccurate.ordinal()] = -1.0f;
-        value[Cause.Purpose.Answer.ordinal()] = +0.5f;
+
+        value[Cause.Purpose.Answer.ordinal()] = +1f;
         value[Cause.Purpose.Action.ordinal()] = +1f;
-        Arrays.fill(valueMomentum, 0.25f);
+
+
+        //Cause.updates(this);
 
         this.emotion = new Emotion(this);
 
@@ -960,10 +965,9 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         eventCycle.emit(this); //synchronous only
 
-        Cause.update(causes, value, valueSummary, valueMomentum);
+        Cause.update(causes, value, valueSummary);
 
         emotion.cycle();
-
     }
 
 
@@ -1611,9 +1615,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      */
     public final FasterList<Cause> causes = new FasterList(256);
     ;
-    final float[] value = new float[Cause.Purpose.values().length];
-    final float[] valueMomentum = new float[value.length];
-    final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[value.length];
+    public final float[] value = new float[Cause.Purpose.values().length];
+    public final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[value.length];
 
     /**
      * default deriver
@@ -1674,8 +1677,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             causeGoal = nar.newChannel(String.valueOf((char) GOAL));
             causeQuestion = nar.newChannel(String.valueOf((char) QUESTION));
             causeQuest = nar.newChannel(String.valueOf((char) QUEST));
-            causePast = nar.newChannel("Past");
             causeEternal = nar.newChannel("Eternal");
+            causePast = nar.newChannel("Past");
             causePresent = nar.newChannel("Present");
             causeFuture = nar.newChannel("Future");
 //            causeConf = new ChannelRange("Conf", 7 /* odd */, nar::newChannel, 0f, 1f);

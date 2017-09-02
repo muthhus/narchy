@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.Util;
+import jcog.math.Interval;
 import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
@@ -151,34 +152,43 @@ public class DerivationTemporalize extends Temporalize {
             long ts = task.start();
             long k;
             if (!te && (belief != null && !belief.isEternal())) {
-                //interpolate
-                ts = task.nearestTimeBetween(belief.start(), belief.end());
-                long bs = belief.nearestTimeBetween(ts, task.end());
-                if (ts != bs) {
-                    //confidence decay in proportion to lack of coherence
-                    if (task.isBeliefOrGoal()) {
-                        float taskEvi = task.evi();
-                        float beliefEvi = belief.evi();
-                        float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
-                        k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
-                        long distSum =
-                                Math.abs(task.nearestTimeTo(k) - k) +
-                                        Math.abs(belief.nearestTimeTo(k) - k);
-                        if (distSum > 0) {
-                            eviGain[0] *= Param.evidenceDecay(1, d.dur, distSum);
-                        }
-                    } else {
-                        k = bs;
-                    }
-                } else {
-                    k = ts;
-                }
+                Interval common = Interval.intersect(ts, task.end(), belief.start(), belief.end());
+                if (common==null)
+                    return null;
+                occ[0] = common.a;
+                occ[1] = common.b;
+                float overlapFactor = (1 + (common.b - common.a)) / (1 + Math.max(task.range(), belief.range()));
+                eviGain[0] *= overlapFactor;
+
+//                //interpolate
+//                ts = task.nearestTimeBetween(belief.start(), belief.end());
+//                long bs = belief.nearestTimeBetween(ts, task.end());
+//                if (ts != bs) {
+//                    //confidence decay in proportion to lack of coherence
+//                    if (task.isBeliefOrGoal()) {
+//                        float taskEvi = task.evi();
+//                        float beliefEvi = belief.evi();
+//                        float taskToBeliefEvi = taskEvi / (taskEvi + beliefEvi);
+//                        k = Util.lerp(taskToBeliefEvi, bs, ts); //TODO any duration?
+//                        long distSum =
+//                                Math.abs(task.nearestTimeTo(k) - k) +
+//                                        Math.abs(belief.nearestTimeTo(k) - k);
+//                        if (distSum > 0) {
+//                            eviGain[0] *= Param.evidenceDecay(1, d.dur, distSum);
+//                        }
+//                    } else {
+//                        k = bs;
+//                    }
+//                } else {
+//                    k = ts;
+//                }
             } else if (te) {
-                k = belief.start(); //TODO any duration?
+                occ[0] = belief.start();
+                occ[1] = belief.end();
             } else /*if (be)*/ {
-                k = ts; //TODO any duration?
+                occ[0] = occ[1] = task.start(); //TODO any duration?
             }
-            occ[0] = occ[1] = k;
+
         }
 
 

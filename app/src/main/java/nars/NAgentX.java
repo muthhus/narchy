@@ -164,15 +164,15 @@ abstract public class NAgentX extends NAgent {
         n.truthResolution.setValue(0.01f);
 
         n.beliefConfidence(0.9f);
-        n.goalConfidence(0.8f);
+        n.goalConfidence(0.9f);
 
 
-        float priFactor = 1f;
-        n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
-        n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
-        n.DEFAULT_QUESTION_PRIORITY = 0.25f * priFactor;
-        n.DEFAULT_QUEST_PRIORITY = 0.3f * priFactor;
-        n.termVolumeMax.setValue(26);
+        float priFactor = 0.5f;
+        n.DEFAULT_BELIEF_PRIORITY = 1f * priFactor;
+        n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
+        n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
+        n.DEFAULT_QUEST_PRIORITY = 1f * priFactor;
+        n.termVolumeMax.setValue(24);
 
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);
@@ -270,12 +270,12 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-        new Implier(a.nar,
-                Iterables.concat(
-                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
-                        Collections.singleton(a.happy.term)
-                )
-        );
+//        new Implier(a.nar,
+//                Iterables.concat(
+//                        Iterables.transform(a.actions.keySet(), ActionConcept::term),
+//                        Collections.singleton(a.happy.term)
+//                )
+//        );
 
 //        AgentService p = new AgentService.AgentBuilder(
 //                //DQN::new,
@@ -404,8 +404,10 @@ abstract public class NAgentX extends NAgent {
 
         int s = nar.causes.size();
 
+        FloatParam gain = new FloatParam(10f, 0f, 10f);
+
         BitmapMatrixView bmp = new BitmapMatrixView((i) ->
-                nar.causes.get(i).value(),
+                gain.floatValue() * nar.causes.get(i).value(),
                 s, Math.max(1, (int) Math.sqrt(s)),
                 Draw::colorBipolar) {
 

@@ -70,7 +70,7 @@ public class Emotivation extends Emotion {
         super.onAnswer(question, answer);
 
         //reward answer for answering the question
-        value(Cause.Purpose.Answer, answer.cause(), answer.conf());
+        value(Cause.Purpose.Answer, answer.cause(), answer.conf() * question.priSafe(0));
     }
 
     /**
@@ -83,7 +83,7 @@ public class Emotivation extends Emotion {
         if (gain != 0) {
 
             float amp = Util.tanhFast(gain) + 1f; //[0..+2]
-            amp = Math.max(amp, Pri.EPSILON * 128);
+            amp = Math.max(amp, 0.1f);
 
 //            amp *= amp; //sharpen, psuedo-logarithmic x^4
 //            amp *= amp;

@@ -327,8 +327,9 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
         int numCauses = causes.length;
 
-        //float sum = 0.5f * numCauses * (numCauses + 1);
-        float vPer = strength / numCauses; //flat
+        float vPer =
+                strength / numCauses; //flat
+                //strength;
 
         for (int i = 0; i < numCauses; i++) {
             short c = causes[i];

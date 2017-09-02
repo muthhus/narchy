@@ -748,10 +748,12 @@ public enum Draw {
     public static int colorBipolar(float v) {
         float r, g, b;
         if (v < 0) {
+            if (v < -1) v = -1; //clip
             r = -v / 2f;
             g = 0f;
             b = -v;
         } else {
+            if (v > +1) v = +1; //clip
             r = v;
             g = v / 2;
             b = 0f;

@@ -10,6 +10,7 @@ import nars.term.atom.Atomic;
 import nars.truth.Truth;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -194,8 +195,13 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         int dur = nar.dur();
 
         this.conf = nar.confDefault(Op.BELIEF);
-        in.input(pixels.stream() /*filter(PixelConcept::update).*/
-                        .map(c -> c.update(now, dur, nar)));
+        for (int i = 0, pixelsSize = pixels.size(); i < pixelsSize; i++) {
+            PixelConcept p = pixels.get(i);
+            @Nullable Task t = p.update(now, dur, nar);
+            if (t!=null) {
+                in.input(t);
+            }
+        }
     }
 
 

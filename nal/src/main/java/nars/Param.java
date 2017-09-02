@@ -144,7 +144,8 @@ public abstract class Param extends Services<Term,NAR> {
     public static float inputCost(Task t, NAR nar) {
 
 //        //prefer simple
-        float c = ((t.complexity()+t.volume())/2f)/nar.termVolumeMax.floatValue();
+        float c = ((t.complexity()+t.volume())/2f);//
+                // /nar.termVolumeMax.floatValue();
 
         //c *= t.priSafe(0);
 
@@ -393,8 +394,8 @@ public abstract class Param extends Services<Term,NAR> {
     }
 
 
-    /** no term sharing means faster comparison but potentially more memory usage. TODO determine effects */
-    public static boolean CompoundDT_TermSharing;
+//    /** no term sharing means faster comparison but potentially more memory usage. TODO determine effects */
+//    public static boolean CompoundDT_TermSharing;
 
 
     /**
