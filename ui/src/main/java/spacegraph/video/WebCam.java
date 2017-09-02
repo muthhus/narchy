@@ -4,10 +4,6 @@ import boofcv.struct.image.InterleavedU8;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamEvent;
 import com.github.sarxos.webcam.WebcamListener;
-import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.texture.TextureIO;
-import com.jogamp.opengl.util.texture.spi.TGAImage;
 import javafx.scene.image.WritableImage;
 import jcog.data.Range;
 import jcog.event.ArrayTopic;
@@ -17,14 +13,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spacegraph.SpaceGraph;
 import spacegraph.Surface;
-import spacegraph.render.Draw;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 
@@ -39,13 +30,12 @@ public class WebCam {
     public final Topic<WebcamEvent> eventChange = new ArrayTopic();
 
 
-
     @Range(min = 0, max = 1)
     public final MutableFloat cpuThrottle = new MutableFloat(0.5f);
 
-    public InterleavedU8 iimage;
 
     final static Logger logger = LoggerFactory.getLogger(WebCam.class);
+    public BufferedImage iimage;
     //public byte[] image;
 
 
@@ -57,6 +47,7 @@ public class WebCam {
 
         // Open a webcam at a resolution close to 640x480
         webcam = Webcam.getDefault();
+        webcam.setViewSize(new Dimension(w, h));
         if (!webcam.open(true))
             throw new RuntimeException("webcam not open");
 
@@ -87,25 +78,24 @@ public class WebCam {
             public void webcamImageObtained(WebcamEvent we) {
 
 
-
                 Dimension viewSize = webcam.getViewSize();
                 if (viewSize != null) {
                     width = (int) viewSize.getWidth();
                     height = (int) viewSize.getHeight();
 
                     BufferedImage nextImage = we.getImage();
-                    if (nextImage!=null) {
+                    if (nextImage != null) {
                         //if (iimage == null || iimage.width!=width || iimage.height!=height) {
-                        InterleavedU8 iimage = new InterleavedU8(width, height, 3);
+                        //InterleavedU8 iimage = new InterleavedU8(width, height, 3);
 
 
-                        convertFromInterleaved(nextImage, iimage);
+                        //convertFromInterleaved(nextImage, iimage);
 
                         //int[] output = we.getImage().getRGB(0, 0, width, height, null, 0, width * 3);
 
                         //webcam.getgetImageBytes(image);
 
-                        WebCam.this.iimage = iimage;
+                        WebCam.this.iimage = nextImage;
                         ///WebCam.this.image = iimage.data;
 
                         eventChange.emit(we);
@@ -119,6 +109,7 @@ public class WebCam {
 
 
     }
+
     public static void convertFromInterleaved(BufferedImage src, InterleavedU8 dst) {
 
         final int width = src.getWidth();
@@ -137,9 +128,9 @@ public class WebCam {
                     dd[indexDst++] = (byte) argb;
                 }
             }
-        } else if( dst.getNumBands() == 1 ){
+        } else if (dst.getNumBands() == 1) {
             //ConvertRaster.bufferedToGray(src, dst);
-        //} else {
+            //} else {
             throw new IllegalArgumentException("Unsupported number of input bands");
         }
     }
@@ -227,82 +218,20 @@ public class WebCam {
 //    }
 
     public Surface surface() {
-        return new Surface() {
 
-            public Texture texture;
-            final AtomicBoolean updated = new AtomicBoolean();
+        TextureSurface ts = new TextureSurface();
 
+        eventChange.on(x -> {
+            ts.update(iimage);
+        });
 
-            {
-                eventChange.on(x -> {
-                    updated.set(true);
-
-                });
-
-            }
-
-            /**
-             * TODO use GL textures
-             */
-            @Override
-            protected void paint(GL2 gl) {
-                super.paint(gl);
-
-                if (updated.compareAndSet(true, false)) {
-                    try {
-                        //DDSImage di = DDSImage.createFromData(DDSImage.D3DFMT_R8G8B8, width, height, new ByteBuffer[]{image.asReadOnlyBuffer()});
-                        //JPEGImage di = JPEGImage.read(new ByteBufferInputStream(image.asReadOnlyBuffer()));
-                        TGAImage di = TGAImage.createFromData(width, height, false, true, ByteBuffer.wrap(iimage.data));
-                        final String target = "/var/tmp/x.tga";
-
-                        di.write(target);
-
-                        Texture oldTexture = texture;
-                        texture = TextureIO.newTexture(new File(target), true);
-                        if (oldTexture != null) {
-                            oldTexture.destroy(gl);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (texture != null) {
-                    Draw.rectTex(gl, texture, 0, 0, 1, 1, 0);
-                }
-
-
-//                float y = 0;
-//                int w = width;
-//                float dx = 1f / w;
-//                int h = height;
-//                float dy = 1f / h;
-//                int k = 0;
-//                final byte[] img = image.array();
-//                for (int j = 0; j < h; j++) {
-//                    float x = 0;
-//                    for (int i = 0; i < w; i++) {
-//                        byte r = img[k++];
-//                        byte g = img[k++];
-//                        byte b = img[k++];
-//
-//                        gl.glColor3ub(r, g, b);
-//                        Draw.rect(gl, x, y, dx, dy);
-//                        x += dx;
-//                    }
-//                    y += dy;
-//                }
-
-
-            }
-
-        };
+        return ts;
     }
 
 
     public static void main(String[] args) {
 
-        final WebCam w = new WebCam(320, 200);
+        final WebCam w = new WebCam(320, 240);
         SpaceGraph.window(
                 //new Cuboid(new WebcamSurface(320, 200),4,4), 1200, 1200);
                 w.surface(), 1200, 1200);

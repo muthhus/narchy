@@ -322,7 +322,8 @@ public class Emotion extends ConcurrentMonitorRegistry {
 
     public void value(Cause.Purpose p, short[] causes, float strength) {
 
-        if (Math.abs(strength) < Prioritized.EPSILON) return; //no change
+        assert(strength >= 0);
+        if (strength < Prioritized.EPSILON) return; //no change
 
         int numCauses = causes.length;
 

@@ -6,6 +6,7 @@ import jcog.data.FloatParam;
 import jcog.data.MutableInteger;
 import jcog.pri.op.PriMerge;
 import jcog.util.FloatFloatToFloatFunction;
+import nars.control.Derivation;
 import nars.task.Tasked;
 import nars.task.TruthPolation;
 import nars.term.Term;
@@ -143,7 +144,7 @@ public abstract class Param extends Services<Term,NAR> {
     public static float inputCost(Task t, NAR nar) {
 
 //        //prefer simple
-        float c = ((float)t.complexity())/nar.termVolumeMax.floatValue();
+        float c = ((t.complexity()+t.volume())/2f)/nar.termVolumeMax.floatValue();
 
         //c *= t.priSafe(0);
 
@@ -167,8 +168,13 @@ public abstract class Param extends Services<Term,NAR> {
         //return 0;
     }
 
-    public float derivePriority(Term t, Truth tr, byte punc) {
-        float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());
+    public float derivePriority(Term t, Truth tr, byte punc, @NotNull Derivation d) {
+        //float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());
+
+        int dCompl = t.complexity();
+        int pCompl = Math.max(d.taskTerm.complexity(), d.beliefTerm.complexity());
+        float p =
+                (dCompl) / (dCompl + pCompl);
 
 
         if (/* belief or goal */ tr!=null) {
@@ -184,7 +190,7 @@ public abstract class Param extends Services<Term,NAR> {
             p *= 0.5f;
         }
 
-        return p;
+        return p * d.premisePri;
     }
 
 
@@ -255,7 +261,7 @@ public abstract class Param extends Services<Term,NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 10;
+    public static final int CAUSE_CAPACITY = 20;
 
     public final static int UnificationStackMax = 72; //how many assignments can be stored in the 'versioning' maps
 

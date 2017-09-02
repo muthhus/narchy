@@ -527,7 +527,9 @@ public enum Draw {
 
         //gl.glPushMatrix();
 
+        tt.enable(gl);
         tt.bind(gl);
+        gl.glTexParameteri( GL2.GL_TEXTURE_2D,GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
 
         gl.glBegin(GL2.GL_QUADS);
 

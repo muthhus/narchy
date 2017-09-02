@@ -278,16 +278,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         value[Cause.Purpose.Inaccurate.ordinal()] = -1.0f;
         value[Cause.Purpose.Answer.ordinal()] = +0.5f;
         value[Cause.Purpose.Action.ordinal()] = +1f;
-        Arrays.fill(valueMomentum, 0.25f);
+        Arrays.fill(valueMomentum, 0.1f);
 
         this.emotion = new Emotion(this);
 
         if (terms.nar == null) //dont reinitialize if already initialized, for sharing
             terms.start(this);
-
-//        (this.conceptBuilder = conceptBuilder).start(this);
-//
-//        this.deriver = deriver.apply(this);
 
         exe.start(this);
     }

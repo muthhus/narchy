@@ -236,7 +236,8 @@ public class Conclusion extends AbstractPred<Derivation> {
         }
 
 
-        float priority = p.premisePri * nar.derivePriority(t.term(), t.truth(), punc);
+
+        float priority = nar.derivePriority(t.term(), t.truth(), punc, p);
         assert (priority == priority);
 
         float tp = t.setPri(priority);
