@@ -627,8 +627,8 @@ public class NAL7Test extends AbstractNALTest {
     public void variable_elimination_on_temporal_statements() {
 
         test
-                .inputAt(0, "(on({t002},#1) &&+0 at(SELF,#1)). :|:")
-                .inputAt(1, "((on($1,#2) &&+0 at(SELF,#2)) ==>+0 reachable(SELF,$1)).")
+                .inputAt(0, "(on({t002},#1) &| at(SELF,#1)). :|:")
+                .inputAt(1, "((on($1,#2) &| at(SELF,#2)) =|> reachable(SELF,$1)).")
                 .mustBelieve(cycles, "reachable(SELF,{t002})",
                         1.0f, 0.66f /*0.81f*/, 0);
 
@@ -967,12 +967,11 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testIntersectionTemporalNear() {
 
-        int dependsOn = Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS;
         test
                 .dur(2)
                 .inputAt(0, "(x --> a). :|:")
-                .inputAt(2, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.68f, 1)
+                .inputAt(1, "(y --> a). :|:")
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 1)
         ;
     }
 
@@ -982,7 +981,6 @@ public class NAL7Test extends AbstractNALTest {
     @Test
     public void testIntersectionTemporalFar() {
 
-        int dependsOn = Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS;
         test
                 .dur(1)
                 .inputAt(0, "(x --> a). :|:")

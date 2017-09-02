@@ -341,7 +341,7 @@ public class Revision {
 
 
         if (timeOverlap == null && u > 0) {
-            if (u - s > nar.dur() * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_DERIVATIONS)
+            if (u - s > nar.dur() * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS)
                 factor *= (1f + s) / (1f + u);
         }
 

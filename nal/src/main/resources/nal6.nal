@@ -73,14 +73,10 @@
 // Conditional syllogism && Independent Variable Elimination
 //      If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePB, Goal:InductionRecursivePB)
-    B, ((--,%A) ==> C), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePBN, Goal:InductionRecursivePBN)
+    B, (A ==> C), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePB, Goal:DeciInduction)
+    B, (--A ==> C), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePBN, Goal:DeciInductionN)
 
-    //SUSPECT:
-    B, (C ==> A), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePB, Goal:GoductionRecursivePB)
-        //B, (C ==> A), belief(negative), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePBNN, Goal:GoductionRecursivePBNN)
-
-        //TODO maybe the belief(negative) cases are actually necessary to derive --C
+    B, (C ==> A), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePB, Goal:DeciDeduction)
 
         //has(A,"$"),
     //B, ((--,%A) ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)
@@ -198,8 +194,8 @@
 
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
-    B, C, belief("&&+"), task("!"), task(positive) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
-    B, C, belief("&&+"), task("!"), task(negative) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),(--,%B)), (Goal:StrongN)
+    B, C, belief("&&+"), task("!"), task(positive), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),B), (Goal:Strong)
+    B, C, belief("&&+"), task("!"), task(negative), time(urgent) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),(--,%B)), (Goal:StrongN)
 
     //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)
     //SUSPECT:
