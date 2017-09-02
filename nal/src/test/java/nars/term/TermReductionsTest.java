@@ -213,6 +213,20 @@ public class TermReductionsTest extends NarseseTest {
 //        assertInvalidTerms("<R ==> <P<=>Q>>");
 //    }
 
+    @Test public void testConjPosNegElimination1() throws Narsese.NarseseException {
+        //  (a ∧ ¬(a ∧ b))  =⇒ ¬b WRONG
+        //  a and not(a and b)
+        //  http://www.wolframalpha.com/input/?i=(a+and+not(a+and+b))
+        assertEquals("((--,b)&&a)", $.$("(a && --(a && b))").toString());
+    }
+
+    @Test public void testConjPosNegElimination2() throws Narsese.NarseseException {
+        //  (¬a ∧ (a ∨ b)) =⇒ b WRONG
+        //  not(a) and (a or b)
+        //  http://www.wolframalpha.com/input/?i=not(a)+and+(a+or+b)
+        assertEquals("((--,a)&&b)", $.$("(--a && (a || b))").toString());
+    }
+
     @Test
     public void testReducedAndInvalidImplications2() throws Narsese.NarseseException {
         assertEquals("((P&&R)==>Q)", $("<R==><P==>Q>>").toString());

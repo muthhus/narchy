@@ -53,12 +53,12 @@
 //Same as for inheritance again
 
 
-    (S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositive)
-        (S ==> M), ((&&,(--,%S),A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositiveN)
+    //(S ==> M), ((&&,S,A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositive)
+        //(S ==> M), ((&&,(--,%S),A..+) ==> M) |- ((&&,A..+) ==>+- M), (Belief:DecomposeNegativePositivePositiveN)
         //(S ==> M), ((||,S,A..+) ==> M) |- ((||,A..+) ==>+- M), (Belief:DecomposePositiveNegativeNegative)
 
-    (M ==> S), (M ==> (&&,S,A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
-        (M ==> S), (M ==> (&&,(--,%S),A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
+    //(M ==> S), (M ==> (&&,S,A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegative)
+        //(M ==> S), (M ==> (&&,(--,%S),A..+)) |- (M ==>+- (&&,A..+)), (Belief:DecomposePositiveNegativeNegativeN)
         //(M ==> S), (M ==> (||,S,A..+)) |- (M ==>+- (||,A..+)), (Belief:DecomposeNegativePositivePositive)
 
     (M ==> C), C, belief("&&") |- (M ==>+- dropAnyEvent(C)), (Belief:StructuralDeduction)
@@ -193,10 +193,8 @@
 
 //// conjunction decompose AND dependent variable elimination - decomposition with elimination of a variable
 
-     //structural decompose any component of a conjunction.
-     C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
-     (&&,X,A..+), X, task("!") |- X, (Goal:Strong)
-     (&&,(--,%X),A..+), X, task("!") |- (--,%X), (Goal:StrongPN)
+    //structural decompose any component of a conjunction.
+    C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
 
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results
@@ -204,6 +202,10 @@
     B, C, belief("&&+"), task("!"), task(negative) |- subIfUnifiesAny(conjEvent(C,early),conjEvent(C,late),(--,%B)), (Goal:StrongN)
 
     //(&&,A_1..n), A_i |- A_i, (Truth:StructuralDeduction, Desire:Strong)
+    //SUSPECT:
+        //(&&,X,A..+), X, task("!") |- X, (Goal:Strong)
+        //(&&,(--,%X),A..+), X, task("!") |- (--,%X), (Goal:StrongPN)
+
 
 //Anonymous Analogy (NAL5)
     //originally this only unified depvar (dep var elimination)
