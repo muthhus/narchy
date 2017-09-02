@@ -49,6 +49,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.jogamp.opengl.GL.*;
 import static spacegraph.math.v3.v;
 import static spacegraph.render.JoglSpace.glsrt;
 import static spacegraph.render.JoglSpace.glut;
@@ -492,7 +493,8 @@ public enum Draw {
 //        gl.glVertex3f(x1, y1 + h, 0);
 //        gl.glEnd();
     }
-  public static void rect(GL2 gl, int x1, int y1, int w, int h) {
+
+    public static void rect(GL2 gl, int x1, int y1, int w, int h) {
 
         gl.glRecti(x1, y1, x1 + w, y1 + h);
 
@@ -529,7 +531,10 @@ public enum Draw {
 
         tt.enable(gl);
         tt.bind(gl);
-        gl.glTexParameteri( GL2.GL_TEXTURE_2D,GL2.GL_TEXTURE_MIN_FILTER, GL2.GL_LINEAR);
+
+        //sharp pixels on magnification
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        gl.glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
         gl.glBegin(GL2.GL_QUADS);
 
@@ -659,6 +664,12 @@ public enum Draw {
         gl.glColor4fv(f, 0);
     }
 
+    public static int hsb(float hue, float saturation, float brightness) {
+        float[] f = new float[4];
+        hsb(hue, saturation, brightness, 1, f);
+        return rgbInt(f[0], f[1], f[2]);
+    }
+
     @NotNull
     public static float[] hsb(float hue, float saturation, float brightness, float a, @Nullable float[] target) {
         if (target == null || target.length < 4)
@@ -728,6 +739,28 @@ public enum Draw {
             b = 0f;
         }
         gl.glColor3f(r, g, b);
+    }
+
+    public static int colorBipolarHSB(float v) {
+        return hsb(v/2f + 0.5f, 0.7f, 0.75f);
+    }
+
+    public static int colorBipolar(float v) {
+        float r, g, b;
+        if (v < 0) {
+            r = -v / 2f;
+            g = 0f;
+            b = -v;
+        } else {
+            r = v;
+            g = v / 2;
+            b = 0f;
+        }
+        return rgbInt(r, g, b);
+    }
+
+    public static int rgbInt(float r, float g, float b) {
+        return (int) (255 * b) << 16 | (int) (255 * g) << 8 | (int) (255 * r);
     }
 
     public static void colorUnipolarHue(GL2 gl, float v, float hueMin, float hueMax) {
@@ -1416,7 +1449,7 @@ public enum Draw {
         public Glyph getGlyph(char c) {
             int n = (int) c;
         /* if c is out of the BitFont-glyph bounds, return
-		 * the defaultChar glyph (the space char by
+         * the defaultChar glyph (the space char by
 		 * default). */
             n = (n >= 128) ? defaultChar : n;
             return glyphs[n];

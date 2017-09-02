@@ -1,27 +1,19 @@
 package nars;
 
 import com.google.common.collect.Iterables;
-import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.learn.ql.HaiQAgent;
-import jcog.math.FirstOrderDifferenceFloat;
-import jcog.math.FloatNormalized;
+import jcog.event.On;
 import jcog.pri.mix.control.MixContRL;
 import nars.concept.ActionConcept;
-import nars.control.AgentService;
 import nars.control.Derivation;
 import nars.control.NARService;
 import nars.derive.Deriver;
 import nars.derive.PrediTerm;
 import nars.exe.FocusExec;
 import nars.exe.MultiExec;
-import nars.exe.UniExec;
 import nars.gui.Vis;
-import nars.index.term.HijackTermIndex;
-import nars.index.term.map.CaffeineIndex;
 import nars.index.term.map.CaffeineIndex2;
 import nars.op.Implier;
-import nars.op.mental.Abbreviation;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -37,9 +29,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import spacegraph.Surface;
 import spacegraph.layout.Grid;
+import spacegraph.render.Draw;
 import spacegraph.widget.console.ConsoleTerminal;
 import spacegraph.widget.meta.WindowButton;
-import spacegraph.widget.meter.MatrixView;
+import spacegraph.widget.meter.BitmapMatrixView;
 import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
@@ -52,13 +45,11 @@ import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 import static nars.$.$;
-import static nars.Builder.Compound.HijackCompoundBuilder;
 import static nars.Op.BELIEF;
 import static nars.Op.GOAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
-import static spacegraph.widget.meter.MatrixView.bipolar1;
 
 /**
  * Extensions to NAgent interface:
@@ -141,7 +132,7 @@ abstract public class NAgentX extends NAgent {
         clock.durFPS(durFPS);
 
         Function<NAR, PrediTerm<Derivation>> deriver = Deriver.newDeriver(8
-                ,"motivation.nal");
+                , "motivation.nal");
 
         int THREADS = 2;
         NAR n = new NARS()
@@ -176,7 +167,6 @@ abstract public class NAgentX extends NAgent {
         n.goalConfidence(0.8f);
 
 
-
         float priFactor = 1f;
         n.DEFAULT_BELIEF_PRIORITY = 0.5f * priFactor;
         n.DEFAULT_GOAL_PRIORITY = 0.5f * priFactor;
@@ -205,7 +195,6 @@ abstract public class NAgentX extends NAgent {
 //        });
 
 
-
         NInner nin = new NInner(n);
         nin.start();
 
@@ -213,7 +202,7 @@ abstract public class NAgentX extends NAgent {
         chart(n, a);
         window(/*row*/(
 
-                causePlot(n)
+                causePlot(a)
 
                 //mixPlot(a, m, HISTORY),
 
@@ -410,11 +399,32 @@ abstract public class NAgentX extends NAgent {
     }
 
 
-    private static Surface causePlot(NAR nar) {
+    private static Surface causePlot(NAgent a) {
+        NAR nar = a.nar;
+
         int s = nar.causes.size();
-        return new MatrixView((i) ->
+
+        BitmapMatrixView bmp = new BitmapMatrixView((i) ->
                 nar.causes.get(i).value(),
-                s, Math.max(1, (int) Math.round(Math.sqrt(s))), bipolar1);
+                s, Math.max(1, (int) Math.sqrt(s)),
+                Draw::colorBipolar) {
+
+            public final On<NAgent> on;
+
+            {
+                on = a.onFrame(() -> {
+                    update();
+                });
+            }
+
+            @Override
+            public void stop() {
+                super.stop();
+                on.off();
+            }
+        };
+
+        return bmp;
     }
 
     private static void chart(NAR n, NAgent a) {

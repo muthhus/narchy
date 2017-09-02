@@ -26,14 +26,14 @@ public class TextureSurface extends Surface {
     final byte[] aa = new byte[2 * 1024 * 1024];
     private final ByteBuffer bb;
 
-    public boolean mipmap = true;
+    public boolean mipmap = false;
 
     //TODO use a PPM uncompressed format for transferring from CPU to GPU
     String internalFormat =
             //"tif";
             "png";
-    //"png";
-    //"jpg";
+            //"png";
+            //"jpg";
 
 
     final AtomicBoolean textureUpdated = new AtomicBoolean(false);
