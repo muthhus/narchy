@@ -398,7 +398,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
                     input.delete();
 
                     if (activation >= Prioritized.EPSILON) {
-                        ((NALTask) revised).merge(input);
+                        ((NALTask) revised).causeMerge(input);
                     } else {
                         activated = null; //dont bother activating
                     }

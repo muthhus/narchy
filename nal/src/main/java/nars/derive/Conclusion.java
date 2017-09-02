@@ -255,7 +255,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
     final static BiFunction<Task, Task, Task> DUPLICATE_DERIVATION_MERGE = (pp, tt) -> {
         pp.priMax(tt.pri());
-        ((NALTask)pp).merge(tt);
+        ((NALTask)pp).causeMerge(tt);
         return pp;
     };
 
@@ -287,7 +287,7 @@ public class Conclusion extends AbstractPred<Derivation> {
 
                         //((NALTask)parent).merge(derived);
                         parent.priMax(derived.priElseZero());
-                        ((NALTask) parent).merge(derived); //merge cause
+                        ((NALTask) parent).causeMerge(derived); //merge cause
                         return true;
                     }
                 }

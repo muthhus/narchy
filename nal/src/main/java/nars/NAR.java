@@ -272,13 +272,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         for (int i = 0; i < valueSummary.length; i++)
             valueSummary[i] = new RecycledSummaryStatistics();
-        value[Cause.Purpose.Input.ordinal()] = -0.2f;
-        value[Cause.Purpose.Process.ordinal()] = +0.2f;
-        value[Cause.Purpose.Accurate.ordinal()] = +0.5f;
+        value[Cause.Purpose.Input.ordinal()] = -0.5f;
+        value[Cause.Purpose.Process.ordinal()] = +0.4f;
+        value[Cause.Purpose.Accurate.ordinal()] = +0.25f;
         value[Cause.Purpose.Inaccurate.ordinal()] = -1.0f;
         value[Cause.Purpose.Answer.ordinal()] = +0.5f;
-        value[Cause.Purpose.Action.ordinal()] = +0.5f;
-        Arrays.fill(valueMomentum, 0.5f);
+        value[Cause.Purpose.Action.ordinal()] = +1f;
+        Arrays.fill(valueMomentum, 0.25f);
 
         this.emotion = new Emotion(this);
 
@@ -919,6 +919,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public Truth beliefTruth(Termed concept, long when) {
         return truth(concept, BELIEF, when);
     }
+
     @Nullable
     public Truth beliefTruth(Termed concept, long start, long end) {
         return truth(concept, BELIEF, start, end);
@@ -928,6 +929,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public Truth goalTruth(Termed concept, long when) {
         return truth(concept, GOAL, when);
     }
+
     @Nullable
     public Truth goalTruth(Termed concept, long start, long end) {
         return truth(concept, GOAL, start, end);
@@ -1560,6 +1562,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     public Task belief(Term c, long start, long end) {
         return answer(c, BELIEF, start, end);
     }
+
     public Task belief(Term c, long when) {
         return belief(c, when, when);
     }
@@ -1610,23 +1613,30 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * table of values influencing reasoner heuristics
      */
-    public final FasterList<Cause> causes = new FasterList(256);;
+    public final FasterList<Cause> causes = new FasterList(256);
+    ;
     final float[] value = new float[Cause.Purpose.values().length];
     final float[] valueMomentum = new float[value.length];
     final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[value.length];
 
-    /** default deriver */
+    /**
+     * default deriver
+     */
     public Derivation derivation() {
         return derivation(deriver);
     }
 
-    /** another deriver */
+    /**
+     * another deriver
+     */
     public Derivation derivation(PrediTerm<Derivation> deriver) {
         return derivation.get().cycle(deriver);
     }
 
 
-    /** deletes any task with a stamp containing the component */
+    /**
+     * deletes any task with a stamp containing the component
+     */
     public void retract(long stampComponent) {
         tasks().filter(x -> Longs.contains(x.stamp(), stampComponent)).forEach(Task::delete);
     }
@@ -1659,7 +1669,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
 
         public final Cause causeBelief, causeGoal, causeQuestion, causeQuest;
         public final Cause causePast, causePresent, causeFuture, causeEternal;
-        public final ChannelRange causeConf, causeFreq;
+        //public final ChannelRange causeConf, causeFreq;
         public final NAR nar;
 
         ImplicitTaskCauses(NAR nar) {
@@ -1672,8 +1682,8 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             causeEternal = nar.newChannel("Eternal");
             causePresent = nar.newChannel("Present");
             causeFuture = nar.newChannel("Future");
-            causeConf = new ChannelRange("Conf", 7 /* odd */, nar::newChannel, 0f, 1f);
-            causeFreq = new ChannelRange("Freq", 7 /* odd */, nar::newChannel, 0f, 1f);
+//            causeConf = new ChannelRange("Conf", 7 /* odd */, nar::newChannel, 0f, 1f);
+//            causeFreq = new ChannelRange("Freq", 7 /* odd */, nar::newChannel, 0f, 1f);
         }
 
         /**
@@ -1713,13 +1723,13 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
                 default:
                     throw new UnsupportedOperationException();
             }
-            if (x.isBeliefOrGoal()) {
-                short freq = causeFreq.get(x.freq()).id;
-                short conf = causeConf.get(x.conf()).id;
-                return new short[]{time, punc, freq, conf};
-            } else {
-                return new short[]{time, punc};
-            }
+//            if (x.isBeliefOrGoal()) {
+//                short freq = causeFreq.get(x.freq()).id;
+//                short conf = causeConf.get(x.conf()).id;
+//                return new short[]{time, punc, freq, conf};
+//            } else {
+            return new short[]{time, punc};
+//            }
         }
 
     }
@@ -1728,27 +1738,24 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * estimate the value of a cause trace
      */
-    protected float evaluate(Task x, short[]... causes) {
+    protected float evaluate(Task x, short[] causes) {
+
+        int numCauses = causes.length;
+        if (numCauses == 0) return 0;
 
         float boost = 0;
-
-        //value *= activation; //weight the apparent value by its incoming activation?
-
-        int numCauses = 0;
-        for (short[] cc : causes) {
-            numCauses += cc.length;
-            for (short c : cc) {
-                Cause cause = this.causes.getSafe(c);
-                if (cause == null) {
-                    logger.error("cause id={} missing", c);
-                    continue;
-                }
-
-                boost += cause.value();
+        for (short c : causes) {
+            Cause cause = this.causes.getSafe(c);
+            if (cause == null) {
+                logger.error("cause id={} missing", c);
+                continue;
             }
+
+            boost += cause.value();
         }
 
-        return numCauses > 0 ? boost / numCauses : 0;
+
+        return boost / numCauses;
     }
 
     public Cause newCause(Object x) {
@@ -1799,7 +1806,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
             return c;
         }
     }
-
 
 
 }

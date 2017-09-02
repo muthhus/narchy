@@ -251,7 +251,7 @@ public class MySTMClustered extends STMClustered {
                                 NALTask m = new STMClusterTask(cp, t, start, end, evidence, punc, now); //TODO use a truth calculated specific to this fixed-size batch, not all the tasks combined
 
                                 for (Task u : uu)
-                                    m.merge(u); //cause merge
+                                    m.causeMerge(u); //cause merge
 
                                 float maxPri = new FasterList<>(uuLen, uu)
                                         .maxValue(Task::priElseZero) / uuLen; //HACK todo dont use List

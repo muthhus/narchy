@@ -39,9 +39,9 @@ public class Cause<X> {
     public static void update(FasterList<Cause> causes, float[] value, RecycledSummaryStatistics[] summary, float[] momentum) {
 
         for (RecycledSummaryStatistics r : summary) {
-            double m = r.getMax();
+            //double m = r.getMax();
             r.clear();
-            r.setMax(m * 0.5f);
+            //r.setMax(m * 0.9f);
         }
 
         for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
@@ -139,7 +139,25 @@ public class Cause<X> {
 
     }
 
+    public static short[] append(int maxLen, short[] src, short[] add) {
+        int addLen = add.length;
+        if (addLen == 0) return src;
 
+        int srcLen = src.length;
+        if (srcLen + addLen < maxLen) {
+            return ArrayUtils.addAll(src, add);
+        } else {
+            if (addLen >= srcLen) {
+                return zip(maxLen, ()->src, ()->add);
+            } else {
+                short[] dst = new short[maxLen];
+                int mid = maxLen - addLen;
+                System.arraycopy(src, srcLen - mid, dst, 0, mid);
+                System.arraycopy(add, 0, dst, mid, addLen);
+                return dst;
+            }
+        }
+    }
 
     public static short[] zip(int maxLen, Supplier<short[]>... s) {
 

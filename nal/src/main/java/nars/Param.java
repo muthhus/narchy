@@ -255,7 +255,7 @@ public abstract class Param extends Services<Term,NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 20;
+    public static final int CAUSE_CAPACITY = 10;
 
     public final static int UnificationStackMax = 72; //how many assignments can be stored in the 'versioning' maps
 

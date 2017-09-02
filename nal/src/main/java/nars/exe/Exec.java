@@ -95,7 +95,7 @@ abstract public class Exec implements Executor, PriMerge {
             return PriMerge.plus.merge(existing, incoming);
         } else {
             if (existing instanceof NALTask) {
-                ((NALTask)existing).merge((NALTask) incoming);
+                ((NALTask)existing).causeMerge((NALTask) incoming);
             }
             return PriMerge.max.merge(existing, incoming);
         }

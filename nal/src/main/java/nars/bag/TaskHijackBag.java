@@ -31,7 +31,7 @@ public class TaskHijackBag extends PriorityHijackBag<Task, Task> implements Task
         float before = existing.priElseZero();
         existing.priMax(incoming.priElseZero());
         overflowing.add(inc - (existing.priElseZero() /* after */ - before));
-        ((NALTask)existing).merge(incoming);
+        ((NALTask)existing).causeMerge(incoming);
         return existing;
     }
 

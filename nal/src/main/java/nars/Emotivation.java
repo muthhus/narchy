@@ -78,7 +78,7 @@ public class Emotivation extends Emotion {
      */
     public void evaluate(Task x) {
 
-        float gain = nar.evaluate(x, x.cause(), nar.taskCauses.get(x));
+        float gain = nar.evaluate(x, x.cause());
         assert (gain == gain);
         if (gain != 0) {
 
@@ -104,7 +104,7 @@ public class Emotivation extends Emotion {
             //float p0 = t.priSafe(0);
             float cost = Param.inputCost(t, nar);
 
-            ((NALTask)t).merge(nar.taskCauses.get(t));
+            ((NALTask)t).causeAppend(nar.taskCauses.get(t));
             if (cost != 0) {
                 value(Cause.Purpose.Input, t.cause(), cost);
             }
