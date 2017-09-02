@@ -1,6 +1,7 @@
 package jcog.math;
 
 import jcog.Util;
+import jcog.pri.Pri;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.eclipse.collections.api.block.procedure.primitive.FloatProcedure;
 
@@ -216,24 +217,39 @@ public class RecycledSummaryStatistics implements FloatProcedure, StatisticalSum
         return norm(x, min, max);
     }
 
-    private static float norm(float x, double min, double max) {
+    public static float norm(float x, double min, double max) {
         double r = max - min;
         if (r < Double.MIN_NORMAL) return 0;
         return Util.unitize( (float)((x - min) / r) );
     }
 
     public float normPolar(float x) {
-        if (x < 0) {
-            return -norm(x, min, 0);
+        if (Util.equals(min, max, 2 * Pri.EPSILON)) {
+            return 0.5f;
+        } else if (min < -Pri.EPSILON) {
+            if (x < 0) {
+                return 0.5f - norm(x, min, 0)/2f;
+            } else {
+                return 0.5f + norm(x, 0, max)/2f;
+            }
         } else {
+            //return norm(x, min, max); //unipolar
             return norm(x, 0, max);
         }
     }
 
-    public void bipolarize() {
-        double a = Math.max(Math.abs(this.max), Math.abs(this.min));
-        min = -a;
-        max = +a;
+    public void setMin(double min) {
+        this.min = min;
     }
+
+    public void setMax(double v) {
+        this.max = v;
+    }
+
+//    public void bipolarize() {
+//        double a = Math.max(Math.abs(this.max), Math.abs(this.min));
+//        min = -a;
+//        max = +a;
+//    }
 
 }

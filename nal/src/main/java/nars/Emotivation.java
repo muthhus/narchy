@@ -3,9 +3,11 @@ package nars;
 import com.netflix.servo.monitor.BasicGauge;
 import com.netflix.servo.monitor.LongGauge;
 import jcog.Util;
+import jcog.pri.Pri;
 import nars.concept.Concept;
 import nars.control.Cause;
 import nars.task.ITask;
+import nars.task.NALTask;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -81,6 +83,7 @@ public class Emotivation extends Emotion {
         if (gain != 0) {
 
             float amp = Util.tanhFast(gain) + 1f; //[0..+2]
+            amp = Math.max(amp, Pri.EPSILON * 128);
 
 //            amp *= amp; //sharpen, psuedo-logarithmic x^4
 //            amp *= amp;
@@ -101,9 +104,9 @@ public class Emotivation extends Emotion {
             //float p0 = t.priSafe(0);
             float cost = Param.inputCost(t, nar);
 
+            ((NALTask)t).merge(nar.taskCauses.get(t));
             if (cost != 0) {
-                value(Cause.Purpose.Active, nar.taskCauses.get(t), -cost);
-                value(Cause.Purpose.Active, t.cause(), -cost);
+                value(Cause.Purpose.Input, t.cause(), cost);
             }
 
             evaluate(t);
@@ -121,7 +124,7 @@ public class Emotivation extends Emotion {
         if (xl > 0) {
             float conceptValue = origin.value(t, activation, n.time(), n);
             if (conceptValue!=0)
-                value(Cause.Purpose.Active, x, conceptValue);
+                value(Cause.Purpose.Process, x, conceptValue);
         }
 
     }

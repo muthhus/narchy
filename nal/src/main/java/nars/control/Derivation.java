@@ -336,18 +336,9 @@ public class Derivation extends Unify implements TermContext {
 
         this.premisePri = p.priElseZero();
 
-        short[] taskCause = task.cause();
-        short[] beliefCause = belief != null ? belief.cause() : ArrayUtils.EMPTY_SHORT_ARRAY;
-
-        //HACK
-        if (taskCause.length > 0 && beliefCause.length > 0) {
-            //HACK zip
-            this.parentCause = new short[]{taskCause[0], beliefCause[0]};
-        } else if (taskCause.length > 0) {
-            this.parentCause = new short[]{taskCause[0]};
-        } else if (beliefCause.length > 0) {
-            this.parentCause = new short[]{beliefCause[0]};
-        }
+        this.parentCause = belief!=null ?
+                Cause.zip(task, belief) :
+                task.cause();
 
         deriver.test(this);
 

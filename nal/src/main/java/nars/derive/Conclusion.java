@@ -244,7 +244,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         if (Param.DEBUG)
             t.log(rule);
 
-        if (p.derivations.merge(t, t, MAX_MERGE) == t) {
+        if (p.derivations.merge(t, t, DUPLICATE_DERIVATION_MERGE) == t) {
             p.use(Param.TTL_DERIVE_TASK_SUCCESS);
         } else {
             p.use(Param.TTL_DERIVE_TASK_REPEAT);
@@ -253,7 +253,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         return true;
     }
 
-    final static BiFunction<Task, Task, Task> MAX_MERGE = (pp, tt) -> {
+    final static BiFunction<Task, Task, Task> DUPLICATE_DERIVATION_MERGE = (pp, tt) -> {
         pp.priMax(tt.pri());
         ((NALTask)pp).merge(tt);
         return pp;

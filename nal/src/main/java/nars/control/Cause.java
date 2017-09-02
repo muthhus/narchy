@@ -1,6 +1,7 @@
 package nars.control;
 
 import com.google.common.util.concurrent.AtomicDouble;
+import jcog.Util;
 import jcog.list.FasterList;
 import jcog.math.RecycledSummaryStatistics;
 import nars.Task;
@@ -12,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -33,28 +35,26 @@ public class Cause<X> {
 
     private float value;
 
-    /** value and momentum correspond to the possible values in Purpose enum */
+    /** value and momentum indices correspond to the possible values in Purpose enum */
     public static void update(FasterList<Cause> causes, float[] value, RecycledSummaryStatistics[] summary, float[] momentum) {
 
-        for (RecycledSummaryStatistics r : summary)
+        for (RecycledSummaryStatistics r : summary) {
+            double m = r.getMax();
             r.clear();
+            r.setMax(m * 0.5f);
+        }
 
         for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
             causes.get(i).commit(momentum, summary);
         }
 
         int p = value.length;
-        for (int j = 0; j < p; j++) {
-            summary[j].bipolarize();
-        }
-
-        for (float v : value) assert(v >= 0): "value should be non-negative";
-
         for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {
             Cause c = causes.get(i);
             float v = 0;
             for (int j = 0; j < p; j++) {
-                v += value[j] * summary[j].normPolar( c.purpose[j].current );
+                float y = c.purpose[j].current;
+                v += value[j] * RecycledSummaryStatistics.norm( y, 0, summary[j].getMax() );
             }
             c.setValue(v);
         }
@@ -73,8 +73,11 @@ public class Cause<X> {
 
 
     public enum Purpose {
-        /** neg: accepted for input, pos: activated in concept to some degree */
-        Active,
+        /** neg: accepted for input */
+        Input,
+
+        /** pos: activated in concept to some degree */
+        Process,
 
         /** pos: anwers a question */
         Answer,
@@ -82,8 +85,11 @@ public class Cause<X> {
         /** pos: actuated a goal concept */
         Action,
 
-        /** pos: confirmed a sensor input;  neg: contradicted a sensor input */
-        Accurate
+        /** pos: confirmed a sensor input */
+        Accurate,
+
+        /** neg: contradicted a sensor input */
+        Inaccurate
     }
 
     /** the AtomicDouble this inherits holds the accumulated value which is periodically (every cycle) committed  */
@@ -126,29 +132,20 @@ public class Cause<X> {
         switch (e.length) {
             case 0: throw new NullPointerException();
             case 1: return e[0].cause();
-            case 2: return zip(e[0].cause(), e[1].cause(), CAUSE_CAPACITY);
+            case 2: return zip(CAUSE_CAPACITY, e[0]::cause, e[1]::cause);
             default:
-                return zip(Stream.of(e)
-                        .filter(Objects::nonNull).map(Task::cause).collect(toList()), CAUSE_CAPACITY); //HACK
+                return zip(CAUSE_CAPACITY, Util.map((x) -> x::cause, new Supplier[e.length], e)); //HACK
         }
 
     }
 
-    static short[] zip(short[] c0, short[] c1, int cap) {
-        if (Arrays.equals(c0, c1)) return c0; //no change
 
-        if (c0.length + c1.length < cap) {
-            return ArrayUtils.addAll(c0, c1);
-        } else {
-            return zip(List.of(c0, c1), cap);
-        }
-    }
 
-    static short[] zip(@NotNull List<short[]> s, int maxLen) {
+    public static short[] zip(int maxLen, Supplier<short[]>... s) {
 
-        int ss = s.size();
+        int ss = s.length;
         if (ss == 1) {
-            return s.get(0);
+            return s[0].get();
         }
 
         ShortArrayList l = new ShortArrayList(maxLen);
@@ -157,8 +154,8 @@ public class Cause<X> {
         boolean remain;
         main: do {
             remain = false;
-            for (int i = 0, sSize = s.size(); i < sSize; i++) {
-                short[] c = s.get(i);
+            for (int i = 0; i < ss; i++) {
+                short[] c = s[i].get();
                 int cl = c.length;
                 if (cl >= n) {
                     l.add(c[cl - n]);
@@ -191,7 +188,7 @@ public class Cause<X> {
         return value;
     }
 
-    public void commit(float[] momentums, RecycledSummaryStatistics[] valueSummary) {
+    void commit(float[] momentums, RecycledSummaryStatistics[] valueSummary) {
         for (int i = 0, purposeLength = purpose.length; i < purposeLength; i++) {
             Traffic p = purpose[i];
             p.commit(momentums[i]);
@@ -199,22 +196,23 @@ public class Cause<X> {
         }
     }
 
-    /** calculate the value scalar  from the distinctly tracked positive and negative values;
-     * any function could be used here. for example:
-     *      simplest:           pos - neg
-     *      linear combination: x * pos - y * neg
-     *      quadratic:          pos*pos - neg*neg
-     *
-     * pos and neg will always be positive.
-     * */
-    public float value(float pos, float neg) {
-        return pos - neg;
-        //return pos * 2 - neg;
-        //return Util.tanhFast( pos ) - Util.tanhFast( neg );
-    }
+
 
     static float smooth(float cur, double next, float momentum) {
         return (float)((cur * momentum) + ((1f - momentum) * next));
     }
 
 }
+//    /** calculate the value scalar  from the distinctly tracked positive and negative values;
+//     * any function could be used here. for example:
+//     *      simplest:           pos - neg
+//     *      linear combination: x * pos - y * neg
+//     *      quadratic:          pos*pos - neg*neg
+//     *
+//     * pos and neg will always be positive.
+//     * */
+//    public float value(float pos, float neg) {
+//        return pos - neg;
+//        //return pos * 2 - neg;
+//        //return Util.tanhFast( pos ) - Util.tanhFast( neg );
+//    }

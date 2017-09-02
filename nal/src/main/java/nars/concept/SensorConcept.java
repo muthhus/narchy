@@ -117,12 +117,14 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
             if (coherence > fThresh) {
                 //reward
                 v = factor * confidence;
+                nar.emotion.value(Cause.Purpose.Accurate, cc, v);
             } else {
                 //punish
-                v = factor * -confidence * (1f - coherence);
+                v = factor * confidence * (1f - coherence);
+                nar.emotion.value(Cause.Purpose.Inaccurate, cc, v);
                 y.delete();
             }
-            nar.emotion.value(Cause.Purpose.Accurate, cc, v);
+
         });
     }
 

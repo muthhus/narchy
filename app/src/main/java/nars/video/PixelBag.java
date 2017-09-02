@@ -54,7 +54,7 @@ public abstract class PixelBag implements Bitmap2D {
     private float fg = 1f;
     private float fb = 1f;
     float minClarity = 1f, maxClarity = 1f;
-    private final boolean inBoundsOnly = false;
+    private final boolean inBoundsOnly = true;
 
 
     public static PixelBag of(Supplier<BufferedImage> bb, int px, int py) {

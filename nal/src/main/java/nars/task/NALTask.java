@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import static nars.Op.*;
+import static nars.Param.CAUSE_CAPACITY;
 import static nars.time.Tense.ETERNAL;
 
 /**
@@ -158,6 +159,9 @@ public class NALTask extends Pri implements Task {
     public void merge(Task incoming) {
         this.cause = Cause.zip(this, incoming);
     }
+    public void merge(short[] x) {
+        this.cause = Cause.zip(CAUSE_CAPACITY, this::cause, ()->x);
+    }
 
     @Nullable
     @Override
@@ -280,5 +284,6 @@ public class NALTask extends Pri implements Task {
         t.setPri(this);
         return t;
     }
+
 
 }
