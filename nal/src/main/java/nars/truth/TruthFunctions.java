@@ -132,6 +132,8 @@ public final class TruthFunctions {
         return c >= minConf ? t(f, c) : null;
     }
 
+
+
     /**
      * {<S ==> M>, <M <=> P>} |- <S ==> P>
      *
@@ -253,15 +255,15 @@ public final class TruthFunctions {
     /**
      * if unipolar (ex: NAL 1), the condition frequency acts as a gate
      * if bipolar, the condition frequency does not affect confidence
-     *   but the polarity of the derivation only
+     * but the polarity of the derivation only
      */
     @Nullable
     public static Truth desire(Truth goal, Truth cond, float minConf, boolean bipolar, boolean weak) {
 
         float c = and(cond.conf(), goal.conf());
 
-        if (!bipolar)
-            c *= cond.freq();
+//        if (!bipolar)
+//            c *= cond.freq();
 
         if (weak)
             c *= w2c(1.0f);
@@ -269,11 +271,14 @@ public final class TruthFunctions {
         if (c < minConf) {
             return null;
         } else {
-            float goalFreq = goal.freq();
-            float goalPol = (goalFreq - 0.5f);
-            float condPol = (cond.freq() - 0.5f);
-            float a = Math.signum(goalPol) * Math.abs(goalPol * condPol);
-            return t(a * 2f + 0.5f, c);
+            float gf = goal.freq();
+            float f;
+            if (gf >= 0.5f) {
+                f = 0.5f + ((gf - 0.5f) * cond.freq());
+            } else {
+                f = 0.5f - ((0.5f - gf) * cond.freq());
+            }
+            return t(f, c);
         }
 
 //        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq, bFreq));
@@ -289,7 +294,8 @@ public final class TruthFunctions {
         float c = and(a.conf(), b.conf(), bFreq);
         return c < minConf ? null : desire(a.freq(), bFreq, c);
     }
-     /**
+
+    /**
      * A function specially designed for desire value [To be refined]
      */
     public static Truth desireWeakOriginal(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {

@@ -17,7 +17,7 @@ import static nars.truth.TruthFunctions.*;
 
 public enum GoalFunction implements TruthOperator {
 
-    /*@AllowOverlap*/ Strong() {
+    @AllowOverlap Strong() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             //return desireStrongOriginal(T, B, minConf);
@@ -25,65 +25,11 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    Weak() {
+    @AllowOverlap Weak() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             //return desireWeakOriginal(T, B, minConf);
             return TruthFunctions.desire(T, B, minConf, false, true);
-        }
-    },
-
-    Deduction() {
-        @Override
-        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return deduction(T, B, minConf);
-        }
-    },
-//    Goduction() {
-//        @Override
-//        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-//            return deduction(T, B, minConf);
-//        }
-//    },
-//    @AllowOverlap  GoductionRecursivePB() {
-//        @Override
-//        public Truth apply(Truth T, Truth B, NAR m, float minConf) {
-//              if (B.isNegative()) {
-//                Truth x = Goduction.apply(T, B.neg(), m, minConf);
-//                return x != null ? x.neg() : null;
-//            } else {
-//                return Goduction.apply(T, B, m, minConf);
-//            }
-//        }
-//    },
-
-//    Goduction() {
-//        
-//        @Override public Truth apply( final Truth T,  final Truth B, NAR m, float minConf) {
-//            return TruthFunctions.desireStrongOriginal(T, B, minConf);
-//        }
-//    },
-
-//    @SinglePremise StructuralGoduction() {
-//        
-//        @Override public Truth apply( final Truth T,  final Truth B, NAR m, float minConf) {
-//            return TruthFunctions.desireStrongOriginal(T, defaultTruth(m), minConf);
-//        }
-//    },
-
-
-    @SinglePremise
-    Negation() {
-        @Override
-        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return negation(T, minConf);
-        }
-    },
-
-    Induction() {
-        @Override
-        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return induction(T, B, minConf);
         }
     },
 
@@ -143,25 +89,6 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    @SinglePremise
-    Identity() {
-        @Override
-        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return TruthOperator.identity(T, minConf);
-        }
-    },
-
-    /**
-     * same as identity but allows overlap
-     */
-    @SinglePremise
-    //@AllowOverlap
-            IdentityTransform() {
-        @Override
-        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return TruthOperator.identity(T, minConf);
-        }
-    },
 
 
     @SinglePremise
@@ -169,7 +96,7 @@ public enum GoalFunction implements TruthOperator {
     StructuralDeduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return deduction1(T, defaultTruth(m).conf(), minConf);
+            return deduction1(T, defaultConf(m), minConf);
         }
     },
 
@@ -178,7 +105,7 @@ public enum GoalFunction implements TruthOperator {
     BeliefStructuralDeduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return deduction1(B, defaultConfidence(m), minConf);
+            return deduction1(B, defaultConf(m), minConf);
         }
     },
 
@@ -264,7 +191,7 @@ public enum GoalFunction implements TruthOperator {
         return overlap;
     }
 
-    private static float defaultConfidence(NAR m) {
+    private static float defaultConf(NAR m) {
         return m.confDefault(Op.GOAL);
     }
 }

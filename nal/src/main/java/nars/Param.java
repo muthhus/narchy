@@ -175,7 +175,7 @@ public abstract class Param extends Services<Term,NAR> {
         int dCompl = t.complexity();
         int pCompl = Math.max(d.taskTerm.complexity(), d.beliefTerm.complexity());
         float p =
-                (dCompl) / (dCompl + pCompl);
+                ((float)dCompl) / (dCompl + pCompl);
 
 
         if (/* belief or goal */ tr!=null) {
@@ -191,6 +191,7 @@ public abstract class Param extends Services<Term,NAR> {
             p *= 0.5f;
         }
 
+        //return p;
         return p * d.premisePri;
     }
 

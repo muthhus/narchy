@@ -725,16 +725,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
      */
     private static FloatFunction<TaskRegion> regionStrength(long when, int dur) {
 
-        return (TaskRegion cb) -> {
+        return (TaskRegion r) -> {
 
             float awayFromNow = //Math.abs(when - ((cb.start + cb.end)/2)); //now to its midpoint
                     //(Math.min(Math.abs(cb.start - when), Math.abs(cb.end - when)));
-                    Math.min(Math.abs(cb.start - when), Math.abs(cb.end - when)) / ((float) dur); //optimistic distance
+                    Math.min(Math.abs(r.start - when), Math.abs(r.end - when)) / ((float) dur); //optimistic distance
 
 
             return (1 / ((1 + awayFromNow)))
-                    * (1 + (cb.end - cb.start) / awayFromNow) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
-                    * (cb.confMax); /* conf, optimistic */
+                    * (1 + (r.end - r.start) / awayFromNow) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
+                    * (1 + (r.confMin + r.confMax)/2f); /* conf */
 
 
             //maximize confidence, minimize frequency variability, minimize distance to now

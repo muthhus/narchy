@@ -90,7 +90,7 @@
 
 
     //variable elimination 4b:
-    (X --> A), ((#W --> A)<->(#W --> C)),  neq(X,C), neq(X,#W), time(urgent) |- (X-->C), (Belief:Analogy, Goal:Deduction)
+    (X --> A), ((#W --> A)<->(#W --> C)),  neq(X,C), neq(X,#W), time(urgent) |- (X-->C), (Belief:Analogy, Goal:Strong)
 
 
     //answering
@@ -123,10 +123,10 @@
 //If S is the case, and (&&,S,A..+) is not the case, it can't be that (&&,A..+) is the case
 
 //SUSPECT
-    //S, (&&,S,A..+), task(".") |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
-       // //S, (||,S,A..+) |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
-    //S, (&&,(--,%S),A..+), task(".") |- (&&,A..+), (Belief:DecomposePositiveNegativeNegativeN)
-       // //S, (||,(--,%S),A..+) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
+    S, (&&,S,A..+), task(".") |- (&&,A..+), (Belief:DecomposePositiveNegativeNegative)
+        //S, (||,S,A..+) |- (||,A..+), (Belief:DecomposeNegativePositivePositive)
+    S, (&&,(--,%S),A..+), task(".") |- (&&,A..+), (Belief:DecomposePositiveNegativeNegativeN)
+        //S, (||,(--,%S),A..+) |- (||,A..+), (Belief:DecomposePositivePositivePositive)
 
 
 //conditional abduction

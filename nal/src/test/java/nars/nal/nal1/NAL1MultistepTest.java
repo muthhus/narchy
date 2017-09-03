@@ -51,7 +51,8 @@ public class NAL1MultistepTest extends AbstractNALTest {
 
     @Test public void multistepImpl5() {
         test.nar.nal(6);
-        new DeductiveChainTest(test, 5, 4500, impl);
+        test.nar.log();
+        new DeductiveChainTest(test, 5, 1500, impl);
     }
 //    @Test public void multistepEqui5() {
 //        test.nar.nal(6);

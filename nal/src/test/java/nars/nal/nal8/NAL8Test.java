@@ -222,6 +222,12 @@ public class NAL8Test extends AbstractNALTest {
                 //.mustNotOutput(cycles, "(y)", GOAL, 3)
                 .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
     }
+    @Test
+    public void testGoalConjunctionDecomposeNeg() {
+        test
+                .goal("((x) &&+3 (y))", Tense.Present, 0f, 0.9f)
+                .mustNotOutput(cycles, "(x)", GOAL, 0);
+    }
 
     @Ignore @Test
     public void testGoalConjunctionDecomposeViaStrongTruth() {

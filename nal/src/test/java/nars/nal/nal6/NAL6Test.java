@@ -12,7 +12,7 @@ import static nars.time.Tense.ETERNAL;
 public class NAL6Test extends AbstractNALTest {
 
 
-    final int cycles = 1400;
+    final int cycles = 200;
 
     @Before
     public void nal() {
@@ -52,7 +52,7 @@ public class NAL6Test extends AbstractNALTest {
         tester.believe("<<$x --> swan> ==> <$x --> bird>>", 1.00f, 0.80f); //en("If something is a swan, then it is a bird.");
         tester.believe("<<$y --> swan> ==> <$y --> swimmer>>", 0.80f, 0.9f); //en("If something is a swan, then it is a swimmer.");
         tester.mustBelieve(cycles, "<<$1 --> swan> ==> (&&,<$1 --> bird>,<$1 --> swimmer>)>", 0.80f, 0.72f); //en("I believe that if something is a swan, then usually, it is both a bird and a swimmer.");
-        tester.mustBelieve(cycles, "<<$1 --> swimmer> ==> <$1 --> bird>>", 1.00f, 0.37f); //en("I guess if something is a swimmer, then it is a bird.");
+        tester.mustBelieve(cycles, "<<$1 --> swimmer> ==> <$1 --> bird>>", 0.80f, 0.52f); //en("I guess if something is a swimmer, then it is a bird.");
         tester.mustBelieve(cycles, "<<$1 --> bird> ==> <$1 --> swimmer>>", 0.80f, 0.42f); //en("I guess if something is a bird, then it is a swimmer.");
 //        tester.mustBelieve(cycles, "<<$1 --> bird> <=> <$1 --> swimmer>>", 0.80f, 0.42f); //en("I guess something is a bird, if and only if it is a swimmer.");
         //tester.mustBelieve(cycles, "<<$1 --> swan> ==> (&&,(--,<$1 --> bird>),(--,<$1 --> swimmer>))>", 0.00f, 0.72f); //en("I believe that if something is a swan, then it is a bird or a swimmer.");

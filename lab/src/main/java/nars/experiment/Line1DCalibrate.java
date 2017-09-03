@@ -78,7 +78,7 @@ public class Line1DCalibrate {
                            float o = a.o.floatValue();
                            float neededDir = (i - o);
                            boolean good = Math.signum(neededDir) == Math.signum(dir);
-                           if (!good) {
+                           /*if (!good)*/ {
                                System.err.println(n4(dir) + "\t" + good + " " + i + " <-? " + o);
                                System.err.println(t.proof());
                                System.out.println();

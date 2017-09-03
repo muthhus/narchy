@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 
 public class NAL3Test extends AbstractNALTest {
 
-    public static final int cycles = 500;
+    public static final int cycles = 1500;
 
 //    public NAL3Test(Supplier<NAR> b) { super(b); }
 //

@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static nars.Op.Null;
+
 /**
  * Holds a vector or tuple of terms.
  * Useful for storing a fixed number of subterms
@@ -55,7 +57,7 @@ public class ArrayTermVector extends TermVector {
 
     @Override
     @NotNull public final Term sub(int i) {
-        return terms[i];
+        return terms.length > i ? terms[i] : Null;
     }
 
     @NotNull @Override public final Term[] toArray() {

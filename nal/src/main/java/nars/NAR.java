@@ -273,14 +273,14 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         for (int i = 0; i < valueSummary.length; i++)
             valueSummary[i] = new RecycledSummaryStatistics();
 
-        value[Cause.Purpose.Input.ordinal()] = -0.25f;
-        value[Cause.Purpose.Process.ordinal()] = +0.5f;
+        value[Cause.Purpose.Input.ordinal()] = -0.5f;
+        value[Cause.Purpose.Process.ordinal()] = +1f;
 
         value[Cause.Purpose.Accurate.ordinal()] = +1f;
         value[Cause.Purpose.Inaccurate.ordinal()] = -1.0f;
 
         value[Cause.Purpose.Answer.ordinal()] = +0.5f;
-        value[Cause.Purpose.Action.ordinal()] = +10f;
+        value[Cause.Purpose.Action.ordinal()] = +2f;
 
 
         //Cause.updates(this);
