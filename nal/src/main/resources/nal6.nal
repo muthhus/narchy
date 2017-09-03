@@ -191,6 +191,8 @@
 
     //structural decompose any component of a conjunction.
     C, C, task("&&") |- dropAnyEvent(C), (Belief:StructuralDeduction, Goal:StructuralDeduction)
+    //(&&,X,A..+), X, task("!") |- X, (Goal:Strong)
+    //(&&,--X,A..+), X, task("!") |- X, (Goal:StrongPN)
 
     //see: https://en.wikipedia.org/wiki/Imperative_logic#Ross.27_Paradox
     //originally these were only valid if A occurrs during or after C. the opposite is not logical and would also produce redundant results

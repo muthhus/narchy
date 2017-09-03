@@ -44,8 +44,8 @@ public class Line1D {
             NAR n = NARS.threadSafe();
 
             //new STMTemporalLinkage(n, 2, false);
-            n.time.dur(5);
-            n.termVolumeMax.set(24);
+            n.time.dur(3);
+            n.termVolumeMax.set(12);
             //n.beliefConfidence(0.9f);
             //n.goalConfidence(0.5f);
             n.onCycle((nn) -> {

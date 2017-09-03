@@ -212,6 +212,40 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
     }
 
+    @Ignore @Test
+    public void testGoalConjunctionDecomposeViaStrongTruth() {
+
+        test
+                .goal("(&&, x, y, z, w)", Tense.Present, 1f, 0.9f)
+                .believe("w", Tense.Present, 0.9f, 0.9f)
+                .mustGoal(cycles, "w", 0.9f, 0.81f, 0)
+        ;
+    }
+    @Ignore @Test
+    public void testGoalConjunctionDecomposeViaStrongTruthNeg() {
+
+        test
+                .goal("(&&, x, y, z, --w)", Tense.Present, 1f, 0.9f)
+                .believe("w", Tense.Present, 0.1f, 0.9f)
+                .mustGoal(cycles, "w", 0.9f, 0.81f, 0)
+        ;
+    }
+    @Test public void testStrongNegativePositiveInheritance() {
+         // --(A-->B)!  (B-->C). |-  --(A-->C)!
+        test
+                .goal("--(A-->B)")
+                .believe("(B-->C)")
+                .mustGoal(cycles, "(A-->C)", 0f, 0.81f)
+        ;
+    }
+    @Test public void testStrongNegativeNegativeInheritance() {
+         // --(A-->B)!  --(B-->C). |-  --(A-->C)! NO
+        test
+                .goal("--(A-->B)")
+                .believe("--(B-->C)")
+                .mustNotOutput(5, "(A-->C)", GOAL, 0f, 1f, 0f, 1f, ETERNAL)
+        ;
+    }
 
 //    @Test public void testSubIfUnifiesForwardWontDecomposeAntecedentGoal() {
 //
@@ -365,8 +399,8 @@ public class NAL8Test extends AbstractNALTest {
                 .goal("--reward")
                 .believe("(good ==> reward)", 1, 0.9f)
                 .believe("(bad ==> reward)", 0, 0.9f)
-                .mustGoal(cycles, "good", 0.0f, 0.66f)
-                .mustGoal(cycles, "bad", 1.0f, 0.81f)
+                .mustGoal(cycles, "good", 0.0f, 0.45f)
+                .mustGoal(cycles, "bad", 1.0f, 0.45f)
         ;
     }
 
@@ -376,7 +410,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .goal("(reward)")
                 .believe("((bad) ==> --(reward))", 1, 0.9f)
-                .mustGoal(cycles, "(bad)", 0.0f, 0.81f)
+                .mustGoal(cycles, "(bad)", 0.0f, 0.45f)
                 .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0f, 1f, ETERNAL);
     }
 
@@ -559,7 +593,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input("(happy)!")
                 .input("((--,(in)) =|> ((happy)&&(--,(out)))).")
-                .mustGoal(cycles, "(in)", 0f, 0.73f);
+                .mustGoal(cycles, "(in)", 0f, 0.42f);
     }
 
     @Test
@@ -604,7 +638,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(5, "(happy)! :|:")
-                .mustGoal(cycles, "(out)", 0f, 0.81f, /*~*/8);
+                .mustGoal(cycles, "(out)", 0f, 0.45f, /*~*/8);
                 //.mustNotOutput(cycles, "(out)", GOAL, t -> t != 8);
     }
 

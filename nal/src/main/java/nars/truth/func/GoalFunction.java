@@ -17,11 +17,11 @@ import static nars.truth.TruthFunctions.*;
 
 public enum GoalFunction implements TruthOperator {
 
-    @AllowOverlap Strong() {
+    /*@AllowOverlap*/ Strong() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             //return desireStrongOriginal(T, B, minConf);
-            return desireStrongNew(T, B, minConf);
+            return desireStrongNew(T, B, minConf, false);
         }
     },
 
@@ -89,13 +89,13 @@ public enum GoalFunction implements TruthOperator {
     @AllowOverlap DeciDeduction() {
         @Override
         public Truth apply(Truth T, Truth B, NAR m, float minConf) {
-//            if (B.isNegative()) {
-//                Truth x = deduction(T, B.neg(), minConf);
-//                return x != null ? x.neg() : null;
-//            } else {
-//                return deduction(T, B, minConf);
-//            }
-            return desireStrongNew(T, B, minConf);
+            if (B.isNegative()) {
+                Truth x = deduction(T, B.neg(), minConf);
+                return x != null ? x.neg() : null;
+            } else {
+                return deduction(T, B, minConf);
+            }
+            //return desireStrongNew(T, B, minConf, true);
         }
 
     },
@@ -103,15 +103,13 @@ public enum GoalFunction implements TruthOperator {
     @AllowOverlap DeciInduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            boolean tneg = T.isNegative();
+            //boolean tneg = T.isNegative();
             boolean bneg = B.isNegative();
-            if (tneg && bneg) {
-                Truth x = induction(T.neg(), B.neg(), minConf);
-                return x != null ? x : null;
-            } else if (!tneg && !bneg) {
+            if (bneg) {
+                Truth x = induction(T, B.neg(), minConf);
+                return x != null ? x.neg() : null;
+            } else  {
                 return induction(T, B, minConf);
-            } else {
-                return null;
             }
         }
     },

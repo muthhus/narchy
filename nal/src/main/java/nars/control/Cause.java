@@ -49,8 +49,8 @@ public class Cause<X> {
             causes.get(i).commit(summary);
         }
 
-        final float LIMIT = +4f;
-        final float momentum = 0.95f;
+        final float LIMIT = +2f;
+        final float momentum = 0.9f;
 
         int p = value.length;
         for (int i = 0, causesSize = causes.size(); i < causesSize; i++) {

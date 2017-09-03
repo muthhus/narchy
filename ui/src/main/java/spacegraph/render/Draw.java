@@ -50,6 +50,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.jogamp.opengl.GL.*;
+import static jcog.Util.unitize;
 import static spacegraph.math.v3.v;
 import static spacegraph.render.JoglSpace.glsrt;
 import static spacegraph.render.JoglSpace.glut;
@@ -748,21 +749,21 @@ public enum Draw {
     public static int colorBipolar(float v) {
         float r, g, b;
         if (v < 0) {
-            if (v < -1) v = -1; //clip
-            r = -v / 2f;
-            g = 0f;
-            b = -v;
-        } else {
-            if (v > +1) v = +1; //clip
+            v = unitize(-v);
             r = v;
-            g = v / 2;
+            g = 0f;
+            b = v / 2;
+        } else {
+            v = unitize(v);
+            r = v / 2;
+            g = v;
             b = 0f;
         }
         return rgbInt(r, g, b);
     }
 
     public static int rgbInt(float r, float g, float b) {
-        return (int) (255 * b) << 16 | (int) (255 * g) << 8 | (int) (255 * r);
+        return ((int) (255 * r) << 16) | ((int) (255 * g) << 8) | ((int) (255 * b));
     }
 
     public static void colorUnipolarHue(GL2 gl, float v, float hueMin, float hueMax) {
