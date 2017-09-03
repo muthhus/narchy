@@ -441,8 +441,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 
     default float eternalizable() {
 
-        return 1f; //always
-        //return 0f; //never
+        //return 1f; //always
+        return 0f; //never
         //return term().vars() > 0;
         //return term().varIndep() > 0;
 

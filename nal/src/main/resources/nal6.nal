@@ -73,10 +73,10 @@
 // Conditional syllogism && Independent Variable Elimination
 //      If after M, P usually happens, and M happens, it means P is expected to happen
 
-    B, (A ==> C), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePB, Goal:DeciInduction)
-    B, (--A ==> C), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePBN, Goal:DeciInductionN)
+    B, (A ==> C), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePB, Goal:DeciDeduction)
+    B, (--A ==> C), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursivePBN, Goal:DeciDeductionN)
 
-    B, (C ==> A), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePB, Goal:DeciDeduction)
+    B, (C ==> A), time(urgent), neq(B,C), notImpl(B) |- subIfUnifiesAny(C,A,B), (Belief:AbductionRecursivePB, Goal:DeciInduction)
 
         //has(A,"$"),
     //B, ((--,%A) ==> C), belief(positive), notImpl(B), time(urgent) |- subIfUnifiesAny(C,A,B), (Belief:DeductionRecursiveN, Goal:InductionRecursiveN)

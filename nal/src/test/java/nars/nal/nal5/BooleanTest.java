@@ -7,14 +7,14 @@ import nars.truth.Truth;
 import org.jetbrains.annotations.Nullable;
 import org.junit.Test;
 
+import static nars.time.Tense.ETERNAL;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * NAL5 Boolean / Boolean Satisfiability Sanity
+ * NAL5 Boolean / Boolean Satisfiability / Boolean Conditionality
  */
-public class NAL5SATTest {
-
+public class BooleanTest {
 
     @Test
     public void testSAT2Individual00() throws Narsese.NarseseException {
@@ -123,7 +123,8 @@ public class NAL5SATTest {
 //        }
     }
 
-    @Test public void testEternalcept() throws Narsese.NarseseException {
+    @Test
+    public void testEternalcept() throws Narsese.NarseseException {
         Param.DEBUG = true;
         NAR n = NARS.tmp().log();
         n.believe("((&&,(0,x),(1,x),(2,x),(3,x))==>a)");
@@ -132,6 +133,43 @@ public class NAL5SATTest {
         n.question("(a ==> c)");
         n.question("(b ==> c)");
         n.run(200);
+    }
+
+    @Test
+    public void testConditionalImplication() {
+        boolean[] booleans = new boolean[]{true, false};
+        Term x = $.the("x");
+        Term y = $.the("y");
+        Term[] concepts = new Term[]{x, y};
+
+        for (boolean goalSubjPred : booleans) {
+
+
+            for (boolean subjPolarity : booleans) {
+                for (boolean predPolarity : booleans) {
+                    for (boolean goalPolarity : booleans) {
+
+                        Term goal = (goalSubjPred ? x : y).negIf(!goalPolarity);
+                        Term condition = $.impl(x.negIf(!subjPolarity), y.negIf(!predPolarity));
+
+                        NAR n = NARS.tmp();
+                        n.goal(goal);
+                        n.believe(condition);
+                        n.run(128);
+
+                        System.out.println(goal + "!   " + condition + ".");
+                        for (Term t : concepts) {
+                            if (!t.equals(goal.unneg()))
+                                System.out.println("\t " + t + "! == " + n.goalTruth(t, ETERNAL));
+                        }
+                        System.out.println();
+
+                    }
+                }
+
+            }
+
+        }
     }
 
 //    @Test

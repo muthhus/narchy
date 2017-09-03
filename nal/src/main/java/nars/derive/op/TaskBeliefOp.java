@@ -45,9 +45,15 @@ public final class TaskBeliefOp extends AbstractPred<Derivation> {
 
         @Override
         public boolean test(Derivation derivation) {
-            return (!task || (derivation.termSub0op == CONJ.id && isSequence(derivation.taskTerm.dt()))
-                    &&
-                   (!belief || (derivation.belief!=null && derivation.termSub1op == CONJ.id && isSequence(derivation.belief.term().dt()))));
+            if (task) {
+                if (!(derivation.termSub0op == CONJ.id && isSequence(derivation.taskTerm.dt())))
+                    return false;
+            }
+            if (belief) {
+                if (!(derivation.belief != null && derivation.termSub1op == CONJ.id && isSequence(derivation.belief.term().dt())))
+                    return false;
+            }
+            return true;
         }
 
         static boolean isSequence(int dt) {

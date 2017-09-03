@@ -70,11 +70,13 @@ public class Line1DCalibrate {
                            float o = a.o.floatValue();
                            float neededDir = (i - o);
                            boolean good = Math.signum(neededDir) == Math.signum(dir);
-                           System.err.println(n4(dir) + "\t" + good + " " + i + " <-? " + o + " .. " + dir);
-                           System.err.println(t.proof());
+                           if (!good) {
+                               System.err.println(n4(dir) + "\t" + good + " " + i + " <-? " + o + " .. " + dir);
+                               System.err.println(t.proof());
+                               System.out.println();
+                           }
                        }
 
-                       System.out.println();
                    } else {
                        //System.err.println(t.toString(n));
                    }
