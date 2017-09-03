@@ -107,7 +107,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 //        });
 
 
-        senseCamera("", pixels = new CameraSensor<Bitmap2D>(Atomic.the("tetris"), this, this));
+        senseCamera(pixels = new CameraSensor<Bitmap2D>(Atomic.the("tetris"), this, this));
         //pixels.resolution(0.1f);
 
         //new ShapeSensor(pixels.src, this);
@@ -520,7 +520,7 @@ public class Tetris extends NAgentX implements Bitmap2D {
 
             Tetris aa = a;
             n.onTask((t) -> {
-                if (t.isEternal()) {
+                if (t.isEternal() && !t.isInput()) {
                     System.err.println(t.proof());
                 }
                 if (t.isGoal() && t.truth().isNegative() && t.term().equals(aa.happy.term)) {

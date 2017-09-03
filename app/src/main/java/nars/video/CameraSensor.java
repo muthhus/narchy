@@ -27,7 +27,6 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 
     public final List<PixelConcept> pixels;
     public final CauseChannel<Task> in;
-    private final Term id;
 
     float resolution = 0.01f;//Param.TRUTH_EPSILON;
 
@@ -38,9 +37,8 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
     transient float conf;
 
 
-    public CameraSensor(Term root, P src, NAgent a) {
+    public CameraSensor(@Nullable Term root, P src, NAgent a) {
         super(src, src.width(), src.height(), a.nar);
-        this.id = root;
 
         this.w = src.width();
         this.h = src.height();
@@ -79,22 +77,16 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
         };
     }
 
-    private static Int2Function<Term> RadixProduct(Term root, int width, int height, int radix) {
-        return (x, y) ->
-                $.inh(
-                //$.p(root,
-
-
-
-                        //$.secte
-                        radix > 1 ?
-                                //$.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
-                                $.p(zipCoords(coord(x, width), coord(y, height))) :
-                                //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
-                                //new Term[]{coord('x', x, width), coord('y', y, height)} :
-                                $.p(x, y)
-                    , root)
-        ;
+    private static Int2Function<Term> RadixProduct(@Nullable Term root, int width, int height, int radix) {
+        return (x, y) -> {
+            Term coords = radix > 1 ?
+                    //$.pRecurse( zipCoords(coord(x, width), coord(y, height)) ) :
+                    $.p(zipCoords(coord(x, width), coord(y, height))) :
+                    //$.p(new Term[]{coord('x', x, width), coord('y', y, height)}) :
+                    //new Term[]{coord('x', x, width), coord('y', y, height)} :
+                    $.p(x, y);
+            return root==null ? coords : $.inh( coords, root);
+        };
     }
 
     private static Term[] zipCoords(@NotNull Term[] x, @NotNull Term[] y) {

@@ -277,10 +277,10 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         value[Cause.Purpose.Process.ordinal()] = +0.5f;
 
         value[Cause.Purpose.Accurate.ordinal()] = +1f;
-        value[Cause.Purpose.Inaccurate.ordinal()] = -3.0f;
+        value[Cause.Purpose.Inaccurate.ordinal()] = -1.0f;
 
         value[Cause.Purpose.Answer.ordinal()] = +0.5f;
-        value[Cause.Purpose.Action.ordinal()] = +1f;
+        value[Cause.Purpose.Action.ordinal()] = +10f;
 
 
         //Cause.updates(this);

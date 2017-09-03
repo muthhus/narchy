@@ -256,14 +256,19 @@ public final class TruthFunctions {
      *   but the polarity of the derivation only
      */
     @Nullable
-    public static Truth desireStrongNew(/*@NotNull*/ Truth goal, /*@NotNull*/ Truth cond, float minConf, boolean bipolar) {
+    public static Truth desire(Truth goal, Truth cond, float minConf, boolean bipolar, boolean weak) {
 
-        float c = and(cond.conf(), goal.conf(),
-                bipolar ? 1 : cond.freq()
-        );
-        if (c < minConf)
+        float c = and(cond.conf(), goal.conf());
+
+        if (!bipolar)
+            c *= cond.freq();
+
+        if (weak)
+            c *= w2c(1.0f);
+
+        if (c < minConf) {
             return null;
-        else {
+        } else {
             float goalFreq = goal.freq();
             float goalPol = (goalFreq - 0.5f);
             float condPol = (cond.freq() - 0.5f);
@@ -284,17 +289,7 @@ public final class TruthFunctions {
         float c = and(a.conf(), b.conf(), bFreq);
         return c < minConf ? null : desire(a.freq(), bFreq, c);
     }
-//    /**
-//     * A function specially designed for desire value [To be refined]
-//     */
-//    @Nullable public static Truth desireWeakNew(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
-//        float aFreq = a.freq();
-//        float bFreq = b.freq();
-//        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq,bFreq), w2c(1.0f));
-//        return c < minConf ? null : desire(aFreq, bFreq, c);
-//    }
-
-    /**
+     /**
      * A function specially designed for desire value [To be refined]
      */
     public static Truth desireWeakOriginal(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
@@ -303,31 +298,12 @@ public final class TruthFunctions {
         return c < minConf ? null : desire(a.freq(), bFreq, c);
     }
 
+
     /*@NotNull*/
     static Truth desire(float f1, float f2, float c) {
         return t(and(f1, f2), c);
     }
 
-
-//    /**
-//     * original name: desireDed
-//     * A function specially designed for desire value [To be refined]
-//     *
-//     * @param a Truth value of the first premise
-//     * @param b Truth value of the second premise
-//     * @return Truth value of the conclusion
-//     */
-//    @Nullable
-//    public static Truth desireDed(/*@NotNull*/ Truth a, float bf, float bc, float minConf) {
-//
-//        float abConf = and(a.conf(), bc);
-//        if (abConf < minConf) return null;
-//        else {
-//            //float f = and(a.freq(), b.freq());
-//            float f = 0.5f + 2 * ((a.freq() - 0.5f) * (bf - 0.5f));
-//            return t(f, abConf);
-//        }
-//    }
 
 
 

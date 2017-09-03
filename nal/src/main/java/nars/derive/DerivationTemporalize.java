@@ -152,7 +152,7 @@ public class DerivationTemporalize extends Temporalize {
             long ts = task.start();
             long k;
             if (!te && (belief != null && !belief.isEternal())) {
-                Interval common = Interval.intersect(ts-1, task.end()+1, belief.start(), belief.end());
+                Interval common = Interval.intersect(ts, task.end(), belief.start(), belief.end());
                 if (common==null)
                     return null;
                 occ[0] = common.a;

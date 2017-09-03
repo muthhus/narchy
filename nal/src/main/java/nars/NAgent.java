@@ -222,13 +222,19 @@ abstract public class NAgent extends DurService implements NSense, NAct {
             /** set the sensor budget policy */
 
             @NotNull Term happy = this.happy.term();
-            nar.goal(happy); /* eternal */
-            predictors.add(
-                    goal(happy,
-                            t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
-                            //ETERNAL
-                    )
-            );
+            Task happyEternal = nar.goal(happy); /* eternal */
+            predictors.add(()->{
+                happyEternal.priMax(nar.priDefault(GOAL));
+                return happyEternal;
+            });
+
+            //temporal happy
+//            predictors.add(
+//                    goal(happy,
+//                            t(1f, Math.max(nar.confDefault(/*BELIEF*/ GOAL), nar.confDefault(/*BELIEF*/ BELIEF)))
+//                            //ETERNAL
+//                    )
+//            );
 
             //        p.add(
             //            question(seq($.varQuery(1), dur, happiness),

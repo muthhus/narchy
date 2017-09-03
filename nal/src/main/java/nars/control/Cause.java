@@ -49,7 +49,7 @@ public class Cause<X> {
             causes.get(i).commit(summary);
         }
 
-        final float LIMIT = +2f;
+        final float LIMIT = +3f;
         final float momentum = 0.9f;
 
         int p = value.length;
@@ -63,7 +63,7 @@ public class Cause<X> {
 
 
             float nextValue =
-                    Util.clamp(c.value * momentum + v, -LIMIT, LIMIT);
+                    Util.clamp(c.value * momentum + v, -LIMIT, +LIMIT);
                     //smooth(c.value, v, 0.5f);
 
             c.setValue(

@@ -23,7 +23,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class NAL7Test extends AbstractNALTest {
 
-    public int cycles = 1000;
+    public int cycles = 150;
 
     @Test public void inductionDiffEventsAtom() {
         testInduction("before", "after", 10);
@@ -335,9 +335,9 @@ public class NAL7Test extends AbstractNALTest {
 
         test
 
-                .input("((($x, key) --> hold) ==>+3 (($x, room) --> enter)).")
-                .input("<(John, key) --> hold>. :|:")
-                .mustBelieve(cycles, "<(John,room) --> enter>", 1.00f, 0.81f, 3);
+                .input("(hold($x, key) ==>+3 enter($x, room)).")
+                .input("hold(John, key). :|:")
+                .mustBelieve(cycles, "enter(John,room)", 1.00f, 0.81f, 3);
     }
 
     @Test
@@ -622,7 +622,6 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
-    //    //TODO: investigate
     @Test
     public void variable_elimination_on_temporal_statements() {
 
@@ -630,7 +629,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(0, "(on({t002},#1) &| at(SELF,#1)). :|:")
                 .inputAt(1, "((on($1,#2) &| at(SELF,#2)) =|> reachable(SELF,$1)).")
                 .mustBelieve(cycles, "reachable(SELF,{t002})",
-                        1.0f, 0.66f /*0.81f*/, 0);
+                        1.0f, 0.81f, 0);
 
     }
 
@@ -965,13 +964,12 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Test
-    public void testIntersectionTemporalNear() {
+    public void testIntersectionTemporalSimultaneous() {
 
         test
-                .dur(2)
                 .inputAt(0, "(x --> a). :|:")
-                .inputAt(1, "(y --> a). :|:")
-                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 1)
+                .inputAt(0, "(y --> a). :|:")
+                .mustBelieve(cycles, "((x&y)-->a)", 1f, 0.81f, 0)
         ;
     }
 

@@ -894,32 +894,25 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 
     /** matches in the correct ordering conditions for CONJ */
     static boolean unifyConj(TermContainer X, int Xdt, TermContainer Y, int Ydt, @NotNull Unify u) {
-        boolean xUnknown = Xdt == XTERNAL;
-        boolean yUnknown = Ydt == XTERNAL;
-        if (xUnknown || yUnknown) {
-            //if either is XTERNAL then the order is unknown so match commutively
-            return X.unifyCommute(Y, u);
+        boolean xCommutes = communify(Xdt);
+        boolean yCommutes = communify(Ydt);
+
+        if (!xCommutes && !yCommutes) {
+            //both temporal here, so compare in the right sequence:
+            boolean xReversed = (Xdt < 0);
+            boolean yReversed = (Ydt < 0);
+            if (xReversed ^ yReversed) {
+                Y = Y.reverse(); //just need to reverse one
+            }
+            return X.unifyLinear(Y, u);
         }
 
-        boolean xEternal = Xdt == DTERNAL;
-        boolean yEternal = Ydt == DTERNAL;
+        return X.unifyCommute(Y, u);
+    }
 
-        if (xEternal || yEternal) {
-            //both eternal, match commutively
-            return X.unifyCommute(Y, u);
-        }
-//        if (xEternal ^ yEternal) {
-//            //one is eternal, the other is not
-//            return false;
-//        }
-
-        //both temporal here, so compare in the right sequence:
-        boolean xReversed = (Xdt < 0);
-        boolean yReversed = (Ydt < 0);
-        if (xReversed ^ yReversed) {
-            X = X.reverse(); //just need to reverse one
-        }
-        return X.unifyLinear(Y, u);
+    /** commutes for unify */
+    static boolean communify(int Xdt) {
+        return Xdt == XTERNAL || Xdt == DTERNAL || Xdt == 0;
     }
 
     default boolean unifyLinear(TermContainer Y, @NotNull Unify u) {
@@ -975,8 +968,15 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         //lexic sorted so that the formed termutator has a canonical representation, preventing permuted duplicates in the termute chain
         SortedSet<Term> xs = /*toSorted*/toSortedSet();
         SortedSet<Term> ys = y./*toSorted*/toSortedSet();
-        //xs.removeIf(s -> !subst.matchType(s) && ys.remove(s));
-        xs.removeIf(ys::remove);
+        ////xs.removeIf(s -> !subst.matchType(s) && ys.remove(s));
+
+        xs.removeIf(x -> {
+            if (x.vars()==0) {
+                return ys.remove(x);
+            }
+            return false;
+        });
+        //TODO it may be safe to remove from both if a term contains no variables being matched
 
         //subst.termutes.add(new CommutivePermutations(TermVector.the(xs), TermVector.the(ys)));
         int xss = xs.size();

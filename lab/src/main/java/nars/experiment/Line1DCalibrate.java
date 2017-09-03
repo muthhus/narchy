@@ -19,6 +19,7 @@ import spacegraph.widget.meter.Plot2D;
 import java.util.List;
 
 import static java.lang.Math.PI;
+import static jcog.Texts.n2;
 import static jcog.Texts.n4;
 import static nars.Op.IMPL;
 import static spacegraph.SpaceGraph.window;
@@ -50,6 +51,13 @@ public class Line1DCalibrate {
 
 //                final FloatAveraged rewardAveraged = new FloatAveraged(()->super.act(), 10);
 
+                @Override
+                protected float act() {
+
+                    float r = super.act();
+                    System.out.println("reward: " + now + "\t^" + n2(i.floatValue()) + "\t@" + n2(o.floatValue()) + "\t\t= " + r );
+                    return r;
+                }
             };
 
             float tHz = 0.05f; //in time units
@@ -63,7 +71,7 @@ public class Line1DCalibrate {
                    if (t.isGoal()) {
                        if (t.term().equals(a.out.term())) {
 
-                           float dir = new PreciseTruth(t.freq(), t.evi(a.nar.time(), a.nar.dur()), false).expectation() - 0.5f;
+                           float dir = new PreciseTruth(t.freq(), t.evi(a.nar.time(), a.nar.dur()), false).freq() - 0.5f;
 
                            //TEST POLARITY
                            float i = a.i.floatValue();
@@ -71,7 +79,7 @@ public class Line1DCalibrate {
                            float neededDir = (i - o);
                            boolean good = Math.signum(neededDir) == Math.signum(dir);
                            if (!good) {
-                               System.err.println(n4(dir) + "\t" + good + " " + i + " <-? " + o + " .. " + dir);
+                               System.err.println(n4(dir) + "\t" + good + " " + i + " <-? " + o);
                                System.err.println(t.proof());
                                System.out.println();
                            }

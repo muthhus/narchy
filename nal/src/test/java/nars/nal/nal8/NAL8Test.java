@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 public class NAL8Test extends AbstractNALTest {
 
-    public static final int cycles = 830;
+    public static final int cycles = 130;
 
 
 
@@ -153,6 +153,17 @@ public class NAL8Test extends AbstractNALTest {
         ;
     }
 
+        @Test
+    public void temporal_deduction_1() {
+
+        TestNAR tester = test;
+
+        tester.input("pick:t2. :|:");
+        tester.inputAt(10, "(pick:t2 ==>+5 hold:t2).");
+        tester.mustBelieve(cycles, "hold:t2", 1.0f, 0.81f, 5);
+
+    }
+
     @Test
     public void subbelief_2medium() {
         //requires StructuralDeduction to AllowOverlap
@@ -199,7 +210,7 @@ public class NAL8Test extends AbstractNALTest {
         t
                 .goal("(x)")
                 .believe("((x)==>(y))")
-                .mustGoal(cycles, "(y)", 1f, 0.45f);
+                .mustGoal(cycles, "(y)", 1f, 0.81f);
     }
 
     @Test
@@ -419,13 +430,12 @@ public class NAL8Test extends AbstractNALTest {
         //deisreDed, and its negative counterpart for the negated belief
 
         test
-                //.log()
                 .goal("(reward)")
                 .believe("((good) ==> (reward))", 1, 0.9f)
                 .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
-                .mustGoal(cycles, "(good)", 1.0f, 0.81f)
+                .mustGoal(cycles, "(good)", 1.0f, 0.45f)
                 .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.7f, 0.5f, 1f, ETERNAL)
-                .mustGoal(cycles, "(bad)", 0.0f, 0.81f)
+                .mustGoal(cycles, "(bad)", 0.0f, 0.45f)
                 .mustNotOutput(cycles, "(bad)", GOAL, 0.3f, 1f, 0f, 1f, ETERNAL);
     }
 
@@ -626,7 +636,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "((happy) ==>-3 (out)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustGoal(cycles, "(out)", 1f, 0.45f, 13)
+                .mustGoal(cycles, "(out)", 1f, 0.81f, 13)
                 .mustNotOutput(cycles, "(out)", GOAL,
                         t -> t == 3 /*|| t == 16*/ || t == 0
                         );

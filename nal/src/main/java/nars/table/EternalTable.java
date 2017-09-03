@@ -383,8 +383,13 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
             Task revised = tryRevision(input, nar);
             if (revised != null) {
                 if (revised == input) {
-                    //already present duplicate, so ignore
-                    return;
+                    //already present duplicate
+                    if (!input.isInput()) {
+                        return; //so ignore if derived
+                    } else {
+                        activated = input;
+                        activation = 1f; //full reactivation
+                    }
                 } else if (revised.equals(input)) { //HACK todo avoid this duplcate equals which is already known from tryRevision
 
 //                    float maxActivation = 1f - revised.priElseZero();

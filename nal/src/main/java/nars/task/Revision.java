@@ -284,10 +284,11 @@ public class Revision {
         //float p = aa / (aa + bb);
 
         float factor = 1f;
-//            //relate high frequency difference with low confidence
-        float freqDiscount =
-                0.5f + 0.5f * TruthFunctions.freqSimilarity(a.freq(), b.freq());
-        factor *= freqDiscount; if (factor < Prioritized.EPSILON) return null;
+
+        //relate high frequency difference with low confidence
+//        float freqDiscount =
+//                0.5f + 0.5f * TruthFunctions.freqSimilarity(a.freq(), b.freq());
+//        factor *= freqDiscount; if (factor < Prioritized.EPSILON) return null;
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
         //TODO weight the contributed overlap amount by the relative confidence provided by each task

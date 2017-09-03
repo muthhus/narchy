@@ -5,6 +5,7 @@ import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
 import jcog.pri.PriReference;
+import jcog.pri.op.PriMerge;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -66,7 +67,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @Override
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
-        if (v < 16) {
+        if (v > 5 && v < 16) {
             Map sharedMap = newBagMap(v);
             Random rng = nar.random();
             @NotNull Bag<Term, PriReference<Term>> termbag =
@@ -76,8 +77,8 @@ public class DefaultConceptBuilder implements ConceptBuilder {
             return new Bag[]{termbag, taskbag};
         } else {
             return new Bag[]{
-                    new DefaultHijackBag<>(Param.termlinkMerge, 4),
-                    new DefaultHijackBag<>(Param.tasklinkMerge, 4)
+                    new MyDefaultHijackBag(Param.termlinkMerge),
+                    new MyDefaultHijackBag(Param.tasklinkMerge)
             };
         }
 
@@ -392,4 +393,13 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         return nar.exe.concurrent();
     }
 
+    private class MyDefaultHijackBag extends DefaultHijackBag {
+        public MyDefaultHijackBag(PriMerge merge) {
+            super(merge, 3);
+        }
+
+        @Override protected Random random() {
+            return nar.random();
+        }
+    }
 }

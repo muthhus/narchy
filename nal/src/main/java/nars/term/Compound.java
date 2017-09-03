@@ -281,18 +281,18 @@ public interface Compound extends Term, IPair, TermContainer {
             return abbreviated.equals(this) || unify(abbreviated, subst);
         }
 
-        int xs;
-        if ((xs = size()) != ty.size())
-            return false;
-
-//            if (vars(subst.type) == 0)
-//                return false; //no free vars, the only way unification can proceed is if equal
 
         Op op = op();
         if (op != ty.op())
             return false;
 
 
+        int xs;
+        if ((xs = size()) != ty.size())
+            return false;
+
+//            if (vars(subst.type) == 0)
+//                return false; //no free vars, the only way unification can proceed is if equal
         Compound y = (Compound) ty;
 //        if (op.temporal) {
 //            int sdur = subst.dur;

@@ -275,22 +275,7 @@ public class NAL8EternalMixTest extends AbstractNALTest {
     }
 
 
-    @Test
-    public void temporal_deduction_1() {
 
-        TestNAR tester = test;
-
-        //tester.nar;
-//        tester.input("pick({t002}). :\\:");
-//        tester.inputAt(10, "(pick({t002}) ==>+5 hold({t002})). :\\:");
-//
-//        tester.mustBelieve(cycles, "hold({t002})", 1.0f, 0.81f, 0);
-
-        tester.input("pick:t2. :|:");
-        tester.inputAt(10, "(pick:t2 ==>+5 hold:t2).");
-        tester.mustBelieve(cycles, "hold:t2", 1.0f, 0.81f, 5);
-
-    }
 
     @Test
     public void further_detachment_2() {

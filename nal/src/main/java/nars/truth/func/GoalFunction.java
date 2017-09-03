@@ -21,14 +21,15 @@ public enum GoalFunction implements TruthOperator {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             //return desireStrongOriginal(T, B, minConf);
-            return desireStrongNew(T, B, minConf, false);
+            return TruthFunctions.desire(T, B, minConf, false, false);
         }
     },
 
     Weak() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return desireWeakOriginal(T, B, minConf);
+            //return desireWeakOriginal(T, B, minConf);
+            return TruthFunctions.desire(T, B, minConf, false, true);
         }
     },
 

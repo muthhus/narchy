@@ -37,9 +37,7 @@ import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
@@ -60,7 +58,7 @@ import static spacegraph.layout.Grid.grid;
 abstract public class NAgentX extends NAgent {
 
 
-    public final Map<String, CameraSensor> cam = new LinkedHashMap<>();
+    public final Set<CameraSensor> cam = new LinkedHashSet<>();
 
     public NAgentX(NAR nar) {
         this("", nar);
@@ -536,7 +534,7 @@ abstract public class NAgentX extends NAgent {
                             //"agentPredict",
 
                             a instanceof NAgentX ?
-                                    new WindowButton("vision", () -> grid(((NAgentX) a).cam.values().stream().map(cs ->
+                                    new WindowButton("vision", () -> grid(((NAgentX) a).cam.stream().map(cs ->
                                             new CameraSensorView(cs, a).align(Surface.Align.Center, cs.width, cs.height))
                                             .toArray(Surface[]::new))
                                     ) : grid()
@@ -658,21 +656,20 @@ abstract public class NAgentX extends NAgent {
         return senseCamera(id, pb);
     }
 
-    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, C bc) throws Narsese.NarseseException {
-        return senseCamera($(id), bc);
+    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(@Nullable String id, C bc) throws Narsese.NarseseException {
+        return senseCamera(id!=null ? $(id) : null, bc);
     }
 
-    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(Term id, C bc) {
-        return senseCamera(id.toString(), new CameraSensor(id, bc, this));
+    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(@Nullable Term id, C bc) {
+        return senseCamera(new CameraSensor(id, bc, this));
     }
 
-    protected <C extends Bitmap2D> CameraSensor<C> senseCameraReduced(Term id, C bc, int outputPixels) {
-        return senseCamera(id.toString(), new CameraSensor(id, new AutoencodedBitmap(bc, outputPixels), this));
+    protected <C extends Bitmap2D> CameraSensor<C> senseCameraReduced(@Nullable Term id, C bc, int outputPixels) {
+        return senseCamera(new CameraSensor(id, new AutoencodedBitmap(bc, outputPixels), this));
     }
 
-    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(String id, CameraSensor<C> c) {
-        //sense(c);
-        cam.put(id, c);
+    protected <C extends Bitmap2D> CameraSensor<C> senseCamera(CameraSensor<C> c) {
+        cam.add(c);
         return c;
     }
 
