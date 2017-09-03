@@ -393,6 +393,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 if (a.during(start, end) && !b.during(start, end))
                     return a; //only 'a' is for that time
 
+                if (template!=null) {
+                    //choose if either one (but not both or neither) matches template's time
+                    boolean at = (a.term().equals(template));
+                    boolean bt = (b.term().equals(template));
+                    if (at && !bt)
+                        return a;
+                    else if (bt && !at)
+                        return b;
+                }
+
 
                 //otherwise interpolate
                 Task c = Revision.merge(a, b, start, nar);
