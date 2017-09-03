@@ -23,7 +23,7 @@ import static nars.Op.GOAL;
 public class GoalActionConcept extends ActionConcept {
 
 
-    public static final float CURIOSITY_CONF_FACTOR = 0.25f;
+    public static final float CURIOSITY_CONF_FACTOR = 0.1f;
 
     public final Signal feedback;
     public final Signal action;
@@ -177,6 +177,7 @@ public class GoalActionConcept extends ActionConcept {
             else
                 fg = action.get(); //latch previous goal
         } else {
+
             fg = action.set(term, goal, stamper, now, dur, nar);
                     //+1 * nar.dur() /* next moment */);
         }
@@ -184,6 +185,8 @@ public class GoalActionConcept extends ActionConcept {
 
         return Stream.of(fb, curious ? fg : null).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);
+        //return Stream.of(fb).filter(Objects::nonNull);
+
     }
 
 
