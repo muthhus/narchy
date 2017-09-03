@@ -183,7 +183,8 @@ public class Derivation extends Unify implements TermContext {
                 nar.get($.the("union")),
                 nar.get($.the("differ")),
                 nar.get($.the("intersect")),
-                nar.get($.the("conjEvent"))
+                nar.get($.the("conjEvent")),
+                nar.get($.the("without"))
         );
     }
 

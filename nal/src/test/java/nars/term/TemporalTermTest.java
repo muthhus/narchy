@@ -100,6 +100,16 @@ public class TemporalTermTest {
         }
     }
 
+    @Test public void testEventsWithRepeatParallel() throws Narsese.NarseseException {
+
+        assertEquals("[a:0, b:0]",
+                $("(a&|b)").events().toString());
+
+        assertEquals("[a:0, b:0, (a&|b):0, b:5, c:5, (b&|c):5]",
+                $("((a&|b) &&+5 (b&|c))").events().toString());
+
+    }
+
     @Test
     public void testEventsWithXTERNAL() throws Narsese.NarseseException {
         //cant decompose

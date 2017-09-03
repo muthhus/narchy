@@ -83,14 +83,10 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return Compound.super.normalize(offset);
     }
 
-    @Override
-    public void events(Consumer<ObjectLongPair<Term>> events) {
-        Compound.super.events(events);
-    }
 
     @Override
-    public void events(Consumer<ObjectLongPair<Term>> events, long dt) {
-        Compound.super.events(events, dt);
+    public void events(Consumer<ObjectLongPair<Term>> events, long dt, int level) {
+        Compound.super.events(events, dt, level);
     }
 
     @Override

@@ -20,16 +20,16 @@ public enum GoalFunction implements TruthOperator {
     @AllowOverlap Strong() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            //return desireStrongOriginal(T, B, minConf);
-            return TruthFunctions.desire(T, B, minConf, false);
+            return desireStrongOriginal(T, B, minConf);
+            //return TruthFunctions.desire(T, B, minConf, false);
         }
     },
 
     @AllowOverlap Weak() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            //return desireWeakOriginal(T, B, minConf);
-            return TruthFunctions.desire(T, B, minConf, true);
+            return desireWeakOriginal(T, B, minConf);
+            //return TruthFunctions.desire(T, B, minConf, true);
         }
     },
 
@@ -61,28 +61,28 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    DecomposePositiveNegativeNegative() {
+    @AllowOverlap DecomposePositiveNegativeNegative() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return decompose(T, B, true, false, false, minConf);
         }
     },
 
-    DecomposePositiveNegativePositive() {
+    @AllowOverlap DecomposePositiveNegativePositive() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return TruthFunctions.decompose(T, B, true, false, true, minConf);
         }
     },
 
-    DecomposeNegativeNegativeNegative() {
+    @AllowOverlap DecomposeNegativeNegativeNegative() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return decompose(T, B, false, false, false, minConf);
         }
     },
 
-    DecomposeNegativePositivePositive() {
+    @AllowOverlap DecomposeNegativePositivePositive() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return TruthFunctions.decompose(T, B, false, true, true, minConf);

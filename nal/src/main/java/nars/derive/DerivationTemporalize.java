@@ -1,8 +1,6 @@
 package nars.derive;
 
-import jcog.Util;
 import jcog.math.Interval;
-import nars.Param;
 import nars.Task;
 import nars.control.Derivation;
 import nars.derive.time.AbsoluteEvent;
@@ -15,9 +13,7 @@ import nars.term.subst.Subst;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static nars.Op.IMPL;
 import static nars.time.Tense.ETERNAL;
@@ -43,40 +39,53 @@ public class DerivationTemporalize extends Temporalize {
 
     private final Task task, belief;
 
+    /**
+     * constraints specific for specific double premise derivations
+     */
+    public Map<Term, SortedSet<Event>> sng, dbl;
+
     public DerivationTemporalize(Derivation d) {
         super(d.random);
         task = d.task;
         belief = d.belief; //!d.single ? d.belief : null;
         dur = Math.max(1, Math.round(d.nar.dtDither.floatValue() * d.dur));
 
-
         knowDerivedAbsolute(d,
                 polarizedTaskTerm(task),
                 task.start(), task.end());
 
-        if (belief != null) {
-            if (!belief.equals(task)) {
 
-                knowDerivedAbsolute(d,
-                        polarizedTaskTerm(belief),
-                        belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
-            }
-        } else /*if (d.beliefTerm != null)*/ {
-            if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
+        if (!task.term().equals(d.beliefTerm)) { //dont re-know the term
 
-                Term b = d.beliefTerm;
-                knowDerivedAmbient(d, b);
+            Term b = d.beliefTerm;
+            knowDerivedAmbient(d, b);
 
-            }
-            //t.know(d.beliefTerm, d, null);
         }
 
+        sng = constraints;
 
+        if (belief != null && !belief.equals(task)) {
+
+            this.constraints = dbl = new HashMap(); //clone
+            sng.forEach((k,v)->{
+                dbl.put(k, new TreeSet(v));
+            });
+
+            knowDerivedAbsolute(d,
+                    polarizedTaskTerm(belief),
+                    belief.start(), belief.end()); //!taskRooted || !belief.isEternal()); // || (bo != IMPL));
+
+
+        } else {
+            this.dbl = sng;
+        }
     }
 
-    /** negate if negated, for precision in discriminating positive/negative */
+    /**
+     * negate if negated, for precision in discriminating positive/negative
+     */
     static Term polarizedTaskTerm(Task t) {
-        return t.term().negIf(t.truth()!=null && t.truth().isNegative());
+        return t.term().negIf(t.truth() != null && t.truth().isNegative());
     }
 
     void knowDerivedAmbient(Subst d, Term x) {
@@ -108,7 +117,15 @@ public class DerivationTemporalize extends Temporalize {
     @Nullable
     public Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] eviGain) {
 
-        Task belief = d.single ? null : this.belief; //if single, ignore belief occurrence HACK this may not completely ignore any absolute values associated with events contained in the belief
+
+        Task belief;
+        if (d.single) {
+            belief = null;
+            constraints = sng;
+        } else {
+            belief = this.belief;
+            constraints = dbl;
+        }
 
         Map<Term, Time> trail = new HashMap<>();
         Event e;
@@ -153,7 +170,7 @@ public class DerivationTemporalize extends Temporalize {
             long k;
             if (!te && (belief != null && !belief.isEternal())) {
                 Interval common = Interval.intersect(ts, task.end(), belief.start(), belief.end());
-                if (common==null)
+                if (common == null)
                     return null;
                 occ[0] = common.a;
                 occ[1] = common.b;

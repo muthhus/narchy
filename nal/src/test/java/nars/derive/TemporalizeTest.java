@@ -229,7 +229,8 @@ public class TemporalizeTest {
     /**
      * tests temporalization of pure events which overlap, or are separated by a distance below a proximal threshold (see Param.java)
      */
-    @Ignore @Test
+    @Ignore
+    @Test
     public void testStatementEventsNearlyOverlappingTemporal() throws Narsese.NarseseException {
 //              .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
 //              .input(new NALTask($.$("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
@@ -656,6 +657,37 @@ public class TemporalizeTest {
     }
 
     @Test
+    public void testAnotherInstability2342348927342734891() throws Narsese.NarseseException {
+        //            $.01 (((a&|b) &&+5 (b&|c)) ==>+5 (c &&+5 d)). 6 %1.0;.29% {100: 1;2;3} ((((&&,%1073742337..+)==>%2),%3,neqRCom(%2,%3),notImpl(%3)),((((&&,%1073742337..+) &&+- %3) ==>+- %2),((Induction-->Belief))))
+        //              $.10 ((a &&+5 b) ==>+5 (c &&+5 d)). 1 %1.0;.45% {12: 1;3} ((%1,%2,time(raw),belief(positive),task("."),time(dtEvents),neq(%1,%2),notImpl(%2)),((%2 ==>+- %1),((Induction-->Belief))))
+        //              $.50 (b &&+5 c). 6⋈11 %1.0;.90% {6: 2}
+
+        Temporalize t = new Temporalize();
+        t.knowAbsolute($("((a &&+5 b) ==>+5 (c &&+5 d))"),1);
+        t.knowAbsolute($("(b &&+5 c)"), 6, 11);
+
+        Term P = $("(((a&|b) &&+- (b&|c)) ==>+- (c &&+- d))");
+
+        Event s = t.solve(P);
+        assertEquals("(((a&|b) &&+5 (b&|c)) ==>+5 (c &&+5 d))@1", s.toString());
+    }
+    @Test
+    public void testAnotherInstability234234892742() throws Narsese.NarseseException {
+        //$0.0 ((a&|b) &&+5 (b&|c)). -9⋈-4 %1.0;.13% {124: 1;2;3} ((%1,(%2==>%3),time(urgent),neq(%1,%2),notImpl(%1)),(subIfUnifiesAny(%2,%3,%1),((AbductionRecursivePB-->Belief),(DeciInduction-->Goal))))
+        //    $.50 (c &&+5 d). 11⋈16 %1.0;.90% {11: 3}
+        //    $.01 (((a&|b) &&+5 (b&|c)) ==>+5 (c &&+5 d)). 6
+
+        Temporalize t = new Temporalize();
+        t.knowAbsolute($("(c &&+5 d)"), 11, 16);
+        t.knowAbsolute($("(((a&|b) &&+5 (b&|c)) ==>+5 (c &&+5 d))"), 6);
+
+        Term P = $("((a&|b) &&+- (b&|c))");
+
+        Event s = t.solve(P);
+        assertEquals("((a&|b) &&+5 (b&|c))@[1..6]", s.toString());
+    }
+
+    @Test
     public void testConjLinked3() throws Narsese.NarseseException {
         /*
           instability:
@@ -980,7 +1012,8 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
         assertEquals("((x &&+2 #1) &&+3 x)", s.term.toString());
     }
 
-    @Test public void testDropAnyEvent23423423() throws Narsese.NarseseException {
+    @Test
+    public void testDropAnyEvent23423423() throws Narsese.NarseseException {
         /* bad:
          $.07 ((a,b) ==>+1 (b,c)). 0 %1.0;.38% {59: 1;2;3;;} (((%1==>%2),%2,belief("&&")),((%1 ==>+- dropAnyEvent(%2)),((StructuralDeduction-->Belief))))
                $.13 ((a,b) ==>+1 ((b,c) &&+3 (c,d))). 1

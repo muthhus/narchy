@@ -656,13 +656,12 @@ public interface Compound extends Term, IPair, TermContainer {
 
 
     /* collects any contained events within a conjunction*/
-    @Override
-    default void events(Consumer<ObjectLongPair<Term>> events, long offset) {
+    @Override default void events(Consumer<ObjectLongPair<Term>> events, long offset, int level) {
         Op o = op();
         if (o == CONJ) {
             int dt = dt();
 
-            if (dt != DTERNAL && dt != XTERNAL) {
+            if ( !(dt==0&&level>0) && dt!=DTERNAL && dt!=XTERNAL) {
 
                 boolean reverse;
                 if (dt < 0) {
@@ -675,11 +674,12 @@ public interface Compound extends Term, IPair, TermContainer {
                 long t = offset;
                 for (int i = 0; i < s; i++) {
                     Term st = tt.sub(reverse ? (s - 1 - i) : i);
-                    st.events(events, t);
+                    st.events(events, t, level+1); //recurse
                     t += dt + st.dtRange();
                 }
 
-                return;
+                //if (dt!=0 || level==0) //allow dt==0 case to proceed below and add the (&| event as well as its components (which are precisely known)
+                    return;
             }
 
         }

@@ -419,16 +419,20 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
 //                        cw;
 
                 assert (dur > 0);
-                cw = Param.evidenceDecay(cw, durAdjusted, dist); //decay
+
+                float ete = eternalizable();
+                float ecw = ete > 0 ? t.eviEternalized() * ete : 0;
+                float dcw = cw - ecw; //delta to eternalization
+                cw = ecw + Param.evidenceDecay(dcw, durAdjusted, dist); //decay
+
                 //cw = 0; //immediate cut-off
 
 
-                float ete = eternalizable();
-                if (ete > 0) {
-                    float et = t.eviEternalized() * ete;
-                    if (et > cw)
-                        cw = et;
-                }
+//                if (ete > 0) {
+//                    float et = t.eviEternalized() * ete;
+//                    if (et > cw)
+//                        cw = et;
+//                }
 
             }
 
@@ -444,7 +448,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         //return 1f; //always
         //return 0f; //never
 
-        return term().vars() > 0 ? 1f : 0f;
+        //return term().vars() > 0 ? 1f : 0f;
+        return term().vars() > 0 ? 1f : 0.5f;
         //return term().varIndep() > 0 ? 1f: 0f;
 
 //        Term t = term();

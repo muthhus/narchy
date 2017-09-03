@@ -1456,7 +1456,10 @@ public enum Op implements $ {
             int pre = subject.dtRange();
             int edt = pre + (dt != DTERNAL ? dt : 0);
             if (subjConj && predConj) {
-                Set<ObjectLongPair<Term>> se = new HashSet(subject.events());
+
+                Set<ObjectLongPair<Term>> se = new HashSet();
+                subject.events(se::add);
+
                 FasterList<ObjectLongPair<Term>> pe = predicate.events(edt);
                 if (pe.removeIf(se::contains)) {
                     if (pe.isEmpty()) {

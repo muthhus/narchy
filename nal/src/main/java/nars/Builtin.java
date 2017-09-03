@@ -17,10 +17,7 @@ import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static nars.Op.*;
@@ -150,15 +147,19 @@ public class Builtin {
 
         nar.on(Functor.f2((Atom) $.the("without"), (Term container, Term content) -> {
             if (container.op().commutative) {
-                @NotNull Set<Term> s = container.subterms().toSet();
-                if (s.remove(content)) {
-                    return container.op().the(container.dt(), s);
-                } else {
-                    return Null; //wasnt contained
+                TermContainer cs = container.subterms();
+                int z = cs.size();
+                if (z > 1 && cs.contains(content)) {
+                    @NotNull SortedSet<Term> s = cs.toSortedSet();
+                    if (s.remove(content)) {
+                        return z == 2 ? s.first() : container.op().the(container.dt(), s);
+                    } else {
+                        return Null; //wasnt contained
+                    }
                 }
-            } else {
-                return Null;
             }
+
+            return Null;
         }));
 
         /**

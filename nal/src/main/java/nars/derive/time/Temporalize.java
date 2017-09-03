@@ -41,7 +41,7 @@ public class Temporalize implements ITemporalize {
     /**
      * constraint graph
      */
-    public final Map<Term, SortedSet<Event>> constraints = new HashMap<>();
+    public Map<Term, SortedSet<Event>> constraints = new HashMap<>();
     private final Random random;
     public int dur = 1;
     protected static final boolean knowTransformed = true;
@@ -174,8 +174,6 @@ public class Temporalize implements ITemporalize {
     }
 
 
-
-
     /**
      * convenience method for testing: assumes start offset of zero, and dtRange taken from term
      */
@@ -189,7 +187,6 @@ public class Temporalize implements ITemporalize {
     public void knowAbsolute(Term term, long from, long to) {
         know(absolute(term, from, to), 0, from != ETERNAL ? (int) (to - from) : 0);
     }
-
 
 
     /**
@@ -262,9 +259,8 @@ public class Temporalize implements ITemporalize {
                         know(implSubj, relative(implSubj, implPred, -predFromSubj));
 
                         if (implSubj.hasAny(CONJ)) {
-                            FasterList<ObjectLongPair<Term>> se = implSubj.events();
-                            for (int i = 0, eventsSize = se.size(); i < eventsSize; i++) {
-                                ObjectLongPair<Term> oe = se.get(i);
+
+                            implSubj.events(oe -> {
                                 Term ss = oe.getOne();
                                 if (!ss.equals(implPred)) {
                                     int t = -predFromSubj + ((int) oe.getTwo());
@@ -273,12 +269,10 @@ public class Temporalize implements ITemporalize {
                                 } else {
                                     //TODO repeat case
                                 }
-                            }
+                            });
                         }
                         if (implPred.hasAny(CONJ)) {
-                            FasterList<ObjectLongPair<Term>> pe = implPred.events();
-                            for (int i = 0, eventsSize = pe.size(); i < eventsSize; i++) {
-                                ObjectLongPair<Term> oe = pe.get(i);
+                            implPred.events(oe -> {
                                 Term pp = oe.getOne();
                                 if (!pp.equals(implSubj)) {
                                     int t = predFromSubj + ((int) oe.getTwo());
@@ -287,7 +281,7 @@ public class Temporalize implements ITemporalize {
                                 } else {
                                     //TODO repeat case
                                 }
-                            }
+                            });
                         }
                     } else {
                         //TODO repeat case
@@ -334,7 +328,7 @@ public class Temporalize implements ITemporalize {
                             ObjectLongPair<Term> jj = ee.get(j);
                             Term b = jj.getOne();
 
-                            if (!ii.getOne().equals(b)) {
+                            if (!a.equals(b)) {
                                 //chain to previous term
                                 int bt = (int) jj.getTwo();
                                 know(a, relative(a, b, at - bt));
@@ -456,8 +450,8 @@ public class Temporalize implements ITemporalize {
 //                    trail.put(x, oo.get(current).startTime);
 //                    return oo.get(current);
 //                } else {
-                    return new TimeEvent(x, xs);
-     //           }
+                return new TimeEvent(x, xs);
+                //           }
 
             } else
                 return null; //cyclic

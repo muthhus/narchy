@@ -785,6 +785,11 @@ public interface Term extends Termlike, Comparable<Term> {
     }
 
     default void events(Consumer<ObjectLongPair<Term>> events, long dt) {
+        events(events, dt, 0);
+    }
+
+    /** dont call directly */
+    default void events(Consumer<ObjectLongPair<Term>> events, long dt, int level) {
         events.accept(PrimitiveTuples.pair(this, dt));
     }
 
