@@ -77,7 +77,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
                 .input(new NALTask($.$("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
-                .mustGoal(cycles, "(a-->c)", 1f, 0.3f, (x) -> (x >= 10 && x <= 20)) //10..20
+                .mustGoal(cycles, "(a-->c)", 1f, 0.26f, (x) -> (x >= 10 && x <= 20)) //10..20
         ;
 
     }
@@ -402,9 +402,9 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .goal("(reward)")
                 .believe("((good) ==> (reward))", 1, 0.9f)
-                .believe("((--,(bad)) ==> (reward))", 1, 0.9f)
-                .mustGoal(cycles, "(good)", 1.0f, 0.81f)
-                .mustGoal(cycles, "(bad)", 0.0f, 0.81f);
+                .believe("(--(bad) ==> (reward))", 1, 0.9f)
+                .mustGoal(cycles, "(good)", 1.0f, 0.45f)
+                .mustGoal(cycles, "(bad)", 0.0f, 0.45f);
 
     }
 
@@ -454,10 +454,9 @@ public class NAL8Test extends AbstractNALTest {
                 .goal("(reward)")
                 .believe("((reward) ==> (good))", 1, 0.9f)
                 .believe("((--,(reward)) ==> (bad))", 1, 0.9f)
-                .mustGoal(cycles, "(good)", 1.0f, 0.45f)
-                .mustGoal(cycles, "(bad)", 0.0f, 0.45f)
+                .mustGoal(cycles, "(good)", 1.0f, 0.81f)
                 .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.5f, 0.0f, 1f, ETERNAL)
-                .mustNotOutput(cycles, "(bad)", GOAL, 0.5f, 1f, 0.0f, 1f, ETERNAL);
+                .mustNotOutput(cycles, "(bad)", GOAL, ETERNAL);
     }
 
 
@@ -575,7 +574,7 @@ public class NAL8Test extends AbstractNALTest {
     }
 
     @Test
-    public void testGoalConjunctionNegative1() {
+    public void testGoalConjunctionPos1() {
 
         test
                 .input("(a)!")
@@ -632,7 +631,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(0, "((out) ==>-3 (happy)). :|:")
                 .inputAt(13, "(happy)! :|:")
-                .mustGoal(cycles, "(out)", 1f, 0.81f, 16)
+                .mustGoal(cycles, "(out)", 1f, 0.45f, 16)
                 .mustNotOutput(cycles, "(out)", GOAL, 3);
     }
 
@@ -697,11 +696,11 @@ public class NAL8Test extends AbstractNALTest {
     public void implDecomposeGoalAfterPosPos() {
 
         test
-                .inputAt(3, "((a) ==>+3 (b)). :|:")
-                .inputAt(6, "(b)! :|:")
-                .mustGoal(cycles, "(a)", 1f, 0.81f,
-                        (t)-> t >= 6) //desired NOW, not at time 10 as would happen during normal decompose
-                .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL);
+            .inputAt(3, "((a) ==>+3 (b)). :|:")
+            .inputAt(6, "(b)! :|:")
+            .mustGoal(cycles, "(a)", 1f, 0.45f,
+                    (t)-> t >= 6) //desired NOW, not at time 10 as would happen during normal decompose
+            .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL);
     }
 
     @Test
@@ -710,7 +709,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .inputAt(3, "(--(a) ==>+3 (b)). :|:")
                 .inputAt(13, "(b)! :|:")
-                .mustGoal(cycles, "(a)", 0f, 0.81f, 13) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustGoal(cycles, "(a)", 0f, 0.45f, 13) //desired NOW, not at time 10 as would happen during normal decompose
                 .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL || t == 10);
     }
 

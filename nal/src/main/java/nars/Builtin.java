@@ -15,10 +15,12 @@ import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static nars.Op.*;
@@ -146,6 +148,18 @@ public class Builtin {
 
         }));
 
+        nar.on(Functor.f2((Atom) $.the("without"), (Term container, Term content) -> {
+            if (container.op().commutative) {
+                @NotNull Set<Term> s = container.subterms().toSet();
+                if (s.remove(content)) {
+                    return container.op().the(container.dt(), s);
+                } else {
+                    return Null; //wasnt contained
+                }
+            } else {
+                return Null;
+            }
+        }));
 
         /**
          * TODO rename this to 'dropAnyCommutive'

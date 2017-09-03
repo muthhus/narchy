@@ -21,7 +21,7 @@ public enum GoalFunction implements TruthOperator {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             //return desireStrongOriginal(T, B, minConf);
-            return TruthFunctions.desire(T, B, minConf, false, false);
+            return TruthFunctions.desire(T, B, minConf, false);
         }
     },
 
@@ -29,7 +29,7 @@ public enum GoalFunction implements TruthOperator {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             //return desireWeakOriginal(T, B, minConf);
-            return TruthFunctions.desire(T, B, minConf, false, true);
+            return TruthFunctions.desire(T, B, minConf, true);
         }
     },
 
@@ -100,14 +100,14 @@ public enum GoalFunction implements TruthOperator {
         }
     },
 
-    @SinglePremise
-    @AllowOverlap
-    BeliefStructuralDeduction() {
-        @Override
-        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return deduction1(B, defaultConf(m), minConf);
-        }
-    },
+//    @SinglePremise
+//    @AllowOverlap
+//    BeliefStructuralDeduction() {
+//        @Override
+//        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+//            return deduction1(B, defaultConf(m), minConf);
+//        }
+//    },
 
 
 //    @AllowOverlap @SinglePremise
@@ -125,16 +125,7 @@ public enum GoalFunction implements TruthOperator {
             return union(T, B, minConf);
         }
     },
-
-    StructuralIntersection() {
-        @Override
-        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return B != null ? TruthFunctions.intersection(B, defaultTruth(m), minConf) : null;
-        }
-    },
-
-
-    Intersection() {
+   Intersection() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
             return intersection(T, B, minConf);
@@ -148,9 +139,17 @@ public enum GoalFunction implements TruthOperator {
         }
     },;
 
+//    StructuralIntersection() {
+//        @Override
+//        public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
+//            return B != null ? TruthFunctions.intersection(B, defaultTruth(m), minConf) : null;
+//        }
+//    },
+
+
     @NotNull
     private static Truth defaultTruth(NAR m) {
-        return m.truthDefault(Op.GOAL /* goal? */);
+        return m.truthDefault(Op.GOAL);
     }
 
 

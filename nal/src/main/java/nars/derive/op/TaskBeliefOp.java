@@ -10,6 +10,7 @@ import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 
+
 /**
  * Created by me on 5/19/17.
  */
@@ -31,6 +32,10 @@ public final class TaskBeliefOp extends AbstractPred<Derivation> {
                 &&
                 (!belief || derivation.termSub1op == op);
     }
+
+    static boolean isSequence(int dt) {
+            return dt!=0 && dt!=DTERNAL && dt!=XTERNAL;
+        }
 
     public static class TaskBeliefConjSeq extends AbstractPred<Derivation> {
 
@@ -56,10 +61,34 @@ public final class TaskBeliefOp extends AbstractPred<Derivation> {
             return true;
         }
 
-        static boolean isSequence(int dt) {
-            return dt!=0 && dt!=DTERNAL && dt!=XTERNAL;
-        }
 
 
     }
+
+    public static class TaskBeliefConjComm extends AbstractPred<Derivation> {
+
+        private final boolean task;
+        private final boolean belief;
+
+        public TaskBeliefConjComm(boolean testTask, boolean testBelief) {
+            super($.func("conjComm", $.the(testTask ? 1 : 0), $.the(testBelief ? 1 : 0)));
+            this.task = testTask;
+            this.belief = testBelief;
+        }
+
+        @Override
+        public boolean test(Derivation derivation) {
+            if (task) {
+                if (!(derivation.termSub0op == CONJ.id && !isSequence(derivation.taskTerm.dt())))
+                    return false;
+            }
+            if (belief) {
+                if (!(derivation.belief != null && derivation.termSub1op == CONJ.id && !isSequence(derivation.belief.term().dt())))
+                    return false;
+            }
+            return true;
+        }
+
+    }
+
 }

@@ -258,12 +258,11 @@ public final class TruthFunctions {
      * but the polarity of the derivation only
      */
     @Nullable
-    public static Truth desire(Truth goal, Truth cond, float minConf, boolean bipolar, boolean weak) {
+    public static Truth desire(Truth goal, Truth cond, float minConf, boolean weak) {
 
         float c = and(cond.conf(), goal.conf());
 
-//        if (!bipolar)
-//            c *= cond.freq();
+        c *= cond.freq();
 
         if (weak)
             c *= w2c(1.0f);
