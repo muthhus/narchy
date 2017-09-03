@@ -17,10 +17,11 @@ import static nars.truth.TruthFunctions.*;
 
 public enum GoalFunction implements TruthOperator {
 
-    Strong() {
+    @AllowOverlap Strong() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-            return desireStrongOriginal(T, B, minConf);
+            //return desireStrongOriginal(T, B, minConf);
+            return desireStrongNew(T, B, minConf);
         }
     },
 
@@ -88,13 +89,13 @@ public enum GoalFunction implements TruthOperator {
     @AllowOverlap DeciDeduction() {
         @Override
         public Truth apply(Truth T, Truth B, NAR m, float minConf) {
-            if (B.isNegative()) {
-                Truth x = deduction(T, B.neg(), minConf);
-                return x != null ? x.neg() : null;
-            } else {
-                return deduction(T, B, minConf);
-            }
-
+//            if (B.isNegative()) {
+//                Truth x = deduction(T, B.neg(), minConf);
+//                return x != null ? x.neg() : null;
+//            } else {
+//                return deduction(T, B, minConf);
+//            }
+            return desireStrongNew(T, B, minConf);
         }
 
     },

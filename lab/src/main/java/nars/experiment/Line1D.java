@@ -44,14 +44,14 @@ public class Line1D {
             NAR n = NARS.threadSafe();
 
             //new STMTemporalLinkage(n, 2, false);
-            n.time.dur(1);
-            n.termVolumeMax.set(16);
+            n.time.dur(5);
+            n.termVolumeMax.set(24);
             //n.beliefConfidence(0.9f);
             //n.goalConfidence(0.5f);
             n.onCycle((nn) -> {
                 nn.stats(System.out);
             });
-            n.setEmotion(new Emotivation(n));
+            //n.setEmotion(new Emotivation(n));
 
             new Line1DExperiment() {
                 @Override
@@ -112,7 +112,7 @@ public class Line1D {
     }
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.0001f; //in time units
+        float tHz = 0.001f; //in time units
         float yResolution = 0.1f; //in 0..1.0
         float periods = 16;
 

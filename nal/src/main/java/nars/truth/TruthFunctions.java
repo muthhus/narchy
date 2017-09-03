@@ -255,11 +255,22 @@ public final class TruthFunctions {
      * A function specially designed for desire value [To be refined]
      */
     @Nullable
-    public static Truth desireStrongNew(/*@NotNull*/ Truth a, /*@NotNull*/ Truth b, float minConf) {
-        float aFreq = a.freq();
-        float bFreq = b.freq();
-        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq, bFreq));
-        return c < minConf ? null : desire(aFreq, bFreq, c);
+    public static Truth desireStrongNew(/*@NotNull*/ Truth goal, /*@NotNull*/ Truth cond, float minConf) {
+
+        float goalFreq = goal.freq();
+        float goalPol = (goalFreq - 0.5f);
+        float condPol = (cond.freq() - 0.5f);
+
+        float c = and(/*Math.abs(condPol) * 2f,*/ cond.conf(), goal.conf());
+        if (c < minConf)
+            return null;
+        else {
+            float a = Math.signum(condPol) * Math.abs(goalPol * condPol);
+            return t(a * 2f + 0.5f, c);
+        }
+
+//        float c = and(a.conf(), b.conf(), freqSimilarity(aFreq, bFreq));
+//        return c < minConf ? null : desire(aFreq, bFreq, c);
     }
 
     /**

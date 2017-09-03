@@ -56,14 +56,19 @@ public class Line1DSimplest extends NAgent {
         //out = null;
         Term O = //$.inh(Atomic.the("o"), id);
                 $.the("o");
-        out = actionTriState(O, (d) -> {
-            switch (d) {
-                case -1:
-                case +1:
-                    this.o.setValue(Math.max(0, Math.min(1f, this.o.floatValue() + d * speed.floatValue())));
-                    break;
-            }
+
+        out = actionUnipolar(O, (d) -> {
+            this.o.setValue(d);
+            return d;
         });
+//        out = actionTriState(O, (d) -> {
+//            switch (d) {
+//                case -1:
+//                case +1:
+//                    this.o.setValue(Math.max(0, Math.min(1f, this.o.floatValue() + d * speed.floatValue())));
+//                    break;
+//            }
+//        });
 //        out = actionBipolar(O, v -> {
 //            //float current = this.o.floatValue();
 //
