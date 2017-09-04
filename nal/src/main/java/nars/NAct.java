@@ -1,6 +1,9 @@
 package nars;
 
+import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.math.FloatNormalized;
+import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
@@ -366,7 +369,6 @@ public interface NAct {
         return action(s, (b, d) -> {
             float o = (d != null) ?
                     d.freq()
-                    //d.expectation()
                     : lastValue[0]; //0.5f /*Float.NaN*/;
             float f = update.valueOf(o);
             if (f != f)
@@ -376,6 +378,35 @@ public interface NAct {
             return $.t(f, nar().confDefault(BELIEF));
         });
     }
-
+    /**
+     * supplies values in range -1..+1, where 0 ==> expectation=0.5
+     */
+    @NotNull
+    default GoalActionConcept actionExpUnipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        final float[] x = {0f}, xPrev = {0f};
+        //final FloatNormalized y = new FloatNormalized(()->x[0]);
+        return action(s, (b, d) -> {
+            float o = (d != null) ?
+                    //d.freq()
+                    d.expectation() - 0.5f
+                    : xPrev[0]; //0.5f /*Float.NaN*/;
+            float ff;
+            if (o >= 0f) {
+                //y.relax(0.9f);
+                //x[0] = o;
+                float fb = update.valueOf(o /*y.asFloat()*/);
+                if (fb != fb) {
+                    //f = returxPrev[0];
+                    return null;
+                } else {
+                    xPrev[0] = fb;
+                }
+                ff = (fb / 2f) + 0.5f;
+            } else {
+                ff = 0f;
+            }
+            return $.t(Util.unitize(ff), nar().confDefault(BELIEF));
+        });
+    }
 
 }

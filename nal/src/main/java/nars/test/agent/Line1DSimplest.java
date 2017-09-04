@@ -2,6 +2,7 @@ package nars.test.agent;
 
 import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.math.FloatNormalized;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
@@ -38,7 +39,7 @@ public class Line1DSimplest extends NAgent {
         super("", n);
 
 
-        in = senseNumber($.the("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+        in = senseNumber($.p("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
                 this.i
         );
 //        in = senseNumber(
@@ -52,34 +53,41 @@ public class Line1DSimplest extends NAgent {
 //            }
 //        }));
 
-        //out = null;
-        Term O = //$.inh(Atomic.the("o"), id);
-                $.the("o");
+        float[] x = new float[2];
+        onFrame(()->{
+            float d = x[0] - x[1];
+            this.o.setValue(Util.unitize(o.floatValue() + d*speed.floatValue()));
+        });
 
-        up = actionUnipolar($.the("up"), d -> {
+        up = actionUnipolar($.p("up"), d -> {
+            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
             synchronized (o) {
-                float prev = o.floatValue();
-                float sp = speed.floatValue();
-                float next = Math.min(1, prev + d * sp);
-                if (!Util.equals(prev, next, sp / 2f)) {
-                    this.o.setValue(next);
+                //float prev = o.floatValue();
+                //float sp = speed.floatValue();
+                //float next = Math.min(1, prev + d * sp);
+//                if (!Util.equals(prev, next, sp )) {
+
+                x[0] = d - 0.5f;
+                    //this.o.setValue(next);
                     return d;
-                } else {
-                    return 0;
-                }
+//                } else {
+//                    return 0f;
+//                }
             }
         });
-        down = actionUnipolar($.the("down"), d -> {
+        down = actionUnipolar($.p("down"), d -> {
+            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
             synchronized (o) {
-                float prev = o.floatValue();
-                float sp = speed.floatValue();
-                float next = Math.max(0, prev - d * sp);
-                if (!Util.equals(prev, next, sp / 2f)) {
-                    this.o.setValue(next);
+                //float prev = o.floatValue();
+                //float sp = speed.floatValue();
+                //float next = Math.max(0, prev - d * sp);
+                //if (!Util.equals(prev, next, sp )) {
+                    //this.o.setValue(next);
+                    x[1] = d - 0.5f;
                     return d;
-                } else {
-                    return 0;
-                }
+//                } else {
+//                    return 0f;
+//                }
             }
         });
 

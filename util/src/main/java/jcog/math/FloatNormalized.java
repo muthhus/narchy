@@ -78,7 +78,7 @@ public class FloatNormalized implements FloatSupplier {
      * @param decayRate
      * @return
      */
-    public FloatNormalized decay(float decayRate) {
+    public FloatNormalized relax(float decayRate) {
         this.decay = decayRate;
         return this;
     }

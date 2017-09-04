@@ -1,6 +1,7 @@
 package nars.derive;
 
 import jcog.math.Interval;
+import nars.Op;
 import nars.Task;
 import nars.control.Derivation;
 import nars.derive.time.AbsoluteEvent;
@@ -142,7 +143,11 @@ public class DerivationTemporalize extends Temporalize {
 //            model.solve(pattern, trail);
             return null;
         }
-        if (e == null || !e.term.op().conceptualizable) {
+        if (e == null) {
+            return null;
+        }
+        Op eop = e.term.op();
+        if (!eop.conceptualizable) {
             return null;
         }
 
@@ -154,7 +159,6 @@ public class DerivationTemporalize extends Temporalize {
             occ[0] = e.start(trail).abs();
             occ[1] = e.end(trail).abs();
         }
-
 
         boolean te = task.isEternal();
         if (occ[0] == ETERNAL && (!te || (belief != null && !belief.isEternal()))) {

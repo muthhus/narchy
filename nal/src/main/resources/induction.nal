@@ -8,7 +8,7 @@
         A, B, time(raw), belief(negative), task("."), time(dtEventsOrEternals), neqAndCom(A,B),   notImpl(B) |- varIntro((--B ==>+- A)), (Belief:InductionPN)
 
 //&&
-    A, B, task("."), time(raw), time(dtEvents)                             |- (polarize(A,task) &&+- polarize(B,belief)), (Belief:IntersectionDepolarized)
+    A, B, task("."), time(raw), time(dtEvents)                            |- (polarize(A,task) &&+- polarize(B,belief)), (Belief:IntersectionDepolarized)
     A, B, task("."), time(raw), time(dtEventsOrEternals), neqAndCom(A,B)   |- varIntro((polarize(A,task) &&+- polarize(B,belief))), (Belief:IntersectionDepolarized)
 
 

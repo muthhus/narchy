@@ -18,6 +18,8 @@ import java.util.Random;
 
 public class MarioComponent extends JComponent implements Runnable, KeyListener, FocusListener
 {
+    int fps = 16;
+
     public void startGame()
     {
 //        scene = mapScene;
@@ -28,7 +30,6 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
     }
 
     private static final long serialVersionUID = 739318775993206607L;
-    public static final int TICKS_PER_SECOND = 24;
 
     private boolean running;
     private final int width;
@@ -306,7 +307,7 @@ public class MarioComponent extends JComponent implements Runnable, KeyListener,
 
     
     public void adjustFPS() {
-        int fps = 24;
+
         delay = (fps > 0) ? (fps >= 100) ? 0 : (1000 / fps) : 100;
 //        System.out.println("Delay: " + delay);
     }

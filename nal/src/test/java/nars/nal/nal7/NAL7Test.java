@@ -243,7 +243,6 @@ public class NAL7Test extends AbstractNALTest {
         */
 
         test
-                .log()
                 .inputAt(1, "((a,b) ==>+1 (b,c)). :|:")
                 .inputAt(5, "(c, d). :|:")
                 .mustBelieve(cycles, "(((a,b) &&+4 (c,d)) ==>-3 (b,c))", 1f, 0.81f, 1)
@@ -251,6 +250,23 @@ public class NAL7Test extends AbstractNALTest {
         ;
 
     }
+
+    @Test public void justPlainWrongTiming() {
+        /*
+        WRONG
+        $0.0 ((a&|b) &&+5 (b&|c)). -9⋈-4 %1.0;.11% {397: 1;2;3} ((%1,(%2==>%3),time(urgent),neq(%1,%2),notImpl(%1)),(subIfUnifiesAny(%2,%3,%1),((AbductionRecursivePB-->Belief),(DeciInduction-->Goal))))
+            $.50 (c &&+5 d). 11⋈16 %1.0;.90% {11: 3}
+            $0.0 (((a&|b) &&+5 (b&|c)) ==>+5 (c &&+5 d)). 6 %1.0;.29% {310: 1;2;3} ((((&&,%1073742337..+)==>%2),%3,neqRCom(%2,%3),notImpl(%3)),((((&&,%1073742337..+) &&+- %3) ==>+- %2),((Induction-->Belief))))
+            */
+        test
+                .inputAt(11, "(c &&+5 d). :|:")
+                .inputAt(6, "(((a&|b) &&+5 (b&|c)) ==>+5 (c &&+5 d)). :|:")
+                .mustBelieve(cycles, "((a&|b) &&+5 (b&|c))", 1, 0.45f, 1, 6)
+                //.mustNotOutput(cycles, "((a&|b) &&+5 (b&|c))", BELIEF, (t) -> t!=1)
+                .mustNotOutput(cycles, "(c &&+5 d)", BELIEF, (t) -> t!=11)
+        ;
+    }
+
 
     @Test
     public void testTminB() {

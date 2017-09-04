@@ -96,7 +96,7 @@ public class Arkancide extends NAgentX {
         };
 
 
-        paddleSpeed = 160 * noid.BALL_VELOCITY;
+        paddleSpeed = 25 * noid.BALL_VELOCITY;
 
         float resX = 0.1f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
         float resY = 0.1f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
@@ -168,19 +168,21 @@ public class Arkancide extends NAgentX {
 //
 //        });///.resolution(0.1f);
 
-        left = actionUnipolar($.the("L"), d -> {
-            if (noid.paddle.move(-d * paddleSpeed)) {
-                return d;
-            } else {
-                return 0;
-            }
+        left = actionToggle($.p("L"), d -> {
+            if (d)
+                noid.paddle.move(-paddleSpeed);
+//                return d;
+//            } else {
+//                return 0;
+//            }
         });
-        right = actionUnipolar($.the("R"), d -> {
-            if (noid.paddle.move(+d * paddleSpeed)) {
-                return d;
-            } else {
-                return 0;
-            }
+        right = actionToggle($.p("R"), d -> {
+            if (d)
+                noid.paddle.move(+paddleSpeed);
+//                return d;
+//            } else {
+//                return 0;
+//            }
         });
 
         //nar.truthResolution.setValue(0.05f);

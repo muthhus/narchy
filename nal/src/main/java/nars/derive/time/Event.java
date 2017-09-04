@@ -76,7 +76,7 @@ public abstract class Event implements Comparable<Event> {
                         if (xv == yv)
                             return x.compareTo(y);
                         else
-                            return Integer.compare(xv, yv);
+                            return Integer.compare(yv, xv);
            //         }
                 }
 

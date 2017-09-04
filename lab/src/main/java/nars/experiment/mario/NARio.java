@@ -11,6 +11,7 @@ import nars.video.PixelBag;
 import javax.swing.*;
 
 import static nars.$.$;
+import static nars.$.p;
 
 public class NARio extends NAgentX {
 
@@ -101,54 +102,69 @@ public class NARio extends NAgentX {
         vx = senseNumberDifference($("vx"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0).resolution(0.25f);
         senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0).resolution(0.25f);
 
-        actionTriState($("x"), i -> {
-            boolean n, p;
-            switch (i) {
-                case -1:
-                    p = false;
-                    n = true;
-                    break;
-                case +1:
-                    p = true;
-                    n = false;
-                    break;
-                case 0:
-                    p = false;
-                    n = false;
-                    break;
-                default:
-                    throw new RuntimeException();
-            }
+        actionToggle(p("left"), (n) -> {
+            if (n) mario.scene.key(Mario.KEY_RIGHT, false); //mutex
             mario.scene.key(Mario.KEY_LEFT, n);
-            mario.scene.key(Mario.KEY_RIGHT, p);
-            return true;
         });
-        actionTriState($("y"), i -> {
-            boolean n, p;
-            switch (i) {
-                case -1:
-                    p = false;
-                    n = true;
-                    break;
-                case +1:
-                    p = true;
-                    n = false;
-                    break;
-                case 0:
-                    p = false;
-                    n = false;
-                    break;
-                default:
-                    throw new RuntimeException();
-            }
+        actionToggle(p("right"), (n) -> {
+            if (n) mario.scene.key(Mario.KEY_LEFT, false); //mutex
+            mario.scene.key(Mario.KEY_RIGHT, n);
+        });
+        actionToggle(p("jmp"), (n) -> {
+            mario.scene.key(Mario.KEY_JUMP, n);
+        });
+        actionToggle(p("down"), (n) -> {
             mario.scene.key(Mario.KEY_DOWN, n);
-            //mario.scene.key(Mario.KEY_UP, p);
-            mario.scene.key(Mario.KEY_JUMP, p);
-            return true;
         });
-
-
         actionToggle($("speed"), (b) -> mario.scene.key(Mario.KEY_SPEED, b));
+
+//        actionTriState($("x"), i -> {
+//            boolean n, p;
+//            switch (i) {
+//                case -1:
+//                    p = false;
+//                    n = true;
+//                    break;
+//                case +1:
+//                    p = true;
+//                    n = false;
+//                    break;
+//                case 0:
+//                    p = false;
+//                    n = false;
+//                    break;
+//                default:
+//                    throw new RuntimeException();
+//            }
+//            mario.scene.key(Mario.KEY_LEFT, n);
+//            mario.scene.key(Mario.KEY_RIGHT, p);
+//            return true;
+//        });
+//        actionTriState($("y"), i -> {
+//            boolean n, p;
+//            switch (i) {
+//                case -1:
+//                    p = false;
+//                    n = true;
+//                    break;
+//                case +1:
+//                    p = true;
+//                    n = false;
+//                    break;
+//                case 0:
+//                    p = false;
+//                    n = false;
+//                    break;
+//                default:
+//                    throw new RuntimeException();
+//            }
+//            mario.scene.key(Mario.KEY_DOWN, n);
+//            //mario.scene.key(Mario.KEY_UP, p);
+//            mario.scene.key(Mario.KEY_JUMP, p);
+//            return true;
+//        });
+//
+
 
 
 //        frame.addKeyListener(mario);
@@ -191,6 +207,9 @@ public class NARio extends NAgentX {
                 if (t.isEternal() && !t.isInput()) {
                     System.err.println(t.proof());
                 }
+                if (t.isGoal() && !t.isInput()) {
+                    System.err.println(t.proof());
+                }
             });
 
             NAgentX x = null;
@@ -224,7 +243,7 @@ public class NARio extends NAgentX {
 
             return x;
 
-        }, 15);
+        }, 16);
 
 
 
