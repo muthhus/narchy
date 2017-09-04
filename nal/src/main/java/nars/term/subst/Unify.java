@@ -118,6 +118,7 @@ public abstract class Unify extends Versioning implements Subst {
     @Nullable
     @Override
     public Term xy(@NotNull Term x0) {
+        return xy.get(x0);
 
 //        Term xy = x0, y = null;
 //        while ((xy = this.xy.get(xy)) != null) { //completely dereference
@@ -135,16 +136,16 @@ public abstract class Unify extends Versioning implements Subst {
 //        }
 //        return y;
 
-        Term y0 = xy.get(x0);
-        if (y0 == null)
-            return null;
-        else {
-            Term y1 = xy.get(y0);
-            if (y1 == null)
-                return y0;
-            else
-                return y1;
-        }
+//        Term y0 = xy.get(x0);
+//        if (y0 == null)
+//            return null;
+//        else {
+//            Term y1 = xy.get(y0);
+//            if (y1 == null)
+//                return y0;
+//            else
+//                return y1;
+//        }
     }
 
 
@@ -446,8 +447,8 @@ public abstract class Unify extends Versioning implements Subst {
 
     public boolean constrain(MatchConstraint... cc) {
         for (MatchConstraint m : cc) {
-            Versioned<Term> v = xy.map.get(m.target);
-            if (v!=null && !((ConstrainedVersionedTerm) v).constrain(m))
+            Versioned<Term> v = xy.getOrCreateIfAbsent(m.target);
+            if (!((ConstrainedVersionedTerm) v).constrain(m))
                 return false;
         }
         return true;

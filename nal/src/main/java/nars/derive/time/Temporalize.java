@@ -44,7 +44,6 @@ public class Temporalize implements ITemporalize {
     public Map<Term, SortedSet<Event>> constraints = new HashMap<>();
     private final Random random;
     public int dur = 1;
-    protected static final boolean knowTransformed = true;
 
     /**
      * HACK move this this to the solution instance class when it is separated from the pattern class

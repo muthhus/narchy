@@ -22,15 +22,6 @@ public interface Termutator {
 
     abstract class AbstractTermutator extends ProxyTerm implements Termutator {
 
-        protected static Term wrap(TermContainer y) {
-            return y instanceof Term ? (Term)y : $.p(y.toArray());
-        }
-
-//        AbstractTermutator(TermContainer... keyComponents) {
-//            this(Util.map(AbstractTermutator::wrap, new Term[keyComponents.length], keyComponents));
-//        }
-
-
         AbstractTermutator(Term... keyComponents) {
             super(keyComponents.length == 1 ? keyComponents[0] : $.p(keyComponents));
         }

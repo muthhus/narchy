@@ -1058,6 +1058,14 @@ public class TermReductionsTest extends NarseseTest {
                 $("(inside(bob,office) && (inside(john,playground)==>inside(bob,kitchen)))").toString()
         );
     }
+    @Test public void testConjImplReduction() throws Narsese.NarseseException {
+        Term a = $("((a,b) ==>+1 (b,c))");
+        Term b = $("(c,d)");
+        Term x = Op.CONJ.the(5, a, b);
+
+        assertEquals("(((a,b) &&+5 (c,d)) ==>-4 (b,c))",
+                x.toString());
+    }
 
     @Test
     public void testConjImplReduction1() throws Narsese.NarseseException {
@@ -1070,13 +1078,11 @@ public class TermReductionsTest extends NarseseTest {
     @Test
     public void testConjImplReduction2() throws Narsese.NarseseException {
         //with some dt's
-        String ts = "(inside(bob,office) &&+1 (inside(john,playground) ==>+1 inside(bob,kitchen)))";
-        String u = "((inside(bob,office) &&+1 inside(john,playground)) ==>+1 inside(bob,kitchen))";
 
-        Term t = $(ts);
+        Term t = $("(inside(bob,office) &&+1 (inside(john,playground) ==>+1 inside(bob,kitchen)))");
 
         assertEquals(
-                u,
+                "((inside(bob,office) &&+1 inside(john,playground)) ==>+1 inside(bob,kitchen))",
                 t.toString()
         );
         assertEquals(0, t.dtRange());
@@ -1095,8 +1101,12 @@ public class TermReductionsTest extends NarseseTest {
     public void testConjImplReduction3() throws Narsese.NarseseException {
         //with some dt's
         assertEquals(
-                //"((j ==>-1 k) &&+1 b)",
-                "((j &&+1 b) ==>-1 k)",
+                "((j &&+1 b) ==>-2 k)",
+                $("((j ==>-1 k) &&+1 b)").toString()
+        );
+
+        assertEquals(
+                "((j &&+1 b) ==>-2 k)",
                 $("(b &&-1 (j ==>-1 k))").toString()
         );
     }

@@ -39,6 +39,8 @@ public class DerivationTemporalize extends Temporalize {
 
     private final Task task, belief;
 
+    protected static final boolean knowTransformed = true;
+
     /**
      * constraints specific for specific double premise derivations
      */

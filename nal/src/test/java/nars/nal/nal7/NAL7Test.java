@@ -2,6 +2,7 @@ package nars.nal.nal7;
 
 import nars.$;
 import nars.Narsese;
+import nars.Op;
 import nars.Param;
 import nars.term.Term;
 import nars.test.TestNAR;
@@ -218,6 +219,25 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
+    @Test public void testDontStretchImplDerivation() throws Narsese.NarseseException {
+        /*
+        WRONG
+          $0.0 (((a,b) &&+4 (#1,d)) ==>+1 (b,#1)). 1⋈5 %1.0;.40% {31: 1;2;3} ((%1,%2,task("."),time(raw),time(dtEventsOrEternals),neqAndCom(%1,%2)),(varIntro((polarize(%2,belief) &&+- polarize(%1,task))),((IntersectionDepolarized-->Belief))))
+              $.01 ((a,b) ==>+1 (b,c)). 1 %1.0;.45% {2: 1;2} ((%1,%2,time(raw),belief(positive),task("."),time(dtEvents),neq(%1,%2),notImpl(%2)),((%2 ==>+- %1),((Induction-->Belief))))
+              $.50 (c,d). 5 %1.0;.90% {5: 3}
+        */
+
+
+            test
+                .log()
+                .inputAt(1, "((a,b) ==>+1 (b,c)). :|:")
+                .inputAt(5, "(c, d). :|:")
+                .mustBelieve(cycles,"(((a,b) ==>+1 (b,c)) &&+4 (c,d))", 1, 5)
+                .mustNotOutput(cycles, "(((a,b) &&+4 (#1,d)) ==>+1 (b,#1))", BELIEF, 1)
+            ;
+
+    }
+
     @Test
     public void testTminB() {
         //(M ==> P), (M ==> S), neq(S,P), dt(tminb) |- (S ==> P), (Belief:Abduction, Derive:AllowBackward)
@@ -225,9 +245,7 @@ public class NAL7Test extends AbstractNALTest {
         //y..x
         //y.z
         //  zx
-
         test
-
                 .believe("(y ==>+3 x)")
                 .believe("(y ==>+2 z)")
                 .mustBelieve(cycles, "(z ==>+1 x)", 1.00f, 0.45f)

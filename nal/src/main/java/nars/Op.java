@@ -413,19 +413,18 @@ public enum Op implements $ {
         }
 
         /** precondition combiner: a combination nconjunction/implication reduction */
-        private Term implInConjReduction(final Term x /* possibly a conjunction */) {
+        private Term implInConjReduction(final Term conj /* possibly a conjunction */) {
 
-            Op xo = x.op();
-            if (xo != CONJ || !x.hasAny(IMPL))
-                return x; //fall-through
-            int dt = x.dt();
+            Op xo = conj.op();
+            if (xo != CONJ || !conj.hasAny(IMPL))
+                return conj; //fall-through
+            int conjDT = conj.dt();
 
-            if (/*dt==DTERNAL || */dt == XTERNAL)
-                return x;
+            if (/*dt==DTERNAL || */conjDT == XTERNAL)
+                return conj;
 
 
             //if there is only one implication subterm (first layer only), then fold into that.
-            final Term conj = x;
             int whichImpl = -1;
             int conjSize = conj.size();
             Term implication = null;
@@ -438,35 +437,37 @@ public enum Op implements $ {
                     implDT = implication.dt();
                     if (implDT == XTERNAL) {
                         //dont proceed any further if XTERNAL
-                        return x;
+                        return conj;
                     }
                     break;
                 }
             }
 
             if (implication == null)
-                return x;
+                return conj;
 
-            Term others;
-            int conjDT = conj.dt();
+            Term other;
             if (conjSize == 2) {
-                others = x.sub(1 - whichImpl);
+                other = conj.sub(1 - whichImpl);
             } else {
                 //more than 2; group them as one term
                 @NotNull TreeSet<Term> ss = conj.subterms().toSortedSet();
                 assert (ss.remove(implication)) : "must have removed something";
 
-                others = xo.the(conjDT, Terms.sorted(ss) /* assumes commutive since > 2 */);
+                other = xo.the(conjDT, Terms.sorted(ss) /* assumes commutive since > 2 */);
             }
 
-            if (whichImpl == 0)
+
+            if (whichImpl == 0 && conjDT!=DTERNAL && conjDT!=XTERNAL) {
                 conjDT = -conjDT; //reverse dt if impl is from the 0th subterm
+            }
 
-            Term ia =
-                    CONJ.the(conjDT, others, implication.sub(0) /* impl precond */);
+            Term conjInner =
+                    CONJ.the(conjDT, other, implication.sub(0) /* impl precond */);
 
-            @NotNull Term ib = implication.sub(1); /* impl postcondition */
-            return IMPL.the(implDT, ia, ib);
+            @NotNull Term implPost = implication.sub(1); /* impl postcondition */
+            return IMPL.the(implDT + conjInner.subtermTime(implication.sub(0)) - conjInner.dtRange(),
+                    conjInner, implPost);
         }
     },
 

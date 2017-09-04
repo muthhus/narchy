@@ -153,7 +153,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("(&&, x, y)");
         tester.believe("x", 0.80f, 0.9f);
-        tester.mustBelieve(cycles, "y", 0.80f, 0.58f /*0.43f*/);
+        tester.mustBelieve(cycles, "y", 0.80f, 0.43f);
     }
 
     @Test
@@ -161,7 +161,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("(&&, x, y, z)");
         tester.believe("x", 0.80f, 0.9f);
-        tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.58f /*0.43f*/);
+        tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f);
     }
 
     @Test
@@ -169,7 +169,7 @@ public class NAL5Test extends AbstractNALTest {
         TestNAR tester = test;
         tester.believe("(&&, --x, y, z)");
         tester.believe("x", 0.20f, 0.9f);
-        tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.58f /*0.43f*/);
+        tester.mustBelieve(cycles, "(&&,y,z)", 0.80f, 0.43f /*0.43f*/);
     }
 
     @Test
