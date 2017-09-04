@@ -7,6 +7,7 @@ import jcog.Util;
 import jcog.math.FloatSupplier;
 import jcog.net.MeshOptimize;
 import nars.*;
+import nars.concept.GoalActionConcept;
 import nars.gui.Vis;
 import nars.test.agent.Line1DSimplest;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
@@ -112,8 +113,8 @@ public class Line1D {
     }
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.01f; //in time units
-        float yResolution = 0.25f; //in 0..1.0
+        float tHz = 0.001f; //in time units
+        float yResolution = 0.1f; //in 0..1.0
         float periods = 16;
 
         final int runtime = Math.round(periods / tHz);
@@ -136,8 +137,11 @@ public class Line1D {
             a.speed.setValue(yResolution);
 
             a.happy.resolution.setValue(0.01f);
-            a.out.resolution.setValue(yResolution);
+
             a.in.resolution(yResolution);
+            for (GoalActionConcept g : new GoalActionConcept[] { a.up, a.down })
+                g.resolution(yResolution);
+
             a.curiosity.setValue(
                     0.1f
                     //(2/yResolution)*tHz);

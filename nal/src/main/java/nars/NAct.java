@@ -254,7 +254,7 @@ public interface NAct {
     }
 
     @Nullable
-    default ActionConcept actionToggle(@NotNull Term s, @NotNull BooleanProcedure onChange) {
+    default GoalActionConcept actionToggle(@NotNull Term s, @NotNull BooleanProcedure onChange) {
         return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false));
     }
 //

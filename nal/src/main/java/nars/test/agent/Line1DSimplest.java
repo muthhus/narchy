@@ -1,16 +1,14 @@
 package nars.test.agent;
 
+import jcog.Util;
 import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.GoalActionConcept;
-import nars.concept.ScalarConcepts;
 import nars.concept.SensorConcept;
 import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
-
-import static jcog.Util.round;
 
 
 /**
@@ -27,7 +25,8 @@ public class Line1DSimplest extends NAgent {
     public final FloatParam speed = new FloatParam(0.04f, 0f, 0.5f);
 
     @NotNull
-    public final GoalActionConcept out;
+    public final GoalActionConcept up, down;
+
     /**
      * the current value
      */
@@ -37,9 +36,9 @@ public class Line1DSimplest extends NAgent {
 
     public Line1DSimplest(NAR n) {
         super("", n);
-        
 
-        in = senseNumber( $.the("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
+
+        in = senseNumber($.the("i"),                //$.inh($.the("i"), id),                 //$.inh(Atomic.the("i"), id),
                 this.i
         );
 //        in = senseNumber(
@@ -57,10 +56,37 @@ public class Line1DSimplest extends NAgent {
         Term O = //$.inh(Atomic.the("o"), id);
                 $.the("o");
 
-        out = actionUnipolar(O, (d) -> {
-            this.o.setValue(d);
-            return d;
+        up = actionUnipolar($.the("up"), d -> {
+            synchronized (o) {
+                float prev = o.floatValue();
+                float sp = speed.floatValue();
+                float next = Math.min(1, prev + d * sp);
+                if (!Util.equals(prev, next, sp / 2f)) {
+                    this.o.setValue(next);
+                    return d;
+                } else {
+                    return 0;
+                }
+            }
         });
+        down = actionUnipolar($.the("down"), d -> {
+            synchronized (o) {
+                float prev = o.floatValue();
+                float sp = speed.floatValue();
+                float next = Math.max(0, prev - d * sp);
+                if (!Util.equals(prev, next, sp / 2f)) {
+                    this.o.setValue(next);
+                    return d;
+                } else {
+                    return 0;
+                }
+            }
+        });
+
+//        out = actionUnipolar(O, (d) -> {
+//            this.o.setValue(d);
+//            return d;
+//        });
 //        out = actionTriState(O, (d) -> {
 //            switch (d) {
 //                case -1:
@@ -111,19 +137,18 @@ public class Line1DSimplest extends NAgent {
 //        });
 
 
-
     }
 
     @Override
     protected float act() {
         float dist = Math.abs(
-            i.floatValue() -
-            round(o.floatValue(), out.resolution.floatValue())
+                i.floatValue() -
+                        o.floatValue()
         );
 
         //dist = (float)(Math.sqrt(dist)); //more challenging
 
-        return (1f - dist)*2-1; //unipolar, 0..1.0
+        return (1f - dist) * 2 - 1; //unipolar, 0..1.0
 
 
 //        float r = (1f - dist/2f); //bipolar, normalized to -1..+1

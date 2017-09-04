@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.data.FloatParam;
 import nars.*;
+import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
 import nars.gui.Vis;
 import nars.video.BufferedImageBitmap2D;
@@ -27,10 +28,11 @@ public class Arkancide extends NAgentX {
 
     //final int afterlife = 60;
 
-    final float maxPaddleSpeed;
+    final float paddleSpeed;
 
 
     final Arkanoid noid;
+    private final GoalActionConcept left, right;
 
     private float prevScore;
 
@@ -95,7 +97,7 @@ public class Arkancide extends NAgentX {
         };
 
 
-        maxPaddleSpeed = 80 * noid.BALL_VELOCITY;
+        paddleSpeed = 80 * noid.BALL_VELOCITY;
 
         float resX = 0.1f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
         float resY = 0.1f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width
@@ -148,24 +150,39 @@ public class Arkancide extends NAgentX {
 //            return noid.paddle.moveTo(v, maxPaddleSpeed);
 //        });
         /*actionTriState*/
-        actionBipolar($.the("x"), (s) -> {
-//           switch (s) {
-//               case 0:
-//                   break;
-//               case -1:
-//               case 1:
-//                    if (s > 0 && Util.equals(noid.paddle.x, noid.getWidth(), 1f))
-//                        return 0f; //edge
-//                    if (s < 0 && Util.equals(noid.paddle.x, 0, 1f))
-//                        return 0f; //edge
-                   if (!noid.paddle.move( maxPaddleSpeed * s)) {
-                       return 0f; //against wall
-                   }
-//                    break;
-//           }
-                    return s;
+//        actionBipolar($.the("x"), (s) -> {
+////           switch (s) {
+////               case 0:
+////                   break;
+////               case -1:
+////               case 1:
+////                    if (s > 0 && Util.equals(noid.paddle.x, noid.getWidth(), 1f))
+////                        return 0f; //edge
+////                    if (s < 0 && Util.equals(noid.paddle.x, 0, 1f))
+////                        return 0f; //edge
+//                   if (!noid.paddle.move( maxPaddleSpeed * s)) {
+//                       return 0f; //against wall
+//                   }
+////                    break;
+////           }
+//                    return s;
+//
+//        });///.resolution(0.1f);
 
-        });///.resolution(0.1f);
+        left = actionUnipolar($.the("L"), d -> {
+            if (noid.paddle.move(-d * paddleSpeed)) {
+                return d;
+            } else {
+                return 0;
+            }
+        });
+        right = actionUnipolar($.the("R"), d -> {
+            if (noid.paddle.move(+d * paddleSpeed)) {
+                return d;
+            } else {
+                return 0;
+            }
+        });
 
         //nar.truthResolution.setValue(0.05f);
 

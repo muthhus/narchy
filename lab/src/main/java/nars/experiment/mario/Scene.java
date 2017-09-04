@@ -13,7 +13,7 @@ public abstract class Scene implements SoundListener
     public Audio sound;
     public static boolean[] keys = new boolean[16];
 
-    public void toggleKey(int key, boolean isPressed)
+    public void key(int key, boolean isPressed)
     {
         keys[key] = isPressed;
     }

@@ -118,8 +118,8 @@ public class NARio extends NAgentX {
                 default:
                     throw new RuntimeException();
             }
-            mario.scene.toggleKey(Mario.KEY_LEFT, n);
-            mario.scene.toggleKey(Mario.KEY_RIGHT, p);
+            mario.scene.key(Mario.KEY_LEFT, n);
+            mario.scene.key(Mario.KEY_RIGHT, p);
             return true;
         });
         actionTriState($("y"), i -> {
@@ -140,14 +140,14 @@ public class NARio extends NAgentX {
                 default:
                     throw new RuntimeException();
             }
-            mario.scene.toggleKey(Mario.KEY_DOWN, n);
-            mario.scene.toggleKey(Mario.KEY_UP, p);
-            mario.scene.toggleKey(Mario.KEY_JUMP, p);
+            mario.scene.key(Mario.KEY_DOWN, n);
+            //mario.scene.key(Mario.KEY_UP, p);
+            mario.scene.key(Mario.KEY_JUMP, p);
             return true;
         });
 
 
-        actionToggle($("speed"), (b) -> mario.scene.toggleKey(Mario.KEY_SPEED, b));
+        actionToggle($("speed"), (b) -> mario.scene.key(Mario.KEY_SPEED, b));
 
 
 //        frame.addKeyListener(mario);

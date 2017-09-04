@@ -10,6 +10,7 @@ import nars.NARS;
 import nars.Param;
 import nars.gui.Vis;
 import nars.task.DerivedTask;
+import nars.term.Term;
 import nars.test.agent.Line1DSimplest;
 import nars.truth.PreciseTruth;
 import spacegraph.layout.Grid;
@@ -17,6 +18,7 @@ import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meter.Plot2D;
 
 import java.util.List;
+import java.util.Set;
 
 import static java.lang.Math.PI;
 import static jcog.Texts.n2;
@@ -66,10 +68,11 @@ public class Line1DCalibrate {
 
             final int runtime = Math.round(periods / tHz);
 
+            Set<Term> actions = Set.of(a.up.term(), a.down.term());
             n.onTask(t -> {
                if (t instanceof DerivedTask) {
                    if (t.isGoal()) {
-                       if (t.term().equals(a.out.term())) {
+                       if (actions.contains(t.term())) {
 
                            float dir = new PreciseTruth(t.freq(), t.evi(a.nar.time(), a.nar.dur()), false).freq() - 0.5f;
 
@@ -94,7 +97,8 @@ public class Line1DCalibrate {
             a.speed.setValue(yResolution);
 
             a.happy.resolution.setValue(0.01f);
-            a.out.resolution.setValue(yResolution);
+            a.up.resolution.setValue(yResolution);
+            a.down.resolution.setValue(yResolution);
             a.in.resolution(yResolution);
             a.curiosity.setValue(
                     0.1f
