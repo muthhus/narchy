@@ -181,7 +181,7 @@ public abstract class Param extends Services<Term,NAR> {
         if (/* belief or goal */ tr!=null) {
 
             //prefer confidence
-            p *= Util.unitize(  (tr.conf()) / w2c(w2c(d.premiseEvi)) );
+            p *= Util.unitize(  (tr.conf()) / (w2c(d.premiseEvi)) );
 
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));

@@ -105,41 +105,45 @@ public class GoalActionConcept extends ActionConcept {
         //float curiPeriod = 2; //TODO vary this
         float cur = curiosity.floatValue();
         boolean curious = false;
+
+        Truth belief;
         if (nar.random().nextFloat() < cur) {
-            // curiosity override
-
+//            // curiosity override
+//
             float curiConf =
-                    //nar.confDefault(GOAL);
+//                    //nar.confDefault(GOAL);
                     Math.max(goal!=null ? nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR : 0, nar.confMin.floatValue());
-
-                    //nar.confMin.floatValue()*2f;
-
-//            float cc =
-//                    //curiConf;
-//                    curiConf - (goal != null ? goal.conf() : 0);
-//            if (cc > 0) {
-
+//
+//                    //nar.confMin.floatValue()*2f;
+//
+////            float cc =
+////                    //curiConf;
+////                    curiConf - (goal != null ? goal.conf() : 0);
+////            if (cc > 0) {
+//
             float f =
                     Util.round(nar.random().nextFloat(), resolution.floatValue());
-//                    ((float)Math.sin(
-//                        hashCode() /* for phase shift */
-//                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
-
+////                    ((float)Math.sin(
+////                        hashCode() /* for phase shift */
+////                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
+//
             goal = $.t(f, curiConf);
-            curious = true;
+//            curious = true;
+//
+////                Truth ct = $.t(f, cc);
+////                goal = ct; //curiosity overrides goal
+//
+////                if (goal == null) {
+////                    goal = ct;
+////                } else {
+////                    goal = Revision.revise(goal, ct);
+////                }
 
-//                Truth ct = $.t(f, cc);
-//                goal = ct; //curiosity overrides goal
 
-//                if (goal == null) {
-//                    goal = ct;
-//                } else {
-//                    goal = Revision.revise(goal, ct);
-//                }
-        }
+        } //else {
 
-
-        Truth belief = this.beliefs().truth(pStart, pEnd, nar);
+            belief = this.beliefs().truth(pStart, pEnd, nar);
+        //}
 
 //        //HACK try to improve this
 //        //if (goal == null) goal = belief; //use belief state, if exists (latch)
@@ -167,29 +171,27 @@ public class GoalActionConcept extends ActionConcept {
 //        if (fb != null) {
 //            SensorConcept.feedback(fb, beliefs(), now, nar);
 //        }
+//
+//        Task fg;
+//        boolean latchGoal = false; //experimental
+//        if (latchGoal) {
+//            if (goal!=null)
+//                fg = action.set(term, goal, stamper, now, dur, nar);
+//                        //+1 * nar.dur() /* next moment */);
+//            else
+//                fg = action.get(); //latch previous goal
+//        } else {
+//
+//            fg = action.set(term, goal, stamper, now, dur, nar);
+//                    //+1 * nar.dur() /* next moment */);
+//        }
+//        if (Param.DEBUG && curious) {
+//            fg.log("Curiosity");
+//        }
 
-        Task fg;
-        boolean latchGoal = false; //experimental
-        if (latchGoal) {
-            if (goal!=null)
-                fg = action.set(term, goal, stamper, now, dur, nar);
-                        //+1 * nar.dur() /* next moment */);
-            else
-                fg = action.get(); //latch previous goal
-        } else {
-
-            fg = action.set(term, goal, stamper, now, dur, nar);
-                    //+1 * nar.dur() /* next moment */);
-        }
-
-
-        if (Param.DEBUG && curious) {
-            fg.log("Curiosity");
-        }
-
-        return Stream.of(fb, curious ? fg : null).filter(Objects::nonNull);
+        //return Stream.of(fb, curious ? fg : null).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);
-        //return Stream.of(fb).filter(Objects::nonNull);
+        return Stream.of(fb).filter(Objects::nonNull);
 
     }
 

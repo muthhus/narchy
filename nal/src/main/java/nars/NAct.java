@@ -78,8 +78,8 @@ public interface NAct {
         }
 
         return $.t(freq,
-                d!=null ? d.conf() : nar().confMin.floatValue());
-                //nar().confDefault(BELIEF) /*d.conf()*/);
+                //d!=null ? d.conf() : nar().confMin.floatValue());
+                nar().confDefault(BELIEF) /*d.conf()*/);
     }
 
     /**
