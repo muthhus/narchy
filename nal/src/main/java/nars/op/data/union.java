@@ -7,8 +7,6 @@ import nars.term.Terms;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static nars.Op.Null;
-
 public class union extends Functor.BinaryFunctor {
 
     public union() {

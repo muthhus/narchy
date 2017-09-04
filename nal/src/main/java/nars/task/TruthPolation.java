@@ -4,16 +4,12 @@ import jcog.Util;
 import jcog.decide.DecideSoftmax;
 import nars.Task;
 import nars.truth.PreciseTruth;
-import nars.truth.Truth;
 import org.eclipse.collections.impl.list.mutable.primitive.FloatArrayList;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 
-import static jcog.Util.sqr;
 import static nars.truth.TruthFunctions.w2c;
 
 /**

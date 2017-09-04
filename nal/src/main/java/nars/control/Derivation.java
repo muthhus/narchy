@@ -7,7 +7,6 @@ import nars.derive.PrediTerm;
 import nars.derive.rule.PremiseRule;
 import nars.index.term.TermContext;
 import nars.op.substitute;
-import nars.task.ITask;
 import nars.term.Functor;
 import nars.term.Term;
 import nars.term.Termed;
@@ -16,13 +15,15 @@ import nars.term.atom.Bool;
 import nars.term.subst.Unify;
 import nars.truth.Stamp;
 import nars.truth.Truth;
-import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.api.map.ImmutableMap;
 import org.eclipse.collections.impl.factory.Maps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static nars.Op.Null;
 import static nars.op.substituteIfUnifies.substituteIfUnifiesAny;
@@ -123,6 +124,7 @@ public class Derivation extends Unify implements TermContext {
     public boolean single;
     public final Map<Task,Task> derivations = new LinkedHashMap();
     public DerivationTemporalize temporalize;
+    public int parentComplexity;
 
 //    private transient Term[][] currentMatch;
 
@@ -290,7 +292,7 @@ public class Derivation extends Unify implements TermContext {
 //            bt = bt.normalize(ttv); //shift variables up to be unique compared to taskTerm's
 //        }
         this.beliefTerm = bt;
-
+        this.parentComplexity = Math.max(tt.complexity(), bt.complexity());
 
         this.cyclic = task.cyclic(); //belief cyclic should not be considered because in single derivation its evidence will not be used any way
 
@@ -332,7 +334,7 @@ public class Derivation extends Unify implements TermContext {
 
         float premiseEvidence = task.isBeliefOrGoal() ? taskTruth.evi() : 0;
         if (beliefTruth != null)
-            premiseEvidence = (premiseEvidence + beliefTruth.evi());
+            premiseEvidence = Math.max(premiseEvidence, beliefTruth.evi());
         this.premiseEvi = premiseEvidence;
 
         this.premisePri = p.priElseZero();

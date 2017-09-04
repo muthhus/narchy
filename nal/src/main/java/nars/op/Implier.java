@@ -55,8 +55,8 @@ public class Implier extends DurService {
     private HashMap<Term, Task> belief = new HashMap();
 
 
-    final static TruthOperator ded = GoalFunction.get($.the("GoductionRecursivePB"));
-    final static TruthOperator ind = GoalFunction.get($.the("InductionRecursivePB"));
+    final static TruthOperator ded = GoalFunction.get($.the("DeciDeduction"));
+    final static TruthOperator ind = GoalFunction.get($.the("DeciInduction"));
     private long now;
     private long next;
     private float strength = 0.5f;

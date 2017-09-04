@@ -48,6 +48,8 @@ public class WebCam {
         // Open a webcam at a resolution close to 640x480
         webcam = Webcam.getDefault();
         webcam.setViewSize(new Dimension(w, h));
+
+
         if (!webcam.open(true))
             throw new RuntimeException("webcam not open");
 
@@ -83,6 +85,8 @@ public class WebCam {
                     width = (int) viewSize.getWidth();
                     height = (int) viewSize.getHeight();
 
+
+
                     BufferedImage nextImage = we.getImage();
                     if (nextImage != null) {
                         //if (iimage == null || iimage.width!=width || iimage.height!=height) {
@@ -94,6 +98,7 @@ public class WebCam {
                         //int[] output = we.getImage().getRGB(0, 0, width, height, null, 0, width * 3);
 
                         //webcam.getgetImageBytes(image);
+
 
                         WebCam.this.iimage = nextImage;
                         ///WebCam.this.image = iimage.data;

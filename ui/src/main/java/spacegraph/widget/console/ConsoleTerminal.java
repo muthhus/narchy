@@ -10,7 +10,6 @@ import com.googlecode.lanterna.terminal.virtual.DefaultVirtualTerminal;
 import com.googlecode.lanterna.terminal.virtual.VirtualTerminal;
 import com.jogamp.newt.event.KeyEvent;
 
-import java.io.IOException;
 import java.io.OutputStream;
 
 /**

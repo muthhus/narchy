@@ -1,20 +1,16 @@
 package nars.experiment;
 
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
 import jcog.Util;
 import jcog.math.FloatSupplier;
 import nars.$;
 import nars.NAR;
 import nars.NARS;
 import nars.Param;
-import nars.gui.Vis;
 import nars.task.DerivedTask;
 import nars.term.Term;
 import nars.test.agent.Line1DSimplest;
 import nars.truth.PreciseTruth;
 import spacegraph.layout.Grid;
-import spacegraph.widget.meta.ReflectionSurface;
 import spacegraph.widget.meter.Plot2D;
 
 import java.util.List;
@@ -23,11 +19,7 @@ import java.util.Set;
 import static java.lang.Math.PI;
 import static jcog.Texts.n2;
 import static jcog.Texts.n4;
-import static nars.Op.IMPL;
-import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.VERTICAL;
-import static spacegraph.layout.Grid.col;
-import static spacegraph.layout.Grid.row;
 
 public class Line1DCalibrate {
 

@@ -1,15 +1,11 @@
 package spacegraph.widget.console;
 
 import com.googlecode.lanterna.TextCharacter;
-import com.googlecode.lanterna.TextColor;
 import com.jogamp.opengl.GL2;
-import com.jogamp.opengl.util.gl2.GLUT;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
 import java.awt.*;
-
-import static spacegraph.render.JoglSpace.glut;
 
 /**
  * Created by me on 4/1/16.

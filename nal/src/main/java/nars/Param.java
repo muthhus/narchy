@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadLocalRandom;
 
 import static nars.Op.*;
 
@@ -173,7 +172,7 @@ public abstract class Param extends Services<Term,NAR> {
         //float p = 1f / (1f + ((float)t.complexity())/termVolumeMax.floatValue());
 
         int dCompl = t.complexity();
-        int pCompl = Math.max(d.taskTerm.complexity(), d.beliefTerm.complexity());
+        int pCompl = d.parentComplexity;
         float p =
                 ((float)pCompl) / (dCompl + pCompl); //1 - (proportion of its complexity / (its complexity + parent complexity) )
 
@@ -181,9 +180,7 @@ public abstract class Param extends Services<Term,NAR> {
         if (/* belief or goal */ tr!=null) {
 
             //prefer confidence
-            float cMin = confMin.floatValue();
-            float cDef = confDefault(punc);
-            p *= Util.unitize( (tr.conf()-cMin) / (cDef-cMin) );
+            p *= Util.unitize(  tr.evi() / d.premiseEvi );
 
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));

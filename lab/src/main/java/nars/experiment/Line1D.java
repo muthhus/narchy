@@ -46,7 +46,7 @@ public class Line1D {
 
             //new STMTemporalLinkage(n, 2, false);
             n.time.dur(5);
-            n.termVolumeMax.set(12);
+            n.termVolumeMax.set(24);
             //n.beliefConfidence(0.9f);
             //n.goalConfidence(0.5f);
             n.onCycle((nn) -> {

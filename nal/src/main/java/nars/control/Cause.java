@@ -1,6 +1,5 @@
 package nars.control;
 
-import com.google.common.primitives.Doubles;
 import com.google.common.util.concurrent.AtomicDouble;
 import jcog.Util;
 import jcog.list.FasterList;
@@ -8,7 +7,6 @@ import jcog.math.RecycledSummaryStatistics;
 import nars.Task;
 import org.apache.commons.lang3.ArrayUtils;
 import org.eclipse.collections.impl.list.mutable.primitive.ShortArrayList;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;

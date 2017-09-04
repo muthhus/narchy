@@ -1,21 +1,20 @@
 package jake2;
 
-import jake2.client.CL;
 import jake2.client.CL_input;
 import jake2.client.Key;
 import jake2.client.refexport_t;
-import jake2.game.Cmd;
 import jake2.game.PlayerView;
 import jake2.game.edict_t;
-import jake2.qcommon.Cbuf;
 import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
-import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
-import nars.video.*;
+import nars.video.CameraSensor;
+import nars.video.PixelBag;
+import nars.video.Scale;
+import nars.video.ShapeSensor;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -26,7 +25,6 @@ import java.util.function.Supplier;
 import static jake2.Globals.*;
 import static jake2.render.Base.vid;
 import static nars.$.*;
-import static nars.$.$;
 
 /**
  * Created by me on 9/22/16.

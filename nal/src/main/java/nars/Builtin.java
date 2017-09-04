@@ -17,7 +17,10 @@ import nars.term.var.Variable;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.SortedSet;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static nars.Op.*;

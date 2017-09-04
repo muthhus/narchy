@@ -3,7 +3,6 @@ package nars;
 import com.netflix.servo.monitor.BasicGauge;
 import com.netflix.servo.monitor.LongGauge;
 import jcog.Util;
-import jcog.pri.Pri;
 import nars.concept.Concept;
 import nars.control.Cause;
 import nars.task.ITask;

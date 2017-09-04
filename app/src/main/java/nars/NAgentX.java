@@ -1,10 +1,8 @@
 package nars;
 
-import com.google.common.collect.Iterables;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.pri.mix.control.MixContRL;
-import nars.concept.ActionConcept;
 import nars.control.Derivation;
 import nars.control.NARService;
 import nars.derive.Deriver;
@@ -13,7 +11,6 @@ import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
-import nars.op.Implier;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -37,14 +34,14 @@ import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
 
 import static nars.$.$;
 import static nars.Op.BELIEF;
-import static nars.Op.GOAL;
 import static spacegraph.SpaceGraph.window;
 import static spacegraph.layout.Grid.col;
 import static spacegraph.layout.Grid.grid;
@@ -170,7 +167,7 @@ abstract public class NAgentX extends NAgent {
         n.DEFAULT_GOAL_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUESTION_PRIORITY = 1f * priFactor;
         n.DEFAULT_QUEST_PRIORITY = 1f * priFactor;
-        n.termVolumeMax.setValue(24);
+        n.termVolumeMax.setValue(17);
 
         //n.dtDither.setValue(0.25f);
         //n.dtMergeOrChoose.setValue(true);
@@ -178,8 +175,8 @@ abstract public class NAgentX extends NAgent {
         STMLinkage stmLink = new STMLinkage(n, 1, false);
         MySTMClustered stmBelief = new MySTMClustered(n, 128, BELIEF, 3, true, 10f);
         //MySTMClustered stmBeliefAux = new MySTMClustered(n, 32, BELIEF, 4, true, 2f);
-        MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
-        Inperience inp = new Inperience(n, 16, 0.05f);
+        //MySTMClustered stmGoal = new MySTMClustered(n, 96, GOAL, 3, true, 4f);
+        Inperience inp = new Inperience(n, 16, 0.03f);
         //Abbreviation abb = new Abbreviation(n, "z", 4, 9, 0.1f, 32);
 
 
@@ -252,13 +249,6 @@ abstract public class NAgentX extends NAgent {
         NARLoop loop =
                 a.nar.startFPS(fps);
 
-//        this.loop = nar.exe.loop(fps, () -> {
-//            if (enabled.get()) {
-//                this.now = nar.time();
-//                senseAndMotor();
-//                predict();
-//            }
-//        });
 
 
 //        n.onCycle(nn -> {
@@ -289,7 +279,7 @@ abstract public class NAgentX extends NAgent {
 //                )
 //                .in(new FloatNormalized(
 //                        //TODO use a Long-specific impl of this:
-//                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.taskDerivations.getValue().longValue())
+//                        new FirstOrderDifferenceFloat(n::time, () -> n.emotion.taskDerived.getValue().longValue())
 //                ).decay(0.9f))
 //                .in(new FloatNormalized(
 //                        //TODO use a Long-specific impl of this:

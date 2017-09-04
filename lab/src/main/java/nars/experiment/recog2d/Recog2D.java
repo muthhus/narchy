@@ -12,7 +12,6 @@ import nars.Param;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
 import nars.gui.BeliefTableChart;
-import nars.term.Term;
 import nars.term.Termed;
 import nars.term.atom.Atomic;
 import nars.time.Tense;

@@ -1,7 +1,6 @@
 package jcog.bag;
 
 import jcog.Util;
-import jcog.bag.BagTest;
 import jcog.bag.impl.CurveBag;
 import jcog.bag.impl.PLinkArrayBag;
 import jcog.pri.PLink;
@@ -17,9 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.function.DoubleSupplier;
 
-import static jcog.bag.BagTest.fillLinear;
-import static jcog.bag.BagTest.samplingPriDist;
-import static jcog.bag.BagTest.testBasicInsertionRemoval;
+import static jcog.bag.BagTest.*;
 import static jcog.pri.op.PriMerge.plus;
 import static org.junit.Assert.*;
 

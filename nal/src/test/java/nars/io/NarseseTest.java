@@ -1,6 +1,9 @@
 package nars.io;
 
-import nars.*;
+import nars.$;
+import nars.NARS;
+import nars.Narsese;
+import nars.Task;
 import nars.task.util.InvalidTaskException;
 import nars.term.Compound;
 import nars.term.InvalidTermException;

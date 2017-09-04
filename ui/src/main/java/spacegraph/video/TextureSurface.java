@@ -1,34 +1,20 @@
 package spacegraph.video;
 
-import com.fasterxml.jackson.databind.util.ByteBufferBackedOutputStream;
-import com.google.common.primitives.Ints;
-import com.jogamp.nativewindow.util.PixelFormat;
-import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLProfile;
-import com.jogamp.opengl.util.GLPixelBuffer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
 import spacegraph.Surface;
 import spacegraph.render.Draw;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.jogamp.opengl.GL.GL_BGRA;
 import static com.jogamp.opengl.GL.GL_RGB;
-import static com.jogamp.opengl.GL.GL_RGBA;
-import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_8_8_8_8;
 import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV;
 import static java.lang.System.arraycopy;
 

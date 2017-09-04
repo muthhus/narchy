@@ -6,13 +6,17 @@
 
 package jcog.map;
 
-import java.lang.ref.*;
-import java.lang.reflect.*;
-import java.io.*;
-import java.util.*;
-import java.util.concurrent.*;
-import java.util.concurrent.locks.*;
 import sun.misc.Unsafe;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.SoftReference;
+import java.lang.ref.WeakReference;
+import java.util.*;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A {@link java.util.ConcurrentMap} supporting user-defined

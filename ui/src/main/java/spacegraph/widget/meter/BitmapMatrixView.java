@@ -11,7 +11,6 @@ import java.awt.image.WritableRaster;
 import java.util.function.Supplier;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
-import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
 
 /**

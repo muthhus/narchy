@@ -1,7 +1,6 @@
 package jcog.bag.impl;
 
 import com.conversantmedia.util.concurrent.DisruptorBlockingQueue;
-import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import jcog.util.QueueLock;

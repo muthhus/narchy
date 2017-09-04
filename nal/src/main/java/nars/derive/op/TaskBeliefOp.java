@@ -4,7 +4,6 @@ import nars.$;
 import nars.Op;
 import nars.control.Derivation;
 import nars.derive.AbstractPred;
-import nars.derive.PrediTerm;
 
 import static nars.Op.CONJ;
 import static nars.time.Tense.DTERNAL;

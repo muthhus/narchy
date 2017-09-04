@@ -18,11 +18,7 @@
 
 package jcog.data.graph;
 
-import org.eclipse.collections.api.collection.primitive.MutableIntCollection;
-import org.eclipse.collections.api.iterator.IntIterator;
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
-
-import java.util.Collection;
 
 /**
  * A general graph interface. It follows the following model:

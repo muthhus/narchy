@@ -20,10 +20,6 @@ package jcog.data.graph;
 
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-
 /**
  * This class is an adaptor making any Graph an undirected graph
  * by making its edges bidirectional. The graph to be made undirected

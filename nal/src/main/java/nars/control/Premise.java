@@ -8,7 +8,6 @@ import nars.NAR;
 import nars.Param;
 import nars.Task;
 import nars.concept.Concept;
-import nars.derive.PrediTerm;
 import nars.derive.time.Event;
 import nars.derive.time.Temporalize;
 import nars.index.term.TermIndex;
@@ -27,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-import java.util.Set;
 
 import static nars.Op.BELIEF;
 import static nars.time.Tense.ETERNAL;

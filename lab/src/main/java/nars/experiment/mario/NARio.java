@@ -5,7 +5,8 @@ import jcog.data.FloatParam;
 import nars.*;
 import nars.concept.SensorConcept;
 import nars.experiment.mario.sprites.Mario;
-import nars.video.*;
+import nars.video.CameraSensor;
+import nars.video.PixelBag;
 
 import javax.swing.*;
 

@@ -27,7 +27,6 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static nars.Op.ZeroProduct;
 import static nars.Op.concurrent;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;

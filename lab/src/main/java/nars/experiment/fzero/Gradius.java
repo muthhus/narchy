@@ -7,10 +7,7 @@ import nars.NAgentX;
 import nars.concept.ScalarConcepts;
 import nars.gui.Vis;
 import nars.term.atom.Atomic;
-import nars.video.BufferedImageBitmap2D;
 import nars.video.CameraSensor;
-import nars.video.Scale;
-import nars.video.ShapeSensor;
 import org.jetbrains.annotations.NotNull;
 
 import static nars.term.atom.Atomic.the;

@@ -20,7 +20,9 @@ package jcog.data.graph;
 
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.List;
 
 /**
  * This class implements a graph which uses a bitmatrix as inner representation

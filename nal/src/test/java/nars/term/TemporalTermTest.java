@@ -14,8 +14,6 @@ import java.util.TreeSet;
 
 import static junit.framework.TestCase.assertNotNull;
 import static nars.$.$;
-import static nars.Op.False;
-import static nars.Op.True;
 import static nars.term.container.TermContainer.theTermArray;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;

@@ -2,26 +2,24 @@ package jcog.bag;
 
 import jcog.Util;
 import jcog.bag.impl.ArrayBag;
-import jcog.bag.impl.CurveBag;
-import jcog.bag.impl.PLinkArrayBag;
 import jcog.bag.impl.hijack.DefaultHijackBag;
 import jcog.list.FasterList;
-import jcog.pri.*;
-import jcog.pri.op.PriMerge;
+import jcog.pri.PLink;
+import jcog.pri.PriReference;
+import jcog.pri.Prioritized;
 import jcog.random.XorShift128PlusRandom;
 import jcog.tensor.ArrayTensor;
 import jcog.tensor.Tensor;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.jetbrains.annotations.NotNull;
-import org.junit.Test;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.DoubleSupplier;
 
 import static jcog.Texts.n4;
-import static jcog.pri.op.PriMerge.plus;
 import static org.junit.Assert.*;
 import static org.junit.jupiter.api.Assertions.assertSame;
 

@@ -10,7 +10,6 @@ import nars.Param;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.Termed;
-import nars.term.subst.Unify;
 import org.eclipse.collections.api.list.primitive.ByteList;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.set.mutable.primitive.ByteHashSet;

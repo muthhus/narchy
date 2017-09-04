@@ -24,7 +24,6 @@ package jcog.data.graph;
 
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
-import java.util.ArrayList;
 import java.util.BitSet;
 
 /**

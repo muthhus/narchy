@@ -24,7 +24,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static nars.derive.rule.PremiseRuleSet.parse;
 import static org.junit.Assert.*;
 
 /**

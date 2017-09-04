@@ -31,7 +31,8 @@ import java.nio.file.Paths;
 import java.util.function.Function;
 
 import static nars.IO.TaskSerialization.TermFirst;
-import static nars.Op.*;
+import static nars.Op.ATOM;
+import static nars.Op.INH;
 import static nars.time.Tense.DTERNAL;
 import static nars.time.Tense.XTERNAL;
 

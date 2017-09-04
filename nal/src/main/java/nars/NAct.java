@@ -364,7 +364,10 @@ public interface NAct {
     default GoalActionConcept actionUnipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         final float[] lastValue = {0.5f};
         return action(s, (b, d) -> {
-            float o = (d != null) ? d.freq() : lastValue[0]; //0.5f /*Float.NaN*/;
+            float o = (d != null) ?
+                    d.freq()
+                    //d.expectation()
+                    : lastValue[0]; //0.5f /*Float.NaN*/;
             float f = update.valueOf(o);
             if (f != f)
                 f = lastValue[0];

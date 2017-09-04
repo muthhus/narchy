@@ -20,10 +20,6 @@ package jcog.data.graph;
 
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-
 /**
  * This class is an adaptor for representing special subgraphs of any graph.
  * It can represent the subgraphs spanned by the nodes 0,...,i where

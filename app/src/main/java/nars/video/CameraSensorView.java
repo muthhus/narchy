@@ -1,16 +1,13 @@
 package nars.video;
 
-import com.jogamp.opengl.GL2;
 import jcog.Util;
 import jcog.event.On;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.BaseConcept;
 import nars.truth.Truth;
-import spacegraph.Surface;
 import spacegraph.render.Draw;
 import spacegraph.widget.meter.BitmapMatrixView;
-import spacegraph.widget.meter.MatrixView;
 
 import java.util.function.Consumer;
 

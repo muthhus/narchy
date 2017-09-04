@@ -1,6 +1,5 @@
 package jcog.bag.impl;
 
-import jcog.pri.Prioritized;
 import jcog.pri.Priority;
 import jcog.pri.op.PriMerge;
 import org.jetbrains.annotations.NotNull;

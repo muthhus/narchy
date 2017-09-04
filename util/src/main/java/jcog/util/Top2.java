@@ -9,7 +9,6 @@ import java.util.AbstractCollection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  * @see TopKSelector (guava)

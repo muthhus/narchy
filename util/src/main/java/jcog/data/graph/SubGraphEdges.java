@@ -20,7 +20,7 @@ package jcog.data.graph;
 
 import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
-import java.util.*;
+import java.util.BitSet;
 
 /**
  * This class is an adaptor for representing subgraphs of any graph.

@@ -2,7 +2,6 @@ package nars.experiment.arkanoid;
 
 
 import com.google.common.collect.Lists;
-import jcog.Util;
 import jcog.data.FloatParam;
 import nars.*;
 import nars.concept.GoalActionConcept;
@@ -16,7 +15,7 @@ import spacegraph.SpaceGraph;
 
 public class Arkancide extends NAgentX {
 
-    static boolean numeric = false;
+    static boolean numeric = true;
     static boolean cam = true;
 
     public final FloatParam ballSpeed = new FloatParam(1f, 0.1f, 6f);
@@ -97,7 +96,7 @@ public class Arkancide extends NAgentX {
         };
 
 
-        paddleSpeed = 80 * noid.BALL_VELOCITY;
+        paddleSpeed = 160 * noid.BALL_VELOCITY;
 
         float resX = 0.1f; //Math.max(0.01f, 0.5f / visW); //dont need more resolution than 1/pixel_width
         float resY = 0.1f; //Math.max(0.01f, 0.5f / visH); //dont need more resolution than 1/pixel_width

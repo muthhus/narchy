@@ -12,6 +12,7 @@ import nars.video.Scale;
 import org.apache.commons.math3.util.MathUtils;
 import org.jetbrains.annotations.NotNull;
 
+import static nars.$.p;
 import static nars.term.atom.Atomic.the;
 import static spacegraph.SpaceGraph.window;
 
@@ -22,9 +23,12 @@ public class FZero extends NAgentX {
 
     private final FZeroGame fz;
 
+    float fwdSpeed = 1f;
+    float rotSpeed = 0.2f;
+
     public static void main(String[] args) {
 
-        float fps = 20f;
+        float fps = 15f;
 
         NAgentX.runRT((n) -> {
 
@@ -50,8 +54,8 @@ public class FZero extends NAgentX {
 
         this.fz = new FZeroGame();
 
-        CameraSensor<Scale> c = senseCamera((String)null, new Scale(() -> fz.image, 32, 24)/*.blur()*/);//.resolution(0.01f)
-                ;
+        CameraSensor<Scale> c = senseCamera((String) null, new Scale(() -> fz.image, 32, 24)/*.blur()*/);//.resolution(0.01f)
+        ;
 
 //        PixelBag cc = PixelBag.of(()->fz.image, 32, 24);
 //        cc.addActions($.the("fz"), this, false, false, true);
@@ -59,18 +63,23 @@ public class FZero extends NAgentX {
 //                .resolution(0.05f);
 
 
-        actionBipolar(the("fwd"), (f) -> {
-            if (f > 0) {
-                //accelerator
-                fz.vehicleMetrics[0][6] += (f) * 1.5f;
-            } else {
-                float brake = -f;
-                fz.vehicleMetrics[0][6] *= (1f - brake);
-            }
+        actionUnipolar(p("fwd"), (f) -> {
+            //if (f > 0) {
+            //accelerator
+            fz.vehicleMetrics[0][6] += (f) * fwdSpeed;
+//            } else {
+//                float brake = -f;
+//                fz.vehicleMetrics[0][6] *= (1f - brake);
+//            }
             return f;
         });//.resolution.setValue(0.02f);
-        actionBipolar(the("rot"), (r) -> {
-            fz.playerAngle += (r) * 0.12f;
+
+        actionUnipolar(p("left"), (r) -> {
+            fz.playerAngle -= (r) * rotSpeed;
+            return r;
+        });//.resolution.setValue(0.01f);
+        actionUnipolar(p("right"), (r) -> {
+            fz.playerAngle += (r) * rotSpeed;
             return r;
         });//.resolution.setValue(0.01f);
 
@@ -101,16 +110,16 @@ public class FZero extends NAgentX {
                 //DQN::new,
                 HaiQAgent::new,
                 //() -> Util.tanhFast(a.dexterity())) //reward function
-                () -> dexterity() * Util.tanhFast( reward) /* - lag */ ) //reward function
+                () -> dexterity() * Util.tanhFast(reward) /* - lag */) //reward function
 
                 .in(this::dexterity)
-                .in(new FloatNormalized(()->reward).decay(0.9f))
+                .in(new FloatNormalized(() -> reward).decay(0.9f))
                 .in(new FloatNormalized(
                         ((Emotivation) nar.emotion).cycleDTRealMean::getValue)
-                            .decay(0.9f)
+                        .decay(0.9f)
                 ).in(new FloatNormalized(
-                        () -> nar.emotion.busyVol.getSum()
-                    ).decay(0.9f)
+                                () -> nar.emotion.busyVol.getSum()
+                        ).decay(0.9f)
                 ).out(
                         new StepController((x) -> c.in.amplitude(x), 0, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f)
                 ).out(

@@ -2,7 +2,6 @@ package jcog.pri;
 
 
 import jcog.Texts;
-import jcog.Util;
 import org.fusesource.jansi.Ansi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

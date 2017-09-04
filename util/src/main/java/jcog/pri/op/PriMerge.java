@@ -7,7 +7,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 
 import static jcog.pri.op.PriMerge.PriMergeOp.*;
 
