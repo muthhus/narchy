@@ -1,8 +1,12 @@
 package spacegraph.video;
 
 import com.fasterxml.jackson.databind.util.ByteBufferBackedOutputStream;
+import com.google.common.primitives.Ints;
+import com.jogamp.nativewindow.util.PixelFormat;
+import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.util.GLPixelBuffer;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
@@ -11,37 +15,40 @@ import spacegraph.render.Draw;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferInt;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static com.jogamp.opengl.GL.GL_BGRA;
+import static com.jogamp.opengl.GL.GL_RGB;
+import static com.jogamp.opengl.GL.GL_RGBA;
+import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_8_8_8_8;
+import static com.jogamp.opengl.GL2GL3.GL_UNSIGNED_INT_8_8_8_8_REV;
+import static java.lang.System.arraycopy;
 
 public class TextureSurface extends Surface {
 
     Texture texture;
 
-    //TODO dynamically adapt this
-    final byte[] aa = new byte[2 * 1024 * 1024];
-    private final ByteBuffer bb;
-
     public boolean mipmap = false;
 
     //TODO use a PPM uncompressed format for transferring from CPU to GPU
-    String internalFormat =
-            //"tif";
-            "png";
-            //"png";
-            //"jpg";
 
 
     final AtomicBoolean textureUpdated = new AtomicBoolean(false);
     private GLProfile profile;
     private TextureData nextData;
+    private int[] array;
+    private IntBuffer buffer;
 
     public TextureSurface() {
-        bb = ByteBuffer.wrap(aa);
+
     }
 
 
@@ -75,20 +82,58 @@ public class TextureSurface extends Surface {
         if (profile == null)
             return;
 
-        bb.rewind();
-        OutputStream out = new ByteBufferBackedOutputStream(bb); //ByteArrayOutputStream(aa);
+        int pixels = iimage.getWidth() * iimage.getHeight();
 
-        try {
+        if (nextData == null) {
 
-            ImageIO.write(iimage, internalFormat, out);
-            out.close();
-
-            InputStream in = new ByteArrayInputStream(aa);
-            nextData = TextureIO.newTextureData(profile, in, mipmap, internalFormat);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            buffer = IntBuffer.allocate(pixels);
+            array = buffer.array();
+            nextData = new TextureData(profile, GL_RGB,
+                    iimage.getWidth(), iimage.getHeight(),
+                    0 /* border */,
+                    GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV,
+                    mipmap,
+                    false,
+                    false,
+                    buffer, (TextureData.Flusher)null
+            );
         }
+
+
+        if (array!=null) {
+            //TODO eliminate need for BufferedImage and move to subclass
+
+            int[] aa = ((DataBufferInt)(iimage.getRaster().getDataBuffer())).getData();
+            arraycopy(aa, 0, array, 0, aa.length);
+
+//            int i = 0;
+//            for (int j = 0; j < pixels; ) {
+//                byte r = aa[i++];
+//                byte g = aa[i++];
+//                byte b = aa[i++];
+//                byte a = aa[i++];
+//                array[j++] = Ints.fromBytes(r, g, b, a);
+//            }
+        }
+
+
+//        bb.rewind();
+//        OutputStream out = new ByteBufferBackedOutputStream(bb); //ByteArrayOutputStream(aa);
+//
+//        try {
+//
+//
+//            ImageIO.write(iimage, internalFormat, out);
+//            out.close();
+//
+//            InputStream in = new ByteArrayInputStream(aa);
+//            nextData = TextureIO.newTextureData(profile, in, mipmap, internalFormat);
+//
+//
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
 
         textureUpdated.set(true);
     }

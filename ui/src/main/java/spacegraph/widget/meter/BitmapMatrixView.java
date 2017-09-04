@@ -10,6 +10,7 @@ import java.awt.image.DataBufferInt;
 import java.awt.image.WritableRaster;
 import java.util.function.Supplier;
 
+import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 import static java.awt.image.BufferedImage.TYPE_INT_RGB;
 
 
@@ -170,7 +171,7 @@ public class BitmapMatrixView extends TextureSurface {
     /** must call this to re-generate texture so it will display */
     public void update() {
         if (buf == null) {
-            buf = new BufferedImage(w, h, TYPE_INT_RGB);
+            buf = new BufferedImage(w, h, TYPE_INT_ARGB);
             raster = buf.getRaster();
             this.rasInt = ((DataBufferInt)raster.getDataBuffer()).getData();
         }

@@ -540,13 +540,13 @@ public enum Draw {
         gl.glBegin(GL2.GL_QUADS);
 
         gl.glNormal3f(0, 0, 1);
-        gl.glTexCoord2f(0.0f, 0.0f);
-        gl.glVertex3f(x1, y1, z);
-        gl.glTexCoord2f(1.0f, 0.0f);
-        gl.glVertex3f(x1 + w, y1, z);
-        gl.glTexCoord2f(1.0f, 1.0f);
-        gl.glVertex3f(x1 + w, y1 + h, z);
         gl.glTexCoord2f(0.0f, 1.0f);
+        gl.glVertex3f(x1, y1, z);
+        gl.glTexCoord2f(1.0f, 1.0f);
+        gl.glVertex3f(x1 + w, y1, z);
+        gl.glTexCoord2f(1.0f, 0.0f);
+        gl.glVertex3f(x1 + w, y1 + h, z);
+        gl.glTexCoord2f(0.0f, 0.0f);
         gl.glVertex3f(x1, y1 + h, z);
         gl.glEnd();
 
