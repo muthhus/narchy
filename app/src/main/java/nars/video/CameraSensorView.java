@@ -69,10 +69,10 @@ public class CameraSensorView extends BitmapMatrixView implements BitmapMatrixVi
 //                float z = (f - 0.5f) * 2f;
 //                B -= z/2;
                 G = f;
-                B = 0;
+                B = bf*(1f-(f - 0.5f)*2f);
             } else {
                 R = f;
-                B = 0;
+                B = bf*(1f-(0.5f - f)*2f);
 //                float z = (0.5f - f) * 2f;
 //                B += z/2;
 //                G -= z/2;

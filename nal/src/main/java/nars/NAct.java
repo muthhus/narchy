@@ -44,7 +44,7 @@ public interface NAct {
     default GoalActionConcept actionToggle(@NotNull Term s, @NotNull Runnable on, @NotNull Runnable off) {
         GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
             boolean next = d != null && d.freq() > 0.5f;
-            return toggle(on, off, next);
+            return toggle(d, on, off, next);
         });
         //m.resolution(0.5f);
         return addAction(m);
@@ -67,7 +67,7 @@ public interface NAct {
 //    }
 
     @Nullable
-    default Truth toggle(@NotNull Runnable on, @NotNull Runnable off, boolean next) {
+    default Truth toggle(@Nullable Truth d, @NotNull Runnable on, @NotNull Runnable off, boolean next) {
         float freq;
         if (next) {
             freq = +1;
@@ -78,8 +78,8 @@ public interface NAct {
         }
 
         return $.t(freq,
-                //nar().confMin.floatValue());
-                nar().confDefault(BELIEF) /*d.conf()*/);
+                d!=null ? d.conf() : nar().confMin.floatValue());
+                //nar().confDefault(BELIEF) /*d.conf()*/);
     }
 
     /**
@@ -366,17 +366,26 @@ public interface NAct {
     @NotNull
     default GoalActionConcept actionUnipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         final float[] lastValue = {0.5f};
+        boolean latch = false;
         return action(s, (b, d) -> {
             float o = (d != null) ?
+                    //d.expectation()
                     d.freq()
-                    : lastValue[0]; //0.5f /*Float.NaN*/;
-            float f = update.valueOf(o);
+                    : (latch ? lastValue[0] : Float.NaN);
+
+            float f = update.valueOf(o == o ? o : 0);
             if (f != f)
                 f = lastValue[0];
             else
                 lastValue[0] = f;
+
             //return $.t(f, nar().confDefault(BELIEF));
-            return $.t(f, d!=null ? d.conf() : nar().confMin.floatValue());
+
+            if (f==f)
+                return $.t(f, d!=null ? d.conf() : nar().confMin.floatValue());
+            else
+                return null;
+
         });
     }
     /**

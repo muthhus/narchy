@@ -79,7 +79,7 @@ public class PoleCart extends NAgentX {
     // Define InputVariable1 x(t) {angular velocity}
     SensorConcept angVel;
     // OutputVariable {force to be applied}
-    GoalActionConcept move;
+
     // Define the RuleBlock
     double action;
 
@@ -128,12 +128,21 @@ public class PoleCart extends NAgentX {
                 new FloatPolarNormalized(()->(float)angleDot)
         ).resolution(0.1f);
 
-        this.move = actionBipolar($.p("move"), (a) -> {
+//        this.move = actionBipolar($.p("move"), (a) -> {
+//            if (!manualOverride)
+//                action = a;
+//            return a;
+//        });
+        actionUnipolar($.p("left"), (a) -> {
             if (!manualOverride)
-                action = a;
+                action = Util.clampBi((float) (action + a));
             return a;
         });
-
+        actionUnipolar($.p("right"), (a) -> {
+            if (!manualOverride)
+                action = Util.clampBi((float) (action - a));
+            return a;
+        });
 
         SpaceGraph.window(Vis.beliefCharts(100,
                 Lists.newArrayList(x, xVel,

@@ -22,6 +22,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.Executor;
 
 import static nars.Op.*;
+import static nars.truth.TruthFunctions.w2c;
 
 /**
  * NAR Parameters
@@ -180,7 +181,7 @@ public abstract class Param extends Services<Term,NAR> {
         if (/* belief or goal */ tr!=null) {
 
             //prefer confidence
-            p *= Util.unitize(  tr.evi() / d.premiseEvi );
+            p *= Util.unitize(  (tr.conf()) / w2c(w2c(d.premiseEvi)) );
 
             //prefer polarized
             //c *= (1f + p * (0.5f - Math.abs(t.freq()-0.5f)));
@@ -260,7 +261,7 @@ public abstract class Param extends Services<Term,NAR> {
      * Maximum length of the evidental base of the Stamp, a power of 2
      */
     public static final int STAMP_CAPACITY = 10;
-    public static final int CAUSE_CAPACITY = 20;
+    public static final int CAUSE_CAPACITY = 30;
 
     public final static int UnificationStackMax = 72; //how many assignments can be stored in the 'versioning' maps
 
