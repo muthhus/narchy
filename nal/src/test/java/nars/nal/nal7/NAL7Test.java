@@ -2,7 +2,6 @@ package nars.nal.nal7;
 
 import nars.$;
 import nars.Narsese;
-import nars.Op;
 import nars.Param;
 import nars.term.Term;
 import nars.test.TestNAR;
@@ -26,28 +25,38 @@ public class NAL7Test extends AbstractNALTest {
 
     public int cycles = 150;
 
-    @Test public void inductionDiffEventsAtom() {
+    @Test
+    public void inductionDiffEventsAtom() {
         testInduction("before", "after", 10);
     }
 
-    @Test public void inductionDiffEventsCompound() {
+    @Test
+    public void inductionDiffEventsCompound() {
         testInduction("x:before", "x:after", 10);
     }
 
-    @Test public void inductionDiffEventsNegPos() {
+    @Test
+    public void inductionDiffEventsNegPos() {
         testInduction("--x:before", "x:after", 10);
     }
 
-    @Test public void inductionSameEvents() {
+    @Test
+    public void inductionSameEvents() {
         testInduction("x", "x", 10);
     }
-    @Test public void inductionSameEventsNeg() {
+
+    @Test
+    public void inductionSameEventsNeg() {
         testInduction("--x", "--x", 10);
     }
-    @Test public void inductionSameEventsInvertPosNeg() {
+
+    @Test
+    public void inductionSameEventsInvertPosNeg() {
         testInduction("x", "--x", 10);
     }
-    @Test public void inductionSameEventsInvertNegPos() {
+
+    @Test
+    public void inductionSameEventsInvertNegPos() {
         testInduction("--x", "x", 10);
     }
 
@@ -105,29 +114,32 @@ public class NAL7Test extends AbstractNALTest {
     }
 
 
-    @Test public void testConjDecomposeWrongDirection() {
+    @Test
+    public void testConjDecomposeWrongDirection() {
         /*
         $.13 b. -4 %1.0;.81% {399: 1;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
             $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
          */
         test
-            .inputAt(1, "(a &&+5 b). :|:")
-            .inputAt(6, "(b &&+5 #1). :|:") //should not unify in the same direction
-            .mustBelieve(cycles, "(a &&+10 #1)", 1.00f, 0.73f, 1, 11)
-            .mustBelieve(cycles, "a", 1.00f, 0.81f, 1)
-            .mustBelieve(cycles, "b", 1.00f, 0.81f, 6)
-            .mustNotOutput(cycles, "b", BELIEF, -4)
+                .inputAt(1, "(a &&+5 b). :|:")
+                .inputAt(6, "(b &&+5 #1). :|:") //should not unify in the same direction
+                .mustBelieve(cycles, "(a &&+10 #1)", 1.00f, 0.73f, 1, 11)
+                .mustBelieve(cycles, "a", 1.00f, 0.81f, 1)
+                .mustBelieve(cycles, "b", 1.00f, 0.81f, 6)
+                .mustNotOutput(cycles, "b", BELIEF, -4)
         ;
     }
-    @Test public void testConjDecomposeWrongDirection2() {
+
+    @Test
+    public void testConjDecomposeWrongDirection2() {
         /*
         $.13 b. -4 %1.0;.81% {399: 1;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
             $.50 (a &&+5 b). 1⋈6 %1.0;.90% {1: 1}
          */
         test
-            .inputAt(1, "((a &&+5 b) ==>+5 #1). :|:")
-            .inputAt(1, "a. :|:")
-            .mustNotOutput(cycles, "(a &&+5 b)", BELIEF, (t) -> t < 0 /* any negative number occ */)
+                .inputAt(1, "((a &&+5 b) ==>+5 #1). :|:")
+                .inputAt(1, "a. :|:")
+                .mustNotOutput(cycles, "(a &&+5 b)", BELIEF, (t) -> t < 0 /* any negative number occ */)
         ;
     }
 
@@ -140,14 +152,15 @@ public class NAL7Test extends AbstractNALTest {
         */
 
         test
-            .inputAt(1, "((a &&+5 b) &&+5 c). :|:")
-            .mustBelieve(cycles, "(b &&+5 c)", 1.00f, 0.81f, 6, 11)
-            .mustNotOutput(cycles, "(b &&+5 c)", BELIEF, ETERNAL)
-            .mustNotOutput(cycles, "(b &&+5 c)", BELIEF, 16) //<- not caught here TODO fix this mustNotEmit stuff
+                .inputAt(1, "((a &&+5 b) &&+5 c). :|:")
+                .mustBelieve(cycles, "(b &&+5 c)", 1.00f, 0.81f, 6, 11)
+                .mustNotOutput(cycles, "(b &&+5 c)", BELIEF, ETERNAL)
+                .mustNotOutput(cycles, "(b &&+5 c)", BELIEF, 16) //<- not caught here TODO fix this mustNotEmit stuff
         ;
     }
 
-    @Test public void testDropAnyEventSimple() {
+    @Test
+    public void testDropAnyEventSimple() {
         /*
           instability:
             $0.0 (c). 7 %1.0;.73% {89: 2;3;;} ((%1,%1,task("&&")),(dropAnyEvent(%1),((StructuralDeduction-->Belief),(StructuralDeduction-->Goal))))
@@ -155,15 +168,16 @@ public class NAL7Test extends AbstractNALTest {
                   $.50 (b). 2 %1.0;.90% {2: 2}
                   $.50 (c). 5 %1.0;.90% {5: 3}
          */
-       test
-            .log()
-            .inputAt(1, "(a). :|:") //try to ignore this
-            .inputAt(2, "(b). :|:")
-            .inputAt(5, "(c). :|:")
-            .mustBelieve(cycles, "((b) &&+3 (c))", 1.00f, 0.81f, 2, 5)
-            .mustNotOutput(cycles, "(c)", BELIEF, 7)
+        test
+                .log()
+                .inputAt(1, "(a). :|:") //try to ignore this
+                .inputAt(2, "(b). :|:")
+                .inputAt(5, "(c). :|:")
+                .mustBelieve(cycles, "((b) &&+3 (c))", 1.00f, 0.81f, 2, 5)
+                .mustNotOutput(cycles, "(c)", BELIEF, 7)
         ;
     }
+
     @Test
     public void updating_and_revision() {
         testTemporalRevision(10, 0.50f, 0.7f, "<(John,key) --> hold>");
@@ -219,7 +233,8 @@ public class NAL7Test extends AbstractNALTest {
         ;
     }
 
-    @Test public void testDontStretchImplDerivation() throws Narsese.NarseseException {
+    @Test
+    public void testDontStretchImplDerivation() throws Narsese.NarseseException {
         /*
         WRONG
           $0.0 (((a,b) &&+4 (#1,d)) ==>+1 (b,#1)). 1⋈5 %1.0;.40% {31: 1;2;3} ((%1,%2,task("."),time(raw),time(dtEventsOrEternals),neqAndCom(%1,%2)),(varIntro((polarize(%2,belief) &&+- polarize(%1,task))),((IntersectionDepolarized-->Belief))))
@@ -227,14 +242,13 @@ public class NAL7Test extends AbstractNALTest {
               $.50 (c,d). 5 %1.0;.90% {5: 3}
         */
 
-
-            test
+        test
                 .log()
                 .inputAt(1, "((a,b) ==>+1 (b,c)). :|:")
                 .inputAt(5, "(c, d). :|:")
-                .mustBelieve(cycles,"(((a,b) ==>+1 (b,c)) &&+4 (c,d))", 1, 5)
-                .mustNotOutput(cycles, "(((a,b) &&+4 (#1,d)) ==>+1 (b,#1))", BELIEF, 1)
-            ;
+                .mustBelieve(cycles, "(((a,b) &&+4 (c,d)) ==>-3 (b,c))", 1f, 0.81f, 1)
+                .mustBelieve(cycles, "(((a,b) &&+4 ($1,d)) ==>-3 (b,$1))", 1f, 0.81f, 1)
+        ;
 
     }
 
@@ -413,7 +427,7 @@ public class NAL7Test extends AbstractNALTest {
                 .input("open(John,door). :|:")
                 .inputAt(4, "enter(John,room). :|:")
                 .mustBelieve(cycles, "( enter(John, room) ==>-4 open(John, door) )",
-                        1.00f, 0.45f,  4);
+                        1.00f, 0.45f, 4);
     }
 
     @Test
@@ -785,7 +799,6 @@ public class NAL7Test extends AbstractNALTest {
     }
 
 
-
     @Test
     public void testComparison2() {
 
@@ -1097,7 +1110,7 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(a ==>+2 (x &&+1 y))", 1.00f, 0.81f, 0) //correct conj sub-term DT
                 .mustNotOutput(cycles, "(a ==>+2 (y &&+1 x))", BELIEF, (t) -> t == 0 || t == ETERNAL)
                 .mustNotOutput(cycles, "(a ==>+2 (x && y))", BELIEF, (t) -> t == 0 || t == ETERNAL)
-                .mustNotOutput(cycles, "(a ==>+3 (x && y))", BELIEF,(t) -> t == 0 || t == ETERNAL);
+                .mustNotOutput(cycles, "(a ==>+3 (x && y))", BELIEF, (t) -> t == 0 || t == ETERNAL);
     }
 
     @Test
@@ -1367,7 +1380,7 @@ public class NAL7Test extends AbstractNALTest {
 
                 .mustBelieve(cycles, "(($1-->[heated]) ==>+20 ($1-->[hardened]))", 1f, 0.73f, ETERNAL)
                 .mustNotOutput(cycles, "(($1-->[heated]) ==>-20 ($1-->[hardened]))", BELIEF,
-                        (t -> t == ETERNAL || t == 10 || t == 20 || t ==  0));
+                        (t -> t == ETERNAL || t == 10 || t == 20 || t == 0));
         ;
     }
 
@@ -1441,19 +1454,5 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
-    @Test public void testConjDecomposeRightTime() {
-        /** should have been 1328:
-        $0.0 happy! 1253 %.34;.03% {1434: ÝÛÊã3ÄËëÇ;ÝÛÊã3ÄËíÒ;ÝÛÊã3ÄËïy;ÝÛÊã3ÄËð1} ((%1,%2,belief("&&"),task("!"),task(negative)),(subIfUnifiesAny(conjEvent(%2,early),conjEvent(%2,late),(--,%1)),((StrongN-->Goal))))
-            $.50 tetris(0,1)! 1421⋈1426 %.33;.07% {1421: ÝÛÊã3ÄËð1}
-            $.09 (happy &&+93 (--,tetris(0,1))).
-         */
-        test
-                .log()
-                .inputAt(5, "--tetris(0,1)! :|:")
-                .inputAt(10, "(happy &&+3 (--,tetris(0,1))). :|:")
-                .mustGoal(cycles, "happy", 1f, 0.81f, 2)
-        ;
-
-    }
 
 }
