@@ -67,9 +67,12 @@ public class Line1DSimplest extends NAgent {
                 //float next = Math.min(1, prev + d * sp);
 //                if (!Util.equals(prev, next, sp )) {
 
-                x[0] = d - 0.5f;
+                if (d > 0.5f)
+                    x[0] = d - 0.5f;
+                else
+                    x[0] = 0;
                     //this.o.setValue(next);
-                    return d;
+                return x[0];
 //                } else {
 //                    return 0f;
 //                }
@@ -83,8 +86,11 @@ public class Line1DSimplest extends NAgent {
                 //float next = Math.max(0, prev - d * sp);
                 //if (!Util.equals(prev, next, sp )) {
                     //this.o.setValue(next);
+                if (d > 0.5f)
                     x[1] = d - 0.5f;
-                    return d;
+                else
+                    x[1] = 0;
+                return x[1];
 //                } else {
 //                    return 0f;
 //                }

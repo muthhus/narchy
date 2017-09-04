@@ -67,8 +67,8 @@ public final class TruthFunctions {
         /*
 
         if (t == null) return null;
-        final float f = 1 - t.getFrequency();
-        final float c = t.getConfidence();
+        final float f = 1 - t.freq();
+        final float c = t.conf();
 
         if (t.isAnalytic())
             return AnalyticTruth.get(f, c, t); //experimental: for cases where analytic is inverted, to preserve analytic state
@@ -309,7 +309,43 @@ public final class TruthFunctions {
         return t(and(f1, f2), c);
     }
 
+    /**
+     * A function specially designed for desire value [To be refined]
+     * @param v1 Truth value of the first premise
+     * @param v2 Truth value of the second premise
+     * @return Truth value of the conclusion
+     */
+    public static final Truth desireDed(final Truth v1, final Truth v2, float confMin) {
+        final float f1 = v1.freq();
+        final float f2 = v2.freq();
+        final float c1 = v1.conf();
+        final float c2 = v2.conf();
+        final float f = and(f1, f2);
+        final float c = and(c1, c2);
+        if (c > confMin)
+            return new PreciseTruth(f, c);
+        else
+            return null;
+    }
 
+    /**
+     * A function specially designed for desire value [To be refined]
+     * @param v1 Truth value of the first premise
+     * @param v2 Truth value of the second premise
+     * @return Truth value of the conclusion
+     */
+    public static final Truth desireInd(final Truth v1, final Truth v2, float confMin) {
+        final float f1 = v1.freq();
+        final float f2 = v2.freq();
+        final float c1 = v1.conf();
+        final float c2 = v2.conf();
+        final float w = and(f2, c1, c2);
+        final float c = w2c(w);
+        if (c > confMin)
+            return new PreciseTruth(f1, c);
+        else
+            return null;
+    }
 
 
     /* ----- double argument functions, called in CompositionalRules ----- */

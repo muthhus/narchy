@@ -64,8 +64,8 @@ public class TemporalizeTest {
 
         Term ab = $("(a-->b)");
         RelativeEvent zab = t.relative(z, ab, 0);
-        assertEquals(-1, zx.compareTo(zab)); //prefer simpler referrents, always
-        assertEquals(-1, zy.compareTo(zab)); //prefer simpler referrents, always
+        assertEquals(1, zx.compareTo(zab)); //prefer simpler referrents, always
+        assertEquals(1, zy.compareTo(zab)); //prefer simpler referrents, always
 
         assertEquals(-1, zx.compareTo(zy));
         assertEquals(-zy.compareTo(zx), zx.compareTo(zy));
@@ -76,7 +76,7 @@ public class TemporalizeTest {
         l.add(zx);
         l.add(zy);
         l.sortThis();
-        assertEquals("[z@0->x, z@0->y, z@0->(a-->b)]", l.toString()); //y first since it is non-eternal
+        assertEquals("[z@0->(a-->b), z@0->x, z@0->y]", l.toString()); //y first since it is non-eternal
     }
 
     @Test
@@ -669,7 +669,7 @@ public class TemporalizeTest {
         Term P = $("(((a&|b) &&+- (b&|c)) ==>+- (c &&+- d))");
 
         Event s = t.solve(P);
-        assertEquals("(((a&|b) &&+5 (b&|c)) ==>+5 (c &&+5 d))@1", s.toString());
+        assertEquals("(((a &&+5 b) &&+5 c) ==>+5 d)@1", s.toString());
     }
     @Test
     public void testAnotherInstability234234892742() throws Narsese.NarseseException {

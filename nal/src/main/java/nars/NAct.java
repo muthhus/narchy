@@ -375,7 +375,8 @@ public interface NAct {
                 f = lastValue[0];
             else
                 lastValue[0] = f;
-            return $.t(f, nar().confDefault(BELIEF));
+            //return $.t(f, nar().confDefault(BELIEF));
+            return $.t(f, d!=null ? d.conf() : nar().confMin.floatValue());
         });
     }
     /**

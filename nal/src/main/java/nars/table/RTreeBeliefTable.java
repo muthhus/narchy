@@ -747,7 +747,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             return (1 / ((1 + awayFromNow)))
                     * (1 + (r.end - r.start) / awayFromNow) /* range, divided by the distance to emulate vanishing perspective proportion to distance */
-                    * (1 + (r.confMin + r.confMax)/2f); /* conf */
+                    * (/*1 +*/ (r.confMin + r.confMax)/2f); /* conf */
 
 
             //maximize confidence, minimize frequency variability, minimize distance to now

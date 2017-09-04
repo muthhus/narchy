@@ -23,7 +23,7 @@ import static nars.Op.GOAL;
 public class GoalActionConcept extends ActionConcept {
 
 
-    public static final float CURIOSITY_CONF_FACTOR = 0.5f;
+    public static final float CURIOSITY_CONF_FACTOR = 0.25f;
 
     public final Signal feedback;
     public final Signal action;
