@@ -1082,7 +1082,12 @@ public enum Op implements $ {
         int preInInner = conjInner.subtermTimeSafe(implication.sub(0));
         if (preInInner == DTERNAL)
             preInInner = 0; //HACK
-        return IMPL.the(implDT + preInInner - conjInner.dtRange(),
+        int d =
+                implDT != DTERNAL ?
+                        implDT + preInInner - conjInner.dtRange() :
+                        DTERNAL;
+
+        return IMPL.the(d,
                 conjInner, implPost);
 
     }

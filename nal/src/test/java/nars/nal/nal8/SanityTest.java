@@ -26,7 +26,7 @@ public class SanityTest {
             public boolean on;
 
             {
-                must = actionToggle($.the("mustBeOn"), (b) -> {
+                must = (GoalActionConcept) actionToggle($.the("mustBeOn"), (b) -> {
                     (b ? togglesPos : togglesNeg)[0]++;
                     on = b;
                 });

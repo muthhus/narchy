@@ -66,7 +66,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @Override
     public Bag[] newLinkBags(Term t) {
         int v = t.volume();
-        if (/*v > 5 && */v < 16) {
+        if (v > 3 && v < 16) {
             Map sharedMap = newBagMap(v);
             Random rng = nar.random();
             @NotNull Bag<Term, PriReference<Term>> termbag =
