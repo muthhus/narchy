@@ -27,7 +27,7 @@ import java.util.function.LongSupplier;
 public class SensorConcept extends WiredConcept implements FloatFunction<Term>, FloatSupplier {
 
     public final ScalarSignal sensor;
-    private FloatSupplier signal;
+    public FloatSupplier signal;
     protected float currentValue = Float.NaN;
 
     static final Logger logger = LoggerFactory.getLogger(SensorConcept.class);

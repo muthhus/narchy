@@ -3,20 +3,26 @@ package nars.experiment.arkanoid;
 
 import com.google.common.collect.Lists;
 import jcog.data.FloatParam;
+import jcog.learn.ql.HaiQAgent;
 import nars.*;
+import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
+import nars.experiment.NAgentY;
 import nars.gui.Vis;
+import nars.term.Term;
 import nars.video.BufferedImageBitmap2D;
 import nars.video.CameraSensor;
 import nars.video.Scale;
 import nars.video.SwingBitmap2D;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.SpaceGraph;
 
-public class Arkancide extends NAgentX {
+public class Arkancide extends NAgentY {
 
     static boolean numeric = true;
-    static boolean cam = true;
+    static boolean cam = false;
 
     public final FloatParam ballSpeed = new FloatParam(1f, 0.1f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
@@ -31,7 +37,7 @@ public class Arkancide extends NAgentX {
 
 
     final Arkanoid noid;
-    private final GoalActionConcept left, right;
+    private final ActionConcept left, right;
 
     private float prevScore;
 
@@ -81,10 +87,11 @@ public class Arkancide extends NAgentX {
     }
 
 
-    public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
-        super(nar);
 
-        //nar.derivedEvidenceGain.setValue(1f);
+    public Arkancide(NAR nar, boolean cam, boolean numeric) throws Narsese.NarseseException {
+        //super(nar);
+        super(nar, HaiQAgent::new);
+
 
 
         noid = new Arkanoid(true) {

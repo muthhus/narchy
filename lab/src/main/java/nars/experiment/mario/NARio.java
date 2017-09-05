@@ -2,8 +2,10 @@ package nars.experiment.mario;
 
 import jcog.Util;
 import jcog.data.FloatParam;
+import jcog.learn.ql.HaiQAgent;
 import nars.*;
 import nars.concept.SensorConcept;
+import nars.experiment.NAgentY;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
@@ -13,7 +15,7 @@ import javax.swing.*;
 import static nars.$.$;
 import static nars.$.p;
 
-public class NARio extends NAgentX {
+public class NARio extends NAgentY {
 
     private final MarioComponent mario;
 
@@ -21,7 +23,8 @@ public class NARio extends NAgentX {
     private final SensorConcept vx;
 
     public NARio(NAR nar) throws Narsese.NarseseException {
-        super( nar);
+        //super( nar);
+        super(nar, HaiQAgent::new);
 
         //Param.ANSWER_REPORTING = false;
         //Param.DEBUG = true;
@@ -103,11 +106,11 @@ public class NARio extends NAgentX {
         senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0).resolution(0.25f);
 
         actionToggle(p("left"), (n) -> {
-            if (n) mario.scene.key(Mario.KEY_RIGHT, false); //mutex
+            //if (n) mario.scene.key(Mario.KEY_RIGHT, false); //mutex
             mario.scene.key(Mario.KEY_LEFT, n);
         });
         actionToggle(p("right"), (n) -> {
-            if (n) mario.scene.key(Mario.KEY_LEFT, false); //mutex
+            //if (n) mario.scene.key(Mario.KEY_LEFT, false); //mutex
             mario.scene.key(Mario.KEY_RIGHT, n);
         });
         actionToggle(p("jmp"), (n) -> {

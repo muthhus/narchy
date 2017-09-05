@@ -2,8 +2,6 @@ package mcaixictw.worldmodels;
 
 import mcaixictw.BooleanArrayList;
 
-import java.util.List;
-
 /**
  * The agents model of the the environment. The goal of the agent is to maximize
  * its reward while it is interacting with an environment. In order to be

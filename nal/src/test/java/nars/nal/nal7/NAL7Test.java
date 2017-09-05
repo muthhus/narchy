@@ -251,7 +251,8 @@ public class NAL7Test extends AbstractNALTest {
 
     }
 
-    @Test public void justPlainWrongTiming() {
+    @Test
+    public void justPlainWrongTiming() {
         /*
         WRONG
         $0.0 ((a&|b) &&+5 (b&|c)). -9⋈-4 %1.0;.11% {397: 1;2;3} ((%1,(%2==>%3),time(urgent),neq(%1,%2),notImpl(%1)),(subIfUnifiesAny(%2,%3,%1),((AbductionRecursivePB-->Belief),(DeciInduction-->Goal))))
@@ -263,7 +264,7 @@ public class NAL7Test extends AbstractNALTest {
                 .inputAt(6, "(((a&|b) &&+5 (b&|c)) ==>+5 (c &&+5 d)). :|:")
                 .mustBelieve(cycles, "((a&|b) &&+5 (b&|c))", 1, 0.45f, 1, 6)
                 //.mustNotOutput(cycles, "((a&|b) &&+5 (b&|c))", BELIEF, (t) -> t!=1)
-                .mustNotOutput(cycles, "(c &&+5 d)", BELIEF, (t) -> t!=11)
+                .mustNotOutput(cycles, "(c &&+5 d)", BELIEF, (t) -> t != 11)
         ;
     }
 
@@ -503,6 +504,39 @@ public class NAL7Test extends AbstractNALTest {
                 1);
     }
 
+    @Test
+    public void induction_on_events_pos_neg() {
+
+        test
+                .inputAt(1, "a. :|:")
+                .inputAt(2, "--b. :|:")
+                .mustBelieve(cycles, "(a &&+1 --b)", 1.00f, 0.81f, 1, 2)
+                .mustBelieve(cycles, "(--b ==>-1 a)", 1.00f, 0.45f, 2)
+                .mustBelieve(cycles, "(a ==>+1 b)", 0.00f, 0.45f, 1)
+        ;
+    }
+
+    @Test
+    public void induction_on_events_neg_pos() {
+
+        test
+                .inputAt(1, "--a. :|:")
+                .inputAt(2, "b. :|:")
+                .mustBelieve(cycles, "(--a &&+1 b)", 1.00f, 0.81f, 1, 2)
+                .mustBelieve(cycles, "(--a ==>+1 b)", 1.00f, 0.45f, 1)
+                .mustBelieve(cycles, "(b ==>-1 a)", 0.00f, 0.45f, 2)
+        ;
+    }
+
+    @Test
+    public void induction_on_events_neg_neg() {
+
+        test
+                .inputAt(1, "--a. :|:")
+                .inputAt(2, "--b. :|:")
+                .mustBelieve(cycles, "(--a &&+1 --b)", 1.00f, 0.81f, 1, 2)
+        ;
+    }
 
     @Test
     public void induction_on_events_with_variable_introduction() {
@@ -800,7 +834,7 @@ public class NAL7Test extends AbstractNALTest {
         test
                 .inputAt(0, "(--, (x)). :|:")
                 .inputAt(4, "(x)? :|:")
-                .mustBelieve(cycles, "(x)", 0f, 0.64f /* some smaller conf since it is a prediction */, 4);
+                .mustBelieve(cycles, "(x)", 0f, 0.68f /* some smaller conf since it is a prediction */, 4);
     }
 
     @Test
@@ -890,7 +924,7 @@ public class NAL7Test extends AbstractNALTest {
     public void testDecomposeConjunctionEmbeddedInnerCommute() {
 
         test
-                .input("((&&,a,b,c) &&+1 z). :|:")
+                .input("((&|,a,b,c) &&+1 z). :|:")
                 .mustBelieve(cycles, "(a &&+1 z)", 1f, 0.81f, 0, 1)
                 .mustBelieve(cycles, "(b &&+1 z)", 1f, 0.81f, 0, 1)
                 .mustBelieve(cycles, "(c &&+1 z)", 1f, 0.81f, 0, 1);

@@ -1,6 +1,7 @@
 package jcog.learn.ql;
 
 import jcog.data.Range;
+import jcog.decide.DecideEpsilonGreedy;
 import jcog.decide.DecideSoftmax;
 import jcog.decide.Deciding;
 import jcog.learn.Agent;
@@ -86,7 +87,7 @@ public class HaiQ extends Agent {
         q = new float[inputs][actions];
         et = new float[inputs][actions];
 
-        setQ(0.5f, 0.5f, 0.5f); // 0.1 0.5 0.9
+        setQ(0.1f, 0.5f, 0.75f); // 0.1 0.5 0.9
         rng = new XorShift128PlusRandom();
 
         decideInput =
@@ -96,9 +97,10 @@ public class HaiQ extends Agent {
         decideState =
                 //DecideEpsilonGreedy.ArgMax;
                 new DecideSoftmax(0.25f, rng);
+
         decideAction =
-                //new DecideEpsilonGreedy(0.05f, rng);
-                new DecideSoftmax(0.25f, rng);
+                new DecideEpsilonGreedy(0.05f, rng);
+                //new DecideSoftmax(0.25f, rng);
     }
 
     int learn(int state, float reward) {

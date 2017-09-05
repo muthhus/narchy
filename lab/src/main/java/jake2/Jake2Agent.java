@@ -8,9 +8,11 @@ import jake2.game.edict_t;
 import jake2.render.Base;
 import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
+import jcog.learn.ql.HaiQAgent;
 import nars.NAR;
 import nars.NAgentX;
 import nars.Narsese;
+import nars.experiment.NAgentY;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
 import nars.video.Scale;
@@ -29,7 +31,7 @@ import static nars.$.*;
 /**
  * Created by me on 9/22/16.
  */
-public class Jake2Agent extends NAgentX implements Runnable {
+public class Jake2Agent extends NAgentY implements Runnable {
 
     ByteBuffer seen;
     int width, height;
@@ -102,25 +104,25 @@ public class Jake2Agent extends NAgentX implements Runnable {
     final PlayerData player = new PlayerData();
 
     public Jake2Agent(NAR nar) throws Narsese.NarseseException {
-        super("q", nar);
+        super("q", nar, HaiQAgent::new);
 
 
         CameraSensor<PixelBag> qcam =
                 senseCameraRetina("q", screenshotter, 32, 24);
         qcam.src.setMinZoomOut(0.5f);
         qcam.src.setMaxZoomOut(1f);
-        qcam.resolution(0.1f);
+        qcam.resolution(0.01f);
         qcam.src.vflip = true;
 
-        new ShapeSensor(p(id, the("shape")), new Scale(screenshotter, 128, 96) {
-            @Override
-            public float brightness(int xx, int yy, float rFactor, float gFactor, float bFactor) {
-                if (ph> 0)
-                    return super.brightness(xx, (ph - 1) - yy, rFactor, gFactor, bFactor);
-                else
-                    return Float.NaN;
-            }
-        },this);
+//        new ShapeSensor(p(id, the("shape")), new Scale(screenshotter, 128, 96) {
+//            @Override
+//            public float brightness(int xx, int yy, float rFactor, float gFactor, float bFactor) {
+//                if (ph> 0)
+//                    return super.brightness(xx, (ph - 1) - yy, rFactor, gFactor, bFactor);
+//                else
+//                    return Float.NaN;
+//            }
+//        },this);
 
 
 //        camAE = new PixelAutoClassifier("cra", qcam.src.pixels, 16, 16, 32, this);
@@ -128,28 +130,36 @@ public class Jake2Agent extends NAgentX implements Runnable {
 
         senseFields("q", player);
 
-        actionToggle($("q(fore)"), (x) -> CL_input.in_forward.state = x ? 1 : 0);
-        actionToggle($("q(back)"), (x) -> CL_input.in_back.state = x ? 1 : 0);
+        actionToggle($("q(move,fore)"), (x) -> CL_input.in_forward.state = x ? 1 : 0);
+        actionToggle($("q(move,back)"), (x) -> CL_input.in_back.state = x ? 1 : 0);
 
         //actionToggle($.$("(left)"), (x) -> CL_input.in_left.state = x ? 1 : 0);
         //actionToggle($.$("(right)"), (x) -> CL_input.in_right.state = x ? 1 : 0);
-        actionToggle($("q(moveleft)"), (x) -> CL_input.in_moveleft.state = x ? 1 : 0);
-        actionToggle($("q(moveright)"), (x) -> CL_input.in_moveright.state = x ? 1 : 0);
+        actionToggle($("q(move,left)"), (x) -> CL_input.in_moveleft.state = x ? 1 : 0);
+        actionToggle($("q(move,right)"), (x) -> CL_input.in_moveright.state = x ? 1 : 0);
         actionToggle($("q(jump)"), (x) -> CL_input.in_up.state = x ? 1 : 0);
-        actionBipolar($("q(lookyaw)"), (x) -> {
-            float yawSpeed = 20;
-            cl.viewangles[Defines.YAW] += yawSpeed * x;
-            //return CL_input.in_lookup.state = x ? 1 : 0;
-            return x;
-        });
-        actionBipolar($("q(lookpitch)"), (x) -> {
-            float pitchSpeed = 30; //absolute
-            cl.viewangles[Defines.PITCH] = pitchSpeed * x;
-            //return CL_input.in_lookup.state = x ? 1 : 0;
-            return x;
-        });
-        //actionToggle($.$("(lookdown)"), (x) -> CL_input.in_lookdown.state = x ? 1 : 0);
+
+
+        float yawSpeed = 20;
+        float pitchSpeed = 5;
+        actionToggle($("q(look,left)"), (x) ->
+                cl.viewangles[Defines.YAW] += yawSpeed );
+        actionToggle($("q(look,right)"), (x) ->
+                cl.viewangles[Defines.YAW] -= yawSpeed );
+        actionToggle($("q(look,up)"), (x) ->
+                cl.viewangles[Defines.PITCH] = Math.min(30, cl.viewangles[Defines.PITCH] + pitchSpeed) );
+        actionToggle($("q(look,down)"), (x) ->
+                cl.viewangles[Defines.PITCH] = Math.max(-30, cl.viewangles[Defines.PITCH] - pitchSpeed) );
+
         actionToggle($("q(attak)"), (x) -> CL_input.in_attack.state = x ? 1 : 0);
+
+//        actionBipolar($("q(lookpitch)"), (x) -> {
+//
+//            cl.viewangles[Defines.PITCH] = pitchSpeed * x;
+//            //return CL_input.in_lookup.state = x ? 1 : 0;
+//            return x;
+//        });
+        //actionToggle($.$("(lookdown)"), (x) -> CL_input.in_lookdown.state = x ? 1 : 0);
 
         new Thread(this).start();
     }

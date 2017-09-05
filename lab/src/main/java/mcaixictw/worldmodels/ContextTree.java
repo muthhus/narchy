@@ -1,13 +1,9 @@
 package mcaixictw.worldmodels;
 
-import mcaixictw.Bits;
-import mcaixictw.Util;
 import mcaixictw.BooleanArrayList;
-import org.eclipse.collections.impl.stack.mutable.primitive.BooleanArrayStack;
+import mcaixictw.Util;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Stack;
 
 /**

@@ -2,10 +2,7 @@ package mcaixictw;
 
 import mcaixictw.worldmodels.WorldModelSettings;
 import mcaixictw.worldmodels.Worldmodel;
-import mcaixictw.BooleanArrayList;
 import org.junit.*;
-
-import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;

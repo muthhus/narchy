@@ -1,10 +1,12 @@
 package nars.experiment.fzero;
 
 import java4k.gradius4k.Gradius4K;
+import jcog.learn.ql.HaiQAgent;
 import nars.$;
 import nars.NAR;
 import nars.NAgentX;
 import nars.concept.ScalarConcepts;
+import nars.experiment.NAgentY;
 import nars.gui.Vis;
 import nars.term.atom.Atomic;
 import nars.video.CameraSensor;
@@ -17,12 +19,12 @@ import static spacegraph.layout.Grid.col;
 /**
  * Created by me on 4/30/17.
  */
-public class Gradius extends NAgentX {
+public class Gradius extends NAgentY {
 
     private final Gradius4K g;
 
     public Gradius(NAR nar) {
-        super("G", nar);
+        super("G", nar, HaiQAgent::new);
 
         this.g = new Gradius4K();
 
@@ -91,36 +93,44 @@ public class Gradius extends NAgentX {
 //            ).resolution(0.05f);
 //        }
 
-        /*nar.believe($.inh(*/$.sete(
+        /*nar.believe($.inh(*///$.sete(
 
-        actionToggle($.p(Atomic.the("fire")),
-                (b) -> g.keys[Gradius4K.VK_SHOOT] = b).term(),
+        actionToggle($.p("fire"),
+                (b) -> g.keys[Gradius4K.VK_SHOOT] = b).term();
+        actionToggle($.p("up"),
+                (b) -> g.keys[Gradius4K.VK_UP] = b).term();
+        actionToggle($.p("down"),
+                (b) -> g.keys[Gradius4K.VK_DOWN] = b).term();
+        actionToggle($.p("left"),
+                (b) -> g.keys[Gradius4K.VK_LEFT] = b).term();
+        actionToggle($.p("right"),
+                (b) -> g.keys[Gradius4K.VK_RIGHT] = b).term();
 
-        actionTriState($.p(Atomic.the("dx")), (dh) -> {
-            g.keys[Gradius4K.VK_LEFT] = false;
-            g.keys[Gradius4K.VK_RIGHT] = false;
-            switch (dh) {
-                case +1:
-                    g.keys[Gradius4K.VK_RIGHT] = true;
-                    break;
-                case -1:
-                    g.keys[Gradius4K.VK_LEFT] = true;
-                    break;
-            }
-        }).term(),
-
-        actionTriState($.p(Atomic.the("dy")), (dh) -> {
-            g.keys[Gradius4K.VK_UP] = false;
-            g.keys[Gradius4K.VK_DOWN] = false;
-            switch (dh) {
-                case +1:
-                    g.keys[Gradius4K.VK_DOWN] = true;
-                    break;
-                case -1:
-                    g.keys[Gradius4K.VK_UP] = true;
-                    break;
-            }
-        }).term())/*, id))*/;
+//        actionTriState($.p(Atomic.the("dx")), (dh) -> {
+//            g.keys[Gradius4K.VK_LEFT] = false;
+//            g.keys[Gradius4K.VK_RIGHT] = false;
+//            switch (dh) {
+//                case +1:
+//                    g.keys[Gradius4K.VK_RIGHT] = true;
+//                    break;
+//                case -1:
+//                    g.keys[Gradius4K.VK_LEFT] = true;
+//                    break;
+//            }
+//        }).term(),
+//
+//        actionTriState($.p(Atomic.the("dy")), (dh) -> {
+//            g.keys[Gradius4K.VK_UP] = false;
+//            g.keys[Gradius4K.VK_DOWN] = false;
+//            switch (dh) {
+//                case +1:
+//                    g.keys[Gradius4K.VK_DOWN] = true;
+//                    break;
+//                case -1:
+//                    g.keys[Gradius4K.VK_UP] = true;
+//                    break;
+//            }
+//        }).term())/*, id))*/;
 
 
     }

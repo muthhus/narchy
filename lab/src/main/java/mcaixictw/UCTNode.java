@@ -3,8 +3,6 @@ package mcaixictw;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
-import java.util.Map.Entry;
-
 /**
  * one node of the upper confidence bound applied to trees algorithm.
  */

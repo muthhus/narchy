@@ -30,7 +30,7 @@ public class HaiQAgent extends HaiQ {
 
 
     public HaiQAgent(int inputs, int outputs) {
-        this(inputs, (i,o)->(int) Math.ceil(/*Math.sqrt*/(1 + (i)*(o))), outputs);
+        this(inputs, (i,o)->(int) Math.ceil(Math.sqrt(1 + (i)*(o))), outputs);
     }
 
     public HaiQAgent(int inputs, BiFunction<Integer,Integer,Integer> states, int outputs) {
@@ -43,7 +43,7 @@ public class HaiQAgent extends HaiQ {
         //logger.info("start {} -> {} -> {}", inputs, states, outputs);
         this.perceptionAlpha =
                 //1f/(inputs);
-                0.1f;
+                0.05f;
         this.perceptionError = FloatAveragedAsync.averaged(()->lastPerceptionError, inputs/2);
         this.ae = perception(inputs, states);
     }

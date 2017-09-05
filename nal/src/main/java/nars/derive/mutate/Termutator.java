@@ -3,7 +3,6 @@ package nars.derive.mutate;
 import nars.$;
 import nars.term.ProxyTerm;
 import nars.term.Term;
-import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 
 /**

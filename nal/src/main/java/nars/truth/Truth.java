@@ -226,8 +226,8 @@ public interface Truth extends Truthed {
     }
 
 
-    @Nullable default PreciseTruth ditherFreqConf(float resolution, float confMin, float eviGain) {
-        float c0 = eviGain != 1 ? w2c(evi() * eviGain) : conf();
+    @Nullable default PreciseTruth ditherFreqConf(float resolution, float confMin, float confGain) {
+        float c0 = confGain != 1 ? w2c(evi()) * confGain : conf();
         if (c0 < confMin)
             return null;
         float c = conf(c0, resolution); //dither confidence

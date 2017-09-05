@@ -23,7 +23,7 @@ import static nars.Op.GOAL;
 public class GoalActionConcept extends ActionConcept {
 
 
-    public static final float CURIOSITY_CONF_FACTOR = 0.5f;
+    public static final float CURIOSITY_CONF_FACTOR = 0.25f;
 
     public final Signal feedback;
     public final Signal action;
@@ -98,23 +98,26 @@ public class GoalActionConcept extends ActionConcept {
     @Override public Stream<Task> update(long now, int dur, NAR nar) {
 
 
-        long pStart = now - dur / 2;
-        long pEnd = now + dur / 2;
+        long pStart = now;
+        long pEnd = now + dur;
+        LongSupplier stamper = nar.time::nextStamp;
+
         Truth goal = this.goals().truth(pStart, pEnd, nar);
 
         //float curiPeriod = 2; //TODO vary this
         float cur = curiosity.floatValue();
-        boolean curious = false;
 
         Truth belief;
+        Task fg;
         if (nar.random().nextFloat() < cur) {
 //            // curiosity override
 //
             float curiConf =
 //                    //nar.confDefault(GOAL);
-                    Math.max(goal!=null ? nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR : 0, nar.confMin.floatValue());
-//
-//                    //nar.confMin.floatValue()*2f;
+                    //nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR;
+                    Math.max(goal!=null ? goal.conf() : 0,
+                            nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR);
+                            //nar.confMin.floatValue()*2);
 //
 ////            float cc =
 ////                    //curiConf;
@@ -128,6 +131,7 @@ public class GoalActionConcept extends ActionConcept {
 ////                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
 //
             goal = $.t(f, curiConf);
+            fg = action.set(term, goal, stamper, now, dur, nar);
 //            curious = true;
 //
 ////                Truth ct = $.t(f, cc);
@@ -140,10 +144,13 @@ public class GoalActionConcept extends ActionConcept {
 ////                }
 
 
-        } //else {
+        } else {
+            fg = null;
+            action.set(term(), null, stamper, now, dur, nar);
+        }
 
-            belief = this.beliefs().truth(pStart, pEnd, nar);
-        //}
+        belief = this.beliefs().truth(pStart, pEnd, nar);
+
 
 //        //HACK try to improve this
 //        //if (goal == null) goal = belief; //use belief state, if exists (latch)
@@ -165,7 +172,6 @@ public class GoalActionConcept extends ActionConcept {
         //3. check previous signal belief
         //beliefFeedback != null ? beliefFeedback : belief; //latch
 
-        LongSupplier stamper = nar.time::nextStamp;
 
         Task fb = feedback.set(term, beliefFeedback, stamper, now, dur, nar);
 //        if (fb != null) {
@@ -189,9 +195,9 @@ public class GoalActionConcept extends ActionConcept {
 //            fg.log("Curiosity");
 //        }
 
-        //return Stream.of(fb, curious ? fg : null).filter(Objects::nonNull);
+        return Stream.of(fb, fg!=null ? fg : null).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);
-        return Stream.of(fb).filter(Objects::nonNull);
+        //return Stream.of(fb).filter(Objects::nonNull);
 
     }
 

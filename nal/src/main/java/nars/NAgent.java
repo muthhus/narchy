@@ -393,7 +393,7 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         this.now = nar.time();
 
-        float r = reward = act();
+        float r = reward = doAct();
         if (r == r) {
             rewardSum += r;
         }
@@ -438,6 +438,10 @@ abstract public class NAgent extends DurService implements NSense, NAct {
 
         if (trace)
             logger.info(summary());
+    }
+
+    protected float doAct() {
+        return act();
     }
 
 //    /**

@@ -18,7 +18,7 @@ import java.util.Random;
 
 public class MarioComponent extends JComponent implements Runnable, KeyListener, FocusListener
 {
-    int fps = 16;
+    int fps = 32;
 
     public void startGame()
     {

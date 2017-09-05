@@ -1,7 +1,5 @@
 package mcaixictw;
 
-import mcaixictw.BooleanArrayList;
-
 import java.util.ArrayList;
 
 /**

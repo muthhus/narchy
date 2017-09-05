@@ -10,6 +10,7 @@ import nars.*;
 import nars.concept.GoalActionConcept;
 import nars.gui.Vis;
 import nars.test.agent.Line1DSimplest;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import spacegraph.layout.Grid;
@@ -18,6 +19,7 @@ import spacegraph.widget.meter.Plot2D;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Math.PI;
 import static spacegraph.SpaceGraph.window;
@@ -45,9 +47,10 @@ public class Line1D {
             NAR n = NARS.threadSafe();
 
             //new STMTemporalLinkage(n, 2, false);
-            n.time.dur(10);
-            n.termVolumeMax.set(9);
-            n.log();
+            //n.time.dur(10);
+            n.termVolumeMax.set(12);
+            n.time.dur(1);
+            //n.log();
             //n.beliefConfidence(0.9f);
             //n.goalConfidence(0.5f);
 //            n.onCycle((nn) -> {
@@ -55,9 +58,10 @@ public class Line1D {
 //            });
             //n.setEmotion(new Emotivation(n));
 
-            new Line1DExperiment() {
+            Line1DExperiment exp = new Line1DExperiment() {
                 @Override
                 protected void onStart(Line1DSimplest a) {
+
                     new Thread(() -> {
                         //NAgentX.chart(a);
                         int history = 800;
@@ -84,7 +88,11 @@ public class Line1D {
                     }).start();
 
                 }
-            }.floatValueOf(n);
+            };
+            exp.floatValueOf(n);
+
+
+            exp.agent.durations.setValue(16f);
 
             n.start();
 
@@ -114,36 +122,47 @@ public class Line1D {
     }
 
     static class Line1DExperiment implements FloatFunction<NAR> {
-        float tHz = 0.01f; //in time units
-        float yResolution = 0.1f; //in 0..1.0
+
+
+        float tHz = 0.001f; //in time units
+        float yResolution = 0.05f; //in 0..1.0
         float periods = 16;
 
         final int runtime = Math.round(periods / tHz);
+        public Line1DSimplest agent;
 
         @Override
         public float floatValueOf(NAR n) {
 
             //n.truthResolution.setValue(0.05f);
 
-            Line1DSimplest a = new Line1DSimplest(n) {
+
+            AtomicBoolean AUTO = new AtomicBoolean(true);
+            agent = new Line1DSimplest(n) {
+                public final AtomicBoolean auto = AUTO;
 
 //                final FloatAveraged rewardAveraged = new FloatAveraged(()->super.act(), 10);
 
+
+                @Override
+                protected float act() {
+                    return (float) Math.pow(super.act(), 3);
+                }
             };
 
 
-            onStart(a);
+            onStart(agent);
 
 
-            a.speed.setValue(yResolution);
+            agent.speed.setValue(yResolution);
 
-            a.happy.resolution.setValue(0.01f);
+            agent.happy.resolution.setValue(0.01f);
 
-            a.in.resolution(yResolution);
-            for (GoalActionConcept g : new GoalActionConcept[] { a.up, a.down })
+            agent.in.resolution(yResolution);
+            for (GoalActionConcept g : new GoalActionConcept[]{agent.up, agent.down})
                 g.resolution(yResolution);
 
-            a.curiosity.setValue(
+            agent.curiosity.setValue(
                     0.05f
                     //(2/yResolution)*tHz);
             );
@@ -159,23 +178,24 @@ public class Line1D {
             //ImplicationBooster.implAccelerator(a);
 
 
-            a.onFrame((z) -> {
+            agent.onFrame((z) -> {
 
-                a.target(
-                        //Math.signum(Math.sin(a.nar.time() * tHz * 2 * PI) ) > 0 ? 1f : -1f
-                        Util.round((float) (0.5f + 0.5f * Math.sin(a.nar.time() * tHz * 2 * PI / a.nar.dur()) ), yResolution)
-                        //(float) ( Math.sin(a.nar.time() * tHz * 2 * PI) )
-                        //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
-                        //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
-                );
+                if (AUTO.get()) {
+                    agent.target(
+                            //Math.signum(Math.sin(a.nar.time() * tHz * 2 * PI) ) > 0 ? 1f : -1f
+                            Util.round((float) (0.5f + 0.5f * Math.sin(agent.nar.time() * tHz * 2 * PI / agent.nar.dur())), yResolution)
+                            //(float) ( Math.sin(a.nar.time() * tHz * 2 * PI) )
+                            //Util.sqr((float) (0.5f * (Math.sin(n.time()/90f) + 1f)))
+                            //(0.5f * (Math.sin(n.time()/90f) + 1f)) > 0.5f ? 1f : 0f
+                    );
+                }
 
                 //Util.pause(1);
             });
 
-
 //            a.runCycles(runtime);
 
-            return a.rewardSum / runtime;
+            return agent.rewardSum / runtime;
 
         }
 
@@ -199,8 +219,8 @@ public class Line1D {
                 NAR n = new NARS().get();
                 n.random().setSeed(System.nanoTime());
 
-                n.time.dur(1);
-                n.termVolumeMax.set(32);
+                n.time.dur(5);
+                n.termVolumeMax.set(12);
 
                 return n;
             })/*.tweak("beliefConf", 0.1f, 0.9f, 0.1f, (y, x) -> {

@@ -3,7 +3,6 @@ package mcaixictw;
 import mcaixictw.worldmodels.ContextTree;
 import mcaixictw.worldmodels.WorldModelSettings;
 import mcaixictw.worldmodels.Worldmodel;
-import mcaixictw.BooleanArrayList;
 import org.junit.*;
 
 import static org.junit.Assert.assertTrue;

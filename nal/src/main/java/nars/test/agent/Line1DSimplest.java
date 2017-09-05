@@ -2,14 +2,15 @@ package nars.test.agent;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.math.FloatNormalized;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
 import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
-import nars.term.Term;
 import org.jetbrains.annotations.NotNull;
+
+import static nars.time.Tense.ETERNAL;
+import static nars.time.Tense.Eternal;
 
 
 /**
@@ -67,12 +68,12 @@ public class Line1DSimplest extends NAgent {
                 //float next = Math.min(1, prev + d * sp);
 //                if (!Util.equals(prev, next, sp )) {
 
-                if (d > 0.5f)
-                    x[0] = d - 0.5f;
-                else
-                    x[0] = 0;
+//                if (d > 0.5f)
+//                    x[0] = d - 0.5f;
+//                else
+//                    x[0] = 0;
                     //this.o.setValue(next);
-                return x[0];
+                return x[0] = d;
 //                } else {
 //                    return 0f;
 //                }
@@ -86,16 +87,18 @@ public class Line1DSimplest extends NAgent {
                 //float next = Math.max(0, prev - d * sp);
                 //if (!Util.equals(prev, next, sp )) {
                     //this.o.setValue(next);
-                if (d > 0.5f)
-                    x[1] = d - 0.5f;
-                else
-                    x[1] = 0;
-                return x[1];
+//                if (d > 0.5f)
+//                    x[1] = d - 0.5f;
+//                else
+//                    x[1] = 0;
+                return x[1] = d;
 //                } else {
 //                    return 0f;
 //                }
             }
         });
+        n.goal(up.term(), Eternal, 0f, 0.01f);
+        n.goal(down.term(), Eternal, 0f, 0.01f);
 
 //        out = actionUnipolar(O, (d) -> {
 //            this.o.setValue(d);

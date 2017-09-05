@@ -24,7 +24,6 @@ import nars.term.Termed;
 import nars.term.atom.Int;
 import nars.term.container.TermContainer;
 import nars.term.var.Variable;
-import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

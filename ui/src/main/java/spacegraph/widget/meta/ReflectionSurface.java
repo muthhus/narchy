@@ -53,6 +53,7 @@ public class ReflectionSurface<X> extends Grid {
 
             try {
                 //Class c = f.getType();
+                f.trySetAccessible();
                 Object y = f.get(x);
 
                 if (y instanceof Surface) {

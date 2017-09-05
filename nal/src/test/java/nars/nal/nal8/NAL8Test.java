@@ -20,7 +20,6 @@ public class NAL8Test extends AbstractNALTest {
     public static final int cycles = 130;
 
 
-
     @Test
     public void subsent_1_even_simpler_simplerBeliefTemporal() {
 
@@ -41,29 +40,11 @@ public class NAL8Test extends AbstractNALTest {
 
                 .input("(open(t1) &&+5 opened(t1))! :|:")
                 .mustGoal(cycles, "open(t1)", 1.0f, 0.81f, 0) //only temporal
-                .mustNotOutput(cycles, "open(t1)", GOAL, t->t==ETERNAL || t == 5) //no eternal
+                .mustNotOutput(cycles, "open(t1)", GOAL, t -> t == ETERNAL || t == 5) //no eternal
                 .mustGoal(cycles, "opened(t1)", 1.0f, 0.81f, 5) //only temporal
-                .mustNotOutput(cycles, "opened(t1)", GOAL,  t->t==ETERNAL || t == 0) //no eternal
+                .mustNotOutput(cycles, "opened(t1)", GOAL, t -> t == ETERNAL || t == 0) //no eternal
         ;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     @Test
@@ -81,7 +62,6 @@ public class NAL8Test extends AbstractNALTest {
         ;
 
     }
-
 
 
 //    @Test
@@ -104,10 +84,6 @@ public class NAL8Test extends AbstractNALTest {
 //            .mustNotOutput(cycles,suffix,BELIEF,0)
 //        ;
 //    }
-
-
-
-
 
 
     @Test
@@ -153,7 +129,7 @@ public class NAL8Test extends AbstractNALTest {
         ;
     }
 
-        @Test
+    @Test
     public void temporal_deduction_1() {
 
         TestNAR tester = test;
@@ -177,14 +153,7 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-
-
-
-
-
-
     //below here: CONTINUE moving appropriate tests to NAL8EternalMixTest -------
-
 
 
     @Test
@@ -222,6 +191,7 @@ public class NAL8Test extends AbstractNALTest {
                 //.mustNotOutput(cycles, "(y)", GOAL, 3)
                 .mustNotOutput(cycles, "(y)", GOAL, ETERNAL);
     }
+
     @Test
     public void testGoalConjunctionDecomposeNeg() {
         test
@@ -229,7 +199,8 @@ public class NAL8Test extends AbstractNALTest {
                 .mustNotOutput(cycles, "(x)", GOAL, 0);
     }
 
-    @Ignore @Test
+    @Ignore
+    @Test
     public void testGoalConjunctionDecomposeViaStrongTruth() {
 
         test
@@ -238,7 +209,9 @@ public class NAL8Test extends AbstractNALTest {
                 .mustGoal(cycles, "w", 0.9f, 0.81f, 0)
         ;
     }
-    @Ignore @Test
+
+    @Ignore
+    @Test
     public void testGoalConjunctionDecomposeViaStrongTruthNeg() {
 
         test
@@ -247,16 +220,20 @@ public class NAL8Test extends AbstractNALTest {
                 .mustGoal(cycles, "w", 0.9f, 0.81f, 0)
         ;
     }
-    @Test public void testStrongNegativePositiveInheritance() {
-         // --(A-->B)!  (B-->C). |-  --(A-->C)!
+
+    @Test
+    public void testStrongNegativePositiveInheritance() {
+        // --(A-->B)!  (B-->C). |-  --(A-->C)!
         test
                 .goal("--(A-->B)")
                 .believe("(B-->C)")
                 .mustGoal(cycles, "(A-->C)", 0f, 0.81f)
         ;
     }
-    @Test public void testStrongNegativeNegativeInheritance() {
-         // --(A-->B)!  --(B-->C). |-  --(A-->C)! NO
+
+    @Test
+    public void testStrongNegativeNegativeInheritance() {
+        // --(A-->B)!  --(B-->C). |-  --(A-->C)! NO
         test
                 .goal("--(A-->B)")
                 .believe("--(B-->C)")
@@ -287,11 +264,19 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustBelieve(cycles, "(x)", 1f, 0.81f, 0)
                 .mustBelieve(cycles, "(y)", 1f, 0.81f, 3)
-                //.mustDesire(cycles, "(y)", 1f, 0.81f, 3)
+        //.mustDesire(cycles, "(y)", 1f, 0.81f, 3)
         ;
     }
 
- @Test
+    @Test
+    public void testInsanity() {
+        test
+            .goal("happy", Tense.Present, 1f, 0.9f)
+            .believe("(must ==>+1 happy)", Tense.Present, 0f, 0.2f)
+            .mustNotOutput(cycles, "must", GOAL, (t) -> true);
+    }
+
+    @Test
     public void testConditionalGoalConjunctionDecomposePositivePostconditionGoal() {
 
         test
@@ -310,8 +295,8 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("(--(x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustBelieve(cycles, "(x)", 0f, 0.81f, 0)
                 .mustBelieve(cycles, "(y)", 1f, 0.81f, 3)
-                ;
-                //.mustDesire(cycles, "(y)", 0f, 0.81f, 3);
+        ;
+        //.mustDesire(cycles, "(y)", 0f, 0.81f, 3);
     }
 
     @Test
@@ -322,7 +307,7 @@ public class NAL8Test extends AbstractNALTest {
                 .believe("((x) &&+3 (y))", Tense.Present, 1f, 0.9f)
                 .mustBelieve(cycles, "(x)", 1f, 0.81f, 0)
                 .mustBelieve(cycles, "(y)", 1f, 0.81f, 3)
-                //.mustDesire(cycles, "(y)", 0f, 0.81f, 0)
+        //.mustDesire(cycles, "(y)", 0f, 0.81f, 0)
         ;
     }
 
@@ -393,8 +378,6 @@ public class NAL8Test extends AbstractNALTest {
     //}
 
 
-
-
     @Test
     public void testInhibition() {
         //by deduction
@@ -460,8 +443,6 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-
-
     //similarity should not spread desire
     @Test
     public void testGoalSimilaritySpreading() {
@@ -482,7 +463,6 @@ public class NAL8Test extends AbstractNALTest {
                 .input("((G) <-> (R)).")
                 .mustNotOutput(cycles, "(G)", GOAL, ETERNAL); // because <-> isnt symmetric
     }
-
 
 
 //    @Test public void testInheritanceCompositionTemporal() {
@@ -601,7 +581,6 @@ public class NAL8Test extends AbstractNALTest {
     }
 
 
-
     @Test
     public void testGoalImplComponentEternal() {
 
@@ -644,7 +623,7 @@ public class NAL8Test extends AbstractNALTest {
                 .mustGoal(cycles, "(out)", 1f, 0.81f, 13)
                 .mustNotOutput(cycles, "(out)", GOAL,
                         t -> t == 3 /*|| t == 16*/ || t == 0
-                        );
+                );
     }
 
     @Test
@@ -654,11 +633,8 @@ public class NAL8Test extends AbstractNALTest {
                 .inputAt(0, "(--(out) ==>-3 (happy)). :|:")
                 .inputAt(5, "(happy)! :|:")
                 .mustGoal(cycles, "(out)", 0f, 0.45f, /*~*/8);
-                //.mustNotOutput(cycles, "(out)", GOAL, t -> t != 8);
+        //.mustNotOutput(cycles, "(out)", GOAL, t -> t != 8);
     }
-
-
-
 
 
     @Test
@@ -696,11 +672,11 @@ public class NAL8Test extends AbstractNALTest {
     public void implDecomposeGoalAfterPosPos() {
 
         test
-            .inputAt(3, "((a) ==>+3 (b)). :|:")
-            .inputAt(6, "(b)! :|:")
-            .mustGoal(cycles, "(a)", 1f, 0.45f,
-                    (t)-> t >= 6) //desired NOW, not at time 10 as would happen during normal decompose
-            .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL);
+                .inputAt(3, "((a) ==>+3 (b)). :|:")
+                .inputAt(6, "(b)! :|:")
+                .mustGoal(cycles, "(a)", 1f, 0.45f,
+                        (t) -> t >= 6) //desired NOW, not at time 10 as would happen during normal decompose
+                .mustNotOutput(cycles, "(a)", GOAL, t -> t == ETERNAL);
     }
 
     @Test
@@ -720,7 +696,7 @@ public class NAL8Test extends AbstractNALTest {
                 .log()
                 .inputAt(3, "((a) &&+3 --(b)). :|:")
                 .inputAt(6, "(--,(b))! :|:")
-                .mustGoal(cycles, "(a)", 1f, 0.81f, (t)->t>=6) //since b is not desired now, it should reverse predict the goal of (a)
+                .mustGoal(cycles, "(a)", 1f, 0.81f, (t) -> t >= 6) //since b is not desired now, it should reverse predict the goal of (a)
                 .mustNotOutput(cycles, "(a)", GOAL, ETERNAL);
     }
 
@@ -736,7 +712,6 @@ public class NAL8Test extends AbstractNALTest {
                 .mustGoal(cycles, "c:a", 1f, 0.81f)
                 .mustGoal(cycles, "z:x", 0f, 0.81f);
     }
-
 
 
     @Ignore

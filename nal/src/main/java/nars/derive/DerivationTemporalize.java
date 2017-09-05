@@ -118,7 +118,7 @@ public class DerivationTemporalize extends Temporalize {
     }
 
     @Nullable
-    public Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] eviGain) {
+    public Term solve(@NotNull Derivation d, Term pattern, long[] occ, float[] confGain) {
 
 
         Task belief;
@@ -181,7 +181,7 @@ public class DerivationTemporalize extends Temporalize {
                 occ[0] = common.a;
                 occ[1] = common.b;
                 float overlapFactor = (1f + (common.b - common.a)) / (1 + Math.max(task.range(), belief.range()));
-                eviGain[0] *= overlapFactor;
+                confGain[0] *= overlapFactor;
 
 //                //interpolate
 //                ts = task.nearestTimeBetween(belief.start(), belief.end());

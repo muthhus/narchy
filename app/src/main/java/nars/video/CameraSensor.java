@@ -207,7 +207,7 @@ public class CameraSensor<P extends Bitmap2D> extends Sensor2D<P> implements Con
 //    }
 
 
-    class PixelConcept extends SensorConcept {
+    public class PixelConcept extends SensorConcept {
 
 //        //private final int x, y;
         //private final TermContainer templates;

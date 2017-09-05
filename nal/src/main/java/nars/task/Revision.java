@@ -11,10 +11,7 @@ import nars.control.Cause;
 import nars.control.Derivation;
 import nars.term.Term;
 import nars.term.container.TermContainer;
-import nars.truth.PreciseTruth;
-import nars.truth.Stamp;
-import nars.truth.Truth;
-import nars.truth.Truthed;
+import nars.truth.*;
 import org.eclipse.collections.api.tuple.primitive.ObjectBooleanPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,6 +23,7 @@ import java.util.Random;
 import static jcog.Util.lerp;
 import static nars.Op.CONJ;
 import static nars.time.Tense.*;
+import static nars.truth.TruthFunctions.c2w;
 
 /**
  * Revision / Projection / Revection Utilities
@@ -36,9 +34,9 @@ public class Revision {
 
     @Nullable
     public static Truth revise(@NotNull Truthed a, @NotNull Truthed b, float factor, float minEvi) {
-        float w1 = a.evi() * factor;
-        float w2 = b.evi() * factor;
-        float w = (w1 + w2);
+        float w1 = a.evi();
+        float w2 = b.evi();
+        float w = (w1 + w2) * factor;
         return w <= minEvi ?
                 null :
                 new PreciseTruth(
@@ -289,15 +287,18 @@ public class Revision {
         float factor = 1f;
 
         //relate high frequency difference with low confidence
-//        float freqDiscount =
-//                0.5f + 0.5f * TruthFunctions.freqSimilarity(a.freq(), b.freq());
-//        factor *= freqDiscount; if (factor < Prioritized.EPSILON) return null;
+        float freqDiscount =
+                0.5f + 0.5f * TruthFunctions.freqSimilarity(a.freq(), b.freq());
+        factor *= freqDiscount; if (factor < Prioritized.EPSILON) return null;
 
         //more evidence overlap indicates redundant information, so reduce the confWeight (measure of evidence) by this amount
         //TODO weight the contributed overlap amount by the relative confidence provided by each task
         float overlap = Stamp.overlapFraction(a.stamp(), b.stamp());
         float stampDiscount = 1f - overlap;
         factor *= stampDiscount; if (factor < Prioritized.EPSILON) return null;
+
+        float intermvalDistance = dtDiff(a.term(), b.term());
+        factor *= (1f/(1f+intermvalDistance/nar.dur()));  if (factor < Prioritized.EPSILON) return null;
 
 //            float temporalOverlap = timeOverlap==null || timeOverlap.length()==0 ? 0 : timeOverlap.length()/((float)Math.min(ai.length(), bi.length()));
 //            float confMax = Util.lerp(temporalOverlap, Math.max(w2c(ae),w2c(be)),  1f);
@@ -349,9 +350,17 @@ public class Revision {
                 factor *= (1f + s) / (1f + u);
         }
 
-        @Nullable Truth rawTruth = revise(a, b, factor, 0);
+
+        float confMin = nar.confMin.floatValue();
+        Truth rawTruth = revise(a, b, 1, c2w(confMin));
         if (rawTruth == null)
             return null;
+
+        Truth newTruth1 = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), confMin, factor);
+        if (newTruth1 == null)
+            return null;
+
+
         //TODO maybe delay dithering until after the negation has been determined below
 
 //            float conf = w2c(expected.evi() * factor);
@@ -363,8 +372,8 @@ public class Revision {
 
         assert (a.punc() == b.punc());
 
-        float aw = a.isQuestOrQuestion() ? 0 : a.evi(); //question
-        float bw = b.evi();
+        float aw = a.isQuestOrQuestion() ? 0 : a.conf(); //question
+        float bw = b.conf();
 
         float aProp = aw / (aw + bw);
 
@@ -407,9 +416,7 @@ public class Revision {
         if (negated) {
             rawTruth = rawTruth.neg();
         }
-        Truth newTruth1 = rawTruth.ditherFreqConf(nar.truthResolution.floatValue(), nar.confMin.floatValue(), 1f);
-        if (newTruth1 == null)
-            return null;
+
 
         long start, end;
         if (cc.op() == CONJ) {

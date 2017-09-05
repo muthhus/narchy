@@ -114,7 +114,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         Truth truth = p.concTruth;
 
         @NotNull final long[] occ;
-        final float[] eviGain = {1f}; //flat by default
+        final float[] confGain = {1f}; //flat by default
 
         Term c2;
         long now = p.time;
@@ -123,7 +123,7 @@ public class Conclusion extends AbstractPred<Derivation> {
             Term t1;
             try {
                 occ = new long[]{ETERNAL, ETERNAL};
-                t1 = solveTime(p, c1, occ, eviGain);
+                t1 = solveTime(p, c1, occ, confGain);
 //                if (t1!=null && occ[0] == 7) {
 //                    //FOR A SPECIFIC TEST TEMPORAR
 //                    System.err.println("wtf");
@@ -198,7 +198,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         Task t = Task.tryTask(c2, punc, truth, (C, tr) -> {
 
             if (tr != null) { //beliefs and goals
-                tr = tr.ditherFreqConf(p.truthResolution, p.confMin, eviGain[0]);
+                tr = tr.ditherFreqConf(p.truthResolution, p.confMin, confGain[0]);
                 if (tr == null)
                     return null; //HACK
             }
@@ -260,13 +260,13 @@ public class Conclusion extends AbstractPred<Derivation> {
         return pp;
     };
 
-    private Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] eviGain) {
+    private Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] confGain) {
         DerivationTemporalize dt = d.temporalize;
         if (dt == null) {
             d.temporalize = dt = new DerivationTemporalize(d); //cache in derivation
         }
 //        dt = new DerivationTemporalize(d);
-        return dt.solve(d, c1, occ, eviGain);
+        return dt.solve(d, c1, occ, confGain);
     }
 
     boolean same(Task derived, Task parent, float truthResolution) {

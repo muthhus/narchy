@@ -2,8 +2,6 @@ package nars;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.math.FloatNormalized;
-import jcog.math.FloatPolarNormalized;
 import nars.concept.ActionConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
@@ -41,9 +39,10 @@ public interface NAct {
      * its initial state will remain indetermined until the first feedback is generated.
      */
     @Nullable
-    default GoalActionConcept actionToggle(@NotNull Term s, @NotNull Runnable on, @NotNull Runnable off) {
+    default ActionConcept actionToggle(@NotNull Term s, @NotNull Runnable on, @NotNull Runnable off) {
+        float THRESH = 0.5f;
         GoalActionConcept m = new GoalActionConcept(s, this, (b, d) -> {
-            boolean next = d != null && d.freq() > 0.5f;
+            boolean next = d != null && d.freq() > THRESH;
             return toggle(d, on, off, next);
         });
         //m.resolution(0.5f);
@@ -257,7 +256,7 @@ public interface NAct {
     }
 
     @Nullable
-    default GoalActionConcept actionToggle(@NotNull Term s, @NotNull BooleanProcedure onChange) {
+    default ActionConcept actionToggle(@NotNull Term s, @NotNull BooleanProcedure onChange) {
         return actionToggle(s, () -> onChange.value(true), () -> onChange.value(false));
     }
 //
@@ -382,7 +381,10 @@ public interface NAct {
             //return $.t(f, nar().confDefault(BELIEF));
 
             if (f==f)
-                return $.t(f, d!=null ? d.conf() : nar().confMin.floatValue());
+                return $.t(f,
+                        //d!=null ? d.conf() : nar().confMin.floatValue()
+                        nar().confDefault(BELIEF)
+                );
             else
                 return null;
 
