@@ -4,7 +4,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.11'
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.2.2'
     }
 }
 
