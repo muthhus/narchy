@@ -40,7 +40,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-public interface Concept extends Termed, ConcurrentMap {
+public interface Concept extends Termed, ConcurrentMap, Comparable<Concept> {
 
 
     @NotNull Bag<Task,PriReference<Task>> tasklinks();
@@ -166,6 +166,12 @@ public interface Concept extends Termed, ConcurrentMap {
 
 
     }
+
+    @Override
+    default int compareTo(@NotNull Concept o) {
+        return term().compareTo(o.term());
+    }
+
 
     @NotNull ConceptState state();
 

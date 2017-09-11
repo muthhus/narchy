@@ -7,11 +7,11 @@ import jcog.Util;
 import jcog.math.FloatSupplier;
 import jcog.net.MeshOptimize;
 import nars.*;
-import nars.concept.GoalActionConcept;
 import nars.gui.Vis;
+import nars.task.DerivedTask;
 import nars.test.agent.Line1DSimplest;
-import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
+import org.eclipse.collections.impl.collector.Collectors2;
 import org.intelligentjava.machinelearning.decisiontree.RealDecisionTree;
 import spacegraph.layout.Grid;
 import spacegraph.widget.meta.ReflectionSurface;
@@ -34,11 +34,7 @@ public class Line1D {
 
         public static void main(String[] args) {
 
-//        a.nar.onTask(t -> {
-//            if (!t.isInput() && t instanceof DerivedTask && t.isGoal()) {
-//                System.err.println(t.proof());
-//            }
-//        });
+
 //                InstrumentedExecutor exe =
 //                        new InstrumentedExecutor(
 //                        new TaskExecutor(256, 0.5f)
@@ -48,9 +44,10 @@ public class Line1D {
 
             //new STMTemporalLinkage(n, 2, false);
             //n.time.dur(10);
-            n.termVolumeMax.set(12);
-            n.time.dur(1);
+
+
             //n.log();
+
             //n.beliefConfidence(0.9f);
             //n.goalConfidence(0.5f);
 //            n.onCycle((nn) -> {
@@ -63,7 +60,6 @@ public class Line1D {
                 protected void onStart(Line1DSimplest a) {
 
                     new Thread(() -> {
-                        //NAgentX.chart(a);
                         int history = 800;
                         window(
                                 row(
@@ -86,15 +82,42 @@ public class Line1D {
                                 , 900, 900);
 
                     }).start();
+                    a.nar.onTask(t -> {
+                        if (!t.isInput() && t instanceof DerivedTask /*&& t.isGoal()*/) {
+                            System.err.println(t.proof());
+                        }
+                    });
 
+//                  Term[] c = Util.map((String s) -> $.$safe(s), Term[]::new,
+////                            "((i)==>happy)",
+////                            "((i)-(y,\"+\"))",
+////                            "((i)-(y,\"-\"))",
+////                            "((y,\"+\")-(i))",
+////                            "((y,\"-\")-(i))"
+//                            "((y,\"+\")-(y,\"-\"))",
+//                            "((y,\"-\")-(y,\"+\"))"
+//
+//                    );
+//                    a.nar.onCycle(() -> {
+//                        for (Term x : c) {
+//                            System.out.println(x + " " + a.nar.beliefTruth(x, a.nar.time()));
+//                        }
+//                        System.out.println();
+//                    });
                 }
             };
             exp.floatValueOf(n);
+            exp.agent.durations.setValue(2);
+            n.termVolumeMax.set(10);
+            n.time.dur(4);
+            n.beliefConfidence(0.5f);
+            n.goalConfidence(0.5f);
 
-
-            exp.agent.durations.setValue(16f);
-
-            n.start();
+            //n.start();
+            n.run(100);
+            n.concepts().collect(Collectors2.toSortedSet()).forEach(x -> {
+                System.out.println(x);
+            });
 
 
         }

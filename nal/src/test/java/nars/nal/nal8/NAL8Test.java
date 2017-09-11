@@ -58,7 +58,7 @@ public class NAL8Test extends AbstractNALTest {
         test
                 .input(new NALTask($.$("(a-->b)"), GOAL, $.t(1f, 0.9f), 5, 10, 20, new long[]{100}).pri(0.5f))
                 .input(new NALTask($.$("(c-->b)"), BELIEF, $.t(1f, 0.9f), 4, 5, 25, new long[]{101}).pri(0.5f))
-                .mustGoal(cycles, "(a-->c)", 1f, 0.26f, (x) -> (x >= 10 && x <= 20)) //10..20
+                .mustGoal(cycles, "(a-->c)", 1f, 0.21f, (x) -> (x >= 10 && x <= 20)) //10..20
         ;
 
     }
@@ -272,7 +272,7 @@ public class NAL8Test extends AbstractNALTest {
     public void testInsanity() {
         test
             .goal("happy", Tense.Present, 1f, 0.9f)
-            .believe("(must ==>+1 happy)", Tense.Present, 0f, 0.2f)
+            .believe("(must ==>+1 happy)", Tense.Present, 0f, 0.15f)
             .mustNotOutput(cycles, "must", GOAL, (t) -> true);
     }
 
@@ -419,9 +419,10 @@ public class NAL8Test extends AbstractNALTest {
         //deisreDed, and its negative counterpart for the negated belief
 
         test
+                .log()
                 .goal("(reward)")
                 .believe("((good) ==> (reward))", 1, 0.9f)
-                .believe("((bad) ==> (--,(reward)))", 1, 0.9f)
+                .believe("((bad) ==> --(reward))", 1, 0.9f)
                 .mustGoal(cycles, "(good)", 1.0f, 0.45f)
                 .mustNotOutput(cycles, "(good)", GOAL, 0.0f, 0.7f, 0.5f, 1f, ETERNAL)
                 .mustGoal(cycles, "(bad)", 0.0f, 0.45f)

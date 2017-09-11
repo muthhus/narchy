@@ -14,8 +14,10 @@ public class FloatNormalized implements FloatSupplier {
     private final float maxStart;
 
     /** precision threshold */
-    static final float epsilon = 0.01f;
-    private float decay = 1f;
+    static final float epsilon = Float.MIN_NORMAL;
+
+    /** relaxation rate: brings min and max closer to each other in proportion to the value. if == 0, disables */
+    private float relax = 0;
 
 
     public FloatNormalized(DoubleSupplier in) {
@@ -66,10 +68,12 @@ public class FloatNormalized implements FloatSupplier {
 
         updateRange(raw);
 
-        if (Util.equals(min,max,epsilon))
+        float r = max - min;
+        assert(r >= 0);
+        if (r <= epsilon)
             return 0.5f;
         else
-            return (raw - min) / (max - min);
+            return (raw - min) / r;
     }
 
     /**
@@ -79,20 +83,32 @@ public class FloatNormalized implements FloatSupplier {
      * @return
      */
     public FloatNormalized relax(float decayRate) {
-        this.decay = decayRate;
+        this.relax = decayRate;
         return this;
     }
 
     public FloatNormalized updateRange(float raw) {
-        if (min > raw)
-            min = raw;
-        else
-            min *= decay;
 
-        if (max < raw)
+        boolean incMin = false, incMax = false;
+
+        if (min > raw) {
+            min = raw;
+        } else {
+            incMin = true;
+        }
+
+        if (max < raw) {
             max = raw;
-        else
-            max *= decay;
+        } else {
+            incMax = true;
+        }
+
+        if (relax > 0) {
+            if (incMax)
+                max = Util.clamp(max - (max - min * relax), min, max);
+            if (incMin)
+                min = Util.clamp(min + (max - min * relax), min, max);
+        }
 
         return this;
     }

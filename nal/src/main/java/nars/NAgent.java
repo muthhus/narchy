@@ -7,6 +7,7 @@ import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import jcog.list.FasterList;
+import jcog.math.FloatNormalized;
 import jcog.math.RecycledSummaryStatistics;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
@@ -127,10 +128,14 @@ abstract public class NAgent extends DurService implements NSense, NAct {
                         $.the("happy") : //generally happy
                         p(id, $.the("happy")), //happy in this environment
                 nar,
-                //new FloatPolarNormalized(() -> reward),
-                () -> reward /* -1..+1 */,
 
-                (x) -> t(0.5f * (Util.tanhFast(x * 2) + 1), alpha())
+                new FloatNormalized(()->reward),
+                (x) -> t(x, alpha())
+
+                //new FloatPolarNormalized(() -> reward),
+
+                //() -> reward /* -1..+1 */,
+                //(x) -> t(0.5f * (Util.tanhFast(x * 2) + 1), alpha())
 
 //                (x) -> {
 //                    if (x > 0.5f + Param.TRUTH_EPSILON) {

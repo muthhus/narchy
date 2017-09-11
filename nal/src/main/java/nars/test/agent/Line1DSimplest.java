@@ -18,7 +18,9 @@ public class Line1DSimplest extends NAgent {
     /**
      * the target value
      */
-    public final FloatParam i = new FloatParam(0f, 0, 1f);
+    public final FloatParam i = new FloatParam(0.5f, 0, 1f);
+    public final FloatParam o = new FloatParam(0.5f, 0, 1f);
+
     public final FloatParam speed = new FloatParam(0.04f, 0f, 0.5f);
 
 //    @NotNull
@@ -27,7 +29,7 @@ public class Line1DSimplest extends NAgent {
     /**
      * the current value
      */
-    public final FloatParam o = new FloatParam(0.5f, 0, 1f);
+
     public final SensorConcept in;
 
 
@@ -49,11 +51,11 @@ public class Line1DSimplest extends NAgent {
 //            }
 //        }));
 
-        float[] x = new float[2];
-        onFrame(() -> {
-            float d = x[0] - x[1];
-            this.o.setValue(Util.unitize(o.floatValue() + d * speed.floatValue()));
-        });
+//        float[] x = new float[2];
+//        onFrame(() -> {
+//            float d = x[0] - x[1];
+//            this.o.setValue(Util.unitize(o.floatValue() + d * speed.floatValue()));
+//        });
 
 //        up = actionUnipolar($.p("up"), d -> {
 //            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
@@ -109,13 +111,17 @@ public class Line1DSimplest extends NAgent {
 //            }
 //        });
 
-        actionBipolar($.p("y"), v -> {
+        actionBipolar($.the("y"), v -> {
             if (v == v) {
                 o.setValue(
                         Util.unitize(o.floatValue() + v * speed.floatValue())
                 );
+
+                //o.setValue( (v/2f)+0.5f );
+
             }
-            return o.getValue();
+
+            return v;
 
             //float current = this.o.floatValue();
 
@@ -168,7 +174,11 @@ public class Line1DSimplest extends NAgent {
 
         //dist = (float)(Math.sqrt(dist)); //more challenging
 
-        return (1f - dist) * 2 - 1; //unipolar, 0..1.0
+        float h = 1f - dist;
+        //System.out.println(h + " " + happy.sensor.get());
+        return h;
+        //return (float) Math.pow((1f - dist), 2);
+        //return (1f - dist) * 2 - 1; //unipolar, 0..1.0
 
 
 //        float r = (1f - dist/2f); //bipolar, normalized to -1..+1

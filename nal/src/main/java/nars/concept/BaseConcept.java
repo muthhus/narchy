@@ -27,9 +27,9 @@ import static nars.Op.*;
 import static nars.concept.state.ConceptState.Deleted;
 
 /** concept of a compound term which can NOT name a task, so it has no task tables and ability to process tasks */
-public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Concept, Termlike {
+public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike {
 
-    @NotNull public final T term;
+    @NotNull public final Term term;
     @NotNull public final BeliefTable beliefs;
     @NotNull public final BeliefTable goals;
     @NotNull public final QuestionTable quests;
@@ -45,7 +45,7 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
      * @param termLinks
      * @param taskLinks
      */
-    public BaseConcept(@NotNull T term,
+    public BaseConcept(@NotNull Term term,
                        @NotNull BeliefTable beliefs, @NotNull BeliefTable goals,
                        @NotNull QuestionTable questions, @NotNull QuestionTable quests,
                        @NotNull Bag[] bags) {
@@ -59,7 +59,7 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
         this.state = Deleted;
     }
 
-    public BaseConcept(@NotNull T term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
+    public BaseConcept(@NotNull Term term, @Nullable BeliefTable beliefs, @Nullable BeliefTable goals, ConceptBuilder conceptBuilder) {
         this(term,
                 beliefs!=null ? beliefs : conceptBuilder.newBeliefTable(term, true),
                 goals!=null ? goals : conceptBuilder.newBeliefTable(term, false),
@@ -136,12 +136,12 @@ public class BaseConcept<T extends Term> extends ConcurrentHashMap implements Co
     /**
      * used for setting an explicit OperationConcept instance via java; activates it on initialization
      */
-    public BaseConcept(@NotNull T term, @NotNull NAR n) {
+    public BaseConcept(@NotNull Term term, @NotNull NAR n) {
         this(term,  n.terms.conceptBuilder);
     }
 
 
-    public BaseConcept(@NotNull T term, @NotNull ConceptBuilder b) {
+    public BaseConcept(@NotNull Term term, @NotNull ConceptBuilder b) {
         this(term, b.newBeliefTable(term, true), b.newBeliefTable(term, false),
                 b.newQuestionTable(term, true), b.newQuestionTable(term, false),
                 b.newLinkBags(term));

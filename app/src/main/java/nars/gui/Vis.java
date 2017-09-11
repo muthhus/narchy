@@ -19,6 +19,7 @@ import nars.term.Term;
 import nars.term.Termed;
 import nars.truth.Truth;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import spacegraph.AbstractSpace;
 import spacegraph.Ortho;
 import spacegraph.SpaceGraph;
@@ -373,10 +374,7 @@ public class Vis {
 
         private final int plotHistory;
         private final On on;
-        Plot2D plot1;
-        Plot2D plot2;
-        Plot2D plot3;
-        Plot2D plot4;
+        Plot2D plot1, plot2, plot3, plot4;
 
         public EmotionPlot(int plotHistory, NAgent a) {
             this(plotHistory, a, a.nar);
@@ -401,7 +399,17 @@ public class Vis {
             plot1.add("Dex", a::dexterity, 0f, 1f);
 
             //plot4.add("Hapy", a.happy, 0f, 1f);
-            plot4.add("Hapy", () -> a.reward, -1f, 1f);
+            plot4.add("Hapy (Value)", () -> {
+                return a.happy.signal.asFloat();
+            }, 0, 1f);
+            plot4.add("Hapy (Task)", () -> {
+                @Nullable Task t = a.happy.sensor.get();
+                if (t == null)
+                    return Float.NaN;
+                else
+                    return t.freq();
+
+            }, 0, 1f);
 
 //            plot4.add("Hapy", nar.emotion.happy::getSum);
 //            plot4.add("Sad", nar.emotion.sad::getSum);

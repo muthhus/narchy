@@ -84,9 +84,9 @@ public class SensorConcept extends WiredConcept implements FloatFunction<Term>, 
 
         Task x = sensor.update(nar, time, dur);
 
-        if (x != null) {
-            feedback(x, beliefs(), time, nar);
-        }
+//        if (x != null) {
+//            feedback(x, beliefs(), time, nar);
+//        }
 
         return x;
     }

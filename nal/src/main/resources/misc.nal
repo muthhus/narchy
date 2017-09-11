@@ -47,7 +47,7 @@
 
 
 //disjunction
-   (&&,(--,%B),A..+), B, task("?") |- (--,((&&,A..+) &&+- (--,%B))), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
+   (&&,--B,A..+), B, task("?") |- (--,((&&,A..+) &&+- --B)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)
 
 ////composition on both sides of a statement  TODO - quests handling of these
     ((A..+) --> Z), (X --> Y), task("?") |- ((A..+) --> substitute((A..+),X,Y,strict)), (Belief:BeliefStructuralDeduction, Punctuation:Belief)

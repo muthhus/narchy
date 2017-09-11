@@ -123,13 +123,13 @@ public class FZero extends NAgentX {
                 () -> dexterity() * Util.tanhFast(reward) /* - lag */) //reward function
 
                 .in(this::dexterity)
-                .in(new FloatNormalized(() -> reward).relax(0.9f))
+                .in(new FloatNormalized(() -> reward).relax(0.01f))
                 .in(new FloatNormalized(
                         ((Emotivation) nar.emotion).cycleDTRealMean::getValue)
-                        .relax(0.9f)
+                        .relax(0.01f)
                 ).in(new FloatNormalized(
                                 () -> nar.emotion.busyVol.getSum()
-                        ).relax(0.9f)
+                        ).relax(0.01f)
                 ).out(
                         new StepController((x) -> c.in.amplitude(x), 0, 0.1f, 0.2f, 0.3f, 0.4f, 0.5f)
                 ).out(

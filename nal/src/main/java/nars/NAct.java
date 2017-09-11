@@ -4,6 +4,7 @@ import jcog.Util;
 import jcog.data.FloatParam;
 import nars.concept.ActionConcept;
 import nars.concept.BeliefActionConcept;
+import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
 import nars.term.Term;
@@ -14,10 +15,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.IntConsumer;
 import java.util.function.IntPredicate;
 
 import static nars.Op.BELIEF;
+import static nars.Op.GOAL;
 
 /**
  * Created by me on 9/30/16.
@@ -350,8 +353,40 @@ public interface NAct {
      */
     @NotNull
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        throw new UnsupportedOperationException("TODO");
-//        return actionUnipolar(s, (f) -> {
+        Term pt = $.p(s, $.the("\"+\""));
+        Term nt = $.p(s, $.the("\"-\""));
+
+        float gg[] = new float[2];
+        @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
+            boolean p;
+            p = c.term().equals(pt);
+            gg[ p ? 0 : 1] = g!=null ?
+                    //g.expectation() - 0.5f : 0
+                    g.freq() : 0.5f
+            ;
+            if (!p) {
+                assert(gg[0] == gg[0]); //assert that positive has been set in this cycle
+                float balance = update.valueOf((gg[0] - gg[1]));
+                float pp, nn;
+                if (balance > 0) {
+                    pp = +balance; //0.5f + (balance/2f);
+                    nn = 0;
+                } else {
+                    nn = -balance; //0.5f + (-balance/2f);
+                    pp = 0;
+                }
+                gg[0] = gg[1] = Float.NaN; //reset for next cycle
+                float conf = nar().confDefault(GOAL);
+                ((GoalActionAsyncConcept)nar().concept(pt)).feedback($.t(pp, conf));
+                ((GoalActionAsyncConcept)nar().concept(nt)).feedback($.t(nn, conf));
+            }
+        };
+
+        GoalActionAsyncConcept p = new GoalActionAsyncConcept(pt, this, u);
+        GoalActionAsyncConcept n = new GoalActionAsyncConcept(nt, this, u);
+        addAction(p);
+        addAction(n);
+        //        return actionUnipolar(s, (f) -> {
 //            if (f != f)
 //                return Float.NaN;
 //            else {

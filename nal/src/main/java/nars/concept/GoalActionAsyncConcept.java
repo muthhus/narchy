@@ -9,7 +9,7 @@ import nars.truth.Truth;
 import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
@@ -20,35 +20,32 @@ import static nars.Op.GOAL;
 /**
  * ActionConcept which is driven by Goals that are interpreted into feedback Beliefs
  */
-public class GoalActionConcept extends ActionConcept {
+public class GoalActionAsyncConcept extends ActionConcept {
 
 
     public static final float CURIOSITY_CONF_FACTOR = 0.25f;
 
     public final Signal feedback;
-    public final Signal action;
 
     private final FloatParam curiosity;
 
 
-
     @NotNull
-    private MotorFunction motor;
+    private BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor;
+    private NAR nar;
 
-    public GoalActionConcept(@NotNull Term c, @NotNull NAct act, @NotNull MotorFunction motor) {
-        this(c, act.nar(), act.curiosity(), motor);
-    }
-
-    public GoalActionConcept(@NotNull Term c, @NotNull NAR n, FloatParam curiosity, @NotNull MotorFunction motor) {
+    public GoalActionAsyncConcept(@NotNull Term c, @NotNull NAct act, @NotNull BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor) {
         super(c,
                 //new SensorBeliefTable(n.conceptBuilder.newTemporalBeliefTable(c)),
                 //new SensorBeliefTable(n.conceptBuilder.newTemporalBeliefTable(c)),
                 null, null,
-                n);
+                act.nar());
 
-        this.curiosity = curiosity;
+        NAR n = act.nar();
 
-        this.action = new Signal(GOAL, n.truthResolution).pri(() -> n.priDefault(GOAL));
+        this.curiosity = act.curiosity();
+
+//        this.action = new Signal(GOAL, n.truthResolution).pri(() -> n.priDefault(GOAL));
         //((SensorBeliefTable) goals).sensor = action;
 
         this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priDefault(BELIEF));
@@ -89,14 +86,17 @@ public class GoalActionConcept extends ActionConcept {
         return v;
     }
 
-    public GoalActionConcept resolution(float r) {
+    public GoalActionAsyncConcept resolution(float r) {
         resolution.setValue(r);
         return this;
     }
 
 
-    @Override public Stream<Task> update(long now, int dur, NAR nar) {
+    @Override
+    public Stream<Task> update(long now, int dur, NAR nar) {
 
+
+        this.nar = nar;
 
         long pStart = now;
         long pEnd = now + dur;
@@ -115,9 +115,9 @@ public class GoalActionConcept extends ActionConcept {
             float curiConf =
 //                    //nar.confDefault(GOAL);
                     //nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR;
-                    Math.max(goal!=null ? goal.conf() : 0,
+                    Math.max(goal != null ? goal.conf() : 0,
                             nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR);
-                            //nar.confMin.floatValue()*2);
+            //nar.confMin.floatValue()*2);
 //
 ////            float cc =
 ////                    //curiConf;
@@ -131,7 +131,7 @@ public class GoalActionConcept extends ActionConcept {
 ////                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
 //
             goal = $.t(f, curiConf);
-            fg = action.set(term, goal, stamper, now, dur, nar);
+//            fg = action.set(term, goal, stamper, now, dur, nar);
 //            curious = true;
 //
 ////                Truth ct = $.t(f, cc);
@@ -144,12 +144,9 @@ public class GoalActionConcept extends ActionConcept {
 ////                }
 
 
-        } else {
-            fg = null;
-            action.set(term(), null, stamper, now, dur, nar);
         }
 
-        belief = this.beliefs().truth(pStart, pEnd, nar);
+//        belief = this.beliefs().truth(pStart, pEnd, nar);
 
 
 //        //HACK try to improve this
@@ -162,7 +159,7 @@ public class GoalActionConcept extends ActionConcept {
 //            kickstart = false;
 //        }
 
-        Truth beliefFeedback = this.motor.motor(belief, goal);
+        this.motor.accept(this, goal);
 //        if (fbt==null && belief!=null) {
 //            fbt = belief;
 //        }
@@ -173,7 +170,6 @@ public class GoalActionConcept extends ActionConcept {
         //beliefFeedback != null ? beliefFeedback : belief; //latch
 
 
-        Task fb = feedback.set(term, beliefFeedback, stamper, now, dur, nar);
 //        if (fb != null) {
 //            SensorConcept.feedback(fb, beliefs(), now, nar);
 //        }
@@ -195,12 +191,16 @@ public class GoalActionConcept extends ActionConcept {
 //            fg.log("Curiosity");
 //        }
 
-        return Stream.of(fb, fg!=null ? fg : null).filter(Objects::nonNull);
+        return Stream.empty();
         //return Stream.of(fb, fg).filter(Objects::nonNull);
         //return Stream.of(fb).filter(Objects::nonNull);
 
     }
 
+    public void feedback(Truth f) {
+        Task fb = feedback.set(term, f, nar.time::nextStamp, nar.time(), nar.dur(), nar);
+        nar.input(fb);
+    }
 
 
     //    Truth[] linkTruth(long when, long now, float minConf) {
@@ -395,29 +395,6 @@ public class GoalActionConcept extends ActionConcept {
 //        }
 //
 //    }
-
-    //    @Override
-//    public boolean validBelief(@NotNull Task t, @NotNull NAR nar) {
-//        if (!t.isEternal() && t.occurrence() > nar.time() + 1) {
-//            System.err.println("prediction detected: " + (t.occurrence() - nar.time()));
-//        }
-//        return true;
-//    }
-//
-//    @Override
-//    public boolean validGoal(@NotNull Task t, @NotNull NAR nar) {
-//        if (!t.isEternal() && t.occurrence() > nar.time() + 1) {
-//            System.err.println("prediction detected: " + (t.occurrence() - nar.time()));
-//        }
-//        return true;
-//    }
-
-
-//    @Override
-//    public @NotNull Task filterGoals(@NotNull Task t, @NotNull NAR nar, List<Task> displaced) {
-//        return t;
-//    }
-
 
 
 //    @NotNull

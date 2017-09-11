@@ -37,6 +37,7 @@ import org.apache.commons.math3.stat.Frequency;
 import org.eclipse.collections.api.block.function.primitive.DoubleToFloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.IntToFloatFunction;
+import org.eclipse.collections.api.block.function.primitive.IntToObjectFunction;
 import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.list.mutable.primitive.ByteArrayList;
 import org.eclipse.collections.impl.list.mutable.primitive.DoubleArrayList;
@@ -1140,6 +1141,16 @@ public enum Util {
     /** TODO make a version of this which can return the input array if no modifications occurr either by .equals() or identity */
     public static <X, Y> Y[] map(Function<X, Y> f, Y[] target, X... src) {
         int i = 0;
+        for (X x : src) {
+            Y y = f.apply(x);
+            target[i++] = y;
+        }
+        return target;
+    }
+    /** TODO make a version of this which can return the input array if no modifications occurr either by .equals() or identity */
+    public static <X, Y> Y[] map(Function<X, Y> f, IntFunction<Y[]> targetBuilder, X... src) {
+        int i = 0;
+        Y[] target = targetBuilder.apply(src.length);
         for (X x : src) {
             Y y = f.apply(x);
             target[i++] = y;

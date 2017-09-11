@@ -53,15 +53,15 @@ public enum GoalFunction implements TruthOperator {
     @AllowOverlap DeciInduction() {
         @Override
         public Truth apply(final Truth T, final Truth B, NAR m, float minConf) {
-//            boolean bneg = B.isNegative();
-//            if (bneg) {
-//                Truth x = induction(T, B.neg(), minConf);
-//                //Truth x = desireInd(T, B.neg(), minConf);
-//                return x != null ? x.neg() : null;
-//            } else  {
+            boolean bneg = B.isNegative();
+            if (bneg) {
+                Truth x = induction(T, B.neg(), minConf);
+                //Truth x = desireInd(T, B.neg(), minConf);
+                return x != null ? x.neg() : null;
+            } else  {
                 return induction(T, B, minConf);
                 //return desireInd(T, B, minConf);
-      //      }
+            }
         }
     },
 

@@ -393,7 +393,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         switch (host.op()) {
 
             case PROD:
-                return 0;
+                return 2;
 
             case SETe:
             case SETi:
@@ -406,7 +406,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
             case DIFFi:
             case SECTi:
             case SECTe:
-                return 1;
+                return 2;
 
             case CONJ:
                 return 2;
@@ -432,8 +432,9 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
 
             default:
-                return 1;
-            //throw new UnsupportedOperationException("unhandled operator type: " + host.op());
+                throw new UnsupportedOperationException("unhandled operator type: " + host.op());
+
+
         }
     }
 

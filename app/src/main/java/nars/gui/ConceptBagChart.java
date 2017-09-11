@@ -24,7 +24,7 @@ public class ConceptBagChart extends NARChart<PriReference<Concept>> {
         float r, g, b;
 
         Concept c = x.get();
-        if (c != null) if (c instanceof Atomic) {
+        if (c != null) if (c.term() instanceof Atomic) {
             r = g = b = p * 0.5f;
         } else {
             float belief = 0.5f, goal = 0.5f;

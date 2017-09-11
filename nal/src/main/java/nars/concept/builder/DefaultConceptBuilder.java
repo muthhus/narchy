@@ -261,6 +261,10 @@ public class DefaultConceptBuilder implements ConceptBuilder {
                 }
                 break;
 
+            case DIFFe:
+                dmt = new DynamicTruthModel.Difference(t.sub(0), t.sub(1));
+                break;
+
             case NEG:
                 throw new RuntimeException("negation terms must not be conceptualized");
         }
@@ -331,7 +335,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     public Termed apply(@NotNull Term term) {
 
         //already a concept, or non-conceptualizable:  assume it is from here
-        if (term instanceof Concept || !term.op().conceptualizable) {
+        if (!term.op().conceptualizable) {
             return term;
         }
 

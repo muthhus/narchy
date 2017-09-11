@@ -444,13 +444,14 @@ abstract public class PatternCompound extends GenericCompoundDT {
 //
 //                } else {
 
-                boolean xConst = !u.matchType(x.op());
+                Op xo = x.op();
+                boolean xConst = xo!=NEG && !u.matchType(xo); //exception for NEG
                 if (!xConst) {
                     //try to resolve an already assigned and thus resolvable to constant
                     @Nullable Term xx = u.xy(x);
                     if (xx!=null) {
                         x = xx;
-                        xConst = !u.matchType(x.op());
+                        xConst = !u.matchType(xo);
                     }
                 }
 
