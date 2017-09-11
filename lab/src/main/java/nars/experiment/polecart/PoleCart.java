@@ -2,9 +2,14 @@ package nars.experiment.polecart;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
+import jcog.learn.ql.HaiQAgent;
 import jcog.math.FloatPolarNormalized;
-import nars.*;
+import nars.$;
+import nars.NAR;
+import nars.NAgent;
+import nars.Narsese;
 import nars.concept.SensorConcept;
+import nars.experiment.NAgentY;
 import nars.gui.Vis;
 import spacegraph.SpaceGraph;
 
@@ -20,7 +25,7 @@ import static jcog.Texts.n2;
  * adapted from: https://github.com/B00075594/CI_Lab2_CartAndPole/blob/master/src/pole.java
  * see also: https://github.com/rihasrdsk/continuous-action-cartpole-java/blob/master/src/org/rlcommunity/environments/cartpole/CartPole.java
  */
-public class PoleCart extends NAgentX {
+public class PoleCart extends NAgentY {
 
 
     private final SensorConcept xVel, x;
@@ -83,7 +88,7 @@ public class PoleCart extends NAgentX {
     double action;
 
     public PoleCart(NAR nar) throws Narsese.NarseseException {
-        super("", nar);
+        super(nar, HaiQAgent::new);
 
 //        this.inputVariable1 = senseNumber("(ang)",
 //                () -> MathUtils.normalizeAngle(angle, 0)).resolution(0.1f);

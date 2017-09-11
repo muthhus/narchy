@@ -24,7 +24,7 @@ public class AgentTest {
         testAgent( new DPG(1, 2) ); //broken it seems
     }
 
-    @Ignore
+
     @Test public void testDQNAgent() {
         testAgent( new DQN(1, 2) ); //broken it seems
     }
@@ -37,15 +37,19 @@ public class AgentTest {
 
         final float minRatio = 3f;
 
+        int cycles = 10000;
+
         float nextReward = 0;
         IntIntHashMap acts = new IntIntHashMap();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < cycles; i++) {
             int action = agent.act(nextReward, new float[] { (float)Math.random() } );
             //System.out.println(a);
             acts.addToValue(action, 1);
             switch (action) {
-                case 0: nextReward = 0.0f; break;
-                case 1: nextReward = 1.0f; break;
+                case 0: nextReward = -1.0f; break;
+                case 1: nextReward = +1.0f; break;
+                default:
+                    throw new UnsupportedOperationException();
             }
         }
         System.out.println(agent.getClass() + " " + agent.summary() + "\n" + acts);

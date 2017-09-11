@@ -40,7 +40,14 @@ pitest {
     outputFormats = [ 'HTML' ]
     timestampedReports = false
 }
+
 description = ''
+
+compileJava {
+    includes = ['src/main/java/nars/nal/*.nal']
+    //files("src/main/java/nars/nal/*.nal")
+}
+
 dependencies {
     compile project(':util')
     compile group: 'com.netflix.servo', name: 'servo-core', version: '0.12.17'
@@ -53,5 +60,9 @@ dependencies {
 
 //    compile group: 'org.pitest', name: 'pitest', version: '1.2.2'
 //    testCompile group: 'org.pitest', name: 'pitest-command-line', version: '1.2.2'
+
+
+
+
 
 }

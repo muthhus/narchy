@@ -9,6 +9,7 @@ import nars.$;
 import nars.NAR;
 import org.apache.commons.lang3.mutable.MutableFloat;
 import org.eclipse.collections.api.tuple.primitive.IntObjectPair;
+import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -103,6 +104,10 @@ public class AgentService extends DurService {
         public AgentBuilder in(Tensor t) {
             sensors.add(t);
             return this;
+        }
+
+        public AgentBuilder out(int actions, IntConsumer action) {
+            return out(PrimitiveTuples.pair(actions, action));
         }
 
         public AgentBuilder out(IntObjectPair<? extends IntConsumer> action) {

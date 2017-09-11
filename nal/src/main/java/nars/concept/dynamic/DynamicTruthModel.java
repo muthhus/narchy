@@ -1,8 +1,10 @@
 package nars.concept.dynamic;
 
+import jcog.Util;
 import jcog.list.FasterList;
 import nars.NAR;
 import nars.Op;
+import nars.Param;
 import nars.Task;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
@@ -27,10 +29,10 @@ abstract public class DynamicTruthModel {
 
         int sdt = superterm.dt();
         if (sdt == XTERNAL)
-            return null;
+            sdt = DTERNAL;
 
         Term[] inputs = components(superterm);
-        assert (inputs.length > 0): this + " yielded no dynamic components for superterm " + superterm;
+        assert (inputs.length > 0) : this + " yielded no dynamic components for superterm " + superterm;
 
         DynTruth d = new DynTruth(stamp ? new FasterList(inputs.length) : null);
         d.freq = d.conf = 1f;
@@ -68,7 +70,7 @@ abstract public class DynamicTruthModel {
             boolean evi = d.e != null;
 
             Truth nt;
-            Task bt = null;
+            Task bt;
 
             //TODO check these times
             long subStart, subEnd;
@@ -97,17 +99,18 @@ abstract public class DynamicTruthModel {
 
             } else {
                 //truth only
+                bt = null;
                 nt = n.truth(subConcept, beliefOrGoal ? BELIEF : GOAL, subStart, subEnd);
             }
 
-            if (nt == null || nt.conf() < n.confMin.floatValue()) {
+            if (nt == null) {
                 return null;
             }
 
             if (!add(i, d, nt.negIf(negated), confMin))
                 return null;
 
-            if (evi)
+            if (bt != null)
                 d.e.add(bt);
 
         }
@@ -138,7 +141,7 @@ abstract public class DynamicTruthModel {
 
         public Union(@NotNull Term... comp) {
             super(comp);
-            assert(comp.length > 1);
+            assert (comp.length > 1);
         }
 
         @Override
@@ -158,24 +161,24 @@ abstract public class DynamicTruthModel {
         @NotNull
         private final Term[] comp;
 
-//        protected Intersection() {
-//            this.comp = Term.EmptyArray;
-//        }
-
         public Intersection(@NotNull Term... comp) {
             this.comp = comp;
-            assert(comp.length > 1);
+            assert (comp.length > 1);
         }
 
         @Override
         protected final boolean add(int subterm, DynTruth d, Truth truth, float confMin) {
 
-            //specific to Truth.Intersection:
-            d.conf *= c(truth.conf());
-            if (d.conf < confMin)
-                return false;
-
+            float f0 = d.freq;
             d.freq *= f(truth.freq());
+
+            //HACK for subterms beyond 2, if the frequency has not changed, do not decrease confidence
+            if (subterm < 2 || !Util.equals(f0, d.freq, Param.TRUTH_EPSILON)) {
+                d.conf *= truth.conf();
+                if (d.conf < confMin)
+                    return false;
+            }
+
 
             return true;
 
@@ -183,10 +186,6 @@ abstract public class DynamicTruthModel {
 
         public float f(float freq) {
             return freq;
-        }
-
-        public float c(float conf) {
-            return conf;
         }
 
 
@@ -200,7 +199,6 @@ abstract public class DynamicTruthModel {
 
     public static class Difference extends DynamicTruthModel {
         private final Term[] components;
-        private Truth tx, ty;
 
         public Difference(Term x, Term y) {
             super();
@@ -214,19 +212,19 @@ abstract public class DynamicTruthModel {
         }
 
         @Override
-        protected DynTruth commit(DynTruth d) {
-            //intersection(a, b.negated(), minConf);
-            d.freq = tx.freq() * (1f - ty.freq());
-            d.conf = tx.conf() * ty.conf();
-            return d;
-        }
-
-        @Override
         protected boolean add(int subterm, DynTruth d, Truth t, float confMin) {
-            if (subterm == 0)
-                tx = t;
-            else {
-                ty = t;
+            float c = t.conf();
+            if (subterm == 0) {
+                if (c < confMin)
+                    return false;
+                d.conf = c;
+                d.freq = t.freq();
+            } else {
+                d.conf *= c;
+                if (d.conf < confMin)
+                    return false;
+                d.freq *= (1f - t.freq());
+
 //                if (t.conf() * tx.conf() < confMin) //early termination check
 //                    return false;
             }

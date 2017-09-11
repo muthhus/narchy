@@ -22,9 +22,9 @@ import spacegraph.SpaceGraph;
 public class Arkancide extends NAgentY {
 
     static boolean numeric = true;
-    static boolean cam = false;
+    static boolean cam = true;
 
-    public final FloatParam ballSpeed = new FloatParam(1f, 0.1f, 6f);
+    public final FloatParam ballSpeed = new FloatParam(0.2f, 0.04f, 6f);
     //public final FloatParam paddleSpeed = new FloatParam(2f, 0.1f, 3f);
 
 

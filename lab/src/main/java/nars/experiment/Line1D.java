@@ -159,8 +159,8 @@ public class Line1D {
             agent.happy.resolution.setValue(0.01f);
 
             agent.in.resolution(yResolution);
-            for (GoalActionConcept g : new GoalActionConcept[]{agent.up, agent.down})
-                g.resolution(yResolution);
+//            for (GoalActionConcept g : new GoalActionConcept[]{agent.up, agent.down})
+//                g.resolution(yResolution);
 
             agent.curiosity.setValue(
                     0.05f

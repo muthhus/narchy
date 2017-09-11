@@ -328,7 +328,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
 
                 TopN<TaskRegion> tt = scan(
-                        new TopN<TaskRegion>(new TaskRegion[Math.min(s, TRUTHPOLATED_MAX)], strongestTask),
+                        new TopN<>(new TaskRegion[Math.min(s, TRUTHPOLATED_MAX)], strongestTask),
                         start, end, 1);
                 if (!tt.isEmpty()) {
 

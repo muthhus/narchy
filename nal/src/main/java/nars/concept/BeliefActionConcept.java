@@ -1,14 +1,17 @@
 package nars.concept;
 
+import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.task.NALTask;
-import nars.term.Compound;
-import nars.truth.DiscreteTruth;
+import nars.task.Revision;
+import nars.term.Term;
+import nars.time.Tense;
 import nars.truth.Truth;
+import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
+import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -21,10 +24,16 @@ public class BeliefActionConcept extends ActionConcept {
 
 
     private final Consumer<Truth> action;
+    private final Signal feedback;
+
+    private float curiosity = 0.1f;
 
 
-    public BeliefActionConcept(@NotNull Compound term, @NotNull NAR n, Consumer<Truth> action) {
+    public BeliefActionConcept(@NotNull Term term, @NotNull NAR n, Consumer<Truth> action) {
         super(term, n);
+
+        this.feedback = new Signal(BELIEF, resolution).pri(() -> n.priDefault(BELIEF));
+
         this.action = action;
     }
 
@@ -36,30 +45,43 @@ public class BeliefActionConcept extends ActionConcept {
     @Override
     public Stream<Task> update(long now, int dur, NAR nar) {
 
-        long nowStart = now - dur/2;
-        long nowEnd = now + dur/2;
+        long nowStart = now;
+        long nowEnd = now;
 
-        Truth belief =
-                this.beliefs().truth(nowStart, nowEnd, nar);
-                //beliefIntegrated.commitAverage();
-        action.accept(belief);
+        Truth belief;
+        if (nar.random().nextFloat() < curiosity) {
+            float f = nar.random().nextFloat();
+            float c = nar.confDefault(BELIEF);
+            nar.believe(term(), Tense.Present, f, c);
+            belief = $.t(f, c);
+        } else {
 
-        Truth goal =
-                this.goals().truth(nowStart, nowEnd, nar);
-                //goalIntegrated.commitAverage();
-        if (goal!=null) {
-            //allow any goal desire to influence belief to some extent
-            float rate = 1f;
-            DiscreteTruth t = new DiscreteTruth(goal.freq(), goal.conf() * rate);
-            if (t!=null) {
-                NALTask y = new NALTask(term(), BELIEF, t, now, nowStart, nowEnd, new long[]{nar.time.nextStamp()});
-                y.pri(nar.priDefault(BELIEF));
-                return Stream.of(y);
-            }
+            belief =
+                    this.beliefs().truth(nowStart, nowEnd, nar);
+            //beliefIntegrated.commitAverage();
         }
 
+//        Truth goal =
+//                this.goals().truth(nowStart, nowEnd, nar);
+////                //goalIntegrated.commitAverage();
+//        if (goal!=null) {
+//            if (belief!=null)
+//                belief = Revision.revise(belief, goal,1f, 0f);
+//            else
+//                belief = goal;
+//
+//        }
 
-        return Stream.empty();
+        Task x;
+        if (belief!=null) {
+            x = feedback.set(term(), belief, nar.time::nextStamp, nowStart, dur, nar);
+        } else {
+            x = feedback.get();
+        }
+
+        action.accept(x == null ? null : x.truth());
+
+        return Stream.of(x);
     }
 
 

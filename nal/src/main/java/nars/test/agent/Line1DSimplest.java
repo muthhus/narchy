@@ -5,12 +5,7 @@ import jcog.data.FloatParam;
 import nars.$;
 import nars.NAR;
 import nars.NAgent;
-import nars.concept.GoalActionConcept;
 import nars.concept.SensorConcept;
-import org.jetbrains.annotations.NotNull;
-
-import static nars.time.Tense.ETERNAL;
-import static nars.time.Tense.Eternal;
 
 
 /**
@@ -26,8 +21,8 @@ public class Line1DSimplest extends NAgent {
     public final FloatParam i = new FloatParam(0f, 0, 1f);
     public final FloatParam speed = new FloatParam(0.04f, 0f, 0.5f);
 
-    @NotNull
-    public final GoalActionConcept up, down;
+//    @NotNull
+//    public GoalActionConcept up, down;
 
     /**
      * the current value
@@ -55,50 +50,51 @@ public class Line1DSimplest extends NAgent {
 //        }));
 
         float[] x = new float[2];
-        onFrame(()->{
+        onFrame(() -> {
             float d = x[0] - x[1];
-            this.o.setValue(Util.unitize(o.floatValue() + d*speed.floatValue()));
+            this.o.setValue(Util.unitize(o.floatValue() + d * speed.floatValue()));
         });
 
-        up = actionUnipolar($.p("up"), d -> {
-            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
-            synchronized (o) {
-                //float prev = o.floatValue();
-                //float sp = speed.floatValue();
-                //float next = Math.min(1, prev + d * sp);
-//                if (!Util.equals(prev, next, sp )) {
+//        up = actionUnipolar($.p("up"), d -> {
+//            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
+//            synchronized (o) {
+//                //float prev = o.floatValue();
+//                //float sp = speed.floatValue();
+//                //float next = Math.min(1, prev + d * sp);
+////                if (!Util.equals(prev, next, sp )) {
+//
+////                if (d > 0.5f)
+////                    x[0] = d - 0.5f;
+////                else
+////                    x[0] = 0;
+//                    //this.o.setValue(next);
+//                return x[0] = d;
+////                } else {
+////                    return 0f;
+////                }
+//            }
+//        });
 
-//                if (d > 0.5f)
-//                    x[0] = d - 0.5f;
-//                else
-//                    x[0] = 0;
-                    //this.o.setValue(next);
-                return x[0] = d;
-//                } else {
-//                    return 0f;
-//                }
-            }
-        });
-        down = actionUnipolar($.p("down"), d -> {
-            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
-            synchronized (o) {
-                //float prev = o.floatValue();
-                //float sp = speed.floatValue();
-                //float next = Math.max(0, prev - d * sp);
-                //if (!Util.equals(prev, next, sp )) {
-                    //this.o.setValue(next);
-//                if (d > 0.5f)
-//                    x[1] = d - 0.5f;
-//                else
-//                    x[1] = 0;
-                return x[1] = d;
-//                } else {
-//                    return 0f;
-//                }
-            }
-        });
-        n.goal(up.term(), Eternal, 0f, 0.01f);
-        n.goal(down.term(), Eternal, 0f, 0.01f);
+//        down = actionUnipolar($.p("down"), d -> {
+//            //if (d < 0.5f)  return 0; d -= 0.5f; d *= 2f;
+//            synchronized (o) {
+//                //float prev = o.floatValue();
+//                //float sp = speed.floatValue();
+//                //float next = Math.max(0, prev - d * sp);
+//                //if (!Util.equals(prev, next, sp )) {
+//                    //this.o.setValue(next);
+////                if (d > 0.5f)
+////                    x[1] = d - 0.5f;
+////                else
+////                    x[1] = 0;
+//                return x[1] = d;
+////                } else {
+////                    return 0f;
+////                }
+//            }
+//        });
+//        n.goal(up.term(), Eternal, 0f, 0.01f);
+//        n.goal(down.term(), Eternal, 0f, 0.01f);
 
 //        out = actionUnipolar(O, (d) -> {
 //            this.o.setValue(d);
@@ -112,20 +108,27 @@ public class Line1DSimplest extends NAgent {
 //                    break;
 //            }
 //        });
-//        out = actionBipolar(O, v -> {
-//            //float current = this.o.floatValue();
-//
-//            //if (!Util.equals(nv, o.floatValue(), Param.TRUTH_EPSILON)) {
-//            if (v == v) {
+
+        actionBipolar($.p("y"), v -> {
+            if (v == v) {
+                o.setValue(
+                        Util.unitize(o.floatValue() + v * speed.floatValue())
+                );
+            }
+            return o.getValue();
+
+            //float current = this.o.floatValue();
+
+            //if (!Util.equals(nv, o.floatValue(), Param.TRUTH_EPSILON)) {
 //                o.setValue(
 //                        //Util.unitize( current + v * speed.floatValue())
 //                        v
 //                );
 //            }
 //            return o.floatValue();
-//            //}
-//            //return false;
-//        });
+            //}
+            //return false;
+        });
 
 //        out = action(
 //                //$.inh($.the("o"), id),

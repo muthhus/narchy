@@ -13,6 +13,7 @@ import nars.truth.PreciseTruth;
 import spacegraph.layout.Grid;
 import spacegraph.widget.meter.Plot2D;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -60,7 +61,7 @@ public class Line1DCalibrate {
 
             final int runtime = Math.round(periods / tHz);
 
-            Set<Term> actions = Set.of(a.up.term(), a.down.term());
+            Collection actions = a.actions.values(); //Set.of(a.up.term(), a.down.term());
             n.onTask(t -> {
                if (t instanceof DerivedTask) {
                    if (t.isGoal()) {
@@ -89,8 +90,8 @@ public class Line1DCalibrate {
             a.speed.setValue(yResolution);
 
             a.happy.resolution.setValue(0.01f);
-            a.up.resolution.setValue(yResolution);
-            a.down.resolution.setValue(yResolution);
+//            a.up.resolution.setValue(yResolution);
+//            a.down.resolution.setValue(yResolution);
             a.in.resolution(yResolution);
             a.curiosity.setValue(
                     0.1f

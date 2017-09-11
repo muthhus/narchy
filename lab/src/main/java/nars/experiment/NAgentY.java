@@ -42,6 +42,8 @@ abstract public class NAgentY extends NAgentX {
     @Override
     protected void start(NAR nar) {
 
+        spec.out(1, (ignored)->{ /* do nothing */ });
+
         agent = spec.get(nar);
 
         //agent.ons.off(); //HACK
@@ -68,11 +70,10 @@ abstract public class NAgentY extends NAgentX {
         return super.addCamera(c);
     }
 
-    @Override public ScalarConcepts senseNumber(FloatSupplier v, ScalarConcepts.ScalarEncoder model, Term... states) {
+    @Override
+    public ScalarConcepts senseNumber(FloatSupplier v, ScalarConcepts.ScalarEncoder model, Term... states) {
         ScalarConcepts sc = super.senseNumber(v, model, states);
-        sc.forEach(x -> {
-            spec.in(x.signal::asFloat);
-        });
+        sc.forEach(x -> spec.in(x.signal::asFloat) );
         return sc;
     }
 
@@ -85,11 +86,18 @@ abstract public class NAgentY extends NAgentX {
             this.belief = new Signal(BELIEF, n.truthResolution);
         }
 
-        public void believe(float freq) {
+        void believe(float freq) {
             long pStart = now;
             long pEnd = now + nar.dur();
             LongSupplier stamper = nar.time::nextStamp;
             belief.set(term(), $.t(freq, nar.confDefault(BELIEF)), stamper, pStart, nar.dur(), nar);
+        }
+
+        public void enable() {
+            believe(1);
+        }
+        public void clear() {
+            believe(0);
         }
 
         @Override
@@ -103,7 +111,7 @@ abstract public class NAgentY extends NAgentX {
 
         RLActionConcept m = new RLActionConcept(s, nar);
 
-        spec.out(PrimitiveTuples.pair(2, (i) -> {
+        spec.out(2, (i) -> {
             switch (i) {
                 case 0:
                     off.run();
@@ -114,7 +122,7 @@ abstract public class NAgentY extends NAgentX {
                     m.believe(1);
                     break;
             }
-        }));
+        });
 
         return addAction(m);
     }

@@ -3,6 +3,7 @@ package nars;
 import jcog.Util;
 import jcog.data.FloatParam;
 import nars.concept.ActionConcept;
+import nars.concept.BeliefActionConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
 import nars.term.Term;
@@ -348,15 +349,25 @@ public interface NAct {
      * TODO make a FloatToFloatFunction variation in which a returned value in 0..+1.0 proportionally decreasese the confidence of any feedback
      */
     @NotNull
-    default GoalActionConcept actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
-        return actionUnipolar(s, (f) -> {
-            if (f != f)
-                return Float.NaN;
-            else {
-                float y = (f - 0.5f) * 2f;
-                return (update.valueOf(y) / 2) + 0.5f;
-            }
-        });
+    default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
+        throw new UnsupportedOperationException("TODO");
+//        return actionUnipolar(s, (f) -> {
+//            if (f != f)
+//                return Float.NaN;
+//            else {
+//                float y = (f - 0.5f) * 2f;
+//                return (update.valueOf(y) / 2) + 0.5f;
+//            }
+//        });
+
+//        addAction(new BeliefActionConcept(s, nar(), (t) -> {
+//            float f;
+//            if (t == null)
+//                f = 0f;
+//            else
+//                f = (t.freq()-0.5f)*2f;
+//            update.valueOf( f );
+//        }));
     }
 
     /**

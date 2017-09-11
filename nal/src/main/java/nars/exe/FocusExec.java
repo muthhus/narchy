@@ -65,7 +65,6 @@ public class FocusExec extends Exec implements Runnable {
     };
 
 
-
     public final Bag concepts =
             new ConcurrentCurveBag<>(Param.conceptActivate,
                     //new ConcurrentHashMap<>(),
@@ -179,12 +178,9 @@ public class FocusExec extends Exec implements Runnable {
     }
 
     protected void execute(ITask x) {
+        Iterable<? extends ITask> y = null;
         try {
-
-            Iterable<? extends ITask> y = x.run(nar);
-            if (y != null) {
-                y.forEach(this::add);
-            }
+            y = x.run(nar);
 
         } catch (UnsupportedOperationException e) {
             e.printStackTrace();
@@ -196,6 +192,11 @@ public class FocusExec extends Exec implements Runnable {
                 x.delete();
             }
         }
+
+        if (y != null) {
+            y.forEach(this::add);
+        }
+
     }
 
 
@@ -222,7 +223,7 @@ public class FocusExec extends Exec implements Runnable {
             }
         } else if (x instanceof Premise) {
 
-            premises.putAsync((Premise)x);
+            premises.putAsync((Premise) x);
 
         } else if (x instanceof Activate) {
             concepts.putAsync(x);

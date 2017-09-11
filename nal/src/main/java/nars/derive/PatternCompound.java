@@ -13,6 +13,7 @@ import nars.term.compound.GenericCompound;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -365,7 +366,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
          * @param y the compound being matched to this
          */
         @Override
-        protected boolean matchEllipsis(@NotNull TermContainer y, @NotNull Unify subst) {
+        protected boolean matchEllipsis(@NotNull TermContainer y, @NotNull Unify u) {
             //return subst.matchEllipsedCommutative(
             //        this, ellipsis, y
             //);
@@ -386,9 +387,15 @@ abstract public class PatternCompound extends GenericCompoundDT {
                 Term x = sub(k);
 
                 if (x.equals(ellipsis)) {
-                    Term v = subst.xy(x);
+                    Term v = u.xy(x);
                     if (v != null) {
-                        return ((EllipsisMatch) v).rematch(y, yFree);
+                        if (v instanceof EllipsisMatch) {
+                            return ((EllipsisMatch) v).rematch(y, yFree);
+                        } else {
+                            Term vv = (Term)v; //single-term matched for the ellipsis, so wont be EllipsisMatch instance
+                            if (!yFree.remove(vv))
+                                return false;
+                        }
                     }
 
                     continue;
@@ -437,18 +444,41 @@ abstract public class PatternCompound extends GenericCompoundDT {
 //
 //                } else {
 
-                xFixed.add(x);
+                boolean xConst = !u.matchType(x.op());
+                if (!xConst) {
+                    //try to resolve an already assigned and thus resolvable to constant
+                    @Nullable Term xx = u.xy(x);
+                    if (xx!=null) {
+                        x = xx;
+                        xConst = !u.matchType(x.op());
+                    }
+                }
+
+                if (xConst && !yFree.remove(x))
+                    return false; //x requires a constant not even present in y
+                if (!xConst) {
+                    xFixed.add(x); //x is a variable which must be termuted when everything non-X is assigned
+                }
+
                 //         }
 
 
             }
 
-            int numRemainingForEllipsis = yFree.size() - xFixed.size();
+            int xs = xFixed.size();
+            int ys = yFree.size();
+            int numRemainingForEllipsis = ys - xs;
 
             //if not invalid size there wouldnt be enough remaining matches to satisfy ellipsis cardinality
-            return ellipsis.validSize(numRemainingForEllipsis)
-                    &&
-                    matchEllipsisCommutive(subst, xFixed, yFree);
+            boolean vs = ellipsis.validSize(numRemainingForEllipsis);
+            if (!vs)
+                return false;
+
+            if (xs == 0) {
+                return u.putXY(ellipsis, ys > 0 ? EllipsisMatch.match(yFree) : EllipsisMatch.empty);
+            } else {
+                return matchEllipsisCommutive(u, xFixed, yFree);
+            }
 
 
         }

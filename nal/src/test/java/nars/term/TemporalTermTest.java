@@ -103,7 +103,9 @@ public class TemporalTermTest {
         assertEquals("[a:0, b:0]",
                 $("(a&|b)").events().toString());
 
-        assertEquals("[a:0, b:0, (a&|b):0, b:5, c:5, (b&|c):5]",
+        assertEquals(
+                "[(a&|b):0, (b&|c):5]",
+                //"[a:0, b:0, (a&|b):0, b:5, c:5, (b&|c):5]",
                 $("((a&|b) &&+5 (b&|c))").events().toString());
 
     }

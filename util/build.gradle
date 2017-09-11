@@ -2,7 +2,7 @@ description = ''
 dependencies {
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'org.jetbrains', name: 'annotations', version: '15.0'
-    compile group: 'org.eclipse.collections', name: 'eclipse-collections', version: '9.0.0.M3'
+    compile group: 'org.eclipse.collections', name: 'eclipse-collections', version: '9.0.0.M5'
     compile group: 'com.conversantmedia', name: 'disruptor', version: '1.2.11'
     compile group: 'org.fusesource.jansi', name: 'jansi', version: '1.16'
     compile(group: 'io.thekraken', name: 'grok', version: '0.1.5') {
@@ -20,10 +20,10 @@ dependencies {
     compile(group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3') {
         exclude(module: 'slf4j-api')
     }
-    compile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.0-RC3'
-    compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.0.0-RC3'
-    compile group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '4.12.0-RC3'
-    compile group: 'org.junit.platform', name: 'junit-platform-runner', version: '1.0.0-RC3'
+    compile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.0'
+    compile group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.0.0'
+    compile group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '4.12.0'
+    compile group: 'org.junit.platform', name: 'junit-platform-runner', version: '1.0.0'
     compile group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '2.5.5'
     compile(group: 'net.openhft', name: 'affinity', version: '3.1.0') {
         exclude(module: 'slf4j-api')
