@@ -196,28 +196,31 @@ public abstract class TermIndex implements TermContext {
     /* TODO move to Term instance method */
     @Nullable public static Term retemporalize(@NotNull Term x, Retemporalize r) {
 
-        if (x.size() == 0)
-            return x;
-
         Term y = x.transform(r.dt(x), r);
-        if (y == null || y.size() == 0) {
-            return y;
-        } else {
+        return y.normalize();
 
-
-
-            //            int ydt = yy.dt();
-//            if (ydt ==XTERNAL|| ydt ==DTERNAL) {
-//                int zdt = r.dt(x);
-//                if (ydt!=zdt)
-//                    //yy = compoundOrNull(transform(yy, zdt, CompoundTransform.Identity));
-//                    yy = compoundOrNull(yy.op().the(zdt, yy.toArray()));
-//            }
-//            if (yy == null)
-//                return null;
-            return y.normalize();
-        }
-
+//        if (x.size() == 0)
+//            return x;
+//
+//        Term y = x.transform(r.dt(x), r);
+//        if (y == null || y.size() == 0) {
+//            return y;
+//        } else {
+//
+//
+//
+//            //            int ydt = yy.dt();
+////            if (ydt ==XTERNAL|| ydt ==DTERNAL) {
+////                int zdt = r.dt(x);
+////                if (ydt!=zdt)
+////                    //yy = compoundOrNull(transform(yy, zdt, CompoundTransform.Identity));
+////                    yy = compoundOrNull(yy.op().the(zdt, yy.toArray()));
+////            }
+////            if (yy == null)
+////                return null;
+//            return y.normalize();
+//        }
+//
     }
 
 

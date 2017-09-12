@@ -551,9 +551,13 @@ public interface Compound extends Term, IPair, TermContainer {
     @Override
     default Term dt(int nextDT) {
 
-        int dt;
-        Op o = op();
-        if (o.temporal && nextDT != (dt = this.dt())) {
+
+        if (nextDT != this.dt()) {
+
+
+            Op o = op();
+            assert (o.temporal);
+
             Compound b = this instanceof GenericCompoundDT ?
                     ((GenericCompoundDT) this).ref : this;
 
@@ -573,11 +577,10 @@ public interface Compound extends Term, IPair, TermContainer {
                 return o.the(nextDT, ss);
             }
 
-        } else {
-            return this;
+
         }
 
-
+        return this;
     }
 
     /**
@@ -797,6 +800,11 @@ public interface Compound extends Term, IPair, TermContainer {
         return y;
     }
 
+    @Override
+    @Nullable
+    default Term transform(@NotNull CompoundTransform t) {
+        return transform(dt(), t);
+    }
 
     @Nullable
     default Term transform(int newDT, @NotNull CompoundTransform t) {
@@ -821,6 +829,8 @@ public interface Compound extends Term, IPair, TermContainer {
 
             Term x = srcSubs.sub(i);
             Term y = x.transform(this, t);
+            y = t.apply(null, y);
+
             if (Term.invalidBoolSubterm(y, boolFilter)) {
                 return null;
             }
@@ -829,7 +839,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 EllipsisMatch xx = (EllipsisMatch) y;
                 int xxs = xx.size();
                 for (int j = 0; j < xxs; j++) {
-                    @Nullable Term k = xx.sub(j).transform(this, t);
+                    @Nullable Term k = t.apply(null, xx.sub(j)); //.transform(this, t);
                     if (Term.invalidBoolSubterm(k, boolFilter)) {
                         return null;
                     } else {
@@ -838,11 +848,11 @@ public interface Compound extends Term, IPair, TermContainer {
                 }
                 subtermMods += xxs;
             } else {
-                if (!y.equals(x)) {
+                if (y != x /*&& !y.equals(x)*/) {
                     subtermMods++;
-                } else {
+                } /*else {
                     y = x;
-                }
+                }*/
 
                 target.add(y);
             }
@@ -869,7 +879,11 @@ public interface Compound extends Term, IPair, TermContainer {
             return this;
         }
     }
-
+    @Nullable
+    default Term transform(Compound parent, @NotNull CompoundTransform t) {
+        return transform(t);
+        //return t.apply(parent, this); //transform(dt(), t); //recurse
+    }
 
     @Override
     @NotNull

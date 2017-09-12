@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class VariableTransform implements CompoundTransform {
 
     @Override
-    public final boolean testSuperTerm(@NotNull Compound t) {
+    public boolean testSuperTerm(@NotNull Compound t) {
         //prevent executing on any superterms that contain no variables, because this would have no effect
         return t.vars() > 0 || t.varPattern() > 0;
     }

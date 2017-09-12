@@ -9,6 +9,7 @@ import nars.derive.PatternCompound;
 import nars.index.term.TermContext;
 import nars.term.container.TermContainer;
 import nars.term.subst.Unify;
+import nars.term.transform.CompoundTransform;
 import org.eclipse.collections.api.tuple.primitive.ObjectLongPair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -194,6 +195,11 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
     @Override
     public int dt() {
         return dt;
+    }
+
+    @Nullable
+    public final Term transform(int newDT, @NotNull CompoundTransform t) {
+        return Compound.super.transform(op(), newDT, t);
     }
 
     @Override

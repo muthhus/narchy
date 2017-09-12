@@ -3,14 +3,12 @@ package nars.term.transform;
 import nars.Op;
 import nars.term.Compound;
 import nars.term.Term;
-import nars.term.atom.Atomic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static nars.time.Tense.XTERNAL;
 
 abstract public class Retemporalize implements CompoundTransform {
-
 
 
     @Override
@@ -30,7 +28,8 @@ abstract public class Retemporalize implements CompoundTransform {
 
     abstract public int dt(@NotNull Term x);
 
-    @Deprecated  public static class RetemporalizeAll extends Retemporalize {
+    @Deprecated
+    public static class RetemporalizeAll extends Retemporalize {
 
         final int targetDT;
 
@@ -38,11 +37,14 @@ abstract public class Retemporalize implements CompoundTransform {
             this.targetDT = targetDT;
         }
 
-        @Override public int dt(@NotNull Term x) {
+        @Override
+        public int dt(@NotNull Term x) {
             return targetDT;
         }
     }
-    @Deprecated  public static class RetemporalizeNonXternal extends Retemporalize {
+
+    @Deprecated
+    public static class RetemporalizeNonXternal extends Retemporalize {
 
         final int dtIfXternal;
 
@@ -50,9 +52,10 @@ abstract public class Retemporalize implements CompoundTransform {
             this.dtIfXternal = dtIfXternal;
         }
 
-        @Override public int dt(@NotNull Term x) {
+        @Override
+        public int dt(@NotNull Term x) {
             int dt = x.dt();
-            return (dt==XTERNAL) ? dtIfXternal : dt;
+            return (dt == XTERNAL) ? dtIfXternal : dt;
         }
     }
 
