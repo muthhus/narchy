@@ -24,10 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -243,22 +240,23 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
             public void merge(TaskRegion existing, TaskRegion incoming) {
 
                 Task i = incoming.task;
-                Task e = existing.task;
-                if (e == i)
-                    return; //same instance
+//                if (e == i)
+//                    return; //same instance
 
                 float activation = i.priElseZero();
                 if (activation < Prioritized.EPSILON)
                     return;
 
+                Task e = existing.task;
                 float before = e.priElseZero();
                 ((NALTask) e).causeMerge(i);
                 float after = e.priMax(activation);
                 float activationApplied = (after - before);
 
 
-                if (activationApplied >= Prioritized.EPSILON)
-                    Activate.activate(e, activationApplied, nar);
+                if (activationApplied >= Prioritized.EPSILON) {
+                    i.log( (Runnable)()->{Activate.activate(e, activationApplied, nar);} ); //store here so callee can activate outside of the lock
+                }
             }
         };
 
@@ -583,6 +581,16 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
         if (added[0]) {
             Activate.activate(x, x.priElseZero(), nar);
+        } else {
+
+            @Nullable List ll = x.log();
+            if (ll!=null) {
+                Object ar = ll.get(ll.size() - 1);
+                if (ar instanceof Runnable) {
+                    ((Runnable)ar).run();
+                }
+            }
+            x.delete();
         }
 
     }
@@ -600,24 +608,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         Task input = inputRegion.task;
 
         FloatFunction<Task> taskStrength = taskStrengthWithFutureBoost(now, PRESENT_AND_FUTURE_BOOST, now, dur);
-
         FloatFunction<TaskRegion> weakestTask = (t -> -taskStrength.floatValueOf(t.task));
 
-        FloatFunction<TaskRegion> rs = regionStrength(now, dur);
-
-        FloatFunction<TaskRegion> regionWeakness = (r) -> -rs.floatValueOf(r);
-
-        FloatFunction<Node<?, TaskRegion>> leafWeakness = (l) -> -rs.floatValueOf((TaskRegion) (l.region()));
-
-
         float inputStrength = taskStrength.floatValueOf(input);
-        Top<TaskRegion> deleteVictim = new Top<>(weakestTask, -inputStrength) {
-            @Override
-            public void accept(TaskRegion x) {
-                super.accept(x);
-            }
-        };
+        Top<TaskRegion> deleteVictim = new Top<>(weakestTask, -inputStrength);
 
+        FloatFunction<TaskRegion> rs = regionStrength(now, dur);
+        FloatFunction<Node<?, TaskRegion>> leafWeakness = (l) -> -rs.floatValueOf((TaskRegion) (l.region()));
         Top<Leaf<TaskRegion>> mergeVictim = new Top(leafWeakness);
 
         compressNode(tree, tree.root(), deleteVictim, mergeVictim);
@@ -627,6 +624,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
         boolean merged = false;
         @Nullable Leaf<TaskRegion> toMerge = mergeVictim.the;
         if (toMerge != null) {
+            FloatFunction<TaskRegion> regionWeakness = (r) -> -rs.floatValueOf(r);
             if (compressMerge(tree, toMerge, taskStrength, inputStrength, regionWeakness, now, nar) != null) {
                 merged = true; //the result has already been added in compressMerge
             }

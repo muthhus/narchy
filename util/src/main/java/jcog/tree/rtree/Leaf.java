@@ -77,7 +77,8 @@ public class Leaf<T> implements Node<T, T> {
     @Override
     public Node<T, ?> add(/*@NotNull*/ final T t, Nodelike<T> parent, /*@NotNull*/ Spatialization<T> model) {
 
-        if (parent != null && !contains(t, model)) {
+        boolean ctm = contains(t, model);
+        if (parent != null && !ctm) {
             Node<T, ?> next;
 
             if (size < model.max) {
@@ -95,7 +96,7 @@ public class Leaf<T> implements Node<T, T> {
             return next;
         } else {
 
-            return (parent == null && contains(t, model)) ? null : this;
+            return (parent == null && ctm) ? null : this;
         }
     }
 
@@ -124,6 +125,9 @@ public class Leaf<T> implements Node<T, T> {
     public boolean contains(T t, Spatialization<T> model) {
         for (int i = 0; i < size; i++) {
             T d = data[i];
+            if (d == t) {
+                return true;
+            }
             if (d.equals(t)) {
                 model.merge(d, t);
                 return true;
