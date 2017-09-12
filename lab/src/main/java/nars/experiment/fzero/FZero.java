@@ -74,24 +74,29 @@ public class FZero extends NAgentX {
 //            }
             return f;
         });//.resolution.setValue(0.02f);
-
-        actionUnipolar(p("left"), (r) -> {
-            //if (r > 0.5f)
-                fz.playerAngle -= (r) * rotSpeed;
-            return r;
-        });//.resolution.setValue(0.01f);
-        actionUnipolar(p("right"), (r) -> {
-            //if (r > 0.5f)
-                fz.playerAngle += (r) * rotSpeed;
-            return r;
-        });//.resolution.setValue(0.01f);
-
         //throttle stabilizer (eternal goal)
-        nar.goal(p("fwd"), 0f, 0.02f);
+        nar.goal(p("fwd"), 0f, 0.01f);
+
+        actionBipolar($.the("x"), (x) -> {
+            fz.playerAngle += (x) * rotSpeed;
+            return x;
+        });
+//        actionUnipolar(p("left"), (r) -> {
+//            //if (r > 0.5f)
+//                fz.playerAngle -= (r) * rotSpeed;
+//            return r;
+//        });//.resolution.setValue(0.01f);
+//        actionUnipolar(p("right"), (r) -> {
+//            //if (r > 0.5f)
+//                fz.playerAngle += (r) * rotSpeed;
+//            return r;
+//        });//.resolution.setValue(0.01f);
+
+
 
         //yaw stabilizer (eternal goal)
-        nar.goal(p("left"), 0f, 0.02f);
-        nar.goal(p("right"), 0f, 0.02f);
+//        nar.goal(p($.the("x"),$.the("\"+\"")), 0f, 0.01f);
+//        nar.goal(p($.the("x"),$.the("\"-\"")), 0f, 0.01f);
 
         //keyboard-ish controls:
 //actionToggle($.inh(Atomic.the("fwd"),id), (b)-> fz.thrust = b );

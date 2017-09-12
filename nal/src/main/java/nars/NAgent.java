@@ -1,13 +1,12 @@
 package nars;
 
 import jcog.Loop;
-import jcog.Util;
 import jcog.data.FloatParam;
 import jcog.event.ArrayTopic;
 import jcog.event.On;
 import jcog.event.Topic;
 import jcog.list.FasterList;
-import jcog.math.FloatNormalized;
+import jcog.math.FloatPolarNormalized;
 import jcog.math.RecycledSummaryStatistics;
 import nars.concept.ActionConcept;
 import nars.concept.Concept;
@@ -129,7 +128,8 @@ abstract public class NAgent extends DurService implements NSense, NAct {
                         p(id, $.the("happy")), //happy in this environment
                 nar,
 
-                new FloatNormalized(()->reward),
+                //new FloatNormalized(()->reward),
+                new FloatPolarNormalized(() -> reward),
                 (x) -> t(x, alpha())
 
                 //new FloatPolarNormalized(() -> reward),

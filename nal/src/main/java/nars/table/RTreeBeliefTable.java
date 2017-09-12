@@ -585,12 +585,13 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
 
             @Nullable List ll = x.log();
             if (ll!=null) {
-                Object ar = ll.get(ll.size() - 1);
+                int t = ll.size() - 1;
+                Object ar = ll.get(t);
                 if (ar instanceof Runnable) {
+                    ll.remove(t);
                     ((Runnable)ar).run();
                 }
             }
-            x.delete();
         }
 
     }

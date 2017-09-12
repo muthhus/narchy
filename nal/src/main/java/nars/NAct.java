@@ -366,7 +366,9 @@ public interface NAct {
             p = c.term().equals(pt);
             ff[p ? 0 : 1] = g != null ?
                     //(g.expectation() - 0.5f)*2f: 0f
-                    (g.freq() - 0.5f) * 2f : 0f
+                    //(g.freq() - 0.5f) * 2f : 0f
+                    //g.freq() : 0f
+                    (g.freq() > 0.5f ? (g.freq() - 0.5f)*2f : 0f) : 0f
             ;
 
             NAR n = nar();
@@ -382,15 +384,17 @@ public interface NAct {
                 float cur = curiosity().floatValue();
                 if (cur > 0 && n.random().nextFloat() <= cur) {
                     //x = Util.clamp(x + (n.random().nextFloat())*4f - 2f, -1f, +1f);
-                    x = n.random().nextFloat() * 2f - 1f;
+                    //x = n.random().nextFloat() * 2f - 1f;
+                    x = (n.random().nextBoolean() ? +1 : -1f) * (0.5f + Util.clamp((float) Math.abs(n.random().nextGaussian()), 0f, 0.5f));
                 } else {
                     x = (ff[0] - ff[1]);
 
+//                    x *= (Math.abs(ff[0] - ff[1])/2f);
+
 //                    float range =
 //                            //Math.abs(ff[0] - ff[1]);
-//                            Math.abs(ff[0]) + Math.abs(ff[1]);
-//                    //Math.max(Math.abs(ff[0]), Math.abs(ff[1]));
-//
+//                            //Math.abs(ff[0]) + Math.abs(ff[1]);
+//                            Math.max(Math.abs(ff[0]), Math.abs(ff[1]));
 //                    if (range >= Param.TRUTH_EPSILON)
 //                        x /= range; //normalize against its own range
 //                    else
@@ -399,36 +403,47 @@ public interface NAct {
 
 
                 float y = update.valueOf(x);
+                if (y!=y)
+                    y = 0;
+                else {
+                    float momentum = 0.5f;
+                    y *= momentum;
+                }
 
-                y = Util.clamp(y, -1f, +1f);
+                //y = Util.clamp(y, -1f/2, +1f/2);
 
                 float pp, nn;
                 if (y > 0) {
                     pp = +y; //0.5f + (balance/2f);
                     nn = 0; //-pp; // 0;
-                    if (pp > 0.5f) {
-                        nn = -(pp - 0.5f);
-                        pp = 0.5f;
-                    }
+//                    if (pp > 0.5f) {
+//                        nn = -(pp - 0.5f);
+//                        pp = 0.5f;
+//                    }
                 } else {
                     nn = -y; //0.5f + (-balance/2f);
                     pp = 0; //-nn; //0;
-                    if (nn > 0.5f) {
-                        pp = -(nn - 0.5f);
-                        nn = 0.5f;
-                    }
+//                    if (nn > 0.5f) {
+//                        pp = -(nn - 0.5f);
+//                        nn = 0.5f;
+//                    }
                 }
 
-                pp = Util.clamp(pp, -0.5f, +0.5f);
-                nn = Util.clamp(nn, -0.5f, +0.5f);
+//                pp = Util.clamp(pp, -0.5f, +0.5f) + 0.5f;
+//                nn = Util.clamp(nn, -0.5f, +0.5f) + 0.5f;
+
+                pp = Util.clamp(pp, 0f, +1);
+                if (pp < Param.TRUTH_EPSILON) pp = 0; else pp = pp/2f + 0.5f;
+                nn = Util.clamp(nn, 0f, +1);
+                if (nn < Param.TRUTH_EPSILON) nn = 0; else nn = nn/2f + 0.5f;
 
                 ff[0] = ff[1] = Float.NaN; //reset for next cycle
                 float conf =
                         //(cc[0] + cc[1])/2f;
                         n.confDefault(GOAL);
                 //if (conf >= n.confMin.floatValue()) {
-                ((GoalActionAsyncConcept) n.concept(pt)).feedback($.t(pp + 0.5f, conf));
-                ((GoalActionAsyncConcept) n.concept(nt)).feedback($.t(nn + 0.5f, conf));
+                ((GoalActionAsyncConcept) n.concept(pt)).feedback($.t(pp, conf));
+                ((GoalActionAsyncConcept) n.concept(nt)).feedback($.t(nn, conf));
                 //}
             }
         };

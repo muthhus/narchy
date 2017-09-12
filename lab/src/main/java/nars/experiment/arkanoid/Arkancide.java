@@ -174,7 +174,7 @@ public class Arkancide extends NAgentX {
         });
 
         actionBipolar($.the("X"), (dx) -> {
-            if (noid.paddle.move(dx * 4 * paddleSpeed))
+            if (noid.paddle.move(dx * paddleSpeed))
                 return dx;
             else
                 return 0;

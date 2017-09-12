@@ -95,9 +95,9 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         this.nar = nar;
 
-        long pStart = now - dur/2;
-        long pEnd = now + dur/2;
-        LongSupplier stamper = nar.time::nextStamp;
+        long pStart = now;// - dur/2;
+        long pEnd = now + dur;
+        //LongSupplier stamper = nar.time::nextStamp;
 
         Truth goal = this.goals().truth(pStart, pEnd, nar);
 

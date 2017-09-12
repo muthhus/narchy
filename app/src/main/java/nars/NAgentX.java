@@ -1,8 +1,10 @@
 package nars;
 
+import com.google.common.collect.Iterables;
 import jcog.data.FloatParam;
 import jcog.event.On;
 import jcog.pri.mix.control.MixContRL;
+import nars.concept.ActionConcept;
 import nars.control.Derivation;
 import nars.control.NARService;
 import nars.derive.Deriver;
@@ -11,6 +13,7 @@ import nars.exe.FocusExec;
 import nars.exe.MultiExec;
 import nars.gui.Vis;
 import nars.index.term.map.CaffeineIndex2;
+import nars.op.Implier;
 import nars.op.mental.Inperience;
 import nars.op.stm.MySTMClustered;
 import nars.op.stm.STMLinkage;
@@ -34,6 +37,7 @@ import spacegraph.widget.meter.Plot2D;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.function.Function;
