@@ -2,10 +2,12 @@ package nars.task;
 
 import jcog.Util;
 import jcog.pri.Pri;
+import jcog.tree.rtree.HyperRegion;
 import nars.Param;
 import nars.Task;
 import nars.control.Cause;
 import nars.task.util.InvalidTaskException;
+import nars.task.util.TaskRegion;
 import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;
@@ -34,7 +36,9 @@ public class NALTask extends Pri implements Task {
 
     public final long[] stamp;
 
-    /** TODO final */
+    /**
+     * TODO final
+     */
     public short[] cause = ArrayUtils.EMPTY_SHORT_ARRAY;
 
     final int hash;
@@ -82,27 +86,26 @@ public class NALTask extends Pri implements Task {
         this.term = term;
 
         this.truth =
-            truth==null ? null :
-                truth instanceof DiscreteTruth ?
-                    ((DiscreteTruth)truth) :
-                    new DiscreteTruth(truth.freq(), truth.conf());
+                truth == null ? null :
+                        truth instanceof DiscreteTruth ?
+                                ((DiscreteTruth) truth) :
+                                new DiscreteTruth(truth.freq(), truth.conf());
 
         this.punc = punc;
 
 
-
-        assert (start == ETERNAL && end == ETERNAL) || (start != ETERNAL && start <= end):
+        assert (start == ETERNAL && end == ETERNAL) || (start != ETERNAL && start <= end) :
                 "start=" + start + ", end=" + end + " is invalid task occurrence time";
 
         //ensure that a temporal task is at least as long as the contained dt.
         //bugs and rounding off-by-N errors may produce inexact results, this corrects it.
-        if (start!=ETERNAL && term.op() == CONJ) {
+        if (start != ETERNAL && term.op() == CONJ) {
             int tdt = term.dtRange();
             if (tdt > 0) {
                 if (tdt > (end - start)) {
                     end = start + tdt; //keeps start (left)-aligned, end is stretched if necessary
                 }
-            }  else if (tdt < 0) {
+            } else if (tdt < 0) {
                 throw new RuntimeException("dt overflow");
             }
         }
@@ -111,7 +114,7 @@ public class NALTask extends Pri implements Task {
         this.end = end;
 
         //EVIDENCE STAMP
-        assert(punc == COMMAND || (stamp.length > 0) ): "non-command tasks must have non-empty stamp";
+        assert (punc == COMMAND || (stamp.length > 0)) : "non-command tasks must have non-empty stamp";
         this.stamp = stamp;
 
         //CALCULATE HASH
@@ -123,7 +126,7 @@ public class NALTask extends Pri implements Task {
 
         if (stamp.length > 1) {
 
-            if (start!=ETERNAL) {
+            if (start != ETERNAL) {
                 h = Util.hashCombine(
                         Long.hashCode(start),
                         Long.hashCode(end), h
@@ -149,19 +152,24 @@ public class NALTask extends Pri implements Task {
     @Override
     public final boolean equals(Object that) {
         return this == that ||
-                (that instanceof Task &&
-                 hash == that.hashCode() &&
-                 Task.equal(this, (Task) that));
+                (hash == that.hashCode() &&
+                    that instanceof Tasked &&
+                    Task.equal(this, ((Tasked) that).task())
+                );
     }
 
 
-    /** combine cause: should be called in all Task bags and belief tables on merge */
+    /**
+     * combine cause: should be called in all Task bags and belief tables on merge
+     */
     public void causeMerge(Task incoming) {
         this.cause = Cause.zip(this, incoming);
     }
+
     public void causeMerge(short[] x) {
-        this.cause = Cause.zip(CAUSE_CAPACITY, this::cause, ()->x);
+        this.cause = Cause.zip(CAUSE_CAPACITY, this::cause, () -> x);
     }
+
     public void causeAppend(short[] x) {
         this.cause = Cause.append(CAUSE_CAPACITY, cause, x);
     }
@@ -240,8 +248,6 @@ public class NALTask extends Pri implements Task {
     }
 
 
-
-
     @Override
     public Map meta() {
         return meta;
@@ -251,7 +257,7 @@ public class NALTask extends Pri implements Task {
     public void meta(Object key, Object value) {
         //synchronized (this) {
         if (meta == null) {
-            meta = UnifiedMap.newWithKeysValues(key,value); /* for compactness */
+            meta = UnifiedMap.newWithKeysValues(key, value); /* for compactness */
         } else {
             meta.put(key, value);
         }
@@ -289,4 +295,39 @@ public class NALTask extends Pri implements Task {
     }
 
 
+
+    @Override
+    public double coord(boolean maxOrMin, int dimension) {
+        switch (dimension) {
+            case 0:
+                return maxOrMin ? end : start;
+            case 1:
+                return freq();
+            case 2:
+                return conf();
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public double range(int dim) {
+        switch (dim) {
+            case 0: return end-start;
+            case 1: return 0;
+            case 2: return 0;
+            default:
+                throw new UnsupportedOperationException();
+        }
+    }
+
+    /** rtree cost heuristic; constant result */
+    @Override public float freqCost() {
+        return 1;
+    }
+
+    /** rtree cost heuristic; constant result */
+    @Override public float confCost() {
+        return 1;
+    }
 }

@@ -9,6 +9,7 @@ import nars.task.ITask;
 import nars.task.NALTask;
 import nars.task.Tasked;
 import nars.task.util.InvalidTaskException;
+import nars.task.util.TaskRegion;
 import nars.term.Term;
 import nars.term.Termed;
 import nars.time.Tense;
@@ -25,7 +26,6 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 import static nars.Op.*;
-import static nars.Op.goalable;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -35,7 +35,7 @@ import static nars.truth.TruthFunctions.w2c;
 /**
  * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.
  */
-public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
+public interface Task extends Tasked, Truthed, Stamp, Termed, ITask, TaskRegion {
 
 
     static boolean equal(@NotNull Task a, @NotNull Task b) {
