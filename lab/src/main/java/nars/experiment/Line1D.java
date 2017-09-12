@@ -115,7 +115,8 @@ public class Line1D {
             n.goalConfidence(0.5f);
 
             //n.start();
-            n.run(1000);
+            n.run(100000);
+
             n.concepts().collect(Collectors2.toSortedSet()).forEach(x -> {
                 if (x.op()==IMPL) {
                     x.print();

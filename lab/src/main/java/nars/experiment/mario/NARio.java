@@ -105,21 +105,44 @@ public class NARio extends NAgentY {
         vx = senseNumberDifference($("vx"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.x : 0).resolution(0.25f);
         senseNumberDifference($("vy"), () -> mario.scene instanceof LevelScene ? ((LevelScene) mario.scene).mario.y : 0).resolution(0.25f);
 
-        actionToggle(p("left"), (n) -> {
-            //if (n) mario.scene.key(Mario.KEY_RIGHT, false); //mutex
-            mario.scene.key(Mario.KEY_LEFT, n);
+        actionBipolar($.the("x"), (x) -> {
+            float thresh = 0.33f;
+            float thresh2 = 0.75f;
+            if (x <= -thresh) {
+               mario.scene.key(Mario.KEY_LEFT, true);
+               mario.scene.key(Mario.KEY_RIGHT, false);
+               mario.scene.key(Mario.KEY_SPEED, x <= -thresh2);
+               //return -1f;
+               return x;
+           } else if (x >= +thresh) {
+               mario.scene.key(Mario.KEY_RIGHT, true);
+               mario.scene.key(Mario.KEY_LEFT, false);
+               mario.scene.key(Mario.KEY_SPEED, x >= +thresh2);
+               //return +1f;
+               return x;
+           } else {
+               mario.scene.key(Mario.KEY_LEFT, false);
+               mario.scene.key(Mario.KEY_RIGHT, false);
+               mario.scene.key(Mario.KEY_SPEED, false);
+               //return 0f;
+               return x;
+           }
         });
-        actionToggle(p("right"), (n) -> {
-            //if (n) mario.scene.key(Mario.KEY_LEFT, false); //mutex
-            mario.scene.key(Mario.KEY_RIGHT, n);
-        });
+//        actionToggle(p("left"), (n) -> {
+//            //if (n) mario.scene.key(Mario.KEY_RIGHT, false); //mutex
+//            mario.scene.key(Mario.KEY_LEFT, n);
+//        });
+//        actionToggle(p("right"), (n) -> {
+//            //if (n) mario.scene.key(Mario.KEY_LEFT, false); //mutex
+//            mario.scene.key(Mario.KEY_RIGHT, n);
+//        });
         actionToggle(p("jmp"), (n) -> {
             mario.scene.key(Mario.KEY_JUMP, n);
         });
         actionToggle(p("down"), (n) -> {
             mario.scene.key(Mario.KEY_DOWN, n);
         });
-        actionToggle($("speed"), (b) -> mario.scene.key(Mario.KEY_SPEED, b));
+        //actionToggle($("speed"), (b) -> mario.scene.key(Mario.KEY_SPEED, b));
 
 //        actionTriState($("x"), i -> {
 //            boolean n, p;

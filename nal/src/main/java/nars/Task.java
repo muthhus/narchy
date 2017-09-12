@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 import static nars.Op.*;
+import static nars.Op.goalable;
 import static nars.op.DepIndepVarIntroduction.validIndepVarSuperterm;
 import static nars.term.Terms.normalizedOrNull;
 import static nars.time.Tense.ETERNAL;
@@ -160,8 +161,8 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask {
         }
 
 
-        Op op = t.op();
-        if ((op == Op.IMPL) && (punc == Op.GOAL || punc == Op.QUEST))
+
+        if ((punc == Op.GOAL || punc == Op.QUEST) && !goalable(t))
             return fail(t, "Goal/Quest task term may not be Implication or Equivalence", safe);
 
         return true;

@@ -1638,6 +1638,10 @@ public enum Op implements $ {
         return compound(intersection, DTERNAL, aa);
     }
 
+    public static boolean goalable(Term c) {
+        return !c.hasAny(Op.NonGoalable);// && c.op().goalable;
+    }
+
     @NotNull
     @Override
     public String toString() {

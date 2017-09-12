@@ -24,11 +24,9 @@ import static nars.Op.GOAL;
 public class GoalActionAsyncConcept extends ActionConcept {
 
 
-    public static final float CURIOSITY_CONF_FACTOR = 0.25f;
 
     public final Signal feedback;
 
-    private final FloatParam curiosity;
 
 
     @NotNull
@@ -43,8 +41,6 @@ public class GoalActionAsyncConcept extends ActionConcept {
                 act.nar());
 
         NAR n = act.nar();
-
-        this.curiosity = act.curiosity();
 
 //        this.action = new Signal(GOAL, n.truthResolution).pri(() -> n.priDefault(GOAL));
         //((SensorBeliefTable) goals).sensor = action;
@@ -105,47 +101,47 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
         Truth goal = this.goals().truth(pStart, pEnd, nar);
 
-        //float curiPeriod = 2; //TODO vary this
-        float cur = curiosity.floatValue();
-
-        Truth belief;
-        Task fg;
-        if (nar.random().nextFloat() < cur) {
-//            // curiosity override
+//        //float curiPeriod = 2; //TODO vary this
+//        float cur = curiosity.floatValue();
 //
-            float curiConf =
-//                    //nar.confDefault(GOAL);
-                    //nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR;
-                    Math.max(goal != null ? goal.conf() : 0,
-                            nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR);
-            //nar.confMin.floatValue()*2);
+//        Truth belief;
+//        Task fg;
+//        if (nar.random().nextFloat() < cur) {
+////            // curiosity override
+////
+//            float curiConf =
+////                    //nar.confDefault(GOAL);
+//                    //nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR;
+//                    Math.max(goal != null ? goal.conf() : 0,
+//                            nar.confDefault(GOAL) * CURIOSITY_CONF_FACTOR);
+//            //nar.confMin.floatValue()*2);
+////
+//////            float cc =
+//////                    //curiConf;
+//////                    curiConf - (goal != null ? goal.conf() : 0);
+//////            if (cc > 0) {
+////
+//            float f =
+//                    Util.round(nar.random().nextFloat(), resolution.floatValue());
+//////                    ((float)Math.sin(
+//////                        hashCode() /* for phase shift */
+//////                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
+////
+//            goal = $.t(f, curiConf);
+////            fg = action.set(term, goal, stamper, now, dur, nar);
+////            curious = true;
+////
+//////                Truth ct = $.t(f, cc);
+//////                goal = ct; //curiosity overrides goal
+////
+//////                if (goal == null) {
+//////                    goal = ct;
+//////                } else {
+//////                    goal = Revision.revise(goal, ct);
+//////                }
 //
-////            float cc =
-////                    //curiConf;
-////                    curiConf - (goal != null ? goal.conf() : 0);
-////            if (cc > 0) {
 //
-            float f =
-                    Util.round(nar.random().nextFloat(), resolution.floatValue());
-////                    ((float)Math.sin(
-////                        hashCode() /* for phase shift */
-////                            + now / (curiPeriod * (2 * Math.PI) * dur)) + 1f)/2f;
-//
-            goal = $.t(f, curiConf);
-//            fg = action.set(term, goal, stamper, now, dur, nar);
-//            curious = true;
-//
-////                Truth ct = $.t(f, cc);
-////                goal = ct; //curiosity overrides goal
-//
-////                if (goal == null) {
-////                    goal = ct;
-////                } else {
-////                    goal = Revision.revise(goal, ct);
-////                }
-
-
-        }
+//        }
 
 //        belief = this.beliefs().truth(pStart, pEnd, nar);
 

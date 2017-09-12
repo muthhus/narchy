@@ -19,18 +19,18 @@ public class PreciseTruth implements Truth {
         this(freq, conf, true);
     }
 
-    public PreciseTruth(float freq, float x, boolean xIsConfOrEvidence) {
+    public PreciseTruth(float freq, float ce, boolean xIsConfOrEvidence) {
         assert ((freq == freq) && (freq >= 0) && (freq <= 1)):
-                "invalid freq";
+                "invalid freq: " + freq;
         this.f = freq;
-        assert ((x == x) && (x > 0)):
-                "invalid evidence/conf";
+        assert ((ce == ce) && (ce > 0)):
+                "invalid evidence/conf: " + ce;
         float e;
         if (xIsConfOrEvidence) {
-            assert(x <= TruthFunctions.MAX_CONF): x + " is gte max (" + TruthFunctions.MAX_CONF + ')';
-            e = c2wSafe(x, Param.HORIZON);
+            assert(ce <= TruthFunctions.MAX_CONF): ce + " is gte max (" + TruthFunctions.MAX_CONF + ')';
+            e = c2wSafe(ce, Param.HORIZON);
         } else {
-            e = x;
+            e = ce;
         }
         this.e = e;
     }

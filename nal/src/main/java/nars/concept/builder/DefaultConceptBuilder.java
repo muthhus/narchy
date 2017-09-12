@@ -304,10 +304,6 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         return BeliefTable.Empty;
     }
 
-    static boolean goalable(Term c) {
-        return !c.hasAny(Op.NonGoalable) && c.op().goalable;
-    }
-
     @Override
     public TemporalBeliefTable newTemporalBeliefTable(Term c) {
         if (c.complexity() < 12) {

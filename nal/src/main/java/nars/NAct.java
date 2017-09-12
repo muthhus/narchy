@@ -3,7 +3,6 @@ package nars;
 import jcog.Util;
 import jcog.data.FloatParam;
 import nars.concept.ActionConcept;
-import nars.concept.BeliefActionConcept;
 import nars.concept.GoalActionAsyncConcept;
 import nars.concept.GoalActionConcept;
 import nars.control.CauseChannel;
@@ -143,7 +142,7 @@ public interface NAct {
                         throw new RuntimeException();
                 }
 
-                return $.t( f, nar().confDefault(BELIEF));
+                return $.t(f, nar().confDefault(BELIEF));
             }
 
             return b;
@@ -154,7 +153,7 @@ public interface NAct {
 
     default <A extends ActionConcept> A addAction(A c) {
         CauseChannel existing = actions().put(c, nar().newCauseChannel(c));
-        assert(existing == null);
+        assert (existing == null);
         nar().on(c);
         return c;
     }
@@ -341,7 +340,7 @@ public interface NAct {
 
     @NotNull
     default GoalActionConcept action(@NotNull Term s, @NotNull GoalActionConcept.MotorFunction update) {
-        return addAction( new GoalActionConcept(s, this, update) );
+        return addAction(new GoalActionConcept(s, this, update));
     }
 
     /**
@@ -355,44 +354,82 @@ public interface NAct {
     default void actionBipolar(@NotNull Term s, @NotNull FloatToFloatFunction update) {
         Term pt =
                 //$.inh( $.the("\"+\""), s);
-            $.p(s, $.the("\"+\""));
+                $.p(s, $.the("\"+\""));
         Term nt =
                 //$.inh($.the("\"-\""), s);
-            $.p(s, $.the("\"-\""));
+                $.p(s, $.the("\"-\""));
 
-        final float gg[] = new float[2];
+        final float ff[] = new float[2];
+        final float cc[] = new float[2];
         @NotNull BiConsumer<GoalActionAsyncConcept, Truth> u = (c, g) -> {
             boolean p;
             p = c.term().equals(pt);
-            gg[ p ? 0 : 1] = g!=null ?
-                    //g.expectation() - 0.5f : 0
-                    g.freq() : 0.5f
+            ff[p ? 0 : 1] = g != null ?
+                    //(g.expectation() - 0.5f)*2f: 0f
+                    (g.freq() - 0.5f) * 2f : 0f
             ;
+
+            NAR n = nar();
+            cc[p ? 0 : 1] = (g != null) ? g.conf() : 0;
+
             if (!p) {
-                assert(gg[0] == gg[0]); //assert that positive has been set in this cycle
-                float balance = update.valueOf((gg[0] - gg[1]));
+                assert (ff[0] == ff[0]); //assert that positive has been set in this cycle
+
+
+                float x;
+
+                //curiosity noise
+                float cur = curiosity().floatValue();
+                if (cur > 0 && n.random().nextFloat() <= cur) {
+                    //x = Util.clamp(x + (n.random().nextFloat())*4f - 2f, -1f, +1f);
+                    x = n.random().nextFloat() * 2f - 1f;
+                } else {
+                    x = (ff[0] - ff[1]);
+
+//                    float range =
+//                            //Math.abs(ff[0] - ff[1]);
+//                            Math.abs(ff[0]) + Math.abs(ff[1]);
+//                    //Math.max(Math.abs(ff[0]), Math.abs(ff[1]));
+//
+//                    if (range >= Param.TRUTH_EPSILON)
+//                        x /= range; //normalize against its own range
+//                    else
+//                        x = 0; //no difference anyway
+                }
+
+
+                float y = update.valueOf(x);
+
+                y = Util.clamp(y, -1f, +1f);
 
                 float pp, nn;
-                if (balance > 0) {
-                    pp = +balance; //0.5f + (balance/2f);
+                if (y > 0) {
+                    pp = +y; //0.5f + (balance/2f);
                     nn = 0; //-pp; // 0;
                     if (pp > 0.5f) {
-                        nn = (pp - 0.5f);
+                        nn = -(pp - 0.5f);
                         pp = 0.5f;
                     }
                 } else {
-                    nn = -balance; //0.5f + (-balance/2f);
+                    nn = -y; //0.5f + (-balance/2f);
                     pp = 0; //-nn; //0;
                     if (nn > 0.5f) {
-                        pp = (nn - 0.5f);
+                        pp = -(nn - 0.5f);
                         nn = 0.5f;
                     }
                 }
-                gg[0] = gg[1] = Float.NaN; //reset for next cycle
-                NAR n = nar();
-                float conf = n.confDefault(GOAL);
-                ((GoalActionAsyncConcept) n.concept(pt)).feedback($.t(pp+0.5f, conf));
-                ((GoalActionAsyncConcept) n.concept(nt)).feedback($.t(nn+0.5f, conf));
+
+                pp = Util.clamp(pp, -0.5f, +0.5f);
+                nn = Util.clamp(nn, -0.5f, +0.5f);
+
+                ff[0] = ff[1] = Float.NaN; //reset for next cycle
+                float conf =
+                        //(cc[0] + cc[1])/2f;
+                        n.confDefault(GOAL);
+                //if (conf >= n.confMin.floatValue()) {
+                ((GoalActionAsyncConcept) n.concept(pt)).feedback($.t(pp + 0.5f, conf));
+                ((GoalActionAsyncConcept) n.concept(nt)).feedback($.t(nn + 0.5f, conf));
+                //}
             }
         };
 
@@ -441,7 +478,7 @@ public interface NAct {
 
             //return $.t(f, nar().confDefault(BELIEF));
 
-            if (f==f)
+            if (f == f)
                 return $.t(f,
                         //d!=null ? d.conf() : nar().confMin.floatValue()
                         nar().confDefault(BELIEF)
@@ -451,6 +488,7 @@ public interface NAct {
 
         });
     }
+
     /**
      * supplies values in range -1..+1, where 0 ==> expectation=0.5
      */
