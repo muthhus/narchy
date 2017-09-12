@@ -100,6 +100,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
 
     }
 
+    @Override
     public List<Premise> run(NAR nar) {
         nar.emotion.conceptFires.increment();
         nar.terms.commit(id); //index cache update
@@ -140,19 +141,19 @@ public class Activate extends UnaryTask<Concept> implements Termed {
         if (!localTemplates.isEmpty()) {
             float subDecay = decayed / localTemplates.size();
             float balance = Param.TERMLINK_BALANCE;
-            float subDecayForward = subDecay * balance;
-            float subDecayReverse = subDecay * (1f - balance);
             Term thisTerm = id.term();
-            float activationFactor = 1f; //priElseZero();
 
             localSubConcepts = $.newArrayList(); //temporary for this function call only, so as not to retain refs to Concepts
 
             Random rng = nar.random();
+            float activationFactor = 1f; //priElseZero();
+            float subDecayReverse = subDecay * (1f - balance);
+            float subDecayForward = subDecay * balance;
             for (Termed localSub : localTemplates) {
-                float d;
 
                 localSub = local(localSub, rng); //for special Termed instances, ex: RotatedInt etc
 
+                float d;
                 if (localSub.op().conceptualizable) {
 
                     Concept localSubConcept = nar.conceptualize(localSub);
@@ -220,7 +221,7 @@ public class Activate extends UnaryTask<Concept> implements Termed {
     /**
      * preprocess termlink
      */
-    private Termed local(Termed x, Random rng) {
+    private static Termed local(Termed x, Random rng) {
 
         if (Param.MUTATE_INT_CONTAINING_TERMS_RATE > 0) {
             Term t = x.term();

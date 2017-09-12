@@ -24,8 +24,8 @@ public class Emotivation extends Emotion {
     public final LongGauge cycleDT = new LongGauge(id("cycle time"));
     public final DescriptiveStatistics cycleDTReal = new DescriptiveStatistics(4 /* cycles */); //realtime
 
-    public final BasicGauge<Float> cycleDTRealMean = new BasicGauge<Float>(id("cycle time real mean"), ()->(float)cycleDTReal.getMean());
-    public final BasicGauge<Float> cycleDTRealVary = new BasicGauge<Float>(id("cycle time real vary"), ()->(float)cycleDTReal.getVariance());
+    public final BasicGauge<Float> cycleDTRealMean = new BasicGauge<>(id("cycle time real mean"), () -> (float) cycleDTReal.getMean());
+    public final BasicGauge<Float> cycleDTRealVary = new BasicGauge<>(id("cycle time real vary"), () -> (float) cycleDTReal.getVariance());
 
     long lastCycleTime, lastRealTime;
 

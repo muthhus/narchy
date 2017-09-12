@@ -29,6 +29,7 @@ import static nars.time.Tense.ETERNAL;
 public interface BeliefTable extends TaskTable, Iterable<Task> {
 
 
+    @Override
     default Iterator<Task> taskIterator() {
         return iterator();
     }
@@ -161,6 +162,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     /**
      * attempt to insert a task; returns what was input or null if nothing changed (rejected)
      */
+    @Override
     void add(@NotNull Task input, BaseConcept concept, @NotNull NAR nar);
 
 
@@ -205,6 +207,7 @@ public interface BeliefTable extends TaskTable, Iterable<Task> {
     /**
      * empties the table, an unindexes them in the NAR
      */
+    @Override
     void clear();
 
     /**

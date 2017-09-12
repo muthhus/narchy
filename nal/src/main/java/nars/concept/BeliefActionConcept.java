@@ -3,7 +3,6 @@ package nars.concept;
 import nars.$;
 import nars.NAR;
 import nars.Task;
-import nars.task.Revision;
 import nars.term.Term;
 import nars.time.Tense;
 import nars.truth.Truth;
@@ -11,7 +10,6 @@ import nars.util.signal.Signal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
-import java.util.function.LongSupplier;
 import java.util.stream.Stream;
 
 import static nars.Op.BELIEF;
@@ -26,7 +24,7 @@ public class BeliefActionConcept extends ActionConcept {
     private final Consumer<Truth> action;
     private final Signal feedback;
 
-    private float curiosity = 0.1f;
+    private final float curiosity = 0.1f;
 
 
     public BeliefActionConcept(@NotNull Term term, @NotNull NAR n, Consumer<Truth> action) {

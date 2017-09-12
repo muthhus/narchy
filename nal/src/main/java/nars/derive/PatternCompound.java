@@ -392,7 +392,7 @@ abstract public class PatternCompound extends GenericCompoundDT {
                         if (v instanceof EllipsisMatch) {
                             return ((EllipsisMatch) v).rematch(y, yFree);
                         } else {
-                            Term vv = (Term)v; //single-term matched for the ellipsis, so wont be EllipsisMatch instance
+                            Term vv = v; //single-term matched for the ellipsis, so wont be EllipsisMatch instance
                             if (!yFree.remove(vv))
                                 return false;
                         }

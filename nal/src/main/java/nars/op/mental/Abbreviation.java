@@ -50,7 +50,7 @@ public class Abbreviation/*<S extends Term>*/ extends TaskService {
     /**
      * whether to use a (strong, proxying) alias atom concept
      */
-    boolean aliasConcept = false;
+    boolean aliasConcept;
 
     private static final Logger logger = LoggerFactory.getLogger(Abbreviation.class);
 

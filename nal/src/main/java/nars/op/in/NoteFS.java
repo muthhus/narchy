@@ -53,9 +53,7 @@ public class NoteFS extends NARService {
                     } else {
                         logger.error("{} {}", p, e);
                     }
-                } catch (IOException e) {
-                    logger.error("{} {}", p, e);
-                } catch (Narsese.NarseseException e) {
+                } catch (IOException | Narsese.NarseseException e) {
                     logger.error("{} {}", p, e);
                 }
             }

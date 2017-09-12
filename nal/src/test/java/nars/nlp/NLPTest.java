@@ -21,7 +21,7 @@ public class NLPTest {
 //    }
 
     @Test @Ignore
-    public void testNLP0() throws IOException, Narsese.NarseseException {
+    public void testNLP0() throws Narsese.NarseseException {
         //Param.DEBUG = true;
 
         NAR n = new NARS().get();

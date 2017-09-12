@@ -62,12 +62,13 @@ public abstract class Ellipsis extends AbstractVariable implements Ellipsislike 
         @NotNull
         public static Ellipsis make(int serial, int minArity) {
             @NotNull AbstractVariable v = $.v(Op.VAR_PATTERN, serial);
-            if (minArity == 0) {
-                return new EllipsisZeroOrMore(v);
-            } else if (minArity == 1) {
-                return new EllipsisOneOrMore(v);
-            } else {
-                throw new RuntimeException("invalid ellipsis minArity");
+            switch (minArity) {
+                case 0:
+                    return new EllipsisZeroOrMore(v);
+                case 1:
+                    return new EllipsisOneOrMore(v);
+                default:
+                    throw new RuntimeException("invalid ellipsis minArity");
             }
         }
     }

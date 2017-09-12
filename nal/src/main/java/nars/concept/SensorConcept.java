@@ -9,7 +9,6 @@ import nars.table.BeliefTable;
 import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.Truth;
-import nars.truth.TruthFunctions;
 import nars.util.signal.ScalarSignal;
 import org.eclipse.collections.api.block.function.primitive.FloatFunction;
 import org.eclipse.collections.api.block.function.primitive.FloatToObjectFunction;

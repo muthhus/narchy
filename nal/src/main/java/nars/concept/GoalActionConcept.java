@@ -33,7 +33,7 @@ public class GoalActionConcept extends ActionConcept {
 
 
     @NotNull
-    private MotorFunction motor;
+    private final MotorFunction motor;
 
     public GoalActionConcept(@NotNull Term c, @NotNull NAct act, @NotNull MotorFunction motor) {
         this(c, act.nar(), act.curiosity(), motor);
@@ -195,7 +195,7 @@ public class GoalActionConcept extends ActionConcept {
 //            fg.log("Curiosity");
 //        }
 
-        return Stream.of(fb, fg!=null ? fg : null).filter(Objects::nonNull);
+        return Stream.of(fb, fg).filter(Objects::nonNull);
         //return Stream.of(fb, fg).filter(Objects::nonNull);
         //return Stream.of(fb).filter(Objects::nonNull);
 

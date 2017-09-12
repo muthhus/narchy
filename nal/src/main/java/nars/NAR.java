@@ -64,7 +64,6 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static nars.$.$;
-import static nars.$.newArrayList;
 import static nars.Op.*;
 import static nars.term.Functor.f;
 import static nars.time.Tense.ETERNAL;
@@ -113,7 +112,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * scoped to this NAR so it can be reset by it
      */
     final IterableThreadLocal<Derivation> derivation =
-            new IterableThreadLocal<Derivation>(() -> new Derivation(this));
+            new IterableThreadLocal<>(() -> new Derivation(this));
     //ThreadLocal.withInitial(()->new Derivation(this));
 
 
@@ -137,7 +136,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     int nal;
 
     protected final NARLoop loop = new NARLoop(this);
-    private PrediTerm<Derivation> deriver;
+    private final PrediTerm<Derivation> deriver;
 
 
     //private final PrediTerm<Derivation> deriver;
@@ -362,6 +361,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         return l;
     }
 
+    @Override
     @NotNull
     public <T extends Term> T term(@NotNull String t) throws NarseseException {
         return $.$(t);
@@ -617,6 +617,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * main task entry point
      */
+    @Override
     public final void input(@NotNull ITask... t) {
         for (ITask x : t)
             input(x);
@@ -940,6 +941,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     /**
      * Exits an iteration loop if running
      */
+    @Override
     public NAR stop() {
 
         loop.stop();
@@ -947,7 +949,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         //clear();
         super.stop();
 
-        derivation.forEach(c -> c.reset());
+        derivation.forEach(Derivation::reset);
         //derivation.forEach(c -> c.transformsCache.invalidateAll());
 
         exe.stop();
@@ -1163,7 +1165,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
         assert (tt.length > 0);
 
         at(time, () -> {
-            List<Task> yy = newArrayList(tt.length);
+            List<Task> yy = $.newArrayList(tt.length);
             for (String s : tt) {
                 try {
                     yy.addAll(Narsese.parse().tasks(s, this));
@@ -1324,6 +1326,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * a frame batches a burst of multiple cycles, for coordinating with external systems in which multiple cycles
      * must be run per control frame.
      */
+    @Override
     @NotNull
     public final On onCycle(@NotNull Consumer<NAR> each) {
         return eventCycle.on(each);
@@ -1429,7 +1432,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
 
-    public @NotNull NAR inputBinary(@NotNull File input) throws IOException {
+    public @NotNull NAR inputBinary(@NotNull File input) throws IOException, FileNotFoundException {
         return inputBinary(new BufferedInputStream(new FileInputStream(input), 64 * 1024));
     }
 
@@ -1439,7 +1442,7 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException {
+    public NAR outputBinary(@NotNull File f, boolean append, @NotNull Function<Task, Task> each) throws IOException, FileNotFoundException {
         FileOutputStream ff = new FileOutputStream(f, append);
         outputBinary(ff, each);
         ff.close();
@@ -1504,12 +1507,12 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
     }
 
     @NotNull
-    public NAR output(@NotNull File o) throws IOException {
+    public NAR output(@NotNull File o) throws FileNotFoundException {
         return output(new FileOutputStream(o));
     }
 
     @NotNull
-    public NAR output(@NotNull File o, Function<Task, Task> f) throws IOException {
+    public NAR output(@NotNull File o, Function<Task, Task> f) throws FileNotFoundException {
         return outputBinary(new FileOutputStream(o), f);
     }
 
@@ -1614,7 +1617,6 @@ public class NAR extends Param implements Consumer<ITask>, NARIn, NAROut, Cycles
      * table of values influencing reasoner heuristics
      */
     public final FasterList<Cause> causes = new FasterList(256);
-    ;
     public final float[] value = new float[Cause.Purpose.values().length];
     public final RecycledSummaryStatistics[] valueSummary = new RecycledSummaryStatistics[value.length];
 

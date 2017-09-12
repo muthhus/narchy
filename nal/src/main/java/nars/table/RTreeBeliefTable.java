@@ -18,7 +18,6 @@ import nars.task.SignalTask;
 import nars.task.Tasked;
 import nars.task.util.TaskRegion;
 import nars.task.util.TaskRegionLink;
-import nars.task.util.TasksRegion;
 import nars.task.util.TimeRange;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -340,10 +339,10 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                 tr = taskRegion;
             } else {
                 //throw new UnsupportedOperationException(sx + " either stretching or it isn't");
-                tr = (NALTask) x; //new TaskLinkRegion(x);
+                tr = x; //new TaskLinkRegion(x);
             }
         } else {
-            tr = (NALTask)x;//new TaskLinkRegion(x);
+            tr = x;//new TaskLinkRegion(x);
         }
 
         final boolean[] added = {false};
@@ -456,7 +455,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
                     //already has write lock so just use non-async methods
                     tree.remove(a);
                     tree.remove(b);
-                    tree.add((NALTask)c); //new TaskLinkRegion(c));
+                    tree.add(c); //new TaskLinkRegion(c));
 
                     return c;
                 } else {
@@ -654,7 +653,7 @@ public class RTreeBeliefTable implements TemporalBeliefTable {
     @Override
     public boolean removeTask(Task x) {
         return tree.remove(
-                (NALTask) x
+                x
                 //new TaskLinkRegion(x)
         );
     }

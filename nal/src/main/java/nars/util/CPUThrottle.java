@@ -75,7 +75,7 @@ public class CPUThrottle implements Runnable {
 
     public boolean active() {
         long c = this.nextCycle;
-        return c == Long.MIN_VALUE ? false : System.currentTimeMillis() < c;
+        return c != Long.MIN_VALUE && System.currentTimeMillis() < c;
     }
 
 }

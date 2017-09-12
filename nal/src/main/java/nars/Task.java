@@ -7,7 +7,6 @@ import nars.op.Operation;
 import nars.task.DerivedTask;
 import nars.task.ITask;
 import nars.task.NALTask;
-import nars.task.Tasked;
 import nars.task.util.InvalidTaskException;
 import nars.task.util.TaskRegion;
 import nars.term.Term;
@@ -35,7 +34,7 @@ import static nars.truth.TruthFunctions.w2c;
 /**
  * NAL Task to be processed, consists of a Sentence, stamp, time, and budget.
  */
-public interface Task extends Tasked, Truthed, Stamp, Termed, ITask, TaskRegion {
+public interface Task extends Truthed, Stamp, Termed, ITask, TaskRegion {
 
 
     static boolean equal(@NotNull Task a, @NotNull Task b) {
@@ -858,17 +857,14 @@ public interface Task extends Tasked, Truthed, Stamp, Termed, ITask, TaskRegion 
         if (eve == eve && eve >= c2w(minConf)) {
 
 
+            return new PreciseTruth(freq(), eve, false);
 
-            {
-                return new PreciseTruth(freq(), eve, false);
-
-                //quantum entropy uncertainty:
+            //quantum entropy uncertainty:
 //                float ff = freq();
 //                ff = (float) Util.unitize(
 //                        (ThreadLocalRandom.current().nextFloat() - 0.5f) *
 //                                2f * Math.pow((1f-conf),4) + ff);
 //                return $.t(ff, conf);
-            }
         }
         return null;
     }

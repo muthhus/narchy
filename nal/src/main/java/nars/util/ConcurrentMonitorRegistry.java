@@ -101,8 +101,6 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
             createMBeans(name, monitor, mapper).forEach(bean -> {
                 try {
                     register(bean.getObjectName(), bean);
-                } catch (InstanceNotFoundException e) {
-                    e.printStackTrace();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -176,7 +174,7 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
              * {@inheritDoc}
              */
             @Override
-            public Object getAttribute(String name) throws AttributeNotFoundException {
+            public Object getAttribute(String name) {
                 return monitor.getValue();
             }
 
@@ -184,8 +182,7 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
              * {@inheritDoc}
              */
             @Override
-            public void setAttribute(Attribute attribute)
-                    throws InvalidAttributeValueException, MBeanException, AttributeNotFoundException {
+            public void setAttribute(Attribute attribute) {
                 throw new UnsupportedOperationException("setAttribute is not implemented");
             }
 
@@ -213,8 +210,7 @@ public class ConcurrentMonitorRegistry implements MonitorRegistry {
              * {@inheritDoc}
              */
             @Override
-            public Object invoke(String name, Object[] args, String[] sig)
-                    throws MBeanException, ReflectionException {
+            public Object invoke(String name, Object[] args, String[] sig) {
                 throw new UnsupportedOperationException("invoke is not implemented");
             }
 

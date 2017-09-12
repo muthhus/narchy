@@ -13,7 +13,7 @@ import static nars.time.Tense.ETERNAL;
 
 abstract public class TemporalStabilityTest {
 
-    boolean unstable = false;
+    boolean unstable;
 
     //private final boolean stopOnFirstError = true;
 

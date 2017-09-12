@@ -10,7 +10,6 @@ import org.eclipse.collections.api.block.predicate.Predicate;
 import org.eclipse.collections.api.block.predicate.Predicate2;
 import org.eclipse.collections.api.block.procedure.Procedure;
 import org.eclipse.collections.api.block.procedure.primitive.ObjectIntProcedure;
-import org.eclipse.collections.api.collection.primitive.*;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.list.ParallelListIterable;
@@ -24,12 +23,9 @@ import org.eclipse.collections.api.tuple.Pair;
 import org.eclipse.collections.impl.collection.mutable.AbstractMultiReaderMutableCollection;
 import org.eclipse.collections.impl.factory.Lists;
 import org.eclipse.collections.impl.lazy.ReverseIterable;
-import org.eclipse.collections.impl.lazy.parallel.list.ListIterableParallelIterable;
 import org.eclipse.collections.impl.lazy.parallel.list.MultiReaderParallelListIterable;
 import org.eclipse.collections.impl.list.mutable.SynchronizedMutableList;
 import org.eclipse.collections.impl.list.mutable.UnmodifiableMutableList;
-import org.eclipse.collections.impl.stack.mutable.ArrayStack;
-import org.eclipse.collections.impl.utility.LazyIterate;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Externalizable;
@@ -41,8 +37,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
-
-import static org.eclipse.collections.impl.factory.Iterables.mList;
 
 /**
  * extension of org.eclipse collections MultiRWFasterList

@@ -145,9 +145,9 @@ public interface Term extends Termlike, Comparable<Term> {
      */
     default boolean isTemporal() {
         return hasAny(Op.TemporalBits) &&
-                (op().temporal && (dt() != DTERNAL))
+                ((op().temporal && (dt() != DTERNAL))
                 ||
-                (subterms().isTemporal());
+                (subterms().isTemporal()));
     }
 
     /**
@@ -503,9 +503,6 @@ public interface Term extends Termlike, Comparable<Term> {
             if (dt == XTERNAL) //unknown
                 return DTERNAL;
 
-            int idt;
-            boolean reverse;
-
             @NotNull TermContainer yy = subterms();
 
             if (op == IMPL) {
@@ -531,6 +528,8 @@ public interface Term extends Termlike, Comparable<Term> {
                 }
 
             } else if (op == CONJ) {
+                boolean reverse;
+                int idt;
                 if (dt == DTERNAL || dt == 0) {
                     idt = 0; //parallel or eternal, no dt increment
                     reverse = false;

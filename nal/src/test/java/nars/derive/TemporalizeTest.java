@@ -24,14 +24,14 @@ public class TemporalizeTest {
     final NAR n = NARS.shell();
 
     @Test
-    public void testAbsoluteRanking() throws Narsese.NarseseException {
+    public void testAbsoluteRanking() {
         Temporalize t = new Temporalize();
 
 
         //eternal should be ranked lower than non-eternal
         Term x = the("x");
-        AbsoluteEvent ete = t.absolute(x, ETERNAL, ETERNAL);
-        AbsoluteEvent tmp = t.absolute(x, 0, 0);
+        AbsoluteEvent ete = Temporalize.absolute(x, ETERNAL, ETERNAL);
+        AbsoluteEvent tmp = Temporalize.absolute(x, 0, 0);
         assertEquals(+1, ete.compareTo(tmp));
         assertEquals(-1, tmp.compareTo(ete));
         assertEquals(0, ete.compareTo(ete));
@@ -48,11 +48,11 @@ public class TemporalizeTest {
         Temporalize t = new Temporalize();
 
         Term x = the("x");
-        AbsoluteEvent xa = t.absolute(x, ETERNAL, ETERNAL);
+        AbsoluteEvent xa = Temporalize.absolute(x, ETERNAL, ETERNAL);
         t.constraints.put(x, new TreeSet(List.of(xa)));
 
         Term y = the("y");
-        AbsoluteEvent ya = t.absolute(y, 0, 0);
+        AbsoluteEvent ya = Temporalize.absolute(y, 0, 0);
         t.constraints.put(y, new TreeSet(List.of(ya)));
 
         Term z = the("z");
@@ -80,14 +80,14 @@ public class TemporalizeTest {
     }
 
     @Test
-    public void testAbsoluteRelativeRanking() throws Narsese.NarseseException {
+    public void testAbsoluteRelativeRanking() {
         Temporalize t = new Temporalize();
 
         //eternal should be ranked lower than non-eternal
         Term x = the("x");
         Term y = the("y");
-        Event yTmp0 = t.absolute(y, 0, 0);
-        Event xEte = t.absolute(x, ETERNAL, ETERNAL);
+        Event yTmp0 = Temporalize.absolute(y, 0, 0);
+        Event xEte = Temporalize.absolute(x, ETERNAL, ETERNAL);
         Event xRelY = t.relative(x, y, 0);
         assertEquals(+1, xEte.compareTo(xRelY));
 //        assertEquals(-1, tmp.compareTo(ete));
@@ -307,21 +307,19 @@ public class TemporalizeTest {
             assertEquals(3, solution.start(h).abs());
         }
         System.out.println();
-        {
-            Term a = $("x");
-            System.out.println(t);
-            System.out.println(t.constraints.get(a));
-            HashMap h = new HashMap() {
-                @Override
-                public Object put(Object key, Object value) {
-                    System.out.println(" --> " + key + "   " + value);
-                    return super.put(key, value);
-                }
-            };
-            Event solution = t.solve(a, h);
-            System.out.println(h);
-            assertEquals(2, solution.start(h).abs());
-        }
+        Term a = $("x");
+        System.out.println(t);
+        System.out.println(t.constraints.get(a));
+        HashMap h = new HashMap() {
+            @Override
+            public Object put(Object key, Object value) {
+                System.out.println(" --> " + key + "   " + value);
+                return super.put(key, value);
+            }
+        };
+        Event solution = t.solve(a, h);
+        System.out.println(h);
+        assertEquals(2, solution.start(h).abs());
     }
 
     @Test
@@ -432,11 +430,9 @@ public class TemporalizeTest {
             assertEquals("(a &&+5 b)", solution.term.toString());
             assertEquals(1, solution.start(h).abs()); //@[1..6]
         }
-        {
-            Event solution = t.solve($("(a &&+- #1)"));
-            assertNotNull(solution);
-            assertEquals("(a &&+10 #1)@[1..11]", solution.toString());
-        }
+        Event solution = t.solve($("(a &&+- #1)"));
+        assertNotNull(solution);
+        assertEquals("(a &&+10 #1)@[1..11]", solution.toString());
     }
 
     @Test
@@ -473,12 +469,10 @@ public class TemporalizeTest {
 
         //System.out.println(Joiner.on('\n').join(t.constraints.entrySet()));
 
-        {
-            HashMap h = new HashMap();
-            Event s = t.solve($("(x &&+- y)"), h);
-            assertNotNull(s);
-            assertEquals("(x &&+2 y)@ETE", s.toString());
-        }
+        HashMap h = new HashMap();
+        Event s = t.solve($("(x &&+- y)"), h);
+        assertNotNull(s);
+        assertEquals("(x &&+2 y)@ETE", s.toString());
 
     }
 
@@ -622,22 +616,20 @@ public class TemporalizeTest {
 
     @Test
     public void testConjImpl23424232354234() throws Narsese.NarseseException {
-        {
-            Temporalize t = new Temporalize();
-            t.knowAbsolute($("a"), 1);
-            t.knowAbsolute($("(((b &&+5 c) &&+5 d) ==>-15 a)"), 6);
-            System.out.println(t);
+        Temporalize t = new Temporalize();
+        t.knowAbsolute($("a"), 1);
+        t.knowAbsolute($("(((b &&+5 c) &&+5 d) ==>-15 a)"), 6);
+        System.out.println(t);
 
-            assertTrue(t.constraints.get($("((b &&+5 c) &&+5 d)")).toString().contains("((b &&+5 c) &&+5 d)@[5..15]->a"));
-            //assertEquals("[(b &&+5 c)@[5..10]->a, (b &&+5 c)@[-10..-5]->d]", t.constraints.get($("(b &&+5 c)")).toString());
+        assertTrue(t.constraints.get($("((b &&+5 c) &&+5 d)")).toString().contains("((b &&+5 c) &&+5 d)@[5..15]->a"));
+        //assertEquals("[(b &&+5 c)@[5..10]->a, (b &&+5 c)@[-10..-5]->d]", t.constraints.get($("(b &&+5 c)")).toString());
 
-            Term r = $("((b &&+- c) &&+- d)");
-            Map<Term, Time> h = new HashMap();
-            Event e = t.solve(r, h);
-            assertNotNull(e);
-            assertEquals("((b &&+5 c) &&+5 d)@[5..15]->a", e.toString());
-            assertEquals(6, e.start(h).abs());
-        }
+        Term r = $("((b &&+- c) &&+- d)");
+        Map<Term, Time> h = new HashMap();
+        Event e = t.solve(r, h);
+        assertNotNull(e);
+        assertEquals("((b &&+5 c) &&+5 d)@[5..15]->a", e.toString());
+        assertEquals(6, e.start(h).abs());
     }
 
     @Test
@@ -715,22 +707,20 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
 
         }
 
-        {
-            Temporalize t = new Temporalize();
-            t.knowAbsolute(A, 6);
+        Temporalize t = new Temporalize();
+        t.knowAbsolute(A, 6);
 
-            Term B = $("(b &&+5 c)");
-            t.knowAbsolute(B, 6, 11);
+        Term B = $("(b &&+5 c)");
+        t.knowAbsolute(B, 6, 11);
 
-            //System.out.println(t);
+        //System.out.println(t);
 
-            Term p = $("(a &&+- b)");
-            Map<Term, Time> h = new HashMap();
-            Event s = t.solve(p, h);
-            //System.out.println(h);
-            assertNotNull(s);
-            assertEquals("(a &&+5 b)@[1..6]", s.toString());
-        }
+        Term p = $("(a &&+- b)");
+        Map<Term, Time> h = new HashMap();
+        Event s = t.solve(p, h);
+        //System.out.println(h);
+        assertNotNull(s);
+        assertEquals("(a &&+5 b)@[1..6]", s.toString());
     }
 
     @Test
@@ -758,12 +748,10 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
             assertEquals("(--,a)", st.term.toString());
             assertEquals((x.subtermTime(Aneg) + start), st.start(h).abs());
         }
-        {
-            HashMap h = new HashMap();
-            Event st = t.solve(A, h);
-            assertEquals("a", st.term.toString());
-            assertEquals((x.subtermTime(A) + start), st.start(h).abs());
-        }
+        HashMap h = new HashMap();
+        Event st = t.solve(A, h);
+        assertEquals("a", st.term.toString());
+        assertEquals((x.subtermTime(A) + start), st.start(h).abs());
 
 
         //System.out.println(a);
@@ -1026,12 +1014,10 @@ $.72 (a &&+5 b). -4⋈1 %1.0;.30% {151: 1;2;;} ((%1,(%2==>%3),belief(positive),n
             assertNotNull(s);
             assertEquals("((a,b) ==>+1 (b,c))", s.term.toString());
         }
-        {
-            Map h = new HashMap();
-            Event s = t.solve($("((a,b) ==>+- (c,d))"), h);
-            assertNotNull(s);
-            assertEquals("((a,b) ==>+4 (c,d))", s.term.toString());
-        }
+        Map h = new HashMap();
+        Event s = t.solve($("((a,b) ==>+- (c,d))"), h);
+        assertNotNull(s);
+        assertEquals("((a,b) ==>+4 (c,d))", s.term.toString());
         //assertEquals(1, s.start(h).abs());
 
     }

@@ -51,19 +51,19 @@ public class RTreeBeliefTableTest {
     }
 
 
-    @Test public void testAccuracyFlat() throws Narsese.NarseseException {
+    @Test public void testAccuracyFlat() {
         testAccuracy(1, 1,20, (t) -> 0.5f); //flat
     }
-    @Test public void testAccuracySineDur1() throws Narsese.NarseseException {
+    @Test public void testAccuracySineDur1() {
         testAccuracy(1, 1,20, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
     }
-    @Test public void testAccuracySineDur1Ext() throws Narsese.NarseseException {
+    @Test public void testAccuracySineDur1Ext() {
         testAccuracy(1, 1,50, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
     }
-    @Test public void testAccuracySineDur() throws Narsese.NarseseException {
+    @Test public void testAccuracySineDur() {
         testAccuracy(2, 4,50, (t) -> (float)(Math.sin(t/5f)/2f+0.5f));
     }
-    @Test public void testAccuracySqrWave() throws Narsese.NarseseException {
+    @Test public void testAccuracySqrWave() {
         testAccuracy(1, 3, 20, (t) -> (Math.sin(t)/2f+0.5f) >= 0.5 ? 1f : 0f);
     }
 

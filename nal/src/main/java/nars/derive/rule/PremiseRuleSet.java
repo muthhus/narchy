@@ -4,7 +4,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Streams;
 import jcog.Util;
 import nars.$;
-import nars.NAR;
 import nars.Narsese;
 import nars.index.term.PatternTermIndex;
 import nars.index.term.TermIndex;

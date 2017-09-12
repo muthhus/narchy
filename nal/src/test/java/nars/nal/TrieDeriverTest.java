@@ -45,7 +45,7 @@ public class TrieDeriverTest {
 
 
     @Test
-    public void testConclusionWithXTERNAL() throws Narsese.NarseseException {
+    public void testConclusionWithXTERNAL() {
         PatternTermIndex idx = new PatternTermIndex() {
             @Override
             public @Nullable Termed get(@NotNull Term x, boolean create) {

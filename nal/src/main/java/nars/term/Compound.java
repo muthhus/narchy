@@ -103,6 +103,7 @@ public interface Compound extends Term, IPair, TermContainer {
         return !inSubtermsOf.test(this) && subterms().containsRecursively(t, inSubtermsOf);
     }
 
+    @Override
     @NotNull
     TermContainer subterms();
 
@@ -111,6 +112,7 @@ public interface Compound extends Term, IPair, TermContainer {
         return subterms().hashCode();
     }
 
+    @Override
     default boolean isTemporal() {
         return Term.super.isTemporal();
     }
@@ -201,6 +203,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
+    @Override
     @NotNull
     default ByteList structureKey(@NotNull ByteArrayList appendTo) {
         appendTo.add(op().id);
@@ -239,6 +242,7 @@ public interface Compound extends Term, IPair, TermContainer {
         }
     }
 
+    @Override
     @Nullable
     default Set<Term> varsUnique(@Nullable Op type, @NotNull Set<Term> unlessHere) {
         int num = vars(type);
@@ -351,6 +355,7 @@ public interface Compound extends Term, IPair, TermContainer {
 //    }
 
 
+    @Override
     default Term sub(int i, Term ifOutOfBounds) {
         return subterms().sub(i, ifOutOfBounds);
     }
@@ -546,6 +551,7 @@ public interface Compound extends Term, IPair, TermContainer {
     /**
      * gets temporal relation value
      */
+    @Override
     int dt();
 
     @Override
@@ -566,7 +572,7 @@ public interface Compound extends Term, IPair, TermContainer {
                 return Null; //tried to temporalize what can only be commutive
 
             if (nextDT == XTERNAL) {
-                return Op.compound(b, nextDT);
+                return Op.compound(b, XTERNAL);
             }
 
             Term[] ss = subs.theArray();
@@ -691,6 +697,7 @@ public interface Compound extends Term, IPair, TermContainer {
     }
 
 
+    @Override
     default Term evalSafe(TermContext index, int remain) {
 
         if (!isDynamic())
@@ -770,6 +777,7 @@ public interface Compound extends Term, IPair, TermContainer {
 
     Logger logger = LoggerFactory.getLogger(Compound.class);
 
+    @Override
     @Nullable
     default Term normalize(int varOffset) {
         if (varOffset == 0 && this.isNormalized())
@@ -806,6 +814,7 @@ public interface Compound extends Term, IPair, TermContainer {
         return transform(dt(), t);
     }
 
+    @Override
     @Nullable
     default Term transform(int newDT, @NotNull CompoundTransform t) {
         return transform(op(), newDT, t);
@@ -880,6 +889,7 @@ public interface Compound extends Term, IPair, TermContainer {
             return this;
         }
     }
+    @Override
     @Nullable
     default Term transform(Compound parent, CompoundTransform t) {
         Term x = transform(t);

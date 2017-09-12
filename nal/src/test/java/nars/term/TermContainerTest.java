@@ -30,9 +30,9 @@ public class TermContainerTest {
             return TermContainer.commonSubterms((Compound) a, ((Compound) b), false);
         } else {
             if (aCompound && !bCompound) {
-                return ((Compound) a).contains(b);
+                return a.contains(b);
             } else if (bCompound && !aCompound) {
-                return ((Compound) b).contains(a);
+                return b.contains(a);
             } else {
                 //neither are compounds
                 return a.equals(b);

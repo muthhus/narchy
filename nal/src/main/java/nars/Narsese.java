@@ -31,7 +31,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
-import static nars.$.newArrayList;
 import static nars.Op.*;
 import static nars.term.Term.nullIfNull;
 import static nars.time.Tense.DTERNAL;
@@ -616,7 +615,7 @@ public class Narsese extends BaseParser<Object> {
      */
     Rule Atom() {
         return seq(
-                ValidAtomCharMatcher.the,
+                ValidAtomCharMatcher,
                 push(match())
         );
     }
@@ -635,13 +634,8 @@ public class Narsese extends BaseParser<Object> {
     }
 
 
-    static final class ValidAtomCharMatcher extends AbstractMatcher {
+    static final AbstractMatcher ValidAtomCharMatcher = new AbstractMatcher("'ValidAtomChar'") {
 
-        public static final ValidAtomCharMatcher the = new ValidAtomCharMatcher();
-
-        protected ValidAtomCharMatcher() {
-            super("'ValidAtomChar'");
-        }
 
         @NotNull
         @Override
@@ -661,7 +655,7 @@ public class Narsese extends BaseParser<Object> {
 
             return count > 0;
         }
-    }
+    };
 
     public static boolean isValidAtomChar(char x) {
 
@@ -1119,7 +1113,7 @@ public class Narsese extends BaseParser<Object> {
     }
 
     public static List<Task> tasks(String input, NAR m) throws NarseseException {
-        List<Task> result = newArrayList(1);
+        List<Task> result = $.newArrayList(1);
         tasks(input, result, m);
 
         return result;
@@ -1201,21 +1195,20 @@ public class Narsese extends BaseParser<Object> {
             throw new NarseseException("Task term unnormalizable: " + contentRaw);
             //return Command.task($.func("log", content));
         } else */
-        {
 
-            Object px = x[2];
+        Object px = x[2];
 
-            byte punct =
-                    px instanceof Byte ?
-                            ((Byte) x[2]).byteValue()
-                            :
-                            (byte) (((Character) x[2]).charValue());
+        byte punct =
+                px instanceof Byte ?
+                        ((Byte) x[2]).byteValue()
+                        :
+                        (byte) (((Character) x[2]).charValue());
 
-            Truth t = (Truth) x[3];
-            if (t != null && !Float.isFinite(t.conf()))
-                t = $.t(t.freq(), m.confDefault(punct));
+        Truth t = (Truth) x[3];
+        if (t != null && !Float.isFinite(t.conf()))
+            t = $.t(t.freq(), m.confDefault(punct));
 
-            @Nullable Truth t1 = t;
+        @Nullable Truth t1 = t;
 
 //        if (p == null)
 //            throw new RuntimeException("character is null");
@@ -1227,33 +1220,32 @@ public class Narsese extends BaseParser<Object> {
 //            blen = 0;
 //
 
-            if (t1 == null) {
-                t1 = m.truthDefault(punct);
-            }
-
-            if (content.op() == NEG) {
-                content = content.unneg();
-                if (t1 != null)
-                    t1 = t1.neg();
-            }
-
-            TaskBuilder ttt =
-                    new TaskBuilder(content, punct, t1)
-                            .time(
-                                    m.time(), //creation time
-                                    Tense.getRelativeOccurrence(
-                                            (Tense) x[4],
-                                            m
-                                    ));
-
-            if (x[0] == null)  /* do not set, Memory will apply defaults */
-                ttt.setPri(m.priDefault(punct));
-            else
-                ttt.setPri((Float) x[0]);
-
-
-            return ttt.log(NARSESE_TASK_TAG).apply(m);
+        if (t1 == null) {
+            t1 = m.truthDefault(punct);
         }
+
+        if (content.op() == NEG) {
+            content = content.unneg();
+            if (t1 != null)
+                t1 = t1.neg();
+        }
+
+        TaskBuilder ttt =
+                new TaskBuilder(content, punct, t1)
+                        .time(
+                                m.time(), //creation time
+                                Tense.getRelativeOccurrence(
+                                        (Tense) x[4],
+                                        m
+                                ));
+
+        if (x[0] == null)  /* do not set, Memory will apply defaults */
+            ttt.setPri(m.priDefault(punct));
+        else
+            ttt.setPri((Float) x[0]);
+
+
+        return ttt.log(NARSESE_TASK_TAG).apply(m);
     }
 
     /**

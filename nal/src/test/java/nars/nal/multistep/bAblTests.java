@@ -64,7 +64,7 @@ public class bAblTests extends AbstractNALTest {
      * TODO find a better problem representation, this one isnt good
      */
     @Test
-    public void test19() throws nars.Narsese.NarseseException {
+    public void test19() {
 
         //(19) Path Finding
 

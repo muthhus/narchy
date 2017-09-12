@@ -8,7 +8,6 @@ import nars.NAgentX;
 import nars.concept.ScalarConcepts;
 import nars.experiment.NAgentY;
 import nars.gui.Vis;
-import nars.term.atom.Atomic;
 import nars.video.CameraSensor;
 import org.jetbrains.annotations.NotNull;
 

@@ -187,10 +187,7 @@ public abstract class STMClustered extends TaskService {
             final int[] currentVolume = {0};
             return tasks.stream().
                     filter(x -> {
-                        if (x.get().isDeleted()) {
-                            return false;
-                        }
-                        return true;
+                        return !x.get().isDeleted();
                     })
                     .collect(Collectors.groupingBy(tx -> {
 

@@ -863,17 +863,9 @@ public enum Op implements $ {
         }
 
         conceptualizable = !(var || virtual || str.equals("+") /* INT */ || str.equals("B") /* Bool */);
-        if (!conceptualizable || str.equals("==>")) {
-            goalable = false;
-        } else {
-            goalable = true;
-        }
+        goalable = conceptualizable && !str.equals("==>");
 
-        if (!conceptualizable) {
-            beliefable = false;
-        } else {
-            beliefable = true;
-        }
+        beliefable = conceptualizable;
 
 
     }

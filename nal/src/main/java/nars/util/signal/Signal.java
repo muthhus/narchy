@@ -8,7 +8,6 @@ import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.PreciseTruth;
 import nars.truth.Truth;
-import nars.truth.Truthed;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -48,7 +48,7 @@ public class Temporalize implements ITemporalize {
     /**
      * HACK move this this to the solution instance class when it is separated from the pattern class
      */
-    protected Boolean fullyEternal = null;
+    protected Boolean fullyEternal;
 
     /**
      * for testing
@@ -105,7 +105,7 @@ public class Temporalize implements ITemporalize {
 //        }
 //    }
 
-    public AbsoluteEvent absolute(Term x, long start, long end) {
+    public static AbsoluteEvent absolute(Term x, long start, long end) {
         return new AbsoluteEvent(x, start, end);
     }
 
@@ -562,27 +562,23 @@ public class Temporalize implements ITemporalize {
                 }
 
                 //test for 0 first because it's more specific
-                {
-                    /* test for the exact appearance of temporalized form present in constraints */
-                    if (has0) { //quick test filter
-                        @NotNull Term xPar = x.dt(0);
-                        if (!(xPar instanceof Bool) && constraints.get(xPar) != null) {
-                            Event ds = solve(xPar, trail);
-                            if (ds != null)
-                                return relative(xPar, ds, 0);
-                        }
+                /* test for the exact appearance of temporalized form present in constraints */
+                if (has0) { //quick test filter
+                    @NotNull Term xPar = x.dt(0);
+                    if (!(xPar instanceof Bool) && constraints.get(xPar) != null) {
+                        Event ds = solve(xPar, trail);
+                        if (ds != null)
+                            return relative(xPar, ds, 0);
                     }
                 }
 
-                {
-                    /* test for the exact appearance of temporalized form present in constraints */
-                    if (hasEte) { //quick test filter
-                        @NotNull Term xEte = x.dt(DTERNAL);
-                        if (!(xEte instanceof Bool) && constraints.get(xEte) != null) {
-                            Event ds = solve(xEte, trail);
-                            if (ds != null) {
-                                return relative(xEte, ds, DTERNAL);
-                            }
+                /* test for the exact appearance of temporalized form present in constraints */
+                if (hasEte) { //quick test filter
+                    @NotNull Term xEte = x.dt(DTERNAL);
+                    if (!(xEte instanceof Bool) && constraints.get(xEte) != null) {
+                        Event ds = solve(xEte, trail);
+                        if (ds != null) {
+                            return relative(xEte, ds, DTERNAL);
                         }
                     }
                 }
@@ -808,7 +804,7 @@ public class Temporalize implements ITemporalize {
         return new TimeEvent(newTerm, early, cDur == -1 ? newTerm.dtRange() : cDur);
     }
 
-    private Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {
+    private static Event solveStatement(Term target, Map<Term, Time> trail, Event ra, Event rb) {
 
         //not overlapping at all, compute point interpolation
         Time as = ra.start(trail);

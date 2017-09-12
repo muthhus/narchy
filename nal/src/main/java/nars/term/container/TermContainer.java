@@ -38,7 +38,7 @@ import static nars.time.Tense.XTERNAL;
  */
 public interface TermContainer extends Termlike, Iterable<Term> {
 
-    @NotNull TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[]{});
+    @NotNull TermVector NoSubterms = new ArrayTermVector((Term[]) new Term[0]);
 
 
     //TODO optionally allow atomic structure positions to differ
@@ -51,15 +51,13 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         }
 
         ByteList structureKey = sub(0).structureKey();
-        {
-            ByteArrayList reuseKey = new ByteArrayList(structureKey.size());
-            for (int i = 1; i < s; i++) {
-                //all subterms must share the same structure
-                //TODO only needs to construct the key while comparing equality with the first
-                if (!sub(i).structureKey(reuseKey).equals(structureKey))
-                    return false;
-                reuseKey.clear();
-            }
+        ByteArrayList reuseKey = new ByteArrayList(structureKey.size());
+        for (int i = 1; i < s; i++) {
+            //all subterms must share the same structure
+            //TODO only needs to construct the key while comparing equality with the first
+            if (!sub(i).structureKey(reuseKey).equals(structureKey))
+                return false;
+            reuseKey.clear();
         }
         return true;
     }
@@ -76,6 +74,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
     /**
      * gets subterm at index i
      */
+    @Override
     @NotNull Term sub(int i);
 
 
@@ -310,6 +309,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return !impossibleSubTerm(t) && OR(t::equals);
     }
 
+    @Override
     default boolean containsRecursively(@NotNull Term y) {
         int s = size();
         if (s > 0 && !impossibleSubTerm(y)) {
@@ -323,6 +323,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return false;
     }
 
+    @Override
     default boolean containsRecursively(@NotNull Term y, Predicate<Term> subTermOf) {
         int s = size();
         if (s > 0 && !impossibleSubTerm(y)) {
@@ -671,6 +672,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return true;
     }
 
+    @Override
     default boolean ANDrecurse(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++)
@@ -679,6 +681,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
         return true;
     }
 
+    @Override
     default boolean ORrecurse(@NotNull Predicate<Term> p) {
         int s = size();
         for (int i = 0; i < s; i++)
@@ -939,7 +942,7 @@ public interface TermContainer extends Termlike, Iterable<Term> {
 //                    }
 //                }
 
-            default: {
+            default:
                 //TODO unify variables last after matching all constants by saving them to a secondary list as they are encountered in the below loop
 
                 //begin at random offset to shuffle the order of the match sequence
@@ -951,7 +954,6 @@ public interface TermContainer extends Termlike, Iterable<Term> {
                         j = 0;
                 }
                 return true;
-            }
         }
 
     }

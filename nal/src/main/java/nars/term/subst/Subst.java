@@ -1,18 +1,11 @@
 package nars.term.subst;
 
-import jcog.list.FasterList;
-import nars.Op;
-import nars.derive.match.EllipsisMatch;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.term.atom.Bool;
 import nars.term.atom.Intlike;
-import nars.term.container.TermContainer;
 import nars.term.transform.CompoundTransform;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static nars.Op.Null;
 
 
 public interface Subst extends CompoundTransform {

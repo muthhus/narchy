@@ -1,6 +1,9 @@
 package nars.concept;
 
-import nars.*;
+import nars.NAR;
+import nars.NAct;
+import nars.Param;
+import nars.Task;
 import nars.task.SignalTask;
 import nars.term.Term;
 import nars.truth.Truth;
@@ -25,7 +28,7 @@ public class GoalActionAsyncConcept extends ActionConcept {
 
 
     @NotNull
-    private BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor;
+    private final BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor;
     private NAR nar;
 
     public GoalActionAsyncConcept(@NotNull Term c, @NotNull NAct act, @NotNull BiConsumer<GoalActionAsyncConcept, Truth /* goal */> motor) {

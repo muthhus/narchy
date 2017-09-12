@@ -3,6 +3,7 @@ package nars.term;
 import nars.*;
 import nars.concept.BaseConcept;
 import nars.concept.Concept;
+import nars.index.term.TermIndex;
 import nars.term.container.TermContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -801,7 +802,7 @@ public class TemporalTermTest {
 
 
     @Test
-    public void testEqualsAnonymous4() throws Narsese.NarseseException {
+    public void testEqualsAnonymous4() {
         //temporal terms within non-temporal terms
         //        if (as == bs) {
 //            return true;
@@ -839,7 +840,7 @@ public class TemporalTermTest {
     }
 
     @Test
-    public void testEqualAtemporally5() throws Narsese.NarseseException {
+    public void testEqualAtemporally5() {
         //special handling for images
         //        if (as == bs) {
 //            return true;
@@ -865,7 +866,7 @@ public class TemporalTermTest {
         String st = "((--,(happy)) && (--,((--,(o))&&(happy))))";
         Compound t = $.$(st);
         assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", t.toString());
-        Term xe = $.terms.retemporalize(t, $.terms.retemporalizeXTERNALToDTERNAL);
+        Term xe = TermIndex.retemporalize(t, TermIndex.retemporalizeXTERNALToDTERNAL);
         assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", xe.toString());
 
         //TODO this will require a refactor allowing arbitrary function mapping matched dt source value to a target dt
@@ -879,10 +880,10 @@ public class TemporalTermTest {
         Compound u = $.$(su);
         assertEquals("((--,((--,(o)) &&+- (happy))) &&+- (--,(happy)))", u.toString());
 
-        Term ye = $.terms.retemporalize(u, $.terms.retemporalizeXTERNALToDTERNAL);
+        Term ye = TermIndex.retemporalize(u, TermIndex.retemporalizeXTERNALToDTERNAL);
         assertEquals("((--,((--,(o))&&(happy)))&&(--,(happy)))", ye.toString());
 
-        Term yz = $.terms.retemporalize(u, $.terms.retemporalizeXTERNALToZero);
+        Term yz = TermIndex.retemporalize(u, TermIndex.retemporalizeXTERNALToZero);
         assertEquals("((--,((--,(o))&|(happy)))&|(--,(happy)))", yz.toString());
 
     }

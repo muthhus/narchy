@@ -184,17 +184,17 @@ public interface $ {
     }
 
     @NotNull
-    static Term p(@NotNull Collection<? super Term> t) {
+    public static Term p(@NotNull Collection<? super Term> t) {
         return $.p(t.toArray(new Term[t.size()]));
     }
 
     @NotNull
-    static Term p(@NotNull Term... t) {
+    public static Term p(@NotNull Term... t) {
         return (t.length == 0) ? ZeroProduct : PROD.the(DTERNAL, t);
     }
 
     @NotNull
-    static Term p(@NotNull TermContainer t) {
+    public static Term p(@NotNull TermContainer t) {
         return p((Term[]) t.toArray());
     }
 
@@ -361,7 +361,7 @@ public interface $ {
     }
 
     static <X> Term[] terms(@NotNull X[] map, @NotNull Function<X, Term> toTerm) {
-        return Stream.of(map).map(e -> toTerm.apply(e)).toArray(n -> new Term[n]);
+        return Stream.of(map).map(toTerm::apply).toArray(Term[]::new);
     }
 
     @NotNull
@@ -481,16 +481,14 @@ public interface $ {
             logEncoder.start();
 
 
-            {
-                ConsoleAppender c = new ConsoleAppender();
-                c.setContext(loggerContext);
-                c.setEncoder(logEncoder);
-                c.setImmediateFlush(false);
-                //c.setWithJansi(true);
-                c.start();
+            ConsoleAppender c = new ConsoleAppender();
+            c.setContext(loggerContext);
+            c.setEncoder(logEncoder);
+            c.setImmediateFlush(false);
+            //c.setWithJansi(true);
+            c.start();
 
-                LOG.addAppender(c);
-            }
+            LOG.addAppender(c);
 
 //            SyslogAppender syslog = new SyslogAppender();
 //            syslog.setPort(5000);
@@ -643,7 +641,7 @@ public interface $ {
      * negates each entry in the array
      */
     static void neg(@NotNull Term[] array) {
-        Util.map(x -> x.neg(), array, array);
+        Util.map(Term::neg, array, array);
 //        int l = array.length;
 //        for (int i = 0; i < l; i++) {
 //            array[i] = $.neg(array[i]);
@@ -696,18 +694,18 @@ public interface $ {
      * conjunction sequence (2-ary)
      */
     @Nullable
-    static Term seq(Term x, int dt, Term y) {
+    public static Term seq(Term x, int dt, Term y) {
         return CONJ.the(dt, x, y); //must be a vector, not set
     }
 
 
     @NotNull
-    static <K, V> Map<K, V> newHashMap() {
+    public static <K, V> Map<K, V> newHashMap() {
         return newHashMap(0);
     }
 
     @NotNull
-    static <K, V> Map<K, V> newHashMap(int capacity) {
+    public static <K, V> Map<K, V> newHashMap(int capacity) {
         return new HashMap<>(capacity);
 
         //return new UnifiedMap(capacity);
@@ -719,18 +717,18 @@ public interface $ {
         //return new LinkedHashMap(capacity);
     }
 
-    static @NotNull <X> List<X> newArrayList() {
+    public static @NotNull <X> List<X> newArrayList() {
         return new FasterList<>(0);
         //return new ArrayList();
     }
 
     @NotNull
-    static <X> List<X> newArrayList(int capacity) {
+    public static <X> List<X> newArrayList(int capacity) {
         return new FasterList(capacity);
         //return new ArrayList(capacity);
     }
 
-    static @NotNull <X> Set<X> newHashSet(int capacity) {
+    public static @NotNull <X> Set<X> newHashSet(int capacity) {
 //        if (capacity < 4) {
 //            return new UnifiedSet(0);
 //        } else {
@@ -831,7 +829,7 @@ public interface $ {
     static @NotNull Term pRecurseIntersect(char prefix, @NotNull Term... t) {
         final int[] index = {0};
         return $.secte($.terms(t, x -> {
-            return Atomic.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + x.toString());
+            return Atomic.the(Strings.repeat(String.valueOf(prefix), ++index[0]) + x);
         }));
     }
 
@@ -902,17 +900,17 @@ public interface $ {
     }
 
     static <X> PrediTerm<X> IF(Term t, Predicate<X> test) {
-        return new LambdaPred<X>(t, test);
+        return new LambdaPred<>(t, test);
     }
 
     static <X> PrediTerm<X> AND(PrediTerm<X> a, PrediTerm<X> b) {
-        return new LambdaPred<X>($.conj(a, b), (X x) -> {
+        return new LambdaPred<>($.conj(a, b), (X x) -> {
             return a.test(x) && b.test(x);
         });
     }
 
     static <X> PrediTerm<X> OR(PrediTerm<X> a, PrediTerm<X> b) {
-        return new LambdaPred<X>($.disj(a, b), (X x) -> {
+        return new LambdaPred<>($.disj(a, b), (X x) -> {
             return a.test(x) || b.test(x);
         });
     }

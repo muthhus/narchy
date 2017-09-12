@@ -264,7 +264,7 @@ public class Conclusion extends AbstractPred<Derivation> {
         return pp;
     };
 
-    private Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] confGain) {
+    private static Term solveTime(@NotNull Derivation d, Term c1, @NotNull long[] occ, float[] confGain) {
         DerivationTemporalize dt = d.temporalize;
         if (dt == null) {
             d.temporalize = dt = new DerivationTemporalize(d); //cache in derivation

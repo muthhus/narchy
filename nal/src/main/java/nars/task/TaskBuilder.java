@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-import static nars.$.t;
+import static nars.$.*;
 import static nars.Op.*;
 import static nars.time.Tense.*;
 
@@ -75,7 +75,7 @@ import static nars.time.Tense.*;
 
 
     public TaskBuilder(@NotNull Term t, byte punct, float freq, @NotNull NAR nar) throws InvalidTaskException {
-        this(t, punct, $.t(freq, nar.confDefault(punct)));
+        this(t, punct, t(freq, nar.confDefault(punct)));
     }
 
     //    public MutableTask(@NotNull String compoundTermString, byte punct, float freq, float conf) throws Narsese.NarseseException {
@@ -86,7 +86,7 @@ import static nars.time.Tense.*;
     }
 
     public TaskBuilder(@NotNull String compoundTermString, byte punct, @Nullable Truth truth) throws Narsese.NarseseException, InvalidTaskException {
-        this($.$(compoundTermString), punct, truth);
+        this($(compoundTermString), punct, truth);
     }
 
 
@@ -125,6 +125,7 @@ import static nars.time.Tense.*;
         return evidence().length <= 1;
     }
 
+    @Override
     public Task apply(@NotNull NAR n) throws Concept.InvalidConceptException, InvalidTaskException {
 
         if (isDeleted())
@@ -363,7 +364,7 @@ import static nars.time.Tense.*;
 //    }
 
     @NotNull
-    private final TaskBuilder setCreationTime(long creationTime) {
+    private TaskBuilder setCreationTime(long creationTime) {
 //        if ((this.creation == ETERNAL) && (start > Tense.TIMELESS)) {
 //            //use the occurrence time as the delta, now that this has a "finite" creationTime
 //            long when = start + creationTime;
@@ -381,7 +382,7 @@ import static nars.time.Tense.*;
     /**
      * TODO for external use in TaskBuilder instances only
      */
-    private final void setStart(long o) {
+    private void setStart(long o) {
 //        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
 //            System.err.println("Likely an invalid occurrence time being set");
 //        }
@@ -394,7 +395,7 @@ import static nars.time.Tense.*;
     /**
      * TODO for external use in TaskBuilder instances only
      */
-    private final void setEnd(long o) {
+    private void setEnd(long o) {
 //        if ((o == Integer.MIN_VALUE || o == Integer.MAX_VALUE) && Param.DEBUG) {
 //            System.err.println("Likely an invalid occurrence time being set");
 //        }
@@ -542,6 +543,7 @@ import static nars.time.Tense.*;
         return evidence(evidenceToCopy.stamp());
     }
 
+    @Override
     @NotNull public TaskBuilder setPriThen(float p) {
         setPri(p);
         return this;
@@ -568,7 +570,7 @@ import static nars.time.Tense.*;
 
     public TaskBuilder log(String s) {
         if (log == null)
-            log = $.newArrayList(1);
+            log = newArrayList(1);
         log.add(s);
         return this;
     }

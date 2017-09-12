@@ -30,6 +30,7 @@ public class PatternTermIndex extends MapTermIndex {
         super(new ConcurrentHashMap<>(512));
     }
 
+    @SuppressWarnings("Java8MapApi")
     @Override
     public Termed get(@NotNull Term x, boolean createIfMissing) {
         if (x instanceof Variable)

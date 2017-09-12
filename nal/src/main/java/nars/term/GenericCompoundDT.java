@@ -197,6 +197,7 @@ public class GenericCompoundDT extends ProxyTerm<Compound> implements Compound {
         return dt;
     }
 
+    @Override
     @Nullable
     public final Term transform(int newDT, @NotNull CompoundTransform t) {
         return Compound.super.transform(op(), newDT, t);

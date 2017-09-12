@@ -25,11 +25,11 @@ public class Builder {
 
     public static class Subterms {
 
-        private static Function<Term[], TermContainer> HeapSubtermBuilder =
+        private static final Function<Term[], TermContainer> HeapSubtermBuilder =
                 TermVector::the;
 
-        private static Function<Term[], TermContainer> CaffeineSubtermBuilder =
-                new Function<Term[], TermContainer>() {
+        private static final Function<Term[], TermContainer> CaffeineSubtermBuilder =
+                new Function<>() {
 
                     final Cache<NewCompound, TermContainer> cache =
                             Caffeine.newBuilder().maximumSize(64453 /* prime */).build();
@@ -44,7 +44,7 @@ public class Builder {
                 };
 
         public static Function<Term[], TermContainer> HijackSubtermBuilder =
-                new Function<Term[], TermContainer>() {
+                new Function<>() {
 
                     final HijackMemoize<NewCompound, TermContainer> cache
                             = new HijackMemoize<>((x) -> HeapSubtermBuilder.apply(x.subs),
@@ -94,7 +94,7 @@ public class Builder {
 
 
         public static BiFunction<Op, Term[], Term> HijackCompoundBuilder =
-                new BiFunction<Op, Term[], Term>() {
+                new BiFunction<>() {
 
                     final HijackMemoize<NewCompound, Term> cache
                             = new HijackMemoize<>((x) -> HeapCompoundBuilder.apply(x.op, x.subs),

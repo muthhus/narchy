@@ -84,7 +84,6 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(x:before &&+10 --x:after)", 1.00f, 0.81f /*intersectionConf*/, 0, 10)
                 .mustNotOutput(cycles, "(x:before &&-10 --x:after)", BELIEF,
                         (t -> t == 0 || t == 10));
-        ;
     }
 
     @Test
@@ -241,7 +240,7 @@ public class NAL7Test extends AbstractNALTest {
     }
 
     @Test
-    public void testDontStretchImplDerivation() throws Narsese.NarseseException {
+    public void testDontStretchImplDerivation() {
         /*
         WRONG
           $0.0 (((a,b) &&+4 (#1,d)) ==>+1 (b,#1)). 1⋈5 %1.0;.40% {31: 1;2;3} ((%1,%2,task("."),time(raw),time(dtEventsOrEternals),neqAndCom(%1,%2)),(varIntro((polarize(%2,belief) &&+- polarize(%1,task))),((IntersectionDepolarized-->Belief))))
@@ -494,7 +493,6 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(enter(John, room) ==>-4 open(John, door))",
                         1.00f, 0.45f,
                         4);
-        ;
 
     }
 
@@ -1438,7 +1436,6 @@ public class NAL7Test extends AbstractNALTest {
                 .mustBelieve(cycles, "(($1-->[heated]) ==>+20 ($1-->[hardened]))", 1f, 0.73f, ETERNAL)
                 .mustNotOutput(cycles, "(($1-->[heated]) ==>-20 ($1-->[hardened]))", BELIEF,
                         (t -> t == ETERNAL || t == 10 || t == 20 || t == 0));
-        ;
     }
 
 //    @Test public void testContrapositionWierdness() {

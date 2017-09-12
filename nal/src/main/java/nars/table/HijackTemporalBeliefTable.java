@@ -359,9 +359,10 @@ public class HijackTemporalBeliefTable extends TaskHijackBag implements Temporal
 
         long ys = y.start();
         long ye = y.end();
-        float yRange = (ye - ys) / dur;
+        float fdur = dur;
+        float yRange = (ye - ys) / fdur;
         float yf = y.freq();
-        float yDist = Math.min(abs(ye - now), abs(ys - now)) / dur;
+        float yDist = Math.min(abs(ye - now), abs(ys - now)) / fdur;
         long[] yStamp = y.stamp();
 
         return x -> {

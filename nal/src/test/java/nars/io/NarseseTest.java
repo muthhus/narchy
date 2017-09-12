@@ -48,7 +48,7 @@ public class NarseseTest {
     }
 
 
-    protected void testProductABC(@NotNull Compound p) throws Narsese.NarseseException {
+    protected void testProductABC(@NotNull Compound p) {
         assertEquals(p + " should have 3 sub-terms", 3, p.size());
         assertEquals("a", p.sub(0).toString());
         assertEquals("b", p.sub(1).toString());

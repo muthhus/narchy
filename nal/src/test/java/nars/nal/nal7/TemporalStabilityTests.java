@@ -48,7 +48,7 @@ public class TemporalStabilityTests {
         }
 
         @Override
-        public void input(@NotNull NAR n) throws Narsese.NarseseException {
+        public void input(@NotNull NAR n) {
             int j = 0;
             for (int i : whens.toSortedArray()) {
                 n.inputAt(i, eventer.valueOf(j++) + ". :|:");

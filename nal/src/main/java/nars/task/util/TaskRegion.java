@@ -20,9 +20,9 @@ public interface TaskRegion extends HyperRegion, Tasked {
     @Override
     int hashCode();
 
-    abstract long start();
+    long start();
 
-    abstract long end();
+    long end();
 
     @Override
     default double cost() {
@@ -74,7 +74,7 @@ public interface TaskRegion extends HyperRegion, Tasked {
     }
 
     @Override
-    default public boolean intersects(HyperRegion x) {
+    default boolean intersects(HyperRegion x) {
         //        for (int i = 0; i < d; i++)
         //            if (coord(false, i) > x.coord(true, i) ||
         //                    coord(true, i) < x.coord(false, i))
@@ -89,14 +89,12 @@ public interface TaskRegion extends HyperRegion, Tasked {
                 return false;
             if ((coord(false,1) > t.coord(true,1)) || (coord(true,1) < t.coord(false,1)))
                 return false;
-            if ((coord(false,2)> t.coord(true,2)) || (coord(true,2) < t.coord(false, 2)))
-                return false;
-            return true;
+            return (!(coord(false, 2) > t.coord(true, 2))) && (!(coord(true, 2) < t.coord(false, 2)));
         }
     }
 
     @Override
-    default public  boolean contains(HyperRegion x) {
+    default boolean contains(HyperRegion x) {
         //    default boolean contains(HyperRegion<X> x) {
         //        int d = dim();
         //        for (int i = 0; i < d; i++)
@@ -114,9 +112,7 @@ public interface TaskRegion extends HyperRegion, Tasked {
                 return false;
             if ((coord(false,1) > t.coord(false,1)) || (coord(true,1) < t.coord(true, 1)))
                 return false;
-            if ((coord(false,2) > t.coord(false, 2)) || (coord(true, 2) < t.coord(true,2)))
-                return false;
-            return true;
+            return (!(coord(false, 2) > t.coord(false, 2))) && (!(coord(true, 2) < t.coord(true, 2)));
         }
     }
 

@@ -113,9 +113,9 @@ public class Cause<X> {
     /** the AtomicDouble this inherits holds the accumulated value which is periodically (every cycle) committed  */
     public static class Traffic extends AtomicDouble {
         /** current, ie. the last commited value */
-        public float current = 0;
+        public float current;
 
-        public double total = 0;
+        public double total;
 
         public void commit() {
             double next = getAndSet(0);
@@ -232,7 +232,7 @@ public class Cause<X> {
 
 
     static float smooth(float cur, float next, float momentum) {
-        return (float)((momentum * cur) + ((1f - momentum) * next));
+        return (momentum * cur) + ((1f - momentum) * next);
     }
 
 }

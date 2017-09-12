@@ -208,7 +208,7 @@ public class OptiUnit<T> extends RunListener {
         }
 
         @Override
-        public void evaluate() throws Throwable {
+        public void evaluate() {
             Throwable error = null;
             try {
                 cause = setCause.apply(subject);

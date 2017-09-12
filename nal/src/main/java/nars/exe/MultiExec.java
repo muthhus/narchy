@@ -10,11 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.IntFunction;
 import java.util.stream.Stream;
-
-import static java.util.concurrent.ForkJoinPool.defaultForkJoinWorkerThreadFactory;
 
 /**
  * multithreaded execution system
@@ -71,7 +72,7 @@ public class MultiExec extends Exec {
             }
         }
 
-        void work(Runnable r) {
+        static void work(Runnable r) {
             try {
                 r.run();
             } catch (Throwable t) {
@@ -157,7 +158,7 @@ public class MultiExec extends Exec {
     public void cycle() {
         Runnable r;
         while ((r = passive.q.poll()) != null) {
-            passive.work(r);
+            Passive.work(r);
         }
 //        while (!passive.awaitQuiescence(10, TimeUnit.MILLISECONDS)) {
 //            Thread.yield();

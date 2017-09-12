@@ -10,13 +10,10 @@ import jake2.render.JoglGL2Renderer;
 import jake2.sys.IN;
 import jcog.learn.ql.HaiQAgent;
 import nars.NAR;
-import nars.NAgentX;
 import nars.Narsese;
 import nars.experiment.NAgentY;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
-import nars.video.Scale;
-import nars.video.ShapeSensor;
 
 import java.awt.*;
 import java.awt.color.ColorSpace;
@@ -26,7 +23,7 @@ import java.util.function.Supplier;
 
 import static jake2.Globals.*;
 import static jake2.render.Base.vid;
-import static nars.$.*;
+import static nars.$.$;
 
 /**
  * Created by me on 9/22/16.

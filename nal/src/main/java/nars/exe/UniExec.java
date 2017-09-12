@@ -29,7 +29,7 @@ public class UniExec extends Exec implements Runnable {
 
     Bag<ITask, ITask> plan;
 
-    int workRemaining = 0;
+    int workRemaining;
 
     float activationFactor = 0.25f;
     float premiseFactor = 0.5f;
@@ -84,7 +84,7 @@ public class UniExec extends Exec implements Runnable {
     public synchronized void start(NAR nar) {
 
         plan =
-                new PriorityHijackBag<ITask, ITask>(4) {
+                new PriorityHijackBag<>(4) {
                     @Override
                     public ITask key(ITask value) {
                         return value;

@@ -152,11 +152,13 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
         return state;
     }
 
+    @Override
     @NotNull
     public QuestionTable quests() {
         return quests;
     }
 
+    @Override
     @NotNull
     public QuestionTable questions() {
         return questions;
@@ -166,6 +168,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
      * Judgments directly made about the term Use ArrayList because of access
      * and insertion in the middle
      */
+    @Override
     @NotNull
     public final BeliefTable beliefs() {
         return beliefs;
@@ -174,6 +177,7 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
     /**
      * Desire values on the term, similar to the above one
      */
+    @Override
     @NotNull
     public final BeliefTable goals() {
         return goals;
@@ -326,10 +330,12 @@ public class BaseConcept extends ConcurrentHashMap implements Concept, Termlike 
      * Directly process a new task, if belief tables agree to store it.
      * Called exactly once on each task.
      */
+    @Override
     public void process(@NotNull Task t, @NotNull NAR n) {
         table(t.punc()).add(t, this, n);
     }
 
+    @Override
     public float value(@NotNull Task t, float activation, long when, NAR n) {
 
         return Param.inputCost(t, n) * activation; //undo the input load in proportion to the activation factor

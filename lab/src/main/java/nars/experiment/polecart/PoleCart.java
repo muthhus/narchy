@@ -2,7 +2,6 @@ package nars.experiment.polecart;
 
 import com.google.common.collect.Lists;
 import jcog.Util;
-import jcog.learn.ql.HaiQAgent;
 import jcog.math.FloatPolarNormalized;
 import nars.*;
 import nars.concept.SensorConcept;

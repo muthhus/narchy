@@ -74,7 +74,7 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testIntersectExtReduction5() throws Narsese.NarseseException {
+    public void testIntersectExtReduction5() {
         assertEquals(Null /* emptyset */, secte(seti(p, q), seti(r, s)));
     }
 
@@ -107,7 +107,7 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testIntersectIntReductionToZero() throws Narsese.NarseseException {
+    public void testIntersectIntReductionToZero() {
         assertInvalidTerms("(|,{P,Q},{R,S})");
     }
 
@@ -210,7 +210,7 @@ public class TermReductionsTest extends NarseseTest {
 //    }
 
     @Test
-    public void testReducedAndInvalidImplications5() throws Narsese.NarseseException {
+    public void testReducedAndInvalidImplications5() {
         assertInvalidTerms("<<P==>Q> ==> R>");
     }
 
@@ -243,7 +243,7 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testReducedAndInvalidImplications3() throws Narsese.NarseseException {
+    public void testReducedAndInvalidImplications3() {
         assertInvalidTerms("<R==><P==>R>>");
     }
 
@@ -285,7 +285,7 @@ public class TermReductionsTest extends NarseseTest {
          */
 
     @Test
-    public void testDisjunctEqual() throws Narsese.NarseseException {
+    public void testDisjunctEqual() {
         @NotNull Term pp = p(this.p);
         assertEquals(pp, disj(pp, pp));
     }
@@ -390,7 +390,7 @@ public class TermReductionsTest extends NarseseTest {
 
 
     @Test
-    public void testConjunctionEqual() throws Narsese.NarseseException {
+    public void testConjunctionEqual() {
         assertEquals(p, conj(p, p));
     }
 
@@ -402,26 +402,26 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testIntExtEqual() throws Narsese.NarseseException {
+    public void testIntExtEqual() {
         assertEquals(p, secte(p, p));
         assertEquals(p, secti(p, p));
     }
 
     @Test
-    public void testDiffIntEqual() throws Narsese.NarseseException {
+    public void testDiffIntEqual() {
 
         assertEquals(Null, diffi(p, p));
     }
 
     @Test
-    public void testDiffExtEqual() throws Narsese.NarseseException {
+    public void testDiffExtEqual() {
 
         assertEquals(Null, diffe(p, p));
     }
 
 
     @Test
-    public void testDifferenceSorted() throws Narsese.NarseseException {
+    public void testDifferenceSorted() {
 //        assertArrayEquals(
 //            new Term[] { r, s },
 //            Terms.toArray(TermContainer.differenceSorted(sete(r, p, q, s), sete(p, q)))
@@ -434,7 +434,7 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testDifferenceSortedEmpty() throws Narsese.NarseseException {
+    public void testDifferenceSortedEmpty() {
 //        assertArrayEquals(
 //                new Term[] { },
 //                Terms.toArray(TermContainer.differenceSorted(sete(p, q), sete(p, q)))
@@ -582,7 +582,7 @@ public class TermReductionsTest extends NarseseTest {
 
 
     @Test
-    public void testMultireduction() throws Narsese.NarseseException {
+    public void testMultireduction() {
         //TODO probably works
     }
 
@@ -672,7 +672,7 @@ public class TermReductionsTest extends NarseseTest {
 
 
     @Test
-    public void testInvalidStatementIndepVarTask() throws Narsese.NarseseException {
+    public void testInvalidStatementIndepVarTask() {
         NAR t = NARS.shell();
         try {
             t.inputAndGet("at($1,$2,$3)");
@@ -793,7 +793,7 @@ public class TermReductionsTest extends NarseseTest {
 
 
     @Test
-    public void testCoNegatedImpl() throws Narsese.NarseseException {
+    public void testCoNegatedImpl() {
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) ==> (a))"));
         assertValidTermValidConceptInvalidTaskContent(("((--,(a)) ==>+0 (a))"));
     }
@@ -865,32 +865,32 @@ public class TermReductionsTest extends NarseseTest {
 
 
     @Test
-    public void testCoNegatedDifference() throws Narsese.NarseseException {
+    public void testCoNegatedDifference() {
         //..
     }
 
     @Test
-    public void testCoNegatedIntersection() throws Narsese.NarseseException {
+    public void testCoNegatedIntersection() {
         //..
     }
 
     @Test
-    public void testSimEquivOfAbsoluteTrueNull1() throws Narsese.NarseseException {
+    public void testSimEquivOfAbsoluteTrueNull1() {
         assertEquals(True, sim(True, True));
     }
 
     @Test
-    public void testSimEquivOfAbsoluteTrueNull2() throws Narsese.NarseseException {
+    public void testSimEquivOfAbsoluteTrueNull2() {
         assertEquals(Null, sim(Null, Null));
     }
 
     @Test
-    public void testSimEquivOfAbsoluteTrueNull3() throws Narsese.NarseseException {
+    public void testSimEquivOfAbsoluteTrueNull3() {
         assertEquals(Null, sim(True, Null));
     }
 
     @Test
-    public void testSimEquivOfAbsoluteTrueNull4() throws Narsese.NarseseException {
+    public void testSimEquivOfAbsoluteTrueNull4() {
         assertEquals(Null, sim(True.neg(), Null));
         assertEquals(False, sim(True, False));
         assertEquals(True, sim(True.neg(), False));
@@ -913,7 +913,7 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testSingularStatementsInDisjunction() throws Narsese.NarseseException {
+    public void testSingularStatementsInDisjunction() {
 
         assertInvalidTerms("(||,(a<->a),c:d,e:f)"); //null, singular true
     }
@@ -940,7 +940,7 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testCoNegatedIntersectionAndDiffs() throws Narsese.NarseseException {
+    public void testCoNegatedIntersectionAndDiffs() {
         assertInvalidTerms("(|,(x),(--,(x))");
         assertInvalidTerms("(&,(x),(--,(x))");
         assertInvalidTerms("(-,(x),(--,(x))");
@@ -968,7 +968,7 @@ public class TermReductionsTest extends NarseseTest {
     }
 
     @Test
-    public void testReducibleImpl() throws Narsese.NarseseException {
+    public void testReducibleImpl() {
         assertInvalidTerms("((--,(x)) ==>+0 ((--,(y)) &&+0 (--,(x))))");
         assertInvalidTerms("((--,(x)) ==> ((--,(y)) && (--,(x))))");
     }
@@ -989,7 +989,7 @@ public class TermReductionsTest extends NarseseTest {
 
 
     @Test
-    public void testConjunctiveCoNegationAcrossImpl() throws Narsese.NarseseException {
+    public void testConjunctiveCoNegationAcrossImpl() {
         //((--,(&&,(--,(pad_top)),(pad_bottom),(pad_top))) ==>+133 (--,(pad_bottom)))! :4355: %.73;.24%
 
         /*

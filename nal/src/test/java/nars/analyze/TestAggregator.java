@@ -29,7 +29,7 @@ public class TestAggregator extends RunListener {
     Set<Description> success = new HashSet();
 
     @Override
-    public void testRunStarted(Description description) throws Exception {
+    public void testRunStarted(Description description) {
         testName = "nartest" + description.getTestClass() + "_" + System.currentTimeMillis();
     }
 
@@ -49,7 +49,7 @@ public class TestAggregator extends RunListener {
 
 
     @Override
-    public void testFinished(Description d) throws Exception {
+    public void testFinished(Description d) {
 
         success.add(d);
 
@@ -92,7 +92,7 @@ public class TestAggregator extends RunListener {
     }
 
     @Override
-    public void testIgnored(Description description) throws Exception {
+    public void testIgnored(Description description) {
     }
 
     public TestAggregator(NAR nar, @NotNull String... classnames) {

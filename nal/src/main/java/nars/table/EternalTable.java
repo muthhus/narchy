@@ -167,6 +167,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
     /**
      * for ranking purposes
      */
+    @Override
     public final float floatValueOf(@NotNull Task w) {
         //return rankEternalByConfAndOriginality(w);
         return -w.conf();
@@ -356,6 +357,7 @@ public class EternalTable extends SortedArray<Task> implements TaskTable, FloatF
 
     }
 
+    @Override
     @Nullable
     public void add(@NotNull Task input, BaseConcept c, @NotNull NAR nar) {
 

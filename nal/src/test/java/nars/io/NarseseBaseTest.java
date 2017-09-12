@@ -352,24 +352,24 @@ public class NarseseBaseTest extends NarseseTest {
         }
     }
     @Test
-    public void testQuoteEscapeBackslash() throws Narsese.NarseseException {
+    public void testQuoteEscapeBackslash() {
         //TODO
         //assertEquals("")
     }
 
     @Test
-    public void testFuzzyKeywords() throws Narsese.NarseseException {
+    public void testFuzzyKeywords() {
         //definately=certainly, uncertain, doubtful, dubious, maybe, likely, unlikely, never, always, yes, no, sometimes, usually, rarely, etc...
         //ex: %maybe never%, % doubtful always %, %certainly never%
     }
 
     @Test
-    public void testEmbeddedJavascript() throws Narsese.NarseseException {
+    public void testEmbeddedJavascript() {
 
     }
 
     @Test
-    public void testEmbeddedPrologRules() throws Narsese.NarseseException {
+    public void testEmbeddedPrologRules() {
 
     }
 

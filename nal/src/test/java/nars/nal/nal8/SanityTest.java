@@ -3,7 +3,6 @@ package nars.nal.nal8;
 import nars.*;
 import nars.concept.GoalActionConcept;
 import nars.task.DerivedTask;
-import nars.task.NALTask;
 import org.junit.Test;
 
 import java.util.SortedSet;

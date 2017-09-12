@@ -29,7 +29,7 @@ public interface TruthPolation extends Consumer<Tasked> {
      * uses "waldorf method" to calculate a running variance
      * additionally, the variance is weighted by the contributor's confidences
      */
-    public static class TruthPolationBasic implements TruthPolation {
+    class TruthPolationBasic implements TruthPolation {
         float eviSum, wFreqSum;
         final long start, end;
         final int dur;
@@ -52,6 +52,7 @@ public interface TruthPolation extends Consumer<Tasked> {
         }
 
 
+        @Override
         public PreciseTruth truth() {
             if (eviSum > 0) {
                 float f = wFreqSum / eviSum;
@@ -65,7 +66,7 @@ public interface TruthPolation extends Consumer<Tasked> {
     }
 
     /** TODO this does not fairly handle equal values; the first will be chosen */
-    public static class TruthPolationGreedy implements TruthPolation {
+    class TruthPolationGreedy implements TruthPolation {
 
         final long start, end;
         final int dur;
@@ -88,6 +89,7 @@ public interface TruthPolation extends Consumer<Tasked> {
         }
 
 
+        @Override
         public PreciseTruth truth() {
             float f = this.bestF;
             if (f != f)
@@ -97,7 +99,7 @@ public interface TruthPolation extends Consumer<Tasked> {
         }
     }
 
-    public static class TruthPolationSoftMax implements TruthPolation {
+    class TruthPolationSoftMax implements TruthPolation {
 
         final long when;
         final int dur;
@@ -117,6 +119,7 @@ public interface TruthPolation extends Consumer<Tasked> {
         }
 
 
+        @Override
         public PreciseTruth truth() {
             if (!conf.isEmpty()) {
                 int which = new DecideSoftmax(0f, ThreadLocalRandom.current()).decide(conf.toArray(), -1);
@@ -130,7 +133,7 @@ public interface TruthPolation extends Consumer<Tasked> {
 
         }
     }
-    public static class TruthPolationRoulette implements TruthPolation {
+    class TruthPolationRoulette implements TruthPolation {
 
         final long start, end;
         final int dur;
@@ -153,6 +156,7 @@ public interface TruthPolation extends Consumer<Tasked> {
         }
 
 
+        @Override
         public PreciseTruth truth() {
             if (!evi.isEmpty()) {
                 int which = Util.decideRoulette(freq.size(), evi::get, rng);
@@ -173,7 +177,7 @@ public interface TruthPolation extends Consumer<Tasked> {
      * uses "waldorf method" to calculate a running variance
      * additionally, the variance is weighted by the contributor's confidences
      */
-    public static class TruthPolationWithVariance implements TruthPolation {
+    class TruthPolationWithVariance implements TruthPolation {
         float eviSum, wFreqSum;
         float meanSum = 0.5f, deltaSum;
         int count;
@@ -213,6 +217,7 @@ public interface TruthPolation extends Consumer<Tasked> {
         }
 
 
+        @Override
         public PreciseTruth truth() {
             if (eviSum > 0) {
                 float f = wFreqSum / eviSum;

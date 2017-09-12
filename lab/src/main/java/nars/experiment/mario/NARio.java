@@ -2,10 +2,8 @@ package nars.experiment.mario;
 
 import jcog.Util;
 import jcog.data.FloatParam;
-import jcog.learn.ql.HaiQAgent;
 import nars.*;
 import nars.concept.SensorConcept;
-import nars.experiment.NAgentY;
 import nars.experiment.mario.sprites.Mario;
 import nars.video.CameraSensor;
 import nars.video.PixelBag;
@@ -13,7 +11,6 @@ import nars.video.PixelBag;
 import javax.swing.*;
 
 import static nars.$.$;
-import static nars.$.p;
 
 public class NARio extends NAgentX {
 

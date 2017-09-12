@@ -296,7 +296,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
         //return new HijackTemporalBeliefTable(tCap);
         //return new RTreeBeliefTable(tCap);
         Op o = c.op();
-        if ((beliefOrGoal && o.beliefable) || (!beliefOrGoal && goalable(c))) {
+        if (beliefOrGoal ? o.beliefable : goalable(c)) {
             DefaultBeliefTable b = new DefaultBeliefTable(newTemporalBeliefTable(c));
             return b;
         }
@@ -318,7 +318,7 @@ public class DefaultConceptBuilder implements ConceptBuilder {
     @Override
     public QuestionTable newQuestionTable(Term term, boolean questionOrQuest) {
         Op o = term.op();
-        if (questionOrQuest && o.beliefable || !questionOrQuest && o.goalable) {
+        if (questionOrQuest ? o.beliefable : o.goalable) {
             return new HijackQuestionTable(0, 2);
         } else {
             return QuestionTable.Empty;

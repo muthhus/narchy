@@ -36,12 +36,12 @@ public class IntTest {
         NAR n = NARS.tmp();
         n.log();
         n.believe("(f(1) <-> 5)");
-        n.believe($.sim($.func("f", new Term[]{ii}), $.varDep(1)));
+        n.believe($.sim($.func("f", ii), $.varDep(1)));
         n.run(10);
     }
 
     @Test
-    public void testIntIntersectionReduction() throws Narsese.NarseseException {
+    public void testIntIntersectionReduction() {
         //(P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S | P) --> M), (Belief:Intersection)
         //(P --> M), (S --> M), task("."), notSet(S), notSet(P), neqRCom(S,P) |- ((S & P) --> M), (Belief:Union)
 
@@ -65,7 +65,7 @@ public class IntTest {
 //    }
 
     @Test
-    public void testIntInProductIntersectionReduction() throws Narsese.NarseseException {
+    public void testIntInProductIntersectionReduction() {
 
         //simple scalar agglomeration
         assertEquals(
@@ -89,12 +89,12 @@ public class IntTest {
         assertEquals("[(1,1), (1,2)]", Arrays.toString(Iterators.toArray(Int.unroll(a), Term.class)));
     }
     @Test
-    public void testRangeUnification() throws Narsese.NarseseException {
+    public void testRangeUnification() {
         TestNAR n = new TestNAR(NARS.tmp());
         n.log();
         //Tense.Present so that Temporal Induction links the two unrelated Statements
         n.nar.believe(
-                (Term)$.inh(range(0, 2), $.the("x")),
+                $.inh(range(0, 2), $.the("x")),
                 Tense.Present
         );
         n.nar.believe(

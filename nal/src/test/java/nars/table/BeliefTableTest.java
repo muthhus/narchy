@@ -78,9 +78,9 @@ public class BeliefTableTest {
         float conf = 0.9f;
         float[] freqPattern =
                 //new float[]{0, 0.25f, 0.5f, 0.75f, 1f};
-                new float[]{0, 0.5f, 1f};
+                {0, 0.5f, 1f};
         long[] timing =
-                new long[]{0, 2, 4};
+                {0, 2, 4};
 
         int dur = 1;
 
@@ -164,7 +164,7 @@ public class BeliefTableTest {
     }
 
     @Test
-    public void testDurationDithering() throws Narsese.NarseseException {
+    public void testDurationDithering() {
         NAR n = NARS.tmp();
         n.dtDither.setValue(1f);
         n.time.dur(3);

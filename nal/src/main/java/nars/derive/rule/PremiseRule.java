@@ -49,8 +49,8 @@ public class PremiseRule extends GenericCompound {
     private static final Term QUESTION_PUNCTUATION = $.inh(Atomic.the("Question"), Atomic.the("Punctuation"));
 
 
-    public boolean permuteBackward = false;
-    public boolean permuteForward = false;
+    public boolean permuteBackward;
+    public boolean permuteForward;
 
 
     /**
@@ -82,7 +82,7 @@ public class PremiseRule extends GenericCompound {
     /**
      * when a rule with time(urgent) derives a goal, the occurrence time is set to the task time
      */
-    public boolean goalUrgent = false;
+    public boolean goalUrgent;
 
     /**
      * for printing complex terms as a recursive tree
@@ -147,26 +147,21 @@ public class PremiseRule extends GenericCompound {
                 new SolvePuncOverride(ii, puncOverride, belief, goal, beliefProjected);
 
         //PREFIX
-        {
-            addAll(s, PRE);
+        addAll(s, PRE);
 
-            s.add(truth);
+        s.add(truth);
 
-            s.addAll(match.pre);
-
-        }
+        s.addAll(match.pre);
 
         List<Term> l = sort(new FasterList(s));
 
         l.addAll(match.constraints);
 
         //SUFFIX (order already determined for matching)
-        {
 
-            l.addAll(match.post);
+        l.addAll(match.post);
 
-            ((UnificationPrototype) match.post.get(match.post.size() - 1)).conclude.add(conc.apply(nar));
-        }
+        ((UnificationPrototype) match.post.get(match.post.size() - 1)).conclude.add(conc.apply(nar));
 
         return l;
     }
@@ -243,7 +238,7 @@ public class PremiseRule extends GenericCompound {
     @NotNull
     private static List<Term> sort(@NotNull List<Term> l) {
 
-        Collections.sort(l, (a, b) -> {
+        l.sort((a, b) -> {
 
             Object ac = classify(a);
             Object bc = classify(b);
@@ -748,19 +743,15 @@ public class PremiseRule extends GenericCompound {
         Term B = getBelief(); //Belief
         Term C = getConclusionTermPattern(); //Conclusion
 
-        {
-            // C, B, [pre], task_is_question() |- T, [post]
-            PremiseRule clone1 = clonePermutation(C, B, T, true, index);
-            if (clone1 != null)
-                w.accept(clone1, "C,B,question |- T");
-        }
+        // C, B, [pre], task_is_question() |- T, [post]
+        PremiseRule clone1 = clonePermutation(C, B, T, true, index);
+        if (clone1 != null)
+            w.accept(clone1, "C,B,question |- T");
 
-        {
-            // T, C, [pre], task_is_question() |- B, [post]
-            PremiseRule clone3 = clonePermutation(T, C, B, true, index);
-            if (clone3 != null)
-                w.accept(clone3, "T,C,question |- B");
-        }
+        // T, C, [pre], task_is_question() |- B, [post]
+        PremiseRule clone3 = clonePermutation(T, C, B, true, index);
+        if (clone3 != null)
+            w.accept(clone3, "T,C,question |- B");
 
         //if needed, use Swap which would be applied before this recursively,
 //        // T, C, [pre], task_is_question() |- B, [post]

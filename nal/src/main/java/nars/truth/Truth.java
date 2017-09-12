@@ -238,6 +238,7 @@ public interface Truth extends Truthed {
 
 
 
+    @Override
     default float eviEternalized() {
 //        float c = eternalizedConf();
 //        return c2w(c);

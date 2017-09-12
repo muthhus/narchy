@@ -2,12 +2,10 @@ package nars.task;
 
 import jcog.Util;
 import jcog.pri.Pri;
-import jcog.tree.rtree.HyperRegion;
 import nars.Param;
 import nars.Task;
 import nars.control.Cause;
 import nars.task.util.InvalidTaskException;
-import nars.task.util.TaskRegion;
 import nars.term.Term;
 import nars.truth.DiscreteTruth;
 import nars.truth.Truth;

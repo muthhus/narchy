@@ -2,7 +2,6 @@ package nars.concept.dynamic;
 
 import jcog.Util;
 import jcog.list.FasterList;
-import jcog.math.RecycledSummaryStatistics;
 import nars.NAR;
 import nars.Op;
 import nars.Param;
@@ -13,7 +12,6 @@ import nars.table.BeliefTable;
 import nars.term.Compound;
 import nars.term.Term;
 import nars.truth.Truth;
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,9 +72,6 @@ abstract public class DynamicTruthModel {
 
             boolean evi = d.e != null;
 
-            Truth nt;
-            Task bt;
-
             //TODO check these times
             long subStart, subEnd;
             if (start == ETERNAL) {
@@ -90,6 +85,8 @@ abstract public class DynamicTruthModel {
                 }
             }
 
+            Task bt;
+            Truth nt;
             if (evi) {
                 //task
                 bt = ((BeliefTable) ((BaseConcept) subConcept).table(beliefOrGoal ? BELIEF : GOAL))
@@ -130,8 +127,6 @@ abstract public class DynamicTruthModel {
      * a standard value (ex: 0 or DTERNAL) */
     private int matchDT(Term term, boolean beliefOrGoal, long start, long end, NAR n) {
 
-        final int MAX_TASKS_FOR_COMPLETE_ITERATION = 8;
-
         assert(term.op().temporal);
 
         Concept c = n.concept(term);
@@ -150,6 +145,7 @@ abstract public class DynamicTruthModel {
                     }
                 };
 
+                final int MAX_TASKS_FOR_COMPLETE_ITERATION = 8;
                 if (s < MAX_TASKS_FOR_COMPLETE_ITERATION)
                     table.forEachTask(tx);
                 else

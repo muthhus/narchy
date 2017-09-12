@@ -327,7 +327,7 @@ public class Inperience extends LeakOut {
         arg[k++] = self;
         Term x = s.term().negIf(tr != null && tr.isNegative());
         arg[k/*++*/] =
-                x instanceof Compound && x.hasAny(VAR_QUERY) ? ((Compound)x)
+                x instanceof Compound && x.hasAny(VAR_QUERY) ? x
                     .transform(CompoundTransform.queryToDepVar) : x; //unwrapping negation here isnt necessary sice the term of a task will be non-negated
 
 

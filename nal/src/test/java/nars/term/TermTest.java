@@ -79,7 +79,7 @@ public class TermTest {
     }
 
     @Test
-    public void testConjCommutivity() throws Exception {
+    public void testConjCommutivity() {
 
         assertEquivalentTerm("(&&,a,b)", "(&&,b,a)");
         assertEquivalentTerm("(&&,(||,(b),(c)),(a))", "(&&,(a),(||,(b),(c)))");

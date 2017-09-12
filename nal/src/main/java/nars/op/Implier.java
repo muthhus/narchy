@@ -41,25 +41,25 @@ public class Implier extends DurService {
     float min = Prioritized.EPSILON; //even though it's for truth
     Map<Term, TruthAccumulator> goalTruth = new HashMap();
 
-    AdjGraph<Term, Term> impl = null;
+    AdjGraph<Term, Term> impl;
 
-    private float relativeTargetDur = +1f;
+    private final float relativeTargetDur = +1f;
 
     /**
      * truth cache
      */
-    private HashMap<Term, Truth> desire = new HashMap();
+    private final HashMap<Term, Truth> desire = new HashMap();
     /**
      * truth cache
      */
-    private HashMap<Term, Task> belief = new HashMap();
+    private final HashMap<Term, Task> belief = new HashMap();
 
 
     final static TruthOperator ded = GoalFunction.get($.the("DeciDeduction"));
     final static TruthOperator ind = GoalFunction.get($.the("DeciInduction"));
     private long now;
     private long next;
-    private float strength = 0.5f;
+    private final float strength = 0.5f;
 
     public Implier(NAR n, Term... seeds) {
         this(n, List.of(seeds));
@@ -134,17 +134,15 @@ public class Implier extends DurService {
             float f = SGimpl.freq();
 
 
-            {
-                //G, (S ==> G) |- S  (Goal:DeductionRecursivePB)
-                Truth Pg = desire(pred, this.now + implDT); //the desire at the predicate time
-                if (Pg == null)
-                    return;
+            //G, (S ==> G) |- S  (Goal:DeductionRecursivePB)
+            Truth Pg = desire(pred, this.now + implDT); //the desire at the predicate time
+            if (Pg == null)
+                return;
 
-                Truth Sg = ded.apply(Pg, $.t(f, implConf), nar, confSubMin);
+            Truth Sg = ded.apply(Pg, $.t(f, implConf), nar, confSubMin);
 
-                if (Sg != null) {
-                    goal(goalTruth, subj, Sg);
-                }
+            if (Sg != null) {
+                goal(goalTruth, subj, Sg);
             }
             //experimental:
 //            {

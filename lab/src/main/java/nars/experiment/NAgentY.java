@@ -15,7 +15,6 @@ import nars.term.Term;
 import nars.util.signal.Signal;
 import nars.video.Bitmap2D;
 import nars.video.CameraSensor;
-import org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

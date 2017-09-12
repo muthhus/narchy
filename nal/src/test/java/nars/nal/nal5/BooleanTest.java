@@ -137,10 +137,10 @@ public class BooleanTest {
 
     @Test
     public void testConditionalImplication() {
-        boolean[] booleans = new boolean[]{true, false};
+        boolean[] booleans = {true, false};
         Term x = $.the("x");
         Term y = $.the("y");
-        Term[] concepts = new Term[]{x, y};
+        Term[] concepts = {x, y};
 
         for (boolean goalSubjPred : booleans) {
 

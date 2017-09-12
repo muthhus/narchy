@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Random;
 
 import static jcog.Util.lerp;
-import static nars.Op.CONJ;
 import static nars.time.Tense.*;
 import static nars.truth.TruthFunctions.c2w;
 
@@ -329,10 +328,9 @@ public class Revision {
         long u = uu.length();
         long s = ai.length() + bi.length();
 //        Interval timeOverlap = ai.intersection(bi);
-        /*if (timeOverlap == null && u > 0) */{
-            if (u - s <= dur * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS)
-                factor *= (1f + s) / (1f + u);
-        }
+        /*if (timeOverlap == null && u > 0) */
+        if (u - s <= dur * Param.TEMPORAL_TOLERANCE_FOR_NON_ADJACENT_EVENT_REVISIONS)
+            factor *= (1f + s) / (1f + u);
 
 
         float confMin = nar.confMin.floatValue();
@@ -402,8 +400,7 @@ public class Revision {
         }
 
 
-        long start, end;
-//        if (cc.op() == CONJ) {
+        //        if (cc.op() == CONJ) {
 //            long mid = Util.lerp(aProp, b.mid(), a.mid());
 //            long range = cc.op() == CONJ ?
 //                    cc.dtRange() :
@@ -414,8 +411,8 @@ public class Revision {
 //            if (u > s) {
 //                start = end = Util.lerp(aProp, b.mid(), a.mid());
 //            } else {
-                start = uu.a;
-                end = uu.b;
+        long start = uu.a;
+        long end = uu.b;
 //            }
 //        }
 

@@ -232,7 +232,7 @@ public class NarseseExtendedTest extends NarseseTest {
     }
 
 
-    @Test public void testQuoteEscaping() throws Narsese.NarseseException {
+    @Test public void testQuoteEscaping() {
         assertEquals("\"it said: \\\"wtf\\\"\"",
                 $.quote("it said: \"wtf\"").toString());
     }

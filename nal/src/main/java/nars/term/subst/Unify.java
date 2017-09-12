@@ -383,7 +383,7 @@ public abstract class Unify extends Versioning implements Subst {
         /**
          * lazyily constructed
          */
-        Versioned<MatchConstraint> constraints = null;
+        Versioned<MatchConstraint> constraints;
 
 //        /**
 //         * divide constraints into two classes: fast and slow,

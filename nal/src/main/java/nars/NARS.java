@@ -1,5 +1,6 @@
 package nars;
 
+import jcog.list.FasterList;
 import jcog.random.XorShift128PlusRandom;
 import nars.concept.builder.ConceptBuilder;
 import nars.concept.builder.DefaultConceptBuilder;
@@ -59,7 +60,7 @@ public class NARS {
     protected Function<NAR,PrediTerm<Derivation>> deriver;
 
     /** applied in sequence as final step before returning the NAR */
-    protected final List<Consumer<NAR>> after = $.newArrayList(0);
+    protected final List<Consumer<NAR>> after = new FasterList();
 
 
     public NARS index(@NotNull TermIndex concepts) {
@@ -93,7 +94,7 @@ public class NARS {
 
         time = new CycleTime();
 
-        exe = () -> new FocusExec();
+        exe = FocusExec::new;
                     //new UnifiedExec();
 
         rng = () -> new XorShift128PlusRandom(1);
